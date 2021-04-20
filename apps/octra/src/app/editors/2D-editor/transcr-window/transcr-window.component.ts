@@ -29,7 +29,7 @@ import {AudioChunk, AudioManager, AudioRessource, AudioSelection, SampleUnit} fr
 import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
 import {LoginMode} from '../../../core/store';
-import {timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -50,7 +50,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private;
   public;
   private showWindow = false;
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private tempSegments: Segments;
   private oldRaw = '';
 
@@ -176,7 +176,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public cd: ChangeDetectorRef,
               private asrService: AsrService) {
 
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {

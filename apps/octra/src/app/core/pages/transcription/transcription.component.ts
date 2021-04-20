@@ -24,7 +24,7 @@ import {
   ShortcutManager,
   SubscriptionManager
 } from '@octra/utilities';
-import {interval, throwError, timer} from 'rxjs';
+import {interval, Subscription, throwError, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
@@ -90,7 +90,7 @@ export class TranscriptionComponent implements OnInit,
   public editorloaded = false;
   user: number;
   public platform = BrowserInfo.platform;
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private sendOk = false;
   private levelSubscriptionID = 0;
   private audioManager: AudioManager;
@@ -220,7 +220,7 @@ export class TranscriptionComponent implements OnInit,
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
               private alertService: AlertService) {
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
     this.audioManager = this.audio.audiomanagers[0];
 
     this.navbarServ.transcrService = this.transcrService;

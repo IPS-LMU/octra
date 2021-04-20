@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
 import {FileSize, getFileSize, hasPropertyTree, isUnset, navigateTo, SubscriptionManager} from '@octra/utilities';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
   err = '';
   public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private audioService: AudioService,
               private store: Store,
               private actions: Actions) {
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 
   ngOnDestroy() {

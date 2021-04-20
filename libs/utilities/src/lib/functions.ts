@@ -335,7 +335,7 @@ export function afterDefined(observable: Observable<any>): Promise<any> {
 }
 
 export function waitTillResultRetrieved(actions: Actions, success: Action, failure: Action) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const subscr = actions.subscribe((action: Action) => {
       if (action.type === success.type) {
         subscr.unsubscribe();

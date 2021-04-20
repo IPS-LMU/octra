@@ -56,7 +56,7 @@ export class TranscriptionService {
   public filename = '';
   public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
   public annotationChanged: EventEmitter<void> = new EventEmitter<void>();
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private _segments: Segments;
   private state = 'ANNOTATED';
   private _audiomanager: AudioManager;
@@ -179,7 +179,7 @@ export class TranscriptionService {
               private languageService: TranslocoService,
               private http: HttpClient) {
     this.alertTriggered = new Subject<{ type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean, duration?: number }>();
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
 
     this.subscrmanager.add(
       this.uiService.afteradd.subscribe((elem) => {

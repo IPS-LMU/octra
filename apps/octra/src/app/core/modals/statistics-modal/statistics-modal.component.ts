@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {SubscriptionManager} from '@octra/utilities';
@@ -29,7 +29,7 @@ export class StatisticsModalComponent implements OnInit {
   public transcrObjStr = '';
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get transcrServ(): TranscriptionService {
     return this.navbarService.transcrService;

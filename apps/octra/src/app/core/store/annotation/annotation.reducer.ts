@@ -32,7 +32,8 @@ export const reducer = createUndoRedoReducer(
     ...state,
     annotation
   })),
-  on(AnnotationActions.clearAnnotation, () => ({
+  on(AnnotationActions.clearAnnotation, (state) => ({
+    ...state,
     levels: [],
     links: [],
     levelCounter: 0

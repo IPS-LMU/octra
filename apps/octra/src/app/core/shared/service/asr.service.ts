@@ -1,7 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {Subject, timer} from 'rxjs';
+import {Subject, Subscription, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {ASRLanguage, ASRService, ASRSettings} from '../../obj/Settings';
 import {AppStorageService} from './appstorage.service';
@@ -127,7 +127,7 @@ class ASRQueue {
   private readonly _audiomanager: AudioManager;
   private readonly _itemChange: Subject<ASRQueueItem>;
   private readonly MAX_PARALLEL_ITEMS = 3;
-  private subscrManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   get itemChange(): Subject<ASRQueueItem> {
     return this._itemChange;

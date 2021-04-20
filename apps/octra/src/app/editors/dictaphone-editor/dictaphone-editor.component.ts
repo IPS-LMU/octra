@@ -23,6 +23,7 @@ import {OCTRAEditor} from '../octra-editor';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioplayerComponent} from '@octra/components';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-audioplayer-gui',
@@ -41,7 +42,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   public audiochunk: AudioChunk;
   public audioManager: AudioManager;
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private boundaryselected = false;
 
   public get highlighting(): boolean {
@@ -124,7 +125,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
     super();
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
 
     if (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo') {
       this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {

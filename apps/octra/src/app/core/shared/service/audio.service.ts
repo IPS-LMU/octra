@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import {Observable, Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {downloadFile, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioManager} from '@octra/media';
@@ -9,7 +9,7 @@ import {AudioManager} from '@octra/media';
 export class AudioService {
 
   public missingPermission = new EventEmitter<void>();
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
   private afterloaded: EventEmitter<any> = new EventEmitter<any>();
 
   private _audiomanagers: AudioManager[] = [];

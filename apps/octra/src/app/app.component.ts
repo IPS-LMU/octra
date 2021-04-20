@@ -15,6 +15,7 @@ import * as jQuery from 'jquery';
 import * as fromApplication from './core/store/application'
 import * as fromTranscription from './core/store/transcription'
 import {Store} from '@ngrx/store';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-app',
@@ -25,7 +26,7 @@ import {Store} from '@ngrx/store';
 export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('navigation', {static: true}) navigation: NavigationComponent;
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get version(): string {
     return AppInfo.version;

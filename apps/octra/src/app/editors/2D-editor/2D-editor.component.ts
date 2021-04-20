@@ -80,7 +80,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public miniLoupeSettings: AudioviewerConfig;
   private;
   public;
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private mousestate = 'initiliazied';
   private intervalID = null;
   private factor = 8;
@@ -198,7 +198,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               private store: Store<ApplicationState>) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 
   ngOnInit() {

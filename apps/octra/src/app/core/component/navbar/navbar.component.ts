@@ -12,6 +12,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {NavbarService} from './navbar.service';
 import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
+import {Subscription} from 'rxjs';
 
 declare let jQuery: any;
 
@@ -29,7 +30,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public test = 'ok';
   public secondsPerLine = '5';
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get environment(): any {
     return environment;

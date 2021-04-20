@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
-import {Observable, Subject} from 'rxjs';
+import {Observable, Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
@@ -238,7 +238,7 @@ export class AppStorageService {
   public saving: EventEmitter<string> = new EventEmitter<string>();
   public settingschange = new Subject<{ key: string, value: any }>();
 
-  private subscrManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   private _loaded = new EventEmitter();
 
@@ -432,7 +432,7 @@ export class AppStorageService {
 
         const subscr = this.actions.subscribe((a) => {
           if (a.type === IDBActions.overwriteAnnotationSuccess.type) {
-            resolve();
+            resolve(null);
             subscr.unsubscribe();
           } else if (a.type === IDBActions.overwriteAnnotationFailed.type) {
             reject((a as any).error);

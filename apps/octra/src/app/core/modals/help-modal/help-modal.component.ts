@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 
 @Component({
@@ -17,7 +17,7 @@ export class HelpModalComponent implements OnInit, OnDestroy {
 
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor() {
   }

@@ -30,7 +30,7 @@ import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
 import {TranslocoService} from '@ngneat/transloco';
 import {PermutationsReplaceModalComponent} from './modals/permutations-replace-modal/permutations-replace-modal.component';
-import {timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 
 declare var validateAnnotation: any;
 
@@ -57,7 +57,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
               private alertService: AlertService,
               private translocoService: TranslocoService) {
     super();
-    this.subscrManager = new SubscriptionManager();
+    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   public static editorname = 'TRN-Editor';
@@ -110,7 +110,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     icon: 'play' | 'stop'
   }[] = [];
   private lastMouseOver = 0;
-  private subscrManager: SubscriptionManager;
+  private subscrManager: SubscriptionManager<Subscription>;
 
   private shortcuts: ShortcutGroup = {
     name: 'TRN-Editor',

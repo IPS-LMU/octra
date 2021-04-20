@@ -11,7 +11,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {DragulaService} from 'ng2-dragula';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {Segment} from '@octra/annotation';
 
@@ -54,7 +54,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
       value: '<sequNumber>'
     }
   ];
-  private subcrManager = new SubscriptionManager();
+  private subcrManager = new SubscriptionManager<Subscription>();
 
   public get preview(): string {
     let result = '';

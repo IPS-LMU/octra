@@ -3,7 +3,7 @@ import {AudioService, SettingsService, TranscriptionService, UserInteractionsSer
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
-import {Subject, timer} from 'rxjs';
+import {Subject, Subscription, timer} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
@@ -99,7 +99,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   @Input() uiService: UserInteractionsService;
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
 
   constructor(private sanitizer: DomSanitizer,

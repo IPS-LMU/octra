@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService} from '../../../../core/shared/service';
 
@@ -18,7 +18,7 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
 
   protected data = null;
   private actionperformed: Subject<string> = new Subject<string>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   listOfSpeakers: {
     name: string;

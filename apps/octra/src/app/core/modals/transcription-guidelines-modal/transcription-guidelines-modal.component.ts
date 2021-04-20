@@ -12,7 +12,7 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject, timer} from 'rxjs';
+import {Subject, Subscription, timer} from 'rxjs';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -44,7 +44,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private counter = 0;
   private videoPlayers: any[] = [];
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(private modalService: BsModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,

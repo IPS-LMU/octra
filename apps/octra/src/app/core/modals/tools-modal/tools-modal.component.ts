@@ -5,7 +5,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {interval, Subject, timer} from 'rxjs';
+import {interval, Subject, Subscription, timer} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -97,7 +97,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
   @Input() uiService: UserInteractionsService;
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get manualURL(): string {
     return AppInfo.manualURL;

@@ -14,6 +14,7 @@ import {Store} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
 import {TranscriptionActions} from '../../store/transcription/transcription.actions';
 import {LoginActions} from '../../store/login/login.actions';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-loading',
@@ -26,7 +27,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   public audioLoadingProgress = 0;
   public state = '';
   public warning = '';
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   constructor(private langService: TranslocoService,
               public settService: SettingsService,

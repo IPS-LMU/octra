@@ -6,6 +6,7 @@ import {APIService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {ModalService} from '../modal.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-modal',
@@ -26,7 +27,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   public sendproObj = true;
   public bugsent = false;
   public data: any;
-  private _subscrmanager: SubscriptionManager;
+  private _subscrmanager: SubscriptionManager<Subscription>;
 
   public get AppInfo(): any {
     return AppInfo;
@@ -41,7 +42,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.bgemail = (!isUnset(this.appStorage.userProfile.email)) ? this.appStorage.userProfile.email : '';
-    this._subscrmanager = new SubscriptionManager();
+    this._subscrmanager = new SubscriptionManager<Subscription>();
 
     this._subscrmanager.add(this.modService.showmodal.subscribe(
       (result: any) => {

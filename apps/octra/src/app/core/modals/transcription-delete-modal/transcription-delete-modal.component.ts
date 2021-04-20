@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
@@ -30,7 +30,7 @@ export class TranscriptionDeleteModalComponent implements OnInit {
   @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<ModalDeleteAnswer> = new Subject<ModalDeleteAnswer>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService) {

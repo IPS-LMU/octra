@@ -4,9 +4,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
 import {SubscriptionManager} from '@octra/utilities';
-import {timer} from 'rxjs';
-import {AnnotationActions} from '../../store/annotation/annotation.actions';
-import {IDBActions} from '../../store/idb/idb.actions';
+import {Subscription, timer} from 'rxjs';
 
 @Component({
   selector: 'octra-help-tools',
@@ -16,7 +14,7 @@ import {IDBActions} from '../../store/idb/idb.actions';
 export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
 
-  private subscrManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   constructor(private appStorage: AppStorageService,
               private api: APIService,

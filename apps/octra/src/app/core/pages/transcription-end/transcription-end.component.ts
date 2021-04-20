@@ -4,6 +4,7 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {NavbarService} from '../../component/navbar/navbar.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-transcription-submitted',
@@ -11,7 +12,7 @@ import {NavbarService} from '../../component/navbar/navbar.service';
   styleUrls: ['./transcription-end.component.css']
 })
 export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewInit {
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
 
   constructor(private router: Router,
               private appStorage: AppStorageService,
@@ -20,7 +21,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
               private settService: SettingsService,
               private navService: NavbarService) {
 
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
     this.navService.showInterfaces = false;
     this.navService.showExport = false;
     this.navService.dataloaded = false;

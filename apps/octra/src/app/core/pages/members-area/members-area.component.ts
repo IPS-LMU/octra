@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AsrService} from '../../shared/service/asr.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-members-area',
@@ -12,7 +13,7 @@ import {AsrService} from '../../shared/service/asr.service';
 })
 export class MembersAreaComponent implements OnInit, OnDestroy {
 
-  subscrmanager: SubscriptionManager = new SubscriptionManager();
+  subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   constructor(private router: Router,
               private settService: SettingsService) {

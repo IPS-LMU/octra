@@ -7,7 +7,7 @@ import {contains, fileListToArray, FileSize, getFileSize, isUnset, SubscriptionM
 import {FileProgress} from '../../obj/objects';
 import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
-import {timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 
 @Component({
   selector: 'octra-dropzone',
@@ -18,7 +18,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   @ViewChild('dropzone', {static: true}) dropzone: DropZoneComponent;
   @Input() height = '250px';
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
   private _audiomanager: AudioManager;
 
   get AppInfo(): AppInfo {

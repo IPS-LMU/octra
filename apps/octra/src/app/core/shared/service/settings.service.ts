@@ -3,7 +3,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {afterDefined, afterTrue, isUnset, SubscriptionManager} from '@octra/utilities';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {APIService} from './api.service';
@@ -21,7 +21,7 @@ import {ConfigurationActions} from '../../store/configuration/configuration.acti
 export class SettingsService {
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
   public audioloading = new Subject<number>();
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
 
   public get isASREnabled(): boolean {
     return (!isUnset(this.appSettings.octra.plugins.asr) &&
@@ -112,7 +112,7 @@ export class SettingsService {
               private api: APIService,
               private langService: TranslocoService,
               private store: Store) {
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 
   public static queryParamsSet(queryParams: Params): boolean {

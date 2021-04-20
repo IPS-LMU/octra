@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 
 import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {Subscription} from 'rxjs';
 
 @Directive({
   selector: '[octraDynComponent]'
@@ -24,7 +25,7 @@ export class DynComponentDirective implements OnInit, OnDestroy {
   @Output() initialized = new EventEmitter<{ id: number; instance: any; }>();
   @Output() destroyed = new EventEmitter<{ id: number; }>();
 
-  private subscrManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   constructor(public viewContainerRef: ViewContainerRef, private _componentFactoryResolver: ComponentFactoryResolver) {
   }

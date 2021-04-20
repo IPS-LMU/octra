@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
 import {isFunction, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
@@ -33,7 +33,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   protected data = null;
   private shortcutID = -1;
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
   private actionperformed: Subject<void> = new Subject<void>();
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {

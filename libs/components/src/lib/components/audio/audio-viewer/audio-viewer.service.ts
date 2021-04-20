@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioChunk, AudioManager, AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
@@ -22,7 +22,7 @@ export class AudioViewerService {
   protected audioPxW = 0;
   protected hZoom = 0;
   protected audioChunk: AudioChunk;
-  private subscrManager: SubscriptionManager = new SubscriptionManager();
+  private subscrManager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   private _currentTranscriptionLevel: Level;
 

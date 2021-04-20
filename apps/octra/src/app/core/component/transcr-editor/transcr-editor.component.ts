@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {isNumeric} from 'rxjs/internal-compatibility';
-import {timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 
 import {BrowserInfo} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
@@ -104,7 +104,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   };
   private _lastAudioChunkID = -1;
   private _settings: TranscrEditorConfig;
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager<Subscription>;
   private init = 0;
   private summernoteUI: any = null;
   private lastkeypress = 0;
@@ -193,7 +193,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
               private asrService: AsrService) {
     this.shortcutsManager = new ShortcutManager();
     this._settings = new TranscrEditorConfig();
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 
   /**

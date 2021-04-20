@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject, timer} from 'rxjs';
+import {Subject, Subscription, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -31,7 +31,7 @@ export class BugreportModalComponent implements OnInit {
   }[] = [];
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
+  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get email(): string {
     return this.appStorage.userProfile.email;

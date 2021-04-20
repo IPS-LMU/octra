@@ -32,7 +32,7 @@ import {
 } from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, SampleUnit} from '@octra/media';
 import {LoginMode} from '../../core/store';
-import {timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -69,7 +69,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   public selectedAudioChunk: AudioChunk;
 
   private oldRaw = '';
-  private subscrManager: SubscriptionManager;
+  private subscrManager: SubscriptionManager<Subscription>;
   private saving = false;
   private factor = 6;
   private platform = BrowserInfo.platform;
@@ -198,7 +198,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
     super();
-    this.subscrManager = new SubscriptionManager();
+    this.subscrManager = new SubscriptionManager<Subscription>();
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.subscrManager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {

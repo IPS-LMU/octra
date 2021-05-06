@@ -25,6 +25,7 @@ import {Position, Size} from '../../../obj';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
+import Shape = Konva.Shape;
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -39,9 +40,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   constructor(public av: AudioViewerService, private renderer: Renderer2) {
     this.shortcutsManager = new ShortcutManager();
     this.subscrManager = new SubscriptionManager<Subscription>();
+
     this.subscrManager.add(this.av.boundaryDragging.subscribe((status) => {
-      console.log(`boundary dragging: ${status}`);
-    }));
+      if (status === 'stopped') {
+        this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
+      }
+    }))
   }
 
   @Input() set isMultiLine(value: boolean) {
@@ -984,7 +988,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.av.PlayCursor.changeAbsX(newValue, this.av.audioTCalculator, this.av.AudioPxWidth, this.audioChunk);
   }
 
-  private createSegmentsForCanvas(startSegment: number = -1, endSegment: number = -1) {
+  private createSegmentsForCanvas() {
     let drawnSegments = 0;
     let drawnBoundaries = 0;
     let y = 0;
@@ -1019,10 +1023,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         id: number
       }[] = [];
 
-      const startLoop = (startSegment > -1) ? startSegment : 0;
-      const endLoop = (endSegment > -1) ? endSegment + 1 : segments.length;
-
-      for (let i = startLoop; i < endLoop; i++) {
+      for (let i = 0; i < segments.length; i++) {
         const segment = segments[i];
         const start = segment.time.sub(this.audioChunk.time.start);
         const absX = this.av.audioTCalculator.samplestoAbsX(start, this.audioChunk.time.duration);
@@ -1062,127 +1063,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             width: this.av.innerWidth,
             height: segmentHeight,
             transformsEnabled: 'position',
-            sceneFunc: (context: any, shape) => {
-              const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
-              const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
-              if (isUnset(sceneSegment)) {
-                console.error(`scenceSegment is null!`);
-              }
-
-              for (let j = lineNum1; j <= lineNum2; j++) {
-                const localY = j * (this.settings.lineheight + this.settings.margin.top);
-
-                if (absY + segmentHeight >= Math.abs(this.layers.background.y())
-                  && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
-
-                  const startSecond = j * this.secondsPerLine;
-                  let endSecond = 0;
-
-                  if (numOfLines > 1) {
-                    endSecond = Math.ceil(Math.min(startSecond + this.secondsPerLine, this.audioChunk.time.duration.seconds));
-                  } else {
-                    endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
-                  }
-
-                  const pipe = new TimespanPipe();
-                  const maxDuration = this.audioChunk.time.duration.unix;
-
-                  const timeString = pipe.transform(endSecond * 1000, {
-                    showHour: true,
-                    showMilliSeconds: !this.settings.multiLine,
-                    maxDuration
-                  });
-                  const timestampWidth = this.layers.overlay.getContext().measureText(timeString).width;
-
-                  const h = this.settings.lineheight;
-                  const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-                  let relX = 0;
-
-                  relX = absX % this.av.innerWidth + this.settings.margin.left;
-                  const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
-                  let w = 0;
-                  let x = select.start;
-
-                  if (select.start > -1 && select.end > -1) {
-                    w = Math.abs(select.end - select.start);
-                  }
-
-                  if (select.start < 1 || select.start > lineWidth) {
-                    x = 0;
-                  }
-                  if (select.end < 1) {
-                    w = 0;
-                  }
-                  if (select.end < 1 || select.end > lineWidth) {
-                    w = select.end;
-                  }
-
-                  if (j === numOfLines - 1 && i === segments.length - 1) {
-                    w = lineWidth - select.start;
-                  }
-
-                  if (isUnset(sceneSegment.isBlockedBy)) {
-                    if (sceneSegment.transcript === '') {
-                      context.fillStyle = 'rgba(255,0,0,0.2)';
-                    } else if (!isUnset(this.breakMarker) && segment.transcript === this.breakMarker.code) {
-                      context.fillStyle = 'rgba(0,0,255,0.2)';
-                    } else if (sceneSegment.transcript !== '') {
-                      context.fillStyle = 'rgba(0,128,0,0.2)';
-                    }
-                    context.fillRect(x, localY, w, h);
-                  } else {
-                    let progressBarFillColor = '';
-                    let progressBarForeColor = '';
-                    if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
-                      // blocked by ASR
-                      context.fillStyle = 'rgba(255,191,0,0.5)';
-                      progressBarFillColor = 'rgba(221,167,14,0.8)';
-                      progressBarForeColor = 'black';
-                    } else if (sceneSegment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
-                      context.fillStyle = 'rgba(179,10,179,0.5)';
-                      progressBarFillColor = 'rgba(179,10,179,0.8)';
-                      progressBarForeColor = 'white';
-                    } else if (sceneSegment.isBlockedBy === ASRQueueItemType.MAUS) {
-                      context.fillStyle = 'rgba(26,229,160,0.5)';
-                      progressBarFillColor = 'rgba(17,176,122,0.8)';
-                      progressBarForeColor = 'white';
-                    }
-                    context.fillRect(x, localY, w, h);
-
-                    if (this.settings.showProgressBars) {
-                      let timeStampsWidth = 0;
-
-                      if (w === lineWidth) {
-                        // time labels on both sides
-                        timeStampsWidth = timestampWidth * 2;
-                      } else {
-                        if (x === 0 || select.start + w === lineWidth) {
-                          // time label on the left or on the right
-                          timeStampsWidth = timestampWidth;
-                        }
-                      }
-
-                      const progressWidth = w - timeStampsWidth - 20;
-
-                      if (progressWidth > 10 && !isUnset(sceneSegment.progressInfo)) {
-                        const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
-                        const textPosition = Math.round(progressStart + progressWidth / 2);
-                        const loadedPixels = Math.round(progressWidth * sceneSegment.progressInfo.progress);
-
-                        this.drawRoundedRect(context, progressStart, localY + 3, 15, progressWidth, 5, 'transparent', progressBarFillColor);
-                        this.drawRoundedRect(context, progressStart, localY + 3, 15, loadedPixels, 5, progressBarFillColor);
-
-                        if (progressWidth > 100) {
-                          const progressString = `${sceneSegment.progressInfo.statusLabel} ${sceneSegment.progressInfo.progress * 100}%`;
-                          context.fillStyle = (progressStart + loadedPixels > textPosition && progressBarForeColor === 'white') ? 'white' : 'black';
-                          context.fillText(progressString, textPosition, localY + 14);
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              context.fillStrokeShape(shape);
+            sceneFunc: (context: any, shape: Shape) => {
+              this.overlaySceneFunction({
+                from: lineNum1,
+                to: lineNum2
+              }, segments, i, absX, beginTime, segmentHeight, numOfLines, context, shape)
             }
           });
 
@@ -1198,44 +1083,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               height: segmentHeight,
               transformsEnabled: 'position',
               sceneFunc: (context: any, shape) => {
-                const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
-                for (let j = lineNum1; j <= lineNum2; j++) {
-                  const localY = j * (this.settings.lineheight + this.settings.margin.top);
-
-                  if (absY + segmentHeight >= Math.abs(this.layers.background.y())
-                    && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
-
-                    const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-                    let relX = 0;
-
-                    relX = absX % this.av.innerWidth + this.settings.margin.left;
-                    const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
-                    let w = 0;
-                    let x = select.start;
-
-                    if (select.start > -1 && select.end > -1) {
-                      w = Math.abs(select.end - select.start);
-                    }
-
-                    if (select.start < 1 || select.start > lineWidth) {
-                      x = 1;
-                    }
-                    if (select.end < 1) {
-                      w = 0;
-                    }
-                    if (select.end < 1 || select.end > lineWidth) {
-                      w = select.end;
-                    }
-
-                    if (j === numOfLines - 1 && i === segments.length - 1) {
-                      w = lineWidth - select.start + 1;
-                    }
-
-                    context.fillStyle = 'white';
-                    context.fillRect(x, localY + this.settings.lineheight - 20, w, 20);
-                  }
-                }
-                context.fillStrokeShape(shape);
+                this.transcriptSceneFunction({
+                  from: lineNum1,
+                  to: lineNum2
+                }, segments, i, absX, beginTime, segmentHeight, numOfLines, context, shape);
               }
             });
 
@@ -1297,46 +1148,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           fontFamily: 'Arial',
           transformsEnabled: 'position',
           sceneFunc: (context: any) => {
-            for (let j = 0; j < numOfLines; j++) {
-              // draw time label
-              y = j * (this.settings.lineheight + this.settings.margin.top);
-
-              if (y + this.settings.lineheight >= Math.abs(this.layers.background.y())
-                && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
-                let startTime = this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
-                let endTime = 0;
-
-                if (numOfLines > 1) {
-                  endTime = Math.min(startTime + this.secondsPerLine * 1000, this.audioChunk.time.duration.unix);
-                  endTime = Math.ceil(endTime / 1000) * 1000;
-                  startTime = Math.floor(startTime / 1000) * 1000;
-                } else {
-                  endTime = this.audioChunk.time.start.unix + this.audioChunk.time.duration.unix;
-                }
-
-                const pipe = new TimespanPipe();
-                const maxDuration = this.audioChunk.time.duration.unix;
-                const startTimeString = pipe.transform(startTime,
-                  {
-                    showHour: true,
-                    showMilliSeconds: !this.settings.multiLine,
-                    maxDuration
-                  }
-                );
-                const endTimeString = pipe.transform(endTime,
-                  {
-                    showHour: true,
-                    showMilliSeconds: !this.settings.multiLine,
-                    maxDuration
-                  }
-                );
-                const length = this.layers.overlay.getContext().measureText(startTimeString).width;
-                context.fillStyle = 'dimgray';
-                context.fillText(startTimeString, 3, y + 8);
-                context.fillText(endTimeString, ((j < numOfLines - 1)
-                  ? this.av.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
-              }
-            }
+            this.timeLabelSceneFunction(y, numOfLines, context);
           }
         });
         this.layers.overlay.add(timeStampLabels);
@@ -1388,6 +1200,219 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.removeNonExistingSegments();
       }
     }
+  }
+
+  private timeLabelSceneFunction = (y: number, numOfLines: number, context: any) => {
+    for (let j = 0; j < numOfLines; j++) {
+      // draw time label
+      y = j * (this.settings.lineheight + this.settings.margin.top);
+
+      if (y + this.settings.lineheight >= Math.abs(this.layers.background.y())
+        && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+        let startTime = this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
+        let endTime = 0;
+
+        if (numOfLines > 1) {
+          endTime = Math.min(startTime + this.secondsPerLine * 1000, this.audioChunk.time.duration.unix);
+          endTime = Math.ceil(endTime / 1000) * 1000;
+          startTime = Math.floor(startTime / 1000) * 1000;
+        } else {
+          endTime = this.audioChunk.time.start.unix + this.audioChunk.time.duration.unix;
+        }
+
+        const pipe = new TimespanPipe();
+        const maxDuration = this.audioChunk.time.duration.unix;
+        const startTimeString = pipe.transform(startTime,
+          {
+            showHour: true,
+            showMilliSeconds: !this.settings.multiLine,
+            maxDuration
+          }
+        );
+        const endTimeString = pipe.transform(endTime,
+          {
+            showHour: true,
+            showMilliSeconds: !this.settings.multiLine,
+            maxDuration
+          }
+        );
+        const length = this.layers.overlay.getContext().measureText(startTimeString).width;
+        context.fillStyle = 'dimgray';
+        context.fillText(startTimeString, 3, y + 8);
+        context.fillText(endTimeString, ((j < numOfLines - 1)
+          ? this.av.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
+      }
+    }
+  }
+
+  private transcriptSceneFunction = (lineInterval: {
+    from: number,
+    to: number
+  }, segments: Segment[], i: number, absX: number, beginTime: SampleUnit, segmentHeight: number, numOfLines: number, context: any, shape: Shape) => {
+    const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
+    for (let j = lineInterval.from; j <= lineInterval.to; j++) {
+      const localY = j * (this.settings.lineheight + this.settings.margin.top);
+
+      if (absY + segmentHeight >= Math.abs(this.layers.background.y())
+        && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+
+        const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
+        let relX = 0;
+
+        relX = absX % this.av.innerWidth + this.settings.margin.left;
+        const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
+        let w = 0;
+        let x = select.start;
+
+        if (select.start > -1 && select.end > -1) {
+          w = Math.abs(select.end - select.start);
+        }
+
+        if (select.start < 1 || select.start > lineWidth) {
+          x = 1;
+        }
+        if (select.end < 1) {
+          w = 0;
+        }
+        if (select.end < 1 || select.end > lineWidth) {
+          w = select.end;
+        }
+
+        if (j === numOfLines - 1 && i === segments.length - 1) {
+          w = lineWidth - select.start + 1;
+        }
+
+        context.fillStyle = 'white';
+        context.fillRect(x, localY + this.settings.lineheight - 20, w, 20);
+      }
+    }
+    context.fillStrokeShape(shape);
+  }
+  private overlaySceneFunction = (lineInterval: {
+    from: number,
+    to: number
+  }, segments: Segment[], i: number, absX: number, beginTime: SampleUnit, segmentHeight: number, numOfLines: number, context: any, shape: Shape) => {
+    const segment = segments[i];
+    const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
+    const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
+    if (isUnset(sceneSegment)) {
+      console.error(`scenceSegment is null!`);
+    }
+
+    for (let j = lineInterval.from; j <= lineInterval.to; j++) {
+      const localY = j * (this.settings.lineheight + this.settings.margin.top);
+
+      if (absY + segmentHeight >= Math.abs(this.layers.background.y())
+        && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+
+        const startSecond = j * this.secondsPerLine;
+        let endSecond = 0;
+
+        if (numOfLines > 1) {
+          endSecond = Math.ceil(Math.min(startSecond + this.secondsPerLine, this.audioChunk.time.duration.seconds));
+        } else {
+          endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
+        }
+
+        const pipe = new TimespanPipe();
+        const maxDuration = this.audioChunk.time.duration.unix;
+
+        const timeString = pipe.transform(endSecond * 1000, {
+          showHour: true,
+          showMilliSeconds: !this.settings.multiLine,
+          maxDuration
+        });
+        const timestampWidth = this.layers.overlay.getContext().measureText(timeString).width;
+
+        const h = this.settings.lineheight;
+        const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
+        let relX = 0;
+
+        relX = absX % this.av.innerWidth + this.settings.margin.left;
+        const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
+        let w = 0;
+        let x = select.start;
+
+        if (select.start > -1 && select.end > -1) {
+          w = Math.abs(select.end - select.start);
+        }
+
+        if (select.start < 1 || select.start > lineWidth) {
+          x = 0;
+        }
+        if (select.end < 1) {
+          w = 0;
+        }
+        if (select.end < 1 || select.end > lineWidth) {
+          w = select.end;
+        }
+
+        if (j === numOfLines - 1 && i === segments.length - 1) {
+          w = lineWidth - select.start;
+        }
+
+        if (isUnset(sceneSegment.isBlockedBy)) {
+          if (sceneSegment.transcript === '') {
+            context.fillStyle = 'rgba(255,0,0,0.2)';
+          } else if (!isUnset(this.breakMarker) && segment.transcript === this.breakMarker.code) {
+            context.fillStyle = 'rgba(0,0,255,0.2)';
+          } else if (sceneSegment.transcript !== '') {
+            context.fillStyle = 'rgba(0,128,0,0.2)';
+          }
+          context.fillRect(x, localY, w, h);
+        } else {
+          let progressBarFillColor = '';
+          let progressBarForeColor = '';
+          if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
+            // blocked by ASR
+            context.fillStyle = 'rgba(255,191,0,0.5)';
+            progressBarFillColor = 'rgba(221,167,14,0.8)';
+            progressBarForeColor = 'black';
+          } else if (sceneSegment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
+            context.fillStyle = 'rgba(179,10,179,0.5)';
+            progressBarFillColor = 'rgba(179,10,179,0.8)';
+            progressBarForeColor = 'white';
+          } else if (sceneSegment.isBlockedBy === ASRQueueItemType.MAUS) {
+            context.fillStyle = 'rgba(26,229,160,0.5)';
+            progressBarFillColor = 'rgba(17,176,122,0.8)';
+            progressBarForeColor = 'white';
+          }
+          context.fillRect(x, localY, w, h);
+
+          if (this.settings.showProgressBars) {
+            let timeStampsWidth = 0;
+
+            if (w === lineWidth) {
+              // time labels on both sides
+              timeStampsWidth = timestampWidth * 2;
+            } else {
+              if (x === 0 || select.start + w === lineWidth) {
+                // time label on the left or on the right
+                timeStampsWidth = timestampWidth;
+              }
+            }
+
+            const progressWidth = w - timeStampsWidth - 20;
+
+            if (progressWidth > 10 && !isUnset(sceneSegment.progressInfo)) {
+              const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
+              const textPosition = Math.round(progressStart + progressWidth / 2);
+              const loadedPixels = Math.round(progressWidth * sceneSegment.progressInfo.progress);
+
+              this.drawRoundedRect(context, progressStart, localY + 3, 15, progressWidth, 5, 'transparent', progressBarFillColor);
+              this.drawRoundedRect(context, progressStart, localY + 3, 15, loadedPixels, 5, progressBarFillColor);
+
+              if (progressWidth > 100) {
+                const progressString = `${sceneSegment.progressInfo.statusLabel} ${sceneSegment.progressInfo.progress * 100}%`;
+                context.fillStyle = (progressStart + loadedPixels > textPosition && progressBarForeColor === 'white') ? 'white' : 'black';
+                context.fillText(progressString, textPosition, localY + 14);
+              }
+            }
+          }
+        }
+      }
+    }
+    context.fillStrokeShape(shape);
   }
 
   private removeNonExistingSegments() {
@@ -1633,11 +1658,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       }
 
       this.av.setMouseMovePosition(absXPos);
-      if (this.av.dragableBoundaryNumber > -1) {
-        // something dragged
-        this.createSegmentsForCanvas();
-        this.stage.batchDraw();
-      } else {
+      if (this.av.dragableBoundaryNumber < 0) {
         this.drawWholeSelection();
       }
 

@@ -10,6 +10,10 @@ import {ASRQueueItemType, Level} from '@octra/annotation';
   providedIn: 'root'
 })
 export class AudioViewerService {
+  get boundaryDragging(): Subject<'started' | 'stopped'> {
+    return this._boundaryDragging;
+  }
+
   public audioTCalculator: AudioTimeCalculator;
   public overboundary = false;
   public shiftPressed = false;
@@ -17,6 +21,8 @@ export class AudioViewerService {
   public channelInitialized = new Subject<void>();
   protected mouseClickPos: SampleUnit = null;
   protected playcursor: PlayCursor = null;
+
+  private _boundaryDragging: Subject<'started' | 'stopped'>;
 
   // AUDIO
   protected audioPxW = 0;
@@ -87,6 +93,10 @@ export class AudioViewerService {
   }
 
   set dragableBoundaryNumber(value: number) {
+    if (value > -1 && this._dragableBoundaryNumber === -1) {
+      // started
+      this._boundaryDragging.next('started');
+    }
     this._dragableBoundaryNumber = value;
   }
 
@@ -127,6 +137,7 @@ export class AudioViewerService {
   }
 
   constructor(private multiThreadingService: MultiThreadingService) {
+    this._boundaryDragging = new Subject<'started' | 'stopped'>();
   }
 
   public initialize(innerWidth: number, audioChunk: AudioChunk, currentTranscriptionLevel: Level) {
@@ -179,11 +190,13 @@ export class AudioViewerService {
             if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._dragableBoundaryNumber > -1 &&
               this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length) {
               // some boundary dragged
-              const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
+              const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber).clone();
               segment.time = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
-              this._currentTranscriptionLevel.segments.change(this._dragableBoundaryNumber, segment);
-              this._currentTranscriptionLevel.segments.sort();
-              this._dragableBoundaryNumber = -1;
+
+              // trigger segment change because it wasn't triggered while dragging
+              this._currentTranscriptionLevel.segments.onsegmentchange.emit();
+
+              this._boundaryDragging.next('stopped');
             } else {
               // set selection
               this.audioChunk.selection.end = absXInTime.clone();
@@ -433,10 +446,7 @@ export class AudioViewerService {
         }
 
         segment.time = absXTime.clone();
-        this._currentTranscriptionLevel.segments.change(this._dragableBoundaryNumber, segment);
-        this._currentTranscriptionLevel.segments.sort();
-        // dragableBoundaryTemp = this.getBoundaryNumber(absX);
-        // this._dragableBoundaryNumber = dragableBoundaryTemp;
+        this._currentTranscriptionLevel.segments.segments[this._dragableBoundaryNumber] = segment;
       } else {
         this._mouseDown = false;
       }

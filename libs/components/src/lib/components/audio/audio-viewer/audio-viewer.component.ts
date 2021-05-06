@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import Konva from 'konva';
 import {Context} from 'konva/types/Context';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
@@ -38,6 +38,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   constructor(public av: AudioViewerService, private renderer: Renderer2) {
     this.shortcutsManager = new ShortcutManager();
+    this.subscrManager = new SubscriptionManager<Subscription>();
+    this.subscrManager.add(this.av.boundaryDragging.subscribe((status) => {
+      console.log(`boundary dragging: ${status}`);
+    }));
   }
 
   @Input() set isMultiLine(value: boolean) {
@@ -123,6 +127,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     time: SampleUnit
   }>();
 
+  @Output()
+  public get boundaryDragging(): Subject<'started' | 'stopped'> {
+    return this.av.boundaryDragging;
+  }
+
   @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
   private shortcutsManager: ShortcutManager;
   public updating = false;
@@ -171,7 +180,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     overlay: Konva.Layer,
     scrollBars: Konva.Layer
   };
-  private subscrManager = new SubscriptionManager();
+  private subscrManager: SubscriptionManager<Subscription>;
   private animation: {
     playHead: Konva.Animation
   } = {
@@ -300,18 +309,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
-      this.refreshLevel()
-      this.subscrManager.removeByTag(`segmentchange`);
-      this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
-          // TODO do we need this?
-          // console.log(`refresh after segment change`);
-          // this.refreshLevel();
-        },
-        (error) => {
-          console.error(error);
-        },
-        () => {
-        }), 'segmentchange');
+      this.refreshLevel();
     }
   }
 

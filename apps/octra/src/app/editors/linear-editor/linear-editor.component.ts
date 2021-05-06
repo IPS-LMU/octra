@@ -255,13 +255,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.keyMap.register({
       name: 'signaldisplay_top_audio',
       enabled: true,
-      items: [...this.audioShortcutsTopDisplay.items]
+      items: this.audioShortcutsTopDisplay.items
     });
 
     this.keyMap.register({
       name: 'signaldisplay_top',
       enabled: true,
-      items: [...this.signalDisplayTop.settings.shortcuts.items]
+      items: this.signalDisplayTop.settings.shortcuts.items
     });
 
     this.signalDisplayTop.settings.shortcutsEnabled = true;
@@ -276,12 +276,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.keyMap.register({
       name: 'signaldisplay_down_audio',
       enabled: true,
-      items: [...this.audioShortcutsBottomDisplay.items]
+      items: this.audioShortcutsBottomDisplay.items
     });
     this.keyMap.register({
       name: 'signaldisplay_down',
       enabled: true,
-      items: [...this.loupeSettings.shortcuts.items]
+      items: this.loupeSettings.shortcuts.items
     });
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
@@ -474,6 +474,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       if (!isUnset(this.audioShortcutsTopDisplay) && !isUnset(this.audioShortcutsBottomDisplay)) {
         const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top_audio') ? this.audioChunkTop : this.audioChunkDown;
+        const controlName = $event.shortcutGroupName.replace('_audio', '');
         if (!isUnset(currentAudioChunk)) {
           switch ($event.shortcutName) {
             case('play_pause'):
@@ -481,7 +482,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               this.triggerUIActionAfterShortcut({
                 shortcut: comboKey,
                 value: $event.shortcutName
-              }, $event.shortcutGroupName, $event.timestamp);
+              }, controlName, $event.timestamp);
               if (currentAudioChunk.isPlaying) {
                 currentAudioChunk.pausePlayback().catch((error) => {
                   console.error(error);
@@ -497,7 +498,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               this.triggerUIActionAfterShortcut({
                 shortcut: comboKey,
                 value: $event.shortcutName
-              }, $event.shortcutGroupName, $event.timestamp);
+              }, controlName, $event.timestamp);
               currentAudioChunk.stopPlayback().catch((error) => {
                 console.error(error);
               });
@@ -508,7 +509,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               this.triggerUIActionAfterShortcut({
                 shortcut: comboKey,
                 value: $event.shortcutName
-              }, $event.shortcutGroupName, $event.timestamp);
+              }, controlName, $event.timestamp);
               currentAudioChunk.stepBackward().catch((error) => {
                 console.error(error);
               });
@@ -519,7 +520,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               this.triggerUIActionAfterShortcut({
                 shortcut: comboKey,
                 value: $event.shortcutName
-              }, $event.shortcutGroupName, $event.timestamp);
+              }, controlName, $event.timestamp);
               currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
                 console.error(error);
               });

@@ -16,7 +16,6 @@ import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropz
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
-import * as fromApplication from '../../store/application/';
 import {Store} from '@ngrx/store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {Actions} from '@ngrx/effects';
@@ -154,25 +153,21 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.appStorage.clearWholeSession();
       }
 
-      if (!this.appStorage.idbLoaded) {
-        this.subscrmanager.add(this.appStorage.loaded.subscribe(
-          () => {
-          },
-          () => {
-          },
-          () => {
-            loaduser();
-          })
-        );
-      } else {
-        loaduser();
-      }
+      this.loadPojectsList();
+    }
 
-      this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded).subscribe((idbLoaded) => {
-        if (idbLoaded) {
-          this.loadPojectsList();
-        }
-      }));
+    if (!this.appStorage.idbLoaded) {
+      this.subscrmanager.add(this.appStorage.loaded.subscribe(
+        () => {
+        },
+        () => {
+        },
+        () => {
+          loaduser();
+        })
+      );
+    } else {
+      loaduser();
     }
   }
 

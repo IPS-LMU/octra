@@ -571,7 +571,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         }
       }
     } else {
-      const externalShortcutInfo = this.externalShortcutManager.getCommandByEvent($event);
+      const externalShortcutInfo = this.externalShortcutManager.checkKeyEvent($event, Date.now());
       if (!isUnset(externalShortcutInfo)) {
 
         $event.preventDefault();
@@ -588,7 +588,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     if (!isUnset(shortcutInfo)) {
       $event.preventDefault();
     } else if (!isUnset(this.externalShortcutManager)) {
-      const externalShortcutCommand = this.externalShortcutManager.getCommandByEvent($event);
+      const externalShortcutCommand = this.externalShortcutManager.checkKeyEvent($event, Date.now());
 
       if (!isUnset(externalShortcutCommand)) {
         $event.preventDefault();

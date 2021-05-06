@@ -207,9 +207,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
     this.shortcuts = this.keyMap.register({
-      name: '2D-Editor',
+      name: '2D-Editor viewer',
       enabled: true,
-      items: [...this.audioShortcuts.items, ...this.viewer.settings.shortcuts.items]
+      items: this.viewer.settings.shortcuts.items
+    });
+    this.shortcuts = this.keyMap.register({
+      name: '2D-Editor audio',
+      enabled: true,
+      items: this.audioShortcuts.items
     });
     this.keyMap.register(this.windowShortcuts);
     this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered));

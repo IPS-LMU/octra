@@ -36,8 +36,7 @@
     <ng-template octraLoadeditor></ng-template>
   </div>
 
-  <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
-    && (appStorage.useMode === 'online' || appStorage.useMode === 'demo') && transcrService.feedback !== null">
+  <div *ngIf="showCommentSection">
     <form class="form-inline" id="bottom-comment">
       <fieldset class="w-100">
         <div class="form-group" style="padding-top:0;">

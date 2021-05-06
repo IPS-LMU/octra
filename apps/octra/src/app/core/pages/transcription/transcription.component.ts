@@ -165,6 +165,8 @@ export class TranscriptionComponent implements OnInit,
     ]
   };
 
+  showCommentSection = false;
+
   public get Interface(): string {
     return this.interface;
   }
@@ -364,6 +366,12 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngOnInit() {
+    this.showCommentSection = (
+        this.settingsService.isTheme('shortAudioFiles') ||
+        this.settingsService.isTheme('korbinian')
+      ) && (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo')
+      && this.transcrService.feedback !== null;
+
     this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
       this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
     }));

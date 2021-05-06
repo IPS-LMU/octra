@@ -119,6 +119,13 @@ export class ShortcutManager {
     }
   ];
 
+  private protectedShortcuts: string[] = [
+    'CMD + S', // Save dialogue
+    'STRG + S',
+    'CMD + P', // Print dialogue
+    'STRG + P'
+  ];
+
   constructor() {
     this._shortcuts = [];
   }
@@ -149,6 +156,12 @@ export class ShortcutManager {
         // run shortcut check
         const shortcut = this.getShorcutCombination(event);
         const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
+
+        if (this.isProtectedShortcut(shortcut)) {
+          // clear pressed keys
+          this.resetPressedKeys();
+          return null;
+        }
 
         if (checkPressKey) {
           this.checkPressedKey(event);
@@ -352,12 +365,26 @@ export class ShortcutManager {
     this._pressedKeys.other = (valueToSet) ? this.getKeyCode(event) : -1;
   }
 
+  private resetPressedKeys() {
+    this._pressedKeys = {
+      alt: false,
+      shift: false,
+      cmd: false,
+      ctrl: false,
+      other: -1
+    };
+  }
+
   public enableShortcutGroup(name: string) {
     const group = this.shortcuts.find(a => a.name === name);
 
     if (!isUnset(group)) {
       group.enabled = true;
     }
+  }
+
+  private isProtectedShortcut(shortcutCombination: string) {
+    return this.protectedShortcuts.findIndex(a => a === shortcutCombination) > -1;
   }
 
   public disableShortcutGroup(name: string) {

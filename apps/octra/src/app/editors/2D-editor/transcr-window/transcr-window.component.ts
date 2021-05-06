@@ -369,6 +369,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.transcript = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
     }
 
+    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
+    shortcutGroup.enabled = false;
+
     this.cd.markForCheck();
     this.cd.detectChanges();
 
@@ -427,6 +430,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   close() {
     this.showWindow = false;
+
+    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
+    shortcutGroup.enabled = true;
 
     const startSample = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
 

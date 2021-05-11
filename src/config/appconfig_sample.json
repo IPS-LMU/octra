@@ -21,18 +21,80 @@
       "auth_token": "",
       "url": ""
     },
-    "allowed_browsers": [],
-    "allowed_projects": [],
+    "plugins": {
+      "audioCutter": {
+        "enabled": false,
+        "authToken": "",
+        "url": ""
+      },
+      "asr": {
+        "enabled": false,
+        "calls": [
+          "",
+          ""
+        ],
+        "services": [
+        ],
+        "languages": [
+        ]
+      }
+    },
+    "allowed_browsers": [
+      {
+        "name": "Chrome",
+        "version": ""
+      },
+      {
+        "name": "Chrome Mobile",
+        "version": ""
+      },
+      {
+        "name": "Firefox",
+        "version": ""
+      },
+      {
+        "name": "Firefox Mobile",
+        "version": ""
+      },
+      {
+        "name": "Opera",
+        "version": ""
+      },
+      {
+        "name": "Opera Mini",
+        "version": ""
+      },
+      {
+        "name": "Opera Mobile",
+        "version": ""
+      }
+    ],
+    "allowed_projects": [
+    ],
     "languages": [
-      "de",
-      "en"
+      "en",
+      "de"
+    ],
+    "audioExamples": [
+      {
+        "language": "de",
+        "url": "",
+        "description": ""
+      },
+      {
+        "language": "en",
+        "url": "",
+        "description": ""
+      }
     ],
     "tracking": {
-      "active": "",
-      "matomo": {
-        "host": "",
-        "siteID": 0
-      }
+    },
+    "inactivityNotice": {
+      "showAfter": 60
+    },
+    "maintenanceNotification": {
+      "active": "inactive",
+      "apiURL": ""
     }
   }
 }

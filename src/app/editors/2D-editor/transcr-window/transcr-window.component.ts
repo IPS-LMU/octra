@@ -121,23 +121,27 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }));
     }
 
-    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
-          && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
-          if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
-            this.editor.rawText = item.result;
-          }
-          this.loupe.update(false);
+    if (!isNullOrUndefined(this.settingsService.appSettings.octra.plugins) &&
+      !isNullOrUndefined(this.settingsService.appSettings.octra.plugins.asr)
+      && this.settingsService.appSettings.octra.plugins.asr.enabled) {
+      this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+          if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
+            && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+            if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
+              this.editor.rawText = item.result;
+            }
+            this.loupe.update(false);
 
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-        }
-      },
-      (error) => {
-        console.error(error);
-      },
-      () => {
-      }));
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          }
+        },
+        (error) => {
+          console.error(error);
+        },
+        () => {
+        }));
+    }
   }
 
   @ViewChild('loupe', {static: true}) loupe: LoupeComponent;

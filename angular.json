@@ -16,7 +16,6 @@
             "main": "apps/octra/src/main.ts",
             "polyfills": "apps/octra/src/polyfills.ts",
             "tsConfig": "apps/octra/tsconfig.app.json",
-            "aot": true,
             "allowedCommonJsDependencies": [
               "js-sha256",
               "x2js",
@@ -69,7 +68,13 @@
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {

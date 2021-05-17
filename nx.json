@@ -28,9 +28,7 @@
     },
     "octra-e2e": {
       "tags": [],
-      "implicitDependencies": [
-        "octra"
-      ]
+      "implicitDependencies": ["octra"]
     },
     "media": {
       "tags": []

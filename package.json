@@ -110,6 +110,7 @@
     "cypress": "^3.8.2",
     "dotenv": "8.2.0",
     "eslint": "7.22.0",
+    "fsevents": "^2.3.2",
     "jest": "26.2.2",
     "jest-preset-angular": "8.4.0",
     "ng-packagr": "12.0.0",

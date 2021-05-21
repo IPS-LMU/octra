@@ -18,6 +18,17 @@ import {Router} from '@angular/router';
   providedIn: 'root'
 })
 export class AsrService {
+  get accessCode(): string {
+    if (this._queue) {
+      return this._queue.accessCode;
+    }
+    return null;
+  }
+
+  set accessCode(value: string) {
+    this._queue.accessCode = value;
+  }
+
   get queue(): ASRQueue {
     return this._queue;
   }
@@ -127,6 +138,14 @@ export class AsrService {
 }
 
 class ASRQueue {
+  set accessCode(value: string) {
+    this._accessCode = value;
+  }
+
+  get accessCode(): string {
+    return this._accessCode;
+  }
+
   get queue(): ASRQueueItem[] {
     return this._queue;
   }
@@ -160,6 +179,7 @@ class ASRQueue {
   private readonly _httpClient: HttpClient;
   private _status: ASRProcessStatus;
   private readonly _audiomanager: AudioManager;
+  private _accessCode = '';
 
   private readonly _itemChange: Subject<ASRQueueItem>;
 
@@ -227,7 +247,7 @@ class ASRQueue {
         const nextItem = this.getFirstFreeItem();
 
         if (nextItem !== undefined) {
-          if (nextItem.startProcessing()) {
+          if (nextItem.startProcessing(this._accessCode)) {
             this.updateStatistics({
               old: ASRProcessStatus.IDLE,
               new: ASRProcessStatus.STARTED
@@ -447,11 +467,11 @@ export class ASRQueueItem {
     }
   }
 
-  public startProcessing(): boolean {
+  public startProcessing(accessCode: string): boolean {
     if (this.status !== ASRProcessStatus.STARTED) {
       if (this._type === ASRQueueItemType.ASR) {
         console.log(`CALL ASR ONLY`);
-        this.transcribeSignalWithASR('txt').then(() => {
+        this.transcribeSignalWithASR('txt', accessCode).then(() => {
           this.changeStatus(ASRProcessStatus.FINISHED);
         }).catch((error) => {
           console.error(`ASR only failed`);
@@ -460,7 +480,7 @@ export class ASRQueueItem {
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
-        this.transcribeSignalWithASR('txt').then((result) => {
+        this.transcribeSignalWithASR('txt', accessCode).then((result) => {
 
           this.callMAUS(this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
             const reader = new FileReader();
@@ -549,7 +569,7 @@ export class ASRQueueItem {
     });
   }
 
-  private callASR(languageObject: ASRLanguage, audioURL: string, outFormat: string): Promise<{
+  private callASR(languageObject: ASRLanguage, audioURL: string, outFormat: string, accessCode: string): Promise<{
     file: File,
     url: string
   }> {
@@ -557,11 +577,15 @@ export class ASRQueueItem {
       file: File,
       url: string
     }>((resolve, reject) => {
-      const asrUrl = this.parent.asrSettings.calls[0].replace('{{host}}', languageObject.host)
+      let asrUrl = this.parent.asrSettings.calls[0].replace('{{host}}', languageObject.host)
         .replace('{{audioURL}}', audioURL)
         .replace('{{asrType}}', languageObject.asr)
         .replace('{{language}}', languageObject.code)
         .replace('{{outFormat}}', outFormat);
+
+      if (accessCode !== '') {
+        asrUrl += `&ACCESSCODE=${accessCode}`;
+      }
 
       this.parent.httpClient.post(asrUrl, {}, {
         headers: {
@@ -649,7 +673,7 @@ export class ASRQueueItem {
     });
   }
 
-  public transcribeSignalWithASR(outFormat: string): Promise<{
+  public transcribeSignalWithASR(outFormat: string, accessCode: string): Promise<{
     audioURL: string,
     transcriptURL: string
   }> {
@@ -674,7 +698,7 @@ export class ASRQueueItem {
           this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
             if (this._status !== ASRProcessStatus.STOPPED) {
               // 3) signal audio url to ASR
-              this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
+              this.callASR(this.selectedLanguage, audioURL, outFormat, accessCode).then((asrResult) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
                   const reader = new FileReader();
                   reader.onload = () => {

@@ -56,6 +56,17 @@ export class AppStorageService {
     this._userProfile = value;
   }
 
+  get accessCode(): string {
+    return this._accessCode;
+  }
+
+  set accessCode(value: string) {
+    this._idb.save('options', 'accessCode', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._accessCode = value;
+  }
+
   set logs(value: any[]) {
     this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
       console.error(err);
@@ -462,6 +473,8 @@ export class AppStorageService {
     userName: '',
     email: ''
   };
+
+  private _accessCode = '';
 
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
@@ -872,6 +885,10 @@ export class AppStorageService {
         {
           attribute: '_asr',
           key: 'asr'
+        },
+        {
+          attribute: '_accessCode',
+          key: 'accessCode'
         }
       ]
     ).then(() => {

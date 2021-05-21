@@ -24,7 +24,18 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public test = 'ok';
   collapsed = true;
+  accessCodeVisible = false;
+  settingsCollapsed = true;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
+
+  public get accessCode(): string {
+    return this.navbarServ.asrService.accessCode;
+  }
+
+  public set accessCode(value: string) {
+    this.navbarServ.asrService.accessCode = value;
+    this.appStorage.accessCode = value;
+  }
 
   public get environment(): any {
     return environment;

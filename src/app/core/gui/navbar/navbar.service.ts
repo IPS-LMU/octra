@@ -2,6 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AudioInfo} from '../../../media-components/obj/media/audio';
 import {FileSize} from '../../shared/Functions';
+import {AsrService} from '../../shared/service/asr.service';
 
 @Injectable()
 export class NavbarService {
@@ -10,6 +11,7 @@ export class NavbarService {
   public onclick = new EventEmitter<string>();
   public transcrService: TranscriptionService;
   public uiService: UserInteractionsService;
+  public asrService: AsrService;
   public dataloaded = false;
   public originalInfo: AudioInfo;
   public filesize: FileSize;

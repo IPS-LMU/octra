@@ -119,6 +119,7 @@ export class TranscriptionComponent implements OnInit,
     this.audiomanager = this.audio.audiomanagers[0];
 
     this.navbarServ.transcrService = this.transcrService;
+    this.navbarServ.asrService = this.asrService;
     this.navbarServ.uiService = this.uiService;
 
     this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
@@ -443,6 +444,7 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.asrService.init();
+    this.asrService.accessCode = this.appStorage.accessCode;
 
     // set general shortcuts
     this.generalShortcuts.push({

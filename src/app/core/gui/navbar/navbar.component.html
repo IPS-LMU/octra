@@ -197,12 +197,32 @@
       <li class="nav-item dropdown" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
                 }">
-        <a class="nav-link" href="#" id="optionsDropdown" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false">
+        <a class="nav-link" id="optionsDropdown"
+           aria-haspopup="true" aria-expanded="false" (click)="settingsCollapsed = !settingsCollapsed;">
           <fa-icon icon="cog"></fa-icon>
         </a>
-        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown">
+        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown"  (mouseleave)="settingsCollapsed = true;accessCodeVisible = false" [collapse]="settingsCollapsed">
           <table class="table">
+            <tr>
+              <td colspan="2" style="font-size:0.9em;"><label for="accessCode">
+                <fa-icon [icon]="['fas', 'key']"></fa-icon>
+                Access Code (for Google ASR only):</label></td>
+            </tr>
+            <tr>
+              <td colspan="2" *ngIf="navbarServ.asrService !== undefined">
+                <div class="input-group mb-3" id="accessCodeGroup">
+                  <input class="form-control" style="border: 1px solid lightgray; color:black;"
+                         [(ngModel)]="accessCode" id="accessCode" name="accessCode"
+                         placeholder="Enter access code..." aria-label="Enter access code..."
+                         [type]="(accessCodeVisible) ? 'text': 'password'"/>
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2" style="padding-left:3px;">
+                      <fa-icon style="cursor: pointer;" [icon]="['fas', (accessCodeVisible)? 'eye': 'eye-slash']" (click)="accessCodeVisible = !accessCodeVisible"></fa-icon>
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </tr>
             <tr>
               <td><label for="easymode">{{"settings.easy mode" | transloco}}:</label></td>
               <td>

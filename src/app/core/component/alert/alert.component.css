@@ -3,8 +3,9 @@
   width: 400px;
   top: 0;
   right: 0;
-  z-index: 1000;
-  height: 100%;
+  overflow-y: auto;
+  z-index: 700;
+  max-height: 100%;
 }
 
 .queue {

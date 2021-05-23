@@ -370,7 +370,24 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       }
                     }
                   } else if (item.status === ASRProcessStatus.FAILED) {
-                    this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1);
+                    const regex = /(can't find a transcript)|(ASR access code not valid or expired)/g;
+                    const matches = regex.exec(item.result);
+
+                    let clearMessage = '';
+
+                    if (matches && matches.length > 0) {
+                      if (matches[1]) {
+                        // transcript not found
+                        clearMessage += 'ASR on a segment failed: Can\'t find a transcript.' +
+                          'This means either a bad signal quality or empty signal.';
+                      } else if (matches[2]) {
+                        clearMessage += 'ASR on a segment failed: ASR access code not valid or expired.';
+                      }
+                    }
+
+                    const data = (clearMessage !== '') ? clearMessage : ErrorOccurredComponent;
+                    const duration = (clearMessage !== '') ? 10 : -1;
+                    this.alertService.showAlert('danger', data, true, duration);
                     segment.isBlockedBy = null;
                     this.transcrService.currentlevel.segments.change(segNumber, segment);
                   }

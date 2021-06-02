@@ -44,3 +44,5 @@ Thumbs.db
 /extern/
 
 /apps/octra/src/config/appconfig.json
+future_features.txt
+/src/

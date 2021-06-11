@@ -30,6 +30,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.appStorage.submitted = true;
+    this.appStorage.transcriptionEnded = true;
   }
 
   ngAfterViewInit() {
@@ -50,6 +51,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   clearData() {
     this.appStorage.submitted = false;
+    this.appStorage.transcriptionEnded = false;
     this.appStorage.clearAnnotationData().catch((err) => {
       console.error(err);
     });

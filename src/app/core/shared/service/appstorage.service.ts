@@ -446,6 +446,7 @@ export class AppStorageService {
   @SessionStorage() _loggedIn: boolean;
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobsLeft') jobsLeft: number;
+  @SessionStorage('transcriptionEnded') transcriptionEnded: boolean;
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
   private _isSaving = false;

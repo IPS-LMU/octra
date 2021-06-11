@@ -1,10 +1,13 @@
 <div id="transcr-end">
-    <div class="container" style="width:900px;">
-        <div class="well well-large">
-          <p>{{"transcription submitted.no jobs left" | transloco}}</p>
+  <div class="container" style="width:900px;">
+    <div class="card" style="padding: 30px;">
+      <div style="text-align: center;margin-bottom:30px;">
+        <fa-icon icon="check-circle" style="color:green" size="4x"></fa-icon>
+      </div>
+      <p style="margin-bottom: 50px;">{{"transcription submitted.no jobs left" | transloco}}</p>
 
-            <a class="btn btn-raised btn-default" style="width:100%;" (click)="leave()">{{"transcription submitted.quit"
-                | transloco}}</a>
-        </div>
+      <a class="btn btn-raised btn-primary" style="width:100%;" (click)="leave()">{{"transcription submitted.quit"
+        | transloco}}</a>
     </div>
+  </div>
 </div>

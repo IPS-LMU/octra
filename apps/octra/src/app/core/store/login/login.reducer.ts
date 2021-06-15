@@ -19,14 +19,7 @@ export const initialState: LoginState = {
 
 export const reducer = createReducer(
   initialState,
-  on(LoginActions.loginDemo, (state: LoginState, {onlineSession}) => ({
-    ...state,
-    mode: LoginMode.DEMO,
-    loggedIn: true,
-    sessionFile: undefined,
-    files: undefined,
-    onlineSession
-  })),
+
   on(LoginActions.loginLocal, (state: LoginState, {files, sessionFile}) => ({
     ...state,
     mode: LoginMode.LOCAL,
@@ -34,27 +27,6 @@ export const reducer = createReducer(
     loggedIn: true,
     sessionFile,
     files
-  })),
-  on(LoginActions.loginURLParameters, (state: LoginState, {urlParams}) => ({
-    ...state,
-    mode: LoginMode.URL,
-    onlineSession: initialState.onlineSession,
-    loggedIn: true,
-    sessionFile: undefined,
-    files: undefined,
-    urlParams
-  })),
-  on(LoginActions.loginOnline, (state: LoginState, {onlineSession}) => ({
-    ...state,
-    mode: LoginMode.ONLINE,
-    loggedIn: true,
-    onlineSession,
-    sessionFile: undefined,
-    files: undefined
-  })),
-  on(LoginActions.setMode, (state: LoginState, {mode}) => ({
-    ...state,
-    mode
   })),
   on(LoginActions.logout, (state: LoginState, {clearSession}) => {
     let result = {

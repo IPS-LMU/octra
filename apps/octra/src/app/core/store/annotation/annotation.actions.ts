@@ -2,22 +2,57 @@ import {createAction, props} from '@ngrx/store';
 import {AnnotationState, AnnotationStateLevel} from '../index';
 import {OIDBLink} from '@octra/annotation';
 
-const context = 'Annotation';
-
 export class AnnotationActions {
+  protected static context = 'Annotation';
+
+  public static logout = createAction(
+    `[${AnnotationActions.context}] Logout`,
+    props<{
+      clearSession: boolean;
+    }>()
+  );
+
+
+  public static setAudioURL = createAction(`[${AnnotationActions.context}] Set Audio URL`,
+    props<{
+      audioURL: string;
+    }>()
+  );
+
+  public static clearSessionStorageSuccess = createAction(
+    `[${AnnotationActions.context}] Clear Session Storage Success`,
+  );
+
+  public static clearSessionStorageFailed = createAction(
+    `[${AnnotationActions.context}] Clear Session Storage Failed`,
+  );
+
+  public static clearWholeSession = createAction(
+    `[${AnnotationActions.context}] Clear whole session`,
+  );
+
+
+  public static clearWholeSessionSuccess = createAction(
+    `[${AnnotationActions.context}] Clear whole session success`,
+  );
+
+  public static clearWholeSessionFailed = createAction(
+    `[${AnnotationActions.context}] Clear whole session failed`,
+  );
+
   public static setAnnotation = createAction(
-    `[${context}] Set annotation`,
+    `[${AnnotationActions.context}] Set annotation`,
     props<{
       annotation: AnnotationState;
     }>()
   );
 
   public static clearAnnotation = createAction(
-    `[${context}] Clear annotation`
+    `[${AnnotationActions.context}] Clear annotation`
   );
 
   public static overwriteAnnotation = createAction(
-    `[${context}] Overwrite annotation`,
+    `[${AnnotationActions.context}] Overwrite annotation`,
     props<{
       annotation: AnnotationState,
       saveToDB: boolean
@@ -25,14 +60,14 @@ export class AnnotationActions {
   );
 
   public static overwriteLinks = createAction(
-    `[${context}] Overwrite links`,
+    `[${AnnotationActions.context}] Overwrite links`,
     props<{
       links: OIDBLink[]
     }>()
   );
 
   public static changeAnnotationLevel = createAction(
-    `[${context}] Change Annotation Level`,
+    `[${AnnotationActions.context}] Change Annotation Level`,
     props<{
       level: AnnotationStateLevel;
       sortorder: number;
@@ -40,21 +75,21 @@ export class AnnotationActions {
   );
 
   public static addAnnotationLevel = createAction(
-    `[${context}] Add Annotation Level`,
+    `[${AnnotationActions.context}] Add Annotation Level`,
     props<{
       level: AnnotationStateLevel
     }>()
   );
 
   public static removeAnnotationLevel = createAction(
-    `[${context}] Remove Annotation Level`,
+    `[${AnnotationActions.context}] Remove Annotation Level`,
     props<{
       id: number
     }>()
   );
 
   public static setLevelCounter = createAction(
-    `[${context}] Set Level Counter`,
+    `[${AnnotationActions.context}] Set Level Counter`,
     props<{
       levelCounter: number
     }>()

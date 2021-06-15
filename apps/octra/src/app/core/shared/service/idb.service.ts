@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
 import {OIDBLink, OLevel} from '@octra/annotation';
 import {Subject} from 'rxjs';
-import {IIDBLevel, IIDBLink, IOption, OctraDatabase} from '../octra-database';
+import {IIDBLevel, IIDBLink, IIDBOption, OctraDatabase} from '../octra-database';
 import {isUnset} from '@octra/utilities';
 import {AnnotationStateLevel} from '../../store';
 
@@ -99,7 +99,7 @@ export class IDBService {
    * load options
    * @param variables
    */
-  public loadOptions = (variables: { attribute: string, key: string }[]): Subject<IOption[]> => {
+  public loadOptions = (variables: { attribute: string, key: string }[]): Subject<IIDBOption[]> => {
     const subject = new Subject<{
       value: any;
       name: string;
@@ -123,6 +123,7 @@ export class IDBService {
     return new Promise<any[]>((resolve, reject) => {
       const logs: any[] = [];
 
+      // TODO db: load logs for each mode
       this.database.logs.each((item) => {
         if (!isUnset(item)) {
           logs.push(item.value);

@@ -1,9 +1,11 @@
 import {createReducer, on} from '@ngrx/store';
-import {ApplicationState, LoadingStatus} from '../index';
+import {ApplicationState, LoadingStatus, LoginMode} from '../index';
 import {isUnset} from '@octra/utilities';
 import {ApplicationActions} from './application.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {IDBActions} from '../idb/idb.actions';
+import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
+import {AnnotationActions} from '../annotation/annotation.actions';
 
 export const initialState: ApplicationState = {
   loading: {
@@ -18,7 +20,20 @@ export const initialState: ApplicationState = {
   },
   language: 'en',
   appConfiguration: undefined,
-  consoleEntries: []
+  loggedIn: false,
+  consoleEntries: [],
+  options: {
+    playOnHover: false,
+    followPlayCursor: false,
+    showLoupe: false,
+    audioSettings: {
+      volume: 1,
+      speed: 1
+    },
+    easyMode: false,
+    secondsPerLine: 10,
+    highlightingEnabled: false
+  }
 };
 
 export const reducer = createReducer(
@@ -106,7 +121,30 @@ export const reducer = createReducer(
       ...state.idb,
       loaded: true
     }
-  }))
+  })),
+  on(OnlineModeActions.login, (state: ApplicationState) => ({
+    ...state,
+    mode: LoginMode.ONLINE,
+    loggedIn: true
+  })),
+  on(OnlineModeActions.loginURLParameters, (state: ApplicationState, {urlParams}) => ({
+    ...state,
+    mode: LoginMode.URL,
+    loggedIn: true,
+    queryParams: urlParams
+  })),
+  on(ApplicationActions.setMode, (state: ApplicationState, {mode}) => ({
+    ...state,
+    mode
+  })),
+  on(AnnotationActions.logout, (state: ApplicationState) => {
+    return {
+      ...state,
+      mode: null,
+      queryParams: undefined,
+      loggedIn: false
+    };
+  }),
 );
 
 

@@ -1,5 +1,6 @@
 import {createAction, props} from '@ngrx/store';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
+import {LoginMode} from '../index';
 
 const context = 'Application';
 
@@ -39,6 +40,19 @@ export class ApplicationActions {
   );
 
   public static finishLoading = createAction(`[${context}] Finish Loading`);
+
+  public static setLoggedIn = createAction(
+    `[${context}] Set loggedIn`,
+    props<{
+      loggedIn: boolean;
+    }>()
+  );
+
+  public static setMode = createAction(`[${context}] Set Mode`,
+    props<{
+      mode: LoginMode;
+    }>()
+  );
 
   public static addError = createAction(
     `[${context}] Add Error`,

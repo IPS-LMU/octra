@@ -100,11 +100,10 @@ import {TranscriptionComponent} from './core/pages/transcription';
 import {TranscriptionEndComponent} from './core/pages/transcription-end';
 import {TranscrWindowComponent} from './editors/2D-editor/transcr-window';
 import {OctraModalComponent} from './core/modals/octra-modal';
-import * as fromLogin from './core/store/login/login.reducer';
 import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
-import * as fromTranscription from './core/store/transcription/transcription.reducer';
-import * as fromAnnotation from './core/store/annotation/annotation.reducer';
+import * as fromOnlineMode from './core/store/modes/online-mode/online-mode.reducer';
+import * as fromLocalMode from './core/store/modes/local-mode/local-mode.reducer';
 import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
@@ -222,11 +221,11 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     TooltipModule.forRoot(),
     StoreModule.forRoot(
       {
-        login: fromLogin.reducer,
         application: fromApplication.reducer,
         asr: fromASR.reducer,
-        transcription: fromTranscription.reducer,
-        annotation: fromAnnotation.reducer,
+        onlineMode: fromOnlineMode.reducer,
+        demoMode: fromOnlineMode.reducer,
+        localMode: fromLocalMode.reducer,
         user: fromUser.reducer
       },
       {

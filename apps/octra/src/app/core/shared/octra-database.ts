@@ -1,15 +1,16 @@
 import Dexie, {Transaction} from 'dexie';
 import {Subject} from 'rxjs';
 import {OLevel, OLink} from '@octra/annotation';
+import {isUnset} from '@octra/utilities';
 
 export class OctraDatabase extends Dexie {
-  public annotation_levels: Dexie.Table<IAnnotationLevel, number>;
-  public annotation_links: Dexie.Table<IIDBLink, number>;
-  public logs: Dexie.Table<any, number>;
-  public options: Dexie.Table<IOption, string>;
+  public demoData: Dexie.Table<IIDBEntry, string>;
+  public onlineData: Dexie.Table<IIDBEntry, string>;
+  public localData: Dexie.Table<IIDBEntry, string>;
+  public options: Dexie.Table<IIDBOption, string>;
   public onReady: Subject<void>;
 
-  private defaultOptions: IOption[] = [
+  private defaultOptions: IIDBOption[] = [
     {
       name: 'submitted',
       value: false
@@ -119,9 +120,20 @@ export class OctraDatabase extends Dexie {
       options: 'name'
     }).upgrade(this.upgradeToDatabaseV3);
 
-    this.annotation_levels = this.table('annotation_levels');
-    this.annotation_links = this.table('annotation_links');
-    this.logs = this.table('logs');
+    this.version(0.4).stores({
+      annotation_levels: '++id',
+      annotation_links: '++id',
+      logs: 'timestamp',
+      demo_data: 'name',
+      online_data: 'name',
+      local_data: 'name',
+      options: 'name'
+    }).upgrade(this.upgradeToDatabaseV4);
+
+    this.demoData = this.table('demo_data');
+    this.onlineData = this.table('online_data');
+    this.localData = this.table('local_data');
+
     this.options = this.table('options');
 
     this.on('ready', () => {
@@ -141,7 +153,7 @@ export class OctraDatabase extends Dexie {
 
   private upgradeToDatabaseV3(transaction: Transaction) {
     console.log(`UPGRADE to v3`);
-    return transaction.table('options').toCollection().modify((option: IOption) => {
+    return transaction.table('options').toCollection().modify((option: IIDBOption) => {
       if (option.name === 'uselocalmode') {
         option.name = 'usemode';
         if (option.value === false) {
@@ -153,11 +165,84 @@ export class OctraDatabase extends Dexie {
     });
   }
 
+
+  private upgradeToDatabaseV4(transaction: Transaction) {
+    console.log(`UPGRADE to v4`);
+
+    return new Promise<void>((resolve, reject) => {
+      transaction.table('options').get('usemode').then((usemode) => {
+        if (usemode === 'local') {
+          // TODO db: migrate old local data to localData, remove old tables
+          resolve();
+        }
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  loadModeOptionsFromDB(mode: 'demo' | 'local' | 'online') {
+    return new Promise<IIDBModeOptions>((resolve, reject) => {
+      const table = this.getTableFromString(mode);
+
+      if (table) {
+        return table.get('options').then((options) => {
+          if (!isUnset(options)) {
+            resolve(options.value)
+          }
+          resolve(null);
+        }).catch((e) => {
+          reject(e);
+        });
+      }
+    });
+  }
+
+  loadModeLogsFromDB(mode: 'demo' | 'local' | 'online') {
+    return new Promise<any[]>((resolve, reject) => {
+      const table = this.getTableFromString(mode);
+
+      if (table) {
+        return table.get('logs').then((logs) => {
+          if (!isUnset(logs)) {
+            resolve(logs.value)
+          }
+          resolve([]);
+        }).catch((e) => {
+          reject(e);
+        });
+      }
+    });
+  }
+
+  private getTableFromString(mode: 'demo' | 'local' | 'online'): Dexie.Table<IIDBEntry, string> {
+    let table: Dexie.Table<IIDBEntry, string> = null;
+
+    switch (mode) {
+      case 'demo':
+        table = this.demoData;
+        break;
+      case 'local':
+        table = this.localData;
+        break;
+      case 'online':
+        table = this.onlineData;
+        break;
+    }
+
+    return table;
+  }
+
   private checkAndFillPopulation(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.options.count((count) => {
         if (count === 0) {
-          this.populateOptions().then(() => {
+          Promise.all([
+            this.populateOptions(),
+            this.populateModeOptions(this.demoData),
+            this.populateModeOptions(this.onlineData),
+            this.populateModeOptions(this.localData)
+          ]).then(() => {
             console.log(`population of options finished!`);
             resolve();
           }).catch((error) => {
@@ -170,12 +255,27 @@ export class OctraDatabase extends Dexie {
     });
   }
 
+  private populateModeOptions(table: Dexie.Table<IIDBEntry, string>) {
+    const modeOptions: IIDBModeOptions = {
+      submitted: false,
+      audioURL: '',
+      comment: '',
+      dataID: -1,
+      feedback: null,
+      sessionfile: null,
+      prompttext: '',
+      servercomment: '',
+      logging: true
+    };
+
+    return table.add({
+      name: 'options',
+      value: modeOptions
+    });
+  }
+
   private populateOptions() {
     return this.options.bulkPut([
-      {
-        name: 'submitted',
-        value: false
-      },
       {
         name: 'version',
         value: 3
@@ -185,27 +285,7 @@ export class OctraDatabase extends Dexie {
         value: false
       },
       {
-        name: 'audioURL',
-        value: null
-      },
-      {
-        name: 'comment',
-        value: ''
-      },
-      {
-        name: 'dataID',
-        value: null
-      },
-      {
-        name: 'feedback',
-        value: null
-      },
-      {
         name: 'language',
-        value: null
-      },
-      {
-        name: 'sessionfile',
         value: null
       },
       {
@@ -221,20 +301,8 @@ export class OctraDatabase extends Dexie {
         value: null
       },
       {
-        name: 'logging',
-        value: true
-      },
-      {
         name: 'showLoupe',
         value: false
-      },
-      {
-        name: 'prompttext',
-        value: ''
-      },
-      {
-        name: 'servercomment',
-        value: ''
       },
       {
         name: 'secondsPerLine',
@@ -263,6 +331,11 @@ export class OctraDatabase extends Dexie {
   }
 }
 
+export interface IAnnotation {
+  levels: IAnnotationLevel[];
+  links: IIDBLink
+}
+
 export interface IAnnotationLevel {
   id: number,
   value: IIDBLevel
@@ -279,7 +352,25 @@ export interface IIDBLink {
   link: OLink;
 }
 
-export interface IOption {
+export interface IIDBEntry {
   name: string;
   value: any;
 }
+
+export interface IIDBModeOptions {
+  submitted: boolean;
+  audioURL: string;
+  comment: string;
+  dataID: number;
+  feedback: any;
+  sessionfile: any;
+  prompttext: string;
+  servercomment: string;
+  logging: boolean;
+}
+
+export interface IIDBOption {
+  name: string;
+  value: any;
+}
+

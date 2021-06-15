@@ -1,5 +1,4 @@
 import {IDataEntry} from '../obj/data-entry';
-import {SessionFile} from '../obj/SessionFile';
 import {
   AnnotationLevelType,
   ASRQueueItemType,
@@ -57,16 +56,10 @@ export interface URLParameters {
   host: string;
 }
 
-export interface LoginState {
+export interface ApplicationState {
   mode?: LoginMode;
-  files?: File[];
-  onlineSession: OnlineSession,
-  sessionFile?: SessionFile,
   queryParams?: URLParameters,
   loggedIn: boolean;
-}
-
-export interface ApplicationState {
   loading: {
     status: LoadingStatus;
     progress: number;
@@ -80,6 +73,18 @@ export interface ApplicationState {
   language: string;
   appConfiguration: AppSettings;
   consoleEntries: ConsoleEntry[];
+  options: {
+    playOnHover: boolean;
+    followPlayCursor: boolean;
+    showLoupe: boolean;
+    audioSettings: {
+      volume: number;
+      speed: number;
+    },
+    easyMode: boolean;
+    secondsPerLine: number;
+    highlightingEnabled: boolean;
+  };
 }
 
 export interface ASRState {
@@ -88,39 +93,38 @@ export interface ASRState {
 }
 
 export interface AnnotationState extends UndoRedoState {
-  levels: AnnotationStateLevel[];
-  links: OIDBLink[];
-  levelCounter: number;
-  histories: Histories;
-}
-
-export interface TranscriptionState {
   savingNeeded: boolean;
   isSaving: boolean;
-  playOnHover: boolean;
-  followPlayCursor: boolean;
   submitted: boolean;
   currentEditor?: string;
-  showLoupe: boolean;
   audio: {
     loaded: boolean;
   }
-  audioSettings: {
-    volume: number;
-    speed: number;
-  },
   feedback: any;
   guidelines?: any;
   logs: ILog[];
   logging: boolean;
-  easyMode: boolean;
-  secondsPerLine: number;
-  highlightingEnabled: boolean;
   projectConfig?: ProjectSettings;
   methods?: {
-    validate: ((string, any) => any);
-    tidyUp: ((string, any) => any);
+    validate: ((transcript: string, guidelines: any) => any);
+    tidyUp: ((transcript: string, guidelines: any) => any);
   }
+  transcript: TranscriptionState;
+  histories: Histories;
+}
+
+export interface OnlineModeState extends AnnotationState {
+  onlineSession: OnlineSession,
+}
+
+export interface LocalModeState extends AnnotationState {
+  files?: any[];
+}
+
+export interface TranscriptionState {
+  levels: AnnotationStateLevel[];
+  links: OIDBLink[];
+  levelCounter: number;
 }
 
 export interface UserState {
@@ -130,10 +134,10 @@ export interface UserState {
 
 export interface RootState {
   application: ApplicationState,
-  login: LoginState,
   asr: ASRState,
-  transcription: TranscriptionState,
-  annotation: AnnotationState,
+  onlineMode: OnlineModeState,
+  demoMode: OnlineModeState,
+  localMode: LocalModeState,
   user: UserState
 }
 

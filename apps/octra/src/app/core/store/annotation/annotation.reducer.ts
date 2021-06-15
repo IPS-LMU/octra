@@ -1,4 +1,4 @@
-import {on} from '@ngrx/store';
+import {ActionCreator, on, ReducerTypes} from '@ngrx/store';
 import {AnnotationState} from '../index';
 import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from './annotation.actions';
@@ -6,9 +6,20 @@ import {IDBActions} from '../idb/idb.actions';
 import {LoginActions} from '../login/login.actions';
 
 export const initialState: AnnotationState = {
-  levels: [],
-  links: [],
-  levelCounter: 0,
+  transcript: {
+    levels: [],
+    links: [],
+    levelCounter: 0
+  },
+  savingNeeded: false,
+  isSaving: false,
+  submitted: false,
+  audio: {
+    loaded: false
+  },
+  feedback: null,
+  logs: [],
+  logging: false,
   histories: {}
 };
 
@@ -21,8 +32,7 @@ const {createUndoRedoReducer} = undoRedo({
   ]
 })
 
-export const reducer = createUndoRedoReducer(
-  initialState,
+export const reducers: ReducerTypes<AnnotationState, ActionCreator[]>[] = [
   on(AnnotationActions.setLevelCounter, (state: AnnotationState, {levelCounter}) =>
     ({
       ...state,
@@ -129,4 +139,4 @@ export const reducer = createUndoRedoReducer(
       ...state,
       links
     }))
-);
+];

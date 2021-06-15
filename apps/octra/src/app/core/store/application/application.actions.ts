@@ -99,6 +99,60 @@ export class ApplicationActions {
       error: string;
     }>()
   );
+
+  public static setPlayOnHover = createAction(
+    `[${context}] set playOnHover`,
+    props<{
+      playOnHover: boolean;
+    }>()
+  );
+
+  public static setFollowPlayCursor = createAction(
+    `[${context}] set follow play cursor`,
+    props<{
+      followPlayCursor: boolean;
+    }>()
+  );
+
+  public static setAudioSettings = createAction(
+    `[${context}] Set volume`,
+    props<{
+      volume: number;
+      speed: number;
+    }>()
+  );
+
+  public static setShowLoupe = createAction(
+    `[${context}] Set showLoupe`,
+    props<{
+      showLoupe: boolean;
+    }>()
+  );
+
+  public static setEasyMode = createAction(
+    `[${context}] Set easy mode`,
+    props<{
+      easyMode: boolean;
+    }>()
+  );
+
+  public static setSecondsPerLine = createAction(
+    `[${context}] Set seconds per line`,
+    props<{
+      secondsPerLine: number;
+    }>()
+  );
+
+  public static setHighlightingEnabled = createAction(
+    `[${context}] Set highlightingEnabled`,
+    props<{
+      highlightingEnabled: boolean;
+    }>()
+  );
+
+  public static clearSettings = createAction(
+    `[Configuration] Clear Settings`
+  );
 }
 
 

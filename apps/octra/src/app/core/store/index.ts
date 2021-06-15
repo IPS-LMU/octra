@@ -16,6 +16,7 @@ import {SampleUnit} from '@octra/media';
 import {isUnset} from '@octra/utilities';
 import {ILog} from '../obj/Settings/logging';
 import {Histories, UndoRedoState} from 'ngrx-wieder';
+import {SessionFile} from '../obj/SessionFile';
 
 export enum LoginMode {
   URL = 'url',
@@ -119,6 +120,7 @@ export interface OnlineModeState extends AnnotationState {
 
 export interface LocalModeState extends AnnotationState {
   files?: any[];
+  sessionFile?: SessionFile;
 }
 
 export interface TranscriptionState {

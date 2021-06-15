@@ -24,8 +24,6 @@ import {IDBActions} from './idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {ApplicationActions} from '../application/application.actions';
 import {ASRActions} from '../asr/asr.actions';
-import {TranscriptionActions} from '../transcription/transcription.actions';
-import {LoginActions} from '../login/login.actions';
 import {UserActions} from '../user/user.actions';
 
 

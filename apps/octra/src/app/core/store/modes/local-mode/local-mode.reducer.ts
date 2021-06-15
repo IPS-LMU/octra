@@ -1,9 +1,12 @@
 import {on} from '@ngrx/store';
-import {LocalModeState, OnlineModeState} from '../../index';
+import {LocalModeState} from '../../index';
 import * as fromAnnotation from '../../annotation/annotation.reducer';
 import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {LocalModeActions} from './local-mode.actions';
+import {SessionFile} from '../../../obj/SessionFile';
+import {IDBActions} from '../../idb/idb.actions';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: LocalModeState = {
   ...fromAnnotation.initialState,
@@ -22,11 +25,11 @@ const {createUndoRedoReducer} = undoRedo({
 export const reducer = createUndoRedoReducer(
   initialState,
   ...fromAnnotation.reducers,
-  on(LocalModeActions.login, (state: OnlineModeState, data) => ({
+  on(LocalModeActions.login, (state: LocalModeState, data) => ({
     ...state,
     ...data
   })),
-  on(LocalModeActions.logout, (state: OnlineModeState, {clearSession}) => {
+  on(LocalModeActions.logout, (state: LocalModeState, {clearSession}) => {
     return (clearSession) ? initialState : {
       ...state,
       savingNeeded: false,
@@ -38,5 +41,36 @@ export const reducer = createUndoRedoReducer(
       files: [],
       histories: {}
     };
-  })
+  }),
+  on(LocalModeActions.setSessionFile, (state: LocalModeState, {sessionFile}) => ({
+    ...state,
+    sessionFile
+  })),
+  on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {variables}) => {
+      let result = state;
+
+      for (const variable of variables) {
+        if (!isUnset(variable)) {
+          result = writeOptionToStore(result, variable.name, variable.value);
+        }
+      }
+
+      return result;
+    }
+  )
 );
+
+
+function writeOptionToStore(state: LocalModeState, attribute: string, value: any): LocalModeState {
+  switch (attribute) {
+    case('sessionfile'):
+      const sessionFile = SessionFile.fromAny(value);
+
+      return {
+        ...state,
+        sessionFile
+      };
+  }
+
+  return state;
+}

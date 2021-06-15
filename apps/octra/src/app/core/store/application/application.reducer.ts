@@ -137,6 +137,10 @@ export const reducer = createReducer(
     ...state,
     mode
   })),
+  on(ApplicationActions.setLoggedIn, (state: ApplicationState, {loggedIn}) => ({
+    ...state,
+    loggedIn
+  })),
   on(AnnotationActions.logout, (state: ApplicationState) => {
     return {
       ...state,
@@ -145,6 +149,49 @@ export const reducer = createReducer(
       loggedIn: false
     };
   }),
+  on(ApplicationActions.setPlayOnHover, (state: ApplicationState, {playOnHover}) => ({
+    ...state,
+    options: {
+      ...state.options,
+      playOnHover
+    }
+  })),
+
+  on(ApplicationActions.setAudioSettings, (state: ApplicationState, data) => ({
+    ...state,
+    options: {
+      ...state.options,
+      audioSettings: data
+    }
+  })),
+  on(ApplicationActions.setShowLoupe, (state: ApplicationState, {showLoupe}) => ({
+    ...state,
+    options: {
+      ...state.options,
+      showLoupe
+    }
+  })),
+  on(ApplicationActions.setEasyMode, (state: ApplicationState, {easyMode}) => ({
+    ...state,
+    options: {
+      ...state.options,
+      easyMode
+    }
+  })),
+  on(ApplicationActions.setSecondsPerLine, (state: ApplicationState, {secondsPerLine}) => ({
+    ...state,
+    options: {
+      ...state.options,
+      secondsPerLine
+    }
+  })),
+  on(ApplicationActions.setHighlightingEnabled, (state: ApplicationState, {highlightingEnabled}) => ({
+    ...state,
+    options: {
+      ...state.options,
+      highlightingEnabled
+    }
+  })),
 );
 
 
@@ -162,6 +209,54 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
       return {
         ...state,
         language: (!isUnset(value)) ? value : 'en'
+      };
+    case('usemode'):
+      return {
+        ...state,
+        mode: value
+      };
+    case('easymode'):
+      return {
+        ...state,
+        options: {
+          ...state.options,
+          easyMode: (!isUnset(value)) ? value : false
+        }
+      };
+    case('showLoupe'):
+      return {
+        ...state,
+        options: {
+          ...state.options,
+          showLoupe: (!isUnset(value)) ? value : false
+        }
+      };
+    case('secondsPerLine'):
+      return {
+        ...state,
+        options: {
+          ...state.options,
+          secondsPerLine: (!isUnset(value)) ? value : 5
+        }
+      };
+    case('audioSettings'):
+      return {
+        ...state,
+        options: {
+          ...state.options,
+          audioSettings: {
+            volume: (!isUnset(value)) ? value.volume : 1,
+            speed: (!isUnset(value)) ? value.speed : 1
+          }
+        }
+      };
+    case('highlightingEnabled'):
+      return {
+        ...state,
+        options: {
+          ...state.options,
+          highlightingEnabled: (!isUnset(value)) ? value : false
+        }
       };
     default:
       return state;

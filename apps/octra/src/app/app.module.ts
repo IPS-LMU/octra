@@ -107,13 +107,14 @@ import * as fromLocalMode from './core/store/modes/local-mode/local-mode.reducer
 import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
-import {ConfigurationEffects} from './core/store/transcription/configuration.effects';
+import {ConfigurationEffects} from './core/store/application/configuration.effects';
 import {fab} from '@fortawesome/free-brands-svg-icons';
 import {ShortcutComponent} from './core/shortcut/shortcut.component';
 import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
 import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
 import {ProtectedModalComponent} from './core/modals/protected-modal/protected-modal.component';
+import {ApplicationEffects} from './core/store/application/application-effects.service';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -237,7 +238,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       }
     ),
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
-    EffectsModule.forRoot([ConfigurationEffects, IDBEffects]),
+    EffectsModule.forRoot([ConfigurationEffects, IDBEffects, ApplicationEffects]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([]),
     MaintenanceModule

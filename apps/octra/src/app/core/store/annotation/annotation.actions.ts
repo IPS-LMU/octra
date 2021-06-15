@@ -1,6 +1,7 @@
 import {createAction, props} from '@ngrx/store';
-import {AnnotationState, AnnotationStateLevel} from '../index';
+import {AnnotationState, AnnotationStateLevel, TranscriptionState} from '../index';
 import {OIDBLink} from '@octra/annotation';
+import {ILog} from '../../obj/Settings/logging';
 
 export class AnnotationActions {
   protected static context = 'Annotation';
@@ -92,6 +93,78 @@ export class AnnotationActions {
     `[${AnnotationActions.context}] Set Level Counter`,
     props<{
       levelCounter: number
+    }>()
+  );
+
+  public static setSavingNeeded = createAction(
+    `[${AnnotationActions.context}] Set savingNeeded`,
+    props<{
+      savingNeeded: boolean;
+    }>()
+  );
+
+  public static setIsSaving = createAction(
+    `[${AnnotationActions.context}] Set isSaving`,
+    props<{
+      isSaving: boolean;
+    }>()
+  );
+
+  public static setSubmitted = createAction(
+    `[${AnnotationActions.context}] set submitted`,
+    props<{
+      submitted: boolean;
+    }>()
+  );
+
+  public static addLog = createAction(
+    `[${AnnotationActions.context}] add log`,
+    props<{
+      log: ILog;
+    }>()
+  );
+
+  public static setLogs = createAction(
+    `[${AnnotationActions.context}] set logs`,
+    props<{
+      logs: any[];
+    }>()
+  );
+
+  public static setTranscriptionState = createAction(
+    `[${AnnotationActions.context}] set transcription state`,
+    props<TranscriptionState>()
+  );
+
+  public static setCurrentEditor = createAction(
+    `[${AnnotationActions.context}] Set current editor`,
+    props<{
+      currentEditor: string
+    }>()
+  );
+
+  public static setLogging = createAction(
+    `[${AnnotationActions.context}] Set logging`,
+    props<{
+      logging: boolean;
+    }>()
+  );
+
+  public static setFeedback = createAction(
+    `[${AnnotationActions.context}] Set feedback`,
+    props<{
+      feedback: any;
+    }>()
+  );
+
+  public static clearLogs = createAction(
+    `[${AnnotationActions.context}] Clear logs`
+  );
+
+  public static setAudioLoaded = createAction(
+    `[Transcription] Set Audio Loaded`,
+    props<{
+      loaded: boolean;
     }>()
   );
 }

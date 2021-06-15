@@ -20,6 +20,10 @@ export class LocalModeActions extends AnnotationActions {
       sessionFile: SessionFile
     }>()
   );
+
+  public static clearSessionStorageSuccess = createAction(
+    `[${LocalModeActions.context}] Clear Session Success`
+  );
 }
 
 

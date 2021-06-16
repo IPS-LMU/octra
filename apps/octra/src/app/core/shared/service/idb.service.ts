@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
-import {OIDBLink, OLevel} from '@octra/annotation';
 import {Subject} from 'rxjs';
-import {IIDBLevel, IIDBLink, IIDBOption, OctraDatabase} from '../octra-database';
+import {IAnnotation, IIDBModeOptions, IIDBOption, OctraDatabase} from '../octra-database';
 import {isUnset} from '@octra/utilities';
-import {AnnotationStateLevel} from '../../store';
+import {LoginMode} from '../../store';
 
 
 @Injectable({
@@ -53,18 +52,22 @@ export class IDBService {
   /**
    * clears all annotaiton data
    */
-  public clearAnnotationData(): Promise<any> {
-    return this.clearIDBTable('annotation_levels').then(
-      () => {
-        return this.clearIDBTable('annotation_links');
-      });
+  public clearAnnotationData(mode: LoginMode): Promise<any> {
+    return this.database.clearDataOfMode(mode, 'annotation');
   }
 
   /**
    * clears all options
    */
-  public clearOptions(): Promise<any> {
-    return this.clearIDBTable('options');
+  public clearModeOptions(mode: LoginMode): Promise<any> {
+    return this.database.clearDataOfMode(mode, 'options');
+  }
+
+  /**
+   * clears all options
+   */
+  public clearOptions(mode: LoginMode): Promise<any> {
+    return this.database.options.clear();
   }
 
   /**
@@ -119,59 +122,15 @@ export class IDBService {
   /**
    * load all logs
    */
-  public loadLogs() {
-    return new Promise<any[]>((resolve, reject) => {
-      const logs: any[] = [];
-
-      // TODO db: load logs for each mode
-      this.database.logs.each((item) => {
-        if (!isUnset(item)) {
-          logs.push(item.value);
-        }
-      }).then(() => {
-        resolve(logs);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
+  public loadLogs(mode: LoginMode): Promise<any[]> {
+    return this.database.loadDataOfMode<any[]>(mode, 'logs', []);
   }
 
   /**
-   * load one annotation level
+   * load annotation
    */
-  public loadAnnotationLevels() {
-    return new Promise<IIDBLevel[]>((resolve, reject) => {
-      const levels: IIDBLevel[] = [];
-
-      this.database.annotation_levels.each((item) => {
-        if (!isUnset(item)) {
-          levels.push(item.value)
-        }
-      }).then(() => {
-        resolve(levels);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  /**
-   * load all annotaiton links
-   */
-  public loadAnnotationLinks() {
-    return new Promise<IIDBLink[]>((resolve, reject) => {
-      const links: IIDBLink[] = [];
-
-      this.database.annotation_links.each((item) => {
-        if (!isUnset(item)) {
-          links.push(item);
-        }
-      }).then(() => {
-        resolve(links);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
+  public loadAnnotation(mode: LoginMode) {
+    return this.database.loadDataOfMode(mode, 'annotation', null);
   }
 
   /**
@@ -187,100 +146,29 @@ export class IDBService {
     }
   }
 
-  /**
-   * save one log item.
-   * @param log
-   * @param timestamp
-   */
-  public saveLog(log: any, timestamp: number) {
-    return this.database.logs.put(log, timestamp);
+  public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {
+    return this.database.saveModeData(mode, 'options', options);
   }
 
   /**
-   * save all logs
-   * @param logs
+   * save one log item.
    */
-  public saveLogs(logs: any[]) {
-    return this.database.logs.bulkPut(logs);
+  public saveLogs(mode: LoginMode, logs: any[]) {
+    return this.database.saveModeData(mode, 'logs', logs);
   }
 
   /**
    * save one annotation level.
-   * @param level
-   * @param id
    */
-  public saveAnnotationLevel(level: IIDBLevel) {
-    return this.database.annotation_levels.put({
-      id: level.id,
-      value: level
-    }, level.id);
-  }
-
-  /***
-   * adds annotation level
-   * @param level
-   */
-  public addAnnotationLevel(level: IIDBLevel) {
-    return this.database.annotation_levels.add({
-      id: level.id,
-      value: level
-    });
-  }
-
-  /**
-   * saves all annotation levels.
-   * @param levels
-   */
-  public saveAnnotationLevels(levels: AnnotationStateLevel[]) {
-    return this.database.annotation_levels.bulkPut(levels.map((a, i) => {
-      return {
-        id: a.id,
-        value: {
-          id: a.id,
-          level: new OLevel(a.name, a.type, a.items),
-          sortorder: i
-        }
-      }
-    }));
-  }
-
-  /**
-   * saves one annotation link
-   * @param link
-   */
-  public saveAnnotationLink(link: OIDBLink) {
-    return this.database.annotation_links.put(link, link.id);
-  }
-
-  /**
-   * adds one annotation link
-   * @param link
-   */
-  public addAnnotationLink(link: OIDBLink) {
-    return this.database.annotation_links.add(link, link.id);
-  }
-
-  /**
-   * saves all annotation links
-   * @param links
-   */
-  public saveAnnotationLinks(links: OIDBLink[]) {
-    return this.database.annotation_links.bulkPut(links);
-  }
-
-  /**
-   * clears selected IDB Table
-   * @param name
-   */
-  public clearIDBTable(name: string): Promise<any> {
-    return this.database[name].clear();
+  public saveAnnotation(mode: LoginMode, annotation: IAnnotation) {
+    return this.database.saveModeData(mode, 'annotation', annotation);
   }
 
   /**
    * clears logging data
    */
-  public clearLoggingData(): Promise<any> {
-    return this.clearIDBTable('logs');
+  public clearLoggingData(mode: LoginMode): Promise<any> {
+    return this.database.clearDataOfMode(mode, 'logs');
   }
 
   /**

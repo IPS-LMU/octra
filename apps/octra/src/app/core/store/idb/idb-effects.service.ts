@@ -39,16 +39,21 @@ export class IDBEffects {
         const subject = new Subject<Action>();
         // code for saving to the database
         console.log(`save after undo`);
-        Promise.all([
-          this.idbService.saveAnnotationLevels(appState.annotation.levels),
-          this.idbService.saveAnnotationLinks(appState.annotation.links)
-        ]).then(() => {
-          subject.next(ApplicationActions.undoSuccess());
-        }).catch((error) => {
+        const modeState = getModeState(appState);
+
+        if (modeState) {
+          this.idbService.saveAnnotation(appState.).then(() => {
+            subject.next(ApplicationActions.undoSuccess());
+          }).catch((error) => {
+            subject.next(ApplicationActions.undoFailed({
+              error
+            }));
+          });
+        } else {
           subject.next(ApplicationActions.undoFailed({
             error
           }));
-        });
+        }
 
         return subject;
       })
@@ -321,7 +326,7 @@ export class IDBEffects {
       || action.type === LoginActions.clearWholeSession.type || action.type === LoginActions.logout.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-      if(!action.hasOwnProperty("clearSession") || (action as any).clearSession){
+      if (!action.hasOwnProperty('clearSession') || (action as any).clearSession) {
         this.idbService.clearAnnotationData().then(() => {
           subject.next(IDBActions.clearAnnotationSuccess());
           subject.complete();
@@ -333,7 +338,7 @@ export class IDBEffects {
         });
 
       } else {
-        timer(10).subscribe(()=>{
+        timer(10).subscribe(() => {
           subject.complete();
         })
       }
@@ -408,7 +413,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store("loggedIn", false);
+      this.sessStr.store('loggedIn', false);
       if (action.clearSession) {
         const promises: PromiseExtended<string>[] = [];
         promises.push(this.idbService.saveOption('user', null));
@@ -1044,4 +1049,19 @@ export class IDBEffects {
     });
   }
 
+}
+
+function getModeState(appState: RootState) {
+  switch (appState.application.mode) {
+    case LoginMode.DEMO:
+      return appState.demoMode;
+    case LoginMode.LOCAL:
+      return appState.localMode;
+    case LoginMode.URL:
+      return appState.onlineMode;
+    case LoginMode.ONLINE:
+      return appState.onlineMode;
+  }
+
+  return null;
 }

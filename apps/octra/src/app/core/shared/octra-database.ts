@@ -2,6 +2,7 @@ import Dexie, {Transaction} from 'dexie';
 import {Subject} from 'rxjs';
 import {OLevel, OLink} from '@octra/annotation';
 import {isUnset} from '@octra/utilities';
+import {LoginMode} from '../store';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -181,7 +182,7 @@ export class OctraDatabase extends Dexie {
     });
   }
 
-  loadModeOptionsFromDB(mode: 'demo' | 'local' | 'online') {
+  loadModeOptionsFromDB(mode: LoginMode) {
     return new Promise<IIDBModeOptions>((resolve, reject) => {
       const table = this.getTableFromString(mode);
 
@@ -198,7 +199,7 @@ export class OctraDatabase extends Dexie {
     });
   }
 
-  loadModeLogsFromDB(mode: 'demo' | 'local' | 'online') {
+  loadModeLogsFromDB(mode: LoginMode) {
     return new Promise<any[]>((resolve, reject) => {
       const table = this.getTableFromString(mode);
 
@@ -215,17 +216,17 @@ export class OctraDatabase extends Dexie {
     });
   }
 
-  private getTableFromString(mode: 'demo' | 'local' | 'online'): Dexie.Table<IIDBEntry, string> {
+  private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
     let table: Dexie.Table<IIDBEntry, string> = null;
 
     switch (mode) {
-      case 'demo':
+      case LoginMode.DEMO:
         table = this.demoData;
         break;
-      case 'local':
+      case LoginMode.LOCAL:
         table = this.localData;
         break;
-      case 'online':
+      case LoginMode.ONLINE:
         table = this.onlineData;
         break;
     }
@@ -271,6 +272,58 @@ export class OctraDatabase extends Dexie {
     return table.add({
       name: 'options',
       value: modeOptions
+    });
+  }
+
+  public saveModeData(mode: LoginMode, name: string, value: any) {
+    return new Promise<void>((resolve, reject) => {
+      const table = this.getTableFromString(mode);
+      if (table) {
+        table.put({name, value}, name).then(() => {
+          resolve();
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public clearDataOfMode(mode: LoginMode, name: string) {
+    return new Promise<void>((resolve, reject) => {
+      const table = this.getTableFromString(mode);
+      if (table) {
+        table.put({
+          name: name,
+          value: {}
+        }, name).then(() => {
+          resolve();
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public loadDataOfMode<T>(mode: LoginMode, name: string, emptyValue: T) {
+    return new Promise<T>((resolve, reject) => {
+      const table = this.getTableFromString(mode);
+      if (table) {
+        table.get(name).then((result) => {
+          if (result && result.value) {
+            resolve(result.value as T);
+          } else {
+            resolve(emptyValue);
+          }
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        resolve(emptyValue);
+      }
     });
   }
 
@@ -355,6 +408,10 @@ export interface IIDBLink {
 export interface IIDBEntry {
   name: string;
   value: any;
+}
+
+export interface IIDBLogs extends IIDBEntry {
+  value: any[];
 }
 
 export interface IIDBModeOptions {

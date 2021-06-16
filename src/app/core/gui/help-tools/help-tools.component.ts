@@ -42,25 +42,32 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         }
       );
     } else if (this.appStorage.usemode === 'online') {
-      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-        this.appStorage.clearAnnotationData().then(() => {
-          this.appStorage.clearLoggingData();
-        }).then(() => {
-          this.appStorage.clearOptions();
-        }).then(
-          () => {
-            alert('All cleared. The app will be reloaded.');
-            document.location.reload();
-          }
-        );
-      }).catch((error) => {
-        console.error(error);
-      });
+      this.appStorage.clearAnnotationData().then(() => {
+        this.appStorage.clearLoggingData();
+      }).then(() => {
+        this.appStorage.clearOptions();
+      }).then(
+        () => {
+          alert('All cleared. The app will be reloaded.');
+          document.location.reload();
+        }
+      );
     } else if (this.appStorage.usemode === 'url') {
       this.appStorage.clearAnnotationData().then(() => {
         this.appStorage.clearLoggingData();
       }).then(() => {
         this.appStorage.clearOptions();
+      }).then(
+        () => {
+          alert('All cleared. The app will be reloaded.');
+          document.location.reload();
+        }
+      );
+    } else {
+      this.appStorage.clearAnnotationData().then(() => {
+        this.appStorage.clearOptions();
+      }).then(() => {
+        this.appStorage.clearLoggingData();
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');

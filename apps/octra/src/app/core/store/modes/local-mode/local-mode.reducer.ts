@@ -1,6 +1,7 @@
 import {on} from '@ngrx/store';
-import {LocalModeState} from '../../index';
+import {LocalModeState, LoginMode} from '../../index';
 import * as fromAnnotation from '../../annotation/annotation.reducer';
+import {AnnotationStateReducers} from '../../annotation/annotation.reducer';
 import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {LocalModeActions} from './local-mode.actions';
@@ -24,7 +25,7 @@ const {createUndoRedoReducer} = undoRedo({
 
 export const reducer = createUndoRedoReducer(
   initialState,
-  ...fromAnnotation.reducers,
+  ...new AnnotationStateReducers(LoginMode.LOCAL).create(),
   on(LocalModeActions.login, (state: LocalModeState, data) => ({
     ...state,
     ...data
@@ -36,7 +37,9 @@ export const reducer = createUndoRedoReducer(
       isSaving: false,
       submitted: false,
       audio: {
-        loaded: false
+        loaded: false,
+        fileName: '',
+        sampleRate: 0
       },
       files: [],
       histories: {}

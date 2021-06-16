@@ -1,5 +1,5 @@
 import {createAction, props} from '@ngrx/store';
-import {AnnotationState, AnnotationStateLevel, TranscriptionState} from '../index';
+import {AnnotationState, AnnotationStateLevel, LoginMode, TranscriptionState} from '../index';
 import {OIDBLink} from '@octra/annotation';
 import {ILog} from '../../obj/Settings/logging';
 
@@ -10,35 +10,32 @@ export class AnnotationActions {
     `[${AnnotationActions.context}] Logout`,
     props<{
       clearSession: boolean;
-    }>()
-  );
-
-
-  public static setAudioURL = createAction(`[${AnnotationActions.context}] Set Audio URL`,
-    props<{
-      audioURL: string;
+      mode: LoginMode;
     }>()
   );
 
   public static clearSessionStorageSuccess = createAction(
-    `[${AnnotationActions.context}] Clear Session Storage Success`,
+    `[${AnnotationActions.context}] Clear Session Storage Success`
   );
 
   public static clearSessionStorageFailed = createAction(
-    `[${AnnotationActions.context}] Clear Session Storage Failed`,
+    `[${AnnotationActions.context}] Clear Session Storage Failed`
   );
 
   public static clearWholeSession = createAction(
     `[${AnnotationActions.context}] Clear whole session`,
+    props<{
+      mode: LoginMode;
+    }>()
   );
 
 
   public static clearWholeSessionSuccess = createAction(
-    `[${AnnotationActions.context}] Clear whole session success`,
+    `[${AnnotationActions.context}] Clear whole session success`
   );
 
   public static clearWholeSessionFailed = createAction(
-    `[${AnnotationActions.context}] Clear whole session failed`,
+    `[${AnnotationActions.context}] Clear whole session failed`
   );
 
   public static setAnnotation = createAction(
@@ -49,13 +46,17 @@ export class AnnotationActions {
   );
 
   public static clearAnnotation = createAction(
-    `[${AnnotationActions.context}] Clear annotation`
+    `[${AnnotationActions.context}] Clear annotation`,
+    props<{
+      mode: LoginMode
+    }>()
   );
 
-  public static overwriteAnnotation = createAction(
+  public static overwriteTranscript = createAction(
     `[${AnnotationActions.context}] Overwrite annotation`,
     props<{
-      annotation: AnnotationState,
+      annotation: TranscriptionState,
+      mode: LoginMode,
       saveToDB: boolean
     }>()
   );
@@ -71,21 +72,23 @@ export class AnnotationActions {
     `[${AnnotationActions.context}] Change Annotation Level`,
     props<{
       level: AnnotationStateLevel;
-      sortorder: number;
+      mode: LoginMode;
     }>()
   );
 
   public static addAnnotationLevel = createAction(
     `[${AnnotationActions.context}] Add Annotation Level`,
     props<{
-      level: AnnotationStateLevel
+      level: AnnotationStateLevel;
+      mode: LoginMode;
     }>()
   );
 
   public static removeAnnotationLevel = createAction(
     `[${AnnotationActions.context}] Remove Annotation Level`,
     props<{
-      id: number
+      id: number;
+      mode: LoginMode;
     }>()
   );
 
@@ -100,6 +103,7 @@ export class AnnotationActions {
     `[${AnnotationActions.context}] Set savingNeeded`,
     props<{
       savingNeeded: boolean;
+      mode: LoginMode;
     }>()
   );
 
@@ -110,24 +114,11 @@ export class AnnotationActions {
     }>()
   );
 
-  public static setSubmitted = createAction(
-    `[${AnnotationActions.context}] set submitted`,
-    props<{
-      submitted: boolean;
-    }>()
-  );
-
-  public static addLog = createAction(
-    `[${AnnotationActions.context}] add log`,
-    props<{
-      log: ILog;
-    }>()
-  );
-
-  public static setLogs = createAction(
+  public static saveLogs = createAction(
     `[${AnnotationActions.context}] set logs`,
     props<{
       logs: any[];
+      mode: LoginMode;
     }>()
   );
 
@@ -139,7 +130,8 @@ export class AnnotationActions {
   public static setCurrentEditor = createAction(
     `[${AnnotationActions.context}] Set current editor`,
     props<{
-      currentEditor: string
+      currentEditor: string;
+      mode: LoginMode;
     }>()
   );
 
@@ -147,24 +139,38 @@ export class AnnotationActions {
     `[${AnnotationActions.context}] Set logging`,
     props<{
       logging: boolean;
-    }>()
-  );
-
-  public static setFeedback = createAction(
-    `[${AnnotationActions.context}] Set feedback`,
-    props<{
-      feedback: any;
+      mode: LoginMode;
     }>()
   );
 
   public static clearLogs = createAction(
-    `[${AnnotationActions.context}] Clear logs`
+    `[${AnnotationActions.context}] Clear logs`,
+    props<{
+      mode: LoginMode;
+    }>()
   );
 
   public static setAudioLoaded = createAction(
     `[Transcription] Set Audio Loaded`,
     props<{
+      mode: LoginMode,
       loaded: boolean;
+      fileName: string;
+      sampleRate: number;
+    }>()
+  );
+
+  public static addLog = createAction(
+    `[Transcription] Set Audio Loaded`,
+    props<{
+      log: ILog;
+      mode: LoginMode;
+    }>()
+  );
+
+  public static setAudioURL = createAction(`[${AnnotationActions.context}] Set Audio URL`,
+    props<{
+      audioURL: string;
     }>()
   );
 }

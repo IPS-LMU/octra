@@ -1,6 +1,17 @@
-import {RootState} from '../index';
+import {getModeState, RootState} from '../index';
 import {pipe} from 'rxjs';
 
-export const selectAnnotation = (state: RootState) => state.annotation;
-export const selectAnnotationLevels = pipe(selectAnnotation, (state) => state.levels);
-export const selectAnnotationLinks = pipe(selectAnnotation, (state) => state.links);
+export const selectAnnotation = (state: RootState) => {
+  const mode = getModeState(state);
+  if (mode) {
+    return mode;
+  }
+
+  return null;
+};
+export const selectAudioLoaded = pipe(selectAnnotation, (state) => state?.audio.loaded);
+export const selectProjectConfig = pipe(selectAnnotation, (state) => state?.projectConfig);
+export const selectGuideLines = pipe(selectAnnotation, (state) => state?.guidelines);
+export const selectMethods = pipe(selectAnnotation, (state) => state?.methods);
+export const selectAnnotationLevels = pipe(selectAnnotation, (state) => state?.transcript.levels);
+export const selectAnnotationLinks = pipe(selectAnnotation, (state) => state?.transcript.links);

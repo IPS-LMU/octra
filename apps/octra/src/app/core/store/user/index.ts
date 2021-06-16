@@ -1,4 +1,4 @@
-import {LoginState, RootState} from '../index';
+import {RootState} from '../index';
 import {pipe} from 'rxjs';
 
 const selectUser = (state: RootState) => state.user;

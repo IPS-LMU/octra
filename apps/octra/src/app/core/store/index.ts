@@ -2,6 +2,7 @@ import {IDataEntry} from '../obj/data-entry';
 import {
   AnnotationLevelType,
   ASRQueueItemType,
+  ILevel,
   Level,
   OEvent,
   OIDBLevel,
@@ -47,6 +48,8 @@ export interface OnlineSession {
     jobsLeft: number;
     serverDataEntry: IDataEntry;
     comment: string;
+    submitted: boolean;
+    feedback: any;
   }
 }
 
@@ -96,12 +99,12 @@ export interface ASRState {
 export interface AnnotationState extends UndoRedoState {
   savingNeeded: boolean;
   isSaving: boolean;
-  submitted: boolean;
   currentEditor?: string;
   audio: {
     loaded: boolean;
+    fileName: string;
+    sampleRate: number;
   }
-  feedback: any;
   guidelines?: any;
   logs: ILog[];
   logging: boolean;
@@ -112,6 +115,9 @@ export interface AnnotationState extends UndoRedoState {
   }
   transcript: TranscriptionState;
   histories: Histories;
+  onlineSession?: any;
+  files?: any;
+  sessionFile?: any;
 }
 
 export interface OnlineModeState extends AnnotationState {
@@ -231,13 +237,28 @@ export function convertFromLevelObject(level: Level, lastOriginalBoundary: Sampl
   return result;
 }
 
-export function convertFromOIDLevel(oidbLevel: OIDBLevel): AnnotationStateLevel {
+export function convertFromOIDLevel(level: ILevel, id: number): AnnotationStateLevel {
   const result = {
-    id: oidbLevel.id,
-    name: oidbLevel.level.name,
-    type: oidbLevel.level.type,
-    items: oidbLevel.level.items
+    id,
+    name: level.name,
+    type: level.type,
+    items: level.items
   };
 
   return result;
+}
+
+export function getModeState(appState: RootState) {
+  switch (appState.application.mode) {
+    case LoginMode.DEMO:
+      return appState.demoMode;
+    case LoginMode.LOCAL:
+      return appState.localMode;
+    case LoginMode.URL:
+      return appState.onlineMode;
+    case LoginMode.ONLINE:
+      return appState.onlineMode;
+  }
+
+  return null;
 }

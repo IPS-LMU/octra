@@ -1,6 +1,6 @@
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {createAction, props} from '@ngrx/store';
-import {OnlineSession, URLParameters} from '../../index';
+import {LoginMode, OnlineSession, URLParameters} from '../../index';
 import {IDataEntry} from '../../../obj/data-entry';
 
 export class OnlineModeActions extends AnnotationActions {
@@ -10,14 +10,16 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Login`,
     props<{
       onlineSession: OnlineSession,
-      removeData: boolean
+      removeData: boolean;
+      mode: LoginMode.ONLINE;
     }>()
   );
 
   public static loginDemo = createAction(
     `[${OnlineModeActions.context}] Login Demo`,
     props<{
-      onlineSession: OnlineSession
+      onlineSession: OnlineSession;
+      mode: LoginMode.DEMO;
     }>()
   );
 
@@ -41,6 +43,7 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set user comment`,
     props<{
       comment: string;
+      mode: string;
     }>()
   );
 
@@ -69,6 +72,22 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set serverDataEntry`,
     props<{
       serverDataEntry: IDataEntry;
+    }>()
+  );
+
+  public static setSubmitted = createAction(
+    `[${AnnotationActions.context}] set submitted`,
+    props<{
+      submitted: boolean;
+      mode: LoginMode;
+    }>()
+  );
+
+  public static setFeedback = createAction(
+    `[${AnnotationActions.context}] Set feedback`,
+    props<{
+      feedback: any;
+      mode: LoginMode;
     }>()
   );
 }

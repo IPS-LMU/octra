@@ -6,15 +6,16 @@ import {AppInfo} from '../../../app.info';
 import {afterTrue, isUnset, navigateTo, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {IFile, ImportResult, Level, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
+import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
-import * as fromTranscription from '../../store/transcription';
 import * as fromApplication from '../../store/application';
+import * as fromAnnotation from '../../store/annotation';
 import {Store} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
-import {TranscriptionActions} from '../../store/transcription/transcription.actions';
-import {LoginActions} from '../../store/login/login.actions';
 import {Subscription} from 'rxjs';
+import {AnnotationActions} from '../../store/annotation/annotation.actions';
+import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
+import {ApplicationActions} from '../../store/application/application.actions';
 
 @Component({
   selector: 'octra-loading',
@@ -146,8 +147,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
               }
             }).then(() => {
               this.state = 'Audio loaded';
-              this.store.dispatch(TranscriptionActions.setAudioLoaded({
-                loaded: true
+              const audioRessource = this.audio.audiomanagers[0].ressource;
+              this.store.dispatch(AnnotationActions.setAudioLoaded({
+                mode: this.appStorage.useMode,
+                loaded: true,
+                fileName: audioRessource.info.fullname,
+                sampleRate: audioRessource.info.sampleRate
               }));
             }).catch((error) => {
               console.error(error);
@@ -165,10 +170,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
     );
 
     afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
-      Level.counter = this.appStorage.snapshot.annotation.levelCounter;
       if (!isUnset(this.appStorage.urlParams) && this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !isUnset(this.appStorage.urlParams.audio)) {
-        this.store.dispatch(LoginActions.loginURLParameters({
+        this.store.dispatch(OnlineModeActions.loginURLParameters({
           urlParams: this.appStorage.urlParams
         }));
       } else if (this.appStorage.useMode === LoginMode.URL) {
@@ -176,15 +180,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
         console.warn(`use mode is url but no params found. Reset use mode.`);
         if (!isUnset(this.appStorage.onlineSession.loginData.id) && this.appStorage.onlineSession.loginData.id !== ''
           && (isUnset(this.appStorage.sessionfile))) {
-          this.store.dispatch(LoginActions.setMode({
+          this.store.dispatch(ApplicationActions.setMode({
             mode: LoginMode.ONLINE
           }));
         } else {
-          this.store.dispatch(LoginActions.setMode({
+          this.store.dispatch(ApplicationActions.setMode({
             mode: LoginMode.LOCAL
           }));
         }
-        this.store.dispatch(LoginActions.logout({clearSession: true}));
       }
 
       if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {
@@ -201,7 +204,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (this.appStorage.useMode === LoginMode.URL) {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
-            this.store.dispatch(LoginActions.setAudioURL({
+            this.store.dispatch(OnlineModeActions.setAudioURL({
               audioURL: decodeURI(this.appStorage.urlParams.audio)
             }));
           }
@@ -223,7 +226,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     // do navigation after all is loaded
     const promises: Promise<any>[] = [];
-    promises.push(afterTrue(this.store.select(fromTranscription.selectAudioLoaded)));
+    promises.push(afterTrue(this.store.select(fromAnnotation.selectAudioLoaded)));
 
     Promise.all(promises).then(() => {
       this.transcrService.load().then(() => {

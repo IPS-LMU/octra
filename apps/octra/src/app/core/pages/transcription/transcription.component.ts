@@ -872,13 +872,13 @@ export class TranscriptionComponent implements OnInit,
   }
 
   clearDataPermanently() {
+    // replace with store method
     this.appStorage.submitted = false; // ok
     this.appStorage.clearAnnotationPermanently(); // ok
     this.appStorage.feedback = {}; // ok
     this.appStorage.comment = ''; // ok
     this.appStorage.clearLoggingDataPermanently(); // ok
     this.uiService.elements = [];
-    this.appStorage.audioLoaded = false; // ok
   }
 
   public onSaveTranscriptionButtonClicked() {

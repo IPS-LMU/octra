@@ -23,7 +23,9 @@ export class IDBActions {
   public static loadLogsSuccess = createAction(
     `[${context}] Load Logs Success`,
     props<{
-      logs: any
+      online: any[],
+      demo: any[],
+      local: any[]
     }>()
   );
 
@@ -41,23 +43,26 @@ export class IDBActions {
     }>()
   );
 
-  public static loadAnnotationLinksFailed = createAction(
-    `[${context}] Load AnnotationLinks Failed`,
+  public static loadAnnotationSuccess = createAction(
+    `[${context}] Load Annotation Success`,
     props<{
-      error: string
+      online: {
+        levels: AnnotationStateLevel[];
+        levelCounter: number;
+      },
+      demo: {
+        levels: AnnotationStateLevel[];
+        levelCounter: number;
+      },
+      local: {
+        levels: AnnotationStateLevel[];
+        levelCounter: number;
+      },
     }>()
   );
 
-  public static loadAnnotationLevelsSuccess = createAction(
-    `[${context}] Load Annotation Levels Success`,
-    props<{
-      levels: AnnotationStateLevel[];
-      levelCounter: number;
-    }>()
-  );
-
-  public static loadAnnotationLevelsFailed = createAction(
-    `[${context}] Load Annotation Levels Failed`,
+  public static loadAnnotationFailed = createAction(
+    `[${context}] Load Annotation Failed`,
     props<{
       error: string
     }>()
@@ -78,7 +83,10 @@ export class IDBActions {
   );
 
   public static clearLogsSuccess = createAction(
-    `[${context}] Clear Logs Success`
+    `[${context}] Clear Logs Success`,
+    props<{
+      mode: string
+    }>()
   );
 
   public static clearLogsFailed = createAction(
@@ -389,6 +397,20 @@ export class IDBActions {
     }>()
   );
 
+  public static saveModeOptionsSuccess = createAction(
+    `[${context}] Save Mode Options Success`,
+    props<{
+      mode: string;
+    }>()
+  );
+
+  public static saveModeOptionsFailed = createAction(
+    `[${context}] Save Mode Options Failed`,
+    props<{
+      error: string;
+    }>()
+  );
+
   public static logoutSessionSuccess = createAction(
     `[${context}] Logout Session Success`
   );
@@ -400,23 +422,12 @@ export class IDBActions {
     }>()
   );
 
-  public static saveLogSuccess = createAction(
-    `[${context}] Save Log Success`
+  public static saveAnnotationSuccess = createAction(
+    `[${context}] Save Annotation Success`
   );
 
-  public static saveLogFailed = createAction(
-    `[${context}] Save Log Failed`,
-    props<{
-      error: string
-    }>()
-  );
-
-  public static saveAnnotationLevelSuccess = createAction(
-    `[${context}] Save AnnotationLevel Success`
-  );
-
-  public static saveAnnotationLevelFailed = createAction(
-    `[${context}] Save AnnotationLevel Failed`,
+  public static saveAnnotationFailed = createAction(
+    `[${context}] Save Annotation Failed`,
     props<{
       error: string
     }>()

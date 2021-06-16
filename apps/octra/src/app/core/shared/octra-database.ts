@@ -1,6 +1,6 @@
 import Dexie, {Transaction} from 'dexie';
 import {Subject} from 'rxjs';
-import {OLevel, OLink} from '@octra/annotation';
+import {IAnnotJSON} from '@octra/annotation';
 import {isUnset} from '@octra/utilities';
 import {LoginMode} from '../store';
 
@@ -8,10 +8,10 @@ export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
   public onlineData: Dexie.Table<IIDBEntry, string>;
   public localData: Dexie.Table<IIDBEntry, string>;
-  public options: Dexie.Table<IIDBOption, string>;
+  public options: Dexie.Table<IIDBEntry, string>;
   public onReady: Subject<void>;
 
-  private defaultOptions: IIDBOption[] = [
+  private defaultOptions: IIDBEntry[] = [
     {
       name: 'submitted',
       value: false
@@ -154,7 +154,7 @@ export class OctraDatabase extends Dexie {
 
   private upgradeToDatabaseV3(transaction: Transaction) {
     console.log(`UPGRADE to v3`);
-    return transaction.table('options').toCollection().modify((option: IIDBOption) => {
+    return transaction.table('options').toCollection().modify((option: IIDBEntry) => {
       if (option.name === 'uselocalmode') {
         option.name = 'usemode';
         if (option.value === false) {
@@ -266,7 +266,13 @@ export class OctraDatabase extends Dexie {
       sessionfile: null,
       prompttext: '',
       servercomment: '',
-      logging: true
+      currentEditor: 'Dictaphone-Editor',
+      logging: true,
+      user: {
+        id: '',
+        project: '',
+        jobNumber: -1
+      }
     };
 
     return table.add({
@@ -384,25 +390,8 @@ export class OctraDatabase extends Dexie {
   }
 }
 
-export interface IAnnotation {
-  levels: IAnnotationLevel[];
-  links: IIDBLink
-}
-
-export interface IAnnotationLevel {
-  id: number,
-  value: IIDBLevel
-}
-
-export interface IIDBLevel {
-  id: number;
-  level: OLevel;
-  sortorder: number;
-}
-
-export interface IIDBLink {
-  id: number;
-  link: OLink;
+export interface IAnnotation extends IIDBEntry {
+  value: IAnnotJSON;
 }
 
 export interface IIDBEntry {
@@ -423,11 +412,12 @@ export interface IIDBModeOptions {
   sessionfile: any;
   prompttext: string;
   servercomment: string;
+  currentEditor: string;
   logging: boolean;
-}
-
-export interface IIDBOption {
-  name: string;
-  value: any;
+  user: {
+    id: string;
+    project: string;
+    jobNumber: number;
+  }
 }
 

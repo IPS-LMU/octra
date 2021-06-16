@@ -6,11 +6,12 @@ import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {isUnset, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
-import {Level, OIDBLevel, OIDBLink} from '@octra/annotation';
+import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
   AnnotationStateLevel,
   convertFromOIDLevel,
+  getModeState,
   LoadingStatus,
   LoginMode,
   OnlineSession,
@@ -23,14 +24,13 @@ import {ConsoleEntry} from './bug-report.service';
 import {Router} from '@angular/router';
 import {AnnotationActions} from '../../store/annotation/annotation.actions';
 import {UserActions} from '../../store/user/user.actions';
-import {TranscriptionActions} from '../../store/transcription/transcription.actions';
 import {ApplicationActions} from '../../store/application/application.actions';
-import {LoginActions} from '../../store/login/login.actions';
 import {IDBActions} from '../../store/idb/idb.actions';
-import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 import * as fromAnnotation from '../../store/annotation';
 import {ASRActions} from '../../store/asr/asr.actions';
 import {ILog} from '../../obj/Settings/logging';
+import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
+import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +49,7 @@ export class AppStorageService {
   }
 
   get sessionfile(): SessionFile {
-    return this._snapshot.login.sessionFile;
+    return this._snapshot.localMode.sessionFile;
   }
 
   set userProfile(value: { name: string; email: string }) {
@@ -57,7 +57,7 @@ export class AppStorageService {
   }
 
   set playonhover(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setPlayOnHover({playOnHover: value}));
+    this.store.dispatch(ApplicationActions.setPlayOnHover({playOnHover: value}));
   }
 
   public get annotationChanged(): Observable<AnnotationState> {
@@ -75,23 +75,30 @@ export class AppStorageService {
   }
 
   set serverDataEntry(value: IDataEntry) {
-    this.store.dispatch(LoginActions.setServerDataEntry({serverDataEntry: value}));
+    this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value}));
   }
 
   set submitted(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setSubmitted({submitted: value}));
+    this.store.dispatch(OnlineModeActions.setSubmitted({
+      submitted: value,
+      mode: this._snapshot.application.mode
+    }));
   }
 
   get feedback(): any {
-    return this._snapshot.transcription.feedback;
+    return getModeState(this._snapshot)?.onlineSession?.feedback;
   }
 
   set feedback(value: any) {
-    this.store.dispatch(TranscriptionActions.setFeedback({feedback: value}));
+    this.store.dispatch(OnlineModeActions.setFeedback(
+      {
+        feedback: value,
+        mode: this.useMode
+      }));
   }
 
   get dataID(): number {
-    return this._snapshot.login.onlineSession?.sessionData?.dataID;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.dataID;
   }
 
   get language(): string {
@@ -108,17 +115,18 @@ export class AppStorageService {
   }
 
   get logging(): boolean {
-    return this._snapshot.transcription.logging;
+    return getModeState(this._snapshot)?.logging;
   }
 
   set logging(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setLogging({
-      logging: value
+    this.store.dispatch(AnnotationActions.setLogging({
+      logging: value,
+      mode: this.useMode
     }));
   }
 
   get showLoupe(): boolean {
-    return this._snapshot.transcription.showLoupe;
+    return this._snapshot.application.options.showLoupe;
   }
 
   get consoleEntries(): ConsoleEntry[] {
@@ -132,53 +140,54 @@ export class AppStorageService {
   }
 
   set showLoupe(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setShowLoupe({
+    this.store.dispatch(ApplicationActions.setShowLoupe({
       showLoupe: value
     }));
   }
 
   get prompttext(): string {
-    return this._snapshot.login.onlineSession?.sessionData?.promptText;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.promptText;
   }
 
   get urlParams(): any {
-    return this._snapshot.login.queryParams;
+    return this._snapshot.application.queryParams;
   }
 
   get easymode(): boolean {
-    return this._snapshot.transcription.easyMode;
+    return this._snapshot.application.options.easyMode;
   }
 
   set easymode(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setEasyMode({
+    this.store.dispatch(ApplicationActions.setEasyMode({
       easyMode: value
     }));
   }
 
   get comment(): string {
-    return this._snapshot.login.onlineSession?.sessionData?.comment;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.comment;
   }
 
   set comment(value: string) {
-    this.store.dispatch(LoginActions.setComment({
-      comment: value
+    this.store.dispatch(OnlineModeActions.setComment({
+      comment: value,
+      mode: this.useMode
     }));
   }
 
   get servercomment(): string {
-    return this._snapshot.login.onlineSession?.sessionData?.serverComment;
+    return getModeState(this._snapshot).onlineSession?.sessionData?.serverComment;
   }
 
   get annotationLevels(): AnnotationStateLevel[] {
-    return this._snapshot.annotation.levels;
+    return getModeState(this._snapshot)?.transcript?.levels;
   }
 
   get annotationLinks(): OIDBLink[] {
-    return this._snapshot.annotation.links;
+    return getModeState(this._snapshot)?.transcript?.links;
   }
 
   get secondsPerLine(): number {
-    return this._snapshot.transcription.secondsPerLine;
+    return this._snapshot.application.options.secondsPerLine;
   }
 
   get loadingStatus(): LoadingStatus {
@@ -186,7 +195,7 @@ export class AppStorageService {
   }
 
   set secondsPerLine(value: number) {
-    this.store.dispatch(TranscriptionActions.setSecondsPerLine({
+    this.store.dispatch(ApplicationActions.setSecondsPerLine({
       secondsPerLine: value
     }));
     this.settingschange.next({
@@ -196,11 +205,11 @@ export class AppStorageService {
   }
 
   get highlightingEnabled(): boolean {
-    return this._snapshot.transcription.highlightingEnabled;
+    return this._snapshot.application?.options.highlightingEnabled;
   }
 
   set highlightingEnabled(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setHighlightingEnabled({
+    this.store.dispatch(ApplicationActions.setHighlightingEnabled({
       highlightingEnabled: value
     }));
   }
@@ -218,17 +227,10 @@ export class AppStorageService {
 
     this.subscrManager.add(actions.subscribe((action) => {
       if (action.type === '@ngrx/effects/init') {
-        this.store.dispatch(TranscriptionActions.setTranscriptionState({
-          ...fromTranscriptionReducer.initialState,
-          playOnHover: this.sessStr.retrieve('playonhover'),
-          followPlayCursor: this.sessStr.retrieve('followplaycursor')
-        }));
-
-        this.store.dispatch(LoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
-
-        this.store.dispatch(LoginActions.setLoggedIn({
-          loggedIn: this.sessStr.retrieve('loggedIn')
-        }));
+        this.playonhover = this.sessStr.retrieve('playonhover');
+        this.followPlayCursor = this.sessStr.retrieve('followplaycursor');
+        this.jobsLeft = this.sessStr.retrieve('jobsLeft');
+        this.loggedIn = this.sessStr.retrieve('loggedIn');
         this.reloaded = this.sessStr.retrieve('reloaded');
         this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
       }
@@ -245,11 +247,14 @@ export class AppStorageService {
   private _snapshot: RootState;
 
   set savingNeeded(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setSavingNeeded({savingNeeded: value}));
+    this.store.dispatch(AnnotationActions.setSavingNeeded({
+      savingNeeded: value,
+      mode: this.useMode
+    }));
   }
 
   set followPlayCursor(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setFollowPlayCursor({
+    this.store.dispatch(ApplicationActions.setFollowPlayCursor({
       followPlayCursor: value
     }));
   }
@@ -259,19 +264,25 @@ export class AppStorageService {
   }
 
   get followPlayCursor(): boolean {
-    return this._snapshot.transcription.followPlayCursor;
+    return this._snapshot.application.options.followPlayCursor;
   }
 
   get jobsLeft(): number {
-    return this._snapshot.login.onlineSession?.sessionData.jobsLeft;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData.jobsLeft;
+  }
+
+  set jobsLeft(jobsLeft: number) {
+    this.store.dispatch(ApplicationActions.setJobsLeft({
+      jobsLeft
+    }));
   }
 
   get logs(): any[] {
-    return this._snapshot.transcription.logs;
+    return getModeState(this._snapshot)?.logs;
   }
 
   get onlineSession(): OnlineSession {
-    return this._snapshot.login.onlineSession;
+    return getModeState(this._snapshot)?.onlineSession;
   }
 
   get userProfile(): { name: string; email: string } {
@@ -279,7 +290,7 @@ export class AppStorageService {
   }
 
   get playonhover(): boolean {
-    return this._snapshot.transcription.playOnHover;
+    return this._snapshot.application.options.playOnHover;
   }
 
   get reloaded(): boolean {
@@ -287,15 +298,18 @@ export class AppStorageService {
   }
 
   get serverDataEntry(): IDataEntry {
-    return this._snapshot.login.onlineSession.sessionData?.serverDataEntry;
+    return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
   }
 
   get submitted(): boolean {
-    return this._snapshot.transcription.submitted;
+    return getModeState(this._snapshot)?.onlineSession?.submitted;
   }
 
   setLogs(value: any[]) {
-    this.store.dispatch(TranscriptionActions.setLogs({logs: value}));
+    this.store.dispatch(AnnotationActions.saveLogs({
+      logs: value,
+      mode: this.useMode
+    }));
   }
 
   get asrSelectedLanguage(): string {
@@ -310,13 +324,11 @@ export class AppStorageService {
   }
 
   get audioLoaded() {
-    return this._snapshot.transcription.audio.loaded;
-  }
-
-  set audioLoaded(loaded: boolean) {
-    this.store.dispatch(TranscriptionActions.setAudioLoaded({
-      loaded
-    }));
+    const modeState = getModeState(this._snapshot);
+    if (modeState) {
+      return modeState.audio.loaded;
+    }
+    return undefined;
   }
 
   get asrSelectedService(): string {
@@ -331,57 +343,68 @@ export class AppStorageService {
   }
 
   public get audioVolume(): number {
-    return this._snapshot.transcription.audioSettings.volume;
+    return this._snapshot?.application?.options?.audioSettings?.volume;
   }
 
   public set audioVolume(value: number) {
-    this.store.dispatch(TranscriptionActions.setAudioSettings({
+    this.store.dispatch(ApplicationActions.setAudioSettings({
       volume: value,
       speed: this.audioSpeed
     }));
   }
 
   public get audioSpeed(): number {
-    return this._snapshot.transcription.audioSettings.speed;
+    return this._snapshot.application?.options?.audioSettings?.speed;
   }
 
   public set audioSpeed(value: number) {
-    this.store.dispatch(TranscriptionActions.setAudioSettings({
+    this.store.dispatch(ApplicationActions.setAudioSettings({
       speed: value,
       volume: this.audioVolume
     }));
   }
 
   get savingNeeded(): boolean {
-    return this._snapshot.transcription.savingNeeded;
+    return getModeState(this._snapshot).savingNeeded;
   }
 
   get isSaving(): boolean {
-    return this._snapshot.transcription.isSaving;
+    return getModeState(this._snapshot).isSaving;
   }
 
   set isSaving(value: boolean) {
-    this.store.dispatch(TranscriptionActions.setIsSaving({isSaving: value}));
+    this.store.dispatch(AnnotationActions.setIsSaving({
+      isSaving: value
+    }));
   }
 
   get audioURL(): string {
-    return this._snapshot.login.onlineSession?.sessionData?.audioURL;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.audioURL;
   }
 
   get useMode(): LoginMode {
-    return this._snapshot.login.mode;
+    return this._snapshot.application.mode;
   }
 
   get loggedIn(): boolean {
-    return this._snapshot.login.loggedIn;
+    return this._snapshot.application.loggedIn;
+  }
+
+  set loggedIn(loggedIn: boolean) {
+    this.store.dispatch(ApplicationActions.setLoggedIn({
+      loggedIn
+    }));
   }
 
   get interface(): string {
-    return this._snapshot.transcription.currentEditor;
+    return getModeState(this._snapshot)?.currentEditor;
   }
 
   set interface(newInterface: string) {
-    this.store.dispatch(TranscriptionActions.setCurrentEditor({currentEditor: newInterface}));
+    this.store.dispatch(AnnotationActions.setCurrentEditor({
+      currentEditor: newInterface,
+      mode: this.useMode
+    }));
   }
 
   public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
@@ -396,14 +419,10 @@ export class AppStorageService {
           }
         }
 
-        const onlineSession = this._snapshot.login.onlineSession;
-
 
         if (!isUnset(audiofile)) {
-          const removeData = (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.sessionData?.dataID)));
-
           const storeFiles = files.map(a => (a.file));
-          this.setLocalSession(storeFiles, this.getSessionFile(audiofile), removeData);
+          this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
           resolve();
         } else {
           reject('file not supported');
@@ -440,14 +459,14 @@ export class AppStorageService {
           }
         });
 
-        this.store.dispatch(AnnotationActions.overwriteAnnotation({
+        this.store.dispatch(AnnotationActions.overwriteTranscript({
+          mode: this.useMode,
           annotation: {
             levels: (levels.map((a) => {
-              return convertFromOIDLevel(a);
-            }) as AnnotationStateLevel[]),
+              return convertFromOIDLevel(a.level, a.id);
+            })),
             links,
-            levelCounter: max,
-            histories: null // will ne ignored
+            levelCounter: max
           },
           saveToDB
         }));
@@ -471,7 +490,8 @@ export class AppStorageService {
     }
 
     if (!isUnset(member)) {
-      this.store.dispatch(LoginActions.loginOnline({
+      this.store.dispatch(OnlineModeActions.login({
+        mode: LoginMode.ONLINE,
         onlineSession: {
           loginData: {
             id: member.id,
@@ -486,15 +506,17 @@ export class AppStorageService {
             serverComment,
             jobsLeft,
             serverDataEntry: null,
-            comment: ''
+            comment: '',
+            submitted: false,
+            feedback: null
           }
         },
-        removeData
+        removeData: false
       }));
     }
   }
 
-  setLocalSession(files: File[], sessionFile: SessionFile, removeData: boolean) {
+  setLocalSession(files: File[], sessionFile: SessionFile) {
     if (isUnset(this.easymode)) {
       this.easymode = false;
     }
@@ -503,7 +525,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(LoginActions.loginLocal({files, sessionFile, removeData}));
+    this.store.dispatch(LocalModeActions.login({files, sessionFile, removeData: false, mode: LoginMode.LOCAL}));
   }
 
   setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
@@ -515,7 +537,8 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(LoginActions.loginDemo({
+    this.store.dispatch(OnlineModeActions.loginDemo({
+      mode: LoginMode.DEMO,
       onlineSession: {
         loginData: {
           id: 'demo_user',
@@ -530,7 +553,9 @@ export class AppStorageService {
           comment: '',
           audioURL,
           serverComment,
-          jobsLeft
+          jobsLeft,
+          submitted: false,
+          feedback: null
         }
       }
     }));
@@ -545,7 +570,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(LoginActions.loginURLParameters({
+    this.store.dispatch(OnlineModeActions.loginURLParameters({
       urlParams: {
         audio,
         transcript,
@@ -591,7 +616,8 @@ export class AppStorageService {
             this.savingNeeded = false;
             this.saving.emit('success');
           });
-          this.store.dispatch(TranscriptionActions.setFeedback({
+          this.store.dispatch(OnlineModeActions.setFeedback({
+            mode: LoginMode.ONLINE,
             feedback: value
           }));
 
@@ -611,7 +637,8 @@ export class AppStorageService {
         }
       }
 
-      this.store.dispatch(TranscriptionActions.addLog({
+      this.store.dispatch(AnnotationActions.addLog({
+        mode: this.useMode,
         log: log
       }));
     } else {
@@ -643,7 +670,7 @@ export class AppStorageService {
             const changedLevel = this.annotationLevels[tiernum];
             const id = changedLevel.id;
 
-            waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationLevelSuccess, IDBActions.saveAnnotationLevelFailed)
+            waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationSuccess, IDBActions.saveAnnotationFailed)
               .then(() => {
                 resolve();
               })
@@ -653,7 +680,7 @@ export class AppStorageService {
 
             this.store.dispatch(AnnotationActions.changeAnnotationLevel({
               level,
-              sortorder: tiernum
+              mode: this.useMode
             }));
           } else {
             reject('number of level that should be changed is invalid');
@@ -670,7 +697,7 @@ export class AppStorageService {
   public addAnnotationLevel(level: OIDBLevel) {
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(level)) {
-        level.id = ++Level.counter;
+        level.id = getModeState(this._snapshot).transcript.levelCounter + 1;
 
         waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
           .then(() => {
@@ -681,7 +708,8 @@ export class AppStorageService {
           });
 
         this.store.dispatch(AnnotationActions.addAnnotationLevel({
-          level: convertFromOIDLevel(level)
+          level: convertFromOIDLevel(level.level, level.id),
+          mode: this.useMode
         }));
       } else {
         console.error('level is undefined or null');
@@ -692,7 +720,8 @@ export class AppStorageService {
   public removeAnnotationLevel(id: number): Promise<void> {
     if (id > -1) {
       this.store.dispatch(AnnotationActions.removeAnnotationLevel({
-        id
+        id,
+        mode: this.useMode
       }));
       return new Promise<void>((resolve) => {
         resolve();
@@ -705,7 +734,9 @@ export class AppStorageService {
   }
 
   public clearLoggingDataPermanently() {
-    this.store.dispatch(TranscriptionActions.clearLogs());
+    this.store.dispatch(AnnotationActions.clearLogs({
+      mode: this.useMode
+    }));
   }
 
   public getLevelByID(id: number) {
@@ -718,8 +749,9 @@ export class AppStorageService {
   }
 
   public logout(clearSession = false) {
-    this.store.dispatch(LoginActions.logout({
-      clearSession
+    this.store.dispatch(AnnotationActions.logout({
+      clearSession,
+      mode: this.useMode
     }));
     // TODO WAIT?
     navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
@@ -756,7 +788,9 @@ export class AppStorageService {
   }
 
   public clearAnnotationPermanently() {
-    this.store.dispatch(AnnotationActions.clearAnnotation());
+    this.store.dispatch(AnnotationActions.clearAnnotation({
+      mode: this.useMode
+    }));
   }
 
   public clearWholeSession(): Promise<void[]> {
@@ -766,7 +800,9 @@ export class AppStorageService {
       waitTillResultRetrieved(this.actions, IDBActions.clearLogsSuccess, IDBActions.clearLogsFailed),
       waitTillResultRetrieved(this.actions, IDBActions.clearAnnotationSuccess, IDBActions.clearAnnotationFailed)
     );
-    this.store.dispatch(LoginActions.clearWholeSession());
+    this.store.dispatch(AnnotationActions.clearWholeSession({
+      mode: this.useMode
+    }));
 
     return Promise.all(promises);
   }

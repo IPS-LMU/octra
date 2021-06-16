@@ -13,7 +13,6 @@ import {AsrService} from './core/shared/service/asr.service';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import * as jQuery from 'jquery';
 import * as fromApplication from './core/store/application'
-import * as fromTranscription from './core/store/transcription'
 import {Store} from '@ngrx/store';
 import {Subscription} from 'rxjs';
 
@@ -139,6 +138,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           } else {
             console.error('Could not read ASR language from database');
           }
+
+          if (!this.settingsService.responsive.enabled) {
+            this.setFixedWidth();
+          }
+
+          this.navigation.changeSecondsPerLine(this.appStorage.secondsPerLine);
         }
 
         this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
@@ -146,15 +151,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     ));
 
     // after project settings loaded
-    this.subscrmanager.add(this.store.select(fromTranscription.selectProjectConfig).subscribe(
-      () => {
-        if (!this.settingsService.responsive.enabled) {
-          this.setFixedWidth();
-        }
-
-        this.navigation.changeSecondsPerLine(this.appStorage.secondsPerLine);
-      }
-    ));
 
     this.settingsService.loadApplicationSettings(queryParams).then(() => {
       console.log(`Application settings loaded`);

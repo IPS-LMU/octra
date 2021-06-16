@@ -115,7 +115,7 @@ export const reducer = createReducer(
       progress: state.loading.progress + 25
     }
   })),
-  on(IDBActions.loadAnnotationLinksSuccess, (state: ApplicationState) => ({
+  on(IDBActions.loadAnnotationSuccess, (state: ApplicationState) => ({
     ...state,
     idb: {
       ...state.idb,

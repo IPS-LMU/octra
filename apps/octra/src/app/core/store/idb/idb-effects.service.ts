@@ -5,19 +5,10 @@ import {exhaustMap, filter, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
-import {
-  AnnotationStateLevel,
-  convertFromOIDLevel,
-  convertToOIDBLevel,
-  LoginMode,
-  OnlineSession,
-  RootState
-} from '../index';
+import {convertFromOIDLevel, getModeState, LocalModeState, LoginMode, OnlineModeState, RootState} from '../index';
 import {isUnset} from '@octra/utilities';
-import {OIDBLink} from '@octra/annotation';
+import {ILevel, ILink, OAnnotJSON, OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
-import {PromiseExtended} from 'dexie';
-import {IIDBLevel} from '../../shared/octra-database';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
 import {AnnotationActions} from '../annotation/annotation.actions';
 import {IDBActions} from './idb.actions';
@@ -25,6 +16,8 @@ import {ConfigurationActions} from '../configuration/configuration.actions';
 import {ApplicationActions} from '../application/application.actions';
 import {ASRActions} from '../asr/asr.actions';
 import {UserActions} from '../user/user.actions';
+import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
+import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
 
 
 @Injectable({
@@ -42,7 +35,8 @@ export class IDBEffects {
         const modeState = getModeState(appState);
 
         if (modeState) {
-          this.idbService.saveAnnotation(appState.).then(() => {
+          const links = modeState.transcript.links.map(a => a.link);
+          this.idbService.saveAnnotation(appState.application.mode, new OAnnotJSON(modeState.audio.fileName, modeState.audio.sampleRate, modeState.transcript.levels, links)).then(() => {
             subject.next(ApplicationActions.undoSuccess());
           }).catch((error) => {
             subject.next(ApplicationActions.undoFailed({
@@ -51,10 +45,9 @@ export class IDBEffects {
           });
         } else {
           subject.next(ApplicationActions.undoFailed({
-            error
+            error: 'Can\'t find modeState'
           }));
         }
-
         return subject;
       })
     )
@@ -69,16 +62,22 @@ export class IDBEffects {
         // code for saving to the database
         console.log(`save after redo`);
 
-        Promise.all([
-          this.idbService.saveAnnotationLevels(appState.annotation.levels),
-          this.idbService.saveAnnotationLinks(appState.annotation.links)
-        ]).then(() => {
-          subject.next(ApplicationActions.redoSuccess());
-        }).catch((error) => {
-          subject.next(ApplicationActions.redoFailed({
-            error
+        const modeState = getModeState(appState);
+
+        if (modeState) {
+          const links = modeState.transcript.links.map(a => a.link);
+          this.idbService.saveAnnotation(appState.application.mode, new OAnnotJSON(modeState.audio.fileName, modeState.audio.sampleRate, modeState.transcript.levels, links)).then(() => {
+            subject.next(ApplicationActions.redoSuccess());
+          }).catch((error) => {
+            subject.next(ApplicationActions.redoFailed({
+              error
+            }));
+          });
+        } else {
+          subject.next(ApplicationActions.undoFailed({
+            error: 'Can\'t find modeState'
           }));
-        });
+        }
 
         return subject;
       })
@@ -198,10 +197,15 @@ export class IDBEffects {
     ofType(IDBActions.loadOptionsSuccess),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-
-      this.idbService.loadLogs().then((logs) => {
+      Promise.all([
+        this.idbService.loadLogs(LoginMode.ONLINE),
+        this.idbService.loadLogs(LoginMode.LOCAL),
+        this.idbService.loadLogs(LoginMode.DEMO)
+      ]).then(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
         subject.next(IDBActions.loadLogsSuccess({
-          logs: logs.map(a => a.value)
+          online: onlineModeLogs,
+          demo: localModeLogs,
+          local: demoModeLogs
         }));
         subject.complete();
       }).catch((error) => {
@@ -215,63 +219,65 @@ export class IDBEffects {
     })
   ));
 
-  loadAnnotationLevels$ = createEffect(() => this.actions$.pipe(
+  loadAnnotation$ = createEffect(() => this.actions$.pipe(
     ofType(IDBActions.loadLogsSuccess),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-      this.idbService.loadAnnotationLevels().then((levels: IIDBLevel[]) => {
-        const annotationLevels: AnnotationStateLevel[] = [];
+      Promise.all([
+          this.idbService.loadAnnotation(LoginMode.ONLINE),
+          this.idbService.loadAnnotation(LoginMode.LOCAL),
+          this.idbService.loadAnnotation(LoginMode.DEMO)
+        ]
+      ).then(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
+        console.log(`results:`);
+        console.log(onlineAnnotation);
         let max = 0;
-        for (let i = 0; i < levels.length; i++) {
-          const annotationStateLevel = convertFromOIDLevel(levels[i]);
-
-          if (!levels[i].hasOwnProperty('id')) {
+        const convertToStateLevel = (level: ILevel, i) => {
+          const annotationStateLevel = convertFromOIDLevel(level, i + 1);
+          if (!level.hasOwnProperty('id')) {
             annotationStateLevel.id = i + 1;
           }
 
-          annotationLevels.push(annotationStateLevel);
           max = Math.max(annotationStateLevel.id, max);
-        }
+          return annotationStateLevel;
+        };
 
-        subject.next(IDBActions.loadAnnotationLevelsSuccess({
-          levels: annotationLevels,
-          levelCounter: max
-        }));
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.loadAnnotationLevelsFailed({
-          error
-        }));
-        subject.complete();
-      });
-
-      return subject;
-    })
-  ));
-
-  loadAnnotationLinks$ = createEffect(() => this.actions$.pipe(
-    ofType(IDBActions.loadAnnotationLevelsSuccess),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.loadAnnotationLinks().then((links) => {
-        const annotationLinks = [];
-        for (let i = 0; i < links.length; i++) {
-          if (!links[i].hasOwnProperty('id')) {
-            annotationLinks.push(
-              new OIDBLink(i + 1, links[i].link)
-            );
+        const convertLink = (link: ILink, i) => {
+          if (!link.hasOwnProperty('id')) {
+            return new OIDBLink(i + 1, link);
           } else {
-            annotationLinks.push(links[i]);
+            return link;
           }
-        }
+        };
 
-        subject.next(IDBActions.loadAnnotationLinksSuccess({
-          links: annotationLinks
+        const oidbOnlineAnnotation = {
+          levels: onlineAnnotation?.levels?.map(convertToStateLevel),
+          links: onlineAnnotation?.links?.map(convertLink),
+          levelCounter: max
+        };
+
+        max = 0;
+        const oidbLocalAnnotation = {
+          levels: localAnnotation?.levels?.map(convertToStateLevel),
+          links: localAnnotation?.links.map(convertLink),
+          levelCounter: max
+        };
+
+        max = 0;
+        const oidbDemoAnnotation = {
+          levels: demoAnnotation?.levels?.map(convertToStateLevel),
+          links: demoAnnotation?.links?.map(convertLink),
+          levelCounter: max
+        };
+
+        subject.next(IDBActions.loadAnnotationSuccess({
+          online: oidbOnlineAnnotation,
+          local: oidbLocalAnnotation,
+          demo: oidbDemoAnnotation
         }));
         subject.complete();
       }).catch((error) => {
-        subject.next(IDBActions.loadAnnotationLinksFailed({
+        subject.next(IDBActions.loadAnnotationFailed({
           error
         }));
         subject.complete();
@@ -280,16 +286,14 @@ export class IDBEffects {
       return subject;
     })
   ));
-
-  // TODO add loadAnnotationLinks
 
   clearLogs$ = createEffect(() => this.actions$.pipe(
-    filter(a => a.type === TranscriptionActions.clearLogs.type || a.type === LoginActions.clearWholeSession.type),
+    filter(a => a.type === AnnotationActions.clearLogs.type || a.type === AnnotationActions.clearWholeSession.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.clearLoggingData().then(() => {
-        subject.next(IDBActions.clearLogsSuccess());
+      this.idbService.clearLoggingData((action as any).mode).then(() => {
+        subject.next(IDBActions.clearLogsSuccess((action as any).mode));
         subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.clearLogsFailed({
@@ -303,11 +307,11 @@ export class IDBEffects {
   ));
 
   clearAllOptions$ = createEffect(() => this.actions$.pipe(
-    filter(a => a.type === IDBActions.clearAllOptions.type || a.type === LoginActions.clearWholeSession.type),
+    filter(a => a.type === IDBActions.clearAllOptions.type || a.type === OnlineModeActions.clearWholeSession.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.clearOptions().then(() => {
+      this.idbService.clearOptions((action as any).mode).then(() => {
         subject.next(IDBActions.clearAllOptionsSuccess());
         subject.complete();
       }).catch((error) => {
@@ -323,11 +327,11 @@ export class IDBEffects {
 
   clearAnnotation$ = createEffect(() => this.actions$.pipe(
     filter(action => action.type === AnnotationActions.clearAnnotation.type
-      || action.type === LoginActions.clearWholeSession.type || action.type === LoginActions.logout.type),
+      || action.type === OnlineModeActions.clearWholeSession.type || action.type === AnnotationActions.logout.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
       if (!action.hasOwnProperty('clearSession') || (action as any).clearSession) {
-        this.idbService.clearAnnotationData().then(() => {
+        this.idbService.clearAnnotationData((action as any).mode).then(() => {
           subject.next(IDBActions.clearAnnotationSuccess());
           subject.complete();
         }).catch((error) => {
@@ -347,28 +351,14 @@ export class IDBEffects {
   ));
 
   overwriteAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.overwriteAnnotation),
+    ofType(AnnotationActions.overwriteTranscript),
     exhaustMap((action) => {
         const subject = new Subject<Action>();
 
         if (action.saveToDB) {
-          this.idbService.clearAnnotationData().then(() => {
-            this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
-              this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
-                subject.next(IDBActions.overwriteAnnotationSuccess());
-                subject.complete();
-              }).catch((error) => {
-                subject.next(IDBActions.overwriteAnnotationFailed({
-                  error
-                }));
-                subject.complete();
-              });
-            }).catch((error) => {
-              subject.next(IDBActions.overwriteAnnotationFailed({
-                error
-              }));
-              subject.complete();
-            });
+          this.idbService.clearAnnotationData((action as any).mode).then(() => {
+            subject.next(IDBActions.overwriteAnnotationSuccess());
+            subject.complete();
           }).catch((error) => {
             subject.next(IDBActions.overwriteAnnotationFailed({
               error
@@ -382,25 +372,14 @@ export class IDBEffects {
       }
     )));
 
-  overwriteAnnotationLinks$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.overwriteLinks),
-    exhaustMap((action) => {
+  logoutSession$ = createEffect(() => this.actions$.pipe(
+    ofType(AnnotationActions.logout),
+    exhaustMap(() => {
       const subject = new Subject<Action>();
 
-      this.idbService.clearIDBTable('annotation_links').then(() => {
-        this.idbService.saveAnnotationLinks(action.links).then(() => {
-          subject.next(IDBActions.overwriteAnnotationLinksSuccess());
-          subject.complete();
-        }).catch((error) => {
-          subject.next(IDBActions.overwriteAnnotationLinksFailed({
-            error
-          }));
-          subject.complete();
-        });
-      }).catch((error) => {
-        subject.next(IDBActions.overwriteAnnotationLinksFailed({
-          error
-        }));
+      this.sessStr.store('loggedIn', false);
+      timer(0).subscribe(() => {
+        subject.next(IDBActions.logoutSessionSuccess());
         subject.complete();
       });
 
@@ -408,33 +387,47 @@ export class IDBEffects {
     })
   ));
 
-  logoutSession$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.logout),
-    exhaustMap((action) => {
+  saveUseModeOptions$ = createEffect(() => this.actions$.pipe(
+    ofType(
+      AnnotationActions.logout, OnlineModeActions.setSubmitted, OnlineModeActions.setComment,
+      OnlineModeActions.setFeedback, AnnotationActions.setLogging, LocalModeActions.login,
+      AnnotationActions.setCurrentEditor, OnlineModeActions.loginDemo, OnlineModeActions.login,
+      LocalModeActions.login
+    ),
+    withLatestFrom(this.store),
+    mergeMap(([action, appState]: [Action, RootState]) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', false);
-      if (action.clearSession) {
-        const promises: PromiseExtended<string>[] = [];
-        promises.push(this.idbService.saveOption('user', null));
-        promises.push(this.idbService.saveOption('feedback', null));
-        promises.push(this.idbService.saveOption('comment', ''));
-        promises.push(this.idbService.saveOption('audioURL', null));
-        promises.push(this.idbService.saveOption('dataID', null));
+      const modeState = this.getModeStateFromString(appState, (action as any).mode);
+      if (modeState) {
+        const onlineModeState = modeState as OnlineModeState;
+        const localModeState = modeState as LocalModeState;
 
-        Promise.all(promises).then(() => {
-          subject.next(IDBActions.logoutSessionSuccess());
-          subject.complete();
-        }).catch((error) => {
-          subject.next(IDBActions.logoutSessionFailed({
-            error
+        this.idbService.saveModeOptions((action as any).mode, {
+          submitted: onlineModeState.onlineSession?.sessionData?.submitted,
+          audioURL: onlineModeState.onlineSession?.sessionData?.audioURL,
+          comment: onlineModeState.onlineSession?.sessionData?.comment,
+          dataID: onlineModeState.onlineSession?.sessionData?.dataID,
+          feedback: onlineModeState.onlineSession?.sessionData?.feedback,
+          sessionfile: localModeState?.sessionFile,
+          prompttext: onlineModeState?.onlineSession?.sessionData?.promptText,
+          servercomment: onlineModeState?.onlineSession?.sessionData?.serverComment,
+          currentEditor: modeState.currentEditor,
+          logging: modeState?.logging,
+          user: {
+            id: onlineModeState?.onlineSession?.loginData.id,
+            jobNumber: onlineModeState?.onlineSession?.loginData.jobNumber,
+            project: onlineModeState?.onlineSession?.loginData.project
+          }
+        }).then(() => {
+          subject.next(IDBActions.saveModeOptionsSuccess({
+            mode: (action as any).mode
           }));
           subject.complete();
-        });
-
-      } else {
-        timer(100).subscribe(() => {
-          subject.next(IDBActions.logoutSessionSuccess());
+        }).catch((error) => {
+          subject.next(IDBActions.saveModeOptionsFailed({
+            error
+          }));
           subject.complete();
         });
       }
@@ -453,44 +446,6 @@ export class IDBEffects {
         subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveUserProfileFailed({
-          error
-        }));
-        subject.complete();
-      });
-
-      return subject;
-    })
-  ));
-
-  saveTranscriptionSubmitted$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setSubmitted),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveOption('submitted', action.submitted).then(() => {
-        subject.next(IDBActions.saveTranscriptionSubmittedSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveTranscriptionSubmittedFailed({
-          error
-        }));
-        subject.complete();
-      });
-
-      return subject;
-    })
-  ));
-
-  saveTranscriptionFeedback$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setFeedback),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveOption('feedback', action.feedback).then(() => {
-        subject.next(IDBActions.saveTranscriptionFeedbackSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveTranscriptionFeedbackFailed({
           error
         }));
         subject.complete();
@@ -538,27 +493,8 @@ export class IDBEffects {
     })
   ));
 
-  saveTranscriptionLogging$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setLogging),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveOption('logging', action.logging).then(() => {
-        subject.next(IDBActions.saveTranscriptionLoggingSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveTranscriptionLoggingFailed({
-          error
-        }));
-        subject.complete();
-      });
-
-      return subject;
-    })
-  ));
-
   saveShowLoupe$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setShowLoupe),
+    ofType(ApplicationActions.setShowLoupe),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -577,7 +513,7 @@ export class IDBEffects {
   ));
 
   saveEasyMode$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setEasyMode),
+    ofType(ApplicationActions.setEasyMode),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -595,27 +531,8 @@ export class IDBEffects {
     })
   ));
 
-  saveComment$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.setComment),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveOption('comment', action.comment).then(() => {
-        subject.next(IDBActions.saveTranscriptionCommentSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveTranscriptionCommentFailed({
-          error
-        }));
-        subject.complete();
-      });
-
-      return subject;
-    })
-  ));
-
   saveSecondsPerLine$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setSecondsPerLine),
+    ofType(ApplicationActions.setSecondsPerLine),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -636,7 +553,7 @@ export class IDBEffects {
   ));
 
   saveHighlightingEnabled$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setHighlightingEnabled),
+    ofType(ApplicationActions.setHighlightingEnabled),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -655,18 +572,16 @@ export class IDBEffects {
   ));
 
   saveLoginDemo$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.loginDemo),
+    ofType(OnlineModeActions.loginDemo),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.saveOnlineSession(LoginMode.DEMO, action.onlineSession).then(() => {
+      this.sessStr.store('jobsLeft', action.onlineSession.sessionData.jobsLeft);
+      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData.serverDataEntry);
+
+      timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveDemoSessionFailed({
-          error
-        }));
         subject.complete();
       });
 
@@ -675,18 +590,16 @@ export class IDBEffects {
   ));
 
   saveLoginOnline$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.loginOnline),
+    ofType(OnlineModeActions.login),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.saveOnlineSession(LoginMode.ONLINE, action.onlineSession).then(() => {
+      this.sessStr.store('jobsLeft', action.onlineSession.sessionData.jobsLeft);
+      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData.serverDataEntry);
+
+      timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveOnlineSessionSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveOnlineSessionFailed({
-          error
-        }));
         subject.complete();
       });
 
@@ -695,15 +608,13 @@ export class IDBEffects {
   ));
 
   saveLoginLocal = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.loginLocal),
+    ofType(LocalModeActions.login),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
       this.sessStr.store('loggedIn', true);
 
       const promises: Promise<any>[] = [];
       promises.push(this.idbService.saveOption('usemode', LoginMode.LOCAL));
-      promises.push(this.idbService.saveOption('sessionfile', action.sessionFile.toAny()));
-
       Promise.all(promises).then(() => {
         subject.next(IDBActions.saveLocalSessionSuccess());
         subject.complete();
@@ -719,7 +630,7 @@ export class IDBEffects {
   ));
 
   savePlayOnHover$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setPlayOnHover),
+    ofType(ApplicationActions.setPlayOnHover),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -743,7 +654,7 @@ export class IDBEffects {
   ));
 
   saveFollowPlayCursor$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setFollowPlayCursor),
+    ofType(ApplicationActions.setFollowPlayCursor),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -793,7 +704,7 @@ export class IDBEffects {
   ));
 
   saveServerDataEntry$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.setServerDataEntry),
+    ofType(OnlineModeActions.setServerDataEntry),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -812,24 +723,6 @@ export class IDBEffects {
           subject.complete();
         }, 200);
       }
-
-      return subject;
-    })
-  ));
-  saveLogs$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setLogs),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveLogs(action.logs).then(() => {
-        subject.next(IDBActions.saveLogsSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveLogsFailed({
-          error
-        }));
-        subject.complete();
-      });
 
       return subject;
     })
@@ -858,7 +751,7 @@ export class IDBEffects {
   ));
 
   saveAudioSettings$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setAudioSettings),
+    ofType(ApplicationActions.setAudioSettings),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -880,7 +773,7 @@ export class IDBEffects {
   ));
 
   saveCurrentEditor$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.setCurrentEditor),
+    ofType(AnnotationActions.setCurrentEditor),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -898,84 +791,65 @@ export class IDBEffects {
     })
   ));
 
-  saveLog$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.addLog),
-    exhaustMap((action) => {
+  saveLogs$ = createEffect(() => this.actions$.pipe(
+    ofType(AnnotationActions.saveLogs, AnnotationActions.addLog),
+    withLatestFrom(this.store),
+    mergeMap(([action, appState]: [Action, RootState]) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveLog(action.log, action.log.timestamp).then(() => {
-        subject.next(IDBActions.saveLogSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.saveLogFailed({
-          error
-        }));
-        subject.complete();
-      });
+      const modeState = this.getModeStateFromString(appState, (action as any).mode);
 
-      return subject;
-    })
-  ));
-
-  saveAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.changeAnnotationLevel),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.sortorder)).then(() => {
-        subject.next(IDBActions.saveAnnotationLevelSuccess());
-        subject.complete();
-      }).catch((error) => {
-        console.error(error);
-        subject.next(IDBActions.saveAnnotationLevelFailed({
-          error
-        }));
-      });
-
-      return subject;
-    })
-  ));
-
-  addAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.addAnnotationLevel),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      this.idbService.addAnnotationLevel(convertToOIDBLevel(action.level, action.level.id))
-        .then(() => {
-          subject.next(IDBActions.addAnnotationLevelSuccess());
+      if (modeState) {
+        this.idbService.saveLogs((action as any).mode, modeState.logs).then(() => {
+          subject.next(IDBActions.saveLogsSuccess());
           subject.complete();
         }).catch((error) => {
-        subject.next(IDBActions.addAnnotationLevelFailed({
-          error
+          subject.next(IDBActions.saveLogsFailed({
+            error
+          }));
+          subject.complete();
+        });
+      } else {
+        subject.next(IDBActions.saveLogsFailed({
+          error: 'Can\'t find modeState'
         }));
-      });
+        subject.complete();
+      }
 
       return subject;
     })
   ));
 
-  removeAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.removeAnnotationLevel),
-    exhaustMap((action) => {
+  saveAnnotation = createEffect(() => this.actions$.pipe(
+    ofType(AnnotationActions.changeAnnotationLevel, AnnotationActions.addAnnotationLevel, AnnotationActions.removeAnnotationLevel),
+    withLatestFrom(this.store),
+    mergeMap(([action, appState]: [Action, RootState]) => {
       const subject = new Subject<Action>();
+      const modeState = this.getModeStateFromString(appState, (action as any).mode);
 
-      this.idbService.remove('annotation_levels', action.id).then(() => {
-        subject.next(IDBActions.removeAnnotationLevelSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.removeAnnotationLevelFailed({
-          error
+      if (modeState) {
+        this.idbService.saveAnnotation((action as any).mode, new OAnnotJSON(modeState.audio.fileName, modeState.audio.sampleRate, modeState.transcript.levels, modeState.transcript.links.map(a => a.link))).then(() => {
+          subject.next(IDBActions.saveAnnotationSuccess());
+          subject.complete();
+        }).catch((error) => {
+          subject.next(IDBActions.saveAnnotationFailed({
+            error
+          }));
+          subject.complete();
+        });
+      } else {
+        subject.next(IDBActions.saveAnnotationFailed({
+          error: 'Can\'t find modeState'
         }));
         subject.complete();
-      });
+      }
 
       return subject;
     })
   ));
 
   loadConsoleEntries$ = createEffect(() => this.actions$.pipe(
-    ofType(IDBActions.loadAnnotationLevelsSuccess),
+    ofType(IDBActions.loadAnnotationSuccess),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -1016,24 +890,6 @@ export class IDBEffects {
     })
   ));
 
-  private saveOnlineSession(mode: LoginMode, onlineSession: OnlineSession) {
-    const promises: PromiseExtended<string>[] = [];
-
-    promises.push(this.idbService.saveOption('dataID', onlineSession.sessionData.dataID));
-    promises.push(this.idbService.saveOption('prompttext', onlineSession.sessionData.promptText));
-    promises.push(this.idbService.saveOption('audioURL', onlineSession.sessionData.audioURL));
-    promises.push(this.idbService.saveOption('usemode', mode));
-    promises.push(this.idbService.saveOption('user', {
-      id: onlineSession.loginData.id,
-      jobno: onlineSession.loginData.jobNumber,
-      project: onlineSession.loginData.project
-    }));
-    this.sessStr.store('jobsLeft', onlineSession.sessionData.jobsLeft);
-    this.sessStr.store('serverDataEntry', onlineSession.sessionData.serverDataEntry);
-
-    return Promise.all(promises);
-  }
-
   constructor(private actions$: Actions,
               private appStorage: AppStorageService,
               private idbService: IDBService,
@@ -1049,19 +905,15 @@ export class IDBEffects {
     });
   }
 
-}
-
-function getModeState(appState: RootState) {
-  switch (appState.application.mode) {
-    case LoginMode.DEMO:
-      return appState.demoMode;
-    case LoginMode.LOCAL:
-      return appState.localMode;
-    case LoginMode.URL:
-      return appState.onlineMode;
-    case LoginMode.ONLINE:
-      return appState.onlineMode;
+  getModeStateFromString(appState: RootState, mode: LoginMode) {
+    let modeState: OnlineModeState | LocalModeState = null;
+    if (mode === 'online') {
+      modeState = appState.onlineMode
+    } else if (mode === 'local') {
+      modeState = appState.localMode
+    } else if (mode === 'demo') {
+      modeState = appState.demoMode
+    }
+    return modeState;
   }
-
-  return null;
 }

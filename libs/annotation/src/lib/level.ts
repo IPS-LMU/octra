@@ -5,7 +5,7 @@ import {OIDBLevel} from './db-objects';
 import {Segment} from './segment';
 
 export class Level {
-  public static counter = 1;
+  public counter = 1;
   public segments: Segments;
   public items: OItem[];
   public events: OEvent[];
@@ -98,6 +98,6 @@ export class Level {
   }
 
   public clone(): Level {
-    return new Level(++Level.counter, this.name + '_2', this.getTypeString(), this.segments.clone());
+    return new Level(++this.counter, this.name + '_2', this.getTypeString(), this.segments.clone());
   }
 }

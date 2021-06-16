@@ -102,7 +102,7 @@ import {TranscrWindowComponent} from './editors/2D-editor/transcr-window';
 import {OctraModalComponent} from './core/modals/octra-modal';
 import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
-import * as fromOnlineMode from './core/store/modes/online-mode/online-mode.reducer';
+import {OnlineModeReducers} from './core/store/modes/online-mode/online-mode.reducer';
 import * as fromLocalMode from './core/store/modes/local-mode/local-mode.reducer';
 import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
@@ -115,6 +115,7 @@ import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/per
 import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
 import {ProtectedModalComponent} from './core/modals/protected-modal/protected-modal.component';
 import {ApplicationEffects} from './core/store/application/application-effects.service';
+import {LoginMode} from './core/store';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -224,8 +225,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       {
         application: fromApplication.reducer,
         asr: fromASR.reducer,
-        onlineMode: fromOnlineMode.reducer,
-        demoMode: fromOnlineMode.reducer,
+        onlineMode: new OnlineModeReducers(LoginMode.ONLINE).create(),
+        demoMode: new OnlineModeReducers(LoginMode.DEMO).create(),
         localMode: fromLocalMode.reducer,
         user: fromUser.reducer
       },

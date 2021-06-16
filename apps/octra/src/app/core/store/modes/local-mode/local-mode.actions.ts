@@ -1,6 +1,7 @@
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {createAction, props} from '@ngrx/store';
 import {SessionFile} from '../../../obj/SessionFile';
+import {LoginMode} from '../../index';
 
 export class LocalModeActions extends AnnotationActions {
   static context: 'LocalMode';
@@ -10,7 +11,8 @@ export class LocalModeActions extends AnnotationActions {
     props<{
       files: File[],
       sessionFile: SessionFile,
-      removeData: boolean
+      removeData: boolean,
+      mode: LoginMode.LOCAL
     }>()
   );
 

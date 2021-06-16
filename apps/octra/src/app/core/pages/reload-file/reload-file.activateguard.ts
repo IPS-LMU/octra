@@ -4,7 +4,7 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import * as fromTranscription from '../../store/transcription';
+import * as fromAnnotation from '../../store/annotation';
 import {Store} from '@ngrx/store';
 import {afterDefined, navigateTo} from '@octra/utilities';
 
@@ -29,7 +29,7 @@ export class ReloadFileGuard implements CanActivate {
         });
         resolve(false);
       } else {
-        afterDefined(this.store.select(fromTranscription.selectProjectConfig)).then(() => {
+        afterDefined(this.store.select(fromAnnotation.selectProjectConfig)).then(() => {
           resolve(true);
         });
       }

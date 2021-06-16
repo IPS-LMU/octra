@@ -107,6 +107,13 @@ export class ApplicationActions {
     }>()
   );
 
+  public static setJobsLeft = createAction(
+    `[${context}] set jobsLeft`,
+    props<{
+      jobsLeft: number;
+    }>()
+  );
+
   public static setFollowPlayCursor = createAction(
     `[${context}] set follow play cursor`,
     props<{

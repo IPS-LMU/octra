@@ -33,7 +33,7 @@ import {
   TextConverter
 } from '@octra/annotation';
 import {AudioManager} from '@octra/media';
-import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, LoginMode} from '../../store';
+import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, getModeState, LoginMode} from '../../store';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
 import {interval, Subject, Subscription, timer} from 'rxjs';
@@ -90,7 +90,7 @@ export class TranscriptionService {
   }
 
   get guidelines(): any {
-    return this.appStorage.snapshot.transcription.guidelines;
+    return getModeState(this.appStorage.snapshot).guidelines;
   }
 
   private _audiofile: OAudiofile;
@@ -346,7 +346,7 @@ export class TranscriptionService {
 
             this.subscrmanager.removeByTag('idbAnnotationChange');
             this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
-              this.updateAnnotation(state.levels, state.links);
+              this.updateAnnotation(state.transcript.levels, state.transcript.links);
             }), 'idbAnnotationChange');
             resolve();
           }

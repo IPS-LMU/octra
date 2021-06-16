@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
 import {Subject} from 'rxjs';
-import {IAnnotation, IIDBModeOptions, IIDBOption, OctraDatabase} from '../octra-database';
+import {IIDBEntry, IIDBModeOptions, OctraDatabase} from '../octra-database';
 import {isUnset} from '@octra/utilities';
 import {LoginMode} from '../../store';
+import {IAnnotJSON, OAnnotJSON} from '@octra/annotation';
 
 
 @Injectable({
@@ -102,7 +103,7 @@ export class IDBService {
    * load options
    * @param variables
    */
-  public loadOptions = (variables: { attribute: string, key: string }[]): Subject<IIDBOption[]> => {
+  public loadOptions = (variables: { attribute: string, key: string }[]): Subject<IIDBEntry[]> => {
     const subject = new Subject<{
       value: any;
       name: string;
@@ -130,7 +131,7 @@ export class IDBService {
    * load annotation
    */
   public loadAnnotation(mode: LoginMode) {
-    return this.database.loadDataOfMode(mode, 'annotation', null);
+    return this.database.loadDataOfMode<IAnnotJSON>(mode, 'annotation', null);
   }
 
   /**
@@ -160,7 +161,7 @@ export class IDBService {
   /**
    * save one annotation level.
    */
-  public saveAnnotation(mode: LoginMode, annotation: IAnnotation) {
+  public saveAnnotation(mode: LoginMode, annotation: OAnnotJSON) {
     return this.database.saveModeData(mode, 'annotation', annotation);
   }
 

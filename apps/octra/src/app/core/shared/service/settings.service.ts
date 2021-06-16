@@ -9,9 +9,9 @@ import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {LoginMode} from '../../store';
+import {getModeState, LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
-import * as fromTranscription from '../../store/transcription';
+import * as fromAnnotation from '../../store/annotation';
 import * as fromApplication from '../../store/application';
 import {ConfigurationActions} from '../../store/configuration/configuration.actions';
 
@@ -56,7 +56,7 @@ export class SettingsService {
   }
 
   get projectsettings(): ProjectSettings {
-    return this.appStorage.snapshot.transcription.projectConfig;
+    return getModeState(this.appStorage.snapshot).projectConfig;
   }
 
   get appSettings(): AppSettings {
@@ -64,7 +64,7 @@ export class SettingsService {
   }
 
   get guidelines(): any {
-    return this.appStorage.snapshot.transcription.guidelines;
+    return getModeState(this.appStorage.snapshot).guidelines;
   }
 
   private _loaded = false;
@@ -94,11 +94,11 @@ export class SettingsService {
   }
 
   get validationmethod(): (str: string, obj: any) => any[] {
-    return this.appStorage.snapshot.transcription.methods.validate;
+    return getModeState(this.appStorage.snapshot).methods.validate;
   }
 
   get tidyUpMethod(): (str: string, obj: any) => string {
-    return this.appStorage.snapshot.transcription.methods.tidyUp;
+    return getModeState(this.appStorage.snapshot).methods.tidyUp;
   }
 
   private _isDBLoadded = false;
@@ -306,9 +306,9 @@ export class SettingsService {
     const promises: Promise<void>[] = [];
     promises.push(afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
     promises.push(afterDefined(this.store.select(fromApplication.selectAppSettings)));
-    promises.push(afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
-    promises.push(afterDefined(this.store.select(fromTranscription.selectGuideLines)));
-    promises.push(afterDefined(this.store.select(fromTranscription.selectMethods)));
+    promises.push(afterDefined(this.store.select(fromAnnotation.selectProjectConfig)));
+    promises.push(afterDefined(this.store.select(fromAnnotation.selectGuideLines)));
+    promises.push(afterDefined(this.store.select(fromAnnotation.selectMethods)));
 
     return Promise.all(promises);
   }

@@ -128,11 +128,21 @@ export const reducer = createReducer(
     mode: LoginMode.ONLINE,
     loggedIn: true
   })),
+  on(LocalModeActions.login, (state: ApplicationState) => ({
+    ...state,
+    mode: LoginMode.LOCAL,
+    loggedIn: true
+  })),
   on(OnlineModeActions.loginURLParameters, (state: ApplicationState, {urlParams}) => ({
     ...state,
     mode: LoginMode.URL,
     loggedIn: true,
     queryParams: urlParams
+  })),
+  on(OnlineModeActions.loginDemo, (state: ApplicationState, {mode}) => ({
+    ...state,
+    mode: LoginMode.DEMO,
+    loggedIn: true
   })),
   on(ApplicationActions.setMode, (state: ApplicationState, {mode}) => ({
     ...state,
@@ -192,16 +202,6 @@ export const reducer = createReducer(
       ...state.options,
       highlightingEnabled
     }
-  })),
-  on(OnlineModeActions.login, (state: ApplicationState, {mode}) => ({
-    ...state,
-    mode,
-    loggedIn: true
-  })),
-  on(LocalModeActions.login, (state: ApplicationState, {mode}) => ({
-    ...state,
-    mode,
-    loggedIn: true
   }))
 );
 

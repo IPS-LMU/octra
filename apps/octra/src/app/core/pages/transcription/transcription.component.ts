@@ -203,7 +203,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   get comment(): string {
-    return this.transcrService.feedback.comment;
+    return this.transcrService?.feedback?.comment;
   }
 
   constructor(public router: Router,

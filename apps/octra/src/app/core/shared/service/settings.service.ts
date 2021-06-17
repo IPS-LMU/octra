@@ -263,10 +263,10 @@ export class SettingsService {
    */
   public isTheme(theme: string) {
     const selectedTheme = (
-      isUnset(this.projectsettings.octra)
-      || isUnset(this.projectsettings.octra.theme)
+      isUnset(this.projectsettings?.octra)
+      || isUnset(this.projectsettings?.octra?.theme)
     )
-      ? 'default' : this.projectsettings.octra.theme;
+      ? 'default' : this.projectsettings?.octra.theme;
 
     return (selectedTheme === theme);
   }

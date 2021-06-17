@@ -138,15 +138,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
     const loaduser = () => {
       if (this.appStorage.useMode !== LoginMode.DEMO) {
-        if (!isUnset(this.appStorage.onlineSession)) {
-          if (this.appStorage.onlineSession.loginData.id !== '-1') {
-            this.member.id = this.appStorage.onlineSession.loginData.id;
+        const loginData = this.appStorage.snapshot?.onlineMode?.onlineSession?.loginData;
+        if (!isUnset(loginData)) {
+          if (loginData?.id !== '-1') {
+            this.member.id = loginData.id;
           }
 
-          this.member.project = this.appStorage.onlineSession.loginData.project;
+          this.member.project = loginData.project;
 
-          if (this.appStorage.onlineSession.loginData.jobNumber !== null && this.appStorage.onlineSession.loginData.jobNumber > -1) {
-            this.member.jobno = this.appStorage.onlineSession.loginData.jobNumber.toString();
+          if (loginData.jobNumber !== null && loginData.jobNumber > -1) {
+            this.member.jobno = loginData.jobNumber.toString();
           }
         }
       } else {

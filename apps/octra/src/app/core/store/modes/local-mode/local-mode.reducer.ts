@@ -30,35 +30,43 @@ export const reducer = createUndoRedoReducer(
     files,
     sessionFile
   })),
-  on(LocalModeActions.logout, (state: LocalModeState, {clearSession}) => {
-    return (clearSession) ? initialState : {
-      ...state,
-      savingNeeded: false,
-      isSaving: false,
-      submitted: false,
-      audio: {
-        loaded: false,
-        fileName: '',
-        sampleRate: 0
-      },
-      files: [],
-      histories: {}
-    };
+  on(LocalModeActions.logout, (state: LocalModeState, {clearSession, mode}) => {
+    if (mode === LoginMode.LOCAL) {
+      return (clearSession) ? {
+        ...initialState,
+        guidelines: state.guidelines,
+        projectConfig: state.projectConfig,
+        methods: state.methods
+      } : {
+        ...state,
+        savingNeeded: false,
+        isSaving: false,
+        submitted: false,
+        audio: {
+          loaded: false,
+          fileName: '',
+          sampleRate: 0
+        },
+        files: [],
+        histories: {}
+      };
+    }
+    return state;
   }),
   on(LocalModeActions.setSessionFile, (state: LocalModeState, {sessionFile}) => ({
     ...state,
     sessionFile
   })),
   on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {localOptions}) => {
-    let result = state;
+      let result = state;
 
-    for (const name in localOptions) {
-      if (localOptions.hasOwnProperty(name)) {
-        result = writeOptionToStore(result, name, localOptions[name]);
+      for (const name in localOptions) {
+        if (localOptions.hasOwnProperty(name)) {
+          result = writeOptionToStore(result, name, localOptions[name]);
+        }
       }
-    }
 
-    return result;
+      return result;
     }
   )
 );

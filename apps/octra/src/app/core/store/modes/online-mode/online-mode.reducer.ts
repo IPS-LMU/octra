@@ -68,8 +68,19 @@ export class OnlineModeReducers {
         return state;
       }),
       on(OnlineModeActions.logout, (state: OnlineModeState, {clearSession, mode}) => {
+        const loguinData = state.onlineSession.loginData;
+
         if (mode === this.mode) {
-          return (clearSession) ? initialState : {
+          return (clearSession) ? {
+            ...initialState,
+            onlineSession: {
+              ...initialState.onlineSession,
+              loginData: state.onlineSession.loginData
+            },
+            guidelines: state.guidelines,
+            projectConfig: state.projectConfig,
+            methods: state.methods
+          } : {
             ...state,
             savingNeeded: false,
             isSaving: false,
@@ -180,14 +191,14 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(IDBActions.loadOptionsSuccess, (state: OnlineModeState, {onlineOptions, localOptions}) => {
+      on(IDBActions.loadOptionsSuccess, (state: OnlineModeState, {onlineOptions, demoOptions}) => {
           let result = state;
 
           let options: IIDBModeOptions;
           if (this.mode === LoginMode.ONLINE) {
             options = onlineOptions;
-          } else if (this.mode === LoginMode.LOCAL) {
-            options = localOptions;
+          } else if (this.mode === LoginMode.DEMO) {
+            options = demoOptions;
           } else {
             options = DefaultModeOptions;
           }

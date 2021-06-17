@@ -313,12 +313,23 @@ export class IDBActions {
     }>()
   );
 
-  public static saveLocalSessionSuccess = createAction(
-    `[${context}] Save LocalSession Success`
+  public static saveLoginSessionSuccess = createAction(
+    `[${context}] Save LoginSession Success`
   );
 
-  public static saveLocalSessionFailed = createAction(
-    `[${context}] Save LocalSession Failed`,
+  public static saveLoginSessionFailed = createAction(
+    `[${context}] Save LoginSession Failed`,
+    props<{
+      error: string
+    }>()
+  );
+
+  public static saveLogoutSuccess = createAction(
+    `[${context}] Save Logout Success`
+  );
+
+  public static saveLogoutFailed = createAction(
+    `[${context}] Save Logout Failed`,
     props<{
       error: string
     }>()

@@ -107,8 +107,6 @@ export class IDBEffects {
           loadModeOptionsDemo,
           loadModeOptionsOnline
         ]).then(([applicationOptions, localOptions, demoOptions, onlineOptions]: [any, IIDBModeOptions, IIDBModeOptions, IIDBModeOptions]) => {
-          // TODO db: read online mode options for specific modes
-          console.log(`options loaded ok`);
           subject.next(IDBActions.loadOptionsSuccess({
             applicationOptions, localOptions, onlineOptions, demoOptions
           }));
@@ -324,7 +322,7 @@ export class IDBEffects {
     })
   ));
 
-  saveUseModeOptions$ = createEffect(() => this.actions$.pipe(
+  savemodeOptions$ = createEffect(() => this.actions$.pipe(
     ofType(
       AnnotationActions.logout, OnlineModeActions.setSubmitted, OnlineModeActions.setComment,
       OnlineModeActions.setFeedback, AnnotationActions.setLogging, LocalModeActions.login,
@@ -544,19 +542,41 @@ export class IDBEffects {
     })
   ));
 
-  saveLoginLocal = createEffect(() => this.actions$.pipe(
-    ofType(LocalModeActions.login),
+  saveLogin$ = createEffect(() => this.actions$.pipe(
+    ofType(LocalModeActions.login, OnlineModeActions.loginDemo, OnlineModeActions.login),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-      this.sessStr.store('loggedIn', true);
 
+      this.sessStr.store('loggedIn', true);
       const promises: Promise<any>[] = [];
-      promises.push(this.idbService.saveOption('usemode', LoginMode.LOCAL));
+      promises.push(this.idbService.saveOption('usemode', action.mode));
       Promise.all(promises).then(() => {
-        subject.next(IDBActions.saveLocalSessionSuccess());
+        subject.next(IDBActions.saveLoginSessionSuccess());
         subject.complete();
       }).catch((error) => {
-        subject.next(IDBActions.saveLocalSessionFailed({
+        subject.next(IDBActions.saveLoginSessionFailed({
+          error
+        }));
+        subject.complete();
+      });
+
+      return subject;
+    })
+  ));
+
+  saveLogout$ = createEffect(() => this.actions$.pipe(
+    ofType(AnnotationActions.logout),
+    exhaustMap((action) => {
+      const subject = new Subject<Action>();
+
+      this.sessStr.store('loggedIn', false);
+      const promises: Promise<any>[] = [];
+      promises.push(this.idbService.saveOption('usemode', null));
+      Promise.all(promises).then(() => {
+        subject.next(IDBActions.saveLogoutSuccess());
+        subject.complete();
+      }).catch((error) => {
+        subject.next(IDBActions.saveLogoutFailed({
           error
         }));
         subject.complete();

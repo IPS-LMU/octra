@@ -90,7 +90,7 @@ export class TranscriptionService {
   }
 
   get guidelines(): any {
-    return getModeState(this.appStorage.snapshot).guidelines;
+    return getModeState(this.appStorage.snapshot)?.guidelines;
   }
 
   private _audiofile: OAudiofile;
@@ -471,9 +471,6 @@ export class TranscriptionService {
         }).then(() => {
           const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
 
-          const mode = this.appStorage.useMode;
-          const levels = this.appStorage.annotationLevels;
-          const modeState = getModeState(this.appStorage.snapshot);
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (!isUnset(this.appStorage.annotationLevels)) {

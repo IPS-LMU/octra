@@ -1,6 +1,120 @@
 {
   "version": 1,
   "projects": {
+    "annotation": {
+      "root": "libs/annotation",
+      "sourceRoot": "libs/annotation/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/annotation/tsconfig.lib.json",
+              "libs/annotation/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/annotation/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/annotation/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/annotation"]
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/annotation",
+            "tsConfig": "libs/annotation/tsconfig.lib.json",
+            "packageJson": "libs/annotation/package.json",
+            "main": "libs/annotation/src/index.ts",
+            "assets": ["libs/annotation/*.md"]
+          },
+          "outputs": ["{options.outputPath}"]
+        }
+      }
+    },
+    "components": {
+      "projectType": "library",
+      "root": "libs/components",
+      "sourceRoot": "libs/components/src",
+      "prefix": "octra",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/components/tsconfig.lib.json",
+            "project": "libs/components/ng-package.json",
+            "buildableProjectDepsInPackageJsonType": "dependencies"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/components/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/components/tsconfig.lib.json",
+              "libs/components/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/components/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/components/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/components"]
+        }
+      },
+      "schematics": {}
+    },
+    "media": {
+      "root": "libs/media",
+      "sourceRoot": "libs/media/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/media/tsconfig.lib.json",
+              "libs/media/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/media/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/media/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/media"]
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/media",
+            "tsConfig": "libs/media/tsconfig.lib.json",
+            "packageJson": "libs/media/package.json",
+            "main": "libs/media/src/index.ts",
+            "assets": ["libs/media/*.md"]
+          },
+          "outputs": ["{options.outputPath}"]
+        }
+      }
+    },
     "octra": {
       "projectType": "application",
       "schematics": {},
@@ -132,9 +246,7 @@
               ]
             }
           },
-          "outputs": [
-            "{options.outputPath}"
-          ]
+          "outputs": ["{options.outputPath}"]
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -161,10 +273,7 @@
               "apps/octra/tsconfig.app.json",
               "apps/octra/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/octra/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/octra/**/*"]
           }
         },
         "test": {
@@ -173,9 +282,7 @@
             "jestConfig": "apps/octra/jest.config.js",
             "passWithNoTests": true
           },
-          "outputs": [
-            "coverage/apps/octra"
-          ]
+          "outputs": ["coverage/apps/octra"]
         }
       }
     },
@@ -200,13 +307,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "apps/octra-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/octra-e2e/**/*"
-            ]
+            "tsConfig": ["apps/octra-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/octra-e2e/**/*"]
           }
         }
       }
@@ -224,10 +326,7 @@
               "libs/utilities/tsconfig.lib.json",
               "libs/utilities/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/utilities/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/utilities/**/*"]
           }
         },
         "test": {
@@ -236,9 +335,7 @@
             "jestConfig": "libs/utilities/jest.config.js",
             "passWithNoTests": true
           },
-          "outputs": [
-            "coverage/libs/utilities"
-          ]
+          "outputs": ["coverage/libs/utilities"]
         },
         "build": {
           "builder": "@nrwl/node:package",
@@ -247,152 +344,11 @@
             "tsConfig": "libs/utilities/tsconfig.lib.json",
             "packageJson": "libs/utilities/package.json",
             "main": "libs/utilities/src/index.ts",
-            "assets": [
-              "libs/utilities/*.md"
-            ]
+            "assets": ["libs/utilities/*.md"]
           },
-          "outputs": [
-            "{options.outputPath}"
-          ]
+          "outputs": ["{options.outputPath}"]
         }
       }
-    },
-    "media": {
-      "root": "libs/media",
-      "sourceRoot": "libs/media/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/media/tsconfig.lib.json",
-              "libs/media/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/media/**/*"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/media/jest.config.js",
-            "passWithNoTests": true
-          },
-          "outputs": [
-            "coverage/libs/media"
-          ]
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "options": {
-            "outputPath": "dist/libs/media",
-            "tsConfig": "libs/media/tsconfig.lib.json",
-            "packageJson": "libs/media/package.json",
-            "main": "libs/media/src/index.ts",
-            "assets": [
-              "libs/media/*.md"
-            ]
-          },
-          "outputs": [
-            "{options.outputPath}"
-          ]
-        }
-      }
-    },
-    "annotation": {
-      "root": "libs/annotation",
-      "sourceRoot": "libs/annotation/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/annotation/tsconfig.lib.json",
-              "libs/annotation/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/annotation/**/*"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/annotation/jest.config.js",
-            "passWithNoTests": true
-          },
-          "outputs": [
-            "coverage/libs/annotation"
-          ]
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "options": {
-            "outputPath": "dist/libs/annotation",
-            "tsConfig": "libs/annotation/tsconfig.lib.json",
-            "packageJson": "libs/annotation/package.json",
-            "main": "libs/annotation/src/index.ts",
-            "assets": [
-              "libs/annotation/*.md"
-            ]
-          },
-          "outputs": [
-            "{options.outputPath}"
-          ]
-        }
-      }
-    },
-    "components": {
-      "projectType": "library",
-      "root": "libs/components",
-      "sourceRoot": "libs/components/src",
-      "prefix": "octra",
-      "architect": {
-        "build": {
-          "builder": "@nrwl/angular:package",
-          "options": {
-            "tsConfig": "libs/components/tsconfig.lib.json",
-            "project": "libs/components/ng-package.json",
-            "buildableProjectDepsInPackageJsonType": "dependencies"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "libs/components/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/components/tsconfig.lib.json",
-              "libs/components/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/components/**/*"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/components/jest.config.js",
-            "passWithNoTests": true
-          },
-          "outputs": [
-            "coverage/libs/components"
-          ]
-        }
-      },
-      "schematics": {}
     }
   },
   "cli": {

@@ -23,21 +23,21 @@
     }
   },
   "projects": {
+    "annotation": {
+      "tags": []
+    },
+    "components": {
+      "tags": []
+    },
+    "media": {
+      "tags": []
+    },
     "octra": {
       "tags": []
     },
     "octra-e2e": {
       "tags": [],
       "implicitDependencies": ["octra"]
-    },
-    "media": {
-      "tags": []
-    },
-    "annotation": {
-      "tags": []
-    },
-    "components": {
-      "tags": []
     },
     "utilities": {
       "tags": []

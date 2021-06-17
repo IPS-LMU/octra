@@ -9,4 +9,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
   coverageDirectory: '../../coverage/libs/annotation',
   displayName: 'annotation',
+  testEnvironment: 'node',
 };

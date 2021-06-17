@@ -63,6 +63,7 @@ export class AppStorageService {
   public get annotationChanged(): Observable<AnnotationState> {
     const subject = new Subject<AnnotationState>();
     this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
+      console.log(`annotation changed`);
       subject.next(state);
     });
     return subject;
@@ -75,7 +76,7 @@ export class AppStorageService {
   }
 
   set serverDataEntry(value: IDataEntry) {
-    this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value}));
+    this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
   }
 
   set submitted(value: boolean) {
@@ -442,35 +443,33 @@ export class AppStorageService {
 
   public overwriteAnnotation = (levels: OIDBLevel[], links: OIDBLink[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
-      if (saveToDB) {
-        let max = 0;
+      let max = 0;
 
-        for (const valueElem of levels) {
-          max = Math.max(max, valueElem.id);
-        }
-
-        const subscr = this.actions.subscribe((a) => {
-          if (a.type === IDBActions.overwriteAnnotationSuccess.type) {
-            resolve(null);
-            subscr.unsubscribe();
-          } else if (a.type === IDBActions.overwriteAnnotationFailed.type) {
-            reject((a as any).error);
-            subscr.unsubscribe();
-          }
-        });
-
-        this.store.dispatch(AnnotationActions.overwriteTranscript({
-          mode: this.useMode,
-          annotation: {
-            levels: (levels.map((a) => {
-              return convertFromOIDLevel(a.level, a.id);
-            })),
-            links,
-            levelCounter: max
-          },
-          saveToDB
-        }));
+      for (const valueElem of levels) {
+        max = Math.max(max, valueElem.id);
       }
+
+      const subscr = this.actions.subscribe((a) => {
+        if (a.type === IDBActions.overwriteTranscriptSuccess.type) {
+          resolve(null);
+          subscr.unsubscribe();
+        } else if (a.type === IDBActions.overwriteTranscriptFailed.type) {
+          reject((a as any).error);
+          subscr.unsubscribe();
+        }
+      });
+
+      this.store.dispatch(AnnotationActions.overwriteTranscript({
+        mode: this.useMode,
+        transcript: {
+          levels: (levels.map((a) => {
+            return convertFromOIDLevel(a.level, a.id);
+          })),
+          links,
+          levelCounter: max
+        },
+        saveToDB
+      }));
     });
   };
 

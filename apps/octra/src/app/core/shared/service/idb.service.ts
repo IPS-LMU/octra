@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
-import {Subject} from 'rxjs';
-import {IIDBEntry, IIDBModeOptions, OctraDatabase} from '../octra-database';
+import {DefaultModeOptions, IIDBEntry, IIDBModeOptions, OctraDatabase} from '../octra-database';
 import {isUnset} from '@octra/utilities';
 import {LoginMode} from '../../store';
 import {IAnnotJSON, OAnnotJSON} from '@octra/annotation';
@@ -101,23 +100,18 @@ export class IDBService {
 
   /**
    * load options
-   * @param variables
    */
-  public loadOptions = (variables: { attribute: string, key: string }[]): Subject<IIDBEntry[]> => {
-    const subject = new Subject<{
+  public loadOptions = (keys: string[]): Promise<IIDBEntry[]> => {
+    return new Promise<{
       value: any;
       name: string;
-    }[]>();
-
-    const keys = variables.map(a => a.key);
-    this.database.options.bulkGet(keys).then((values) => {
-      subject.next(values.filter(a => !isUnset(a)));
-    }).catch((error) => {
-      console.error(error);
-      subject.error(error);
+    }[]>((resolve, reject) => {
+      this.database.options.bulkGet(keys).then((values) => {
+        resolve(values.filter(a => !isUnset(a)));
+      }).catch((error) => {
+        reject(error);
+      });
     });
-
-    return subject;
   }
 
   /**
@@ -149,6 +143,10 @@ export class IDBService {
 
   public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {
     return this.database.saveModeData(mode, 'options', options);
+  }
+
+  public loadModeOptions(mode: LoginMode) {
+    return this.database.loadDataOfMode<IIDBModeOptions>(mode, 'options', DefaultModeOptions);
   }
 
   /**

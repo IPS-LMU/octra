@@ -18,6 +18,7 @@ import {ASRActions} from '../asr/asr.actions';
 import {UserActions} from '../user/user.actions';
 import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
+import {IIDBModeOptions} from '../../shared/octra-database';
 
 
 @Injectable({
@@ -90,103 +91,39 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.idbService.initialize(action.appConfiguration.octra.database.name).then(() => {
-        this.idbService.loadOptions(
-          [
-            {
-              attribute: '_submitted',
-              key: 'submitted'
-            },
-            {
-              attribute: '_version',
-              key: 'version'
-            },
-            {
-              attribute: '_easymode',
-              key: 'easymode'
-            },
-            {
-              attribute: '_audioURL',
-              key: 'audioURL'
-            },
-            {
-              attribute: '_comment',
-              key: 'comment'
-            },
-            {
-              attribute: '_dataID',
-              key: 'dataID'
-            },
-            {
-              attribute: '_feedback',
-              key: 'feedback'
-            },
-            {
-              attribute: '_language',
-              key: 'language'
-            },
-            {
-              attribute: '_sessionfile',
-              key: 'sessionfile'
-            },
-            {
-              attribute: '_usemode',
-              key: 'usemode'
-            },
-            {
-              attribute: '_user',
-              key: 'user'
-            },
-            {
-              attribute: '_interface',
-              key: 'interface'
-            },
-            {
-              attribute: '_logging',
-              key: 'logging'
-            },
-            {
-              attribute: '_showLoupe',
-              key: 'showLoupe'
-            },
-            {
-              attribute: '_prompttext',
-              key: 'prompttext'
-            },
-            {
-              attribute: '_servercomment',
-              key: 'servercomment'
-            },
-            {
-              attribute: '_secondsPerLine',
-              key: 'secondsPerLine'
-            },
-            {
-              attribute: '_audioSettings',
-              key: 'audioSettings'
-            },
-            {
-              attribute: '_highlightingEnabled',
-              key: 'highlightingEnabled'
-            },
-            {
-              attribute: '_asr',
-              key: 'asr'
-            }
+        console.log(`load options...`);
+        const loadApplicationOptions = this.idbService.loadOptions([
+            'version', 'easymode', 'language', 'usemode', 'user', 'showLoupe', 'secondsPerLine', 'audioSettings', 'highlightingEnabled', 'asr'
           ]
-        ).subscribe(
-          (options) => {
-            subject.next(IDBActions.loadOptionsSuccess({variables: options}));
-            subject.complete();
-          },
-          (error) => {
-            subject.next(IDBActions.loadOptionsFailed({
-              error
-            }));
-            subject.complete();
-          }
         );
+
+        const loadModeOptionsLocal = this.idbService.loadModeOptions(LoginMode.LOCAL);
+        const loadModeOptionsDemo = this.idbService.loadModeOptions(LoginMode.DEMO);
+        const loadModeOptionsOnline = this.idbService.loadModeOptions(LoginMode.ONLINE);
+
+        Promise.all([
+          loadApplicationOptions,
+          loadModeOptionsLocal,
+          loadModeOptionsDemo,
+          loadModeOptionsOnline
+        ]).then(([applicationOptions, localOptions, demoOptions, onlineOptions]: [any, IIDBModeOptions, IIDBModeOptions, IIDBModeOptions]) => {
+          // TODO db: read online mode options for specific modes
+          console.log(`options loaded ok`);
+          subject.next(IDBActions.loadOptionsSuccess({
+            applicationOptions, localOptions, onlineOptions, demoOptions
+          }));
+          subject.complete();
+        }).catch((error) => {
+          subject.next(IDBActions.loadOptionsFailed({
+            error
+          }));
+          subject.complete();
+        });
       }).catch((error) => {
-        console.error(error);
+        subject.next(IDBActions.loadOptionsFailed({
+          error
+        }));
+        subject.complete();
       });
 
       return subject;
@@ -251,22 +188,22 @@ export class IDBEffects {
         };
 
         const oidbOnlineAnnotation = {
-          levels: onlineAnnotation?.levels?.map(convertToStateLevel),
-          links: onlineAnnotation?.links?.map(convertLink),
+          levels: (onlineAnnotation?.levels) ? onlineAnnotation?.levels.map(convertToStateLevel) : [],
+          links: (onlineAnnotation?.links) ? onlineAnnotation?.links.map(convertLink) : [],
           levelCounter: max
         };
 
         max = 0;
         const oidbLocalAnnotation = {
-          levels: localAnnotation?.levels?.map(convertToStateLevel),
-          links: localAnnotation?.links.map(convertLink),
+          levels: (localAnnotation?.levels) ? localAnnotation?.levels.map(convertToStateLevel) : [],
+          links: (localAnnotation?.links) ? localAnnotation?.links.map(convertLink) : [],
           levelCounter: max
         };
 
         max = 0;
         const oidbDemoAnnotation = {
-          levels: demoAnnotation?.levels?.map(convertToStateLevel),
-          links: demoAnnotation?.links?.map(convertLink),
+          levels: (demoAnnotation?.levels) ? demoAnnotation?.levels.map(convertToStateLevel) : [],
+          links: (demoAnnotation?.links) ? demoAnnotation?.links.map(convertLink) : [],
           levelCounter: max
         };
 
@@ -357,10 +294,10 @@ export class IDBEffects {
 
         if (action.saveToDB) {
           this.idbService.clearAnnotationData((action as any).mode).then(() => {
-            subject.next(IDBActions.overwriteAnnotationSuccess());
+            subject.next(IDBActions.overwriteTranscriptSuccess());
             subject.complete();
           }).catch((error) => {
-            subject.next(IDBActions.overwriteAnnotationFailed({
+            subject.next(IDBActions.overwriteTranscriptFailed({
               error
             }));
             subject.complete();
@@ -409,7 +346,7 @@ export class IDBEffects {
           comment: onlineModeState.onlineSession?.sessionData?.comment,
           dataID: onlineModeState.onlineSession?.sessionData?.dataID,
           feedback: onlineModeState.onlineSession?.sessionData?.feedback,
-          sessionfile: localModeState?.sessionFile,
+          sessionfile: localModeState?.sessionFile?.toAny(),
           prompttext: onlineModeState?.onlineSession?.sessionData?.promptText,
           servercomment: onlineModeState?.onlineSession?.sessionData?.serverComment,
           currentEditor: modeState.currentEditor,

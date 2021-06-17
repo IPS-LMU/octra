@@ -12,14 +12,14 @@ export const reducer = createReducer(
     ...state,
     ...data
   })),
-  on(IDBActions.loadOptionsSuccess, (state: ASRState, {variables}) => {
-      let result = state;
+  on(IDBActions.loadOptionsSuccess, (state: ASRState, {applicationOptions}) => {
+    let result = state;
 
-      for (const variable of variables) {
-        result = writeOptionToStore(result, variable.name, variable.value);
-      }
+    for (const option of applicationOptions) {
+      result = writeOptionToStore(result, option.name, option.value);
+    }
 
-      return result;
+    return result;
     }
   ));
 

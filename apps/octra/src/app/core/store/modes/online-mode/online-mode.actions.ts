@@ -35,6 +35,7 @@ export class OnlineModeActions extends AnnotationActions {
       id: string;
       project: string;
       jobNumber: number;
+      mode: LoginMode;
     }>()
   );
 
@@ -51,6 +52,7 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set promptText`,
     props<{
       promptText: string;
+      mode: string;
     }>()
   );
 
@@ -58,6 +60,7 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set serverComment`,
     props<{
       serverComment: string;
+      mode: LoginMode;
     }>()
   );
 
@@ -65,6 +68,7 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set jobsLeft`,
     props<{
       jobsLeft: number;
+      mode: LoginMode;
     }>()
   );
 
@@ -72,6 +76,7 @@ export class OnlineModeActions extends AnnotationActions {
     `[${OnlineModeActions.context}] Set serverDataEntry`,
     props<{
       serverDataEntry: IDataEntry;
+      mode: LoginMode;
     }>()
   );
 

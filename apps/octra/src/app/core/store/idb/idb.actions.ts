@@ -2,6 +2,7 @@ import {createAction, props} from '@ngrx/store';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
 import {OIDBLink} from '@octra/annotation';
 import {AnnotationStateLevel} from '../index';
+import {IIDBModeOptions} from '../../shared/octra-database';
 
 const context = 'IDB';
 
@@ -9,7 +10,10 @@ export class IDBActions {
   public static loadOptionsSuccess = createAction(
     `[${context}] Load Options Success`,
     props<{
-      variables: { name: string, value: any }[]
+      applicationOptions: any;
+      localOptions: IIDBModeOptions;
+      onlineOptions: IIDBModeOptions;
+      demoOptions: IIDBModeOptions;
     }>()
   );
 
@@ -375,12 +379,12 @@ export class IDBActions {
     }>()
   );
 
-  public static overwriteAnnotationSuccess = createAction(
-    `[${context}] Overwrite Annotation Success`
+  public static overwriteTranscriptSuccess = createAction(
+    `[${context}] Overwrite Transcript Success`
   );
 
-  public static overwriteAnnotationFailed = createAction(
-    `[${context}] Overwrite Annotation Failed`,
+  public static overwriteTranscriptFailed = createAction(
+    `[${context}] Overwrite Transcript Failed`,
     props<{
       error: string
     }>()

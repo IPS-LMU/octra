@@ -17,11 +17,11 @@ export const reducer = createReducer(
       ...user
     }
   }),
-  on(IDBActions.loadOptionsSuccess, (state: UserState, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: UserState, {applicationOptions}) => {
       let result = state;
 
-      for (const variable of variables) {
-        result = writeOptionToStore(result, variable.name, variable.value);
+      for (const option of applicationOptions) {
+        result = writeOptionToStore(result, option.name, option.value);
       }
 
       return result;

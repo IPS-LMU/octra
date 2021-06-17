@@ -11,7 +11,6 @@ import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {getModeState, LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
-import * as fromAnnotation from '../../store/annotation';
 import * as fromApplication from '../../store/application';
 import {ConfigurationActions} from '../../store/configuration/configuration.actions';
 
@@ -50,13 +49,11 @@ export class SettingsService {
   }
 
   public get isAllLoaded(): boolean {
-    return (
-      !(this.projectsettings === null || this.projectsettings === undefined)
-    );
+    return this.isDBLoadded;
   }
 
   get projectsettings(): ProjectSettings {
-    return getModeState(this.appStorage.snapshot).projectConfig;
+    return getModeState(this.appStorage.snapshot)?.projectConfig;
   }
 
   get appSettings(): AppSettings {
@@ -64,7 +61,7 @@ export class SettingsService {
   }
 
   get guidelines(): any {
-    return getModeState(this.appStorage.snapshot).guidelines;
+    return getModeState(this.appStorage.snapshot)?.guidelines;
   }
 
   private _loaded = false;
@@ -306,9 +303,6 @@ export class SettingsService {
     const promises: Promise<void>[] = [];
     promises.push(afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
     promises.push(afterDefined(this.store.select(fromApplication.selectAppSettings)));
-    promises.push(afterDefined(this.store.select(fromAnnotation.selectProjectConfig)));
-    promises.push(afterDefined(this.store.select(fromAnnotation.selectGuideLines)));
-    promises.push(afterDefined(this.store.select(fromAnnotation.selectMethods)));
 
     return Promise.all(promises);
   }

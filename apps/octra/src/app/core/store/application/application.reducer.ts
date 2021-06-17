@@ -6,6 +6,7 @@ import {ConfigurationActions} from '../configuration/configuration.actions';
 import {IDBActions} from '../idb/idb.actions';
 import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {AnnotationActions} from '../annotation/annotation.actions';
+import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
 
 export const initialState: ApplicationState = {
   loading: {
@@ -73,11 +74,11 @@ export const reducer = createReducer(
     ...state,
     consoleEntries
   })),
-  on(IDBActions.loadOptionsSuccess, (state: ApplicationState, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: ApplicationState, {applicationOptions}) => {
     let result = state;
 
-    for (const variable of variables) {
-      result = writeOptionToStore(result, variable.name, variable.value);
+    for (const option of applicationOptions) {
+        result = writeOptionToStore(result, option.name, option.value);
     }
 
     return result;
@@ -192,6 +193,16 @@ export const reducer = createReducer(
       highlightingEnabled
     }
   })),
+  on(OnlineModeActions.login, (state: ApplicationState, {mode}) => ({
+    ...state,
+    mode,
+    loggedIn: true
+  })),
+  on(LocalModeActions.login, (state: ApplicationState, {mode}) => ({
+    ...state,
+    mode,
+    loggedIn: true
+  }))
 );
 
 

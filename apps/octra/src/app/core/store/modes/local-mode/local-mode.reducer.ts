@@ -7,7 +7,6 @@ import {AnnotationActions} from '../../annotation/annotation.actions';
 import {LocalModeActions} from './local-mode.actions';
 import {SessionFile} from '../../../obj/SessionFile';
 import {IDBActions} from '../../idb/idb.actions';
-import {isUnset} from '@octra/utilities';
 
 export const initialState: LocalModeState = {
   ...fromAnnotation.initialState,
@@ -26,9 +25,10 @@ const {createUndoRedoReducer} = undoRedo({
 export const reducer = createUndoRedoReducer(
   initialState,
   ...new AnnotationStateReducers(LoginMode.LOCAL).create(),
-  on(LocalModeActions.login, (state: LocalModeState, data) => ({
+  on(LocalModeActions.login, (state: LocalModeState, {files, sessionFile}) => ({
     ...state,
-    ...data
+    files,
+    sessionFile
   })),
   on(LocalModeActions.logout, (state: LocalModeState, {clearSession}) => {
     return (clearSession) ? initialState : {
@@ -49,16 +49,16 @@ export const reducer = createUndoRedoReducer(
     ...state,
     sessionFile
   })),
-  on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {variables}) => {
-      let result = state;
+  on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {localOptions}) => {
+    let result = state;
 
-      for (const variable of variables) {
-        if (!isUnset(variable)) {
-          result = writeOptionToStore(result, variable.name, variable.value);
-        }
+    for (const name in localOptions) {
+      if (localOptions.hasOwnProperty(name)) {
+        result = writeOptionToStore(result, name, localOptions[name]);
       }
+    }
 
-      return result;
+    return result;
     }
   )
 );

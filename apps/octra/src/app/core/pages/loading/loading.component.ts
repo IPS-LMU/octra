@@ -148,6 +148,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             }).then(() => {
               this.state = 'Audio loaded';
               const audioRessource = this.audio.audiomanagers[0].ressource;
+              console.log(`dispatch`);
               this.store.dispatch(AnnotationActions.setAudioLoaded({
                 mode: this.appStorage.useMode,
                 loaded: true,
@@ -205,7 +206,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
             this.store.dispatch(OnlineModeActions.setAudioURL({
-              audioURL: decodeURI(this.appStorage.urlParams.audio)
+              audioURL: decodeURI(this.appStorage.urlParams.audio),
+              mode: this.appStorage.useMode
             }));
           }
 

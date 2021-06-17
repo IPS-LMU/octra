@@ -7,6 +7,7 @@ import {AnnotationActions} from '../../annotation/annotation.actions';
 import {OnlineModeActions} from './online-mode.actions';
 import {IDBActions} from '../../idb/idb.actions';
 import {isUnset} from '@octra/utilities';
+import {DefaultModeOptions, IIDBModeOptions} from '../../../shared/octra-database';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -36,23 +37,36 @@ export class OnlineModeReducers {
   public create(): ActionReducer<AnnotationState, Action> {
     return createUndoRedoReducer(
       initialState,
-      ...(new AnnotationStateReducers(LoginMode.ONLINE).create()),
-      on(OnlineModeActions.loginDemo, (state: OnlineModeState, {onlineSession}) => ({
-        ...state,
-        onlineSession
-      })),
-      on(OnlineModeActions.login, (state: OnlineModeState, {onlineSession, removeData}) => {
-        if (removeData) {
-          return initialState;
+      ...(new AnnotationStateReducers(this.mode).create()),
+      on(OnlineModeActions.loginDemo, (state: OnlineModeState, {onlineSession, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession
+          };
         }
-        return {
-          ...state,
-          onlineSession
-        };
+        return state;
       }),
-      on(OnlineModeActions.clearWholeSession, () => ({
-        ...initialState
-      })),
+      on(OnlineModeActions.login, (state: OnlineModeState, {onlineSession, removeData, mode}) => {
+        if (this.mode === mode) {
+          if (removeData) {
+            return initialState;
+          }
+          return {
+            ...state,
+            onlineSession
+          };
+        }
+        return state;
+      }),
+      on(OnlineModeActions.clearWholeSession, (state: OnlineModeState, {mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...initialState
+          };
+        }
+        return state;
+      }),
       on(OnlineModeActions.logout, (state: OnlineModeState, {clearSession, mode}) => {
         if (mode === this.mode) {
           return (clearSession) ? initialState : {
@@ -70,20 +84,30 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.setAudioURL, (state: OnlineModeState, {audioURL}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          audioURL
+      on(OnlineModeActions.setAudioURL, (state: OnlineModeState, {audioURL, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              audioURL
+            }
+          };
         }
-      })),
-      on(OnlineModeActions.setUserData, (state: OnlineModeState, data) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          ...data
+        return state;
+      }),
+      on(OnlineModeActions.setUserData, (state: OnlineModeState, {id, project, jobNumber, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              id, project, jobNumber
+            }
+          };
         }
-      })),
+        return state;
+      }),
       on(OnlineModeActions.setFeedback, (state: OnlineModeState, {feedback, mode}) => {
         if (mode === mode) {
           return {
@@ -93,50 +117,84 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.setServerDataEntry, (state: OnlineModeState, {serverDataEntry}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          sessionData: {
-            ...state.onlineSession.sessionData,
-            serverDataEntry
-          }
+      on(OnlineModeActions.setServerDataEntry, (state: OnlineModeState, {serverDataEntry, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              sessionData: {
+                ...state.onlineSession.sessionData,
+                serverDataEntry
+              }
+            }
+          };
         }
-      })),
-      on(OnlineModeActions.setComment, (state: OnlineModeState, {comment}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          comment
+        return state;
+      }),
+      on(OnlineModeActions.setComment, (state: OnlineModeState, {comment, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              comment
+            }
+          };
         }
-      })),
-      on(OnlineModeActions.setPromptText, (state: OnlineModeState, {promptText}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          promptText
+        return state;
+      }),
+      on(OnlineModeActions.setPromptText, (state: OnlineModeState, {promptText, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              promptText
+            }
+          };
         }
-      })),
-      on(OnlineModeActions.setServerComment, (state: OnlineModeState, {serverComment}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          serverComment
+        return state;
+      }),
+      on(OnlineModeActions.setServerComment, (state: OnlineModeState, {serverComment, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              serverComment
+            }
+          };
         }
-      })),
-      on(OnlineModeActions.setJobsLeft, (state: OnlineModeState, {jobsLeft}) => ({
-        ...state,
-        onlineSession: {
-          ...state.onlineSession,
-          jobsLeft
+        return state;
+      }),
+      on(OnlineModeActions.setJobsLeft, (state: OnlineModeState, {jobsLeft, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              jobsLeft
+            }
+          };
         }
-      })),
-      on(IDBActions.loadOptionsSuccess, (state: OnlineModeState, {variables}) => {
+        return state;
+      }),
+      on(IDBActions.loadOptionsSuccess, (state: OnlineModeState, {onlineOptions, localOptions}) => {
           let result = state;
 
-          for (const variable of variables) {
-            if (!isUnset(variable)) {
-              result = this.writeOptionToStore(result, variable.name, variable.value);
+          let options: IIDBModeOptions;
+          if (this.mode === LoginMode.ONLINE) {
+            options = onlineOptions;
+          } else if (this.mode === LoginMode.LOCAL) {
+            options = localOptions;
+          } else {
+            options = DefaultModeOptions;
+          }
+
+          for (const name in options) {
+            if (options.hasOwnProperty(name)) {
+              result = this.writeOptionToStore(result, name, options[name]);
             }
           }
 
@@ -144,10 +202,13 @@ export class OnlineModeReducers {
         }
       ),
       on(OnlineModeActions.setSubmitted, (state: AnnotationState, {submitted, mode}) => {
-        return {
-          ...state,
-          submitted
-        };
+        if (this.mode === mode) {
+          return {
+            ...state,
+            submitted
+          };
+        }
+        return state;
       })
     );
   }
@@ -199,8 +260,8 @@ export class OnlineModeReducers {
           if (value.hasOwnProperty('id')) {
             onlineSessionData.id = value.id;
           }
-          if (value.hasOwnProperty('jobno')) {
-            onlineSessionData.jobNumber = value.jobno;
+          if (value.hasOwnProperty('jobNumber')) {
+            onlineSessionData.jobNumber = value.jobNumber;
           }
 
           if (value.hasOwnProperty('project')) {

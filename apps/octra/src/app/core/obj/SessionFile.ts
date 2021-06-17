@@ -41,8 +41,9 @@ export class SessionFile {
     ) {
       return new SessionFile(element.name, element.size, element.timestamp, element.type);
     } else {
-      throw new Error('Can not convert to SessionFile. Properties are not valid.');
+      console.error('Can not convert to SessionFile. Properties are not valid.');
     }
+    return null;
   }
 
   public toAny() {

@@ -4,6 +4,7 @@ import {AnnotationActions} from './annotation.actions';
 import {IDBActions} from '../idb/idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {isUnset} from '@octra/utilities';
+import {IIDBModeOptions} from '../../shared/octra-database';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -29,84 +30,102 @@ export class AnnotationStateReducers {
 
   create(): ReducerTypes<AnnotationState, ActionCreator[]>[] {
     return [
-      on(AnnotationActions.setLevelCounter, (state: AnnotationState, {levelCounter}) =>
-        ({
-          ...state,
-          transcript: {
-            ...state.transcript,
-            levelCounter: levelCounter
-          }
-        })),
-      on(AnnotationActions.setAnnotation, (state: AnnotationState, {annotation}) => ({
-        ...state,
-        annotation
-      })),
-      on(AnnotationActions.clearAnnotation, (state) => ({
-        ...state,
-        transcript: {
-          levels: [],
-          links: [],
-          levelCounter: 0
-        }
-      })),
-      on(AnnotationActions.overwriteTranscript, (state: AnnotationState, {annotation}) => ({
-        ...state,
-        ...annotation
-      })),
-      on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level}) => {
-        const annotationLevels = state.transcript.levels;
-        const index = annotationLevels.findIndex(a => a.id === level.id);
-
-        if (index > -1 && index < annotationLevels.length) {
+      on(AnnotationActions.setLevelCounter, (state: AnnotationState, {levelCounter, mode}) => {
+        if (this.mode === mode) {
           return {
             ...state,
             transcript: {
               ...state.transcript,
-              levels: [
-                ...state.transcript.levels.slice(0, index),
-                {
-                  ...level
-                },
-                ...state.transcript.levels.slice(index + 1)
-              ]
+              levelCounter: levelCounter
             }
           };
-        } else {
-          console.error(`can't change level because index not valid.`);
         }
-
         return state;
       }),
-      on(AnnotationActions.addAnnotationLevel, (state: AnnotationState, {level}) =>
-        ({
-          ...state,
-          transcript: {
-            ...state.transcript,
-            levels: [
-              ...state.transcript.levels,
-              level
-            ]
-          }
-        })),
-      on(AnnotationActions.removeAnnotationLevel, (state: AnnotationState, {id}) => {
-        if (id > -1) {
-          const index = state.transcript.levels.findIndex((a) => (a.id === id));
-          if (index > -1) {
+      on(AnnotationActions.clearAnnotation, (state: AnnotationState, {mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            transcript: {
+              levels: [],
+              links: [],
+              levelCounter: 0
+            }
+          };
+        }
+        return state;
+      }),
+      on(AnnotationActions.overwriteTranscript, (state: AnnotationState, {transcript, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            transcript
+          };
+        }
+        return state;
+      }),
+      on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level, mode}) => {
+        if (this.mode === mode) {
+          const annotationLevels = state.transcript.levels;
+          const index = annotationLevels.findIndex(a => a.id === level.id);
+
+          if (index > -1 && index < annotationLevels.length) {
             return {
               ...state,
               transcript: {
                 ...state.transcript,
                 levels: [
                   ...state.transcript.levels.slice(0, index),
+                  {
+                    ...level
+                  },
                   ...state.transcript.levels.slice(index + 1)
                 ]
               }
+            };
+          } else {
+            console.error(`can't change level because index not valid.`);
+          }
+        }
+
+        return state;
+      }),
+      on(AnnotationActions.addAnnotationLevel, (state: AnnotationState, {level, mode}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            transcript: {
+              ...state.transcript,
+              levels: [
+                ...state.transcript.levels,
+                level
+              ]
+            }
+          };
+        }
+        return state;
+      }),
+      on(AnnotationActions.removeAnnotationLevel, (state: AnnotationState, {id, mode}) => {
+        if (this.mode === mode) {
+          if (id > -1) {
+            const index = state.transcript.levels.findIndex((a) => (a.id === id));
+            if (index > -1) {
+              return {
+                ...state,
+                transcript: {
+                  ...state.transcript,
+                  levels: [
+                    ...state.transcript.levels.slice(0, index),
+                    ...state.transcript.levels.slice(index + 1)
+                  ]
+                }
+              }
+            } else {
+              console.error(`can't remove level because index not valid.`);
             }
           } else {
-            console.error(`can't remove level because index not valid.`);
+            console.error(`can't remove level because id not valid.`);
           }
-        } else {
-          console.error(`can't remove level because id not valid.`);
         }
 
         return state;
@@ -133,7 +152,7 @@ export class AnnotationStateReducers {
       })),
 
       on(AnnotationActions.addLog, (state: AnnotationState, {log, mode}) => {
-        if (mode === mode) {
+        if (this.mode === mode) {
           return {
             ...state,
             logs: [...state.logs, log]
@@ -169,11 +188,22 @@ export class AnnotationStateReducers {
         ...state,
         guidelines
       })),
-      on(IDBActions.loadOptionsSuccess, (state: AnnotationState, {variables}) => {
+      on(IDBActions.loadOptionsSuccess, (state: AnnotationState, {demoOptions, localOptions, onlineOptions}) => {
         let result = state;
 
-        for (const variable of variables) {
-          result = this.writeOptionToStore(result, variable.name, variable.value);
+        let options: IIDBModeOptions;
+        if (this.mode === LoginMode.DEMO) {
+          options = demoOptions;
+        } else if (this.mode === LoginMode.ONLINE) {
+          options = onlineOptions;
+        } else if (this.mode === LoginMode.LOCAL) {
+          options = localOptions;
+        }
+
+        for (const name in options) {
+          if (options.hasOwnProperty(name)) {
+            result = this.writeOptionToStore(result, name, options[name]);
+          }
         }
 
         return result;
@@ -183,14 +213,21 @@ export class AnnotationStateReducers {
           ...state,
           methods
         })),
-      on(AnnotationActions.setAudioLoaded, (state: AnnotationState, audioState) => {
-          return {
-            ...state,
-            audio: {
-              ...state.audio,
-              ...audioState
-            }
-          };
+      on(AnnotationActions.setAudioLoaded, (state: AnnotationState, {loaded, fileName, sampleRate, mode}) => {
+          if (this.mode === mode) {
+            console.log(`set audio loaded ${loaded} for mode ${this.mode}`);
+            console.log(state);
+            return {
+              ...state,
+              audio: {
+                ...state.audio,
+                loaded,
+                fileName,
+                sampleRate
+              }
+            };
+          }
+          return state;
         }
       )
     ];
@@ -198,7 +235,7 @@ export class AnnotationStateReducers {
 
   writeOptionToStore(state: AnnotationState, attribute: string, value: any): AnnotationState {
     switch (attribute) {
-      case('interface'):
+      case('currentEditor'):
         return {
           ...state,
           currentEditor: (!isUnset(value)) ? value : '2D-Editor'

@@ -421,3 +421,20 @@ export interface IIDBModeOptions {
   }
 }
 
+export const DefaultModeOptions: IIDBModeOptions = {
+  submitted: false,
+  audioURL: '',
+  comment: '',
+  dataID: -1,
+  feedback: null,
+  sessionfile: null,
+  prompttext: '',
+  servercomment: '',
+  currentEditor: '',
+  logging: true,
+  user: {
+    id: '',
+    project: '',
+    jobNumber: -1
+  }
+}

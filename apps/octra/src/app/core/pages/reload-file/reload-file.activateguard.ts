@@ -30,6 +30,7 @@ export class ReloadFileGuard implements CanActivate {
         resolve(false);
       } else {
         afterDefined(this.store.select(fromAnnotation.selectProjectConfig)).then(() => {
+          console.log(`reload file guard projectconfig set ok`);
           resolve(true);
         });
       }

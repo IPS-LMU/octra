@@ -458,7 +458,7 @@ export class TranscriptionService {
               }
             }
 
-            this.appStorage.overwriteAnnotation(newLevels, newLinks).then(() => {
+            this.appStorage.overwriteAnnotation(newLevels, newLinks, true).then(() => {
                 resolve2();
               }
             ).catch((err) => {
@@ -471,6 +471,9 @@ export class TranscriptionService {
         }).then(() => {
           const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
 
+          const mode = this.appStorage.useMode;
+          const levels = this.appStorage.annotationLevels;
+          const modeState = getModeState(this.appStorage.snapshot);
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (!isUnset(this.appStorage.annotationLevels)) {

@@ -17,6 +17,7 @@ export class TranscActivateGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.appStorage.audioLoaded) {
+      console.error(`audio not loaded`);
       const params = AppInfo.queryParamsHandling;
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;

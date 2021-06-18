@@ -7,6 +7,7 @@ import {AnnotationActions} from '../../annotation/annotation.actions';
 import {LocalModeActions} from './local-mode.actions';
 import {SessionFile} from '../../../obj/SessionFile';
 import {IDBActions} from '../../idb/idb.actions';
+import {getProperties} from '@octra/utilities';
 
 export const initialState: LocalModeState = {
   ...fromAnnotation.initialState,
@@ -60,7 +61,7 @@ export const reducer = createUndoRedoReducer(
   on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {localOptions}) => {
       let result = state;
 
-      for (const [name, value] of Object.entries(localOptions)) {
+      for (const [name, value] of getProperties(localOptions)) {
         result = writeOptionToStore(result, name, value);
       }
 

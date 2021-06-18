@@ -15,7 +15,7 @@ export class HelpModalComponent implements OnDestroy {
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('content', {static: false}) contentElement: ElementRef;
 
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 

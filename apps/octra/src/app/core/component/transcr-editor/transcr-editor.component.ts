@@ -73,7 +73,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   private internalTyping: EventEmitter<string> = new EventEmitter<string>();
   private shortcutsManager: ShortcutManager;
 
-  public textfield: any = null;
+  public textfield: any = undefined;
   public focused = false;
   public asr = {
     status: 'inactive',
@@ -85,8 +85,8 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     width: 100
   };
   public popovers = {
-    segmentBoundary: null,
-    validationError: null
+    segmentBoundary: undefined,
+    validationError: undefined
   };
   public popoversNew = {
     validation: {
@@ -105,7 +105,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   private _settings: TranscrEditorConfig;
   private subscrmanager: SubscriptionManager<Subscription>;
   private init = 0;
-  private summernoteUI: any = null;
+  private summernoteUI: any = undefined;
   private lastkeypress = 0;
 
   private highlightingRunning = false;
@@ -148,7 +148,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     return this.audiochunk.audioManager;
   }
 
-  @Input() segments: Segments = null;
+  @Input() segments: Segments = undefined;
 
   get Settings(): TranscrEditorConfig {
     return this._settings;
@@ -233,13 +233,13 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         });
         jQuery(domElement).remove();
       } else {
-        console.error(`item parent is null!`);
+        console.error(`item parent is undefined!`);
       }
     });
 
     const replaceFunc = (i, elem) => {
       const tagName = jQuery(elem).prop('tagName');
-      if (jQuery(elem).contents() !== null && jQuery(elem).contents().length > 0) {
+      if (jQuery(elem).contents() !== undefined && jQuery(elem).contents().length > 0) {
         jQuery.each(jQuery(elem).contents(), replaceFunc);
       } else {
         let attr = jQuery(elem).attr('data-marker-code');
@@ -334,7 +334,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
       if (this.textfield !== undefined) {
         this.textfield.summernote('destroy');
-        this.textfield = null;
+        this.textfield = undefined;
       }
 
       this.textfield = jQuery(this.textfieldRef.nativeElement);
@@ -367,7 +367,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
             html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
             html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
             const htmlObj = jQuery(html);
-            if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
+            if (!(this.rawText === undefined || this.rawText === undefined) && this._rawText !== '') {
               this.textfield.summernote('editor.insertNode', htmlObj[0]);
             } else {
               this.textfield.summernote('code', html);
@@ -497,7 +497,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
    * inserts a marker to the editors html
    */
   insertMarker = (markerCode, icon) => {
-    if ((icon === null || icon === undefined) || icon === '') {
+    if ((icon === undefined || icon === undefined) || icon === '') {
       // text only
       this.textfield.summernote('editor.insertText', markerCode + ' ');
     } else {
@@ -652,11 +652,11 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
   ngOnChanges(obj) {
     let renew = false;
-    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.currentValue
+    if (!(obj.markers === undefined || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.currentValue
       && !obj.markers.firstChange) {
       renew = true;
     }
-    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.currentValue
+    if (!(obj.easymode === undefined || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.currentValue
       && !obj.easymode.firstChange) {
       renew = true;
     }
@@ -702,7 +702,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
       str_array: []
     };
 
-    if (!(this.markers === null || this.markers === undefined)) {
+    if (!(this.markers === undefined || this.markers === undefined)) {
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
         result.buttons['' + i + ''] = this.createButton(marker);
@@ -719,7 +719,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     return () => {
       const platform = BrowserInfo.platform;
       let icon;
-      if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
+      if ((marker.icon === undefined || marker.icon === undefined) || marker.icon === '' ||
         marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
         // text only or utf8 symbol
         icon = (marker.icon !== undefined && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
@@ -967,7 +967,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
       const endOffset = 0;
 
-      if (selStart === null) {
+      if (selStart === undefined) {
         selStart = selEnd;
       }
 
@@ -1140,7 +1140,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
           this.audioManager.createSampleUnit(item.time.sampleStart + 1));
         const segment = this.transcrService.currentlevel.segments.get(segIndex);
-        segment.isBlockedBy = null;
+        segment.isBlockedBy = undefined;
         this.transcrService.currentlevel.segments.change(segIndex, segment);
       }
     } else {
@@ -1179,7 +1179,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   private destroy() {
     if (this.textfield !== undefined) {
       this.textfield.summernote('destroy');
-      this.textfield = null;
+      this.textfield = undefined;
     }
     // delete tooltip overlays
     jQuery(this.transcrEditor.nativeElement).find('.tooltip').remove();
@@ -1196,9 +1196,9 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   private onTextMouseOver = (event) => {
     const jqueryObj = jQuery(event.target);
 
-    if (!(jqueryObj.attr('data-samples') === null || jqueryObj.attr('data-samples') === undefined)) {
+    if (!(jqueryObj.attr('data-samples') === undefined || jqueryObj.attr('data-samples') === undefined)) {
       this.onSegmentBoundaryMouseOver(jqueryObj, event);
-    } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
+    } else if (!(jqueryObj.attr('data-errorcode') === undefined || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);
     }
   }
@@ -1210,7 +1210,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     const editorPos = jQuery(this.transcrEditor.nativeElement).find('.note-toolbar').offset();
     const segSamples = jqueryObj.attr('data-samples');
 
-    if (!(segSamples === null || segSamples === undefined) && isNumber(segSamples)) {
+    if (!(segSamples === undefined || segSamples === undefined) && isNumber(segSamples)) {
       const samples = Number(segSamples);
       const time = new SampleUnit(samples, this.audioManager.sampleRate);
 
@@ -1243,10 +1243,10 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
     const errorCode = jQueryObj.attr('data-errorcode');
 
-    if (!(errorCode === null || errorCode === undefined)) {
+    if (!(errorCode === undefined || errorCode === undefined)) {
       const errorDetails = this.transcrService.getErrorDetails(errorCode);
 
-      if (!(errorDetails === null || errorDetails === undefined)) {
+      if (!(errorDetails === undefined || errorDetails === undefined)) {
         // set values
         this.validationPopover.show();
         this.cd.markForCheck();
@@ -1276,7 +1276,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         this.changeValidationPopoverLocation(marginLeft, (cardHeader.height() + jQueryObj.position().top - height));
       }
     } else {
-      console.error(`errorcode is null!`);
+      console.error(`errorcode is undefined!`);
     }
   }
 
@@ -1397,7 +1397,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         });
         jQuery(item).remove();
       } else {
-        console.error(`item parent is null!`);
+        console.error(`item parent is undefined!`);
       }
     });
   }

@@ -20,11 +20,11 @@ export class PartiturConverter extends Converter {
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
     if (annotation === undefined) {
-      // annotation is null;
-      console.error('BASPartitur Converter annotation is null');
-      return null;
+      // annotation is undefined;
+      console.error('BASPartitur Converter annotation is undefined');
+      return undefined;
     }
-    if (!(levelnum === null || levelnum === undefined)) {
+    if (!(levelnum === undefined || levelnum === undefined)) {
       const result: ExportResult = {
         file: {
           name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
@@ -71,14 +71,14 @@ LBD:\n`;
 
       return result;
     } else {
-      // levelnum is null;
+      // levelnum is undefined;
       console.error('BASPartitur Converter needs a level number for export');
-      return null;
+      return undefined;
     }
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const lines = file.content.split(/\r?\n/g);
       let pointer = 0;
 
@@ -87,14 +87,14 @@ LBD:\n`;
 
       // skip not needed information and read needed information
       let previousTier = '';
-      let level = null;
+      let level = undefined;
       let counter = 1;
       while (pointer < lines.length) {
         const search = lines[pointer].match(
           new RegExp('^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
             '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))', 'g'));
 
-        if (!(search === null || search === undefined)) {
+        if (!(search === undefined || search === undefined)) {
           const columns = lines[pointer].split(' ');
 
           if (search[0] === 'SAM') {
@@ -106,7 +106,7 @@ LBD:\n`;
 
           if (search[0] === 'TRN') {
             if (previousTier !== search[0]) {
-              if (level !== null) {
+              if (level !== undefined) {
                 result.levels.push(level);
               }
               level = (search[0] !== 'TRN') ? new OLevel(search[0], 'ITEM', []) : new OLevel(search[0], 'SEGMENT', []);
@@ -114,10 +114,10 @@ LBD:\n`;
               tiers[`${previousTier}`] = [];
             }
             if (previousTier !== 'TRN') {
-              if (level === null) {
+              if (level === undefined) {
                 return {
                   annotjson: result,
-                  audiofile: null,
+                  audiofile: undefined,
                   error: 'A level is missing.'
                 };
               }
@@ -127,10 +127,10 @@ LBD:\n`;
               const transcript = lines[pointer];
               const transcriptArray = transcript.match(/TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/);
 
-              if (level === null) {
+              if (level === undefined) {
                 return {
                   annotjson: result,
-                  audiofile: null,
+                  audiofile: undefined,
                   error: 'A level is missing.'
                 };
               }
@@ -150,14 +150,14 @@ LBD:\n`;
 
       return {
         annotjson: result,
-        audiofile: null,
+        audiofile: undefined,
         error: ''
       };
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This Partitur file is not compatble with this audio file.`
     };
   }

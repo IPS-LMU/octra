@@ -5,7 +5,7 @@ import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
-import {navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
+import {getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
@@ -452,7 +452,7 @@ export class AppStorageService {
 
       const subscr = this.actions.subscribe((a) => {
         if (a.type === IDBActions.overwriteTranscriptSuccess.type) {
-          resolve(null);
+          resolve(undefined);
           subscr.unsubscribe();
         } else if (a.type === IDBActions.overwriteTranscriptFailed.type) {
           reject((a as any).error);
@@ -505,10 +505,10 @@ export class AppStorageService {
             promptText,
             serverComment,
             jobsLeft,
-            serverDataEntry: null,
+            serverDataEntry: undefined,
             comment: '',
             submitted: false,
-            feedback: null
+            feedback: undefined
           }
         },
         removeData: false
@@ -549,13 +549,13 @@ export class AppStorageService {
         sessionData: {
           dataID: 21343134,
           promptText: '',
-          serverDataEntry: null,
+          serverDataEntry: undefined,
           comment: '',
           audioURL,
           serverComment,
           jobsLeft,
           submitted: false,
-          feedback: null
+          feedback: undefined
         }
       }
     }));
@@ -631,7 +631,7 @@ export class AppStorageService {
 
   public saveLogItem(log: ILog) {
     if (log !== undefined) {
-      const properties = Object.entries(log);
+      const properties = getProperties(log);
       for (const [name, value] of properties) {
         if (value === undefined) {
           delete log['' + name];
@@ -643,7 +643,7 @@ export class AppStorageService {
         log: log
       }));
     } else {
-      console.error('Can\'t save log because it is null.');
+      console.error('Can\'t save log because it is undefined.');
     }
   }
 
@@ -684,10 +684,10 @@ export class AppStorageService {
             reject('number of level that should be changed is invalid');
           }
         } else {
-          reject(new Error('level is undefined or null'));
+          reject(new Error('level is undefined or undefined'));
         }
       } else {
-        reject('annotation object is undefined or null');
+        reject('annotation object is undefined or undefined');
       }
     });
   }
@@ -710,7 +710,7 @@ export class AppStorageService {
           mode: this.useMode
         }));
       } else {
-        console.error('level is undefined or null');
+        console.error('level is undefined or undefined');
       }
     });
   }
@@ -726,7 +726,7 @@ export class AppStorageService {
       });
     } else {
       return new Promise<void>((resolve, reject2) => {
-        reject2(new Error('level is undefined or null'));
+        reject2(new Error('level is undefined or undefined'));
       });
     }
   }
@@ -743,7 +743,7 @@ export class AppStorageService {
         return level;
       }
     }
-    return null;
+    return undefined;
   }
 
   public logout(clearSession = false) {

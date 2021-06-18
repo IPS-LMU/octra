@@ -24,7 +24,7 @@ export class PromptModalComponent{
   };
   @ViewChild('modal', {static: true}) modal: any;
   public formatConverter;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,
@@ -44,9 +44,9 @@ export class PromptModalComponent{
               encoding: 'utf8'
             }, audiofile);
 
-            if (result !== null && result !== undefined
-              && result.annotjson !== null && result.annotjson.levels.length > 0
-              && result.annotjson.levels[0] !== null
+            if (result !== undefined && result !== undefined
+              && result.annotjson !== undefined && result.annotjson.levels.length > 0
+              && result.annotjson.levels[0] !== undefined
               && !(converter instanceof TextConverter)) {
               this.formatConverter = converter;
               found = true;
@@ -55,7 +55,7 @@ export class PromptModalComponent{
           }
         }
         if (!found) {
-          this.formatConverter = null;
+          this.formatConverter = undefined;
         }
       }
 

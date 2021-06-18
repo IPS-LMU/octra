@@ -25,7 +25,7 @@ export class OctraDatabase extends Dexie {
     },
     {
       name: 'audioURL',
-      value: null
+      value: undefined
     },
     {
       name: 'comment',
@@ -33,31 +33,31 @@ export class OctraDatabase extends Dexie {
     },
     {
       name: 'dataID',
-      value: null
+      value: undefined
     },
     {
       name: 'feedback',
-      value: null
+      value: undefined
     },
     {
       name: 'language',
-      value: null
+      value: undefined
     },
     {
       name: 'sessionfile',
-      value: null
+      value: undefined
     },
     {
       name: 'usemode',
-      value: null
+      value: undefined
     },
     {
       name: 'user',
-      value: null
+      value: undefined
     },
     {
       name: 'interface',
-      value: null
+      value: undefined
     },
     {
       name: 'logging',
@@ -88,7 +88,7 @@ export class OctraDatabase extends Dexie {
     },
     {
       name: 'asr',
-      value: null
+      value: undefined
     },
     {
       name: 'highlightingEnabled',
@@ -220,7 +220,7 @@ export class OctraDatabase extends Dexie {
   }
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
-    let table: Dexie.Table<IIDBEntry, string> = null;
+    let table: Dexie.Table<IIDBEntry, string> = undefined;
 
     switch (mode) {
       case LoginMode.DEMO:
@@ -265,8 +265,8 @@ export class OctraDatabase extends Dexie {
       audioURL: '',
       comment: '',
       dataID: -1,
-      feedback: null,
-      sessionfile: null,
+      feedback: undefined,
+      sessionfile: undefined,
       prompttext: '',
       servercomment: '',
       currentEditor: 'Dictaphone-Editor',
@@ -348,19 +348,19 @@ export class OctraDatabase extends Dexie {
       },
       {
         name: 'language',
-        value: null
+        value: undefined
       },
       {
         name: 'usemode',
-        value: null
+        value: undefined
       },
       {
         name: 'user',
-        value: null
+        value: undefined
       },
       {
         name: 'interface',
-        value: null
+        value: undefined
       },
       {
         name: 'showLoupe',
@@ -379,7 +379,7 @@ export class OctraDatabase extends Dexie {
       },
       {
         name: 'asr',
-        value: null
+        value: undefined
       },
       {
         name: 'highlightingEnabled',
@@ -429,8 +429,8 @@ export const DefaultModeOptions: IIDBModeOptions = {
   audioURL: '',
   comment: '',
   dataID: -1,
-  feedback: null,
-  sessionfile: null,
+  feedback: undefined,
+  sessionfile: undefined,
   prompttext: '',
   servercomment: '',
   currentEditor: '',

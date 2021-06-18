@@ -2,14 +2,14 @@
  * Statistic Element Class
  */
 import {ILog, SampleInterval} from '../Settings/logging';
-import {hasProperty} from '@octra/utilities';
+import {getProperties, hasProperty} from '@octra/utilities';
 
 export class StatisticElem {
   protected data: ILog = {
-    timestamp: null,
-    type: null,
-    context: null,
-    value: null
+    timestamp: undefined,
+    type: undefined,
+    context: undefined,
+    value: undefined
   };
 
   get selection(): SampleInterval {
@@ -64,7 +64,7 @@ export class StatisticElem {
     this.data.context = context;
     this.data.timestamp = timestamp;
     this.data.value = value;
-    if (!(playpos === null || playpos === undefined)) {
+    if (!(playpos === undefined || playpos === undefined)) {
       this.data.playpos = playpos;
     }
     this.data.selection = selection;
@@ -73,16 +73,16 @@ export class StatisticElem {
 
   public static fromAny(elem: ILog): StatisticElem {
     const result = {
-      value: null,
-      context: null,
-      timestamp: null,
-      type: null,
-      playpos: null,
-      selection: null,
-      segment: null
+      value: undefined,
+      context: undefined,
+      timestamp: undefined,
+      type: undefined,
+      playpos: undefined,
+      selection: undefined,
+      segment: undefined
     };
 
-    for (const [name, value] of Object.entries(elem)) {
+    for (const [name, value] of getProperties(elem)) {
       if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp') ||
         hasProperty(elem, 'type') || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos') ||
         hasProperty(elem, 'cursorpos')

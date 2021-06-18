@@ -272,14 +272,14 @@ export class AudioViewerService {
     this.audioPxW = Math.round(this.audioPxW);
 
     if (this.AudioPxWidth > 0 && this.audioManager !== undefined && this.audioChunk !== undefined
-      && this._innerWidth !== undefined && this.drawnSelection !== undefined) {
+      && this._innerWidth !== undefined) {
       // initialize the default values
       this.audioTCalculator = new AudioTimeCalculator(this.audioChunk.time.duration, this.AudioPxWidth);
       this.MouseClickPos = this.audioManager.createSampleUnit(0);
       this._mouseCursor = this.audioManager.createSampleUnit(0);
       this.PlayCursor = new PlayCursor(0, new SampleUnit(0, this.audioChunk.sampleRate), this._innerWidth);
       this._drawnSelection = this.audioChunk.selection.clone();
-      this._drawnSelection.end = this.drawnSelection.start.clone();
+      this._drawnSelection.end = this._drawnSelection.start.clone();
     } else {
       return new Promise<void>((resolve) => {
         console.error('audio px is 0.');
@@ -307,7 +307,7 @@ export class AudioViewerService {
               reject(error);
             });
           } else {
-            reject(new Error('aduioManager or audioChunk is undefined'));
+            reject(new Error('audioManager or audioChunk is undefined'));
           }
         } catch (err) {
           reject(err);
@@ -333,7 +333,6 @@ export class AudioViewerService {
       const samplePiece = Math.floor((_interval.end - _interval.start) / numberOfPieces);
 
       for (let i = 1; i <= numberOfPieces; i++) {
-
         const start = _interval.start + (i - 1) * samplePiece;
         let end = start + samplePiece;
         if (i === numberOfPieces) {
@@ -669,7 +668,7 @@ export class AudioViewerService {
       const roundValues: boolean = args[4];
       const xZoom = args[5];
 
-      if (interval.start !== null && interval.end !== null && interval.end >= interval.start) {
+      if (interval.start !== undefined && interval.end !== undefined && interval.end >= interval.start) {
         const minMaxArray = [];
         const len = interval.end - interval.start;
 
@@ -715,7 +714,7 @@ export class AudioViewerService {
           }
         }
 
-        args[2] = null;
+        args[2] = undefined;
         resolve(minMaxArray);
       } else {
         reject('interval.end is less than interval.start');

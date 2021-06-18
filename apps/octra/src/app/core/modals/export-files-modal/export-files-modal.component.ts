@@ -52,7 +52,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       selectedMethod: 'client',
       progress: 0,
       result: {
-        url: null,
+        url: undefined,
         filename: ''
       },
       status: 'idle',
@@ -72,19 +72,19 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           selected: true
         }
       ],
-      clientStreamHelper: null,
+      clientStreamHelper: undefined,
       zippingSpeed: -1,
       cuttingSpeed: -1,
       cuttingTimeLeft: 0,
       timeLeft: 0,
-      wavFormat: null
+      wavFormat: undefined
     },
     tableConfigurator: {
       opened: false,
       numberOfColumns: 3,
       columns: [],
       result: {
-        url: null,
+        url: undefined,
         filename: ''
       }
     }
@@ -97,7 +97,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
@@ -127,7 +127,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       this.modal.show(this.modal, this.config);
       this.uiService.addElementFromEvent('export', {
         value: 'opened'
-      }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
+      }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, 'modals');
 
       this.visible = true;
       if (this.tableConfigurator !== undefined) {
@@ -152,7 +152,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     this.uiService.addElementFromEvent('export', {
       value: 'closed'
-    }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
+    }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, 'modals');
 
     this.actionperformed.next();
   }
@@ -219,7 +219,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
           this.parentformat.download = result.name;
 
-          if (this.parentformat.uri !== null) {
+          if (this.parentformat.uri !== undefined) {
             window.URL.revokeObjectURL(this.parentformat.uri.toString());
           }
           const test = new File([result.content], result.name);
@@ -234,17 +234,17 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   getProtocol() {
-    if (!(this.transcrService === null || this.transcrService === undefined)) {
+    if (!(this.transcrService === undefined || this.transcrService === undefined)) {
       this.preparing = {
         name: 'Protocol',
         preparing: true
       };
       this.parentformat.download = this.transcrService.audiofile.name + '.json';
 
-      if (this.parentformat.uri !== null) {
+      if (this.parentformat.uri !== undefined) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
-      const json = new File([JSON.stringify(this.transcrService.extractUI(this.uiService.elements), null, 2)], this.parentformat.download);
+      const json = new File([JSON.stringify(this.transcrService.extractUI(this.uiService.elements), undefined, 2)], this.parentformat.download);
       this.setParentFormatURI(window.URL.createObjectURL(json));
       this.preparing = {
         name: 'Protocol',
@@ -275,7 +275,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.progressbarType = 'idle';
     this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.result.filename = '';
-    this.tools.audioCutting.result.url = null;
+    this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
     this.visible = false;

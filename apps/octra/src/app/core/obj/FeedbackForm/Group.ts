@@ -46,7 +46,7 @@ export class Group {
 
     const result = new Group(
       group.title,
-      (!(group.name === null || group.name === undefined)) ? group.name : group.controls[0].name,
+      (!(group.name === undefined || group.name === undefined)) ? group.name : group.controls[0].name,
       controls
     );
 

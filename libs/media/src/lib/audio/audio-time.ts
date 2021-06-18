@@ -17,8 +17,8 @@ export class SampleUnit {
   }
 
   public get seconds(): number {
-    if (!(this._samples === null || this._samples === undefined)) {
-      if (!(this._sampleRate === null || this._sampleRate === undefined)) {
+    if (!(this._samples === undefined || this._samples === undefined)) {
+      if (!(this._sampleRate === undefined || this._sampleRate === undefined)) {
         return this._samples / this._sampleRate;
       } else {
         throw new Error(`sampleRate is undefined`);

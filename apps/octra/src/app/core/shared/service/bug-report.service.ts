@@ -99,18 +99,18 @@ export class BugReportService {
         useMode: this.appStorage.useMode,
         url: window.location.href,
         lastUpdated: AppInfo.lastUpdate,
-        project: null,
-        user: null,
-        jobID: null,
-        audiofile_size: null,
-        audiofile_duration: null,
-        audiofile_samplerate: null,
-        audiofile_bitrate: null,
-        audiofile_channels: null,
-        audiofile_type: null,
-        levels: null,
-        currentlevel: null,
-        segments: null
+        project: undefined,
+        user: undefined,
+        jobID: undefined,
+        audiofile_size: undefined,
+        audiofile_duration: undefined,
+        audiofile_samplerate: undefined,
+        audiofile_bitrate: undefined,
+        audiofile_channels: undefined,
+        audiofile_type: undefined,
+        levels: undefined,
+        currentlevel: undefined,
+        segments: undefined
       },
       system: {
         os: {
@@ -129,7 +129,7 @@ export class BugReportService {
       result.octra.jobID = this.appStorage.dataID;
     }
 
-    if (!(this.transcrService === null || this.transcrService === undefined)) {
+    if (!(this.transcrService === undefined || this.transcrService === undefined)) {
       const file = getFileSize(this.transcrService.audiofile.size);
       result.octra.audiofile_size = file.size + ' ' + file.label;
       result.octra.audiofile_duration = this.transcrService.audioManager.ressource.info.duration.seconds;
@@ -155,7 +155,7 @@ export class BugReportService {
         }
       }
 
-      if (!(this.reporter === null || this.reporter === undefined)) {
+      if (!(this.reporter === undefined || this.reporter === undefined)) {
         return this.reporter.getText(this.getPackage());
       }
     }
@@ -168,7 +168,7 @@ export class BugReportService {
   ): Observable<any> {
     const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-    if (!(bugreportSettings === null || bugreportSettings === undefined) && bugreportSettings.enabled) {
+    if (!(bugreportSettings === undefined || bugreportSettings === undefined) && bugreportSettings.enabled) {
       const auth_token = credentials.auth_token;
       const url = credentials.url;
       const form = {
@@ -180,7 +180,7 @@ export class BugReportService {
       return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport, screenshots);
     }
 
-    return null;
+    return undefined;
   }
 
 }

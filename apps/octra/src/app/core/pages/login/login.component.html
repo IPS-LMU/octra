@@ -109,7 +109,7 @@
           {{"login.local mode description" | transloco}}
         </p>
         <div>
-          <div *ngIf="appStorage.sessionfile !== null"
+          <div *ngIf="appStorage.sessionfile !== undefined"
                [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
                class="alert alert-warning">
           </div>

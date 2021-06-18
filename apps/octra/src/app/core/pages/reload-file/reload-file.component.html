@@ -21,7 +21,7 @@
       <span class="d-none d-lg-inline"> {{"transcription.new" | transloco}}</span>
     </button>
     <button (click)="onOfflineSubmit()"
-            [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
+            [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== undefined && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
             class="btn btn-primary btn-raised col-md-4"
             type="button">
       <fa-icon icon="edit"></fa-icon>

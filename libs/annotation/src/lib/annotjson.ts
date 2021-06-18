@@ -69,11 +69,11 @@ export class OAnnotJSON implements IAnnotJSON {
       this.name = audioFile.substr(0, audioFile.lastIndexOf('.'));
     }
 
-    if (!(levels === null || levels === undefined)) {
+    if (!(levels === undefined || levels === undefined)) {
       this.levels = levels;
     }
 
-    if (!(links === null || links === undefined)) {
+    if (!(links === undefined || links === undefined)) {
       this.links = links;
     }
   }
@@ -100,7 +100,7 @@ export class OLevel implements ILevel {
     this.type = type;
     this.items = [];
 
-    if (!(items === null || items === undefined)) {
+    if (!(items === undefined || items === undefined)) {
       this.items = items;
     }
   }
@@ -114,7 +114,7 @@ export class OItem implements IItem {
     this.id = id;
 
     this.labels = [];
-    if (!(labels === null || labels === undefined)) {
+    if (!(labels === undefined || labels === undefined)) {
       this.labels = labels;
     }
   }

@@ -22,12 +22,12 @@ export class TextConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
 
       let result = '';
       let filename = '';
 
-      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+      if (!(levelnum === undefined || levelnum === undefined) && levelnum < annotation.levels.length) {
         const level: OLevel = annotation.levels[levelnum];
 
         if (level.type === 'SEGMENT') {
@@ -68,7 +68,7 @@ export class TextConverter extends Converter {
         filename += `${this._extension}`;
       } else {
         console.error('TextConverter needs a level number');
-        return null;
+        return undefined;
       }
 
       result = result.replace(/\s+/g, ' ');
@@ -81,11 +81,11 @@ export class TextConverter extends Converter {
         }
       };
     }
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
@@ -100,10 +100,10 @@ export class TextConverter extends Converter {
         let i = 0;
         let sampleStart = 0;
 
-        if (match !== null) {
+        if (match !== undefined) {
           // all fine
 
-          while (match !== null) {
+          while (match !== undefined) {
             const olabels: OLabel[] = [];
             let samplePoint = 0;
             const samplePointIndex = match.findIndex(a => a === 'sp');
@@ -120,16 +120,16 @@ export class TextConverter extends Converter {
 
                 if (samplePoint < 1) {
                   return {
-                    annotjson: null,
-                    audiofile: null,
+                    annotjson: undefined,
+                    audiofile: undefined,
                     error: '`can\'t convert time string to samples. Invalid format.'
                   };
                 }
               } else {
                 console.error(`can't convert time string to samples. Invalid format.`);
                 return {
-                  annotjson: null,
-                  audiofile: null,
+                  annotjson: undefined,
+                  audiofile: undefined,
                   error: '`can\'t convert time string to samples. Invalid format.'
                 };
               }
@@ -157,8 +157,8 @@ export class TextConverter extends Converter {
           }
         } else {
           return {
-            annotjson: null,
-            audiofile: null,
+            annotjson: undefined,
+            audiofile: undefined,
             error: 'Timestamps in text file do have an invalid format.'
           };
         }
@@ -179,14 +179,14 @@ export class TextConverter extends Converter {
 
       return {
         annotjson: result,
-        audiofile: null,
+        audiofile: undefined,
         error: ''
       };
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: 'Could not read text file beacuse audio file is undefined'
     };
   }
@@ -200,7 +200,7 @@ export class TextConverter extends Converter {
     const regex = new RegExp(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{1,3})/g);
     const match = regex.exec(timeString);
 
-    if (match !== null && match.length > 4) {
+    if (match !== undefined && match.length > 4) {
       hours = Number(match[1]);
       minutes = Number(match[2]);
       seconds = Number(match[3]);

@@ -28,7 +28,7 @@ export class TranscriptionDeleteModalComponent {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<ModalDeleteAnswer> = new Subject<ModalDeleteAnswer>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 

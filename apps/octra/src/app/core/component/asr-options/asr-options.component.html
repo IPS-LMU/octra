@@ -9,7 +9,7 @@
     <button aria-controls="dropdown-basic" class="btn btn-outline-secondary btn-sm dropdown-toggle" dropdownToggle
             id="button-basic"
             type="button">
-      <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet">
+      <ng-container *ngIf="asrService.selectedLanguage === undefined; else asrAllSet">
         {{"asr.without asr" | transloco}}
       </ng-container>
       <ng-template #asrAllSet>
@@ -33,11 +33,11 @@
         </thead>
         <tbody>
         <tr>
-          <td (click)="onASRLangChanged(null)" colspan="2">{{"asr.without asr" | transloco}}</td>
+          <td (click)="onASRLangChanged(undefined)" colspan="2">{{"asr.without asr" | transloco}}</td>
         </tr>
         <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
           <tr [ngClass]="{
-                            selected:  !(asrService.selectedLanguage === null)
+                            selected:  !(asrService.selectedLanguage === undefined)
                                         && (asrService.selectedLanguage.code === lang.code)
                                         && (asrService.selectedLanguage.asr === lang.asr)
                             }"
@@ -118,7 +118,7 @@
     </div>
   </div>
   <div #dropdown2="bs-dropdown"
-       [isDisabled]="asrService.selectedLanguage === null || asrService.selectedLanguage === undefined"
+       [isDisabled]="asrService.selectedLanguage === undefined || asrService.selectedLanguage === undefined"
        class="btn-group"
        dropdown id="dropdown-button2" placement="down right"
        style="margin-left:10px;">

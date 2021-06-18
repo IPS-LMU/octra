@@ -27,7 +27,7 @@ export class StatisticsModalComponent {
   };
   @ViewChild('modal', {static: true}) modal: any;
   public transcrObjStr = '';
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
@@ -44,7 +44,7 @@ export class StatisticsModalComponent {
   }
 
   get UIElements(): StatisticElem[] {
-    return (!(this.uiService === null || this.uiService === undefined)) ? this.uiService.elements : null;
+    return (!(this.uiService === undefined || this.uiService === undefined)) ? this.uiService.elements : undefined;
   }
 
   constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
@@ -79,7 +79,7 @@ export class StatisticsModalComponent {
   }
 
   getText() {
-    if (!(this.transcrServ === null || this.transcrServ === undefined)) {
+    if (!(this.transcrServ === undefined || this.transcrServ === undefined)) {
       return this.navbarService.transcrService.getTranscriptString(new TextConverter());
     }
 
@@ -87,6 +87,6 @@ export class StatisticsModalComponent {
   }
 
   public stringify(value: string) {
-    return JSON.stringify(value, null, 2);
+    return JSON.stringify(value, undefined, 2);
   }
 }

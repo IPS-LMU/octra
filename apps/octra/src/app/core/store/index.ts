@@ -164,7 +164,7 @@ export function
 convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastSample: SampleUnit): Level {
   const level = Level.fromObj({
     id: stateLevel.id,
-    sortorder: null,
+    sortorder: undefined,
     level: new OLevel(stateLevel.name, stateLevel.type, stateLevel.items)
   }, sampleRate, lastSample);
 
@@ -259,5 +259,5 @@ export function getModeState(appState: RootState) {
       return appState.onlineMode;
   }
 
-  return null;
+  return undefined;
 }

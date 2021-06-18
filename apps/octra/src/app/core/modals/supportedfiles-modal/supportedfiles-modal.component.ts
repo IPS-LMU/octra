@@ -23,7 +23,7 @@ export class SupportedFilesModalComponent {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 

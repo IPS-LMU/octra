@@ -27,7 +27,7 @@ export class DirectoryInfo extends DataInfo {
     return new Promise<DirectoryInfo>((resolve, reject) => {
       if (folder) {
         DirectoryInfo.traverseFileTree(folder, '').then((result) => {
-          if (!(result === null || result === undefined) && result[0] instanceof DirectoryInfo) {
+          if (!(result === undefined || result === undefined) && result[0] instanceof DirectoryInfo) {
             resolve(result[0] as DirectoryInfo);
           } else {
             reject('could not parse directory');
@@ -58,14 +58,14 @@ export class DirectoryInfo extends DataInfo {
         throw new Error('invalid folder path.');
       }
     }
-    return null;
+    return undefined;
   }
 
   private static traverseFileTree(item: (DataTransferItem | any), path): Promise<(FileInfo | DirectoryInfo)[]> {
     // console.log(`search path: ${path}`);
     return new Promise<(FileInfo | DirectoryInfo)[]>((resolve, reject) => {
         path = path || '';
-        if (!(item === null || item === undefined)) {
+        if (!(item === undefined || item === undefined)) {
           let webKitEntry: any;
 
           if (item instanceof DataTransferItem) {
@@ -81,7 +81,7 @@ export class DirectoryInfo extends DataInfo {
             if (item instanceof DataTransferItem) {
               const file = item.getAsFile();
 
-              if (!(file === null || file === undefined)) {
+              if (!(file === undefined || file === undefined)) {
                 if (file.name.indexOf('.') > -1) {
                   const fileInfo = new FileInfo(file.name, file.type, file.size, file);
                   resolve([fileInfo]);
@@ -147,7 +147,7 @@ export class DirectoryInfo extends DataInfo {
             });
           }
         } else {
-          reject(`item is null or undefined`);
+          reject(`item is undefined or undefined`);
         }
       }
     );

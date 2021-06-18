@@ -112,7 +112,7 @@ export class TranscriptionService {
     return this._feedback;
   }
 
-  private _breakMarker: any = null;
+  private _breakMarker: any = undefined;
 
   get breakMarker(): any {
     return this._breakMarker;
@@ -246,7 +246,7 @@ export class TranscriptionService {
         level: convertFromLevelObject(level, this._audiomanager.ressource.info.duration)
       });
     } else {
-      console.error(new Error('can not save segments because annotation is null'));
+      console.error(new Error('can not save segments because annotation is undefined'));
     }
   }
 
@@ -296,7 +296,7 @@ export class TranscriptionService {
       }
 
       let match = segRegex.exec(rawText);
-      while (match != null) {
+      while (match != undefined) {
         if (validation.start >= match.index && validation.start + validation.length <= match.index + match[0].length) {
           // remove
           results.splice(i, 1);
@@ -363,7 +363,7 @@ export class TranscriptionService {
   public getTranscriptString(converter: Converter): string {
     let result: IFile;
 
-    if (!(this.annotation === null || this.annotation === undefined)) {
+    if (!(this.annotation === undefined || this.annotation === undefined)) {
       result = converter.export(
         this.annotation.getObj(this.audioManager.ressource.info.duration),
         this.audiofile, 0
@@ -414,7 +414,7 @@ export class TranscriptionService {
                 }
               } else if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
                 && typeof this.appStorage.prompttext === 'string') {
-                // prompt text available and server transcript is null
+                // prompt text available and server transcript is undefined
                 // set prompt as new transcript
 
                 // check if prompttext ist a transcription format like AnnotJSON
@@ -428,9 +428,9 @@ export class TranscriptionService {
                       encoding: 'utf8'
                     }, this._audiofile);
 
-                    if (result !== null && result !== undefined
-                      && result.annotjson !== null && result.annotjson.levels.length > 0
-                      && result.annotjson.levels[0] !== null
+                    if (result !== undefined && result !== undefined
+                      && result.annotjson !== undefined && result.annotjson.levels.length > 0
+                      && result.annotjson.levels[0] !== undefined
                       && !(converter instanceof TextConverter)) {
                       converted = result.annotjson;
                       break;
@@ -479,24 +479,24 @@ export class TranscriptionService {
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
             this._feedback.importData(this.appStorage.feedback);
 
-            if ((this.appStorage.comment === null || this.appStorage.comment === undefined)) {
+            if ((this.appStorage.comment === undefined || this.appStorage.comment === undefined)) {
               this.appStorage.comment = '';
             } else {
               this._feedback.comment = this.appStorage.comment;
             }
 
-            if (this.appStorage.logs === null) {
+            if (this.appStorage.logs === undefined) {
               this.appStorage.clearLoggingDataPermanently();
               this.uiService.elements = [];
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);
             }
-            this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
+            this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), undefined, -1, undefined, undefined, 'version');
 
             // this.navbarServ.dataloaded = true;
             this.dataloaded.emit();
           } else {
-            reject(Error('annotation object in appStorage is null'));
+            reject(Error('annotation object in appStorage is undefined'));
           }
           resolve();
         });
@@ -532,7 +532,7 @@ export class TranscriptionService {
   public exportDataToJSON(): any {
     let data: any = {};
 
-    if (!(this.annotation === null || this.annotation === undefined)) {
+    if (!(this.annotation === undefined || this.annotation === undefined)) {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
@@ -540,7 +540,7 @@ export class TranscriptionService {
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.project,
         annotator: (this.appStorage.onlineSession.loginData.id === undefined)
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.id,
-        transcript: null,
+        transcript: undefined,
         comment: this._feedback.comment,
         jobno: (this.appStorage.onlineSession.loginData.jobNumber === undefined)
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.jobNumber,
@@ -603,13 +603,13 @@ export class TranscriptionService {
   public destroy() {
     this.subscrmanager.destroy();
 
-    // set data to null
-    this._segments = null;
+    // set data to undefined
+    this._segments = undefined;
     this.filename = '';
 
-    this._feedback = null;
+    this._feedback = undefined;
 
-    this._breakMarker = null;
+    this._breakMarker = undefined;
 
     this.state = 'ANNOTATED';
 
@@ -698,7 +698,7 @@ export class TranscriptionService {
       const segment = this._annotation.levels[this._selectedlevel].segments.get(i);
 
       if (segment.transcript !== '') {
-        if (this.breakMarker !== null && segment.transcript.indexOf(this.breakMarker.code) > -1) {
+        if (this.breakMarker !== undefined && segment.transcript.indexOf(this.breakMarker.code) > -1) {
           this._statistic.pause++;
         } else {
           this._statistic.transcribed++;
@@ -773,7 +773,7 @@ export class TranscriptionService {
           const s3 = (g3) ? g3 : '';
 
           let img = '';
-          if (!((marker.icon === null || marker.icon === undefined) || marker.icon === '') && (marker.icon.indexOf('.png') > -1
+          if (!((marker.icon === undefined || marker.icon === undefined) || marker.icon === '') && (marker.icon.indexOf('.png') > -1
             || marker.icon.indexOf('.jpg') > -1 || marker.icon.indexOf('.gif') > -1)) {
             const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
             img = '<img src=\'' + marker.icon + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
@@ -827,7 +827,7 @@ export class TranscriptionService {
             return val.start === validationElement.start;
           });
 
-          if ((insertStart === null || insertStart === undefined)) {
+          if ((insertStart === undefined || insertStart === undefined)) {
             insertStart = {
               start: validationElement.start,
               puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validationElement.code + '\']]]'
@@ -841,7 +841,7 @@ export class TranscriptionService {
             return val.start === validationElement.start + validationElement.length;
           });
 
-          if ((insertEnd === null || insertEnd === undefined)) {
+          if ((insertEnd === undefined || insertEnd === undefined)) {
             insertEnd = {
               start: insertStart.start + validationElement.length,
               puffer: ''
@@ -876,7 +876,7 @@ export class TranscriptionService {
   }
 
   public getErrorDetails(code: string): any {
-    if (!(this.guidelines.instructions === null || this.guidelines.instructions === undefined)) {
+    if (!(this.guidelines.instructions === undefined || this.guidelines.instructions === undefined)) {
       const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {
@@ -893,7 +893,7 @@ export class TranscriptionService {
         }
       }
     }
-    return null;
+    return undefined;
   }
 
   public requestSegment(segnumber: number) {
@@ -916,7 +916,7 @@ export class TranscriptionService {
     const dom = jQuery(html);
 
     const replaceFunc = (i: number, elem: any) => {
-      if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
+      if (jQuery(elem).children() !== undefined && jQuery(elem).children().length > 0) {
         jQuery.each(jQuery(elem).children(), replaceFunc);
       } else {
         let attr = jQuery(elem).attr('data-marker-code');
@@ -995,7 +995,7 @@ export class TranscriptionService {
     const regex = new RegExp(regexStr, 'g');
 
     let match = regex.exec(rawText);
-    while (match != null) {
+    while (match != undefined) {
       result.push({
         start: match.index,
         end: match.index + match[0].length

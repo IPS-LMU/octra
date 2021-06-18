@@ -78,7 +78,7 @@ export class TsWorker {
     if (this.getRunningJobID() < 0) {
       // no job running, start first job
       const job = this.getFirstFreeJob();
-      if (!(job === null || job === undefined)) {
+      if (!(job === undefined || job === undefined)) {
         job.changeStatus(TsWorkerStatus.RUNNING);
         this.run(this._queue[0]).then((result: any) => {
           // remove job from job list
@@ -110,7 +110,7 @@ export class TsWorker {
     if (index > -1) {
       return this._queue[index];
     }
-    return null;
+    return undefined;
   }
 
   /**
@@ -189,7 +189,7 @@ export class TsWorker {
    * the script for the inline web worker
    */
   private getWorkerScript(): string {
-    return `var job = null;
+    return `var job = undefined;
 var base = self;
 
 onmessage = (msg) => {

@@ -1,10 +1,10 @@
-<div #modal="bs-modal" *ngIf="guidelines !== null" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
+<div #modal="bs-modal" *ngIf="guidelines !== undefined" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
      id="rules"
      role="dialog"
      tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <ng-container *ngIf="guidelines !== null && guidelines !== undefined">
+      <ng-container *ngIf="guidelines !== undefined && guidelines !== undefined">
         <div class="modal-header">
           <div class="row" style="width:100%;">
             <div class="col-md-7">

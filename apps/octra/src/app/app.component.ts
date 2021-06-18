@@ -213,7 +213,7 @@ export class AppComponent implements OnDestroy, OnInit {
     const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
     const results = regExp.exec(url);
     if (!results) {
-      return null;
+      return undefined;
     }
     if (!results[2]) {
       return '';

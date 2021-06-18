@@ -53,7 +53,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
         (result) => {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
-              if (this.appStorage.useMode === LoginMode.URL && this.appStorage.urlParams.transcript !== null) {
+              if (this.appStorage.useMode === LoginMode.URL && this.appStorage.urlParams.transcript !== undefined) {
                 this.transcrService.defaultFontSize = 16;
 
                 // load transcript file via URL
@@ -98,8 +98,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       }
                     }
 
-                    if (!(importResult === null || importResult === undefined)
-                      && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
+                    if (!(importResult === undefined || importResult === undefined)
+                      && !(importResult.annotjson === undefined || importResult.annotjson === undefined)) {
                       // conversion successfully finished
                       const newLevels: OIDBLevel[] = [];
                       const newLinks: OIDBLink[] = [];
@@ -220,7 +220,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           this.settService.loadAudioFile(this.audio);
         }
       } else {
-        console.warn(`special situation: loggedIn is null! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`);
+        console.warn(`special situation: loggedIn is undefined! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`);
       }
     }).catch((error) => {
       console.error(error);

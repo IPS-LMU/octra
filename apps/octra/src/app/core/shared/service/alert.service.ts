@@ -24,7 +24,7 @@ export class AlertService {
     }>((resolve) => {
       const alreadyExists = this.queue.findIndex((a) => {
         if (a.message !== data) {
-          return (typeof data !== 'string' && a.component !== null
+          return (typeof data !== 'string' && a.component !== undefined
             && hasProperty(data, 'componentName') && hasProperty(a.component.class, 'componentName')
             && data.componentName === a.component.class.componentName);
         }
@@ -51,8 +51,8 @@ export class AlertService {
           component: (typeof data !== 'string') ? {
             id,
             class: data,
-            instance: null
-          } : null
+            instance: undefined
+          } : undefined
         };
 
         this.queue.push(entry);

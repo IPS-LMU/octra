@@ -159,7 +159,7 @@ export class ShortcutManager {
         if (this.isProtectedShortcut(shortcut)) {
           // clear pressed keys
           this.resetPressedKeys();
-          return null;
+          return undefined;
         }
 
         if (checkPressKey) {
@@ -178,21 +178,21 @@ export class ShortcutManager {
           };
 
         } else {
-          return null;
+          return undefined;
         }
       } else if (event.type === 'keyup') {
         if (checkPressKey) {
           this.checkPressedKey(event);
         }
-        return null;
+        return undefined;
       } else {
         if (checkPressKey) {
           this.checkPressedKey(event);
         }
-        return null;
+        return undefined;
       }
     } else {
-      return null;
+      return undefined;
     }
   }
 
@@ -214,7 +214,7 @@ export class ShortcutManager {
             groupName: shortcutGroup.name
           };
         } else {
-          return null;
+          return undefined;
         }
       }
     }
@@ -229,7 +229,7 @@ export class ShortcutManager {
       };
     }
 
-    return null;
+    return undefined;
   }
 
   /**
@@ -311,7 +311,7 @@ export class ShortcutManager {
     }
 
     // if name == comboKey, only one special Key pressed
-    const keys = comboKey.split(' + ').filter(a => a !== null && a !== '');
+    const keys = comboKey.split(' + ').filter(a => a !== undefined && a !== '');
     if (keys.find(a => a === name) === undefined) {
       if (name === 'A') {
         const ok = 2;

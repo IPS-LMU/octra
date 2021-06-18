@@ -34,7 +34,7 @@ export class PlayCursor {
 
   public changeSamples(sample: SampleUnit, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
     this._timePos = sample.clone();
-    const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.samples < chunk.time.end.samples)
+    const duration = (!(chunk === undefined || chunk === undefined) && chunk.time.start.samples < chunk.time.end.samples)
       ? chunk.time.end.sub(chunk.time.start) : undefined;
 
     this._absX = audioTCalculator.samplestoAbsX(sample, duration);

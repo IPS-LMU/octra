@@ -181,7 +181,7 @@
                       *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
                       Time left: {{tools.audioCutting.timeLeft | timespan}}
                     </ng-container>
-                    <a *ngIf="tools.audioCutting.result.url !== null"
+                    <a *ngIf="tools.audioCutting.result.url !== undefined"
                        [href]="tools.audioCutting.result.url"
                        class="link"
                        download="{{tools.audioCutting.result.filename}}"

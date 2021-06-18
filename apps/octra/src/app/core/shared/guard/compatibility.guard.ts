@@ -25,7 +25,7 @@ export class CompatibilityGuard implements CanActivate {
 
     return new Promise<boolean>((resolve, reject) => {
       new Promise<void>((resolve2, reject2) => {
-        if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
+        if (!(this.settingsService.appSettings === undefined || this.settingsService.appSettings === undefined)) {
           resolve2();
         } else {
           afterDefined(this.store.select(fromApplication.selectAppSettings)).then(resolve2).catch((error) => {

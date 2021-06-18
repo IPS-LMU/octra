@@ -9,10 +9,10 @@
         </button>
       </div>
       <div class="modal-body">
-        <ng-container *ngIf="formatConverter === null || formatConverter === undefined">
+        <ng-container *ngIf="formatConverter === undefined || formatConverter === undefined">
           {{appStorage.prompttext}}
         </ng-container>
-        <ng-container *ngIf="formatConverter !== null && formatConverter !== undefined">
+        <ng-container *ngIf="formatConverter !== undefined && formatConverter !== undefined">
           {{"transcription.no prompttext" | transloco}}
         </ng-container>
       </div>

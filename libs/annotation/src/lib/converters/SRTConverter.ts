@@ -46,11 +46,11 @@ export class SRTConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       let result = '';
       let filename = '';
 
-      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+      if (!(levelnum === undefined || levelnum === undefined) && levelnum < annotation.levels.length) {
         const level: OLevel = annotation.levels[levelnum];
 
         let counter = 1;
@@ -76,7 +76,7 @@ export class SRTConverter extends Converter {
         filename += `${this._extension}`;
       } else {
         console.error('SRTConverter needs a level number');
-        return null;
+        return undefined;
       }
 
       return {
@@ -88,12 +88,12 @@ export class SRTConverter extends Converter {
         }
       };
     }
-    console.error(`annotation file is null`);
-    return null;
+    console.error(`annotation file is undefined`);
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
@@ -107,7 +107,7 @@ export class SRTConverter extends Converter {
           '((?:(?:(?![0-9]).+)?\n?)+)', 'g');
 
         let matches = regex.exec(content);
-        while (matches !== null) {
+        while (matches !== undefined) {
           const timeStart = SRTConverter.getSamplesFromTimeString(matches[2], audiofile.sampleRate);
           const timeEnd = SRTConverter.getSamplesFromTimeString(matches[3], audiofile.sampleRate);
           const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
@@ -138,14 +138,14 @@ export class SRTConverter extends Converter {
       result.levels.push(olevel);
       return {
         annotjson: result,
-        audiofile: null,
+        audiofile: undefined,
         error: ''
       };
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This SRT file is not compatible with this audio file.`
     };
   }

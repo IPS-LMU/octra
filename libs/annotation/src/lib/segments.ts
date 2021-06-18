@@ -30,7 +30,7 @@ export class Segments {
     this._segments = [];
     this.onsegmentchange = new EventEmitter<SegmentChangeEvent>();
 
-    if (segments !== null) {
+    if (segments !== undefined) {
       if (segments.length === 0) {
         this._segments.push(new Segment(lastSampleUnit, ''));
       }
@@ -52,7 +52,7 @@ export class Segments {
   /**
    * adds new Segment
    */
-  public add(time: SampleUnit, label: string, transcript: string = null, triggerChange = true): boolean {
+  public add(time: SampleUnit, label: string, transcript: string = undefined, triggerChange = true): boolean {
     const newSegment: Segment = new Segment(time, label);
 
     if (transcript !== undefined) {
@@ -205,7 +205,7 @@ export class Segments {
     if (i > -1 && i < this.segments.length) {
       return this.segments[i];
     }
-    return null;
+    return undefined;
   }
 
   /**
@@ -279,7 +279,7 @@ export class Segments {
         samples = this.get(i).time.samples;
       }
     }
-    return null;
+    return undefined;
   }
 
   public BetweenWhichSegment(samples: number): Segment | undefined{
@@ -313,7 +313,7 @@ export class Segments {
       labels.push(new OLabel('Speaker', segment.speakerLabel));
       labels.push(new OLabel(levelName, segment.transcript));
 
-      let annotSegment = null;
+      let annotSegment = undefined;
       if (i < this._segments.length - 1) {
         annotSegment = new OSegment((i + 1), start, (segment.time.samples - start), labels);
       } else {
@@ -328,7 +328,7 @@ export class Segments {
   }
 
   public clone(): Segments {
-    const result = new Segments(this.sampleRate, this.levelName, null, this.segments[this.length - 1].time);
+    const result = new Segments(this.sampleRate, this.levelName, undefined, this.segments[this.length - 1].time);
     for (const segment of this.segments) {
       result.add(segment.time, segment.speakerLabel, segment.transcript);
     }
@@ -363,6 +363,6 @@ export class Segments {
     }
 
     // trigger change
-    this.onsegmentchange.emit(null);
+    this.onsegmentchange.emit(undefined);
   }
 }

@@ -220,14 +220,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['audioChunk'] && changes.audioChunk.currentValue !== null) {
+    if (changes['audioChunk'] && changes.audioChunk.currentValue !== undefined) {
       this.afterChunkUpdated();
     }
-    if (changes['transcriptionLevel'] && changes.transcriptionLevel.currentValue !== null) {
+    if (changes['transcriptionLevel'] && changes.transcriptionLevel.currentValue !== undefined) {
       this.afterLevelUpdated();
     }
 
-    if (changes['breakMarker'] && changes.transcriptionLevel.currentValue !== null) {
+    if (changes['breakMarker'] && changes.transcriptionLevel.currentValue !== undefined) {
       this.av.breakMarker = this.breakMarker;
     }
 
@@ -241,7 +241,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       if (secondsPerLine !== undefined) {
         return (this.av.innerWidth / secondsPerLine);
       } else {
-        console.error(`secondsPerLine is null or undefined!`);
+        console.error(`secondsPerLine is undefined or undefined!`);
       }
       return (this.av.innerWidth / 5);
     }
@@ -262,7 +262,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   afterChunkUpdated() {
-    if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+    if (!(this.audioChunk === undefined || this.audioChunk === undefined)) {
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
 
@@ -444,7 +444,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.stage.batchDraw();
     } else {
-      console.error(`transcriptionLevel is null`);
+      console.error(`transcriptionLevel is undefined`);
     }
   }
 
@@ -605,7 +605,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public init() {
-    if (this.width !== undefined && this.height !== undefined && this.konvaContainer !== undefined && this.layers !== undefined) {
+    if (this.width !== undefined && this.height !== undefined && this.konvaContainer !== undefined) {
       this.widthOnInit = this.width;
       this.styles.height = this.height;
       this.drawnSegmentIDs = [];
@@ -684,6 +684,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.shortcutsManager.clearShortcuts();
       this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
+    } else{
+      console.error(`can't init audio viewer`);
     }
   }
 
@@ -956,8 +958,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           context.beginPath();
           context.moveTo(position.x, position.y + midline - this.av.minmaxarray[absXPos]);
 
-          if (!(midline === null || midline === undefined)
-            && !(zoomY === null || zoomY === undefined)) {
+          if (!(midline === undefined || midline === undefined)
+            && !(zoomY === undefined || zoomY === undefined)) {
             for (let x = 0; (x + absXPos) < absXPos + shape.width(); x++) {
               const xDraw = (!this.settings.roundValues) ? position.x + (x * zoomX) : Math.round(position.x + (x * zoomX));
               const yDraw = (!this.settings.roundValues)
@@ -972,10 +974,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
             }
           } else {
-            if ((midline === null || midline === undefined)) {
-              throw Error('midline is null!');
-            } else if ((zoomY === null || zoomY === undefined)) {
-              throw Error('ZoomY is null!');
+            if ((midline === undefined || midline === undefined)) {
+              throw Error('midline is undefined!');
+            } else if ((zoomY === undefined || zoomY === undefined)) {
+              throw Error('ZoomY is undefined!');
             }
           }
           context.fillStrokeShape(shape);
@@ -1346,7 +1348,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
       const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
       if (sceneSegment === undefined || segment?.time === undefined) {
-        console.error(`scenceSegment is null!`);
+        console.error(`scenceSegment is undefined!`);
       } else {
         for (let j = lineInterval.from; j <= lineInterval.to; j++) {
           const localY = j * (this.settings.lineheight + this.settings.margin.top);
@@ -1607,7 +1609,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private drawSelection = (lineNum: number, lineWidth: number): Konva.Rect | null => {
+  private drawSelection = (lineNum: number, lineWidth: number): Konva.Rect | undefined => {
     if (this.av.drawnSelection !== undefined && this.av.drawnSelection.length > 0 && this.stage !== undefined && this.layers !== undefined
       && this.av.innerWidth !== undefined) {
       // draw gray selection
@@ -1650,7 +1652,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         this.layers.background.batchDraw();
       }
     }
-    return null;
+    return undefined;
   }
 
   private resetSelection() {
@@ -1682,7 +1684,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
           const selectionRect = this.drawSelection(j, lineWidth);
 
-          if (selectionRect !== null) {
+          if (selectionRect !== undefined) {
             this.layers.overlay.add(selectionRect);
           }
         }
@@ -1798,7 +1800,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         type: result.msg.type,
                         message: result.msg.text
                       });
-                    } else if (result.type !== null) {
+                    } else if (result.type !== undefined) {
                       this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -1815,7 +1817,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 if (this.settings.boundaries.enabled && this._focused && this.av.mouseCursor !== undefined) {
                   const xSamples = this.av.mouseCursor.clone();
 
-                  if (xSamples !== null && this._transcriptionLevel !== undefined) {
+                  if (xSamples !== undefined && this._transcriptionLevel !== undefined) {
                     const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
                     const segment = this._transcriptionLevel.segments.get(segmentI);
 
@@ -1936,8 +1938,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               case('delete_boundaries'):
                 if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
                   && this._transcriptionLevel !== undefined && this.audioManager !== undefined) {
-                  let start = null;
-                  let end = null;
+                  let start = undefined;
+                  let end = undefined;
                   if (this._transcriptionLevel.segments.length > 0) {
 
                     this.shortcutTrigger.emit({
@@ -1961,7 +1963,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         ) {
                           this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
                           i--;
-                          if (start === null) {
+                          if (start === undefined) {
                             start = i;
                           }
                           end = i;
@@ -1972,7 +1974,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                     }
                   }
 
-                  if (start !== null && end !== null && this.av.drawnSelection !== undefined) {
+                  if (start !== undefined && end !== undefined && this.av.drawnSelection !== undefined) {
                     this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
                     this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
                     this._transcriptionLevel.segments.onsegmentchange.emit();
@@ -2198,7 +2200,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     if (this.audioChunk !== undefined && !this.audioChunk.replay) {
       // let cursor jump to start
       this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
-      this.av.drawnSelection = (this.av.drawnSelection !== null) ? this.av.drawnSelection?.clone() : undefined;
+      this.av.drawnSelection = (this.av.drawnSelection !== undefined) ? this.av.drawnSelection?.clone() : undefined;
     }
 
     this.updatePlayCursor();

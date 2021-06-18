@@ -34,7 +34,7 @@ export class BundleJSONConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       const bundle = {
         ssffFiles: [],
         mediaFile: {
@@ -45,7 +45,7 @@ export class BundleJSONConverter extends Converter {
           )
         }, annotation
       };
-      result = JSON.stringify(bundle, null, 2);
+      result = JSON.stringify(bundle, undefined, 2);
       filename = annotation.name + this._extension;
 
       return {
@@ -58,7 +58,7 @@ export class BundleJSONConverter extends Converter {
       };
     }
 
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
@@ -68,13 +68,13 @@ export class BundleJSONConverter extends Converter {
       json = JSON.parse(content);
     } catch (e) {
       return {
-        annotjson: null,
-        audiofile: null,
+        annotjson: undefined,
+        audiofile: undefined,
         error: `This BundleJSON file is not compatible with this audio file.`
       };
     }
 
-    if (!(json === null || json === undefined) && json['mediaFile'] && json.mediaFile['data']
+    if (!(json === undefined || json === undefined) && json['mediaFile'] && json.mediaFile['data']
       && json['annotation']) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;
@@ -95,16 +95,16 @@ export class BundleJSONConverter extends Converter {
         };
       } else {
         return {
-          annotjson: null,
-          audiofile: null,
+          annotjson: undefined,
+          audiofile: undefined,
           error: `Could not read mediaFile attribute.`
         };
       }
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This BundleJSON file is not compatible with this audio file.`
     };
   }

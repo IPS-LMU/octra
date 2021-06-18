@@ -43,10 +43,10 @@ export class WavFormat extends AudioFormat {
    */
   public isValid(buffer: ArrayBuffer): boolean {
     let bufferPart = buffer.slice(0, 4);
-    let test1 = String.fromCharCode.apply(null, new Uint8Array(bufferPart));
+    let test1 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart));
 
     bufferPart = buffer.slice(8, 12);
-    let test2 = String.fromCharCode.apply(null, new Uint8Array(bufferPart));
+    let test2 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart));
     test1 = test1.slice(0, 4);
     test2 = test2.slice(0, 4);
     const byteCheck = new Uint8Array(buffer.slice(20, 21))[0] === 1;
@@ -334,7 +334,7 @@ export class WavFormat extends AudioFormat {
     while (test !== 'data') {
       result++;
       if (result + 4 < buffer.byteLength) {
-        const part = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(result, result + 4)));
+        const part = String.fromCharCode.apply(undefined, new Uint8Array(buffer.slice(result, result + 4)));
         test = '' + part.slice(0, 4) + '';
       } else {
         break;

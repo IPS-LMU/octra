@@ -4,6 +4,7 @@ import {AnnotationActions} from './annotation.actions';
 import {IDBActions} from '../idb/idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {IIDBModeOptions} from '../../shared/octra-database';
+import {getProperties} from '@octra/utilities';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -199,7 +200,7 @@ export class AnnotationStateReducers {
           options = localOptions;
         }
 
-        for (const [name, value] of Object.entries(options)) {
+        for (const [name, value] of getProperties(options)) {
           result = this.writeOptionToStore(result, name, value);
         }
 

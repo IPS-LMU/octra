@@ -32,7 +32,7 @@ export class PraatTableConverter extends Converter {
       return `${res}${tmin}\t${level.name}\t${transcript}\t${tmax}\n`;
     };
 
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       result = addHeader(result);
 
       for (const level of annotation.levels) {
@@ -56,11 +56,11 @@ export class PraatTableConverter extends Converter {
       };
     }
 
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
@@ -100,7 +100,7 @@ export class PraatTableConverter extends Converter {
               length = 0;
 
               if (isNaN(tmax)) {
-                return null;
+                return undefined;
               } else {
                 length = Number(tmax - tmin);
               }
@@ -108,12 +108,12 @@ export class PraatTableConverter extends Converter {
 
               if (tier === tierElement) {
                 if (isNaN(tmin)) {
-                  return null;
+                  return undefined;
                 } else {
                   const last = (olevel.items.length > 0
-                    && !(olevel.items[olevel.items.length - 1] === null || olevel.items[olevel.items.length - 1] === undefined))
-                    ? olevel.items[olevel.items.length - 1] : null;
-                  if (last !== null && last.sampleStart + last.sampleDur === Math.round(Number(tmin))) {
+                    && !(olevel.items[olevel.items.length - 1] === undefined || olevel.items[olevel.items.length - 1] === undefined))
+                    ? olevel.items[olevel.items.length - 1] : undefined;
+                  if (last !== undefined && last.sampleStart + last.sampleDur === Math.round(Number(tmin))) {
                     start = tmin;
                   }
                 }
@@ -149,21 +149,21 @@ export class PraatTableConverter extends Converter {
         }
         return {
           annotjson: result,
-          audiofile: null,
+          audiofile: undefined,
           error: ''
         };
       } else {
         return {
-          annotjson: null,
-          audiofile: null,
+          annotjson: undefined,
+          audiofile: undefined,
           error: `Filenames for .Table extension does not match.`
         };
       }
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This PraatTable file is not compatible with this audio file`
     };
   }

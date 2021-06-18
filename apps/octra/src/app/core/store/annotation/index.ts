@@ -7,7 +7,7 @@ export const selectAnnotation = (state: RootState) => {
     return mode;
   }
 
-  return null;
+  return undefined;
 };
 export const selectAudioLoaded = pipe(selectAnnotation, (state) => state?.audio.loaded);
 export const selectProjectConfig = pipe(selectAnnotation, (state) => state?.projectConfig);

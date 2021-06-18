@@ -45,13 +45,13 @@ export class Level {
         break;
     }
 
-    if (!(segments === null || segments === undefined)) {
+    if (!(segments === undefined || segments === undefined)) {
       this.segments = segments;
     }
   }
 
   public static fromObj(entry: OIDBLevel, sampleRate: number, lastSample: SampleUnit): Level {
-    let segments: Segments = null;
+    let segments: Segments = undefined;
     let events = [];
     let items = [];
 
@@ -72,7 +72,7 @@ export class Level {
   }
 
   public getObj(lastOriginalBoundary: SampleUnit): OLevel {
-    let result: OLevel = null;
+    let result: OLevel = undefined;
     if (this._type === AnnotationLevelType.SEGMENT) {
       result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.samples));
     } else if (this._type === AnnotationLevelType.ITEM) {
@@ -88,7 +88,7 @@ export class Level {
     return this._type;
   }
 
-  public addSegment(time: SampleUnit, label = '', transcript: string = null, triggerChange = true) {
+  public addSegment(time: SampleUnit, label = '', transcript: string = undefined, triggerChange = true) {
     const newLabel = (label !== '') ? label : this._name;
     this.segments.add(time, newLabel, transcript, triggerChange);
   }

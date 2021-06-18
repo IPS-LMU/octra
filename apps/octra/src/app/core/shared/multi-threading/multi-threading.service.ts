@@ -25,7 +25,7 @@ export class MultiThreadingService {
     return new Promise<void>((resolve, reject) => {
       const bestWorker = this.getBestWorker();
 
-      if (bestWorker !== null) {
+      if (bestWorker !== undefined) {
         const id = this.subscrManager.add(bestWorker.jobstatuschange.subscribe(
           (changedJob: TsWorkerJob) => {
             if (changedJob.id === job.id) {
@@ -65,10 +65,10 @@ export class MultiThreadingService {
   }
 
   private getBestWorker(): TsWorker {
-    let foundWorker: TsWorker = null;
+    let foundWorker: TsWorker = undefined;
 
     for (const worker of this._workers) {
-      if (foundWorker === null) {
+      if (foundWorker === undefined) {
         foundWorker = worker;
       } else if (worker.queue.length < foundWorker.queue.length) {
         foundWorker = worker;

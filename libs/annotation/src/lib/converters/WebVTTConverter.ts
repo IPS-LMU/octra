@@ -18,11 +18,11 @@ export class WebVTTConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === undefined || annotation === null)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       let result = 'WEBVTT\n\n';
       let filename = '';
 
-      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+      if (!(levelnum === undefined || levelnum === undefined) && levelnum < annotation.levels.length) {
         const level: OLevel = annotation.levels[levelnum];
 
         let counter = 1;
@@ -48,7 +48,7 @@ export class WebVTTConverter extends Converter {
         filename += `${this._extension}`;
       } else {
         console.error('SRTConverter needs a level number');
-        return null;
+        return undefined;
       }
 
       return {
@@ -60,11 +60,11 @@ export class WebVTTConverter extends Converter {
         }
       };
     }
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
       result.levels.push(new OLevel(`OCTRA_1`, 'SEGMENT'));
 
@@ -76,14 +76,14 @@ export class WebVTTConverter extends Converter {
         const headerCheck = new RegExp('WEBVTT(?: - ([^\\n]+))?', 'g');
         const headerMatches = headerCheck.exec(content);
 
-        if (headerMatches !== null) {
+        if (headerMatches !== undefined) {
           let body = content;
           const findFirstCueRegex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> '
             + '([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}).*', 'g');
 
           const firstCueMatch = findFirstCueRegex.exec(content);
 
-          if (firstCueMatch !== null) {
+          if (firstCueMatch !== undefined) {
             body = body.substr(firstCueMatch.index).replace(/^\n+/g, '');
             const cues = body.split(/\n\n/g).filter(a => a.trim() !== '');
 
@@ -93,7 +93,7 @@ export class WebVTTConverter extends Converter {
               const matches = regex.exec(cue);
 
               let lastEnd = 0;
-              if (matches !== null) {
+              if (matches !== undefined) {
                 const cueWithoutTimestamp = cue.substr(matches.index + matches[0].length);
                 const linesOfCue = cueWithoutTimestamp.split(/\n/g).filter(a => a.trim() !== '');
 
@@ -136,8 +136,8 @@ export class WebVTTConverter extends Converter {
                   }
                 } else {
                   return {
-                    annotjson: null,
-                    audiofile: null,
+                    annotjson: undefined,
+                    audiofile: undefined,
                     error: 'The last segment\'s end or start point is out of the audio duration.'
                   };
                 }
@@ -166,21 +166,21 @@ export class WebVTTConverter extends Converter {
 
             return {
               annotjson: result,
-              audiofile: null,
+              audiofile: undefined,
               error: ''
             };
           } else {
             // not found
             return {
-              annotjson: null,
-              audiofile: null,
+              annotjson: undefined,
+              audiofile: undefined,
               error: 'Could not find a cue in VTT file'
             };
           }
         } else {
           return {
-            annotjson: null,
-            audiofile: null,
+            annotjson: undefined,
+            audiofile: undefined,
             error: 'This WebVTT file is bad formatted (header)'
           };
         }
@@ -188,8 +188,8 @@ export class WebVTTConverter extends Converter {
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: 'This WebVTT file is not compatible with this audio file.'
     };
   }
@@ -214,7 +214,7 @@ export class WebVTTConverter extends Converter {
 
       const matches = regex.exec(timeString);
 
-      if (matches !== null && matches.length > -1) {
+      if (matches !== undefined && matches.length > -1) {
         const hours = Number(matches[1]);
         const minutes = Number(matches[2]);
         const seconds = Number(matches[3]);

@@ -1,8 +1,6 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {SessionFile} from '../../obj/SessionFile';
 
-declare let window: any;
-
 @Component({
   selector: 'octra-drop-zone',
   templateUrl: './drop-zone.component.html',
@@ -17,7 +15,7 @@ export class DropZoneComponent implements OnInit {
   @ViewChild('fileinput', {static: true}) public fileinput: ElementRef;
   private fileAPIsupported = false;
 
-  private _files: FileList = null;
+  private _files: FileList = undefined;
 
   get files(): FileList {
     return this._files;
@@ -52,7 +50,7 @@ export class DropZoneComponent implements OnInit {
     }
   }
 
-  onClick($event) {
+  onClick() {
     if (!this.clicklocked) {
       this.fileinput.nativeElement.click();
     }

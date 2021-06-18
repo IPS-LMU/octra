@@ -73,10 +73,10 @@ export class OLog implements ILog {
     this.selection = selection;
     this.segment = segment;
 
-    if (selection === null) {
+    if (selection === undefined) {
       delete this.selection;
     }
-    if (segment === null) {
+    if (segment === undefined) {
       delete this.segment;
     }
 

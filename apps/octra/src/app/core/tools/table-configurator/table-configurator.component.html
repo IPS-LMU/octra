@@ -135,7 +135,7 @@ width: tableWidth + 'px'
         <button (click)="generateFile()" [disabled]="this.columns.length < 1" class="btn btn-primary btn-raised"
                 type="submit">{{"custom.table configurator.generate table" | transloco}}
         </button>
-        <a *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension" [href]="this.resultURL"
+        <a *ngIf="this.resultURL !== undefined" [download]="'test' + tableOptions.fileExtension" [href]="this.resultURL"
            style="margin-left:10px;">{{"general.download" | transloco}}</a>
       </div>
     </div>

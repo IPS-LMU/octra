@@ -16,7 +16,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('content', {static: false}) contentElement: ElementRef;
 
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<string> = new Subject<string>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
@@ -106,7 +106,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
     }
 
     // trigger saving
-    this.transcrService.currentLevelSegmentChange.emit(null);
+    this.transcrService.currentLevelSegmentChange.emit(undefined);
     this.modal.hide();
     this.actionperformed.next('replaced');
   }

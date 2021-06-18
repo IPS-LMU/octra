@@ -165,7 +165,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   }
 
   get loaded(): boolean {
-    return (this.audio.loaded && !(this.transcrService.guidelines === null || this.transcrService.guidelines === undefined));
+    return (this.audio.loaded && !(this.transcrService.guidelines === undefined || this.transcrService.guidelines === undefined));
   }
 
   get appc(): any {
@@ -234,7 +234,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
           // make sure that events from playonhover are not logged
           const currentEditorName = this.appStorage.interface;
-          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playposition, caretpos, null, null);
+          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playposition, caretpos, undefined, undefined);
         }
       },
       (error) => {
@@ -253,17 +253,17 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
               this.sendTranscriptionForShortAudioFiles('bad');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:1'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
             } else if (event.shortcut === 'SHIFT + ALT + 2') {
               this.sendTranscriptionForShortAudioFiles('middle');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:2'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
             } else if (event.shortcut === 'SHIFT + ALT + 3') {
               this.sendTranscriptionForShortAudioFiles('good');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:3'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
             }
           }).catch((error) => {
             console.error(error);
@@ -353,7 +353,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.settingsService.isTheme('shortAudioFiles') ||
         this.settingsService.isTheme('korbinian')
       ) && (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo')
-      && this.transcrService.feedback !== null;
+      && this.transcrService.feedback !== undefined;
 
     this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
       this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
@@ -448,7 +448,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
           this.audioManager.createSampleUnit(0),
-          -1, null, null, level.name);
+          -1, undefined, undefined, level.name);
       }
     ));
 
@@ -550,9 +550,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     return new Promise<void>((resolve, reject) => {
       this.editorloaded = false;
       this.cd.detectChanges();
-      let comp: any = null;
+      let comp: any = undefined;
 
-      if ((name === null || name === undefined) || name === '') {
+      if ((name === undefined || name === undefined) || name === '') {
         // fallback to last editor
         name = editorComponents[editorComponents.length - 1].name;
       }
@@ -565,7 +565,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (!(comp === null || comp === undefined)) {
+      if (!(comp === undefined || comp === undefined)) {
         const id = this.subscrmanager.add(comp.initialized.subscribe(
           () => {
             this.editorloaded = true;
@@ -576,7 +576,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
           }
         ));
 
-        if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
+        if (!(this.appLoadeditor === undefined || this.appLoadeditor === undefined)) {
           const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
           this.subscrmanager.add(timer(20).subscribe(() => {
@@ -597,19 +597,19 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
             }
 
             this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
-              null, null, null, null, 'editors');
+              undefined, undefined, undefined, undefined, 'editors');
             console.log(`opened ${name}`);
 
             this.cd.detectChanges();
           }));
 
         } else {
-          reject('ERROR appLoadeditor is null');
-          console.error('ERROR appLoadeditor is null');
+          reject('ERROR appLoadeditor is undefined');
+          console.error('ERROR appLoadeditor is undefined');
         }
       } else {
-        reject('ERROR appLoadeditor is null');
-        console.error('ERROR editor component is null');
+        reject('ERROR appLoadeditor is undefined');
+        console.error('ERROR editor component is undefined');
       }
     });
   }
@@ -625,7 +625,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       });
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
-        if (result !== null) {
+        if (result !== undefined) {
           this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;
 
@@ -789,7 +789,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         console.log(json);
       }
     } else {
-      console.error(`json array for transcription next is null`);
+      console.error(`json array for transcription next is undefined`);
     }
   }
 
@@ -848,7 +848,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     const form: FormData = new FormData();
     let host = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-    if (!(this.appStorage.urlParams.host === null || this.appStorage.urlParams.host === undefined)) {
+    if (!(this.appStorage.urlParams.host === undefined || this.appStorage.urlParams.host === undefined)) {
       host = this.appStorage.urlParams.host;
     }
 

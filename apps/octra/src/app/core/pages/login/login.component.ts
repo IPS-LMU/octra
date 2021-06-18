@@ -90,7 +90,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private beforeNavigation = () => {
-    if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+    if (!(this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
       const newLevels: OIDBLevel[] = [];
       for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
         newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -142,7 +142,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
           this.member.project = loginData.project;
 
-          if (loginData.jobNumber !== null && loginData.jobNumber > -1) {
+          if (loginData.jobNumber !== undefined && loginData.jobNumber > -1) {
             this.member.jobno = loginData.jobNumber.toString();
           }
         }
@@ -177,16 +177,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       });
     } else {
 
-      if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
+      if ((this.member.jobno === undefined || this.member.jobno === undefined) || this.member.jobno === '') {
         this.member.jobno = '0';
       }
 
-      if (this.appStorage.sessionfile !== null) {
+      if (this.appStorage.sessionfile !== undefined) {
         // last was offline mode, begin new Session
         newSession = true;
 
       } else {
-        if (!(this.appStorage.dataID === null || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
+        if (!(this.appStorage.dataID === undefined || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
           // last session was online session
           // check if credentials are available
           if (
@@ -294,12 +294,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   getFileStatus(): string {
-    if (!(this.dropzone.files === null || this.dropzone.files === undefined) && this.dropzone.files.length > 0 &&
-      (!(this.dropzone.oaudiofile === null || this.dropzone.oaudiofile === undefined))) {
+    if (!(this.dropzone.files === undefined || this.dropzone.files === undefined) && this.dropzone.files.length > 0 &&
+      (!(this.dropzone.oaudiofile === undefined || this.dropzone.oaudiofile === undefined))) {
       // check conditions
-      if ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)
+      if ((this.appStorage.sessionfile === undefined || this.appStorage.sessionfile === undefined)
         || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name)
-        && (this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+        && (this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
         return 'start';
       } else {
         return 'new';
@@ -314,7 +314,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       if (Array.isArray(json.data)) {
         this.projects = json.data;
 
-        if (!(this.settingsService.appSettings.octra.allowed_projects === null ||
+        if (!(this.settingsService.appSettings.octra.allowed_projects === undefined ||
           this.settingsService.appSettings.octra.allowed_projects === undefined)
           && this.settingsService.appSettings.octra.allowed_projects.length > 0) {
           // filter disabled projects

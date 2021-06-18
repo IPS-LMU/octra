@@ -571,7 +571,7 @@ export class IDBEffects {
 
       this.sessStr.store('loggedIn', false);
       const promises: Promise<any>[] = [];
-      promises.push(this.idbService.saveOption('usemode', null));
+      promises.push(this.idbService.saveOption('usemode', undefined));
       Promise.all(promises).then(() => {
         subject.next(IDBActions.saveLogoutSuccess());
         subject.complete();
@@ -863,7 +863,7 @@ export class IDBEffects {
   }
 
   getModeStateFromString(appState: RootState, mode: LoginMode) {
-    let modeState: OnlineModeState | LocalModeState = null;
+    let modeState: OnlineModeState | LocalModeState = undefined;
     if (mode === 'online') {
       modeState = appState.onlineMode
     } else if (mode === 'local') {

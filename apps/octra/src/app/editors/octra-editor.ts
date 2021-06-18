@@ -29,7 +29,7 @@ export abstract class OCTRAEditor {
 
   protected changeArea(
     loupe: AudioViewerComponent, signalDisplay: AudioViewerComponent, audioManager: AudioManager,
-    audioChunkLoupe: AudioChunk, cursorTime: SampleUnit, factor: number): Promise<AudioChunk | null> {
+    audioChunkLoupe: AudioChunk, cursorTime: SampleUnit, factor: number): Promise<AudioChunk | undefined> {
     return new Promise<AudioChunk>((resolve) => {
       const cursorLocation = signalDisplay.mouseCursor;
       if (cursorLocation && cursorTime) {
@@ -47,10 +47,10 @@ export abstract class OCTRAEditor {
           audioChunkLoupe.destroy();
           resolve(new AudioChunk(new AudioSelection(start, end), audioManager));
         } else {
-          resolve(null);
+          resolve(undefined);
         }
       } else {
-        resolve(null);
+        resolve(undefined);
       }
     });
   }

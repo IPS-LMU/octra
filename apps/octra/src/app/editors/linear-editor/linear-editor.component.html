@@ -84,7 +84,7 @@
                     (segmententer)="onLoupeSegmentEnter($event)"
                     (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
                     (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
-                    *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
+                    *ngIf="audioChunkDown !== undefined && audioChunkDown !== undefined"
                     [audioChunk]="audioChunkDown"
                     [breakMarker]="{
                         code: '<P>'
@@ -95,11 +95,11 @@
 >
 </octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
-  <div *ngIf="!segmentselected && (audioChunkDown !== null && audioChunkDown !== undefined)"
+  <div *ngIf="!segmentselected && (audioChunkDown !== undefined && audioChunkDown !== undefined)"
        [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}"
        class="inner">
   </div>
-  <div *ngIf="!(audioChunkDown !== null && audioChunkDown !== undefined)"
+  <div *ngIf="!(audioChunkDown !== undefined && audioChunkDown !== undefined)"
        [innerHTML]="'signal-gui.selection text' | transloco"
        class="inner">
   </div>
@@ -112,7 +112,7 @@
                       [audiochunk]="audioChunkDown"
                       [transcript]="transcript"
                       [easymode]="appStorage.easymode"
-                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
                       [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                       [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
                       [externalShortcutManager]="keyMap.shortcutsManager"

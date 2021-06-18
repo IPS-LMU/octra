@@ -30,8 +30,8 @@ export class APIService implements API {
   }
 
   public continueSession(project: string, annotator: string, jobno: number): Promise<any> {
-    if (project !== null && project !== '' &&
-      annotator !== null && annotator !== ''
+    if (project !== undefined && project !== '' &&
+      annotator !== undefined && annotator !== ''
     ) {
       const cmdJSON = {
         querytype: 'continueannotation',
@@ -58,7 +58,7 @@ export class APIService implements API {
     if (
       project !== '' &&
       transcript.length > 0 &&
-      quality !== null
+      quality !== undefined
     ) {
       const cmdJSON = {
         querytype: 'continueannotation',
@@ -109,7 +109,7 @@ export class APIService implements API {
     if (
       project !== '' &&
       transcript.length > 0 &&
-      quality !== null
+      quality !== undefined
     ) {
       const cmdJSON = {
         querytype: 'continueannotation',
@@ -134,8 +134,8 @@ export class APIService implements API {
     comment = (comment) ? comment : '';
 
     if (
-      annotator !== null &&
-      id !== null && id > -1) {
+      annotator !== undefined &&
+      id !== undefined && id > -1) {
       const cmdJSON = {
         querytype: 'endannotation',
         annotator,
@@ -151,8 +151,8 @@ export class APIService implements API {
 
   public getAudioURL(dir: string, src: string): string {
     if (
-      dir !== null && dir !== '' &&
-      src !== null && src !== ''
+      dir !== undefined && dir !== '' &&
+      src !== undefined && src !== ''
     ) {
       dir = this.sanitizer.sanitize(SecurityContext.URL, dir);
       src = this.sanitizer.sanitize(SecurityContext.URL, src);
@@ -233,7 +233,7 @@ export class APIService implements API {
               resolve();
             }
           } else {
-            // json data is null or undefined, ignore
+            // json data is undefined or undefined, ignore
             resolve();
           }
         }).catch((error) => {

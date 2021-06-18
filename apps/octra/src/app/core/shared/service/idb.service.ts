@@ -121,7 +121,7 @@ export class IDBService {
    * load annotation
    */
   public loadAnnotation(mode: LoginMode) {
-    return this.database.loadDataOfMode<IAnnotJSON>(mode, 'annotation', null);
+    return this.database.loadDataOfMode<IAnnotJSON>(mode, 'annotation', undefined);
   }
 
   /**

@@ -19,7 +19,7 @@ export class InactivityModalComponent {
     ignoreBackdropClick: true
   };
   @ViewChild('modal', {static: true}) modal: any;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<string> = new Subject<string>();
 
   constructor(public appStorage: AppStorageService, public settService: SettingsService) {

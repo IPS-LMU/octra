@@ -154,7 +154,7 @@ export const reducer = createReducer(
   on(AnnotationActions.logout, (state: ApplicationState) => {
     return {
       ...state,
-      mode: null,
+      mode: undefined,
       queryParams: undefined,
       loggedIn: false
     };

@@ -27,7 +27,7 @@ export class NewsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(obj) {
-    if (!(obj.url === null || obj.url === undefined)) {
+    if (!(obj.url === undefined || obj.url === undefined)) {
       this.cd.markForCheck();
       this.cd.checkNoChanges();
     }

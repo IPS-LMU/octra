@@ -101,7 +101,7 @@ export class AsrOptionsComponent {
             this.alertService.showAlert('danger', this.langService.translate('asr.file too big')).catch((error) => {
               console.error(error);
             });
-            segment.isBlockedBy = null;
+            segment.isBlockedBy = undefined;
           } else {
             if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
               // segment is empty and contains not a break

@@ -41,10 +41,10 @@ export class Annotation {
     this._levels = [];
     this._links = [];
 
-    if (!(levels === null || levels === undefined)) {
+    if (!(levels === undefined || levels === undefined)) {
       this._levels = levels;
     }
-    if (!(links === null || links === undefined)) {
+    if (!(links === undefined || links === undefined)) {
       this._links = links;
     }
   }
@@ -59,7 +59,7 @@ export class Annotation {
 
       for (const item of oLevel.items) {
         item.id = startID++;
-        if (!(item.labels === null || item.labels === undefined) && item.labels.length > 0) {
+        if (!(item.labels === undefined || item.labels === undefined) && item.labels.length > 0) {
           if (item.labels[0].name === '') {
             item.labels[0].name = oLevel.name;
           }

@@ -31,7 +31,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
-  protected data = null;
+  protected data = undefined;
   private shortcutID = -1;
   private subscrmanager = new SubscriptionManager<Subscription>();
   private actionperformed: Subject<void> = new Subject<void>();
@@ -42,9 +42,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   public get sendValidTranscriptOnly(): boolean {
     return (
-      !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)
+      !(this.settingsService.projectsettings.octra === undefined || this.settingsService.projectsettings.octra === undefined)
       && !(
-        this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === null
+        this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined
         || this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined
       )
       && this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly
@@ -199,7 +199,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       this.visible = true;
 
       if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-        this.feedback.feedbackData = (this.appStorage.feedback === null) ? {} : this.appStorage.feedback;
+        this.feedback.feedbackData = (this.appStorage.feedback === undefined) ? {} : this.appStorage.feedback;
       }
 
       const subscr = this.actionperformed.subscribe(
@@ -213,7 +213,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       );
 
       this.uiService.addElementFromEvent('overview', {value: 'opened'},
-        Date.now(), null, null, null, null, 'overview');
+        Date.now(), undefined, undefined, undefined, undefined, 'overview');
 
       this.updateView();
     });
@@ -237,7 +237,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       if (fromModal) {
         this.uiService.addElementFromEvent('overview', {value: 'closed'},
-          Date.now(), null, null, null, null, 'overview');
+          Date.now(), undefined, undefined, undefined, undefined, 'overview');
       }
     }
   }

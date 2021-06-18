@@ -147,7 +147,7 @@
                                 [transcript]="textEditor.transcript"
                                 [audiochunk]="textEditor.audiochunk"
                                 [height]="60"
-                                [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                                [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
           ></octra-transcr-editor>
           <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('up', i)">
             <fa-icon [icon]="['fas', 'arrow-up']"></fa-icon>

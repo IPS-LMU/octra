@@ -3,6 +3,7 @@ import {NgForm} from '@angular/forms';
 import {TranslocoService} from '@ngneat/transloco';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {getProperties} from '@octra/utilities';
 
 @Component({
   selector: 'octra-transcription-feedback',
@@ -24,21 +25,20 @@ export class TranscriptionFeedbackComponent {
   }
 
   translate(languages: any, lang: string): string {
-    if ((languages[lang] === null || languages[lang] === undefined)) {
-      return Object.entries(languages)[0][1] as string;
+    if ((languages[lang] === undefined || languages[lang] === undefined)) {
+      return getProperties(languages)[0][1] as string;
     }
     return languages[lang];
   }
 
   public saveFeedbackform() {
-    if (!(this.transcrService.feedback.comment === null || this.transcrService.feedback.comment === undefined)
-      && this.transcrService.feedback.comment !== '') {
+    if (!(this.transcrService.feedback.comment === undefined) && this.transcrService.feedback.comment !== '') {
       this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, ' ');
     }
     this.appStorage.comment = this.transcrService.feedback.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
-      for (const [name, value] of Object.entries(this.feedbackData)) {
+      for (const [name, value] of getProperties(this.feedbackData)) {
         this.changeValue(name, value);
       }
       this.appStorage.save('feedback', this.transcrService.feedback.exportData());
@@ -55,7 +55,7 @@ export class TranscriptionFeedbackComponent {
       if (group.name === groupName) {
         for (const control of group.controls) {
           if (control.value === checkb) {
-            control.custom.checked = ((control.custom.checked === null || control.custom.checked === undefined))
+            control.custom.checked = ((control.custom.checked === undefined || control.custom.checked === undefined))
               ? true : !control.custom.checked;
             break;
           }

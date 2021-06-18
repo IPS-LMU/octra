@@ -5,7 +5,7 @@ export class FileInfo extends DataInfo {
    * returns if the file is ready for processing
    */
   get available(): boolean {
-    return this.online || !(this._file === undefined || this._file === null);
+    return this.online || !(this._file === undefined || this._file === undefined);
   }
 
   protected _extension: string;
@@ -70,7 +70,7 @@ export class FileInfo extends DataInfo {
     this._createdAt = (createdAt === undefined) ? 0 : createdAt;
 
     const extraction = FileInfo.extractFileName(fullname);
-    if (!(extraction === null || extraction === undefined)) {
+    if (!(extraction === undefined || extraction === undefined)) {
       this._extension = extraction.extension;
       this._file = file;
     } else {
@@ -82,9 +82,9 @@ export class FileInfo extends DataInfo {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
-  public static fromURL(url: string, type: string, name: string = null, createdAt = 0) {
+  public static fromURL(url: string, type: string, name: string = undefined, createdAt = 0) {
     let fullname = '';
-    if (name != null) {
+    if (name != undefined) {
       const extension = url.substr(url.lastIndexOf('.') + 1);
       fullname = name + '.' + extension;
     } else {
@@ -118,7 +118,7 @@ export class FileInfo extends DataInfo {
   }
 
   public static extractFileName(fullname: string): { name: string, extension: string } {
-    if (!(fullname === null || fullname === undefined) && fullname !== '') {
+    if (!(fullname === undefined || fullname === undefined) && fullname !== '') {
       const lastSlash = fullname.lastIndexOf('/');
       if (lastSlash > -1) {
         // if path remove all but the filename
@@ -139,7 +139,7 @@ export class FileInfo extends DataInfo {
       }
     }
 
-    return null;
+    return undefined;
   }
 
   public static fromAny(object): FileInfo {
@@ -205,7 +205,7 @@ export class FileInfo extends DataInfo {
 
   public updateContentFromURL(httpClient: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (this._url !== undefined && this._url !== null) {
+      if (this._url !== undefined && this._url !== undefined) {
         httpClient.get(this._url, {responseType: 'text'}).subscribe(
           result => {
             this._file = FileInfo.getFileFromContent(result, this.fullname, this._type);

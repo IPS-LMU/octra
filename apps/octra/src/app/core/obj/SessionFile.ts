@@ -32,8 +32,8 @@ export class SessionFile {
   }
 
   public static fromAny(element: any) {
-    if (element === null || element === undefined) {
-      return null;
+    if (element === undefined || element === undefined) {
+      return undefined;
     }
 
     if (
@@ -45,7 +45,7 @@ export class SessionFile {
     } else {
       console.error('Can not convert to SessionFile. Properties are not valid.');
     }
-    return null;
+    return undefined;
   }
 
   public toAny() {

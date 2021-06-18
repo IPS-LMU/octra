@@ -50,7 +50,7 @@ export class AudioService {
           const matches: RegExpExecArray = regex.exec(url);
 
           let filename = '';
-          if (matches !== null && matches[1].length > 0) {
+          if (matches !== undefined && matches[1].length > 0) {
             filename = matches[1] + '.' + matches[3];
           } else {
             filename = url;
@@ -58,7 +58,7 @@ export class AudioService {
 
           this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', event.result, AppInfo.audioformats).subscribe(
             (result) => {
-              if (result.audioManager !== undefined) {
+              if (result.audioManager !== undefined && result.audioManager !== null) {
                 // finished
                 console.log(`REGISTER AUDIOMANAGER`);
                 this.registerAudioManager(result.audioManager);
@@ -84,18 +84,20 @@ export class AudioService {
   }
 
   public registerAudioManager(manager: AudioManager) {
-    console.log(`register new audio manager`);
-    const found = this._audiomanagers.find((a: AudioManager) => {
-      return a.ressource.name === manager.ressource.name;
-    });
+    if (manager !== undefined) {
+      console.log(`register new audio manager`);
+      const found = this._audiomanagers.find((a: AudioManager) => {
+        return a.ressource.name === manager.ressource.name;
+      });
 
-    if ((found === null || found === undefined)) {
-      this._audiomanagers.push(manager);
+      if (found === undefined) {
+        this._audiomanagers.push(manager);
 
-      this.subscrmanager.add(manager.missingPermission.subscribe(() => {
-        this.missingPermission.emit();
-        this.missingPermission.complete();
-      }));
+        this.subscrmanager.add(manager.missingPermission.subscribe(() => {
+          this.missingPermission.emit();
+          this.missingPermission.complete();
+        }));
+      }
     }
   }
 

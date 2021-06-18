@@ -136,7 +136,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     const found = this.navbarServ.interfaces.find((x) => {
       return name === x;
     });
-    return !(found === null || found === undefined);
+    return !(found === undefined || found === undefined);
   }
 
   toggleSettings(option: string) {
@@ -161,7 +161,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   onLevelNameLeave(event, tiernum: number) {
     jQuery(event.target).removeClass('selected');
     // save level name
-    if (event.target.value !== null && event.target.value !== '') {
+    if (event.target.value !== undefined && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum, {

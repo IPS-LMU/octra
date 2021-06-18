@@ -51,7 +51,7 @@ export class ToolsModalComponent implements OnDestroy {
       selectedMethod: 'client',
       progress: 0,
       result: {
-        url: null,
+        url: undefined,
         filename: ''
       },
       status: 'idle',
@@ -71,12 +71,12 @@ export class ToolsModalComponent implements OnDestroy {
           selected: true
         }
       ],
-      clientStreamHelper: null,
+      clientStreamHelper: undefined,
       zippingSpeed: -1,
       cuttingSpeed: -1,
       cuttingTimeLeft: 0,
       timeLeft: 0,
-      wavFormat: null
+      wavFormat: undefined
     },
     combinePhrases: {
       opened: false,
@@ -96,7 +96,7 @@ export class ToolsModalComponent implements OnDestroy {
 
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
@@ -157,7 +157,7 @@ export class ToolsModalComponent implements OnDestroy {
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.result.filename = '';
-    this.tools.audioCutting.result.url = null;
+    this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
     this.visible = false;
@@ -182,7 +182,7 @@ export class ToolsModalComponent implements OnDestroy {
     let startSample = 0;
     this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.progressbarType = 'info';
-    this.tools.audioCutting.result.url = null;
+    this.tools.audioCutting.result.url = undefined;
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
@@ -285,7 +285,7 @@ export class ToolsModalComponent implements OnDestroy {
 
             zip = zip.file(
               this.transcrService.audioManager.ressource.info.name + '_meta.json',
-              new File([JSON.stringify(content, null, 2)],
+              new File([JSON.stringify(content, undefined, 2)],
                 this.transcrService.audioManager.ressource.info.name + '_meta.json', {type: 'text/plain'})
             );
             finished++;
@@ -382,7 +382,7 @@ export class ToolsModalComponent implements OnDestroy {
       this.tools.audioCutting.subscriptionIDs[i] = -1;
     }
 
-    if (this.tools.audioCutting.clientStreamHelper !== null) {
+    if (this.tools.audioCutting.clientStreamHelper !== undefined) {
       this.tools.audioCutting.clientStreamHelper.pause();
     }
 

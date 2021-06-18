@@ -25,7 +25,7 @@ export class CTMConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       const level = annotation.levels[levelnum];
 
       for (const levelItem of level.items) {
@@ -47,11 +47,11 @@ export class CTMConverter extends Converter {
       };
     }
 
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (audiofile !== undefined && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
@@ -69,13 +69,13 @@ export class CTMConverter extends Converter {
             const columns: string[] = lines[i].split(' ');
             length = 0;
             if (isNaN(Number(columns[2]))) {
-              return null;
+              return undefined;
             } else {
               start = Number(columns[2]);
             }
 
             if (isNaN(Number(columns[3]))) {
-              return null;
+              return undefined;
             } else {
               length = Number(columns[3]);
             }
@@ -124,21 +124,21 @@ export class CTMConverter extends Converter {
 
         return {
           annotjson: result,
-          audiofile: null,
+          audiofile: undefined,
           error: ''
         };
       } else {
         return {
-          annotjson: null,
-          audiofile: null,
+          annotjson: undefined,
+          audiofile: undefined,
           error: `The file name stated in the CTM file is not the same as the audio file's.`
         };
       }
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This CTM file is not compatible with this audio file.`
     };
   }

@@ -1,6 +1,6 @@
 import {StatisticElem} from './StatisticElement';
 import {ILog} from '../Settings/logging';
-import {hasProperty} from '@octra/utilities';
+import {getProperties, hasProperty} from '@octra/utilities';
 
 /***
  * Statistic Element Class
@@ -39,17 +39,17 @@ export class KeyStatisticElem extends StatisticElem {
 
   public static fromAny(elem: ILog): KeyStatisticElem {
     const result = {
-      value: null,
-      context: null,
-      timestamp: null,
-      type: null,
+      value: undefined,
+      context: undefined,
+      timestamp: undefined,
+      type: undefined,
       playpos: -1,
       caretpos: -1,
-      selection: null,
-      segment: null
+      selection: undefined,
+      segment: undefined
     };
 
-    for (const [name,] of Object.entries(elem)) {
+    for (const [name,] of getProperties(elem)) {
       if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp')
         || hasProperty(elem, 'type') || hasProperty(elem, 'keyCode') || hasProperty(elem, 'shiftPressed')
         || hasProperty(elem, 'ctrlPressed') || hasProperty(elem, 'altPressed') || hasProperty(elem, 'char')

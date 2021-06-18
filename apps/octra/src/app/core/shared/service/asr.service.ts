@@ -17,7 +17,7 @@ import {AudioManager, SampleUnit, WavFormat} from '@octra/media';
 export class AsrService {
   public static authURL = '';
 
-  private _selectedLanguage: ASRLanguage = null;
+  private _selectedLanguage: ASRLanguage = undefined;
 
   get selectedLanguage(): ASRLanguage {
     return this._selectedLanguage;
@@ -29,8 +29,8 @@ export class AsrService {
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
     } else {
-      this.appStorage.asrSelectedLanguage = null;
-      this.appStorage.asrSelectedService = null;
+      this.appStorage.asrSelectedLanguage = undefined;
+      this.appStorage.asrSelectedService = undefined;
     }
   }
 
@@ -57,7 +57,7 @@ export class AsrService {
 
   public getLanguageByCode(code: string, asr: string): ASRLanguage {
     if (asr === undefined || code === undefined) {
-      return null;
+      return undefined;
     }
 
     return this.asrSettings.languages.find((a) => {
@@ -66,7 +66,7 @@ export class AsrService {
   }
 
   public getServiceInformation(serviceProvider: string) {
-    if (!(this.asrSettings.services === null || this.asrSettings.services === undefined)) {
+    if (!(this.asrSettings.services === undefined || this.asrSettings.services === undefined)) {
       return this.asrSettings.services.find((a) => {
         return a.provider === serviceProvider;
       });
@@ -97,7 +97,7 @@ export class AsrService {
   }
 
   public stopASROfItem(item: ASRQueueItem) {
-    if (item !== undefined && item !== null) {
+    if (item !== undefined && item !== undefined) {
       const audioManager = this.audioService.audiomanagers[0];
       const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, audioManager.sampleRate);
       const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
@@ -108,7 +108,7 @@ export class AsrService {
         const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
         if (segment !== undefined) {
-          segment.isBlockedBy = null;
+          segment.isBlockedBy = undefined;
         }
         item.stopProcessing();
         this.queue.remove(item.id);

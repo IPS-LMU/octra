@@ -231,7 +231,7 @@ export class ConfigurationEffects {
 
       uniqueHTTPRequest(this.http, false, {
         responseType: 'text'
-      }, action.guidelines.meta.validation_url, null).subscribe(
+      }, action.guidelines.meta.validation_url, undefined).subscribe(
         () => {
           const js = document.createElement('script');
 

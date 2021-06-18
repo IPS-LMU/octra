@@ -28,8 +28,8 @@ function writeOptionToStore(state: ASRState, attribute: string, value: any): ASR
     case('asr'):
       return {
         ...state,
-        selectedLanguage: (value !== undefined && hasProperty(value, 'selectedLanguage')) ? value.selectedLanguage : null,
-        selectedService: (value !== undefined && hasProperty(value, 'selectedService')) ? value.selectedService : null
+        selectedLanguage: (value !== undefined && hasProperty(value, 'selectedLanguage')) ? value.selectedLanguage : undefined,
+        selectedService: (value !== undefined && hasProperty(value, 'selectedService')) ? value.selectedService : undefined
       };
 
     default:

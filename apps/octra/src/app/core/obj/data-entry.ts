@@ -17,8 +17,8 @@ export interface IDataEntry {
     'quality-speaker': string;
     'quality-audio': string;
   };
-  segmentbegin: null;
-  segmentend: null;
+  segmentbegin: undefined;
+  segmentend: undefined;
   comment: string;
   priority: any;
   status: string;
@@ -37,7 +37,7 @@ export interface IDataEntry {
   itemcode: any;
   filesize: any;
   sampleRate: number;
-  samples: null;
+  samples: undefined;
   nextannotation_id: number;
   admincomment: string;
 }
@@ -77,7 +77,7 @@ export function parseServerDataEntry(result: string): IDataEntry {
           return value;
         }
       } catch (e) {
-        return null;
+        return undefined;
       }
     }
 

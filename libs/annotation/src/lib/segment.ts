@@ -22,12 +22,12 @@ export class Segment {
   private static counter = 1;
   private readonly _id: number;
 
-  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id: number = null) {
+  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id: number = undefined) {
     this._time = time;
     this._speakerLabel = speakerLabel;
     this._transcript = transcript;
 
-    if (id === null || id === undefined && id > 0) {
+    if (id === undefined || id === undefined && id > 0) {
       this._id = Segment.counter++;
     } else {
       this._id = id;
@@ -116,7 +116,7 @@ export class Segment {
         speakerLabel, transcript, oSegment.id);
     }
 
-    return null;
+    return undefined;
   }
 
   public clone(): Segment {

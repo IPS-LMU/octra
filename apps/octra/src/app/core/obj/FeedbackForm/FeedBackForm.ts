@@ -1,5 +1,6 @@
 import {isArray} from 'rxjs/internal-compatibility';
 import {Group} from './Group';
+import {getProperties} from '@octra/utilities';
 
 export class FeedBackForm {
   public get groups(): Group[] {
@@ -59,7 +60,7 @@ export class FeedBackForm {
       for (const control of group.controls) {
         if (control.type.type !== 'textarea') {
           if (control.type.type === 'radiobutton') {
-            if (!(control.custom.checked === null || control.custom.checked === undefined)) {
+            if (!(control.custom.checked === undefined || control.custom.checked === undefined)) {
               if (control.custom.checked) {
                 result['' + group.name + ''] = control.value;
                 break;
@@ -69,11 +70,11 @@ export class FeedBackForm {
               result['' + group.name + ''] = '';
             }
           } else if (control.type.type === 'checkbox') {
-            if ((result['' + group.name + ''] === null || result['' + group.name + ''] === undefined)) {
+            if ((result['' + group.name + ''] === undefined || result['' + group.name + ''] === undefined)) {
               result['' + group.name + ''] = [];
             }
 
-            if (!(control.custom.checked === null || control.custom.checked === undefined)) {
+            if (!(control.custom.checked === undefined || control.custom.checked === undefined)) {
               if (control.custom.checked) {
                 result['' + group.name + ''].push(control.value);
               }
@@ -90,16 +91,18 @@ export class FeedBackForm {
 
   public importData(feedbackData: any): any {
     const result = {};
-    for (const [name, value] of Object.entries(feedbackData)) {
-      if (isArray(value)) {
-        for (const valueElement of value) {
-          this.setValueForControl(name, valueElement);
+    if (feedbackData !== undefined) {
+      for (const [name, value] of getProperties(feedbackData)) {
+        if (isArray(value)) {
+          for (const valueElement of value) {
+            this.setValueForControl(name, valueElement);
+          }
+        } else {
+          this.setValueForControl(name, value as string);
         }
-      } else {
-        this.setValueForControl(name, value as string);
       }
-    }
 
+    }
     return result;
   }
 
@@ -120,7 +123,7 @@ export class FeedBackForm {
                 control.custom.checked = (control.value === value);
               } else if (control.type.type === 'checkbox') {
                 if (control.value === value) {
-                  if (!(custom === null || custom === undefined) && !(custom.checked === null || custom.checked === undefined)) {
+                  if (!(custom === undefined || custom === undefined) && !(custom.checked === undefined || custom.checked === undefined)) {
                     control.custom.checked = custom.checked;
                   } else {
                     // call from importData

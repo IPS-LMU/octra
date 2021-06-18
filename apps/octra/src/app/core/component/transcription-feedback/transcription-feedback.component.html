@@ -1,6 +1,6 @@
 <form #fo="ngForm" class="form-inline">
   <fieldset>
-    <ng-container *ngIf="transcrService.feedback !== null && feedbackData !== null">
+    <ng-container *ngIf="transcrService.feedback !== undefined && feedbackData !== undefined">
       <ng-container *ngIf="!showCommentFieldOnly">
         <ng-container *ngFor="let group of transcrService.feedback.groups">
           <span>{{translate(group.title, langService.getActiveLang())}}</span>

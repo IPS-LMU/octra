@@ -243,7 +243,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
     state: 'inactive',
     selectedSegment: -1,
     openingBlocked: false,
-    audiochunk: null,
+    audiochunk: undefined,
     transcript: ''
   };
 
@@ -323,7 +323,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
     this.audioViewerSettings.showProgressBars = true;
     this.audioViewerSettings.multiLine = false;
     this.audioViewerSettings.lineheight = 200;
-    // this.audioViewerSettings.av.drawnSelection = null;
+    // this.audioViewerSettings.av.drawnSelection = undefined;
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunk = this.audioManager.mainchunk.clone();
 
@@ -442,7 +442,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
           }
         }
       }
-      this.transcrService.currentLevelSegmentChange.emit(null);
+      this.transcrService.currentLevelSegmentChange.emit(undefined);
     }
   }
 
@@ -541,7 +541,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
 
           this.selectedError = this.transcrService.getErrorDetails(errorcode);
 
-          if (this.selectedError !== null) {
+          if (this.selectedError !== undefined) {
             this.validationPopover.show();
             this.validationPopover.description = this.selectedError.description;
             this.validationPopover.title = this.selectedError.title;
@@ -556,7 +556,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
           }
         }
       } else {
-        this.selectedError = null;
+        this.selectedError = undefined;
         this.popovers.validation.mouse.enter = false;
         this.validationPopover.hide();
         this.cd.markForCheck();
@@ -612,7 +612,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
       isSelected: false,
       transcription: {
         text: segment.transcript,
-        safeHTML: null
+        safeHTML: undefined
       },
       validation: ''
     };
@@ -656,7 +656,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
         /*
         this.uiService.addElementFromEvent('segment', {
           value: 'updated'
-        }, Date.now(), null, null, null, {
+        }, Date.now(), undefined, undefined, undefined, {
           start: startSample,
           length: segment.time.samples - startSample
         }, 'overview'); */
@@ -695,7 +695,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
           this.textEditor.selectedSegment = -1;
 
           this.audioManager.removeChunk(this.textEditor.audiochunk);
-          this.textEditor.audiochunk = null;
+          this.textEditor.audiochunk = undefined;
 
           started = Date.now();
           this.updateSegments();
@@ -760,7 +760,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
     // shift rest of text to next segment
     const found = this.tempSegments.get(segStart + segTexts.length - 1);
 
-    if (!(found === null || found === undefined)) {
+    if (!(found === undefined || found === undefined)) {
       this.tempSegments.get(segStart + segTexts.length - 1).transcript = segTexts[segTexts.length - 1];
     }
   }
@@ -774,7 +774,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
       if (this.transcrEditor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
-        this.transcrService.currentLevelSegmentChange.emit(null);
+        this.transcrService.currentLevelSegmentChange.emit(undefined);
       } else {
         // no boundaries inserted
         const segment = this.transcrService.currentlevel.segments.get(segmentIndex).clone();
@@ -821,7 +821,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           this.textEditor.selectedSegment = -1;
 
           this.audioManager.removeChunk(this.textEditor.audiochunk);
-          this.textEditor.audiochunk = null;
+          this.textEditor.audiochunk = undefined;
           this.cd.markForCheck();
           this.cd.detectChanges();
           resolve();
@@ -930,7 +930,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       this.stopPlayback().then(() => {
         this.uiService.addElementFromEvent('mouseclick', {
           value: 'play_all'
-        }, Date.now(), playpos, null, null, null, 'overview');
+        }, Date.now(), playpos, undefined, undefined, undefined, 'overview');
         this.playAll(0);
       }).catch((err) => {
         console.error(err);
@@ -946,7 +946,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
         this.uiService.addElementFromEvent('mouseclick', {
           value: 'stop_all'
-        }, Date.now(), playpos, null, null, null, 'overview');
+        }, Date.now(), playpos, undefined, undefined, undefined, 'overview');
       }).catch((error) => {
         console.error(error);
       });
@@ -968,7 +968,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
         this.uiService.addElementFromEvent('mouseclick', {
           value: 'play_segment'
-        }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
+        }, Date.now(), this.audio.audiomanagers[0].playposition, undefined, undefined, {
           start: startSample,
           length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
         }, 'overview');
@@ -986,7 +986,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
       this.uiService.addElementFromEvent('mouseclick', {
         value: 'stop_segment'
-      }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
+      }, Date.now(), this.audio.audiomanagers[0].playposition, undefined, undefined, {
         start: startSample,
         length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
       }, 'overview');
@@ -1070,7 +1070,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
-        this.audioManager.playposition, caretPos, null, null, 'texteditor');
+        this.audioManager.playposition, caretPos, undefined, undefined, 'texteditor');
     };
 
     const shortcutName = $event.shortcutName;

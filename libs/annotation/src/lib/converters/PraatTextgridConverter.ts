@@ -17,7 +17,7 @@ export class PraatTextgridConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
-    if (!(annotation === null || annotation === undefined)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       let result = '';
       const durSeconds = (audiofile.duration / audiofile.sampleRate);
 
@@ -79,7 +79,7 @@ export class PraatTextgridConverter extends Converter {
         }
       };
     }
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
@@ -106,7 +106,7 @@ export class PraatTextgridConverter extends Converter {
             let lvlNum = 0;
             const found = lines[7].match(/item\s\[]:\s*/);
 
-            if (found !== null) {
+            if (found !== undefined) {
               // start reading segments
               for (let i = 8; i < lines.length; i++) {
                 lvlNum++;
@@ -116,12 +116,12 @@ export class PraatTextgridConverter extends Converter {
                     i++;
 
                     // get class
-                    let classStr = null;
+                    let classStr = undefined;
                     let test = lines[i].match(/class = "(.*)"/);
-                    if ((test === null || test === undefined)) {
+                    if ((test === undefined || test === undefined)) {
                       return {
-                        annotjson: null,
-                        audiofile: null,
+                        annotjson: undefined,
+                        audiofile: undefined,
                         error: `PraatTextGrid could not read line ${i}.`
                       };
                     }
@@ -129,12 +129,12 @@ export class PraatTextgridConverter extends Converter {
                     i++;
 
                     // get lvl name
-                    let lvlName = null;
+                    let lvlName = undefined;
                     test = lines[i].match(/name = "(.*)"/);
-                    if ((test === null || test === undefined)) {
+                    if ((test === undefined || test === undefined)) {
                       return {
-                        annotjson: null,
-                        audiofile: null,
+                        annotjson: undefined,
+                        audiofile: undefined,
                         error: `PraatTextGrid could not read line ${i}.`
                       };
                     }
@@ -150,15 +150,15 @@ export class PraatTextgridConverter extends Converter {
                     // read items
                     let match = lines[i].match(/item \[([0-9]+)]:/);
 
-                    while (lines[i] !== '' && (match === null || match === undefined) && i < lines.length) {
+                    while (lines[i] !== '' && (match === undefined || match === undefined) && i < lines.length) {
                       let isActive = true;
                       test = lines[i].match(/intervals \[[0-9]+]:/);
-                      if ((test === null || test === undefined)) {
+                      if ((test === undefined || test === undefined)) {
                         test = lines[i].match(/points \[[0-9]+]:/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         } else {
@@ -169,10 +169,10 @@ export class PraatTextgridConverter extends Converter {
 
                       if (isActive) {
                         test = lines[i].match(/xmin = (.*)/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         }
@@ -180,10 +180,10 @@ export class PraatTextgridConverter extends Converter {
                         const xmin = Number(test[1]);
 
                         test = lines[i].match(/xmax = (.*)/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         }
@@ -191,10 +191,10 @@ export class PraatTextgridConverter extends Converter {
                         const xmax = Number(test[1]);
 
                         test = lines[i].match(/text = "(.*)"/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         }
@@ -212,10 +212,10 @@ export class PraatTextgridConverter extends Converter {
                         olevel.items.push(osegment);
                       } else {
                         test = lines[i].match(/number = (.*)/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         }
@@ -224,10 +224,10 @@ export class PraatTextgridConverter extends Converter {
                         const numberStr = Number(test[1]);
 
                         test = lines[i].match(/mark = "(.*)"/);
-                        if ((test === null || test === undefined)) {
+                        if ((test === undefined || test === undefined)) {
                           return {
-                            annotjson: null,
-                            audiofile: null,
+                            annotjson: undefined,
+                            audiofile: undefined,
                             error: `PraatTextGrid could not read line ${i}.`
                           };
                         }
@@ -253,49 +253,49 @@ export class PraatTextgridConverter extends Converter {
 
             if (result.levels.length === 0) {
               return {
-                annotjson: null,
-                audiofile: null,
+                annotjson: undefined,
+                audiofile: undefined,
                 error: `Could not import any level.`
               };
             }
 
             return {
               annotjson: result,
-              audiofile: null,
+              audiofile: undefined,
               error: ''
             };
           } else {
             return {
-              annotjson: null,
-              audiofile: null,
+              annotjson: undefined,
+              audiofile: undefined,
               error: 'invalid Textgrid Header'
             };
           }
         } else {
           return {
-            annotjson: null,
-            audiofile: null,
+            annotjson: undefined,
+            audiofile: undefined,
             error: 'Textgrid has less than 14 lines.'
           };
         }
       } else {
         return {
-          annotjson: null,
-          audiofile: null,
+          annotjson: undefined,
+          audiofile: undefined,
           error: `names of audio file and TextGrid file do not match.`
         };
       }
     } else {
       return {
-        annotjson: null,
-        audiofile: null,
-        error: 'audiofile is null.'
+        annotjson: undefined,
+        audiofile: undefined,
+        error: 'audiofile is undefined.'
       };
     }
 
     return {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: `This PraatTextgrid file is not compatible.`
     };
   }

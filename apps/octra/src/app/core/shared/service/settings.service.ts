@@ -124,14 +124,16 @@ export class SettingsService {
     if (SettingsService.queryParamsSet(queryParams)) {
       // URL MODE, overwrite db name with 'url'
       console.log('appRoute has params');
-      this.appSettings.octra.database.name = 'octra_url';
+
+      // TODO ngstore: change this
+      // this.appSettings.octra.database.name = "";
     } else {
       console.log('appRoute has no params');
     }
 
 
     const transcriptURL = (queryParams.transcript !== undefined)
-      ? queryParams.transcript : null;
+      ? queryParams.transcript : undefined;
 
     afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
       console.log(`selectIDBLoaded is true!`);
@@ -165,7 +167,7 @@ export class SettingsService {
       }
 
       // settings have been loaded
-      if ((this.appSettings === null || this.appSettings === undefined)) {
+      if ((this.appSettings === undefined || this.appSettings === undefined)) {
         throw new Error('config.json does not exist');
       } else {
         this.api.init(this.appSettings.audio_server.url + 'WebTranscribe');
@@ -183,7 +185,7 @@ export class SettingsService {
     }
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL || this.appStorage.useMode === LoginMode.DEMO) {
       // online, url or demo
-      if (!(this.appStorage.audioURL === null || this.appStorage.audioURL === undefined)) {
+      if (!(this.appStorage.audioURL === undefined || this.appStorage.audioURL === undefined)) {
         let src = '';
         if (this.appStorage.useMode === LoginMode.ONLINE) {
           src = this.appSettings.audio_server.url + this.appStorage.audioURL;
@@ -215,7 +217,7 @@ export class SettingsService {
         );
       } else {
         this._log += `No audio source found. Please click on "Back" and try it again.`;
-        console.error('audio src is null');
+        console.error('audio src is undefined');
         this.audioloaded.emit({status: 'error'});
       }
     } else if (this.appStorage.useMode === LoginMode.LOCAL) {
@@ -228,7 +230,7 @@ export class SettingsService {
         this.audioloaded.emit({status: 'success'});
 
       } else {
-        console.error('session file is null.');
+        console.error('session file is undefined.');
       }
     }
   }

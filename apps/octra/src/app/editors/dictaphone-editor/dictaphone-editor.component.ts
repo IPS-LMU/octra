@@ -43,7 +43,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.appStorage.highlightingEnabled = value;
   }
 
-  public segments: Segments = null;
+  public segments: Segments = undefined;
 
 
   private oldRaw = '';
@@ -162,19 +162,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
       event.timestamp, this.audioManager.playposition,
-      this.editor.caretpos, null, null, 'audio_buttons');
+      this.editor.caretpos, undefined, undefined, 'audio_buttons');
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioSpeed = event.new_value;
     this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
-      this.editor.caretpos, null, null, 'audio_speed');
+      this.editor.caretpos, undefined, undefined, 'audio_speed');
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioVolume = event.new_value;
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'audio_volume');
+      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -201,7 +201,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     const triggerUIAction = (shortcutObj) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent('shortcut', shortcutObj, $event.timestamp,
-        this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+        this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
     };
 
     if (this.shortcutsEnabled) {
@@ -274,19 +274,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   onMarkerInsert(markerCode: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   onMarkerClick(markerCode: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor_toolbar');
+      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor_toolbar');
   }
 
   saveTranscript() {

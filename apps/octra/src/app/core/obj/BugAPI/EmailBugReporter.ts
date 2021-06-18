@@ -2,6 +2,7 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {isArray} from 'rxjs/internal-compatibility';
 import {BugReporter} from './BugReporter';
+import {getProperties} from '@octra/utilities';
 
 export class EmailBugReporter extends BugReporter {
   constructor() {
@@ -14,7 +15,7 @@ export class EmailBugReporter extends BugReporter {
       blob: File
     }[]): Observable<HttpResponse<any>> {
 
-    const report = (sendbugreport) ? JSON.parse(JSON.stringify(pkg)) : null;
+    const report = (sendbugreport) ? JSON.parse(JSON.stringify(pkg)) : undefined;
 
     const json = pkg;
 
@@ -51,13 +52,13 @@ export class EmailBugReporter extends BugReporter {
   public getText(pkg: any): string {
     let result = '';
 
-    for (const [name, value] of Object.entries(pkg)) {
+    for (const [name, value] of getProperties(pkg)) {
       if (!isArray(value) && typeof value === 'object') {
         result += name + '\n';
         result += '---------\n';
 
-        for (const [name2, value2] of Object.entries(value)) {
-          if (typeof value2 !== 'object' || value2 === null) {
+        for (const [name2, value2] of getProperties(value)) {
+          if (typeof value2 !== 'object' || value2 === undefined) {
             result += '  ' + name2 + ':  ' + value2 + '\n';
           }
         }
@@ -65,11 +66,11 @@ export class EmailBugReporter extends BugReporter {
         result += name + '\n';
         result += '---------\n';
 
-        for (const [name2, value2] of Object.entries(value)) {
+        for (const [name2, value2] of getProperties(value)) {
           if (typeof value2.message === 'string') {
             result += '  ' + value2.type + '  ' + value2.message + '\n';
           } else if (typeof value2.message === 'object') {
-            result += '  ' + value2.type + '\n' + JSON.stringify(value2.message, null, 2) + '\n';
+            result += '  ' + value2.type + '\n' + JSON.stringify(value2.message, undefined, 2) + '\n';
           }
         }
       }

@@ -13,7 +13,7 @@ import {hasProperty} from '@octra/utilities';
 export class MaintenanceBannerComponent implements OnChanges {
 
   @Input() serverURL: string;
-  @Input() language: string = null;
+  @Input() language: string = undefined;
 
   notification: MaintenanceNotification;
   parsedNotification: MaintenanceNotification;
@@ -23,10 +23,10 @@ export class MaintenanceBannerComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     const isServerURL = hasProperty(changes, 'serverURL') &&
-      (changes.serverURL.currentValue !== null && changes.serverURL.currentValue !== undefined);
+      (changes.serverURL.currentValue !== undefined && changes.serverURL.currentValue !== undefined);
 
     const isLanguage = hasProperty(changes, 'language') &&
-      (changes.language.currentValue !== null && changes.language.currentValue !== undefined);
+      (changes.language.currentValue !== undefined && changes.language.currentValue !== undefined);
 
     if (isServerURL) {
       const api = new MaintenanceAPI(changes.serverURL.currentValue, this.http);
@@ -45,7 +45,7 @@ export class MaintenanceBannerComponent implements OnChanges {
 
   private parseNotification() {
     if (this.notification) {
-      moment.locale((this.language !== null && this.language !== undefined) ? this.language : 'en');
+      moment.locale((this.language !== undefined && this.language !== undefined) ? this.language : 'en');
       const notification = {
         ...this.notification
       };

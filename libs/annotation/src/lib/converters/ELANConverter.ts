@@ -21,7 +21,7 @@ export class ELANConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === undefined || annotation === null)) {
+    if (!(annotation === undefined || annotation === undefined)) {
       let filename = '';
 
       const x2js = new X2JS();
@@ -116,13 +116,13 @@ export class ELANConverter extends Converter {
         }
       };
     }
-    return null;
+    return undefined;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     const result: ImportResult = {
-      annotjson: null,
-      audiofile: null,
+      annotjson: undefined,
+      audiofile: undefined,
       error: ''
     };
 

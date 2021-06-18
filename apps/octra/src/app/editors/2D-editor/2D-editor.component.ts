@@ -82,11 +82,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public;
   private subscrmanager: SubscriptionManager<Subscription>;
   private mousestate = 'initiliazied';
-  private intervalID = null;
+  private intervalID = undefined;
   private factor = 8;
-  private scrolltimer: Subscription = null;
+  private scrolltimer: Subscription = undefined;
   private shortcuts: any = {};
-  private authWindow: Window = null;
+  private authWindow: Window = undefined;
   private windowShortcuts: ShortcutGroup = {
     name: 'transcription window',
     enabled: true,
@@ -167,8 +167,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private shortcutsEnabled = true;
 
   public get editor(): TranscrEditorComponent {
-    if ((this.window === null || this.window === undefined)) {
-      return null;
+    if ((this.window === undefined || this.window === undefined)) {
+      return undefined;
     }
     return this.window.editor;
   }
@@ -269,7 +269,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (state === PlayBackStatus.PLAYING) {
           if (this.appStorage.followPlayCursor !== undefined && this.appStorage.followPlayCursor === true) {
 
-            if (this.scrolltimer !== null) {
+            if (this.scrolltimer !== undefined) {
               this.scrolltimer.unsubscribe();
             }
 
@@ -283,7 +283,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             });
           }
         } else {
-          if (this.scrolltimer !== null) {
+          if (this.scrolltimer !== undefined) {
             this.scrolltimer.unsubscribe();
           }
         }
@@ -324,7 +324,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (segment !== undefined) {
                 segment = segment.clone();
-                segment.isBlockedBy = null;
+                segment.isBlockedBy = undefined;
 
                 if (item.status === ASRProcessStatus.NOQUOTA) {
                   this.alertService.showAlert('danger', this.langService.translate('asr.no quota')).catch((error) => {
@@ -332,7 +332,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   });
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                     value: 'failed'
-                  }, Date.now(), null, null, null, {
+                  }, Date.now(), undefined, undefined, undefined, {
                     start: item.time.sampleStart,
                     length: item.time.sampleLength
                   }, 'automation');
@@ -340,7 +340,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   console.log(`NO AUTH`);
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                     value: 'no_auth'
-                  }, Date.now(), null, null, null, {
+                  }, Date.now(), undefined, undefined, undefined, {
                     start: item.time.sampleStart,
                     length: item.time.sampleLength
                   }, 'automation');
@@ -359,7 +359,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   if (item.status === ASRProcessStatus.FINISHED) {
                     this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                       value: 'finished'
-                    }, Date.now(), null, null, null, {
+                    }, Date.now(), undefined, undefined, undefined, {
                       start: item.time.sampleStart,
                       length: item.time.sampleLength
                     }, 'automation');
@@ -416,7 +416,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                                 segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
-                                this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = null;
+                                this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = undefined;
                               } else {
                                 const origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples,
                                   this.audioManager.sampleRate);
@@ -453,7 +453,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       });
                     }
                     console.error(item.result);
-                    this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = null;
+                    this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = undefined;
                     this.transcrService.currentLevelSegmentChange.emit();
                     this.cd.markForCheck();
                   } else if (item.status === ASRProcessStatus.STOPPED) {
@@ -467,7 +467,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               // item started
               this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                 value: 'started'
-              }, Date.now(), null, null, null, {
+              }, Date.now(), undefined, undefined, undefined, {
                 start: item.time.sampleStart,
                 length: item.time.sampleLength
               }, 'automation');
@@ -487,7 +487,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     clearInterval(this.intervalID);
     this.subscrmanager.destroy();
-    if (this.scrolltimer !== null) {
+    if (this.scrolltimer !== undefined) {
       this.scrolltimer.unsubscribe();
     }
 
@@ -531,7 +531,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           this.uiService.addElementFromEvent('segment', {
             value: 'entered'
-          }, Date.now(), this.audioManager.playposition, -1, null, {
+          }, Date.now(), this.audioManager.playposition, -1, undefined, {
             start: start.samples,
             length: this.transcrService.currentlevel.segments.get(selected.index).time.samples - start.samples
           }, TwoDEditorComponent.editorname);
@@ -573,7 +573,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onMouseOver($event: {
-    event: MouseEvent | null
+    event: MouseEvent | undefined
     time: SampleUnit
   }) {
     this.subscrmanager.removeByTag('mouseTimer');
@@ -750,7 +750,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               : 0;
 
             this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
-              this.audioManager.playposition, -1, null, {
+              this.audioManager.playposition, -1, undefined, {
                 start: sampleStart,
                 length: segment.time.samples - sampleStart
               }, 'multi-lines-viewer');
@@ -786,7 +786,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             } else {
               const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
               this.asrService.stopASROfItem(item);
-              segment.isBlockedBy = null;
+              segment.isBlockedBy = undefined;
             }
           }
         } else {
@@ -800,7 +800,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     }
 
-    if ($event.value === null || !(
+    if ($event.value === undefined || !(
       // cursor move by keyboard events are note saved because this would be too much
       contains($event.value, 'cursor') ||
       contains($event.value, 'segment_enter') ||
@@ -818,10 +818,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         selection.start = $event.selection.start.samples;
         selection.length = $event.selection.duration.samples;
       } else {
-        selection = null;
+        selection = undefined;
       }
 
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
       let playPosition = this.audioManager.playposition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
@@ -830,9 +830,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
 
       this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
-        playPosition, caretpos, selection, null, 'multi-lines-viewer');
+        playPosition, caretpos, selection, undefined, 'multi-lines-viewer');
 
-    } else if ($event.value !== null && contains($event.value, 'playonhover')) {
+    } else if ($event.value !== undefined && contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
     }
   }
@@ -841,9 +841,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.appStorage.audioSpeed = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, null, null, 'audio_speed');
+        this.audioManager.playposition, caretpos, undefined, undefined, 'audio_speed');
     }
   }
 
@@ -851,16 +851,16 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.appStorage.audioVolume = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, null, null, 'audio_volume');
+        this.audioManager.playposition, caretpos, undefined, undefined, 'audio_volume');
     }
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.selectedIndex = -1;
     if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
 
       const selection = {
         start: this.viewer.av.drawnSelection.start.samples,
@@ -869,7 +869,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
         event.timestamp,
-        this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
+        this.audioManager.playposition, caretpos, selection, undefined, 'audio_buttons');
     }
   }
 
@@ -918,7 +918,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     // tslint:disable-next-line:max-line-length
     const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
 
-    if (tempWindow !== null) {
+    if (tempWindow !== undefined) {
       console.log('window opened');
       this.authWindow = tempWindow;
     } else {

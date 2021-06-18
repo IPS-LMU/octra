@@ -112,7 +112,7 @@ export class CompatibilityService {
   getValidBrowsers(): string {
     let result = '';
 
-    if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
+    if (!(this.settingsService.appSettings === undefined || this.settingsService.appSettings === undefined)) {
       for (let i = 0; i < this.settingsService.appSettings.octra.allowed_browsers.length; i++) {
         const browser = this.settingsService.appSettings.octra.allowed_browsers[i];
         result += browser.name;

@@ -29,7 +29,7 @@ export class BugreportModalComponent {
     blob: File,
     previewURL: string
   }[] = [];
-  protected data = null;
+  protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 

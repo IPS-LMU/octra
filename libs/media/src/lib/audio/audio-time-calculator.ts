@@ -8,8 +8,8 @@ export class AudioTimeCalculator {
 
   constructor(public _duration: SampleUnit,
               public audioPxWidth: number) {
-    if (this.audioPxWidth === null || this.audioPxWidth < 1) {
-      console.error('audio px null');
+    if (this.audioPxWidth === undefined || this.audioPxWidth < 1) {
+      console.error('audio px undefined');
     }
   }
 

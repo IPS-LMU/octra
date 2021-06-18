@@ -15,8 +15,8 @@ export class AudioRessource extends MediaRessource {
 
   constructor(fullname: string, source: SourceType, info: AudioInfo, buffer?: ArrayBuffer, size?: number) {
     super(fullname, source, buffer, size);
-    if (!(info.duration === null || info.duration === undefined)
-      && !(info.sampleRate === null || info.sampleRate === undefined)
+    if (!(info.duration === undefined || info.duration === undefined)
+      && !(info.sampleRate === undefined || info.sampleRate === undefined)
       && info.duration.samples > 0 && info.sampleRate > 0) {
       this._info = info;
     } else {

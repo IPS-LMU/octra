@@ -95,7 +95,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   public get timeLeft(): number {
-    if (!(this.audioChunk === null || this.audioChunk === undefined) && this.audioChunk.relativePlayposition !== undefined) {
+    if (!(this.audioChunk === undefined || this.audioChunk === undefined) && this.audioChunk.relativePlayposition !== undefined) {
       return (this.audioChunk.time.duration.unix - this.audioChunk.relativePlayposition.unix);
     }
     return 0;
@@ -108,13 +108,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['audioChunk'] && changes.audioChunk.currentValue !== null) {
+    if (changes['audioChunk'] && changes.audioChunk.currentValue !== undefined) {
       this.afterChunkUpdated();
     }
   }
 
   afterChunkUpdated() {
-    if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+    if (!(this.audioChunk === undefined || this.audioChunk === undefined)) {
       if (this.bufferedSubscr > -1) {
         this.subscrmanager.removeById(this.bufferedSubscr);
       }

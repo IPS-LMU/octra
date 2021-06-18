@@ -40,7 +40,7 @@ export class TableConfiguratorComponent implements OnInit {
   @Input() currentLevelID;
   @Input() view: 'expert' | 'easy' = 'easy';
   @Input() tableWidth = 300;
-  resultURL: SafeResourceUrl = null;
+  resultURL: SafeResourceUrl = undefined;
 
   includeLineNumbers = false;
 
@@ -450,11 +450,11 @@ export class TableConfiguratorComponent implements OnInit {
       }
     }
 
-    return null;
+    return undefined;
   }
 
   onSomethingDone() {
-    this.resultURL = null;
+    this.resultURL = undefined;
   }
 
   onDeleteColumnClick(columnNumber: number) {

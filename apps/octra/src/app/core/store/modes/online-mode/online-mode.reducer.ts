@@ -7,7 +7,7 @@ import {AnnotationActions} from '../../annotation/annotation.actions';
 import {OnlineModeActions} from './online-mode.actions';
 import {IDBActions} from '../../idb/idb.actions';
 import {DefaultModeOptions, IIDBModeOptions} from '../../../shared/octra-database';
-import {hasProperty} from '@octra/utilities';
+import {getProperties, hasProperty} from '@octra/utilities';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -201,7 +201,7 @@ export class OnlineModeReducers {
             options = DefaultModeOptions;
           }
 
-          for (const [name, value] of Object.entries(options)) {
+          for (const [name, value] of getProperties(options)) {
             result = this.writeOptionToStore(result, name, value);
           }
 

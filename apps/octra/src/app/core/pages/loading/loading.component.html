@@ -14,7 +14,7 @@
   <div *ngIf="settService.log === ''" class="description">
     {{text}}{{state}}<br/>
     <div class="text-info">{{warning}}</div>
-    <div *ngIf="warning !== null && warning !== ''">
+    <div *ngIf="warning !== undefined && warning !== ''">
       <span (click)="retry()" class="link">Retry </span>
       <ng-container *ngIf="appStorage.useMode !== 'url'">or <span (click)="goBack()" class="link"> Back</span>
       </ng-container>

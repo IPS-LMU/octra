@@ -44,7 +44,7 @@ export class ReloadFileComponent {
         let keepData = false;
 
         new Promise<void>((resolve) => {
-          if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+          if (!(this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
             const newLevels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
               newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -89,11 +89,11 @@ export class ReloadFileComponent {
   }
 
   public isN(obj: any): boolean {
-    return (obj === null || obj === undefined);
+    return (obj === undefined || obj === undefined);
   }
 
   getDropzoneFileString(file: File | SessionFile) {
-    if (!(file === null || file === undefined)) {
+    if (!(file === undefined || file === undefined)) {
       const fsize: FileSize = getFileSize(file.size);
       return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
     }

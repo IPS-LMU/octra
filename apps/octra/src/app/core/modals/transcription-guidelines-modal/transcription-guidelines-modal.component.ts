@@ -29,7 +29,7 @@ import * as videojs from 'video.js';
 export class TranscriptionGuidelinesModalComponent implements OnChanges {
   modalRef: BsModalRef;
   public visible = false;
-  @Input() guidelines = null;
+  @Input() guidelines = undefined;
   public shownGuidelines: any = {};
   public collapsed: any[][] = [];
   config: ModalOptions = {
@@ -38,7 +38,7 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: false}) modal: any;
-  protected data = null;
+  protected data = undefined;
   private entries = 0;
   private counter = 0;
   private videoPlayers: any[] = [];
@@ -51,12 +51,12 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   }
 
   ngOnChanges($event) {
-    if (!($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
+    if (!($event.guidelines.currentValue === undefined || $event.guidelines.currentValue === undefined)) {
       this.shownGuidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
       this.unCollapseAll();
     }
-    if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined) &&
-      !($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
+    if (($event.guidelines.previousValue === undefined || $event.guidelines.previousValue === undefined) &&
+      !($event.guidelines.currentValue === undefined || $event.guidelines.currentValue === undefined)) {
       this.subscrmanager.add(timer(1000).subscribe(() => {
         this.initVideoPlayers();
       }));

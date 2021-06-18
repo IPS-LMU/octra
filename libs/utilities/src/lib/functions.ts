@@ -12,7 +12,7 @@ export interface FileSize {
 }
 
 export function obj() {
-  return (obj === null || typeof obj === 'undefined');
+  return (obj === undefined || typeof obj === 'undefined');
 }
 
 export function isFunction(value: any) {
@@ -67,7 +67,7 @@ export function checkArray(array: any[]) {
 
 export function scrollTo(y: number, target?: string) {
   setTimeout(() => {
-    if ((target === null || target === undefined)) {
+    if ((target === undefined || target === undefined)) {
       jQuery('html, body').scrollTop(y);
     } else {
       jQuery(target).scrollTop(y);
@@ -204,7 +204,7 @@ export function insertString(input: string, pos: number, insertion: string): str
 export function uniqueHTTPRequest(http: HttpClient, post = false, requestOptions: any,
                                   url: string, body: any): Observable<any> {
   if (!post) {
-    const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};
+    const options = (!(requestOptions === undefined || requestOptions === undefined)) ? requestOptions : {};
 
     if (!options['params']) {
       options.params = {};
@@ -233,7 +233,7 @@ export function downloadFile(http: HttpClient, url: string): Subject<{
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
           progress: event.loaded / event.total,
-          result: null
+          result: undefined
         });
       } else if (event instanceof HttpResponse) {
         subj.next({
@@ -348,6 +348,13 @@ export function waitTillResultRetrieved(actions: Actions, success: Action, failu
   });
 }
 
-export function hasProperty(obj: any, attribute: string) {
-  return Object.entries(obj).findIndex(([key]) => key === attribute) > -1;
+export function hasProperty(obj: unknown, attribute: string) {
+  return getProperties(obj).findIndex(([key]) => key === attribute) > -1;
+}
+
+export function getProperties(obj: any): [string, any][] {
+  if (obj !== undefined && obj !== null) {
+    return Object.entries(obj);
+  }
+  return [];
 }

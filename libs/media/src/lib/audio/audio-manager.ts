@@ -35,11 +35,11 @@ export class AudioManager {
   private _id: number;
   private _stepBackward = false;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
-  private _playbackEndChecker: Subscription = null;
+  private _playbackEndChecker: Subscription = undefined;
   private readonly _audio: HTMLAudioElement;
 
   // variables needed for initializing audio
-  private _source: AudioBufferSourceNode | MediaElementAudioSourceNode = null;
+  private _source: AudioBufferSourceNode | MediaElementAudioSourceNode = undefined;
   private chunks: AudioChunk[] = [];
 
   get audio(): HTMLAudioElement {
@@ -98,13 +98,13 @@ export class AudioManager {
     return this._lastUpdate;
   }
 
-  private _audioContext: AudioContext = null;
+  private _audioContext: AudioContext = undefined;
 
   get audioContext(): AudioContext {
     return this._audioContext;
   }
 
-  private _gainNode: GainNode = null;
+  private _gainNode: GainNode = undefined;
 
   get gainNode(): any {
     return this._gainNode;
@@ -151,7 +151,7 @@ export class AudioManager {
     this._audio.defaultMuted = false;
     this._audio.loop = false;
 
-    if (!(audioinfo === null || audioinfo === undefined)) {
+    if (!(audioinfo === undefined || audioinfo === undefined)) {
       // Fix up for prefixing
       this.initAudioContext();
 
@@ -190,7 +190,7 @@ export class AudioManager {
     if (audioformat !== undefined) {
       audioformat.init(filename, buffer);
 
-      let audioinfo: AudioInfo = null;
+      let audioinfo: AudioInfo = undefined;
       try {
         audioinfo = audioformat.getAudioInfo(filename, type, buffer);
 
@@ -198,7 +198,7 @@ export class AudioManager {
         subj.error(err.message);
       }
 
-      if (audioinfo !== null) {
+      if (audioinfo !== undefined) {
         const bufferLength = buffer.byteLength;
         // decode first 10 seconds
         const sampleDur = new SampleUnit(Math.min(audioformat.sampleRate * 30, audioformat.duration), audioformat.sampleRate);
@@ -237,7 +237,7 @@ export class AudioManager {
               }, 0);
             } else {
               subj.next({
-                audioManager: null,
+                audioManager: undefined,
                 decodeProgress: statusItem.progress
               });
             }
@@ -258,7 +258,7 @@ export class AudioManager {
   }
 
   public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
-    return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
+    return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== undefined;
   }
 
   public static isValidAudioFileName(filename: string, audioformats: AudioFormat[]): boolean {
@@ -278,7 +278,7 @@ export class AudioManager {
   }
 
   public static stopDecoding() {
-    if (!(AudioManager.decoder === null || AudioManager.decoder === undefined)) {
+    if (!(AudioManager.decoder === undefined || AudioManager.decoder === undefined)) {
       AudioManager.decoder.requeststopDecoding();
     }
   }
@@ -388,7 +388,7 @@ export class AudioManager {
   public prepareAudioPlayBack() {
     this._audio.src = URL.createObjectURL(new File([this._ressource.arraybuffer], this._ressource.info.fullname));
 
-    this._channel = null;
+    this._channel = undefined;
     this._state = PlayBackStatus.INITIALIZED;
     this.afterloaded.emit({status: 'success', error: ''});
   }
@@ -421,7 +421,7 @@ export class AudioManager {
       this.addChunk(chunk);
       return chunk;
     }
-    return null;
+    return undefined;
   }
 
   public addChunk(chunk: AudioChunk) {
@@ -441,7 +441,7 @@ export class AudioManager {
   }
 
   public destroy(disconnect = true) {
-    if (!(this._audioContext === null || this._audioContext === undefined)) {
+    if (!(this._audioContext === undefined || this._audioContext === undefined)) {
       if (disconnect) {
         this._audioContext.close()
           .then(() => {
@@ -470,7 +470,7 @@ export class AudioManager {
     format.init(this._ressource.info.name, this._ressource.arraybuffer);
     AudioManager.decoder = new AudioDecoder(format, this._ressource.info, this._ressource.arraybuffer);
     const subj = AudioManager.decoder.onChannelDataCalculate.subscribe((status) => {
-        if (status.progress === 1 && status.result !== null) {
+        if (status.progress === 1 && status.result !== undefined) {
           AudioManager.decoder.destroy();
           this._channel = status.result;
           this._channelDataFactor = AudioManager.decoder.channelDataFactor;
@@ -481,7 +481,7 @@ export class AudioManager {
         }
 
         result.next({progress: status.progress});
-        if (status.progress === 1 && status.result !== null) {
+        if (status.progress === 1 && status.result !== undefined) {
           result.complete();
         }
       },
@@ -503,7 +503,7 @@ export class AudioManager {
       || window.mozAudioContext
       || false;
     if (audioContext) {
-      if ((this._audioContext === null || this._audioContext === undefined)) {
+      if ((this._audioContext === undefined || this._audioContext === undefined)) {
         // reuse old audiocontext
         this._audioContext = new audioContext();
       }
@@ -598,10 +598,10 @@ export class AudioChunk {
    * end position to the last sample every time it's called
    */
   public set startpos(value: SampleUnit) {
-    if ((value === null || value === undefined)) {
-      throw new Error('start pos is null!');
+    if ((value === undefined || value === undefined)) {
+      throw new Error('start pos is undefined!');
     }
-    if ((this.selection === null || this.selection === undefined)) {
+    if ((this.selection === undefined || this.selection === undefined)) {
       this.selection = new AudioSelection(value.clone(), this.time.end.clone());
     } else {
       this.selection.start = value.clone();
@@ -665,7 +665,7 @@ export class AudioChunk {
     return this._status === PlayBackStatus.STOPPED;
   }
 
-  private _selection: AudioSelection = null;
+  private _selection: AudioSelection = undefined;
 
   get selection(): AudioSelection {
     return this._selection;
@@ -675,7 +675,7 @@ export class AudioChunk {
     this._selection = value;
   }
 
-  private _time: AudioSelection = null;
+  private _time: AudioSelection = undefined;
 
   get time(): AudioSelection {
     return this._time;
@@ -742,7 +742,7 @@ export class AudioChunk {
       throw new Error('AudioChunk constructor needs two correct AudioTime objects');
     }
 
-    if (!(audioManager === null || audioManager === undefined)) {
+    if (!(audioManager === undefined || audioManager === undefined)) {
       this._audioManger = audioManager;
       this._playposition = time.start.clone() as SampleUnit;
       this._status = PlayBackStatus.INITIALIZED;
@@ -750,7 +750,7 @@ export class AudioChunk {
       throw new Error('AudioChunk needs an audiomanger reference');
     }
 
-    if (!(selection === null || selection === undefined)) {
+    if (!(selection === undefined || selection === undefined)) {
       this._selection = selection.clone();
     } else {
       this._selection = this._time.clone();
@@ -760,11 +760,11 @@ export class AudioChunk {
   }
 
   public getChannelBuffer(selection: AudioSelection): Float32Array {
-    if (!(selection === null || selection === undefined)) {
+    if (!(selection === undefined || selection === undefined)) {
       return this.audioManager.channel.subarray(selection.start.samples, selection.end.samples);
     }
 
-    return null;
+    return undefined;
   }
 
   public startPlayback(playOnHover = false): Promise<void> {
@@ -879,7 +879,7 @@ export class AudioChunk {
 
   public stepBackward(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (!(this.lastplayedpos === null || this.lastplayedpos === undefined)) {
+      if (!(this.lastplayedpos === undefined || this.lastplayedpos === undefined)) {
         new Promise<void>((resolve2) => {
           if (this._status === PlayBackStatus.PLAYING) {
             const subscr = this.statuschange.subscribe((status) => {
@@ -902,7 +902,7 @@ export class AudioChunk {
           this.startPlayback(false).then(resolve).catch(reject);
         });
       } else {
-        reject('lastplayedpos is null');
+        reject('lastplayedpos is undefined');
       }
     });
   }

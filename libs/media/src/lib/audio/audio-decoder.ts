@@ -33,7 +33,7 @@ export class AudioDecoder {
   private stopDecoding = false;
   private uint8Array: Uint8Array;
   private writtenChannel = 0;
-  private afterChannelDataFinished: Subject<void> = null;
+  private afterChannelDataFinished: Subject<void> = undefined;
 
   get channelDataFactor() {
     let factor: number;
@@ -50,7 +50,7 @@ export class AudioDecoder {
   }
 
   constructor(format: AudioFormat, audioInfo: AudioInfo, arrayBuffer: ArrayBuffer) {
-    if (!(format === null || format === undefined)) {
+    if (!(format === undefined || format === undefined)) {
       this.format = format;
       this.audioInfo = audioInfo;
       this.uint8Array = new Uint8Array(arrayBuffer);
@@ -70,7 +70,7 @@ export class AudioDecoder {
                 this.writtenChannel += j.duration;
                 this.joblist.splice(jobItem, 1);
 
-                if (this.channelData === null || this.channelData === undefined) {
+                if (this.channelData === undefined || this.channelData === undefined) {
                   this.channelData = new Float32Array(Math.round(this.audioInfo.duration.samples / this.channelDataFactor));
                 }
 
@@ -95,7 +95,7 @@ export class AudioDecoder {
               const progress = this.writtenChannel / (this.audioInfo.duration.samples);
               this.onChannelDataCalculate.next({
                 progress,
-                result: null
+                result: undefined
               });
             }
           });
@@ -104,7 +104,7 @@ export class AudioDecoder {
       }
 
     } else {
-      throw new Error('format is null or undefined');
+      throw new Error('format is undefined or undefined');
     }
   }
 
@@ -119,11 +119,11 @@ export class AudioDecoder {
         if (sampleStart.samples + sampleDur.samples <= this.audioInfo.duration.samples
           && sampleStart.samples >= 0) {
 
-          if (this.afterChannelDataFinished === null) {
+          if (this.afterChannelDataFinished === undefined) {
             this.afterChannelDataFinished = new Subject<void>();
             this.afterChannelDataFinished.subscribe(() => {
               this.afterChannelDataFinished.unsubscribe();
-              this.afterChannelDataFinished = null;
+              this.afterChannelDataFinished = undefined;
               resolve(this.channelData);
               this.onChannelDataCalculate.complete();
             });
@@ -181,7 +181,7 @@ export class AudioDecoder {
 
   public destroy() {
     this.subscrmanager.destroy();
-    this.uint8Array = null;
+    this.uint8Array = undefined;
     for (let i = 0; i < this.parallelJobs; i++) {
       this.tsWorkers[i].destroy();
     }

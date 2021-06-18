@@ -13,7 +13,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {getProperties, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -200,7 +200,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         if (item.time.sampleStart === this.audiochunk.time.start.samples
           && item.time.sampleLength === this.audiochunk.time.duration.samples) {
-          if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
+          if (item.status === ASRProcessStatus.FINISHED && item.result !== undefined) {
             this.transcript = item.result;
           }
 
@@ -357,7 +357,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupe.settings.showTimePerLine = true;
     this.loupe.settings.showProgressBars = true;
     this.loupe.settings.multiLine = false;
-    this.loupe.av.drawnSelection = null;
+    this.loupe.av.drawnSelection = undefined;
 
     const segments = this.transcrService.currentlevel.segments;
     this.tempSegments = segments.clone();
@@ -382,7 +382,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngOnChanges(obj) {
-    if (Object.entries(obj).findIndex(([key]) => key === 'audiochunk') > -1) {
+    if (getProperties(obj).findIndex(([key]) => key === 'audiochunk') > -1) {
       const previous: AudioChunk = obj.audiochunk.previousValue;
       const current: AudioChunk = obj.audiochunk.currentValue;
 
@@ -436,7 +436,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     this.uiService.addElementFromEvent('segment', {
         value: 'exited'
-      }, Date.now(), this.loupe.av.PlayCursor.timePos, -1, null,
+      }, Date.now(), this.loupe.av.PlayCursor.timePos, -1, undefined,
       {
         start: startSample,
         length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - startSample
@@ -461,7 +461,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
-        this.transcrService.currentLevelSegmentChange.emit(null);
+        this.transcrService.currentLevelSegmentChange.emit(undefined);
       } else {
         // no boundaries inserted
         const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex).clone();
@@ -502,7 +502,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         segment.length = Math.round(segment.length);
       }
 
-      let selection = null;
+      let selection = undefined;
       if (this.loupe.av.drawnSelection.start.samples >= segment.start
         && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
         selection = {
@@ -531,7 +531,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.segmentIndex < this.transcrService.currentlevel.segments.length) {
         const segmentsLength = this.transcrService.currentlevel.segments.length;
 
-        let segment: Segment = null;
+        let segment: Segment = undefined;
 
         let startIndex = 0;
         let limitFunc: (i: number) => boolean;
@@ -567,7 +567,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
           this.uiService.addElementFromEvent('segment', {value: valueString},
             Date.now(), this.audioManager.playposition,
-            this.editor.caretpos, null, {
+            this.editor.caretpos, undefined, {
               start,
               length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
             }, 'transcription window');
@@ -618,7 +618,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.length = Math.round(segment.length);
     }
 
-    let selection = null;
+    let selection = undefined;
     if (this.loupe.av.drawnSelection.start.samples >= segment.start
       && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
@@ -653,7 +653,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.length = Math.round(segment.length);
     }
 
-    let selection = null;
+    let selection = undefined;
     if (this.loupe.av.drawnSelection.start.samples >= segment.start
       && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
@@ -686,7 +686,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.length = Math.round(segment.length);
     }
 
-    let selection = null;
+    let selection = undefined;
     if (this.loupe.av.drawnSelection.start.samples >= segment.start
       && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
@@ -736,7 +736,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.length = Math.round(segment.length);
     }
 
-    let selection = null;
+    let selection = undefined;
     if (this.loupe.av.drawnSelection.start.samples >= segment.start
       && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
@@ -773,7 +773,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.length = Math.round(segment.length);
     }
 
-    let selection = null;
+    let selection = undefined;
     if (this.loupe.av.drawnSelection.start.samples >= segment.start
       && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
@@ -802,7 +802,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   afterTyping(status) {
@@ -867,7 +867,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     // shift rest of text to next segment
     const found = this.tempSegments.get(segStart + segTexts.length - 1);
 
-    if (!(found === null || found === undefined)) {
+    if (!(found === undefined || found === undefined)) {
       this.tempSegments.get(segStart + segTexts.length - 1).transcript = segTexts[segTexts.length - 1];
     }
   }

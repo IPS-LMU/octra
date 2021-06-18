@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import Ajv from 'ajv';
+import * as Ajv from 'ajv';
 import {HttpClient} from '@angular/common/http';
-import {hasProperty, uniqueHTTPRequest} from '@octra/utilities';
+import {getProperties, hasProperty, uniqueHTTPRequest} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +12,14 @@ export class ConfigurationService {
   }
 
   private validateJSON(filename: string, json: any, schema: any): boolean {
-    if (!(json === null || json === undefined) && !(schema === null || schema === undefined)) {
-      const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
+    if (!(json === undefined || json === undefined) && !(schema === undefined || schema === undefined)) {
+      const ajv = new (Ajv as any)(); // options can be passed, e.g. {allErrors: true}
       const validate = ajv.compile(schema);
       const valid = validate(json);
       if (!valid) {
-        for (const [, value] of Object.entries(validate.errors)) {
+        for (const [, value] of getProperties(validate.errors)) {
           const errObj: any = value;
-          if (hasProperty(errObj, 'dataPath') && !(errObj.dataPath === null || errObj.dataPath === undefined)) {
+          if (hasProperty(errObj, 'dataPath') && !(errObj.dataPath === undefined || errObj.dataPath === undefined)) {
             console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
           }
         }
@@ -37,9 +37,9 @@ export class ConfigurationService {
       hasProperty(urls, 'json') && hasProperty(urls, 'schema') &&
       hasProperty(filenames, 'json') && hasProperty(filenames, 'schema')
     ) {
-      uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
+      uniqueHTTPRequest(this.http, false, undefined, urls.json, undefined).subscribe(
         (settings: any) => {
-          uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
+          uniqueHTTPRequest(this.http, false, undefined, urls.schema, undefined).subscribe(
             (schema) => {
               console.log(filenames.json + ' schema file loaded');
 

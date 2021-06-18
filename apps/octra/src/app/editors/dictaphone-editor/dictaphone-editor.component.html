@@ -48,7 +48,7 @@
                       [audiochunk]="audiochunk"
                       [segments]="segments"
                       [easymode]="appStorage.easymode"
-                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
                       [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
                       [(highlightingEnabled)]="highlighting"
                       [externalShortcutManager]="keyMap.shortcutsManager"

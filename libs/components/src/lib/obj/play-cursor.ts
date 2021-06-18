@@ -10,9 +10,9 @@ export class PlayCursor {
     return this._absX;
   }
 
-  private _timePos: SampleUnit;
+  private _timePos: SampleUnit | undefined;
 
-  get timePos(): SampleUnit {
+  get timePos(): SampleUnit | undefined {
     return this._timePos;
   }
 
@@ -35,7 +35,7 @@ export class PlayCursor {
   public changeSamples(sample: SampleUnit, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
     this._timePos = sample.clone();
     const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.samples < chunk.time.end.samples)
-      ? chunk.time.end.sub(chunk.time.start) : null;
+      ? chunk.time.end.sub(chunk.time.start) : undefined;
 
     this._absX = audioTCalculator.samplestoAbsX(sample, duration);
   }

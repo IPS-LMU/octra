@@ -11,7 +11,7 @@ export interface FileSize {
   label: string;
 }
 
-export function obj: any === undefined {
+export function obj() {
   return (obj === null || typeof obj === 'undefined');
 }
 

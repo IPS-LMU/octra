@@ -1,6 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
-import {TimespanPipe} from '../pipes/timespan.pipe';
+import {TimespanPipe} from '../../../../components/src/lib/pipe/timespan.pipe';
 
 export class TextConverter extends Converter {
 

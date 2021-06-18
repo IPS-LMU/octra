@@ -10,6 +10,7 @@
       ],
       "rules": {
         "strict": "off",
+        "no-undefined": "off",
         "@angular-eslint/directive-selector": [
           "error",
           {

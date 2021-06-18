@@ -4,7 +4,9 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
+      "rules": {
+        "no-undefined": "off"
+      }
     },
     {
       "files": ["*.ts", "*.tsx"],

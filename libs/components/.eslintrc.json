@@ -9,6 +9,8 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "no-undefined": "off",
+        "strict": "off",
         "@angular-eslint/directive-selector": [
           "error",
           {

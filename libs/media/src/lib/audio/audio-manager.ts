@@ -4,7 +4,7 @@ import {AudioDecoder} from './audio-decoder';
 import {AudioInfo} from './audio-info';
 import {AudioRessource} from './audio-ressource';
 import {AudioFormat, WavFormat} from './AudioFormats';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {SampleUnit} from './audio-time';
 import {PlayBackStatus, SourceType} from '../types';
 import {AudioSelection} from './audio-selection';
@@ -617,7 +617,7 @@ export class AudioChunk {
     this._playposition = this.selection.start.clone() as SampleUnit;
   }
 
-  get relativePlayposition(): SampleUnit {
+  get relativePlayposition(): SampleUnit | undefined {
     let result;
 
     if (this._status === PlayBackStatus.PLAYING) {
@@ -633,7 +633,7 @@ export class AudioChunk {
     return result;
   }
 
-  set relativePlayposition(value: SampleUnit) {
+  set relativePlayposition(value: SampleUnit | undefined) {
     if (value !== undefined && this._time.end.samples >= value.samples && value.samples > -1) {
       this._playposition = this._time.start.add(value);
     } else {

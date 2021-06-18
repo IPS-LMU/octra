@@ -284,7 +284,7 @@ export class Segments {
     return null;
   }
 
-  public BetweenWhichSegment(samples: number): Segment {
+  public BetweenWhichSegment(samples: number): Segment | undefined{
     let start = 0;
 
     for (const segment of this.segments) {
@@ -294,7 +294,7 @@ export class Segments {
       start = segment.time.samples;
     }
 
-    return null;
+    return undefined;
   }
 
   public clear() {

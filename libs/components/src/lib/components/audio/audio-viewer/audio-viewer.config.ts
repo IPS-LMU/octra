@@ -238,7 +238,7 @@ export class AudioviewerConfig {
   };
 
   public stepWidthRatio = 0.0226;
-  public type: string;
+  public type: string | undefined;
   public roundValues = true;
 
   public showTimePerLine = false;

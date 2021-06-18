@@ -54,7 +54,7 @@ export class AudioDecoder {
       this.format = format;
       this.audioInfo = audioInfo;
       this.uint8Array = new Uint8Array(arrayBuffer);
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.audioContext = new ((window as any).AudioContext || (window as any).webkitAudioContext)();
       this.tsWorkers = [];
 
       for (let i = 0; i < this.parallelJobs; i++) {

@@ -2,7 +2,6 @@ import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './annotjson';
 import {Segment} from './segment';
 import {SampleUnit} from '@octra/media';
-import {isUnset} from '@octra/utilities';
 
 export interface SegmentChangeEvent {
   type: 'remove' | 'change' | 'add';
@@ -56,7 +55,7 @@ export class Segments {
   public add(time: SampleUnit, label: string, transcript: string = null, triggerChange = true): boolean {
     const newSegment: Segment = new Segment(time, label);
 
-    if (!isUnset(transcript)) {
+    if (transcript !== undefined) {
       newSegment.transcript = transcript;
     }
 
@@ -108,7 +107,7 @@ export class Segments {
   public removeByIndex(index: number, breakMarker: string, triggerChange = true, mergeTranscripts = true) {
     if (index > -1 && index < this.segments.length) {
       const segment = this.segments[index];
-      if (index < this.segments.length - 1 && !isUnset(breakMarker) && breakMarker !== '') {
+      if (index < this.segments.length - 1 && breakMarker !== undefined && breakMarker !== '') {
         const nextSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
         if (nextSegment.transcript !== breakMarker && transcription !== breakMarker && mergeTranscripts) {
@@ -143,7 +142,7 @@ export class Segments {
    * changes samples of segment by given index and sorts the List after adding
    */
   public change(i: number, segment: Segment): boolean {
-    if (i > -1 && !isUnset(this._segments[i])) {
+    if (i > -1 && this._segments[i] !== undefined) {
       const old = {
         samples: this._segments[i].time.samples,
         transcript: this._segments[i].transcript,

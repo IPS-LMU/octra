@@ -18,15 +18,18 @@ export class SubscriptionManager<T> {
    * @param tag optional tag
    * @returns number
    */
-  public add(subscription: T, tag?: string): number {
-    this.subscriptions.push(
-      {
-        id: ++this.counter,
-        tag,
-        subscription
-      }
-    );
-    return this.counter;
+  public add(subscription: T | undefined, tag?: string): number {
+    if (subscription !== undefined) {
+      this.subscriptions.push(
+        {
+          id: ++this.counter,
+          tag,
+          subscription
+        }
+      );
+      return this.counter;
+    }
+    return -1;
   }
 
   /**

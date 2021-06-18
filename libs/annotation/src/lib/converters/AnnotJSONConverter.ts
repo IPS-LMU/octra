@@ -14,7 +14,7 @@ export class AnnotJSONConverter extends Converter {
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(annotation: OAnnotJSON): ExportResult {
     if (!(annotation === null || annotation === undefined)) {
       return {
         file: {

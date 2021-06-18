@@ -203,7 +203,7 @@ export class WavFormat extends AudioFormat {
 
       // one block contains one sample of each channel
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
-      const channels = (!isUnset(selectedChannel)) ? 1 : this._channels;
+      const channels = (selectedChannel !== undefined) ? 1 : this._channels;
       const blockAlign = (this._bitsPerSample / 8) * channels;
 
       let start = sampleStart * blockAlign;
@@ -223,11 +223,11 @@ export class WavFormat extends AudioFormat {
         startPos = 44 + Math.round(start);
       }
 
-      if (!isUnset(result)) {
+      if (result !== undefined) {
         // start and duration are the position in bytes after the header
         const endPos = startPos + Math.round(dataChunkLength);
 
-        if (isUnset(selectedChannel) || this._channels === 1) {
+        if (selectedChannel === undefined || this._channels === 1) {
           result.set(convertedData.slice(startPos, endPos));
           resolve(result);
         } else {

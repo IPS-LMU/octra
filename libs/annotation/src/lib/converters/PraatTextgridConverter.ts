@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains, isUnset} from '@octra/utilities';
+import {contains} from '@octra/utilities';
 import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class PraatTextgridConverter extends Converter {
@@ -83,7 +83,7 @@ export class PraatTextgridConverter extends Converter {
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (!isUnset(audiofile)) {
+    if (audiofile !== undefined) {
       const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
       const fileName = (file.name.indexOf('.') > -1) ? file.name.substr(0, file.name.lastIndexOf('.')) : file.name
       if (name === fileName) {

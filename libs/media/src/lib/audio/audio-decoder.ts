@@ -1,10 +1,10 @@
 import {Subject, timer} from 'rxjs';
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
-import {isUnset, SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
+import {SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
 import {AudioFormat, WavFormat} from './AudioFormats';
 
-declare var window: any;
+declare let window: unknown;
 
 export class AudioDecoder {
   public onChannelDataCalculate: Subject<{
@@ -64,7 +64,7 @@ export class AudioDecoder {
               return a.jobId === job.id;
             });
 
-            if (job.status === TsWorkerStatus.FINISHED && !isUnset(job.result)) {
+            if (job.status === TsWorkerStatus.FINISHED && job.result !== undefined) {
               if (jobItem > -1) {
                 const j = this.joblist[jobItem];
                 this.writtenChannel += j.duration;
@@ -98,10 +98,6 @@ export class AudioDecoder {
                 result: null
               });
             }
-          },
-          () => {
-          },
-          () => {
           });
 
         this.tsWorkers.push(worker);
@@ -191,7 +187,7 @@ export class AudioDecoder {
     }
   }
 
-  public minimizeChannelData(args: any[]): Promise<Float32Array> {
+  public minimizeChannelData(args: [any, number]): Promise<Float32Array> {
     return new Promise<Float32Array>((resolve) => {
       const channelData = args[0];
       const factor = args[1];

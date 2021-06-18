@@ -1,17 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "ES2015",
+    "module": "commonjs",
     "outDir": "../../dist/out-tsc",
     "declaration": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ],
-  "include": [
-    "**/*.ts"
-  ]
+  "exclude": ["**/*.spec.ts"],
+  "include": ["**/*.ts"]
 }

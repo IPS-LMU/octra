@@ -4,14 +4,10 @@
     "defaultBase": "master"
   },
   "implicitDependencies": {
-    "angular.json": "*",
     "package.json": {
       "dependencies": "*",
       "devDependencies": "*"
     },
-    "tsconfig.base.json": "*",
-    "tslint.json": "*",
-    "nx.json": "*",
     ".eslintrc.json": "*"
   },
   "tasksRunnerOptions": {

@@ -43,9 +43,6 @@ export abstract class AudioFormat {
     return this._duration;
   }
 
-  protected constructor() {
-  }
-
   public init(filename, buffer: ArrayBuffer) {
     this._filename = filename;
     this.setSampleRate(buffer);

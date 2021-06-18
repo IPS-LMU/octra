@@ -27,7 +27,7 @@ export class AudioTimeCalculator {
     return Math.round((timeSamples.samples / dur.samples) * this.audioPxWidth);
   }
 
-  public absXChunktoSampleUnit(absX: number, chunk: AudioChunk): SampleUnit | null {
+  public absXChunktoSampleUnit(absX: number, chunk: AudioChunk): SampleUnit | undefined {
     const start = (chunk.time.start) ? chunk.time.start.samples : 1;
     const duration = chunk.time.end.samples - start;
     if (absX >= 0 && absX <= this.audioPxWidth) {
@@ -36,7 +36,7 @@ export class AudioTimeCalculator {
         , chunk.sampleRate);
     }
 
-    return null;
+    return undefined;
   }
 
   public absXtoSamples2(absX: number, chunk: AudioChunk): number {

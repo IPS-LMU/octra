@@ -1,7 +1,6 @@
 import * as moment from 'moment';
 import * as X2JS from 'x2js';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {isUnset} from '@octra/utilities';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class ELANConverter extends Converter {
@@ -135,10 +134,10 @@ export class ELANConverter extends Converter {
 
     let counter = 1;
 
-    if (!isUnset(jsonXML) && jsonXML.hasOwnProperty('ANNOTATION_DOCUMENT')) {
+    if (jsonXML !== undefined && jsonXML['ANNOTATION_DOCUMENT']) {
       const timeUnit = jsonXML.ANNOTATION_DOCUMENT.HEADER._TIME_UNITS;
 
-      if (!isUnset(timeUnit) && timeUnit === 'milliseconds') {
+      if (timeUnit !== undefined && timeUnit === 'milliseconds') {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
           const level = new OLevel(tier._TIER_ID, 'SEGMENT', []);

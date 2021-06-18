@@ -106,7 +106,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.hasOwnProperty('audioChunk') && changes.audioChunk.currentValue !== null) {
+    if (changes['audioChunk'] && changes.audioChunk.currentValue !== null) {
       this.afterChunkUpdated();
     }
   }
@@ -117,7 +117,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
         this.subscrmanager.removeById(this.bufferedSubscr);
       }
 
-      if (!isUnset(this.audiochunkSubscription)) {
+      if (this.audiochunkSubscription !== undefined) {
         this.audiochunkSubscription.unsubscribe();
       }
 
@@ -237,7 +237,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   public ngOnDestroy(): void {
-    if (!isUnset(this.audiochunkSubscription)) {
+    if (this.audiochunkSubscription !== undefined) {
       this.audiochunkSubscription.unsubscribe();
     }
     this.subscrmanager.destroy();
@@ -252,7 +252,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     const playHead = this.canvasElements.playHead;
     const layer = this.stage.getLayers()[0];
 
-    if (isUnset(this.animation.playHead)) {
+    if (this.animation.playHead === undefined) {
       this.animation.playHead = new Konva.Animation(this.doPlayHeadAnimation, layer);
     }
     this.animation.playHead.start();

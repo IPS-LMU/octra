@@ -88,9 +88,6 @@ export class OAudiofile implements IAudioFile {
   sampleRate: number;
   url: string;
   type: string;
-
-  constructor() {
-  }
 }
 
 export class OLevel implements ILevel {

@@ -11,7 +11,7 @@ export interface FileSize {
   label: string;
 }
 
-export function isUnset(obj: any) {
+export function obj: any === undefined {
   return (obj === null || typeof obj === 'undefined');
 }
 
@@ -24,13 +24,13 @@ export function contains(haystack: string, needle: string): boolean {
 }
 
 export function hasPropertyTree(obj: any, treeString: string): boolean {
-  if (!isUnset(obj)) {
-    const properties = treeString.split('.').filter(a => !isUnset(a) && a.trim() !== '');
+  if (obj !== undefined) {
+    const properties = treeString.split('.').filter(a => a !== undefined && a.trim() !== '');
     let pointer = obj;
 
     for (let i = 0; i < properties.length; i++) {
       const property = properties[i];
-      if (!pointer.hasOwnProperty(property) || isUnset(pointer[property])) {
+      if (!pointer.hasOwnProperty(property) || pointer[property] === undefined) {
         return false;
       }
       pointer = pointer[property];
@@ -61,7 +61,7 @@ export function selectAllTextOfNode(el: any) {
 }
 
 export function checkArray(array: any[]) {
-  return array.findIndex(a => isUnset(a)) < 0;
+  return array.findIndex(a => a === undefined) < 0;
 }
 
 
@@ -206,7 +206,7 @@ export function uniqueHTTPRequest(http: HttpClient, post: boolean = false, reque
   if (!post) {
     const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};
 
-    if (!options.hasOwnProperty('params')) {
+    if (!options['params']) {
       options.params = {};
     }
 
@@ -316,7 +316,7 @@ export function afterDefined(observable: Observable<any>): Promise<any> {
   return new Promise<void>((resolve, reject) => {
     const subscription = observable.subscribe(
       (value) => {
-        if (!isUnset(value)) {
+        if (value !== undefined) {
           try {
             subscription.unsubscribe();
           } catch (e) {

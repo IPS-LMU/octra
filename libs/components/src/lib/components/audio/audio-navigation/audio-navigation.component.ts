@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -8,12 +7,11 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, PlayBackStatus} from '@octra/media';
 
 export interface Buttons {
@@ -49,7 +47,7 @@ export interface Buttons {
   styleUrls: ['./audio-navigation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
+export class AudioNavigationComponent implements OnChanges, OnDestroy {
   @Output() buttonClick = new EventEmitter<{ type: string, timestamp: number }>();
   @Output() volumeChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
   @Output() afterVolumeChange = new EventEmitter<{ new_value: number, timestamp: number }>();
@@ -57,7 +55,7 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
   @Output() afterPlaybackRateChange = new EventEmitter<{ new_value: number, timestamp: number }>();
   @Input() responsive = false;
   @Input() easyMode = false;
-  @Input() audioChunk: AudioChunk;
+  @Input() audioChunk: AudioChunk | undefined;
   @Input() stepBackwardTime = 500;
 
   @Input() buttons: Buttons = {
@@ -87,13 +85,13 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
     }
   };
 
-  @ViewChild('audioNavContainer', {static: true}) audioNavContainer: ElementRef;
+  @ViewChild('audioNavContainer', {static: true}) audioNavContainer: ElementRef | undefined;
 
   private subscrManager = new SubscriptionManager();
 
   public get height() {
-    if (!isUnset(this.audioNavContainer)) {
-      return this.audioNavContainer.nativeElement.clientHeight;
+    if (this.audioNavContainer !== undefined) {
+      return this.audioNavContainer?.nativeElement?.clientHeight;
     }
 
     return 0;
@@ -130,7 +128,7 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
       timestamp: Date.now()
     });
     this._volume = value;
-    if (!isUnset(this.audioChunk)) {
+    if (this.audioChunk) {
       this.audioChunk.volume = value;
     }
   }
@@ -149,7 +147,7 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
     });
     this._playbackRate = value;
 
-    if (!isUnset(this.audioChunk)) {
+    if (this.audioChunk !== undefined) {
       this.audioChunk.playbackRate = value;
     }
   }
@@ -157,20 +155,14 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
   constructor(private cd: ChangeDetectorRef) {
   }
 
-  ngOnInit(): void {
-  }
-
-  ngAfterViewInit() {
-  }
-
   /**
    * this method is called only after a input changed (dirty check)
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isUnset(changes.audioChunk)) {
+    if (changes.audioChunk !== undefined) {
       const newAudioChunk: AudioChunk = changes.audioChunk.currentValue;
 
-      if (!isUnset(newAudioChunk)) {
+      if (newAudioChunk !== undefined) {
         this.subscrManager.destroy();
         this.connectEvents();
         this.initialize();
@@ -240,63 +232,77 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
   }
 
   private initialize() {
-    this.audioChunk.playbackRate = this._playbackRate;
-    this.audioChunk.volume = this._volume;
+    if (this.audioChunk !== undefined) {
+      this.audioChunk.playbackRate = this._playbackRate;
+      this.audioChunk.volume = this._volume;
+    }
   }
 
   private connectEvents() {
-    this.subscrManager.add(this.audioChunk.statuschange.subscribe((status: PlayBackStatus) => {
-        this._isAudioPlaying = status === PlayBackStatus.PLAYING;
-        this.cd.markForCheck();
-        this.cd.detectChanges();
-      },
-      (error) => {
-        console.error(error);
-      },
-      () => {
-
-      }));
+    if (this.audioChunk !== undefined) {
+      this.subscrManager.add(this.audioChunk.statuschange.subscribe((status: PlayBackStatus) => {
+          this._isAudioPlaying = status === PlayBackStatus.PLAYING;
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        },
+        (error) => {
+          console.error(error);
+        }));
+    }
   }
 
   private onPlayButtonClicked() {
     this.triggerButtonClick('play');
-    this.audioChunk.startPlayback(false).catch((error) => {
-      console.error(error);
-    });
+    if (this.audioChunk !== undefined) {
+      this.audioChunk.startPlayback(false).catch((error) => {
+        console.error(error);
+      });
+    }
   }
 
   private onPauseButtonClicked() {
     this.triggerButtonClick('pause');
-    this.audioChunk.pausePlayback().catch((error) => {
-      console.error(error);
-    });
+    if (this.audioChunk !== undefined) {
+      this.audioChunk.pausePlayback().catch((error) => {
+        console.error(error);
+      });
+    }
   }
 
   private onStopButtonClicked() {
     this.triggerButtonClick('stop');
-    this.audioChunk.stopPlayback().catch((error) => {
-      console.error(error);
-    });
+    if (this.audioChunk !== undefined) {
+      this.audioChunk.stopPlayback().catch((error) => {
+        console.error(error);
+      });
+    }
   }
 
   private onReplayButtonClicked() {
-    this.audioChunk.toggleReplay();
-    this.triggerButtonClick('replay');
-    this._replay = this.audioChunk.replay;
+
+    if (this.audioChunk !== undefined) {
+      this.audioChunk.toggleReplay();
+      this.triggerButtonClick('replay');
+      this._replay = this.audioChunk.replay;
+    }
   }
 
   private onBackwardButtonClicked() {
-    this.triggerButtonClick('backward');
-    this.audioChunk.stepBackward().catch((error) => {
-      console.error(error);
-    });
+    if (this.audioChunk !== undefined) {
+      this.triggerButtonClick('backward');
+      this.audioChunk.stepBackward().catch((error) => {
+        console.error(error);
+      });
+    }
   }
 
   private onBackwardTimeButtonClicked() {
-    this.triggerButtonClick('backward time');
-    this.audioChunk.stepBackwardTime(500 / 1000).catch((error) => {
-      console.error(error);
-    });
+    if (this.audioChunk !== undefined) {
+      this.triggerButtonClick('backward time');
+      this.audioChunk.stepBackwardTime(500 / 1000).catch((error) => {
+        console.error(error);
+      });
+    }
   }
 
   private triggerButtonClick(type: string) {

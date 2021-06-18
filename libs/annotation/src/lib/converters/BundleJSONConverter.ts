@@ -74,8 +74,8 @@ export class BundleJSONConverter extends Converter {
       };
     }
 
-    if (!(json === null || json === undefined) && json.hasOwnProperty('mediaFile') && json.mediaFile.hasOwnProperty('data')
-      && json.hasOwnProperty('annotation')) {
+    if (!(json === null || json === undefined) && json['mediaFile'] && json.mediaFile['data']
+      && json['annotation']) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;
       const buffer = base64ToArrayBuffer(data);

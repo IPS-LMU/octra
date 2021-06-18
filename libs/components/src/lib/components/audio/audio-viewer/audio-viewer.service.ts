@@ -3,8 +3,8 @@ import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioChunk, AudioManager, AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
-import {isUnset, MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
-import {ASRQueueItemType, Level} from '@octra/annotation';
+import {MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
+import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
 
 @Injectable({
   providedIn: 'root'
@@ -14,35 +14,35 @@ export class AudioViewerService {
     return this._boundaryDragging;
   }
 
-  public audioTCalculator: AudioTimeCalculator;
+  public audioTCalculator: AudioTimeCalculator | undefined;
   public overboundary = false;
   public shiftPressed = false;
   public breakMarker: any;
   public channelInitialized = new Subject<void>();
-  protected mouseClickPos: SampleUnit = null;
-  protected playcursor: PlayCursor = null;
+  protected mouseClickPos: SampleUnit | undefined;
+  protected playcursor: PlayCursor | undefined;
 
   private _boundaryDragging: Subject<'started' | 'stopped'>;
 
   // AUDIO
   protected audioPxW = 0;
   protected hZoom = 0;
-  protected audioChunk: AudioChunk;
+  protected audioChunk: AudioChunk | undefined;
   private subscrManager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
-  private _currentTranscriptionLevel: Level;
+  private _currentTranscriptionLevel: Level | undefined;
 
-  get currentTranscriptionLevel(): Level {
+  get currentTranscriptionLevel(): Level | undefined {
     return this._currentTranscriptionLevel;
   }
 
-  private _drawnSelection: AudioSelection;
+  private _drawnSelection: AudioSelection | undefined;
 
-  get drawnSelection(): AudioSelection {
+  get drawnSelection(): AudioSelection | undefined {
     return this._drawnSelection;
   }
 
-  set drawnSelection(value: AudioSelection) {
+  set drawnSelection(value: AudioSelection | undefined) {
     this._drawnSelection = value;
   }
 
@@ -53,15 +53,15 @@ export class AudioViewerService {
     return this._mouseDown;
   }
 
-  private _mouseCursor: SampleUnit;
+  private _mouseCursor: SampleUnit | undefined;
 
-  get mouseCursor(): SampleUnit {
+  get mouseCursor(): SampleUnit | undefined {
     return this._mouseCursor;
   }
 
-  private _innerWidth: number;
+  private _innerWidth: number | undefined;
 
-  get innerWidth(): number {
+  get innerWidth(): number | undefined {
     return this._innerWidth;
   }
 
@@ -69,20 +69,20 @@ export class AudioViewerService {
     return this.audioPxW;
   }
 
-  get MouseClickPos(): SampleUnit {
+  get MouseClickPos(): SampleUnit | undefined {
     return this.mouseClickPos;
   }
 
-  set MouseClickPos(mouseClickPos: SampleUnit) {
+  set MouseClickPos(mouseClickPos: SampleUnit | undefined) {
     this.mouseClickPos = mouseClickPos;
   }
 
   // PlayCursor in absX
-  get PlayCursor(): PlayCursor {
+  get PlayCursor(): PlayCursor | undefined {
     return this.playcursor;
   }
 
-  set PlayCursor(playcursor: PlayCursor) {
+  set PlayCursor(playcursor: PlayCursor | undefined) {
     this.playcursor = playcursor;
   }
 
@@ -132,8 +132,8 @@ export class AudioViewerService {
     return this._minmaxarray;
   }
 
-  protected get audioManager(): AudioManager {
-    return this.audioChunk.audioManager;
+  protected get audioManager(): AudioManager | undefined {
+    return this.audioChunk?.audioManager;
   }
 
   constructor(private multiThreadingService: MultiThreadingService) {
@@ -153,79 +153,84 @@ export class AudioViewerService {
    */
   public setMouseClickPosition(absX: number, lineNum: number, $event: Event): Promise<number> {
     return new Promise<number>((resolve) => {
-      const absXInTime = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
+      if(this.audioChunk !== undefined){
 
-      if (!isUnset(absXInTime)) {
-        this._mouseCursor = absXInTime.clone();
+        const absXInTime = this.audioTCalculator?.absXChunktoSampleUnit(absX, this.audioChunk);
 
-        if (!this.audioManager.isPlaying) {
-          // same line
-          // fix margin settings
-          if ($event.type === 'mousedown' && !this.shiftPressed) {
-            // no line defined or same line
-            this.mouseClickPos = absXInTime.clone();
+        if (absXInTime !== undefined && this.audioManager !== undefined && this.audioChunk !== undefined &&
+          this._currentTranscriptionLevel !== undefined && this.audioTCalculator !== undefined &&
+          this.PlayCursor !== undefined) {
+          this._mouseCursor = absXInTime.clone();
 
-            this.audioChunk.startpos = this.mouseClickPos.clone();
-            this.audioChunk.selection.start = absXInTime.clone();
-            this.audioChunk.selection.end = absXInTime.clone();
-            this._drawnSelection = this.audioChunk.selection.clone();
+          if (!this.audioManager.isPlaying) {
+            // same line
+            // fix margin settings
+            if ($event.type === 'mousedown' && !this.shiftPressed) {
+              // no line defined or same line
+              this.mouseClickPos = absXInTime.clone();
 
-            if (this._dragableBoundaryNumber > -1) {
-              const segmentBefore = (this._dragableBoundaryNumber > 0)
-                ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber - 1)
-                : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
-              const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
-              const segmentAfter = (this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length - 1)
-                ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber + 1)
-                : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
-
-              if (segment.isBlockedBy === ASRQueueItemType.ASR || segmentBefore.isBlockedBy === ASRQueueItemType.ASR ||
-                segmentAfter.isBlockedBy === ASRQueueItemType.ASR) {
-                // prevent dragging boundary of blocked segment
-                this._dragableBoundaryNumber = -1;
-              }
-            }
-            this._mouseDown = true;
-          } else if ($event.type === 'mouseup') {
-            if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._dragableBoundaryNumber > -1 &&
-              this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length) {
-              // some boundary dragged
-              const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber).clone();
-              segment.time = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
-
-              // trigger segment change because it wasn't triggered while dragging
-              this._currentTranscriptionLevel.segments.onsegmentchange.emit();
-
-              this._boundaryDragging.next('stopped');
-            } else {
-              // set selection
+              this.audioChunk.startpos = this.mouseClickPos.clone();
+              this.audioChunk.selection.start = absXInTime.clone();
               this.audioChunk.selection.end = absXInTime.clone();
-              this.audioChunk.selection.checkSelection();
               this._drawnSelection = this.audioChunk.selection.clone();
 
-              // TODO check this!
-              this.PlayCursor.changeSamples(this.audioChunk.absolutePlayposition.clone(), this.audioTCalculator, this.audioChunk);
+              if (this._dragableBoundaryNumber > -1) {
+                const segmentBefore = (this._dragableBoundaryNumber > 0)
+                  ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber - 1)
+                  : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
+                const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
+                const segmentAfter = (this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length - 1)
+                  ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber + 1)
+                  : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
+
+                if (segment.isBlockedBy === ASRQueueItemType.ASR || segmentBefore.isBlockedBy === ASRQueueItemType.ASR ||
+                  segmentAfter.isBlockedBy === ASRQueueItemType.ASR) {
+                  // prevent dragging boundary of blocked segment
+                  this._dragableBoundaryNumber = -1;
+                }
+              }
+              this._mouseDown = true;
+            } else if ($event.type === 'mouseup') {
+              if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._dragableBoundaryNumber > -1 &&
+                this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length) {
+                // some boundary dragged
+                const segment: Segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber).clone();
+                segment.time = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
+
+                // trigger segment change because it wasn't triggered while dragging
+                this._currentTranscriptionLevel.segments.onsegmentchange.emit();
+
+                this._boundaryDragging.next('stopped');
+              } else {
+                // set selection
+                this.audioChunk.selection.end = absXInTime.clone();
+                this.audioChunk.selection.checkSelection();
+                this._drawnSelection = this.audioChunk.selection.clone();
+
+                // TODO check this!
+                this.PlayCursor.changeSamples(this.audioChunk.absolutePlayposition.clone(), this.audioTCalculator, this.audioChunk);
+              }
+
+              this._dragableBoundaryNumber = -1;
+              this.overboundary = false;
+              this._mouseDown = false;
             }
 
-            this._dragableBoundaryNumber = -1;
-            this.overboundary = false;
-            this._mouseDown = false;
-          }
-
-          resolve(lineNum);
-        } else if (this.audioManager.state === PlayBackStatus.PLAYING && ($event.type === 'mouseup')) {
-          this.audioChunk.stopPlayback().then(() => {
-            this.audioChunk.startpos = absXInTime.clone();
-            this.audioChunk.selection.end = absXInTime.clone();
-            this._drawnSelection = this.audioChunk.selection.clone();
-            this.PlayCursor.changeSamples(absXInTime, this.audioTCalculator, this.audioChunk);
-
-            this._mouseDown = false;
-            this._dragableBoundaryNumber = -1;
             resolve(lineNum);
-          }).catch((error) => {
-            console.error(error);
-          });
+          } else if (this.audioManager.state === PlayBackStatus.PLAYING && ($event.type === 'mouseup')) {
+            this.audioChunk.stopPlayback().then(() => {
+              this.audioChunk.startpos = absXInTime.clone();
+              this.audioChunk.selection.end = absXInTime.clone();
+              this._drawnSelection = this.audioChunk.selection.clone();
+              this.PlayCursor.changeSamples(absXInTime, this.audioTCalculator, this.audioChunk);
+
+              this._mouseDown = false;
+              this._dragableBoundaryNumber = -1;
+              resolve(lineNum);
+            }).catch((error) => {
+              console.error(error);
+            });
+          }
         }
       }
     });
@@ -493,9 +498,9 @@ export class AudioViewerService {
         }
       }
 
-      const selection: number = !isUnset(this._drawnSelection) ? this._drawnSelection.length : 0;
+      const selection: number = this._drawnSelection !== undefined ? this._drawnSelection.length : 0;
 
-      if (selection > 0 && !isUnset(this._drawnSelection) && absXTime >= this._drawnSelection.start.samples
+      if (selection > 0 && this._drawnSelection !== undefined && absXTime >= this._drawnSelection.start.samples
         && absXTime <= this._drawnSelection.end.samples) {
         // some part selected
         const segm1 = this._currentTranscriptionLevel.segments.BetweenWhichSegment(this._drawnSelection.start.samples);

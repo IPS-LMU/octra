@@ -9,7 +9,7 @@ import {SampleUnit} from './audio-time';
 import {PlayBackStatus, SourceType} from '../types';
 import {AudioSelection} from './audio-selection';
 
-declare var window: any;
+declare let window: any;
 
 export class AudioManager {
   public static decoder: AudioDecoder;
@@ -283,19 +283,19 @@ export class AudioManager {
     }
   }
 
-  public startPlayback(audioSelection: AudioSelection, volume: number, playbackRate: number, playOnHover: boolean = false
+  public startPlayback(audioSelection: AudioSelection, volume: number, playbackRate: number, playOnHover = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (isUnset(this._audioContext)) {
+      if (this._audioContext === undefined) {
         this.initAudioContext();
       }
 
       this._audioContext.resume().then(() => {
-        if (isUnset(this._gainNode)) {
+        if (this._gainNode === undefined) {
           this._gainNode = this.audioContext.createGain();
         }
         // create an audio context and hook up the video element as the source
-        if (isUnset(this._source)) {
+        if (this._source === undefined) {
           this._source = this._audioContext.createMediaElementSource(this._audio);
         }
         this.changeState(PlayBackStatus.STARTED);
@@ -447,7 +447,7 @@ export class AudioManager {
     );
   }
 
-  public destroy(disconnect: boolean = true) {
+  public destroy(disconnect = true) {
     if (!(this._audioContext === null || this._audioContext === undefined)) {
       if (disconnect) {
         this._audioContext.close()
@@ -495,8 +495,6 @@ export class AudioManager {
       (error) => {
         this.onChannelDataChange.error(error);
         result.error(error);
-      },
-      () => {
       });
     AudioManager.decoder.started = Date.now();
     AudioManager.decoder.getChunkedChannelData(sampleStart, sampleDur).catch((error) => {
@@ -636,7 +634,7 @@ export class AudioChunk {
   }
 
   set relativePlayposition(value: SampleUnit) {
-    if (!isUnset(value) && this._time.end.samples >= value.samples && value.samples > -1) {
+    if (value !== undefined && this._time.end.samples >= value.samples && value.samples > -1) {
       this._playposition = this._time.start.add(value);
     } else {
       console.error(`invalid value for relative sample unit!`);
@@ -651,7 +649,7 @@ export class AudioChunk {
   }
 
   set absolutePlayposition(value: SampleUnit) {
-    if (!isUnset(value) && value.samples >= this._time.start.samples && value.samples <= this._time.end.samples) {
+    if (value !== undefined && value.samples >= this._time.start.samples && value.samples <= this._time.end.samples) {
       this._playposition = value;
     } else {
       console.error(`incorrect value for absolute playback position!`);
@@ -714,7 +712,7 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    if (!isUnset(this._audioManger.gainNode)) {
+    if (this._audioManger.gainNode !== undefined) {
       this._audioManger.gainNode.gain.value = value;
     }
   }
@@ -776,7 +774,7 @@ export class AudioChunk {
     return null;
   }
 
-  public startPlayback(playOnHover: boolean = false): Promise<void> {
+  public startPlayback(playOnHover = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       new Promise<void>((resolve2, reject2) => {
         if (!this._audioManger.isPlaying) {
@@ -791,7 +789,7 @@ export class AudioChunk {
           });
         }
       }).then(() => {
-        if (isUnset(this._selection)) {
+        if (this._selection === undefined) {
           this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
         }
 
@@ -898,8 +896,6 @@ export class AudioChunk {
               },
               () => {
                 resolve2();
-              },
-              () => {
               });
             this.audioManager.pausePlayback().catch((error) => {
               console.error(error);

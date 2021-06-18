@@ -1,5 +1,4 @@
 import {DataInfo} from './dataInfo';
-import {isUnset} from './functions';
 
 export class FileInfo extends DataInfo {
   /**
@@ -68,7 +67,7 @@ export class FileInfo extends DataInfo {
 
   public constructor(fullname: string, type: string, size: number, file?: File, createdAt?: number) {
     super(FileInfo.extractFileName(fullname).name, type, size);
-    this._createdAt = (isUnset(createdAt)) ? 0 : createdAt;
+    this._createdAt = (createdAt === undefined) ? 0 : createdAt;
 
     const extraction = FileInfo.extractFileName(fullname);
     if (!(extraction === null || extraction === undefined)) {

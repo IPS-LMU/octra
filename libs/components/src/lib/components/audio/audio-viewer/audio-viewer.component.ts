@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -18,7 +17,7 @@ import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
-import {isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
+import {ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment, TimespanPipe} from '@octra/annotation';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {Position, Size} from '../../../obj';
@@ -33,7 +32,7 @@ import Shape = Konva.Shape;
   styleUrls: ['./audio-viewer.component.css'],
   providers: [AudioViewerService]
 })
-export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   // Ways to improve performance
   // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
 
@@ -43,7 +42,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
     this.subscrManager.add(this.av.boundaryDragging.subscribe((status) => {
       if (status === 'stopped') {
-        this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
+        this.renderer.setStyle(this.konvaContainer?.nativeElement, 'cursor', 'auto');
       }
     }))
   }
@@ -54,13 +53,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public get mouseCursor(): {
-    location: Vector2d,
+    location: Vector2d | undefined,
     size: {
       height: number;
       width: number;
-    }
+    } | undefined
   } {
-    if (isUnset(this.canvasElements.mouseCaret)) {
+    if (this.canvasElements.mouseCaret === undefined) {
       return {
         location: {
           x: 0, y: 0
@@ -71,8 +70,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       };
     } else {
       return {
-        location: this.canvasElements.mouseCaret.position(),
-        size: this.canvasElements.mouseCaret.size()
+        location: this.canvasElements?.mouseCaret?.position(),
+        size: this.canvasElements?.mouseCaret?.size()
       };
     }
   }
@@ -86,16 +85,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.av.settings = value;
   }
 
-  public get audioManager(): AudioManager {
-    return this.audioChunk.audioManager;
+  public get audioManager(): AudioManager | undefined {
+    return this.audioChunk?.audioManager;
   }
 
-  public get width(): number {
-    return this.konvaContainer.nativeElement.offsetWidth;
+  public get width(): number | undefined {
+    return this.konvaContainer?.nativeElement.offsetWidth;
   }
 
-  public get height(): number {
-    return this.konvaContainer.nativeElement.clientHeight;
+  public get height(): number | undefined {
+    return this.konvaContainer?.nativeElement.clientHeight;
   }
 
   public get getPlayHeadX(): number {
@@ -106,11 +105,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this.av.AudioPxWidth;
   }
 
-  get transcriptionLevel(): Level {
+  get transcriptionLevel(): Level | undefined {
     return this._transcriptionLevel;
   }
 
-  @Input() set transcriptionLevel(value: Level) {
+  @Input() set transcriptionLevel(value: Level | undefined) {
     this._transcriptionLevel = value;
   }
 
@@ -118,7 +117,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this._focused;
   }
 
-  @Input() audioChunk: AudioChunk;
+  @Input() audioChunk: AudioChunk | undefined;
   @Input() public name = '';
   @Input() breakMarker: any;
   @Output() shortcuttriggered = new EventEmitter<AudioViewerShortcutEvent>();
@@ -127,7 +126,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   @Output() playcursorchange = new EventEmitter<PlayCursor>();
   @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
   @Output() mousecursorchange = new EventEmitter<{
-    event: MouseEvent,
+    event: MouseEvent | undefined,
     time: SampleUnit
   }>();
 
@@ -136,19 +135,19 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this.av.boundaryDragging;
   }
 
-  @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
+  @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef | undefined;
   private shortcutsManager: ShortcutManager;
   public updating = false;
   // EVENTS
   public onInitialized = new Subject<void>();
   public secondsPerLine = 5;
-  private stage: Konva.Stage;
+  private stage: Konva.Stage | undefined;
   private hoveredLine = -1;
   private croppingData: {
-    x: number,
-    y: number,
-    radius: number
-  };
+    x: number;
+    y: number;
+    radius: number;
+  } | undefined;
   private styles = {
     playHead: {
       backgroundColor: '#56a09e',
@@ -183,71 +182,61 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     boundaries: Konva.Layer,
     overlay: Konva.Layer,
     scrollBars: Konva.Layer
-  };
+  } | undefined;
   private subscrManager: SubscriptionManager<Subscription>;
   private animation: {
-    playHead: Konva.Animation
+    playHead: Konva.Animation | undefined
   } = {
-    playHead: null
+    playHead: undefined
   };
   private canvasElements: {
-    playHead: Konva.Group,
-    mouseCaret: Konva.Group,
-    scrollBar: Konva.Group,
-    scrollbarSelector: Konva.Rect,
-    lastLine: Konva.Group
+    playHead: Konva.Group | undefined,
+    mouseCaret: Konva.Group | undefined,
+    scrollBar: Konva.Group | undefined,
+    scrollbarSelector: Konva.Rect | undefined,
+    lastLine: Konva.Group | undefined
   } = {
-    playHead: null,
-    mouseCaret: null,
-    scrollBar: null,
-    scrollbarSelector: null,
-    lastLine: null
+    playHead: undefined,
+    mouseCaret: undefined,
+    scrollBar: undefined,
+    scrollbarSelector: undefined,
+    lastLine: undefined
   };
 
   private grid = {
     verticalLines: 3,
     horizontalLines: 2
   };
-  private widthOnInit;
+  private widthOnInit: number | undefined;
   private drawnSegmentIDs: number[] = [];
 
-  private _transcriptionLevel: Level;
+  private _transcriptionLevel: Level | undefined;
 
   private _focused = false;
-
-  private static afterSettingsUpdated() {
-  }
 
   ngOnInit() {
     this.init();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.hasOwnProperty('audioChunk') && changes.audioChunk.currentValue !== null) {
+    if (changes['audioChunk'] && changes.audioChunk.currentValue !== null) {
       this.afterChunkUpdated();
     }
-    if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
+    if (changes['transcriptionLevel'] && changes.transcriptionLevel.currentValue !== null) {
       this.afterLevelUpdated();
     }
 
-    if (changes.hasOwnProperty('settings') && changes.settings.currentValue !== null) {
-      AudioViewerComponent.afterSettingsUpdated();
-    }
-
-    if (changes.hasOwnProperty('breakMarker') && changes.transcriptionLevel.currentValue !== null) {
+    if (changes['breakMarker'] && changes.transcriptionLevel.currentValue !== null) {
       this.av.breakMarker = this.breakMarker;
     }
 
-    if (!isUnset(this.stage)) {
+    if (this.stage !== undefined && this.height !== undefined) {
       this.stage.height(this.height);
     }
   }
 
-  ngAfterViewInit(): void {
-  }
-
   public getPixelPerSecond(secondsPerLine: number) {
-    if (!isUnset(secondsPerLine)) {
+    if (secondsPerLine !== undefined) {
       return (this.av.innerWidth / secondsPerLine);
     } else {
       console.error(`secondsPerLine is null or undefined!`);
@@ -257,15 +246,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   ngOnDestroy(): void {
     this.subscrManager.destroy();
-    this.stage.destroy();
+    this.stage?.destroy();
 
-    this.konvaContainer.nativeElement.removeEventListener('keydown', this.onKeyDown);
-    this.konvaContainer.nativeElement.removeEventListener('keyup', this.onKeyUp);
-    this.konvaContainer.nativeElement.removeEventListener('mouseleave', this.onMouseLeave);
-    this.konvaContainer.nativeElement.removeEventListener('mouseenter', this.onMouseEnter);
-    this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
-    this.konvaContainer.nativeElement.removeEventListener('mousedown', this.mouseChange);
-    this.konvaContainer.nativeElement.removeEventListener('mouseup', this.mouseChange);
+    this.konvaContainer?.nativeElement.removeEventListener('keydown', this.onKeyDown);
+    this.konvaContainer?.nativeElement.removeEventListener('keyup', this.onKeyUp);
+    this.konvaContainer?.nativeElement.removeEventListener('mouseleave', this.onMouseLeave);
+    this.konvaContainer?.nativeElement.removeEventListener('mouseenter', this.onMouseEnter);
+    this.konvaContainer?.nativeElement.removeEventListener('mousemove', this.onMouseMove);
+    this.konvaContainer?.nativeElement.removeEventListener('mousedown', this.mouseChange);
+    this.konvaContainer?.nativeElement.removeEventListener('mouseup', this.mouseChange);
   }
 
   afterChunkUpdated() {
@@ -280,7 +269,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         }), 'audioChunkStatusChange');
 
       new Promise<void>((resolve, reject) => {
-        if (isUnset(this.audioChunk.audioManager.channel)) {
+        if (this.audioChunk !== undefined && this.audioChunk.audioManager.channel === undefined) {
           this.subscrManager.add(
             this.audioChunk.audioManager.onChannelDataChange.subscribe(() => {
                 resolve();
@@ -295,16 +284,20 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           resolve();
         }
       }).then(() => {
-        const innerWidth = this.width - (this.settings.margin.left + this.settings.margin.right);
-        console.log(`INIT AUDIOV`);
-        this.av.initialize(innerWidth, this.audioChunk, this._transcriptionLevel);
-        this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+        if (this.width !== undefined && this.audioChunk !== undefined && this._transcriptionLevel !== undefined) {
+          const innerWidth = this.width - (this.settings.margin.left + this.settings.margin.right);
+          console.log(`INIT AUDIOV`);
+          this.av.initialize(innerWidth, this.audioChunk, this._transcriptionLevel);
+          this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
 
-        this.av.initializeSettings().then(() => {
-          this.initializeView();
-        }).catch((error) => {
-          console.error(error);
-        });
+          this.av.initializeSettings().then(() => {
+            this.initializeView();
+          }).catch((error) => {
+            console.error(error);
+          });
+        } else {
+          console.error(`width is undefined`);
+        }
       }).catch((error) => {
         console.error(error);
       });
@@ -312,7 +305,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   afterLevelUpdated() {
-    if (!isUnset(this._transcriptionLevel)) {
+    if (this._transcriptionLevel !== undefined) {
       this.refreshLevel();
     }
   }
@@ -329,35 +322,39 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   onResize() {
     return new Promise<void>((resolve, reject) => {
-      const playpos = this.audioChunk.absolutePlayposition.clone();
-      const drawnSelection = this.av.drawnSelection.clone();
-      this.stage.width(this.width);
-      this.stage.height(this.height);
-      this.av.initialize(this.width - (this.settings.margin.left + this.settings.margin.right), this.audioChunk, this._transcriptionLevel);
-      this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
-      this.av.initializeSettings().then(() => {
-        if (!this.audioChunk.isPlaying) {
-          this.audioChunk.absolutePlayposition = playpos.clone();
-        }
-        this.av.drawnSelection = drawnSelection;
-        this.updateLines();
-        this.createSegmentsForCanvas();
-        this.updatePlayCursor();
-        this.stage.batchDraw();
-        resolve();
-      }).catch(reject);
+      if (this.audioChunk !== undefined && this.stage !== undefined && this.width !== undefined && this.height !== undefined && this._transcriptionLevel !== undefined) {
+        const playpos = this.audioChunk?.absolutePlayposition.clone();
+        const drawnSelection = this.av.drawnSelection?.clone();
+        this.stage.width(this.width);
+        this.stage.height(this.height);
+        this.av.initialize(this.width - (this.settings.margin.left + this.settings.margin.right), this.audioChunk, this._transcriptionLevel);
+        this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+        this.av.initializeSettings().then(() => {
+          if (this.audioChunk !== undefined) {
+            if (!this.audioChunk.isPlaying) {
+              this.audioChunk.absolutePlayposition = playpos.clone();
+            }
+            this.av.drawnSelection = drawnSelection;
+            this.updateLines();
+            this.createSegmentsForCanvas();
+            this.updatePlayCursor();
+          }
+          if (this.stage !== undefined) {
+            this.stage.batchDraw();
+          }
+          resolve();
+        }).catch(reject);
+      }
     });
   }
 
   public initializeView() {
-    if (!isUnset(this._transcriptionLevel)) {
+    if (this._transcriptionLevel !== undefined && this.stage !== undefined && this.height !== undefined && this.layers !== undefined) {
       this.stage.height(this.height);
 
       this.onInitialized.next();
-      for (const attr in this.layers) {
-        if (this.layers.hasOwnProperty(attr)) {
-          this.layers['' + attr].removeChildren();
-        }
+      for (const [, value] of Object.entries(this.layers)) {
+        value.removeChildren();
       }
 
       if (this.settings.cropping === 'circle') {
@@ -374,7 +371,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         const line = this.createLine(
           new Size(this.av.innerWidth, this.settings.lineheight),
           new Position(this.settings.margin.left, 0), 0);
-        this.layers.background.add(line);
+        this.layers?.background.add(line);
         this.canvasElements.lastLine = line;
       };
 
@@ -418,7 +415,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.canvasElements.mouseCaret = this.createLineMouseCaret();
       this.layers.playhead.add(this.canvasElements.mouseCaret);
 
-      if (this.settings.cropping === 'circle') {
+      if (this.settings.cropping === 'circle' && this.croppingData !== undefined) {
         const cropGroup = this.createCropContainer();
         this.layers.playhead.removeChildren();
         this.canvasElements.mouseCaret.position({
@@ -433,7 +430,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
       if (this.settings.scrollbar.enabled) {
         this.canvasElements.scrollBar = this.createScrollBar();
-        this.layers.scrollBars.add(this.canvasElements.scrollBar);
+        if (this.canvasElements?.scrollBar !== undefined) {
+          this.layers.scrollBars.add(this.canvasElements.scrollBar);
+        }
       }
 
       this.stage.batchDraw();
@@ -443,42 +442,44 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public updateLines = () => {
-    const lines = this.layers.background.find('.line');
+    const lines = this.layers?.background.find('.line');
 
-    // check all lines but the last one
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const geometrics = line.getChildren();
-      line.width(this.av.innerWidth);
-      // tslint:disable-next-line:prefer-for-of
-      for (let j = 0; j < geometrics.length; j++) {
-        const elem = geometrics[j];
-        if ((lines.length > 1 && i < lines.length - 1) || lines.length === 1) {
-          if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
-            elem.width(this.av.innerWidth);
-          }
-        } else {
-          const width = this.av.AudioPxWidth % this.av.innerWidth;
-          line.width(width);
-          // last line
-          if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
-            elem.width(width);
+    if (lines !== undefined) {
+      // check all lines but the last one
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const geometrics = line.getChildren();
+        line.width(this.av.innerWidth);
+        // tslint:disable-next-line:prefer-for-of
+        for (let j = 0; j < geometrics.length; j++) {
+          const elem = geometrics[j];
+          if ((lines.length > 1 && i < lines.length - 1) || lines.length === 1) {
+            if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
+              elem.width(this.av.innerWidth);
+            }
+          } else {
+            const width = this.av.AudioPxWidth % this.av.innerWidth;
+            line.width(width);
+            // last line
+            if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
+              elem.width(width);
+            }
           }
         }
       }
     }
 
-    const scrollbars = this.layers.scrollBars.find('#scrollBar');
-    if (scrollbars.length > 0) {
+    const scrollbars = this.layers?.scrollBars.find('#scrollBar');
+    if (scrollbars !== undefined && scrollbars.length > 0) {
       scrollbars[0].x(this.av.innerWidth + this.settings.margin.left);
     }
 
     this.drawWholeSelection();
   }
 
-  onWheel = (event) => {
-    if (!isUnset(this.audioChunk) && this.audioChunk.status !== PlayBackStatus.PREPARE
-      && this.canvasElements.scrollBar !== null) {
+  onWheel = (event: Konva.KonvaEventObject<any>) => {
+    if (this.audioChunk !== undefined && this.audioChunk.status !== PlayBackStatus.PREPARE && this.canvasElements !== undefined
+      && this.canvasElements.scrollBar !== undefined && this.canvasElements.scrollbarSelector !== undefined && this.height !== undefined) {
       event.evt.preventDefault();
       let newY = Math.max(0,
         Math.min(this.canvasElements.scrollBar.height(), this.canvasElements.scrollbarSelector.y() + (event.evt.deltaY / 2)));
@@ -491,8 +492,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public scrollToAbsY(absY: number) {
-    const deltaY = absY / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height());
-    this.scrollWithDeltaY(-deltaY);
+    if (this.canvasElements !== undefined && this.canvasElements.lastLine !== undefined) {
+      const deltaY = absY / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height());
+      this.scrollWithDeltaY(-deltaY);
+    }
   }
 
   public getLineNumber(x: number, y: number) {
@@ -514,7 +517,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                        },
                        errorcallback: () => void = () => {
                        }): boolean {
-    if (segIndex > -1) {
+    if (segIndex > -1 && this._transcriptionLevel !== undefined && this.audioChunk !== undefined && this.audioManager !== undefined) {
       const segment = this._transcriptionLevel.segments.get(segIndex);
       const startTime = this._transcriptionLevel.segments.getStartTime(segIndex);
       // make shure, that segments boundaries are visible
@@ -571,12 +574,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
   playSelection = (afterAudioEnded: () => void) => {
-    this.audioChunk.startPlayback().then(() => {
-      if (this.av.drawnSelection !== null && this.av.drawnSelection.duration.samples > 0) {
-        this.audioChunk.selection = this.av.drawnSelection.clone();
-        this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
+    this.audioChunk?.startPlayback().then(() => {
+      if (this.audioChunk !== undefined) {
+        if (this.av.drawnSelection !== undefined && this.av.drawnSelection.duration.samples > 0) {
+          this.audioChunk.selection = this.av.drawnSelection.clone();
+          this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
+        }
+        afterAudioEnded();
       }
-      afterAudioEnded();
     }).catch((error) => {
       console.error(error);
     });
@@ -591,113 +596,115 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public init() {
-    this.widthOnInit = this.width;
-    this.styles.height = this.height;
-    this.drawnSegmentIDs = [];
-    this.subscrManager.removeByTag('resize');
+    if (this.width !== undefined && this.height !== undefined && this.konvaContainer !== undefined && this.layers !== undefined) {
+      this.widthOnInit = this.width;
+      this.styles.height = this.height;
+      this.drawnSegmentIDs = [];
+      this.subscrManager.removeByTag('resize');
 
-    if (!this.settings.multiLine) {
-      this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
-    }
-
-    this.stage = new Konva.Stage({
-      container: this.konvaContainer.nativeElement,   // id of container <div>,
-      width: this.width,
-      height: this.height
-    });
-
-    this.layers = {
-      background: new Konva.Layer({
-        id: 'backgroundLayer',
-        listening: false
-      }),
-      overlay: new Konva.Layer({
-        id: 'overlayLayer',
-        listening: false
-      }),
-      boundaries: new Konva.Layer({
-        id: 'boundariesLayer'
-      }),
-      playhead: new Konva.Layer({
-        id: 'playheadLayer',
-        listening: false
-      }),
-      scrollBars: new Konva.Layer({
-        id: 'scrollBars'
-      })
-    };
-
-    this.stage.on('wheel', this.onWheel);
-
-    this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
-    this.konvaContainer.nativeElement.addEventListener('mousemove', this.onMouseMove);
-
-    this.konvaContainer.nativeElement.removeEventListener('mousedown', this.mouseChange);
-    this.konvaContainer.nativeElement.addEventListener('mousedown', this.mouseChange);
-    this.konvaContainer.nativeElement.removeEventListener('mouseup', this.mouseChange);
-    this.konvaContainer.nativeElement.addEventListener('mouseup', this.mouseChange);
-
-    for (const attr in this.layers) {
-      if (this.layers.hasOwnProperty(attr)) {
-        this.stage.add(this.layers['' + attr]);
+      if (!this.settings.multiLine) {
+        this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
       }
-    }
-    const container = this.stage.container();
-    container.tabIndex = 1;
 
-    // focus it
-    // also stage will be in focus on its click
-    container.focus();
-    container.removeEventListener('keydown', this.onKeyDown);
-    container.addEventListener('keydown', this.onKeyDown);
-    container.removeEventListener('keyup', this.onKeyUp);
-    container.addEventListener('keyup', this.onKeyUp);
-    container.removeEventListener('mouseleave', this.onMouseLeave);
-    container.addEventListener('mouseleave', this.onMouseLeave);
-    container.removeEventListener('mouseenter', this.onMouseEnter);
-    container.addEventListener('mouseenter', this.onMouseEnter);
+      this.stage = new Konva.Stage({
+        container: this.konvaContainer.nativeElement,   // id of container <div>,
+        width: this.width,
+        height: this.height
+      });
 
-    let resizing = false;
-    window.onresize = () => {
-      if (!resizing) {
-        resizing = true;
-        this.onResize().then(() => {
-          resizing = false;
-        }).catch((error) => {
-          console.error(error);
-        });
+      this.layers = {
+        background: new Konva.Layer({
+          id: 'backgroundLayer',
+          listening: false
+        }),
+        overlay: new Konva.Layer({
+          id: 'overlayLayer',
+          listening: false
+        }),
+        boundaries: new Konva.Layer({
+          id: 'boundariesLayer'
+        }),
+        playhead: new Konva.Layer({
+          id: 'playheadLayer',
+          listening: false
+        }),
+        scrollBars: new Konva.Layer({
+          id: 'scrollBars'
+        })
+      };
+
+      this.stage.on('wheel', this.onWheel);
+
+      this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
+      this.konvaContainer.nativeElement.addEventListener('mousemove', this.onMouseMove);
+
+      this.konvaContainer.nativeElement.removeEventListener('mousedown', this.mouseChange);
+      this.konvaContainer.nativeElement.addEventListener('mousedown', this.mouseChange);
+      this.konvaContainer.nativeElement.removeEventListener('mouseup', this.mouseChange);
+      this.konvaContainer.nativeElement.addEventListener('mouseup', this.mouseChange);
+
+      for (const [, layer] of Object.entries(this.layers)) {
+        this.stage.add(layer);
       }
-    }
+      const container = this.stage.container();
+      container.tabIndex = 1;
 
-    this.shortcutsManager.clearShortcuts();
-    this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
+      // focus it
+      // also stage will be in focus on its click
+      container.focus();
+      container.removeEventListener('keydown', this.onKeyDown);
+      container.addEventListener('keydown', this.onKeyDown);
+      container.removeEventListener('keyup', this.onKeyUp);
+      container.addEventListener('keyup', this.onKeyUp);
+      container.removeEventListener('mouseleave', this.onMouseLeave);
+      container.addEventListener('mouseleave', this.onMouseLeave);
+      container.removeEventListener('mouseenter', this.onMouseEnter);
+      container.addEventListener('mouseenter', this.onMouseEnter);
+
+      let resizing = false;
+      window.onresize = () => {
+        if (!resizing) {
+          resizing = true;
+          this.onResize().then(() => {
+            resizing = false;
+          }).catch((error) => {
+            console.error(error);
+          });
+        }
+      }
+
+      this.shortcutsManager.clearShortcuts();
+      this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
+    }
   }
 
   public redraw() {
-    this.stage.batchDraw();
+    this.stage?.batchDraw();
   }
 
   public redrawOverlay() {
-    this.layers.overlay.batchDraw();
+    this.layers?.overlay.batchDraw();
   }
 
   private createCropContainer(id?: string): Group {
     return new Konva.Group({
       id,
       clipFunc: (ctx) => {
-        ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
+        if (this.croppingData !== undefined) {
+          ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
+        }
       }
     });
   }
 
   private onPlaybackStarted() {
-    if (!isUnset(this.animation.playHead)) {
+    if (this.animation.playHead !== undefined) {
       this.animation.playHead.start();
     }
   }
 
   private onPlaybackPaused() {
-    if (!isUnset(this.animation.playHead)) {
+    if (this.animation.playHead !== undefined) {
       this.animation.playHead.stop();
     }
   }
@@ -726,15 +733,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onPlaybackStopped() {
-    this.animation.playHead.stop();
+    this.animation.playHead?.stop();
     this.updatePlayCursor();
-    this.layers.playhead.draw();
+    this.layers?.playhead.draw();
   }
 
   private onPlaybackEnded() {
-    this.animation.playHead.stop();
+    this.animation.playHead?.stop();
     this.updatePlayCursor();
-    this.layers.playhead.draw();
+    this.layers?.playhead.draw();
   }
 
   private createLineBackground(line: Konva.Group, size: Size) {
@@ -778,8 +785,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       width: size.width,
       height: size.height,
       sceneFunc: (context, shape) => {
-        if (line.y() + line.height() >= Math.abs(this.layers.background.y())
-          && line.y() <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+        if (this.layers !== undefined && this.stage !== undefined && this.audioManager !== undefined &&
+          line.y() + line.height() >= Math.abs(this.layers.background.y()) &&
+          line.y() <= Math.abs(this.layers.background.y()) + this.stage.height()) {
           const position = {
             x: 0,
             y: 0
@@ -845,19 +853,24 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     group.add(frame);
     group.add(caret);
 
-    this.animation.playHead = new Konva.Animation(this.doPlayHeadAnimation, this.layers.playhead);
+    if (this.layers !== undefined) {
+      this.animation.playHead = new Konva.Animation(this.doPlayHeadAnimation, this.layers.playhead);
+    }
 
     return group;
   }
 
   private scrollWithDeltaY(deltaY: number) {
-    const newY = (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height()) * deltaY;
-    this.layers.background.y(newY);
-    this.layers.playhead.y(newY);
-    this.layers.overlay.y(newY);
-    this.layers.boundaries.y(newY);
+    if (this.layers !== undefined && this.stage !== undefined && this.canvasElements !== undefined
+      && this.canvasElements.lastLine !== undefined) {
+      const newY = (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height()) * deltaY;
+      this.layers.background.y(newY);
+      this.layers.playhead.y(newY);
+      this.layers.overlay.y(newY);
+      this.layers.boundaries.y(newY);
 
-    this.stage.batchDraw();
+      this.stage.batchDraw();
+    }
   }
 
   private createLine(size: Size, position: Position, lineNum: number): Konva.Group {
@@ -883,7 +896,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.createLineSelection(selectedGroup, size);
     this.createLineBorder(selectedGroup, size);
 
-    if (this.settings.cropping === 'circle') {
+    if (this.settings.cropping === 'circle' && this.croppingData !== undefined) {
       const shadowCircle = new Konva.Circle({
         stroke: 'black',
         strokeWidth: 1,
@@ -918,7 +931,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       width: size.width,
       height: size.height,
       sceneFunc: (context, shape) => {
-        if (line.y() + line.height() >= Math.abs(this.layers.background.y())
+        if (this.layers !== undefined && this.stage !== undefined && line.y() + line.height() >= Math.abs(this.layers.background.y())
           && line.y() <= Math.abs(this.layers.background.y()) + this.stage.height()) {
           const timeLineHeight = (this.settings.timeline.enabled) ? this.settings.timeline.height : 0;
           const midline = Math.round((this.settings.lineheight - timeLineHeight) / 2);
@@ -970,7 +983,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private updatePlayCursor = () => {
-    if (this.settings.selection.enabled) {
+    if (this.settings.selection.enabled && this.audioChunk !== undefined && this.canvasElements?.playHead !== undefined) {
       // TODO check this!
       let currentAbsX = this.av.audioTCalculator.samplestoAbsX(this.audioChunk.relativePlayposition);
       const endAbsX = this.av.audioTCalculator.samplestoAbsX(
@@ -985,7 +998,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private changePlayCursorAbsX = (newValue: number) => {
-    this.av.PlayCursor.changeAbsX(newValue, this.av.audioTCalculator, this.av.AudioPxWidth, this.audioChunk);
+    if (this.audioChunk !== undefined) {
+      this.av.PlayCursor.changeAbsX(newValue, this.av.audioTCalculator, this.av.AudioPxWidth, this.audioChunk);
+    }
   }
 
   private createSegmentsForCanvas() {
@@ -998,13 +1013,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       numOfLines = 1;
     }
 
-    if (this._transcriptionLevel.segments.length > 0 && !isUnset(this.audioChunk)) {
+    if (this.audioManager !== undefined && this._transcriptionLevel !== undefined && this.layers !== undefined && this.layers.overlay !== undefined &&
+      this._transcriptionLevel.segments.length > 0 && this.audioChunk !== undefined) {
       let root: Konva.Group | Konva.Layer = this.layers.overlay;
 
       if (this.settings.cropping === 'circle') {
         const cropGroup = new Konva.Group({
           clipFunc: (ctx) => {
-            ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
+            if (this.croppingData !== undefined) {
+              ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
+            }
           }
         });
 
@@ -1047,7 +1065,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             (beginTime.samples < audioChunkStart.samples && segmentEnd.samples > audioChunkEnd.samples)
           )
         ) {
-          let lastI = 0;
+          let lastI: number | undefined = 0;
           this.removeSegmentFromCanvas(segment.id);
           const segmentHeight = (lineNum2 - lineNum1 + 1) * (this.settings.lineheight + this.settings.margin.top);
 
@@ -1099,9 +1117,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               y: 0,
               transformsEnabled: 'position',
               sceneFunc: (context) => {
-                const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
-                lastI = this.drawTextLabel(context, sceneSegment.transcript, lineNum1, lineNum2, segmentEnd,
-                  beginTime, lastI, segmentHeight, numOfLines, absX, segments, i);
+                if (this._transcriptionLevel !== undefined) {
+                  const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
+                  if (sceneSegment !== undefined) {
+                    lastI = this.drawTextLabel(context, sceneSegment.transcript, lineNum1, lineNum2, segmentEnd,
+                      beginTime, lastI, segmentHeight, numOfLines, absX, segments, i);
+                  }
+                }
               }
             });
             overlayGroup.add(segmentText);
@@ -1135,7 +1157,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       // draw time labels
       if (this.settings.showTimePerLine) {
         const foundText = this.layers.overlay.findOne('#timeStamps');
-        if (!isUnset(foundText)) {
+        if (foundText !== undefined) {
           foundText.remove();
         }
         const timeStampLabels = new Konva.Shape({
@@ -1160,7 +1182,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         if (this.settings.cropping === 'circle') {
           boundaryRoot = this.layers.boundaries.findOne(`#boundary-root`) as any;
 
-          if (isUnset(boundaryRoot)) {
+          if (boundaryRoot === undefined) {
             boundaryRoot = this.createCropContainer('boundary-root');
             this.layers.boundaries.add(boundaryRoot);
           }
@@ -1170,7 +1192,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           const h = this.settings.lineheight;
 
           const foundBoundary = this.layers.boundaries.findOne(`#boundary_${boundary.id}`);
-          if (!isUnset(foundBoundary)) {
+          if (foundBoundary !== undefined) {
             foundBoundary.remove();
           }
 
@@ -1188,10 +1210,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             }
           });
           boundaryObj.on('mouseenter', () => {
-            this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'move');
+            if (this.konvaContainer !== undefined) {
+              this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'move');
+            }
           });
           boundaryObj.on('mouseleave', () => {
-            this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
+            if (this.konvaContainer !== undefined) {
+              this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
+            }
           });
 
           boundaryRoot.add(boundaryObj);
@@ -1203,44 +1229,46 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private timeLabelSceneFunction = (y: number, numOfLines: number, context: any) => {
-    for (let j = 0; j < numOfLines; j++) {
-      // draw time label
-      y = j * (this.settings.lineheight + this.settings.margin.top);
+    if (this.canvasElements?.lastLine !== undefined && this.layers !== undefined && this.stage !== undefined && this.audioChunk !== undefined) {
+      for (let j = 0; j < numOfLines; j++) {
+        // draw time label
+        y = j * (this.settings.lineheight + this.settings.margin.top);
 
-      if (y + this.settings.lineheight >= Math.abs(this.layers.background.y())
-        && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
-        let startTime = this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
-        let endTime = 0;
+        if (y + this.settings.lineheight >= Math.abs(this.layers.background.y())
+          && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+          let startTime = this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
+          let endTime = 0;
 
-        if (numOfLines > 1) {
-          endTime = Math.min(startTime + this.secondsPerLine * 1000, this.audioChunk.time.duration.unix);
-          endTime = Math.ceil(endTime / 1000) * 1000;
-          startTime = Math.floor(startTime / 1000) * 1000;
-        } else {
-          endTime = this.audioChunk.time.start.unix + this.audioChunk.time.duration.unix;
+          if (numOfLines > 1) {
+            endTime = Math.min(startTime + this.secondsPerLine * 1000, this.audioChunk.time.duration.unix);
+            endTime = Math.ceil(endTime / 1000) * 1000;
+            startTime = Math.floor(startTime / 1000) * 1000;
+          } else {
+            endTime = this.audioChunk.time.start.unix + this.audioChunk.time.duration.unix;
+          }
+
+          const pipe = new TimespanPipe();
+          const maxDuration = this.audioChunk.time.duration.unix;
+          const startTimeString = pipe.transform(startTime,
+            {
+              showHour: true,
+              showMilliSeconds: !this.settings.multiLine,
+              maxDuration
+            }
+          );
+          const endTimeString = pipe.transform(endTime,
+            {
+              showHour: true,
+              showMilliSeconds: !this.settings.multiLine,
+              maxDuration
+            }
+          );
+          const length = this.layers.overlay.getContext().measureText(startTimeString).width;
+          context.fillStyle = 'dimgray';
+          context.fillText(startTimeString, 3, y + 8);
+          context.fillText(endTimeString, ((j < numOfLines - 1)
+            ? this.av.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
         }
-
-        const pipe = new TimespanPipe();
-        const maxDuration = this.audioChunk.time.duration.unix;
-        const startTimeString = pipe.transform(startTime,
-          {
-            showHour: true,
-            showMilliSeconds: !this.settings.multiLine,
-            maxDuration
-          }
-        );
-        const endTimeString = pipe.transform(endTime,
-          {
-            showHour: true,
-            showMilliSeconds: !this.settings.multiLine,
-            maxDuration
-          }
-        );
-        const length = this.layers.overlay.getContext().measureText(startTimeString).width;
-        context.fillStyle = 'dimgray';
-        context.fillText(startTimeString, 3, y + 8);
-        context.fillText(endTimeString, ((j < numOfLines - 1)
-          ? this.av.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
       }
     }
   }
@@ -1249,208 +1277,215 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     from: number,
     to: number
   }, segments: Segment[], i: number, absX: number, beginTime: SampleUnit, segmentHeight: number, numOfLines: number, context: any, shape: Shape) => {
-    const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
-    for (let j = lineInterval.from; j <= lineInterval.to; j++) {
-      const localY = j * (this.settings.lineheight + this.settings.margin.top);
+    if (this.layers !== undefined && this.stage !== undefined && this.canvasElements?.lastLine !== undefined) {
+      const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
+      for (let j = lineInterval.from; j <= lineInterval.to; j++) {
+        const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
-      if (absY + segmentHeight >= Math.abs(this.layers.background.y())
-        && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+        if (absY + segmentHeight >= Math.abs(this.layers.background.y())
+          && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
 
-        const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-        let relX = 0;
+          const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
+          let relX = 0;
 
-        relX = absX % this.av.innerWidth + this.settings.margin.left;
-        const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
-        let w = 0;
-        let x = select.start;
+          relX = absX % this.av.innerWidth + this.settings.margin.left;
+          const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
+          let w = 0;
+          let x = select.start;
 
-        if (select.start > -1 && select.end > -1) {
-          w = Math.abs(select.end - select.start);
+          if (select.start > -1 && select.end > -1) {
+            w = Math.abs(select.end - select.start);
+          }
+
+          if (select.start < 1 || select.start > lineWidth) {
+            x = 1;
+          }
+          if (select.end < 1) {
+            w = 0;
+          }
+          if (select.end < 1 || select.end > lineWidth) {
+            w = select.end;
+          }
+
+          if (j === numOfLines - 1 && i === segments.length - 1) {
+            w = lineWidth - select.start + 1;
+          }
+
+          context.fillStyle = 'white';
+          context.fillRect(x, localY + this.settings.lineheight - 20, w, 20);
         }
-
-        if (select.start < 1 || select.start > lineWidth) {
-          x = 1;
-        }
-        if (select.end < 1) {
-          w = 0;
-        }
-        if (select.end < 1 || select.end > lineWidth) {
-          w = select.end;
-        }
-
-        if (j === numOfLines - 1 && i === segments.length - 1) {
-          w = lineWidth - select.start + 1;
-        }
-
-        context.fillStyle = 'white';
-        context.fillRect(x, localY + this.settings.lineheight - 20, w, 20);
       }
+      context.fillStrokeShape(shape);
     }
-    context.fillStrokeShape(shape);
   }
   private overlaySceneFunction = (lineInterval: {
     from: number,
     to: number
   }, segments: Segment[], i: number, absX: number, beginTime: SampleUnit, segmentHeight: number, numOfLines: number, context: any, shape: Shape) => {
-    const segment = segments[i];
-    const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
-    const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
-    if (isUnset(sceneSegment)) {
-      console.error(`scenceSegment is null!`);
-    }
+    if (this._transcriptionLevel !== undefined && this.layers !== undefined && this.stage !== undefined && this.audioChunk
+      && this.canvasElements?.lastLine) {
+      const segment = segments[i];
+      const absY = lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
+      const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
+      if (sceneSegment === undefined) {
+        console.error(`scenceSegment is null!`);
+      } else {
 
-    for (let j = lineInterval.from; j <= lineInterval.to; j++) {
-      const localY = j * (this.settings.lineheight + this.settings.margin.top);
+        for (let j = lineInterval.from; j <= lineInterval.to; j++) {
+          const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
-      if (absY + segmentHeight >= Math.abs(this.layers.background.y())
-        && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
+          if (absY + segmentHeight >= Math.abs(this.layers.background.y())
+            && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
 
-        const startSecond = j * this.secondsPerLine;
-        let endSecond = 0;
+            const startSecond = j * this.secondsPerLine;
+            let endSecond = 0;
 
-        if (numOfLines > 1) {
-          endSecond = Math.ceil(Math.min(startSecond + this.secondsPerLine, this.audioChunk.time.duration.seconds));
-        } else {
-          endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
-        }
-
-        const pipe = new TimespanPipe();
-        const maxDuration = this.audioChunk.time.duration.unix;
-
-        const timeString = pipe.transform(endSecond * 1000, {
-          showHour: true,
-          showMilliSeconds: !this.settings.multiLine,
-          maxDuration
-        });
-        const timestampWidth = this.layers.overlay.getContext().measureText(timeString).width;
-
-        const h = this.settings.lineheight;
-        const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-        let relX = 0;
-
-        relX = absX % this.av.innerWidth + this.settings.margin.left;
-        const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
-        let w = 0;
-        let x = select.start;
-
-        if (select.start > -1 && select.end > -1) {
-          w = Math.abs(select.end - select.start);
-        }
-
-        if (select.start < 1 || select.start > lineWidth) {
-          x = 0;
-        }
-        if (select.end < 1) {
-          w = 0;
-        }
-        if (select.end < 1 || select.end > lineWidth) {
-          w = select.end;
-        }
-
-        if (j === numOfLines - 1 && i === segments.length - 1) {
-          w = lineWidth - select.start;
-        }
-
-        if (isUnset(sceneSegment.isBlockedBy)) {
-          if (sceneSegment.transcript === '') {
-            context.fillStyle = 'rgba(255,0,0,0.2)';
-          } else if (!isUnset(this.breakMarker) && segment.transcript === this.breakMarker.code) {
-            context.fillStyle = 'rgba(0,0,255,0.2)';
-          } else if (sceneSegment.transcript !== '') {
-            context.fillStyle = 'rgba(0,128,0,0.2)';
-          }
-          context.fillRect(x, localY, w, h);
-        } else {
-          let progressBarFillColor = '';
-          let progressBarForeColor = '';
-          if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
-            // blocked by ASR
-            context.fillStyle = 'rgba(255,191,0,0.5)';
-            progressBarFillColor = 'rgba(221,167,14,0.8)';
-            progressBarForeColor = 'black';
-          } else if (sceneSegment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
-            context.fillStyle = 'rgba(179,10,179,0.5)';
-            progressBarFillColor = 'rgba(179,10,179,0.8)';
-            progressBarForeColor = 'white';
-          } else if (sceneSegment.isBlockedBy === ASRQueueItemType.MAUS) {
-            context.fillStyle = 'rgba(26,229,160,0.5)';
-            progressBarFillColor = 'rgba(17,176,122,0.8)';
-            progressBarForeColor = 'white';
-          }
-          context.fillRect(x, localY, w, h);
-
-          if (this.settings.showProgressBars) {
-            let timeStampsWidth = 0;
-
-            if (w === lineWidth) {
-              // time labels on both sides
-              timeStampsWidth = timestampWidth * 2;
+            if (numOfLines > 1) {
+              endSecond = Math.ceil(Math.min(startSecond + this.secondsPerLine, this.audioChunk.time.duration.seconds));
             } else {
-              if (x === 0 || select.start + w === lineWidth) {
-                // time label on the left or on the right
-                timeStampsWidth = timestampWidth;
-              }
+              endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
             }
 
-            const progressWidth = w - timeStampsWidth - 20;
+            const pipe = new TimespanPipe();
+            const maxDuration = this.audioChunk.time.duration.unix;
 
-            if (progressWidth > 10 && !isUnset(sceneSegment.progressInfo)) {
-              const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
-              const textPosition = Math.round(progressStart + progressWidth / 2);
-              const loadedPixels = Math.round(progressWidth * sceneSegment.progressInfo.progress);
+            const timeString = pipe.transform(endSecond * 1000, {
+              showHour: true,
+              showMilliSeconds: !this.settings.multiLine,
+              maxDuration
+            });
+            const timestampWidth = this.layers.overlay.getContext().measureText(timeString).width;
 
-              this.drawRoundedRect(context, progressStart, localY + 3, 15, progressWidth, 5, 'transparent', progressBarFillColor);
-              this.drawRoundedRect(context, progressStart, localY + 3, 15, loadedPixels, 5, progressBarFillColor);
+            const h = this.settings.lineheight;
+            const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
+            let relX = 0;
 
-              if (progressWidth > 100) {
-                const progressString = `${sceneSegment.progressInfo.statusLabel} ${sceneSegment.progressInfo.progress * 100}%`;
-                context.fillStyle = (progressStart + loadedPixels > textPosition && progressBarForeColor === 'white') ? 'white' : 'black';
-                context.fillText(progressString, textPosition, localY + 14);
+            relX = absX % this.av.innerWidth + this.settings.margin.left;
+            const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segments[i].time, this.av.innerWidth);
+            let w = 0;
+            let x = select.start;
+
+            if (select.start > -1 && select.end > -1) {
+              w = Math.abs(select.end - select.start);
+            }
+
+            if (select.start < 1 || select.start > lineWidth) {
+              x = 0;
+            }
+            if (select.end < 1) {
+              w = 0;
+            }
+            if (select.end < 1 || select.end > lineWidth) {
+              w = select.end;
+            }
+
+            if (j === numOfLines - 1 && i === segments.length - 1) {
+              w = lineWidth - select.start;
+            }
+
+            if (sceneSegment.isBlockedBy === undefined) {
+              if (sceneSegment.transcript === '') {
+                context.fillStyle = 'rgba(255,0,0,0.2)';
+              } else if (this.breakMarker !== undefined && segment.transcript === this.breakMarker.code) {
+                context.fillStyle = 'rgba(0,0,255,0.2)';
+              } else if (sceneSegment.transcript !== '') {
+                context.fillStyle = 'rgba(0,128,0,0.2)';
+              }
+              context.fillRect(x, localY, w, h);
+            } else {
+              let progressBarFillColor = '';
+              let progressBarForeColor = '';
+              if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
+                // blocked by ASR
+                context.fillStyle = 'rgba(255,191,0,0.5)';
+                progressBarFillColor = 'rgba(221,167,14,0.8)';
+                progressBarForeColor = 'black';
+              } else if (sceneSegment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
+                context.fillStyle = 'rgba(179,10,179,0.5)';
+                progressBarFillColor = 'rgba(179,10,179,0.8)';
+                progressBarForeColor = 'white';
+              } else if (sceneSegment.isBlockedBy === ASRQueueItemType.MAUS) {
+                context.fillStyle = 'rgba(26,229,160,0.5)';
+                progressBarFillColor = 'rgba(17,176,122,0.8)';
+                progressBarForeColor = 'white';
+              }
+              context.fillRect(x, localY, w, h);
+
+              if (this.settings.showProgressBars) {
+                let timeStampsWidth = 0;
+
+                if (w === lineWidth) {
+                  // time labels on both sides
+                  timeStampsWidth = timestampWidth * 2;
+                } else {
+                  if (x === 0 || select.start + w === lineWidth) {
+                    // time label on the left or on the right
+                    timeStampsWidth = timestampWidth;
+                  }
+                }
+
+                const progressWidth = w - timeStampsWidth - 20;
+
+                if (progressWidth > 10 && sceneSegment.progressInfo !== undefined) {
+                  const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
+                  const textPosition = Math.round(progressStart + progressWidth / 2);
+                  const loadedPixels = Math.round(progressWidth * sceneSegment.progressInfo.progress);
+
+                  this.drawRoundedRect(context, progressStart, localY + 3, 15, progressWidth, 5, 'transparent', progressBarFillColor);
+                  this.drawRoundedRect(context, progressStart, localY + 3, 15, loadedPixels, 5, progressBarFillColor);
+
+                  if (progressWidth > 100) {
+                    const progressString = `${sceneSegment.progressInfo.statusLabel} ${sceneSegment.progressInfo.progress * 100}%`;
+                    context.fillStyle = (progressStart + loadedPixels > textPosition && progressBarForeColor === 'white') ? 'white' : 'black';
+                    context.fillText(progressString, textPosition, localY + 14);
+                  }
+                }
               }
             }
           }
         }
+        context.fillStrokeShape(shape);
       }
     }
-    context.fillStrokeShape(shape);
   }
 
   private removeNonExistingSegments() {
-    const existingSegments: number[] = [];
-    for (const existingSegment of this._transcriptionLevel.segments.segments) {
-      existingSegments.push(existingSegment.id);
-    }
+    if (this._transcriptionLevel !== undefined) {
+      const existingSegments: number[] = [];
+      for (const existingSegment of this._transcriptionLevel.segments.segments) {
+        existingSegments.push(existingSegment.id);
+      }
 
-    const segmentsToRemove: number[] = this.drawnSegmentIDs
-      .filter((a) => {
-        return existingSegments.findIndex((b) => {
-          return b === a;
-        }) < 0;
-      });
+      const segmentsToRemove: number[] = this.drawnSegmentIDs
+        .filter((a) => {
+          return existingSegments.findIndex((b) => {
+            return b === a;
+          }) < 0;
+        });
 
-    for (const idToRemove of segmentsToRemove) {
-      this.removeSegmentFromCanvas(idToRemove);
+      for (const idToRemove of segmentsToRemove) {
+        this.removeSegmentFromCanvas(idToRemove);
+      }
     }
   }
 
-  private mouseChange = (event) => {
+  private mouseChange = (event: any) => {
     const absXPos = this.hoveredLine * this.av.innerWidth + event.layerX;
 
-    if (!isUnset(absXPos) && absXPos > 0 && this.settings.selection.enabled) {
+    if (absXPos !== undefined && absXPos > 0 && this.settings.selection.enabled && this.audioChunk !== undefined
+      && this.layers !== undefined) {
       if (event.type === 'mousedown') {
         this.audioChunk.selection.start = this.audioChunk.absolutePlayposition.clone();
         this.audioChunk.selection.end = this.audioChunk.absolutePlayposition.clone();
         this.av.drawnSelection = this.audioChunk.selection.clone();
       }
 
-      if (!isUnset(absXPos)) {
-        this.av.setMouseClickPosition(absXPos, this.hoveredLine, event).then(() => {
+      this.av.setMouseClickPosition(absXPos, this.hoveredLine, event).then(() => {
+        if (this.layers !== undefined) {
           this.updatePlayCursor();
           this.layers.playhead.draw();
-        });
-      } else {
-        console.error(`absX is unset!`);
-      }
+        }
+      });
 
       if (event.type !== 'mousedown') {
         this.selchange.emit(this.audioChunk.selection);
@@ -1478,7 +1513,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       context.closePath();
       context.fill();
     }
-    if (!isUnset(strokeColor)) {
+    if (strokeColor !== undefined) {
       context.strokeWidth = 1;
       context.strokeStyle = strokeColor;
       context.stroke();
@@ -1486,64 +1521,78 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private createScrollBar = () => {
-    const group = new Konva.Group({
-      id: 'scrollBar',
-      x: this.av.innerWidth + this.settings.margin.left,
-      y: 0,
-      width: this.settings.scrollbar.width,
-      height: this.height
-    });
+    if (this.canvasElements?.lastLine !== undefined) {
 
-    const background = new Konva.Rect({
-      stroke: this.settings.scrollbar.background.stroke,
-      strokeWidth: this.settings.scrollbar.background.strokeWidth,
-      fill: this.settings.scrollbar.background.color,
-      width: this.settings.scrollbar.width,
-      height: this.height
-    });
-    group.add(background);
+      const group = new Konva.Group({
+        id: 'scrollBar',
+        x: this.av.innerWidth + this.settings.margin.left,
+        y: 0,
+        width: this.settings.scrollbar.width,
+        height: this.height
+      });
 
-    const rest = this.settings.scrollbar.width - this.settings.scrollbar.selector.width;
-    const selector = new Konva.Rect({
-      stroke: this.settings.scrollbar.selector.stroke,
-      strokeWidth: this.settings.scrollbar.selector.strokeWidth,
-      fill: this.settings.scrollbar.selector.color,
-      width: this.settings.scrollbar.selector.width,
-      height: background.height() / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height()) * background.height(),
-      x: (rest > 0) ? rest / 2 : 0,
-      draggable: true,
-      dragBoundFunc: (pos) => {
-        pos.x = this.av.innerWidth - ((rest > 0) ? rest / 2 : 0);
-        pos.y = Math.max(Math.min(
-          pos.y, this.height - selector.height()
-        ), 0);
-        return pos;
-      }
-    });
-    group.add(selector);
-    this.canvasElements.scrollbarSelector = selector;
+      const background = new Konva.Rect({
+        stroke: this.settings.scrollbar.background.stroke,
+        strokeWidth: this.settings.scrollbar.background.strokeWidth,
+        fill: this.settings.scrollbar.background.color,
+        width: this.settings.scrollbar.width,
+        height: this.height
+      });
+      group.add(background);
 
-    selector.on('dragmove', this.onScrollbarDragged);
+      const rest = this.settings.scrollbar.width - this.settings.scrollbar.selector.width;
+      const selector = new Konva.Rect({
+        stroke: this.settings.scrollbar.selector.stroke,
+        strokeWidth: this.settings.scrollbar.selector.strokeWidth,
+        fill: this.settings.scrollbar.selector.color,
+        width: this.settings.scrollbar.selector.width,
+        height: background.height() / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height()) * background.height(),
+        x: (rest > 0) ? rest / 2 : 0,
+        draggable: true,
+        dragBoundFunc: (pos) => {
+          if (this.height !== undefined) {
+            pos.x = this.av.innerWidth - ((rest > 0) ? rest / 2 : 0);
+            pos.y = Math.max(Math.min(
+              pos.y, this.height - selector.height()
+            ), 0);
+            return pos;
+          }
+          return {x: 0, y: 0};
+        }
+      });
+      group.add(selector);
+      this.canvasElements.scrollbarSelector = selector;
 
-    selector.on('mouseenter', () => {
-      this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'pointer');
-    });
-    selector.on('mouseleave', () => {
-      this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
-    });
+      selector.on('dragmove', this.onScrollbarDragged);
 
-    return group;
+      selector.on('mouseenter', () => {
+        if (this.konvaContainer !== undefined) {
+          this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'pointer');
+        }
+      });
+      selector.on('mouseleave', () => {
+        if (this.konvaContainer !== undefined) {
+          this.renderer.setStyle(this.konvaContainer.nativeElement, 'cursor', 'auto');
+        }
+      });
+
+      return group;
+    }
+
+    return undefined;
   }
 
   private onScrollbarDragged = () => {
-    // delta in %
-    const delta = (this.canvasElements.scrollbarSelector.y()) / this.canvasElements.scrollBar.height();
+    if (this.canvasElements.scrollbarSelector !== undefined && this.canvasElements?.scrollBar) {
+      // delta in %
+      const delta = (this.canvasElements.scrollbarSelector.y()) / this.canvasElements.scrollBar.height();
 
-    this.scrollWithDeltaY(-delta);
+      this.scrollWithDeltaY(-delta);
+    }
   }
 
   private drawSelection = (lineNum: number, lineWidth: number): Konva.Rect | null => {
-    if (!isUnset(this.av.drawnSelection) && this.av.drawnSelection.length > 0) {
+    if (this.av.drawnSelection !== undefined && this.av.drawnSelection.length > 0 && this.stage !== undefined && this.layers !== undefined) {
       // draw gray selection
       const select = this.av.getRelativeSelectionByLine(
         lineNum, lineWidth, this.av.drawnSelection.start, this.av.drawnSelection.end, this.av.innerWidth
@@ -1588,36 +1637,41 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private resetSelection() {
-    const selections = this.stage.find('.selection');
+    if (this.stage !== undefined) {
+      const selections = this.stage.find('.selection');
 
-    selections.each((child) => {
-      child.width(0);
-      child.x(0);
-    });
+      selections.each((child) => {
+        child.width(0);
+        child.x(0);
+      });
+    }
   }
 
   private drawWholeSelection() {
     // draw selection
     this.resetSelection();
-    if (!(this.av.drawnSelection.duration.equals(this.audioChunk.time.duration)) && this.av.drawnSelection.duration.samples !== 0) {
-      this.av.drawnSelection.checkSelection();
-      const selStart = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.start);
-      const selEnd = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.end);
-      const lineNum1 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selStart / this.av.innerWidth) : 0;
-      const lineNum2 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selEnd / this.av.innerWidth) : 0;
-      const numOfLines = this.getNumberOfLines();
+    if (this.layers !== undefined && this.audioChunk !== undefined && this.canvasElements?.lastLine) {
+      if (this.av.drawnSelection !== undefined && !(this.av.drawnSelection.duration.equals(this.audioChunk.time.duration))
+        && this.av.drawnSelection.duration.samples !== 0) {
+        this.av.drawnSelection.checkSelection();
+        const selStart = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.start);
+        const selEnd = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.end);
+        const lineNum1 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selStart / this.av.innerWidth) : 0;
+        const lineNum2 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selEnd / this.av.innerWidth) : 0;
+        const numOfLines = this.getNumberOfLines();
 
-      // console.log('DRAW Selection ' + this.settings.height);
-      for (let j = lineNum1; j <= lineNum2; j++) {
-        const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-        const selectionRect = this.drawSelection(j, lineWidth);
+        // console.log('DRAW Selection ' + this.settings.height);
+        for (let j = lineNum1; j <= lineNum2; j++) {
+          const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
+          const selectionRect = this.drawSelection(j, lineWidth);
 
-        if (selectionRect !== null) {
-          this.layers.overlay.add(selectionRect);
+          if (selectionRect !== null) {
+            this.layers.overlay.add(selectionRect);
+          }
         }
+      } else {
+        this.layers.background.batchDraw();
       }
-    } else {
-      this.layers.background.batchDraw();
     }
   }
 
@@ -1638,8 +1692,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return false;
   }
 
-  private onMouseMove = (event) => {
-    if (!isUnset(this.canvasElements.mouseCaret)) {
+  private onMouseMove = (event: any) => {
+    if (this.canvasElements.mouseCaret !== undefined && this.layers !== undefined && this.stage !== undefined) {
       const tempLine = this.getLineNumber(event.layerX, event.layerY + Math.abs(this.layers.background.y()));
       this.hoveredLine = (tempLine > -1) ? tempLine : this.hoveredLine;
       const maxLines = Math.ceil(this.AudioPxWidth / this.av.innerWidth);
@@ -1674,7 +1728,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private onKeyDown = (event: KeyboardEvent) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(event, Date.now());
 
-    if (!isUnset(shortcutInfo)) {
+    if (shortcutInfo !== undefined) {
       const comboKey = shortcutInfo.shortcut;
 
       this.av.shiftPressed = comboKey === 'SHIFT';
@@ -1696,7 +1750,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   this.shortcuttriggered.emit({
                     shortcut: comboKey,
                     shortcutName,
-                    value: null,
                     type: 'application',
                     timePosition: this.av.mouseCursor.clone(),
                     timestamp: shortcutInfo.timestamp
@@ -1708,7 +1761,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   this.shortcuttriggered.emit({
                     shortcut: comboKey,
                     shortcutName,
-                    value: null,
                     type: 'application',
                     timePosition: this.av.mouseCursor.clone(),
                     timestamp: shortcutInfo.timestamp
@@ -1716,7 +1768,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 }
                 break;
               case('set_boundary'):
-                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
+                  && this.audioManager !== undefined) {
                   let segments;
                   const result = this.av.addSegment();
                   segments = this.av.currentTranscriptionLevel.segments;
@@ -1743,11 +1796,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 if (this.settings.boundaries.enabled && this._focused) {
                   const xSamples = this.av.mouseCursor.clone();
 
-                  if (xSamples !== null) {
+                  if (xSamples !== null && this._transcriptionLevel !== undefined) {
                     const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
                     const segment = this._transcriptionLevel.segments.get(segmentI);
 
-                    if (segmentI > -1 && !isUnset(segment) && isUnset(segment.isBlockedBy)) {
+                    if (segmentI > -1 && segment !== undefined && segment.isBlockedBy === undefined) {
                       if (segment.transcript !== this.breakMarker.code) {
                         segment.transcript = this.breakMarker.code;
                         this.shortcuttriggered.emit({
@@ -1777,7 +1830,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 }
                 break;
               case('play_selection'):
-                if (this._focused) {
+                if (this._focused && this._transcriptionLevel !== undefined && this.audioChunk !== undefined && this.audioManager !== undefined) {
                   const xSamples = this.av.mouseCursor.clone();
 
                   const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
@@ -1831,9 +1884,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           });
 
                           this.audioChunk.stopPlayback().then(() => {
-                            // after stopping start audio playback
-                            this.audioChunk.selection = boundarySelect.clone();
-                            this.playSelection(this.afterAudioEnded);
+                            if (this.audioChunk !== undefined) {
+                              // after stopping start audio playback
+                              this.audioChunk.selection = boundarySelect.clone();
+                              this.playSelection(this.afterAudioEnded);
+                            }
                           });
                         }
 
@@ -1855,7 +1910,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 }
                 break;
               case('delete_boundaries'):
-                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
+                  && this._transcriptionLevel !== undefined && this.audioManager !== undefined) {
                   let start = null;
                   let end = null;
                   if (this._transcriptionLevel.segments.length > 0) {
@@ -1866,14 +1922,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       value: shortcutName,
                       type: 'audio',
                       timePosition: this.av.mouseCursor.clone(),
-                      selection: this.av.drawnSelection.clone(),
+                      selection: this.av.drawnSelection?.clone(),
                       timestamp: shortcutInfo.timestamp
                     });
 
                     for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
                       const segment = this._transcriptionLevel.segments.get(i);
 
-                      if (segment.time.samples >= this.av.drawnSelection.start.samples
+                      if (this.av.drawnSelection !== undefined && segment.time.samples >= this.av.drawnSelection.start.samples
                         && segment.time.samples <= this.av.drawnSelection.end.samples
                         && i < this._transcriptionLevel.segments.length - 1
                       ) {
@@ -1883,21 +1939,22 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           start = i;
                         }
                         end = i;
-                      } else if (this.av.drawnSelection.end.samples < segment.time.samples) {
+                      } else if (this.av.drawnSelection !== undefined && this.av.drawnSelection.end.samples < segment.time.samples) {
                         break;
                       }
                     }
                   }
 
-                  if (start !== null && end !== null) {
+                  if (start !== null && end !== null && this.av.drawnSelection !== undefined) {
                     this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
                     this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
-                    this.transcriptionLevel.segments.onsegmentchange.emit();
+                    this._transcriptionLevel.segments.onsegmentchange.emit();
                   }
                 }
                 break;
               case('segment_enter'):
-                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
+                  && this._transcriptionLevel !== undefined && this.stage !== undefined) {
                   this.shortcuttriggered.emit({
                     shortcut: comboKey,
                     shortcutName,
@@ -1914,7 +1971,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     (posY1, posY2) => {
                       this._focused = false;
                       this.drawWholeSelection();
-                      this.stage.draw();
+                      this.stage?.draw();
                       this.segmententer.emit({
                         index: segInde,
                         pos: {Y1: posY1, Y2: posY2}
@@ -1929,7 +1986,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 }
                 break;
               case('cursor_left'):
-                if (this._focused) {
+                if (this._focused && this.audioManager !== undefined) {
                   // move cursor to left
                   this.shortcuttriggered.emit({
                     shortcut: comboKey,
@@ -1942,13 +1999,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
                   this.changeMouseCursorSamples(this.av.mouseCursor);
                   this.mousecursorchange.emit({
-                    event: null,
+                    event: undefined,
                     time: this.av.mouseCursor
                   });
                 }
                 break;
               case('cursor_right'):
-                if (this._focused) {
+                if (this._focused && this.audioManager !== undefined) {
                   // move cursor to right
                   this.shortcuttriggered.emit({
                     shortcut: comboKey,
@@ -1962,7 +2019,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
                   this.changeMouseCursorSamples(this.av.mouseCursor);
                   this.mousecursorchange.emit({
-                    event: null,
+                    event: undefined,
                     time: this.av.mouseCursor
                   });
                 }
@@ -1982,12 +2039,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                 break;
 
               case('do_asr'):
-                if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled) {
-                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                  const segment = this.transcriptionLevel.segments.get(segmentI);
+                if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled && this._transcriptionLevel !== undefined) {
+                  const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (isUnset(segment.isBlockedBy)) {
+                    if (segment.isBlockedBy === undefined) {
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -2006,17 +2063,17 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         timestamp: shortcutInfo.timestamp
                       });
                     }
-                    this.transcriptionLevel.segments.onsegmentchange.emit();
+                    this._transcriptionLevel.segments.onsegmentchange.emit();
                   }
                 }
                 break;
               case('do_asr_maus'):
-                if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                  const segment = this.transcriptionLevel.segments.get(segmentI);
+                if (this.settings.boundaries.enabled && this.settings.asr.enabled && this._transcriptionLevel) {
+                  const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (isUnset(segment.isBlockedBy)) {
+                    if (segment.isBlockedBy === undefined) {
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -2035,18 +2092,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         timestamp: shortcutInfo.timestamp
                       });
                     }
-                    this.transcriptionLevel.segments.onsegmentchange.emit();
+                    this._transcriptionLevel.segments.onsegmentchange.emit();
                   }
                 }
                 break;
 
               case('do_maus'):
-                if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                  const segment = this.transcriptionLevel.segments.get(segmentI);
+                if (this.settings.boundaries.enabled && this.settings.asr.enabled && this._transcriptionLevel !== undefined) {
+                  const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (isUnset(segment.isBlockedBy)) {
+                    if (segment.isBlockedBy === undefined) {
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -2065,7 +2122,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         timestamp: shortcutInfo.timestamp
                       });
                     }
-                    this.transcriptionLevel.segments.onsegmentchange.emit();
+                    this._transcriptionLevel.segments.onsegmentchange.emit();
                   }
                 }
                 break;
@@ -2089,34 +2146,38 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private changeMouseCursorSamples = (newValue: SampleUnit) => {
-    const absX = this.av.audioTCalculator.samplestoAbsX(newValue);
-    const lines = Math.floor(absX / this.av.innerWidth);
-    const x = absX % this.av.innerWidth;
-    const y = lines * (this.settings.lineheight + this.settings.margin.top);
+    if (this.canvasElements?.mouseCaret !== undefined && this.layers !== undefined) {
+      const absX = this.av.audioTCalculator.samplestoAbsX(newValue);
+      const lines = Math.floor(absX / this.av.innerWidth);
+      const x = absX % this.av.innerWidth;
+      const y = lines * (this.settings.lineheight + this.settings.margin.top);
 
-    this.canvasElements.mouseCaret.position({
-      x,
-      y
-    });
-    this.layers.playhead.batchDraw();
+      this.canvasElements.mouseCaret.position({
+        x,
+        y
+      });
+      this.layers.playhead.batchDraw();
+    }
   }
 
   /**
    * called if audio ended normally because end of segment reached
    */
   private afterAudioEnded = () => {
-    if (!this.audioChunk.replay) {
+    if (this.audioChunk !== undefined && !this.audioChunk.replay) {
       // let cursor jump to start
       this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
-      this.av.drawnSelection = (this.av.drawnSelection !== null) ? this.av.drawnSelection.clone() : null;
+      this.av.drawnSelection = (this.av.drawnSelection !== null) ? this.av.drawnSelection?.clone() : undefined;
     }
 
     this.updatePlayCursor();
-    this.layers.playhead.batchDraw();
+    if (this.layers !== undefined) {
+      this.layers.playhead.batchDraw();
+    }
   }
 
   private onMouseEnter = () => {
-    this.stage.container().focus();
+    this.stage?.container().focus();
     this._focused = true;
   }
 
@@ -2126,13 +2187,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   private removeSegmentFromCanvas(segmentID: number) {
     if (segmentID > -1) {
-      const overlayGroup = this.layers.overlay.findOne(`#segment_${segmentID}`);
-      const boundary = this.layers.boundaries.findOne(`#boundary_${segmentID}`);
+      const overlayGroup = this.layers?.overlay.findOne(`#segment_${segmentID}`);
+      const boundary = this.layers?.boundaries.findOne(`#boundary_${segmentID}`);
 
-      if (!isUnset(overlayGroup)) {
+      if (overlayGroup !== undefined) {
         overlayGroup.remove();
       }
-      if (!isUnset(boundary)) {
+      if (boundary !== undefined) {
         boundary.remove();
       }
 
@@ -2163,7 +2224,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public refreshLevel() {
-    if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
+    if (this.audioChunk !== undefined && this.av.audioTCalculator !== undefined && this._transcriptionLevel !== undefined
+      && this.layers !== undefined) {
       this.av.updateLevel(this._transcriptionLevel);
       this.createSegmentsForCanvas();
       this.layers.overlay.batchDraw();
@@ -2186,8 +2248,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private drawTextLabel(context: Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,
-                        lastI: number, segmentHeight: number, numOfLines: number, absX: number, segments: Segment[], i: number): number {
-    if (text !== '') {
+                        lastI: number | undefined, segmentHeight: number, numOfLines: number, absX: number, segments: Segment[], i: number): number | undefined {
+    if (text !== '' && this.layers !== undefined && this.stage !== undefined && this.canvasElements?.lastLine !== undefined) {
       const y = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
       for (let j = lineNum1; j <= lineNum2; j++) {
         const localY = (j + 1) * (this.settings.lineheight + this.settings.margin.top);
@@ -2259,7 +2321,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
               const localX = (w - 4 - textLength) / 2 + x;
               context.fillText(newText, localX, localY - 5 - this.settings.margin.top);
-            } else if (j === lineNum2) {
+            } else if (j === lineNum2 && lastI !== undefined) {
               // crop text
               let newText = text.substring(lastI);
               const textLength = context.measureText(newText).width;
@@ -2278,7 +2340,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               const localX = (w - 4 - textLength) / 2 + x;
               context.fillText(newText, localX, localY - 5 - this.settings.margin.top);
               lastI = 0;
-            } else {
+            } else if (lastI !== undefined) {
               let w2 = 0;
 
               if (lineNum1 > -1) {
@@ -2324,13 +2386,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       }
       return lastI;
     }
+
+    return undefined;
   }
 }
 
 export interface AudioViewerShortcutEvent {
   shortcut: string;
   shortcutName: string;
-  value: string;
+  value?: string;
   type: string;
   timePosition?: SampleUnit;
   selection?: AudioSelection;

@@ -20,7 +20,7 @@ export class PartiturConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (isUnset(annotation)) {
+    if (annotation === undefined) {
       // annotation is null;
       console.error('BASPartitur Converter annotation is null');
       return null;

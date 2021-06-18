@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../environments/environment';
@@ -22,9 +22,9 @@ import {Subscription} from 'rxjs';
   styleUrls: ['app.component.css']
 })
 
-export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
+export class AppComponent implements OnDestroy, OnInit {
 
-  @ViewChild('navigation', {static: true}) navigation: NavigationComponent;
+  @ViewChild('navigation', {static: true}) navigation: NavigationComponent | undefined;
   private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get version(): string {
@@ -47,9 +47,9 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private store: Store) {
 
     this.router.events.subscribe((event: any) => {
-        if (event.hasOwnProperty('url')) {
+        if (event.url) {
           console.log(`route to page: ${event?.url}`);
-        } else if (event.hasOwnProperty('snapshot')) {
+        } else if (event.snapshot) {
           console.log(`route to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`);
         }
       }
@@ -63,6 +63,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         // tslint:disable-next-line:only-arrow-functions
         console.log = function (message) {
           serv.addEntry(ConsoleType.LOG, message);
+          // eslint-disable-next-line prefer-rest-params
           oldLog.apply(console, arguments);
         };
       })();
@@ -73,12 +74,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         // tslint:disable-next-line:only-arrow-functions
         console.error = function (error, context) {
           let debug = '';
-          let stack = '';
+          let stack: string | undefined = '';
 
           if (typeof error === 'string') {
             debug = error;
 
-            if (error === 'ERROR' && !isUnset(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
+            if (error === 'ERROR' && !isUnset(context) && context.stack && context.message) {
               debug = context.message;
               stack = context.stack;
             }
@@ -125,7 +126,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       embedded: this.getParameterByName('embedded')
     };
 
-    this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded).subscribe(
+    this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded as any).subscribe(
       () => {
         if (!isUnset(this.appStorage.asrSelectedService) && !isUnset(this.appStorage.asrSelectedLanguage)) {
           // set asr settings
@@ -143,7 +144,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
             this.setFixedWidth();
           }
 
-          this.navigation.changeSecondsPerLine(this.appStorage.secondsPerLine);
+          this.navigation?.changeSecondsPerLine(this.appStorage.secondsPerLine);
         }
 
         this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
@@ -170,13 +171,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     this.route.fragment.subscribe((fragment) => {
       switch (fragment) {
         case('feedback'):
-          this.navigation.openBugReport();
+          this.navigation?.openBugReport();
           break;
       }
     });
-  }
-
-  ngAfterViewInit() {
   }
 
   ngOnDestroy() {
@@ -200,15 +198,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     });
   }
 
-  queryParamsSet(route: ActivatedRoute): boolean {
+  queryParamsSet(): boolean {
     const params = this.route.snapshot.queryParams;
-    return (
-      params.hasOwnProperty('audio') &&
-      params.hasOwnProperty('embedded')
-    );
+    return (params.audio && params.embedded);
   }
 
-  private getParameterByName(name: string, url = null) {
+  private getParameterByName(name: string, url?: string) {
     if (!url) {
       url = document.location.href;
     }

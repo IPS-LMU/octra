@@ -1,5 +1,4 @@
 import {BrowserInfo} from './browser-info';
-import {isUnset} from './functions';
 
 export interface ShortcutEvent {
   shortcut: string;
@@ -167,7 +166,7 @@ export class ShortcutManager {
           this.checkPressedKey(event);
         }
 
-        if (!isUnset(commandObj)) {
+        if (commandObj !== undefined) {
           return {
             platform: BrowserInfo.platform,
             shortcutName: commandObj.shortcut.name,
@@ -208,7 +207,7 @@ export class ShortcutManager {
   } {
     for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
-      if (!isUnset(elem)) {
+      if (elem !== undefined) {
         if (shortcutGroup.enabled) {
           return {
             shortcut: elem,
@@ -223,7 +222,7 @@ export class ShortcutManager {
     // look for general shortcut
     const generalShortcutElem = this.generalShortcuts.items.find(a => a.keys[platform] === shortcut);
 
-    if (!isUnset(generalShortcutElem)) {
+    if (generalShortcutElem !== undefined) {
       return {
         shortcut: generalShortcutElem,
         groupName: this.generalShortcuts.name
@@ -378,7 +377,7 @@ export class ShortcutManager {
   public enableShortcutGroup(name: string) {
     const group = this.shortcuts.find(a => a.name === name);
 
-    if (!isUnset(group)) {
+    if (group !== undefined) {
       group.enabled = true;
     }
   }
@@ -390,7 +389,7 @@ export class ShortcutManager {
   public disableShortcutGroup(name: string) {
     const group = this.shortcuts.find(a => a.name === name);
 
-    if (!isUnset(group)) {
+    if (group !== undefined) {
       group.enabled = false;
     }
   }

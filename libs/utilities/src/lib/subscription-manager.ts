@@ -1,7 +1,7 @@
 export class SubscriptionManager<T> {
   private subscriptions: {
     id: number,
-    tag: string,
+    tag?: string,
     subscription: T
   }[];
 
@@ -36,7 +36,7 @@ export class SubscriptionManager<T> {
    * unsubscribes all subscriptions
    */
   public destroy() {
-    if (!(this.subscriptions === null || this.subscriptions === undefined)) {
+    if (this.subscriptions !== undefined){
       for (const elem of this.subscriptions) {
         (elem.subscription as any).unsubscribe();
       }

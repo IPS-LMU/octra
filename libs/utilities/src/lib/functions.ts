@@ -4,7 +4,7 @@ import {Observable, Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
 
-declare var jQuery: any;
+declare let jQuery: any;
 
 export interface FileSize {
   size: number;
@@ -201,7 +201,7 @@ export function insertString(input: string, pos: number, insertion: string): str
   return result;
 }
 
-export function uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestOptions: any,
+export function uniqueHTTPRequest(http: HttpClient, post = false, requestOptions: any,
                                   url: string, body: any): Observable<any> {
   if (!post) {
     const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};

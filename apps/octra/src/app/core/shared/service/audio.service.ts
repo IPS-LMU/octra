@@ -47,7 +47,7 @@ export class AudioService {
       (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {
-          const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
+          const regex = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
           const matches: RegExpExecArray = regex.exec(url);
 
           let filename = '';

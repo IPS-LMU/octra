@@ -11,6 +11,7 @@
       "rules": {
         "no-undefined": "off",
         "strict": "off",
+        "no-empty-function": "off",
         "@angular-eslint/directive-selector": [
           "error",
           {

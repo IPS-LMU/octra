@@ -32,7 +32,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {PermutationsReplaceModalComponent} from './modals/permutations-replace-modal/permutations-replace-modal.component';
 import {Subscription, timer} from 'rxjs';
 
-declare var validateAnnotation: any;
+declare let validateAnnotation: any;
 
 @Component({
   selector: 'octra-trn-editor',

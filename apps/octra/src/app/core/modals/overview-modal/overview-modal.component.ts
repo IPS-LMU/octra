@@ -8,8 +8,8 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {NavbarService} from '../../component/navbar/navbar.service';
 
-declare var validateAnnotation: ((string, any) => any);
-declare var tidyUpAnnotation: ((string, any) => any);
+declare let validateAnnotation: ((string, any) => any);
+declare let tidyUpAnnotation: ((string, any) => any);
 
 @Component({
   selector: 'octra-overview-modal',

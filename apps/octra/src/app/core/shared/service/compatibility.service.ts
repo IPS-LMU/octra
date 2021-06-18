@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
 import {SettingsService} from './index';
 
-declare var Modernizr: any;
+declare let Modernizr: any;
 
 @Injectable({
   providedIn: 'root'

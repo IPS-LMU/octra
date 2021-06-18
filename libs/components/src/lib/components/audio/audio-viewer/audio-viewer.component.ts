@@ -18,9 +18,10 @@ import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
 import {ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
-import {ASRQueueItemType, Level, Segment, TimespanPipe} from '@octra/annotation';
+import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {Position, Size} from '../../../obj';
+import {TimespanPipe} from '../../../pipe/timespan.pipe';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
@@ -120,8 +121,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   @Input() audioChunk: AudioChunk | undefined;
   @Input() public name = '';
   @Input() breakMarker: any;
-  @Output() shortcuttriggered = new EventEmitter<AudioViewerShortcutEvent>();
-  @Output() alerttriggered = new EventEmitter<{ type: string, message: string }>();
+  @Output() shortcutTrigger = new EventEmitter<AudioViewerShortcutEvent>();
   @Output() selchange = new EventEmitter<AudioSelection>();
   @Output() playcursorchange = new EventEmitter<PlayCursor>();
   @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
@@ -129,6 +129,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     event: MouseEvent | undefined,
     time: SampleUnit | undefined
   }>();
+  @Output() alert = new EventEmitter<{ type: string, message: string }>();
 
   @Output()
   public get boundaryDragging(): Subject<'started' | 'stopped'> {
@@ -279,8 +280,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               },
               (error) => {
                 reject(error);
-              },
-              () => {
               })
             , 'audioChunkChannelFinished');
         } else {
@@ -523,66 +522,61 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     return -1;
   }
 
-  public selectSegment(segIndex: number, successcallback: (posY1: number, posY2: number) => void = () => {
-                       },
-                       errorcallback: () => void = () => {
-                       }): boolean {
-    if (segIndex > -1 && this._transcriptionLevel !== undefined && this.audioChunk !== undefined && this.audioManager !== undefined) {
-      const segment = this._transcriptionLevel.segments.get(segIndex);
-      const startTime = this._transcriptionLevel.segments.getStartTime(segIndex);
+  public selectSegment(segIndex: number): Promise<{ posY1: number, posY2: number }> {
+    return new Promise<{ posY1: number, posY2: number }>((resolve, reject) => {
+      if (segIndex > -1 && this._transcriptionLevel !== undefined && this.audioChunk !== undefined && this.audioManager !== undefined) {
+        const segment = this._transcriptionLevel.segments.get(segIndex);
+        const startTime = this._transcriptionLevel.segments.getStartTime(segIndex);
 
-      // make shure, that segments boundaries are visible
-      if (segment.time?.samples !== undefined && this._transcriptionLevel?.segments !== undefined && this.av.audioTCalculator !== undefined &&
-        startTime.samples >= this.audioChunk.time.start.samples && segment.time.samples <= (this.audioChunk.time.end.samples + 1) &&
-        this.av.innerWidth !== undefined) {
-        const absX = this.av.audioTCalculator.samplestoAbsX(segment.time);
-        let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
-        if (segIndex > 0) {
-          begin = this._transcriptionLevel.segments.get(segIndex - 1);
-        }
-
-        if (begin.time !== undefined) {
-          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
-          const posY1 = (this.av.innerWidth < this.AudioPxWidth)
-            ? Math.floor((beginX / this.av.innerWidth) + 1) * (this.settings.lineheight + this.settings.margin.bottom)
-            - this.settings.margin.bottom
-            : 0;
-
-          let posY2 = 0;
-
-          if (this.av.innerWidth < this.AudioPxWidth) {
-            posY2 = Math.floor((absX / this.av.innerWidth) + 1) * (this.settings.lineheight +
-              this.settings.margin.bottom) - this.settings.margin.bottom;
+        // make shure, that segments boundaries are visible
+        if (segment.time?.samples !== undefined && this._transcriptionLevel?.segments !== undefined && this.av.audioTCalculator !== undefined &&
+          startTime.samples >= this.audioChunk.time.start.samples && segment.time.samples <= (this.audioChunk.time.end.samples + 1) &&
+          this.av.innerWidth !== undefined) {
+          const absX = this.av.audioTCalculator.samplestoAbsX(segment.time);
+          let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
+          if (segIndex > 0) {
+            begin = this._transcriptionLevel.segments.get(segIndex - 1);
           }
 
-          const boundarySelect = this.av.getSegmentSelection(segment.time.samples - 1);
-          if (boundarySelect) {
-            this.audioChunk.selection = boundarySelect;
-            this.av.drawnSelection = boundarySelect.clone();
-            this.settings.selection.color = 'gray';
-            this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
-            this.changePlayCursorSamples(this.audioChunk.selection.start);
-            this.updatePlayCursor();
+          if (begin.time !== undefined) {
+            const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
+            const posY1 = (this.av.innerWidth < this.AudioPxWidth)
+              ? Math.floor((beginX / this.av.innerWidth) + 1) * (this.settings.lineheight + this.settings.margin.bottom)
+              - this.settings.margin.bottom
+              : 0;
 
-            if (this.audioManager.isPlaying) {
-              this.audioManager.stopPlayback().catch((error) => {
-                console.error(error);
-              });
+            let posY2 = 0;
+
+            if (this.av.innerWidth < this.AudioPxWidth) {
+              posY2 = Math.floor((absX / this.av.innerWidth) + 1) * (this.settings.lineheight +
+                this.settings.margin.bottom) - this.settings.margin.bottom;
             }
+
+            const boundarySelect = this.av.getSegmentSelection(segment.time.samples - 1);
+            if (boundarySelect) {
+              this.audioChunk.selection = boundarySelect;
+              this.av.drawnSelection = boundarySelect.clone();
+              this.settings.selection.color = 'gray';
+              this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
+              this.changePlayCursorSamples(this.audioChunk.selection.start);
+              this.updatePlayCursor();
+
+              if (this.audioManager.isPlaying) {
+                this.audioManager.stopPlayback().catch((error) => {
+                  console.error(error);
+                });
+              }
+            }
+
+            resolve({posY1, posY2});
           }
-
-          successcallback(posY1, posY2);
-
-          return true;
+        } else {
+          reject();
         }
       } else {
-        errorcallback();
+        reject();
       }
-      return false;
-    } else {
-      errorcallback();
-    }
-    return false;
+    });
   }
 
   /**
@@ -1781,7 +1775,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             switch (shortcutName) {
               case('undo'):
                 if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     type: 'application',
@@ -1792,7 +1786,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 break;
               case('redo'):
                 if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     type: 'application',
@@ -1804,17 +1798,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               case('set_boundary'):
                 if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
                   && this.audioManager !== undefined && this.av.currentTranscriptionLevel !== undefined) {
-                  let segments;
                   const result = this.av.addSegment();
-                  segments = this.av.currentTranscriptionLevel.segments;
                   if (result !== undefined && result.msg !== undefined) {
                     if (result.msg.text && result.msg.text !== '') {
-                      this.alerttriggered.emit({
+                      this.alert.emit({
                         type: result.msg.type,
                         message: result.msg.text
                       });
                     } else if (result.type !== null) {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: result.type,
@@ -1837,7 +1829,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                     if (segmentI > -1 && segment !== undefined && segment.isBlockedBy === undefined) {
                       if (segment.transcript !== this.breakMarker.code) {
                         segment.transcript = this.breakMarker.code;
-                        this.shortcuttriggered.emit({
+                        this.shortcutTrigger.emit({
                           shortcut: comboKey,
                           shortcutName,
                           value: 'set_break',
@@ -1847,7 +1839,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         });
                       } else {
                         segment.transcript = '';
-                        this.shortcuttriggered.emit({
+                        this.shortcutTrigger.emit({
                           shortcut: comboKey,
                           shortcutName,
                           value: 'remove_break',
@@ -1911,7 +1903,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                             this.changePlayCursorSamples(this.audioChunk.selection.start);
                             this.updatePlayCursor();
 
-                            this.shortcuttriggered.emit({
+                            this.shortcutTrigger.emit({
                               shortcut: comboKey,
                               shortcutName,
                               value: shortcutName,
@@ -1938,7 +1930,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                           }
                         } else {
                           // TODO check this case again!
-                          this.alerttriggered.emit({
+                          this.alert.emit({
                             type: 'error',
                             message: 'segment invisible'
                           });
@@ -1955,7 +1947,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   let end = null;
                   if (this._transcriptionLevel.segments.length > 0) {
 
-                    this.shortcuttriggered.emit({
+                    this.shortcutTrigger.emit({
                       shortcut: comboKey,
                       shortcutName,
                       value: shortcutName,
@@ -1997,7 +1989,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               case('segment_enter'):
                 if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused
                   && this._transcriptionLevel !== undefined && this.stage !== undefined && this.av.mouseCursor !== undefined) {
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     value: shortcutName,
@@ -2009,28 +2001,26 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
                     this.av.mouseCursor
                   );
-                  this.selectSegment(segInde,
-                    (posY1, posY2) => {
-                      this._focused = false;
-                      this.drawWholeSelection();
-                      this.stage?.draw();
-                      this.segmententer.emit({
-                        index: segInde,
-                        pos: {Y1: posY1, Y2: posY2}
-                      });
-                    },
-                    () => {
-                      this.alerttriggered.emit({
-                        type: 'error',
-                        message: 'segment invisible'
-                      });
+                  this.selectSegment(segInde).then(({posY1, posY2}) => {
+                    this._focused = false;
+                    this.drawWholeSelection();
+                    this.stage?.draw();
+                    this.segmententer.emit({
+                      index: segInde,
+                      pos: {Y1: posY1, Y2: posY2}
                     });
+                  }).catch(() => {
+                    this.alert.emit({
+                      type: 'error',
+                      message: 'segment invisible'
+                    });
+                  });
                 }
                 break;
               case('cursor_left'):
                 if (this._focused && this.audioManager !== undefined && this.av.mouseCursor !== undefined) {
                   // move cursor to left
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     value: shortcutName,
@@ -2049,7 +2039,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               case('cursor_right'):
                 if (this._focused && this.audioManager !== undefined && this.av.mouseCursor !== undefined) {
                   // move cursor to right
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     value: shortcutName,
@@ -2069,7 +2059,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               case('playonhover'):
                 if (this._focused && !this.settings.boundaries.readonly && this.av.mouseCursor !== undefined) {
                   // move cursor to right
-                  this.shortcuttriggered.emit({
+                  this.shortcutTrigger.emit({
                     shortcut: comboKey,
                     shortcutName,
                     value: shortcutName,
@@ -2088,7 +2078,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
                   if (segmentI > -1) {
                     if (segment.isBlockedBy === undefined) {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'do_asr',
@@ -2097,7 +2087,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         timestamp: shortcutInfo.timestamp
                       });
                     } else {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'cancel_asr',
@@ -2118,7 +2108,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
                   if (segmentI > -1) {
                     if (segment.isBlockedBy === undefined) {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'do_asr_maus',
@@ -2127,7 +2117,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         timestamp: shortcutInfo.timestamp
                       });
                     } else {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'cancel_asr_maus',
@@ -2149,7 +2139,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
                   if (segmentI > -1) {
                     if (segment.isBlockedBy === undefined) {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'do_maus',
@@ -2158,7 +2148,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         timestamp: shortcutInfo.timestamp
                       });
                     } else {
-                      this.shortcuttriggered.emit({
+                      this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
                         value: 'cancel_maus',
@@ -2300,7 +2290,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     const segment = segments[i];
 
     if (text !== '' && this.layers !== undefined && this.stage !== undefined && this.canvasElements?.lastLine !== undefined
-    && this.av.innerWidth !== undefined && segment?.time !== undefined && this.av.audioTCalculator !== undefined) {
+      && this.av.innerWidth !== undefined && segment?.time !== undefined && this.av.audioTCalculator !== undefined) {
       const y = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
       for (let j = lineNum1; j <= lineNum2; j++) {
         const localY = (j + 1) * (this.settings.lineheight + this.settings.margin.top);

@@ -101,9 +101,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     return 0;
   }
 
-  constructor() {
-  }
-
   ngOnInit() {
     this.afterChunkUpdated();
     this.subscrmanager = new SubscriptionManager();

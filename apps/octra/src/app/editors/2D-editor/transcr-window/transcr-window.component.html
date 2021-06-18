@@ -56,7 +56,7 @@
     <octra-audio-viewer #loupe
                       [audioChunk]="audiochunk"
                       [transcriptionLevel]="transcrService.currentlevel"
-                      (shortcuttriggered)="triggerUIAction($event)"
+                        (shortcutTrigger)="triggerUIAction($event)"
                       id="loupe"
     ></octra-audio-viewer>
     <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"

@@ -15,7 +15,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
 
-declare var JSZip;
+declare let JSZip;
 
 @Component({
   selector: 'octra-tools-modal',

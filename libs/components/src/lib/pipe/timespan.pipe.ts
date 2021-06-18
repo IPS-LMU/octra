@@ -47,7 +47,7 @@ export class TimespanPipe implements PipeTransform {
 
     args = {...defaultArgs, ...args};
 
-    const forceHours = (Math.floor(args.maxDuration / 1000 / 60 / 60)) > 0;
+    const forceHours = (Math.floor((args as any).maxDuration / 1000 / 60 / 60)) > 0;
 
     let result = '';
 
@@ -64,7 +64,7 @@ export class TimespanPipe implements PipeTransform {
     return result;
   }
 
-  private formatNumber = (num, length): string => {
+  private formatNumber = (num: number, length: number): string => {
     let result = '' + num.toFixed(0);
     while (result.length < length) {
       result = '0' + result;

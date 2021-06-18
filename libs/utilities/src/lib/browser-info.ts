@@ -1,4 +1,4 @@
-declare var platform: any;
+declare let platform: any;
 
 export class BrowserInfo {
   public static get platform(): 'mac' | 'pc' {

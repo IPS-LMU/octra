@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {SessionFile} from '../../obj/SessionFile';
 
-declare var window: any;
+declare let window: any;
 
 @Component({
   selector: 'octra-drop-zone',

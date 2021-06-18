@@ -56,7 +56,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   @Output('shortcuttriggered')
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
-    return this.loupe.shortcuttriggered;
+    return this.loupe.shortcutTrigger;
   }
 
   @Output('marker_insert')

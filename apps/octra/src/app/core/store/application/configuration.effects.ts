@@ -10,8 +10,8 @@ import {HttpClient} from '@angular/common/http';
 import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 
-declare var validateAnnotation: ((string, any) => any);
-declare var tidyUpAnnotation: ((string, any) => any);
+declare let validateAnnotation: ((string, any) => any);
+declare let tidyUpAnnotation: ((string, any) => any);
 
 @Injectable()
 export class ConfigurationEffects {

@@ -244,7 +244,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
+    this.subscrmanager.add(this.viewer.alert.subscribe(
       (result) => {
         this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
           console.error(error);

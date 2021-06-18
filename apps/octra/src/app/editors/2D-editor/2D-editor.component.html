@@ -67,7 +67,7 @@
   </div>
   <octra-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
                       (segmententer)="onSegmentEntered($event)"
-                      (shortcuttriggered)="onShortCutViewerTriggered($event)"
+                      (shortcutTrigger)="onShortCutViewerTriggered($event)"
                       [audioChunk]="audioChunkLines"
                       [breakMarker]="{
                         code: '<P>'

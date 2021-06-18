@@ -118,7 +118,7 @@
           </div>
           <button
             (click)="onOfflineSubmit()"
-            *ngIf="getFileStatus() != 'new'"
+            *ngIf="getFileStatus() !== 'new'"
             [disabled]="getFileStatus() !== 'start'"
             class="btn btn-raised btn-primary"
             id="offline-submit"
@@ -127,7 +127,7 @@
           </button>
           <button
             (click)="onTranscriptionDelete()"
-            *ngIf="(getFileStatus() == 'new' || getFileStatus() === 'start')"
+            *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
             class="btn btn-raised btn-danger offline-delete-btn">
             {{'transcription.new' |transloco}}
           </button>

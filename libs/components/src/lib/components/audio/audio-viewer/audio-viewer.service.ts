@@ -559,7 +559,7 @@ export class AudioViewerService {
         }
       } else {
         // no selection
-        let segment = this._currentTranscriptionLevel.segments.BetweenWhichSegment(absXTime);
+        const segment = this._currentTranscriptionLevel.segments.BetweenWhichSegment(absXTime);
         if (segment !== undefined && this.audioManager !== undefined) {
           let transcript = '';
           if (segment) {

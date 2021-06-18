@@ -65,7 +65,7 @@
                       (mouseleave)="miniloupe.isHidden = true;onAudioViewerMouseLeave('signaldisplay_top')"
                       (segmententer)="onSegmentEnter($event)"
                       (selchange)="onSelectionChanged($event)"
-                      (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
+                      (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
                       [audioChunk]="audioChunkTop"
                       [breakMarker]="{
                         code: '<P>'
@@ -77,8 +77,8 @@
 </div>
 
 <octra-audio-viewer #signalDisplayDown
-                    (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
-                    (alerttriggered)="onAlertTriggered($event)"
+                    (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+                    (alert)="onAlertTriggered($event)"
                     (click)="onLoupeClick($event)"
                     (mousedown)="onViewerMouseDown($event)"
                     (segmententer)="onLoupeSegmentEnter($event)"

@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
-import {TimespanPipe} from '../../../../components/src/lib/pipe/timespan.pipe';
 
 export class TextConverter extends Converter {
 
@@ -43,7 +42,7 @@ export class TextConverter extends Converter {
               if (this.options && (this.options.showTimestampString || this.options.showTimestampSamples)) {
                 result += ` <`;
                 if (this.options.showTimestampString) {
-                  const endTime = new TimespanPipe().transform(unixTimestamp, {
+                  const endTime = this.convertToTimeString(unixTimestamp, {
                     showHour: true,
                     showMilliSeconds: true
                   });
@@ -220,4 +219,69 @@ export class TextConverter extends Converter {
       .replace(/\s+/g, ' ')
       .replace(/(^ +)|( +$)/g, '')
   }
+
+  /**
+   * transforms milliseconds to time string
+   * @param value number or milliseconds
+   * @param args [showHour, showMilliSeconds]
+   */
+  convertToTimeString(value: number, args?: {
+    showHour?: boolean,
+    showMilliSeconds?: boolean,
+    maxDuration?: number
+  }) {
+    let timespan = Number(value);
+    if (timespan < 0) {
+      timespan = 0;
+    }
+
+    const defaultArgs = {
+      showHour: false,
+      showMilliSeconds: false,
+      maxDuration: 0
+    };
+
+    args = {...defaultArgs, ...args};
+
+    const forceHours = (Math.floor(args.maxDuration / 1000 / 60 / 60)) > 0;
+
+    let result = '';
+
+    const milliSeconds: string = this.formatNumber(this.getMilliSeconds(timespan), 3);
+    const minutes: string = this.formatNumber(this.getMinutes(timespan), 2);
+    const seconds: string = this.formatNumber(this.getSeconds(timespan), 2);
+    const hours: string = (args.showHour && (forceHours || this.getHours(timespan) > 0)) ? this.formatNumber(this.getHours(timespan), 2) + ':' : '';
+
+    result += hours + minutes + ':' + seconds;
+    if (args.showMilliSeconds) {
+      result += '.' + milliSeconds;
+    }
+
+    return result;
+  }
+
+  private formatNumber = (num: number, length: number): string => {
+    let result = '' + num.toFixed(0);
+    while (result.length < length) {
+      result = '0' + result;
+    }
+    return result;
+  }
+
+  private getMilliSeconds(timespan: number): number {
+    return Math.floor(timespan % 1000);
+  }
+
+  private getSeconds(timespan: number): number {
+    return Math.floor(timespan / 1000) % 60;
+  }
+
+  private getMinutes(timespan: number): number {
+    return Math.floor(timespan / 1000 / 60) % 60;
+  }
+
+  private getHours(timespan: number): number {
+    return Math.floor(timespan / 1000 / 60 / 60);
+  }
+
 }

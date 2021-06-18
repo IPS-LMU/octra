@@ -37,7 +37,7 @@ import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segments, TimespanPipe} from '@octra/annotation';
 
 /// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />
-declare var tidyUpAnnotation: ((string, any) => any);
+declare let tidyUpAnnotation: ((string, any) => any);
 
 declare let document: any;
 

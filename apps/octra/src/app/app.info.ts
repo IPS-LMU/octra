@@ -15,8 +15,8 @@ import {
   WebVTTConverter
 } from '@octra/annotation';
 
-declare var octraVersion: string;
-declare var octraLastUpdated: string;
+declare let octraVersion: string;
+declare let octraLastUpdated: string;
 
 export class AppInfo {
   public static readonly audioformats = [

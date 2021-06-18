@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
@@ -30,7 +21,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.css']
 })
-export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit {
 
   public static editorname = 'Dictaphone Editor';
 
@@ -48,12 +39,12 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   public get highlighting(): boolean {
     return this.appStorage.highlightingEnabled;
   }
-
-  public segments: Segments = null;
-
   public set highlighting(value: boolean) {
     this.appStorage.highlightingEnabled = value;
   }
+
+  public segments: Segments = null;
+
 
   private oldRaw = '';
 
@@ -168,9 +159,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.keyMap.unregisterAll();
   }
 
-  ngOnChanges(obj: SimpleChanges) {
-  }
-
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
       event.timestamp, this.audioManager.playposition,
@@ -232,8 +220,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
           break;
         case('stop'):
           triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
-          this.audiochunk.stopPlayback().then(() => {
-          }).catch((error) => {
+          this.audiochunk.stopPlayback().catch((error) => {
             console.error(error);
           });
           break;
@@ -309,7 +296,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       /\s*{[0-9]+}\s*/g);
 
     const samplesArray: number[] = [];
-    rawText.replace(new RegExp('\s*{([0-9]+)}\s*', 'g'),
+    rawText.replace(new RegExp(/\s*{([0-9]+)}\s*/, 'g'),
       (match, g1) => {
         samplesArray.push(Number(g1));
         return '';

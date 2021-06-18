@@ -1,5 +1,6 @@
 import {StatisticElem} from './StatisticElement';
-import {ILog, SampleInterval} from '../Settings/logging';
+import {ILog} from '../Settings/logging';
+import {hasProperty} from '@octra/utilities';
 
 /***
  * Statistic Element Class
@@ -48,19 +49,17 @@ export class KeyStatisticElem extends StatisticElem {
       segment: null
     };
 
-    for (const attr in elem) {
-      if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
-          || elem.hasOwnProperty('type') || elem.hasOwnProperty('keyCode') || elem.hasOwnProperty('shiftPressed')
-          || elem.hasOwnProperty('ctrlPressed') || elem.hasOwnProperty('altPressed') || elem.hasOwnProperty('char')
-          || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos')
-          || elem.hasOwnProperty('control')
-        ) {
-          if (attr === 'playerpos') {
-            result.playpos = elem[`${attr}`];
-          } else {
-            result[`${attr}`] = elem[`${attr}`];
-          }
+    for (const [name,] of Object.entries(elem)) {
+      if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp')
+        || hasProperty(elem, 'type') || hasProperty(elem, 'keyCode') || hasProperty(elem, 'shiftPressed')
+        || hasProperty(elem, 'ctrlPressed') || hasProperty(elem, 'altPressed') || hasProperty(elem, 'char')
+        || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos') || hasProperty(elem, 'caretpos')
+        || hasProperty(elem, 'control')
+      ) {
+        if (name === 'playerpos') {
+          result.playpos = elem[`${name}`];
+        } else {
+          result[`${name}`] = elem[`${name}`];
         }
       }
     }

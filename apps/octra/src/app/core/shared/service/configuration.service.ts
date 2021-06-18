@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import * as Ajv from 'ajv';
+import Ajv from 'ajv';
 import {HttpClient} from '@angular/common/http';
-import {uniqueHTTPRequest} from '@octra/utilities';
+import {hasProperty, uniqueHTTPRequest} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +17,10 @@ export class ConfigurationService {
       const validate = ajv.compile(schema);
       const valid = validate(json);
       if (!valid) {
-        for (const err in validate.errors) {
-          if (validate.errors.hasOwnProperty(err)) {
-            const errObj: any = (validate.errors['' + err + '']);
-            if (errObj.hasOwnProperty('dataPath') && !(errObj.dataPath === null || errObj.dataPath === undefined)) {
-              console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
-            }
+        for (const [, value] of Object.entries(validate.errors)) {
+          const errObj: any = value;
+          if (hasProperty(errObj, 'dataPath') && !(errObj.dataPath === null || errObj.dataPath === undefined)) {
+            console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
           }
         }
       } else {
@@ -35,9 +33,9 @@ export class ConfigurationService {
   public loadSettings(messages: any, urls: any, filenames: any, onvalidated: (obj: any) => void,
                       onerror: (error: string) => void) {
     if (
-      messages.hasOwnProperty('loading') &&
-      urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
-      filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
+      hasProperty(messages, 'loading') &&
+      hasProperty(urls, 'json') && hasProperty(urls, 'schema') &&
+      hasProperty(filenames, 'json') && hasProperty(filenames, 'schema')
     ) {
       uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
         (settings: any) => {

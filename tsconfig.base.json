@@ -18,7 +18,7 @@
       "@octra/annotation": ["libs/annotation/src/index.ts"],
       "@octra/components": ["libs/components/src/index.ts"],
       "@octra/media": ["libs/media/src/index.ts"],
-      "@octra/utilities": ["libs/utilities/src/index.ts"]
+      "@octra/utilities": ["./libs/utilities/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

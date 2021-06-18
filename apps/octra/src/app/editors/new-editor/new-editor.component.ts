@@ -32,15 +32,19 @@ export class NewEditorComponent extends OCTRAEditor implements OnInit {
     LinearEditorComponent.initialized.emit();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   afterFirstInitialization() {
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   enableAllShortcuts() {
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   disableAllShortcuts() {
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   openSegment(index: number) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }

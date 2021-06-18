@@ -11,7 +11,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {contains, isUnset, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {contains, hasProperty, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
@@ -267,7 +267,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
-          if (!isUnset(this.appStorage.followPlayCursor) && this.appStorage.followPlayCursor === true) {
+          if (this.appStorage.followPlayCursor !== undefined && this.appStorage.followPlayCursor === true) {
 
             if (this.scrolltimer !== null) {
               this.scrolltimer.unsubscribe();
@@ -322,7 +322,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             this.viewer.redraw();
 
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
-              if (!isUnset(segment)) {
+              if (segment !== undefined) {
                 segment = segment.clone();
                 segment.isBlockedBy = null;
 
@@ -394,7 +394,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                         return a.name === 'ORT-MAU';
                       });
 
-                      if (!isUnset(wordsTier)) {
+                      if (wordsTier !== undefined) {
                         let counter = 0;
 
                         if (segmentIndex < 0) {
@@ -477,10 +477,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           }
         }
         checkUndoRedo();
-      },
-      (error) => {
-      },
-      () => {
       }));
   }
 
@@ -514,8 +510,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       () => {
         subscr.unsubscribe();
         TwoDEditorComponent.initialized.emit();
-      }, () => {
-      }, () => {
       });
   }
 
@@ -524,7 +518,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
 
-      if (!isUnset(segment)) {
+      if (segment !== undefined) {
         if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS && segment.isBlockedBy !== ASRQueueItemType.MAUS) {
           const start: SampleUnit = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
             : this.audioManager.createSampleUnit(0);
@@ -572,7 +566,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       y += 10 + (Math.floor(absx / this.viewer.av.innerWidth) * this.viewer.settings.margin.bottom);
       scrollTo(y, '#special');
 
-    } else if (state === 'open') {
     } else if (state === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');
@@ -617,7 +610,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.loupeHidden = false;
     this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, cursorTime, this.factor)
       .then((newLoupeChunk) => {
-        if (!isUnset(newLoupeChunk)) {
+        if (newLoupeChunk !== undefined) {
           this.audioChunkLoupe = newLoupeChunk;
         }
         this.cd.detectChanges();
@@ -641,7 +634,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   onShortCutTriggered = ($event: ShortcutEvent) => {
     if (this.shortcutsEnabled) {
-      if (!isUnset(this.audioChunkLines)) {
+      if (this.audioChunkLines !== undefined) {
         let shortcutTriggered = false;
         switch ($event.shortcutName) {
           case('play_pause'):
@@ -725,7 +718,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
             .then((newLoupeChunk) => {
-              if (!isUnset(newLoupeChunk)) {
+              if (newLoupeChunk !== undefined) {
                 this.audioChunkLoupe = newLoupeChunk;
                 this.cd.detectChanges();
               }
@@ -742,16 +735,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
       || $event.value === 'do_maus' || $event.value === 'cancel_maus'
     ) && $event.type === 'segment') {
-      // @ts-ignore
-      const timePosition: SampleUnit = (!isUnset($event.timePosition)) ? $event.timePosition : this.viewer.av.mouseCursor;
+      const timePosition: SampleUnit = ($event.timePosition !== undefined) ? $event.timePosition : this.viewer.av.mouseCursor;
 
       const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(timePosition);
 
       if (segmentNumber > -1) {
-        if (!isUnset(this.asrService.selectedLanguage)) {
+        if (this.asrService.selectedLanguage !== undefined) {
           const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
-          if (!isUnset(segment)) {
+          if (segment !== undefined) {
 
             const sampleStart = (segmentNumber > 0)
               ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples
@@ -768,7 +760,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               sampleLength: segment.time.samples - sampleStart
             };
 
-            if (isUnset(segment.isBlockedBy)) {
+            if (segment.isBlockedBy === undefined) {
               if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
                 this.viewer.selectSegment(segmentNumber);
 
@@ -796,8 +788,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               this.asrService.stopASROfItem(item);
               segment.isBlockedBy = null;
             }
-          } else {
-
           }
         } else {
           // open transcr window
@@ -824,7 +814,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         length: -1
       };
 
-      if ($event.hasOwnProperty('selection') && !isUnset($event.selection)) {
+      if (hasProperty($event, "selection") && $event.selection !== undefined) {
         selection.start = $event.selection.start.samples;
         selection.length = $event.selection.duration.samples;
       } else {
@@ -949,7 +939,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public enableAllShortcuts() {
     this.shortcutsEnabled = true;
     this.viewer.enableShortcuts();
-    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+    if (this.window !== undefined && this.window.loupe !== undefined) {
       this.window.loupe.enableShortcuts();
     }
   }
@@ -957,7 +947,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public disableAllShortcuts() {
     this.shortcutsEnabled = false;
     this.viewer.disableShortcuts();
-    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+    if (this.window !== undefined && this.window.loupe !== undefined) {
       this.window.loupe.disableShortcuts();
     }
   }

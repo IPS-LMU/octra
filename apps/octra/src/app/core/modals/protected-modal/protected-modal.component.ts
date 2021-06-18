@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
@@ -6,7 +6,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
   templateUrl: './protected-modal.component.html',
   styleUrls: ['./protected-modal.component.css']
 })
-export class ProtectedModalComponent implements OnInit {
+export class ProtectedModalComponent{
   modalRef: BsModalRef;
   config: ModalOptions = {
     keyboard: false,
@@ -19,9 +19,6 @@ export class ProtectedModalComponent implements OnInit {
   };
 
   constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(data: {

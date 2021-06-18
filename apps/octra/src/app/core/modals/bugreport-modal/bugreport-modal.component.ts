@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
@@ -12,7 +12,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
   styleUrls: ['./bugreport-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BugreportModalComponent implements OnInit {
+export class BugreportModalComponent {
   modalRef: BsModalRef;
   public visible = false;
   public bgdescr = '';
@@ -62,10 +62,6 @@ export class BugreportModalComponent implements OnInit {
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
               public bugService: BugReportService, private settService: SettingsService,
               private cd: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
-
   }
 
   public open(data: {

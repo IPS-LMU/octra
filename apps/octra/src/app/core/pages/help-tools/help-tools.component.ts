@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
@@ -14,7 +14,7 @@ import {Router} from '@angular/router';
   templateUrl: './help-tools.component.html',
   styleUrls: ['./help-tools.component.css']
 })
-export class HelpToolsComponent implements OnInit, OnDestroy {
+export class HelpToolsComponent {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
 
   private subscrManager = new SubscriptionManager<Subscription>();
@@ -24,13 +24,6 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
               private store: Store,
               private modalService: ModalService,
               private router: Router) {
-  }
-
-  ngOnInit() {
-  }
-
-  ngOnDestroy() {
-
   }
 
   refreshApp() {

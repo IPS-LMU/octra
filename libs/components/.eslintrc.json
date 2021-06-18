@@ -11,7 +11,8 @@
       "rules": {
         "no-undefined": "off",
         "strict": "off",
-        "no-empty-function": "off",
+        "@angular-eslint/no-output-native": ["off"],
+        "@typescript-eslint/no-explicit-any": ["off"],
         "@angular-eslint/directive-selector": [
           "error",
           {

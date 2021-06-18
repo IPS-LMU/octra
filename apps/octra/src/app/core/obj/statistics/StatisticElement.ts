@@ -2,6 +2,7 @@
  * Statistic Element Class
  */
 import {ILog, SampleInterval} from '../Settings/logging';
+import {hasProperty} from '@octra/utilities';
 
 export class StatisticElem {
   protected data: ILog = {
@@ -81,17 +82,15 @@ export class StatisticElem {
       segment: null
     };
 
-    for (const attr in elem) {
-      if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp') ||
-          elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') ||
-          elem.hasOwnProperty('cursorpos')
-        ) {
-          if (attr === 'playerpos') {
-            result.playpos = elem[`${attr}`];
-          } else {
-            result[`${attr}`] = elem[`${attr}`];
-          }
+    for (const [name, value] of Object.entries(elem)) {
+      if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp') ||
+        hasProperty(elem, 'type') || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos') ||
+        hasProperty(elem, 'cursorpos')
+      ) {
+        if (name === 'playerpos') {
+          result.playpos = value;
+        } else {
+          result[`${name}`] = elem[`${name}`];
         }
       }
     }

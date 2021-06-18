@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {Annotation, Level} from '@octra/annotation';
-import {isUnset} from '@octra/utilities';
 
 export interface ColumnDefinition {
   type: string;
@@ -274,7 +273,7 @@ export class TableConfiguratorComponent implements OnInit {
         return a.type === type;
       });
     }
-    if (!isUnset(colDef)) {
+    if (colDef !== undefined) {
       const item = {
         title: colDef.type,
         columnDefinition: {
@@ -514,9 +513,8 @@ export class TableConfiguratorComponent implements OnInit {
             return 0;
           } else if (a.samples > b.samples) {
             return 1;
-          } else if (a.samples < b.samples) {
-            return -1;
           }
+          return -1;
         }
       );
     }

@@ -1,9 +1,9 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, ViewChild} from '@angular/core';
 import {AppInfo} from '../../../app.info';
 import {DropZoneComponent} from '../drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {SessionFile} from '../../obj/SessionFile';
-import {contains, fileListToArray, FileSize, getFileSize, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, fileListToArray, FileSize, getFileSize, SubscriptionManager} from '@octra/utilities';
 import {FileProgress} from '../../obj/objects';
 import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
@@ -14,7 +14,7 @@ import {Subscription, timer} from 'rxjs';
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.css']
 })
-export class OctraDropzoneComponent implements OnInit, OnDestroy {
+export class OctraDropzoneComponent implements OnDestroy {
 
   @ViewChild('dropzone', {static: true}) dropzone: DropZoneComponent;
   @Input() height = '250px';
@@ -123,16 +123,12 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  ngOnInit() {
-  }
-
   ngOnDestroy() {
     this.subscrmanager.destroy();
   }
 
   public isValidImportData(file: FileProgress) {
-    if (!isUnset(this._oaudiofile)) {
+    if (this._oaudiofile !== undefined) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
         const converter: Converter = AppInfo.converters[i];
         if (contains(file.file.name.toLowerCase(), AppInfo.converters[i].extension.toLowerCase())) {
@@ -154,8 +150,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                   const importResult: ImportResult = converter.import(ofile, this._oaudiofile);
 
                   const setAnnotation = () => {
-                    if (!isUnset(this._oaudiofile) &&
-                      !isUnset(importResult.annotjson) && importResult.error === '') {
+                    if (this._oaudiofile !== undefined &&
+                      importResult.annotjson !== undefined && importResult.error === '') {
                       file.status = 'valid';
                       if (!(this._oaudiofile === null || this._oaudiofile === undefined)) {
                         for (const level of importResult.annotjson.levels) {
@@ -280,7 +276,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     const files = fileListToArray(this.dropzone.files);
 
     for (const importfile of files) {
-      if (isUnset(extension)) {
+      if (extension === undefined) {
         extension = importfile.name.substr(importfile.name.lastIndexOf('.'));
       }
 
@@ -344,7 +340,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           fileProcess.progress = (result.decodeProgress) / 2 + 0.5;
           // console.log((window.performance as any).memory.jsHeapSizeLimit - (window.performance as any).memory.usedJSHeapSize);
 
-          if (isUnset(result.audioManager)) {
+          if (result.audioManager === undefined) {
             // not finished
           } else {
             // finished, get result

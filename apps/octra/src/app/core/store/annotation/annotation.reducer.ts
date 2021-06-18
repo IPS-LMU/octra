@@ -3,7 +3,6 @@ import {AnnotationState, LoginMode} from '../index';
 import {AnnotationActions} from './annotation.actions';
 import {IDBActions} from '../idb/idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
-import {isUnset} from '@octra/utilities';
 import {IIDBModeOptions} from '../../shared/octra-database';
 
 export const initialState: AnnotationState = {
@@ -200,10 +199,8 @@ export class AnnotationStateReducers {
           options = localOptions;
         }
 
-        for (const name in options) {
-          if (options.hasOwnProperty(name)) {
-            result = this.writeOptionToStore(result, name, options[name]);
-          }
+        for (const [name, value] of Object.entries(options)) {
+          result = this.writeOptionToStore(result, name, value);
         }
 
         return result;
@@ -238,12 +235,12 @@ export class AnnotationStateReducers {
       case('currentEditor'):
         return {
           ...state,
-          currentEditor: (!isUnset(value)) ? value : '2D-Editor'
+          currentEditor: (value !== undefined) ? value : '2D-Editor'
         };
       case('logging'):
         return {
           ...state,
-          logging: (!isUnset(value)) ? value : true
+          logging: (value !== undefined) ? value : true
         };
     }
 

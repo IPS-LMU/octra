@@ -425,14 +425,7 @@ export class AudioManager {
   }
 
   public addChunk(chunk: AudioChunk) {
-    if (
-      this.chunks.filter(
-        (a) => {
-          if (a.id === chunk.id) {
-            return true;
-          }
-        }
-      ).length === 0) {
+    if (this.chunks.filter((a) => a.id === chunk.id).length === 0) {
       this.chunks.push(chunk);
     }
   }
@@ -820,7 +813,7 @@ export class AudioChunk {
               }
               if (this._replay) {
                 this.setState(state);
-                return new Promise<void>((resolve2, reject2) => {
+                new Promise<void>((resolve2, reject2) => {
                   this.subscrManager.add(timer(200).subscribe(() => {
                     this.startPlayback(playOnHover).then(() => {
                       resolve2();
@@ -837,6 +830,7 @@ export class AudioChunk {
               }
             } else {
               this.setState(state);
+              resolve();
             }
           },
           (error) => {

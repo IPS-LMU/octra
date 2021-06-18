@@ -22,7 +22,6 @@ export class ELANConverter extends Converter {
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
     if (!(annotation === undefined || annotation === null)) {
-      let result: string;
       let filename = '';
 
       const x2js = new X2JS();
@@ -106,7 +105,7 @@ export class ELANConverter extends Converter {
       }
 
       filename = `${annotation.name}${this._extension}`;
-      result = x2js.js2xml(jsonObj);
+      const result = x2js.js2xml(jsonObj);
 
       return {
         file: {
@@ -147,7 +146,6 @@ export class ELANConverter extends Converter {
 
             if (t1 < 0 || t2 < 0) {
               result.error = 'Invalid time unit found';
-              return result;
             } else {
               if (t1 > lastSample) {
                 // empty segment space before
@@ -179,9 +177,9 @@ export class ELANConverter extends Converter {
       } else {
         result.error = 'The timeunits must be miliseconds';
       }
-
-      return result;
     }
+
+    return result;
   }
 
   private getSamplesFromTimeSlot(obj: ELAN30Object, slotID: string, sampleRate: number) {
@@ -272,7 +270,7 @@ export class ELAN30Object {
       _EXT_REF?: string,
       _LEXICON_REF?: string
     },
-    LOCALE?: {},
+    LOCALE?: any,
     LANGUAGE?: {
       _LANG_ID: string,
       _LANG_DEF?: string,

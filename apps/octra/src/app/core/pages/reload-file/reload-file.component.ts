@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
@@ -16,7 +16,7 @@ import {OIDBLevel, OIDBLink} from '@octra/annotation';
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.css']
 })
-export class ReloadFileComponent implements OnInit {
+export class ReloadFileComponent {
 
   @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
   private error = '';
@@ -90,9 +90,6 @@ export class ReloadFileComponent implements OnInit {
 
   public isN(obj: any): boolean {
     return (obj === null || obj === undefined);
-  }
-
-  ngOnInit() {
   }
 
   getDropzoneFileString(file: File | SessionFile) {

@@ -15,9 +15,6 @@ export class AuthenticationNeededComponent implements OnInit, OnDestroy {
   public destroyed = new EventEmitter<void>();
   public clickedOnAuthenticate = false;
 
-  constructor() {
-  }
-
   ngOnInit() {
     this.initialized.emit();
   }

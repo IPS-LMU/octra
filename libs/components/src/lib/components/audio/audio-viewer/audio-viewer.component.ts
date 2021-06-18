@@ -1015,7 +1015,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createSegmentsForCanvas() {
-    let drawnSegments = 0;
     let drawnBoundaries = 0;
     let y = 0;
 
@@ -1106,7 +1105,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   }
                 });
 
-                drawnSegments++;
                 overlayGroup.add(overlaySegment);
 
                 if (this.settings.showTranscripts) {
@@ -1308,10 +1306,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           && absY <= Math.abs(this.layers.background.y()) + this.stage.height() && segment?.time !== undefined) {
 
           const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-          let relX = 0;
-
-          relX = absX % this.av.innerWidth + this.settings.margin.left;
           const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segment?.time, this.av.innerWidth);
+
           let w = 0;
           let x = select.start;
 
@@ -1379,9 +1375,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
             const h = this.settings.lineheight;
             const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-            let relX = 0;
-
-            relX = absX % this.av.innerWidth + this.settings.margin.left;
             const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segment.time, this.av.innerWidth);
             let w = 0;
             let x = select.start;
@@ -2299,9 +2292,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
 
           const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
-          let relX = 0;
-
-          relX = absX % this.av.innerWidth + this.settings.margin.left;
           const select = this.av.getRelativeSelectionByLine(j, lineWidth, beginTime, segment.time, this.av.innerWidth);
           let w = 0;
           let x = select.start;

@@ -1,6 +1,5 @@
 import {createReducer, on} from '@ngrx/store';
 import {ApplicationState, LoadingStatus, LoginMode} from '../index';
-import {isUnset} from '@octra/utilities';
 import {ApplicationActions} from './application.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {IDBActions} from '../idb/idb.actions';
@@ -219,7 +218,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
     case('language'):
       return {
         ...state,
-        language: (!isUnset(value)) ? value : 'en'
+        language: (value !== undefined) ? value : 'en'
       };
     case('usemode'):
       return {
@@ -231,7 +230,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
         ...state,
         options: {
           ...state.options,
-          easyMode: (!isUnset(value)) ? value : false
+          easyMode: (value !== undefined) ? value : false
         }
       };
     case('showLoupe'):
@@ -239,7 +238,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
         ...state,
         options: {
           ...state.options,
-          showLoupe: (!isUnset(value)) ? value : false
+          showLoupe: (value !== undefined) ? value : false
         }
       };
     case('secondsPerLine'):
@@ -247,7 +246,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
         ...state,
         options: {
           ...state.options,
-          secondsPerLine: (!isUnset(value)) ? value : 5
+          secondsPerLine: (value !== undefined) ? value : 5
         }
       };
     case('audioSettings'):
@@ -256,8 +255,8 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
         options: {
           ...state.options,
           audioSettings: {
-            volume: (!isUnset(value)) ? value.volume : 1,
-            speed: (!isUnset(value)) ? value.speed : 1
+            volume: (value !== undefined) ? value.volume : 1,
+            speed: (value !== undefined) ? value.speed : 1
           }
         }
       };
@@ -266,7 +265,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
         ...state,
         options: {
           ...state.options,
-          highlightingEnabled: (!isUnset(value)) ? value : false
+          highlightingEnabled: (value !== undefined) ? value : false
         }
       };
     default:

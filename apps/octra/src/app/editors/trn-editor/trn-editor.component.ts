@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -24,7 +23,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {LoginMode} from '../../core/store';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ValidationPopoverComponent} from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {isUnset, selectAllTextOfNode, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {selectAllTextOfNode, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
@@ -40,7 +39,7 @@ declare let validateAnnotation: any;
   styleUrls: ['./trn-editor.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
+export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy {
 
   get textEditor(): Texteditor {
     return this._textEditor;
@@ -305,9 +304,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.alertService.showAlert('success', this.translocoService.translate('alerts.combine segments successful'));
   }
 
-  ngAfterViewInit() {
-  }
-
   ngOnInit() {
     this.keyMap.register(this.shortcuts);
     this.keyMap.register(this.tableShortcuts);
@@ -450,12 +446,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   afterFirstInitialization() {
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   enableAllShortcuts() {
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   disableAllShortcuts() {
   }
 
@@ -463,7 +462,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     return (index > 0) ? this.transcrService.currentlevel.segments.get(index - 1).time.unix : 0
   }
 
-  openSegment(index: number) {
+  openSegment() {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }
 
@@ -509,7 +508,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
     const isAnySegmentSelected = this.shownSegments.findIndex(a => a.isSelected) > -1;
 
-    if (!isUnset(this.contextMenu) && isAnySegmentSelected) {
+    if (this.contextMenu !== undefined && isAnySegmentSelected) {
       this.contextMenu.showMenu();
     }
 
@@ -621,7 +620,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     let html = segment.transcript;
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
-        && !isUnset(this.transcrService.validationArray[i])) {
+        && this.transcrService.validationArray[i] !== undefined) {
         if (obj.transcription.text !== '') {
           html = this.transcrService.underlineTextRed(obj.transcription.text,
             this.transcrService.validationArray[i].validation);
@@ -785,7 +784,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
         this.transcrService.currentlevel.segments.change(segmentIndex, segment);
       }
     } else {
-      const isNull = isUnset(this.transcrService.currentlevel.segments);
+      const isNull = this.transcrService.currentlevel.segments === undefined;
       console.log(`could not save segment. segment index=${segmentIndex},
 segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
@@ -1264,7 +1263,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   private waitForTranscrEditor() {
     return new Promise<void>((resolve, reject) => {
-      if (!isUnset(this.transcrEditor)) {
+      if (this.transcrEditor !== undefined) {
         this.transcrEditor.waitForValidationFinished().then(() => {
           resolve();
         });

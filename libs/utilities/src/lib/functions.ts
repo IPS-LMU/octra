@@ -347,3 +347,7 @@ export function waitTillResultRetrieved(actions: Actions, success: Action, failu
     });
   });
 }
+
+export function hasProperty(obj: any, attribute: string) {
+  return Object.entries(obj).findIndex(([key]) => key === attribute) > -1;
+}

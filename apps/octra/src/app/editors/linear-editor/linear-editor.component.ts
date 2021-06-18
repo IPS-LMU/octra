@@ -1,15 +1,5 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
-import {contains, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {contains, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 
@@ -39,7 +29,7 @@ import {Subscription, timer} from 'rxjs';
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.css']
 })
-export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = 'Linear Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('signalDisplayTop', {static: true}) signalDisplayTop: AudioViewerComponent;
@@ -175,7 +165,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   get segmententer_shortc(): string {
     const segmentEnterShortcut = this.signalDisplayTop.settings.shortcuts.items.find(a => a.name === 'segment_enter');
-    if (!isUnset(segmentEnterShortcut) && !isUnset(this.signalDisplayTop.settings)) {
+    if (segmentEnterShortcut !== undefined && this.signalDisplayTop.settings !== undefined) {
       return segmentEnterShortcut.keys[this.platform]
     }
     return '';
@@ -207,7 +197,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           event.shortcut === 'SHIFT + ALT + 3') {
 
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            if (!isUnset(this.audioChunkDown) && this.segmentselected && this.selectedIndex > -1) {
+            if (this.audioChunkDown !== undefined && this.segmentselected && this.selectedIndex > -1) {
               this.editor.updateRawText();
               this.save();
               resolve();
@@ -329,13 +319,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.cd.detectChanges();
   }
 
-  ngOnChanges(obj: SimpleChanges) {
-    if (!(obj.mini_loupe === null || obj.mini_loupe === undefined)) {
-      if (obj.mini_loupe.isFirstChange() && this.appStorage.showLoupe) {
-      }
-    }
-  }
-
   ngOnDestroy() {
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
@@ -374,9 +357,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       () => {
         LinearEditorComponent.initialized.emit();
         subscr.unsubscribe();
-      }, () => {
-      },
-      () => {
       });
   }
 
@@ -385,7 +365,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (selection.length > 0) {
         selection.checkSelection();
         this.segmentselected = false;
-        if (!isUnset(this.audioChunkDown)) {
+        if (this.audioChunkDown !== undefined) {
           this.audioChunkDown.destroy();
         }
         this.audioChunkDown = new AudioChunk(this.audioChunkTop.selection.clone(), this.audioManager);
@@ -472,10 +452,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     if (this.shortcutsEnabled) {
       const comboKey = $event.shortcut;
 
-      if (!isUnset(this.audioShortcutsTopDisplay) && !isUnset(this.audioShortcutsBottomDisplay)) {
+      if (this.audioShortcutsTopDisplay !== undefined && this.audioShortcutsBottomDisplay !== undefined) {
         const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top_audio') ? this.audioChunkTop : this.audioChunkDown;
         const controlName = $event.shortcutGroupName.replace('_audio', '');
-        if (!isUnset(currentAudioChunk)) {
+        if (currentAudioChunk !== undefined) {
           switch ($event.shortcutName) {
             case('play_pause'):
               this.selectedAudioChunk = currentAudioChunk;
@@ -530,7 +510,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
         if (this.appStorage.showLoupe) {
           const event = $event.event;
-          if (!isUnset(this.miniloupe) && this.signalDisplayTop.focused) {
+          if (this.miniloupe !== undefined && this.signalDisplayTop.focused) {
             if (event.key === '+' || event.key === '-') {
               if (event.key === '+') {
                 this.factor = Math.min(12, this.factor + 1);
@@ -545,7 +525,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe,
                 this.signalDisplayTop.av.mouseCursor, this.factor)
                 .then((newLoupeChunk) => {
-                  if (!isUnset(newLoupeChunk)) {
+                  if (newLoupeChunk !== undefined) {
                     this.audioChunkLoupe = newLoupeChunk;
                   }
                 });
@@ -673,7 +653,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe, cursorTime, this.factor)
       .then((newLoupeChunk) => {
-        if (!isUnset(newLoupeChunk)) {
+        if (newLoupeChunk !== undefined) {
           this.audioChunkLoupe = newLoupeChunk;
         }
       });
@@ -749,14 +729,14 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   public enableAllShortcuts() {
     this.signalDisplayTop.enableShortcuts();
-    if (!isUnset(this.signalDisplayDown)) {
+    if (this.signalDisplayDown !== undefined) {
       this.signalDisplayDown.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.signalDisplayTop.disableShortcuts();
-    if (!isUnset(this.signalDisplayDown)) {
+    if (this.signalDisplayDown !== undefined) {
       this.signalDisplayDown.disableShortcuts();
     }
   }

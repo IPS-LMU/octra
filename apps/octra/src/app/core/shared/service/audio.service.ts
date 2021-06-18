@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {downloadFile, isUnset, SubscriptionManager} from '@octra/utilities';
+import {downloadFile, SubscriptionManager} from '@octra/utilities';
 import {AudioManager} from '@octra/media';
 
 @Injectable()
@@ -37,8 +37,7 @@ export class AudioService {
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
   public loadAudio: (url: string) => Subject<any>
-    = (url: string, callback: any = () => {
-  }) => {
+    = (url: string) => {
     this._loaded = false;
 
     const subj = new Subject<number>();
@@ -59,7 +58,7 @@ export class AudioService {
 
           this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', event.result, AppInfo.audioformats).subscribe(
             (result) => {
-              if (!isUnset(result.audioManager)) {
+              if (result.audioManager !== undefined) {
                 // finished
                 console.log(`REGISTER AUDIOMANAGER`);
                 this.registerAudioManager(result.audioManager);

@@ -3,7 +3,7 @@ import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {contains, isUnset} from '@octra/utilities';
+import {contains} from '@octra/utilities';
 import {PlayBackStatus, SampleUnit} from '@octra/media';
 
 @Injectable({
@@ -67,7 +67,7 @@ export class UserInteractionsService {
                                // tslint:disable-next-line:align
                              }, targetName?: string) {
     this._lastAction = Date.now();
-    const originalPlayerPos = (!isUnset(playpos)) ? playpos.samples : -1;
+    const originalPlayerPos = (playpos !== undefined) ? playpos.samples : -1;
 
     if (this._enabled) {
       let name = '';
@@ -78,7 +78,7 @@ export class UserInteractionsService {
           context = event.target;
           name = context.getAttribute('name');
 
-          if (!name && !isUnset(context)) {
+          if (!name && context !== undefined) {
             name = context.parentNode.getAttribute('name');
           }
           if (!name) {
@@ -95,7 +95,7 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          (!isUnset(playpos)) ? playpos.samples : -1,
+          (playpos !== undefined) ? playpos.samples : -1,
           caretpos,
           selection,
           segment
@@ -159,8 +159,7 @@ export class UserInteractionsService {
       let newElem = null;
 
       newElem = MouseStatisticElem.fromAny(elem);
-      if (newElem) {
-      } else {
+      if (newElem !== undefined) {
         console.log(`is not mouse StatisticElem`);
         newElem = StatisticElem.fromAny(elem);
       }

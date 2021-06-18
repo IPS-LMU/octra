@@ -2,8 +2,8 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {API} from '../../obj/API/api.interface';
-import {isUnset} from '@octra/utilities';
 import {AppStorageService} from './appstorage.service';
+import {hasProperty} from '@octra/utilities';
 
 @Injectable()
 export class APIService implements API {
@@ -220,10 +220,10 @@ export class APIService implements API {
   public setOnlineSessionToFree = (appStorage: AppStorageService) => {
     // check if old annotation is already annotated
     return new Promise<void>((resolve, reject) => {
-      if (!isUnset(appStorage.dataID) && appStorage.dataID > -1) {
+      if (appStorage.dataID !== undefined && appStorage.dataID > -1) {
         this.fetchAnnotation(appStorage.dataID).then((json) => {
-          if (!isUnset(json) && !isUnset(json.data)) {
-            if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+          if (json !== undefined && json.data !== undefined) {
+            if (hasProperty(json.data, 'status') && json.data.status === 'BUSY') {
               this.closeSession(appStorage.onlineSession.loginData.id, appStorage.dataID, '').then(() => {
                 resolve();
               }).catch((error) => {

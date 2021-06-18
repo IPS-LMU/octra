@@ -1,18 +1,16 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
   OnDestroy,
-  OnInit,
   Output,
   ViewChild
 } from '@angular/core';
 import {DragulaService} from 'ng2-dragula';
 import {Subject, Subscription} from 'rxjs';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {Segment} from '@octra/annotation';
 
 @Component({
@@ -21,7 +19,7 @@ import {Segment} from '@octra/annotation';
   styleUrls: ['./naming-drag-and-drop.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NamingDragAndDropComponent implements OnDestroy {
 
   public namingConventionArray = [
     'text',
@@ -58,7 +56,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
 
   public get preview(): string {
     let result = '';
-    if (!isUnset(this.firstSegment)) {
+    if (this.firstSegment !== undefined) {
       for (const resultConvention of this.resultConvention) {
         const item = resultConvention;
         if (item.type === 'text') {
@@ -112,14 +110,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
 
     this.subcrManager.add(this.dragulaService.dragend('namingDragDrop').subscribe(() => {
         this.cd.detectChanges();
-      },
-      (error) => {
-      },
-      () => {
       }));
-  }
-
-  ngOnInit() {
   }
 
   remove(i: number) {
@@ -143,9 +134,6 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
       });
     }
     this.namingConventionchanged.next(this.namingConvention);
-  }
-
-  ngAfterViewInit() {
   }
 
   onItemClick(event, i) {

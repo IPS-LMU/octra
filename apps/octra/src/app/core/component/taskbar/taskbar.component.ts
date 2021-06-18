@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
@@ -6,7 +6,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
   templateUrl: './taskbar.component.html',
   styleUrls: ['./taskbar.component.css']
 })
-export class FastbarComponent implements OnInit {
+export class FastbarComponent {
 
   @Input() responsive = false;
   @Input() buttonLabels: any = {
@@ -21,8 +21,5 @@ export class FastbarComponent implements OnInit {
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(public appStorage: AppStorageService) {
-  }
-
-  ngOnInit() {
   }
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {BrowserInfo} from '../../shared';
 import {CompatibilityService} from '../../shared/service/compatibility.service';
@@ -8,16 +8,13 @@ import {CompatibilityService} from '../../shared/service/compatibility.service';
   templateUrl: './browser-test.component.html',
   styleUrls: ['./browser-test.component.css']
 })
-export class BrowserTestComponent implements OnInit {
+export class BrowserTestComponent {
 
   public get browserName(): string {
     return BrowserInfo.browser;
   }
 
   constructor(private router: Router, public compatibility: CompatibilityService) {
-  }
-
-  ngOnInit() {
   }
 
   getStateIcon(rule: any): 'spinner' | 'times' | 'check' {
@@ -29,6 +26,7 @@ export class BrowserTestComponent implements OnInit {
       case('ok'):
         return 'check';
     }
+    return 'spinner';
   }
 
   getStateColor(rule: any): string {
@@ -40,6 +38,7 @@ export class BrowserTestComponent implements OnInit {
       case('ok'):
         return 'forestgreen';
     }
+    return 'processing';
   }
 
   test() {

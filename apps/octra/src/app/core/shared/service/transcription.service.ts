@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {escapeHtml, escapeRegex, getFileSize, insertString, isUnset, SubscriptionManager} from '@octra/utilities';
+import {escapeHtml, escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -77,7 +77,7 @@ export class TranscriptionService {
    */
 
   public get currentlevel(): Level {
-    if (isUnset(this._selectedlevel) || this._selectedlevel < 0) {
+    if (this._selectedlevel === undefined || this._selectedlevel < 0) {
       return this._annotation.levels[0];
     }
     return this._annotation.levels[this._selectedlevel];
@@ -189,18 +189,18 @@ export class TranscriptionService {
       }));
 
     this._currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
-    if (!isUnset(this.settingsService.appSettings) &&
-      this.settingsService.appSettings.octra.hasOwnProperty('maintenanceNotification') &&
+    if (this.settingsService.appSettings !== undefined &&
+      hasProperty(this.settingsService.appSettings.octra, 'maintenanceNotification') &&
       this.settingsService.appSettings.octra.maintenanceNotification.active === 'active') {
       const maintenanceAPI = new MaintenanceAPI(this.settingsService.appSettings.octra.maintenanceNotification.apiURL, this.http);
 
       maintenanceAPI.readMaintenanceNotifications(24).then((notification) => {
         // only check in interval if there is a pending maintenance in the next 24 hours
-        if (!isUnset(notification)) {
+        if (notification !== undefined) {
           const readNotification = () => {
             // notify after 15 minutes one hour before the maintenance begins
             maintenanceAPI.readMaintenanceNotifications(1).then((notification2) => {
-              if (!isUnset(notification2)) {
+              if (notification2 !== undefined) {
                 moment.locale(this.appStorage.language);
                 this.alertTriggered.next({
                   type: 'warning',
@@ -222,7 +222,7 @@ export class TranscriptionService {
             readNotification();
           }));
 
-          if (!isUnset(this.maintenanceChecker)) {
+          if (this.maintenanceChecker !== undefined) {
             this.maintenanceChecker.unsubscribe();
           }
           // run each 15 minutes
@@ -236,9 +236,9 @@ export class TranscriptionService {
 
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
-    if (!isUnset(this._annotation)
+    if (this._annotation !== undefined
       && this._annotation.levels.length > 0
-      && !isUnset(this._annotation.levels[this._selectedlevel])) {
+      && this._annotation.levels[this._selectedlevel] !== undefined) {
       const level = this.currentlevel;
 
       this.appStorage.save('annotation', {
@@ -379,7 +379,7 @@ export class TranscriptionService {
     return new Promise<void>(
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
-          if (isUnset(this.appStorage.annotationLevels) || this.appStorage.annotationLevels.length === 0) {
+          if (this.appStorage.annotationLevels === undefined || this.appStorage.annotationLevels.length === 0) {
             const newLevels: OIDBLevel[] = [];
             const newLinks: OIDBLink[] = [];
             const newAnnotJSON = this.createNewAnnotation();
@@ -394,7 +394,7 @@ export class TranscriptionService {
 
 
             if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
-              if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
+              if (this.appStorage.serverDataEntry !== undefined && this.appStorage.serverDataEntry.transcript !== undefined
                 && this.appStorage.serverDataEntry.transcript.length > 0) {
                 // import logs
                 this.appStorage.setLogs(this.appStorage.serverDataEntry.logtext);
@@ -412,7 +412,7 @@ export class TranscriptionService {
                     newLevels[0].level.items.push(oseg);
                   }
                 }
-              } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+              } else if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
                 && typeof this.appStorage.prompttext === 'string') {
                 // prompt text available and server transcript is null
                 // set prompt as new transcript
@@ -473,7 +473,7 @@ export class TranscriptionService {
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
-          if (!isUnset(this.appStorage.annotationLevels)) {
+          if (this.appStorage.annotationLevels !== undefined) {
             this.updateAnnotation(this.appStorage.annotationLevels, this.appStorage.annotationLinks);
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
@@ -536,13 +536,13 @@ export class TranscriptionService {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
-        project: (isUnset(this.appStorage.onlineSession.loginData.project))
+        project: (this.appStorage.onlineSession.loginData.project === undefined)
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.project,
-        annotator: (isUnset(this.appStorage.onlineSession.loginData.id))
+        annotator: (this.appStorage.onlineSession.loginData.id === undefined)
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.id,
         transcript: null,
         comment: this._feedback.comment,
-        jobno: (isUnset(this.appStorage.onlineSession.loginData.jobNumber))
+        jobno: (this.appStorage.onlineSession.loginData.jobNumber === undefined)
           ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.jobNumber,
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
@@ -650,7 +650,7 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      (isUnset(this.appStorage.onlineSession.loginData.project))
+      (this.appStorage.onlineSession.loginData.project === undefined)
         ? 'local' : this.appStorage.onlineSession.loginData.project,
       now.toUTCString(),
       this._annotation.audiofile.name,
@@ -721,7 +721,7 @@ export class TranscriptionService {
 
       const markers = this.guidelines.markers;
       // replace all tags that are not markers
-      result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
+      result = result.replace(new RegExp(/(<\/?)?([^<>]+)(>)/, 'g'), (g0, g1, g2, g3) => {
         g1 = (g1 === undefined) ? '' : g1;
         g2 = (g2 === undefined) ? '' : g2;
         g3 = (g3 === undefined) ? '' : g3;
@@ -763,11 +763,11 @@ export class TranscriptionService {
         result = result.replace(/\s?{([0-9]+)}\s?/g, (x, g1) => {
           return ' <img src="assets/img/components/transcr-editor/boundary.png" ' +
             'class="btn-icon-text boundary" style="height:16px;" ' +
-            'data-samples="' + g1 + '" alt="\[|' + g1 + '|\]"> ';
+            'data-samples="' + g1 + '" alt="[|' + g1 + '|]"> ';
         });
 
         // replace markers
-        const regex = new RegExp('(\s)*(' + escapeRegex(marker.code) + ')(\s)*', 'g');
+        const regex = new RegExp('( )*(' + escapeRegex(marker.code) + ')( )*', 'g');
         result = result.replace(regex, (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
           const s3 = (g3) ? g3 : '';
@@ -780,7 +780,7 @@ export class TranscriptionService {
               'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
             // is text or ut8 symbol
-            if (!isUnset(marker.icon) && marker.icon !== '') {
+            if (marker.icon !== undefined && marker.icon !== '') {
               img = marker.icon;
             } else {
               img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -854,16 +854,13 @@ export class TranscriptionService {
         }
       }
 
-      insertions = insertions.sort((a, b) => {
+      insertions = insertions.sort((a: Pos, b: Pos) => {
         if (a.start === b.start) {
           return 0;
-        }
-        if (a.start < b.start) {
+        } else if (a.start < b.start) {
           return -1;
         }
-        if (a.start > b.start) {
-          return 1;
-        }
+        return 1;
       });
 
       let puffer = '';
@@ -883,7 +880,7 @@ export class TranscriptionService {
       const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {
-        if (!isUnset(instruction.entries) && isArray(instruction.entries)) {
+        if (instruction.entries !== undefined && isArray(instruction.entries)) {
           for (const entry of instruction.entries) {
             const newEntry = {...entry};
             if (newEntry.code === code) {
@@ -902,7 +899,6 @@ export class TranscriptionService {
   public requestSegment(segnumber: number) {
     if (segnumber < this._annotation.levels[this._selectedlevel].segments.length) {
       this.segmentrequested.emit(segnumber);
-    } else {
     }
   }
 
@@ -919,7 +915,7 @@ export class TranscriptionService {
     html = '<p>' + html + '</p>';
     const dom = jQuery(html);
 
-    const replaceFunc = (i, elem) => {
+    const replaceFunc = (i: number, elem: any) => {
       if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
         jQuery.each(jQuery(elem).children(), replaceFunc);
       } else {
@@ -945,6 +941,7 @@ export class TranscriptionService {
           jQuery(elem).remove();
         }
       }
+      return undefined;
     };
 
     jQuery.each(dom.children(), replaceFunc);

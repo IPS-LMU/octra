@@ -90,17 +90,13 @@ export class FeedBackForm {
 
   public importData(feedbackData: any): any {
     const result = {};
-    for (const attr in feedbackData) {
-      if (feedbackData.hasOwnProperty(attr)) {
-        const value = feedbackData[`${attr}`];
-
-        if (isArray(value)) {
-          for (const valueElement of value) {
-            this.setValueForControl(attr, valueElement);
-          }
-        } else {
-          this.setValueForControl(attr, value);
+    for (const [name, value] of Object.entries(feedbackData)) {
+      if (isArray(value)) {
+        for (const valueElement of value) {
+          this.setValueForControl(name, valueElement);
         }
+      } else {
+        this.setValueForControl(name, value as string);
       }
     }
 

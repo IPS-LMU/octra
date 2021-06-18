@@ -60,10 +60,8 @@ export const reducer = createUndoRedoReducer(
   on(IDBActions.loadOptionsSuccess, (state: LocalModeState, {localOptions}) => {
       let result = state;
 
-      for (const name in localOptions) {
-        if (localOptions.hasOwnProperty(name)) {
-          result = writeOptionToStore(result, name, localOptions[name]);
-        }
+      for (const [name, value] of Object.entries(localOptions)) {
+        result = writeOptionToStore(result, name, value);
       }
 
       return result;
@@ -73,10 +71,10 @@ export const reducer = createUndoRedoReducer(
 
 
 function writeOptionToStore(state: LocalModeState, attribute: string, value: any): LocalModeState {
+  const sessionFile = SessionFile.fromAny(value);
+
   switch (attribute) {
     case('sessionfile'):
-      const sessionFile = SessionFile.fromAny(value);
-
       return {
         ...state,
         sessionFile

@@ -1,7 +1,6 @@
 import Dexie, {Transaction} from 'dexie';
 import {Subject} from 'rxjs';
 import {IAnnotJSON} from '@octra/annotation';
-import {isUnset} from '@octra/utilities';
 import {LoginMode} from '../store';
 
 export class OctraDatabase extends Dexie {
@@ -187,14 +186,17 @@ export class OctraDatabase extends Dexie {
       const table = this.getTableFromString(mode);
 
       if (table) {
-        return table.get('options').then((options) => {
-          if (!isUnset(options)) {
+        table.get('options').then((options) => {
+          if (options !== undefined) {
             resolve(options.value)
+          } else {
+            resolve(DefaultModeOptions);
           }
-          resolve(null);
         }).catch((e) => {
           reject(e);
         });
+      } else {
+        resolve(DefaultModeOptions);
       }
     });
   }
@@ -203,12 +205,13 @@ export class OctraDatabase extends Dexie {
     return new Promise<any[]>((resolve, reject) => {
       const table = this.getTableFromString(mode);
 
-      if (table) {
-        return table.get('logs').then((logs) => {
-          if (!isUnset(logs)) {
+      if (table !== undefined) {
+        table.get('logs').then((logs) => {
+          if (logs !== undefined) {
             resolve(logs.value)
+          } else {
+            resolve([]);
           }
-          resolve([]);
         }).catch((e) => {
           reject(e);
         });

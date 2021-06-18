@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
 import {DefaultModeOptions, IIDBEntry, IIDBModeOptions, OctraDatabase} from '../octra-database';
-import {isUnset} from '@octra/utilities';
 import {LoginMode} from '../../store';
 import {IAnnotJSON, OAnnotJSON} from '@octra/annotation';
 
@@ -17,9 +16,6 @@ export class IDBService {
 
   public get isReady(): boolean {
     return this._isReady;
-  }
-
-  constructor() {
   }
 
   /**
@@ -76,7 +72,7 @@ export class IDBService {
   public loadConsoleEntries(): Promise<ConsoleEntry[]> {
     return new Promise<ConsoleEntry[]>((resolve, reject) => {
       this.database.options.get('console').then((entry) => {
-        if (!isUnset(entry)) {
+        if (entry !== undefined) {
           resolve(entry.value as ConsoleEntry[]);
         } else {
           resolve([]);
@@ -107,7 +103,7 @@ export class IDBService {
       name: string;
     }[]>((resolve, reject) => {
       this.database.options.bulkGet(keys).then((values) => {
-        resolve(values.filter(a => !isUnset(a)));
+        resolve(values.filter(a => a !== undefined));
       }).catch((error) => {
         reject(error);
       });
@@ -134,11 +130,17 @@ export class IDBService {
    * @param value
    */
   public saveOption(key: string, value: any) {
-    if (this.isReady) {
-      return this.database.options.put({name: key, value}, key);
-    } else {
-      console.error(new Error(`can't save option ${key}, because idb is not ready.`));
-    }
+    return new Promise<string>((resolve, reject)=>{
+      if (this.isReady) {
+        this.database.options.put({name: key, value}, key).then((result) => {
+            resolve(result);
+          }).catch((error)=>{
+            reject(error);
+          });
+      } else {
+        reject(new Error(`can't save option ${key}, because idb is not ready.`));
+      }
+    });
   }
 
   public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {

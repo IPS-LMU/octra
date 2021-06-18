@@ -9,7 +9,7 @@ import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'ang
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../tools/table-configurator/table-configurator.component';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Converter, IFile} from '@octra/annotation';
@@ -130,7 +130,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
 
       this.visible = true;
-      if (!isUnset(this.tableConfigurator)) {
+      if (this.tableConfigurator !== undefined) {
         this.tableConfigurator.updateAllTableCells();
       }
 
@@ -185,7 +185,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   private setParentFormatURI(url: string) {
-    if (!isUnset(this.parentformat.uri)) {
+    if (this.parentformat.uri !== undefined) {
       window.URL.revokeObjectURL(this.parentformat.uri['changingThisBreaksApplicationSecurity']);
     }
     this.parentformat.uri = this.sanitize(url);
@@ -198,7 +198,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   updateParentFormat(converter: Converter, levelnum?: number) {
-    if (isUnset(levelnum) && !converter.multitiers) {
+    if (levelnum === undefined && !converter.multitiers) {
       levelnum = 0;
     }
 
@@ -281,11 +281,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.subscrmanager.destroy();
 
-    if (!isUnset(this.tools.audioCutting.result.url)) {
+    if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
     }
 
-    if (!isUnset(this.parentformat.uri)) {
+    if (this.parentformat.uri !== undefined) {
       const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }

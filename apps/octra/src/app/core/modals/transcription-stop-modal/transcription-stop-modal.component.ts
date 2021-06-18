@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
@@ -13,7 +13,7 @@ export enum TranscriptionStopModalAnswer {
   styleUrls: ['./transcription-stop-modal.component.css']
 })
 
-export class TranscriptionStopModalComponent implements OnInit {
+export class TranscriptionStopModalComponent {
   modalRef: BsModalRef;
 
   config: ModalOptions = {
@@ -27,9 +27,6 @@ export class TranscriptionStopModalComponent implements OnInit {
   private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
 
   constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<TranscriptionStopModalAnswer> {

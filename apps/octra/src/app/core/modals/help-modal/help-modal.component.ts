@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
@@ -8,7 +8,7 @@ import {SubscriptionManager} from '@octra/utilities';
   templateUrl: './help-modal.component.html',
   styleUrls: ['./help-modal.component.css']
 })
-export class HelpModalComponent implements OnInit, OnDestroy {
+export class HelpModalComponent implements OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
 
@@ -18,12 +18,6 @@ export class HelpModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
 
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {

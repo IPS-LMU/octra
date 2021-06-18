@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
@@ -11,7 +11,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './transcription-end.component.html',
   styleUrls: ['./transcription-end.component.css']
 })
-export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewInit {
+export class TranscriptionEndComponent implements OnInit, OnDestroy {
   private subscrmanager: SubscriptionManager<Subscription>;
 
   constructor(private router: Router,
@@ -29,9 +29,6 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.appStorage.submitted = true;
-  }
-
-  ngAfterViewInit() {
   }
 
   ngOnDestroy() {

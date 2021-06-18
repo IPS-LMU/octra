@@ -1,4 +1,4 @@
-import {Component, OnInit, SecurityContext, TemplateRef, ViewChild} from '@angular/core';
+import {Component, SecurityContext, TemplateRef, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
@@ -16,7 +16,7 @@ export enum ModalEndAnswer {
   styleUrls: ['./transcription-demo-end-modal.component.css']
 })
 
-export class TranscriptionDemoEndModalComponent implements OnInit {
+export class TranscriptionDemoEndModalComponent {
   modalRef: BsModalRef;
 
   config: ModalOptions = {
@@ -31,9 +31,6 @@ export class TranscriptionDemoEndModalComponent implements OnInit {
 
   constructor(private modalService: BsModalService, private sanitizer: DomSanitizer,
               public languageService: TranslocoService) {
-  }
-
-  ngOnInit() {
   }
 
   sanitize(html: string) {

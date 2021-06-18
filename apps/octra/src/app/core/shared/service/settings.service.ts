@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {afterDefined, afterTrue, isUnset, SubscriptionManager} from '@octra/utilities';
+import {afterDefined, afterTrue, SubscriptionManager} from '@octra/utilities';
 import {Subject, Subscription} from 'rxjs';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
@@ -23,10 +23,10 @@ export class SettingsService {
   private subscrmanager: SubscriptionManager<Subscription>;
 
   public get isASREnabled(): boolean {
-    return (!isUnset(this.appSettings.octra.plugins.asr) &&
-      !isUnset(this.appSettings.octra.plugins.asr.enabled)
+    return (this.appSettings.octra.plugins.asr !== undefined &&
+      this.appSettings.octra.plugins.asr.enabled !== undefined
       && this.appSettings.octra.plugins.asr.enabled === true
-      && !isUnset(this.appSettings.octra.plugins.asr.calls)
+      && this.appSettings.octra.plugins.asr.calls !== undefined
       && this.appSettings.octra.plugins.asr.calls.length === 2
       && this.appSettings.octra.plugins.asr.calls[0] !== ''
       && this.appSettings.octra.plugins.asr.calls[1] !== ''
@@ -37,11 +37,11 @@ export class SettingsService {
     enabled: boolean,
     fixedwidth: number
   } {
-    if (!isUnset(this.projectsettings)
-      && !isUnset(this.projectsettings.responsive)) {
+    if (this.projectsettings !== undefined
+      && this.projectsettings.responsive !== undefined) {
       return this.projectsettings.responsive;
     } else {
-      return (!isUnset(this.appSettings?.octra.responsive)) ? this.appSettings?.octra.responsive : {
+      return (this.appSettings?.octra.responsive !== undefined) ? this.appSettings?.octra.responsive : {
         enabled: true,
         fixedwidth: 1079
       };
@@ -114,8 +114,8 @@ export class SettingsService {
 
   public static queryParamsSet(queryParams: Params): boolean {
     return (
-      !isUnset(queryParams.audio) &&
-      !isUnset(queryParams.embedded)
+      queryParams.audio !== undefined &&
+      queryParams.embedded !== undefined
     );
   }
 
@@ -137,11 +137,10 @@ export class SettingsService {
       console.log(`selectIDBLoaded is true!`);
       // define languages
       const languages = this.appSettings.octra.languages;
-      // @ts-ignore
-      const browserLang = navigator.language || navigator.userLanguage;
+      const browserLang = navigator.language || (navigator as any).userLanguage;
 
       // check if browser language is available in translations
-      if (isUnset(this.appStorage.language) || this.appStorage.language === '') {
+      if (this.appStorage.language === undefined || this.appStorage.language === '') {
         if ((this.appSettings.octra.languages.find((value) => {
           return value === browserLang;
         })) !== undefined) {
@@ -179,7 +178,7 @@ export class SettingsService {
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
-    if (isUnset(this.appStorage.useMode)) {
+    if (this.appStorage.useMode === undefined) {
       this._log += `An error occured. Please click on "Back" and try it again.`;
     }
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL || this.appStorage.useMode === LoginMode.DEMO) {
@@ -221,7 +220,7 @@ export class SettingsService {
       }
     } else if (this.appStorage.useMode === LoginMode.LOCAL) {
       // local mode
-      if (!isUnset(this.appStorage.sessionfile)) {
+      if (this.appStorage.sessionfile !== undefined) {
         this._filename = this.appStorage.sessionfile.name;
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 
@@ -238,7 +237,7 @@ export class SettingsService {
     this.store.dispatch(ConfigurationActions.loadAppConfiguration());
     return new Promise<void>((resolve, reject) => {
       const subscr = this.store.select(fromApplication.selectAppSettings).subscribe((appConfig) => {
-        if (!isUnset(appConfig)) {
+        if (appConfig !== undefined) {
           subscr.unsubscribe();
           console.log('AppSettings loaded.');
 
@@ -263,8 +262,8 @@ export class SettingsService {
    */
   public isTheme(theme: string) {
     const selectedTheme = (
-      isUnset(this.projectsettings?.octra)
-      || isUnset(this.projectsettings?.octra?.theme)
+      this.projectsettings?.octra === undefined
+      || this.projectsettings?.octra?.theme === undefined
     )
       ? 'default' : this.projectsettings?.octra.theme;
 
@@ -272,7 +271,7 @@ export class SettingsService {
   }
 
   public getAudioExample(language: string) {
-    if (!isUnset(this.appSettings.octra.audioExamples)) {
+    if (this.appSettings.octra.audioExamples !== undefined) {
       let example = this.appSettings.octra.audioExamples.find(
         (a) => {
           return a.language === language;

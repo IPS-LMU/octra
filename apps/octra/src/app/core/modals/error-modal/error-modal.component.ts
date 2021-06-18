@@ -1,13 +1,14 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {hasProperty} from '@octra/utilities';
 
 @Component({
   selector: 'octra-error-modal',
   templateUrl: './error-modal.component.html',
   styleUrls: ['./error-modal.component.css']
 })
-export class ErrorModalComponent implements OnInit {
+export class ErrorModalComponent {
   modalRef: BsModalRef;
   config: ModalOptions = {
     keyboard: false,
@@ -23,14 +24,11 @@ export class ErrorModalComponent implements OnInit {
   constructor(private modalService: BsModalService) {
   }
 
-  ngOnInit() {
-  }
-
   public open(data: {
     text: string
   }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (data.hasOwnProperty('text')) {
+      if (hasProperty(data, 'text')) {
         this.data.text = data.text;
         this.modalRef = this.modalService.show(this.modal, this.config);
         const subscr = this.actionperformed.subscribe(

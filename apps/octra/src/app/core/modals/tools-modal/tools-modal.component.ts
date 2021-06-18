@@ -1,10 +1,10 @@
 import {HttpClient} from '@angular/common/http';
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {interval, Subject, Subscription, timer} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -14,6 +14,7 @@ import {AudioService, SettingsService, TranscriptionService, UserInteractionsSer
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
+import {ProgressbarType} from 'ngx-bootstrap/progressbar';
 
 declare let JSZip;
 
@@ -26,7 +27,7 @@ declare let JSZip;
     fadeInExpandOnEnterAnimation()
   ]
 })
-export class ToolsModalComponent implements OnInit, OnDestroy {
+export class ToolsModalComponent implements OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
 
@@ -55,7 +56,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       },
       status: 'idle',
       message: '',
-      progressbarType: 'info',
+      progressbarType: 'info' as ProgressbarType,
       showConfigurator: false,
       subscriptionIDs: [-1, -1, -1],
       exportFormats: [
@@ -121,9 +122,6 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  ngOnInit() {
-  }
-
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
@@ -155,8 +153,8 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
   onHidden() {
     this.tools.audioCutting.status = 'idle';
-    this.tools.audioCutting.progressbarType = 'idle';
-    this.tools.audioCutting.progressbarType = 'idle';
+    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.result.filename = '';
     this.tools.audioCutting.result.url = null;
@@ -165,11 +163,11 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.subscrmanager.destroy();
 
-    if (!isUnset(this.tools.audioCutting.result.url)) {
+    if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
     }
 
-    if (!isUnset(this.parentformat.uri)) {
+    if (this.parentformat.uri !== undefined) {
       const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
@@ -334,7 +332,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             this.tools.audioCutting.progress = 100;
             this.tools.audioCutting.progressbarType = 'success';
 
-            if (!isUnset(this.tools.audioCutting.result.url)) {
+            if (this.tools.audioCutting.result.url !== undefined) {
               window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
             }
 
@@ -393,7 +391,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.cuttingSpeed = -1;
     this.tools.audioCutting.zippingSpeed = -1;
 
-    if (!isUnset(this.tools.audioCutting.wavFormat)) {
+    if (this.tools.audioCutting.wavFormat !== undefined) {
       (this.tools.audioCutting.wavFormat as WavFormat).stopAudioSplitting();
     }
   }
@@ -406,7 +404,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
   isSomethingBlocked(): boolean {
     return this.transcrService.currentlevel.segments.segments.find((a) => {
-      return !isUnset(a.isBlockedBy);
+      return a.isBlockedBy !== undefined;
     }) !== undefined;
   }
 

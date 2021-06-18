@@ -6,9 +6,6 @@ export class ModalService {
   public closemodal = new EventEmitter<{ type: string }>();
   private modalaction = new EventEmitter<any>();
 
-  constructor() {
-  }
-
   /**
    * shows a predefined modal. this modal must be defined in octra-modal.component.
    */

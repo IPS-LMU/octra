@@ -3,7 +3,7 @@ import {Component, OnDestroy, OnInit, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
-import {afterTrue, isUnset, navigateTo, SubscriptionManager} from '@octra/utilities';
+import {afterTrue, hasProperty, navigateTo, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
@@ -89,7 +89,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         // test converter
                         const tempImportResult = converter.import(file, oAudioFile);
 
-                        if (!isUnset(tempImportResult) && tempImportResult.error === '') {
+                        if (tempImportResult !== undefined && tempImportResult.error === '') {
                           importResult = tempImportResult;
                           break;
                         } else {
@@ -171,16 +171,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
     );
 
     afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
-      if (!isUnset(this.appStorage.urlParams) && this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
-        && !isUnset(this.appStorage.urlParams.audio)) {
+      if (this.appStorage.urlParams !== undefined && hasProperty(this.appStorage.urlParams, 'audio') && this.appStorage.urlParams.audio !== ''
+        && this.appStorage.urlParams.audio !== undefined) {
         this.store.dispatch(OnlineModeActions.loginURLParameters({
           urlParams: this.appStorage.urlParams
         }));
       } else if (this.appStorage.useMode === LoginMode.URL) {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        if (!isUnset(this.appStorage.onlineSession.loginData.id) && this.appStorage.onlineSession.loginData.id !== ''
-          && (isUnset(this.appStorage.sessionfile))) {
+        if (this.appStorage.onlineSession.loginData.id !== undefined && this.appStorage.onlineSession.loginData.id !== ''
+          && (this.appStorage.sessionfile === undefined)) {
           this.store.dispatch(ApplicationActions.setMode({
             mode: LoginMode.ONLINE
           }));

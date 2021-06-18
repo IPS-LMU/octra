@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
@@ -18,7 +18,7 @@ export enum ModalDeleteAnswer {
   styleUrls: ['./transcription-delete-modal.component.css']
 })
 
-export class TranscriptionDeleteModalComponent implements OnInit {
+export class TranscriptionDeleteModalComponent {
   modalRef: BsModalRef;
   AppInfo = AppInfo;
   public visible = false;
@@ -34,9 +34,6 @@ export class TranscriptionDeleteModalComponent implements OnInit {
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<ModalDeleteAnswer> {

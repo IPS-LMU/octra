@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
@@ -13,7 +13,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
   styleUrls: ['./supportedfiles-modal.component.css']
 })
 
-export class SupportedFilesModalComponent implements OnInit {
+export class SupportedFilesModalComponent {
   modalRef: BsModalRef;
   AppInfo = AppInfo;
   public visible = false;
@@ -29,9 +29,6 @@ export class SupportedFilesModalComponent implements OnInit {
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<void> {

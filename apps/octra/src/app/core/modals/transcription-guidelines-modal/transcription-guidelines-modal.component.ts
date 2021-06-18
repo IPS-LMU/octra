@@ -4,7 +4,6 @@ import {
   Component,
   Input,
   OnChanges,
-  OnInit,
   SecurityContext,
   ViewChild,
   ViewEncapsulation
@@ -13,7 +12,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription, timer} from 'rxjs';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
@@ -27,7 +26,7 @@ import * as videojs from 'video.js';
   encapsulation: ViewEncapsulation.None
 })
 
-export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges {
+export class TranscriptionGuidelinesModalComponent implements OnChanges {
   modalRef: BsModalRef;
   public visible = false;
   @Input() guidelines = null;
@@ -49,9 +48,6 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   constructor(private modalService: BsModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
               private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
-  }
-
-  ngOnInit() {
   }
 
   ngOnChanges($event) {
@@ -111,7 +107,6 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
                 fluid: true,
                 autoplay: false,
                 preload: 'auto'
-              }, function onPlayerReady() {
               });
 
               this.videoPlayers.push(player);
@@ -124,10 +119,10 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
   public exportPDF() {
     if (
-      !isUnset(this.settService.projectsettings)
-      && !isUnset(this.settService.projectsettings.plugins)
-      && !isUnset(this.settService.projectsettings.plugins.pdfexport)
-      && !isUnset(this.settService.projectsettings.plugins.pdfexport.url)
+      this.settService.projectsettings !== undefined
+      && this.settService.projectsettings.plugins !== undefined
+      && this.settService.projectsettings.plugins.pdfexport !== undefined
+      && this.settService.projectsettings.plugins.pdfexport.url !== undefined
     ) {
       const form = jQuery('<form></form>')
         .attr('method', 'post')

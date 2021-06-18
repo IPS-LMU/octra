@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
 import {AppInfo} from '../../../app.info';
@@ -6,7 +6,6 @@ import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AlertService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
-import {isUnset} from '@octra/utilities';
 import {AudioChunk} from '@octra/media';
 
 @Component({
@@ -14,7 +13,7 @@ import {AudioChunk} from '@octra/media';
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.css']
 })
-export class AsrOptionsComponent implements OnInit {
+export class AsrOptionsComponent {
 
   public serviceProviders = {};
   public settings = {
@@ -42,18 +41,6 @@ export class AsrOptionsComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-
-  }
-
-  onMouseMove() {
-
-  }
-
-  onMouseOut() {
-
-  }
-
   getShortCode(code) {
     return code.substring(code.length - 2);
   }
@@ -64,7 +51,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   startASRForThisSegment() {
-    if (!isUnset(this.asrService.selectedLanguage)) {
+    if (this.asrService.selectedLanguage !== undefined) {
       if (this.audioChunk.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
         this.alertService.showAlert('danger', this.langService.translate('asr.file too big').toString())
@@ -78,7 +65,7 @@ export class AsrOptionsComponent implements OnInit {
         if (segNumber > -1) {
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-          if (!isUnset(segment)) {
+          if (segment !== undefined) {
             segment.isBlockedBy = ASRQueueItemType.ASR;
 
             this.asrService.addToQueue({
@@ -105,7 +92,7 @@ export class AsrOptionsComponent implements OnInit {
       for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
         const segment = this.transcrService.currentlevel.segments.get(i);
 
-        if (!isUnset(segment)) {
+        if (segment !== undefined) {
           const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples
             : 0;
           const sampleLength = segment.time.samples - sampleStart;
@@ -140,7 +127,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   stopASRForThisSegment() {
-    if (!isUnset(this.asrService.selectedLanguage)) {
+    if (this.asrService.selectedLanguage !== undefined) {
       const item = this.asrService.queue.getItemByTime(this.audioChunk.time.start.samples, this.audioChunk.time.duration.samples);
 
       if (item !== undefined) {

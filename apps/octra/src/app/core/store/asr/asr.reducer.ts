@@ -1,8 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import {ASRState} from '../index';
-import {isUnset} from '@octra/utilities';
 import {ASRActions} from './asr.actions';
 import {IDBActions} from '../idb/idb.actions';
+import {hasProperty} from '@octra/utilities';
 
 export const initialState: ASRState = {};
 
@@ -13,13 +13,13 @@ export const reducer = createReducer(
     ...data
   })),
   on(IDBActions.loadOptionsSuccess, (state: ASRState, {applicationOptions}) => {
-    let result = state;
+      let result = state;
 
-    for (const option of applicationOptions) {
-      result = writeOptionToStore(result, option.name, option.value);
-    }
+      for (const option of applicationOptions) {
+        result = writeOptionToStore(result, option.name, option.value);
+      }
 
-    return result;
+      return result;
     }
   ));
 
@@ -28,8 +28,8 @@ function writeOptionToStore(state: ASRState, attribute: string, value: any): ASR
     case('asr'):
       return {
         ...state,
-        selectedLanguage: (!isUnset(value) && value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage : null,
-        selectedService: (!isUnset(value) && value.hasOwnProperty('selectedService')) ? value.selectedService : null
+        selectedLanguage: (value !== undefined && hasProperty(value, 'selectedLanguage')) ? value.selectedLanguage : null,
+        selectedService: (value !== undefined && hasProperty(value, 'selectedService')) ? value.selectedService : null
       };
 
     default:

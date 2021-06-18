@@ -3,9 +3,6 @@ import {AudioViewerComponent} from '@octra/components';
 import {Level} from '@octra/annotation';
 
 export abstract class OCTRAEditor {
-  constructor() {
-  }
-
   public abstract afterFirstInitialization();
 
   public abstract disableAllShortcuts();

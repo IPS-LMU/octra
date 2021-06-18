@@ -1,5 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animations';
+import {IconProp} from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'octra-context-menu',
@@ -14,19 +15,13 @@ import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animation
     })
   ]
 })
-export class ContextMenuComponent implements OnInit {
+export class ContextMenuComponent {
   isVisible = false;
 
   @Input() x = 0;
   @Input() y = 0;
 
   @Input() actions: ContextMenuAction[] = [];
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
-  }
 
   onMouseLeave() {
     this.isVisible = false;
@@ -57,7 +52,7 @@ export class ContextMenuComponent implements OnInit {
 export interface ContextMenuAction {
   name: string,
   status: 'active' | 'inactive',
-  icon: [string, string],
+  icon: IconProp,
   label: string,
   func: () => void
 }

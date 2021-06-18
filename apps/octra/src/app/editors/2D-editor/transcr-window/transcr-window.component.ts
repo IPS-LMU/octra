@@ -13,7 +13,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -90,7 +90,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public get hasSegmentBoundaries() {
-    return !isUnset(this.editor.rawText.match(/{[0-9]+}/));
+    return this.editor.rawText.match(/{[0-9]+}/) !== undefined;
   }
 
   private _validationEnabled = false;
@@ -109,7 +109,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     width: number,
     height: number
   } {
-    if (!isUnset(this.main)) {
+    if (this.main !== undefined) {
       return {
         width: this.main.nativeElement.clientWidth,
         height: this.main.nativeElement.clientHeight
@@ -213,8 +213,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       },
       (error) => {
         console.error(error);
-      },
-      () => {
       }));
   }
 
@@ -244,7 +242,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.goToSegment(direction).then(() => {
           const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
 
-          if (isUnset(segment?.isBlockedBy)) {
+          if (segment?.isBlockedBy === undefined) {
             this.audiochunk.startPlayback().catch((error) => {
               console.error(error);
             });
@@ -384,11 +382,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngOnChanges(obj) {
-    if (obj.hasOwnProperty('audiochunk')) {
+    if (Object.entries(obj).findIndex(([key]) => key === 'audiochunk') > -1) {
       const previous: AudioChunk = obj.audiochunk.previousValue;
       const current: AudioChunk = obj.audiochunk.currentValue;
 
-      if ((isUnset(previous) && !isUnset(current)) ||
+      if ((previous === undefined && current !== undefined) ||
         (
           current.time.start.samples !== previous.time.start.samples &&
           current.time.end.samples !== previous.time.end.samples
@@ -416,7 +414,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager.add(timer(500).subscribe(() => {
       const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
 
-      if (isUnset(segment.isBlockedBy)) {
+      if (segment.isBlockedBy === undefined) {
         this.audiochunk.startPlayback().catch((error) => {
           console.error(error);
         });
@@ -473,7 +471,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
       }
     } else {
-      const isNull = isUnset(this.transcrService.currentlevel.segments);
+      const isNull = this.transcrService.currentlevel.segments === undefined;
     }
   }
 
@@ -582,7 +580,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           begin = new SampleUnit(0, this.audioManager.sampleRate);
         }
 
-        if (!isUnset(segment)) {
+        if (segment !== undefined) {
           this.transcript = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
           // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
@@ -878,7 +876,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samplesArray: number[] = [];
-    html.replace(new RegExp('\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?', 'g'),
+    html.replace(new RegExp(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/, 'g'),
       (match, g1, g2) => {
         samplesArray.push(Number(g1));
         return '';

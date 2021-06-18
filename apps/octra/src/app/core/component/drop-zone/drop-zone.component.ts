@@ -29,9 +29,6 @@ export class DropZoneComponent implements OnInit {
     return this._sessionfile;
   }
 
-  constructor() {
-  }
-
   ngOnInit() {
     // Check for the various File API support.
     if (window.File && window.FileReader && window.FileList && window.Blob) {

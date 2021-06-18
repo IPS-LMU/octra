@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
@@ -9,7 +9,7 @@ import {TranscriptionService} from '../../../../core/shared/service';
   templateUrl: './permutations-replace-modal.component.html',
   styleUrls: ['./permutations-replace-modal.component.css']
 })
-export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PermutationsReplaceModalComponent implements OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
 
@@ -26,12 +26,6 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
   }[] = [];
 
   constructor(private transcrService: TranscriptionService) {
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
   }
 
   private readListOfSpeakers() {

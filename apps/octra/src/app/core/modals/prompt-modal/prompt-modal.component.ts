@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
@@ -13,7 +13,7 @@ import {AnnotJSONConverter, OAudiofile, PartiturConverter, TextConverter} from '
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PromptModalComponent implements OnInit {
+export class PromptModalComponent{
   modalRef: BsModalRef;
   public visible = false;
 
@@ -29,9 +29,6 @@ export class PromptModalComponent implements OnInit {
 
   constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,
               private cd: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
   }
 
   public open(audiofile: OAudiofile): Promise<void> {

@@ -5,7 +5,7 @@ import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/component/navbar';
 import {ASRLanguage} from './core/obj/Settings';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {APIService, SettingsService} from './core/shared/service';
 import {AppStorageService} from './core/shared/service/appstorage.service';
@@ -79,7 +79,7 @@ export class AppComponent implements OnDestroy, OnInit {
           if (typeof error === 'string') {
             debug = error;
 
-            if (error === 'ERROR' && !isUnset(context) && context.stack && context.message) {
+            if (error === 'ERROR' && context !== undefined && context.stack && context.message) {
               debug = context.message;
               stack = context.stack;
             }
@@ -102,6 +102,7 @@ export class AppComponent implements OnDestroy, OnInit {
             serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== '') ? ' ' + stack : ''}`);
           }
 
+          // eslint-disable-next-line prefer-rest-params
           oldError.apply(console, arguments);
         };
       })();
@@ -112,6 +113,7 @@ export class AppComponent implements OnDestroy, OnInit {
         // tslint:disable-next-line:only-arrow-functions
         console.warn = function (message) {
           serv.addEntry(ConsoleType.WARN, message);
+          // eslint-disable-next-line prefer-rest-params
           oldWarn.apply(console, arguments);
         };
       })();
@@ -128,13 +130,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
     this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded as any).subscribe(
       () => {
-        if (!isUnset(this.appStorage.asrSelectedService) && !isUnset(this.appStorage.asrSelectedLanguage)) {
+        if (this.appStorage.asrSelectedService !== undefined && this.appStorage.asrSelectedLanguage !== undefined) {
           // set asr settings
           const selectedLanguage = this.appStorage.asrSelectedLanguage;
           const selectedService = this.appStorage.asrSelectedService;
           const lang: ASRLanguage = this.asrService.getLanguageByCode(selectedLanguage, selectedService);
 
-          if (!isUnset(lang)) {
+          if (lang !== undefined) {
             this.asrService.selectedLanguage = lang;
           } else {
             console.error('Could not read ASR language from database');
@@ -158,8 +160,8 @@ export class AppComponent implements OnDestroy, OnInit {
 
       this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
 
-      if (!isUnset(this.settingsService.appSettings.octra.tracking)
-        && !isUnset(this.settingsService.appSettings.octra.tracking.active)
+      if (this.settingsService.appSettings.octra.tracking !== undefined
+        && this.settingsService.appSettings.octra.tracking.active !== undefined
         && this.settingsService.appSettings.octra.tracking.active !== '') {
         this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
@@ -207,7 +209,7 @@ export class AppComponent implements OnDestroy, OnInit {
     if (!url) {
       url = document.location.href;
     }
-    name = name.replace(/[\[\]]/g, '\\$&');
+    name = name.replace(/[[]]/g, '\\$&');
     const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
     const results = regExp.exec(url);
     if (!results) {
@@ -231,9 +233,9 @@ export class AppComponent implements OnDestroy, OnInit {
   private appendTrackingCode(type: string) {
     // check if matomo is activated
     if (type === 'matomo') {
-      if (!isUnset(this.settingsService.appSettings.octra.tracking.matomo)
-        && !isUnset(this.settingsService.appSettings.octra.tracking.matomo.host)
-        && !isUnset(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
+      if (this.settingsService.appSettings.octra.tracking.matomo !== undefined
+        && this.settingsService.appSettings.octra.tracking.matomo.host !== undefined
+        && this.settingsService.appSettings.octra.tracking.matomo.siteID !== undefined) {
         const matomoSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
         const trackingCode = `

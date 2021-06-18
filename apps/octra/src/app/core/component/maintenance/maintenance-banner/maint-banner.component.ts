@@ -1,18 +1,19 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges} from '@angular/core';
 import {MaintenanceAPI, MaintenanceNotification} from '../maintenance-api';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
+import {hasProperty} from '@octra/utilities';
 
 @Component({
   // tslint:disable-next-line:component-selector
-  selector: 'maint-banner',
+  selector: 'octra-maint-banner',
   templateUrl: './maint-banner.component.html',
   styleUrls: ['./maint-banner.component.css']
 })
-export class MaintenanceBannerComponent implements OnInit, OnChanges {
+export class MaintenanceBannerComponent implements OnChanges {
 
-  @Input('serverURL') serverURL: string;
-  @Input('language') language: string = null;
+  @Input() serverURL: string;
+  @Input() language: string = null;
 
   notification: MaintenanceNotification;
   parsedNotification: MaintenanceNotification;
@@ -20,14 +21,11 @@ export class MaintenanceBannerComponent implements OnInit, OnChanges {
   constructor(private http: HttpClient, private renderer: Renderer2, private elementRef: ElementRef) {
   }
 
-  ngOnInit() {
-  }
-
   ngOnChanges(changes: SimpleChanges) {
-    const isServerURL = changes.hasOwnProperty('serverURL') &&
+    const isServerURL = hasProperty(changes, 'serverURL') &&
       (changes.serverURL.currentValue !== null && changes.serverURL.currentValue !== undefined);
 
-    const isLanguage = changes.hasOwnProperty('language') &&
+    const isLanguage = hasProperty(changes, 'language') &&
       (changes.language.currentValue !== null && changes.language.currentValue !== undefined);
 
     if (isServerURL) {

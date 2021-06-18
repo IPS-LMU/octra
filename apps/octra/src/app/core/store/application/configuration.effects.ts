@@ -5,7 +5,7 @@ import {Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {ConfigurationService} from '../../shared/service/configuration.service';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {isUnset, uniqueHTTPRequest} from '@octra/utilities';
+import {uniqueHTTPRequest} from '@octra/utilities';
 import {HttpClient} from '@angular/common/http';
 import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
@@ -34,7 +34,7 @@ export class ConfigurationEffects {
         },
         (appConfiguration: AppSettings) => {
           // load information from BASWebservices ASR page
-          if (!isUnset(appConfiguration.octra.plugins.asr.asrInfoURL)
+          if (appConfiguration.octra.plugins.asr.asrInfoURL !== undefined
             && typeof appConfiguration.octra.plugins.asr.asrInfoURL === 'string'
             && appConfiguration.octra.plugins.asr.asrInfoURL
           ) {
@@ -60,14 +60,14 @@ export class ConfigurationEffects {
                 jQuery.each(basASRInfoContainers, (key, elem) => {
                   const isStringNumber = (str: string) => !isNaN(Number(str));
                   const sanitizeNumberValue = (el: any, attr: string) => {
-                    if (!isUnset(el[attr]) && isStringNumber(el[attr])) {
+                    if (el[attr] !== undefined && isStringNumber(el[attr])) {
                       el[attr] = Number(el[attr]);
                     } else {
                       el[attr] = undefined;
                     }
                   };
                   const sanitizeStringValue = (el: any, attr: string) => {
-                    if (!isUnset(el[attr]) && typeof el[attr] === 'string') {
+                    if (el[attr] !== undefined && typeof el[attr] === 'string') {
                       el[attr] = el[attr].replace(/[\n\t\r]+/g, '');
                     } else {
                       el[attr] = undefined;
@@ -96,25 +96,25 @@ export class ConfigurationEffects {
 
                 // overwrite data of config
                 for (const service of appConfiguration.octra.plugins.asr.services) {
-                  if (!isUnset(service.basName)) {
+                  if (service.basName !== undefined) {
                     const basInfo = asrInfos.find(a => a.name === service.basName);
-                    if (!isUnset(basInfo)) {
-                      service.dataStoragePolicy = (!isUnset(basInfo.dataStoragePolicy))
+                    if (basInfo !== undefined) {
+                      service.dataStoragePolicy = (basInfo.dataStoragePolicy !== undefined)
                         ? basInfo.dataStoragePolicy : service.dataStoragePolicy;
 
-                      service.maxSignalDuration = (!isUnset(basInfo.maxSignalDuration))
+                      service.maxSignalDuration = (basInfo.maxSignalDuration !== undefined)
                         ? basInfo.maxSignalDuration : service.maxSignalDuration;
 
-                      service.maxSignalSize = (!isUnset(basInfo.maxSignalSize))
+                      service.maxSignalSize = (basInfo.maxSignalSize !== undefined)
                         ? basInfo.maxSignalSize : service.maxSignalSize;
 
-                      service.knownIssues = (!isUnset(basInfo.knownIssues))
+                      service.knownIssues = (basInfo.knownIssues !== undefined)
                         ? basInfo.knownIssues : service.knownIssues;
 
-                      service.quotaPerMonth = (!isUnset(basInfo.quotaPerMonth))
+                      service.quotaPerMonth = (basInfo.quotaPerMonth !== undefined)
                         ? basInfo.quotaPerMonth : service.quotaPerMonth;
 
-                      service.termsURL = (!isUnset(basInfo.termsURL))
+                      service.termsURL = (basInfo.termsURL !== undefined)
                         ? basInfo.termsURL : service.termsURL;
                     }
                   }
@@ -190,7 +190,7 @@ export class ConfigurationEffects {
       const found = action.projectConfig.languages.find((x) => {
         return x === language;
       });
-      if (isUnset(found)) {
+      if (found === undefined) {
         // fall back to first defined language
         language = action.projectConfig.languages[0];
       }

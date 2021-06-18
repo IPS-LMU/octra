@@ -47,10 +47,6 @@ export class NavbarService {
     this._interfaces = value;
   }
 
-  constructor() {
-
-  }
-
   public doclick(name: string) {
     this.onclick.emit(name);
   }

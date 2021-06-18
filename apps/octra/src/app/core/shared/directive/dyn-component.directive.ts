@@ -9,7 +9,7 @@ import {
   ViewContainerRef
 } from '@angular/core';
 
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SubscriptionManager} from '@octra/utilities';
 import {Subscription} from 'rxjs';
 
 @Directive({
@@ -38,7 +38,7 @@ export class DynComponentDirective implements OnInit, OnDestroy {
 
     const comp = viewContainerRef.createComponent(componentFactory);
 
-    if (!isUnset(comp) && !isUnset(comp.instance) && !isUnset((comp.instance as any).initialized)) {
+    if (comp !== undefined && comp.instance !== undefined && (comp.instance as any).initialized !== undefined) {
       this.component.instance = comp.instance;
       this.subscrManager.add(this.component.instance.initialized.subscribe(() => {
         this.initialized.emit({

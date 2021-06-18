@@ -1,3 +1,5 @@
+import {hasProperty} from '@octra/utilities';
+
 export class SessionFile {
   get type(): string {
     return this._type;
@@ -35,9 +37,9 @@ export class SessionFile {
     }
 
     if (
-      element.hasOwnProperty('name')
-      && element.hasOwnProperty('type')
-      && element.hasOwnProperty('size')
+      hasProperty(element, 'name')
+      && hasProperty(element, 'type')
+      && hasProperty(element, 'size')
     ) {
       return new SessionFile(element.name, element.size, element.timestamp, element.type);
     } else {

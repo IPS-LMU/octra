@@ -14,7 +14,6 @@ import {
 import {ConsoleEntry} from '../shared/service/bug-report.service';
 import {AppSettings, ProjectSettings} from '../obj/Settings';
 import {SampleUnit} from '@octra/media';
-import {isUnset} from '@octra/utilities';
 import {ILog} from '../obj/Settings/logging';
 import {Histories, UndoRedoState} from 'ngrx-wieder';
 import {SessionFile} from '../obj/SessionFile';
@@ -175,9 +174,9 @@ convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastS
       const segment = item as AnnotationStateSegment;
       const annoSegment = level.segments.getByID(segment.id)
 
-      if (!isUnset(annoSegment)) {
+      if (annoSegment !== undefined) {
         annoSegment.isBlockedBy = segment.isBlockedBy;
-        if (!isUnset(segment.progressInfo)) {
+        if (segment.progressInfo !== undefined) {
           annoSegment.progressInfo = segment.progressInfo;
         } else {
           annoSegment.progressInfo = {

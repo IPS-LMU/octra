@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {BrowserInfo} from '../../shared';
@@ -12,7 +12,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
   styleUrls: ['./shortcuts-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShortcutsModalComponent implements OnInit {
+export class ShortcutsModalComponent {
   modalRef: BsModalRef;
   public visible = false;
   @Input() editor = '';
@@ -30,12 +30,9 @@ export class ShortcutsModalComponent implements OnInit {
     return BrowserInfo.platform;
   }
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService,
+  constructor(private modalService: BsModalService, public appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService,
               public keyMap: KeymappingService, private cd: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<void> {

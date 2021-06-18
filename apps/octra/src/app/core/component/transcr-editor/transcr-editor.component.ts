@@ -8,7 +8,6 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   ViewChild
 } from '@angular/core';
@@ -26,7 +25,6 @@ import {
   escapeRegex,
   insertString,
   isNumber,
-  isUnset,
   placeAtEnd,
   ShortcutGroup,
   ShortcutManager,
@@ -34,7 +32,8 @@ import {
   unEscapeHtml
 } from '@octra/utilities';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
-import {Segments, TimespanPipe} from '@octra/annotation';
+import {Segments} from '@octra/annotation';
+import {TimespanPipe} from '@octra/components';
 
 /// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />
 declare let tidyUpAnnotation: ((string, any) => any);
@@ -47,7 +46,7 @@ declare let document: any;
   styleUrls: ['./transcr-editor.component.css'],
   providers: [TranscrEditorConfig]
 })
-export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
+export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewInit {
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
@@ -65,7 +64,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   @Input() validationEnabled = false;
   @Input() externalShortcutManager: ShortcutManager;
   // tslint:disable-next-line:no-output-on-prefix
-  @Output() onRedoUndo = new EventEmitter<'undo' | 'redo'>();
+  @Output() redoUndo = new EventEmitter<'undo' | 'redo'>();
 
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
@@ -124,7 +123,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   set highlightingEnabled(value: boolean) {
-    this._highlightingEnabled = (!isUnset(value)) ? value : true;
+    this._highlightingEnabled = (value !== undefined) ? value : true;
     this.highlightingEnabledChange.emit(value);
   }
 
@@ -136,8 +135,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     if (!this.focused) {
       return -1;
     }
-    // @ts-ignore
-    return jQuery(this.transcrEditor.nativeElement).find('.note-editable:eq(0)').caret('pos');
+    return (jQuery(this.transcrEditor.nativeElement).find('.note-editable:eq(0)') as any).caret('pos');
   }
 
   private shortcuts: ShortcutGroup = {
@@ -207,7 +205,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
 
     // check for markers that are utf8 symbols
     for (const marker of this.markers) {
-      if (!isUnset(marker.icon) && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
+      if (marker.icon !== undefined && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
         && marker.icon !== '' && marker.code !== '' && marker.icon !== marker.code
       ) {
         // replace all utf8 symbols with the marker's code
@@ -228,7 +226,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     };
 
     jQuery(dom).find('span.highlighted').each((j, domElement) => {
-      if (!isUnset(jQuery(domElement).parent())) {
+      if (jQuery(domElement).parent() !== undefined) {
         jQuery(domElement).contents().each((k, node) => {
           jQuery(node).remove();
           jQuery(domElement).before(node);
@@ -265,7 +263,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           charCounter += text.length;
           jQuery(elem).text(text);
         } else if (tagName.toLowerCase() === 'img') {
-          if (!isUnset(jQuery(elem).attr('data-samples'))) {
+          if (jQuery(elem).attr('data-samples') !== undefined) {
             const boundaryText = `{${jQuery(elem).attr('data-samples')}}`;
             const textnode = document.createTextNode(boundaryText);
             jQuery(elem).before(textnode);
@@ -316,13 +314,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
    * initializes the editor and the containing summernote editor
    */
   public initialize = () => {
-    if (!isUnset(this.audiochunk)) {
+    if (this.audiochunk !== undefined) {
       this.initializeShortcuts();
       this.shortcutsManager.unregisterShortcutGroup('texteditor');
       this.shortcutsManager.registerShortcutGroup(this.shortcuts);
 
-      // @ts-ignore
-      this.summernoteUI = jQuery.summernote.ui;
+      this.summernoteUI = (jQuery as any).summernote.ui;
       const navigation = this.initNavigation();
 
       if (this.Settings.specialMarkers.boundary) {
@@ -335,7 +332,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         }
       }
 
-      if (!isUnset(this.textfield)) {
+      if (this.textfield !== undefined) {
         this.textfield.summernote('destroy');
         this.textfield = null;
       }
@@ -365,7 +362,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
             e.preventDefault();
             const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
             let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
-              .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\]', 'g'), '}');
+              .replace(new RegExp(/\\\[\\\|/, 'g'), '{').replace(new RegExp(/\\\|]/, 'g'), '}');
             html = unEscapeHtml(html);
             html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
             html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
@@ -382,8 +379,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           onChange: () => {
             this.init++;
 
-            if (this.init === 1) {
-            } else if (this.init > 1) {
+            if (this.init > 1) {
               this.subscrmanager.removeByTag('typing_change');
               this.subscrmanager.add(this.internalTyping.subscribe((status) => {
                 if (status === 'stopped') {
@@ -407,7 +403,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           onInit: () => {
             // fix additional <p><br/></p>
             this.subscrmanager.add(timer(100).subscribe(() => {
-              if (isUnset(this.segments) || this.segments.length === 0) {
+              if (this.segments === undefined || this.segments.length === 0) {
                 this.setTranscript(this.transcript);
               } else {
                 this.setSegments(this.segments);
@@ -472,7 +468,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   onASRItemChange(item: ASRQueueItem) {
-    if (!isUnset(item)) {
+    if (item !== undefined) {
       if (item.time.sampleStart === this.audiochunk.time.start.samples
         && item.time.sampleLength === this.audiochunk.time.duration.samples) {
         if (item.status === ASRProcessStatus.FINISHED) {
@@ -531,7 +527,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   private isMarker(shortcut) {
-    if (!isUnset(this.markers)) {
+    if (this.markers !== undefined) {
       const platform = BrowserInfo.platform;
       return (this.markers.findIndex(a => a.shortcut[platform] === shortcut) > -1 || (shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary));
     }
@@ -544,7 +540,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
    */
   onKeyDownSummernote = ($event) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent($event, Date.now());
-    if (!isUnset(shortcutInfo)) {
+    if (shortcutInfo !== undefined) {
       $event.preventDefault();
       if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
         // add boundary
@@ -572,7 +568,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       }
     } else {
       const externalShortcutInfo = this.externalShortcutManager.checkKeyEvent($event, Date.now());
-      if (!isUnset(externalShortcutInfo)) {
+      if (externalShortcutInfo !== undefined) {
 
         $event.preventDefault();
       } else {
@@ -585,12 +581,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
    */
   onKeyUpSummernote = ($event) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent($event, Date.now());
-    if (!isUnset(shortcutInfo)) {
+    if (shortcutInfo !== undefined) {
       $event.preventDefault();
-    } else if (!isUnset(this.externalShortcutManager)) {
+    } else if (this.externalShortcutManager !== undefined) {
       const externalShortcutCommand = this.externalShortcutManager.checkKeyEvent($event, Date.now());
 
-      if (!isUnset(externalShortcutCommand)) {
+      if (externalShortcutCommand !== undefined) {
         $event.preventDefault();
       } else {
         this.onkeyup.emit($event);
@@ -615,7 +611,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
               placeAtEnd(nodeEditable[0]);
             }
           }
-          if (!isUnset(this.textfield)) {
+          if (this.textfield !== undefined) {
             if (atEnd) {
               this.textfield.summernote('focus');
             } else {
@@ -639,12 +635,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     });
   }
 
-  ngOnInit() {
-  }
-
   ngAfterViewInit() {
     this.Settings.height = this.height;
-    if (!isUnset(this.audiochunk)) {
+    if (this.audiochunk !== undefined) {
       this._lastAudioChunkID = this.audiochunk.id;
     }
     this.initialize();
@@ -654,8 +647,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       },
       (error) => {
         console.error(error);
-      },
-      () => {
       }));
   }
 
@@ -669,15 +660,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       && !obj.easymode.firstChange) {
       renew = true;
     }
-    if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue) && !obj.audiochunk.firstChange) {
+    if (obj.audiochunk !== undefined && obj.audiochunk.currentValue !== undefined && !obj.audiochunk.firstChange) {
       renew = true;
     }
 
-    if (!isUnset(obj.transcript) && !isUnset(obj.transcript.currentValue) && !obj.transcript.firstChange) {
+    if (obj.transcript !== undefined && obj.transcript.currentValue !== undefined && !obj.transcript.firstChange) {
       this.setTranscript(obj.transcript.currentValue);
     }
 
-    if (!isUnset(obj.segments) && !isUnset(obj.segments.currentValue) && !obj.segments.firstChange) {
+    if (obj.segments !== undefined && obj.segments.currentValue !== undefined && !obj.segments.firstChange) {
       this.setSegments(obj.segments);
     }
 
@@ -731,7 +722,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
         marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
         // text only or utf8 symbol
-        icon = (!isUnset(marker.icon) && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
+        icon = (marker.icon !== undefined && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
 
         if (!this.easymode) {
           icon += `${marker.button_text}<span class='btn-shortcut'> ` +
@@ -760,7 +751,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       // create button
       const btnJS = {
         contents: icon,
-        tooltip: (isUnset(this.Settings) || this.Settings.btnPopover) ? marker.description : '',
+        tooltip: (this.Settings === undefined || this.Settings.btnPopover) ? marker.description : '',
         container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
@@ -768,15 +759,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           this.markerClick.emit(marker.name);
         }
       };
-      // @ts-ignore
-      const button = jQuery.summernote.ui.button(btnJS);
+      const button = (jQuery as any).summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
   }
 
   initPopover() {
-    if (!isUnset(this.popovers.validationError)) {
+    if (this.popovers.validationError !== undefined) {
       this.popovers.validationError.css('display', 'none');
       this.popovers.segmentBoundary.css('display', 'none');
     }
@@ -865,8 +855,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
         }
       };
-      // @ts-ignore
-      const button = jQuery.summernote.ui.button(btnJS);
+
+      const button = (jQuery as any).summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
@@ -898,8 +888,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           }
         }
       };
-      // @ts-ignore
-      const button = jQuery.summernote.ui.button(btnJS);
+      const button = (jQuery as any).summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
@@ -945,16 +934,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   saveSelection() {
-    let range;
-
     jQuery(this.transcrEditor.nativeElement).find('sel-start').remove();
     jQuery(this.transcrEditor.nativeElement).find('sel-end').remove();
 
-    // @ts-ignore
-    range = jQuery.summernote.range;
+    const range = (jQuery as any).summernote.range;
     const rangeSelection: WrappedRange = range.createFromSelection();
 
-    if (!isUnset(rangeSelection) && this.focused) {
+    if (rangeSelection !== undefined && this.focused) {
       if (rangeSelection.so === rangeSelection.eo && rangeSelection.sc === rangeSelection.ec) {
         // no selection length
         const teElem = document.createElement('sel-start');
@@ -973,7 +959,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   restoreSelection() {
     const elem = document.getElementsByClassName('note-editable')[0];
 
-    if (!isUnset(elem) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
+    if (elem !== undefined && elem.getElementsByTagName('sel-start')[0] !== undefined) {
       const range = document.createRange();
       const sel = window.getSelection();
       let selStart = elem.getElementsByTagName('sel-start')[0];
@@ -1034,11 +1020,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
       rawtext = rawtext.replace(regex, replaceFunc);
     }
 
-    const segTexts = rawtext.split(regex2).filter((a) => {
-      if (!isNumeric(a)) {
-        return a;
-      }
-    });
+    const segTexts = rawtext.split(regex2).filter(a => !isNumeric(a));
 
     let start = 0;
 
@@ -1151,9 +1133,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   public onASROverlayClick() {
-    if (!isUnset(this.asrService.selectedLanguage)) {
+    if (this.asrService.selectedLanguage !== undefined) {
       const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
-      if (!isUnset(item)) {
+      if (item !== undefined) {
         this.asrService.stopASROfItem(item);
         const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
           this.audioManager.createSampleUnit(item.time.sampleStart + 1));
@@ -1195,7 +1177,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
    * destroys the summernote editor
    */
   private destroy() {
-    if (!isUnset(this.textfield)) {
+    if (this.textfield !== undefined) {
       this.textfield.summernote('destroy');
       this.textfield = null;
     }
@@ -1255,7 +1237,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   }
 
   private onValidationErrorMouseOver(jQueryObj: any, event: any) {
-    if (isUnset(jQueryObj.attr('data-errorcode'))) {
+    if (jQueryObj.attr('data-errorcode' === undefined)) {
       jQueryObj = jQueryObj.parent();
     }
 
@@ -1352,19 +1334,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         const domElements = dom.contents();
         const elem = domElements[i];
 
-        if (!isUnset(elem)) {
+        if (elem !== undefined) {
           const tagName = jQuery(elem).prop('tagName');
           const addElemToPuffer = () => {
-            if (currentSegIndex === segIndex && !isUnset(elem)) {
+            if (currentSegIndex === segIndex && elem !== undefined) {
               jQuery(elem).remove();
               i--;
               puffer.appendChild(elem);
             }
           };
 
-          if (!isUnset(tagName)) {
+          if (tagName !== undefined) {
             if (tagName.toLowerCase() === 'img') {
-              if (!isUnset(jQuery(elem).attr('data-samples'))) {
+              if (jQuery(elem).attr('data-samples') !== undefined) {
                 const segSamples = Number(jQuery(elem).attr('data-samples'));
                 const foundSegment = segment.time.samples;
 
@@ -1408,7 +1390,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
 
   private removeHighlight() {
     jQuery(this.transcrEditor.nativeElement).find('.highlighted').each((index, item) => {
-      if (!isUnset(jQuery(item).parent())) {
+      if (jQuery(item).parent() !== undefined) {
         jQuery(item).contents().each((j, node) => {
           jQuery(node).remove();
           jQuery(item).before(node);
@@ -1479,9 +1461,6 @@ abstract class WrappedRange {
   public readonly so: number;
   public readonly ec: Node;
   public readonly eo: number;
-
-  constructor() {
-  }
 
   // select update visible range
   abstract select();

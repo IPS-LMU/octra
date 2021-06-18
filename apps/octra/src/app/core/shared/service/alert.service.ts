@@ -1,4 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
+import {hasProperty} from '@octra/utilities';
 
 export type AlertType = 'danger' | 'warning' | 'info' | 'success';
 
@@ -12,9 +13,6 @@ export class AlertService {
   public counter = 0;
   public queue: AlertEntry[] = [];
 
-  constructor() {
-  }
-
   public showAlert(type: AlertType, data: string | any, unique: boolean = true, duration?: number)
     : Promise<{
     id: number;
@@ -27,7 +25,7 @@ export class AlertService {
       const alreadyExists = this.queue.findIndex((a) => {
         if (a.message !== data) {
           return (typeof data !== 'string' && a.component !== null
-            && data.hasOwnProperty('componentName') && a.component.class.hasOwnProperty('componentName')
+            && hasProperty(data, 'componentName') && hasProperty(a.component.class, 'componentName')
             && data.componentName === a.component.class.componentName);
         }
         return true;

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -14,7 +14,7 @@ import {TextConverter} from '@octra/annotation';
   styleUrls: ['./statistics-modal.component.css']
 })
 
-export class StatisticsModalComponent implements OnInit {
+export class StatisticsModalComponent {
   modalRef: BsModalRef;
   public visible = false;
   public bgdescr = '';
@@ -48,9 +48,6 @@ export class StatisticsModalComponent implements OnInit {
   }
 
   constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<void> {

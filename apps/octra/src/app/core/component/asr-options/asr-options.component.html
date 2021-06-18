@@ -1,6 +1,6 @@
 <span class="asr-label">ASR -</span>
 <div id="asr-bar">
-  <div #dropdown="bs-dropdown" (mouseleave)="onMouseOut();" (mousemove)="onMouseMove()" [insideClick]="true"
+  <div #dropdown="bs-dropdown" [insideClick]="true"
        class="btn-group"
        dropdown
        id="dropdown-button" placement="down right">
@@ -18,7 +18,7 @@
       </ng-template>
       <span class="caret"></span>
     </button>
-    <div (mouseleave)="onMouseOut();" (mousemove)="onMouseMove()" *dropdownMenu aria-labelledby="button-basic"
+    <div *dropdownMenu aria-labelledby="button-basic"
          class="dropdown-menu"
          id="dropdown-basic" role="menu" style="padding:5px;height:300px;overflow-y: scroll;">
       <p style="font-size: 0.9em;text-align: center;">
@@ -117,7 +117,7 @@
       </table>
     </div>
   </div>
-  <div #dropdown2="bs-dropdown" (mouseleave)="onMouseOut();" (mousemove)="onMouseMove()"
+  <div #dropdown2="bs-dropdown"
        [isDisabled]="asrService.selectedLanguage === null || asrService.selectedLanguage === undefined"
        class="btn-group"
        dropdown id="dropdown-button2" placement="down right"
@@ -128,7 +128,7 @@
       {{"general.SELECT ACTION" | transloco}}
       <span class="caret"></span>
     </button>
-    <div (mouseleave)="onMouseOut();" (mousemove)="onMouseMove()" *dropdownMenu aria-labelledby="button-basic"
+    <div *dropdownMenu aria-labelledby="button-basic"
          class="dropdown-menu"
          id="dropdown-basic2" role="menu" style="padding:5px;">
 
@@ -156,7 +156,7 @@
       </ng-container>
     </div>
     <a [href]="manualURL + 'using-asr'" style="margin-left: 10px;" target="_blank">
-      <fa-icon class="text-info" icon="question-circle" size="1.5x" style="display: inline-block;"></fa-icon>
+      <fa-icon class="text-info" icon="question-circle" size="2x" style="display: inline-block;"></fa-icon>
     </a>
   </div>
   <div class="clearfix"></div>

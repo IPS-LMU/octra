@@ -5,7 +5,7 @@ import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
-import {isUnset, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
+import {navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
@@ -56,6 +56,14 @@ export class AppStorageService {
     this.store.dispatch(UserActions.setUserProfile(value));
   }
 
+  get userProfile(): { name: string; email: string } {
+    return this.snapshot.user;
+  }
+
+  get playonhover(): boolean {
+    return this._snapshot.application.options.playOnHover;
+  }
+
   set playonhover(value: boolean) {
     this.store.dispatch(ApplicationActions.setPlayOnHover({playOnHover: value}));
   }
@@ -69,14 +77,26 @@ export class AppStorageService {
     return subject;
   }
 
+  get reloaded(): boolean {
+    return this._snapshot.application.reloaded;
+  }
+
   set reloaded(value: boolean) {
     this.store.dispatch(ApplicationActions.setReloaded({
       reloaded: value
     }));
   }
 
+  get serverDataEntry(): IDataEntry {
+    return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
+  }
+
   set serverDataEntry(value: IDataEntry) {
     this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
+  }
+
+  get submitted(): boolean {
+    return getModeState(this._snapshot)?.onlineSession?.submitted;
   }
 
   set submitted(value: boolean) {
@@ -130,6 +150,12 @@ export class AppStorageService {
     return this._snapshot.application.options.showLoupe;
   }
 
+  set showLoupe(value: boolean) {
+    this.store.dispatch(ApplicationActions.setShowLoupe({
+      showLoupe: value
+    }));
+  }
+
   get consoleEntries(): ConsoleEntry[] {
     return this._snapshot.application.consoleEntries;
   }
@@ -137,12 +163,6 @@ export class AppStorageService {
   set consoleEntries(consoleEntries: ConsoleEntry[]) {
     this.store.dispatch(ApplicationActions.setConsoleEntries({
       consoleEntries
-    }));
-  }
-
-  set showLoupe(value: boolean) {
-    this.store.dispatch(ApplicationActions.setShowLoupe({
-      showLoupe: value
     }));
   }
 
@@ -191,10 +211,6 @@ export class AppStorageService {
     return this._snapshot.application.options.secondsPerLine;
   }
 
-  get loadingStatus(): LoadingStatus {
-    return this._snapshot?.application?.loading?.status;
-  }
-
   set secondsPerLine(value: number) {
     this.store.dispatch(ApplicationActions.setSecondsPerLine({
       secondsPerLine: value
@@ -203,6 +219,10 @@ export class AppStorageService {
       key: 'secondsPerLine',
       value
     });
+  }
+
+  get loadingStatus(): LoadingStatus {
+    return this._snapshot?.application?.loading?.status;
   }
 
   get highlightingEnabled(): boolean {
@@ -247,6 +267,10 @@ export class AppStorageService {
 
   private _snapshot: RootState;
 
+  get savingNeeded(): boolean {
+    return getModeState(this._snapshot).savingNeeded;
+  }
+
   set savingNeeded(value: boolean) {
     this.store.dispatch(AnnotationActions.setSavingNeeded({
       savingNeeded: value,
@@ -260,13 +284,14 @@ export class AppStorageService {
     }));
   }
 
+  get followPlayCursor(): boolean {
+    return this._snapshot.application.options.followPlayCursor;
+  }
+
   get idbLoaded(): boolean {
     return this._snapshot.application.idb.loaded;
   }
 
-  get followPlayCursor(): boolean {
-    return this._snapshot.application.options.followPlayCursor;
-  }
 
   get jobsLeft(): number {
     return getModeState(this._snapshot)?.onlineSession?.sessionData.jobsLeft;
@@ -284,26 +309,6 @@ export class AppStorageService {
 
   get onlineSession(): OnlineSession {
     return getModeState(this._snapshot)?.onlineSession;
-  }
-
-  get userProfile(): { name: string; email: string } {
-    return this.snapshot.user;
-  }
-
-  get playonhover(): boolean {
-    return this._snapshot.application.options.playOnHover;
-  }
-
-  get reloaded(): boolean {
-    return this._snapshot.application.reloaded;
-  }
-
-  get serverDataEntry(): IDataEntry {
-    return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
-  }
-
-  get submitted(): boolean {
-    return getModeState(this._snapshot)?.onlineSession?.submitted;
   }
 
   setLogs(value: any[]) {
@@ -365,10 +370,6 @@ export class AppStorageService {
     }));
   }
 
-  get savingNeeded(): boolean {
-    return getModeState(this._snapshot).savingNeeded;
-  }
-
   get isSaving(): boolean {
     return getModeState(this._snapshot).isSaving;
   }
@@ -409,8 +410,8 @@ export class AppStorageService {
   }
 
   public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
-    return new Promise<void>(async (resolve, reject) => {
-      if (!isUnset(files)) {
+    return new Promise<void>( (resolve, reject) => {
+      if (files !== undefined) {
         // get audio file
         let audiofile;
         for (const file of files) {
@@ -421,7 +422,7 @@ export class AppStorageService {
         }
 
 
-        if (!isUnset(audiofile)) {
+        if (audiofile !== undefined) {
           const storeFiles = files.map(a => (a.file));
           this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
           resolve();
@@ -480,15 +481,15 @@ export class AppStorageService {
   };
 
   setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number, removeData: boolean) {
-    if (isUnset(this.easymode)) {
+    if (this.easymode === undefined) {
       this.easymode = false;
     }
 
-    if (isUnset(this.interface)) {
+    if (this.interface === undefined) {
       this.interface = '2D-Editor';
     }
 
-    if (!isUnset(member)) {
+    if (member !== undefined) {
       this.store.dispatch(OnlineModeActions.login({
         mode: LoginMode.ONLINE,
         onlineSession: {
@@ -516,11 +517,11 @@ export class AppStorageService {
   }
 
   setLocalSession(files: File[], sessionFile: SessionFile) {
-    if (isUnset(this.easymode)) {
+    if (this.easymode === undefined) {
       this.easymode = false;
     }
 
-    if (isUnset(this.interface)) {
+    if (this.interface === undefined) {
       this.interface = '2D-Editor';
     }
 
@@ -528,11 +529,11 @@ export class AppStorageService {
   }
 
   setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
-    if (isUnset(this.easymode)) {
+    if (this.easymode === undefined) {
       this.easymode = false;
     }
 
-    if (isUnset(this.interface)) {
+    if (this.interface === undefined) {
       this.interface = '2D-Editor';
     }
 
@@ -561,11 +562,11 @@ export class AppStorageService {
   }
 
   setURLSession(audio: string, transcript: string, embedded: boolean, host: string) {
-    if (isUnset(this.easymode)) {
+    if (this.easymode === undefined) {
       this.easymode = false;
     }
 
-    if (isUnset(this.interface)) {
+    if (this.interface === undefined) {
       this.interface = '2D-Editor';
     }
 
@@ -629,10 +630,11 @@ export class AppStorageService {
   }
 
   public saveLogItem(log: ILog) {
-    if (!isUnset(log)) {
-      for (const attr in log) {
-        if (log.hasOwnProperty(attr) && isUnset(log['' + attr])) {
-          delete log['' + attr];
+    if (log !== undefined) {
+      const properties = Object.entries(log);
+      for (const [name, value] of properties) {
+        if (value === undefined) {
+          delete log['' + name];
         }
       }
 
@@ -646,7 +648,7 @@ export class AppStorageService {
   }
 
   public afterSaving(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.isSaving || this.savingNeeded) {
         const subscr = this.saving.subscribe(() => {
           subscr.unsubscribe();
@@ -663,12 +665,9 @@ export class AppStorageService {
 
   public changeAnnotationLevel(tiernum: number, level: AnnotationStateLevel): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (!isUnset(this.annotationLevels)) {
-        if (!isUnset(level)) {
+      if (this.annotationLevels !== undefined) {
+        if (level !== undefined) {
           if (this.annotationLevels.length > tiernum) {
-            const changedLevel = this.annotationLevels[tiernum];
-            const id = changedLevel.id;
-
             waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationSuccess, IDBActions.saveAnnotationFailed)
               .then(() => {
                 resolve();
@@ -695,7 +694,7 @@ export class AppStorageService {
 
   public addAnnotationLevel(level: OIDBLevel) {
     return new Promise<void>((resolve, reject) => {
-      if (!isUnset(level)) {
+      if (level !== undefined) {
         level.id = getModeState(this._snapshot).transcript.levelCounter + 1;
 
         waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {BsModalRef, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {SettingsService} from '../../shared/service';
@@ -10,7 +10,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
   styleUrls: ['./inactivity-modal.component.css']
 })
 
-export class InactivityModalComponent implements OnInit {
+export class InactivityModalComponent {
   modalRef: BsModalRef;
   public visible = false;
   public config: ModalOptions = {
@@ -23,9 +23,6 @@ export class InactivityModalComponent implements OnInit {
   private actionperformed: Subject<string> = new Subject<string>();
 
   constructor(public appStorage: AppStorageService, public settService: SettingsService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<string> {

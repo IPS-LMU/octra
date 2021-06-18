@@ -6,7 +6,6 @@ import {Subject, timer} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
 import {convertFromOIDLevel, getModeState, LocalModeState, LoginMode, OnlineModeState, RootState} from '../index';
-import {isUnset} from '@octra/utilities';
 import {ILevel, ILink, OAnnotJSON, OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
@@ -19,6 +18,7 @@ import {UserActions} from '../user/user.actions';
 import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
 import {IIDBModeOptions} from '../../shared/octra-database';
+import {hasProperty} from '@octra/utilities';
 
 
 @Injectable({
@@ -169,7 +169,7 @@ export class IDBEffects {
         let max = 0;
         const convertToStateLevel = (level: ILevel, i) => {
           const annotationStateLevel = convertFromOIDLevel(level, i + 1);
-          if (!level.hasOwnProperty('id')) {
+          if (!hasProperty(level, 'id')) {
             annotationStateLevel.id = i + 1;
           }
 
@@ -178,7 +178,7 @@ export class IDBEffects {
         };
 
         const convertLink = (link: ILink, i) => {
-          if (!link.hasOwnProperty('id')) {
+          if (!hasProperty(link, 'id')) {
             return new OIDBLink(i + 1, link);
           } else {
             return link;
@@ -265,7 +265,7 @@ export class IDBEffects {
       || action.type === OnlineModeActions.clearWholeSession.type || action.type === AnnotationActions.logout.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-      if (!action.hasOwnProperty('clearSession') || (action as any).clearSession) {
+      if (!hasProperty(action, 'clearSession') || (action as any).clearSession) {
         this.idbService.clearAnnotationData((action as any).mode).then(() => {
           subject.next(IDBActions.clearAnnotationSuccess());
           subject.complete();
@@ -811,7 +811,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.idbService.loadConsoleEntries().then((dbEntries: ConsoleEntry[]) => {
-        if (!isUnset(dbEntries)) {
+        if (dbEntries !== undefined) {
           subject.next(IDBActions.loadConsoleEntriesSuccess({
             consoleEntries: dbEntries
           }));

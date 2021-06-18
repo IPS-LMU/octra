@@ -1,5 +1,5 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 
@@ -8,7 +8,7 @@ import {SubscriptionManager} from '@octra/utilities';
   templateUrl: './missing-permissions.component.html',
   styleUrls: ['./missing-permissions.component.css']
 })
-export class MissingPermissionsModalComponent implements OnInit, OnDestroy {
+export class MissingPermissionsModalComponent implements OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
 
@@ -18,12 +18,6 @@ export class MissingPermissionsModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
-
-  constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
-  }
 
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {

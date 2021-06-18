@@ -194,9 +194,7 @@ export class Segments {
       if (a.time.samples === b.time.samples) {
         return 0;
       }
-      if (a.time.samples > b.time.samples) {
-        return 1;
-      }
+      return 1;
     });
   }
 

@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
@@ -7,7 +7,7 @@ import {Subject} from 'rxjs';
   templateUrl: './yes-no-modal.component.html',
   styleUrls: ['./yes-no-modal.component.css']
 })
-export class YesNoModalComponent implements OnInit {
+export class YesNoModalComponent {
   modalRef: BsModalRef;
   config: ModalOptions = {
     keyboard: false,
@@ -21,9 +21,6 @@ export class YesNoModalComponent implements OnInit {
   private actionperformed: Subject<('yes' | 'no')> = new Subject<('yes' | 'no')>();
 
   constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(data: {

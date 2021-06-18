@@ -1,4 +1,4 @@
-import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, SecurityContext, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
@@ -6,7 +6,7 @@ import {DomSanitizer} from '@angular/platform-browser';
   templateUrl: './validation-popover.component.html',
   styleUrls: ['./validation-popover.component.css']
 })
-export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
+export class ValidationPopoverComponent {
   @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;
   public visible = false;
 
@@ -45,12 +45,6 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
   }
 
   constructor(private el: ElementRef, private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewChecked(): void {
   }
 
   public show() {

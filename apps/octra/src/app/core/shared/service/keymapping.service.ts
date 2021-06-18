@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
-import {isUnset, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '@octra/utilities';
+import {Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '@octra/utilities';
 
 @Injectable()
 export class KeymappingService {
@@ -13,7 +13,7 @@ export class KeymappingService {
   }
 
   public get shortcutGroups(): ShortcutGroup[] {
-    if (isUnset(this._shortcutsManager)) {
+    if (this._shortcutsManager === undefined) {
       return [];
     }
 
@@ -63,7 +63,7 @@ export class KeymappingService {
   public getShortcuts(identifier: string): Shortcut[] {
     const shortcutGroup = this._shortcutsManager.getShortcutGroup(identifier);
 
-    if (!isUnset(shortcutGroup)) {
+    if (shortcutGroup !== undefined) {
       return shortcutGroup.items;
     }
 
@@ -76,7 +76,7 @@ export class KeymappingService {
   public getShortcut(identifier: string, key: string): string {
     const shortcuts = this.getShortcuts(identifier);
 
-    if (shortcuts && !isUnset(shortcuts[key])) {
+    if (shortcuts && shortcuts[key] !== undefined) {
       const platform = BrowserInfo.platform;
       if (shortcuts[key].keys[platform]) {
         let shortc = '[' + shortcuts[key].keys[platform] + ']';
@@ -90,7 +90,7 @@ export class KeymappingService {
 
   private onKeyDown = ($event: KeyboardEvent) => {
     const shortcutInfo = this._shortcutsManager.checkKeyEvent($event, Date.now());
-    if (!isUnset(shortcutInfo)) {
+    if (shortcutInfo !== undefined) {
       this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
       this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
     }
@@ -104,10 +104,10 @@ export class KeymappingService {
     return new Promise<string>((resolve) => {
       if (shortcutsEnabled) {
         const platform = BrowserInfo.platform;
-        if (!isUnset(shortcutGroup)) {
+        if (shortcutGroup !== undefined) {
           const foundShortcut = shortcutGroup.items.find(a => a.keys['' + platform] === shortcut);
 
-          if (!isUnset(foundShortcut)) {
+          if (foundShortcut !== undefined) {
             resolve(foundShortcut.name);
           }
         }

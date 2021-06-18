@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {TranslocoService} from '@ngneat/transloco';
 import {SettingsService, TranscriptionService} from '../../shared/service';
@@ -9,7 +9,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.css']
 })
-export class TranscriptionFeedbackComponent implements OnInit {
+export class TranscriptionFeedbackComponent {
 
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
@@ -23,17 +23,9 @@ export class TranscriptionFeedbackComponent implements OnInit {
               private settingsService: SettingsService) {
   }
 
-  ngOnInit() {
-  }
-
   translate(languages: any, lang: string): string {
     if ((languages[lang] === null || languages[lang] === undefined)) {
-      for (const attr in languages) {
-        // take first
-        if (languages.hasOwnProperty(attr)) {
-          return languages[attr];
-        }
-      }
+      return Object.entries(languages)[0][1] as string;
     }
     return languages[lang];
   }
@@ -41,15 +33,13 @@ export class TranscriptionFeedbackComponent implements OnInit {
   public saveFeedbackform() {
     if (!(this.transcrService.feedback.comment === null || this.transcrService.feedback.comment === undefined)
       && this.transcrService.feedback.comment !== '') {
-      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
+      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, ' ');
     }
     this.appStorage.comment = this.transcrService.feedback.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
-      for (const control in this.feedbackData) {
-        if (this.feedbackData.hasOwnProperty(control)) {
-          this.changeValue(control, this.feedbackData[control]);
-        }
+      for (const [name, value] of Object.entries(this.feedbackData)) {
+        this.changeValue(name, value);
       }
       this.appStorage.save('feedback', this.transcrService.feedback.exportData());
     }

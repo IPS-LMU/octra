@@ -1,15 +1,15 @@
 <div class="octra-audioplayer">
   <span
-    class="start-time">{{audioChunk?.relativePlayposition.unix | timespan: {
+    class="start-time">{{audioChunk?.relativePlayposition?.unix | timespan: {
     showHour: true,
     showMilliSeconds: true,
-    maxDuration: audioChunk?.time.duration.unix
+    maxDuration: audioChunk?.time?.duration?.unix
   }
     }}</span>
   <span class="end-time">{{timeLeft | timespan: {
     showHour: true,
     showMilliSeconds: true,
-    maxDuration: audioChunk?.time.duration.unix
+    maxDuration: audioChunk?.time?.duration?.unix
   }
     }}</span>
   <div #konvaContainer>

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {Component, OnDestroy, SecurityContext, ViewChild} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animations';
 import {interval, Subscription} from 'rxjs';
@@ -15,7 +15,7 @@ import {AlertEntry, AlertService} from '../../shared/service/alert.service';
   ]
 })
 
-export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AlertComponent implements OnDestroy {
   @ViewChild(DynComponentDirective, {static: false}) appDynComponent: DynComponentDirective;
 
   public duration = 20;
@@ -43,12 +43,6 @@ export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy() {
     this.counter.unsubscribe();
-  }
-
-  ngOnInit(): void {
-  }
-
-  ngAfterViewInit(): void {
   }
 
   onClose(entry: AlertEntry) {

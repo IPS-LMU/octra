@@ -169,7 +169,6 @@
               "node_modules/summernote/dist/summernote-bs4.min.js",
               "node_modules/video.js/dist/video.js",
               "node_modules/platform/platform.js",
-              "node_modules/ajv/dist/ajv.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"
@@ -182,7 +181,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumError": "6mb"
                 },
                 {
                   "type": "anyComponentStyle",

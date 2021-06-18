@@ -6,8 +6,8 @@ import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {OnlineModeActions} from './online-mode.actions';
 import {IDBActions} from '../../idb/idb.actions';
-import {isUnset} from '@octra/utilities';
 import {DefaultModeOptions, IIDBModeOptions} from '../../../shared/octra-database';
+import {hasProperty} from '@octra/utilities';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -68,8 +68,6 @@ export class OnlineModeReducers {
         return state;
       }),
       on(OnlineModeActions.logout, (state: OnlineModeState, {clearSession, mode}) => {
-        const loguinData = state.onlineSession.loginData;
-
         if (mode === this.mode) {
           return (clearSession) ? {
             ...initialState,
@@ -203,10 +201,8 @@ export class OnlineModeReducers {
             options = DefaultModeOptions;
           }
 
-          for (const name in options) {
-            if (options.hasOwnProperty(name)) {
-              result = this.writeOptionToStore(result, name, options[name]);
-            }
+          for (const [name, value] of Object.entries(options)) {
+            result = this.writeOptionToStore(result, name, value);
           }
 
           return result;
@@ -225,6 +221,13 @@ export class OnlineModeReducers {
   }
 
   writeOptionToStore(state: OnlineModeState, attribute: string, value: any): OnlineModeState {
+    const onlineSessionData = {
+      jobNumber: -1,
+      id: '',
+      project: '',
+      password: ''
+    };
+
     switch (attribute) {
       case('audioURL'):
         return {
@@ -260,22 +263,15 @@ export class OnlineModeReducers {
           }
         };
       case('user'):
-        const onlineSessionData = {
-          jobNumber: -1,
-          id: '',
-          project: '',
-          password: ''
-        };
-
-        if (!isUnset(value)) {
-          if (value.hasOwnProperty('id')) {
+        if (value !== undefined) {
+          if (hasProperty(value, 'id')) {
             onlineSessionData.id = value.id;
           }
-          if (value.hasOwnProperty('jobNumber')) {
+          if (hasProperty(value, 'jobNumber')) {
             onlineSessionData.jobNumber = value.jobNumber;
           }
 
-          if (value.hasOwnProperty('project')) {
+          if (hasProperty(value, 'project')) {
             onlineSessionData.project = value.project;
           }
         }
@@ -316,7 +312,7 @@ export class OnlineModeReducers {
             ...state.onlineSession,
             sessionData: {
               ...state.onlineSession.sessionData,
-              submitted: (!isUnset(value)) ? value : false
+              submitted: (value !== undefined) ? value : false
             }
           }
         };

@@ -1,24 +1,18 @@
 import {
-  AfterContentChecked,
-  AfterContentInit,
-  AfterViewChecked,
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
   ComponentRef,
   HostListener,
-  OnChanges,
   OnDestroy,
   OnInit,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {
+  hasProperty,
   hasPropertyTree,
-  isUnset,
   navigateTo,
   ShortcutGroup,
   ShortcutManager,
@@ -69,8 +63,7 @@ import {LoginMode} from '../../store';
   styleUrls: ['./transcription.component.css'],
   providers: [AlertService]
 })
-export class TranscriptionComponent implements OnInit,
-  OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
+export class TranscriptionComponent implements OnInit, OnDestroy {
 
   public waitForSend = false;
   // TODO change to ModalComponents!
@@ -235,7 +228,7 @@ export class TranscriptionComponent implements OnInit,
         if (!appStorage.playonhover && !this.modalOverview.visible) {
           let caretpos = -1;
 
-          if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
+          if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
             caretpos = (this.currentEditor.instance as any).editor.caretpos;
           }
 
@@ -287,19 +280,15 @@ export class TranscriptionComponent implements OnInit,
             })).catch((error) => {
               console.error(error);
             });
-            if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
+            if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
               (this._currentEditor.instance as any).update();
             }
             break;
         }
-      },
-      (error) => {
-      },
-      () => {
       }));
 
     this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
-      if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
+      if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor  !== undefined) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         console.log(`CALL disable all shortcuts!`);
         editor.disableAllShortcuts();
@@ -308,8 +297,8 @@ export class TranscriptionComponent implements OnInit,
       }
     }));
 
-    this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
-      if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
+    this.subscrmanager.add(this.modService.closemodal.subscribe(() => {
+      if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         console.log(`CALL enable all shortcuts!`);
         editor.enableAllShortcuts();
@@ -326,8 +315,8 @@ export class TranscriptionComponent implements OnInit,
 
   abortTranscription = () => {
     if ((this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO)
-      && !isUnset(this.settingsService.projectsettings.octra)
-      && !isUnset(this.settingsService.projectsettings.octra.theme)
+      && this.settingsService.projectsettings.octra !== undefined
+      && this.settingsService.projectsettings.octra.theme !== undefined
       && this.settingsService.isTheme('shortAudioFiles')) {
       // clear transcription
 
@@ -358,12 +347,6 @@ export class TranscriptionComponent implements OnInit,
     this.sendError = error.message;
     return throwError(error);
   };
-
-  ngOnChanges(changes: SimpleChanges) {
-  }
-
-  ngAfterContentChecked() {
-  }
 
   ngOnInit() {
     this.showCommentSection = (
@@ -442,7 +425,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
-    if (!isUnset(this.transcrService.annotation)) {
+    if (this.transcrService.annotation !== undefined) {
       this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
       );
@@ -470,8 +453,8 @@ export class TranscriptionComponent implements OnInit,
     ));
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-      if (!isUnset(this.settingsService.appSettings.octra.inactivityNotice)
-        && !isUnset(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
+      if (this.settingsService.appSettings.octra.inactivityNotice !== undefined
+        && this.settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
         // if waitTime is 0 the inactivity modal isn't shown
         let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
@@ -505,9 +488,6 @@ export class TranscriptionComponent implements OnInit,
     this.cd.detectChanges();
   }
 
-  ngAfterViewInit() {
-  }
-
   private async checkCurrentEditor() {
     // TODO move this to another place
     const currentEditor = this.appStorage.interface;
@@ -515,15 +495,9 @@ export class TranscriptionComponent implements OnInit,
       return currentEditor === x;
     });
 
-    if (isUnset(found)) {
+    if (found === undefined) {
       this.appStorage.interface = this.projectsettings.interfaces[0];
     }
-  }
-
-  ngAfterContentInit() {
-  }
-
-  ngAfterViewChecked() {
   }
 
   ngOnDestroy() {
@@ -533,7 +507,7 @@ export class TranscriptionComponent implements OnInit,
   @HostListener('window:keydown', ['$event'])
   onKeyDown($event) {
     const shortcutInfo = this.shortcutManager.checkKeyEvent($event, Date.now());
-    if (!isUnset(shortcutInfo)) {
+    if (shortcutInfo !== undefined) {
       $event.preventDefault();
 
       switch (shortcutInfo.shortcutName) {
@@ -610,13 +584,8 @@ export class TranscriptionComponent implements OnInit,
             viewContainerRef.clear();
 
             this._currentEditor = viewContainerRef.createComponent(componentFactory);
-            let caretpos = -1;
 
-            if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
-              caretpos = (this.currentEditor.instance as any).editor.caretpos;
-            }
-
-            if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
+            if (hasProperty((this.currentEditor.instance as any), 'openModal')) {
               this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
                 (this.currentEditor.instance as any).disableAllShortcuts();
                 this.modalOverview.open().then(() => {
@@ -643,18 +612,6 @@ export class TranscriptionComponent implements OnInit,
         console.error('ERROR editor component is null');
       }
     });
-  }
-
-  translate(languages: any, lang: string): string {
-    if ((languages[lang] === null || languages[lang] === undefined)) {
-      for (const attr in languages) {
-        // take first
-        if (languages.hasOwnProperty(attr)) {
-          return languages[attr];
-        }
-      }
-    }
-    return languages[lang];
   }
 
   public onSendNowClick() {
@@ -740,13 +697,13 @@ export class TranscriptionComponent implements OnInit,
         this.transcrService.validateAll();
         const validTranscript = this.transcrService.transcriptValid;
 
-        if (!isUnset(this.projectsettings.octra) &&
-          !isUnset(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
+        if (this.projectsettings.octra !== undefined &&
+          this.projectsettings.octra.showOverviewIfTranscriptNotValid !== undefined) {
           showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
         }
 
-        if (!isUnset(this.projectsettings.octra)
-          && !isUnset(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
+        if (this.projectsettings.octra !== undefined
+          && this.projectsettings.octra.sendValidatedTranscriptionOnly !== undefined) {
           validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
         }
 
@@ -768,9 +725,9 @@ export class TranscriptionComponent implements OnInit,
   nextTranscription(json: any) {
     this.transcrService.endTranscription(false);
 
-    if (!isUnset(json)) {
+    if (json !== undefined) {
       const data = json.data as IDataEntry;
-      if (data && data.hasOwnProperty('url') && data.hasOwnProperty('id')) {
+      if (data && hasProperty(data, 'url') && hasProperty(data, 'id')) {
         // get transcript data that already exists
         const jsonStr = JSON.stringify(json.data);
         let serverDataEntry = parseServerDataEntry(jsonStr);
@@ -798,19 +755,19 @@ export class TranscriptionComponent implements OnInit,
         }
 
         let promptText = '';
-        if (this.appStorage.useMode === LoginMode.ONLINE && data.hasOwnProperty('prompttext') && data.prompttext !== '') {
+        if (this.appStorage.useMode === LoginMode.ONLINE && hasProperty(data, 'prompttext') && data.prompttext !== '') {
           // get transcript data that already exists
           promptText = json.data.prompttext;
         }
 
         let serverComment = '';
-        if (this.appStorage.useMode === LoginMode.ONLINE && data.hasOwnProperty('comment') && data.comment !== '') {
+        if (this.appStorage.useMode === LoginMode.ONLINE && hasProperty(data, 'comment') && data.comment !== '') {
           // get transcript data that already exists
           serverComment = data.comment;
         }
 
         let jobsLeft = 0;
-        if (json.hasOwnProperty('message')) {
+        if (hasProperty(json, 'message')) {
           const counter = (json.message === '') ? '0' : json.message;
           jobsLeft = Number(counter);
         }
@@ -841,7 +798,7 @@ export class TranscriptionComponent implements OnInit,
     this.clearDataPermanently();
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
-    if (!isUnset(audioExample)) {
+    if (audioExample !== undefined) {
       // transcription available
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, this.appStorage.jobsLeft - 1);
 
@@ -902,7 +859,7 @@ export class TranscriptionComponent implements OnInit,
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    xhr.onloadstart = (e) => {
+    xhr.onloadstart = () => {
       console.log('start');
     };
 

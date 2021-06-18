@@ -1,5 +1,4 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {isUnset} from '@octra/utilities';
 
 @Component({
   selector: 'octra-shortcut',
@@ -17,12 +16,9 @@ export class ShortcutComponent implements OnInit {
   @Input() shortcut = '';
   @Input() theme: 'dark' | 'light' = 'light';
 
-  constructor() {
-  }
-
   ngOnInit(): void {
     const shortcut = this.replaceWithUTF8Symbols(this.shortcut);
-    const splitted = shortcut.split(' ').filter(a => !isUnset(a) && a !== '');
+    const splitted = shortcut.split(' ').filter(a => a !== undefined && a !== '');
 
     this.parts = [];
     for (const part of splitted) {

@@ -51,31 +51,29 @@ export class EmailBugReporter extends BugReporter {
   public getText(pkg: any): string {
     let result = '';
 
-    for (const attr in pkg) {
-      if (pkg.hasOwnProperty(attr)) {
-        if (!isArray(pkg[attr]) && typeof pkg[attr] === 'object') {
-          result += attr + '\n';
-          result += '---------\n';
+    for (const [name, value] of Object.entries(pkg)) {
+      if (!isArray(value) && typeof value === 'object') {
+        result += name + '\n';
+        result += '---------\n';
 
-          for (const attr2 in pkg[attr]) {
-            if (pkg[attr].hasOwnProperty(attr2) && typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
-              result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
-            }
-          }
-        } else if (isArray(pkg[attr])) {
-          result += attr + '\n';
-          result += '---------\n';
-
-          for (const pkgElement of pkg[attr]) {
-            if (typeof pkgElement.message === 'string') {
-              result += '  ' + pkgElement.type + '  ' + pkgElement.message + '\n';
-            } else if (typeof pkgElement.message === 'object') {
-              result += '  ' + pkgElement.type + '\n' + JSON.stringify(pkgElement.message, null, 2) + '\n';
-            }
+        for (const [name2, value2] of Object.entries(value)) {
+          if (typeof value2 !== 'object' || value2 === null) {
+            result += '  ' + name2 + ':  ' + value2 + '\n';
           }
         }
-        result += '\n';
+      } else if (isArray(value)) {
+        result += name + '\n';
+        result += '---------\n';
+
+        for (const [name2, value2] of Object.entries(value)) {
+          if (typeof value2.message === 'string') {
+            result += '  ' + value2.type + '  ' + value2.message + '\n';
+          } else if (typeof value2.message === 'object') {
+            result += '  ' + value2.type + '\n' + JSON.stringify(value2.message, null, 2) + '\n';
+          }
+        }
       }
+      result += '\n';
     }
 
     return result;

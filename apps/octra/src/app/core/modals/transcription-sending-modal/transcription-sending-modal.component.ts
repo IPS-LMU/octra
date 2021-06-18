@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Input, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
@@ -8,7 +8,7 @@ import {Subject} from 'rxjs';
   styleUrls: ['./transcription-sending-modal.component.css']
 })
 
-export class TranscriptionSendingModalComponent implements OnInit {
+export class TranscriptionSendingModalComponent {
   modalRef: BsModalRef;
 
   config: ModalOptions = {
@@ -23,9 +23,6 @@ export class TranscriptionSendingModalComponent implements OnInit {
   private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<void> {

@@ -11,7 +11,7 @@
     width: mainSize.width + 'px',
     height: mainSize.height + 'px'
     }" class="background"></div>
-      <fa-icon icon="spinner" size="4x" spin="spin"></fa-icon>
+      <fa-icon icon="spinner" size="4x" [spin]="true"></fa-icon>
     </div>
     <octra-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
                        [enabled]="editor.rawText === ''"></octra-asr-options>

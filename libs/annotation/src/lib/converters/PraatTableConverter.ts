@@ -77,11 +77,7 @@ export class PraatTableConverter extends Converter {
             const columns: string[] = lines[i].split('\t');
             const tier = columns[1];
 
-            if (tiers.filter((a) => {
-              if (a === tier) {
-                return true;
-              }
-            }).length === 0) {
+            if (tiers.filter(a => a === tier).length === 0) {
               tiers.push(tier);
             }
           }

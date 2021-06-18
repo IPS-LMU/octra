@@ -10,7 +10,7 @@ import {BrowserInfo} from '../BrowserInfo';
 import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {getFileSize, isUnset} from '@octra/utilities';
+import {getFileSize} from '@octra/utilities';
 import {LoginMode} from '../../store';
 
 export enum ConsoleType {
@@ -60,7 +60,7 @@ export class BugReportService {
       message
     };
 
-    if (!isUnset(this._console) && !isUnset(consoleItem)) {
+    if (this._console !== undefined && consoleItem !== undefined) {
       this._console = [
         ...this._console,
         consoleItem
@@ -74,7 +74,7 @@ export class BugReportService {
   }
 
   public addEntriesFromDB(entries: ConsoleEntry[]) {
-    if (!isUnset(entries) && isArray(entries) && entries.length > 0) {
+    if (entries !== undefined && isArray(entries) && entries.length > 0) {
       if (entries.length > 50) {
         // crop down to 100 items
         entries = entries.slice(-50);
@@ -146,7 +146,7 @@ export class BugReportService {
   }
 
   public getText(): string {
-    if (!isUnset(this.settService.appSettings)) {
+    if (this.settService.appSettings !== undefined) {
       const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
       for (const bugreporter of AppInfo.bugreporters) {

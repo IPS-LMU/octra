@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, V
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
-import {isFunction, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {isFunction, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
@@ -135,7 +135,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.keyService.register(shortcuts);
 
         this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
-          if (!isUnset(keyObj)) {
+          if (keyObj !== undefined) {
             keyObj.event.preventDefault();
             this.sendTranscriptionForShortAudioFiles(keyObj.shortcutName as any);
           }
@@ -185,7 +185,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.keyService.register(shortcuts);
 
         this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
-          if (!isUnset(keyObj)) {
+          if (keyObj !== undefined) {
             keyObj.event.preventDefault();
             this.sendTranscriptionForKorbinian(keyObj.shortcutName as any);
           }
@@ -291,19 +291,19 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   public get numberOfSegments(): number {
-    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.currentlevel.segments.length : 0;
+    return (this.transcrService.currentlevel !== undefined && this.transcrService.currentlevel.segments) ? this.transcrService.currentlevel.segments.length : 0;
   }
 
   public get transcrSegments(): number {
-    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.transcribed : 0;
+    return (this.transcrService.currentlevel !== undefined && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.transcribed : 0;
   }
 
   public get pauseSegments(): number {
-    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.pause : 0;
+    return (this.transcrService.currentlevel !== undefined && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.pause : 0;
   }
 
   public get emptySegments(): number {
-    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.empty : 0;
+    return (this.transcrService.currentlevel !== undefined && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.empty : 0;
   }
 
   public get foundErrors(): number {
@@ -355,7 +355,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
-        && !isUnset(this.transcrService.validationArray[i])) {
+        && this.transcrService.validationArray[i] !== undefined) {
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
           this.transcrService.validationArray[i].validation);
       }

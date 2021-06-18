@@ -1,5 +1,6 @@
 import {StatisticElem} from './StatisticElement';
 import {ILog} from '../Settings/logging';
+import {hasProperty} from '@octra/utilities';
 
 /***
  * Statistic Element Class
@@ -45,17 +46,15 @@ export class MouseStatisticElem extends StatisticElem {
       segment: null
     };
 
-    for (const attr in elem) {
-      if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
-          || elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos')
-          || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('segment')
-        ) {
-          if (attr === 'playerpos') {
-            result.playpos = elem[`${attr}`];
-          } else {
-            result[`${attr}`] = elem[`${attr}`];
-          }
+    for (const [name] of Object.entries(elem)) {
+      if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp')
+        || hasProperty(elem, 'type') || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos')
+        || hasProperty(elem, 'caretpos') || hasProperty(elem, 'segment')
+      ) {
+        if (name === 'playerpos') {
+          result.playpos = elem[`${name}`];
+        } else {
+          result[`${name}`] = elem[`${name}`];
         }
       }
     }

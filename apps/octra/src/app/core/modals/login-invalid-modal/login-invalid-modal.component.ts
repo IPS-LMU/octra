@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
@@ -7,7 +7,7 @@ import {Subject} from 'rxjs';
   templateUrl: './login-invalid-modal.component.html',
   styleUrls: ['./login-invalid-modal.component.css']
 })
-export class LoginInvalidModalComponent implements OnInit {
+export class LoginInvalidModalComponent{
   modalRef: BsModalRef;
   config: ModalOptions = {
     keyboard: false,
@@ -21,9 +21,6 @@ export class LoginInvalidModalComponent implements OnInit {
   private actionperformed: Subject<(void)> = new Subject<(void)>();
 
   constructor(private modalService: BsModalService) {
-  }
-
-  ngOnInit() {
   }
 
   public open(): Promise<void> {

@@ -8,7 +8,7 @@ import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {FileInfo, isUnset, SubscriptionManager} from '@octra/utilities';
+import {FileInfo, SubscriptionManager} from '@octra/utilities';
 import {AudioManager, SampleUnit, WavFormat} from '@octra/media';
 
 @Injectable({
@@ -25,7 +25,7 @@ export class AsrService {
 
   set selectedLanguage(value: ASRLanguage) {
     this._selectedLanguage = value;
-    if (!isUnset(value)) {
+    if (value !== undefined) {
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
     } else {
@@ -50,13 +50,13 @@ export class AsrService {
 
   public init() {
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
-    if (!isUnset(this.appStorage.asrSelectedLanguage) && !isUnset(this.appStorage.asrSelectedService)) {
+    if (this.appStorage.asrSelectedLanguage !== undefined && this.appStorage.asrSelectedService !== undefined) {
       this._selectedLanguage = this.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
     }
   }
 
   public getLanguageByCode(code: string, asr: string): ASRLanguage {
-    if (isUnset(asr) || isUnset(code)) {
+    if (asr === undefined || code === undefined) {
       return null;
     }
 
@@ -107,7 +107,7 @@ export class AsrService {
       if (segNumber > -1) {
         const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-        if (!isUnset(segment)) {
+        if (segment !== undefined) {
           segment.isBlockedBy = null;
         }
         item.stopProcessing();
@@ -669,13 +669,13 @@ export class ASRQueueItem {
   }
 
   private fitsServiceRequirements(file: File): string {
-    if (!isUnset(this._selectedASRInfo)) {
-      if (!isUnset(this._selectedASRInfo.maxSignalDuration)) {
+    if (this._selectedASRInfo !== undefined) {
+      if (this._selectedASRInfo.maxSignalDuration !== undefined) {
         if (this.time.sampleLength / this.sampleRate > this._selectedASRInfo.maxSignalDuration) {
           return '[Error] max duration exceeded';
         }
       }
-      if (!isUnset(this._selectedASRInfo.maxSignalSize)) {
+      if (this._selectedASRInfo.maxSignalSize !== undefined) {
         if (file.size / 1000 / 1000 > this._selectedASRInfo.maxSignalSize) {
           return '[Error] max signal size exceeded';
         }

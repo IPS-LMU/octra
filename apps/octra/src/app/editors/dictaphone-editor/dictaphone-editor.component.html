@@ -52,6 +52,6 @@
                       [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
                       [(highlightingEnabled)]="highlighting"
                       [externalShortcutManager]="keyMap.shortcutsManager"
-                      (onRedoUndo)="onTranscrEditorRedoUndo($event)"
+                      (redoUndo)="onTranscrEditorRedoUndo($event)"
 >
 </octra-transcr-editor>

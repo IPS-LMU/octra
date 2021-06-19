@@ -116,6 +116,7 @@ import {MaintenanceModule} from './core/component/maintenance/maintenance.module
 import {ProtectedModalComponent} from './core/modals/protected-modal/protected-modal.component';
 import {ApplicationEffects} from './core/store/application/application-effects.service';
 import {LoginMode} from './core/store';
+import {JoditAngularModule} from 'jodit-angular';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -242,7 +243,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     EffectsModule.forRoot([ConfigurationEffects, IDBEffects, ApplicationEffects]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([]),
-    MaintenanceModule
+    MaintenanceModule,
+    JoditAngularModule
   ],
   bootstrap: [AppComponent],
   providers: [

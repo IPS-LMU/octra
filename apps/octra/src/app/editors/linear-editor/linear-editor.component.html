@@ -104,7 +104,7 @@
        class="inner">
   </div>
 </div>
-<octra-transcr-editor #transcr
+<octra-transcr-editor *ngIf="segmentselected" #transcr
                       (keyup)="onKeyUp()"
                       (markerClick)="onMarkerClick($event)"
                       (markerInsert)="onMarkerInsert($event)"
@@ -113,7 +113,6 @@
                       [transcript]="transcript"
                       [easymode]="appStorage.easymode"
                       [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
-                      [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                       [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
                       [externalShortcutManager]="keyMap.shortcutsManager"
 >

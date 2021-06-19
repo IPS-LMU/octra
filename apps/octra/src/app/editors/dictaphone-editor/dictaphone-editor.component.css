@@ -5,3 +5,9 @@
   flex-direction: column;
   flex: 1 0 auto;
 }
+
+octra-transcr-editor {
+  width: 100% !important;
+  height: 100% !important;
+  display: grid !important;
+}

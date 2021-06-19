@@ -156,7 +156,6 @@
               "apps/octra/src/LICENSE.txt"
             ],
             "styles": [
-              "node_modules/summernote/dist/summernote-bs4.css",
               "node_modules/video.js/dist/video-js.min.css",
               "apps/octra/src/styles.css"
             ],
@@ -166,7 +165,6 @@
               "node_modules/arrive/minified/arrive.min.js",
               "node_modules/popper.js/dist/umd/popper.js",
               "node_modules/bootstrap-material-design/dist/js/bootstrap-material-design.min.js",
-              "node_modules/summernote/dist/summernote-bs4.min.js",
               "node_modules/video.js/dist/video.js",
               "node_modules/platform/platform.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",

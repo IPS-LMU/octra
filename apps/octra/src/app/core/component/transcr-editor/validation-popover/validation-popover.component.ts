@@ -50,6 +50,7 @@ export class ValidationPopoverComponent {
   public show() {
     if (!this.visible) {
       this.el.nativeElement.style.display = 'flex';
+      this.el.nativeElement.style.visibility = 'inherit';
     }
     this.visible = true;
     this.cd.markForCheck();
@@ -58,7 +59,7 @@ export class ValidationPopoverComponent {
 
   public hide() {
     if (this.visible) {
-      this.el.nativeElement.style.display = 'none';
+      this.el.nativeElement.style.visibility = 'hidden';
     }
     this.visible = false;
     this.cd.markForCheck();

@@ -876,7 +876,7 @@ export class TranscriptionService {
   }
 
   public getErrorDetails(code: string): any {
-    if (!(this.guidelines.instructions === undefined || this.guidelines.instructions === undefined)) {
+    if (this.guidelines.instructions !== undefined) {
       const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {

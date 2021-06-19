@@ -96,42 +96,6 @@ export function equalProperties(elem: any, elem2: any) {
   return result;
 }
 
-export function placeAtEnd(element: HTMLElement) {
-  try {
-    element.focus();
-    const bodyInput: any = document.body as any;
-    if (jQuery(element).text() !== '') {
-      if (typeof window.getSelection !== 'undefined'
-        && typeof document.createRange !== 'undefined'
-      ) {
-        // get range
-        const txtRange = document.createRange();
-        txtRange.selectNodeContents(element);
-        // set range to end
-        txtRange.collapse(false);
-
-        // get selection of the element
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        // set previous created range to the element
-        selection.addRange(txtRange);
-      } else if (bodyInput.createTextRange !== 'undefined') {
-        // fix for IE and older Opera Browsers
-
-        // create range from body
-        const txtRange = bodyInput.createTextRange();
-        txtRange.moveToElementText(element);
-        // set selection to end
-        txtRange.collapse(false);
-        txtRange.select();
-      }
-    }
-  } catch (ex) {
-    console.error(ex);
-    // ignore
-  }
-}
-
 export function escapeRegex(regexStr: string) {
   // escape special chars in regex
   return regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -357,4 +321,24 @@ export function getProperties(obj: any): [string, any][] {
     return Object.entries(obj);
   }
   return [];
+}
+
+export function findElements(parent: HTMLElement, selector: string) {
+  const result = parent.querySelectorAll(selector) as any;
+  return (result !== undefined) ? (result as HTMLElement[]) : [];
+}
+
+export function getAttr(elem: HTMLElement, attribute: string) {
+  if (elem.getAttribute !== undefined) {
+    const result = elem.getAttribute(attribute);
+    return result !== null ? result : undefined;
+  }
+  return undefined;
+}
+
+export function setStyle(elem: HTMLElement, styleObj: any) {
+  const styles = getProperties(styleObj);
+  for (const [name, value] of styles) {
+    elem.style[name] = value;
+  }
 }

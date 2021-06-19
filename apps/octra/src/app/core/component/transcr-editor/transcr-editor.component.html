@@ -1,5 +1,4 @@
-<div #transcrEditor (change)="updateTextField()" [ngStyle]="{display: (visible) ? 'inherit' : 'none'}"
-     class="transcr-editor">
+<div #transcrEditor (change)="updateTextField()" class="transcr-editor">
   <octra-validation-popover #validationPopover
                             [ngStyle]="{
                                 'margin-left': popoversNew.validation.location.x + 'px',
@@ -20,7 +19,5 @@
       {{"asr.asr running" | transloco}}
     </p>
   </div>
-  <!-- (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none' -->
-  <div class="textfield" #textfield>
-  </div>
+  <jodit-editor #jodit></jodit-editor>
 </div>

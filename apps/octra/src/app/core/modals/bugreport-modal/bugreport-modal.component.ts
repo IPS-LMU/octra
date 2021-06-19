@@ -91,7 +91,7 @@ export class BugreportModalComponent {
 
   onShown() {
     // TODO check data and set focus
-    jQuery('#bgDescr').focus();
+    // jQuery('#bgDescr').focus();
   }
 
   onHidden() {

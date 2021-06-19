@@ -11,7 +11,6 @@ import {APIService, SettingsService} from './core/shared/service';
 import {AppStorageService} from './core/shared/service/appstorage.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
-import * as jQuery from 'jquery';
 import * as fromApplication from './core/store/application'
 import {Store} from '@ngrx/store';
 import {Subscription} from 'rxjs';
@@ -238,7 +237,9 @@ export class AppComponent implements OnDestroy, OnInit {
         && this.settingsService.appSettings.octra.tracking.matomo.siteID !== undefined) {
         const matomoSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
-        const trackingCode = `
+        const trackingCode = document.createElement("script");
+        trackingCode.setAttribute("type", "text/javascript");
+        trackingCode.innerHTML = `
 <!-- Matomo -->
 <script type="text/javascript">
   var _paq = window._paq || [];
@@ -255,7 +256,7 @@ export class AppComponent implements OnDestroy, OnInit {
 </script>
 <!-- End Matomo Code -->`;
 
-        jQuery(trackingCode).insertAfter(jQuery('body').children().last());
+        document.body.appendChild(trackingCode)
       } else {
         console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
       }

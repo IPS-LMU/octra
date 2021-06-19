@@ -886,13 +886,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     for (let i = 0; i < samplesArray.length; i++) {
       if (!(samplesArray[i] > start)) {
         // mark boundary red
-        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
-          'background-color': 'red'
-        });
+        this.editor.wisiwyg.querySelector('img[data-samples]:eq(' + i + ')').css.backgroundColor = 'red';
       } else {
-        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
-          'background-color': 'white'
-        });
+        this.editor.wisiwyg.querySelector('img[data-samples]:eq(' + i + ')').css.backgroundColor = 'transparent';
         start = samplesArray[i];
       }
     }

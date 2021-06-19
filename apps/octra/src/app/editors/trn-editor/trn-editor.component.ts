@@ -23,7 +23,14 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {LoginMode} from '../../core/store';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ValidationPopoverComponent} from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {selectAllTextOfNode, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {
+  findElements,
+  getAttr,
+  selectAllTextOfNode,
+  ShortcutEvent,
+  ShortcutGroup,
+  SubscriptionManager
+} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
@@ -518,26 +525,27 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
 
   onTranscriptCellMouseOver($event, rowNumber, scrollContainer: HTMLDivElement) {
     this.lastMouseOver = Date.now();
-    let target = jQuery($event.target);
-
+    let target = $event.target as HTMLElement;
 
     if (this.textEditor.state === 'inactive') {
-      if (target.is('.val-error') || target.parent().is('.val-error')) {
+      if (getAttr(target, '.val-error') || getAttr(target.parentElement, '.val-error')) {
         if (!this.popovers.validation.mouse.enter) {
-          if (!target.is('.val-error')) {
-            target = target.parent();
+          if (!getAttr(target, '.val-error')) {
+            target = target.parentElement;
           }
 
           let marginTop = 0;
 
           for (let i = 0; i < rowNumber; i++) {
-            const elem = jQuery(jQuery('.segment-row').get(i));
-            marginTop += elem.outerHeight();
+            const segmentRows = findElements(document.body, '.segment-row');
+            if (segmentRows.length > 0) {
+              marginTop += segmentRows[i].offsetHeight;
+            }
           }
           marginTop -= scrollContainer.scrollTop;
-          const headHeight = jQuery('#table-head').outerHeight();
+          const headHeight = findElements(document.body, '#table-head')[0].offsetHeight;
 
-          const errorcode = target.attr('data-errorcode');
+          const errorcode = getAttr(target, 'data-errorcode');
 
           this.selectedError = this.transcrService.getErrorDetails(errorcode);
 
@@ -546,7 +554,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
             this.validationPopover.description = this.selectedError.description;
             this.validationPopover.title = this.selectedError.title;
 
-            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + target.position().top;
+            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + target.offsetTop;
             this.cd.markForCheck();
             this.cd.detectChanges();
             this.popovers.validation.location.x = $event.offsetX;
@@ -586,8 +594,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
     segmentNumber = Math.max(-1, Math.min(maxSegments, segmentNumber));
     if (segmentNumber < maxSegments - 1) {
       console.log(`focus on ${segmentNumber}`);
-      const segmentLabeljQuery = jQuery('.label-column');
-      const segmentLabel = segmentLabeljQuery.get(segmentNumber + 1);
+      const segmentLabel = findElements(document.body, '.label-column')[segmentNumber + 1];
       segmentLabel.contentEditable = 'true';
       segmentLabel.focus();
       selectAllTextOfNode(segmentLabel);

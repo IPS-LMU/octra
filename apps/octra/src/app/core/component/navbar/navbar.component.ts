@@ -14,8 +14,6 @@ import {NavbarService} from './navbar.service';
 import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
 import {Subscription} from 'rxjs';
 
-declare let jQuery: any;
-
 @Component({
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
@@ -101,11 +99,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    jQuery(document).on('click', '.options-menu', (e) => {
-      e.stopPropagation();
-    });
-
-    (jQuery('body') as any).bootstrapMaterialDesign();
+    // TODO mdb: (jQuery('body') as any).bootstrapMaterialDesign();
   }
 
   setInterface(newInterface: string) {
@@ -155,11 +149,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelNameClick(event) {
-    jQuery(event.target).addClass('selected');
+    // jQuery(event.target).addClass('selected');
   }
 
   onLevelNameLeave(event, tiernum: number) {
-    jQuery(event.target).removeClass('selected');
+    // jQuery(event.target).removeClass('selected');
     // save level name
     if (event.target.value !== undefined && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
@@ -210,7 +204,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
-    jQuery(this.tiersDropdown.nativeElement).addClass('show');
+    // jQuery(this.tiersDropdown.nativeElement).addClass('show');
     this.modService.show('yesno', {
       text: 'The Tier will be deleted permanently. Are you sure?'
     }).then((answer) => {
@@ -234,7 +228,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       .catch((error) => {
         console.error(error);
       });
-    jQuery(this.tiersDropdown.nativeElement).addClass('show');
+    // jQuery(this.tiersDropdown.nativeElement).addClass('show');
   }
 
   public selectLevel(tiernum: number) {

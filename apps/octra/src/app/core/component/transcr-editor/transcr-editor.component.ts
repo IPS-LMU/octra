@@ -185,7 +185,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     return this.jodit.editor.currentPlace.workplace;
   }
 
-  get wisiwyg() {
+  public get wisiwyg() {
     return this.workplace.getElementsByClassName('jodit-wysiwyg')[0];
   }
 

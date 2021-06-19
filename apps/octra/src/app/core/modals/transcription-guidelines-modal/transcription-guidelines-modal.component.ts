@@ -124,23 +124,27 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
       && this.settService.projectsettings.plugins.pdfexport !== undefined
       && this.settService.projectsettings.plugins.pdfexport.url !== undefined
     ) {
-      const form = jQuery('<form></form>')
-        .attr('method', 'post')
-        .attr('target', 'blank')
-        .attr('action', this.settService.projectsettings.plugins.pdfexport.url)
-        .appendTo('body');
+      const form = document.createElement('form');
+      form.setAttribute('method', 'post');
+      form.setAttribute('target', 'blank');
+      form.style.display = 'none';
+      form.setAttribute('action', this.settService.projectsettings.plugins.pdfexport.url);
+
+      document.body.appendChild(form);
 
       const jsonObj = {
         translation: this.lang.translate('general'),
         guidelines: this.guidelines
       };
 
-      const json = jQuery('<input/>')
-        .attr('name', 'json')
-        .attr('type', 'text')
-        .attr('value', JSON.stringify(jsonObj));
+      const json = document.createElement('input');
+      json.setAttribute('name', 'json');
+      json.setAttribute('type', 'text');
+      json.setAttribute('value', JSON.stringify(jsonObj));
+
       form.append(json);
-      form.submit().remove();
+      form.submit();
+      form.remove();
     }
   }
 

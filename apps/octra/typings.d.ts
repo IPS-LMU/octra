@@ -9,7 +9,6 @@ interface NodeModule {
 }
 
 declare var System: any;
-declare var jQuery: any;
 declare var platform: any;
 declare var tidyUpAnnotation: ((string, any) => any);
 declare var videojs: any;

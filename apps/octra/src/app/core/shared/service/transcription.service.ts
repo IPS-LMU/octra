@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {escapeHtml, escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager} from '@octra/utilities';
+import {escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -909,43 +909,6 @@ export class TranscriptionService {
     levels.push(level);
 
     return new OAnnotJSON(this.filename, this._audiomanager.ressource.info.sampleRate, levels);
-  }
-
-  public htmlToRaw(html: string): string {
-    html = '<p>' + html + '</p>';
-    const dom = jQuery(html);
-
-    const replaceFunc = (i: number, elem: any) => {
-      if (jQuery(elem).children() !== undefined && jQuery(elem).children().length > 0) {
-        jQuery.each(jQuery(elem).children(), replaceFunc);
-      } else {
-        let attr = jQuery(elem).attr('data-marker-code');
-        if (elem.type === 'select-one') {
-          const value = jQuery(elem).attr('data-value');
-          attr += '=' + value;
-        }
-        if (attr) {
-          attr = attr.replace(/((?:&lt;)|(?:&gt;))/g, (g0, g1) => {
-            if (g1 === '&lt;') {
-              return '<';
-            }
-            return '>';
-          });
-
-          for (const marker of this.guidelines.markers) {
-            if (attr === marker.code) {
-              return jQuery(elem).replaceWith(escapeHtml(attr));
-            }
-          }
-        } else if (jQuery(elem).attr('class') !== 'val-error') {
-          jQuery(elem).remove();
-        }
-      }
-      return undefined;
-    };
-
-    jQuery.each(dom.children(), replaceFunc);
-    return dom.text();
   }
 
   public validateAll() {

@@ -4,8 +4,6 @@ import {Observable, Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
 
-declare let jQuery: any;
-
 export interface FileSize {
   size: number;
   label: string;
@@ -30,7 +28,7 @@ export function hasPropertyTree(obj: any, treeString: string): boolean {
 
     for (let i = 0; i < properties.length; i++) {
       const property = properties[i];
-      if (!pointer.hasOwnProperty(property) || pointer[property] === undefined) {
+      if (!hasProperty(pointer, property) || pointer[property] === undefined) {
         return false;
       }
       pointer = pointer[property];
@@ -67,10 +65,10 @@ export function checkArray(array: any[]) {
 
 export function scrollTo(y: number, target?: string) {
   setTimeout(() => {
-    if ((target === undefined || target === undefined)) {
-      jQuery('html, body').scrollTop(y);
+    if (target === undefined) {
+      // TODO jquery jQuery('html, body').scrollTop(y);
     } else {
-      jQuery(target).scrollTop(y);
+      // TODO jquery jQuery(target).scrollTop(y);
     }
   }, 200);
 }
@@ -324,8 +322,11 @@ export function getProperties(obj: any): [string, any][] {
 }
 
 export function findElements(parent: HTMLElement, selector: string) {
-  const result = parent.querySelectorAll(selector) as any;
-  return (result !== undefined) ? (result as HTMLElement[]) : [];
+  if (parent) {
+    const result = parent.querySelectorAll(selector) as any;
+    return (result !== undefined) ? (result as HTMLElement[]) : [];
+  }
+  return [];
 }
 
 export function getAttr(elem: HTMLElement, attribute: string) {

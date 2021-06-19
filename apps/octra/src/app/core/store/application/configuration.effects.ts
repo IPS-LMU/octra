@@ -5,7 +5,7 @@ import {Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {ConfigurationService} from '../../shared/service/configuration.service';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {uniqueHTTPRequest} from '@octra/utilities';
+import {findElements, getAttr, uniqueHTTPRequest} from '@octra/utilities';
 import {HttpClient} from '@angular/common/http';
 import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
@@ -43,9 +43,9 @@ export class ConfigurationEffects {
               {responseType: 'text'}
             ).subscribe(
               (result) => {
-                const html = jQuery(result);
-                const basTable = html.find('#bas-asr-service-table');
-                const basASRInfoContainers = basTable.find('.bas-asr-info-container');
+                const document = (new DOMParser()).parseFromString(result, 'text/html');
+                const basTable = document.getElementById('#bas-asr-service-table');
+                const basASRInfoContainers = findElements(basTable, '.bas-asr-info-container');
 
                 const asrInfos: {
                   name: string;
@@ -57,7 +57,7 @@ export class ConfigurationEffects {
                   knownIssues: string;
                 }[] = [];
 
-                jQuery.each(basASRInfoContainers, (key, elem) => {
+                for (const basASRInfoContainer of basASRInfoContainers) {
                   const isStringNumber = (str: string) => !isNaN(Number(str));
                   const sanitizeNumberValue = (el: any, attr: string) => {
                     if (el[attr] !== undefined && isStringNumber(el[attr])) {
@@ -74,14 +74,22 @@ export class ConfigurationEffects {
                     }
                   };
 
+                  const maxSignalDurationSpans = findElements(basASRInfoContainer, '.bas-asr-info-max-signal-duration-seconds');
+                  const maxSignalSizeSpans = findElements(basASRInfoContainer, '.bas-asr-info-max-signal-size-megabytes');
+                  const quotaPerMonthSpans = findElements(basASRInfoContainer, '.bas-asr-info-quota-per-month-seconds');
+                  const termsURLSpans = findElements(basASRInfoContainer, '.bas-asr-info-eula-link');
+                  const dataStoragePolicySpans = findElements(basASRInfoContainer, '.bas-asr-info-data-storage-policy');
+                  const knownIssuesSpans = findElements(basASRInfoContainer, '.bas-asr-info-known-issues');
+
+
                   const newElem: any = {
-                    name: jQuery(elem).attr('data-bas-asr-info-provider-name'),
-                    maxSignalDuration: jQuery(elem).find('.bas-asr-info-max-signal-duration-seconds').attr('data-value'),
-                    maxSignalSize: jQuery(elem).find('.bas-asr-info-max-signal-size-megabytes').attr('data-value'),
-                    quotaPerMonth: jQuery(elem).find('.bas-asr-info-quota-per-month-seconds').attr('data-value'),
-                    termsURL: jQuery(elem).find('.bas-asr-info-eula-link').attr('href'),
-                    dataStoragePolicy: jQuery(elem).find('.bas-asr-info-data-storage-policy').text(),
-                    knownIssues: jQuery(elem).find('.bas-asr-info-known-issues').text()
+                    name: getAttr(basASRInfoContainer, 'data-bas-asr-info-provider-name'),
+                    maxSignalDuration: (maxSignalDurationSpans.length > 0) ? getAttr(maxSignalDurationSpans[0], "data-value") : undefined,
+                    maxSignalSize: (maxSignalSizeSpans.length > 0) ? getAttr(maxSignalSizeSpans[0], "data-value") : undefined,
+                    quotaPerMonth: (quotaPerMonthSpans.length > 0) ? getAttr(quotaPerMonthSpans[0], "data-value") : undefined,
+                    termsURL: (termsURLSpans.length > 0) ? getAttr(termsURLSpans[0], "href") : undefined,
+                    dataStoragePolicy: (dataStoragePolicySpans.length > 0) ? dataStoragePolicySpans[0].innerText : undefined,
+                    knownIssues: (knownIssuesSpans.length > 0) ? knownIssuesSpans[0].innerText : undefined
                   };
 
                   sanitizeNumberValue(newElem, 'maxSignalDuration');
@@ -92,7 +100,7 @@ export class ConfigurationEffects {
                   newElem.knownIssues = (newElem.knownIssues.trim() === 'none') ? undefined : newElem.knownIssues;
 
                   asrInfos.push(newElem);
-                });
+                }
 
                 // overwrite data of config
                 for (const service of appConfiguration.octra.plugins.asr.services) {

@@ -1,3 +1,9 @@
+@import '~mdb-angular-ui-kit/assets/scss/mdb.scss';
+
+.modal-open {
+  padding-right: 0px !important;
+}
+
 h1 {
   text-align: center;
 }
@@ -384,8 +390,4 @@ footer {
   background-color: yellow;
   border: 1px solid dimgray;
   display: inline;
-}
-
-.dropdown-menu {
-  display: inherit !important;
 }

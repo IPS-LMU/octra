@@ -21,7 +21,7 @@ import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics
 @Component({
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
 
@@ -241,11 +241,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openExportModal() {
-    this.modalexport = this.modalService.open(ExportFilesModalComponent);
+    this.modalexport = this.modalService.open(ExportFilesModalComponent, ExportFilesModalComponent.config);
   }
 
   openToolsModal() {
-    this.modalTools = this.modalService.open(ToolsModalComponent);
+    this.modalTools = this.modalService.open(ToolsModalComponent, ToolsModalComponent.config);
   }
 
   openPromptModal() {
@@ -254,6 +254,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openStatisticsModal() {
-    this.modalStatistics = this.modalService.open(StatisticsModalComponent);
+    this.modalStatistics = this.modalService.open(StatisticsModalComponent, StatisticsModalComponent.config);
   }
 }

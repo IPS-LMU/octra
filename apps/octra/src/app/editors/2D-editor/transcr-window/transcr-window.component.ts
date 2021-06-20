@@ -34,7 +34,7 @@ import {Subscription, timer} from 'rxjs';
 @Component({
   selector: 'octra-transcr-window',
   templateUrl: './transcr-window.component.html',
-  styleUrls: ['./transcr-window.component.css'],
+  styleUrls: ['./transcr-window.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {

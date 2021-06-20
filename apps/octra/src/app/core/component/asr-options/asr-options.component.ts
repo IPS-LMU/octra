@@ -12,7 +12,7 @@ import {MdbPopoverDirective} from 'mdb-angular-ui-kit/popover';
 @Component({
   selector: 'octra-asr-options',
   templateUrl: './asr-options.component.html',
-  styleUrls: ['./asr-options.component.css']
+  styleUrls: ['./asr-options.component.scss']
 })
 export class AsrOptionsComponent {
 

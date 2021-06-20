@@ -12,7 +12,7 @@ import {Subscription, timer} from 'rxjs';
 @Component({
   selector: 'octra-dropzone',
   templateUrl: './octra-dropzone.component.html',
-  styleUrls: ['./octra-dropzone.component.css']
+  styleUrls: ['./octra-dropzone.component.scss']
 })
 export class OctraDropzoneComponent implements OnDestroy {
 

@@ -9,21 +9,20 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
 @Component({
   selector: 'octra-bugreport-modal',
   templateUrl: './bugreport-modal.component.html',
-  styleUrls: ['./bugreport-modal.component.css'],
+  styleUrls: ['./bugreport-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BugreportModalComponent {
-  modalRef: MdbModalRef<BugreportModalComponent>;
+  public static config: MdbModalConfig = {
+    keyboard: false,
+    backdrop: true,
+    ignoreBackdropClick: false,
+    modalClass: 'modal-xl'
+  };
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
-  config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
   public sendStatus: 'pending' | 'success' | 'error' | 'sending' = 'pending';
   public screenshots: {
     blob: File,
@@ -61,37 +60,11 @@ export class BugreportModalComponent {
 
   constructor(private modalService: MdbModalService, private appStorage: AppStorageService,
               public bugService: BugReportService, private settService: SettingsService,
-              private cd: ChangeDetectorRef) {
-  }
-
-  public open(data: {
-    text: string
-  }): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modalRef = this.modalService.open(BugreportModalComponent, this.config);
-      this.sendStatus = 'pending';
-      this.visible = true;
-      this.screenshots = [];
-      this.update();
-
-      const subscr = this.modalRef.onClose.subscribe(() => {
-        subscr.unsubscribe();
-        resolve();
-      });
-    });
+              private cd: ChangeDetectorRef, public modalRef: MdbModalRef<BugreportModalComponent>) {
   }
 
   public close() {
     this.modalRef.close();
-  }
-
-  public hide() {
-    this.actionperformed.next();
-  }
-
-  onShown() {
-    // TODO check data and set focus
-    // jQuery('#bgDescr').focus();
   }
 
   onHidden() {

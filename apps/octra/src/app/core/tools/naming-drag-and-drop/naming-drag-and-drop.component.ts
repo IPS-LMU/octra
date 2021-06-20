@@ -16,7 +16,7 @@ import {Segment} from '@octra/annotation';
 @Component({
   selector: 'octra-naming-drag-and-drop',
   templateUrl: './naming-drag-and-drop.component.html',
-  styleUrls: ['./naming-drag-and-drop.component.css'],
+  styleUrls: ['./naming-drag-and-drop.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NamingDragAndDropComponent implements OnDestroy {

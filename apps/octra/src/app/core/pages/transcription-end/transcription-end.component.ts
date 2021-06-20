@@ -9,7 +9,7 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'octra-transcription-submitted',
   templateUrl: './transcription-end.component.html',
-  styleUrls: ['./transcription-end.component.css']
+  styleUrls: ['./transcription-end.component.scss']
 })
 export class TranscriptionEndComponent implements OnInit, OnDestroy {
   private subscrmanager: SubscriptionManager<Subscription>;

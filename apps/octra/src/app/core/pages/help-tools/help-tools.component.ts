@@ -12,7 +12,7 @@ import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 @Component({
   selector: 'octra-help-tools',
   templateUrl: './help-tools.component.html',
-  styleUrls: ['./help-tools.component.css']
+  styleUrls: ['./help-tools.component.scss']
 })
 export class HelpToolsComponent {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;

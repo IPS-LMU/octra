@@ -5,11 +5,10 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
 @Component({
   selector: 'octra-login-invalid-modal',
   templateUrl: './login-invalid-modal.component.html',
-  styleUrls: ['./login-invalid-modal.component.css']
+  styleUrls: ['./login-invalid-modal.component.scss']
 })
 export class LoginInvalidModalComponent{
-  modalRef: MdbModalRef<LoginInvalidModalComponent>;
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -20,22 +19,7 @@ export class LoginInvalidModalComponent{
   };
   private actionperformed: Subject<(void)> = new Subject<(void)>();
 
-  constructor(private modalService: MdbModalService) {
-  }
-
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modal, this.config);
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
+  constructor(private modalService: MdbModalService, public modalRef: MdbModalRef<LoginInvalidModalComponent>) {
   }
 
   public close() {

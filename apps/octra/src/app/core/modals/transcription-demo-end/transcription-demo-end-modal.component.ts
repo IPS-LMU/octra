@@ -1,4 +1,4 @@
-import {Component, SecurityContext, TemplateRef, ViewChild} from '@angular/core';
+import {Component, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {Subject} from 'rxjs';
@@ -13,43 +13,24 @@ export enum ModalEndAnswer {
 @Component({
   selector: 'octra-transcription-demo-end-modal',
   templateUrl: './transcription-demo-end-modal.component.html',
-  styleUrls: ['./transcription-demo-end-modal.component.css']
+  styleUrls: ['./transcription-demo-end-modal.component.scss']
 })
 
 export class TranscriptionDemoEndModalComponent {
-  modalRef: MdbModalRef<TranscriptionDemoEndModalComponent>;
-
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true
   };
 
-  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
-
   private actionperformed: Subject<ModalEndAnswer> = new Subject<ModalEndAnswer>();
 
   constructor(private modalService: MdbModalService, private sanitizer: DomSanitizer,
-              public languageService: TranslocoService) {
+              public languageService: TranslocoService, public modalRef: MdbModalRef<TranscriptionDemoEndModalComponent>) {
   }
 
   sanitize(html: string) {
     this.sanitizer.sanitize(SecurityContext.HTML, html);
-  }
-
-  public open(): Promise<ModalEndAnswer> {
-    return new Promise<ModalEndAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modal, this.config);
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
   }
 
   public close(action: string) {

@@ -6,7 +6,7 @@ import {NavbarService} from '../../component/navbar/navbar.service';
 @Component({
   selector: 'octra-news',
   templateUrl: './news.component.html',
-  styleUrls: ['./news.component.css'],
+  styleUrls: ['./news.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewsComponent implements OnInit, OnChanges {

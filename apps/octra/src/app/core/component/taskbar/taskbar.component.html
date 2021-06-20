@@ -1,4 +1,3 @@
-<octra-help-modal #helpModal></octra-help-modal>
 <div id="fastbar">
   <div aria-label="Justified button group" class="btn-group d-flex" role="group" style="margin:0;">
     <a (click)="shortcutbtnclicked.emit()" class="btn w-100">
@@ -21,7 +20,7 @@
       <span *ngIf="!appStorage.easymode"
             [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 0]</span>
     </a>
-    <a (click)="helpModal.open();" class="btn w-100">
+    <a (click)="openHelpModal()" class="btn w-100">
       <fa-icon icon="question-circle"></fa-icon>
       <span *ngIf="!appStorage.easymode"
             [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.help}}</span>

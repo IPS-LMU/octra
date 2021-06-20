@@ -9,7 +9,7 @@ import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
-import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AudioService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
@@ -20,15 +20,19 @@ declare let JSZip;
 @Component({
   selector: 'octra-tools-modal',
   templateUrl: './tools-modal.component.html',
-  styleUrls: ['./tools-modal.component.css'],
+  styleUrls: ['./tools-modal.component.scss'],
   animations: [
     fadeOutCollapseOnLeaveAnimation(),
     fadeInExpandOnEnterAnimation()
   ]
 })
 export class ToolsModalComponent implements OnDestroy {
-  modalRef: MdbModalRef<ToolsModalComponent>;
-  public visible = false;
+  public static config: MdbModalConfig = {
+    keyboard: false,
+    backdrop: false,
+    ignoreBackdropClick: false,
+    modalClass: 'modal-xl'
+  };
 
   public parentformat: {
     download: string,
@@ -38,12 +42,6 @@ export class ToolsModalComponent implements OnDestroy {
     uri: ''
   };
   public converters = AppInfo.converters;
-  config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: "modal-lg"
-  };
 
   public tools = {
     audioCutting: {
@@ -90,7 +88,6 @@ export class ToolsModalComponent implements OnDestroy {
     }
   };
 
-  @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
   @ViewChild('content', {static: false}) contentElement: ElementRef;
 
@@ -117,32 +114,13 @@ export class ToolsModalComponent implements OnDestroy {
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
-              private settService: SettingsService,
-              public transloco: TranslocoService
+              public transloco: TranslocoService,
+              public modalRef: MdbModalRef<ToolsModalComponent>
   ) {
   }
 
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-
-      this.visible = true;
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-
-    });
-  }
-
   public close() {
-    this.modal.hide();
+    this.modalRef.close();
 
     this.actionperformed.next();
   }
@@ -160,7 +138,6 @@ export class ToolsModalComponent implements OnDestroy {
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.visible = false;
     this.subscrmanager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {

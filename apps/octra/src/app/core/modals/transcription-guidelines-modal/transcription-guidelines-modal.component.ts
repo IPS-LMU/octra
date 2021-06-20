@@ -5,7 +5,6 @@ import {
   Input,
   OnChanges,
   SecurityContext,
-  ViewChild,
   ViewEncapsulation
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
@@ -21,66 +20,45 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
 @Component({
   selector: 'octra-transcription-guidelines-modal',
   templateUrl: './transcription-guidelines-modal.component.html',
-  styleUrls: ['./transcription-guidelines-modal.component.css'],
+  styleUrls: ['./transcription-guidelines-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
 
 export class TranscriptionGuidelinesModalComponent implements OnChanges {
-  modalRef: MdbModalRef<TranscriptionGuidelinesModalComponent>;
-  public visible = false;
-  @Input() guidelines = undefined;
-  public shownGuidelines: any = {};
-  public collapsed: any[][] = [];
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
     modalClass: 'modal-lg'
   };
-  @ViewChild('modal', {static: false}) modal: any;
+
+  @Input() guidelines = undefined;
+
+  public shownGuidelines: any = {};
+  public collapsed: any[][] = [];
+
   protected data = undefined;
   private entries = 0;
-  private counter = 0;
   private videoPlayers: any[] = [];
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(private modalService: MdbModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
-              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
+              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer, public modalRef: MdbModalRef<TranscriptionGuidelinesModalComponent>) {
   }
 
   ngOnChanges($event) {
-    if (!($event.guidelines.currentValue === undefined || $event.guidelines.currentValue === undefined)) {
+    if (!($event.guidelines.currentValue === undefined)) {
       this.shownGuidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
       this.unCollapseAll();
     }
-    if (($event.guidelines.previousValue === undefined || $event.guidelines.previousValue === undefined) &&
-      !($event.guidelines.currentValue === undefined || $event.guidelines.currentValue === undefined)) {
+    if (($event.guidelines.previousValue === undefined) && !($event.guidelines.currentValue === undefined)) {
       this.subscrmanager.add(timer(1000).subscribe(() => {
         this.initVideoPlayers();
       }));
     }
-  }
-
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-      this.visible = true;
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
   }
 
   videoplayerExists(player: string): number {
@@ -150,8 +128,7 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   }
 
   public close() {
-    this.modal.hide();
-    this.visible = false;
+    this.modalRef.close();
 
     this.cd.markForCheck();
     this.cd.detectChanges();

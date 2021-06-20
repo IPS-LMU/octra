@@ -18,7 +18,7 @@ import {LoginInvalidModalComponent} from '../login-invalid-modal/login-invalid-m
 @Component({
   selector: 'octra-modal',
   templateUrl: './octra-modal.component.html',
-  styleUrls: ['./octra-modal.component.css']
+  styleUrls: ['./octra-modal.component.scss']
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
   loginInvalid: MdbModalRef<LoginInvalidModalComponent>;
@@ -55,7 +55,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       (result: any) => {
         this.data = result;
 
-        if (result.type === undefined && this[result.type] !== undefined) {
+        if (result.type !== undefined) {
           const modalRef = this.openModal(result.type);
 
           if (modalRef !== undefined) {
@@ -64,7 +64,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
             }).catch((error) => {
               console.error(error);
             });
-          } else{
+          } else {
             console.error(`modalRef for ${result.type} not found`);
           }
         } else {
@@ -81,25 +81,25 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   openModal(name: string): MdbModalRef<any> {
     switch (name) {
       case 'yesno':
-        this.yesno = this.modalService.open(YesNoModalComponent);
+        this.yesno = this.modalService.open(YesNoModalComponent, YesNoModalComponent.config);
         return this.yesno;
       case 'supportedfiles':
-        this.supportedfiles = this.modalService.open(SupportedFilesModalComponent);
+        this.supportedfiles = this.modalService.open(SupportedFilesModalComponent, SupportedFilesModalComponent.config);
         return this.supportedfiles;
       case 'bugreport':
-        this.bugreport = this.modalService.open(BugreportModalComponent);
+        this.bugreport = this.modalService.open(BugreportModalComponent, BugreportModalComponent.config);
         return this.bugreport;
       case 'error':
-        this.error = this.modalService.open(ErrorModalComponent);
+        this.error = this.modalService.open(ErrorModalComponent, ErrorModalComponent.config);
         return this.error;
       case 'transcriptionStop':
-        this.transcriptionStop = this.modalService.open(TranscriptionStopModalComponent);
+        this.transcriptionStop = this.modalService.open(TranscriptionStopModalComponent, TranscriptionStopModalComponent.config);
         return this.transcriptionStop;
       case 'transcriptionDelete':
-        this.transcriptionDelete = this.modalService.open(TranscriptionDeleteModalComponent);
+        this.transcriptionDelete = this.modalService.open(TranscriptionDeleteModalComponent, TranscriptionDeleteModalComponent.config);
         return this.transcriptionDelete;
       case 'loginInvalid':
-        this.loginInvalid = this.modalService.open(LoginInvalidModalComponent);
+        this.loginInvalid = this.modalService.open(LoginInvalidModalComponent, LoginInvalidModalComponent.config);
         return this.loginInvalid;
     }
     return undefined;

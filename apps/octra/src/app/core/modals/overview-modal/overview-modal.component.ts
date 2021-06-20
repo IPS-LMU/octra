@@ -1,7 +1,7 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
-import {isFunction, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {isFunction, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
@@ -14,21 +14,17 @@ declare let tidyUpAnnotation: ((string, any) => any);
 @Component({
   selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',
-  styleUrls: ['./overview-modal.component.css']
+  styleUrls: ['./overview-modal.component.scss']
 })
 
-export class OverviewModalComponent implements OnInit, OnDestroy {
-  modalRef: MdbModalRef<OverviewModalComponent>;
-  public visible = false;
-
-  config: MdbModalConfig = {
+export class OverviewModalComponent implements OnDestroy {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true,
-    modalClass: "modal-kg"
+    modalClass: 'modal-kg'
   };
 
-  @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
@@ -64,177 +60,31 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
               private keyService: KeymappingService,
               private uiService: UserInteractionsService,
               private cd: ChangeDetectorRef,
-              private navbarService: NavbarService) {
-  }
-
-  ngOnInit() {
-    this.subscrmanager.add(this.modal.onHide.subscribe(
-      () => {
-        this.visible = false;
-        this.actionperformed.next();
-      }
-    ));
-    this.subscrmanager.add(this.modal.onHidden.subscribe(
-      () => {
-        this.visible = false;
-        this.actionperformed.next();
-      }
-    ));
+              private navbarService: NavbarService,
+              public modalRef: MdbModalRef<OverviewModalComponent>) {
   }
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
   }
 
-  public open(validate = true): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-
-      this.keyService.unregister('overview');
-
-      const shortcuts: ShortcutGroup = {
-        name: 'overview',
-        enabled: true,
-        items: []
-      };
-      if (this.settingsService.isTheme('shortAudioFiles')) {
-        shortcuts.items = [
-          {
-            name: 'good',
-            title: 'good',
-            keys: {
-              mac: 'CTRL + 1',
-              pc: 'CTRL + 1'
-            },
-            focusonly: false
-          },
-          {
-            name: 'middle',
-            title: 'middle',
-            keys: {
-              mac: 'CTRL + 2',
-              pc: 'CTRL + 2'
-            },
-            focusonly: false
-          },
-          {
-            name: 'bad',
-            title: 'bad',
-            keys: {
-              mac: 'CTRL + 3',
-              pc: 'CTRL + 3'
-            },
-            focusonly: false
-          }
-        ];
-
-        this.keyService.register(shortcuts);
-
-        this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
-          if (keyObj !== undefined) {
-            keyObj.event.preventDefault();
-            this.sendTranscriptionForShortAudioFiles(keyObj.shortcutName as any);
-          }
-        }));
-      }
-
-      if (this.settingsService.isTheme('korbinian')) {
-        shortcuts.items = [
-          {
-            name: 'NO',
-            title: 'NO',
-            keys: {
-              mac: 'CTRL + 1',
-              pc: 'CTRL + 1'
-            },
-            focusonly: false
-          },
-          {
-            name: 'VE',
-            title: 'VE',
-            keys: {
-              mac: 'CTRL + 2',
-              pc: 'CTRL + 2'
-            },
-            focusonly: false
-          },
-          {
-            name: 'EE',
-            title: 'EE',
-            keys: {
-              mac: 'CTRL + 3',
-              pc: 'CTRL + 3'
-            },
-            focusonly: false
-          },
-          {
-            name: 'AN',
-            title: 'AN',
-            keys: {
-              mac: 'CTRL + 4',
-              pc: 'CTRL + 4'
-            },
-            focusonly: false
-          }
-        ];
-
-        this.keyService.register(shortcuts);
-
-        this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
-          if (keyObj !== undefined) {
-            keyObj.event.preventDefault();
-            this.sendTranscriptionForKorbinian(keyObj.shortcutName as any);
-          }
-        }));
-      }
-
-      if (validate && this.appStorage.useMode !== LoginMode.URL) {
-        this.transcrService.validateAll();
-      }
-
-      this.visible = true;
-
-      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-        this.feedback.feedbackData = (this.appStorage.feedback === undefined) ? {} : this.appStorage.feedback;
-      }
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-
-      this.uiService.addElementFromEvent('overview', {value: 'opened'},
-        Date.now(), undefined, undefined, undefined, undefined, 'overview');
-
-      this.updateView();
-    });
-  }
-
   public close(fromModal = false) {
-    if (this.visible) {
-      this.modal.hide();
-      this.visible = false;
-      this.actionperformed.next();
+    this.modalRef.close();
+    this.actionperformed.next();
 
-      // unsubscribe shortcut listener
-      if (this.shortcutID > -1) {
-        this.subscrmanager.removeById(this.shortcutID);
-        this.shortcutID = -1;
-      }
+    // unsubscribe shortcut listener
+    if (this.shortcutID > -1) {
+      this.subscrmanager.removeById(this.shortcutID);
+      this.shortcutID = -1;
+    }
 
-      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-        this.feedback.saveFeedbackform();
-      }
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
+      this.feedback.saveFeedbackform();
+    }
 
-      if (fromModal) {
-        this.uiService.addElementFromEvent('overview', {value: 'closed'},
-          Date.now(), undefined, undefined, undefined, undefined, 'overview');
-      }
+    if (fromModal) {
+      this.uiService.addElementFromEvent('overview', {value: 'closed'},
+        Date.now(), undefined, undefined, undefined, undefined, 'overview');
     }
   }
 

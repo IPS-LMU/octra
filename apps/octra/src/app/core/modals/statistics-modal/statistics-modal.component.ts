@@ -1,8 +1,7 @@
-import {Component, ViewChild} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
+import {Component} from '@angular/core';
+import {Subject} from 'rxjs';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TextConverter} from '@octra/annotation';
@@ -11,26 +10,23 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
 @Component({
   selector: 'octra-statistics-modal',
   templateUrl: './statistics-modal.component.html',
-  styleUrls: ['./statistics-modal.component.css']
+  styleUrls: ['./statistics-modal.component.scss']
 })
 
 export class StatisticsModalComponent {
-  modalRef: MdbModalRef<StatisticsModalComponent>;
-  public visible = false;
-  public bgdescr = '';
-  public sendProObj = true;
-  public bugsent = false;
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
     modalClass: 'modal-lg'
   };
-  @ViewChild('modal', {static: true}) modal: any;
+
+  public bgdescr = '';
+  public sendProObj = true;
+  public bugsent = false;
   public transcrObjStr = '';
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get transcrServ(): TranscriptionService {
     return this.navbarService.transcrService;
@@ -45,32 +41,15 @@ export class StatisticsModalComponent {
   }
 
   get UIElements(): StatisticElem[] {
-    return (!(this.uiService === undefined || this.uiService === undefined)) ? this.uiService.elements : undefined;
+    return this.uiService !== undefined ? this.uiService.elements : undefined;
   }
 
-  constructor(private modalService: MdbModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
-  }
-
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-      this.visible = true;
-      this.transcrObjStr = this.stringify(this.transcrServ.exportDataToJSON());
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
+  constructor(private modalService: MdbModalService, private navbarService: NavbarService, private appStorage: AppStorageService,
+              public modalRef: MdbModalRef<StatisticsModalComponent>) {
   }
 
   public close() {
-    this.modal.hide();
-    this.visible = false;
+    this.modalRef.close();
     this.actionperformed.next();
   }
 

@@ -4,7 +4,7 @@ import {SessionFile} from '../../obj/SessionFile';
 @Component({
   selector: 'octra-drop-zone',
   templateUrl: './drop-zone.component.html',
-  styleUrls: ['./drop-zone.component.css']
+  styleUrls: ['./drop-zone.component.scss']
 })
 export class DropZoneComponent implements OnInit {
   @Input()

@@ -7,11 +7,10 @@ import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 @Component({
   selector: 'octra-activity-timeout-modal',
   templateUrl: './inactivity-modal.component.html',
-  styleUrls: ['./inactivity-modal.component.css']
+  styleUrls: ['./inactivity-modal.component.scss']
 })
 
 export class InactivityModalComponent {
-  modalRef: MdbModalRef<InactivityModalComponent>;
   public visible = false;
   public config: MdbModalConfig = {
     keyboard: false,
@@ -22,23 +21,8 @@ export class InactivityModalComponent {
   protected data = undefined;
   private actionperformed: Subject<string> = new Subject<string>();
 
-  constructor(public appStorage: AppStorageService, public settService: SettingsService) {
-  }
-
-  public open(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-      this.visible = true;
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
+  constructor(public appStorage: AppStorageService, public settService: SettingsService,
+              public modalRef: MdbModalRef<InactivityModalComponent>) {
   }
 
   public close(action: string) {

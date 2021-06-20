@@ -9,12 +9,16 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/annotation/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/annotation/**/*.ts"
+            ]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/annotation"],
+          "outputs": [
+            "coverage/libs/annotation"
+          ],
           "options": {
             "jestConfig": "libs/annotation/jest.config.js",
             "passWithNoTests": true
@@ -22,13 +26,17 @@
         },
         "build": {
           "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/annotation",
             "tsConfig": "libs/annotation/tsconfig.lib.json",
             "packageJson": "libs/annotation/package.json",
             "main": "libs/annotation/src/index.ts",
-            "assets": ["libs/annotation/*.md"]
+            "assets": [
+              "libs/annotation/*.md"
+            ]
           }
         }
       }
@@ -41,7 +49,9 @@
       "architect": {
         "build": {
           "builder": "@nrwl/angular:package",
-          "outputs": ["dist/libs/components"],
+          "outputs": [
+            "dist/libs/components"
+          ],
           "options": {
             "project": "libs/components/ng-package.json"
           },
@@ -57,7 +67,9 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/components"],
+          "outputs": [
+            "coverage/libs/components"
+          ],
           "options": {
             "jestConfig": "libs/components/jest.config.js",
             "passWithNoTests": true
@@ -82,12 +94,16 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/media/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/media/**/*.ts"
+            ]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/media"],
+          "outputs": [
+            "coverage/libs/media"
+          ],
           "options": {
             "jestConfig": "libs/media/jest.config.js",
             "passWithNoTests": true
@@ -95,13 +111,17 @@
         },
         "build": {
           "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/media",
             "tsConfig": "libs/media/tsconfig.lib.json",
             "packageJson": "libs/media/package.json",
             "main": "libs/media/src/index.ts",
-            "assets": ["libs/media/*.md"]
+            "assets": [
+              "libs/media/*.md"
+            ]
           }
         }
       }
@@ -114,7 +134,9 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/octra",
             "index": "apps/octra/src/index.html",
@@ -157,8 +179,7 @@
             ],
             "styles": [
               "node_modules/video.js/dist/video-js.min.css",
-              "node_modules/mdb-ui-kit/css/mdb.min.css",
-              "apps/octra/src/styles.css"
+              "apps/octra/src/styles.scss"
             ],
             "scripts": [
               "apps/octra/src/assets/js/modernizr.js",
@@ -233,11 +254,18 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/octra"],
+          "outputs": [
+            "coverage/apps/octra"
+          ],
           "options": {
             "jestConfig": "apps/octra/jest.config.js",
             "passWithNoTests": true
           }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
         }
       }
     },
@@ -262,7 +290,9 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/octra-e2e/**/*.{js,ts}"]
+            "lintFilePatterns": [
+              "apps/octra-e2e/**/*.{js,ts}"
+            ]
           }
         }
       }
@@ -275,12 +305,16 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/utilities/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/utilities/**/*.ts"
+            ]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/utilities"],
+          "outputs": [
+            "coverage/libs/utilities"
+          ],
           "options": {
             "jestConfig": "libs/utilities/jest.config.js",
             "passWithNoTests": true
@@ -288,13 +322,17 @@
         },
         "build": {
           "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/utilities",
             "tsConfig": "libs/utilities/tsconfig.lib.json",
             "packageJson": "libs/utilities/package.json",
             "main": "libs/utilities/src/index.ts",
-            "assets": ["libs/utilities/*.md"]
+            "assets": [
+              "libs/utilities/*.md"
+            ]
           }
         }
       }

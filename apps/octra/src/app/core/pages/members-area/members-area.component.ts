@@ -8,7 +8,7 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'octra-members-area',
   templateUrl: './members-area.component.html',
-  styleUrls: ['./members-area.component.css'],
+  styleUrls: ['./members-area.component.scss'],
   providers: [UserInteractionsService, TranscriptionService, AsrService]
 })
 export class MembersAreaComponent implements OnDestroy {

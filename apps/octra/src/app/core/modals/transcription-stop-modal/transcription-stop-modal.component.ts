@@ -1,6 +1,6 @@
-import {Component, TemplateRef, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {Subject} from 'rxjs';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 export enum TranscriptionStopModalAnswer {
   CONTINUE = 'CONTINUE',
@@ -10,38 +10,19 @@ export enum TranscriptionStopModalAnswer {
 @Component({
   selector: 'octra-transcription-stop-modal',
   templateUrl: './transcription-stop-modal.component.html',
-  styleUrls: ['./transcription-stop-modal.component.css']
+  styleUrls: ['./transcription-stop-modal.component.scss']
 })
 
 export class TranscriptionStopModalComponent {
-  modalRef: MdbModalRef<TranscriptionStopModalComponent>;
-
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
 
-  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
-
   private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
 
-  constructor(private modalService: MdbModalService) {
-  }
-
-  public open(): Promise<TranscriptionStopModalAnswer> {
-    return new Promise<TranscriptionStopModalAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modal, this.config);
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
+  constructor(public modalRef: MdbModalRef<TranscriptionStopModalComponent>) {
   }
 
   public close(action: string) {

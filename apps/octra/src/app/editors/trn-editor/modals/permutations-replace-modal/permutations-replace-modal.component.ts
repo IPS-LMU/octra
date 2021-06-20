@@ -7,7 +7,7 @@ import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 @Component({
   selector: 'octra-permutations-replace',
   templateUrl: './permutations-replace-modal.component.html',
-  styleUrls: ['./permutations-replace-modal.component.css']
+  styleUrls: ['./permutations-replace-modal.component.scss']
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
   modalRef: MdbModalRef<PermutationsReplaceModalComponent>;

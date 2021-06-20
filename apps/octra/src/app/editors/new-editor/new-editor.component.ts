@@ -13,7 +13,7 @@ import {OCTRAEditor} from '../octra-editor';
 @Component({
   selector: 'octra-new-editor',
   templateUrl: './new-editor.component.html',
-  styleUrls: ['./new-editor.component.css']
+  styleUrls: ['./new-editor.component.scss']
 })
 export class NewEditorComponent extends OCTRAEditor implements OnInit {
   public static editorname = 'New Editor';

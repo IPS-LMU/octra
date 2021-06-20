@@ -6,7 +6,7 @@ import {NavbarService} from '../../component/navbar/navbar.service';
 @Component({
   selector: 'octra-auth',
   templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.css']
+  styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent implements OnInit, OnDestroy {
   private interval: Subscription;

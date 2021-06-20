@@ -6,10 +6,9 @@ import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 @Component({
   selector: 'octra-missing-permissions-modal',
   templateUrl: './missing-permissions.component.html',
-  styleUrls: ['./missing-permissions.component.css']
+  styleUrls: ['./missing-permissions.component.scss']
 })
 export class MissingPermissionsModalComponent implements OnDestroy {
-  modalRef: MdbModalRef<MissingPermissionsModalComponent>;
   public visible = false;
 
   @ViewChild('modal', {static: true}) modal: any;
@@ -19,22 +18,7 @@ export class MissingPermissionsModalComponent implements OnDestroy {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal);
-      this.visible = true;
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-
-    });
+  constructor(public modalRef: MdbModalRef<MissingPermissionsModalComponent>) {
   }
 
   public close() {

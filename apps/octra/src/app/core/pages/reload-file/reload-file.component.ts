@@ -14,7 +14,7 @@ import {OIDBLevel, OIDBLink} from '@octra/annotation';
 @Component({
   selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
-  styleUrls: ['./reload-file.component.css']
+  styleUrls: ['./reload-file.component.scss']
 })
 export class ReloadFileComponent {
 

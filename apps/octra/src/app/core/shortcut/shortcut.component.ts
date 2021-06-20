@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 @Component({
   selector: 'octra-shortcut',
   templateUrl: './shortcut.component.html',
-  styleUrls: ['./shortcut.component.css'],
+  styleUrls: ['./shortcut.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShortcutComponent implements OnInit {

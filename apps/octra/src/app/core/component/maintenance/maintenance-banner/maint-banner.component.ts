@@ -8,7 +8,7 @@ import {hasProperty} from '@octra/utilities';
   // tslint:disable-next-line:component-selector
   selector: 'octra-maint-banner',
   templateUrl: './maint-banner.component.html',
-  styleUrls: ['./maint-banner.component.css']
+  styleUrls: ['./maint-banner.component.scss']
 })
 export class MaintenanceBannerComponent implements OnChanges {
 

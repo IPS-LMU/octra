@@ -43,7 +43,7 @@ declare let validateAnnotation: any;
 @Component({
   selector: 'octra-trn-editor',
   templateUrl: './trn-editor.component.html',
-  styleUrls: ['./trn-editor.component.css'],
+  styleUrls: ['./trn-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy {

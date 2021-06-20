@@ -27,7 +27,7 @@ import {Subscription, timer} from 'rxjs';
 @Component({
   selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
-  styleUrls: ['./linear-editor.component.css']
+  styleUrls: ['./linear-editor.component.scss']
 })
 export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = 'Linear Editor';

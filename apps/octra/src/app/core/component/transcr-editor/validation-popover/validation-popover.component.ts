@@ -4,7 +4,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 @Component({
   selector: 'octra-validation-popover',
   templateUrl: './validation-popover.component.html',
-  styleUrls: ['./validation-popover.component.css']
+  styleUrls: ['./validation-popover.component.scss']
 })
 export class ValidationPopoverComponent {
   @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;

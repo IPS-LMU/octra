@@ -86,7 +86,6 @@
             aria-expanded="false"
             mdbDropdownToggle
           >
-
             {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
             '...' : transcrServ.currentlevel.name}}
             <fa-icon class="navbar-icon" icon="book"></fa-icon>
@@ -135,12 +134,17 @@
         <!--
         infoDropdown
         -->
-        <li *ngIf="appStorage.loggedIn && navbarServ.filesize !== undefined" class="nav-item dropdown">
-          <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
-             href="#" id="infoDropdown">
+        <li *ngIf="appStorage.loggedIn && navbarServ.filesize !== undefined" mdbDropdown class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            role="button"
+            id="infoDropdown"
+            mdbDropdownToggle
+            aria-expanded="false"
+          >
             <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
           </a>
-          <div aria-labelledby="infoDropdown" class="dropdown-menu dropdown-menu-right info-menu">
+          <div mdbDropdownMenu class="dropdown-menu" data-toggle="dropdown" aria-labelledby="infoDropdown">
             <table class="table">
               <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
                 <td><span>{{'general.project' |transloco}}:</span></td>
@@ -197,6 +201,7 @@
             </table>
           </div>
         </li>
+
         <li *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport" class="nav-item">
           <a (mouseup)="openToolsModal()" class="nav-link">
             <fa-icon class="navbar-icon" icon="tools"></fa-icon>
@@ -210,17 +215,20 @@
           </a>
         </li>
 
-        <!--
-        optionsDropdown
-        -->
-        <li [ngStyle]="{
+
+        <li mdbDropdown class="nav-item dropdown" [ngStyle]="{
                 'display': (!(appStorage.audioLoaded && appStorage.loggedIn)) ? 'none': 'inherit'
-                }" class="nav-item dropdown">
-          <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
-             href="#" id="optionsDropdown">
+                }">
+          <a
+            class="nav-link dropdown-toggle"
+            role="button"
+            id="optionsDropdown"
+            mdbDropdownToggle
+            aria-expanded="false"
+          >
             <fa-icon icon="cog"></fa-icon>
           </a>
-          <div aria-labelledby="optionsDropdown" class="dropdown-menu dropdown-menu-right options-menu">
+          <div mdbDropdownMenu class="dropdown-menu" data-toggle="dropdown" aria-labelledby="optionsDropdown">
             <table class="table">
               <tr>
                 <td><label for="easymode">{{"settings.easy mode" | transloco}}:</label></td>
@@ -343,9 +351,9 @@
         <!--
         languageDropdown
         -->
-        <div mdbDropdown class="nav-item dropdown">
+        <li mdbDropdown class="nav-item dropdown">
           <a
-            class="btn btn-primary dropdown-toggle"
+            class="nav-link dropdown-toggle"
             role="button"
             id="dropdownLanguages"
             mdbDropdownToggle
@@ -354,14 +362,13 @@
             {{langService.getActiveLang() | uppercase}} <span class="caret"></span>
           </a>
           <div mdbDropdownMenu class="dropdown-menu" data-toggle="dropdown" aria-labelledby="dropdownLanguages">
-            <a> test test</a>
             <ng-container *ngIf="settService.appSettings !== undefined">
               <a (click)="changeLanguage(item)" *ngFor="let item of settService.appSettings.octra.languages;"
                  class="dropdown-item">
                 {{item | uppercase}}</a>
             </ng-container>
           </div>
-        </div>
+        </li>
       </ul>
     </div>
   </div>

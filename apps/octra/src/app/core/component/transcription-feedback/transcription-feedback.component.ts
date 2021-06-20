@@ -8,7 +8,7 @@ import {getProperties} from '@octra/utilities';
 @Component({
   selector: 'octra-transcription-feedback',
   templateUrl: './transcription-feedback.component.html',
-  styleUrls: ['./transcription-feedback.component.css']
+  styleUrls: ['./transcription-feedback.component.scss']
 })
 export class TranscriptionFeedbackComponent {
 

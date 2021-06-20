@@ -9,9 +9,6 @@
   min-width: 300px;
 }
 
-.info-menu {
-}
-
 .dropdown-menu.options-menu.show label,
 .dropdown-menu.info-menu.show span {
   color: black;
@@ -21,13 +18,6 @@
   font-weight: bold;
   font-size: 1.3em;
   color: black;
-}
-
-.dropdown-menu.options-menu label,
-.dropdown-menu.info-menu label,
-.dropdown-menu.info-menu table tr td,
-.dropdown-menu.options-menu table tr td {
-  color: white;
 }
 
 .options-menu * {
@@ -110,5 +100,10 @@
 .switch {
   margin-top: -5px;
   display: flex;
+}
+
+#infoDropdown:after,
+#optionsDropdown:after {
+  visibility: hidden;
 }
 

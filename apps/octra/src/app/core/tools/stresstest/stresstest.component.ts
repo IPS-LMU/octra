@@ -6,7 +6,7 @@ import {getFileSize} from '@octra/utilities';
 @Component({
   selector: 'octra-stresstest',
   templateUrl: './stresstest.component.html',
-  styleUrls: ['./stresstest.component.css'],
+  styleUrls: ['./stresstest.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [SessionStorageService]
 })

@@ -62,7 +62,7 @@ import {ShortcutsModalComponent} from '../../modals/shortcuts-modal/shortcuts-mo
 @Component({
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
-  styleUrls: ['./transcription.component.css'],
+  styleUrls: ['./transcription.component.scss'],
   providers: [AlertService]
 })
 export class TranscriptionComponent implements OnInit, OnDestroy {

@@ -19,7 +19,7 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'octra-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
-  styleUrls: ['./dictaphone-editor.component.css']
+  styleUrls: ['./dictaphone-editor.component.scss']
 })
 export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit {
 

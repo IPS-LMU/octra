@@ -17,7 +17,7 @@ export interface ColumnFormat {
 @Component({
   selector: 'octra-table-configurator',
   templateUrl: './table-configurator.component.html',
-  styleUrls: ['./table-configurator.component.css'],
+  styleUrls: ['./table-configurator.component.scss'],
   providers: []
 })
 export class TableConfiguratorComponent implements OnInit {

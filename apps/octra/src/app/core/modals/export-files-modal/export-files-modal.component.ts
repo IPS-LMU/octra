@@ -12,21 +12,26 @@ import {SubscriptionManager} from '@octra/utilities';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Converter, IFile} from '@octra/annotation';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
-  styleUrls: ['./export-files-modal.component.css'],
+  styleUrls: ['./export-files-modal.component.scss'],
   animations: [
     fadeInExpandOnEnterAnimation(),
     fadeOutCollapseOnLeaveAnimation()
   ]
 })
 export class ExportFilesModalComponent implements OnInit, OnDestroy {
-  modalRef: MdbModalRef<ExportFilesModalComponent>;
+  public static config: MdbModalConfig = {
+    keyboard: false,
+    backdrop: true,
+    ignoreBackdropClick: false,
+    modalClass: 'modal-xl'
+  };
+
   AppInfo = AppInfo;
-  public visible = false;
   public exportStates = [];
   public preparing = {
     name: '',
@@ -40,11 +45,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     uri: ''
   };
   public converters = AppInfo.converters;
-  config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
 
   public tools = {
     audioCutting: {
@@ -90,7 +90,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   };
 
-  @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
   @ViewChild('content', {static: false}) contentElement: ElementRef;
   @ViewChild('tableConfigurator', {static: false}) tableConfigurator: TableConfiguratorComponent;
@@ -104,12 +103,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              private modalService: MdbModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
               private settService: SettingsService,
-              private dragulaService: DragulaService) {
+              private dragulaService: DragulaService,
+              public modalRef: MdbModalRef<ExportFilesModalComponent>) {
     this.dragulaService.createGroup('tableConfiguratorColumns', {
       revertOnSpill: true,
       removeOnSpill: false
@@ -122,33 +121,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
-      this.uiService.addElementFromEvent('export', {
-        value: 'opened'
-      }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, 'modals');
-
-      this.visible = true;
-      if (this.tableConfigurator !== undefined) {
-        this.tableConfigurator.updateAllTableCells();
-      }
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-
-    });
-  }
-
   public close() {
-    this.modal.hide();
+    this.modalRef.close();
 
     this.uiService.addElementFromEvent('export', {
       value: 'closed'
@@ -234,7 +208,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   getProtocol() {
-    if (!(this.transcrService === undefined || this.transcrService === undefined)) {
+    if (!(this.transcrService === undefined)) {
       this.preparing = {
         name: 'Protocol',
         preparing: true
@@ -278,7 +252,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.visible = false;
     this.subscrmanager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {

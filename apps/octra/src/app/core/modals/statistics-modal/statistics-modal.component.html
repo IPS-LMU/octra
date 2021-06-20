@@ -8,62 +8,60 @@
   ></button>
 </div>
 <div class="modal-body">
-  <div *ngIf="visible">
-    <h3>Transkriptionstext:</h3>
-    <p>
-      {{getText()}}
-    </p>
-    <table class="table">
+
+  <h3>Transkriptionstext:</h3>
+  <p>
+    {{getText()}}
+  </p>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Wert</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Anzahl Segmente:</td>
+      <td>{{transcrServ.currentlevel.segments.length}}</td>
+    </tr>
+    <tr>
+      <td>Anzahl Logeinträge:</td>
+      <td>{{(UIElements !== undefined) ? UIElements.length : 0}}</td>
+    </tr>
+    </tbody>
+  </table>
+  <h3 style="display:inline;">Ereignisse</h3>
+  <button (click)="clearElements()">Ereignisse löschen</button>
+  <div style="max-height:400px;overflow: scroll;">
+    <table class="table" style="">
       <thead>
       <tr>
-        <th>Name</th>
-        <th>Wert</th>
+        <th>Zeit</th>
+        <th>Typ</th>
+        <th>Ziel</th>
+        <th>Inhalt</th>
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Anzahl Segmente:</td>
-        <td>{{transcrServ.currentlevel.segments.length}}</td>
-      </tr>
-      <tr>
-        <td>Anzahl Logeinträge:</td>
-        <td>{{(UIElements !== undefined) ? UIElements.length : 0}}</td>
+      <tr *ngFor="let elem of UIElements">
+        <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
+        <td>{{elem.type}}</td>
+        <td>{{elem.context}}</td>
+        <td>
+          {{elem.value}}
+        </td>
       </tr>
       </tbody>
     </table>
-    <h3 style="display:inline;">Ereignisse</h3>
-    <button (click)="clearElements()">Ereignisse löschen</button>
-    <div style="max-height:400px;overflow: scroll;">
-      <table class="table" style="">
-        <thead>
-        <tr>
-          <th>Zeit</th>
-          <th>Typ</th>
-          <th>Ziel</th>
-          <th>Inhalt</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let elem of UIElements">
-          <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
-          <td>{{elem.type}}</td>
-          <td>{{elem.context}}</td>
-          <td>
-            {{elem.value}}
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <h3>
-      Das Transkriptionsobjekt:
-    </h3>
-    <textarea [innerHTML]="transcrObjStr" style="width: 100%;display: block;">
-                  </textarea>
   </div>
+  <h3>
+    Das Transkriptionsobjekt:
+  </h3>
+  <textarea [innerHTML]="transcrObjStr" style="width: 100%;display: block;"></textarea>
 </div>
 <div class="modal-footer">
   <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
-  {{"general.close" | transloco}}
-</button>
+    {{"general.close" | transloco}}
+  </button>
 </div>

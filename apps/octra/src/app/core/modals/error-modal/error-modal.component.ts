@@ -1,16 +1,14 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs';
-import {hasProperty} from '@octra/utilities';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-error-modal',
   templateUrl: './error-modal.component.html',
-  styleUrls: ['./error-modal.component.css']
+  styleUrls: ['./error-modal.component.scss']
 })
 export class ErrorModalComponent {
-  modalRef: MdbModalRef<ErrorModalComponent>;
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -21,29 +19,7 @@ export class ErrorModalComponent {
   };
   private actionperformed: Subject<void> = new Subject<void>();
 
-  constructor(private modalService: MdbModalService) {
-  }
-
-  public open(data: {
-    text: string
-  }): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (hasProperty(data, 'text')) {
-        this.data.text = data.text;
-        this.modalRef = this.modalService.open(this.modal, this.config);
-        const subscr = this.actionperformed.subscribe(
-          (action) => {
-            resolve(action);
-            subscr.unsubscribe();
-          },
-          (err) => {
-            reject(err);
-          }
-        );
-      } else {
-        reject('error modal needs data.text property');
-      }
-    });
+  constructor(public modalRef: MdbModalRef<ErrorModalComponent>) {
   }
 
   public close() {

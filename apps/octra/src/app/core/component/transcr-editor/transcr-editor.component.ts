@@ -46,7 +46,7 @@ declare let document: any;
 @Component({
   selector: 'octra-transcr-editor',
   templateUrl: './transcr-editor.component.html',
-  styleUrls: ['./transcr-editor.component.css'],
+  styleUrls: ['./transcr-editor.component.scss'],
   providers: [TranscrEditorConfig],
   encapsulation: ViewEncapsulation.None
 })

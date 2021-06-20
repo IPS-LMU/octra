@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 export enum ModalSendAnswer {
   CANCEL = 'CANCEL',
@@ -10,13 +10,11 @@ export enum ModalSendAnswer {
 @Component({
   selector: 'octra-transcription-send-modal',
   templateUrl: './transcription-send-modal.component.html',
-  styleUrls: ['./transcription-send-modal.component.css']
+  styleUrls: ['./transcription-send-modal.component.scss']
 })
 
 export class TranscriptionSendModalComponent {
-  modalRef: MdbModalRef<TranscriptionSendModalComponent>;
-
-  config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -26,22 +24,8 @@ export class TranscriptionSendModalComponent {
 
   private actionperformed: Subject<ModalSendAnswer> = new Subject<ModalSendAnswer>();
 
-  constructor(private modalService: MdbModalService) {
-  }
-
-  public open(): Promise<ModalSendAnswer> {
-    return new Promise<ModalSendAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modal, this.config);
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-    });
+  constructor(
+    public modalRef: MdbModalRef<TranscriptionSendModalComponent>) {
   }
 
   public close(action: string) {

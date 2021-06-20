@@ -45,7 +45,7 @@ import {Store} from '@ngrx/store';
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css'],
+  styleUrls: ['./2D-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {

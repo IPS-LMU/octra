@@ -5,7 +5,7 @@ import {IconProp} from '@fortawesome/fontawesome-svg-core';
 @Component({
   selector: 'octra-context-menu',
   templateUrl: './context-menu.component.html',
-  styleUrls: ['./context-menu.component.css'],
+  styleUrls: ['./context-menu.component.scss'],
   animations: [
     fadeInOnEnterAnimation({
       duration: 100

@@ -21,7 +21,7 @@ import {OIDBLevel, OIDBLink} from '@octra/annotation';
 @Component({
   selector: 'octra-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.scss'],
   providers: [LoginService]
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, OnDestroy {

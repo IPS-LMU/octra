@@ -6,41 +6,26 @@ import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 @Component({
   selector: 'octra-help-modal',
   templateUrl: './help-modal.component.html',
-  styleUrls: ['./help-modal.component.css']
+  styleUrls: ['./help-modal.component.scss']
 })
 export class HelpModalComponent implements OnDestroy {
-  modalRef: MdbModalRef<HelpModalComponent>;
-  public visible = false;
-
-  @ViewChild('modal', {static: true}) modal: any;
-  @ViewChild('content', {static: false}) contentElement: ElementRef;
-
-  public config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true,
     modalClass: 'modal-lg'
   };
+
+  public visible = false;
+
+  @ViewChild('modal', {static: true}) modal: any;
+  @ViewChild('content', {static: false}) contentElement: ElementRef;
+
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal);
-      this.visible = true;
-
-      const subscr = this.actionperformed.subscribe(
-        (action) => {
-          resolve(action);
-          subscr.unsubscribe();
-        },
-        (err) => {
-          reject(err);
-        }
-      );
-
-    });
+  constructor(public modalRef: MdbModalRef<HelpModalComponent>) {
   }
 
   public close() {

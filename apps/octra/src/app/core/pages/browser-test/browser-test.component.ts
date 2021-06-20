@@ -6,7 +6,7 @@ import {CompatibilityService} from '../../shared/service/compatibility.service';
 @Component({
   selector: 'octra-browser-test',
   templateUrl: './browser-test.component.html',
-  styleUrls: ['./browser-test.component.css']
+  styleUrls: ['./browser-test.component.scss']
 })
 export class BrowserTestComponent {
 

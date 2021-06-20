@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 export enum TranscriptionStopModalAnswer {
   CONTINUE = 'CONTINUE',
@@ -14,9 +14,9 @@ export enum TranscriptionStopModalAnswer {
 })
 
 export class TranscriptionStopModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<TranscriptionStopModalComponent>;
 
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -26,12 +26,12 @@ export class TranscriptionStopModalComponent {
 
   private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
 
-  constructor(private modalService: BsModalService) {
+  constructor(private modalService: MdbModalService) {
   }
 
   public open(): Promise<TranscriptionStopModalAnswer> {
     return new Promise<TranscriptionStopModalAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -45,7 +45,7 @@ export class TranscriptionStopModalComponent {
   }
 
   public close(action: string) {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next(action as TranscriptionStopModalAnswer);
   }
 }

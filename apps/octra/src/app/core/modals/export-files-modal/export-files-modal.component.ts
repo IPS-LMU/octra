@@ -6,13 +6,13 @@ import {HttpClient} from '@angular/common/http';
 import {Subject, Subscription, timer} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../tools/table-configurator/table-configurator.component';
 import {SubscriptionManager} from '@octra/utilities';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Converter, IFile} from '@octra/annotation';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -24,7 +24,7 @@ import {Converter, IFile} from '@octra/annotation';
   ]
 })
 export class ExportFilesModalComponent implements OnInit, OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<ExportFilesModalComponent>;
   AppInfo = AppInfo;
   public visible = false;
   public exportStates = [];
@@ -40,7 +40,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     uri: ''
   };
   public converters = AppInfo.converters;
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -104,7 +104,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              private modalService: BsModalService,
+              private modalService: MdbModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,

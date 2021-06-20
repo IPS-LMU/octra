@@ -1,7 +1,7 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {hasProperty} from '@octra/utilities';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-error-modal',
@@ -9,8 +9,8 @@ import {hasProperty} from '@octra/utilities';
   styleUrls: ['./error-modal.component.css']
 })
 export class ErrorModalComponent {
-  modalRef: BsModalRef;
-  config: ModalOptions = {
+  modalRef: MdbModalRef<ErrorModalComponent>;
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -21,7 +21,7 @@ export class ErrorModalComponent {
   };
   private actionperformed: Subject<void> = new Subject<void>();
 
-  constructor(private modalService: BsModalService) {
+  constructor(private modalService: MdbModalService) {
   }
 
   public open(data: {
@@ -30,7 +30,7 @@ export class ErrorModalComponent {
     return new Promise<void>((resolve, reject) => {
       if (hasProperty(data, 'text')) {
         this.data.text = data.text;
-        this.modalRef = this.modalService.show(this.modal, this.config);
+        this.modalRef = this.modalService.open(this.modal, this.config);
         const subscr = this.actionperformed.subscribe(
           (action) => {
             resolve(action);
@@ -47,7 +47,7 @@ export class ErrorModalComponent {
   }
 
   public close() {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next();
   }
 }

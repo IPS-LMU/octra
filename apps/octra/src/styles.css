@@ -385,3 +385,7 @@ footer {
   border: 1px solid dimgray;
   display: inline;
 }
+
+.dropdown-menu {
+  display: inherit !important;
+}

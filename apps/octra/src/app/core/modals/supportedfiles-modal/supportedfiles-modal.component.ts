@@ -1,11 +1,11 @@
 import {Component, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-supportedfiles-modal',
@@ -14,20 +14,21 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 })
 
 export class SupportedFilesModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<SupportedFilesModalComponent>;
   AppInfo = AppInfo;
   public visible = false;
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: 'modal-lg'
   };
   @ViewChild('modal', {static: true}) modal: any;
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService,
+  constructor(private modalService: MdbModalService, private appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService) {
   }
 

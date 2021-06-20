@@ -1,12 +1,13 @@
 import {Component, Input, ViewChild} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
 import {AppInfo} from '../../../app.info';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AlertService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {AudioChunk} from '@octra/media';
+import {MdbDropdownDirective} from 'mdb-angular-ui-kit/dropdown';
+import {MdbPopoverDirective} from 'mdb-angular-ui-kit/popover';
 
 @Component({
   selector: 'octra-asr-options',
@@ -23,7 +24,8 @@ export class AsrOptionsComponent {
 
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
-  @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
+  @ViewChild('dropdown', {static: true}) dropdown: MdbDropdownDirective;
+  @ViewChild('pop', {static: true}) pop: MdbPopoverDirective;
 
   public get appSettings(): AppSettings {
     return this.settingsService.appSettings;

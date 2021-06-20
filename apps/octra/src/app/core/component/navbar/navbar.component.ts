@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../../../../environments/environment';
@@ -13,17 +13,22 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {NavbarService} from './navbar.service';
 import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
 import {Subscription} from 'rxjs';
+import {MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {ToolsModalComponent} from '../../modals/tools-modal/tools-modal.component';
+import {PromptModalComponent} from '../../modals/prompt-modal/prompt-modal.component';
+import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics-modal.component';
 
 @Component({
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
+export class NavigationComponent implements OnInit, OnDestroy {
 
-  @ViewChild('modalexport', {static: true}) modalexport: ExportFilesModalComponent;
-  @ViewChild('tiersDropdown', {static: false}) tiersDropdown: ElementRef;
-  @ViewChild('tiersDropdownUp', {static: false}) tiersDropdownUp: ElementRef;
+  modalexport: MdbModalRef<ExportFilesModalComponent>;
+  modalTools: MdbModalRef<ToolsModalComponent>;
+  modalPrompt: MdbModalRef<PromptModalComponent>;
+  modalStatistics: MdbModalRef<StatisticsModalComponent>;
   @Input() version: string;
 
   public test = 'ok';
@@ -77,7 +82,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
               public langService: TranslocoService,
               public modService: ModalService,
               public settService: SettingsService,
-              public bugService: BugReportService) {
+              public bugService: BugReportService,
+              private modalService: MdbModalService) {
   }
 
   ngOnDestroy() {
@@ -89,17 +95,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case('export'):
-            this.modalexport.open().catch((error) => {
-              console.error(error);
-            });
+            this.modalexport = this.modalService.open(ExportFilesModalComponent);
             break;
         }
       })
     );
-  }
-
-  ngAfterViewInit() {
-    // TODO mdb: (jQuery('body') as any).bootstrapMaterialDesign();
   }
 
   setInterface(newInterface: string) {
@@ -238,5 +238,22 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   public changeSecondsPerLine(seconds: number) {
     this.secondsPerLine = seconds.toString();
     this.appStorage.secondsPerLine = seconds;
+  }
+
+  openExportModal() {
+    this.modalexport = this.modalService.open(ExportFilesModalComponent);
+  }
+
+  openToolsModal() {
+    this.modalTools = this.modalService.open(ToolsModalComponent);
+  }
+
+  openPromptModal() {
+    // TODO mdb: preserve this.transcrServ.audiofile
+    this.modalPrompt = this.modalService.open(PromptModalComponent);
+  }
+
+  openStatisticsModal() {
+    this.modalStatistics = this.modalService.open(StatisticsModalComponent);
   }
 }

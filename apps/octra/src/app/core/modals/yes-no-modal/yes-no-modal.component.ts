@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-yes-no-modal',
@@ -8,8 +8,8 @@ import {Subject} from 'rxjs';
   styleUrls: ['./yes-no-modal.component.css']
 })
 export class YesNoModalComponent {
-  modalRef: BsModalRef;
-  config: ModalOptions = {
+  modalRef: MdbModalRef<YesNoModalComponent>;
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -20,7 +20,7 @@ export class YesNoModalComponent {
   };
   private actionperformed: Subject<('yes' | 'no')> = new Subject<('yes' | 'no')>();
 
-  constructor(private modalService: BsModalService) {
+  constructor(private modalService: MdbModalService) {
   }
 
   public open(data: {
@@ -28,7 +28,7 @@ export class YesNoModalComponent {
   }): Promise<'yes' | 'no'> {
     return new Promise<'yes' | 'no'>((resolve, reject) => {
       this.data.text = data.text;
-      this.modalRef = this.modalService.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -42,7 +42,7 @@ export class YesNoModalComponent {
   }
 
   public close(action: 'yes' | 'no') {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next(action);
   }
 }

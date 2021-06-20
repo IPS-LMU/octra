@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
 import {Subject, Subscription, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-bugreport-modal',
@@ -13,17 +13,17 @@ import {BugReportService} from '../../shared/service/bug-report.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BugreportModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<BugreportModalComponent>;
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: 'modal-lg'
   };
-  @ViewChild('modal', {static: true}) modal: any;
   public sendStatus: 'pending' | 'success' | 'error' | 'sending' = 'pending';
   public screenshots: {
     blob: File,
@@ -59,7 +59,7 @@ export class BugreportModalComponent {
     return this.sendProObj || this.bgdescr !== '';
   }
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService,
+  constructor(private modalService: MdbModalService, private appStorage: AppStorageService,
               public bugService: BugReportService, private settService: SettingsService,
               private cd: ChangeDetectorRef) {
   }
@@ -68,13 +68,13 @@ export class BugreportModalComponent {
     text: string
   }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.modal.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(BugreportModalComponent, this.config);
       this.sendStatus = 'pending';
       this.visible = true;
       this.screenshots = [];
       this.update();
 
-      const subscr = this.modal.onHide.subscribe(() => {
+      const subscr = this.modalRef.onClose.subscribe(() => {
         subscr.unsubscribe();
         resolve();
       });
@@ -82,7 +82,7 @@ export class BugreportModalComponent {
   }
 
   public close() {
-    this.modal.hide();
+    this.modalRef.close();
   }
 
   public hide() {
@@ -121,7 +121,7 @@ export class BugreportModalComponent {
 
           this.subscrmanager.add(timer(2000).subscribe(() => {
             this.bgdescr = '';
-            this.modal.hide();
+            this.modalRef.close();
           }));
         },
         (error) => {

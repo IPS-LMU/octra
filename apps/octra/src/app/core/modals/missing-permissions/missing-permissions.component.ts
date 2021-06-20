@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
+import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-missing-permissions-modal',
@@ -9,7 +9,7 @@ import {SubscriptionManager} from '@octra/utilities';
   styleUrls: ['./missing-permissions.component.css']
 })
 export class MissingPermissionsModalComponent implements OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<MissingPermissionsModalComponent>;
   public visible = false;
 
   @ViewChild('modal', {static: true}) modal: any;

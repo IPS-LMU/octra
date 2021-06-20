@@ -8,10 +8,9 @@
       <td>{{getDropzoneFileString(file.file)}}
       </td>
       <td>
-        <fa-icon *ngIf="file.status === 'invalid'" [popoverTitle]="'Validation Error'" [popover]="file.error"
+        <fa-icon *ngIf="file.status === 'invalid'" [mdbPopoverTitle]="'Validation Error'" [mdbPopover]="file.error"
                  class="icon-invalid" icon="times" placement="top"
-                 style="font-size:16px"
-                 triggers="mouseenter:mouseleave"></fa-icon>
+                 style="font-size:16px"></fa-icon>
         <fa-icon *ngIf="file.status === 'valid'" class="icon-success" icon="check"
                  style="font-size:16px"></fa-icon>
         <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
@@ -19,11 +18,18 @@
                    style="font-size:16px"></fa-icon>
         </ng-container>
         <ng-container *ngIf="file.file.name.indexOf('.wav') > -1 && file.status === 'progress'">
-          <progressbar [animate]="false" [style.height]="'20px'" [style.width]="'100px'"
-                       [value]="file.progress | procent"
-                       type="info">
-            <b>{{file.progress | procent}}%</b>
-          </progressbar>
+          <div class="progress">
+            <div
+              class="progress-bar progress-bar-striped progress-bar-animated"
+              role="progressbar"
+              aria-valuenow="75"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [style.width]="file.progress | procent"
+            >
+              <b>{{file.progress | procent}}%</b>
+            </div>
+          </div>
         </ng-container>
       </td>
     </tr>

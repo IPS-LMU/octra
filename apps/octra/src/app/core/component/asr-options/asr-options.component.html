@@ -1,14 +1,17 @@
 <span class="asr-label">ASR -</span>
 <div id="asr-bar">
-  <div #dropdown="bs-dropdown" [insideClick]="true"
-       class="btn-group"
-       dropdown
-       id="dropdown-button" placement="down right">
-    <label for="button-basic" style="vertical-align: middle;margin-right:10px;">{{"general.Language" | transloco}}
-      : </label>
-    <button aria-controls="dropdown-basic" class="btn btn-outline-secondary btn-sm dropdown-toggle" dropdownToggle
-            id="button-basic"
-            type="button">
+  <div #dropdown mdbDropdown class="btn-group dropend">
+
+    <label for="dropdownMenuButton" style="vertical-align: middle;margin-right:10px;">
+      {{"general.Language" | transloco}}:
+    </label>
+    <button
+      class="btn btn-info dropdown-toggle"
+      type="button"
+      id="dropdownMenuButton"
+      aria-expanded="false"
+      mdbDropdownToggle
+    >
       <ng-container *ngIf="asrService.selectedLanguage === undefined; else asrAllSet">
         {{"asr.without asr" | transloco}}
       </ng-container>
@@ -16,11 +19,9 @@
         {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
         [{{asrService.selectedLanguage.asr}}]
       </ng-template>
-      <span class="caret"></span>
     </button>
-    <div *dropdownMenu aria-labelledby="button-basic"
-         class="dropdown-menu"
-         id="dropdown-basic" role="menu" style="padding:5px;height:300px;overflow-y: scroll;">
+    <div mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+         style="padding:5px;height:300px;overflow-y: scroll;">
       <p style="font-size: 0.9em;text-align: center;">
         {{"asr.click on logo" | transloco}}
       </p>
@@ -54,13 +55,14 @@
               </ng-container>
             </td>
             <td class="col-asr">
-              <img #pop="bs-popover" (click)="pop.toggle();"
-                   [outsideClick]="true"
-                   [popover]="asrDescription" [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
+              <!-- [outsideClick]="true"
+              TODO mdb: find replacement for popover
+              [popover]="asrDescription" [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
                    popoverTitle="Service Information"
                    container="#asr-bar"
                    triggers="focus"
-              >
+              -->
+              <img mdbPopover #pop="mdbPopover" (click)="pop.hide()">
               <ng-template #asrDescription>
                 <table class="table table-sm table-borderless">
                   <tbody>
@@ -117,21 +119,28 @@
       </table>
     </div>
   </div>
-  <div #dropdown2="bs-dropdown"
-       [isDisabled]="asrService.selectedLanguage === undefined || asrService.selectedLanguage === undefined"
-       class="btn-group"
-       dropdown id="dropdown-button2" placement="down right"
-       style="margin-left:10px;">
-    <button aria-controls="dropdown-basic" class="btn btn-outline-primary btn-sm dropdown-toggle" dropdownToggle
-            id="button-basic2"
-            type="button">
-      {{"general.SELECT ACTION" | transloco}}
-      <span class="caret"></span>
-    </button>
-    <div *dropdownMenu aria-labelledby="button-basic"
-         class="dropdown-menu"
-         id="dropdown-basic2" role="menu" style="padding:5px;">
+  <div #dropdown2 mdbDropdown class="btn-group dropend" style="margin-left:10px;">
 
+    <label for="dropdownMenuButton2" style="vertical-align: middle;margin-right:10px;">
+      {{"general.SELECT ACTION" | transloco}}
+    </label>
+    <button
+      [disabled]="asrService.selectedLanguage === undefined || asrService.selectedLanguage === undefined"
+      class="btn btn-info dropdown-toggle"
+      type="button"
+      id="dropdownMenuButton2"
+      aria-expanded="false"
+      mdbDropdownToggle
+    >
+      <ng-container *ngIf="asrService.selectedLanguage === undefined; else asrAllSet">
+        {{"asr.without asr" | transloco}}
+      </ng-container>
+      <ng-template #asrAllSet>
+        {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
+        [{{asrService.selectedLanguage.asr}}]
+      </ng-template>
+    </button>
+    <div mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:5px;">
       <ng-container *ngIf="asrService.queue.status !== 'STARTED'">
         <li role="menuitem">
           <button (click)="startASRForThisSegment()"
@@ -155,10 +164,10 @@
         </li>
       </ng-container>
     </div>
-    <a [href]="manualURL + 'using-asr'" style="margin-left: 10px;" target="_blank">
-      <fa-icon class="text-info" icon="question-circle" size="1x" style="display: inline-block;"></fa-icon>
-    </a>
   </div>
+  <a [href]="manualURL + 'using-asr'" style="margin-left: 10px;" target="_blank">
+    <fa-icon class="text-info" icon="question-circle" size="1x" style="display: inline-block;"></fa-icon>
+  </a>
   <div class="clearfix"></div>
 </div>
 <div class="clearfix"></div>

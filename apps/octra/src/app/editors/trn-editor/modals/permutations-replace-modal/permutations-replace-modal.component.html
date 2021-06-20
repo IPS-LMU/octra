@@ -1,58 +1,51 @@
-<div #modal="bs-modal" (onHidden)="onHidden()" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
-     id="supportedfiles"
-     role="dialog" tabindex="-1">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">{{"trn-editor.modals.permutations replace.replace permutations" | transloco}}</h4>
-        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div #content class="modal-body">
-        <p>
-          {{"trn-editor.modals.permutations replace.description" | transloco}}
-        </p>
+<div class="modal-header">
+  <h5 class="modal-title">{{"trn-editor.modals.permutations replace.replace permutations" | transloco}}</h5>
+  <button type="button"
+          class="btn-close"
+          aria-label="Close" (click)="modalRef.close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" #content>
+  <p>
+    {{"trn-editor.modals.permutations replace.description" | transloco}}
+  </p>
 
-        <table class="table table-striped table-sm w-100">
-          <tbody>
-          <tr *ngFor="let speaker of listOfSpeakers; let i = index;">
-            <td class="leftcolumn">{{speaker.name}}</td>
-            <td style="width:60px;">
-              <fa-icon [icon]="['fas', 'long-arrow-alt-right']"></fa-icon>
-            </td>
-            <td class="rightcolumn">
-              <div class="btn-group" dropdown>
-                <button dropdownToggle type="button"
-                        class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
-                        aria-controls="dropdown-basic">
-                  {{speaker.replaceWith}} <span class="caret"></span>
-                </button>
-                <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu">
-                  <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker.replaceWith)" role="menuitem"
-                      (click)="setReplacement(i, otherSpeaker.name)" style="cursor:pointer;">
-                    <span class="dropdown-item" href="#">{{otherSpeaker.name}}</span>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <div class="w-50 text-left">
-          <button (click)="close()" class="btn btn-secondary btn-raised" data-dismiss="modal" type="button">
-            {{"general.abort" | transloco}}
+  <table class="table table-striped table-sm w-100">
+    <tbody>
+    <tr *ngFor="let speaker of listOfSpeakers; let i = index;">
+      <td class="leftcolumn">{{speaker.name}}</td>
+      <td style="width:60px;">
+        <fa-icon [icon]="['fas', 'long-arrow-alt-right']"></fa-icon>
+      </td>
+      <td class="rightcolumn">
+        <div mdbDropdown class="dropdown">
+          <button
+            class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            aria-expanded="false"
+            mdbDropdownToggle
+          >
+            {{speaker.replaceWith}} <span class="caret"></span>
           </button>
+          <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker.replaceWith)" role="menuitem"
+                (click)="setReplacement(i, otherSpeaker.name)" style="cursor:pointer;">
+              <span class="dropdown-item" href="#">{{otherSpeaker.name}}</span>
+            </li>
+          </ul>
         </div>
-        <div class="w-50 text-right">
-          <button (click)="replaceSpeakers()" class="btn btn-primary btn-raised" data-dismiss="modal" type="button">
-            {{"trn-editor.modals.permutations replace.replace permutations" | transloco}}
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modalRef.close()">
+    {{"general.abort" | transloco}}
+  </button>
+  <button type="button" class="btn btn-primary" (click)="replaceSpeakers()">
+    {{"trn-editor.modals.permutations replace.replace permutations" | transloco}}
+  </button>
 </div>

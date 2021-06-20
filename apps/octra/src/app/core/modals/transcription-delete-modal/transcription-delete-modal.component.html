@@ -1,22 +1,19 @@
-<div #modal="bs-modal" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade" id="supportedfiles" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">{{"modal.transcription.delete.header" | transloco}}</h4>
-      </div>
-      <div class="modal-body">
-        <div [innerHTML]="'modal.transcription.delete.text' | transloco"></div>
-      </div>
-      <div class="modal-footer">
-        <button (click)="close('ABORT')" class="btn btn-default" data-dismiss="modal" type="button">
-          {{"general.abort" | transloco}}
-        </button>
-        <button (click)="close('DELETE')" class="btn btn-danger"
-                type="button">
-          {{"modal.transcription.delete.delete old" | transloco}}
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="modal-header">
+  <h5 class="modal-title" id="exampleModalLabel">{{"modal.transcription.delete.header" | transloco}}</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="modalRef.close()"
+  ></button>
+</div>
+<div class="modal-body"><div [innerHTML]="'modal.transcription.delete.text' | transloco"></div></div>
+<div class="modal-footer">
+  <button (click)="close('ABORT')" class="btn btn-default" data-dismiss="modal" type="button">
+    {{"general.abort" | transloco}}
+  </button>
+  <button (click)="close('DELETE')" class="btn btn-danger"
+          type="button">
+    {{"modal.transcription.delete.delete old" | transloco}}
+  </button>
 </div>

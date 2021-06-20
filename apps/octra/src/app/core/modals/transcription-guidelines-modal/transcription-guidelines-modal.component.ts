@@ -10,13 +10,13 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as videojs from 'video.js';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
@@ -27,15 +27,16 @@ import * as videojs from 'video.js';
 })
 
 export class TranscriptionGuidelinesModalComponent implements OnChanges {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<TranscriptionGuidelinesModalComponent>;
   public visible = false;
   @Input() guidelines = undefined;
   public shownGuidelines: any = {};
   public collapsed: any[][] = [];
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: 'modal-lg'
   };
   @ViewChild('modal', {static: false}) modal: any;
   protected data = undefined;
@@ -45,7 +46,7 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  constructor(private modalService: BsModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
+  constructor(private modalService: MdbModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
               private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
   }

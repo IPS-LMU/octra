@@ -6,9 +6,60 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {far} from '@fortawesome/free-regular-svg-icons';
+import {faHandshake} from '@fortawesome/free-regular-svg-icons';
 // icons
-import {fas} from '@fortawesome/free-solid-svg-icons';
+import {
+  faAlignJustify,
+  faArrowDown,
+  faArrowLeft,
+  faArrowRight,
+  faArrowUp,
+  faBars,
+  faBook,
+  faCheck,
+  faChevronDown,
+  faChevronUp,
+  faCircle,
+  faCog,
+  faCopy,
+  faDatabase,
+  faDownload,
+  faEdit,
+  faEraser,
+  faExchangeAlt,
+  faExclamationTriangle,
+  faEye,
+  faFile,
+  faFolderOpen,
+  faGlobe,
+  faGripLines,
+  faInfoCircle,
+  faKeyboard,
+  faLongArrowAltRight,
+  faMinus,
+  faObjectGroup,
+  faPaperPlane,
+  faPause,
+  faPlay,
+  faPlus,
+  faPrint,
+  faQuestionCircle,
+  faSave,
+  faSearch,
+  faSignOutAlt,
+  faSpinner,
+  faStar,
+  faStop,
+  faTable,
+  faThList,
+  faTimes,
+  faTimesCircle,
+  faTools,
+  faTrash,
+  faTrashAlt,
+  faUserCheck,
+  faWindowMaximize
+} from '@fortawesome/free-solid-svg-icons';
 import {
   Translation,
   TRANSLOCO_CONFIG,
@@ -19,13 +70,6 @@ import {
 } from '@ngneat/transloco';
 // third-party
 import {DragulaModule} from 'ng2-dragula';
-import {ButtonsModule} from 'ngx-bootstrap/buttons';
-import {CollapseModule} from 'ngx-bootstrap/collapse';
-import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
-import {ModalModule} from 'ngx-bootstrap/modal';
-import {PopoverModule} from 'ngx-bootstrap/popover';
-import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
-import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {OctraComponentsModule} from '@octra/components';
 import {environment} from '../environments/environment';
 
@@ -35,43 +79,40 @@ import {routing} from './app.routes';
 import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 // other
-import {AlertComponent, DropZoneComponent} from './core/component';
+import {
+  AlertComponent,
+  DropZoneComponent,
+  FastbarComponent,
+  NavigationComponent,
+  TranscrEditorComponent
+} from './core/component';
 import {NamingDragAndDropComponent} from './core/tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from './core/tools/table-configurator/table-configurator.component';
-import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
-import {AuthComponent, BrowserTestComponent, NewsComponent} from './core/pages';
+import {
+  AuthComponent,
+  BrowserTestComponent,
+  Error404Component,
+  FeaturesComponent,
+  HelpToolsComponent,
+  LoadingComponent,
+  LoginComponent,
+  MembersAreaComponent,
+  NewsComponent,
+  ReloadFileComponent,
+  TranscriptionComponent,
+  TranscriptionEndComponent
+} from './core/pages';
 import {AsrOptionsComponent} from './core/component/asr-options/asr-options.component';
-import {Error404Component} from './core/pages/error404';
-import {FeaturesComponent} from './core/pages/features';
-import {HelpToolsComponent} from './core/pages/help-tools/';
 import {NavbarService} from './core/component/navbar/navbar.service';
 import {OctraDropzoneComponent} from './core/component/octra-dropzone/octra-dropzone.component';
 
 import {ReloadFileGuard} from './core/pages/reload-file/reload-file.activateguard';
 import {TranscriptionFeedbackComponent} from './core/component/transcription-feedback/transcription-feedback.component';
-import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
-import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
-import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
-import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
-import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
-import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
-import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
+
 import {ModalService} from './core/modals/modal.service';
-import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
-import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
-import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
-import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
-import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
-import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
-import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
-import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
-import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
-import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
-import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
-import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
+
 // modules
-import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
@@ -90,16 +131,8 @@ import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
-import {FastbarComponent} from './core/component/taskbar';
-import {LoadingComponent} from './core/pages/loading';
-import {LoginComponent} from './core/pages/login';
-import {MembersAreaComponent} from './core/pages/members-area';
-import {NavigationComponent} from './core/component/navbar';
-import {ReloadFileComponent} from './core/pages/reload-file';
-import {TranscriptionComponent} from './core/pages/transcription';
-import {TranscriptionEndComponent} from './core/pages/transcription-end';
 import {TranscrWindowComponent} from './editors/2D-editor/transcr-window';
-import {OctraModalComponent} from './core/modals/octra-modal';
+
 import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
 import {OnlineModeReducers} from './core/store/modes/online-mode/online-mode.reducer';
@@ -108,15 +141,43 @@ import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
 import {ConfigurationEffects} from './core/store/application/configuration.effects';
-import {fab} from '@fortawesome/free-brands-svg-icons';
+import {faDropbox} from '@fortawesome/free-brands-svg-icons';
 import {ShortcutComponent} from './core/shortcut/shortcut.component';
 import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
-import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
-import {ProtectedModalComponent} from './core/modals/protected-modal/protected-modal.component';
 import {ApplicationEffects} from './core/store/application/application-effects.service';
 import {LoginMode} from './core/store';
 import {JoditAngularModule} from 'jodit-angular';
+import {MdbCheckboxModule} from 'mdb-angular-ui-kit/checkbox';
+import {MdbCollapseModule} from 'mdb-angular-ui-kit/collapse';
+import {MdbDropdownModule} from 'mdb-angular-ui-kit/dropdown';
+import {MdbFormsModule} from 'mdb-angular-ui-kit/forms';
+import {MdbModalModule} from 'mdb-angular-ui-kit/modal';
+import {MdbPopoverModule} from 'mdb-angular-ui-kit/popover';
+import {MdbTooltipModule} from 'mdb-angular-ui-kit/tooltip';
+import {MdbValidationModule} from 'mdb-angular-ui-kit/validation';
+import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
+import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
+import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
+import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
+import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
+import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
+import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
+import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
+import {OctraModalComponent} from './core/modals/octra-modal';
+import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
+import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
+import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
+import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
+import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
+import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
+import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
+import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
+import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
+import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
+import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -146,7 +207,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     EDITORS,
     FastbarComponent,
     FeaturesComponent,
-    HelpModalComponent,
     HelpToolsComponent,
     LoadeditorDirective,
     LoadingComponent,
@@ -156,56 +216,52 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NewEditorComponent,
     NewsComponent,
     OctraDropzoneComponent,
-    OctraModalComponent,
     ReloadFileComponent,
     TranscrEditorComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,
     TranscrWindowComponent,
     Error404Component,
-    YesNoModalComponent,
-    BugreportModalComponent,
-    ProtectedModalComponent,
-    SupportedFilesModalComponent,
-    TranscriptionDeleteModalComponent,
-    TranscriptionStopModalComponent,
-    LoginInvalidModalComponent,
-    ErrorModalComponent,
-    ExportFilesModalComponent,
-    StatisticsModalComponent,
-    PromptModalComponent,
-    TranscriptionSendModalComponent,
-    TranscriptionSendingModalComponent,
-    OverviewModalComponent,
-    ShortcutsModalComponent,
-    TranscriptionGuidelinesModalComponent,
     BrowserTestComponent,
     TranscriptionFeedbackComponent,
-    InactivityModalComponent,
     ValidationPopoverComponent,
     NamingDragAndDropComponent,
     StresstestComponent,
-    TranscriptionDemoEndModalComponent,
     AsrOptionsComponent,
     TableConfiguratorComponent,
     ClipTextPipe,
     AuthComponent,
-    ToolsModalComponent,
-    HelpModalComponent,
+    PermutationsReplaceModalComponent,
     ALERTS,
     DynComponentDirective,
     ErrorOccurredComponent,
-    MissingPermissionsModalComponent,
     ShortcutComponent,
     ContextMenuComponent,
-    PermutationsReplaceModalComponent
+    BugreportModalComponent,
+    ErrorModalComponent,
+    ExportFilesModalComponent,
+    HelpModalComponent,
+    InactivityModalComponent,
+    LoginInvalidModalComponent,
+    MissingPermissionsModalComponent,
+    OctraModalComponent,
+    OverviewModalComponent,
+    PromptModalComponent,
+    ShortcutsModalComponent,
+    StatisticsModalComponent,
+    SupportedFilesModalComponent,
+    ToolsModalComponent,
+    TranscriptionDeleteModalComponent,
+    TranscriptionDemoEndModalComponent,
+    TranscriptionGuidelinesModalComponent,
+    TranscriptionSendModalComponent,
+    TranscriptionSendingModalComponent,
+    TranscriptionStopModalComponent,
+    YesNoModalComponent
   ],
   imports: [
     BrowserModule,
     FontAwesomeModule,
-    ModalModule.forRoot(),
-    BsDropdownModule.forRoot(),
-    CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
     OctraComponentsModule,
@@ -215,13 +271,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    ProgressbarModule.forRoot(),
     routing,
-    ButtonsModule.forRoot(),
-    PopoverModule.forRoot(),
     TranslocoModule,
     DragulaModule.forRoot(),
-    TooltipModule.forRoot(),
     StoreModule.forRoot(
       {
         application: fromApplication.reducer,
@@ -244,7 +296,15 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([]),
     MaintenanceModule,
-    JoditAngularModule
+    JoditAngularModule,
+    MdbCheckboxModule,
+    MdbCollapseModule,
+    MdbDropdownModule,
+    MdbFormsModule,
+    MdbModalModule,
+    MdbPopoverModule,
+    MdbTooltipModule,
+    MdbValidationModule
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -281,6 +341,59 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {
-    library.addIconPacks(fas, far, fab);
+    library.addIcons(
+      faPaperPlane,
+      faTrashAlt,
+      faDatabase,
+      faExclamationTriangle,
+      faHandshake,
+      faGlobe,
+      faQuestionCircle,
+      faObjectGroup,
+      faEraser,
+      faTrash,
+      faDropbox,
+      faMinus,
+      faWindowMaximize,
+      faAlignJustify,
+      faTable,
+      faThList,
+      faBook,
+      faCopy,
+      faPlus,
+      faInfoCircle,
+      faTools,
+      faDownload,
+      faCog,
+      faTimes,
+      faCheck,
+      faSpinner,
+      faKeyboard,
+      faEye,
+      faChevronUp,
+      faChevronDown,
+      faSave,
+      faStar,
+      faPrint,
+      faSearch,
+      faUserCheck,
+      faSignOutAlt,
+      faFile,
+      faTimesCircle,
+      faGripLines,
+      faArrowLeft,
+      faArrowRight,
+      faPlay,
+      faStop,
+      faPause,
+      faExchangeAlt,
+      faCircle,
+      faArrowUp,
+      faArrowDown,
+      faLongArrowAltRight,
+      faBars,
+      faEdit,
+      faFolderOpen
+    );
   }
 }

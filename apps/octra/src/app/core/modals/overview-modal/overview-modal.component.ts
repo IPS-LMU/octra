@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
 import {isFunction, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
@@ -7,6 +6,7 @@ import {KeymappingService, SettingsService, TranscriptionService, UserInteractio
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {NavbarService} from '../../component/navbar/navbar.service';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);
@@ -18,13 +18,14 @@ declare let tidyUpAnnotation: ((string, any) => any);
 })
 
 export class OverviewModalComponent implements OnInit, OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<OverviewModalComponent>;
   public visible = false;
 
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: true
+    ignoreBackdropClick: true,
+    modalClass: "modal-kg"
   };
 
   @ViewChild('modal', {static: true}) modal: any;
@@ -41,14 +42,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   public get sendValidTranscriptOnly(): boolean {
-    return (
-      !(this.settingsService.projectsettings.octra === undefined || this.settingsService.projectsettings.octra === undefined)
-      && !(
-        this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined
-        || this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined
-      )
-      && this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly
-    );
+    return (!(this.settingsService.projectsettings.octra === undefined) &&
+      !(this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined) &&
+      this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly);
   }
 
   public selectedError: any = '';
@@ -62,7 +58,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   public trnEditorswitch = new EventEmitter<void>();
 
   constructor(public transcrService: TranscriptionService,
-              public ms: BsModalService,
+              public ms: MdbModalService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private keyService: KeymappingService,

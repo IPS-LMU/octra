@@ -3,7 +3,6 @@ import {Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core'
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {SubscriptionManager} from '@octra/utilities';
 import {interval, Subject, Subscription, timer} from 'rxjs';
 import {AppInfo} from '../../../app.info';
@@ -14,7 +13,7 @@ import {AudioService, SettingsService, TranscriptionService, UserInteractionsSer
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
-import {ProgressbarType} from 'ngx-bootstrap/progressbar';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 declare let JSZip;
 
@@ -28,7 +27,7 @@ declare let JSZip;
   ]
 })
 export class ToolsModalComponent implements OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<ToolsModalComponent>;
   public visible = false;
 
   public parentformat: {
@@ -39,10 +38,11 @@ export class ToolsModalComponent implements OnDestroy {
     uri: ''
   };
   public converters = AppInfo.converters;
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: "modal-lg"
   };
 
   public tools = {
@@ -56,7 +56,7 @@ export class ToolsModalComponent implements OnDestroy {
       },
       status: 'idle',
       message: '',
-      progressbarType: 'info' as ProgressbarType,
+      progressbarType: 'info' as any,
       showConfigurator: false,
       subscriptionIDs: [-1, -1, -1],
       exportFormats: [
@@ -113,7 +113,7 @@ export class ToolsModalComponent implements OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              private modalService: BsModalService,
+              private modalService: MdbModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,

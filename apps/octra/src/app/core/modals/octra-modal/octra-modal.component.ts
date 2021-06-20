@@ -1,12 +1,19 @@
-import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap/modal';
+import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '@octra/utilities';
-import {APIService, SettingsService} from '../../shared/service';
+import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {ModalService} from '../modal.service';
 import {Subscription} from 'rxjs';
+import {MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {YesNoModalComponent} from '../yes-no-modal/yes-no-modal.component';
+import {SupportedFilesModalComponent} from '../supportedfiles-modal/supportedfiles-modal.component';
+import {BugreportModalComponent} from '../bugreport-modal/bugreport-modal.component';
+import {ErrorModalComponent} from '../error-modal/error-modal.component';
+import {TranscriptionStopModalComponent} from '../transcription-stop-modal/transcription-stop-modal.component';
+import {TranscriptionDeleteModalComponent} from '../transcription-delete-modal/transcription-delete-modal.component';
+import {LoginInvalidModalComponent} from '../login-invalid-modal/login-invalid-modal.component';
 
 @Component({
   selector: 'octra-modal',
@@ -14,15 +21,13 @@ import {Subscription} from 'rxjs';
   styleUrls: ['./octra-modal.component.css']
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
-
-  @ViewChild('loginInvalid', {static: true}) loginInvalid: BsModalRef;
-  @ViewChild('transcriptionDelete', {static: true}) transcriptionDelete: BsModalRef;
-  @ViewChild('transcriptionStop', {static: true}) transcriptionStop: BsModalRef;
-  @ViewChild('error', {static: true}) error: BsModalRef;
-  @ViewChild('protected', {static: true}) protected: BsModalRef;
-  @ViewChild('bugreport', {static: true}) bugreport: BsModalRef;
-  @ViewChild('supportedfiles', {static: true}) supportedfiles: BsModalRef;
-  @ViewChild('yesno', {static: true}) yesno: BsModalRef;
+  loginInvalid: MdbModalRef<LoginInvalidModalComponent>;
+  transcriptionDelete: MdbModalRef<TranscriptionDeleteModalComponent>;
+  transcriptionStop: MdbModalRef<TranscriptionStopModalComponent>;
+  error: MdbModalRef<ErrorModalComponent>;
+  bugreport: MdbModalRef<BugreportModalComponent>;
+  supportedfiles: MdbModalRef<SupportedFilesModalComponent>;
+  yesno: MdbModalRef<YesNoModalComponent>;
 
   public bgdescr = '';
   public bgemail = '';
@@ -39,7 +44,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
               public bugService: BugReportService,
               private api: APIService,
               private appStorage: AppStorageService,
-              private settService: SettingsService) {
+              private modalService: MdbModalService) {
   }
 
   ngOnInit() {
@@ -50,16 +55,18 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       (result: any) => {
         this.data = result;
 
-        if (!(result.type === undefined || result.type === undefined) && this[result.type] !== undefined) {
-          this[result.type].open(result.data).then(
-            (answer: any | undefined) => {
+        if (result.type === undefined && this[result.type] !== undefined) {
+          const modalRef = this.openModal(result.type);
+
+          if (modalRef !== undefined) {
+            modalRef.onClose.toPromise().then((answer: any) => {
               result.emitter.emit(answer);
-            }
-          ).catch(
-            (err) => {
-              console.error(err);
-            }
-          );
+            }).catch((error) => {
+              console.error(error);
+            });
+          } else{
+            console.error(`modalRef for ${result.type} not found`);
+          }
         } else {
           const emitter: EventEmitter<any> = result.emitter;
           emitter.error('modal function not supported');
@@ -69,5 +76,32 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._subscrmanager.destroy();
+  }
+
+  openModal(name: string): MdbModalRef<any> {
+    switch (name) {
+      case 'yesno':
+        this.yesno = this.modalService.open(YesNoModalComponent);
+        return this.yesno;
+      case 'supportedfiles':
+        this.supportedfiles = this.modalService.open(SupportedFilesModalComponent);
+        return this.supportedfiles;
+      case 'bugreport':
+        this.bugreport = this.modalService.open(BugreportModalComponent);
+        return this.bugreport;
+      case 'error':
+        this.error = this.modalService.open(ErrorModalComponent);
+        return this.error;
+      case 'transcriptionStop':
+        this.transcriptionStop = this.modalService.open(TranscriptionStopModalComponent);
+        return this.transcriptionStop;
+      case 'transcriptionDelete':
+        this.transcriptionDelete = this.modalService.open(TranscriptionDeleteModalComponent);
+        return this.transcriptionDelete;
+      case 'loginInvalid':
+        this.loginInvalid = this.modalService.open(LoginInvalidModalComponent);
+        return this.loginInvalid;
+    }
+    return undefined;
   }
 }

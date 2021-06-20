@@ -1,8 +1,8 @@
 import {Component, SecurityContext, TemplateRef, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 export enum ModalEndAnswer {
   CANCEL = 'CANCEL',
@@ -17,9 +17,9 @@ export enum ModalEndAnswer {
 })
 
 export class TranscriptionDemoEndModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<TranscriptionDemoEndModalComponent>;
 
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true
@@ -29,7 +29,7 @@ export class TranscriptionDemoEndModalComponent {
 
   private actionperformed: Subject<ModalEndAnswer> = new Subject<ModalEndAnswer>();
 
-  constructor(private modalService: BsModalService, private sanitizer: DomSanitizer,
+  constructor(private modalService: MdbModalService, private sanitizer: DomSanitizer,
               public languageService: TranslocoService) {
   }
 
@@ -39,7 +39,7 @@ export class TranscriptionDemoEndModalComponent {
 
   public open(): Promise<ModalEndAnswer> {
     return new Promise<ModalEndAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -53,7 +53,7 @@ export class TranscriptionDemoEndModalComponent {
   }
 
   public close(action: string) {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next(action as ModalEndAnswer);
   }
 }

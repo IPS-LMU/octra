@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-help-modal',
@@ -9,12 +9,18 @@ import {SubscriptionManager} from '@octra/utilities';
   styleUrls: ['./help-modal.component.css']
 })
 export class HelpModalComponent implements OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<HelpModalComponent>;
   public visible = false;
 
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('content', {static: false}) contentElement: ElementRef;
 
+  public config: MdbModalConfig = {
+    keyboard: false,
+    backdrop: false,
+    ignoreBackdropClick: true,
+    modalClass: 'modal-lg'
+  };
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();

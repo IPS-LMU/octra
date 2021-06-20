@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AnnotJSONConverter, OAudiofile, PartiturConverter, TextConverter} from '@octra/annotation';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-prompt-modal',
@@ -13,21 +13,22 @@ import {AnnotJSONConverter, OAudiofile, PartiturConverter, TextConverter} from '
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PromptModalComponent{
-  modalRef: BsModalRef;
+export class PromptModalComponent {
+  modalRef: MdbModalRef<PromptModalComponent>;
   public visible = false;
 
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: 'modal-lg'
   };
   @ViewChild('modal', {static: true}) modal: any;
   public formatConverter;
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
 
-  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,
+  constructor(private modalService: MdbModalService, public appStorage: AppStorageService, private settService: SettingsService,
               private cd: ChangeDetectorRef) {
   }
 

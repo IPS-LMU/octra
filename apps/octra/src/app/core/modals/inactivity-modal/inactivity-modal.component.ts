@@ -1,8 +1,8 @@
 import {Component, ViewChild} from '@angular/core';
-import {BsModalRef, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-activity-timeout-modal',
@@ -11,11 +11,11 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 })
 
 export class InactivityModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<InactivityModalComponent>;
   public visible = false;
-  public config: ModalOptions = {
+  public config: MdbModalConfig = {
     keyboard: false,
-    backdrop: 'static',
+    backdrop: false,
     ignoreBackdropClick: true
   };
   @ViewChild('modal', {static: true}) modal: any;

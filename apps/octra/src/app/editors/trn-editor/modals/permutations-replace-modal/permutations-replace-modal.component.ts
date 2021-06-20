@@ -1,8 +1,8 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService} from '../../../../core/shared/service';
+import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-permutations-replace',
@@ -10,7 +10,7 @@ import {TranscriptionService} from '../../../../core/shared/service';
   styleUrls: ['./permutations-replace-modal.component.css']
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<PermutationsReplaceModalComponent>;
   public visible = false;
 
   @ViewChild('modal', {static: true}) modal: any;

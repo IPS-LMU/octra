@@ -1,25 +1,13 @@
-<octra-alert #alert></octra-alert>
-<octra-transcription-send-modal #modal></octra-transcription-send-modal>
-<octra-transcription-sending-modal #transcrSendingModal [sendError]="sendError"></octra-transcription-sending-modal>
-<octra-overview-modal #modalOverview (transcriptionSend)="onSendNowClick()" id="overview"></octra-overview-modal>
-<octra-shortcuts-modal #modalShortcutsDialogue [editor]="Interface"></octra-shortcuts-modal>
-<octra-transcription-demo-end-modal #modalDemoEnd></octra-transcription-demo-end-modal>
-<octra-transcription-guidelines-modal #modalGuidelines
-                                      [guidelines]="transcrService.guidelines"></octra-transcription-guidelines-modal>
-<octra-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined
-&& settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined"></octra-activity-timeout-modal>
-<octra-missing-permissions-modal #missingPermissionsModal></octra-missing-permissions-modal>
-
 <div class="flex">
     <span id='saving'>
         <fa-icon *ngIf="saving === 'saving'" icon="save" style="color:#333333"></fa-icon>
         <fa-icon *ngIf="saving === 'error'" icon="save" style="color:red"></fa-icon>
     </span>
   <octra-fastbar
-    (guidelinesbtnclicked)="modalGuidelines.open()"
-    (overviewbtnclicked)="modalOverview.open()"
+    (guidelinesbtnclicked)="openGuidelines()"
+    (overviewbtnclicked)="openOverview()"
 
-    (shortcutbtnclicked)="modalShortcutsDialogue.open()"
+    (shortcutbtnclicked)="openShortcutsModal()"
     [buttonLabels]="{
             shortcuts: 'general.shortcuts' | transloco,
             guidelines: 'general.guidelines' | transloco,

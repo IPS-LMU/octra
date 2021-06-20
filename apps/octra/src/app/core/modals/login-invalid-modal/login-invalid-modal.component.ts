@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-login-invalid-modal',
@@ -8,8 +8,8 @@ import {Subject} from 'rxjs';
   styleUrls: ['./login-invalid-modal.component.css']
 })
 export class LoginInvalidModalComponent{
-  modalRef: BsModalRef;
-  config: ModalOptions = {
+  modalRef: MdbModalRef<LoginInvalidModalComponent>;
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -20,12 +20,12 @@ export class LoginInvalidModalComponent{
   };
   private actionperformed: Subject<(void)> = new Subject<(void)>();
 
-  constructor(private modalService: BsModalService) {
+  constructor(private modalService: MdbModalService) {
   }
 
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.modalRef = this.modalService.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -39,7 +39,7 @@ export class LoginInvalidModalComponent{
   }
 
   public close() {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next();
   }
 }

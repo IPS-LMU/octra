@@ -1,5 +1,4 @@
 import {Component, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject, Subscription} from 'rxjs';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
@@ -7,6 +6,7 @@ import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TextConverter} from '@octra/annotation';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-statistics-modal',
@@ -15,15 +15,16 @@ import {TextConverter} from '@octra/annotation';
 })
 
 export class StatisticsModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<StatisticsModalComponent>;
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: false,
+    modalClass: 'modal-lg'
   };
   @ViewChild('modal', {static: true}) modal: any;
   public transcrObjStr = '';
@@ -47,7 +48,7 @@ export class StatisticsModalComponent {
     return (!(this.uiService === undefined || this.uiService === undefined)) ? this.uiService.elements : undefined;
   }
 
-  constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
+  constructor(private modalService: MdbModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
   }
 
   public open(): Promise<void> {
@@ -79,7 +80,7 @@ export class StatisticsModalComponent {
   }
 
   getText() {
-    if (!(this.transcrServ === undefined || this.transcrServ === undefined)) {
+    if (this.transcrServ !== undefined) {
       return this.navbarService.transcrService.getTranscriptString(new TextConverter());
     }
 

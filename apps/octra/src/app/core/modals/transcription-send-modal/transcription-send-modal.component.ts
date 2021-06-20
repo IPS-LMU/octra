@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 export enum ModalSendAnswer {
   CANCEL = 'CANCEL',
@@ -14,9 +14,9 @@ export enum ModalSendAnswer {
 })
 
 export class TranscriptionSendModalComponent {
-  modalRef: BsModalRef;
+  modalRef: MdbModalRef<TranscriptionSendModalComponent>;
 
-  config: ModalOptions = {
+  config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
@@ -26,12 +26,12 @@ export class TranscriptionSendModalComponent {
 
   private actionperformed: Subject<ModalSendAnswer> = new Subject<ModalSendAnswer>();
 
-  constructor(private modalService: BsModalService) {
+  constructor(private modalService: MdbModalService) {
   }
 
   public open(): Promise<ModalSendAnswer> {
     return new Promise<ModalSendAnswer>((resolve, reject) => {
-      this.modalRef = this.modalService.show(this.modal, this.config);
+      this.modalRef = this.modalService.open(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -45,7 +45,7 @@ export class TranscriptionSendModalComponent {
   }
 
   public close(action: string) {
-    this.modalRef.hide();
+    this.modalRef.close();
     this.actionperformed.next(action as ModalSendAnswer);
   }
 }

@@ -74,6 +74,9 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
   @ViewChild('jodit', {static: true}) jodit: JoditAngularComponent;
   public focused = false;
+
+  public joditOptions: any;
+
   public asr = {
     status: 'inactive',
     result: '',
@@ -141,6 +144,82 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     this.shortcutsManager = new ShortcutManager();
     this._settings = new TranscrEditorConfig();
     this.subscrmanager = new SubscriptionManager<Subscription>();
+
+    this.joditOptions = {
+      'showCharsCounter': false,
+      'showWordsCounter': false,
+      'showXPathInStatusbar': false,
+      'disablePlugins': 'image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
+        'table-keyboard-navigation,table,preview,print,about,drag-and-drop,iframe,indent,inline-popup,' +
+        'drag-and-drop-element,format-block,resizer,hr,hotkeys,fullsize,font,justify,limit,link,class-span,' +
+        'bold,delete,clean-html,wrap-text-nodes,copy-format,clipboard,paste,paste-storage,color,enter,' +
+        'error-messages,mobile,ordered-list,placeholder,redo-undo,search,select,size,resize-handler,' +
+        'source,stat,sticky,symbols,xpath,tooltip',
+      events: {
+        keyup: this.onKeyUp,
+        keydown: this.onKeyDown,
+        focus: () => {
+          this.focused = true;
+        },
+        blur: () => {
+          this.focused = false;
+        },
+        mouseup: () => {
+          // TODO this.selectionchanged.emit(this.caretpos);
+        },
+        afterInit: () => {
+          // fix additional <p><br/></p>
+          this.subscrmanager.add(timer(100).subscribe(() => {
+            if (this.segments === undefined || this.segments.length === 0) {
+              this.setTranscript(this.transcript);
+            } else {
+              this.setSegments(this.segments);
+            }
+            this.focus(true, true).then(() => {
+              this.loaded.emit(true);
+            }).catch((error) => {
+              console.error(error);
+            });
+          }));
+        },
+        paste: (e) => {
+          e.preventDefault();
+          const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
+          let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
+            .replace(new RegExp(/\\\[\\\|/, 'g'), '{').replace(new RegExp(/\\\|]/, 'g'), '}');
+          html = unEscapeHtml(html);
+          html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
+          html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
+          const htmlObj = document.createElement('span');
+          htmlObj.innerHTML = html;
+
+          if (this.rawText !== undefined && this._rawText !== '') {
+            this.jodit.editor.insertNode(htmlObj[0]);
+          } else {
+            this.jodit.value = html;
+            this.focus(true, false).catch((error) => {
+              console.error(error);
+            });
+          }
+        },
+        change: () => {
+          this.init++;
+
+          if (this.init > 1) {
+            this.subscrmanager.removeByTag('typing_change');
+            this.subscrmanager.add(this.internalTyping.subscribe((status) => {
+              if (status === 'stopped') {
+                this.validate();
+                this.initPopover();
+              }
+
+              this.typing.emit(status);
+            }), 'typing_change');
+          }
+        }
+      },
+      buttons: []
+    };
   }
 
   private _highlightingEnabled = true;
@@ -274,82 +353,6 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     } else {
       this.onkeyup.emit($event);
     }
-  }
-
-  public joditOptions: any = {
-    'showCharsCounter': false,
-    'showWordsCounter': false,
-    'showXPathInStatusbar': false,
-    'disablePlugins': 'image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
-      'table-keyboard-navigation,table,preview,print,about,drag-and-drop,iframe,indent,inline-popup,' +
-      'drag-and-drop-element,format-block,resizer,hr,hotkeys,fullsize,font,justify,limit,link,class-span,' +
-      'bold,delete,clean-html,wrap-text-nodes,copy-format,clipboard,paste,paste-storage,color,enter,' +
-      'error-messages,mobile,ordered-list,placeholder,redo-undo,search,select,size,resize-handler,' +
-      'source,stat,sticky,symbols,xpath,tooltip',
-    events: {
-      keyup: this.onKeyUp,
-      keydown: this.onKeyDown,
-      focus: () => {
-        this.focused = true;
-      },
-      blur: () => {
-        this.focused = false;
-      },
-      mouseup: () => {
-        // TODO this.selectionchanged.emit(this.caretpos);
-      },
-      afterInit: () => {
-        // fix additional <p><br/></p>
-        this.subscrmanager.add(timer(100).subscribe(() => {
-          if (this.segments === undefined || this.segments.length === 0) {
-            this.setTranscript(this.transcript);
-          } else {
-            this.setSegments(this.segments);
-          }
-          this.focus(true, true).then(() => {
-            this.loaded.emit(true);
-          }).catch((error) => {
-            console.error(error);
-          });
-        }));
-      },
-      paste: (e) => {
-        e.preventDefault();
-        const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
-        let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
-          .replace(new RegExp(/\\\[\\\|/, 'g'), '{').replace(new RegExp(/\\\|]/, 'g'), '}');
-        html = unEscapeHtml(html);
-        html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
-        html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
-        const htmlObj = document.createElement('span');
-        htmlObj.innerHTML = html;
-
-        if (this.rawText !== undefined && this._rawText !== '') {
-          this.jodit.editor.insertNode(htmlObj[0]);
-        } else {
-          this.jodit.value = html;
-          this.focus(true, false).catch((error) => {
-            console.error(error);
-          });
-        }
-      },
-      change: () => {
-        this.init++;
-
-        if (this.init > 1) {
-          this.subscrmanager.removeByTag('typing_change');
-          this.subscrmanager.add(this.internalTyping.subscribe((status) => {
-            if (status === 'stopped') {
-              this.validate();
-              this.initPopover();
-            }
-
-            this.typing.emit(status);
-          }), 'typing_change');
-        }
-      }
-    },
-    buttons: []
   }
 
   /**

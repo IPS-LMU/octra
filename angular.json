@@ -123,13 +123,13 @@
             "tsConfig": "apps/octra/tsconfig.app.json",
             "allowedCommonJsDependencies": [
               "js-sha256",
+              "jodit-angular",
               "x2js",
               "konva",
               "crossevent",
               "contra/emitter",
               "flat",
               "dragula",
-              "jquery",
               "platform",
               "global/document",
               "videojs",
@@ -157,17 +157,13 @@
             ],
             "styles": [
               "node_modules/video.js/dist/video-js.min.css",
+              "node_modules/mdb-ui-kit/css/mdb.min.css",
               "apps/octra/src/styles.css"
             ],
             "scripts": [
               "apps/octra/src/assets/js/modernizr.js",
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/arrive/minified/arrive.min.js",
-              "node_modules/popper.js/dist/umd/popper.js",
-              "node_modules/bootstrap-material-design/dist/js/bootstrap-material-design.min.js",
-              "node_modules/video.js/dist/video.js",
               "node_modules/platform/platform.js",
-              "node_modules/jquery.caret/dist/jquery.caret.min.js",
+              "node_modules/video.js/dist/video.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"
             ],

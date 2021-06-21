@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
@@ -26,7 +25,6 @@ export class StatisticsModalComponent {
   public bugsent = false;
   public transcrObjStr = '';
   protected data = undefined;
-  private actionperformed: Subject<void> = new Subject<void>();
 
   public get transcrServ(): TranscriptionService {
     return this.navbarService.transcrService;
@@ -50,7 +48,6 @@ export class StatisticsModalComponent {
 
   public close() {
     this.modalRef.close();
-    this.actionperformed.next();
   }
 
   clearElements() {

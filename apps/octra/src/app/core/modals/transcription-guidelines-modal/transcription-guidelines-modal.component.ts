@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {Subject, Subscription, timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -41,7 +41,6 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   protected data = undefined;
   private entries = 0;
   private videoPlayers: any[] = [];
-  private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(private modalService: MdbModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
@@ -132,8 +131,6 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
 
     this.cd.markForCheck();
     this.cd.detectChanges();
-
-    this.actionperformed.next();
   }
 
   toggle(group: number, entry: number) {

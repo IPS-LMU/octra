@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
 import {isFunction, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
@@ -31,7 +31,6 @@ export class OverviewModalComponent implements OnDestroy {
   protected data = undefined;
   private shortcutID = -1;
   private subscrmanager = new SubscriptionManager<Subscription>();
-  private actionperformed: Subject<void> = new Subject<void>();
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
@@ -70,7 +69,6 @@ export class OverviewModalComponent implements OnDestroy {
 
   public close(fromModal = false) {
     this.modalRef.close();
-    this.actionperformed.next();
 
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {

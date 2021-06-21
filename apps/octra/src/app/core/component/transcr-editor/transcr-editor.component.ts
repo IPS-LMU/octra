@@ -697,9 +697,9 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     return {
       name,
       getContent: () => {
-        const newButton = document.createElement('button');
+        const newButton = document.createElement('span');
         newButton.innerHTML = content;
-        newButton.setAttribute('class', 'btn btn-info-outline btn-sm');
+        newButton.setAttribute('class', 'marker-btn');
         newButton.onmousedown = onClick;
         newButton.setAttribute('title', tooltip);
 

@@ -16,12 +16,22 @@ octra-transcr-editor .transcr-editor .textfield {
   display: block;
 }
 
+octra-transcr-editor .transcr-editor .jodit-toolbar {
+  display: inline-table;
+}
+
+octra-transcr-editor .transcr-editor .jodit-toolbar-content {
+  margin: 0;
+  border: none;
+}
+
 octra-transcr-editor .transcr-editor .marker-btn {
-  height: 100%;
   display: inline-block;
   padding: 3px 5px;
-  margin-right: 2px;
   vertical-align: middle;
+  height: 30px;
+  margin: 0 3px;
+  border: none;
 }
 
 octra-transcr-editor .transcr-editor .marker-btn:hover {

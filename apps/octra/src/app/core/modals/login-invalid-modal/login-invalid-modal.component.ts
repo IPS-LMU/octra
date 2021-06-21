@@ -1,6 +1,5 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-login-invalid-modal',
@@ -17,13 +16,11 @@ export class LoginInvalidModalComponent{
   protected data = {
     text: ''
   };
-  private actionperformed: Subject<(void)> = new Subject<(void)>();
 
-  constructor(private modalService: MdbModalService, public modalRef: MdbModalRef<LoginInvalidModalComponent>) {
+  constructor(public modalRef: MdbModalRef<LoginInvalidModalComponent>) {
   }
 
   public close() {
     this.modalRef.close();
-    this.actionperformed.next();
   }
 }

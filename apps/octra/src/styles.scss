@@ -1,5 +1,35 @@
 @import '~mdb-angular-ui-kit/assets/scss/mdb.scss';
 
+.btn.btn-success {
+  color: #fff;
+  background-color: #009688;
+  border-color: #009688;
+}
+
+.btn.btn-warning {
+  color: #fff;
+  background-color: #ff5722;
+  border-color: #ff5722;
+}
+
+.btn.btn-danger {
+  color: #fff;
+  background-color: #f44336;
+  border-color: #f44336;
+}
+
+.btn.btn-primary {
+  color: #fff;
+  background-color: #009688;
+  border-color: #009688;
+}
+
+.btn.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
 .modal-open {
   padding-right: 0px !important;
 }

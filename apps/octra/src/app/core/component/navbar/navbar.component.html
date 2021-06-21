@@ -139,12 +139,12 @@
             class="nav-link dropdown-toggle"
             role="button"
             id="infoDropdown"
-            mdbDropdownToggle
             aria-expanded="false"
+            mdbDropdownToggle
           >
             <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
           </a>
-          <div mdbDropdownMenu class="dropdown-menu" data-toggle="dropdown" aria-labelledby="infoDropdown">
+          <div mdbDropdownMenu class="dropdown-menu" aria-labelledby="infoDropdown">
             <table class="table">
               <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
                 <td><span>{{'general.project' |transloco}}:</span></td>

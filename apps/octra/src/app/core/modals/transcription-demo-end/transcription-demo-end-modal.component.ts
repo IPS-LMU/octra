@@ -1,7 +1,6 @@
 import {Component, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {Subject} from 'rxjs';
 import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 export enum ModalEndAnswer {
@@ -23,8 +22,6 @@ export class TranscriptionDemoEndModalComponent {
     ignoreBackdropClick: true
   };
 
-  private actionperformed: Subject<ModalEndAnswer> = new Subject<ModalEndAnswer>();
-
   constructor(private modalService: MdbModalService, private sanitizer: DomSanitizer,
               public languageService: TranslocoService, public modalRef: MdbModalRef<TranscriptionDemoEndModalComponent>) {
   }
@@ -34,7 +31,6 @@ export class TranscriptionDemoEndModalComponent {
   }
 
   public close(action: string) {
-    this.modalRef.close();
-    this.actionperformed.next(action as ModalEndAnswer);
+    this.modalRef.close(action);
   }
 }

@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
@@ -19,13 +18,11 @@ export class SupportedFilesModalComponent {
   AppInfo = AppInfo;
 
   protected data = undefined;
-  private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(public modalRef: MdbModalRef<SupportedFilesModalComponent>) {
   }
 
   public close() {
     this.modalRef.close();
-    this.actionperformed.next();
   }
 }

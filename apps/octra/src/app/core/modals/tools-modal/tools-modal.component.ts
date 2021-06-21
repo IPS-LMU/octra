@@ -4,7 +4,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {SubscriptionManager} from '@octra/utilities';
-import {interval, Subject, Subscription, timer} from 'rxjs';
+import {interval, Subscription, timer} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -94,7 +94,6 @@ export class ToolsModalComponent implements OnDestroy {
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
   protected data = undefined;
-  private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get manualURL(): string {
@@ -121,8 +120,6 @@ export class ToolsModalComponent implements OnDestroy {
 
   public close() {
     this.modalRef.close();
-
-    this.actionperformed.next();
   }
 
   ngOnDestroy() {

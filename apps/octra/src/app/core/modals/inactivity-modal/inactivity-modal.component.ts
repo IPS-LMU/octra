@@ -1,5 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
+import {Component} from '@angular/core';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
@@ -11,23 +10,18 @@ import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 })
 
 export class InactivityModalComponent {
-  public visible = false;
-  public config: MdbModalConfig = {
+  public static config: MdbModalConfig = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true
   };
-  @ViewChild('modal', {static: true}) modal: any;
   protected data = undefined;
-  private actionperformed: Subject<string> = new Subject<string>();
 
   constructor(public appStorage: AppStorageService, public settService: SettingsService,
               public modalRef: MdbModalRef<InactivityModalComponent>) {
   }
 
   public close(action: string) {
-    this.modal.hide();
-    this.visible = false;
-    this.actionperformed.next(action);
+    this.modalRef.close(action);
   }
 }

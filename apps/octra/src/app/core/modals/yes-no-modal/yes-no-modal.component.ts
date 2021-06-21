@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-yes-no-modal',
@@ -17,14 +16,12 @@ export class YesNoModalComponent {
   public data = {
     text: ''
   };
-  private actionperformed: Subject<('yes' | 'no')> = new Subject<('yes' | 'no')>();
 
-  constructor(private modalService: MdbModalService, public modalRef: MdbModalRef<YesNoModalComponent>) {
+  constructor(public modalRef: MdbModalRef<YesNoModalComponent>) {
   }
 
 
   public close(action: 'yes' | 'no') {
-    this.modalRef.close();
-    this.actionperformed.next(action);
+    this.modalRef.close(action);
   }
 }

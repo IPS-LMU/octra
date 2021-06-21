@@ -1,5 +1,4 @@
 import {Component, Input} from '@angular/core';
-import {Subject} from 'rxjs';
 import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 
 @Component({
@@ -11,19 +10,16 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
 export class TranscriptionSendingModalComponent {
   public static config: MdbModalConfig = {
     keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
+    backdrop: true,
+    ignoreBackdropClick: true
   };
 
   @Input() sendError = '';
-
-  private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: MdbModalService, public modalRef: MdbModalRef<TranscriptionSendingModalComponent>) {
   }
 
   public close() {
     this.modalRef.close();
-    this.actionperformed.next();
   }
 }

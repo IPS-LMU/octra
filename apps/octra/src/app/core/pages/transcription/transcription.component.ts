@@ -471,23 +471,27 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.subscrmanager.add(interval(5000).subscribe(
           () => {
             if (Date.now() - this.uiService.lastAction > waitTime && !this.modalVisiblities.inactivity) {
-              this.inactivityModal = this.modalService.open(InactivityModalComponent);
-              this.inactivityModal.onClose.toPromise().then((answer) => {
-                switch (answer) {
-                  case('quit'):
-                    this.abortTranscription();
-                    break;
-                  case('new'):
-                    this.closeTranscriptionAndGetNew();
-                    break;
-                  case('continue'):
-                    // reload OCTRA to continue
-                    break;
-                }
-                this.uiService.lastAction = Date.now();
-              }).catch((error) => {
-                console.error(error);
-              });
+              if (this.inactivityModal === undefined) {
+                this.inactivityModal = this.modalService.open(InactivityModalComponent, InactivityModalComponent.config);
+                this.inactivityModal.onClose.toPromise().then((answer) => {
+                  switch (answer) {
+                    case('quit'):
+                      this.abortTranscription();
+                      break;
+                    case('new'):
+                      this.closeTranscriptionAndGetNew();
+                      break;
+                    case('continue'):
+                      // reload OCTRA to continue
+                      break;
+                  }
+                  this.uiService.lastAction = Date.now();
+                  this.inactivityModal = undefined;
+                }).catch((error) => {
+                  this.inactivityModal = undefined;
+                  console.error(error);
+                });
+              }
             }
           }
         ));

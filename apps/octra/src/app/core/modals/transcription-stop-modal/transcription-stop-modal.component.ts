@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs';
 import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 export enum TranscriptionStopModalAnswer {
@@ -20,13 +19,10 @@ export class TranscriptionStopModalComponent {
     ignoreBackdropClick: false
   };
 
-  private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
-
   constructor(public modalRef: MdbModalRef<TranscriptionStopModalComponent>) {
   }
 
   public close(action: string) {
-    this.modalRef.close();
-    this.actionperformed.next(action as TranscriptionStopModalAnswer);
+    this.modalRef.close(action);
   }
 }

@@ -95,7 +95,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case('export'):
-            this.modalexport = this.modalService.open(ExportFilesModalComponent);
+            this.modalexport = this.modalService.open(ExportFilesModalComponent, ExportFilesModalComponent.config);
             break;
         }
       })

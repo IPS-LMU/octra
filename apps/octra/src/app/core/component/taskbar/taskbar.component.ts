@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {MdbModalService} from 'mdb-angular-ui-kit/modal';
 import {HelpModalComponent} from '../../modals/help-modal/help-modal.component';
+import {ModalService} from '../../modals/modal.service';
+import {modalConfigurations} from '../../modals/types';
 
 @Component({
   selector: 'octra-fastbar',
@@ -22,10 +23,10 @@ export class FastbarComponent {
   @Output() guidelinesbtnclicked: EventEmitter<void> = new EventEmitter<void>();
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(public appStorage: AppStorageService, private modalService: MdbModalService) {
+  constructor(public appStorage: AppStorageService, private modalService: ModalService) {
   }
 
   openHelpModal() {
-    this.modalService.open(HelpModalComponent, HelpModalComponent.config);
+    this.modalService.openModal(HelpModalComponent, modalConfigurations.help);
   }
 }

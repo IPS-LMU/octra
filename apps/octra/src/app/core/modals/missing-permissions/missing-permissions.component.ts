@@ -1,25 +1,19 @@
-import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
-import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-missing-permissions-modal',
   templateUrl: './missing-permissions.component.html',
   styleUrls: ['./missing-permissions.component.scss']
 })
-export class MissingPermissionsModalComponent implements OnDestroy {
-  @ViewChild('content', {static: false}) contentElement: ElementRef;
-
-  protected data = undefined;
+export class MissingPermissionsModalComponent extends OctraModal implements OnDestroy {
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  constructor(public modalRef: MdbModalRef<MissingPermissionsModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
-
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('MissingPermissionsModalComponent', modalRef, modalService);
   }
 
   ngOnDestroy() {

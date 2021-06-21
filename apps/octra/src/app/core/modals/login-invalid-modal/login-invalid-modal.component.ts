@@ -1,26 +1,14 @@
-import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {Component} from '@angular/core';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-login-invalid-modal',
   templateUrl: './login-invalid-modal.component.html',
   styleUrls: ['./login-invalid-modal.component.scss']
 })
-export class LoginInvalidModalComponent{
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
-  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
-  protected data = {
-    text: ''
-  };
-
-  constructor(public modalRef: MdbModalRef<LoginInvalidModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+export class LoginInvalidModalComponent extends OctraModal {
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('yesNoModal', modalRef, modalService);
   }
 }

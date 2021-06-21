@@ -2,21 +2,15 @@ import {Component, Input} from '@angular/core';
 import {BrowserInfo} from '../../shared';
 import {KeymappingService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
   styleUrls: ['./shortcuts-modal.component.scss']
 })
-export class ShortcutsModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
-
+export class ShortcutsModalComponent extends OctraModal {
   @Input() editor = '';
 
   protected data = undefined;
@@ -27,10 +21,7 @@ export class ShortcutsModalComponent {
 
   constructor(public appStorage: AppStorageService,
               public keyMap: KeymappingService,
-              public modalRef: MdbModalRef<ShortcutsModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+              modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('ShortcutsModalComponent', modalRef, modalService);
   }
 }

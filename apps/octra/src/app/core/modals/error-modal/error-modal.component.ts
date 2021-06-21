@@ -1,29 +1,20 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-error-modal',
   templateUrl: './error-modal.component.html',
   styleUrls: ['./error-modal.component.scss']
 })
-export class ErrorModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
+export class ErrorModalComponent extends OctraModal {
   @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
+
   public data = {
     text: ''
   };
-  private actionperformed: Subject<void> = new Subject<void>();
 
-  constructor(public modalRef: MdbModalRef<ErrorModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
-    this.actionperformed.next();
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('errorModal', modalRef, modalService);
   }
 }

@@ -1,4 +1,6 @@
-@import '~mdb-angular-ui-kit/assets/scss/mdb.scss';
+@import "~angular-bootstrap-md/assets/scss/bootstrap/bootstrap.scss";
+@import "~angular-bootstrap-md/assets/scss/mdb.scss";
+@import "~animate.css/animate.css";
 
 .btn.btn-success {
   color: #fff;
@@ -420,4 +422,8 @@ footer {
   background-color: yellow;
   border: 1px solid dimgray;
   display: inline;
+}
+
+.modal-content {
+  border-radius: 20px !important;
 }

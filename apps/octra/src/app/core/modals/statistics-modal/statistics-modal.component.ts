@@ -4,7 +4,8 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TextConverter} from '@octra/annotation';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-statistics-modal',
@@ -12,14 +13,7 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
   styleUrls: ['./statistics-modal.component.scss']
 })
 
-export class StatisticsModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
-
+export class StatisticsModalComponent extends OctraModal {
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
@@ -42,12 +36,9 @@ export class StatisticsModalComponent {
     return this.uiService !== undefined ? this.uiService.elements : undefined;
   }
 
-  constructor(private modalService: MdbModalService, private navbarService: NavbarService, private appStorage: AppStorageService,
-              public modalRef: MdbModalRef<StatisticsModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+  constructor(modalService: MDBModalService, private navbarService: NavbarService, private appStorage: AppStorageService,
+              modalRef: MDBModalRef) {
+    super('statisticsModal', modalRef, modalService);
   }
 
   clearElements() {

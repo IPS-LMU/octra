@@ -1,20 +1,18 @@
-<div class="modal-header">
-  <h5 class="modal-title" id="exampleModalLabel">{{"modal.transcription.demoEnd.header" | transloco}}</h5>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="modalRef.close()"
-  ></button>
-</div>
-<div class="modal-body" style="font-size:0.9em;">
-  <p [innerHTML]="languageService.translate('modal.transcription.demoEnd.text')" style="text-align: justify;"></p>
-  <p style="text-align: justify;">
-    {{"modal.transcription.demoEnd.exportText" | transloco}}
-  </p>
-  <img alt="Export Screenshot" src="assets/img/exportScreenshot.png" style="width:100%;"/>
-</div>
-<div class="modal-footer">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">{{"modal.transcription.demoEnd.header" | transloco}}</h5>
+  </div>
+  <div class="modal-body" style="font-size:0.9em;">
+    <p [innerHTML]="languageService.translate('modal.transcription.demoEnd.text')" style="text-align: justify;"></p>
+    <p style="text-align: justify;">
+      {{"modal.transcription.demoEnd.exportText" | transloco}}
+    </p>
+    <img alt="Export Screenshot" src="assets/img/exportScreenshot.png" style="width:100%;"/>
+  </div>
+  <div class="modal-footer">
   <button (click)="close('CANCEL')" class="btn btn-secondary"
           type="button">{{"general.back" | transloco}}</button>
   <button (click)="close('QUIT')" class="btn btn-secondary" type="button">{{"general.quit" | transloco}}</button>

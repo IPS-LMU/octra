@@ -3,7 +3,7 @@ import {AudioService, SettingsService, TranscriptionService, UserInteractionsSer
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
-import {Subject, Subscription, timer} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -12,7 +12,8 @@ import {SubscriptionManager} from '@octra/utilities';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Converter, IFile} from '@octra/annotation';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {OctraModal} from '../types';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -23,14 +24,7 @@ import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
     fadeOutCollapseOnLeaveAnimation()
   ]
 })
-export class ExportFilesModalComponent implements OnInit, OnDestroy {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: true,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-xl'
-  };
-
+export class ExportFilesModalComponent extends OctraModal implements OnInit, OnDestroy {
   AppInfo = AppInfo;
   public exportStates = [];
   public preparing = {
@@ -97,7 +91,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
   protected data = undefined;
-  private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
 
@@ -108,7 +101,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
               private audio: AudioService,
               private settService: SettingsService,
               private dragulaService: DragulaService,
-              public modalRef: MdbModalRef<ExportFilesModalComponent>) {
+              modalRef: MDBModalRef,
+              modalService: MDBModalService) {
+    super('ExportFilesModalComponent', modalRef, modalService);
+
     this.dragulaService.createGroup('tableConfiguratorColumns', {
       revertOnSpill: true,
       removeOnSpill: false
@@ -122,13 +118,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   public close() {
-    this.modalRef.close();
-
     this.uiService.addElementFromEvent('export', {
       value: 'closed'
     }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, 'modals');
 
-    this.actionperformed.next();
+    return super.close();
   }
 
   onLineClick(converter: Converter, index: number) {

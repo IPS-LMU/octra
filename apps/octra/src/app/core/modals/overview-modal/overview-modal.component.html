@@ -1,21 +1,19 @@
-<div class="modal-header">
-  <h5 class="modal-title" id="exampleModalLabel">{{'general.overview' | transloco}}</h5>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="modalRef.close()"
-  ></button>
-</div>
-<div class="modal-body">
-  <div class="row" style="overflow: auto; flex:auto;">
-    <div [ngClass]="{
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">{{'general.overview' | transloco}}</h5>
+  </div>
+  <div class="modal-body">
+    <div class="row" style="overflow: auto; flex:auto;">
+      <div [ngClass]="{
                         'col-md-6 col-lg-9': appStorage.useMode === 'online' || this.appStorage.useMode === 'demo',
                         'col-12': appStorage.useMode !== 'online' && this.appStorage.useMode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-      <h4>{{"general.statistics" | transloco}}</h4>
+        <h4>{{"general.statistics" | transloco}}</h4>
 
-      <table class="table table-bordered" id="statistics">
+        <table class="table table-bordered" id="statistics">
         <thead>
         <tr>
           <th>{{"segments.total" | transloco}}</th>

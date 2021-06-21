@@ -1,20 +1,18 @@
-<div class="modal-header">
-  <h5 class="modal-title" id="exampleModalLabel">Statistics</h5>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="modalRef.close()"
-  ></button>
-</div>
-<div class="modal-body">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">Statistics</h5>
+  </div>
+  <div class="modal-body">
 
-  <h3>Transkriptionstext:</h3>
-  <p>
-    {{getText()}}
-  </p>
-  <table class="table">
-    <thead>
+    <h3>Transkriptionstext:</h3>
+    <p>
+      {{getText()}}
+    </p>
+    <table class="table">
+      <thead>
     <tr>
       <th>Name</th>
       <th>Wert</th>

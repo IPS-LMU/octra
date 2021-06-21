@@ -6,8 +6,7 @@ import {AlertService, SettingsService, TranscriptionService} from '../../shared/
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {AudioChunk} from '@octra/media';
-import {MdbDropdownDirective} from 'mdb-angular-ui-kit/dropdown';
-import {MdbPopoverDirective} from 'mdb-angular-ui-kit/popover';
+import {BsDropdownDirective, PopoverDirective} from 'angular-bootstrap-md';
 
 @Component({
   selector: 'octra-asr-options',
@@ -24,8 +23,8 @@ export class AsrOptionsComponent {
 
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
-  @ViewChild('dropdown', {static: true}) dropdown: MdbDropdownDirective;
-  @ViewChild('pop', {static: true}) pop: MdbPopoverDirective;
+  @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
+  @ViewChild('pop', {static: true}) pop: PopoverDirective;
 
   public get appSettings(): AppSettings {
     return this.settingsService.appSettings;

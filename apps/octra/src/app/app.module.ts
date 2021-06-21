@@ -148,14 +148,6 @@ import {MaintenanceModule} from './core/component/maintenance/maintenance.module
 import {ApplicationEffects} from './core/store/application/application-effects.service';
 import {LoginMode} from './core/store';
 import {JoditAngularModule} from 'jodit-angular';
-import {MdbCheckboxModule} from 'mdb-angular-ui-kit/checkbox';
-import {MdbCollapseModule} from 'mdb-angular-ui-kit/collapse';
-import {MdbDropdownModule} from 'mdb-angular-ui-kit/dropdown';
-import {MdbFormsModule} from 'mdb-angular-ui-kit/forms';
-import {MdbModalModule} from 'mdb-angular-ui-kit/modal';
-import {MdbPopoverModule} from 'mdb-angular-ui-kit/popover';
-import {MdbTooltipModule} from 'mdb-angular-ui-kit/tooltip';
-import {MdbValidationModule} from 'mdb-angular-ui-kit/validation';
 import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
@@ -178,6 +170,7 @@ import {TranscriptionSendModalComponent} from './core/modals/transcription-send-
 import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
+import {MDBBootstrapModule} from 'angular-bootstrap-md';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -297,14 +290,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     EffectsModule.forFeature([]),
     MaintenanceModule,
     JoditAngularModule,
-    MdbCheckboxModule,
-    MdbCollapseModule,
-    MdbDropdownModule,
-    MdbFormsModule,
-    MdbModalModule,
-    MdbPopoverModule,
-    MdbTooltipModule,
-    MdbValidationModule
+    MDBBootstrapModule.forRoot()
   ],
   bootstrap: [AppComponent],
   providers: [

@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {AppInfo} from '../../../app.info';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 export enum ModalDeleteAnswer {
   DELETE = 'DELETE',
@@ -13,20 +14,10 @@ export enum ModalDeleteAnswer {
   styleUrls: ['./transcription-delete-modal.component.scss']
 })
 
-export class TranscriptionDeleteModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
-
+export class TranscriptionDeleteModalComponent extends OctraModal {
   AppInfo = AppInfo;
-  protected data = undefined;
 
-  constructor(public modalRef: MdbModalRef<TranscriptionDeleteModalComponent>) {
-  }
-
-  public close(action: string) {
-    this.modalRef.close(action as ModalDeleteAnswer);
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('transcriptionDelete', modalRef, modalService);
   }
 }

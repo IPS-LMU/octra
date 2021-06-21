@@ -37,6 +37,7 @@ import {ContextMenuAction, ContextMenuComponent} from '../../core/component/cont
 import {TranslocoService} from '@ngneat/transloco';
 import {PermutationsReplaceModalComponent} from './modals/permutations-replace-modal/permutations-replace-modal.component';
 import {Subscription, timer} from 'rxjs';
+import {MDBModalService} from 'angular-bootstrap-md';
 
 declare let validateAnnotation: any;
 
@@ -61,7 +62,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
               private sanitizer: DomSanitizer,
               private cd: ChangeDetectorRef,
               private alertService: AlertService,
-              private translocoService: TranslocoService) {
+              private translocoService: TranslocoService,
+              private modalService: MDBModalService) {
     super();
     this.subscrManager = new SubscriptionManager<Subscription>();
   }
@@ -75,7 +77,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
   @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('contextMenu', {static: false}) contextMenu: ContextMenuComponent;
-  @ViewChild('permutationsReplace', {static: true}) permutationsReplace: PermutationsReplaceModalComponent;
 
   public audioChunk: AudioChunk;
   audioViewerSettings: AudioviewerConfig;
@@ -1308,7 +1309,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   openPermutationsReplaceModal() {
-    this.permutationsReplace.open().then((action) => {
+    this.modalService.show(PermutationsReplaceModalComponent);
+    this.modalService.closed.toPromise().then((action) => {
       if (action === 'replaced') {
         this.updateSegments();
         this.cd.markForCheck();

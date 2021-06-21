@@ -13,10 +13,11 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {NavbarService} from './navbar.service';
 import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
 import {Subscription} from 'rxjs';
-import {MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
 import {ToolsModalComponent} from '../../modals/tools-modal/tools-modal.component';
 import {PromptModalComponent} from '../../modals/prompt-modal/prompt-modal.component';
 import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics-modal.component';
+import {MDBModalRef} from 'angular-bootstrap-md';
+import {modalConfigurations} from '../../modals/types';
 
 @Component({
   selector: 'octra-navigation',
@@ -25,14 +26,14 @@ import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics
 })
 export class NavigationComponent implements OnInit, OnDestroy {
 
-  modalexport: MdbModalRef<ExportFilesModalComponent>;
-  modalTools: MdbModalRef<ToolsModalComponent>;
-  modalPrompt: MdbModalRef<PromptModalComponent>;
-  modalStatistics: MdbModalRef<StatisticsModalComponent>;
+  modalexport: MDBModalRef;
+  modalTools: MDBModalRef;
+  modalPrompt: MDBModalRef;
+  modalStatistics: MDBModalRef;
   @Input() version: string;
 
   public test = 'ok';
-  public secondsPerLine = '5';
+  public secondsPerLine = 5;
   private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get environment(): any {
@@ -82,8 +83,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
               public langService: TranslocoService,
               public modService: ModalService,
               public settService: SettingsService,
-              public bugService: BugReportService,
-              private modalService: MdbModalService) {
+              public bugService: BugReportService) {
   }
 
   ngOnDestroy() {
@@ -95,7 +95,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case('export'):
-            this.modalexport = this.modalService.open(ExportFilesModalComponent, ExportFilesModalComponent.config);
+            this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export);
             break;
         }
       })
@@ -141,6 +141,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   public openBugReport() {
+    console.log(`open bugreport`);
     this.modService.show('bugreport').then(() => {
       window.location.hash = '';
     }).catch((err) => {
@@ -236,24 +237,24 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   public changeSecondsPerLine(seconds: number) {
-    this.secondsPerLine = seconds.toString();
+    this.secondsPerLine = seconds;
     this.appStorage.secondsPerLine = seconds;
   }
 
   openExportModal() {
-    this.modalexport = this.modalService.open(ExportFilesModalComponent, ExportFilesModalComponent.config);
+    this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export);
   }
 
   openToolsModal() {
-    this.modalTools = this.modalService.open(ToolsModalComponent, ToolsModalComponent.config);
+    this.modalTools = this.modService.openModalRef(ToolsModalComponent, modalConfigurations.tools);
   }
 
   openPromptModal() {
     // TODO mdb: preserve this.transcrServ.audiofile
-    this.modalPrompt = this.modalService.open(PromptModalComponent);
+    this.modalPrompt = this.modService.openModalRef(PromptModalComponent, modalConfigurations.prompt);
   }
 
   openStatisticsModal() {
-    this.modalStatistics = this.modalService.open(StatisticsModalComponent, StatisticsModalComponent.config);
+    this.modalStatistics = this.modService.openModalRef(StatisticsModalComponent, modalConfigurations.statistics);
   }
 }

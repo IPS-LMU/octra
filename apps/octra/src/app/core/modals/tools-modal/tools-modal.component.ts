@@ -13,7 +13,8 @@ import {AudioService, TranscriptionService, UserInteractionsService} from '../..
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 declare let JSZip;
 
@@ -26,14 +27,7 @@ declare let JSZip;
     fadeInExpandOnEnterAnimation()
   ]
 })
-export class ToolsModalComponent implements OnDestroy {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-xl'
-  };
-
+export class ToolsModalComponent extends OctraModal implements OnDestroy {
   public parentformat: {
     download: string,
     uri: SafeUrl
@@ -109,17 +103,14 @@ export class ToolsModalComponent implements OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              private modalService: MdbModalService,
+              modalService: MDBModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
               public transloco: TranslocoService,
-              public modalRef: MdbModalRef<ToolsModalComponent>
+              modalRef: MDBModalRef
   ) {
-  }
-
-  public close() {
-    this.modalRef.close();
+    super('toolsModal', modalRef, modalService);
   }
 
   ngOnDestroy() {

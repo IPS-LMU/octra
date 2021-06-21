@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {OctraModal} from '../types';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 
 export enum TranscriptionStopModalAnswer {
   CONTINUE = 'CONTINUE',
@@ -12,17 +13,8 @@ export enum TranscriptionStopModalAnswer {
   styleUrls: ['./transcription-stop-modal.component.scss']
 })
 
-export class TranscriptionStopModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
-
-  constructor(public modalRef: MdbModalRef<TranscriptionStopModalComponent>) {
-  }
-
-  public close(action: string) {
-    this.modalRef.close(action);
+export class TranscriptionStopModalComponent extends OctraModal {
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('transcriptionStopModal', modalRef, modalService);
   }
 }

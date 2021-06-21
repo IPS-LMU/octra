@@ -8,7 +8,7 @@
       <td>{{getDropzoneFileString(file.file)}}
       </td>
       <td>
-        <fa-icon *ngIf="file.status === 'invalid'" [mdbPopoverTitle]="'Validation Error'" [mdbPopover]="file.error"
+        <fa-icon *ngIf="file.status === 'invalid'" [popoverTitle]="'Validation Error'" [mdbPopover]="file.error"
                  class="icon-invalid" icon="times" placement="top"
                  style="font-size:16px"></fa-icon>
         <fa-icon *ngIf="file.status === 'valid'" class="icon-success" icon="check"

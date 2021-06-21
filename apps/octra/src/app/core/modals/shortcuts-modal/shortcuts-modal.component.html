@@ -1,20 +1,18 @@
-<div class="modal-header">
-  <h5 class="modal-title" id="exampleModalLabel">{{"general.shortcuts" | transloco}} {{appStorage.interface}}</h5>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="modalRef.close()"
-  ></button>
-</div>
-<div class="modal-body">
-  <div class="shortcut-group" *ngFor="let shortcutGroup of keyMap.shortcutGroups">
-    <h5>{{("modal.shortcuts." + shortcutGroup.name) | transloco}}</h5>
-    <table class="table table-striped table-bordered">
-      <tbody>
-      <tr *ngFor="let entry of shortcutGroup.items">
-        <td>{{"modal.shortcuts." + entry.title | transloco}}</td>
-        <td>
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">{{"general.shortcuts" | transloco}} {{appStorage.interface}}</h5>
+  </div>
+  <div class="modal-body">
+    <div class="shortcut-group" *ngFor="let shortcutGroup of keyMap.shortcutGroups">
+      <h5>{{("modal.shortcuts." + shortcutGroup.name) | transloco}}</h5>
+      <table class="table table-striped table-bordered">
+        <tbody>
+        <tr *ngFor="let entry of shortcutGroup.items">
+          <td>{{"modal.shortcuts." + entry.title | transloco}}</td>
+          <td>
           <octra-shortcut [shortcut]="entry.keys[platform]"></octra-shortcut>
           <span *ngIf="entry.focusonly" class="focus-info">({{"general.on focus only" | transloco}}
             )</span>

@@ -1,17 +1,15 @@
-<div class="modal-header">
-  <h5 class="modal-title" id="exampleModalLabel">{{"modal.login.header" | transloco}}</h5>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="modalRef.close()"
-  ></button>
-</div>
-<div class="modal-body">
-  {{"modal.login.text" | transloco}}
-</div>
-<div class="modal-footer">
-  <button (click)="close()" class="btn btn-primary" type="button">
-    {{"general.OK" | transloco}}
-  </button>
-</div>
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">{{"modal.login.header" | transloco}}</h5>
+  </div>
+  <div class="modal-body">
+    {{"modal.login.text" | transloco}}
+  </div>
+  <div class="modal-footer">
+    <button (click)="close()" class="btn btn-primary" type="button">
+      {{"general.OK" | transloco}}
+    </button>
+  </div>

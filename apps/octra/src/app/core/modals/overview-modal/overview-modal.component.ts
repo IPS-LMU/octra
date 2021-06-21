@@ -6,7 +6,8 @@ import {KeymappingService, SettingsService, TranscriptionService, UserInteractio
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {NavbarService} from '../../component/navbar/navbar.service';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);
@@ -17,14 +18,7 @@ declare let tidyUpAnnotation: ((string, any) => any);
   styleUrls: ['./overview-modal.component.scss']
 })
 
-export class OverviewModalComponent implements OnDestroy {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: true,
-    modalClass: 'modal-kg'
-  };
-
+export class OverviewModalComponent extends OctraModal implements OnDestroy {
   @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
@@ -53,14 +47,15 @@ export class OverviewModalComponent implements OnDestroy {
   public trnEditorswitch = new EventEmitter<void>();
 
   constructor(public transcrService: TranscriptionService,
-              public ms: MdbModalService,
+              public modalService: MDBModalService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private keyService: KeymappingService,
               private uiService: UserInteractionsService,
               private cd: ChangeDetectorRef,
               private navbarService: NavbarService,
-              public modalRef: MdbModalRef<OverviewModalComponent>) {
+              public modalRef: MDBModalRef) {
+    super('overviewModal', modalRef, modalService);
   }
 
   ngOnDestroy() {
@@ -68,8 +63,6 @@ export class OverviewModalComponent implements OnDestroy {
   }
 
   public close(fromModal = false) {
-    this.modalRef.close();
-
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
       this.subscrmanager.removeById(this.shortcutID);
@@ -84,6 +77,7 @@ export class OverviewModalComponent implements OnDestroy {
       this.uiService.addElementFromEvent('overview', {value: 'closed'},
         Date.now(), undefined, undefined, undefined, undefined, 'overview');
     }
+    return super.close();
   }
 
   onSegmentInOverviewClicked(segnumber: number) {

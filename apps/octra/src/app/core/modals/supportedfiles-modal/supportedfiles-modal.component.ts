@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {AppInfo} from '../../../app.info';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {OctraModal} from '../types';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 
 @Component({
   selector: 'octra-supportedfiles-modal',
@@ -8,21 +9,10 @@ import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
   styleUrls: ['./supportedfiles-modal.component.scss']
 })
 
-export class SupportedFilesModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
+export class SupportedFilesModalComponent extends OctraModal {
   AppInfo = AppInfo;
 
-  protected data = undefined;
-
-  constructor(public modalRef: MdbModalRef<SupportedFilesModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('supportedFilesModal', modalRef, modalService);
   }
 }

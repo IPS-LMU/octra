@@ -4,7 +4,8 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-bugreport-modal',
@@ -12,13 +13,7 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
   styleUrls: ['./bugreport-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BugreportModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: true,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-xl'
-  };
+export class BugreportModalComponent extends OctraModal {
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
@@ -58,13 +53,10 @@ export class BugreportModalComponent {
     return this.sendProObj || this.bgdescr !== '';
   }
 
-  constructor(private modalService: MdbModalService, private appStorage: AppStorageService,
+  constructor(modalService: MDBModalService, private appStorage: AppStorageService,
               public bugService: BugReportService, private settService: SettingsService,
-              private cd: ChangeDetectorRef, public modalRef: MdbModalRef<BugreportModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+              private cd: ChangeDetectorRef, modalRef: MDBModalRef) {
+    super('bugreportModal', modalRef, modalService);
   }
 
   onHidden() {
@@ -94,7 +86,7 @@ export class BugreportModalComponent {
 
           this.subscrmanager.add(timer(2000).subscribe(() => {
             this.bgdescr = '';
-            this.modalRef.close();
+            this.close();
           }));
         },
         (error) => {

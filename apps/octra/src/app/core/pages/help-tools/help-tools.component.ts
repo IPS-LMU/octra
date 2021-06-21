@@ -7,7 +7,6 @@ import {SubscriptionManager} from '@octra/utilities';
 import {Subscription} from 'rxjs';
 import {ModalService} from '../../modals/modal.service';
 import {Router} from '@angular/router';
-import {MdbModalRef} from 'mdb-angular-ui-kit/modal';
 
 @Component({
   selector: 'octra-help-tools',
@@ -36,9 +35,8 @@ export class HelpToolsComponent {
     const clearSession = () => {
       this.modalService.show('protected', {
         text: 'Please wait a moment (max. 5 seconds)'
-      }).then((modal: MdbModalRef<any>) => {
+      }).then(() => {
         this.appStorage.clearWholeSession().then(() => {
-          modal.close();
           this.appStorage.logout(false);
           setTimeout(() => {
             document.location.reload(true);

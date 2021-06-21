@@ -1,146 +1,141 @@
-<ng-container *ngIf="guidelines !== undefined">
+<div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="modalRef.close()"
-    ></button>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">✕</span>
+    </button>
+    <h5 class="modal-title" id="exampleModalLabel">
+      {{"general.guidelines" | transloco }}<span class="version">
+                     v {{ guidelines.meta.version }}
+                </span>
+    </h5>
   </div>
   <div class="modal-body">
-    <ng-container *ngIf="guidelines !== undefined && guidelines !== undefined">
-      <div class="modal-header">
-        <div class="row" style="width:100%;">
-          <div class="col-md-7">
-            <h3 style="display:inline;">{{"general.guidelines" | transloco }}<span class="version">
+    <div class="row" style="width:100%;">
+      <div class="col-md-7">
+        <h3 style="display:inline;">{{"general.guidelines" | transloco }}<span class="version">
                      v {{ guidelines.meta.version }}
                 </span></h3>
-            <button (click)="exportPDF()"
-                    *ngIf="isPDFExportEnabled() && !isPDFLinkOnly() else pdfNotEnabled" class="btn btn-sm btn-danger"
-                    style="border:1px solid red;">
-              <fa-icon icon="print"></fa-icon>
-              PDF
-            </button>
-            <ng-template #pdfNotEnabled>
-              <a *ngIf="isPDFLinkOnly() && getPDFNameFromLink() !== ''" [download]="getPDFNameFromLink()"
-                 [href]="settService.projectsettings.plugins.pdfexport.url"
-                 class="btn btn-sm btn-danger"
-                 style="border:1px solid red;" target="_blank">
-                <fa-icon icon="print"></fa-icon>
-                PDF
-              </a>
-            </ng-template>
-            <span class="project">
+        <button (click)="exportPDF()"
+                *ngIf="isPDFExportEnabled() && !isPDFLinkOnly() else pdfNotEnabled" class="btn btn-sm btn-danger"
+                style="border:1px solid red;">
+          <fa-icon icon="print"></fa-icon>
+          PDF
+        </button>
+        <ng-template #pdfNotEnabled>
+          <a *ngIf="isPDFLinkOnly() && getPDFNameFromLink() !== ''" [download]="getPDFNameFromLink()"
+             [href]="settService.projectsettings.plugins.pdfexport.url"
+             class="btn btn-sm btn-danger"
+             style="border:1px solid red;" target="_blank">
+            <fa-icon icon="print"></fa-icon>
+            PDF
+          </a>
+        </ng-template>
+        <span class="project">
                      {{"general.project" | transloco }}: {{guidelines.meta.project }}
                 </span>
-            <span class="authors">
+        <span class="authors">
                      {{"general.authors" | transloco }}: {{ guidelines.meta.authors }}
                 </span>
-          </div>
-          <div class="col-md-5">
-            <div class="form-group">
-              <div class="input-group">
+      </div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <div class="input-group">
                                 <span class="input-group-addon">
                                     <fa-icon icon="search"></fa-icon></span>
-                <input #input (keyup)="search(input.value)" class="form-control"
-                       id="addon1" placeholder="{{'general.search' |transloco}}" type="text">
-              </div>
-            </div>
+            <input #input (keyup)="search(input.value)" class="form-control"
+                   id="addon1" placeholder="{{'general.search' |transloco}}" type="text">
           </div>
         </div>
       </div>
-      <div class="modal-body">
-        <div *ngIf="shownGuidelines.instructions.length === 0" class="bg-warning">
-          {{"general.no guidelines found" | transloco}}
-        </div>
-        <div *ngFor="let instructions of shownGuidelines.instructions;let j = index;" class="row"
-             style="margin-bottom:20px;">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                {{instructions.group}}
+    </div>
+    <div *ngIf="shownGuidelines?.instructions !== undefined && shownGuidelines.instructions.length === 0"
+         class="bg-warning">
+      {{"general.no guidelines found" | transloco}}
+    </div>
+    <div *ngFor="let instructions of shownGuidelines.instructions;let j = index;" class="row"
+         style="margin-bottom:20px;">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            {{instructions.group}}
+          </div>
+          <div *ngIf="collapsed.length > 0" class="card-body">
+            <div *ngFor="let entry of instructions.entries;let k = index;" class="row select-row">
+              <div (click)="toggle(j,k)" class="col-1 chevron">
+                <fa-icon
+                  [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
               </div>
-              <div *ngIf="collapsed.length > 0" class="card-body">
-                <div *ngFor="let entry of instructions.entries;let k = index;" class="row select-row">
-                  <div (click)="toggle(j,k)" class="col-1 chevron">
-                    <fa-icon
-                      [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
-                  </div>
-                  <div (click)="toggle(j,k)" class="col-2 code">
-                    {{entry.code}}
-                  </div>
-                  <div class="col-8">
-                    <span (click)="toggle(j,k)" class="guidelines-title">{{entry.title}}</span>
-                    <div mdbCollapse [collapsed]="collapsed[j][k]" [innerHTML]="getGuidelineHTML(entry.description)"
-                         class="guidelines-descr">
-                    </div>
-                    <div mdbCollapse [collapsed]="collapsed[j][k]" class="row entry-row">
-                      <div *ngIf="entry.examples.length > 0" class="col-md-12">
-                        <div *ngFor="let example of entry.examples; let i = index;"
-                             class="card card-example">
-                          <div *ngIf="settService.projectsettings.guidelines === undefined
+              <div (click)="toggle(j,k)" class="col-2 code">
+                {{entry.code}}
+              </div>
+              <div class="col-8">
+                <span (click)="toggle(j,k)" class="guidelines-title">{{entry.title}}</span>
+                <div mdbCollapse [isCollapsed]="collapsed[j][k]" [innerHTML]="getGuidelineHTML(entry.description)"
+                     class="guidelines-descr">
+                </div>
+                <div mdbCollapse [isCollapsed]="collapsed[j][k]" class="row entry-row">
+                  <div *ngIf="entry.examples.length > 0" class="col-md-12">
+                    <div *ngFor="let example of entry.examples; let i = index;"
+                         class="card card-example">
+                      <div *ngIf="settService.projectsettings.guidelines === undefined
                                                          || settService.projectsettings.guidelines?.showExampleHeader"
-                               class="card-header example">
-                            {{"general.example" | transloco}}
-                            <ng-container
-                              *ngIf="settService.projectsettings.guidelines === undefined
+                           class="card-header example">
+                        {{"general.example" | transloco}}
+                        <ng-container
+                          *ngIf="settService.projectsettings.guidelines === undefined
                                                          || settService.projectsettings.guidelines?.showExampleNumbers">
-                              {{i + 1}}
-                            </ng-container>
-                          </div>
-                          <div class="card-body">
-                            <div *ngIf="example.url.indexOf('.wav') > -1" class="media">
-                              <audio controls src="{{example.url}}"></audio>
-                            </div>
-                            <div *ngIf="example.url.indexOf('.mp4') > -1" class="media">
-                              <video
-                                class="video-js vjs-default-skin vjs-big-play-centered"
-                                controls
-                                data-setup='{}'
-                                id="my-player_g{{j}}i{{k}}e{{i}}"
-                                preload="auto">
-                                <source src="{{example.url}}" type="video/mp4">
-                                <p class="vjs-no-js">
-                                  To view this video please enable JavaScript, and
-                                  consider
-                                  upgrading to a
-                                  web browser that
-                                  <a href="http://videojs.com/html5-video-support/"
-                                     target="_blank">
-                                    supports HTML5 video
-                                  </a>
-                                </p>
-                              </video>
-                            </div>
-                            <div *ngIf="example.url.indexOf('.png') > -1 || example.url.indexOf('.jpg') > -1"
-                                 class="media">
-                              <a [href]="example.url" target="_blank"><img
-                                [src]="example.url"/></a>
-                            </div>
-                            <div class="text">
-                              <div [innerHTML]="getGuidelineHTML(example.annotation)"></div>
-                            </div>
-                          </div>
+                          {{i + 1}}
+                        </ng-container>
+                      </div>
+                      <div class="card-body">
+                        <div *ngIf="example.url.indexOf('.wav') > -1" class="media">
+                          <audio controls src="{{example.url}}"></audio>
+                        </div>
+                        <div *ngIf="example.url.indexOf('.mp4') > -1" class="media">
+                          <video
+                            class="video-js vjs-default-skin vjs-big-play-centered"
+                            controls
+                            data-setup='{}'
+                            id="my-player_g{{j}}i{{k}}e{{i}}"
+                            preload="auto">
+                            <source src="{{example.url}}" type="video/mp4">
+                            <p class="vjs-no-js">
+                              To view this video please enable JavaScript, and
+                              consider
+                              upgrading to a
+                              web browser that
+                              <a href="http://videojs.com/html5-video-support/"
+                                 target="_blank">
+                                supports HTML5 video
+                              </a>
+                            </p>
+                          </video>
+                        </div>
+                        <div *ngIf="example.url.indexOf('.png') > -1 || example.url.indexOf('.jpg') > -1"
+                             class="media">
+                          <a [href]="example.url" target="_blank"><img
+                            [src]="example.url"/></a>
+                        </div>
+                        <div class="text">
+                          <div [innerHTML]="getGuidelineHTML(example.annotation)"></div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div (click)="toggle(j,k)" class="col-1 d-none d-sm-inline col-priority">
-                    <span class="label label-info">{{entry.priority}}</span>
-                  </div>
                 </div>
+              </div>
+              <div (click)="toggle(j,k)" class="col-1 d-none d-sm-inline col-priority">
+                <span class="label label-info">{{entry.priority}}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
+    </div>
   </div>
   <div class="modal-footer">
     <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
       {{"general.close" | transloco}}
     </button>
   </div>
-
-</ng-container>
+</div>

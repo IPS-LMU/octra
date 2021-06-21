@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 export enum ModalSendAnswer {
   CANCEL = 'CANCEL',
@@ -12,18 +13,8 @@ export enum ModalSendAnswer {
   styleUrls: ['./transcription-send-modal.component.scss']
 })
 
-export class TranscriptionSendModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
-
-  constructor(
-    public modalRef: MdbModalRef<TranscriptionSendModalComponent>) {
-  }
-
-  public close(action: string) {
-    this.modalRef.close(action as ModalSendAnswer);
+export class TranscriptionSendModalComponent extends OctraModal {
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('transcriptionSendModal', modalRef, modalService);
   }
 }

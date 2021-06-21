@@ -2,7 +2,7 @@
   <h5 class="modal-title">{{"trn-editor.modals.permutations replace.replace permutations" | transloco}}</h5>
   <button type="button"
           class="btn-close"
-          aria-label="Close" (click)="modalRef.close()">
+          aria-label="Close" (click)="close()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -42,7 +42,7 @@
   </table>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="modalRef.close()">
+  <button type="button" class="btn btn-secondary" (click)="close()">
     {{"general.abort" | transloco}}
   </button>
   <button type="button" class="btn btn-primary" (click)="replaceSpeakers()">

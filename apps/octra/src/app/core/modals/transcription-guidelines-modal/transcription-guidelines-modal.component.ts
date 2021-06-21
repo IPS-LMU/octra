@@ -2,8 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Input,
-  OnChanges,
+  OnInit,
   SecurityContext,
   ViewEncapsulation
 } from '@angular/core';
@@ -15,7 +14,8 @@ import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as videojs from 'video.js';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
@@ -25,17 +25,12 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
   encapsulation: ViewEncapsulation.None
 })
 
-export class TranscriptionGuidelinesModalComponent implements OnChanges {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
+export class TranscriptionGuidelinesModalComponent extends OctraModal implements OnInit {
+  public get guidelines() {
+    return this.transcrService.guidelines;
+  }
 
-  @Input() guidelines = undefined;
-
-  public shownGuidelines: any = {};
+  public shownGuidelines: any;
   public collapsed: any[][] = [];
 
   protected data = undefined;
@@ -43,21 +38,18 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   private videoPlayers: any[] = [];
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  constructor(private modalService: MdbModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
+  constructor(modalService: MDBModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
-              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer, public modalRef: MdbModalRef<TranscriptionGuidelinesModalComponent>) {
+              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer, modalRef: MDBModalRef) {
+    super('transcriptionGuidelinesModal', modalRef, modalService);
   }
 
-  ngOnChanges($event) {
-    if (!($event.guidelines.currentValue === undefined)) {
-      this.shownGuidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
-      this.unCollapseAll();
-    }
-    if (($event.guidelines.previousValue === undefined) && !($event.guidelines.currentValue === undefined)) {
-      this.subscrmanager.add(timer(1000).subscribe(() => {
-        this.initVideoPlayers();
-      }));
-    }
+  ngOnInit() {
+    this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
+    this.unCollapseAll();
+    this.subscrmanager.add(timer(1000).subscribe(() => {
+      this.initVideoPlayers();
+    }));
   }
 
   videoplayerExists(player: string): number {
@@ -127,10 +119,10 @@ export class TranscriptionGuidelinesModalComponent implements OnChanges {
   }
 
   public close() {
-    this.modalRef.close();
-
     this.cd.markForCheck();
     this.cd.detectChanges();
+
+    return super.close();
   }
 
   toggle(group: number, entry: number) {

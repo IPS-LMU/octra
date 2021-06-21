@@ -1,27 +1,17 @@
 import {Component} from '@angular/core';
-import {MdbModalConfig, MdbModalRef} from 'mdb-angular-ui-kit/modal';
+import {OctraModal} from '../types';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 
 @Component({
   selector: 'octra-yes-no-modal',
   templateUrl: './yes-no-modal.component.html',
   styleUrls: ['./yes-no-modal.component.scss']
 })
-export class YesNoModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
-  };
+export class YesNoModalComponent extends OctraModal {
+  public message: string;
 
-  public data = {
-    text: ''
-  };
-
-  constructor(public modalRef: MdbModalRef<YesNoModalComponent>) {
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('yesNoModal', modalRef, modalService);
   }
 
-
-  public close(action: 'yes' | 'no') {
-    this.modalRef.close(action);
-  }
 }

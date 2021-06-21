@@ -184,6 +184,7 @@
             "scripts": [
               "apps/octra/src/assets/js/modernizr.js",
               "node_modules/platform/platform.js",
+              "node_modules/hammerjs/hammer.min.js",
               "node_modules/video.js/dist/video.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"

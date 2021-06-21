@@ -1,7 +1,8 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-prompt-modal',
@@ -10,24 +11,18 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PromptModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false,
-    modalClass: 'modal-lg'
-  };
-
+export class PromptModalComponent extends OctraModal {
   public formatConverter;
   protected data = undefined;
 
-  constructor(private modalService: MdbModalService, public appStorage: AppStorageService, private settService: SettingsService,
-              private cd: ChangeDetectorRef, public modalRef: MdbModalRef<PromptModalComponent>) {
+  constructor(modalService: MDBModalService, public appStorage: AppStorageService, private settService: SettingsService,
+              private cd: ChangeDetectorRef, modalRef: MDBModalRef) {
+    super('promptModal', modalRef, modalService);
   }
 
   public close() {
-    this.modalRef.close();
     this.cd.markForCheck();
     this.cd.detectChanges();
+    return super.close();
   }
 }

@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/modal';
+import {Component} from '@angular/core';
+import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
+import {OctraModal} from '../types';
 
 @Component({
   selector: 'octra-transcription-sending-modal',
@@ -7,19 +8,10 @@ import {MdbModalConfig, MdbModalRef, MdbModalService} from 'mdb-angular-ui-kit/m
   styleUrls: ['./transcription-sending-modal.component.scss']
 })
 
-export class TranscriptionSendingModalComponent {
-  public static config: MdbModalConfig = {
-    keyboard: false,
-    backdrop: true,
-    ignoreBackdropClick: true
-  };
+export class TranscriptionSendingModalComponent extends OctraModal {
+  public content: string;
 
-  @Input() sendError = '';
-
-  constructor(private modalService: MdbModalService, public modalRef: MdbModalRef<TranscriptionSendingModalComponent>) {
-  }
-
-  public close() {
-    this.modalRef.close();
+  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
+    super('transcriptionSendingModal', modalRef, modalService);
   }
 }

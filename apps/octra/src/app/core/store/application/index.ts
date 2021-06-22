@@ -1,5 +1,5 @@
-import {RootState} from '../index';
 import {pipe} from 'rxjs';
+import {RootState} from '../index';
 
 export const selectApplication = (state: RootState) => state.application;
 export const selectLoadingStatus = pipe(selectApplication, (state) => state.loading.status);

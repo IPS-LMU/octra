@@ -1,5 +1,4 @@
 import {EventEmitter} from '@angular/core';
-import {Subject, Subscription, timer} from 'rxjs'
 import {AudioDecoder} from './audio-decoder';
 import {AudioInfo} from './audio-info';
 import {AudioRessource} from './audio-ressource';
@@ -8,6 +7,9 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SampleUnit} from './audio-time';
 import {PlayBackStatus, SourceType} from '../types';
 import {AudioSelection} from './audio-selection';
+import {Subject} from 'rxjs/internal/Subject';
+import {timer} from 'rxjs/internal/observable/timer';
+import {Subscription} from 'rxjs/internal/Subscription';
 
 declare let window: any;
 

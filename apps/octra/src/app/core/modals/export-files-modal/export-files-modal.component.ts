@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -85,11 +85,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   };
 
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
-  @ViewChild('content', {static: false}) contentElement: ElementRef;
   @ViewChild('tableConfigurator', {static: false}) tableConfigurator: TableConfiguratorComponent;
 
-  @Input() transcrService: TranscriptionService;
-  @Input() uiService: UserInteractionsService;
   protected data = undefined;
   private subscrmanager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
@@ -102,7 +99,9 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
               private settService: SettingsService,
               private dragulaService: DragulaService,
               modalRef: MDBModalRef,
-              modalService: MDBModalService) {
+              modalService: MDBModalService,
+              public transcrService: TranscriptionService,
+              private uiService: UserInteractionsService) {
     super('ExportFilesModalComponent', modalRef, modalService);
 
     this.dragulaService.createGroup('tableConfiguratorColumns', {

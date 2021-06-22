@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {BrowserInfo} from '../BrowserInfo';
 import {SettingsService} from './index';
+import {BrowserInfo} from '@octra/utilities';
 
 declare let Modernizr: any;
 

@@ -13,15 +13,12 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {isNumeric} from 'rxjs/internal-compatibility';
-import {Subscription, timer} from 'rxjs';
-
-import {BrowserInfo} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {
+  BrowserInfo,
   escapeHtml,
   escapeRegex,
   findElements,
@@ -37,8 +34,10 @@ import {
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segments} from '@octra/annotation';
 import {TimespanPipe} from '@octra/components';
+import {Subscription, timer} from 'rxjs';
 import {JoditAngularComponent} from 'jodit-angular';
-/// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />
+import {isNumeric} from 'rxjs/internal-compatibility';
+
 declare let tidyUpAnnotation: ((string, any) => any);
 
 declare let document: any;

@@ -1,7 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager} from '@octra/utilities';
-import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
@@ -35,9 +34,10 @@ import {
 import {AudioManager} from '@octra/media';
 import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, getModeState, LoginMode} from '../../store';
 import {TranslocoService} from '@ngneat/transloco';
-import * as moment from 'moment';
-import {interval, Subject, Subscription, timer} from 'rxjs';
 import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
+import {interval, Subject, Subscription, timer} from 'rxjs';
+import {DateTime} from 'luxon';
+import {isArray} from 'rxjs/internal-compatibility';
 
 declare let validateAnnotation: ((string, any) => any);
 
@@ -201,12 +201,11 @@ export class TranscriptionService {
             // notify after 15 minutes one hour before the maintenance begins
             maintenanceAPI.readMaintenanceNotifications(1).then((notification2) => {
               if (notification2 !== undefined) {
-                moment.locale(this.appStorage.language);
                 this.alertTriggered.next({
                   type: 'warning',
                   data: '⚠️ ' + this.languageService.translate('maintenance.in app', {
-                    start: moment(notification.begin).format('L LT'),
-                    end: moment(notification.end).format('L LT')
+                    start: DateTime.fromISO(notification.begin).setLocale(this.appStorage.language).toLocaleString(DateTime.DATETIME_SHORT),
+                    end: DateTime.fromISO(notification.end).setLocale(this.appStorage.language).toLocaleString(DateTime.DATETIME_SHORT)
                   }),
                   unique: true,
                   duration: 60
@@ -363,7 +362,7 @@ export class TranscriptionService {
   public getTranscriptString(converter: Converter): string {
     let result: IFile;
 
-    if (!(this.annotation === undefined || this.annotation === undefined)) {
+    if (!(this.annotation === undefined)) {
       result = converter.export(
         this.annotation.getObj(this.audioManager.ressource.info.duration),
         this.audiofile, 0
@@ -428,9 +427,7 @@ export class TranscriptionService {
                       encoding: 'utf8'
                     }, this._audiofile);
 
-                    if (result !== undefined && result !== undefined
-                      && result.annotjson !== undefined && result.annotjson.levels.length > 0
-                      && result.annotjson.levels[0] !== undefined
+                    if (result !== undefined && result.annotjson !== undefined && result.annotjson.levels.length > 0 && result.annotjson.levels[0] !== undefined
                       && !(converter instanceof TextConverter)) {
                       converted = result.annotjson;
                       break;
@@ -479,7 +476,7 @@ export class TranscriptionService {
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
             this._feedback.importData(this.appStorage.feedback);
 
-            if ((this.appStorage.comment === undefined || this.appStorage.comment === undefined)) {
+            if ((this.appStorage.comment === undefined)) {
               this.appStorage.comment = '';
             } else {
               this._feedback.comment = this.appStorage.comment;
@@ -532,7 +529,7 @@ export class TranscriptionService {
   public exportDataToJSON(): any {
     let data: any = {};
 
-    if (!(this.annotation === undefined || this.annotation === undefined)) {
+    if (!(this.annotation === undefined)) {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
@@ -773,7 +770,7 @@ export class TranscriptionService {
           const s3 = (g3) ? g3 : '';
 
           let img = '';
-          if (!((marker.icon === undefined || marker.icon === undefined) || marker.icon === '') && (marker.icon.indexOf('.png') > -1
+          if (!((marker.icon === undefined) || marker.icon === '') && (marker.icon.indexOf('.png') > -1
             || marker.icon.indexOf('.jpg') > -1 || marker.icon.indexOf('.gif') > -1)) {
             const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
             img = '<img src=\'' + marker.icon + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
@@ -827,7 +824,7 @@ export class TranscriptionService {
             return val.start === validationElement.start;
           });
 
-          if ((insertStart === undefined || insertStart === undefined)) {
+          if ((insertStart === undefined)) {
             insertStart = {
               start: validationElement.start,
               puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validationElement.code + '\']]]'
@@ -841,7 +838,7 @@ export class TranscriptionService {
             return val.start === validationElement.start + validationElement.length;
           });
 
-          if ((insertEnd === undefined || insertEnd === undefined)) {
+          if ((insertEnd === undefined)) {
             insertEnd = {
               start: insertStart.start + validationElement.length,
               puffer: ''

@@ -1,6 +1,6 @@
-import {isArray} from 'rxjs/internal-compatibility';
 import {Group} from './Group';
 import {getProperties} from '@octra/utilities';
+import {isArray} from 'rxjs/internal-compatibility';
 
 export class FeedBackForm {
   public get groups(): Group[] {

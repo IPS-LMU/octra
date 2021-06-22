@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
-import {BrowserInfo} from '../../shared';
 import {CompatibilityService} from '../../shared/service/compatibility.service';
+import {BrowserInfo} from '@octra/utilities';
 
 @Component({
   selector: 'octra-browser-test',

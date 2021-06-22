@@ -1,8 +1,8 @@
 import {Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges} from '@angular/core';
 import {MaintenanceAPI, MaintenanceNotification} from '../maintenance-api';
 import {HttpClient} from '@angular/common/http';
-import * as moment from 'moment';
 import {hasProperty} from '@octra/utilities';
+import {DateTime} from 'luxon';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -23,10 +23,10 @@ export class MaintenanceBannerComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     const isServerURL = hasProperty(changes, 'serverURL') &&
-      (changes.serverURL.currentValue !== undefined && changes.serverURL.currentValue !== undefined);
+      (changes.serverURL.currentValue !== undefined);
 
     const isLanguage = hasProperty(changes, 'language') &&
-      (changes.language.currentValue !== undefined && changes.language.currentValue !== undefined);
+      (changes.language.currentValue !== undefined);
 
     if (isServerURL) {
       const api = new MaintenanceAPI(changes.serverURL.currentValue, this.http);
@@ -45,13 +45,17 @@ export class MaintenanceBannerComponent implements OnChanges {
 
   private parseNotification() {
     if (this.notification) {
-      moment.locale((this.language !== undefined && this.language !== undefined) ? this.language : 'en');
+      const language = (this.language !== undefined) ? this.language : 'en';
+
       const notification = {
         ...this.notification
       };
 
-      notification.begin = moment(notification.begin).format('L LT');
-      notification.end = moment(notification.end).format('L LT');
+      const begin = DateTime.fromISO(notification.begin).setLocale(language);
+      const end = DateTime.fromISO(notification.end).setLocale(language)
+
+      notification.begin = begin.toLocaleString(DateTime.DATETIME_SHORT);
+      notification.end = end.toLocaleString(DateTime.DATETIME_SHORT);
       this.parsedNotification = notification;
 
       if (this.language && this.serverURL) {

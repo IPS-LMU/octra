@@ -12,7 +12,6 @@ import {
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {contains, hasProperty, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
-import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
@@ -41,6 +40,7 @@ import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} fr
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
 import {ApplicationState} from '../../core/store';
 import {Store} from '@ngrx/store';
+import {interval, Subscription, timer} from 'rxjs';
 
 @Component({
   selector: 'octra-overlay-gui',

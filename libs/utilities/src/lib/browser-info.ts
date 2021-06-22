@@ -1,4 +1,4 @@
-declare let platform: any;
+import * as platform from 'platform';
 
 export class BrowserInfo {
   public static get platform(): 'mac' | 'pc' {
@@ -10,14 +10,14 @@ export class BrowserInfo {
   }
 
   public static get browser(): string {
-    return (!(platform === undefined || platform === undefined)) ? platform.name : '';
+    return !(platform === undefined) ? platform.name : '';
   }
 
   public static get version(): string {
-    return (!(platform === undefined || platform === undefined)) ? platform.version : '';
+    return !(platform === undefined) ? platform.version : '';
   }
 
   public static get os(): any {
-    return (!(platform === undefined || platform === undefined)) ? platform.os : undefined;
+    return !(platform === undefined) ? platform.os : undefined;
   }
 }

@@ -1,5 +1,5 @@
-import * as moment from 'moment';
 import {AudioInfo} from '@octra/media';
+import {DateTime} from 'luxon';
 
 abstract class CuttingFormat {
   public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);
@@ -19,7 +19,7 @@ export class JSONConverter extends CuttingFormat {
   public exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string) {
     const json = {
       meta: {
-        creationTime: moment().format(),
+        creationTime: DateTime.now().toLocaleString(DateTime.DATETIME_SHORT),
         version: '1.0.0',
         audioFile: {
           name: fileName,

@@ -1,7 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {contains, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {BrowserInfo, contains, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
-import {BrowserInfo} from '../../core/shared';
 
 import {
   AlertService,

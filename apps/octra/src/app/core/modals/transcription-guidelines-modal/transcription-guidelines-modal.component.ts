@@ -13,7 +13,7 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import * as videojs from 'video.js';
+import videojs from 'video.js';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
 

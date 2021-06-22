@@ -1,5 +1,5 @@
-import {getModeState, RootState} from '../index';
 import {pipe} from 'rxjs';
+import {getModeState, RootState} from '../index';
 
 export const selectAnnotation = (state: RootState) => {
   const mode = getModeState(state);

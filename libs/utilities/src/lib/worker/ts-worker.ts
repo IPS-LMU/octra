@@ -1,4 +1,4 @@
-import {Subject} from 'rxjs';
+import {Subject} from 'rxjs/internal/Subject';
 import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
 
 export class TsWorker {

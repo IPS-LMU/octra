@@ -57,6 +57,7 @@ import {
   faTools,
   faTrash,
   faTrashAlt,
+  faUniversity,
   faUserCheck,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
@@ -170,7 +171,19 @@ import {TranscriptionSendModalComponent} from './core/modals/transcription-send-
 import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
-import {MDBBootstrapModule} from 'angular-bootstrap-md';
+import {
+  ButtonsModule,
+  CardsModule,
+  CheckboxModule,
+  CollapseModule,
+  DropdownModule,
+  ModalModule,
+  NavbarModule,
+  PopoverModule,
+  TooltipModule,
+  WavesModule
+} from 'angular-bootstrap-md';
+import {faHouseUser} from '@fortawesome/free-solid-svg-icons/faHouseUser';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -290,7 +303,16 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     EffectsModule.forFeature([]),
     MaintenanceModule,
     JoditAngularModule,
-    MDBBootstrapModule.forRoot()
+    DropdownModule.forRoot(),
+    NavbarModule,
+    ModalModule.forRoot(),
+    PopoverModule.forRoot(),
+    TooltipModule.forRoot(),
+    ButtonsModule.forRoot(),
+    CardsModule.forRoot(),
+    CheckboxModule,
+    CollapseModule.forRoot(),
+    WavesModule.forRoot()
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -379,7 +401,9 @@ export class AppModule {
       faLongArrowAltRight,
       faBars,
       faEdit,
-      faFolderOpen
+      faFolderOpen,
+      faUniversity,
+      faHouseUser
     );
   }
 }

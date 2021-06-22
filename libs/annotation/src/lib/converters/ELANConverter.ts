@@ -1,7 +1,7 @@
-import * as moment from 'moment';
 import * as X2JS from 'x2js';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import {DateTime} from 'luxon';
 
 export class ELANConverter extends Converter {
 
@@ -21,7 +21,7 @@ export class ELANConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (!(annotation === undefined)) {
       let filename = '';
 
       const x2js = new X2JS();
@@ -34,7 +34,7 @@ export class ELANConverter extends Converter {
         },
         ANNOTATION_DOCUMENT: {
           _AUTHOR: 'OCTRA',
-          _DATE: moment().format(),
+          _DATE: DateTime.now().toISODate(),
           _FORMAT: '3.0',
           _VERSION: '3.0',
           '_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',

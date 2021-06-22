@@ -1,9 +1,9 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {Observable, Subject, Subscription} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {downloadFile, SubscriptionManager} from '@octra/utilities';
 import {AudioManager} from '@octra/media';
+import {Subject, Subscription} from 'rxjs';
 
 @Injectable()
 export class AudioService {
@@ -108,11 +108,5 @@ export class AudioService {
     }
     this._audiomanagers = [];
     this.subscrmanager.destroy();
-  }
-
-  private handleError(err: any) {
-    const errMsg = err;
-    console.error(errMsg); // log to console instead
-    return Observable.throw(errMsg);
   }
 }

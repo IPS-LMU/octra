@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable, Subject} from 'rxjs';
 import {SettingsService} from '../service';
 import {AppStorageService} from '../service/appstorage.service';
 import {Store} from '@ngrx/store';
+import {Observable, Subject} from 'rxjs';
 
 @Injectable()
 export class SettingsGuard implements CanActivate {

@@ -2,9 +2,15 @@ import {ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnIni
 import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {sha256} from 'js-sha256';
-import {FileSize, getFileSize, hasProperty, hasPropertyTree, navigateTo, SubscriptionManager} from '@octra/utilities';
-import {Observable, Subscription} from 'rxjs';
+import {
+  BrowserInfo,
+  FileSize,
+  getFileSize,
+  hasProperty,
+  hasPropertyTree,
+  navigateTo,
+  SubscriptionManager
+} from '@octra/utilities';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
@@ -17,6 +23,7 @@ import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {Observable, Subscription} from 'rxjs';
 
 @Component({
   selector: 'octra-login',
@@ -40,7 +47,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     password: ''
   };
   err = '';
-  public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
+  public apiStatus: 'init' | 'available' | 'unavailable' = 'available';
   private subscrmanager: SubscriptionManager<Subscription>;
 
   get sessionfile(): SessionFile {
@@ -64,6 +71,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private langService: TranslocoService,
               private audioService: AudioService) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
+    console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
   }
 
   ngOnDestroy() {
@@ -90,7 +98,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private beforeNavigation = () => {
-    if (!(this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
+    if (!(this.dropzone.oannotation === undefined)) {
       const newLevels: OIDBLevel[] = [];
       for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
         newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -149,8 +157,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       } else {
         this.appStorage.clearWholeSession();
       }
-
-      this.loadPojectsList();
     }
 
     if (!this.appStorage.idbLoaded) {
@@ -167,17 +173,17 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onOnlineSubmit(form: NgForm) {
+    /*
     let newSession = false;
     let newSessionAfterOld = false;
     let continueSession = false;
-
     if (!this.isPasswordCorrect(this.member.project, this.member.password)) {
       this.modService.show('loginInvalid').catch((error) => {
         console.error(error);
       });
     } else {
 
-      if ((this.member.jobno === undefined || this.member.jobno === undefined) || this.member.jobno === '') {
+      if ((this.member.jobno === undefined) || this.member.jobno === '') {
         this.member.jobno = '0';
       }
 
@@ -186,7 +192,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         newSession = true;
 
       } else {
-        if (!(this.appStorage.dataID === undefined || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
+        if (!(this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
           // last session was online session
           // check if credentials are available
           if (
@@ -208,7 +214,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           newSession = true;
         }
       }
-
       if (newSessionAfterOld) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           this.createNewOnlineSession(form);
@@ -270,6 +275,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         });
       }
     }
+    */
   }
 
   canDeactivate(): Observable<boolean> | boolean {
@@ -294,12 +300,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   getFileStatus(): string {
-    if (!(this.dropzone.files === undefined || this.dropzone.files === undefined) && this.dropzone.files.length > 0 &&
-      (!(this.dropzone.oaudiofile === undefined || this.dropzone.oaudiofile === undefined))) {
+    if (!(this.dropzone.files === undefined) && this.dropzone.files.length > 0 && !(this.dropzone.oaudiofile === undefined)) {
       // check conditions
-      if ((this.appStorage.sessionfile === undefined || this.appStorage.sessionfile === undefined)
-        || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name)
-        && (this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
+      if ((this.appStorage.sessionfile === undefined) || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name) && (this.dropzone.oannotation === undefined)) {
         return 'start';
       } else {
         return 'new';
@@ -307,42 +310,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     return 'unknown';
-  }
-
-  loadPojectsList() {
-    this.api.getProjects().then((json) => {
-      if (Array.isArray(json.data)) {
-        this.projects = json.data;
-
-        if (!(this.settingsService.appSettings.octra.allowed_projects === undefined ||
-          this.settingsService.appSettings.octra.allowed_projects === undefined)
-          && this.settingsService.appSettings.octra.allowed_projects.length > 0) {
-          // filter disabled projects
-          this.projects = this.projects.filter((a) => {
-            return (this.settingsService.appSettings.octra.allowed_projects.findIndex((b) => {
-              return a === b.name;
-            }) > -1);
-          });
-        }
-        if (this.appStorage.onlineSession !== undefined &&
-          this.appStorage.onlineSession.loginData.project !== undefined && this.appStorage.onlineSession.loginData.project !== '') {
-
-          const found = this.projects.find(
-            (x) => {
-              return x === this.appStorage.onlineSession.loginData.project;
-            });
-          if (found === undefined) {
-            // make sure that old project is in list
-            this.projects.push(this.appStorage.onlineSession.loginData.project);
-          }
-        }
-      }
-
-      this.apiStatus = 'available';
-    }).catch((error) => {
-      console.error(`ERROR: could not load list of projects:\n${error}`);
-      this.apiStatus = 'unavailable';
-    });
   }
 
   onTranscriptionDelete() {
@@ -370,6 +337,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public isPasswordCorrect(selectedProject, password) {
+    /*
     if (this.settingsService.appSettings.octra.allowed_projects !== undefined) {
       const inputHash = sha256(password).toUpperCase();
       const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
@@ -384,6 +352,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     return true;
+
+     */
   }
 
   passwordExists() {

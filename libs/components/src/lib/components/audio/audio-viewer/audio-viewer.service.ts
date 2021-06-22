@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioChunk, AudioManager, AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
 import {MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
+import {Subject} from 'rxjs/internal/Subject';
+import {Subscription} from 'rxjs/internal/Subscription';
 
 @Injectable({
   providedIn: 'root'

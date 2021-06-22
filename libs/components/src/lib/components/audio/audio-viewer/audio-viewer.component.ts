@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import Konva from 'konva';
 import {Context} from 'konva/types/Context';
-import {Subject, Subscription} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
@@ -22,6 +21,8 @@ import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {Position, Size} from '../../../obj';
 import {TimespanPipe} from '../../../pipe/timespan.pipe';
+import {Subscription} from 'rxjs/internal/Subscription';
+import {Subject} from 'rxjs/internal/Subject';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
@@ -684,7 +685,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.shortcutsManager.clearShortcuts();
       this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
-    } else{
+    } else {
       console.error(`can't init audio viewer`);
     }
   }

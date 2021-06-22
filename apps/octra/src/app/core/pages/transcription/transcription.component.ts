@@ -11,6 +11,7 @@ import {
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {
+  BrowserInfo,
   hasProperty,
   hasPropertyTree,
   navigateTo,
@@ -37,7 +38,6 @@ import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-moda
 import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
-import {BrowserInfo} from '../../shared';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 
 import {

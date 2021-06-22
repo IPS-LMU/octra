@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {exhaustMap} from 'rxjs/operators';
-import {Subject, timer} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {SessionStorageService} from 'ngx-webstorage';
 import {ApplicationActions} from '../application/application.actions';
 import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
+import {Subject, timer} from 'rxjs';
+import {exhaustMap} from 'rxjs/operators';
 
 
 @Injectable({

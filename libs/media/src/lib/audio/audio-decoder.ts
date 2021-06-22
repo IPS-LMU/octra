@@ -1,8 +1,9 @@
-import {Subject, timer} from 'rxjs';
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
 import {SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
 import {AudioFormat, WavFormat} from './AudioFormats';
+import {Subject} from 'rxjs/internal/Subject';
+import {timer} from 'rxjs/internal/observable/timer';
 
 declare let window: unknown;
 

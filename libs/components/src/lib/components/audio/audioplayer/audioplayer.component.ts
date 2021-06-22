@@ -10,10 +10,11 @@ import {
   ViewChild
 } from '@angular/core';
 import Konva from 'konva';
-import {Subscription, timer} from 'rxjs';
 import {AudioplayerSettings} from './audioplayer-settings';
 import {SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, PlayBackStatus, SampleUnit} from '@octra/media';
+import {Subscription} from 'rxjs/internal/Subscription';
+import {timer} from 'rxjs/internal/observable/timer';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({
@@ -95,7 +96,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   public get timeLeft(): number {
-    if (!(this.audioChunk === undefined || this.audioChunk === undefined) && this.audioChunk.relativePlayposition !== undefined) {
+    if (!(this.audioChunk === undefined) && this.audioChunk.relativePlayposition !== undefined) {
       return (this.audioChunk.time.duration.unix - this.audioChunk.relativePlayposition.unix);
     }
     return 0;
@@ -114,7 +115,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   afterChunkUpdated() {
-    if (!(this.audioChunk === undefined || this.audioChunk === undefined)) {
+    if (!(this.audioChunk === undefined)) {
       if (this.bufferedSubscr > -1) {
         this.subscrmanager.removeById(this.bufferedSubscr);
       }

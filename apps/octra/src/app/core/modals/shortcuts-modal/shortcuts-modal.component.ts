@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
-import {BrowserInfo} from '../../shared';
 import {KeymappingService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import {BrowserInfo} from '@octra/utilities';
 
 @Component({
   selector: 'octra-shortcuts-modal',

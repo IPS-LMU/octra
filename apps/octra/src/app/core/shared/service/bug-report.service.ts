@@ -1,17 +1,16 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import * as moment from 'moment';
 import {Observable} from 'rxjs';
-import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
-import {BrowserInfo} from '../BrowserInfo';
 import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {getFileSize} from '@octra/utilities';
+import {BrowserInfo, getFileSize} from '@octra/utilities';
 import {LoginMode} from '../../store';
+import {DateTime} from 'luxon';
+import {isArray} from 'rxjs/internal-compatibility';
 
 export enum ConsoleType {
   LOG,
@@ -56,11 +55,11 @@ export class BugReportService {
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {
       type,
-      timestamp: moment().format('DD.MM.YY HH:mm:ss'),
+      timestamp: DateTime.now().setLocale('de').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
       message
     };
 
-    if (this._console !== undefined && consoleItem !== undefined) {
+    if (this._console !== undefined) {
       this._console = [
         ...this._console,
         consoleItem
@@ -82,7 +81,7 @@ export class BugReportService {
 
       this._console = entries.concat([{
         type: 0,
-        timestamp: moment().format('DD.MM.YY HH:mm:ss'),
+        timestamp: DateTime.now().setLocale('de').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
         message: '--- AFTER RELOAD ---'
       }], this._console);
     }
@@ -129,7 +128,7 @@ export class BugReportService {
       result.octra.jobID = this.appStorage.dataID;
     }
 
-    if (!(this.transcrService === undefined || this.transcrService === undefined)) {
+    if (!(this.transcrService === undefined)) {
       const file = getFileSize(this.transcrService.audiofile.size);
       result.octra.audiofile_size = file.size + ' ' + file.label;
       result.octra.audiofile_duration = this.transcrService.audioManager.ressource.info.duration.seconds;
@@ -155,7 +154,7 @@ export class BugReportService {
         }
       }
 
-      if (!(this.reporter === undefined || this.reporter === undefined)) {
+      if (!(this.reporter === undefined)) {
         return this.reporter.getText(this.getPackage());
       }
     }
@@ -168,7 +167,7 @@ export class BugReportService {
   ): Observable<any> {
     const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-    if (!(bugreportSettings === undefined || bugreportSettings === undefined) && bugreportSettings.enabled) {
+    if (!(bugreportSettings === undefined) && bugreportSettings.enabled) {
       const auth_token = credentials.auth_token;
       const url = credentials.url;
       const form = {

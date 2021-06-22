@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {exhaustMap, filter, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
@@ -19,6 +18,7 @@ import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
 import {IIDBModeOptions} from '../../shared/octra-database';
 import {hasProperty} from '@octra/utilities';
+import {exhaustMap, filter, mergeMap, withLatestFrom} from 'rxjs/operators';
 
 
 @Injectable({

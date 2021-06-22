@@ -1,7 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {exhaustMap} from 'rxjs/operators';
-import {Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {ConfigurationService} from '../../shared/service/configuration.service';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
@@ -9,6 +7,8 @@ import {findElements, getAttr, uniqueHTTPRequest} from '@octra/utilities';
 import {HttpClient} from '@angular/common/http';
 import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
+import {Subject} from 'rxjs';
+import {exhaustMap} from 'rxjs/operators';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);

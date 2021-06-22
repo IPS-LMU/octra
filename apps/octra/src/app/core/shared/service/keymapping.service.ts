@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {BrowserInfo} from '../BrowserInfo';
-import {Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '@octra/utilities';
+import {BrowserInfo, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '@octra/utilities';
 
 @Injectable()
 export class KeymappingService {

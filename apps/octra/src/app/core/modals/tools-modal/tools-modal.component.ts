@@ -15,8 +15,7 @@ import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
-
-declare let JSZip;
+import * as JSZip from 'jszip';
 
 @Component({
   selector: 'octra-tools-modal',
@@ -258,7 +257,10 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
           let sizeProcessed = 0;
           const startZipping = Date.now();
-          this.tools.audioCutting.clientStreamHelper = zip.generateInternalStream({type: 'blob', streamFiles: true})
+          this.tools.audioCutting.clientStreamHelper = (zip as any).generateInternalStream({
+            type: 'blob',
+            streamFiles: true
+          })
             .on('data', (data, metadata) => {
               if (sizeProcessed === 0) {
                 // first process

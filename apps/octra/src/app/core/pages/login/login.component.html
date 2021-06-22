@@ -13,127 +13,116 @@
     </div>
   </div>
   <div class="row" id="loginrow">
-    <div #onlinemode class="col-md-6 card" id='onlinemode' style="padding:40px;">
-      <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
-         class="warning">
-      </p>
-      <section>
-        <h4>{{ 'login.online mode' | transloco}}</h4>
-        <p style="text-align: center;">
-          {{"login.online mode description" | transloco}}
+    <mdb-card #onlinemode class="col-md-6 login-card">
+      <mdb-card-body>
+        <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
+           class="warning">
         </p>
-        <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
-          {{'login.online mode disabled' | transloco}}
-        </div>
-        <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
-          <div *ngIf="apiStatus === 'init'" style="text-align: center;margin-top:20%;">
-            <ng-container>
-              <fa-icon [size]="'4x'" icon="spinner" [spin]="true" style="color:lightgray"></fa-icon>
-            </ng-container>
+        <section>
+          <h4>{{ 'login.online mode' | transloco}}</h4>
+          <p style="text-align: center;">
+            {{"login.online mode description" | transloco}}
+          </p>
+          <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
+            {{'login.online mode disabled' | transloco}}
           </div>
-          <div *ngIf="apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
-            <ng-container *ngIf="apiStatus === 'unavailable'">
-              <div class="alert alert-danger" style="padding:20px;">
-                <div style="text-align: center;">
-                  <fa-icon [size]="'4x'" icon="exclamation-triangle" style="color:red"></fa-icon>
+          <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
+
+            <div *ngIf="apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
+              <ng-container *ngIf="apiStatus === 'unavailable'">
+                <div class="alert alert-danger" style="padding:20px;">
+                  <div style="text-align: center;">
+                    <fa-icon [size]="'4x'" icon="exclamation-triangle" style="color:red"></fa-icon>
+                  </div>
+                  <p style="text-align: justify; margin-top:10px;">
+                    {{"login.api not available" | transloco}}
+                  </p>
                 </div>
-                <p style="text-align: justify; margin-top:10px;">
-                  {{"login.api not available" | transloco}}
-                </p>
-              </div>
-            </ng-container>
-          </div>
-          <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)" *ngIf="apiStatus === 'available'">
-            <fieldset>
-              <div class="form-group">
-                <label class="control-label" for="select111">
-                  {{"general.select database" | transloco}}
-                </label>
-                <select #selection [(ngModel)]="member.project" aria-describedby="databaseName" class="form-control"
-                        id="select111" name="project" required>
-                  <option value="">{{"general.select database" | transloco}}</option>
-                  <option *ngFor="let project of projects;" value="{{project}}">{{project}}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="control-label" for="login-id">
-                  {{ 'general.name' | transloco}}
-                </label>
-                <input [(ngModel)]="member.id" aria-describedby="loginName" class="form-control"
-                       id="login-id"
-                       name="login-id" pattern="\w+"
-                       placeholder="{{ 'general.name' | transloco }}"
-                       required
-                />
-              </div>
-              <div *ngIf="passwordExists()" class="form-group">
-                <label class="control-label" for="login-password">
-                  {{ 'general.password' | transloco}}
-                </label>
-                <input [(ngModel)]="member.password" aria-describedby="password" class="form-control"
-                       id="login-password"
-                       name="login-password"
-                       placeholder="{{ 'general.password' | transloco }}" type="password"
-                />
-              </div>
-              <div class="form-group">
-                <label class="control-label" for="jobno">
-                  {{"general.job number" | transloco}}
-                </label>
-                <input #t [(ngModel)]="member.jobno" aria-describedby="jobNumber" class="form-control"
-                       id="jobno"
-                       name="jobno" pattern="[0-9]+"
-                       placeholder="{{'general.job number' | transloco}}"
-                       type="number"
-                />
-              </div>
-              <div class="form-group">
-                <button [disabled]="!f.valid"
-                        aria-describedby="submitButton"
-                        class="btn btn-primary btn-raised login-submit"
-                        name="login-submit">{{'general.login' | transloco}}
+              </ng-container>
+            </div>
+            <div class="text-center" *ngIf="apiStatus === 'available'">
+              <!-- Default form login -->
+              <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)">
+                <button mdbBtn [block]="true" class="my-4 btn-primary" type="submit">
+                  <fa-icon icon="university"></fa-icon>
+                  Sign in with Shibboleth
                 </button>
-              </div>
-            </fieldset>
-          </form>
-        </div>
-        <br/>
-      </section>
-    </div>
-    <div #localmode class="col-md-6 card" id='localmode' style="padding:40px;">
-      <section>
-        <h4>{{'login.local mode' | transloco}}
-        </h4>
-        <p style="text-align: center;">
-          {{"login.local mode description" | transloco}}
-        </p>
-        <div>
-          <div *ngIf="appStorage.sessionfile !== undefined"
-               [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
-               class="alert alert-warning">
+              </form>
+              <span>or</span>
+              <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)">
+                <!-- Username -->
+                <div class="md-form">
+                  <input mdbInput type="text" name="username" [(ngModel)]="member.id" id="username"
+                         class="form-control">
+                  <label for="username">Username</label>
+                </div>
+
+                <!-- Username -->
+                <div class="md-form">
+                  <input mdbInput type="password" name="password" [(ngModel)]="member.id" id="password"
+                         class="form-control">
+                  <label for="password">Password</label>
+                </div>
+
+                <div class="d-flex justify-content-around">
+                  <div>
+                    <!-- Remember me -->
+                    <mdb-checkbox [default]="true">Remember me</mdb-checkbox>
+                  </div>
+                  <div>
+                    <!-- Forgot password -->
+                    <a href="">Forgot password?</a>
+                  </div>
+                </div>
+
+                <!-- Sign in button -->
+                <button mdbBtn color="info" [block]="true" class="my-4" type="submit">
+                  <fa-icon icon="house-user"></fa-icon>
+                  Sign in with credentials
+                </button>
+              </form>
+              <!-- Default form login -->
+            </div>
           </div>
-          <div style="margin-top: 40px;">
-            <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
+          <br/>
+        </section>
+      </mdb-card-body>
+    </mdb-card>
+    <mdb-card #localmode class="col-md-6 login-card">
+      <mdb-card-body>
+        <section>
+          <h4>{{'login.local mode' | transloco}}
+          </h4>
+          <p style="text-align: center;">
+            {{"login.local mode description" | transloco}}
+          </p>
+          <div>
+            <div *ngIf="appStorage.sessionfile !== undefined"
+                 [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
+                 class="alert alert-warning">
+            </div>
+            <div style="margin-top: 40px;">
+              <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
+            </div>
+            <button
+              (click)="onOfflineSubmit()"
+              *ngIf="getFileStatus() !== 'new'"
+              [disabled]="getFileStatus() !== 'start'"
+              class="btn btn-raised btn-primary"
+              id="offline-submit"
+              type="submit">
+              {{'transcription.start' | transloco}}
+            </button>
+            <button
+              (click)="onTranscriptionDelete()"
+              *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
+              class="btn btn-raised btn-danger offline-delete-btn">
+              {{'transcription.new' |transloco}}
+            </button>
           </div>
-          <button
-            (click)="onOfflineSubmit()"
-            *ngIf="getFileStatus() !== 'new'"
-            [disabled]="getFileStatus() !== 'start'"
-            class="btn btn-raised btn-primary"
-            id="offline-submit"
-            type="submit">
-            {{'transcription.start' | transloco}}
-          </button>
-          <button
-            (click)="onTranscriptionDelete()"
-            *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
-            class="btn btn-raised btn-danger offline-delete-btn">
-            {{'transcription.new' |transloco}}
-          </button>
-        </div>
-      </section>
-    </div>
+        </section>
+      </mdb-card-body>
+    </mdb-card>
   </div>
 </div>
 <div class="section">

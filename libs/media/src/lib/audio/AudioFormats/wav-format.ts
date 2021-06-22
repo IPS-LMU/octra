@@ -1,6 +1,6 @@
-import {Subject} from 'rxjs';
 import {AudioFormat} from './audio-format';
 import {NumeratedSegment} from '../../types';
+import {Subject} from 'rxjs/internal/Subject';
 
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {

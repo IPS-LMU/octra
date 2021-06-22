@@ -3,7 +3,6 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {afterDefined, afterTrue, SubscriptionManager} from '@octra/utilities';
-import {Subject, Subscription} from 'rxjs';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {APIService} from './api.service';
@@ -13,6 +12,7 @@ import {getModeState, LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
 import * as fromApplication from '../../store/application';
 import {ConfigurationActions} from '../../store/configuration/configuration.actions';
+import {Subject, Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

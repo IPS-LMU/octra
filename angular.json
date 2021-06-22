@@ -144,32 +144,7 @@
             "polyfills": "apps/octra/src/polyfills.ts",
             "tsConfig": "apps/octra/tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "js-sha256",
-              "jodit-angular",
-              "x2js",
-              "konva",
-              "crossevent",
-              "contra/emitter",
-              "flat",
-              "dragula",
-              "platform",
-              "global/document",
-              "videojs",
-              "ajv",
-              "querystring",
-              "crossvent",
-              "xmldom",
-              "videojs-vtt.js",
-              "@videojs/xhr",
-              "@babel/runtime/helpers/possibleConstructorReturn",
-              "@babel/runtime/helpers/construct",
-              "@babel/runtime/helpers/inherits",
-              "mux.js/lib/tools/mp4-inspector",
-              "mux.js/lib/tools/ts-inspector.js",
-              "mux.js/lib/mp4/probe",
-              "mux.js/lib/mp4/caption-parser",
-              "@videojs/vhs-utils/dist/resolve-url",
-              "@videojs/vhs-utils/dist/decode-b64-to-uint8-array"
+              "jodit-angular"
             ],
             "assets": [
               "apps/octra/src/assets",
@@ -183,11 +158,7 @@
             ],
             "scripts": [
               "apps/octra/src/assets/js/modernizr.js",
-              "node_modules/platform/platform.js",
-              "node_modules/hammerjs/hammer.min.js",
-              "node_modules/video.js/dist/video.js",
-              "node_modules/moment/min/moment.min.js",
-              "node_modules/jszip/dist/jszip.min.js"
+              "node_modules/hammerjs/hammer.min.js"
             ],
             "extractLicenses": true
           },

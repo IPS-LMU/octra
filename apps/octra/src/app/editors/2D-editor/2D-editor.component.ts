@@ -30,17 +30,13 @@ import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval} from '../../core/shared/service/asr.service';
 import {OCTRAEditor} from '../octra-editor';
 import {TranscrWindowComponent} from './transcr-window';
-import {
-  AudioNavigationComponent,
-  AudioViewerComponent,
-  AudioviewerConfig,
-  AudioViewerShortcutEvent
-} from '@octra/components';
+import {AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent} from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
 import {ApplicationState} from '../../core/store';
 import {Store} from '@ngrx/store';
 import {interval, Subscription, timer} from 'rxjs';
+import {AudioNavigationComponent} from '../../core/component/audio-navigation';
 
 @Component({
   selector: 'octra-overlay-gui',

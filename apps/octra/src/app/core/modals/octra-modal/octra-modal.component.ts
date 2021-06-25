@@ -22,13 +22,34 @@ import {modalConfigurations} from '../types';
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
   modals = {
-    error: ErrorModalComponent,
-    bugreport: BugreportModalComponent,
-    supportedfiles: SupportedFilesModalComponent,
-    yesno: YesNoModalComponent,
-    loginInvalid: LoginInvalidModalComponent,
-    transcriptionDelete: TranscriptionDeleteModalComponent,
-    transcriptionStop: TranscriptionStopModalComponent
+    error: {
+      visible: false,
+      type: ErrorModalComponent
+    },
+    bugreport: {
+      visible: false,
+      type: BugreportModalComponent
+    },
+    supportedfiles: {
+      visible: false,
+      type: SupportedFilesModalComponent
+    },
+    yesno: {
+      visible: false,
+      type: YesNoModalComponent
+    },
+    loginInvalid: {
+      visible: false,
+      type: LoginInvalidModalComponent
+    },
+    transcriptionDelete: {
+      visible: false,
+      type: TranscriptionDeleteModalComponent
+    },
+    transcriptionStop: {
+      visible: false,
+      type: TranscriptionStopModalComponent
+    }
   };
 
   public bgdescr = '';
@@ -69,8 +90,6 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       }));
   }
 
-  ü
-
   ngOnDestroy() {
     this._subscrmanager.destroy();
   }
@@ -78,7 +97,15 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   openModal(name: string, data?: any): Promise<any> {
     if (hasProperty(this.modals, name)) {
       if (hasProperty(modalConfigurations, name)) {
-        return this.modService.openModal(this.modals[name], modalConfigurations[name], data);
+        if (!this.modals[name].visible) {
+          this.modals[name].visible = true;
+          return this.modService.openModal(this.modals[name].type, modalConfigurations[name], data).then(() => {
+            this.modals[name].visible = false;
+          });
+        }
+        return new Promise<void>((resolve) => {
+          resolve();
+        });
       } else {
         return new Promise<any>((reject) => {
           reject(new Error(`Can't find modal configuration for name ${name}`));

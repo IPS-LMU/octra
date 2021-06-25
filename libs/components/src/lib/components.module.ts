@@ -17,7 +17,6 @@ import {
   faVolumeDown,
   faVolumeUp
 } from '@fortawesome/free-solid-svg-icons';
-import {AudioNavigationComponent} from './components/audio/audio-navigation';
 import {AudioViewerComponent} from './components/audio/audio-viewer';
 import {AudioplayerComponent} from './components/audio/audioplayer';
 import {LeadingNullPipe, ProcentPipe} from './pipe';
@@ -26,7 +25,6 @@ import {TimespanPipe} from './pipe/timespan.pipe';
 @NgModule({
   declarations: [
     AudioplayerComponent,
-    AudioNavigationComponent,
     ProcentPipe,
     AudioViewerComponent,
     LeadingNullPipe,
@@ -42,7 +40,6 @@ import {TimespanPipe} from './pipe/timespan.pipe';
     ReactiveFormsModule
   ],
   exports: [
-    AudioNavigationComponent,
     AudioplayerComponent,
     AudioViewerComponent,
     ProcentPipe,

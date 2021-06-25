@@ -32,16 +32,16 @@ export class TranscriptionFeedbackComponent {
   }
 
   public saveFeedbackform() {
-    if (!(this.transcrService.feedback.comment === undefined) && this.transcrService.feedback.comment !== '') {
+    if (!(this.transcrService?.feedback?.comment === undefined) && this.transcrService.feedback.comment !== '') {
       this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, ' ');
     }
-    this.appStorage.comment = this.transcrService.feedback.comment;
+    this.appStorage.comment = this.transcrService?.feedback?.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
       for (const [name, value] of getProperties(this.feedbackData)) {
         this.changeValue(name, value);
       }
-      this.appStorage.save('feedback', this.transcrService.feedback.exportData());
+      this.appStorage.save('feedback', this.transcrService?.feedback?.exportData());
     }
   }
 

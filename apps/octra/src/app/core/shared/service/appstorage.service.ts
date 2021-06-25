@@ -196,7 +196,7 @@ export class AppStorageService {
   }
 
   get servercomment(): string {
-    return getModeState(this._snapshot).onlineSession?.sessionData?.serverComment;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.serverComment;
   }
 
   get annotationLevels(): AnnotationStateLevel[] {

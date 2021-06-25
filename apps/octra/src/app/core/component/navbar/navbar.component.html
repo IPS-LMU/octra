@@ -45,20 +45,22 @@
 
     <ng-template #showMembersNav>
       <ul class="navbar-nav mr-auto">
-        <li *ngFor="let editor of editors" class="nav-item">
-          <ng-container *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
-                        [ngClass]="{
+        <ng-template [ngForOf]="editors" let-editor ngFor>
+          <li class="nav-item waves-light" mdbWavesEffect
+              *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
+              (click)="setInterface(editor.name)">
+            <a class="nav-link" [ngClass]="{
                         'active': appStorage.interface === editor.name
-                    }"
-                        class="nav-item"
-          >
-            <a (mouseup)="setInterface(editor.name)" class="nav-link">
+                    }">
+              <span>
               <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
               <span
-                class="d-none d-xl-inline"> {{editor.translate | transloco}}</span>
+                class="d-none d-xl-inline"> {{editor.translate | transloco}}
+              </span>
+              </span>
             </a>
-          </ng-container>
-        </li>
+          </li>
+        </ng-template>
         <li *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
             class="nav-item">
           <a (mouseup)="openStatisticsModal()" class="nav-link">
@@ -203,46 +205,47 @@
         <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light">
           <fa-icon icon="cog"></fa-icon>
         </a>
-        <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu"
+        <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right options-menu" role="menu"
              (click)="$event.stopPropagation();">
           <table class="table">
             <tr>
-              <td><label for="easymode">{{"settings.easy mode" | transloco}}:</label></td>
               <td>
-                <div class="switch">
-                  <label>
-                    <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
-                           id="easymode" type="checkbox">
-                  </label>
+                <label for="easymode">{{"settings.easy mode" | transloco}}:</label>
+              </td>
+              <td>
+                <div class="custom-control custom-switch">
+                  <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode" id="easymode"
+                         type="checkbox"
+                         class="custom-control-input">
+                  <label class="custom-control-label" for="easymode"></label>
                 </div>
               </td>
             </tr>
             <tr>
               <td><label for="playonhover">{{"settings.play on hover" | transloco}}:</label></td>
               <td>
-                <div class="switch">
-                  <label>
-                    <input (click)="toggleSettings('playonhover')"
-                           [checked]="appStorage.playonhover"
-                           id="playonhover" type="checkbox">
-                  </label>
+                <div class="custom-control custom-switch">
+                  <input (click)="toggleSettings('playonhover')" [checked]="appStorage.playonhover" id="playonhover"
+                         type="checkbox"
+                         class="custom-control-input">
+                  <label class="custom-control-label" for="playonhover"></label>
                 </div>
               </td>
             </tr>
             <tr>
               <td><label for="playonhover">{{"settings.follow playcursor" | transloco}}:</label></td>
               <td>
-                <div class="switch">
-                  <label>
-                    <input (click)="toggleSettings('followplaycursor')"
-                           [checked]="appStorage.followPlayCursor"
-                           id="followplaycursor" type="checkbox">
-                  </label>
+                <div class="custom-control custom-switch">
+                  <input (click)="toggleSettings('followplaycursor')" [checked]="appStorage.followPlayCursor"
+                         id="followplaycursor" type="checkbox"
+                         class="custom-control-input">
+                  <label class="custom-control-label" for="followplaycursor"></label>
                 </div>
               </td>
             </tr>
             <tr>
-              <td><label class="custom-control-label" for="logging">{{"settings.logging" | transloco}}:</label>
+              <td>
+                <label for="logging">{{"settings.logging" | transloco}}:</label>
               </td>
               <td>
                 <div class="custom-control custom-switch">
@@ -256,62 +259,47 @@
             <tr>
               <td><label for="playonhover">{{"settings.show loupe" | transloco}}:</label></td>
               <td>
-                <div class="switch">
-                  <label>
-                    <input (click)="toggleSettings('showLoupe')"
-                           [checked]="appStorage.showLoupe"
-                           id="show_loupe" type="checkbox">
-                  </label>
+                <div class="custom-control custom-switch">
+                  <input (click)="toggleSettings('showLoupe')" [checked]="appStorage.showLoupe" id="showLoupe"
+                         type="checkbox"
+                         class="custom-control-input">
+                  <label class="custom-control-label" for="showLoupe"></label>
                 </div>
               </td>
             </tr>
-            <ng-container *ngIf="appStorage.interface === '2D-Editor'">
-              <tr>
-                <td colspan="2">
-                  <hr style="border:1px solid lightgray;"/>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2"><label>{{"settings.seconds per line" | transloco}}:</label></td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <div class="btn-group">
-                    <button (click)="changeSecondsPerLine(5)" [ngClass]="{
-                    'btn-primary': secondsPerLine === 5
-                    }" name="secondsPerLine"
-                            class="btn btn-outline-secondary" role="button"
-                            tabindex="0">5
-                    </button>
-                    <button (click)="changeSecondsPerLine(10)" [ngClass]="{
-                    'btn-primary': secondsPerLine === 10
-                    }" name="secondsPerLine"
-                            class="btn btn-outline-secondary" role="button"
-                            tabindex="0">10
-                    </button>
-                    <button (click)="changeSecondsPerLine(15)" [ngClass]="{
-                    'btn-primary': secondsPerLine === 15
-                    }" name="secondsPerLine"
-                            class="btn btn-outline-secondary" role="button"
-                            tabindex="0">15
-                    </button>
-                    <button (click)="changeSecondsPerLine(20)" [ngClass]="{
-                    'btn-primary': secondsPerLine === 20
-                    }" name="secondsPerLine"
-                            class="btn btn-outline-secondary" role="button"
-                            tabindex="0">20
-                    </button>
-                    <button (click)="changeSecondsPerLine(60)" [ngClass]="{
-                    'btn-primary': secondsPerLine === 60
-                    }" name="secondsPerLine"
-                            class="btn btn-outline-secondary" role="button"
-                            tabindex="0">60
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </ng-container>
           </table>
+          <ng-container *ngIf="appStorage.interface === '2D-Editor'">
+            <hr style="border:1px solid lightgray;"/>
+            <br/>
+            <label>{{"settings.seconds per line" | transloco}}:</label>
+            <div class="btn-group">
+              <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 5) ? 'primary' : 'secondary'"
+                      [outline]="secondsPerLine !== 5" (click)="changeSecondsPerLine(5)" name="secondsPerLine"
+                      role="button"
+                      tabindex="0">5
+              </button>
+              <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 10) ? 'primary' : 'secondary'"
+                      [outline]="secondsPerLine !== 10" (click)="changeSecondsPerLine(10)" name="secondsPerLine"
+                      role="button"
+                      tabindex="0">10
+              </button>
+              <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 15) ? 'primary' : 'secondary'"
+                      [outline]="secondsPerLine !== 15" (click)="changeSecondsPerLine(15)" name="secondsPerLine"
+                      role="button"
+                      tabindex="0">15
+              </button>
+              <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 20) ? 'primary' : 'secondary'"
+                      [outline]="secondsPerLine !== 20" (click)="changeSecondsPerLine(20)" name="secondsPerLine"
+                      role="button"
+                      tabindex="0">20
+              </button>
+              <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 60) ? 'primary' : 'secondary'"
+                      [outline]="secondsPerLine !== 60" (click)="changeSecondsPerLine(60)" name="secondsPerLine"
+                      role="button"
+                      tabindex="0">60
+              </button>
+            </div>
+          </ng-container>
         </div>
       </li>
 
@@ -351,23 +339,3 @@
 
 </mdb-navbar>
 <!--/.Navbar-->
-<div
-  *ngIf="appStorage.loggedIn && (appStorage.useMode === 'online' || appStorage.useMode === 'demo') && appStorage.audioLoaded"
-  class="panel"
-  id="subnav">
-  <div class="row">
-    <div [ngClass]="{
-        'col-12 col-sm-9': appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
-        'col-12': appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext === ''
-        }" class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
-      {{navbarServ.ressource?.info.fullname}}: <i>{{appStorage.servercomment}}</i>
-    </div>
-    <div
-      *ngIf="appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext !== ''"
-      class="col-12 col-sm-3"
-      style="text-align: right;padding-right:20px;">
-      <a (click)="openPromptModal()"
-         style="cursor: pointer; color:#009688;">{{'general.prompt'| transloco}}</a>
-    </div>
-  </div>
-</div>

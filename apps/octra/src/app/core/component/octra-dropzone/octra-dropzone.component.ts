@@ -8,6 +8,8 @@ import {FileProgress} from '../../obj/objects';
 import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
 import {Subscription, timer} from 'rxjs';
+import {SupportedFilesModalComponent} from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
+import {modalConfigurations} from '../../modals/types';
 
 @Component({
   selector: 'octra-dropzone',
@@ -114,7 +116,7 @@ export class OctraDropzoneComponent implements OnDestroy {
         break;
       } else {
         // the latest dropped file is a format file
-        if (!(audioFile === undefined || audioFile === undefined)) {
+        if (!(audioFile === undefined)) {
           const extension = audioFile.file.name.substr(audioFile.file.name.lastIndexOf('.'));
           this.loadImportFileData(extension);
         } else {
@@ -153,29 +155,27 @@ export class OctraDropzoneComponent implements OnDestroy {
                     if (this._oaudiofile !== undefined &&
                       importResult.annotjson !== undefined && importResult.error === '') {
                       file.status = 'valid';
-                      if (!(this._oaudiofile === undefined || this._oaudiofile === undefined)) {
-                        for (const level of importResult.annotjson.levels) {
-                          if (level.type === 'SEGMENT') {
-                            if (level.items[0].sampleStart !== 0) {
-                              let temp = [];
-                              temp.push(new OSegment(0, 0, level.items[0].sampleStart, [new OLabel(level.name, '')]));
-                              temp = temp.concat(level.items);
-                              level.items = temp;
+                      for (const level of importResult.annotjson.levels) {
+                        if (level.type === 'SEGMENT') {
+                          if (level.items[0].sampleStart !== 0) {
+                            let temp = [];
+                            temp.push(new OSegment(0, 0, level.items[0].sampleStart, [new OLabel(level.name, '')]));
+                            temp = temp.concat(level.items);
+                            level.items = temp;
 
-                              for (let j = 1; j < level.items.length + 1; j++) {
-                                level.items[j - 1].id = j;
-                              }
-                              i++;
+                            for (let j = 1; j < level.items.length + 1; j++) {
+                              level.items[j - 1].id = j;
                             }
+                            i++;
+                          }
 
-                            const last = level.items[level.items.length - 1];
-                            if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration) {
-                              level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
-                                (this._oaudiofile.duration * this._oaudiofile.sampleRate) - (last.sampleStart + last.sampleDur),
-                                [new OLabel(level.name, '')]));
-                            } else {
-                              console.error(`Import Error, last sample of result is bigger than the audio file's duration`);
-                            }
+                          const last = level.items[level.items.length - 1];
+                          if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration) {
+                            level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
+                              (this._oaudiofile.duration * this._oaudiofile.sampleRate) - (last.sampleStart + last.sampleDur),
+                              [new OLabel(level.name, '')]));
+                          } else {
+                            console.error(`Import Error, last sample of result is bigger than the audio file's duration`);
                           }
                         }
                       }
@@ -192,8 +192,7 @@ export class OctraDropzoneComponent implements OnDestroy {
                     }
                   };
 
-                  if (!(importResult === undefined || importResult === undefined)
-                    && !(importResult.audiofile === undefined || importResult.audiofile === undefined)) {
+                  if (!(importResult === undefined) && !(importResult.audiofile === undefined)) {
                     // is bundle file
                     this.dropFile('_bndl.json', true, true);
                     const audioProcess: FileProgress = {
@@ -248,13 +247,13 @@ export class OctraDropzoneComponent implements OnDestroy {
   }
 
   showSupported() {
-    this.modService.show('supportedfiles').catch((error) => {
+    this.modService.openModal(SupportedFilesModalComponent, modalConfigurations.supportedFiles).catch((error) => {
       console.error(error);
     });
   }
 
   onDeleteEntry(entry: string) {
-    if (!(entry === undefined || entry === undefined)) {
+    if (!(entry === undefined)) {
       this.dropFile(entry);
       if (contains(entry, '.wav') || contains(entry, '.ogg')) {
         this._oaudiofile = undefined;
@@ -303,10 +302,10 @@ export class OctraDropzoneComponent implements OnDestroy {
   }
 
   private checkState() {
-    if ((this._files === undefined || this._files === undefined)) {
+    if ((this._files === undefined)) {
       this._status = 'empty';
     } else {
-      if (!(this.oaudiofile === undefined || this.oaudiofile === undefined)) {
+      if (!(this.oaudiofile === undefined)) {
         if (this.files.length > 0) {
           for (const file of this.files) {
             if (file.status === 'progress'
@@ -344,7 +343,7 @@ export class OctraDropzoneComponent implements OnDestroy {
             // not finished
           } else {
             // finished, get result
-            if (!(this._audiomanager === undefined || this._audiomanager === undefined)) {
+            if (!(this._audiomanager === undefined)) {
               this._audiomanager.destroy();
               this._audiomanager = undefined;
             }

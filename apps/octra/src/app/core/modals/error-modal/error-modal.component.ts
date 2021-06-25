@@ -9,10 +9,7 @@ import {OctraModal} from '../types';
 })
 export class ErrorModalComponent extends OctraModal {
   @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
-
-  public data = {
-    text: ''
-  };
+  text: ''
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
     super('errorModal', modalRef, modalService);

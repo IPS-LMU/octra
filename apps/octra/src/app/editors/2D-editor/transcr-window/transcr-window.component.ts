@@ -27,9 +27,10 @@ import {AppStorageService} from '../../../core/shared/service/appstorage.service
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 import {AudioChunk, AudioManager, AudioRessource, AudioSelection, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
-import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
+import {AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
 import {LoginMode} from '../../../core/store';
 import {Subscription, timer} from 'rxjs';
+import {AudioNavigationComponent} from '../../../core/component/audio-navigation';
 
 @Component({
   selector: 'octra-transcr-window',

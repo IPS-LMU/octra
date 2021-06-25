@@ -3,8 +3,6 @@ import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
-import {SubscriptionManager} from '@octra/utilities';
-import {Subscription} from 'rxjs';
 import {ModalService} from '../../modals/modal.service';
 import {Router} from '@angular/router';
 
@@ -15,8 +13,6 @@ import {Router} from '@angular/router';
 })
 export class HelpToolsComponent {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
-
-  private subscrManager = new SubscriptionManager<Subscription>();
 
   constructor(private appStorage: AppStorageService,
               private api: APIService,
@@ -30,24 +26,14 @@ export class HelpToolsComponent {
   }
 
   clearAllData() {
-    const login = document.location.href.replace('help-tools', '');
-
     const clearSession = () => {
-      this.modalService.show('protected', {
-        text: 'Please wait a moment (max. 5 seconds)'
-      }).then(() => {
-        this.appStorage.clearWholeSession().then(() => {
-          this.appStorage.logout(false);
-          setTimeout(() => {
-            document.location.reload(true);
-          }, 1000);
-        }).catch((error) => {
-          console.error(error);
-        });
-      }).catch((error) => {
-        console.error(error);
+      this.appStorage.clearWholeSession().then(() => {
+        this.appStorage.logout(false);
+        setTimeout(() => {
+          document.location.reload(true);
+        }, 1000);
       });
-    };
+    }
 
     if (this.appStorage.useMode === LoginMode.LOCAL || this.appStorage.useMode === LoginMode.DEMO || this.appStorage.useMode === LoginMode.URL) {
       clearSession();

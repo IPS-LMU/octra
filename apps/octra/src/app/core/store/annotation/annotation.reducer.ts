@@ -5,6 +5,8 @@ import {IDBActions} from '../idb/idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {IIDBModeOptions} from '../../shared/octra-database';
 import {getProperties} from '@octra/utilities';
+import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
+import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -223,6 +225,36 @@ export class AnnotationStateReducers {
                 fileName,
                 sampleRate
               }
+            };
+          }
+          return state;
+        }
+      ),
+      on(OnlineModeActions.loginDemo, (state: AnnotationState, {mode}) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              audio: initialState.audio
+            };
+          }
+          return state;
+        }
+      ),
+      on(OnlineModeActions.login, (state: AnnotationState, {mode}) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              audio: initialState.audio
+            };
+          }
+          return state;
+        }
+      ),
+      on(LocalModeActions.login, (state: AnnotationState, {mode}) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              audio: initialState.audio
             };
           }
           return state;

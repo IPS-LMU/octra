@@ -7,11 +7,11 @@
   </div>
   <div class="modal-body" [innerHTML]="'modal.transcription.stop.text' | transloco"></div>
   <div class="modal-footer">
-    <button (click)="close('CONTINUE')" class="btn btn-default" data-dismiss="modal" type="button">
+    <button mdbBtn mdbWavesEffect color="secondary" (click)="close('QUIT');">
+      {{"general.quit" | transloco}}
+    </button>
+    <button mdbBtn mdbWavesEffect color="primary" (click)="close('CONTINUE')" class="waves-light"
+            type="button">
       {{"general.continue" | transloco}}
     </button>
-    <button (click)="close('QUIT');" class="btn btn-primary"
-            type="button">
-      {{"general.quit" | transloco}}
-  </button>
-</div>
+  </div>

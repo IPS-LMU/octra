@@ -78,9 +78,9 @@ export class TranscriptionService {
 
   public get currentlevel(): Level {
     if (this._selectedlevel === undefined || this._selectedlevel < 0) {
-      return this._annotation.levels[0];
+      return this._annotation?.levels[0];
     }
-    return this._annotation.levels[this._selectedlevel];
+    return this._annotation?.levels[this._selectedlevel];
   }
 
   private _annotation: Annotation;

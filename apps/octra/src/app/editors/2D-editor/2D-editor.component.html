@@ -9,38 +9,15 @@
                           (afterVolumeChange)="afterVolumeChange($event)"
                           (buttonClick)="onButtonClick($event)"
                           [audioChunk]="audioChunkLines"
-
-                          [buttons]="{
-                                play: {
-                                    label: ('general.play' | transloco),
-                                    shortcut: keyMap.getShortcut('overlay', 'play_pause')
-                                },
-                                pause: {
-                                    label: ('general.pause' | transloco),
-                                    shortcut: keyMap.getShortcut('overlay', 'play_pause')
-                                },
-                                stop: {
-                                    label: ('general.stop' | transloco),
-                                    shortcut: keyMap.getShortcut('overlay', 'stop')
-                                },
-                                replay: {
-                                    label: ('general.replay' | transloco),
-                                    shortcut: ''
-                                },
-                                backward: {
-                                    label: ('general.backward' | transloco),
-                                    shortcut: keyMap.getShortcut('overlay', 'step_backward')
-                                },
-                                backwardtime: {
-                                    label: ('general.backwardtime' | transloco),
-                                    shortcut: keyMap.getShortcut('overlay', 'step_backward')
-                                }
-                              }"
                           [easyMode]="appStorage.easymode"
                           [playbackRate]="appStorage.audioSpeed"
                           [responsive]="settingsService.responsive.enabled"
                           [volume]="appStorage.audioVolume"
-  ></octra-audio-navigation>
+  >
+    <button octraOcbAudioBtn>
+      test
+    </button>
+  </octra-audio-navigation>
   <div *ngIf="appStorage.showLoupe">
     <octra-audio-viewer #loupe
                         (mousemove)="onCircleLoupeMouseOver($event)"

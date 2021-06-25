@@ -13,7 +13,10 @@ import {
 } from '@octra/utilities';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
-import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import {
+  ModalDeleteAnswer,
+  TranscriptionDeleteModalComponent
+} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {APIService, AudioService, SettingsService} from '../../shared/service';
@@ -24,6 +27,9 @@ import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {Observable, Subscription} from 'rxjs';
+import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
+import {modalConfigurations} from '../../modals/types';
+import {LoginInvalidModalComponent} from '../../modals/login-invalid-modal/login-invalid-modal.component';
 
 @Component({
   selector: 'octra-login',
@@ -124,8 +130,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.appStorage.clearLoggingDataPermanently();
     this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
       if (error === 'file not supported') {
-        this.modService.show('error', {
-          text: this.langService.translate('reload-file.file not supported', {type: ''})
+        this.modService.openModal(ErrorModalComponent, {
+          ...modalConfigurations.error,
+          data: {
+            text: this.langService.translate('reload-file.file not supported', {type: ''})
+          }
         }).catch((error2) => {
           console.error(error2);
         });
@@ -313,7 +322,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onTranscriptionDelete() {
-    this.modService.show('transcriptionDelete').then((answer: ModalDeleteAnswer) => {
+    this.modService.openModal(TranscriptionDeleteModalComponent, modalConfigurations.transcriptionDelete).then((answer: ModalDeleteAnswer) => {
       if (answer === ModalDeleteAnswer.DELETE) {
         this.newTranscription();
       }
@@ -425,7 +434,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft, true);
         this.navigate();
       } else {
-        this.modService.show('loginInvalid').catch((error) => {
+        this.modService.openModal(LoginInvalidModalComponent, {}).catch((error) => {
           console.error(error);
         });
       }

@@ -34,7 +34,10 @@ import {
 } from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {
+  TranscriptionStopModalAnswer,
+  TranscriptionStopModalComponent
+} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
@@ -59,6 +62,7 @@ import {LoginMode} from '../../store';
 import {ShortcutsModalComponent} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {modalConfigurations} from '../../modals/types';
+import {PromptModalComponent} from '../../modals/prompt-modal/prompt-modal.component';
 
 @Component({
   selector: 'octra-transcription',
@@ -67,6 +71,13 @@ import {modalConfigurations} from '../../modals/types';
   providers: [AlertService]
 })
 export class TranscriptionComponent implements OnInit, OnDestroy {
+  get selectedTheme(): string {
+    return this._selectedTheme;
+  }
+
+  get useMode(): string {
+    return this._useMode;
+  }
 
   public waitForSend = false;
   modalShortcutsDialogue: MDBModalRef;
@@ -85,6 +96,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   public platform = BrowserInfo.platform;
   private subscrmanager: SubscriptionManager<Subscription>;
   private sendOk = false;
+  private _useMode = '';
+  private _selectedTheme = '';
   private levelSubscriptionID = 0;
   private audioManager: AudioManager;
 
@@ -169,13 +182,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   };
 
   showCommentSection = false;
+  isInactivityModalVisible = false;
 
   public get Interface(): string {
     return this.interface;
   }
 
   get loaded(): boolean {
-    return (this.audio.loaded && !(this.transcrService.guidelines === undefined || this.transcrService.guidelines === undefined));
+    return (this.audio.loaded && this.transcrService.guidelines !== undefined);
   }
 
   get appc(): any {
@@ -253,7 +267,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }));
 
     this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
-      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
+      if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
         if (['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(event.shortcut)) {
           event.event.preventDefault();
           this.waitForSend = true;
@@ -323,7 +337,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   }
 
   abortTranscription = () => {
-    if ((this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO)
+    if ((this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO)
       && this.settingsService.projectsettings.octra !== undefined
       && this.settingsService.projectsettings.octra.theme !== undefined
       && this.settingsService.isTheme('shortAudioFiles')) {
@@ -331,7 +345,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
       this.transcrService.endTranscription();
 
-      if (this.appStorage.useMode !== LoginMode.DEMO) {
+      if (this._useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           this.logout(true);
         }).catch((error) => {
@@ -342,7 +356,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.logout(true);
       }
     } else {
-      this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
+      this.modService.openModal(TranscriptionStopModalComponent, modalConfigurations.transcriptionStop).then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.logout(false);
         }
@@ -358,10 +372,16 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit() {
+    this._useMode = this.appStorage.useMode;
+    this._selectedTheme = (
+      this.projectsettings?.octra === undefined
+      || this.projectsettings?.octra?.theme === undefined
+    )
+      ? 'default' : this.projectsettings?.octra.theme;
     this.showCommentSection = (
         this.settingsService.isTheme('shortAudioFiles') ||
         this.settingsService.isTheme('korbinian')
-      ) && (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo')
+      ) && (this._useMode === 'online' || this._useMode === 'demo')
       && this.transcrService.feedback !== undefined;
 
     this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
@@ -402,7 +422,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
     this.bugService.init(this.transcrService);
 
-    if (this.appStorage.useMode === LoginMode.ONLINE) {
+    if (this._useMode === LoginMode.ONLINE) {
       // console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
     }
 
@@ -461,7 +481,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }
     ));
 
-    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
+    if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
       if (this.settingsService.appSettings.octra.inactivityNotice !== undefined
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
@@ -471,8 +491,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.subscrmanager.add(interval(5000).subscribe(
           () => {
             if (Date.now() - this.uiService.lastAction > waitTime && !this.modalVisiblities.inactivity) {
-              if (this.inactivityModal === undefined) {
+              if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
+                this.isInactivityModalVisible = true;
                 this.modService.openModal(InactivityModalComponent, modalConfigurations.inactivity).then((answer) => {
+                  this.isInactivityModalVisible = false;
                   switch (answer) {
                     case('quit'):
                       this.abortTranscription();
@@ -567,7 +589,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       this.cd.detectChanges();
       let comp: any = undefined;
 
-      if ((name === undefined || name === undefined) || name === '') {
+      if ((name === undefined) || name === '') {
         // fallback to last editor
         name = editorComponents[editorComponents.length - 1].name;
       }
@@ -580,7 +602,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (!(comp === undefined || comp === undefined)) {
+      if (!(comp === undefined)) {
         const id = this.subscrmanager.add(comp.initialized.subscribe(
           () => {
             this.editorloaded = true;
@@ -591,7 +613,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
           }
         ));
 
-        if (!(this.appLoadeditor === undefined || this.appLoadeditor === undefined)) {
+        if (!(this.appLoadeditor === undefined)) {
           const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
           this.subscrmanager.add(timer(20).subscribe(() => {
@@ -634,7 +656,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
     const json: any = this.transcrService.exportDataToJSON();
 
-    if (this.appStorage.useMode === LoginMode.ONLINE) {
+    if (this._useMode === LoginMode.ONLINE) {
       this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
@@ -657,11 +679,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }).catch((error) => {
         this.onSendError(error);
       });
-    } else if (this.appStorage.useMode === LoginMode.DEMO) {
+    } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
-      this.modalOverview.hide();
+      if (this.modalVisiblities.overview) {
+        this.modalOverview.hide();
+      }
 
-      this.modService.openModal(TranscriptionDemoEndModalComponent, modalConfigurations.transcriptionDemo).then((action: ModalEndAnswer) => {
+      this.modService.openModal(TranscriptionDemoEndModalComponent, modalConfigurations.transcriptionDemoEnd).then((action: ModalEndAnswer) => {
         this.appStorage.savingNeeded = false;
         this.waitForSend = false;
 
@@ -763,13 +787,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         }
 
         let promptText = '';
-        if (this.appStorage.useMode === LoginMode.ONLINE && hasProperty(data, 'prompttext') && data.prompttext !== '') {
+        if (this._useMode === LoginMode.ONLINE && hasProperty(data, 'prompttext') && data.prompttext !== '') {
           // get transcript data that already exists
           promptText = json.data.prompttext;
         }
 
         let serverComment = '';
-        if (this.appStorage.useMode === LoginMode.ONLINE && hasProperty(data, 'comment') && data.comment !== '') {
+        if (this._useMode === LoginMode.ONLINE && hasProperty(data, 'comment') && data.comment !== '') {
           // get transcript data that already exists
           serverComment = data.comment;
         }
@@ -819,7 +843,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
   closeTranscriptionAndGetNew() {
     // close current session
-    if (this.appStorage.useMode === LoginMode.ONLINE) {
+    if (this._useMode === LoginMode.ONLINE) {
       this.api.closeSession(this.appStorage.onlineSession.loginData.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
         // begin new session
         this.api.beginSession(this.appStorage.onlineSession.loginData.project, this.appStorage.onlineSession.loginData.id, this.appStorage.onlineSession.loginData.jobNumber).then((json) => {
@@ -831,7 +855,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }).catch((error) => {
         console.error(error);
       });
-    } else if (this.appStorage.useMode === LoginMode.DEMO) {
+    } else if (this._useMode === LoginMode.DEMO) {
       this.reloadDemo();
     }
   }
@@ -969,5 +993,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   openShortcutsModal() {
     this.modalShortcutsDialogue = this.modService.openModalRef(ShortcutsModalComponent, modalConfigurations.shortcuts);
     this.modalVisiblities.shortcuts = true;
+  }
+
+  openPromptModal() {
+    // TODO mdb: preserve this.transcrServ.audiofile
+    this.modService.openModalRef(PromptModalComponent, modalConfigurations.prompt);
   }
 }

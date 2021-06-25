@@ -12,23 +12,6 @@ export class ModalService {
 
   }
 
-  /**
-   * shows a predefined modal. this modal must be defined in octra-modal.component.
-   */
-  public show(type: string, data?: any): Promise<any> {
-    return new Promise<void>((resolve, reject) => {
-      this.showmodal.emit({type, data, emitter: this.modalaction});
-      const subscr = this.modalaction.subscribe((result) => {
-          subscr.unsubscribe();
-          this.closemodal.emit({type});
-          resolve(result);
-        },
-        (err) => {
-          reject(err);
-        });
-    });
-  }
-
   public openModal(modal: any, config: ModalOptions, data?: any) {
     const modalRef = this.modalService.show(modal, {
       ...config,

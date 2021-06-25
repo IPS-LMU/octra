@@ -98,8 +98,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       }
                     }
 
-                    if (!(importResult === undefined || importResult === undefined)
-                      && !(importResult.annotjson === undefined || importResult.annotjson === undefined)) {
+                    if (!(importResult === undefined) && !(importResult.annotjson === undefined)) {
                       // conversion successfully finished
                       const newLevels: OIDBLevel[] = [];
                       const newLinks: OIDBLink[] = [];

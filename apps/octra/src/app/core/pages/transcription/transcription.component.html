@@ -1,3 +1,24 @@
+<div
+  *ngIf="(useMode === 'online' || useMode === 'demo')"
+  class="panel"
+  id="subnav">
+  <div class="row">
+    <div [ngClass]="{
+        'col-12 col-sm-9': appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
+        'col-12': appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext === ''
+        }" class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
+      {{navbarServ.ressource?.info.fullname}}: <i>{{appStorage.servercomment}}</i>
+    </div>
+    <div
+      *ngIf="appStorage.prompttext !== undefined && appStorage.prompttext !== undefined && appStorage.prompttext !== ''"
+      class="col-12 col-sm-3"
+      style="text-align: right;padding-right:20px;">
+      <a (click)="openPromptModal()"
+         style="cursor: pointer; color:#009688;">{{'general.prompt'| transloco}}</a>
+    </div>
+  </div>
+</div>
+
 <div class="flex">
     <span id='saving'>
         <fa-icon *ngIf="saving === 'saving'" icon="save" style="color:#333333"></fa-icon>
@@ -40,7 +61,7 @@
     class="row" id="bottom-navigation"
     role="group">
     <div class="btn-group w-100"
-         *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.useMode === 'online' || appStorage.useMode === 'demo'); else defaultBottom2">
+         *ngIf="selectedTheme === 'shortAudioFiles' && (useMode === 'online' || useMode === 'demo'); else defaultBottom2">
       <button (click)="abortTranscription()" class="col-md-3"
               mdbBtn type="button" color="secondary" mdbWavesEffect>
         <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
@@ -69,7 +90,7 @@
 
     <ng-template #defaultBottom2>
       <ng-container
-        *ngIf="settingsService.isTheme('korbinian') && (appStorage.useMode === 'online' || appStorage.useMode === 'demo'); else defaultBottom"
+        *ngIf="selectedTheme === 'korbinian' && (useMode === 'online' || useMode === 'demo'); else defaultBottom"
       >
         <button (click)="abortTranscription()" class="btn btn-secondary btn-raised col-md-4">
           <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
@@ -93,35 +114,35 @@
     </ng-template>
 
     <ng-template #defaultBottom>
-      <ng-container>
+      <div class="btn-group w-100">
         <button (click)="abortTranscription()"
-                *ngIf="appStorage.useMode !== 'url'"
-                mdbBtn type="button" color="secondary" mdbWavesEffect>
+                *ngIf="useMode !== 'url'"
+                mdbBtn type="button" color="secondary" class="col-md-6" mdbWavesEffect>
           <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
           <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
                     {{"general.quit" | transloco}}
             </span>
         </button>
-        <button (click)="navbarServ.doclick('export');" *ngIf="appStorage.useMode === 'local'"
+        <button (click)="navbarServ.doclick('export');" *ngIf="useMode === 'local'"
                 class="col-md-6" mdbBtn type="button" color="primary" mdbWavesEffect>
           <fa-icon icon="download"></fa-icon>
           <span
             *ngIf="!appStorage.easymode"
             [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | transloco}}</span>
         </button>
-        <button (click)="onSendButtonClick()" *ngIf="appStorage.useMode === 'online' || appStorage.useMode === 'demo'"
+        <button (click)="onSendButtonClick()" *ngIf="useMode === 'online' || useMode === 'demo'"
                 class="col-md-6" mdbBtn type="button" color="primary" mdbWavesEffect>
             <span
               *ngIf="!appStorage.easymode"
               [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | transloco}} </span>
           <fa-icon icon="paper-plane"></fa-icon>
         </button>
-        <button (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.useMode === 'url'"
+        <button (click)="onSaveTranscriptionButtonClicked()" *ngIf="useMode === 'url'"
                 mdbBtn type="button" color="primary" mdbWavesEffect>
           <span>{{"transcription.send" | transloco}} </span>
           <fa-icon icon="paper-plane"></fa-icon>
         </button>
-      </ng-container>
+      </div>
     </ng-template>
   </div>
 </div>

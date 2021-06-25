@@ -43,7 +43,7 @@
             <div class="text-center" *ngIf="apiStatus === 'available'">
               <!-- Default form login -->
               <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)">
-                <button mdbBtn [block]="true" class="my-4 btn-primary" type="submit">
+                <button mdbBtn mdbWavesEffect color="primary" [block]="true" class="my-4 waves-light" type="submit">
                   <fa-icon icon="university"></fa-icon>
                   Sign in with Shibboleth
                 </button>
@@ -76,7 +76,7 @@
                 </div>
 
                 <!-- Sign in button -->
-                <button mdbBtn color="info" [block]="true" class="my-4" type="submit">
+                <button mdbBtn mdbWavesEffect color="info" [block]="true" class="my-4 waves-light" type="submit">
                   <fa-icon icon="house-user"></fa-icon>
                   Sign in with credentials
                 </button>

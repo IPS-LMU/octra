@@ -8,21 +8,22 @@
   </p>
   <octra-dropzone #dropzone></octra-dropzone>
 
-  <div class="row" role="group">
-    <button (click)="askForAbort()"
-            class="btn btn-secondary btn-raised col-md-4">
+  <div class="btn-group w-100" role="group">
+    <button mdbBtn color="secondary" mdbWavesEffect (click)="askForAbort()"
+            class="waves-light">
       <fa-icon icon="sign-out-alt"></fa-icon>
       <span
         class=" d-none d-lg-inline"> {{"transcription.stop" | transloco}}</span>
     </button>
-    <button (click)="newTranscription()" [disabled]="!(dropzone.status === 'valid')"
-            class="btn btn-default btn-raised btn-danger col-md-4">
+    <button mdbBtn mdbWavesEffect color="danger" (click)="newTranscription()"
+            [disabled]="!(dropzone.status === 'valid')"
+            class="waves-light">
       <fa-icon icon="file"></fa-icon>
       <span class="d-none d-lg-inline"> {{"transcription.new" | transloco}}</span>
     </button>
-    <button (click)="onOfflineSubmit()"
+    <button mdbBtn mdbWavesEffect color="primary" (click)="onOfflineSubmit()"
             [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== undefined && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
-            class="btn btn-primary btn-raised col-md-4"
+            class="waves-light"
             type="button">
       <fa-icon icon="edit"></fa-icon>
       <span

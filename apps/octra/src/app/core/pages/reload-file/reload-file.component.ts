@@ -3,13 +3,19 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {
+  TranscriptionStopModalAnswer,
+  TranscriptionStopModalComponent
+} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {SessionFile} from '../../obj/SessionFile';
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {FileSize, getFileSize, navigateTo} from '@octra/utilities';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {modalConfigurations} from '../../modals/types';
+import {TranscriptionDeleteModalComponent} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
 
 @Component({
   selector: 'octra-reload-file',
@@ -39,12 +45,12 @@ export class ReloadFileComponent {
   }
 
   newTranscription = () => {
-    this.modService.show('transcriptionDelete').then((decision) => {
+    this.modService.openModal(TranscriptionDeleteModalComponent, modalConfigurations.transcriptionDelete).then((decision) => {
       if (decision === 'DELETE') {
         let keepData = false;
 
         new Promise<void>((resolve) => {
-          if (!(this.dropzone.oannotation === undefined || this.dropzone.oannotation === undefined)) {
+          if (!(this.dropzone.oannotation === undefined)) {
             const newLevels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
               newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -89,11 +95,11 @@ export class ReloadFileComponent {
   }
 
   public isN(obj: any): boolean {
-    return (obj === undefined || obj === undefined);
+    return (obj === undefined || false);
   }
 
   getDropzoneFileString(file: File | SessionFile) {
-    if (!(file === undefined || file === undefined)) {
+    if (!(file === undefined)) {
       const fsize: FileSize = getFileSize(file.size);
       return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
     }
@@ -101,7 +107,7 @@ export class ReloadFileComponent {
   }
 
   askForAbort() {
-    this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
+    this.modService.openModal(TranscriptionStopModalComponent, modalConfigurations.transcriptionStop).then((answer: TranscriptionStopModalAnswer) => {
       if (answer === TranscriptionStopModalAnswer.QUIT) {
         this.abortTranscription();
       }
@@ -118,8 +124,11 @@ export class ReloadFileComponent {
 
   private showErrorMessage(err: string) {
     this.error = err;
-    this.modService.show('error', {
-      text: err
+    this.modService.openModal(ErrorModalComponent, {
+      ...modalConfigurations.error,
+      data: {
+        text: err
+      }
     }).catch((error) => {
       console.error(error);
     });

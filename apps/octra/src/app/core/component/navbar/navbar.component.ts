@@ -14,10 +14,11 @@ import {NavbarService} from './navbar.service';
 import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
 import {Subscription} from 'rxjs';
 import {ToolsModalComponent} from '../../modals/tools-modal/tools-modal.component';
-import {PromptModalComponent} from '../../modals/prompt-modal/prompt-modal.component';
 import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics-modal.component';
 import {MDBModalRef} from 'angular-bootstrap-md';
 import {modalConfigurations} from '../../modals/types';
+import {BugreportModalComponent} from '../../modals/bugreport-modal/bugreport-modal.component';
+import {YesNoModalComponent} from '../../modals/yes-no-modal/yes-no-modal.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -28,7 +29,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   modalexport: MDBModalRef;
   modalTools: MDBModalRef;
-  modalPrompt: MDBModalRef;
   modalStatistics: MDBModalRef;
   @Input() version: string;
 
@@ -106,21 +106,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.navbarServ.interfacechange.emit(newInterface);
   }
 
-  onNavBarLeave($event) {
-    $event.target.click();
-  }
-
-  getTextFile() {
-    const txt = '';
-    /*
-     let data = this.tranServ.exportDataToJSON();
-
-     let tc:TextConverter = new TextConverter();
-     txt = tc.convert(data);
-
-     alert(txt);*/
-  }
-
   changeLanguage(lang: string) {
     this.langService.setActiveLang(lang);
     this.appStorage.language = lang;
@@ -130,7 +115,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     const found = this.navbarServ.interfaces.find((x) => {
       return name === x;
     });
-    return !(found === undefined || found === undefined);
+    return !(found === undefined || false);
   }
 
   toggleSettings(option: string) {
@@ -142,7 +127,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   public openBugReport() {
     console.log(`open bugreport`);
-    this.modService.show('bugreport').then(() => {
+    this.modService.openModal(BugreportModalComponent, modalConfigurations.bugreport).then(() => {
       window.location.hash = '';
     }).catch((err) => {
       console.error(err);
@@ -206,8 +191,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   onLevelRemoveClick(tiernum: number, id: number) {
     // jQuery(this.tiersDropdown.nativeElement).addClass('show');
-    this.modService.show('yesno', {
-      text: 'The Tier will be deleted permanently. Are you sure?'
+    this.modService.openModal(YesNoModalComponent, {
+      ...modalConfigurations.yesNo,
+      data: {
+        text: 'The Tier will be deleted permanently. Are you sure?'
+      }
     }).then((answer) => {
       if (answer === 'yes') {
         if (this.transcrServ.annotation.levels.length > 1) {
@@ -247,11 +235,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openToolsModal() {
     this.modalTools = this.modService.openModalRef(ToolsModalComponent, modalConfigurations.tools);
-  }
-
-  openPromptModal() {
-    // TODO mdb: preserve this.transcrServ.audiofile
-    this.modalPrompt = this.modService.openModalRef(PromptModalComponent, modalConfigurations.prompt);
   }
 
   openStatisticsModal() {

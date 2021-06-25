@@ -103,32 +103,6 @@
   }">
         <div id="transcription-panel">
           <octra-audio-navigation
-            [buttons]="{
-                        play: {
-                            label: ('general.play' | transloco),
-                            shortcut: keyMap.getShortcut('TRN-Editor', 'play_pause')
-                        },
-                        pause: {
-                            label: ('general.pause' | transloco),
-                            shortcut: keyMap.getShortcut('TRN-Editor', 'play_pause')
-                        },
-                        stop: {
-                            label: ('general.stop' | transloco),
-                            shortcut: keyMap.getShortcut('TRN-Editor', 'stop')
-                        },
-                        replay: {
-                            label: ('general.replay' | transloco),
-                            shortcut: ''
-                        },
-                        backward: {
-                            label: ('general.backward' | transloco),
-                            shortcut: keyMap.getShortcut('TRN-Editor', 'step_backward')
-                        },
-                        backwardtime: {
-                            label: ('general.backwardtime' | transloco),
-                            shortcut: keyMap.getShortcut('TRN-Editor', 'step_backward')
-                        }
-                      }"
             [easyMode]="appStorage.easymode"
             [playbackRate]="appStorage.audioSpeed"
             [audioChunk]="textEditor.audiochunk"

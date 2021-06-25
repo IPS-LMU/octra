@@ -55,35 +55,8 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   @Output() afterPlaybackRateChange = new EventEmitter<{ new_value: number, timestamp: number }>();
   @Input() responsive = false;
   @Input() easyMode = false;
-  @Input() audioChunk: AudioChunk | undefined;
+  @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
-
-  @Input() buttons: Buttons = {
-    play: {
-      label: 'Play',
-      shortcut: 'TAB'
-    },
-    pause: {
-      label: 'Pause',
-      shortcut: 'TAB'
-    },
-    stop: {
-      label: 'Stop',
-      shortcut: 'ESC'
-    },
-    replay: {
-      label: 'Replay',
-      shortcut: ''
-    },
-    backward: {
-      label: 'Backward',
-      shortcut: 'SHIFT + DEL'
-    },
-    backwardtime: {
-      label: 'Backward in time',
-      shortcut: 'SHIFT + DEL'
-    }
-  };
 
   @ViewChild('audioNavContainer', {static: true}) audioNavContainer: ElementRef | undefined;
 
@@ -307,5 +280,9 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
 
   private triggerButtonClick(type: string) {
     this.buttonClick.emit({type, timestamp: Date.now()});
+  }
+
+  test() {
+    alert('ok, klappt!');
   }
 }

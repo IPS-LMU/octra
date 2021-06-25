@@ -40,44 +40,55 @@ export const modalConfigurations = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true,
+    scroll: true,
     class: 'modal-lg'
   },
   prompt: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-lg'
   },
   shortcuts: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-lg'
   },
   statistics: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-lg'
   },
   supportedFiles: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-lg'
   },
   tools: {
     keyboard: false,
-    backdrop: false,
+    backdrop: true,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-xl'
+  },
+  protected: {
+    keyboard: false,
+    backdrop: true,
+    ignoreBackdropClick: true
   },
   transcriptionDelete: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   },
-  transcriptionDemo: {
+  transcriptionDemoEnd: {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: true
@@ -86,6 +97,7 @@ export const modalConfigurations = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false,
+    scroll: true,
     class: 'modal-lg'
   },
   transcriptionSend: {
@@ -132,18 +144,16 @@ export class OctraModal {
       } else {
         observable = this.modalService.closed;
       }
+      const subscr = observable.subscribe(() => {
+        subscr.unsubscribe();
 
-      const subscr = observable.subscribe((modal: OctraModal) => {
-        if (modal !== null && modal.name === this.name) {
-          subscr.unsubscribe();
-
-          if (type === 'closed') {
-            this.thisClose.emit();
-            this.thisClose.complete();
-          }
-
-          resolve(action);
+        if (type === 'closed') {
+          console.log(`modal ${this.name} closed`);
+          this.thisClose.emit(action);
+          this.thisClose.complete();
         }
+
+        resolve(action);
       })
     });
   }

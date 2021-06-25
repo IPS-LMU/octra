@@ -13,15 +13,11 @@ import {
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
-import {
-  AudioNavigationComponent,
-  AudioViewerComponent,
-  AudioviewerConfig,
-  AudioViewerShortcutEvent
-} from '@octra/components';
+import {AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent} from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, SampleUnit} from '@octra/media';
 import {LoginMode} from '../../core/store';
 import {Subscription, timer} from 'rxjs';
+import {AudioNavigationComponent} from '../../core/component/audio-navigation';
 
 @Component({
   selector: 'octra-signal-gui',

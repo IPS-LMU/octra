@@ -20,13 +20,24 @@
   color: black;
 }
 
-.options-menu * {
-  border: none;
-  font-size: 1.1em;
+.options-menu .table tr td label {
+  margin: 0;
 }
 
 .options-menu .table {
   margin-bottom: 0;
+  width: auto;
+}
+
+.options-menu .table tr td {
+  border: none;
+  font-size: 1.2em;
+  padding: 1px;
+  vertical-align: middle;
+}
+
+.options-menu .table tr td .custom-switch {
+  margin-left: 10px;
 }
 
 .info-menu * {
@@ -35,13 +46,6 @@
 }
 
 .info-menu .table {
-  margin-bottom: 0;
-}
-
-#subnav {
-  padding: 3px;
-  text-align: center;
-  background-color: #bae6f3;
   margin-bottom: 0;
 }
 
@@ -91,14 +95,11 @@
   color: black;
 }
 
-@media (max-width: 765px) {
-  #subnav {
-    font-size: 0.8em;
-  }
-}
-
 .switch {
   margin-top: -5px;
   display: flex;
 }
 
+.nav-link.active span {
+  border-bottom: 2px solid cornflowerblue;
+}

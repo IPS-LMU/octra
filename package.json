@@ -61,7 +61,7 @@
     "@nrwl/angular": "12.4.0",
     "@nrwl/schematics": "^8.12.11",
     "@popperjs/core": "^2.9.2",
-    "ajv": "^6.12.6",
+    "ajv": "^8.6.0",
     "angular-animations": "0.0.10",
     "angular-bootstrap-md": "^11.1.0",
     "animate.css": "^4.1.1",

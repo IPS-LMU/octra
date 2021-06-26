@@ -45,7 +45,7 @@ export class TsWorker {
    */
   private static convertJobToObj(job: TsWorkerJob) {
     return {
-      id: job.id,
+      userName: job.id,
       args: job.args,
       doFunction: job.doFunction.toString().replace('function (args)', '(args) => ')
     };

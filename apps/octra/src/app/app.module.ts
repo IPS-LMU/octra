@@ -86,6 +86,7 @@ import {
   CheckboxModule,
   CollapseModule,
   DropdownModule,
+  InputsModule,
   ModalModule,
   NavbarModule,
   PopoverModule,
@@ -98,6 +99,7 @@ import {AppSharedModule} from './app.shared.module';
 import {OctraComponentsModule} from '@octra/components';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
+import {NgxOctraApiModule, OctraAPIService} from '@octra/ngx-octra-api';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -189,10 +191,12 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     CheckboxModule,
     CollapseModule.forRoot(),
     WavesModule.forRoot(),
+    InputsModule.forRoot(),
     ModalsModule,
     FontAwesomeModule,
     TranslocoModule,
-    OctraComponentsModule
+    OctraComponentsModule,
+    NgxOctraApiModule
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -209,6 +213,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     IDBService,
     TranscActivateGuard,
     SettingsGuard,
+    OctraAPIService,
     SettingsService,
     TranscrEndGuard,
     BugReportService,

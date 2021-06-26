@@ -20,6 +20,7 @@ export class ConfigurationEffects {
     exhaustMap(() => {
       const subject = new Subject<Action>();
 
+      console.log(`load configuration`);
       this.configurationService.loadSettings(
         {
           loading: 'Load application settings...'
@@ -132,10 +133,10 @@ export class ConfigurationEffects {
                   appConfiguration
                 }));
               },
-              (e) => {
-                console.error(e);
-                subject.next(ConfigurationActions.appConfigurationLoadSuccess({
-                  appConfiguration
+              (error) => {
+                console.error(error);
+                subject.next(ConfigurationActions.appConfigurationLoadFailed({
+                  error
                 }));
               });
           } else {
@@ -145,6 +146,7 @@ export class ConfigurationEffects {
           }
         },
         (error) => {
+          console.error(error);
           subject.next(ConfigurationActions.appConfigurationLoadFailed({
             error
           }));

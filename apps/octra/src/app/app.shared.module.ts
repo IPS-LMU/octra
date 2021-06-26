@@ -62,7 +62,7 @@ import {
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 import {faHandshake} from '@fortawesome/free-regular-svg-icons';
-import {faDropbox} from '@fortawesome/free-brands-svg-icons';
+import {faDropbox, faGithub} from '@fortawesome/free-brands-svg-icons';
 import {faHouseUser} from '@fortawesome/free-solid-svg-icons/faHouseUser';
 import {TranslocoModule} from '@ngneat/transloco';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
@@ -151,7 +151,8 @@ export class AppSharedModule {
       faEdit,
       faFolderOpen,
       faUniversity,
-      faHouseUser, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown
+      faHouseUser, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown,
+      faGithub
     );
   }
 }

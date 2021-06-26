@@ -324,8 +324,9 @@ export class TranscriptionService {
         this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
         this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
         this._audiofile.size = this._audiomanager.ressource.info.size;
+        /* TODO api
         this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
-          ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
+          ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';*/
 
         this._audiofile.url = (this.appStorage.useMode === LoginMode.DEMO)
           ? `${this.appStorage.audioURL}` : this._audiofile.url;
@@ -533,14 +534,12 @@ export class TranscriptionService {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
-        project: (this.appStorage.onlineSession.loginData.project === undefined)
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.project,
-        annotator: (this.appStorage.onlineSession.loginData.id === undefined)
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.id,
+        project: (this.appStorage.onlineSession.currentProject === undefined)
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.currentProject?.name,
+        annotator: (this.appStorage.onlineSession.loginData.userName === undefined)
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.userName,
         transcript: undefined,
         comment: this._feedback.comment,
-        jobno: (this.appStorage.onlineSession.loginData.jobNumber === undefined)
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.jobNumber,
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
@@ -647,8 +646,8 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      (this.appStorage.onlineSession.loginData.project === undefined)
-        ? 'local' : this.appStorage.onlineSession.loginData.project,
+      (this.appStorage.onlineSession.currentProject?.name === undefined)
+        ? 'local' : this.appStorage.onlineSession.currentProject?.name,
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.sampleRate,

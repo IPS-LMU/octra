@@ -410,7 +410,7 @@ export class AppStorageService {
   }
 
   public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
-    return new Promise<void>( (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (files !== undefined) {
         // get audio file
         let audiofile;
@@ -480,39 +480,39 @@ export class AppStorageService {
     }));
   };
 
+  afterLoginOnlineSuccessful(type: 'local' | 'shibboleth', user: {
+    name: string,
+    email: string,
+    webToken: string
+  }) {
+    this.store.dispatch(OnlineModeActions.login({
+      mode: LoginMode.ONLINE,
+      onlineSession: {
+        loginData: {
+          userName: user.name,
+          email: user.email,
+          webToken: user.webToken
+        }
+      },
+      removeData: false
+    }));
+
+    // TODO api
+    // 1. Save loginData to store and IDB
+    // 2. Create Actions and Reducers for startOnlineAnnotation
+    // 3. After 1. redirect to a ProjectsListComponent
+    // 4. After project selected, dispatch startAnnotation with retrieved transcript, save data to store and IDB
+    // 5. Redirect to transcr section
+    // 6. Make sure that all data persists, even after reload
+    // 7. Send transcription to server and retrieve next one (it's AnnotJSON). Make sure it's saved.
+    // 8. Load new transcript and redirect to transcr
+    // 9. Check logout/login
+    // 10. Add person icon to navbar with menu for signout, etc.
+    // 11. Add information about project to the navbar.
+  }
+
   setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number, removeData: boolean) {
-    if (this.easymode === undefined) {
-      this.easymode = false;
-    }
-
-    if (this.interface === undefined) {
-      this.interface = '2D-Editor';
-    }
-
     if (member !== undefined) {
-      this.store.dispatch(OnlineModeActions.login({
-        mode: LoginMode.ONLINE,
-        onlineSession: {
-          loginData: {
-            id: member.id,
-            project: member.project,
-            jobNumber: member.jobno,
-            password: member.password
-          },
-          sessionData: {
-            dataID,
-            audioURL,
-            promptText,
-            serverComment,
-            jobsLeft,
-            serverDataEntry: undefined,
-            comment: '',
-            submitted: false,
-            feedback: undefined
-          }
-        },
-        removeData: false
-      }));
     }
   }
 
@@ -541,19 +541,23 @@ export class AppStorageService {
       mode: LoginMode.DEMO,
       onlineSession: {
         loginData: {
-          id: 'demo_user',
-          project: 'demo',
-          jobNumber: -1,
-          password: ''
+          userName: 'demo_user',
+          email: 'john-doe@email.com',
+          webToken: '270858034895u23894ruz827z030r983jr02h7'
+        },
+        currentProject: {
+          id: 234267,
+          name: 'DemoProject',
+          description: 'This is a demo project.',
+          jobsLeft
         },
         sessionData: {
-          dataID: 21343134,
+          transcriptID: 21343134,
           promptText: '',
           serverDataEntry: undefined,
           comment: '',
           audioURL,
           serverComment,
-          jobsLeft,
           submitted: false,
           feedback: undefined
         }

@@ -179,7 +179,7 @@ export class TsWorker {
    */
   private convertJobToObj(job: TsWorkerJob) {
     return {
-      id: job.id,
+      userName: job.id,
       args: job.args,
       doFunction: job.doFunction.toString()
     };

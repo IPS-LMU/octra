@@ -154,7 +154,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
         x: this._settings.border.width,
         y: this._settings.border.width,
         width: this.width - this._settings.border.width * 2,
-        id: 'panel',
+        userName: 'panel',
         height: this._settings.height - this._settings.border.width * 2,
         fill: this._settings.background.color,
         stroke: this._settings.border.color,
@@ -168,7 +168,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
       this.canvasElements.sliderBar = new Konva.Rect({
         x: settings.slider.margin.left,
         y: settings.slider.margin.top,
-        id: 'sliderBar',
+        userName: 'sliderBar',
         width: this.canvasElements.panel.width() - settings.slider.margin.left - settings.slider.margin.right,
         height: settings.slider.height,
         fill: '#84d5d3'
@@ -180,7 +180,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
       this.canvasElements.playHead = new Konva.Rect({
         x: settings.slider.margin.left - (this._settings.playHead.width / 2),
         y: settings.slider.margin.top + this._settings.slider.height / 2 - this._settings.playHead.height / 2,
-        id: 'playHead',
+        userName: 'playHead',
         draggable: true,
         dragBoundFunc: this.onPlayHeadDragging,
         width: this._settings.playHead.width,

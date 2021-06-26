@@ -624,22 +624,22 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.layers = {
         background: new Konva.Layer({
-          id: 'backgroundLayer',
+          userName: 'backgroundLayer',
           listening: false
         }),
         overlay: new Konva.Layer({
-          id: 'overlayLayer',
+          userName: 'overlayLayer',
           listening: false
         }),
         boundaries: new Konva.Layer({
-          id: 'boundariesLayer'
+          userName: 'boundariesLayer'
         }),
         playhead: new Konva.Layer({
-          id: 'playheadLayer',
+          userName: 'playheadLayer',
           listening: false
         }),
         scrollBars: new Konva.Layer({
-          id: 'scrollBars'
+          userName: 'scrollBars'
         })
       };
 
@@ -1089,7 +1089,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 const segmentHeight = (lineNum2 - lineNum1 + 1) * (this.settings.lineheight + this.settings.margin.top);
 
                 const overlayGroup = new Konva.Group({
-                  id: `segment_${segment.id}`
+                  userName: `segment_${segment.id}`
                 });
 
                 const overlaySegment = new Konva.Shape({
@@ -1181,7 +1181,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             foundText.remove();
           }
           const timeStampLabels = new Konva.Shape({
-            id: 'timeStamps',
+            userName: 'timeStamps',
             width: this.av.innerWidth,
             height: this.height,
             x: this.settings.margin.left,
@@ -1217,7 +1217,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             }
 
             const boundaryObj = new Konva.Line({
-              id: `boundary_${boundary.id}`,
+              userName: `boundary_${boundary.id}`,
               strokeWidth: this.settings.boundaries.width,
               stroke: this.settings.boundaries.color,
               points: [boundary.x, boundary.y, boundary.x, boundary.y + h],
@@ -1543,7 +1543,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     if (this.canvasElements?.lastLine !== undefined && this.av.innerWidth !== undefined) {
 
       const group = new Konva.Group({
-        id: 'scrollBar',
+        userName: 'scrollBar',
         x: this.av.innerWidth + this.settings.margin.left,
         y: 0,
         width: this.settings.scrollbar.width,

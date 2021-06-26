@@ -261,6 +261,7 @@ export function afterTrue(observable: Observable<boolean>): Promise<void> {
           try {
             subscription.unsubscribe();
           } catch (e) {
+            // ignore
           }
           resolve();
         }
@@ -276,22 +277,21 @@ export function afterTrue(observable: Observable<boolean>): Promise<void> {
 }
 
 export function afterDefined(observable: Observable<any>): Promise<any> {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<any>((resolve, reject) => {
     const subscription = observable.subscribe(
       (value) => {
         if (value !== undefined) {
+          console.log(`is defined`);
           try {
             subscription.unsubscribe();
           } catch (e) {
+            // ignore
           }
           resolve(value);
         }
       },
       (error) => {
         reject(error);
-      },
-      () => {
-        reject('comnpleted!');
       }
     )
   });

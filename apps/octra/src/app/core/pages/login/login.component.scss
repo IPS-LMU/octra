@@ -4,11 +4,8 @@ h4 {
   padding: 10px
 }
 
-#login {
-  display: flex;
-  flex-direction: column;
-  flex: auto;
-  background-color: white;
+:host {
+  background-color: whitesmoke;
 }
 
 .login-submit,
@@ -33,14 +30,19 @@ h4 {
 }
 
 @media (min-width: 796px) {
-  #loginrow {
+  #loginrow .col-md-6 {
     flex: auto;
     display: flex;
+  }
+
+  #loginrow .col-md-6 mdb-card {
+    width: 100%;
   }
 }
 
 footer {
-  margin-top: 20px;
+  padding-top: 40px;
+  background: whitesmoke;
 }
 
 footer .logo {
@@ -66,4 +68,8 @@ h4,
 
 .login-card {
   padding: 50px;
+}
+
+.feature {
+  text-align: center;
 }

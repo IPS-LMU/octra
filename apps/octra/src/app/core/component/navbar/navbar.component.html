@@ -36,7 +36,7 @@
       </li>
       <li class="nav-item" mdbWavesEffect>
         <a class="nav-link" href="https://github.com/IPS-LMU/octra" target="_blank">
-          <!-- <fa-icon [icon]="['fab', 'github']"></fa-icon> -->
+          <fa-icon [icon]="['fab', 'github']"></fa-icon>
           Github
         </a>
       </li>
@@ -116,7 +116,7 @@
       <li class="nav-item"
           *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))">
         <a class="nav-link" mdbWavesEffect>
-          {{appStorage.onlineSession?.loginData?.project}}: {{appStorage.jobsLeft}}
+          {{appStorage.onlineSession?.currentProject?.name}}: {{appStorage.jobsLeft}}
         </a>
       </li>
 
@@ -132,7 +132,7 @@
             <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
               <td>
-                <span>{{appStorage.onlineSession?.loginData?.project}}</span>
+                <span>{{appStorage.onlineSession?.currentProject?.name}}</span>
               </td>
             </tr>
             <tr>

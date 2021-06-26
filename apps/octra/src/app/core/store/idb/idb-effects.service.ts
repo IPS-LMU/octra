@@ -342,7 +342,7 @@ export class IDBEffects {
           submitted: onlineModeState.onlineSession?.sessionData?.submitted,
           audioURL: onlineModeState.onlineSession?.sessionData?.audioURL,
           comment: onlineModeState.onlineSession?.sessionData?.comment,
-          dataID: onlineModeState.onlineSession?.sessionData?.dataID,
+          dataID: onlineModeState.onlineSession?.sessionData?.transcriptID,
           feedback: onlineModeState.onlineSession?.sessionData?.feedback,
           sessionfile: localModeState?.sessionFile?.toAny(),
           prompttext: onlineModeState?.onlineSession?.sessionData?.promptText,
@@ -350,9 +350,14 @@ export class IDBEffects {
           currentEditor: modeState.currentEditor,
           logging: modeState?.logging,
           user: {
-            id: onlineModeState?.onlineSession?.loginData.id,
-            jobNumber: onlineModeState?.onlineSession?.loginData.jobNumber,
-            project: onlineModeState?.onlineSession?.loginData.project
+            name: onlineModeState?.onlineSession?.loginData?.userName,
+            email: onlineModeState?.onlineSession?.loginData?.email,
+            webToken: onlineModeState?.onlineSession?.loginData?.webToken
+          },
+          project: {
+            id: onlineModeState?.onlineSession?.currentProject?.id,
+            name: onlineModeState?.onlineSession?.currentProject?.name,
+            description: onlineModeState?.onlineSession?.currentProject?.description
           }
         }).then(() => {
           subject.next(IDBActions.saveModeOptionsSuccess({
@@ -512,8 +517,8 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.sessStr.store('jobsLeft', action.onlineSession.sessionData.jobsLeft);
-      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData.serverDataEntry);
+      this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
+      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
 
       timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
@@ -530,8 +535,8 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.sessStr.store('jobsLeft', action.onlineSession.sessionData.jobsLeft);
-      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData.serverDataEntry);
+      this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
+      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
 
       timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveOnlineSessionSuccess());

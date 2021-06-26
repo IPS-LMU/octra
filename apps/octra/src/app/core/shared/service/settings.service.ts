@@ -5,7 +5,6 @@ import {TranslocoService} from '@ngneat/transloco';
 import {afterDefined, afterTrue, SubscriptionManager} from '@octra/utilities';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {getModeState, LoginMode} from '../../store';
@@ -13,6 +12,7 @@ import {Store} from '@ngrx/store';
 import * as fromApplication from '../../store/application';
 import {ConfigurationActions} from '../../store/configuration/configuration.actions';
 import {Subject, Subscription} from 'rxjs';
+import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Injectable({
   providedIn: 'root'
@@ -106,7 +106,7 @@ export class SettingsService {
 
   constructor(private http: HttpClient,
               private appStorage: AppStorageService,
-              private api: APIService,
+              private api: OctraAPIService,
               private langService: TranslocoService,
               private store: Store) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
@@ -131,51 +131,7 @@ export class SettingsService {
       console.log('appRoute has no params');
     }
 
-
-    const transcriptURL = (queryParams.transcript !== undefined)
-      ? queryParams.transcript : undefined;
-
-    afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
-      console.log(`selectIDBLoaded is true!`);
-      // define languages
-      const languages = this.appSettings.octra.languages;
-      const browserLang = navigator.language || (navigator as any).userLanguage;
-
-      // check if browser language is available in translations
-      if (this.appStorage.language === undefined || this.appStorage.language === '') {
-        if ((this.appSettings.octra.languages.find((value) => {
-          return value === browserLang;
-        })) !== undefined) {
-          this.langService.setActiveLang(browserLang);
-        } else {
-          // use first language defined as default language
-          this.langService.setActiveLang(languages[0]);
-        }
-      } else {
-        if ((this.appSettings.octra.languages.find((value) => {
-          return value === this.appStorage.language;
-        })) !== undefined) {
-          this.langService.setActiveLang(this.appStorage.language);
-        } else {
-          this.langService.setActiveLang(languages[0]);
-        }
-      }
-
-      // if url mode, set it in options
-      if (SettingsService.queryParamsSet(queryParams)) {
-        this.appStorage.setURLSession(queryParams.audio, transcriptURL, (queryParams.embedded === '1'), queryParams.host);
-      }
-
-      // settings have been loaded
-      if ((this.appSettings === undefined || this.appSettings === undefined)) {
-        throw new Error('config.json does not exist');
-      } else {
-        this.api.init(this.appSettings.audio_server.url + 'WebTranscribe');
-      }
-      this._isDBLoadded = true;
-    }).catch((error) => {
-      console.error(error);
-    });
+    return afterTrue(this.store.select(fromApplication.selectIDBLoaded));
   }
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
@@ -185,10 +141,11 @@ export class SettingsService {
     }
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL || this.appStorage.useMode === LoginMode.DEMO) {
       // online, url or demo
-      if (!(this.appStorage.audioURL === undefined || this.appStorage.audioURL === undefined)) {
+      if (!(this.appStorage.audioURL === undefined)) {
         let src = '';
         if (this.appStorage.useMode === LoginMode.ONLINE) {
-          src = this.appSettings.audio_server.url + this.appStorage.audioURL;
+          // TODO api
+          // src = this.appSettings.audio_server.url + this.appStorage.audioURL;
         } else {
           src = this.appStorage.audioURL;
         }
@@ -236,21 +193,70 @@ export class SettingsService {
   }
 
   public loadApplicationSettings(queryParams: any): Promise<void> {
-    this.store.dispatch(ConfigurationActions.loadAppConfiguration());
+    console.log(`load app settings`);
+
     return new Promise<void>((resolve, reject) => {
-      const subscr = this.store.select(fromApplication.selectAppSettings).subscribe((appConfig) => {
-        if (appConfig !== undefined) {
-          subscr.unsubscribe();
-          console.log('AppSettings loaded.');
+      this.store.dispatch(ConfigurationActions.loadAppConfiguration());
 
-          // settings finally loaded
-          resolve();
+      afterDefined(this.store.select(fromApplication.selectApplication)).then(() => {
+        console.log('AppSettings loaded.');
 
-          this.loadDB(queryParams);
+        this.loadDB(queryParams).then(() => {
+          console.log(`then!`);
+          const transcriptURL = (queryParams.transcript !== undefined)
+            ? queryParams.transcript : undefined;
+          // define languages
+          const languages = this.appSettings.octra.languages;
+          const browserLang = navigator.language || (navigator as any).userLanguage;
+
+          // check if browser language is available in translations
+          if (this.appStorage.language === undefined || this.appStorage.language === '') {
+            if ((this.appSettings.octra.languages.find((value) => {
+              return value === browserLang;
+            })) !== undefined) {
+              this.langService.setActiveLang(browserLang);
+            } else {
+              // use first language defined as default language
+              this.langService.setActiveLang(languages[0]);
+            }
+          } else {
+            if ((this.appSettings.octra.languages.find((value) => {
+              return value === this.appStorage.language;
+            })) !== undefined) {
+              this.langService.setActiveLang(this.appStorage.language);
+            } else {
+              this.langService.setActiveLang(languages[0]);
+            }
+          }
+
+          // if url mode, set it in options
+          if (SettingsService.queryParamsSet(queryParams)) {
+            this.appStorage.setURLSession(queryParams.audio, transcriptURL, (queryParams.embedded === '1'), queryParams.host);
+          }
+
+          // settings have been loaded
+          if ((this.appSettings === undefined)) {
+            throw new Error('config.json does not exist');
+          } else {
+            console.log(`init octra api`);
+            this.api.init(this.appSettings.api.url, this.appSettings.api.appToken);
+            this.api.loginUser('shibboleth').then((result) => {
+              console.log(result);
+            }).catch((error) => {
+              console.error(error);
+            });
+          }
+          this._isDBLoadded = true;
+
           this.triggerSettingsLoaded();
-        }
-      }, (error) => {
-        reject(error);
+          // settings finally loaded
+          console.log(`resolve!`);
+          resolve();
+        }).catch((error) => {
+          reject(error);
+        });
+      }).catch((error) => {
+        console.error(error);
       });
     });
   }

@@ -14,6 +14,7 @@ import {BugReportService, ConsoleType} from './core/shared/service/bug-report.se
 import * as fromApplication from './core/store/application'
 import {Store} from '@ngrx/store';
 import {Subscription} from 'rxjs';
+import {OctraAPIService} from '../../../../../octra-backend/extern/ngx-octra-api';
 
 @Component({
   selector: 'octra-app',
@@ -43,7 +44,8 @@ export class AppComponent implements OnDestroy, OnInit {
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
               private asrService: AsrService,
-              private store: Store) {
+              private store: Store,
+              private octraAPI: OctraAPIService) {
 
     this.router.events.subscribe((event: any) => {
         if (event.url) {

@@ -13,116 +13,110 @@
     </div>
   </div>
   <div class="row" id="loginrow">
-    <mdb-card #onlinemode class="col-md-6 login-card">
-      <mdb-card-body>
-        <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
-           class="warning">
-        </p>
-        <section>
-          <h4>{{ 'login.online mode' | transloco}}</h4>
-          <p style="text-align: center;">
-            {{"login.online mode description" | transloco}}
+    <div class="col-md-6">
+      <mdb-card #onlinemode class="login-card">
+        <mdb-card-body>
+          <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
+             class="warning">
           </p>
-          <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
-            {{'login.online mode disabled' | transloco}}
-          </div>
-          <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
+          <section>
+            <h4>{{ 'login.online mode' | transloco}}</h4>
+            <p style="text-align: center;">
+              {{"login.online mode description" | transloco}}
+            </p>
+            <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
+              {{'login.online mode disabled' | transloco}}
+            </div>
+            <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
 
-            <div *ngIf="apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
-              <ng-container *ngIf="apiStatus === 'unavailable'">
-                <div class="alert alert-danger" style="padding:20px;">
-                  <div style="text-align: center;">
-                    <fa-icon [size]="'4x'" icon="exclamation-triangle" style="color:red"></fa-icon>
+              <div *ngIf="apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
+                <ng-container *ngIf="apiStatus === 'unavailable'">
+                  <div class="alert alert-danger" style="padding:20px;">
+                    <div style="text-align: center;">
+                      <fa-icon [size]="'4x'" icon="exclamation-triangle" style="color:red"></fa-icon>
+                    </div>
+                    <p style="text-align: justify; margin-top:10px;">
+                      {{"login.api not available" | transloco}}
+                    </p>
                   </div>
-                  <p style="text-align: justify; margin-top:10px;">
-                    {{"login.api not available" | transloco}}
-                  </p>
-                </div>
-              </ng-container>
-            </div>
-            <div class="text-center" *ngIf="apiStatus === 'available'">
-              <!-- Default form login -->
-              <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)">
-                <button mdbBtn mdbWavesEffect color="primary" [block]="true" class="my-4 waves-light" type="submit">
-                  <fa-icon icon="university"></fa-icon>
-                  Sign in with Shibboleth
-                </button>
-              </form>
-              <span>or</span>
-              <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)">
-                <!-- Username -->
-                <div class="md-form">
-                  <input mdbInput type="text" name="username" [(ngModel)]="member.id" id="username"
-                         class="form-control">
-                  <label for="username">Username</label>
-                </div>
-
-                <!-- Username -->
-                <div class="md-form">
-                  <input mdbInput type="password" name="password" [(ngModel)]="member.id" id="password"
-                         class="form-control">
-                  <label for="password">Password</label>
-                </div>
-
-                <div class="d-flex justify-content-around">
-                  <div>
-                    <!-- Remember me -->
-                    <mdb-checkbox [default]="true">Remember me</mdb-checkbox>
+                </ng-container>
+              </div>
+              <div class="text-center" *ngIf="apiStatus === 'available'">
+                <!-- Default form login -->
+                <form #f="ngForm" (ngSubmit)="onOnlineShibbolethSubmit(f)">
+                  <button mdbBtn mdbWavesEffect color="primary" [block]="true" class="my-4 waves-light" type="submit">
+                    <fa-icon icon="university"></fa-icon>
+                    Sign in with Shibboleth
+                  </button>
+                </form>
+                <span>or</span>
+                <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit(f2)">
+                  <!-- Username -->
+                  <div class="md-form">
+                    <input mdbInput type="text" name="username" [(ngModel)]="member.userName" id="username"
+                           class="form-control" required="required">
+                    <label for="username">Username</label>
                   </div>
-                  <div>
-                    <!-- Forgot password -->
-                    <a href="">Forgot password?</a>
-                  </div>
-                </div>
 
-                <!-- Sign in button -->
-                <button mdbBtn mdbWavesEffect color="info" [block]="true" class="my-4 waves-light" type="submit">
-                  <fa-icon icon="house-user"></fa-icon>
-                  Sign in with credentials
-                </button>
-              </form>
-              <!-- Default form login -->
+                  <!-- Password -->
+                  <div class="md-form">
+                    <input mdbInput type="password" name="password" [(ngModel)]="member.password" id="password"
+                           class="form-control" required="required">
+                    <label for="password">Password</label>
+                  </div>
+
+                  <!-- Sign in button -->
+                  <button mdbBtn mdbWavesEffect color="info" [disabled]="!f2.valid" [block]="true"
+                          class="my-4 waves-light" type="submit">
+                    <fa-icon icon="house-user"></fa-icon>
+                    Sign in with credentials
+                  </button>
+                </form>
+                <!-- Default form login -->
+              </div>
             </div>
-          </div>
-          <br/>
-        </section>
-      </mdb-card-body>
-    </mdb-card>
-    <mdb-card #localmode class="col-md-6 login-card">
-      <mdb-card-body>
-        <section>
-          <h4>{{'login.local mode' | transloco}}
-          </h4>
-          <p style="text-align: center;">
-            {{"login.local mode description" | transloco}}
-          </p>
-          <div>
-            <div *ngIf="appStorage.sessionfile !== undefined"
-                 [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
-                 class="alert alert-warning">
+            <br/>
+          </section>
+        </mdb-card-body>
+      </mdb-card>
+    </div>
+    <div class="col-md-6">
+      <mdb-card #localmode class="login-card">
+        <mdb-card-body>
+          <section>
+            <h4>{{'login.local mode' | transloco}}
+            </h4>
+            <p style="text-align: center;">
+              {{"login.local mode description" | transloco}}
+            </p>
+            <div>
+              <div *ngIf="appStorage.sessionfile !== undefined"
+                   [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
+                   class="alert alert-warning">
+              </div>
+              <div style="margin-top: 40px;">
+                <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
+              </div>
+              <button
+                (click)="onOfflineSubmit()"
+                *ngIf="getFileStatus() !== 'new'"
+                [disabled]="getFileStatus() !== 'start'"
+                class="btn btn-raised btn-primary"
+                id="offline-submit"
+                type="submit">
+                {{'transcription.start' | transloco}}
+              </button>
+              <button
+                (click)="onTranscriptionDelete()"
+                *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
+                class="btn btn-raised btn-danger offline-delete-btn">
+                {{'transcription.new' |transloco}}
+              </button>
             </div>
-            <div style="margin-top: 40px;">
-              <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
-            </div>
-            <button
-              (click)="onOfflineSubmit()"
-              *ngIf="getFileStatus() !== 'new'"
-              [disabled]="getFileStatus() !== 'start'"
-              class="btn btn-raised btn-primary"
-              id="offline-submit"
-              type="submit">
-              {{'transcription.start' | transloco}}
-            </button>
-            <button
-              (click)="onTranscriptionDelete()"
-              *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
-              class="btn btn-raised btn-danger offline-delete-btn">
-              {{'transcription.new' |transloco}}
-            </button>
-          </div>
-        </section>
-      </mdb-card-body>
-    </mdb-card>
+          </section>
+        </mdb-card-body>
+      </mdb-card>
+    </div>
   </div>
 </div>
 <div class="section">
@@ -146,3 +140,55 @@
     </div>
   </footer>
 </div>
+<section>
+  <div class="container">
+    <hr/>
+    <h1 style="text-align: center;margin-top: 40px;">About OCTRA</h1>
+    <p style="text-align: justify">
+      OCTRA is a modern web-application for the orthographic transcription of audio files. It supports four different
+      editors for different needs. You can switch between these editors, they share the same transcript. Your
+      proceedings
+      are saved automatically to your browser. If your web browser or computer crashes just reopen your web browser and
+      continue your work. Overall OCTRA supports these features:
+    </p>
+    <ul>
+      <li>
+        Four editors
+        <ul>
+          <li>
+            Dictaphone-Editor: A simple editor without a signal display. It consists of an audio player and a
+            text-editor.
+          </li>
+          <li>
+            Linear-Editor: A classic editor with two signal displays and a text editor. The top signal display shows an
+            audio signal of the whole audio file. After you select a part of the audio signal the bottom display shows a
+            zoomed version of the selected part. You can transcribe the selected audio sequence with a text-editor.
+          </li>
+          <li>
+            2D-Editor: A multiline signal display shows the whole audio signal. You can scroll through the lines, add
+            segment boundaries and much more. Using the ENTER key you can open a transcription window that shows the
+            selected audio signal and a text-editor.
+          </li>
+        </ul>
+      </li>
+      <li>Automatic speech recognition and alignment</li>
+      <li>
+        Four modes: Online-mode, Local-mode, URL-mode and Demo-mode
+      </li>
+      <li>Auto-Saving</li>
+      <li>Import &amp; Export of various annotation file formats</li>
+      <li>Inline validation using transcription guidelines</li>
+      <li>Shortcuts for faster annotation</li>
+      <li>Additional tools
+        <ul>
+          <li>Cutting Audio files</li>
+          <li>Combine phrases into bigger segments</li>
+        </ul>
+      </li>
+      <li>Multi-Tier support</li>
+      <li>Localization</li>
+      <li>Customization</li>
+    </ul>
+  </div>
+
+</section>

@@ -1,7 +1,8 @@
 export interface AppSettings {
   version: string;
-  audio_server: {
-    url: string
+  api: {
+    url: string;
+    appToken: string;
   };
   octra: {
     database: {

@@ -32,7 +32,7 @@ export class OnlineModeActions extends AnnotationActions {
 
   public static setUserData = createAction(`[${OnlineModeActions.context}] Set user data`,
     props<{
-      id: string;
+      userName: string;
       project: string;
       jobNumber: number;
       mode: LoginMode;

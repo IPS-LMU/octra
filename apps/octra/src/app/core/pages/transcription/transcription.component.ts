@@ -807,10 +807,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.appStorage.serverDataEntry = serverDataEntry;
 
         this.appStorage.setOnlineSession({
-          id: this.appStorage.onlineSession.loginData.id,
-          project: this.appStorage.onlineSession.loginData.project,
-          password: this.appStorage.onlineSession.loginData.password,
-          jobno: this.appStorage.onlineSession.loginData.jobNumber
+          userName: this.appStorage.onlineSession.loginData.userName,
+          email: this.appStorage.onlineSession.loginData.email,
+          webToken: this.appStorage.onlineSession.loginData.webToken
         }, data.id, data.url, promptText, serverComment, jobsLeft, true);
 
         navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
@@ -844,9 +843,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   closeTranscriptionAndGetNew() {
     // close current session
     if (this._useMode === LoginMode.ONLINE) {
-      this.api.closeSession(this.appStorage.onlineSession.loginData.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
+      this.api.closeSession(this.appStorage.onlineSession.loginData.userName, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
         // begin new session
-        this.api.beginSession(this.appStorage.onlineSession.loginData.project, this.appStorage.onlineSession.loginData.id, this.appStorage.onlineSession.loginData.jobNumber).then((json) => {
+        this.api.beginSession(this.appStorage.onlineSession.currentProject.name, this.appStorage.onlineSession.loginData.userName, 1).then((json) => {
           // new session
           this.nextTranscription(json);
         }).catch((error) => {

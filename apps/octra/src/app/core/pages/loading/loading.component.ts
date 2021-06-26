@@ -178,7 +178,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else if (this.appStorage.useMode === LoginMode.URL) {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        if (this.appStorage.onlineSession.loginData.id !== undefined && this.appStorage.onlineSession.loginData.id !== ''
+        if (this.appStorage.onlineSession.loginData.userName !== undefined && this.appStorage.onlineSession.loginData.userName !== ''
           && (this.appStorage.sessionfile === undefined)) {
           this.store.dispatch(ApplicationActions.setMode({
             mode: LoginMode.ONLINE

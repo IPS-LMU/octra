@@ -13,10 +13,9 @@ export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
   onlineSession: {
     loginData: {
-      id: '',
-      project: '',
-      jobNumber: -1,
-      password: ''
+      userName: '',
+      email: '',
+      webToken: ''
     }
   }
 };
@@ -105,13 +104,13 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.setUserData, (state: OnlineModeState, {id, project, jobNumber, mode}) => {
+      on(OnlineModeActions.setUserData, (state: OnlineModeState, {userName, project, jobNumber, mode}) => {
         if (this.mode === mode) {
           return {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              id, project, jobNumber
+              userName, project, jobNumber
             }
           };
         }
@@ -222,10 +221,9 @@ export class OnlineModeReducers {
 
   writeOptionToStore(state: OnlineModeState, attribute: string, value: any): OnlineModeState {
     const onlineSessionData = {
-      jobNumber: -1,
-      id: '',
-      project: '',
-      password: ''
+      userName: '',
+      email: '',
+      webToken: ''
     };
 
     switch (attribute) {
@@ -258,21 +256,21 @@ export class OnlineModeReducers {
             ...state.onlineSession,
             sessionData: {
               ...state.onlineSession.sessionData,
-              dataID: value
+              transcriptID: value
             }
           }
         };
       case('user'):
         if (value !== undefined) {
-          if (hasProperty(value, 'id')) {
-            onlineSessionData.id = value.id;
+          if (hasProperty(value, 'userName')) {
+            onlineSessionData.userName = value.userName;
           }
-          if (hasProperty(value, 'jobNumber')) {
-            onlineSessionData.jobNumber = value.jobNumber;
+          if (hasProperty(value, 'email')) {
+            onlineSessionData.email = value.email;
           }
 
-          if (hasProperty(value, 'project')) {
-            onlineSessionData.project = value.project;
+          if (hasProperty(value, 'webToken')) {
+            onlineSessionData.webToken = value.webToken;
           }
         }
 

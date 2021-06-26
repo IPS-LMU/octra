@@ -11,8 +11,8 @@ export const modalConfigurations = {
   },
   error: {
     keyboard: false,
-    backdrop: false,
-    ignoreBackdropClick: false
+    backdrop: true,
+    ignoreBackdropClick: true
   },
   export: {
     keyboard: false,

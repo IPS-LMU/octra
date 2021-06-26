@@ -160,7 +160,8 @@
               "apps/octra/src/assets/js/modernizr.js",
               "node_modules/hammerjs/hammer.min.js"
             ],
-            "extractLicenses": true
+            "extractLicenses": true,
+            "preserveSymlinks": true
           },
           "configurations": {
             "production": {
@@ -180,6 +181,27 @@
                 {
                   "replace": "apps/octra/src/environments/environment.ts",
                   "with": "apps/octra/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "public-dev": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/octra/src/environments/environment.ts",
+                  "with": "apps/octra/src/environments/environment.dev.ts"
                 }
               ],
               "outputHashing": "all"

@@ -34,17 +34,21 @@ export enum LoadingStatus {
 
 export interface OnlineSession {
   loginData: {
-    id: string;
-    project: string;
-    jobNumber: number;
-    password: string;
+    userName: string;
+    email: string;
+    webToken: string;
+  },
+  currentProject?: {
+    name: string;
+    id: number;
+    description: string;
+    jobsLeft: number;
   },
   sessionData?: {
-    dataID: number;
+    transcriptID: number;
     audioURL: string;
     promptText: string;
     serverComment: string;
-    jobsLeft: number;
     serverDataEntry: IDataEntry;
     comment: string;
     submitted: boolean;

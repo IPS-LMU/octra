@@ -2,34 +2,25 @@ import {ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnIni
 import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {
-  BrowserInfo,
-  FileSize,
-  getFileSize,
-  hasProperty,
-  hasPropertyTree,
-  navigateTo,
-  SubscriptionManager
-} from '@octra/utilities';
+import {BrowserInfo, FileSize, getFileSize, navigateTo, SubscriptionManager} from '@octra/utilities';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent
 } from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
-import {APIService, AudioService, SettingsService} from '../../shared/service';
+import {AudioService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
-import {Observable, Subscription} from 'rxjs';
+import {interval, Observable, Subscription} from 'rxjs';
 import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
 import {modalConfigurations} from '../../modals/types';
-import {LoginInvalidModalComponent} from '../../modals/login-invalid-modal/login-invalid-modal.component';
+import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-login',
@@ -47,14 +38,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   public projects: string[] = [];
   valid = false;
   member = {
-    id: '',
-    project: '',
-    jobno: '',
+    userName: '',
     password: ''
   };
   err = '';
   public apiStatus: 'init' | 'available' | 'unavailable' = 'available';
   private subscrmanager: SubscriptionManager<Subscription>;
+
+  private windowChecker: Subscription;
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -70,12 +61,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   constructor(private router: Router,
               public appStorage: AppStorageService,
-              private api: APIService,
               private cd: ChangeDetectorRef,
               public settingsService: SettingsService,
               public modService: ModalService,
               private langService: TranslocoService,
-              private audioService: AudioService) {
+              private audioService: AudioService,
+              private api: OctraAPIService) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
     console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
   }
@@ -87,6 +78,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   onOfflineSubmit = () => {
     if (this.appStorage.useMode !== LoginMode.DEMO && this.appStorage.dataID !== undefined && typeof this.appStorage.dataID === 'number') {
       // last was online mode
+      /*
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audioManager);
         this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
@@ -100,6 +92,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.appStorage.beginLocalSession(this.dropzone.files, true).then(this.beforeNavigation).catch((error) => {
         alert(error);
       });
+       */
     }
   }
 
@@ -148,40 +141,48 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else {
       this.validSize = true;
     }
-
-    const loaduser = () => {
-      if (this.appStorage.useMode !== LoginMode.DEMO) {
-        const loginData = this.appStorage.snapshot?.onlineMode?.onlineSession?.loginData;
-        if (loginData !== undefined) {
-          if (loginData?.id !== '-1') {
-            this.member.id = loginData.id;
-          }
-
-          this.member.project = loginData.project;
-
-          if (loginData.jobNumber !== undefined && loginData.jobNumber > -1) {
-            this.member.jobno = loginData.jobNumber.toString();
-          }
-        }
-      } else {
-        this.appStorage.clearWholeSession();
-      }
-    }
-
-    if (!this.appStorage.idbLoaded) {
-      this.subscrmanager.add(this.appStorage.loaded.subscribe(
-        undefined,
-        undefined,
-        () => {
-          loaduser();
-        })
-      );
-    } else {
-      loaduser();
-    }
   }
 
-  onOnlineSubmit(form: NgForm) {
+  onOnlineShibbolethSubmit(form: NgForm) {
+    this.api.loginUser('shibboleth').then((result) => {
+      if (result.openWindowURL !== undefined) {
+        // need to open windowURL
+        console.log(`open window!`);
+        const authWindow = window.open(result.openWindowURL, '_blank', `top:${(window.outerHeight - 400) / 2},width=600,height=400,titlebar=no,status=no,location=no`);
+        if (authWindow) {
+          authWindow.addEventListener('beforeunload', () => {
+            console.log(`window closed`);
+          });
+
+          if (this.windowChecker !== undefined) {
+            this.windowChecker.unsubscribe();
+          }
+          let closed = false;
+          this.windowChecker = interval(1000).subscribe(() => {
+            if (!closed && authWindow.closed) {
+              this.windowChecker.unsubscribe();
+              this.windowChecker = undefined;
+              closed = true;
+
+              // TODO api: get token, name, email from window
+              this.api.retrieveTokenFromWindow(result.openWindowURL as string).then((token) => {
+                this.appStorage.afterLoginOnlineSuccessful('shibboleth', {
+                  name: this.member.userName,
+                  email: 'email',
+                  webToken: token
+                });
+              }).catch((error) => {
+                console.error(error);
+              });
+            }
+          });
+        }
+      } else if (result.user) {
+        console.log(`auth ok, continue...`);
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
     /*
     let newSession = false;
     let newSessionAfterOld = false;
@@ -287,6 +288,17 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     */
   }
 
+
+  onOnlineCredentialsSubmit(form: NgForm) {
+    this.api.loginUser('local', this.member.userName, this.member.password).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      this.modService.openModal(ErrorModalComponent, modalConfigurations.error, {
+        text: error
+      });
+    });
+  }
+
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
   }
@@ -335,10 +347,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (audioExample !== undefined) {
-      this.member.id = 'demo_user';
-      this.member.project = 'DemoProject';
-      this.member.jobno = '123';
-
       // delete old data for fresh new session
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
       this.navigate();
@@ -365,18 +373,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
      */
   }
 
-  passwordExists() {
-    if (this.settingsService.appSettings.octra.allowed_projects !== undefined) {
-      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
-        return a.name === this.member.project;
-      });
-
-      return (projectData !== undefined && hasProperty(projectData, 'password')) && projectData.password !== '';
-    }
-
-    return false;
-  }
-
   private navigate = (): void => {
     navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
@@ -384,6 +380,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private createNewOnlineSession(form: NgForm) {
+    /*
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
       const data = json.data as IDataEntry;
       if (form.valid && json.message !== '0') {
@@ -442,5 +439,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       alert('Server cannot be requested. Please check if you are online.');
       console.error(error);
     });
+     */
   }
 }

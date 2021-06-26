@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {getProperties, hasProperty, uniqueHTTPRequest} from '@octra/utilities';
+import {hasProperty, uniqueHTTPRequest} from '@octra/utilities';
 import Ajv from 'ajv';
 
 @Injectable({
@@ -17,11 +17,8 @@ export class ConfigurationService {
       const validate = ajv.compile(schema);
       const valid = validate(json);
       if (!valid) {
-        for (const [, value] of getProperties(validate.errors)) {
-          const errObj: any = value;
-          if (hasProperty(errObj, 'dataPath') && !(errObj.dataPath === undefined)) {
-            console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
-          }
+        for (const errObj of validate.errors) {
+          console.error(`JSON Validation Error (${filename}): ${errObj.message}`);
         }
       } else {
         console.log(`${filename} is valid`);
@@ -48,10 +45,12 @@ export class ConfigurationService {
 
               if (validationOK) {
                 onvalidated(settings);
+              } else {
+                onerror(filenames.json + ' not valid');
               }
             },
             () => {
-              console.error(filenames.schema + ' could not be loaded!');
+              onerror(filenames.schema + ' could not be loaded!');
             }
           )
         },

@@ -224,7 +224,7 @@ export class APIService implements API {
         this.fetchAnnotation(appStorage.dataID).then((json) => {
           if (json !== undefined && json.data !== undefined) {
             if (hasProperty(json.data, 'status') && json.data.status === 'BUSY') {
-              this.closeSession(appStorage.onlineSession.loginData.id, appStorage.dataID, '').then(() => {
+              this.closeSession(appStorage.onlineSession.loginData.userName, appStorage.dataID, '').then(() => {
                 resolve();
               }).catch((error) => {
                 reject(error);

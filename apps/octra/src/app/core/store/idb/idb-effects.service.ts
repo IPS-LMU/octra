@@ -327,7 +327,7 @@ export class IDBEffects {
       AnnotationActions.logout, OnlineModeActions.setSubmitted, OnlineModeActions.setComment,
       OnlineModeActions.setFeedback, AnnotationActions.setLogging, LocalModeActions.login,
       AnnotationActions.setCurrentEditor, OnlineModeActions.loginDemo, OnlineModeActions.login,
-      LocalModeActions.login
+      OnlineModeActions.startOnlineAnnotation, LocalModeActions.login
     ),
     withLatestFrom(this.store),
     mergeMap(([action, appState]: [Action, RootState]) => {
@@ -342,7 +342,9 @@ export class IDBEffects {
           submitted: onlineModeState.onlineSession?.sessionData?.submitted,
           audioURL: onlineModeState.onlineSession?.sessionData?.audioURL,
           comment: onlineModeState.onlineSession?.sessionData?.comment,
-          dataID: onlineModeState.onlineSession?.sessionData?.transcriptID,
+          transcriptID: onlineModeState.onlineSession?.sessionData?.transcriptID,
+          jobsLeft: onlineModeState.onlineSession?.currentProject?.jobsLeft,
+          serverDataEntry: onlineModeState.onlineSession?.sessionData?.serverDataEntry,
           feedback: onlineModeState.onlineSession?.sessionData?.feedback,
           sessionfile: localModeState?.sessionFile?.toAny(),
           prompttext: onlineModeState?.onlineSession?.sessionData?.promptText,
@@ -517,8 +519,6 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
-      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
 
       timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
@@ -535,8 +535,9 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       this.sessStr.store('loggedIn', true);
-      this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
-      this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
+      // TODO api: move this to new effect
+      // this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
+      // this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
 
       timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveOnlineSessionSuccess());

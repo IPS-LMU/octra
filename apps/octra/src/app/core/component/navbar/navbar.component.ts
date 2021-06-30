@@ -6,7 +6,7 @@ import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
 import {ModalService} from '../../modals/modal.service';
-import {SubscriptionManager} from '@octra/utilities';
+import {navigateTo, SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
@@ -19,6 +19,7 @@ import {MDBModalRef} from 'angular-bootstrap-md';
 import {modalConfigurations} from '../../modals/types';
 import {BugreportModalComponent} from '../../modals/bugreport-modal/bugreport-modal.component';
 import {YesNoModalComponent} from '../../modals/yes-no-modal/yes-no-modal.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'octra-navigation',
@@ -83,7 +84,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
               public langService: TranslocoService,
               public modService: ModalService,
               public settService: SettingsService,
-              public bugService: BugReportService) {
+              public bugService: BugReportService,
+              private router: Router) {
   }
 
   ngOnDestroy() {
@@ -100,6 +102,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.secondsPerLine = this.appStorage.secondsPerLine;
   }
 
   setInterface(newInterface: string) {
@@ -239,5 +243,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openStatisticsModal() {
     this.modalStatistics = this.modService.openModalRef(StatisticsModalComponent, modalConfigurations.statistics);
+  }
+
+  backToProjectsList() {
+    navigateTo(this.router, ['user/projects']);
   }
 }

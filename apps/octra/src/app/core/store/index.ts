@@ -1,4 +1,3 @@
-import {IDataEntry} from '../obj/data-entry';
 import {
   AnnotationLevelType,
   ASRQueueItemType,
@@ -17,6 +16,7 @@ import {SampleUnit} from '@octra/media';
 import {ILog} from '../obj/Settings/logging';
 import {Histories, UndoRedoState} from 'ngrx-wieder';
 import {SessionFile} from '../obj/SessionFile';
+import {AnnotationStartResponseDataItem} from '../../../../../../../octra-backend/extern/octra-db';
 
 export enum LoginMode {
   URL = 'url',
@@ -32,28 +32,34 @@ export enum LoadingStatus {
   FINISHED = 'FINISHED'
 }
 
+export interface LoginData {
+  userName: string;
+  webToken: string;
+  email?: string;
+}
+
+export interface CurrentProject {
+  name: string;
+  id: number;
+  description: string;
+  jobsLeft: number;
+}
+
+export interface SessionData {
+  transcriptID: number;
+  audioURL: string;
+  promptText: string;
+  serverComment: string;
+  serverDataEntry: AnnotationStartResponseDataItem;
+  comment: string;
+  submitted: boolean;
+  feedback: any;
+}
+
 export interface OnlineSession {
-  loginData: {
-    userName: string;
-    email: string;
-    webToken: string;
-  },
-  currentProject?: {
-    name: string;
-    id: number;
-    description: string;
-    jobsLeft: number;
-  },
-  sessionData?: {
-    transcriptID: number;
-    audioURL: string;
-    promptText: string;
-    serverComment: string;
-    serverDataEntry: IDataEntry;
-    comment: string;
-    submitted: boolean;
-    feedback: any;
-  }
+  loginData: LoginData;
+  currentProject?: CurrentProject;
+  sessionData?: SessionData;
 }
 
 export interface URLParameters {

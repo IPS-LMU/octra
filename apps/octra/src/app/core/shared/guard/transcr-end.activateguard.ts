@@ -14,12 +14,15 @@ export class TranscrEndGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+    console.log(`submitted is ${this.appStorage.submitted}`);
     if (!this.appStorage.submitted) {
+      console.log(`not submitted, to load`);
       navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
       });
       return false;
     }
+    console.log(`is submitted`);
     return true;
   }
 }

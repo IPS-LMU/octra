@@ -21,6 +21,7 @@ import {interval, Observable, Subscription} from 'rxjs';
 import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
 import {modalConfigurations} from '../../modals/types';
 import {OctraAPIService} from '@octra/ngx-octra-api';
+import {UserInfoResponseDataItem} from '../../../../../../../../octra-backend/extern/octra-db';
 
 @Component({
   selector: 'octra-login',
@@ -76,7 +77,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onOfflineSubmit = () => {
-    if (this.appStorage.useMode !== LoginMode.DEMO && this.appStorage.dataID !== undefined && typeof this.appStorage.dataID === 'number') {
+    if (this.appStorage.useMode !== LoginMode.DEMO && this.appStorage.transcriptID !== undefined && typeof this.appStorage.transcriptID === 'number') {
       // last was online mode
       /*
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
@@ -166,10 +167,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
               // TODO api: get token, name, email from window
               this.api.retrieveTokenFromWindow(result.openWindowURL as string).then((token) => {
-                this.appStorage.afterLoginOnlineSuccessful('shibboleth', {
-                  name: this.member.userName,
-                  email: 'email',
-                  webToken: token
+                this.api.getCurrentUserInformation().then((user: UserInfoResponseDataItem) => {
+                  this.appStorage.afterLoginOnlineSuccessful('shibboleth', {
+                    name: user.username,
+                    email: user.email,
+                    roles: user.roles,
+                    webToken: token
+                  });
+                }).catch((error) => {
+                  console.error(error);
                 });
               }).catch((error) => {
                 console.error(error);
@@ -291,7 +297,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   onOnlineCredentialsSubmit(form: NgForm) {
     this.api.loginUser('local', this.member.userName, this.member.password).then((result) => {
+      console.log(`after login`);
       console.log(result);
+      this.appStorage.afterLoginOnlineSuccessful('local', {
+        name: this.member.userName, email: result.user.email, roles: result.user.roles, webToken: result.user.jwt
+      })
     }).catch((error) => {
       this.modService.openModal(ErrorModalComponent, modalConfigurations.error, {
         text: error

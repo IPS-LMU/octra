@@ -74,9 +74,10 @@
         -->
     <ul class="navbar-nav">
       <li class="nav-item dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(appStorage.loggedIn && (appStorage.useMode === 'local' || appStorage.useMode === 'url'))) ? 'none': 'inherit'
+                'display': (!appStorage.loggedIn || appStorage.onlineSession?.currentProject === undefined || !appStorage.audioLoaded) ? 'none': 'inherit'
                 }" dropdown>
-        <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light">
+        <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle
+         waves-light">
           {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
           '...' : transcrServ.currentlevel.name}}
           <fa-icon class="navbar-icon" icon="book"></fa-icon>
@@ -112,27 +113,26 @@
         </div>
       </li>
 
-      <!-- online mode counter -->
-      <li class="nav-item"
-          *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))">
-        <a class="nav-link" mdbWavesEffect>
-          {{appStorage.onlineSession?.currentProject?.name}}: {{appStorage.jobsLeft}}
-        </a>
-      </li>
-
       <!--
       infoDropdown
       -->
-      <li class="nav-item dropdown" *ngIf="appStorage.loggedIn && navbarServ.filesize !== undefined" dropdown>
-        <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light">
+      <li class="nav-item dropdown"
+          *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.filesize !== undefined" dropdown>
+        <a dropdownToggle mdbWavesEffect type="button" class="nav-link waves-light">
           <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
         </a>
         <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
-          <table class="table">
+          <table class="table table-sm table-striped info-menu">
             <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
               <td>
                 <span>{{appStorage.onlineSession?.currentProject?.name}}</span>
+              </td>
+            </tr>
+            <tr *ngIf="appStorage.useMode === 'online' || appStorage.useMode === 'demo'">
+              <td><span>{{'general.free jobs' | transloco}}:</span></td>
+              <td>
+                <span>{{appStorage.jobsLeft}}</span>
               </td>
             </tr>
             <tr>
@@ -172,13 +172,7 @@
             <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.id' | transloco}}:</span></td>
               <td>
-                <span>{{appStorage.dataID}}</span>
-              </td>
-            </tr>
-            <tr *ngIf="appStorage.useMode === 'online' || appStorage.useMode === 'demo'">
-              <td><span>{{'general.free jobs' | transloco}}:</span></td>
-              <td>
-                <span>{{appStorage.jobsLeft}}</span>
+                <span>{{appStorage.transcriptID}}</span>
               </td>
             </tr>
           </table>
@@ -202,7 +196,7 @@
       <li class="nav-item dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
                 'display': (!(appStorage.audioLoaded && appStorage.loggedIn)) ? 'none': 'inherit'
                 }" dropdown>
-        <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light">
+        <a dropdownToggle mdbWavesEffect type="button" class="nav-link waves-light">
           <fa-icon icon="cog"></fa-icon>
         </a>
         <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right options-menu" role="menu"
@@ -271,35 +265,54 @@
           <ng-container *ngIf="appStorage.interface === '2D-Editor'">
             <hr style="border:1px solid lightgray;"/>
             <br/>
-            <label>{{"settings.seconds per line" | transloco}}:</label>
+            <label style="font-size:1.2em;">{{"settings.seconds per line" | transloco}}:</label>
+            <br/>
             <div class="btn-group">
               <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 5) ? 'primary' : 'secondary'"
                       [outline]="secondsPerLine !== 5" (click)="changeSecondsPerLine(5)" name="secondsPerLine"
                       role="button"
-                      tabindex="0">5
+                      tabindex="0" class="btn-sm">5
               </button>
               <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 10) ? 'primary' : 'secondary'"
                       [outline]="secondsPerLine !== 10" (click)="changeSecondsPerLine(10)" name="secondsPerLine"
                       role="button"
-                      tabindex="0">10
+                      tabindex="0" class="btn-sm">10
               </button>
               <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 15) ? 'primary' : 'secondary'"
                       [outline]="secondsPerLine !== 15" (click)="changeSecondsPerLine(15)" name="secondsPerLine"
                       role="button"
-                      tabindex="0">15
+                      tabindex="0" class="btn-sm">15
               </button>
               <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 20) ? 'primary' : 'secondary'"
                       [outline]="secondsPerLine !== 20" (click)="changeSecondsPerLine(20)" name="secondsPerLine"
                       role="button"
-                      tabindex="0">20
+                      tabindex="0" class="btn-sm">20
               </button>
               <button mdbBtn mdbWavesEffect [color]="(secondsPerLine === 60) ? 'primary' : 'secondary'"
                       [outline]="secondsPerLine !== 60" (click)="changeSecondsPerLine(60)" name="secondsPerLine"
                       role="button"
-                      tabindex="0">60
+                      tabindex="0" class="btn-sm">60
               </button>
             </div>
           </ng-container>
+        </div>
+      </li>
+
+      <!-- profile -->
+      <li class="nav-item dropdown" dropdown
+          *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))">
+        <a dropdownToggle mdbWavesEffect type="button" class="nav-link waves-light">
+          <fa-icon [icon]="['fas', 'user-circle']"></fa-icon>
+        </a>
+        <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
+          <a class="dropdown-item">
+            <fa-icon [icon]="['fas', 'user-circle']"></fa-icon>
+            Account
+          </a>
+          <a class="dropdown-item" (click)="backToProjectsList()">
+            <fa-icon icon="door-open"></fa-icon>
+            Back to the list of projects
+          </a>
         </div>
       </li>
 

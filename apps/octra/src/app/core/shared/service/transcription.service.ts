@@ -543,7 +543,7 @@ export class TranscriptionService {
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
-        id: this.appStorage.dataID,
+        id: this.appStorage.transcriptID,
         log: logData.getObj()
       };
 

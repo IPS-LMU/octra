@@ -100,6 +100,7 @@ import {OctraComponentsModule} from '@octra/components';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
 import {NgxOctraApiModule, OctraAPIService} from '@octra/ngx-octra-api';
+import {ProjectsListComponent} from './core/pages/projects-list/projects-list.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -142,7 +143,8 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     ALERTS,
     DynComponentDirective,
     ErrorOccurredComponent,
-    ContextMenuComponent
+    ContextMenuComponent,
+    ProjectsListComponent
   ],
   imports: [
     BrowserModule,

@@ -13,7 +13,6 @@ import {TranslocoService} from '@ngneat/transloco';
 import {
   BrowserInfo,
   hasProperty,
-  hasPropertyTree,
   navigateTo,
   ShortcutGroup,
   ShortcutManager,
@@ -38,14 +37,12 @@ import {
   TranscriptionStopModalAnswer,
   TranscriptionStopModalComponent
 } from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 
 import {
   AlertService,
-  APIService,
   AudioService,
   KeymappingService,
   SettingsService,
@@ -63,6 +60,7 @@ import {ShortcutsModalComponent} from '../../modals/shortcuts-modal/shortcuts-mo
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {modalConfigurations} from '../../modals/types';
 import {PromptModalComponent} from '../../modals/prompt-modal/prompt-modal.component';
+import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-transcription',
@@ -233,13 +231,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
               public navbarServ: NavbarService,
               public settingsService: SettingsService,
               public modService: ModalService,
+              private modalService: MDBModalService,
               public langService: TranslocoService,
-              private api: APIService,
+              private api: OctraAPIService,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
-              private alertService: AlertService,
-              private modalService: MDBModalService) {
+              private alertService: AlertService) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
     this.audioManager = this.audio.audiomanagers[0];
 
@@ -346,7 +344,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       this.transcrService.endTranscription();
 
       if (this._useMode !== LoginMode.DEMO) {
-        this.api.setOnlineSessionToFree(this.appStorage).then(() => {
+        this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
           this.logout(true);
         }).catch((error) => {
           console.error(error);
@@ -657,28 +655,47 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     const json: any = this.transcrService.exportDataToJSON();
 
     if (this._useMode === LoginMode.ONLINE) {
-      this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
-      this.api.saveSession(json.transcript, json.project, json.annotator,
-        json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
-        if (result !== undefined) {
+      const subscr = this.modalService.open.subscribe((modal) => {
+        this.api.saveAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID, {
+          transcript: this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration),
+          comment: this.appStorage.comment,
+          assessment: this.appStorage.feedback,
+          log: this.appStorage.logs
+        }).then(() => {
           this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;
 
-          this.subscrmanager.add(timer(500).subscribe(() => {
-            this.waitForSend = false;
-            this.transcrSendingModal.hide();
+          this.waitForSend = false;
+          const subscr2 = this.modalService.closed.subscribe(() => {
+            this.transcrService.endTranscription(false);
 
-            // only if opened
-            this.modalOverview.hide();
+            this.appStorage.startOnlineAnnotation(this.appStorage.onlineSession.currentProject).then((newAnnotation) => {
+              console.log(`new annotation is `);
+              console.log(newAnnotation);
+              if (newAnnotation !== undefined) {
+                navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+                  console.error(error);
+                });
+              } else {
+                //TODO api clear state
+                navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
+                  console.error(error);
+                });
+              }
+            }).catch((error) => {
+              this.sendError = error;
+            });
+            subscr2.unsubscribe();
+          });
+          this.transcrSendingModal.hide();
+          this.modalOverview?.hide();
+        }).catch((error) => {
+          this.sendError = error;
+        });
 
-            this.nextTranscription(result);
-          }));
-        } else {
-          this.sendError = this.langService.translate('send error');
-        }
-      }).catch((error) => {
-        this.onSendError(error);
+        subscr.unsubscribe();
       });
+      this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
@@ -699,7 +716,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
             this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
             this.subscrmanager.add(timer(1000).subscribe(() => {
               // simulate nextTranscription
-              this.transcrSendingModal.hide();
+              this.transcrSendingModal.hide()
               this.reloadDemo();
             }));
             break;
@@ -754,76 +771,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     });
   }
 
-  nextTranscription(json: any) {
-    this.transcrService.endTranscription(false);
-
-    if (json !== undefined) {
-      const data = json.data as IDataEntry;
-      if (data && hasProperty(data, 'url') && hasProperty(data, 'id')) {
-        // get transcript data that already exists
-        const jsonStr = JSON.stringify(json.data);
-        let serverDataEntry = parseServerDataEntry(jsonStr);
-
-        if (hasPropertyTree(serverDataEntry, 'transcript')) {
-          if (!Array.isArray(serverDataEntry.transcript)) {
-            console.log(`server transcript is not array, set []`);
-            serverDataEntry = {
-              ...serverDataEntry,
-              transcript: []
-            };
-          } else {
-            console.log(`seervertranscript is array`);
-          }
-        } else {
-          console.log(`no server transcript`);
-        }
-
-        if (!hasPropertyTree(serverDataEntry, 'logtext') ||
-          !Array.isArray(serverDataEntry.logtext)) {
-          serverDataEntry = {
-            ...serverDataEntry,
-            logtext: []
-          };
-        }
-
-        let promptText = '';
-        if (this._useMode === LoginMode.ONLINE && hasProperty(data, 'prompttext') && data.prompttext !== '') {
-          // get transcript data that already exists
-          promptText = json.data.prompttext;
-        }
-
-        let serverComment = '';
-        if (this._useMode === LoginMode.ONLINE && hasProperty(data, 'comment') && data.comment !== '') {
-          // get transcript data that already exists
-          serverComment = data.comment;
-        }
-
-        let jobsLeft = 0;
-        if (hasProperty(json, 'message')) {
-          const counter = (json.message === '') ? '0' : json.message;
-          jobsLeft = Number(counter);
-        }
-
-        this.appStorage.serverDataEntry = serverDataEntry;
-
-        this.appStorage.setOnlineSession({
-          userName: this.appStorage.onlineSession.loginData.userName,
-          email: this.appStorage.onlineSession.loginData.email,
-          webToken: this.appStorage.onlineSession.loginData.webToken
-        }, data.id, data.url, promptText, serverComment, jobsLeft, true);
-
-        navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
-          console.error(error);
-        });
-      } else {
-        console.error(`can't read next segment because audioURL or id is undefined!`);
-        console.log(json);
-      }
-    } else {
-      console.error(`json array for transcription next is undefined`);
-    }
-  }
-
   reloadDemo() {
     this.transcrService.endTranscription(false);
     this.clearDataPermanently();
@@ -843,11 +790,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   closeTranscriptionAndGetNew() {
     // close current session
     if (this._useMode === LoginMode.ONLINE) {
-      this.api.closeSession(this.appStorage.onlineSession.loginData.userName, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
-        // begin new session
-        this.api.beginSession(this.appStorage.onlineSession.currentProject.name, this.appStorage.onlineSession.loginData.userName, 1).then((json) => {
-          // new session
-          this.nextTranscription(json);
+      this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
+        this.api.startAnnotation(this.appStorage.onlineSession.currentProject.id).then((result) => {
+          this.transcrService.endTranscription(false);
+          navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+            console.error(error);
+          });
         }).catch((error) => {
           console.error(error);
         });

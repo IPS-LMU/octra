@@ -4,12 +4,13 @@ import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
-import {getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
+import {afterTrue, getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
   AnnotationStateLevel,
   convertFromOIDLevel,
+  CurrentProject,
   getModeState,
   LoadingStatus,
   LoginMode,
@@ -26,11 +27,14 @@ import {UserActions} from '../../store/user/user.actions';
 import {ApplicationActions} from '../../store/application/application.actions';
 import {IDBActions} from '../../store/idb/idb.actions';
 import * as fromAnnotation from '../../store/annotation';
+import * as fromApplication from '../../store/application';
 import {ASRActions} from '../../store/asr/asr.actions';
 import {ILog} from '../../obj/Settings/logging';
 import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
 import {Observable, Subject, Subscription} from 'rxjs';
+import {AnnotationStartResponseDataItem, UserRole} from '@octra/octra-db';
+import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Injectable({
   providedIn: 'root'
@@ -96,7 +100,8 @@ export class AppStorageService {
   }
 
   get submitted(): boolean {
-    return getModeState(this._snapshot)?.onlineSession?.submitted;
+    console.log(`mode state for ${this.useMode}`);
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.submitted;
   }
 
   set submitted(value: boolean) {
@@ -107,7 +112,7 @@ export class AppStorageService {
   }
 
   get feedback(): any {
-    return getModeState(this._snapshot)?.onlineSession?.feedback;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.feedback;
   }
 
   set feedback(value: any) {
@@ -118,8 +123,8 @@ export class AppStorageService {
       }));
   }
 
-  get dataID(): number {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.dataID;
+  get transcriptID(): number {
+    return getModeState(this._snapshot)?.onlineSession?.sessionData?.transcriptID;
   }
 
   get language(): string {
@@ -241,7 +246,8 @@ export class AppStorageService {
               public localStr: LocalStorageService,
               private store: Store<RootState>,
               private actions: Actions,
-              private router: Router) {
+              private router: Router,
+              private api: OctraAPIService) {
     this.subscrManager.add(this.store.subscribe((state: RootState) => {
       this._snapshot = state;
     }));
@@ -294,7 +300,7 @@ export class AppStorageService {
 
 
   get jobsLeft(): number {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData.jobsLeft;
+    return getModeState(this._snapshot)?.onlineSession?.currentProject?.jobsLeft;
   }
 
   set jobsLeft(jobsLeft: number) {
@@ -483,16 +489,21 @@ export class AppStorageService {
   afterLoginOnlineSuccessful(type: 'local' | 'shibboleth', user: {
     name: string,
     email: string,
+    roles: UserRole[],
     webToken: string
   }) {
+    afterTrue(this.store.select(fromApplication.selectLoggedIn)).then(() => {
+      navigateTo(this.router, ['/user/projects'])
+    }).catch((error) => {
+      console.error(error);
+    });
+
     this.store.dispatch(OnlineModeActions.login({
       mode: LoginMode.ONLINE,
-      onlineSession: {
-        loginData: {
-          userName: user.name,
-          email: user.email,
-          webToken: user.webToken
-        }
+      loginData: {
+        userName: user.name,
+        email: user.email,
+        webToken: user.webToken
       },
       removeData: false
     }));
@@ -500,8 +511,7 @@ export class AppStorageService {
     // TODO api
     // 1. Save loginData to store and IDB
     // 2. Create Actions and Reducers for startOnlineAnnotation
-    // 3. After 1. redirect to a ProjectsListComponent
-    // 4. After project selected, dispatch startAnnotation with retrieved transcript, save data to store and IDB
+    // 4. After project selected, dispatch startOnlineAnnotation with retrieved transcript, save data to store and IDB
     // 5. Redirect to transcr section
     // 6. Make sure that all data persists, even after reload
     // 7. Send transcription to server and retrieve next one (it's AnnotJSON). Make sure it's saved.
@@ -509,11 +519,6 @@ export class AppStorageService {
     // 9. Check logout/login
     // 10. Add person icon to navbar with menu for signout, etc.
     // 11. Add information about project to the navbar.
-  }
-
-  setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number, removeData: boolean) {
-    if (member !== undefined) {
-    }
   }
 
   setLocalSession(files: File[], sessionFile: SessionFile) {
@@ -748,6 +753,35 @@ export class AppStorageService {
       }
     }
     return undefined;
+  }
+
+  public startOnlineAnnotation(currentProject: CurrentProject): Promise<AnnotationStartResponseDataItem> {
+    return new Promise<AnnotationStartResponseDataItem>((resolve, reject) => {
+      this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
+        if (newAnnotation !== undefined) {
+          console.log(`got new annotation`);
+          console.log(newAnnotation);
+
+          this.store.dispatch(OnlineModeActions.startOnlineAnnotation({
+            mode: this.useMode,
+            currentProject,
+            sessionData: {
+              transcriptID: newAnnotation.id,
+              audioURL: newAnnotation.mediaitem.url,
+              promptText: newAnnotation.orgtext,
+              serverComment: newAnnotation.comment,
+              serverDataEntry: newAnnotation,
+              comment: '',
+              submitted: false,
+              feedback: undefined
+            }
+          }));
+        }
+        resolve(newAnnotation);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 
   public logout(clearSession = false) {

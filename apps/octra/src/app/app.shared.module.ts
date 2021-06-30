@@ -17,6 +17,7 @@ import {
   faCog,
   faCopy,
   faDatabase,
+  faDoorOpen,
   faDownload,
   faEdit,
   faEraser,
@@ -28,6 +29,7 @@ import {
   faForward,
   faGlobe,
   faGripLines,
+  faHouseUser,
   faInfoCircle,
   faKeyboard,
   faLongArrowAltRight,
@@ -57,13 +59,13 @@ import {
   faTrashAlt,
   faUniversity,
   faUserCheck,
+  faUserCircle,
   faVolumeDown,
   faVolumeUp,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 import {faHandshake} from '@fortawesome/free-regular-svg-icons';
 import {faDropbox, faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faHouseUser} from '@fortawesome/free-solid-svg-icons/faHouseUser';
 import {TranslocoModule} from '@ngneat/transloco';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
 import {AsrOptionsComponent} from './core/component/asr-options/asr-options.component';
@@ -151,8 +153,8 @@ export class AppSharedModule {
       faEdit,
       faFolderOpen,
       faUniversity,
-      faHouseUser, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown,
-      faGithub
+      faHouseUser, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown, faUserCircle,
+      faGithub, faDoorOpen
     );
   }
 }

@@ -249,15 +249,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
-      this.cd.markForCheck();
     }));
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(() => {
-      this.cd.markForCheck();
     }));
 
     this.subscrmanager.add(this.transcrService.currentLevelSegmentChange.subscribe(() => {
-      this.cd.markForCheck();
     }));
 
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(

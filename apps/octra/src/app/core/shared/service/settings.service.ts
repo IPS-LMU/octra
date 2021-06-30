@@ -142,13 +142,7 @@ export class SettingsService {
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL || this.appStorage.useMode === LoginMode.DEMO) {
       // online, url or demo
       if (!(this.appStorage.audioURL === undefined)) {
-        let src = '';
-        if (this.appStorage.useMode === LoginMode.ONLINE) {
-          // TODO api
-          // src = this.appSettings.audio_server.url + this.appStorage.audioURL;
-        } else {
-          src = this.appStorage.audioURL;
-        }
+        const src = this.appStorage.audioURL;
         // extract filename
         this._filename = this.appStorage.audioURL.substr(this.appStorage.audioURL.lastIndexOf('/') + 1);
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
@@ -240,11 +234,7 @@ export class SettingsService {
           } else {
             console.log(`init octra api`);
             this.api.init(this.appSettings.api.url, this.appSettings.api.appToken);
-            this.api.loginUser('shibboleth').then((result) => {
-              console.log(result);
-            }).catch((error) => {
-              console.error(error);
-            });
+            this.api.webToken = this.appStorage?.onlineSession?.loginData?.webToken;
           }
           this._isDBLoadded = true;
 

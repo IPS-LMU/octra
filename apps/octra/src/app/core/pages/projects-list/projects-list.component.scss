@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  background-color: whitesmoke;
+}
+
+.container {
+  margin-top: 40px;
+  height: 300px;
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+}
+
+.table-wrapper {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100%;
+  border: 1px solid lightgray;
+}
+
+table tbody tr td {
+  vertical-align: middle;
+}
+
+table tbody .deactivated {
+  opacity: 0.6;
+}
+
+table tbody tr {
+  cursor: pointer;
+}
+
+.description {
+  font-size: 0.9em;
+}

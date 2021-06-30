@@ -46,14 +46,17 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.login, (state: OnlineModeState, {onlineSession, removeData, mode}) => {
+      on(OnlineModeActions.login, (state: OnlineModeState, {loginData, removeData, mode}) => {
         if (this.mode === mode) {
           if (removeData) {
             return initialState;
           }
           return {
             ...state,
-            onlineSession
+            onlineSession: {
+              ...state.onlineSession,
+              loginData
+            }
           };
         }
         return state;
@@ -98,19 +101,9 @@ export class OnlineModeReducers {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              audioURL
-            }
-          };
-        }
-        return state;
-      }),
-      on(OnlineModeActions.setUserData, (state: OnlineModeState, {userName, project, jobNumber, mode}) => {
-        if (this.mode === mode) {
-          return {
-            ...state,
-            onlineSession: {
-              ...state.onlineSession,
-              userName, project, jobNumber
+              sessionData: {
+                audioURL
+              }
             }
           };
         }
@@ -120,7 +113,13 @@ export class OnlineModeReducers {
         if (mode === mode) {
           return {
             ...state,
-            feedback
+            onlineSession: {
+              ...state.onlineSession,
+              sessionData: {
+                ...state.onlineSession.sessionData,
+                feedback
+              }
+            }
           };
         }
         return state;
@@ -146,7 +145,10 @@ export class OnlineModeReducers {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              comment
+              sessionData: {
+                ...state.onlineSession.sessionData,
+                comment
+              }
             }
           };
         }
@@ -158,7 +160,10 @@ export class OnlineModeReducers {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              promptText
+              sessionData: {
+                ...state.onlineSession.sessionData,
+                promptText
+              }
             }
           };
         }
@@ -170,7 +175,10 @@ export class OnlineModeReducers {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              serverComment
+              sessionData: {
+                ...state.onlineSession.sessionData,
+                serverComment
+              }
             }
           };
         }
@@ -182,7 +190,10 @@ export class OnlineModeReducers {
             ...state,
             onlineSession: {
               ...state.onlineSession,
-              jobsLeft
+              currentProject: {
+                ...state.onlineSession.currentProject,
+                jobsLeft
+              }
             }
           };
         }
@@ -207,11 +218,29 @@ export class OnlineModeReducers {
           return result;
         }
       ),
-      on(OnlineModeActions.setSubmitted, (state: AnnotationState, {submitted, mode}) => {
+      on(OnlineModeActions.setSubmitted, (state: OnlineModeState, {submitted, mode}) => {
         if (this.mode === mode) {
           return {
             ...state,
-            submitted
+            onlineSession: {
+              ...state.onlineSession,
+              sessionData: {
+                submitted
+              }
+            }
+          };
+        }
+        return state;
+      }),
+      on(OnlineModeActions.startOnlineAnnotation, (state: OnlineModeState, {currentProject, mode, sessionData}) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            onlineSession: {
+              ...state.onlineSession,
+              currentProject,
+              sessionData
+            }
           };
         }
         return state;
@@ -249,7 +278,7 @@ export class OnlineModeReducers {
             }
           }
         };
-      case('dataID'):
+      case('transcriptID'):
         return {
           ...state,
           onlineSession: {
@@ -262,8 +291,8 @@ export class OnlineModeReducers {
         };
       case('user'):
         if (value !== undefined) {
-          if (hasProperty(value, 'userName')) {
-            onlineSessionData.userName = value.userName;
+          if (hasProperty(value, 'name')) {
+            onlineSessionData.userName = value.name;
           }
           if (hasProperty(value, 'email')) {
             onlineSessionData.email = value.email;
@@ -289,6 +318,29 @@ export class OnlineModeReducers {
             sessionData: {
               ...state.onlineSession.sessionData,
               promptText: value
+            }
+          }
+        };
+      case('jobsLeft'):
+        return {
+          ...state,
+          onlineSession: {
+            ...state.onlineSession,
+            currentProject: {
+              ...state.onlineSession.currentProject,
+              jobsLeft: value
+            }
+          }
+        };
+      case('serverDataEntry'):
+        return {
+          ...state,
+          onlineSession: {
+            ...state.onlineSession,
+            currentProject: state.onlineSession.currentProject,
+            sessionData: {
+              ...state.onlineSession.sessionData,
+              serverDataEntry: value
             }
           }
         };
@@ -322,6 +374,19 @@ export class OnlineModeReducers {
             sessionData: {
               ...state.onlineSession.sessionData,
               feedback: value
+            }
+          }
+        };
+      case('project'):
+        return {
+          ...state,
+          onlineSession: {
+            ...state.onlineSession,
+            currentProject: {
+              ...state.onlineSession.currentProject,
+              name: value?.name,
+              id: value?.id,
+              description: value?.description
             }
           }
         };

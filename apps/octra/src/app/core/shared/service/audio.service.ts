@@ -50,7 +50,7 @@ export class AudioService {
           const matches: RegExpExecArray = regex.exec(url);
 
           let filename = '';
-          if (matches !== undefined && matches[1].length > 0) {
+          if (matches !== null && matches.length > 0) {
             filename = matches[1] + '.' + matches[3];
           } else {
             filename = url;

@@ -42,11 +42,10 @@
 
 .info-menu * {
   border: none;
-  font-size: 11px;
 }
 
-.info-menu .table {
-  margin-bottom: 0;
+.info-menu {
+  margin: 1em;
 }
 
 #modalstatis .modal-dialog {
@@ -95,11 +94,10 @@
   color: black;
 }
 
-.switch {
-  margin-top: -5px;
-  display: flex;
-}
-
 .nav-link.active span {
   border-bottom: 2px solid cornflowerblue;
+}
+
+.custom-switch label.custom-control-label {
+  cursor: pointer;
 }

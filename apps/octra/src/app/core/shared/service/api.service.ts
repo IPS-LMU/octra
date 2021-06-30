@@ -220,11 +220,11 @@ export class APIService implements API {
   public setOnlineSessionToFree = (appStorage: AppStorageService) => {
     // check if old annotation is already annotated
     return new Promise<void>((resolve, reject) => {
-      if (appStorage.dataID !== undefined && appStorage.dataID > -1) {
-        this.fetchAnnotation(appStorage.dataID).then((json) => {
+      if (appStorage.transcriptID !== undefined && appStorage.transcriptID > -1) {
+        this.fetchAnnotation(appStorage.transcriptID).then((json) => {
           if (json !== undefined && json.data !== undefined) {
             if (hasProperty(json.data, 'status') && json.data.status === 'BUSY') {
-              this.closeSession(appStorage.onlineSession.loginData.userName, appStorage.dataID, '').then(() => {
+              this.closeSession(appStorage.onlineSession.loginData.userName, appStorage.transcriptID, '').then(() => {
                 resolve();
               }).catch((error) => {
                 reject(error);

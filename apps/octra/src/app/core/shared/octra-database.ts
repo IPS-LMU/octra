@@ -2,6 +2,7 @@ import Dexie, {Transaction} from 'dexie';
 import {IAnnotJSON} from '@octra/annotation';
 import {LoginMode} from '../store';
 import {Subject} from 'rxjs';
+import {AnnotationStartResponseDataItem} from '../../../../../../../octra-backend/extern/octra-db';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -264,7 +265,9 @@ export class OctraDatabase extends Dexie {
       submitted: false,
       audioURL: '',
       comment: '',
-      dataID: -1,
+      transcriptID: -1,
+      jobsLeft: -1,
+      serverDataEntry: undefined,
       feedback: undefined,
       sessionfile: undefined,
       prompttext: '',
@@ -415,8 +418,10 @@ export interface IIDBModeOptions {
   submitted: boolean;
   audioURL: string;
   comment: string;
-  dataID: number;
+  transcriptID: number;
   feedback: any;
+  jobsLeft: number;
+  serverDataEntry: AnnotationStartResponseDataItem;
   sessionfile: any;
   prompttext: string;
   servercomment: string;
@@ -438,12 +443,14 @@ export const DefaultModeOptions: IIDBModeOptions = {
   submitted: false,
   audioURL: '',
   comment: '',
-  dataID: -1,
+  transcriptID: -1,
   feedback: undefined,
   sessionfile: undefined,
   prompttext: '',
   servercomment: '',
   currentEditor: '',
+  jobsLeft: -1,
+  serverDataEntry: undefined,
   logging: true,
   user: {
     name: '',

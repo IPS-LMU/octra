@@ -8,9 +8,15 @@ import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
 import {TranscriptionComponent} from '../transcription';
 import {TranscriptionEndComponent} from '../transcription-end';
 import {MembersAreaGuard} from './members-area.activateguard';
+import {ProjectsListComponent} from '../projects-list/projects-list.component';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},
+  {
+    path: 'projects',
+    component: ProjectsListComponent,
+    canActivate: [MembersAreaGuard]
+  },
   {
     path: 'transcr',
     component: TranscriptionComponent,

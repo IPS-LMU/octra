@@ -15,7 +15,7 @@ import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
-import * as JSZip from 'jszip';
+import {strToU8, zip, zipSync} from 'fflate';
 
 @Component({
   selector: 'octra-tools-modal',
@@ -64,6 +64,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       ],
       clientStreamHelper: undefined,
       zippingSpeed: -1,
+      archiveStructure: undefined,
       cuttingSpeed: -1,
       cuttingTimeLeft: 0,
       timeLeft: 0,
@@ -185,18 +186,16 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       this.transcrService.audioManager.ressource.info.fullname, this.transcrService.audioManager.ressource.arraybuffer
     );
 
-    let zip = new JSZip();
-
     let totalSize = 0;
     let cuttingStarted = 0;
 
     this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(this.tools.audioCutting.wavFormat.onaudiocut.subscribe(
-      (status: {
-        finishedSegments: number,
-        file: File
-      }) => {
+      (status) => {
         this.tools.audioCutting.progress = Math.round(status.finishedSegments / overallTasks * 100);
-        zip = zip.file(status.file.name, status.file);
+        if (this.tools.audioCutting.archiveStructure === undefined) {
+          this.tools.audioCutting.archiveStructure = {};
+        }
+        this.tools.audioCutting.archiveStructure[status.file.name] = status.u8Array;
         totalSize += status.file.size;
 
         if (this.tools.audioCutting.cuttingSpeed < 0) {
@@ -231,10 +230,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               this.namingConvention.namingConvention
             );
 
-            zip = zip.file(
-              this.transcrService.audioManager.ressource.info.name + '_meta.txt',
-              new File([content], this.transcrService.audioManager.ressource.info.name + '_meta.txt', {type: 'text/plain'})
-            );
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + '_meta.txt'] = strToU8(content);
             finished++;
           }
 
@@ -247,21 +243,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               this.namingConvention.namingConvention
             );
 
-            zip = zip.file(
-              this.transcrService.audioManager.ressource.info.name + '_meta.json',
-              new File([JSON.stringify(content, undefined, 2)],
-                this.transcrService.audioManager.ressource.info.name + '_meta.json', {type: 'text/plain'})
-            );
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + '_meta.json'] = strToU8(JSON.stringify(content, undefined, 2));
             finished++;
           }
 
           let sizeProcessed = 0;
           const startZipping = Date.now();
-          this.tools.audioCutting.clientStreamHelper = (zip as any).generateInternalStream({
-            type: 'blob',
-            streamFiles: true
-          })
-            .on('data', (data, metadata) => {
+          /** TODO better use stream **/
+          zip(this.tools.audioCutting.archiveStructure, {level: 9}, (error, data) => {
+            if (error === undefined) {
               if (sizeProcessed === 0) {
                 // first process
                 if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
@@ -271,6 +261,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 this.tools.audioCutting.cuttingSpeed = -1;
                 this.tools.audioCutting.zippingSpeed = -1;
               }
+
               sizeProcessed += data.length;
               const overAllProgress = sizeProcessed / totalSize;
               // data is a Uint8Array because that's the type asked in generateInternalStream
@@ -284,15 +275,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
                 lastCheck = Date.now();
               }
-            })
-            .on('error', (e) => {
-              // e is the error
+              // TODO save data
+            } else {
               console.error(`cutting error`);
-              console.error(e);
-            })
-            .on('end', () => {
-              // no parameter
-            });
+              console.error(error);
+            }
+          });
 
           this.tools.audioCutting.clientStreamHelper.accumulate().then((data) => {
             this.tools.audioCutting.status = 'finished';
@@ -377,20 +365,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   private getDurationFactorForZipping(): Promise<number> {
     return new Promise<number>((resolve, reject) => {
-
-      let zip = new JSZip();
-
-      const file = new File([new ArrayBuffer(1024 * 1024)], 'test.txt');
-
-      zip = zip.file('test.txt', file);
-
       const started = Date.now();
-      zip.generateAsync({type: 'blob'}).then(() => {
-        const dur = (Date.now() - started) / 1000;
-        resolve(dur / file.size);
-      }).catch((err) => {
-        reject(err);
-      });
+      zipSync({
+        'test.txt': new Uint8Array(new ArrayBuffer(1024 * 1024))
+      }, {level: 9})
+      const dur = (Date.now() - started) / 1000;
+      resolve(dur / (1024 * 1024));
     });
   }
 

@@ -37,22 +37,14 @@ export class ConfigurationService {
     ) {
       uniqueHTTPRequest(this.http, false, undefined, urls.json, undefined).subscribe(
         (settings: any) => {
-          uniqueHTTPRequest(this.http, false, undefined, urls.schema, undefined).subscribe(
-            (schema) => {
-              console.log(filenames.json + ' schema file loaded');
+          console.log(filenames.json + ' schema file loaded');
+          const validationOK = this.validateJSON(filenames.json, settings, urls.schema);
 
-              const validationOK = this.validateJSON(filenames.json, settings, schema);
-
-              if (validationOK) {
-                onvalidated(settings);
-              } else {
-                onerror(filenames.json + ' not valid');
-              }
-            },
-            () => {
-              onerror(filenames.schema + ' could not be loaded!');
-            }
-          )
+          if (validationOK) {
+            onvalidated(settings);
+          } else {
+            onerror(filenames.json + ' not valid');
+          }
         },
         () => {
           onerror('Loading ' + filenames.json + ' failed<br/>');

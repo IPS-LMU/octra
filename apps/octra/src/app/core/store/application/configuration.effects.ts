@@ -9,6 +9,10 @@ import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
 import {Subject} from 'rxjs';
 import {exhaustMap} from 'rxjs/operators';
+import '../../schemata/appconfig.schema';
+import {AppConfigSchema} from '../../schemata/appconfig.schema';
+import {ProjectConfigSchema} from '../../schemata/projectconfig.schema';
+import {GuidelinesSchema} from '../../schemata/guidelines.schema';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);
@@ -27,7 +31,7 @@ export class ConfigurationEffects {
         },
         {
           json: './config/appconfig.json',
-          schema: './assets/schemata/appconfig.schema.json'
+          schema: AppConfigSchema
         },
         {
           json: 'appconfig.json',
@@ -168,11 +172,11 @@ export class ConfigurationEffects {
         },
         {
           json: './config/localmode/projectconfig.json',
-          schema: './assets/schemata/projectconfig.schema.json'
+          schema: ProjectConfigSchema
         },
         {
           json: 'projectconfig.json',
-          schema: 'projectconfig.schema.json'
+          schema: ProjectConfigSchema
         },
         (projectConfig: ProjectSettings) => {
           subject.next(ConfigurationActions.projectConfigurationLoaded({
@@ -212,11 +216,11 @@ export class ConfigurationEffects {
         },
         {
           json: url,
-          schema: './assets/schemata/guidelines.schema.json'
+          schema: GuidelinesSchema
         },
         {
           json: 'guidelines_' + language + '.json',
-          schema: 'guidelines.schema.json'
+          schema: GuidelinesSchema
         },
         (guidelines: any) => {
           subject.next(ConfigurationActions.loadGuidelinesSuccess({

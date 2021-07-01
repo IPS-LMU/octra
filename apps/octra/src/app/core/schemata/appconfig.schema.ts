@@ -1,14 +1,14 @@
-{
-  "properties": {
-    "version": {
-      "type": "string"
+export const AppConfigSchema = {
+  'properties': {
+    'version': {
+      'type': 'string'
     },
-    "api": {
-      "properties": {
-        "url": {
-          "type": "string"
+    'api': {
+      'properties': {
+        'url': {
+          'type': 'string'
         },
-        "appToken": {
+        'appToken': {
           "type": "string"
         }
       },

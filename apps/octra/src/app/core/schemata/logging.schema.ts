@@ -1,13 +1,13 @@
-{
-  "properties": {
-    "version": {
-      "type": "string"
+export const LoggingSchema = {
+  'properties': {
+    'version': {
+      'type': 'string'
     },
-    "encoding": {
-      "type": "string"
+    'encoding': {
+      'type': 'string'
     },
-    "projectname": {
-      "type": "string"
+    'projectname': {
+      'type': 'string'
     },
     "logs": {
       "items": {

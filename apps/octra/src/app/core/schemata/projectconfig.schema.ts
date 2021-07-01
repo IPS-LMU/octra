@@ -1,14 +1,14 @@
-{
-  "properties": {
-    "version": {
-      "type": "string"
+export const ProjectConfigSchema = {
+  'properties': {
+    'version': {
+      'type': 'string'
     },
-    "navigation": {
-      "properties": {
-        "export": {
-          "type": "boolean"
+    'navigation': {
+      'properties': {
+        'export': {
+          'type': 'boolean'
         },
-        "interfaces": {
+        'interfaces': {
           "type": "boolean"
         },
         "help_url": {

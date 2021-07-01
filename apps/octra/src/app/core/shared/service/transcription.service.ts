@@ -394,10 +394,12 @@ export class TranscriptionService {
 
 
             if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
+              // TODO api import serverDataEntry
+              /*
               if (this.appStorage.serverDataEntry !== undefined && this.appStorage.serverDataEntry.transcript !== undefined
                 && this.appStorage.serverDataEntry.transcript.length > 0) {
                 // import logs
-                this.appStorage.setLogs(this.appStorage.serverDataEntry.logtext);
+                this.appStorage.setLogs(this.appStorage.serverDataEntry.log);
 
                 // check if servertranscript's segment is empty
                 if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
@@ -412,7 +414,10 @@ export class TranscriptionService {
                     newLevels[0].level.items.push(oseg);
                   }
                 }
-              } else if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
+
+
+              } else */
+              if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
                 && typeof this.appStorage.prompttext === 'string') {
                 // prompt text available and server transcript is undefined
                 // set prompt as new transcript
@@ -486,7 +491,7 @@ export class TranscriptionService {
             if (this.appStorage.logs === undefined) {
               this.appStorage.clearLoggingDataPermanently();
               this.uiService.elements = [];
-            } else {
+            } else if (isArray(this.appStorage.logs)) {
               this.uiService.fromAnyArray(this.appStorage.logs);
             }
             this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), undefined, -1, undefined, undefined, 'version');

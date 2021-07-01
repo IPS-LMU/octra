@@ -236,6 +236,7 @@ export class OnlineModeReducers {
         if (this.mode === mode) {
           return {
             ...state,
+            audio: initialState.audio,
             onlineSession: {
               ...state.onlineSession,
               currentProject,

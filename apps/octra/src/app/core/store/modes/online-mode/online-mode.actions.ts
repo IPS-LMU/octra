@@ -1,7 +1,7 @@
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {createAction, props} from '@ngrx/store';
 import {CurrentProject, LoginData, LoginMode, OnlineSession, SessionData, URLParameters} from '../../index';
-import {IDataEntry} from '../../../obj/data-entry';
+import {AnnotationStartResponseDataItem} from '@octra/octra-db';
 
 export class OnlineModeActions extends AnnotationActions {
   static context: 'OnlineMode';
@@ -65,7 +65,7 @@ export class OnlineModeActions extends AnnotationActions {
   public static setServerDataEntry = createAction(
     `[${OnlineModeActions.context}] Set serverDataEntry`,
     props<{
-      serverDataEntry: IDataEntry;
+      serverDataEntry: AnnotationStartResponseDataItem;
       mode: LoginMode;
     }>()
   );

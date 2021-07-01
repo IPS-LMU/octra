@@ -7,9 +7,7 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SampleUnit} from './audio-time';
 import {PlayBackStatus, SourceType} from '../types';
 import {AudioSelection} from './audio-selection';
-import {Subject} from 'rxjs/internal/Subject';
-import {timer} from 'rxjs/internal/observable/timer';
-import {Subscription} from 'rxjs/internal/Subscription';
+import {Subject, Subscription, timer} from 'rxjs';
 
 declare let window: any;
 

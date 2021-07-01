@@ -9,7 +9,6 @@ export class ModalService {
   private modalaction = new EventEmitter<any>();
 
   constructor(private modalService: MDBModalService) {
-
   }
 
   public openModal(modal: any, config: ModalOptions, data?: any) {
@@ -22,11 +21,9 @@ export class ModalService {
   }
 
   public openModalRef(modal: any, config: ModalOptions, data?: any) {
-    const modalRef = this.modalService.show(modal, {
+    return this.modalService.show(modal, {
       ...config,
       data
     });
-
-    return modalRef;
   }
 }

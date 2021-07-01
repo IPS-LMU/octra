@@ -652,10 +652,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   public onSendNowClick() {
     this.sendOk = true;
 
-    const json: any = this.transcrService.exportDataToJSON();
-
     if (this._useMode === LoginMode.ONLINE) {
       const subscr = this.modalService.open.subscribe((modal) => {
+        console.log(`modal opened!`);
         this.api.saveAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID, {
           transcript: this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration),
           comment: this.appStorage.comment,
@@ -667,8 +666,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
           this.waitForSend = false;
           const subscr2 = this.modalService.closed.subscribe(() => {
-            this.transcrService.endTranscription(false);
-
+            console.log(`modal closed!`);
             this.appStorage.startOnlineAnnotation(this.appStorage.onlineSession.currentProject).then((newAnnotation) => {
               console.log(`new annotation is `);
               console.log(newAnnotation);
@@ -677,18 +675,21 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
                   console.error(error);
                 });
               } else {
-                //TODO api clear state
                 navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
                   console.error(error);
                 });
+                this.appStorage.clearAnnotationPermanently();
               }
             }).catch((error) => {
               this.sendError = error;
             });
             subscr2.unsubscribe();
           });
-          this.transcrSendingModal.hide();
-          this.modalOverview?.hide();
+          this.transcrService.endTranscription(false);
+
+          setTimeout(() => {
+            this.transcrSendingModal.hide();
+          }, 500);
         }).catch((error) => {
           this.sendError = error;
         });

@@ -14,7 +14,7 @@ import {BugReportService, ConsoleType} from './core/shared/service/bug-report.se
 import * as fromApplication from './core/store/application'
 import {Store} from '@ngrx/store';
 import {Subscription} from 'rxjs';
-import {OctraAPIService} from '../../../../../octra-backend/extern/ngx-octra-api';
+import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-app',

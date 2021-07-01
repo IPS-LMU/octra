@@ -1,7 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
 import {AppInfo} from '../../../app.info';
-import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {afterTrue, getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
@@ -91,11 +90,11 @@ export class AppStorageService {
     }));
   }
 
-  get serverDataEntry(): IDataEntry {
+  get serverDataEntry(): AnnotationStartResponseDataItem {
     return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
   }
 
-  set serverDataEntry(value: IDataEntry) {
+  set serverDataEntry(value: AnnotationStartResponseDataItem) {
     this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
   }
 
@@ -764,7 +763,10 @@ export class AppStorageService {
 
           this.store.dispatch(OnlineModeActions.startOnlineAnnotation({
             mode: this.useMode,
-            currentProject,
+            currentProject: {
+              ...currentProject,
+              jobsLeft: newAnnotation.transcripts_free_count
+            },
             sessionData: {
               transcriptID: newAnnotation.id,
               audioURL: newAnnotation.mediaitem.url,

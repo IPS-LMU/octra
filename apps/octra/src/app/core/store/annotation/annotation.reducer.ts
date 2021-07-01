@@ -7,6 +7,7 @@ import {IIDBModeOptions} from '../../shared/octra-database';
 import {getProperties} from '@octra/utilities';
 import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
+import {isArray} from 'rxjs/internal-compatibility';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -157,7 +158,7 @@ export class AnnotationStateReducers {
         if (this.mode === mode) {
           return {
             ...state,
-            logs: [...state.logs, log]
+            logs: (!isArray(state.logs)) ? [log] : [...state.logs, log]
           };
         }
         return state;

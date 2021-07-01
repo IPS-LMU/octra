@@ -1,15 +1,17 @@
 import {AudioFormat} from './audio-format';
 import {NumeratedSegment} from '../../types';
-import {Subject} from 'rxjs/internal/Subject';
+import {Subject} from 'rxjs';
 
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {
   public onaudiocut: Subject<{
     finishedSegments: number,
-    file: File
+    fileName: string,
+    u8Array: Uint8Array
   }> = new Subject<{
     finishedSegments: number,
-    file: File
+    fileName: string,
+    u8Array: Uint8Array
   }>();
   protected dataStart = -1;
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
@@ -64,15 +66,15 @@ export class WavFormat extends AudioFormat {
     if (pointer > -1 && pointer < segments.length) {
       const segment = segments[pointer];
 
-      this.cutAudioFile(namingConvention, buffer, segment).then((file) => {
+      this.cutAudioFile(namingConvention, buffer, segment).then(({fileName, u8Array}) => {
         this.onaudiocut.next({
           finishedSegments: pointer + 1,
-          file
+          fileName,
+          u8Array
         });
 
         if (pointer < segments.length - 1) {
           // continue
-          // @ts-ignore
           // const freeSpace = window.performance.memory.totalJSHeapSize - window.performance.memory.usedJSHeapSize;
           // console.log(`${freeSpace / 1024 / 1024} MB left.`);
           if (this.status === 'running') {
@@ -92,15 +94,24 @@ export class WavFormat extends AudioFormat {
     }
   }
 
-  public cutAudioFile(namingConvention: string, buffer: ArrayBuffer, segment: NumeratedSegment): Promise<File> {
-    return new Promise<File>((resolve, reject) => {
-      const filename = this.getNewFileName(namingConvention, this._filename, segment);
+  public cutAudioFile(namingConvention: string, buffer: ArrayBuffer, segment: NumeratedSegment): Promise<{
+    fileName: string,
+    u8Array: Uint8Array
+  }> {
+    return new Promise<{
+      fileName: string,
+      u8Array: Uint8Array
+    }>((resolve, reject) => {
+      const fileName = this.getNewFileName(namingConvention, this._filename, segment);
 
       if (this.isValid(buffer)) {
         const u8array = new Uint8Array(buffer);
 
         this.extractDataFromArray(segment.sampleStart, segment.sampleDur, u8array).then((data: Uint8Array | Uint16Array) => {
-          resolve(this.getFileFromBufferPart(data, this._channels, filename));
+          resolve({
+            fileName,
+            u8Array: new Uint8Array(this.getFileFromBufferPartArrayBuffer(data, this._channels))
+          });
         }).catch((error) => {
           reject(error);
         });
@@ -352,6 +363,10 @@ export class WavFormat extends AudioFormat {
 
   private getFileFromBufferPart(data: Uint8Array | Uint16Array, channels: number, filename: string): File {
     return new File([this.getFileDataView(data, channels)], `${filename}.wav`, {type: 'audio/wav'});
+  }
+
+  private getFileFromBufferPartArrayBuffer(data: Uint8Array | Uint16Array, channels: number): ArrayBuffer {
+    return this.getFileDataView(data, channels);
   }
 
   public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): Promise<File[]> {

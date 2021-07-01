@@ -2,8 +2,7 @@ import {HttpClient, HttpEventType, HttpRequest, HttpResponse} from '@angular/com
 import {NavigationExtras, Router} from '@angular/router';
 import {Action} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
-import {Observable} from 'rxjs/internal/Observable';
-import {Subject} from 'rxjs/internal/Subject';
+import {Observable, Subject} from 'rxjs';
 
 export interface FileSize {
   size: number;

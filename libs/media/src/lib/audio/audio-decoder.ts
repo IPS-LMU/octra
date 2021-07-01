@@ -2,8 +2,7 @@ import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
 import {SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
 import {AudioFormat, WavFormat} from './AudioFormats';
-import {Subject} from 'rxjs/internal/Subject';
-import {timer} from 'rxjs/internal/observable/timer';
+import {Subject, timer} from 'rxjs';
 
 declare let window: unknown;
 
@@ -61,45 +60,45 @@ export class AudioDecoder {
       for (let i = 0; i < this.parallelJobs; i++) {
         const worker = new TsWorker();
         worker.jobstatuschange.subscribe((job: TsWorkerJob) => {
-            const jobItem = this.joblist.findIndex((a) => {
-              return a.jobId === job.id;
+          const jobItem = this.joblist.findIndex((a) => {
+            return a.jobId === job.id;
+          });
+
+          if (job.status === TsWorkerStatus.FINISHED && job.result !== undefined) {
+            if (jobItem > -1) {
+              const j = this.joblist[jobItem];
+              this.writtenChannel += j.duration;
+              this.joblist.splice(jobItem, 1);
+
+              if (this.channelData === undefined || this.channelData === undefined) {
+                this.channelData = new Float32Array(Math.round(this.audioInfo.duration.samples / this.channelDataFactor));
+              }
+
+              this.minimizeChannelData([job.result, this.channelDataFactor]).then((result) => {
+                this.insertChannelBuffer(Math.floor(j.start / this.channelDataFactor), result);
+              })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+          }
+
+          if (this.writtenChannel >= this.audioInfo.duration.samples - 1) {
+            // send complete audiobuffer
+            this.onChannelDataCalculate.next({
+              progress: 1,
+              result: this.channelData
             });
 
-            if (job.status === TsWorkerStatus.FINISHED && job.result !== undefined) {
-              if (jobItem > -1) {
-                const j = this.joblist[jobItem];
-                this.writtenChannel += j.duration;
-                this.joblist.splice(jobItem, 1);
-
-                if (this.channelData === undefined || this.channelData === undefined) {
-                  this.channelData = new Float32Array(Math.round(this.audioInfo.duration.samples / this.channelDataFactor));
-                }
-
-                this.minimizeChannelData([job.result, this.channelDataFactor]).then((result) => {
-                  this.insertChannelBuffer(Math.floor(j.start / this.channelDataFactor), result);
-                })
-                  .catch((error) => {
-                    console.error(error);
-                  });
-              }
-            }
-
-            if (this.writtenChannel >= this.audioInfo.duration.samples - 1) {
-              // send complete audiobuffer
-              this.onChannelDataCalculate.next({
-                progress: 1,
-                result: this.channelData
-              });
-
-              this.afterChannelDataFinished.next();
-            } else {
-              const progress = this.writtenChannel / (this.audioInfo.duration.samples);
-              this.onChannelDataCalculate.next({
-                progress,
-                result: undefined
-              });
-            }
-          });
+            this.afterChannelDataFinished.next();
+          } else {
+            const progress = this.writtenChannel / (this.audioInfo.duration.samples);
+            this.onChannelDataCalculate.next({
+              progress,
+              result: undefined
+            });
+          }
+        });
 
         this.tsWorkers.push(worker);
       }

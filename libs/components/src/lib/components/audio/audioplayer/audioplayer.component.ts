@@ -13,8 +13,7 @@ import Konva from 'konva';
 import {AudioplayerSettings} from './audioplayer-settings';
 import {SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, PlayBackStatus, SampleUnit} from '@octra/media';
-import {Subscription} from 'rxjs/internal/Subscription';
-import {timer} from 'rxjs/internal/observable/timer';
+import {Subscription, timer} from 'rxjs';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({

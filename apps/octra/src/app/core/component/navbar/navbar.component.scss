@@ -52,13 +52,13 @@
   width: 100%;
 }
 
-.row.level-row {
+.level-row {
   border: 1px solid gray;
   padding: 5px;
 }
 
-.row.level-row.selected,
-.row.level-row.selected * {
+.level-row.selected,
+.level-row.selected * {
   background-color: rgb(165, 250, 190);
 }
 
@@ -66,16 +66,17 @@
   opacity: 0.3;
 }
 
-.row.level-row .col-8 input[type="text"] {
+.level-row td input[type="text"] {
   padding: 3px;
   width: 100%;
+  border: none;
 }
 
-.row.level-row .col-8 .selected {
+.level-row td .selected {
   border: 1px solid lightgray;
 }
 
-.row.level-add-row {
+.level-add-row {
   margin-top: 5px;
   border: 1px dashed gray;
   text-align: center;
@@ -83,14 +84,14 @@
   cursor: pointer;
 }
 
-.row.level-row .col-2 {
+.level-row td {
   padding-top: 5px;
   text-align: center;
   vertical-align: middle;
   height: 100%;
 }
 
-.row.level-row div {
+.level-row div {
   color: black;
 }
 

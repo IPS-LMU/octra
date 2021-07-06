@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../../../../environments/environment';
@@ -15,7 +15,7 @@ import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation
 import {Subscription} from 'rxjs';
 import {ToolsModalComponent} from '../../modals/tools-modal/tools-modal.component';
 import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics-modal.component';
-import {MDBModalRef} from 'angular-bootstrap-md';
+import {MDBModalRef, NavbarComponent} from 'angular-bootstrap-md';
 import {modalConfigurations} from '../../modals/types';
 import {BugreportModalComponent} from '../../modals/bugreport-modal/bugreport-modal.component';
 import {YesNoModalComponent} from '../../modals/yes-no-modal/yes-no-modal.component';
@@ -32,6 +32,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   modalTools: MDBModalRef;
   modalStatistics: MDBModalRef;
   @Input() version: string;
+  @ViewChild('navbar', {static: true}) navbar: NavbarComponent
 
   public test = 'ok';
   public secondsPerLine = 5;

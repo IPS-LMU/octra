@@ -776,7 +776,8 @@ export class AppStorageService {
               comment: '',
               submitted: false,
               feedback: undefined
-            }
+            },
+            transcript: undefined //TODO api: enable to continue online session
           }));
         }
         resolve(newAnnotation);

@@ -1,6 +1,14 @@
 import {AnnotationActions} from '../../annotation/annotation.actions';
 import {createAction, props} from '@ngrx/store';
-import {CurrentProject, LoginData, LoginMode, OnlineSession, SessionData, URLParameters} from '../../index';
+import {
+  CurrentProject,
+  LoginData,
+  LoginMode,
+  OnlineSession,
+  SessionData,
+  TranscriptionState,
+  URLParameters
+} from '../../index';
 import {AnnotationStartResponseDataItem} from '@octra/octra-db';
 
 export class OnlineModeActions extends AnnotationActions {
@@ -92,6 +100,7 @@ export class OnlineModeActions extends AnnotationActions {
       mode: LoginMode;
       currentProject: CurrentProject;
       sessionData: SessionData;
+      transcript?: TranscriptionState;
     }>()
   );
 }

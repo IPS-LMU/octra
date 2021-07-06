@@ -1,7 +1,6 @@
 <!--Navbar-->
-<mdb-navbar *ngIf="navbarServ.showNavbar" [containerInside]="false" id="navbar"
+<mdb-navbar *ngIf="navbarServ.showNavbar" [containerInside]="false" id="navbar" #navbar
             SideClass="navbar navbar-expand-lg navbar-dark indigo py-0">
-
   <!-- Navbar brand -->
   <mdb-navbar-brand><a [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')" class="navbar-brand"
                        href="#">OCTRA
@@ -14,19 +13,21 @@
 
   <!-- Collapsible content -->
   <links>
-
     <!-- Links -->
     <ul *ngIf="!appStorage.loggedIn else showMembersNav;" class="navbar-nav mr-auto">
       <li [routerLinkActive]="['active']" class="nav-item active" mdbWavesEffect>
-        <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link">{{'general.login' |
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link"
+           (click)="navbar.hide()">{{'general.login' |
           transloco}}</a>
       </li>
       <li [routerLinkActive]="['active']" class="nav-item" mdbWavesEffect>
-        <a [queryParamsHandling]="'merge'" [routerLink]="['/features']" class="nav-link">{{'general.features' |
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/features']" class="nav-link"
+           (click)="navbar.hide()">{{'general.features' |
           transloco}}</a>
       </li>
       <li [routerLinkActive]="['active']" class="nav-item" mdbWavesEffect>
-        <a [queryParamsHandling]="'merge'" [routerLink]="['/news']" class="nav-link">{{'general.news' |
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/news']" class="nav-link"
+           (click)="navbar.hide()">{{'general.news' |
           transloco}}</a>
       </li>
       <li class="nav-item" mdbWavesEffect>
@@ -51,7 +52,7 @@
               (click)="setInterface(editor.name)">
             <a class="nav-link" [ngClass]="{
                         'active': appStorage.interface === editor.name
-                    }">
+                    }" (click)="navbar.hide()">
               <span>
               <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
               <span
@@ -82,34 +83,39 @@
           '...' : transcrServ.currentlevel.name}}
           <fa-icon class="navbar-icon" icon="book"></fa-icon>
         </a>
-        <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
-          <div *ngFor="let level of transcrServ.annotation.levels; let i = index;" [ngClass]="{
+        <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu"
+             style="min-width: 300px;" (click)="$event.stopPropagation();">
+          <table style="width:100%;">
+            <tbody>
+            <tr *ngFor="let level of transcrServ.annotation.levels; let i = index;" [ngClass]="{
                         selected: (transcrServ.selectedlevel === i)
                         }"
-               class="row level-row"
-          >
-            <div (click)="selectLevel(i)" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
-                 class="col-2"
-                 style="cursor: pointer;">{{i + 1}}:
-            </div>
-            <div [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }" class="col-7"><input
-              (blur)="onLevelNameLeave($event, i)"
-              (click)="onLevelNameClick($event)" maxlength="100"
-              type="text" value="{{level.name}}"/>
-            </div>
-            <div class="col-3">
-              <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
-                       style="cursor: pointer;"></fa-icon>
-              <fa-icon (mousedown)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === annotJSONType.SEGMENT"
-                       [icon]="['fas', 'copy']"
-                       style="margin-left:3px;cursor:pointer;"></fa-icon>
-            </div>
-          </div>
-          <div (click)="onLevelAddClick()" class="row level-add-row">
-            <div class="col-12">
-              <fa-icon icon="plus"></fa-icon>
-            </div>
-          </div>
+                class="level-row"
+            >
+              <td (click)="selectLevel(i)" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
+                  style="cursor: pointer;">{{i + 1}}:
+              </td>
+              <td [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
+                (blur)="onLevelNameLeave($event, i)"
+                (click)="onLevelNameClick($event)" maxlength="100"
+                type="text" value="{{level.name}}" style="width:100%;"/>
+              </td>
+              <td>
+                <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
+                         style="cursor: pointer;"></fa-icon>
+                <fa-icon (mousedown)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === annotJSONType.SEGMENT"
+                         [icon]="['fas', 'copy']"
+                         style="margin-left:3px;cursor:pointer;"></fa-icon>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" (click)="onLevelAddClick()" class="level-add-row">
+                <fa-icon icon="plus"></fa-icon>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
         </div>
       </li>
 

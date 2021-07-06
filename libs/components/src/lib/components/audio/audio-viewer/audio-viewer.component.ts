@@ -2263,7 +2263,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers.boundaries.batchDraw();
       this.refreshRunning = false;
     } else {
-      console.error(new Error('can\'t refresh level'));
+      // console.error(new Error('can\'t refresh level'));
     }
   }
 

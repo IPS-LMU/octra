@@ -232,7 +232,12 @@ export class OnlineModeReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.startOnlineAnnotation, (state: OnlineModeState, {currentProject, mode, sessionData}) => {
+      on(OnlineModeActions.startOnlineAnnotation, (state: OnlineModeState, {
+        currentProject,
+        mode,
+        sessionData,
+        transcript
+      }) => {
         if (this.mode === mode) {
           return {
             ...state,
@@ -241,7 +246,8 @@ export class OnlineModeReducers {
               ...state.onlineSession,
               currentProject,
               sessionData
-            }
+            },
+            transcript
           };
         }
         return state;

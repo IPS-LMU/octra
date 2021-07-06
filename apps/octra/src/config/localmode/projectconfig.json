@@ -134,7 +134,7 @@
   "octra": {
     "validationEnabled": true,
     "sendValidatedTranscriptionOnly": false,
-    "showOverviewIfTranscriptNotValid": true,
+    "showOverviewIfTranscriptNotValid": false,
     "theme": "shortAudioFiles"
   },
   "guidelines": {

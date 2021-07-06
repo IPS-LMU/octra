@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -41,8 +40,7 @@ import {AudioNavigationComponent} from '../../core/component/audio-navigation';
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./2D-editor.component.scss']
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 

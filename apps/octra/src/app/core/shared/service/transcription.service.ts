@@ -443,8 +443,6 @@ export class TranscriptionService {
 
                 if (converted === undefined) {
                   // prompttext is raw text
-                  console.log(`import prompttext!`);
-                  console.log(newLevels);
                   newLevels[0].level.items[0].labels[0] = new OLabel('OCTRA_1', this.appStorage.prompttext);
                 } else {
                   // use imported annotJSON
@@ -509,18 +507,19 @@ export class TranscriptionService {
 
   private updateAnnotation(levels: AnnotationStateLevel[], links: OIDBLink[]) {
     // load levels
-    this._annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
+    const annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
 
     for (const annotationStateLevel of levels) {
       const level = convertToLevelObject(annotationStateLevel,
         this.audioManager.sampleRate, this.audioManager.ressource.info.duration.clone());
-      this._annotation.levels.push(level);
+      annotation.levels.push(level);
     }
 
     for (const annotationLink of links) {
-      this._annotation.links.push(annotationLink.link);
+      annotation.links.push(annotationLink.link);
     }
 
+    this._annotation = annotation;
     this.listenForSegmentChanges();
     this.annotationChanged.emit();
   }

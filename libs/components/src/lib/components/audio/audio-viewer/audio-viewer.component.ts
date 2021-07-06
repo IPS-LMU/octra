@@ -12,7 +12,6 @@ import {
   ViewChild
 } from '@angular/core';
 import Konva from 'konva';
-import {Context} from 'konva/types/Context';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
@@ -144,6 +143,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   public secondsPerLine = 5;
   private stage: Konva.Stage | undefined;
   private hoveredLine = -1;
+  private refreshRunning = false;
+
   private croppingData: {
     x: number;
     y: number;
@@ -288,7 +289,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       }).then(() => {
         if (this.width !== undefined && this.audioChunk !== undefined && this._transcriptionLevel !== undefined) {
           const innerWidth = this.width - (this.settings.margin.left + this.settings.margin.right);
-          console.log(`INIT AUDIOV`);
           this.av.initialize(innerWidth, this.audioChunk, this._transcriptionLevel);
           this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
 
@@ -449,27 +449,26 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public updateLines = () => {
-    const lines = this.layers?.background.find('.line');
+    const lines: Group[] | undefined = this.layers?.background?.find('.line');
 
     if (this.av.innerWidth !== undefined) {
       if (lines !== undefined) {
         // check all lines but the last one
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
-          const geometrics = line.getChildren();
           line.width(this.av.innerWidth);
-          // tslint:disable-next-line:prefer-for-of
+          const geometrics = line.getChildren();
           for (let j = 0; j < geometrics.length; j++) {
             const elem = geometrics[j];
             if ((lines.length > 1 && i < lines.length - 1) || lines.length === 1) {
-              if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
+              if (elem.name() !== 'selection' && elem.id() !== 'scrollBar') {
                 elem.width(this.av.innerWidth);
               }
             } else {
               const width = this.av.AudioPxWidth % this.av.innerWidth;
               line.width(width);
               // last line
-              if (elem.name() !== 'selection' && elem.id !== 'scrollBar') {
+              if (elem.name() !== 'selection' && elem.id() !== 'scrollBar') {
                 elem.width(width);
               }
             }
@@ -623,22 +622,22 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.layers = {
         background: new Konva.Layer({
-          userName: 'backgroundLayer',
+          id: 'backgroundLayer',
           listening: false
         }),
         overlay: new Konva.Layer({
-          userName: 'overlayLayer',
+          id: 'overlayLayer',
           listening: false
         }),
         boundaries: new Konva.Layer({
-          userName: 'boundariesLayer'
+          id: 'boundariesLayer'
         }),
         playhead: new Konva.Layer({
-          userName: 'playheadLayer',
+          id: 'playheadLayer',
           listening: false
         }),
         scrollBars: new Konva.Layer({
-          userName: 'scrollBars'
+          id: 'scrollBars'
         })
       };
 
@@ -1088,7 +1087,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 const segmentHeight = (lineNum2 - lineNum1 + 1) * (this.settings.lineheight + this.settings.margin.top);
 
                 const overlayGroup = new Konva.Group({
-                  userName: `segment_${segment.id}`
+                  id: `segment_${segment.id}`
                 });
 
                 const overlaySegment = new Konva.Shape({
@@ -1180,7 +1179,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             foundText.remove();
           }
           const timeStampLabels = new Konva.Shape({
-            userName: 'timeStamps',
+            id: 'timeStamps',
             width: this.av.innerWidth,
             height: this.height,
             x: this.settings.margin.left,
@@ -1216,7 +1215,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             }
 
             const boundaryObj = new Konva.Line({
-              userName: `boundary_${boundary.id}`,
+              id: `boundary_${boundary.id}`,
               strokeWidth: this.settings.boundaries.width,
               stroke: this.settings.boundaries.color,
               points: [boundary.x, boundary.y, boundary.x, boundary.y + h],
@@ -1542,7 +1541,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     if (this.canvasElements?.lastLine !== undefined && this.av.innerWidth !== undefined) {
 
       const group = new Konva.Group({
-        userName: 'scrollBar',
+        id: 'scrollBar',
         x: this.av.innerWidth + this.settings.margin.left,
         y: 0,
         width: this.settings.scrollbar.width,
@@ -1657,9 +1656,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   private resetSelection() {
     if (this.stage !== undefined) {
-      const selections = this.stage.find('.selection');
-
-      selections.each((child) => {
+      this.stage.find('.selection').forEach((child) => {
         child.width(0);
         child.x(0);
       });
@@ -1679,7 +1676,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         const lineNum2 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selEnd / this.av.innerWidth) : 0;
         const numOfLines = this.getNumberOfLines();
 
-        // console.log('DRAW Selection ' + this.settings.height);
+
         for (let j = lineNum1; j <= lineNum2; j++) {
           const lineWidth = (j < numOfLines - 1) ? this.av.innerWidth : this.canvasElements.lastLine.width();
           const selectionRect = this.drawSelection(j, lineWidth);
@@ -2258,11 +2255,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   public refreshLevel() {
     if (this.audioChunk !== undefined && this.av.audioTCalculator !== undefined && this._transcriptionLevel !== undefined
-      && this.layers !== undefined) {
+      && this.layers !== undefined && !this.refreshRunning) {
+      this.refreshRunning = true;
       this.av.updateLevel(this._transcriptionLevel);
       this.createSegmentsForCanvas();
       this.layers.overlay.batchDraw();
       this.layers.boundaries.batchDraw();
+      this.refreshRunning = false;
     } else {
       console.error(new Error('can\'t refresh level'));
     }
@@ -2280,7 +2279,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private drawTextLabel(context: Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,
+  private drawTextLabel(context: Konva.Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,
                         lastI: number | undefined, segmentHeight: number, numOfLines: number, absX: number, segments: Segment[], i: number): number | undefined {
     const segment = segments[i];
 

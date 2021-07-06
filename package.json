@@ -75,7 +75,7 @@
     "immer": "^8.0.4",
     "jodit": "^3.6.1",
     "jodit-angular": "^1.11.3",
-    "konva": "^7.2.5",
+    "konva": "^8.1.1",
     "luxon": "^1.27.0",
     "modernizr": "^3.11.7",
     "ng2-dragula": "~2.1.1",

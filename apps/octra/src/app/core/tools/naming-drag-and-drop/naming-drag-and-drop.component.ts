@@ -8,10 +8,10 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {DragulaService} from 'ng2-dragula';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {Segment} from '@octra/annotation';
+import {moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
@@ -101,16 +101,7 @@ export class NamingDragAndDropComponent implements OnDestroy {
     return result;
   }
 
-  constructor(private dragulaService: DragulaService, private cd: ChangeDetectorRef) {
-    this.dragulaService.createGroup('namingDragDrop', {
-      direction: 'horizontal',
-      revertOnSpill: true,
-      removeOnSpill: false
-    });
-
-    this.subcrManager.add(this.dragulaService.dragend('namingDragDrop').subscribe(() => {
-        this.cd.detectChanges();
-      }));
+  constructor(private cd: ChangeDetectorRef) {
   }
 
   remove(i: number) {
@@ -154,7 +145,6 @@ export class NamingDragAndDropComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.dragulaService.destroy('namingDragDrop');
     this.subcrManager.destroy();
   }
 
@@ -166,5 +156,9 @@ export class NamingDragAndDropComponent implements OnDestroy {
         window.getSelection().removeAllRanges();
       }
     }
+  }
+
+  onDrop($event) {
+    moveItemInArray(this.resultConvention, $event.previousIndex, $event.currentIndex);
   }
 }

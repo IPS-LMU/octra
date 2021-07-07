@@ -23,16 +23,23 @@ import {YesNoModalComponent} from './yes-no-modal/yes-no-modal.component';
 import {ProtectedModalComponent} from './protected-modal/protected-modal.component';
 import {Translation, TranslocoLoader, TranslocoModule} from '@ngneat/transloco';
 import {HttpClient} from '@angular/common/http';
-import {ButtonsModule, CollapseModule, TooltipModule} from 'angular-bootstrap-md';
+import {
+  ButtonsModule,
+  CheckboxModule,
+  CollapseModule,
+  DropdownModule,
+  TooltipModule,
+  WavesModule
+} from 'angular-bootstrap-md';
 import {AppSharedModule} from '../../app.shared.module';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from '../../app.transloco';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {OctraComponentsModule} from '@octra/components';
 import {FormsModule} from '@angular/forms';
-import {DragulaModule} from 'ng2-dragula';
 import {NamingDragAndDropComponent} from '../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {ShortcutComponent} from '../shortcut/shortcut.component';
 import {TableConfiguratorComponent} from '../tools/table-configurator/table-configurator.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @Injectable({providedIn: 'root'})
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -79,10 +86,13 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     FontAwesomeModule,
     OctraComponentsModule,
     FormsModule,
-    DragulaModule.forRoot(),
     CollapseModule.forRoot(),
     TooltipModule.forRoot(),
-    ButtonsModule.forRoot()
+    ButtonsModule.forRoot(),
+    DragDropModule,
+    DropdownModule,
+    WavesModule,
+    CheckboxModule
   ],
   providers: [
     TranslocoConfigProvider,

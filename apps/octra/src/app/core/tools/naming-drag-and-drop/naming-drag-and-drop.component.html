@@ -18,9 +18,9 @@
       </ul>
     </div>
   </div>
-  <div #list
-       [(dragulaModel)]="resultConvention" class="namingConventionDragDrop" dragula="namingDragDrop">
-    <div (mouseup)="onItemClick($event, i)" *ngFor="let item of resultConvention; let i = index;"
+  <div #list cdkDropList cdkDropListOrientation="horizontal" class="namingConventionDragDrop"
+       (cdkDropListDropped)="onDrop($event)">
+    <div cdkDrag (mouseup)="onItemClick($event, i)" *ngFor="let item of resultConvention; let i = index;"
          [ngClass]="{
     'naming-placeholder': item.type === 'placeholder',
     'naming-text': item.type === 'text',

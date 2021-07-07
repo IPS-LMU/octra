@@ -78,7 +78,6 @@
     "konva": "^8.1.1",
     "luxon": "^1.27.0",
     "modernizr": "^3.11.7",
-    "ng2-dragula": "~2.1.1",
     "ngrx-wieder": "^6.0.1",
     "ngx-webstorage": "^8.0.0",
     "node-ssh": "^11.1.1",

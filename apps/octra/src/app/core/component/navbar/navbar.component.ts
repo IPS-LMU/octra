@@ -98,7 +98,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case('export'):
-            this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export);
+            this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export, {
+              navbarService: this,
+              transcriptionService: this.transcrServ,
+              uiService: this.uiService
+            });
             break;
         }
       })
@@ -235,7 +239,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openExportModal() {
-    this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export);
+    this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export, {
+      navbarService: this,
+      transcriptionService: this.transcrServ,
+      uiService: this.uiService
+    });
   }
 
   openToolsModal() {

@@ -15,8 +15,9 @@ export const modalConfigurations = {
     ignoreBackdropClick: true
   },
   export: {
-    keyboard: false,
+    keyboard: true,
     backdrop: true,
+    scroll: true,
     ignoreBackdropClick: false,
     class: 'modal-xl'
   },

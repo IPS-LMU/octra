@@ -47,12 +47,12 @@
             <td></td>
             <td colspan="4" style="padding-left:20px;">
               <div class="tier-selection" style="margin-bottom:10px;"
-                   *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1">
+                   *ngIf="transcriptionService !== undefined && !converter.multitiers && transcriptionService.annotation.levels.length > 1">
                 <span style="margin-left:10px;">{{"general.select one tier" | transloco}}: </span>
                 <select #val
                         [(ngModel)]="selectedLevel"
                         (change)="onSelectionChange(converter, val.value)" style="padding: 5px 10px;">
-                  <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                  <option *ngFor="let level of transcriptionService.annotation.levels; let l = index;"
                           value="{{l}}">{{level.name}}
                   </option>
                 </select>
@@ -117,6 +117,7 @@
       </tbody>
     </table>
 
+    <div contenteditable="true">test test</div>
     <h5>{{"general.custom formats" | transloco}}</h5>
     <table class="table table-striped">
       <thead>
@@ -143,10 +144,10 @@
       <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="tools.tableConfigurator.opened">
         <td></td>
         <td colspan="4" style="padding-left:20px;">
-          <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+          <div class="card" style="padding:10px;" *ngIf="transcriptionService !== undefined">
             <octra-table-configurator [columns]="tools.tableConfigurator.columns"
-                                      [annotation]="transcrService.annotation"
-                                      [currentLevelID]="transcrService.currentlevel.id"
+                                      [annotation]="transcriptionService.annotation"
+                                      [currentLevelID]="transcriptionService?.currentlevel?.id"
                                       [tableWidth]="content.offsetWidth - 100"
                                       #tableConfigurator
             ></octra-table-configurator>

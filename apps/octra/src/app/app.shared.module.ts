@@ -72,6 +72,7 @@ import {AsrOptionsComponent} from './core/component/asr-options/asr-options.comp
 import {TranscriptionFeedbackComponent} from './core/component/transcription-feedback/transcription-feedback.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {FormsModule} from '@angular/forms';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -84,7 +85,8 @@ import {FormsModule} from '@angular/forms';
     CommonModule,
     FormsModule,
     FontAwesomeModule,
-    TranslocoModule
+    TranslocoModule,
+    DragDropModule
   ],
   providers: [
     TranslocoConfigProvider,

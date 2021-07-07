@@ -1,45 +1,42 @@
 <div style="margin-bottom: 10px">
-  <div class="btn-group" dropdown>
-    <button aria-controls="dropdown-basic" class="btn btn-secondary btn-raised btn-sm" dropdownToggle
-            style="width:100%; margin-left:5px;" type="button">
+  <div class="btn-group" mdbDropdown>
+    <button mdbDropdownToggle size="sm" type="button" mdbBtn color="primary" class="dropdown-toggle waves-light"
+            mdbWavesEffect style="width:100%; margin-left:5px;">
       <fa-icon icon="plus"></fa-icon>
       {{"custom.table configurator.add column" | transloco}}
     </button>
-    <ul *dropdownMenu aria-labelledby="button-basic"
-        class="dropdown-menu" role="menu" style="cursor: pointer">
-      <li (click)="tableConfiguratorAddColumn(-1, colDef.type)" *ngFor="let colDef of remainingColDefs"
-          class="dropdown-item"
-          role="menuitem"
+
+    <div class="dropdown-menu dropdown-primary" style="cursor: pointer">
+      <a (click)="tableConfiguratorAddColumn(-1, colDef.type)" *ngFor="let colDef of remainingColDefs"
+         class="dropdown-item"
       >
         {{colDef.type}}
-      </li>
-    </ul>
+      </a>
+    </div>
   </div>
 
   <div class="settings">
-    <input (ngModelChange)="onCheckboxChange()" [(ngModel)]="includeLineNumbers"
-           id="includeLineNumbers"
-           name="includeLines"
-           type="checkbox"/>
-    <label for="includeLineNumbers"
-           style="margin-left: 15px;">{{"custom.table configurator.include line numbers"| transloco}}</label>
+    <mdb-checkbox [default]="false" [inline]="true" [(ngModel)]="includeLineNumbers"
+                  (ngModelChange)="onCheckboxChange()">{{"custom.table configurator.include line numbers"| transloco}}</mdb-checkbox>
   </div>
   <div class="settings">
     <label>{{"custom.table configurator.time format"| transloco}}: </label>
-    <div class="btn-group" dropdown>
-      <button aria-controls="dropdown-basic" class="btn btn-info btn-raised btn-sm" dropdownToggle
-              style="width:150px; margin-left:5px;" type="button">
+
+
+    <div class="btn-group" mdbDropdown>
+      <button mdbDropdownToggle size="sm" type="button" mdbBtn color="primary" class="dropdown-toggle waves-light"
+              mdbWavesEffect style="width:150px; margin-left:5px;">
         {{tableOptions.timeFormat}}
       </button>
-      <ul *dropdownMenu aria-labelledby="button-basic"
-          class="dropdown-menu" role="menu" style="cursor: pointer">
-        <li (click)="onTimeFormatChange(timeFormat)" *ngFor="let timeFormat of tableOptions.timeFormats"
-            class="dropdown-item"
-            role="menuitem"
+
+      <div class="dropdown-menu dropdown-primary" style="cursor: pointer">
+        <a (click)="onTimeFormatChange(timeFormat)" *ngFor="let timeFormat of tableOptions.timeFormats"
+           class="dropdown-item"
+           role="menuitem"
         >
           {{timeFormat}}
-        </li>
-      </ul>
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -47,9 +44,8 @@
 <div [ngStyle]="{
 width: tableWidth + 'px'
 }" class="easy-table">
-  <div (dragulaModelChange)="onDragulaModelChange($event)" [(dragulaModel)]="columns"
-       class="inner" dragula="tableConfiguratorColumns">
-    <div *ngFor="let column of columns; let i = index;" class="column">
+  <div cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="onDropChange($event)" class="inner">
+    <div *ngFor="let column of columns; let i = index;" class="column" cdkDrag>
       <div class="grip">
         <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
       </div>
@@ -60,7 +56,7 @@ width: tableWidth + 'px'
         <div #title (keydown)="onTitleKeyDown($event)"
              (keyup)="onTitleKeyUp($event, title, i)"
              (mouseleave)="onTitleLeave(title, i)"
-             class="title" contenteditable="true">
+             class="title" contenteditable="true" (mousedown)="$event.stopPropagation()">
           {{column.title}}
         </div>
       </div>

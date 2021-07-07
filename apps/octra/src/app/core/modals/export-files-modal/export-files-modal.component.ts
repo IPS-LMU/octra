@@ -4,7 +4,6 @@ import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
 import {Subscription, timer} from 'rxjs';
-import {DragulaService} from 'ng2-dragula';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../tools/table-configurator/table-configurator.component';
@@ -87,27 +86,21 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
   @ViewChild('tableConfigurator', {static: false}) tableConfigurator: TableConfiguratorComponent;
 
-  protected data = undefined;
-  private subscrmanager = new SubscriptionManager<Subscription>();
+  transcriptionService: TranscriptionService;
+  navbarService: NavbarService;
+  uiService: UserInteractionsService;
+
+  private subscriptionManager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
 
   constructor(private sanitizer: DomSanitizer,
-              public navbarServ: NavbarService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
               private settService: SettingsService,
-              private dragulaService: DragulaService,
               modalRef: MDBModalRef,
-              modalService: MDBModalService,
-              public transcrService: TranscriptionService,
-              private uiService: UserInteractionsService) {
+              modalService: MDBModalService) {
     super('ExportFilesModalComponent', modalRef, modalService);
-
-    this.dragulaService.createGroup('tableConfiguratorColumns', {
-      revertOnSpill: true,
-      removeOnSpill: false
-    });
   }
 
   ngOnInit() {
@@ -125,7 +118,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   }
 
   onLineClick(converter: Converter, index: number) {
-    if (converter.multitiers || (!converter.multitiers && this.transcrService.annotation.levels.length === 1)) {
+    if (converter.multitiers || (!converter.multitiers && this.transcriptionService.annotation.levels.length === 1)) {
       this.updateParentFormat(converter);
     }
     this.toggleLine(index);
@@ -170,19 +163,23 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
     }
 
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audioManager.ressource.info.duration);
+      if (this.transcriptionService.annotation === undefined) {
+        console.error(`annotation is undefined!`);
+        return;
+      }
+      const oannotjson = this.transcriptionService.annotation.getObj(this.transcriptionService.audioManager.ressource.info.duration);
       this.preparing = {
         name: converter.name,
         preparing: true
       };
-      this.subscrmanager.add(timer(300).subscribe(
+      this.subscriptionManager.add(timer(300).subscribe(
         () => {
           if (converter.name === 'Bundle') {
             // only this converter needs an array buffer
-            this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audioManager.ressource.arraybuffer;
+            this.transcriptionService.audiofile.arraybuffer = this.transcriptionService.audioManager.ressource.arraybuffer;
           }
 
-          const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
+          const result: IFile = converter.export(oannotjson, this.transcriptionService.audiofile, levelnum).file;
 
           this.parentformat.download = result.name;
 
@@ -201,17 +198,17 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   }
 
   getProtocol() {
-    if (!(this.transcrService === undefined)) {
+    if (!(this.transcriptionService === undefined)) {
       this.preparing = {
         name: 'Protocol',
         preparing: true
       };
-      this.parentformat.download = this.transcrService.audiofile.name + '.json';
+      this.parentformat.download = this.transcriptionService.audiofile.name + '.json';
 
       if (this.parentformat.uri !== undefined) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
-      const json = new File([JSON.stringify(this.transcrService.extractUI(this.uiService.elements), undefined, 2)], this.parentformat.download);
+      const json = new File([JSON.stringify(this.transcriptionService.extractUI(this.uiService.elements), undefined, 2)], this.parentformat.download);
       this.setParentFormatURI(window.URL.createObjectURL(json));
       this.preparing = {
         name: 'Protocol',
@@ -223,13 +220,13 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   }
 
   onDownloadClick(i: number) {
-    this.subscrmanager.add(timer(500).subscribe(() => {
+    this.subscriptionManager.add(timer(500).subscribe(() => {
       this.exportStates[i] = 'inactive';
     }));
   }
 
   ngOnDestroy() {
-    this.subscrmanager.destroy();
+    this.subscriptionManager.destroy();
   }
 
   onHidden() {
@@ -245,7 +242,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.subscrmanager.destroy();
+    this.subscriptionManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);

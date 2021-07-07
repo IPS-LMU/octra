@@ -471,7 +471,6 @@ export class TranscriptionService {
           }
         }).then(() => {
           const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
-
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (this.appStorage.annotationLevels !== undefined) {

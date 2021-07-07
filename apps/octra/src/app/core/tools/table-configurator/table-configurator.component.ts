@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {Annotation, Level} from '@octra/annotation';
+import {moveItemInArray} from '@angular/cdk/drag-drop';
 
 export interface ColumnDefinition {
   type: string;
@@ -521,7 +522,8 @@ export class TableConfiguratorComponent implements OnInit {
 
   }
 
-  onDragulaModelChange(event) {
+  onDropChange(event) {
+    moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
     this.updateAllTableCells();
   }
 
@@ -565,7 +567,7 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   private getLevelNumber(): number {
-    if (!this.currentLevelID !== undefined) {
+    if (!this.currentLevelID !== undefined && this.annotation?.levels !== undefined) {
       const result = (this.annotation.levels.findIndex((a) => {
         return a.id === this.currentLevelID;
       }));

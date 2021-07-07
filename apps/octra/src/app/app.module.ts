@@ -8,7 +8,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 // icons
 import {TranslocoModule} from '@ngneat/transloco';
 // third-party
-import {DragulaModule} from 'ng2-dragula';
 import {environment} from '../environments/environment';
 
 import {NgxWebstorageModule} from 'ngx-webstorage';
@@ -159,7 +158,6 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     ReactiveFormsModule,
     routing,
     TranslocoModule,
-    DragulaModule.forRoot(),
     StoreModule.forRoot(
       {
         application: fromApplication.reducer,

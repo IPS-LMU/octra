@@ -1,9 +1,3 @@
-module.exports = {
-  projects: [
-    '<rootDir>/apps/octra',
-    '<rootDir>/libs/annotation',
-    '<rootDir>/libs/media',
-    '<rootDir>/libs/utilities',
-    '<rootDir>/libs/components',
-  ],
-};
+const {getJestProjects} = require('@nrwl/jest');
+
+module.exports = {projects: getJestProjects()};

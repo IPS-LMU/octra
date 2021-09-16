@@ -14,7 +14,7 @@ export class AnnotationActions {
     }>()
   );
 
-  public static clearSessionStorageSuccess = createAction(
+  public static clearSessionStorageSuccess: any = createAction(
     `[${AnnotationActions.context}] Clear Session Storage Success`
   );
 

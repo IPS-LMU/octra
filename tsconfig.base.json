@@ -15,12 +15,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@octra/ngx-octra-api": [
-        "node-modules/@octra/ngx-octra-api"
-      ],
-      "@octra/octra-db": [
-        "node-modules/@octra/octra-db"
-      ],
       "@octra/annotation": [
         "libs/annotation/src/index.ts"
       ],
@@ -29,6 +23,12 @@
       ],
       "@octra/media": [
         "libs/media/src/index.ts"
+      ],
+      "@octra/ngx-octra-api": [
+        "node-modules/@octra/ngx-octra-api"
+      ],
+      "@octra/octra-db": [
+        "node-modules/@octra/octra-db"
       ],
       "@octra/utilities": [
         "./libs/utilities/src/index.ts"

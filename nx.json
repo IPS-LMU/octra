@@ -33,10 +33,20 @@
     },
     "octra-e2e": {
       "tags": [],
-      "implicitDependencies": ["octra"]
+      "implicitDependencies": [
+        "octra"
+      ]
     },
     "utilities": {
       "tags": []
     }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }

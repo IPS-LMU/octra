@@ -12,7 +12,10 @@
             "lintFilePatterns": [
               "libs/annotation/**/*.ts"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -82,7 +85,10 @@
               "libs/components/src/**/*.ts",
               "libs/components/src/**/*.html"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         }
       }
     },
@@ -97,7 +103,10 @@
             "lintFilePatterns": [
               "libs/media/**/*.ts"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -244,7 +253,10 @@
               "apps/octra/src/**/*.ts",
               "apps/octra/src/**/*.html"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -287,7 +299,10 @@
             "lintFilePatterns": [
               "apps/octra-e2e/**/*.{js,ts}"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         }
       }
     },
@@ -302,7 +317,10 @@
             "lintFilePatterns": [
               "libs/utilities/**/*.ts"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",

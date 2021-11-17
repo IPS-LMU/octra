@@ -42,7 +42,8 @@
             ]
           }
         }
-      }
+      },
+      "tags": []
     },
     "components": {
       "projectType": "library",
@@ -90,7 +91,8 @@
             "{options.outputFile}"
           ]
         }
-      }
+      },
+      "tags": []
     },
     "media": {
       "root": "libs/media",
@@ -133,7 +135,8 @@
             ]
           }
         }
-      }
+      },
+      "tags": []
     },
     "octra": {
       "projectType": "application",
@@ -153,7 +156,8 @@
             "polyfills": "apps/octra/src/polyfills.ts",
             "tsConfig": "apps/octra/tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "jodit-angular"
+              "jodit-angular",
+              "ajv"
             ],
             "assets": [
               "apps/octra/src/assets",
@@ -273,7 +277,8 @@
         "@schematics/angular:component": {
           "style": "scss"
         }
-      }
+      },
+      "tags": []
     },
     "octra-e2e": {
       "root": "apps/octra-e2e",
@@ -304,7 +309,11 @@
             "{options.outputFile}"
           ]
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": [
+        "octra"
+      ]
     },
     "utilities": {
       "root": "libs/utilities",
@@ -347,38 +356,8 @@
             ]
           }
         }
-      }
-    }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/angular"
-  },
-  "schematics": {
-    "@nrwl/angular": {
-      "application": {
-        "linter": "eslint"
       },
-      "library": {
-        "linter": "eslint"
-      },
-      "storybook-configuration": {
-        "linter": "eslint"
-      }
-    },
-    "@nrwl/angular:application": {
-      "style": "css",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
-    },
-    "@nrwl/angular:library": {
-      "style": "css",
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nrwl/angular:component": {
-      "style": "css"
+      "tags": []
     }
-  },
-  "defaultProject": "octra"
+  }
 }

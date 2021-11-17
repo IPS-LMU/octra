@@ -75,8 +75,8 @@
     "immer": "^8.0.4",
     "jodit": "^3.6.1",
     "jodit-angular": "^1.11.3",
-    "konva": "^8.1.1",
-    "luxon": "^1.27.0",
+    "konva": "^8.3.0",
+    "luxon": "^2.1.1",
     "modernizr": "^3.11.7",
     "ngrx-wieder": "^6.0.1",
     "ngx-webstorage": "^8.0.0",
@@ -85,7 +85,8 @@
     "rxjs": "~6.6.0",
     "ssh2": "^0.8.9",
     "tslib": "^2.0.0",
-    "video.js": "^7.12.1",
+    "video.js": "^7.17.0",
+    "videojs": "^1.0.0",
     "x2js": "^3.4.1",
     "zone.js": "0.11.4"
   },
@@ -132,6 +133,6 @@
     "ts-jest": "27.0.5",
     "ts-node": "~9.1.1",
     "typescript": "4.3.5",
-    "webpack-bundle-analyzer": "^4.4.2"
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }

@@ -46,12 +46,20 @@ export function parseServerDataEntry(result: string): IDataEntry {
   return JSON.parse(result, (key, value) => {
     if (key === 'transcript') {
       if (typeof value === 'string') {
-        return JSON.parse(value);
+        try {
+          return JSON.parse(value);
+        } catch (e) {
+          return value;
+        }
       }
       return value;
     } else if (key === 'quality') {
       if (typeof value === 'string') {
-        return JSON.parse(value);
+        try {
+          return JSON.parse(value);
+        } catch (e) {
+          return value;
+        }
       }
       return value;
     } else if (key === 'logtext') {

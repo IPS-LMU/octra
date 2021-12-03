@@ -404,3 +404,6 @@ xcuserdata/
 /src/assets/Bahnauskunft.wav
 /src/media/Bahnauskunft.wav
 deploy.config.json
+/apps/octra/src/config/
+/extern/libs/
+/future_features.txt

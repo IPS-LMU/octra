@@ -36,7 +36,7 @@
     <ng-template appLoadeditor></ng-template>
   </div>
 
-  <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
+  <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('secondSegmentFast') || settingsService.isTheme('korbinian'))
     && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && transcrService.feedback !== null">
     <form class="form-inline" id="bottom-comment">
       <fieldset class="w-100">
@@ -50,27 +50,30 @@
     </form>
   </div>
 
-    <div class="row" id="bottom-navigation" role="group"
-         *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">
-        <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
-            <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
-            <span>
+  <div class="row" id="bottom-navigation" role="group"
+       *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('secondSegmentFast')) && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">
+    <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
+      <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
+      <span>
                    {{"general.quit" | transloco}}
             </span>
-        </button>
-        <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')">
-            <fa-icon icon="star"></fa-icon>
-        </button>
-        <button class="btn btn-raised btn-warning col-md-3" style="background-color: orange"
-                (click)="sendTranscriptionForShortAudioFiles('middle')">
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-        </button>
-        <button class="btn btn-raised btn-primary col-md-3" (click)="sendTranscriptionForShortAudioFiles('good')">
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-        </button>
+    </button>
+    <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')"
+            [disabled]="!audiomanager.hasPlayed">
+      <fa-icon icon="star"></fa-icon>
+    </button>
+    <button class="btn btn-raised btn-warning col-md-3" style="background-color: orange"
+            [disabled]="!audiomanager.hasPlayed"
+            (click)="sendTranscriptionForShortAudioFiles('middle')">
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+    </button>
+    <button class="btn btn-raised btn-primary col-md-3" (click)="sendTranscriptionForShortAudioFiles('good')"
+            [disabled]="!audiomanager.hasPlayed">
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+    </button>
     </div>
     <ng-template #defaultBottom2>
         <div class="row" id="bottom-navigation" role="group"

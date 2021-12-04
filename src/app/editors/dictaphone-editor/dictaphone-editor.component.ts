@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {
+  AlertService,
   AppStorageService,
   AudioService,
   KeymappingService,
@@ -15,6 +16,7 @@ import {AudioNavigationComponent} from '../../media-components/components/audio/
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {OCTRAEditor} from '../octra-editor';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -60,7 +62,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
               public transcrService: TranscriptionService,
               private uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              private langService: TranslocoService,
+              private alertService: AlertService) {
     super();
     this.subscrmanager = new SubscriptionManager();
 
@@ -69,11 +73,16 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
-          this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            this.appStorage.afterSaving().then(() => {
-              resolve();
-            });
-          }));
+
+          if (this.audiomanager.hasPlayed) {
+            this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
+              this.appStorage.afterSaving().then(() => {
+                resolve();
+              });
+            }));
+          } else {
+            this.alertService.showAlert('warning', this.langService.translate('alerts.need playback'));
+          }
         }
       }));
     }
@@ -376,5 +385,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onKeyUp() {
     this.appStorage.savingNeeded = true;
+  }
+
+  save() {
   }
 }

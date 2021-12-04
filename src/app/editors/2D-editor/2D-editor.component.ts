@@ -631,10 +631,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much
-      Functions.contains($event.value, 'cursor') ||
-      Functions.contains($event.value, 'segment_enter') ||
-      Functions.contains($event.value, 'playonhover') ||
-      Functions.contains($event.value, 'asr'))
+        Functions.contains($event.value, 'cursor') ||
+        Functions.contains($event.value, 'segment_enter') ||
+        Functions.contains($event.value, 'playonhover') ||
+        Functions.contains($event.value, 'asr'))
     ) {
       $event.value = `${$event.type}:${$event.value}`;
 
@@ -803,6 +803,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
       return a.transcript === '';
     });
+    if (this.settingsService.isTheme('secondSegmentFast') && this.audioChunkLines.time.duration.browserSample.seconds <= 35) {
+      this.openSegment(1);
+    }
     if (this.audioChunkLines.time.duration.browserSample.seconds <= 35) {
       if (emptySegmentIndex > -1) {
         this.openSegment(emptySegmentIndex);
@@ -847,6 +850,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.disableShortcuts();
     if (!isNullOrUndefined(this.window) && !isNullOrUndefined(this.window.loupe)) {
       this.window.loupe.viewer.disableShortcuts();
+    }
+  }
+
+  public save() {
+    if (this.showWindow) {
+      console.log(`SAVE transcrwindow transcript`);
+      this.window.save();
     }
   }
 }

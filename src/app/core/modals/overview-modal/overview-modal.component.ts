@@ -1,11 +1,16 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
-import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {
+  AppStorageService,
+  KeymappingService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
-import {PlayBackState} from '../../../media-components/obj/media';
 
 @Component({
   selector: 'app-overview-modal',
@@ -81,7 +86,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
 
-      if (this.settingsService.isTheme('shortAudioFiles')) {
+      if (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast')) {
         this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
           switch (keyObj.comboKey) {
             case('CTRL + 1'):

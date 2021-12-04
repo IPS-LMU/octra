@@ -556,7 +556,7 @@ export class TranscriptionService {
         comment: this._feedback.comment,
         jobno: ((this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined))
           ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
-        quality: (this.settingsService.isTheme('shortAudioFiles'))
+        quality: (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
         id: this.appStorage.dataID,

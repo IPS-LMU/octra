@@ -39,13 +39,17 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {interval, throwError} from 'rxjs';
-import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {
+  TranscriptionGuidelinesModalComponent
+} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {
+  TranscriptionSendingModalComponent
+} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
 import {
@@ -57,6 +61,7 @@ import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {OCTRAEditor} from '../../../editors/octra-editor';
 import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
+import {TwoDEditorComponent} from '../../../editors';
 
 @Component({
   selector: 'app-transcription',
@@ -146,29 +151,33 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe((event) => {
       if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
-          this.waitForSend = true;
+          if (this.audiomanager.hasPlayed) {
+            this.waitForSend = true;
 
-          this.appStorage.afterSaving().then(() => {
-            this.waitForSend = false;
-            if (event.comboKey === 'ALT + SHIFT + 1') {
-              this.sendTranscriptionForShortAudioFiles('bad');
-              this.uiService.addElementFromEvent('shortcut', {
-                value: 'send_transcription:1'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
-            } else if (event.comboKey === 'ALT + SHIFT + 2') {
-              this.sendTranscriptionForShortAudioFiles('middle');
-              this.uiService.addElementFromEvent('shortcut', {
-                value: 'send_transcription:2'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
-            } else if (event.comboKey === 'ALT + SHIFT + 3') {
-              this.sendTranscriptionForShortAudioFiles('good');
-              this.uiService.addElementFromEvent('shortcut', {
-                value: 'send_transcription:3'
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
-            }
-          }).catch((error) => {
-            console.error(error);
-          });
+            this.appStorage.afterSaving().then(() => {
+              this.waitForSend = false;
+              if (event.comboKey === 'ALT + SHIFT + 1') {
+                this.sendTranscriptionForShortAudioFiles('bad');
+                this.uiService.addElementFromEvent('shortcut', {
+                  value: 'send_transcription:1'
+                }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              } else if (event.comboKey === 'ALT + SHIFT + 2') {
+                this.sendTranscriptionForShortAudioFiles('middle');
+                this.uiService.addElementFromEvent('shortcut', {
+                  value: 'send_transcription:2'
+                }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              } else if (event.comboKey === 'ALT + SHIFT + 3') {
+                this.sendTranscriptionForShortAudioFiles('good');
+                this.uiService.addElementFromEvent('shortcut', {
+                  value: 'send_transcription:3'
+                }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
+              }
+            }).catch((error) => {
+              console.error(error);
+            });
+          } else {
+            this.alertService.showAlert('warning', this.langService.translate('alerts.need playback'));
+          }
         }
       }
     }));
@@ -235,14 +244,14 @@ export class TranscriptionComponent implements OnInit,
   private subscrmanager: SubscriptionManager;
   private sendOk = false;
   private levelSubscriptionID = 0;
-  private audiomanager: AudioManager;
+  public audiomanager: AudioManager;
   private _currentEditor: ComponentRef<Component>;
 
   abortTranscription = () => {
     if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
       && !isNullOrUndefined(this.settingsService.projectsettings.octra)
       && !isNullOrUndefined(this.settingsService.projectsettings.octra.theme)
-      && this.settingsService.isTheme('shortAudioFiles')) {
+      && (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast'))) {
       // clear transcription
 
       this.transcrService.endTranscription();
@@ -612,22 +621,32 @@ export class TranscriptionComponent implements OnInit,
     const json: any = this.transcrService.exportDataToJSON();
 
     if (this.appStorage.usemode === 'online') {
-      this.transcrSendingModal.open();
+      if (!this.settingsService.isTheme('secondSegmentFast')) {
+        this.transcrSendingModal.open();
+      }
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
         if (result !== null) {
           this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;
 
-          setTimeout(() => {
+          if (this.settingsService.isTheme('secondSegmentFast')) {
             this.waitForSend = false;
-            this.transcrSendingModal.close();
-
             // only if opened
             this.modalOverview.close();
-
             this.nextTranscription(result);
-          }, 500);
+          } else {
+            setTimeout(() => {
+              this.waitForSend = false;
+              this.transcrSendingModal.close();
+
+              // only if opened
+              this.modalOverview.close();
+
+              this.nextTranscription(result);
+            }, 500);
+          }
+
         } else {
           this.sendError = this.langService.translate('send error');
         }
@@ -666,6 +685,7 @@ export class TranscriptionComponent implements OnInit,
 
   onSendButtonClick() {
     this.waitForSend = true;
+    (this._currentEditor.instance as TwoDEditorComponent).save();
     this.appStorage.afterSaving().then(() => {
       // after saving
       // make sure no tasks are pending
@@ -696,7 +716,7 @@ export class TranscriptionComponent implements OnInit,
         }
 
         if ((
-          (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
+            (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
           || (validTranscriptOnly && !validTranscript)
         ) {
           this.waitForSend = false;

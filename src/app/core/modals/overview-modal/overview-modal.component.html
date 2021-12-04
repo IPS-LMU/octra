@@ -30,7 +30,7 @@
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback
                                                     [feedbackData]="appStorage.feedback"
-                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
+                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('secondSegmentFast') || settingsService.isTheme('korbinian')">
                         </app-transcription-feedback>
 
                         <p style="color:red; text-align: center"
@@ -47,17 +47,18 @@
                             </button>
                         </ng-container>
                         <ng-template #isShortAudioFilesTheme>
-                            <div class="row" *ngIf="settingsService.isTheme('shortAudioFiles'); else isKorbinianTheme"
-                                 id="bottom-navigation" role="group">
-                                <button class="btn btn-raised btn-primary w-100"
-                                        (click)="sendTranscriptionForShortAudioFiles('good')">
-                                    <fa-icon icon="star"></fa-icon>
-                                    <fa-icon icon="star"></fa-icon>
-                                    <fa-icon icon="star"></fa-icon>
-                                </button>
-                                <button class="btn btn-raised btn-warning w-100" style="background-color: orange"
-                                        (click)="sendTranscriptionForShortAudioFiles('middle')">
-                                    <fa-icon icon="star"></fa-icon>
+                          <div class="row"
+                               *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('secondSegmentFast')); else isKorbinianTheme"
+                               id="bottom-navigation" role="group">
+                            <button class="btn btn-raised btn-primary w-100"
+                                    (click)="sendTranscriptionForShortAudioFiles('good')">
+                              <fa-icon icon="star"></fa-icon>
+                              <fa-icon icon="star"></fa-icon>
+                              <fa-icon icon="star"></fa-icon>
+                            </button>
+                            <button class="btn btn-raised btn-warning w-100" style="background-color: orange"
+                                    (click)="sendTranscriptionForShortAudioFiles('middle')">
+                              <fa-icon icon="star"></fa-icon>
                                     <fa-icon icon="star"></fa-icon>
                                 </button>
                                 <button class="btn btn-raised btn-danger w-100"

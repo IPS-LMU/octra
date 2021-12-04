@@ -41,4 +41,7 @@ export class NewEditorComponent extends OCTRAEditor implements OnInit {
   disableAllShortcuts() {
   }
 
+  save() {
+  }
+
 }

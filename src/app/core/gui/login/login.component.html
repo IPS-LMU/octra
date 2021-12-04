@@ -64,7 +64,7 @@
                 <input class="form-control" id="login-id" aria-describedby="loginName"
                        name="login-id"
                        placeholder="{{ 'general.name' | transloco }}" [(ngModel)]="member.id"
-                       pattern="\w+"
+                       pattern="[^0-9]+"
                        required
                 />
               </div>
@@ -84,7 +84,7 @@
                 </label>
                 <input class="form-control" type="number" id="jobno" aria-describedby="jobNumber"
                        name="jobno"
-                       placeholder="{{'general.job number' | transloco}}" #t
+                       placeholder="{{'general.job number' | transloco}}"
                        [(ngModel)]="member.jobno"
                        pattern="[0-9]+"
                 />

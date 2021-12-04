@@ -106,16 +106,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
-          this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            this.save();
+          if (this.audiomanager.hasPlayed) {
+            this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
+              this.save();
 
-            if (this.oldRaw === this.editor.rawText) {
-              this.appStorage.saving.emit('success');
-            }
+              if (this.oldRaw === this.editor.rawText) {
+                this.appStorage.saving.emit('success');
+              }
 
-            this.close();
-            resolve();
-          }));
+              this.close();
+              resolve();
+            }));
+          }
         }
 
       }));
@@ -130,6 +132,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
               this.editor.rawText = item.result;
             }
+
             this.loupe.update(false);
 
             this.cd.markForCheck();

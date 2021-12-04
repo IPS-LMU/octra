@@ -341,7 +341,8 @@
     "error": "An error occurred. Please send us a short feedback for the error to be fixed."
   },
   "alerts": {
-    "authentication needed": "Please authenticate in order to use features like ASR or word-alignment. After you clicked on \"Authenticate\" a separate window opens. If no window opens, make sure to have popups enabled in your browser."
+    "authentication needed": "Please authenticate in order to use features like ASR or word-alignment. After you clicked on \"Authenticate\" a separate window opens. If no window opens, make sure to have popups enabled in your browser.",
+    "need playback": "You need to start the playback at least once before submitting the transcript."
   },
   "authentication": {
     "you are authenticated": "You are authenticated!",

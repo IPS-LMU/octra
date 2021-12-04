@@ -341,7 +341,8 @@
     "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
   },
   "alerts": {
-    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
+    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
+    "need playback": "Du musst die Audiowiedergabe mindestens einmal gestartet haben, bevor Du das Transkript absenden kannst."
   },
   "authentication": {
     "you are authenticated": "Du bist authentifiziert!",

@@ -31,6 +31,7 @@ import {AVMousePos} from '../../media-components/obj';
 import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-signal-gui',
@@ -60,7 +61,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               public cd: ChangeDetectorRef,
               public uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              private langService: TranslocoService) {
     super();
     this.subscrmanager = new SubscriptionManager();
 
@@ -70,15 +72,19 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
 
-          this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            if (this.topSelected && this.segmentselected && this.selectedIndex > -1) {
-              this.editor.updateRawText();
-              this.save();
-              resolve();
-            } else {
-              resolve();
-            }
-          }));
+          if (this.audiomanager.hasPlayed) {
+            this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
+              if (this.topSelected && this.segmentselected && this.selectedIndex > -1) {
+                this.editor.updateRawText();
+                this.save();
+                resolve();
+              } else {
+                resolve();
+              }
+            }));
+          } else {
+            this.alertService.showAlert('warning', this.langService.translate('alerts.need playback'));
+          }
         }
       }));
     }
@@ -617,7 +623,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     );
   }
 
-  private save() {
+  save() {
     if (this.segmentselected) {
       if (this.selectedIndex > -1 && this.transcrService.currentlevel.segments &&
         this.selectedIndex < this.transcrService.currentlevel.segments.length) {

@@ -11,6 +11,10 @@ import {isNullOrUndefined} from '../../../../core/shared/Functions';
 declare var window: any;
 
 export class AudioManager {
+  get hasPlayed(): boolean {
+    return this._hasPlayed;
+  }
+
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
@@ -72,6 +76,7 @@ export class AudioManager {
   }
 
   private _startedAt = 0;
+  private _hasPlayed = false;
   private _audio: HTMLAudioElement;
 
   private _positionInterval: Subscription;
@@ -334,6 +339,7 @@ export class AudioManager {
             this._audio.playbackRate = speed;
             this._audio.currentTime = begintime.browserSample.seconds;
 
+            this._hasPlayed = true;
             this._audio.play().then(() => {
               this._startedAt = Date.now();
               this.changeState(PlayBackState.PLAYING);

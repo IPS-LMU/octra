@@ -134,7 +134,7 @@
     "validationEnabled": true,
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": true,
-    "theme": "shortAudioFiles"
+    "theme": "secondSegmentFast"
   },
   "guidelines": {
     "showExampleNumbers": false,

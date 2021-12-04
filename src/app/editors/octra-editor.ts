@@ -7,5 +7,7 @@ export abstract class OCTRAEditor {
   public abstract disableAllShortcuts();
 
   public abstract enableAllShortcuts();
+
+  public abstract save();
 }
 

@@ -195,6 +195,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         if (!isNullOrUndefined(this.appStorage.user)) {
           if (this.appStorage.user.id !== '-1') {
             this.member.id = this.appStorage.user.id;
+            this.clearUserName();
           }
 
           if (this.appStorage.user.hasOwnProperty('project')) {
@@ -335,14 +336,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 });
               }
 
-                if (this.appStorage.usemode === 'online'
-                  && json.data.hasOwnProperty('prompttext')) {
-                  // get transcript data that already exists
-                  const prompt = json.data.prompttext;
-                  this.appStorage.prompttext = (prompt) ? prompt : '';
-                } else {
-                  this.appStorage.prompttext = '';
-                }
+              if (this.appStorage.usemode === 'online'
+                && json.data.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                const prompt = json.data.prompttext;
+                this.appStorage.prompttext = (prompt) ? prompt : '';
+              } else {
+                this.appStorage.prompttext = '';
+              }
 
               const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
               if (res.error === '') {
@@ -418,7 +419,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.projects = json.data;
 
         if (!(this.settingsService.appSettings.octra.allowed_projects === null ||
-          this.settingsService.appSettings.octra.allowed_projects === undefined)
+            this.settingsService.appSettings.octra.allowed_projects === undefined)
           && this.settingsService.appSettings.octra.allowed_projects.length > 0) {
           // filter disabled projects
           this.projects = this.projects.filter((a) => {
@@ -469,6 +470,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private createNewSession(form: NgForm) {
+    this.clearUserName();
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
 
       if (form.valid && this.agreementChecked
@@ -590,5 +592,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     return false;
+  }
+
+  clearUserName() {
+    if (!isNullOrUndefined(this.member.id) && typeof this.member.id === 'string') {
+      this.member.id = this.member.id.replace(/(^\s+)|(\s+$)/g, '');
+      this.member.id = this.member.id.replace(/[\s ]+/g, '_');
+    }
   }
 }

@@ -45,7 +45,8 @@ export class AppInfo {
 
   public static readonly themes: string[] = [
     'default',
-    'shortAudioFiles'
+    'shortAudioFiles',
+    'secondSegmentFast'
   ];
 
   static readonly version = octraVersion;

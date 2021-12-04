@@ -44,7 +44,7 @@ export class TranscriptionFeedbackComponent implements OnInit {
     }
     this.appStorage.comment = this.transcrService.feedback.comment;
 
-    if (!this.settingsService.isTheme('shortAudioFiles')) {
+    if (!(this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast'))) {
       for (const control in this.feedbackData) {
         if (this.feedbackData.hasOwnProperty(control)) {
           this.changeValue(control, this.feedbackData[control]);

@@ -25,6 +25,6 @@ export class MissingPermissionsModalComponent extends OctraModal implements OnDe
   }
 
   reload() {
-    document.location.reload(true);
+    document.location.reload();
   }
 }

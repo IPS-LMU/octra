@@ -22,7 +22,7 @@ export class HelpToolsComponent {
   }
 
   refreshApp() {
-    document.location.reload(true);
+    document.location.reload();
   }
 
   clearAllData() {
@@ -30,7 +30,7 @@ export class HelpToolsComponent {
       this.appStorage.clearWholeSession().then(() => {
         this.appStorage.logout(false);
         setTimeout(() => {
-          document.location.reload(true);
+          document.location.reload();
         }, 1000);
       });
     }
@@ -45,7 +45,7 @@ export class HelpToolsComponent {
       });
     } else {
       this.router.navigate(['/login']);
-      document.location.reload(true);
+      document.location.reload();
     }
   }
 }

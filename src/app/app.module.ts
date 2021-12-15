@@ -84,6 +84,7 @@ import {
   faKey,
   faKeyboard,
   faMinus,
+  faMinusCircle,
   faPaperPlane,
   faPlus,
   faPrint,
@@ -106,18 +107,28 @@ import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.compo
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
-import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
-import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
+import {
+  TranscriptionDeleteModalComponent
+} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
+import {
+  TranscriptionStopModalComponent
+} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
 import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
 import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
 import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
-import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
-import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
+import {
+  TranscriptionSendModalComponent
+} from './core/modals/transcription-send-modal/transcription-send-modal.component';
+import {
+  TranscriptionSendingModalComponent
+} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
 import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
 import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
-import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {
+  TranscriptionGuidelinesModalComponent
+} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {BrowserTestComponent} from './core/gui/browser-test/browser-test.component';
 import {NavbarService} from './core/gui/navbar/navbar.service';
 import {CompatibilityService} from './core/shared/service/compatibility.service';
@@ -125,11 +136,15 @@ import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
 import {faStar} from '@fortawesome/free-solid-svg-icons/faStar';
-import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
+import {
+  ValidationPopoverComponent
+} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
-import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {
+  TranscriptionDemoEndModalComponent
+} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
 import {environment} from '../environments/environment';
 import {
@@ -153,6 +168,9 @@ import {DynComponentDirective} from './core/shared/directive/dyn-component.direc
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
 import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
+import {
+  TranscriptionPostponeAllModalComponent
+} from './core/modals/transcription-postpone-session/transcription-postpone-all-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -236,7 +254,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ALERTS,
     DynComponentDirective,
     ErrorOccurredComponent,
-    MissingPermissionsModalComponent
+    MissingPermissionsModalComponent,
+    TranscriptionPostponeAllModalComponent
   ],
   entryComponents: [EDITORS, ALERTS, ErrorOccurredComponent],
   imports: [
@@ -349,7 +368,8 @@ export class AppModule {
       faGripLines,
       faTools,
       faTrashAlt,
-      faUserCheck
+      faUserCheck,
+      faMinusCircle
     );
   }
 }

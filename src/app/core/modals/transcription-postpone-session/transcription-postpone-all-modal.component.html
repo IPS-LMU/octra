@@ -1,0 +1,38 @@
+<ng-template #modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Aufgaben sperren</h4>
+  </div>
+  <div class="modal-body">
+    <p>
+      Mit dieser Funktion kannst Du alle Aufgaben dieser Sitzung mit einem Kommentar versehen und sperren. Gesperrte
+      Aufgaben werden nicht erneut für die Transkription vorgeschlagen.
+    </p>
+
+    <form>
+      <div class="form-group">
+        <label for="commentForPostpone">Kommentar</label>
+        <textarea class="form-control" style="border:1px solid gray;" id="commentForPostpone"
+                  placeholder="Kommentar hier eingeben..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="patternForPostpone">Suchmuster</label>
+        <input type="text" class="form-control border-light" style="border:1px solid gray;" id="patternForPostpone"
+               placeholder="Suchmuster eingeben...">
+        <small id="passwordHelpBlock" class="form-text text-muted">
+          Alle Aufgaben dieser Sitzung, deren Audiodateien dem Suchmuster entsprechen, werden gesperrt.
+        </small>
+      </div>
+    </form>
+
+    <p style="display:block;"><b>Ein Klick auf "Aufgaben sperren" kann nicht rückgängig gemacht
+      werden.</b></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-raised m-1" data-dismiss="modal" (click)="close()">
+      {{"general.close" | transloco}}
+    </button>
+    <button type="button" class="btn btn-primary btn-raised btn-danger m-1" data-dismiss="modal" (click)="close()">
+      Aufgaben sperren
+    </button>
+  </div>
+</ng-template>

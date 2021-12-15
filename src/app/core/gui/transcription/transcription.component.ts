@@ -62,6 +62,9 @@ import {parseServerDataEntry} from '../../obj/data-entry';
 import {OCTRAEditor} from '../../../editors/octra-editor';
 import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
 import {TwoDEditorComponent} from '../../../editors';
+import {
+  TranscriptionPostponeAllModalComponent
+} from '../../modals/transcription-postpone-session/transcription-postpone-all-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -234,6 +237,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
   @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
+  @ViewChild('modalPostponeAll', {static: false}) modalPostponeAll: TranscriptionPostponeAllModalComponent;
 
   public sendError = '';
   public saving = '';
@@ -919,7 +923,7 @@ export class TranscriptionComponent implements OnInit,
     xhr.send(form);
   }
 
-  public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
+  public sendTranscriptionForShortAudioFiles(type: 'postpone_before' | 'bad' | 'middle' | 'good') {
     switch (type) {
       case('bad'):
         this.appStorage.feedback = 'SEVERE';
@@ -933,7 +937,11 @@ export class TranscriptionComponent implements OnInit,
       default:
     }
 
-    this.onSendButtonClick();
+    if (type !== 'postpone_before') {
+      this.onSendButtonClick();
+    } else {
+      this.modalPostponeAll.open();
+    }
   }
 
   public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {

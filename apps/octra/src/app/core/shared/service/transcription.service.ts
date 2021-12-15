@@ -380,8 +380,8 @@ export class TranscriptionService {
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
           if (this.appStorage.annotationLevels === undefined || this.appStorage.annotationLevels.length === 0) {
-            const newLevels: OIDBLevel[] = [];
-            const newLinks: OIDBLink[] = [];
+            let newLevels: OIDBLevel[] = [];
+            let newLinks: OIDBLink[] = [];
             const newAnnotJSON = this.createNewAnnotation();
             const levels = newAnnotJSON.levels;
             for (let i = 0; i < levels.length; i++) {
@@ -394,65 +394,92 @@ export class TranscriptionService {
 
 
             if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
-              // TODO api import serverDataEntry
-              /*
-              if (this.appStorage.serverDataEntry !== undefined && this.appStorage.serverDataEntry.transcript !== undefined
-                && this.appStorage.serverDataEntry.transcript.length > 0) {
+              const test = this.appStorage.serverDataEntry;
+              const test2 = '';
+
+              if (this.appStorage.serverDataEntry && this.appStorage.serverDataEntry.transcript && this.appStorage.serverDataEntry.transcript !== '') {
                 // import logs
                 this.appStorage.setLogs(this.appStorage.serverDataEntry.log);
 
-                // check if servertranscript's segment is empty
-                if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                  newLevels[0].level.items[0].labels[0].value = this.appStorage.prompttext;
-                } else {
-                  // import servertranscript
-                  newLevels[0].level.items = [];
-                  for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
-                    const segT = this.appStorage.serverDataEntry.transcript[i];
-
-                    const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
-                    newLevels[0].level.items.push(oseg);
-                  }
+                // check if it's AnnotJSON
+                let annotResult = undefined;
+                try {
+                  const transcript = JSON.stringify(this.appStorage.serverDataEntry.transcript);
+                  annotResult = (new AnnotJSONConverter()).import({
+                    name: `${this._audiomanager.ressource.info.name}_annot.json`,
+                    content: transcript,
+                    type: 'text/plain', encoding: 'utf-8'
+                  }, {
+                    name: this._audiomanager.ressource.info.fullname,
+                    // need type attribute
+                    arraybuffer: this._audiomanager.ressource.arraybuffer,
+                    size: this._audiomanager.ressource.info.size,
+                    duration: this._audiomanager.ressource.info.duration.samples,
+                    sampleRate: this._audiomanager.ressource.info.sampleRate,
+                    url: this.appStorage.audioURL,
+                    type: this._audiomanager.ressource.info.type
+                  });
+                } catch (e) {
+                  console.error(`Invalid annotJSON.`);
+                  console.error(e);
                 }
 
+                // import servertranscript
+                if (annotResult && annotResult.annotjson) {
+                  newLevels = [];
+                  newLinks = [];
 
-              } else */
-              if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
-                && typeof this.appStorage.prompttext === 'string') {
-                // prompt text available and server transcript is undefined
-                // set prompt as new transcript
+                  for (let i = 0; i < annotResult.annotjson.levels.length; i++) {
+                    const level = annotResult.annotjson.levels[i];
+                    newLevels.push(new OIDBLevel(i + 1, level, i));
+                  }
+                  for (let i = 0; i < annotResult.annotjson.links.length; i++) {
+                    const link = annotResult.annotjson.links[i];
+                    newLinks.push(new OIDBLink(i + 1, link));
+                  }
+                }
+              } else {
+                if (this.appStorage.prompttext !== undefined && this.appStorage.prompttext !== ''
+                  && typeof this.appStorage.prompttext === 'string') {
+                  // prompt text available and server transcript is undefined
+                  // set prompt as new transcript
 
-                // check if prompttext ist a transcription format like AnnotJSON
-                let converted: OAnnotJSON;
-                for (const converter of AppInfo.converters) {
-                  if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
-                    const result = converter.import({
-                      name: this._audiofile.name,
-                      content: this.appStorage.prompttext,
-                      type: 'text',
-                      encoding: 'utf8'
-                    }, this._audiofile);
+                  // check if prompttext ist a transcription format like AnnotJSON
+                  let converted: OAnnotJSON;
+                  try {
+                    for (const converter of AppInfo.converters) {
+                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                        const result = converter.import({
+                          name: this._audiofile.name,
+                          content: this.appStorage.prompttext,
+                          type: 'text',
+                          encoding: 'utf8'
+                        }, this._audiofile);
 
-                    if (result !== undefined && result.annotjson !== undefined && result.annotjson.levels.length > 0 && result.annotjson.levels[0] !== undefined
-                      && !(converter instanceof TextConverter)) {
-                      converted = result.annotjson;
-                      break;
+                        if (result !== undefined && result.annotjson !== undefined && result.annotjson.levels.length > 0 && result.annotjson.levels[0] !== undefined
+                          && !(converter instanceof TextConverter)) {
+                          converted = result.annotjson;
+                          break;
+                        }
+                      }
                     }
+                  } catch (e) {
+                    // ignore...
                   }
-                }
 
-                if (converted === undefined) {
-                  // prompttext is raw text
-                  newLevels[0].level.items[0].labels[0] = new OLabel('OCTRA_1', this.appStorage.prompttext);
-                } else {
-                  // use imported annotJSON
-                  for (let i = 0; i < converted.levels.length; i++) {
-                    if (i >= newLevels.length) {
-                      newLevels.push(new OIDBLevel(i + 1, converted.levels[i], i));
-                    } else {
-                      newLevels[i].level.name = converted.levels[i].name;
-                      newLevels[i].level.type = converted.levels[i].type;
-                      newLevels[i].level.items = converted.levels[i].items;
+                  if (converted === undefined) {
+                    // prompttext is raw text
+                    newLevels[0].level.items[0].labels[0] = new OLabel('OCTRA_1', this.appStorage.prompttext);
+                  } else {
+                    // use imported annotJSON
+                    for (let i = 0; i < converted.levels.length; i++) {
+                      if (i >= newLevels.length) {
+                        newLevels.push(new OIDBLevel(i + 1, converted.levels[i], i));
+                      } else {
+                        newLevels[i].level.name = converted.levels[i].name;
+                        newLevels[i].level.type = converted.levels[i].type;
+                        newLevels[i].level.items = converted.levels[i].items;
+                      }
                     }
                   }
                 }

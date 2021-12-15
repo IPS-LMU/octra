@@ -259,6 +259,7 @@ export class AppStorageService {
         this.loggedIn = this.sessStr.retrieve('loggedIn');
         this.reloaded = this.sessStr.retrieve('reloaded');
         this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
+        const test = '';
       }
     }));
   }

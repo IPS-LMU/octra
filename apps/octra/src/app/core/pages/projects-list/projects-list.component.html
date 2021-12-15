@@ -1,9 +1,17 @@
 <mdb-card class="container">
+  <div style="display: inline;text-align: right;">
+    <button mdbBtn mdbWavesEffect color="secondary" size="sm" (click)="appStorage.logout(true)">
+      <fa-icon icon="door-open"></fa-icon>
+      Logout
+    </button>
+  </div>
   <mdb-card-body>
     <h1>Projects</h1>
     <p class="text-center">
       Please select a project that you want to transcribe and click on "START".
     </p>
+    <input type="file" name="uploadFile" #fileInput (change)="onFileChange($event)"/>
+    <button (click)="testUpload()">upload test</button>
     <div class="table-wrapper">
       <table class="table table-striped table-hover">
         <thead>

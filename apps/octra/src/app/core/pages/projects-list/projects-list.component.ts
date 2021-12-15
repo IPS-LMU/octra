@@ -4,6 +4,7 @@ import {ProjectResponseDataItem} from '@octra/octra-db';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {navigateTo} from '@octra/utilities';
 import {Router} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'octra-projects-list',
@@ -12,10 +13,11 @@ import {Router} from '@angular/router';
 })
 export class ProjectsListComponent implements OnInit {
   projects: ProjectResponseDataItem[] = [];
+  selectedFile: File;
 
   constructor(private api: OctraAPIService,
-              private appStorage: AppStorageService,
-              private router: Router) {
+              public appStorage: AppStorageService,
+              private router: Router, private http: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -46,5 +48,20 @@ export class ProjectsListComponent implements OnInit {
         console.error(error);
       });
     }
+  }
+
+  onFileChange(event: any) {
+    const test = 'result';
+    const res = event.target.files[0];
+    this.selectedFile = res;
+  }
+
+  testUpload() {
+    console.log(`test upload`);
+    this.api.uploadMedia(5, this.selectedFile, {test: 234234}).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 }

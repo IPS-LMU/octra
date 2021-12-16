@@ -32,7 +32,7 @@ import {ILog} from '../../obj/Settings/logging';
 import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
 import {Observable, Subject, Subscription} from 'rxjs';
-import {AnnotationStartResponseDataItem, UserRole} from '@octra/octra-db';
+import {AnnotationStartResponseDataItem, UserRole} from '@octra/db';
 import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Injectable({

@@ -9,7 +9,7 @@ import {
   TranscriptionState,
   URLParameters
 } from '../../index';
-import {AnnotationStartResponseDataItem} from '@octra/octra-db';
+import {AnnotationStartResponseDataItem} from '@octra/db';
 
 export class OnlineModeActions extends AnnotationActions {
   static context: 'OnlineMode';

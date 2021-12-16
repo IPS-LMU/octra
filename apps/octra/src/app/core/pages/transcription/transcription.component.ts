@@ -31,8 +31,12 @@ import {
   ModalEndAnswer,
   TranscriptionDemoEndModalComponent
 } from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
-import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
-import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {
+  TranscriptionGuidelinesModalComponent
+} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {
+  TranscriptionSendingModalComponent
+} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   TranscriptionStopModalAnswer,
   TranscriptionStopModalComponent
@@ -656,10 +660,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       const subscr = this.modalService.open.subscribe((modal) => {
         console.log(`modal opened!`);
         this.api.saveAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID, {
-          transcript: this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration),
+          transcript: JSON.stringify(this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration)),
           comment: this.appStorage.comment,
           assessment: this.appStorage.feedback,
-          log: this.appStorage.logs
+          log: JSON.stringify(this.appStorage.logs)
         }).then(() => {
           this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;

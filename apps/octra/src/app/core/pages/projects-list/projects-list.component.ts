@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {OctraAPIService} from '@octra/ngx-octra-api';
-import {ProjectResponseDataItem} from '@octra/octra-db';
+import {ProjectResponseDataItem} from '@octra/db';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {navigateTo} from '@octra/utilities';
 import {Router} from '@angular/router';

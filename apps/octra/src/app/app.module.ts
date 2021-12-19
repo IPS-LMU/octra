@@ -23,7 +23,9 @@ import {
   NavigationComponent,
   TranscrEditorComponent
 } from './core/component';
-import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
+import {
+  ValidationPopoverComponent
+} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {
   AuthComponent,
   BrowserTestComponent,
@@ -78,7 +80,9 @@ import {MaintenanceModule} from './core/component/maintenance/maintenance.module
 import {ApplicationEffects} from './core/store/application/application-effects.service';
 import {LoginMode} from './core/store';
 import {JoditAngularModule} from 'jodit-angular';
-import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
+import {
+  PermutationsReplaceModalComponent
+} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import {
   ButtonsModule,
   CardsModule,

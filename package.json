@@ -33,8 +33,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "modernizr": "modernizr -d apps/octra/src/assets/js/modernizr.js -c ./apps/octra/src/modernizr.json",
     "workspace-generator": "nx workspace-generator",
-    "update-browserlist": "npx browserslist@latest --update-db",
-    "postinstall": "npm link @octra/db @octra/ngx-octra-api"
+    "update-browserlist": "npx browserslist@latest --update-db"
   },
   "private": true,
   "dependencies": {
@@ -60,6 +59,8 @@
     "@ngrx/store": "13.0.1",
     "@nrwl/angular": "13.3.9",
     "@nrwl/schematics": "^8.12.11",
+    "@octra/db": "file:../octra-backend/extern/octra-db",
+    "@octra/ngx-octra-api": "file:../octra-backend/extern/ngx-octra-api",
     "@popperjs/core": "^2.9.2",
     "ajv": "^8.8.1",
     "angular-animations": "0.0.10",
@@ -134,4 +135,3 @@
     "webpack-bundle-analyzer": "^4.5.0"
   }
 }
-

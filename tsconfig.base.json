@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@angular/*": [
+        "./node_modules/@angular/*"
+      ],
       "@octra/annotation": [
         "libs/annotation/src/index.ts"
       ],

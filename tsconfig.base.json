@@ -28,10 +28,10 @@
         "libs/media/src/index.ts"
       ],
       "@octra/ngx-octra-api": [
-        "node-modules/@octra/ngx-octra-api"
+        "../octra-backend/dist/libs/ngx-octra-api"
       ],
       "@octra/octra-db": [
-        "node-modules/@octra/octra-db"
+        "../octra-backend/dist/libs/octra-db"
       ],
       "@octra/utilities": [
         "./libs/utilities/src/index.ts"

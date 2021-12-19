@@ -20,8 +20,8 @@ import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {interval, Observable, Subscription} from 'rxjs';
 import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
 import {modalConfigurations} from '../../modals/types';
+import {UserInfoResponseDataItem} from '@octra/db';
 import {OctraAPIService} from '@octra/ngx-octra-api';
-import {UserInfoResponseDataItem} from '../../../../../../../../octra-backend/extern/octra-db';
 
 @Component({
   selector: 'octra-login',

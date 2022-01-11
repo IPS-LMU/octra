@@ -8,10 +8,9 @@ import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {UpdateManager} from '../UpdateManager';
-import {ActivatedRoute, Params} from '@angular/router';
+import {Params} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {query} from '@angular/animations';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -488,7 +487,7 @@ export class SettingsService {
    * checks jif the specific theme is active
    */
   public isTheme(theme: string) {
-    const selectedTheme = (
+    const selectedTheme = (isNullOrUndefined(this.projectsettings) ||
       isNullOrUndefined(this.projectsettings.octra)
       || isNullOrUndefined(this.projectsettings.octra.theme)
     )

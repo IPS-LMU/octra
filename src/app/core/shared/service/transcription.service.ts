@@ -371,7 +371,7 @@ export class TranscriptionService {
                     this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 
                     // check if servertranscript's segment is empty
-                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
+                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry.transcript[0].text === '') {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
                         new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])

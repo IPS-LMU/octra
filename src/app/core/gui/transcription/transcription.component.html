@@ -108,21 +108,30 @@
           </button>
           <button class="btn btn-outline-danger bg-white col-md-3" style="color: black;"
                   (click)="sendTranscriptionForShortAudioFiles('postpone_before')"
-                  [disabled]="!audiomanager.hasPlayed">
+                  [disabled]="!audiomanager.hasPlayed" *ngIf="projectsettings.plugins.postponeAll?.enabled">
             <fa-icon icon="times-circle" style="color: red;"></fa-icon>
             Aufgaben sperren
           </button>
-          <button class="btn btn-raised btn-danger col-md-2" (click)="sendTranscriptionForShortAudioFiles('bad')"
+          <button class="btn btn-raised btn-danger" [ngClass]="{
+            'col-md-2': projectsettings.plugins.postponeAll?.enabled,
+            'col-md-3': !(projectsettings.plugins.postponeAll?.enabled)
+          }" (click)="sendTranscriptionForShortAudioFiles('bad')"
                   [disabled]="!audiomanager.hasPlayed">
             <fa-icon icon="star"></fa-icon>
           </button>
-          <button class="btn btn-raised btn-warning col-md-2" style="background-color: orange"
+          <button class="btn btn-raised btn-warning" [ngClass]="{
+            'col-md-2': projectsettings.plugins.postponeAll?.enabled,
+            'col-md-3': !(projectsettings.plugins.postponeAll?.enabled)
+          }" style="background-color: orange"
                   [disabled]="!audiomanager.hasPlayed"
                   (click)="sendTranscriptionForShortAudioFiles('middle')">
             <fa-icon icon="star"></fa-icon>
             <fa-icon icon="star"></fa-icon>
           </button>
-          <button class="btn btn-raised btn-primary col-md-2" (click)="sendTranscriptionForShortAudioFiles('good')"
+          <button class="btn btn-raised btn-primary" [ngClass]="{
+            'col-md-2': projectsettings.plugins.postponeAll?.enabled,
+            'col-md-3': !(projectsettings.plugins.postponeAll?.enabled)
+          }" (click)="sendTranscriptionForShortAudioFiles('good')"
                   [disabled]="!audiomanager.hasPlayed">
             <fa-icon icon="star"></fa-icon>
             <fa-icon icon="star"></fa-icon>

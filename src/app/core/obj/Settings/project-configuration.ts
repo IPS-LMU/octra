@@ -23,6 +23,9 @@ export interface ProjectSettings {
   plugins: {
     pdfexport: {
       url: ''
+    },
+    postponeAll: {
+      enabled: boolean;
     }
   };
   feedback_form: Group[];

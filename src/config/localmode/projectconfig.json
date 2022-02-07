@@ -21,6 +21,9 @@
   "plugins": {
     "pdfexport": {
       "url": "https://www.phonetik.uni-muenchen.de/apps/octra/pdfconverter/"
+    },
+    "postponeAll": {
+      "enabled": false
     }
   },
   "languages": [

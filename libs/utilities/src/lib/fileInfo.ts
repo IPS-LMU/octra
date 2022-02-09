@@ -97,7 +97,23 @@ export class FileInfo extends DataInfo {
   }
 
   public static escapeFileName(name: string) {
-    return name.replace(/[\s\/?!%*(){}&:=+#'<>^;,Ââ°]/g, '_');
+    return name.replace(/[\s/?!%*(){}ß&:=+#'<>^;,Ââ°]/g, '_').replace(/([äÄüÜöÖ])/g, (g0, g1) => {
+      switch (g1) {
+        case('ä'):
+          return 'ae';
+        case('Ä'):
+          return 'Ae';
+        case('ö'):
+          return 'oe';
+        case('Ö'):
+          return 'oe';
+        case('ü'):
+          return 'ue';
+        case('Ü'):
+          return 'Ue';
+      }
+      return '_';
+    });
   }
 
   public static renameFile(file: File, newName: string, attributes: any): Promise<File> {

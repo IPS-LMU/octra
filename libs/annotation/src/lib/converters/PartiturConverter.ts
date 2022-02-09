@@ -24,7 +24,7 @@ export class PartiturConverter extends Converter {
       console.error('BASPartitur Converter annotation is undefined');
       return undefined;
     }
-    if (!(levelnum === undefined || levelnum === undefined)) {
+    if (levelnum) {
       const result: ExportResult = {
         file: {
           name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
@@ -78,7 +78,7 @@ LBD:\n`;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== undefined && audiofile !== undefined) {
+    if (audiofile) {
       const lines = file.content.split(/\r?\n/g);
       let pointer = 0;
 
@@ -94,7 +94,7 @@ LBD:\n`;
           new RegExp('^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
             '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))', 'g'));
 
-        if (!(search === undefined || search === undefined)) {
+        if (search) {
           const columns = lines[pointer].split(' ');
 
           if (search[0] === 'SAM') {

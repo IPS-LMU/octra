@@ -17,7 +17,7 @@ export class PraatTextgridConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (annotation) {
       let result = '';
       const durSeconds = (audiofile.duration / audiofile.sampleRate);
 
@@ -118,7 +118,7 @@ export class PraatTextgridConverter extends Converter {
                     // get class
                     let classStr = undefined;
                     let test = lines[i].match(/class = "(.*)"/);
-                    if ((test === undefined || test === undefined)) {
+                    if (!test) {
                       return {
                         annotjson: undefined,
                         audiofile: undefined,
@@ -131,7 +131,7 @@ export class PraatTextgridConverter extends Converter {
                     // get lvl name
                     let lvlName = undefined;
                     test = lines[i].match(/name = "(.*)"/);
-                    if ((test === undefined || test === undefined)) {
+                    if (!test) {
                       return {
                         annotjson: undefined,
                         audiofile: undefined,
@@ -150,12 +150,12 @@ export class PraatTextgridConverter extends Converter {
                     // read items
                     let match = lines[i].match(/item \[([0-9]+)]:/);
 
-                    while (lines[i] !== '' && (match === undefined || match === undefined) && i < lines.length) {
+                    while (lines[i] !== '' && match === null && i < lines.length) {
                       let isActive = true;
                       test = lines[i].match(/intervals \[[0-9]+]:/);
-                      if ((test === undefined || test === undefined)) {
+                      if (!test) {
                         test = lines[i].match(/points \[[0-9]+]:/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
@@ -169,7 +169,7 @@ export class PraatTextgridConverter extends Converter {
 
                       if (isActive) {
                         test = lines[i].match(/xmin = (.*)/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
@@ -180,7 +180,7 @@ export class PraatTextgridConverter extends Converter {
                         const xmin = Number(test[1]);
 
                         test = lines[i].match(/xmax = (.*)/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
@@ -191,7 +191,7 @@ export class PraatTextgridConverter extends Converter {
                         const xmax = Number(test[1]);
 
                         test = lines[i].match(/text = "(.*)"/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
@@ -212,7 +212,7 @@ export class PraatTextgridConverter extends Converter {
                         olevel.items.push(osegment);
                       } else {
                         test = lines[i].match(/number = (.*)/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
@@ -224,7 +224,7 @@ export class PraatTextgridConverter extends Converter {
                         const numberStr = Number(test[1]);
 
                         test = lines[i].match(/mark = "(.*)"/);
-                        if ((test === undefined || test === undefined)) {
+                        if (!test) {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,

@@ -96,7 +96,7 @@ export function equalProperties(elem: any, elem2: any) {
 
 export function escapeRegex(regexStr: string) {
   // escape special chars in regex
-  return regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return regexStr.replace(/[-/\\^$*+?ß%.()|[\]{}]/g, '\\$&');
 }
 
 export function getFileSize(bytes: number): FileSize {
@@ -342,4 +342,8 @@ export function setStyle(elem: HTMLElement, styleObj: any) {
   for (const [name, value] of styles) {
     elem.style[name] = value;
   }
+}
+
+export function flatten(values: never[]) {
+  return values.reduce((acc: never[], val: never[]) => acc.concat(val), []);
 }

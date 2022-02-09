@@ -15,7 +15,7 @@ export class AnnotJSONConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON): ExportResult {
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (annotation) {
       return {
         file: {
           name: annotation.name + this._extension,
@@ -30,7 +30,7 @@ export class AnnotJSONConverter extends Converter {
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== undefined && audiofile !== undefined) {
+    if (audiofile) {
       let result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
       const content = file.content;
 

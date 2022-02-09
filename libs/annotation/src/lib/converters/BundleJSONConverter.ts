@@ -34,7 +34,7 @@ export class BundleJSONConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (annotation) {
       const bundle = {
         ssffFiles: [],
         mediaFile: {
@@ -74,7 +74,7 @@ export class BundleJSONConverter extends Converter {
       };
     }
 
-    if (!(json === undefined || json === undefined) && json['mediaFile'] && json.mediaFile['data']
+    if (json && json['mediaFile'] && json.mediaFile['data']
       && json['annotation']) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;

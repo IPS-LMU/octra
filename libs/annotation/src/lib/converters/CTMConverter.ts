@@ -25,7 +25,11 @@ export class CTMConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (levelnum === undefined || levelnum < 0 || levelnum > annotation.levels.length) {
+      console.error(`CTMConverter needs a levelnumber`);
+      return undefined;
+    }
+    if (annotation) {
       const level = annotation.levels[levelnum];
 
       for (const levelItem of level.items) {
@@ -51,7 +55,7 @@ export class CTMConverter extends Converter {
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== undefined && audiofile !== undefined) {
+    if (audiofile) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;

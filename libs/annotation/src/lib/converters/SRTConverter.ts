@@ -46,11 +46,17 @@ export class SRTConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    if (!(annotation === undefined || annotation === undefined)) {
+    if (annotation) {
       let result = '';
       let filename = '';
 
-      if (!(levelnum === undefined || levelnum === undefined) && levelnum < annotation.levels.length) {
+      if (levelnum === undefined || levelnum < 0 || levelnum > annotation.levels.length) {
+
+        console.error('SRTConverter needs a level number');
+        return undefined;
+      }
+
+      if (levelnum < annotation.levels.length) {
         const level: OLevel = annotation.levels[levelnum];
 
         let counter = 1;
@@ -74,9 +80,6 @@ export class SRTConverter extends Converter {
           filename += `-${level.name}`;
         }
         filename += `${this._extension}`;
-      } else {
-        console.error('SRTConverter needs a level number');
-        return undefined;
       }
 
       return {
@@ -93,7 +96,7 @@ export class SRTConverter extends Converter {
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== undefined && audiofile !== undefined) {
+    if (audiofile) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;

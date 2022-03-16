@@ -14,11 +14,19 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {
+  AppStorageService,
+  AudioService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../shared/service';
 import {AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
-import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
+import {
+  ValidationPopoverComponent
+} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
@@ -145,7 +153,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
               public audio: AudioService,
               public sanitizer: DomSanitizer,
               private cd: ChangeDetectorRef,
-              private appStorage: AppStorageService,
+              public appStorage: AppStorageService,
               private settingsService: SettingsService,
               private uiService: UserInteractionsService) {
 

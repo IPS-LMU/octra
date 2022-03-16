@@ -131,6 +131,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() audiochunk: AudioChunk;
   @Input() validationEnabled = false;
 
+  @Input()
+  font: string;
+
+  @Output()
+  fontChange = new EventEmitter<string>();
+
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
 
@@ -293,6 +299,42 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       navigation.str_array.push('fontSizeDown');
       navigation.str_array.push('fontSizeUp');
     }
+
+    // create font selection
+    const changeFont = () => {
+      const currentFont = this.font ? this.font : ((BrowserInfo.platform === 'mac') ? 'Helvetica' : 'Arial');
+      jQuery('.transcr-editor .note-editable.card-block').css('font-family', this.getFontFamily(currentFont));
+      const icon = `
+<div>
+<div id="editor-change-font-btn" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false" style="font-family: '${currentFont}'">
+           <div class="change-font-inner" style="width:150px; display:inline-block;">${currentFont}</div>
+</div>
+<div class="dropdown-menu dropdown-menu-down editor-change-font-dropdown" aria-labelledby="editor-change-font-btn">
+        <div class="dropdown-item" style="font-family: Helvetica, Arial, serif">Helvetica</div>
+        <div class="dropdown-item" style="font-family: Arial, Helvetica, serif">Arial</div>
+        <div class="dropdown-item" style="font-family: 'Courier New', serif">Courier New</div>
+        <div class="dropdown-item" style="font-family: 'Times New Roman', serif">Times New Roman</div>
+        <div class="dropdown-item" style="font-family: Verdana, Geneva, sans-serif">Verdana</div>
+</div></div>`;
+      // create button
+      const btnJS = {
+        contents: icon,
+        tooltip: '',
+        container: false
+      };
+      const button = jQuery.summernote.ui.button(btnJS).render();
+      button.addClass('editor-change-font-parent');
+      button.find('.dropdown-item').on('click', (event) => {
+        const fontName = jQuery(event.target).text();
+        this.changeFont(fontName);
+      });
+
+      return button;   // return button as jquery object
+    };
+
+    navigation.buttons.changeFont = changeFont;
+    navigation.str_array.push('changeFont');
 
     if (!isNullOrUndefined(this.textfield)) {
       this.textfield.summernote('destroy');
@@ -567,6 +609,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+    this.changeFont(this.font);
     this.Settings.height = this.height;
     if (!isNullOrUndefined(this.audiochunk)) {
       this._lastAudioChunkID = this.audiochunk.id;
@@ -590,6 +633,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.newValue) {
       renew = true;
+    }
+
+    if (!(obj.font === null || obj.font === undefined) && obj.font.previousValue !== obj.font.newValue) {
+      this.changeFont(obj.font.currentValue)
     }
 
     if (renew) {
@@ -618,7 +665,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       buttons: {
         boundary: undefined,
         fontSizeUp: undefined,
-        fontSizeDown: undefined
+        fontSizeDown: undefined,
+        changeFont: undefined
       },
       str_array: []
     };
@@ -1458,5 +1506,31 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       console.error(`could not stop ASR because segment number was not found.`);
     }
+  }
+
+  private changeFont(fontName: string) {
+    if (fontName && typeof fontName === 'string' && fontName !== '') {
+      const fontFamily = this.getFontFamily(fontName);
+      jQuery('.transcr-editor .note-editable.card-block').css('font-family', fontFamily);
+      jQuery('.transcr-editor #editor-change-font-btn .change-font-inner').html(fontName);
+      jQuery('.transcr-editor #editor-change-font-btn').css('font-family', fontFamily);
+      this.fontChange.emit(fontName);
+    }
+  }
+
+  private getFontFamily(fontName: string) {
+    switch (fontName) {
+      case ('Arial'):
+        return 'Arial, Helvetica, serif';
+      case ('Helvetica'):
+        return 'Helvetica, Arial, serif';
+      case ('Courier New'):
+        return '\'Courier New\', serif';
+      case ('Times New Roman'):
+        return '\'Times New Roman\', serif';
+      case ('Verdana'):
+        return 'Verdana, Geneva, sans-serif';
+    }
+    return 'Helvetica, Arial, serif';
   }
 }

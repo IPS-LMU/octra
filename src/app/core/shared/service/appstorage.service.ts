@@ -67,6 +67,17 @@ export class AppStorageService {
     this._accessCode = value;
   }
 
+  get editorFont(): string {
+    return this._editorFont;
+  }
+
+  set editorFont(value: string) {
+    this._idb.save('options', 'editorFont', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._editorFont = value;
+  }
+
   set logs(value: any[]) {
     this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
       console.error(err);
@@ -476,6 +487,7 @@ export class AppStorageService {
   };
 
   private _accessCode = '';
+  private _editorFont = '';
 
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
@@ -890,6 +902,10 @@ export class AppStorageService {
         {
           attribute: '_accessCode',
           key: 'accessCode'
+        },
+        {
+          attribute: '_editorFont',
+          key: 'editorFont'
         }
       ]
     ).then(() => {

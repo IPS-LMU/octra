@@ -196,7 +196,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   public update = (computeDisplayData: boolean = false) => {
     return new Promise<void>((resolve, reject) => {
-
       if (this.AudioPxWidth > 0) {
         this.updateVisibleLines();
         if (!this.updating) {
@@ -1335,8 +1334,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5 - 11, w, 18);
                 this.tContext.globalAlpha = 1;
                 this.tContext.fillStyle = 'black';
-                this.tContext.font = '11px Arial';
+
+                const font = (this.settings.transcript.font === 'Helvetica' && BrowserInfo.platform === 'pc') ? 'Arial' : this.settings.transcript.font;
+                this.tContext.font = `${this.settings.transcript.fontSize}px ${font}`;
                 this.tContext.textAlign = 'center';
+                let fontOffset = 4;
+
+                if (font === 'Courier New') {
+                  fontOffset = 15;
+                }
 
                 const text = segment.transcript;
 
@@ -1345,9 +1351,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     const textLength = this.tContext.measureText(text).width;
                     let newText = text;
                     // segment in same line
-                    if (textLength > w - 4) {
+                    if (textLength > w - fontOffset) {
                       // crop text
-                      const overflow = textLength / (w - 4) - 1;
+                      const overflow = textLength / (w - fontOffset) - 1;
                       const leftHalf = (1 - overflow) / 2;
                       newText = text.substring(0, Math.floor(text.length * leftHalf) - 1);
                       newText += '...';

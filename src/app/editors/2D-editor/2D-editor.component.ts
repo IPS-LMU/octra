@@ -181,6 +181,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
     this.viewer.settings.asr.enabled = this.settingsService.isASREnabled;
+    // this.viewer.settings.transcript.font = (this.appStorage.editorFont) ? this.appStorage.editorFont : 'Helvetica';
     this.viewer.name = 'multiline viewer';
 
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
@@ -492,6 +493,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onWindowAction(state) {
     if (state === 'close') {
       this.showWindow = false;
+      // this.viewer.settings.transcript.font = this.appStorage.editorFont ? this.appStorage.editorFont : "Helvetica";
       this.viewer.deactivateShortcuts = false;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
@@ -744,6 +746,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public update() {
+    // this.viewer.settings.transcript.font = this.appStorage.editorFont;
     this.viewer.update().catch((error) => {
       console.error(`could not update GUI for multiline-viewer`);
       console.error(error);

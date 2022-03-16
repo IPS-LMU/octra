@@ -1,285 +1,285 @@
 h1 {
-    text-align: center;
+  text-align: center;
 }
 
 html {
-    height: 100%;
-    overflow: hidden;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100%;
 }
 
 main {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 0 auto;
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (max-width: 400px) {
-    main .container {
-        padding-left: 0;
-        padding-right: 0;
-    }
+  main .container {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 footer {
-    text-align: center;
-    font-size: 10px;
+  text-align: center;
+  font-size: 10px;
 }
 
 .container {
-    width: 100%;
+  width: 100%;
 }
 
 .icon-block {
-    padding: 0 15px;
+  padding: 0 15px;
 }
 
 .icon-block .material-icons {
-    font-size: inherit;
+  font-size: inherit;
 }
 
 .waiting {
-    margin: 100px auto;
-    width: 64px;
-    position: relative;
+  margin: 100px auto;
+  width: 64px;
+  position: relative;
 }
 
 .link {
-    color: #0095dd;
-    cursor: pointer;
+  color: #0095dd;
+  cursor: pointer;
 }
 
 #rules {
-    display: none;
+  display: none;
 }
 
 #loading {
-    text-align: center;
-    padding: 20px;
+  text-align: center;
+  padding: 20px;
 }
 
 #loading .description {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 #overview .modal-dialog,
 #rules .modal-dialog {
-    width: 90%;
+  width: 90%;
 }
 
 .note-popover .popover-content, .panel-heading.note-toolbar {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .transcr-editor .btn-description {
-    font-size: 0.90em;
+  font-size: 0.90em;
 }
 
 .transcr-editor .btn-shortcut {
-    font-size: 0.65em;
+  font-size: 0.65em;
 }
 
 #loading {
-    text-align: center;
+  text-align: center;
 }
 
 .btn-icon-text {
-    height: 16px;
+  height: 16px;
 }
 
 .export-button {
-    background-color: whitesmoke;
-    border: 1px solid grey;
-    text-align: center;
-    padding: 20px;
+  background-color: whitesmoke;
+  border: 1px solid grey;
+  text-align: center;
+  padding: 20px;
 }
 
 .export-a {
-    font-size: 0.8em;
+  font-size: 0.8em;
 }
 
 .bg-warning,
 .bg-danger {
-    padding: 10px;
+  padding: 10px;
 }
 
 .error_underline {
-    border-bottom: 2px solid #ff6a7d;
-    display: inline;
-    cursor: pointer;
+  border-bottom: 2px solid #ff6a7d;
+  display: inline;
+  cursor: pointer;
 }
 
 .error-tooltip {
-    display: none;
-    background-color: #ff899d;
-    padding: 10px;
-    max-width: 70%;
-    position: absolute;
-    z-index: 2000;
-    left: 0;
-    top: 0;
+  display: none;
+  background-color: #ff899d;
+  padding: 10px;
+  max-width: 70%;
+  position: absolute;
+  z-index: 2000;
+  left: 0;
+  top: 0;
 }
 
 .error-tooltip .title {
-    font-weight: bold;
-    display: block;
+  font-weight: bold;
+  display: block;
 }
 
 .error-tooltip .description {
-    font-size: 0.8em;
+  font-size: 0.8em;
 }
 
 #logo {
-    text-align: center;
-    width: 100%;
-    display: block;
-    font-size: 5em;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 300;
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-size: 5em;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 300;
 }
 
 #bugreport .modal-dialog {
-    width: 90%;
-    height: 100%;
+  width: 90%;
+  height: 100%;
 }
 
 .flex {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 0 auto;
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .note-editor.note-frame.panel.panel-default {
-    flex: auto;
+  flex: auto;
 }
 
 .transcr-editor .note-editable.panel-body {
-    flex: auto;
+  flex: auto;
 }
 
 .note-editor.note-frame.panel.panel-default,
 .note-editing-area {
-    flex: auto;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0;
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
 }
 
 .note-editable.panel-body {
 }
 
 .seg-popover {
-    border: 1px solid orange;
-    background-color: white;
-    z-index: 100;
-    position: absolute;
-    padding: 5px;
-    display: none;
+  border: 1px solid orange;
+  background-color: white;
+  z-index: 100;
+  position: absolute;
+  padding: 5px;
+  display: none;
 }
 
 .textspan {
-    display: inline;
+  display: inline;
 }
 
 .tooltip.right {
-    width: 200px;
+  width: 200px;
 }
 
 #prompt-modal .modal-dialog {
-    width: 90%;
+  width: 90%;
 }
 
 .alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
 }
 
 .note-toolbar button.note-btn.btn.btn-light.btn-sm {
-    background-color: whitesmoke;
-    color: black;
-    padding: 2px 6px;
+  background-color: whitesmoke;
+  color: black;
+  padding: 2px 6px;
 }
 
 .note-toolbar button.note-btn.btn.btn-light.btn-sm:hover {
-    background-color: lightgrey;
-    color: black;
+  background-color: lightgrey;
+  color: black;
 }
 
 .note-editor.note-frame.panel {
-    display: flex;
-    flex-direction: column;
-    flex: auto;
+  display: flex;
+  flex-direction: column;
+  flex: auto;
 }
 
 .note-editing-area span.bmd-form-group {
-    display: none;
+  display: none;
 }
 
 .note-editor .note-editable {
-    flex-direction: column;
-    flex: auto;
+  flex-direction: column;
+  flex: auto;
 }
 
 .note-toolbar.panel-heading {
-    margin: 5px 0 0 5px;
+  margin: 5px 0 0 5px;
 }
 
 .note-btn-group.btn-group.note-default {
-    margin: 0;
-    display: inherit;
+  margin: 0;
+  display: inherit;
 }
 
 .note-toolbar-wrapper.panel-default {
-    background-color: whitesmoke;
+  background-color: whitesmoke;
 }
 
 .val-error {
-    border: 1px solid red;
-    border-radius: 2px;
-    cursor: pointer;
+  border: 1px solid red;
+  border-radius: 2px;
+  cursor: pointer;
 }
 
 .note-editor.note-frame.card {
-    display: flex;
-    flex-direction: column;
-    flex: auto;
+  display: flex;
+  flex-direction: column;
+  flex: auto;
 }
 
 .note-toolbar {
-    z-index: 20;
+  z-index: 20;
 }
 
 .note-btn-group.btn-group.note-default button {
-    margin: 3px 0 0 0;
-    /* padding: 1px; */
+  margin: 3px 0 0 0;
+  /* padding: 1px; */
 }
 
 .radio label .bmd-radio, label.radio-inline .bmd-radio {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .radio {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .note-editable.card-block {
-    min-height: 100px;
+  min-height: 100px;
 }
 
 .btn-icon {
-    height: 14px;
+  height: 14px;
 }
 
 /* in-flight clone */
@@ -373,4 +373,27 @@ column.ng-star-inserted.gu-mirror .delete-column fa-icon {
 
 .column.ng-star-inserted.gu-mirror .cell:last-of-type {
   border-bottom: none;
+}
+
+#editor-change-font-btn {
+  border: 1px solid gray;
+  padding: 3px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+#editor-change-font-btn:after {
+  content: '▾';
+  padding-left: 5px;
+}
+
+.editor-change-font-dropdown {
+  width: 95%;
+}
+
+.editor-change-font-dropdown .dropdown-item {
+  text-transform: capitalize;
+  font-size: 0.8rem;
+  padding: 10px;
+  min-height: 1em;
 }

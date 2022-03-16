@@ -216,6 +216,12 @@ export class AudioviewerConfig {
     foreColor: 'black'
   };
 
+  public transcript = {
+    fontSize: 11,
+    font: 'Arial',
+    foreColor: 'black'
+  };
+
   public stepWidthRatio = 0.0226;
   public scrollable = false;
   public type: string;

@@ -51,5 +51,6 @@
                     (boundaryinserted)="onBoundaryInserted()"
                     (selectionchanged)="onSelectionChanged($event)"
                     [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                    [(font)]="appStorage.editorFont"
 >
 </app-transcr-editor>

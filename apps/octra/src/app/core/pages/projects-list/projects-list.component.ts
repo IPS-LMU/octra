@@ -57,11 +57,5 @@ export class ProjectsListComponent implements OnInit {
   }
 
   testUpload() {
-    console.log(`test upload`);
-    this.api.uploadMedia(5, this.selectedFile, {test: 234234}).then((result) => {
-      console.log(result);
-    }).catch((error) => {
-      console.error(error);
-    });
   }
 }

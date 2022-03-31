@@ -770,7 +770,7 @@ export class AppStorageService {
             },
             sessionData: {
               transcriptID: newAnnotation.id,
-              audioURL: newAnnotation.mediaitem.url,
+              audioURL: newAnnotation.file.url,
               promptText: newAnnotation.orgtext,
               serverComment: newAnnotation.comment,
               serverDataEntry: newAnnotation,

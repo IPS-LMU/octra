@@ -46,7 +46,7 @@ You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-
 
 
 ## Remarks
-At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers.
+At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers (see project [octra-backend](https://github.com/IPS-LMU/octra-backend).
 
 ## Production Use
 

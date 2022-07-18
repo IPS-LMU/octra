@@ -16,7 +16,7 @@ import {SampleUnit} from '@octra/media';
 import {ILog} from '../obj/Settings/logging';
 import {Histories, UndoRedoState} from 'ngrx-wieder';
 import {SessionFile} from '../obj/SessionFile';
-import {AnnotationStartResponseDataItem} from '@octra/octra-db';
+import {AnnotationStartResponseDataItem} from '@octra/db';
 
 export enum LoginMode {
   URL = 'url',

@@ -2,6 +2,7 @@
   "version": 1,
   "projects": {
     "annotation": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/annotation",
       "sourceRoot": "libs/annotation/src",
       "projectType": "library",
@@ -23,12 +24,12 @@
             "coverage/libs/annotation"
           ],
           "options": {
-            "jestConfig": "libs/annotation/jest.config.js",
+            "jestConfig": "libs/annotation/jest.config.ts",
             "passWithNoTests": true
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "builder": "@nrwl/js:tsc",
           "outputs": [
             "{options.outputPath}"
           ],
@@ -46,6 +47,7 @@
       "tags": []
     },
     "components": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "projectType": "library",
       "root": "libs/components",
       "sourceRoot": "libs/components/src",
@@ -75,7 +77,7 @@
             "coverage/libs/components"
           ],
           "options": {
-            "jestConfig": "libs/components/jest.config.js",
+            "jestConfig": "libs/components/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -95,6 +97,7 @@
       "tags": []
     },
     "media": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/media",
       "sourceRoot": "libs/media/src",
       "projectType": "library",
@@ -116,12 +119,12 @@
             "coverage/libs/media"
           ],
           "options": {
-            "jestConfig": "libs/media/jest.config.js",
+            "jestConfig": "libs/media/jest.config.ts",
             "passWithNoTests": true
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "builder": "@nrwl/js:tsc",
           "outputs": [
             "{options.outputPath}"
           ],
@@ -139,6 +142,7 @@
       "tags": []
     },
     "octra": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "projectType": "application",
       "root": "apps/octra",
       "sourceRoot": "apps/octra/src",
@@ -268,7 +272,7 @@
             "coverage/apps/octra"
           ],
           "options": {
-            "jestConfig": "apps/octra/jest.config.js",
+            "jestConfig": "apps/octra/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -281,6 +285,7 @@
       "tags": []
     },
     "octra-e2e": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/octra-e2e",
       "sourceRoot": "apps/octra-e2e/src",
       "projectType": "application",
@@ -316,6 +321,7 @@
       ]
     },
     "utilities": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/utilities",
       "sourceRoot": "libs/utilities/src",
       "projectType": "library",
@@ -337,12 +343,12 @@
             "coverage/libs/utilities"
           ],
           "options": {
-            "jestConfig": "libs/utilities/jest.config.js",
+            "jestConfig": "libs/utilities/jest.config.ts",
             "passWithNoTests": true
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "builder": "@nrwl/js:tsc",
           "outputs": [
             "{options.outputPath}"
           ],

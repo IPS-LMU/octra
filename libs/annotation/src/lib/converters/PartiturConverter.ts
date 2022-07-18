@@ -24,7 +24,7 @@ export class PartiturConverter extends Converter {
       console.error('BASPartitur Converter annotation is undefined');
       return undefined;
     }
-    if (levelnum) {
+    if (levelnum !== undefined && levelnum > -1) {
       const result: ExportResult = {
         file: {
           name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
@@ -44,7 +44,7 @@ LBD:\n`;
       let ortCounter = 0;
 
       for (const item of annotation.levels[levelnum].items) {
-        const words = item.labels[0].value.split(' ');
+        const words = item.labels.filter(a => a.name !== 'Speaker')[0].value.split(' ');
         ort = ort.concat(words);
         let trnLine = `TRN: ${item.sampleStart} ${item.sampleDur} `;
 
@@ -55,7 +55,7 @@ LBD:\n`;
           }
         }
         ortCounter += words.length;
-        trnLine += ` ${item.labels[0].value}\n`;
+        trnLine += ` ${item.labels.filter(a => a.name !== 'Speaker')[0].value}\n`;
         trn.push(trnLine);
       }
 

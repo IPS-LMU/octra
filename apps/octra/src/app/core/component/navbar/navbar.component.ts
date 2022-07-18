@@ -247,7 +247,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openToolsModal() {
-    this.modalTools = this.modService.openModalRef(ToolsModalComponent, modalConfigurations.tools);
+    this.modalTools = this.modService.openModalRef(ToolsModalComponent, modalConfigurations.tools, {
+      transcrService: this.transcrServ
+    });
   }
 
   openStatisticsModal() {

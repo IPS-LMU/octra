@@ -88,12 +88,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }).catch((error) => {
         console.error(error);
       });
+      */
     } else {
       this.audioService.registerAudioManager(this.dropzone.audioManager);
       this.appStorage.beginLocalSession(this.dropzone.files, true).then(this.beforeNavigation).catch((error) => {
         alert(error);
       });
-       */
     }
   }
 
@@ -171,7 +171,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                   this.appStorage.afterLoginOnlineSuccessful('shibboleth', {
                     name: user.username,
                     email: user.email,
-                    roles: user.roles,
+                    roles: [],
                     webToken: token
                   });
                 }).catch((error) => {

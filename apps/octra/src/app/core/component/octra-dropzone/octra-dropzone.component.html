@@ -20,14 +20,15 @@
         <ng-container *ngIf="file.file.name.indexOf('.wav') > -1 && file.status === 'progress'">
           <div class="progress">
             <div
-              class="progress-bar progress-bar-striped progress-bar-animated"
+              class="progress-bar"
               role="progressbar"
-              aria-valuenow="75"
+              style="height:13px;"
+              [style.width]="(file.progress | procent) + '%'"
+              aria-valuenow="25"
               aria-valuemin="0"
               aria-valuemax="100"
-              [style.width]="file.progress | procent"
             >
-              <b>{{file.progress | procent}}%</b>
+              {{file.progress | procent}}%
             </div>
           </div>
         </ng-container>

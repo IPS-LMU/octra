@@ -16,6 +16,8 @@ import {WavFormat} from '@octra/media';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
 import {strToU8, zip, zipSync} from 'fflate';
+import {ModalService} from '../modal.service';
+import {ErrorModalComponent} from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'octra-tools-modal',
@@ -104,6 +106,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
               modalService: MDBModalService,
+              private modalsService: ModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
@@ -195,19 +198,19 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         if (this.tools.audioCutting.archiveStructure === undefined) {
           this.tools.audioCutting.archiveStructure = {};
         }
-        this.tools.audioCutting.archiveStructure[status.file.name] = status.u8Array;
-        totalSize += status.file.size;
+        this.tools.audioCutting.archiveStructure[status.fileName + '.wav'] = status.u8Array;
+        totalSize += status.u8Array.byteLength / 2;
 
         if (this.tools.audioCutting.cuttingSpeed < 0) {
           const now = Date.now();
-          this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.file.size;
+          this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.u8Array.length;
 
           const rest = (this.transcrService.audioManager.ressource.arraybuffer.byteLength - totalSize);
           this.tools.audioCutting.cuttingTimeLeft = this.tools.audioCutting.cuttingSpeed * rest;
 
           const zippingSpeed = this.tools.audioCutting.zippingSpeed;
           this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
-            + (this.transcrService.audioManager.ressource.arraybuffer.byteLength * zippingSpeed)) * 1000);
+            + (this.transcrService.audioManager.ressource.arraybuffer.byteLength * zippingSpeed) + 10) * 1000);
 
           this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(interval(1000).subscribe(
             () => {
@@ -251,7 +254,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           const startZipping = Date.now();
           /** TODO better use stream **/
           zip(this.tools.audioCutting.archiveStructure, {level: 9}, (error, data) => {
-            if (error === undefined) {
+            if (!error) {
               if (sizeProcessed === 0) {
                 // first process
                 if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
@@ -275,13 +278,32 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
                 lastCheck = Date.now();
               }
-              // TODO save data
+
+              this.tools.audioCutting.status = 'finished';
+              this.tools.audioCutting.progress = 100;
+              this.tools.audioCutting.progressbarType = 'success';
+
+              if (this.tools.audioCutting.result.url !== undefined) {
+                window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
+              }
+
+              try {
+
+                this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new File([data], this.transcrService.audioManager.ressource.info.name + '.zip')));
+                this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
+
+              } catch (e) {
+                this.modalsService.openModal(ErrorModalComponent, {backdrop: false}, {
+                  text: e.message ?? e
+                })
+              }
             } else {
               console.error(`cutting error`);
               console.error(error);
             }
           });
 
+          /*
           this.tools.audioCutting.clientStreamHelper.accumulate().then((data) => {
             this.tools.audioCutting.status = 'finished';
             this.tools.audioCutting.progress = 100;
@@ -297,6 +319,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           });
 
           this.tools.audioCutting.clientStreamHelper.resume();
+
+           */
         }
       },
       (err) => {
@@ -337,9 +361,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       this.tools.audioCutting.subscriptionIDs[i] = -1;
     }
 
+    /*
     if (this.tools.audioCutting.clientStreamHelper !== undefined) {
       this.tools.audioCutting.clientStreamHelper.pause();
     }
+     */
 
     this.tools.audioCutting.status = 'idle';
 

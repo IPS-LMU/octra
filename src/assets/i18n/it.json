@@ -1,0 +1,369 @@
+{
+  "translation": {
+    "language name": "Italiano"
+  },
+  "general": {
+    "name": "Nome",
+    "abort": "Interrompi",
+    "continue": "Continua",
+    "close": "Chiudi",
+    "open": "Apri {{valore}}",
+    "delete": "Cancella",
+    "save": "Salva",
+    "send now": "Invia ora",
+    "back": "Indietro",
+    "OK": "OK",
+    "quit": "Abbandona",
+    "login": "Accesso",
+    "logout": "Disconnessione",
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "stop": "Stop",
+    "backward": "Indietro",
+    "backwardtime": "Indietro (nel tempo)",
+    "replay": "Ripeti",
+    "shortcuts": "Scorciatoie",
+    "guidelines": "Linee guida",
+    "overview": "Panoramica",
+    "help": "Aiuto",
+    "on focus only": "Solo su focus",
+    "wanted": "Richiesto",
+    "unknown": "sconosciuto",
+    "please wait": "Prego attendere",
+    "logout successful": "Disconnessione riuscita",
+    "export data": "Esporta Dati",
+    "export": "Esporta",
+    "text file": "File di testo",
+    "statistics": "Statistiche",
+    "transcript": "Trascrizione",
+    "transcription": "Trascrizione",
+    "timespan": "Intervallo temporale (s)",
+    "validation": "Convalida",
+    "search": "Cerca",
+    "project": "Progetto",
+    "authors": "Autori",
+    "no guidelines found": "Nessuna linea guida trovata",
+    "example": "Esempio",
+    "select database": "Seleziona Database",
+    "agreement": "accordo",
+    "agreement read": "Ho letto l'accordo e accetto il suo contenuto",
+    "yes": "Sì",
+    "no": "No",
+    "errors found": "({{errors}}) trovati errori",
+    "no errors found": "Nessun errore trovato",
+    "segment": "Unità di trascrizione",
+    "job number": "Lavoro numero",
+    "free jobs": "Lavori liberi",
+    "email": "Email",
+    "description": "Descrizione",
+    "bug report": "Segnalazione Bug",
+    "protocol": "Protocollo",
+    "submission success": "trasmesso con successo",
+    "duration": "Durata",
+    "samplerate": "Frequenza di campionamento",
+    "bitspersecond": "Bit per secondo",
+    "filesize": "Dimensione del file",
+    "id": "ID",
+    "download": "Scarica",
+    "application": "Applicazione",
+    "website": "Sito web",
+    "news": "News",
+    "faq": "FAQ",
+    "features": "Funzionalità",
+    "transcription window": "Finestra di trascrizione",
+    "supported files": "File supportati",
+    "select one tier": "Seleziona il tier",
+    "prompt": "Prompt",
+    "feedback": "Feedback",
+    "skip silence": "salta il silenzio",
+    "good": "Buono",
+    "bad": "Cattivo",
+    "middle": "Medio",
+    "insert comment": "Inserisci commento qui... (opzionale)",
+    "password": "Password",
+    "preview": "Preview",
+    "screenshots": "Schermate",
+    "Language": "Lingua",
+    "Speech Recognition": "Riconoscimento vocale",
+    "Service Provider": "Fornitore del servizio",
+    "SELECT ACTION": "SELEZIONA AZIONE",
+    "Format": "Formato",
+    "Type": "Tipo",
+    "File extension": "Estensione file",
+    "tools": "Strumenti",
+    "custom formats": "Formati personalizzati",
+    "meta data": "Metadati",
+    "manual": "Manuale",
+    "authenticate": "Autentica",
+    "im authenticated": "Sono autenticato!",
+    "dismissed": "rimosso in {{value}}s",
+    "Send feedback": "Invia feedback",
+    "reload": "ricarica",
+    "Options": "Opzioni"
+  },
+  "bug report": {
+    "give feedback": "Fornisci un feedback",
+    "description": "Per favore, dicci cosa pensi di OCTRA. Cosa potrebbe essere migliorato? Hai riscontrato problemi?",
+    "sent": "Il tuo feedback è stato inviato con successo 🙂",
+    "error": "Sfortunatamente, il tuo feedback non può essere inviato. Per favore, invia una mail a {{email}}.",
+    "send protocol": "Aggiungi protocollo (raccomandato)"
+  },
+  "transcription": {
+    "start": "Continua trascrizione",
+    "new": "Inizia nuova trascrizione",
+    "finish": "Finisci trascrizione",
+    "stop": "Ferma trascrizione",
+    "check": "Controlla trascrizione",
+    "send": "Invia trascrizione",
+    "complete": "Completa Trascrizione",
+    "invalid": "Solo le trascrizioni valide sono accettate. Per favore, correggi la tua trascrizione.",
+    "no prompttext": "Il testo prompt non può essere mostrato."
+  },
+  "segments": {
+    "total": "Unità di trascrizione totali",
+    "transcribed": "Unità di trascrizione",
+    "with breaks": "Unità di trascrizione silenti",
+    "not transcribed": "Unità di trascrizione vuote",
+    "previous": "unità di trascrizione precedente",
+    "next": "unità di trascrizione successiva"
+  },
+  "feedback": {
+    "unintelligible": "incomprensibile",
+    "less intelligible": "quasi incomprensibile",
+    "intelligible": "comprensibile",
+    "very good intelligible": "comprensibilità molto buona",
+    "quality of signal": "Qualità del segnale",
+    "a lot of noises": "segnale molto rumoroso",
+    "few noises": "rumore nel segnale",
+    "very few noises": "segnale poco rumoroso",
+    "no noises": "segnale pulito"
+  },
+  "interfaces": {
+    "simple editor": "Editor del Dittafono",
+    "linear editor": "Editor Lineare",
+    "2D editor": "Editor 2D"
+  },
+  "modal": {
+    "transcription": {
+      "delete": {
+        "header": "Crea una nuova trascrizione?",
+        "text": "Vuoi davvero eliminare la precedente trascrizione e crearne una nuova?<br><br>I tuoi progressi sulla precedente trascrizione saranno eliminati. Quest'azione è irreversibile.",
+        "delete old": "Elimina trascrizione precedente"
+      },
+      "stop": {
+        "header": "Ferma trascrizione",
+        "text": "Vuoi davvero fermare la trascrizione?<br><br>Il tuo lavoro è stato salvato nel browser. Se vuoi continuare più tardi non eliminare la cache e riapri l'applicazione nello stesso browser (la cache non è condivisa con altri browser)."
+      },
+      "send": {
+        "header": "Invia trascrizione",
+        "text": "Cliccando su 'Invia ora' invierai i tuoi dati al server per salvarli. Non potrai più cambiare i tuoi dati dopo quest'azione."
+      },
+      "sending": {
+        "header": "Invia trascrizione ora...",
+        "text": "I tuoi risultati saranno trasmessi al server... Per favore, attendi la fine della trasmissione."
+      },
+      "demoEnd": {
+        "header": "Modalità Demo",
+        "text": "Al momento stai usando la Modalità Demo. <br/><br/>Clicca su...<ul><li>\"Continua\" per ricaricare il file audio corrente. Il tuo input sarà eliminato e la trasmissione della trascrizione sarà simulata.</li><li>\"Esci\" per abbandonare OCTRA. Il tuo input sarà eliminato.</li><li>\"Indietro\" per continuare la trascrizione.</li></ul>",
+        "exportText": "Puoi esportare la tua trascrizione cliccando su \"Indietro\" e poi su \"Esporta\":"
+      }
+    },
+    "login": {
+      "header": "Accesso fallito",
+      "text": "Per favore controlla il tuo nome utente e la tua password"
+    },
+    "supported": {
+      "header": "Formati file supportati in modalità locale",
+      "audio files": "File audio",
+      "file formats for import": "Formati file per importazione"
+    },
+    "shortcuts": {
+      "play pause": "Play / Pausa",
+      "stop playback": "Ferma Playback",
+      "step backward": "Salta all'ultima posizione",
+      "step backward time": "Salta indietro nel tempo",
+      "set segment": "Apri finestra di trascrizione",
+      "set break": "Segna l'unità di trascrizione come silenzio",
+      "play selection": "Riproduci selezione",
+      "transcribe segment": "Unità di trascrizione",
+      "move cursor left": "Muovi cursore a sinistra",
+      "move cursor right": "Muovi cursore a destra",
+      "audioplayer": "Scorciatoie player audio",
+      "top signaldisplay": "Scorciatoie del display segnale in alto",
+      "down signaldisplay": "Scorciatoie del display segnale in basso",
+      "2D-Editor": "Scorciatoie dell'editor 2D",
+      "play audio on hover": "Riproduci l'audio al passaggio del mouse",
+      "jump_last_segment": "Salva & vai all'unità di trascrizione precedente",
+      "jump_next_segment": "Salva & vai all'unità di trascrizione successiva",
+      "close_save": "Salva & chiudi finestra",
+      "delete boundaries": "Elimina i confini e unisci le unità di trascrizione",
+      "general shortcuts": "Scorciatoie generali",
+      "feedback and send 1": "Invia trascrizione con una stella",
+      "feedback and send 2": "Invia trascrizione con due stelle",
+      "feedback and send 3": "Invia trascrizione con tre stelle",
+      "do asr": "Lancia ASR sull'unità di trascrizione selezionata",
+      "do asr maus": "Lancia ASR e segmentazione MAUS sull'unità di trascrizione selezionata",
+      "do maus only": "Applica allineamento per parola sull'unità di trascrizione selezionata usando MAUS"
+    },
+    "inactivity": {
+      "header": "Assenza più lunga rilevata",
+      "body": "Sei stato assente per almeno {{value}} minuti senza concludere OCTRA. Si raccomanda di abbandonare OCTRA in caso di assenza prolungata. Se non prosegui nella trascrizione al momento, puoi abbandonare OCTRA adesso. Vuoi abbandonare?",
+      "new": "Inizia nuova trascrizione",
+      "continue": "Continua trascrizione",
+      "quit": "Abbandona OCTRA"
+    },
+    "missing permissions": {
+      "header": "Permessi mancanri",
+      "description": "OCTRA ha rilevato l'assenza dei permessi per riprodurre l'audio. Per continuare, devi garantire ad OCTRA i permessi di riproduzione. Segui i seguenti tre step e clicca su \"RICARICA\" alla fine di questa finestra.",
+      "step1": "Clicca sulla finestra di riproduzione collassata sulla sinistra della barra degli indirizzi.",
+      "step2": "Clicca sul bottone vicino ad 'Autoplay'.",
+      "step3": "Clicca su \"Consenti Audio e Video\".",
+      "step4": "Clicca sul bottone \"RICARICA\" in basso."
+    }
+  },
+  "login": {
+    "online mode": "Modalità Online",
+    "online mode disabled": "La modalità online è al momento inattiva. Per favore, usa OCTRA in modalità locale.",
+    "online mode description": "Nella modalità online puoi ottenere automaticamente file audio per la trascrizione.",
+    "local mode": "Modalità locale.",
+    "local mode description": "In modalità locale puoi trascrivere file audio dal tuo computer. I tuoi dati non saranno caricati su un server.",
+    "old file found": "Ci sono dati disponibili da una trascrizione precedente. Se vuoi continuare il tuo lavoro, trascina e rilascia il seguente file nell'area grigia: <br/><br/>{{file_label}}",
+    "online mode data warning": "Ci sono dati locali disponibili creati in modalità locale. Se vuoi continuare in modalità online questi dati saranno sovrascritti.",
+    "offline mode data warning": "Ci sono dati locali disponibili che sono stati creati in modalità online. Se vuoi continuare in modalità locale questi dati saranno sovrascritti.",
+    "online mode continue": "Dati precedenti trovati! Per continuare assicurati di selezionare i dati di accesso: {{member_id}} , {{member_project}}, {{member_jobno}}",
+    "last used": "usato di recente",
+    "login and remove": "Rimuovi dati della modalità locale & accedi",
+    "local and remove": "Rimuovi dati della modalità online & continua",
+    "demo": "Clicca qui per usare OCTRA su un file audio di default (demo)",
+    "api not available": "Il server non è al momento disponibile. Per favore, prova di nuovo più tardi. Se questo messaggio appare ancora dopo 4 ore invia una segnalazione tramite il modulo feedback."
+  },
+  "dropzone": {
+    "drag&drop here": "Trascine & Rilascia il file audio (*.wav) (+ il file opzionale per l'importazione) qui o clicca qui.",
+    "file selected": "{{file_label}} selezionato"
+  },
+  "browser": {
+    "invalid": "<b>Il tuo browser non è compatibile</b>. Per favore, usa uno di questi browser:",
+    "small window width": "<b>La larghezza della finestra è troppo piccola.</b> Per favore, aumenta la larghezza della finestra per risolvere questo messaggio."
+  },
+  "reload-file": {
+    "header": "Ricarica file audio.",
+    "text": "Questa applicazione è stata chiusa o ricaricata. Per favore, seleziona di nuovo lo stesso file audio. Potrai poi proseguire con il tuo lavoro.",
+    "file not supported": "Il tipo di file è '{{type}}' non è supportato.",
+    "another file selected": "Un altro file è stato selezionato. Per favore, selezione lo stesso file o inizia una nuova trascrizione. Richiesto: '{{file}}'"
+  },
+  "logout": {
+    "successful text": "Ti sei disconnesso con successo.",
+    "login again": "Ripeti l'accesso"
+  },
+  "signal-gui": {
+    "selection text": "Per favore seleziona una parte del segnale usando il mouse: Clicca e trascina il tasto sinistro del mouse e mantienilo premuto mentre muovi il cursore alla posizione finale.",
+    "segment enter text": "Per favore seleziona un'unità di trascrizione spostando il cursore su di essa e premendo il tasto {{value}}."
+  },
+  "transcription-submit": {
+    "overview": "La prossima tabella mostra un'anteprima delle unità di trascrizione.",
+    "form fill out": "Per favore, riempi il modulo",
+    "intelligibility of the speaker": "Incomprensibilità del parlante",
+    "comment description": "Commento breve (Note sulla procedura, tempi di attesa, problematiche ecc.)"
+  },
+  "segment invisible": "Quest'unità di trascrizione deve essere visibile per riprodurre l'audio contenuto al suo interno",
+  "boundary cannot delete": "Impossibile eliminare il confine perché vi sono unità di trascrizione confinanti che sono già trascritte.",
+  "boundary cannot set": "Impossibile selezionare un confine in un'unità di trascrizione già trascritta.",
+  "send error": "Si è verificato un errore. Per favore, ricarica questa pagine e riprova!",
+  "transcription submitted": {
+    "no jobs left": "Nessun lavoro disponibile rimasto",
+    "transcription sent": "La trascrizione è stata trasmessa",
+    "transcription sent successfully": "La tua trascrizione è stata trasmessa con successo.",
+    "want to do": "Cosa ti piacerebbe fare?",
+    "quit": "Esci e disconnettiti",
+    "next transcription": "Vai alla prossima trascrizione"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "Segnale di ritaglio",
+      "description": "Dopo aver selezionato la posizione del playback nell'audio player o nel display del segnale con questo puoi inserire un segnale di ritaglio alla posizione del testo."
+    }
+  },
+  "settings": {
+    "easy mode": "Modalità Facile",
+    "play on hover": "Riproduci sul cursore",
+    "follow playcursor": "Segui il cursore di riproduzione",
+    "logging": "Azioni utenti registrati",
+    "show loupe": "Mostra lente di ingrandimento",
+    "seconds per line": "Secondi per riga"
+  },
+  "custom": {
+    "table configurator": {
+      "name": "Configuratore della tabella",
+      "description": "Questo strumento ti consente di creare il tuo formato di tabella.",
+      "add column": "Aggiungi colonna",
+      "divider": "Divisore",
+      "add header": "Aggiungi intestazione alla tabella",
+      "generate table": "Genera tabella",
+      "include line numbers": "includi numero delle righe",
+      "time format": "formato del tempo"
+    }
+  },
+  "tools": {
+    "cut audio": {
+      "name": "Taglia file audio",
+      "description": "Questo strumento permette di tagliare il file audio in sequenze in base alle unità di trascrizione.",
+      "append meta files": "Aggiungi meta files",
+      "add placeholder": "Aggiungi segnaposto",
+      "hide configurator": "Nascondi configuratore",
+      "show configurator": "Mostra configuratore"
+    },
+    "combine phrases": {
+      "name": "Combina Frasi",
+      "warning": "Il limite di parole è possibile solo se questo strumento è applicato ad un'annotazione con la segmentazione in parole. Dopo l'uso di questo strumento, non puoi ripristinare il risultato.",
+      "description": "Con questo strumento le frasi comprese fra silenzi sono combinate così da unire unità di trascrizione breve. Le unità di trascrizione che contengono silenzio più brevi di una certa durata.",
+      "hide settings": "Nascondi impostazioni",
+      "show settings": "Mostra impostazioni",
+      "minimal silence desc": "Tutte le unità di trascrizione contenenti silenzio sono ignorate se la loro durata è più lunga di questo valore.",
+      "minimal silence": "Durata minima del silenzio.",
+      "maximal words": "Numero massimo di parole.",
+      "maximal words desc": "Dopo la fusione tutte le unità di trascrizione conterranno un numero massimo di parole. (Funziona solo se ogni segmento contiene solo una parola). Un valore di 0 significa che non è impostato alcun limite."
+    },
+    "alerts": {
+      "done": "Lo strumento '{{value}}' è stato applicato con successo."
+    }
+  },
+  "asr": {
+    "without asr": "Nessun ASR",
+    "file too big": "L'ASR supporta solo sequenze audio con durata massima di 10 minuti. Le unità di trascrizione inferiori saranno tralasciate.",
+    "click on logo": "Clicca sul logo di un servizio per ulteriori informazioni.",
+    "start this segment": "Inizia solo per questa unità di trascrizione.",
+    "start for all next": "Inizia per questa e tutte le successive unità di trascrizione.",
+    "stop this segment": "Ferma solo per questa unità di trascrizione.",
+    "stop for all next": "Ferma per questa e per tutte le successive unità a seguire",
+    "stop all": "Ferma per tutte le unità di trascrizione",
+    "asr running": "L'ASR è attualmente in atto. Se vuoi fermare l'ASR per questa trascrizione, clicca qui.",
+    "no asr selected": "Prego, seleziona le opzioni ASR prima di usare la scorciatoia.",
+    "no quota": "Nessuna quota rimanente. Per favore, usa un altro provider ASR.",
+    "no auth": "Autenticazione richiesta per continuare la trascrizione.",
+    "maus empty text": "L'unità di trascrizione selezionata non contiene testo o contiene meno di due parole.",
+    "error": "Si è verificato un errore. Per favore, inviaci un breve feedback in modo da consentirci di risolverlo."
+  },
+  "alerts": {
+    "authentication needed": "Per favore autenticati in modo da usare funzionalità come l'ASR o l'allineamento per parola. Dopo aver cliccato su \"Autenticati\" si aprirà una finestra separata. Se non si apre alcuna finestra, assicurati di avere i popup attivati nel tuo browser.",
+    "need playback": "Devi attivare il playback almeno una volta prima di sottoporre la trascrizione."
+  },
+  "authentication": {
+    "you are authenticated": "Sei autenticato!",
+    "window closed": "Questa finestra sarà automaticamente chiusa in {{seconds}} secondi.",
+    "description": "Chiudi questa finestra e clicca \"Sono autenticato!\" in OCTRA per confermare l'autenticazione. Dopo questo, il processo automatico continuerà."
+  },
+  "export": {
+    "meta data": {
+      "description": "Scarica i metadati registrati mentre la tua trascrizione prosegue. (Disponibili solo quando l'accesso è abilitato nel menu delle impostazioni)."
+    },
+    "options": {
+      "add timestamps": "Separa le unità di trascrizione con marcature temporali leggibili (HH:MM:SS.s)",
+      "add samplepoints": "Separa le unità di trascrizione con punti di campionamento (e.g. 123456)",
+      "timestamp notice": "Se spunti entrambi le opzioni, entrambi i formati temporali saranno inseriti:"
+    }
+  },
+  "maintenance": {
+    "banner": "Da <b>{{start}}</b> fino a <b>{{end}}</b> (previsto) è programmato un aggiornamento.<br/>In questo lasso di tempo, OCTRA non sarà disponibile. Per favore, assicurati di non usare OCTRA in questo lasso di tempo.",
+    "in app": "Da <b>{{start}}</b> fino a <b>{{end}}</b> (previsto) è programmato un aggiornamento.<b>Per favore, assicurati di lasciare OCTRA 15 minuti prima l'inizio dell'aggiornamento."
+  }
+}

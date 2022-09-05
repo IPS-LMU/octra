@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "English"
+  },
   "general": {
     "name": "Name",
     "abort": "Abort",
@@ -48,7 +51,7 @@
     "no": "No",
     "errors found": "({{errors}}) errors found",
     "no errors found": "No errors found",
-    "segment": "Segment",
+    "segment": "Transcription unit",
     "job number": "Job number",
     "free jobs": "Free Jobs",
     "email": "Email",
@@ -89,7 +92,7 @@
     "File extension": "File extension",
     "tools": "Tools",
     "custom formats": "Custom formats",
-    "meta data": "Mata data",
+    "meta data": "Meta data",
     "manual": "Manual",
     "authenticate": "Authenticate",
     "im authenticated": "I'm authenticated!",
@@ -100,7 +103,7 @@
   },
   "bug report": {
     "give feedback": "Give feedback",
-    "description": "Please tell us what you are thinking about OCTRA. What can we do better? Did you find any bugs?",
+    "description": "Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?",
     "sent": "Your feedback was successfully reported \uD83D\uDE42",
     "error": "Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.",
     "send protocol": "Add Protocol (recommended)"
@@ -117,23 +120,23 @@
     "no prompttext": "The prompt text can not be shown."
   },
   "segments": {
-    "total": "Total segments",
-    "transcribed": "Transcribed segments",
-    "with breaks": "Segments with breaks",
-    "not transcribed": "Segments without content",
-    "previous": "previous segment",
-    "next": "next segment"
+    "total": "Total transcription units",
+    "transcribed": "Transcribed units",
+    "with breaks": "Silent transcription units",
+    "not transcribed": "Empty transcription units",
+    "previous": "previous transcription unit",
+    "next": "next transcription unit"
   },
   "feedback": {
     "unintelligible": "unintelligible",
-    "less intelligible": "less intelligible",
+    "less intelligible": "almost unintelligible",
     "intelligible": "intelligible",
     "very good intelligible": "very good intelligibility",
     "quality of signal": "Quality of signal",
-    "a lot of noises": "a lot of noises",
-    "few noises": "few noises",
-    "very few noises": "very few noises",
-    "no noises": "no noises"
+    "a lot of noises": "very noisy signal",
+    "few noises": "some noise in the signal",
+    "very few noises": "low noise in the signal",
+    "no noises": "clean signal"
   },
   "interfaces": {
     "simple editor": "Dictaphone Editor",
@@ -144,16 +147,16 @@
     "transcription": {
       "delete": {
         "header": "Create a new transcription?",
-        "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
+        "text": "Do you really want to delete the previous transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
         "delete old": "Delete previous transcription"
       },
       "stop": {
         "header": "Stop Transcription",
-        "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later do not delete the browser cache and revisit the application in the same browser (a browser's cache is not shared with other browsers)."
+        "text": "Do you really want to stop the transcription?<br><br>Your work has been saved in your Browser. If you want to continue later do not delete the browser cache and revisit the application in the same browser (a browser's cache is not shared with other browsers)."
       },
       "send": {
         "header": "Send transcription",
-        "text": "Clicking on 'Send now' will send your data to the Server to save it. After this, you can not change your data."
+        "text": "Clicking on 'Send now' will send your data to the Server to save it. You can not change your data after this."
       },
       "sending": {
         "header": "Send transcription now...",
@@ -161,7 +164,7 @@
       },
       "demoEnd": {
         "header": "Demo Mode",
-        "text": "You are currently using the Demo Mode. <br/><br/>Click on...<ul><li>\"Continue\" in order to reload the current audio file. The proceedings will be deleted and the transmission of the transcript will be simulated.</li><li>\"Quit\" in order to quit OCTRA. The proceedings will be deleted.</li><li>\"Back\" in order to continue the transcription.</li></ul>",
+        "text": "You are currently using the Demo Mode. <br/><br/>Click on...<ul><li>\"Continue\" in order to reload the current audio file. Your input will be deleted and the transmission of the transcript will be simulated.</li><li>\"Quit\" in order to quit OCTRA. Your input will be deleted.</li><li>\"Back\" in order to continue the transcription.</li></ul>",
         "exportText": "You can export your transcript if you click on \"Back\" and then on \"Export\":"
       }
     },
@@ -180,9 +183,9 @@
       "step backward": "Jump to the last position",
       "step backward time": "Jump back in time",
       "set segment": "Open transcription window",
-      "set break": "Mark segment as break",
+      "set break": "Mark transcription unit as silence",
       "play selection": "Play selection",
-      "transcribe segment": "Transcribe segment",
+      "transcribe segment": "Transcribe unit",
       "move cursor left": "Move cursor to the left",
       "move cursor right": "Move cursor to the right",
       "audioplayer": "Audioplayer shortcuts",
@@ -190,21 +193,21 @@
       "down signaldisplay": "Shortcuts of the signal display on the bottom",
       "2D-Editor": "Shortcuts of the 2D-Editor",
       "play audio on hover": "Play audio on hover",
-      "jump_last_segment": "Save & jump to previous segment",
-      "jump_next_segment": "Save & jump to next segment",
+      "jump_last_segment": "Save & jump to previous transcription unit",
+      "jump_next_segment": "Save & jump to next transcription unit",
       "close_save": "Save & close window",
-      "delete boundaries": "Delete selected segment boundaries and join transcripts",
+      "delete boundaries": "Delete selected boundaries and join transcription units",
       "general shortcuts": "General shortcuts",
-      "feedback and send 1": "Send transcription with one star",
-      "feedback and send 2": "Send transcription with two stars",
-      "feedback and send 3": "Send transcription with three stars",
-      "do asr": "Apply ASR on selected segment",
-      "do asr maus": "Apply ASR & MAUS segmentation on the selected segment",
-      "do maus only": "Apply word-alignment on the selected segment using MAUS"
+      "feedback and send 1": "Send transcript with one star",
+      "feedback and send 2": "Send transcript with two stars",
+      "feedback and send 3": "Send transcript with three stars",
+      "do asr": "Apply ASR on selected transcription unit",
+      "do asr maus": "Apply ASR & MAUS segmentation on the selected transcription unit",
+      "do maus only": "Apply word-alignment on the selected transcription unit using MAUS"
     },
     "inactivity": {
       "header": "Longer absence detected",
-      "body": "You were absent for at least {{value}} minutes without finishing OCTRA. It is recommended to exit OCTRA if longer absence is predictable. If you do not continue the transcription at the moment you can quit OCTRA now. What Do you want to do?",
+      "body": "You were absent for at least {{value}} minutes without finishing OCTRA. It is recommended to exit OCTRA if longer absence is predictable. If you do not continue the transcription at the moment you can quit OCTRA now. What do you want to do?",
       "new": "Start new transcription",
       "continue": "Continue transcription",
       "quit": "Quit OCTRA"
@@ -254,17 +257,17 @@
   },
   "signal-gui": {
     "selection text": "Please select a part of signal using the mouse: Click and hold the left mouse button and hold it while moving the cursor to the end position.",
-    "segment enter text": "Please select a segment by hovering over it and pressing the {{value}} key."
+    "segment enter text": "Please select a transcription unit by hovering over it and pressing the {{value}} key."
   },
   "transcription-submit": {
-    "overview": "The next table shows an overview about your defined segments:",
+    "overview": "The next table shows an overview of the transcription units:",
     "form fill out": "Please fill out the form",
     "intelligibility of the speaker": "Intelligibility of the speaker",
     "comment description": "Short comment (Notes about workflows, waiting times, issues etc.)"
   },
-  "segment invisible": "This segment has to be visible to play the audio contained within it",
-  "boundary cannot delete": "Cannot delete boundary because there are neighboring segments that are already transcribed.",
-  "boundary cannot set": "Cannot set boundary in a segments that is already transcribed.",
+  "segment invisible": "This transcription unit has to be visible to play the audio contained within it",
+  "boundary cannot delete": "Cannot delete boundary because there are neighboring transcription units that are already transcribed.",
+  "boundary cannot set": "Cannot set boundary in a transcription unit that is already transcribed.",
   "send error": "An error occurred. Please reload this page and try again!",
   "transcription submitted": {
     "no jobs left": "No available jobs left",
@@ -303,7 +306,7 @@
   "tools": {
     "cut audio": {
       "name": "Cut audio file",
-      "description": "This tool offers to cut the audio file to sequences depending on the created segments.",
+      "description": "This tool offers to cut the audio file to sequences from the transcription units.",
       "append meta files": "Append meta files",
       "add placeholder": "Add placeholder",
       "hide configurator": "Hide configurator",
@@ -312,13 +315,13 @@
     "combine phrases": {
       "name": "Combine Phrases",
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After the use of this tool, you can not revert the result.",
-      "description": "With this tool phrases between silence are combined in order to reduce short segments. Segments that contain silence, which is smaller than a specific length, are merged with their neighbours.",
+      "description": "With this tool phrases between silence are combined in order to reduce short transcription units. Transcription units containing silence shorter than a gven duration are merged with their neighbours.",
       "hide settings": "Hide settings",
       "show settings": "Show settings",
-      "minimal silence desc": "All segments that contain silence are ignored if their duration are bigger than this value.",
+      "minimal silence desc": "All transcription units containing silence are ignored if their duration is longer than this value.",
       "minimal silence": "Minimal length of silence",
       "maximal words": "Maximal number of words",
-      "maximal words desc": "After the merge all segments will contain a maximal number of words. (Works only if each segment contains only one word). A value of 0 means that there is no limitation."
+      "maximal words desc": "After the merge all transcription units will contain a maximal number of words. (Works only if each segment contains only one word). A value of 0 means that there is no limitation."
     },
     "alerts": {
       "done": "Tool '{{value}}' was applied sucessfully."
@@ -326,18 +329,18 @@
   },
   "asr": {
     "without asr": "No ASR",
-    "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes. Affected segments were skipped.",
+    "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes. Affected transcription units were skipped.",
     "click on logo": "Click on a service logo for further information.",
-    "start this segment": "Start it only for this segment",
-    "start for all next": "Start it for this and all segments coming next",
-    "stop this segment": "Stop it for this segment only",
-    "stop for all next": "Stop it for this one and all segments coming next",
-    "stop all": "Stop it for all segments",
-    "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here.",
+    "start this segment": "Start it only for this transcription unit",
+    "start for all next": "Start it for this and all subsequent transcription units",
+    "stop this segment": "Stop it for this transcription unit only",
+    "stop for all next": "Stop it for this one and all transcription unit coming next",
+    "stop all": "Stop it for all transcription units",
+    "asr running": "ASR is currently running. If you want to stop ASR for this transcription unit, click here.",
     "no asr selected": "Please select ASR options before using the shortcut.",
     "no quota": "No quota left. Please use another ASR provider.",
     "no auth": "Authentication needed for further transcription.",
-    "maus empty text": "The selected segment does not contain any text or less than two words.",
+    "maus empty text": "The selected transcription unit does not contain any text or less than two words.",
     "error": "An error occurred. Please send us a short feedback for the error to be fixed."
   },
   "alerts": {
@@ -354,8 +357,8 @@
       "description": "Download the meta data that was logged while your transcription progress. (Only available when logging was enabled in the settings menu)."
     },
     "options": {
-      "add timestamps": "Separate segments by readable timestamps (HH:MM:SS.s)",
-      "add samplepoints": "Separate segments by sample points (e.g. 123456)",
+      "add timestamps": "Separate transcription units by readable timestamps (HH:MM:SS.s)",
+      "add samplepoints": "Separate transcription units by sample points (e.g. 123456)",
       "timestamp notice": "If you check both options, both time formats will be inserted:"
     }
   },

@@ -48,7 +48,7 @@
     "no": "Nein",
     "errors found": "({{errors}}) Fehler gefunden",
     "no errors found": "Keine Fehler gefunden",
-    "segment": "Segment",
+    "segment": "Transkriptionseinheit",
     "job number": "Aufgabennummer",
     "free jobs": "Freie Aufgaben",
     "email": "Email",
@@ -117,12 +117,12 @@
     "no prompttext": "Der Vorlagentext kann nicht angezeigt werden."
   },
   "segments": {
-    "total": "Segmente insgesamt",
-    "transcribed": "Segmente transkribiert",
-    "with breaks": "Segmente mit Pausen",
-    "not transcribed": "Segmente ohne Inhalt",
-    "previous": "vorheriges Segment",
-    "next": "nächstes Segment"
+    "total": "Transkriptionseinheiten insgesamt",
+    "transcribed": "Einheiten transkribiert",
+    "with breaks": "Einheiten mit Pausen",
+    "not transcribed": "Einheiten ohne Inhalt",
+    "previous": "vorherige Transkriptionseinheit",
+    "next": "nächste Transkriptionseinheit"
   },
   "feedback": {
     "unintelligible": "unverständlich",
@@ -179,8 +179,8 @@
       "stop playback": "Wiedergabe beenden",
       "step backward": "Zur zuletzt pausierten Stelle springen",
       "step backward time": "Zeitversetzt zurückspringen",
-      "set segment": "Segmentgrenze setzen",
-      "set break": "Segment als Pause markieren",
+      "set segment": "Grenze setzen",
+      "set break": "Transkriptionseinheit als Pause markieren",
       "play selection": "Selektion abspielen",
       "transcribe segment": "Transkriptionsfenter öffnen",
       "move cursor left": "Cursor nach links bewegen",
@@ -190,21 +190,21 @@
       "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
       "2D-Editor": "Tastenkombinationen des 2D-Editors",
       "play audio on hover": "Audio mit Mausbewegung abspielen",
-      "jump_last_segment": "Speichern & zum vorherigen Segment springen",
-      "jump_next_segment": "Speichern & zum nächsten Segment springen",
+      "jump_last_segment": "Speichern & zur vorherigen Einheit springen",
+      "jump_next_segment": "Speichern & zur nächsten Einheit springen",
       "close_save": "Speichern & Fenster schließen",
-      "delete boundaries": "Ausgewählte Segmentgrenzen entfernen und Transkript zusammenführen",
+      "delete boundaries": "Ausgewählte Grenzen entfernen und Transkript zusammenführen",
       "general shortcuts": "Allgmeneine Tastenkombinationen",
-      "feedback and send 1": "Transcription mit einem Stern senden",
-      "feedback and send 2": "Transcription mit zwei Sternen senden",
-      "feedback and send 3": "Transcription mit drei Sternen senden",
-      "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
-      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen",
-      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)"
+      "feedback and send 1": "Transkript mit einem Stern senden",
+      "feedback and send 2": "Transkript mit zwei Sternen senden",
+      "feedback and send 3": "Transkript mit drei Sternen senden",
+      "do asr": "Ausgewählte Transkriptionseinheit von ASR verarbeiten lassen",
+      "do asr maus": "Ausgewähte Transkriptionseinheit von ASR & MAUS segmentieren lassen",
+      "do maus only": "Ausgewählte Transkriptionseinheit mit MAUS verarbeiten (Wort-Segmentierung)"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
-      "body": "Du warst seit mindestens {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorrausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
+      "body": "Du warst seit mindestens {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
       "new": "Neue Transkription beginnen",
       "continue": "Transkription fortsetzen",
       "quit": "OCTRA beenden"
@@ -214,7 +214,7 @@
       "description": "OCTRA hat nicht die Berechtigung Audio abszuspielen. Damit Du OCTRA weiter nutzen kannst, musst Du diese Berechtigung erteilen. Führe die folgenden Schritte aus und klicke anschließend auf die \"NEU LADEN\" Schaltfläche am Ende dieses Fensters.",
       "step1": "Klicke auf das durchgestrichene Play-Symbol links der Adresszeile.",
       "step2": "Klicke auf die Schaltfläche rechts von \"Autoplay\".",
-      "step3": "Klicke aud \"Audio und Video erlauben\".",
+      "step3": "Klicke auf \"Audio und Video erlauben\".",
       "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
     }
   },
@@ -254,17 +254,17 @@
   },
   "signal-gui": {
     "selection text": "Bitte wählen Sie mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicken Sie mit der linken Maustaste an eine gewünschte Position, halten Sie diese gedrückt und ziehen Sie den Mauszeiger bis zur Endposition.",
-    "segment enter text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
+    "segment enter text": "Bitte wählen Sie eine Transkriptionseinheit aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit": {
-    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
+    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Einheiten:",
     "form fill out": "Bitte füllen Sie kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
   },
-  "segment invisible": "Das Segment muss sichtbar sein, um es abspielen zu können",
-  "boundary cannot delete": "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden",
-  "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden",
+  "segment invisible": "Die Transkriptionseinheit muss sichtbar sein, um sie abspielen zu können",
+  "boundary cannot delete": "Die Grenze kann nicht gelöscht werden, da daran angrenzende Transkriptionseinheiten bereits transkribiert wurden",
+  "boundary cannot set": "Die Grenze kann nicht innerhalb einer trankribierten Transkriptioneinheit gesetzt werden",
   "send error": "Es ist ein Fehler aufgetreten. Lade diese Seite mit ihrem Browser noch einmal und versuche es erneut",
   "transcription submitted": {
     "no jobs left": "Keine freien Aufgaben verfügbar",
@@ -276,8 +276,8 @@
   },
   "special_markers": {
     "boundary": {
-      "insert": "Segmentgrenze",
-      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Segmentgrenze eingefügt werden."
+      "insert": "Grenze",
+      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Grenze eingefügt werden."
     }
   },
   "settings": {
@@ -303,7 +303,7 @@
   "tools": {
     "cut audio": {
       "name": "Audiodatei schneiden",
-      "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Segmentgrenzen geschnitten werden.",
+      "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Grenzen geschnitten werden.",
       "append meta files": "Meta Dateien hinzufügen",
       "add placeholder": "Platzhalter hinzufügen",
       "hide configurator": "Verstecke den Konfigurator",
@@ -312,13 +312,13 @@
     "combine phrases": {
       "name": "Kombiniere Phrasen",
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat nicht rückgängig gemacht werden.",
-      "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Segmente entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
+      "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Transkriptionseinheiten entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
       "hide settings": "Verstecke die Einstellungen",
       "show settings": "Zeige die Einstellungen",
       "minimal silence": "Minimale Pausenlänge (ms)",
       "minimal silence desc": "Alle Pausen, deren Länge größer oder gleich dem angegebenen Wert sind, werden nicht zusammengeführt.",
       "maximal words": "Maximale Anzahl an Wörtern",
-      "maximal words desc": "Die Segmente werden so zusammengeführt, dass ein Segment eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert."
+      "maximal words desc": "Die Transkriptionseinheiten werden so zusammengeführt, dass eine Einheit eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert."
     },
     "alerts": {
       "done": "Das Werkzeug '{{value}}' wurde erfolgreich angewendet."
@@ -326,19 +326,18 @@
   },
   "asr": {
     "without asr": "Ohne ASR",
-    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen.",
+    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Transkiptionseinheiten wurden übersprungen.",
     "click on logo": "Klicke für weitere Informationen auf ein Logo.",
-    "start this segment": "Verarbeite nur dieses Segment",
-    "start for all next": "Verarbeite alle folgende Segmente",
-    "stop this segment": "Beende Verarbeitung für dieses Segment",
-    "stop for all next": "Beende Verarbeitung für dieses und für alle folgende Segmente",
-    "stop all": "Beende Verarbeitung für alle Segmente",
-    "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
+    "start this segment": "Verarbeite nur diese Transkriptionseinheit",
+    "start for all next": "Verarbeite alle folgenden Einheiten",
+    "stop this segment": "Beende Verarbeitung für diese Einheit",
+    "stop for all next": "Beende Verarbeitung für dieses und für alle folgenden Einheiten",
+    "stop all": "Beende Verarbeitung für alle Einheiten",
+    "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für diese Transkriptionseinheit abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
     "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
-    "maus empty text": "Das ausgewählte Segment enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
-    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
+    "maus empty text": "Die ausgewählte Transkriptionseinheit enthält keinen Text oder der Text enthält weniger als zwei Wörter."
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
@@ -354,13 +353,13 @@
       "description": "Lade die Daten herunter, die während deiner Transkription aufgezeichnet wurden. (Nur verfügbar, wenn die Protokollierung in den Einstellungen aktiviert wurde)."
     },
     "options": {
-      "add timestamps": "Trenne Segmente durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
-      "add samplepoints": "Trenne Segmente durch Zeitstempel im Sample-Format (z.B. 123456)",
+      "add timestamps": "Trenne Transkriptionseinheiten durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
+      "add samplepoints": "Trenne Transkriptionseinheiten durch Zeitstempel im Sample-Format (z.B. 123456)",
       "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
     }
   },
   "maintenance": {
-    "banner": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
-    "in app": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
+    "banner": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
+    "in app": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
   }
 }

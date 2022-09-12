@@ -23,6 +23,7 @@ import {
   faVolumeDown,
   faVolumeUp
 } from '@fortawesome/free-solid-svg-icons';
+import {faGithub} from '@fortawesome/free-brands-svg-icons';
 
 
 @NgModule({
@@ -64,6 +65,6 @@ import {
 })
 export class MediaComponentsModule {
   constructor(library: FaIconLibrary) {
-    library.addIcons(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
+    library.addIcons(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown, faGithub);
   }
 }

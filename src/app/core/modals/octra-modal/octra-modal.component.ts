@@ -20,6 +20,8 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   @ViewChild('bugreport', {static: true}) bugreport: BsModalRef;
   @ViewChild('supportedfiles', {static: true}) supportedfiles: BsModalRef;
   @ViewChild('yesno', {static: true}) yesno: BsModalRef;
+  @ViewChild('about', {static: true}) about: BsModalRef;
+
   public bgdescr = '';
   public bgemail = '';
   public sendproObj = true;

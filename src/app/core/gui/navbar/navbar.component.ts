@@ -274,4 +274,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.secondsPerLine = seconds.toString();
     this.appStorage.secondsPerLine = seconds;
   }
+
+  openAboutModal() {
+    this.modService.show('about');
+  }
 }

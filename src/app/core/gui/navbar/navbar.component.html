@@ -6,13 +6,15 @@
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
 <nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;" *ngIf="navbarServ.showNavbar">
-  <a class="navbar-brand" href="#" [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')">OCTRA
+  <span class="navbar-brand" href="#" style="cursor:pointer;"
+        [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')"
+        (click)="openAboutModal()">OCTRA
     v{{version}}
     <ng-container
       *ngIf="appStorage.usemode !== undefined && appStorage.usemode !== null">
       ({{appStorage.usemode}})
     </ng-container>
-  </a>
+  </span>
   <div class="d-block d-md-none" *ngIf="environment.dev_version" style="color:red;"><b>in development</b></div>
   <div class="d-block d-md-none" *ngIf="environment.beta_version" style="color:red;"><b>BETA</b></div>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -36,6 +38,16 @@
       <li class="nav-item">
         <a class="nav-link" href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/" target="_blank">
           {{"general.manual"| transloco}}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/IPS-LMU/octra" target="_blank">
+          <fa-icon [icon]="['fab', 'github']"></fa-icon> Github
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="openAboutModal()">
+          {{"general.about"| transloco}}
         </a>
       </li>
     </ul>
@@ -201,7 +213,8 @@
            aria-haspopup="true" aria-expanded="false" (click)="settingsCollapsed = !settingsCollapsed;">
           <fa-icon icon="cog"></fa-icon>
         </a>
-        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown"  (mouseleave)="settingsCollapsed = true;accessCodeVisible = false" [collapse]="settingsCollapsed">
+        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown"
+             (mouseleave)="settingsCollapsed = true;accessCodeVisible = false" [collapse]="settingsCollapsed">
           <table class="table">
             <tr>
               <td colspan="2" style="font-size:0.9em;"><label for="accessCode">
@@ -217,7 +230,8 @@
                          [type]="(accessCodeVisible) ? 'text': 'password'"/>
                   <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2" style="padding-left:3px;">
-                      <fa-icon style="cursor: pointer;" [icon]="['fas', (accessCodeVisible)? 'eye': 'eye-slash']" (click)="accessCodeVisible = !accessCodeVisible"></fa-icon>
+                      <fa-icon style="cursor: pointer;" [icon]="['fas', (accessCodeVisible)? 'eye': 'eye-slash']"
+                               (click)="accessCodeVisible = !accessCodeVisible"></fa-icon>
                     </span>
                   </div>
                 </div>

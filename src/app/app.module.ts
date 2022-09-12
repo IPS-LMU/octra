@@ -171,6 +171,7 @@ import {MaintenanceModule} from './core/component/maintenance/maintenance.module
 import {
   TranscriptionPostponeAllModalComponent
 } from './core/modals/transcription-postpone-session/transcription-postpone-all-modal.component';
+import {AboutModalComponent} from './core/modals/about-modal/about-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -255,7 +256,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     DynComponentDirective,
     ErrorOccurredComponent,
     MissingPermissionsModalComponent,
-    TranscriptionPostponeAllModalComponent
+    TranscriptionPostponeAllModalComponent,
+    AboutModalComponent
   ],
   entryComponents: [EDITORS, ALERTS, ErrorOccurredComponent],
   imports: [
@@ -309,9 +311,13 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     {
       provide: TRANSLOCO_CONFIG,
       useValue: translocoConfig({
-        availableLangs: ['en'],
+        availableLangs: ['en', 'nl'],
         defaultLang: 'en',
         fallbackLang: 'en',
+        missingHandler: {
+          logMissingKey: true,
+          useFallbackTranslation: true
+        },
         prodMode: environment.production,
         reRenderOnLangChange: true
       })

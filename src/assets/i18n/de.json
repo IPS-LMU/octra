@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "Deutsch"
+  },
   "general": {
     "name": "Name",
     "abort": "Abbrechen",
@@ -96,7 +99,8 @@
     "dismissed": "verschwindet in {{value}}s",
     "Send feedback": "Feedback senden",
     "reload": "NEU LADEN",
-    "Options": "Optionen"
+    "Options": "Optionen",
+    "about": "Über"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -216,6 +220,9 @@
       "step2": "Klicke auf die Schaltfläche rechts von \"Autoplay\".",
       "step3": "Klicke auf \"Audio und Video erlauben\".",
       "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
+    },
+    "about": {
+      "header": "Über OCTRA"
     }
   },
   "login": {
@@ -337,7 +344,8 @@
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
     "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
-    "maus empty text": "Die ausgewählte Transkriptionseinheit enthält keinen Text oder der Text enthält weniger als zwei Wörter."
+    "maus empty text": "Die ausgewählte Transkriptionseinheit enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
+    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback zu dem Fehler, damit er behoben werden kann."
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",

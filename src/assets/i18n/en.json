@@ -99,7 +99,8 @@
     "dismissed": "dismissed in {{value}}s",
     "Send feedback": "Send feedback",
     "reload": "reload",
-    "Options": "Options"
+    "Options": "Options",
+    "about": "About"
   },
   "bug report": {
     "give feedback": "Give feedback",

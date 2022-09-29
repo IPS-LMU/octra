@@ -9,7 +9,7 @@ import {
   TranscriptionState,
   URLParameters
 } from '../../index';
-import {AnnotationStartResponseDataItem} from '@octra/db';
+import {SaveAnnotationDto} from '@octra/api-types';
 
 export class OnlineModeActions extends AnnotationActions {
   static override context: 'OnlineMode';
@@ -73,7 +73,7 @@ export class OnlineModeActions extends AnnotationActions {
   public static setServerDataEntry = createAction(
     `[${OnlineModeActions.context}] Set serverDataEntry`,
     props<{
-      serverDataEntry: AnnotationStartResponseDataItem;
+      serverDataEntry: SaveAnnotationDto;
       mode: LoginMode;
     }>()
   );

@@ -2,7 +2,6 @@ import Dexie, {Transaction} from 'dexie';
 import {IAnnotJSON} from '@octra/annotation';
 import {LoginMode} from '../store';
 import {Subject} from 'rxjs';
-import {AnnotationStartResponseDataItem} from '@octra/db';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -421,7 +420,7 @@ export interface IIDBModeOptions {
   transcriptID: number;
   feedback: any;
   jobsLeft: number;
-  serverDataEntry: AnnotationStartResponseDataItem;
+  serverDataEntry: any;
   sessionfile: any;
   prompttext: string;
   servercomment: string;

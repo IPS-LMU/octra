@@ -23,8 +23,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let project of projects" [ngClass]="{
-        'deactivated': project.transcripts_count_free < 1 || !project.active
+        <!-- TODO <tr *ngFor="let project of projects" [ngClass]="{
+        'deactivated': project < 1 || !project.active
       }">
           <td>{{project.name}}</td>
           <td class="description">{{project.description}}</td>
@@ -34,7 +34,7 @@
                     [disabled]="project.transcripts_count_free < 1 || !project.active">Start
             </button>
           </td>
-        </tr>
+        </tr> -->
         </tbody>
       </table>
     </div>

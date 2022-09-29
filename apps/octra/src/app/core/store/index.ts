@@ -16,7 +16,7 @@ import {SampleUnit} from '@octra/media';
 import {ILog} from '../obj/Settings/logging';
 import {Histories, UndoRedoState} from 'ngrx-wieder';
 import {SessionFile} from '../obj/SessionFile';
-import {AnnotationStartResponseDataItem} from '@octra/db';
+import {SaveAnnotationDto} from '@octra/api-types';
 
 export enum LoginMode {
   URL = 'url',
@@ -50,7 +50,7 @@ export interface SessionData {
   audioURL: string;
   promptText: string;
   serverComment: string;
-  serverDataEntry: AnnotationStartResponseDataItem;
+  serverDataEntry: SaveAnnotationDto;
   comment: string;
   submitted: boolean;
   feedback: any;

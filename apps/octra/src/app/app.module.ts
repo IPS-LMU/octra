@@ -204,6 +204,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
   ],
   bootstrap: [AppComponent],
   providers: [
+    OctraAPIService,
     ALoginGuard,
     APIService,
     AudioService,
@@ -217,7 +218,6 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     IDBService,
     TranscActivateGuard,
     SettingsGuard,
-    OctraAPIService,
     SettingsService,
     TranscrEndGuard,
     BugReportService,

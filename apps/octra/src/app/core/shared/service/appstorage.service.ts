@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
+import {SessionStorageService} from 'ngx-webstorage';
 import {AppInfo} from '../../../app.info';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
@@ -32,8 +32,7 @@ import {ILog} from '../../obj/Settings/logging';
 import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
 import {Observable, Subject, Subscription} from 'rxjs';
-import {AnnotationStartResponseDataItem, UserRole} from '@octra/db';
-import {OctraAPIService} from '@octra/ngx-octra-api';
+import {AccountRole, SaveAnnotationDto} from '@octra/api-types';
 
 @Injectable({
   providedIn: 'root'
@@ -90,11 +89,11 @@ export class AppStorageService {
     }));
   }
 
-  get serverDataEntry(): AnnotationStartResponseDataItem {
+  get serverDataEntry(): SaveAnnotationDto {
     return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
   }
 
-  set serverDataEntry(value: AnnotationStartResponseDataItem) {
+  set serverDataEntry(value: SaveAnnotationDto) {
     this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
   }
 
@@ -242,11 +241,9 @@ export class AppStorageService {
   private _undoRedoDisabled = false;
 
   constructor(public sessStr: SessionStorageService,
-              public localStr: LocalStorageService,
               private store: Store<RootState>,
               private actions: Actions,
-              private router: Router,
-              private api: OctraAPIService) {
+              private router: Router) {
     this.subscrManager.add(this.store.subscribe((state: RootState) => {
       this._snapshot = state;
     }));
@@ -489,7 +486,7 @@ export class AppStorageService {
   afterLoginOnlineSuccessful(type: 'local' | 'shibboleth', user: {
     name: string,
     email: string,
-    roles: UserRole[],
+    roles: AccountRole[],
     webToken: string
   }) {
     afterTrue(this.store.select(fromApplication.selectLoggedIn)).then(() => {
@@ -755,8 +752,8 @@ export class AppStorageService {
     return undefined;
   }
 
-  public startOnlineAnnotation(currentProject: CurrentProject): Promise<AnnotationStartResponseDataItem> {
-    return new Promise<AnnotationStartResponseDataItem>((resolve, reject) => {
+  public startOnlineAnnotation(currentProject: CurrentProject): Promise<SaveAnnotationDto> {
+    return new Promise<SaveAnnotationDto>((resolve, reject) => {
       // TODO
       /* this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
         if (newAnnotation !== undefined) {

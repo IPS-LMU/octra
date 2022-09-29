@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {OctraAPIService} from '@octra/ngx-octra-api';
-import {ProjectResponseDataItem} from '@octra/db';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {navigateTo} from '@octra/utilities';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
+import {ProjectDto} from '@octra/api-types';
 
 @Component({
   selector: 'octra-projects-list',
@@ -12,7 +11,7 @@ import {HttpClient} from '@angular/common/http';
   styleUrls: ['./projects-list.component.scss']
 })
 export class ProjectsListComponent implements OnInit {
-  projects: ProjectResponseDataItem[] = [];
+  projects: ProjectDto[] = [];
   selectedFile: File;
 
   constructor(private api: OctraAPIService,
@@ -36,7 +35,8 @@ export class ProjectsListComponent implements OnInit {
     }); */
   }
 
-  onProjectClick(project: ProjectResponseDataItem) {
+  onProjectClick(project: ProjectDto) {
+    /* TODO
     if (project.active && project.transcripts_count_free > 0) {
       this.appStorage.startOnlineAnnotation({
         name: project.name,
@@ -49,6 +49,7 @@ export class ProjectsListComponent implements OnInit {
         console.error(error);
       });
     }
+     */
   }
 
   onFileChange(event: any) {

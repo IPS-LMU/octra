@@ -34,10 +34,10 @@
         "libs/utilities/src/index.ts"
       ],
       "@octra/ngx-octra-api": [
-        "../../octra-backend/dist/libs/ngx-octra-api/src/index.ts"
+        "../octra-backend/dist/libs/ngx-octra-api/src/index.ts"
       ],
       "@octra/api-types": [
-        "../../octra-backend/dist/libs/api-types/src/index.ts"
+        "../octra-backend/dist/libs/api-types/src/index.ts"
       ]
     }
   },

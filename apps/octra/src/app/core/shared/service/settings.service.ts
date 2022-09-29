@@ -233,7 +233,7 @@ export class SettingsService {
             throw new Error('config.json does not exist');
           } else {
             console.log(`init octra api`);
-            this.api.init(this.appSettings.api.url, this.appSettings.api.appToken);
+            // TODO this.api.init(this.appSettings.api.url, this.appSettings.api.appToken);
             this.api.webToken = this.appStorage?.onlineSession?.loginData?.webToken;
           }
           this._isDBLoadded = true;

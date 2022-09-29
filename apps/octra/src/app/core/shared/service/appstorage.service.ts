@@ -757,7 +757,8 @@ export class AppStorageService {
 
   public startOnlineAnnotation(currentProject: CurrentProject): Promise<AnnotationStartResponseDataItem> {
     return new Promise<AnnotationStartResponseDataItem>((resolve, reject) => {
-      this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
+      // TODO
+      /* this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
         if (newAnnotation !== undefined) {
           console.log(`got new annotation`);
           console.log(newAnnotation);
@@ -784,7 +785,7 @@ export class AppStorageService {
         resolve(newAnnotation);
       }).catch((error) => {
         reject(error);
-      });
+      });*/
     });
   }
 

@@ -348,11 +348,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       this.transcrService.endTranscription();
 
       if (this._useMode !== LoginMode.DEMO) {
+        /* TODO
         this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
           this.logout(true);
         }).catch((error) => {
           console.error(error);
-        });
+        }); */
       } else {
         // is demo mode
         this.logout(true);
@@ -659,6 +660,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     if (this._useMode === LoginMode.ONLINE) {
       const subscr = this.modalService.open.subscribe((modal) => {
         console.log(`modal opened!`);
+        /* TODO
         this.api.saveAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID, {
           transcript: JSON.stringify(this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration)),
           comment: this.appStorage.comment,
@@ -697,7 +699,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         }).catch((error) => {
           this.sendError = error;
         });
-
+        */
         subscr.unsubscribe();
       });
       this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
@@ -795,7 +797,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   closeTranscriptionAndGetNew() {
     // close current session
     if (this._useMode === LoginMode.ONLINE) {
-      this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
+      /* TODO
+        this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
         this.api.startAnnotation(this.appStorage.onlineSession.currentProject.id).then((result) => {
           this.transcrService.endTranscription(false);
           navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
@@ -806,7 +809,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         });
       }).catch((error) => {
         console.error(error);
-      });
+      }); */
     } else if (this._useMode === LoginMode.DEMO) {
       this.reloadDemo();
     }

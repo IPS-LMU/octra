@@ -17,10 +17,9 @@ import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
-import {interval, Observable, Subscription} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
 import {modalConfigurations} from '../../modals/types';
-import {UserInfoResponseDataItem} from '@octra/db';
 import {OctraAPIService} from '@octra/ngx-octra-api';
 
 @Component({
@@ -145,6 +144,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onOnlineShibbolethSubmit(form: NgForm) {
+    /* TODO
     this.api.loginUser('shibboleth').then((result) => {
       if (result.openWindowURL !== undefined) {
         // need to open windowURL
@@ -166,6 +166,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               closed = true;
 
               // TODO api: get token, name, email from window
+              /* TODO
               this.api.retrieveTokenFromWindow(result.openWindowURL as string).then((token) => {
                 this.api.getCurrentUserInformation().then((user: UserInfoResponseDataItem) => {
                   this.appStorage.afterLoginOnlineSuccessful('shibboleth', {
@@ -180,6 +181,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               }).catch((error) => {
                 console.error(error);
               });
+
             }
           });
         }
@@ -296,6 +298,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 
   onOnlineCredentialsSubmit(form: NgForm) {
+    /* TODO
     this.api.loginUser('local', this.member.userName, this.member.password).then((result) => {
       console.log(`after login`);
       console.log(result);
@@ -307,6 +310,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         text: error
       });
     });
+     */
   }
 
   canDeactivate(): Observable<boolean> | boolean {

@@ -21,6 +21,7 @@ export class ProjectsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    /* TODO
     this.api.listProjects().then((projects: ProjectResponseDataItem[]) => {
       projects = projects.filter(a => a.active === true);
       projects.sort((a, b) => {
@@ -32,7 +33,7 @@ export class ProjectsListComponent implements OnInit {
       this.projects = projects;
     }).catch((error) => {
       console.error(error);
-    });
+    }); */
   }
 
   onProjectClick(project: ProjectResponseDataItem) {

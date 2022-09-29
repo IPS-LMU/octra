@@ -37,7 +37,6 @@ import {TranslocoService} from '@ngneat/transloco';
 import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
 import {interval, Subject, Subscription, timer} from 'rxjs';
 import {DateTime} from 'luxon';
-import {isArray} from 'rxjs/internal-compatibility';
 
 declare let validateAnnotation: ((string, any) => any);
 
@@ -515,7 +514,7 @@ export class TranscriptionService {
             if (this.appStorage.logs === undefined) {
               this.appStorage.clearLoggingDataPermanently();
               this.uiService.elements = [];
-            } else if (isArray(this.appStorage.logs)) {
+            } else if (Array.isArray(this.appStorage.logs)) {
               this.uiService.fromAnyArray(this.appStorage.logs);
             }
             this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), undefined, -1, undefined, undefined, 'version');
@@ -906,7 +905,7 @@ export class TranscriptionService {
       const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {
-        if (instruction.entries !== undefined && isArray(instruction.entries)) {
+        if (instruction.entries !== undefined && Array.isArray(instruction.entries)) {
           for (const entry of instruction.entries) {
             const newEntry = {...entry};
             if (newEntry.code === code) {

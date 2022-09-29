@@ -19,8 +19,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {AudioViewerComponent} from './components/audio/audio-viewer';
 import {AudioplayerComponent} from './components/audio/audioplayer';
-import {LeadingNullPipe, ProcentPipe} from './pipe';
-import {TimespanPipe} from './pipe/timespan.pipe';
+import {LeadingNullPipe, ProcentPipe, TimespanPipe} from './pipe';
 
 @NgModule({
   declarations: [

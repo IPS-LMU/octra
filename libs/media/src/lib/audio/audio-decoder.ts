@@ -9,15 +9,15 @@ declare let window: unknown;
 export class AudioDecoder {
   public onChannelDataCalculate: Subject<{
     progress: number,
-    result: Float32Array
+    result?: Float32Array
   }> = new Subject<{
     progress: number,
-    result: Float32Array
+    result?: Float32Array
   }>();
   public started = 0;
   private audioInfo: AudioInfo;
   private readonly format: AudioFormat;
-  private channelData: Float32Array;
+  private channelData?: Float32Array;
   private channelDataOffset = 0;
   private audioContext: AudioContext;
   private tsWorkers: TsWorker[];
@@ -31,9 +31,9 @@ export class AudioDecoder {
   private subscrmanager = new SubscriptionManager();
 
   private stopDecoding = false;
-  private uint8Array: Uint8Array;
+  private uint8Array?: Uint8Array;
   private writtenChannel = 0;
-  private afterChannelDataFinished: Subject<void> = undefined;
+  private afterChannelDataFinished?: Subject<void>;
 
   get channelDataFactor() {
     let factor: number;
@@ -90,7 +90,7 @@ export class AudioDecoder {
               result: this.channelData
             });
 
-            this.afterChannelDataFinished.next();
+            this.afterChannelDataFinished!.next();
           } else {
             const progress = this.writtenChannel / (this.audioInfo.duration.samples);
             this.onChannelDataCalculate.next({
@@ -122,15 +122,15 @@ export class AudioDecoder {
           if (this.afterChannelDataFinished === undefined) {
             this.afterChannelDataFinished = new Subject<void>();
             this.afterChannelDataFinished.subscribe(() => {
-              this.afterChannelDataFinished.unsubscribe();
+              this.afterChannelDataFinished!.unsubscribe();
               this.afterChannelDataFinished = undefined;
-              resolve(this.channelData);
+              resolve(this.channelData!);
               this.onChannelDataCalculate.complete();
             });
           }
 
           if (sampleStart.samples === 0 && sampleDur.samples === this.audioInfo.duration.samples) {
-            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array, 0)
+            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0)
               .then((data: Uint8Array | Uint16Array) => {
                 this.getChannelData([data, sampleDur.samples]).then((channelData) => {
                   const job = new TsWorkerJob(this.getChannelData, [channelData, sampleDur.samples]);
@@ -141,7 +141,7 @@ export class AudioDecoder {
               });
           } else {
             // decode chunked
-            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array, 0).then((result) => {
+            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0).then((result) => {
               const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples]);
               this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
             }).catch((error) => {
@@ -222,11 +222,11 @@ export class AudioDecoder {
   }
 
   private insertChannelBuffer(offset: number, channelData: Float32Array) {
-    if (offset + channelData.length <= this.channelData.length) {
-      this.channelData.set(channelData, offset);
+    if (offset + channelData.length <= this.channelData!.length) {
+      this.channelData!.set(channelData, offset);
       this.channelDataOffset += channelData.length;
     } else {
-      console.error(`can't insert channel channelData: ${channelData.length}, buffer: ${(offset + channelData.length) - this.channelData.length}`);
+      console.error(`can't insert channel channelData: ${channelData.length}, buffer: ${(offset + channelData.length) - this.channelData!.length}`);
     }
   }
 

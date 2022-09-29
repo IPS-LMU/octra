@@ -8,8 +8,5 @@
       "jest",
       "node"
     ]
-  },
-  "exclude": [
-    "jest.config.ts"
-  ]
+  }
 }

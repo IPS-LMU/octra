@@ -6,10 +6,10 @@ import {Segment} from './segment';
 
 export class Level {
   public counter = 1;
-  public segments: Segments;
-  public items: OItem[];
-  public events: OEvent[];
-  private readonly _type: AnnotationLevelType;
+  public segments!: Segments;
+  public items!: OItem[];
+  public events!: OEvent[];
+  private readonly _type!: AnnotationLevelType;
   private readonly _id: number;
 
   private _name: string;
@@ -45,15 +45,15 @@ export class Level {
         break;
     }
 
-    if (!(segments === undefined || segments === undefined)) {
+    if (segments) {
       this.segments = segments;
     }
   }
 
   public static fromObj(entry: OIDBLevel, sampleRate: number, lastSample: SampleUnit): Level {
-    let segments: Segments = undefined;
-    let events = [];
-    let items = [];
+    let segments: Segments | undefined = undefined;
+    let events: any[] = [];
+    let items: any[] = [];
 
     if (entry.level.type === 'SEGMENT') {
       const segmentEntries: ISegment[] = entry.level.items as ISegment[];
@@ -71,8 +71,8 @@ export class Level {
     return result;
   }
 
-  public getObj(lastOriginalBoundary: SampleUnit): OLevel {
-    let result: OLevel = undefined;
+  public getObj(lastOriginalBoundary: SampleUnit): OLevel | undefined {
+    let result: OLevel | undefined = undefined;
     if (this._type === AnnotationLevelType.SEGMENT) {
       result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.samples));
     } else if (this._type === AnnotationLevelType.ITEM) {
@@ -88,7 +88,7 @@ export class Level {
     return this._type;
   }
 
-  public addSegment(time: SampleUnit, label = '', transcript: string = undefined, triggerChange = true) {
+  public addSegment(time: SampleUnit, label = '', transcript: string | undefined = undefined, triggerChange = true) {
     const newLabel = (label !== '') ? label : this._name;
     this.segments.add(time, newLabel, transcript, triggerChange);
   }

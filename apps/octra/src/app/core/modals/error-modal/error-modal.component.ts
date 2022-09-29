@@ -12,6 +12,7 @@ export class ErrorModalComponent extends OctraModal {
   text: ''
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('errorModal', modalRef, modalService);
+    super('errorModal');
+    this.init(modalService, modalRef);
   }
 }

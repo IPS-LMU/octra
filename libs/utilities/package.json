@@ -1,10 +1,4 @@
 {
   "name": "@octra/utilities",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^10.0.0",
-    "@angular/core": "^10.0.0",
-    "@angular/router": "^10.0.0",
-    "rxjs": "~6.6.3"
-  }
+  "version": "0.0.1"
 }

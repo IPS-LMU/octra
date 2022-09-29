@@ -5,7 +5,7 @@ export class DirectoryInfo extends DataInfo {
   private readonly _path: string;
 
   public constructor(path: string, size?: number) {
-    super(DirectoryInfo.extractFolderName(path), 'folder', size);
+    super(DirectoryInfo.extractFolderName(path)!, 'folder', size);
     this._path = path;
   }
 
@@ -41,7 +41,7 @@ export class DirectoryInfo extends DataInfo {
     });
   }
 
-  public static extractFolderName(path: string): string {
+  public static extractFolderName(path: string): string | undefined {
     if (path !== '') {
       let extensionBegin = path.lastIndexOf('/');
       if (extensionBegin > -1) {
@@ -61,17 +61,17 @@ export class DirectoryInfo extends DataInfo {
     return undefined;
   }
 
-  private static traverseFileTree(item: (DataTransferItem | any), path): Promise<(FileInfo | DirectoryInfo)[]> {
+  private static traverseFileTree(item: (DataTransferItem | any), path?: string): Promise<(FileInfo | DirectoryInfo)[]> {
     // console.log(`search path: ${path}`);
     return new Promise<(FileInfo | DirectoryInfo)[]>((resolve, reject) => {
-        path = path || '';
-        if (!(item === undefined || item === undefined)) {
-          let webKitEntry: any;
+      path = path || '';
+      if (!(item === undefined || item === undefined)) {
+        let webKitEntry: any;
 
-          if (item instanceof DataTransferItem) {
-            webKitEntry = item.webkitGetAsEntry();
-          } else {
-            webKitEntry = item as any;
+        if (item instanceof DataTransferItem) {
+          webKitEntry = item.webkitGetAsEntry();
+        } else {
+          webKitEntry = item as any;
           }
 
           if (webKitEntry.isFile) {
@@ -81,7 +81,7 @@ export class DirectoryInfo extends DataInfo {
             if (item instanceof DataTransferItem) {
               const file = item.getAsFile();
 
-              if (!(file === undefined || file === undefined)) {
+              if (file) {
                 if (file.name.indexOf('.') > -1) {
                   const fileInfo = new FileInfo(file.name, file.type, file.size, file);
                   resolve([fileInfo]);

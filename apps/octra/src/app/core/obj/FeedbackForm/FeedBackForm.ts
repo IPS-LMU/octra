@@ -1,6 +1,5 @@
 import {Group} from './Group';
 import {getProperties} from '@octra/utilities';
-import {isArray} from 'rxjs/internal-compatibility';
 
 export class FeedBackForm {
   public get groups(): Group[] {
@@ -93,7 +92,7 @@ export class FeedBackForm {
     const result = {};
     if (feedbackData !== undefined) {
       for (const [name, value] of getProperties(feedbackData)) {
-        if (isArray(value)) {
+        if (Array.isArray(value)) {
           for (const valueElement of value) {
             this.setValueForControl(name, valueElement);
           }

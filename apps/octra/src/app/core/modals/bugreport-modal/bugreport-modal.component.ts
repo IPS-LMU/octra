@@ -56,7 +56,8 @@ export class BugreportModalComponent extends OctraModal {
   constructor(modalService: MDBModalService, private appStorage: AppStorageService,
               public bugService: BugReportService, private settService: SettingsService,
               private cd: ChangeDetectorRef, modalRef: MDBModalRef) {
-    super('bugreportModal', modalRef, modalService);
+    super('bugreportModal');
+    this.init(modalService, modalRef);
   }
 
   onHidden() {

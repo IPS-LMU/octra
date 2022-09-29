@@ -187,8 +187,8 @@ export class AudioViewerService {
                   ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber + 1)
                   : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
 
-                if (segment.isBlockedBy === ASRQueueItemType.ASR || segmentBefore.isBlockedBy === ASRQueueItemType.ASR ||
-                  segmentAfter.isBlockedBy === ASRQueueItemType.ASR) {
+                if (segment?.isBlockedBy === ASRQueueItemType.ASR || segmentBefore?.isBlockedBy === ASRQueueItemType.ASR ||
+                  segmentAfter?.isBlockedBy === ASRQueueItemType.ASR) {
                   // prevent dragging boundary of blocked segment
                   this._dragableBoundaryNumber = -1;
                 }
@@ -198,8 +198,11 @@ export class AudioViewerService {
               if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._dragableBoundaryNumber > -1 &&
                 this._dragableBoundaryNumber < this._currentTranscriptionLevel.segments.length) {
                 // some boundary dragged
-                const segment: Segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber).clone();
-                segment.time = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
+                const segment: Segment | undefined = this?._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber)?.clone();
+                // TODO check this
+                if (segment) {
+                  segment.time = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk) as any;
+                }
 
                 // trigger segment change because it wasn't triggered while dragging
                 this._currentTranscriptionLevel.segments.onsegmentchange.emit();
@@ -296,7 +299,7 @@ export class AudioViewerService {
       (resolve, reject) => {
         try {
           if (this.audioManager !== undefined && this.audioChunk !== undefined) {
-            this.computeWholeDisplayData(this.AudioPxWidth / 2, this._settings.lineheight, this.audioManager.channel,
+            this.computeWholeDisplayData(this.AudioPxWidth / 2, this._settings.lineheight, this.audioManager.channel as any,
               {
                 start: this.audioChunk.time.start.samples / this.audioManager.channelDataFactor,
                 end: this.audioChunk.time.end.samples / this.audioManager.channelDataFactor
@@ -447,7 +450,7 @@ export class AudioViewerService {
           this._drawnSelection = this.audioChunk.selection.clone();
         } else if (this.settings.boundaries.enabled && this.mouseDown && this._dragableBoundaryNumber > -1) {
           // mouse down something dragged
-          const segment = this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber).clone();
+          const segment = (this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber) as any).clone();
           const absXSeconds = absXTime.seconds;
 
           // prevent overwriting another boundary
@@ -502,7 +505,7 @@ export class AudioViewerService {
         for (i = 0; i < this._currentTranscriptionLevel.segments.length; i++) {
           const segment = this._currentTranscriptionLevel.segments.get(i);
           if (segment?.time !== undefined && this.audioManager !== undefined && (segment.time.samples >= absXTime - bWidthTime
-            && segment.time.samples <= absXTime + bWidthTime)
+              && segment.time.samples <= absXTime + bWidthTime)
             && segment.time.samples !== this.audioManager.ressource.info.duration.samples
           ) {
 

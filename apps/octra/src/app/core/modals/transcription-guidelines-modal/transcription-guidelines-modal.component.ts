@@ -41,7 +41,8 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   constructor(modalService: MDBModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
               private cd: ChangeDetectorRef, private sanitizer: DomSanitizer, modalRef: MDBModalRef) {
-    super('transcriptionGuidelinesModal', modalRef, modalService);
+    super('transcriptionGuidelinesModal');
+    this.init(modalService, modalRef);
   }
 
   ngOnInit() {
@@ -118,7 +119,7 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
     }
   }
 
-  public close() {
+  public override close() {
     this.cd.markForCheck();
     this.cd.detectChanges();
 

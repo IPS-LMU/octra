@@ -10,8 +10,9 @@ import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 export class YesNoModalComponent extends OctraModal {
   public message: string;
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('yesNoModal', modalRef, modalService);
+  constructor(public modalRef: MDBModalRef, public modalService: MDBModalService) {
+    super('yesNoModal');
+    this.init(modalService, modalRef);
   }
 
 }

@@ -113,7 +113,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               public transloco: TranslocoService,
               modalRef: MDBModalRef
   ) {
-    super('toolsModal', modalRef, modalService);
+    super('toolsModal');
+    this.init(modalService, modalRef);
   }
 
   ngOnDestroy() {

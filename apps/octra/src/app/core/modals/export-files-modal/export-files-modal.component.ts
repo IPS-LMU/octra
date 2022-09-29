@@ -100,7 +100,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
               private settService: SettingsService,
               modalRef: MDBModalRef,
               modalService: MDBModalService) {
-    super('ExportFilesModalComponent', modalRef, modalService);
+    super('ExportFilesModalComponent');
+    this.init(modalService, modalRef);
   }
 
   ngOnInit() {
@@ -109,7 +110,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
     }
   }
 
-  public close() {
+  public override close() {
     this.uiService.addElementFromEvent('export', {
       value: 'closed'
     }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, 'modals');

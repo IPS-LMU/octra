@@ -17,7 +17,7 @@ export class WebVTTConverter extends Converter {
     this._notice = 'OCTRA reads timestamps and the transcripts. STYLE, NOTICE and other parts of VTT will be ignored. Multi-Line-Transcript will be merged.';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult | undefined {
     if (annotation) {
       let result = 'WEBVTT\n\n';
       let filename = '';
@@ -80,23 +80,23 @@ export class WebVTTConverter extends Converter {
 
         if (headerMatches !== undefined) {
           let body = content;
-          const findFirstCueRegex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> '
-            + '([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}).*', 'g');
+          const findFirstCueRegex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) --> '
+            + '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*', 'g');
 
           const firstCueMatch = findFirstCueRegex.exec(content);
 
           if (firstCueMatch !== undefined) {
-            body = body.substr(firstCueMatch.index).replace(/^\n+/g, '');
+            body = body.substring(firstCueMatch.index).replace(/^\n+/g, '');
             const cues = body.split(/\n\n/g).filter(a => a.trim() !== '');
 
             for (const cue of cues) {
-              const regex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) -->' +
-                ' ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}).*', 'g');
+              const regex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) -->' +
+                ' ([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*', 'g');
               const matches = regex.exec(cue);
 
               let lastEnd = 0;
               if (matches !== undefined) {
-                const cueWithoutTimestamp = cue.substr(matches.index + matches[0].length);
+                const cueWithoutTimestamp = cue.substring(matches.index + matches[0].length);
                 const linesOfCue = cueWithoutTimestamp.split(/\n/g).filter(a => a.trim() !== '');
 
                 const timeStart = this.getSamplesFromTimeString(matches[1], audiofile.sampleRate);
@@ -240,7 +240,7 @@ export class WebVTTConverter extends Converter {
   }
 
 
-  public formatNumber = (num, length): string => {
+  public formatNumber = (num: number, length): string => {
     let result = '' + num.toFixed(0);
     while (result.length < length) {
       result = '0' + result;

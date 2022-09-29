@@ -38,7 +38,8 @@ export class StatisticsModalComponent extends OctraModal {
 
   constructor(modalService: MDBModalService, private navbarService: NavbarService, private appStorage: AppStorageService,
               modalRef: MDBModalRef) {
-    super('statisticsModal', modalRef, modalService);
+    super('statisticsModal');
+    this.init(modalService, modalRef);
   }
 
   clearElements() {

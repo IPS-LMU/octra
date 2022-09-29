@@ -13,6 +13,7 @@ import {OctraModal} from '../types';
 export class InactivityModalComponent extends OctraModal {
   constructor(public appStorage: AppStorageService, public settService: SettingsService,
               modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('inactivityModal', modalRef, modalService);
+    super('inactivityModal');
+    this.init(modalService, modalRef);
   }
 }

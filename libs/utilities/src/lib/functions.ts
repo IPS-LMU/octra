@@ -40,7 +40,7 @@ export function hasPropertyTree(obj: any, treeString: string): boolean {
   }
 }
 
-export function base64ToArrayBuffer(base64): ArrayBuffer {
+export function base64ToArrayBuffer(base64: any): ArrayBuffer {
   const binaryString = window.atob(base64);
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
@@ -54,8 +54,8 @@ export function selectAllTextOfNode(el: any) {
   const range = document.createRange();
   range.selectNodeContents(el);
   const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
+  sel?.removeAllRanges();
+  sel?.addRange(range);
 }
 
 export function checkArray(array: any[]) {
@@ -82,7 +82,7 @@ export function equalProperties(elem: any, elem2: any) {
   let result = false;
 
   for (const el in elem) {
-    if (elem.hasOwnProperty(el)) {
+    if (Object.keys(elem).includes(el)) {
       const propStr = '' + el + '';
       result = true;
       if (!(propStr in elem2)) {
@@ -194,7 +194,7 @@ export function downloadFile(http: HttpClient, url: string): Subject<{
   http.request(req).subscribe(event => {
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
-          progress: event.loaded / event.total,
+          progress: (event.total) ? event.loaded / event.total : 0,
           result: undefined
         });
       } else if (event instanceof HttpResponse) {
@@ -212,7 +212,7 @@ export function downloadFile(http: HttpClient, url: string): Subject<{
   return subj;
 }
 
-export function setCursor(node, pos) {
+export function setCursor(node: any, pos: any) {
 
   node = (typeof node === 'string' || node instanceof String) ? document.getElementById('' + node + '') : node;
 
@@ -340,7 +340,7 @@ export function getAttr(elem: HTMLElement, attribute: string) {
 export function setStyle(elem: HTMLElement, styleObj: any) {
   const styles = getProperties(styleObj);
   for (const [name, value] of styles) {
-    elem.style[name] = value;
+    (elem.style as any)[name] = value;
   }
 }
 

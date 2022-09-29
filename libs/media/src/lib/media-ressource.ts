@@ -8,13 +8,13 @@ export class MediaRessource {
     return this._extension;
   }
 
-  private _arraybuffer: ArrayBuffer;
+  private _arraybuffer: ArrayBuffer | undefined;
 
-  get arraybuffer(): ArrayBuffer {
+  get arraybuffer(): ArrayBuffer | undefined {
     return this._arraybuffer;
   }
 
-  set arraybuffer(value: ArrayBuffer) {
+  set arraybuffer(value: ArrayBuffer | undefined) {
     this._arraybuffer = value;
   }
 
@@ -24,9 +24,9 @@ export class MediaRessource {
     return this._name;
   }
 
-  private readonly _size: number;
+  private readonly _size: number | undefined;
 
-  get size(): number {
+  get size(): number | undefined {
     return this._size;
   }
 

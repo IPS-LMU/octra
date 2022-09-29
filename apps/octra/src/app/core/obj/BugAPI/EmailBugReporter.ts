@@ -2,7 +2,6 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {BugReporter} from './BugReporter';
 import {getProperties} from '@octra/utilities';
-import {isArray} from 'rxjs/internal-compatibility';
 
 export class EmailBugReporter extends BugReporter {
   constructor() {
@@ -53,7 +52,7 @@ export class EmailBugReporter extends BugReporter {
     let result = '';
 
     for (const [name, value] of getProperties(pkg)) {
-      if (!isArray(value) && typeof value === 'object') {
+      if (!Array.isArray(value) && typeof value === 'object') {
         result += name + '\n';
         result += '---------\n';
 
@@ -62,7 +61,7 @@ export class EmailBugReporter extends BugReporter {
             result += '  ' + name2 + ':  ' + value2 + '\n';
           }
         }
-      } else if (isArray(value)) {
+      } else if (Array.isArray(value)) {
         result += name + '\n';
         result += '---------\n';
 

@@ -6,15 +6,15 @@ export class AudioSelection {
     if (this._start && this._end && this._start.samples > this._end.samples) {
       return Math.abs(this._start.samples - this._end.samples);
     } else {
-      return Math.abs(this._end.samples - this._start.samples);
+      return Math.abs(this._end!.samples - this._start!.samples);
     }
   }
 
   get duration(): SampleUnit {
-    return new SampleUnit(this.length, this.start.sampleRate);
+    return new SampleUnit(this.length, this.start!.sampleRate);
   }
 
-  private _start: SampleUnit;
+  private _start!: SampleUnit;
 
   get start(): SampleUnit {
     return this._start;
@@ -24,7 +24,7 @@ export class AudioSelection {
     this._start = value;
   }
 
-  private _end: SampleUnit;
+  private _end!: SampleUnit;
 
   get end(): SampleUnit {
     return this._end;
@@ -37,12 +37,12 @@ export class AudioSelection {
   constructor(start: SampleUnit,
               end: SampleUnit) {
     this.start = start.clone();
-    this.end = end.clone();
+    this.end = end?.clone();
   }
 
   public clone() {
     return new AudioSelection(
-      this._start, this._end
+      this._start!, this._end
     );
   }
 

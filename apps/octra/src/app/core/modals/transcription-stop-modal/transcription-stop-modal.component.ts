@@ -15,6 +15,7 @@ export enum TranscriptionStopModalAnswer {
 
 export class TranscriptionStopModalComponent extends OctraModal {
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('transcriptionStopModal', modalRef, modalService);
+    super('transcriptionStopModal');
+    this.init(modalService, modalRef);
   }
 }

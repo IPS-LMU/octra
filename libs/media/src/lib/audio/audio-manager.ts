@@ -35,11 +35,11 @@ export class AudioManager {
   private _id: number;
   private _stepBackward = false;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
-  private _playbackEndChecker: Subscription = undefined;
+  private _playbackEndChecker?: Subscription;
   private readonly _audio: HTMLAudioElement;
 
   // variables needed for initializing audio
-  private _source: AudioBufferSourceNode | MediaElementAudioSourceNode = undefined;
+  private _source?: AudioBufferSourceNode | MediaElementAudioSourceNode;
   private chunks: AudioChunk[] = [];
 
   get audio(): HTMLAudioElement {
@@ -54,25 +54,25 @@ export class AudioManager {
     return (this._state === PlayBackStatus.PLAYING);
   }
 
-  private _ressource: AudioRessource;
+  private _ressource!: AudioRessource;
 
   get ressource(): AudioRessource {
     return this._ressource;
   }
 
-  private _state: PlayBackStatus;
+  private _state!: PlayBackStatus;
 
   get state(): PlayBackStatus {
     return this._state;
   }
 
-  private _mainchunk: AudioChunk;
+  private _mainchunk!: AudioChunk;
 
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
 
-  private _playposition: SampleUnit;
+  private _playposition!: SampleUnit;
 
   get playposition(): SampleUnit {
     return new SampleUnit(
@@ -92,28 +92,28 @@ export class AudioManager {
     return this._playOnHover;
   }
 
-  private _lastUpdate: number;
+  private _lastUpdate!: number;
 
   get lastUpdate(): number {
     return this._lastUpdate;
   }
 
-  private _audioContext: AudioContext = undefined;
+  private _audioContext?: AudioContext;
 
-  get audioContext(): AudioContext {
+  get audioContext(): AudioContext | undefined {
     return this._audioContext;
   }
 
-  private _gainNode: GainNode = undefined;
+  private _gainNode?: GainNode;
 
   get gainNode(): any {
     return this._gainNode;
   }
 
   // only the Audiomanager may have the channel array
-  private _channel: Float32Array;
+  private _channel: Float32Array | undefined;
 
-  get channel(): Float32Array {
+  get channel(): Float32Array | undefined {
     return this._channel;
   }
 
@@ -169,7 +169,7 @@ export class AudioManager {
    * @param extension file extension
    * @param audioformats list of supported audio formats
    */
-  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
+  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat | undefined {
     return audioformats.find((a) => {
       return a.extension === extension;
     });
@@ -177,28 +177,29 @@ export class AudioManager {
 
   public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
                                audioformats: AudioFormat[]): Subject<{
-    audioManager: AudioManager,
+    audioManager?: AudioManager,
     decodeProgress: number
   }> => {
     const subj = new Subject<{
-      audioManager: AudioManager,
+      audioManager?: AudioManager,
       decodeProgress: number
     }>();
 
-    const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
+    const audioformat: AudioFormat | undefined = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 
     if (audioformat !== undefined) {
       audioformat.init(filename, buffer);
 
-      let audioinfo: AudioInfo = undefined;
+      let audioinfo: AudioInfo | undefined = undefined;
+
       try {
         audioinfo = audioformat.getAudioInfo(filename, type, buffer);
 
-      } catch (err) {
-        subj.error(err.message);
+      } catch (err: any) {
+        subj.error(err!.message);
       }
 
-      if (audioinfo !== undefined) {
+      if (audioinfo) {
         const bufferLength = buffer.byteLength;
         // decode first 10 seconds
         const sampleDur = new SampleUnit(Math.min(audioformat.sampleRate * 30, audioformat.duration), audioformat.sampleRate);
@@ -290,13 +291,13 @@ export class AudioManager {
         this.initAudioContext();
       }
 
-      this._audioContext.resume().then(() => {
+      this._audioContext?.resume().then(() => {
         if (this._gainNode === undefined) {
-          this._gainNode = this.audioContext.createGain();
+          this._gainNode = this.audioContext!.createGain();
         }
         // create an audio context and hook up the video element as the source
         if (this._source === undefined) {
-          this._source = this._audioContext.createMediaElementSource(this._audio);
+          this._source = this._audioContext!.createMediaElementSource(this._audio);
         }
         this.changeState(PlayBackStatus.STARTED);
 
@@ -307,14 +308,14 @@ export class AudioManager {
         this._source.connect(this._gainNode);
 
         // connect the gain node to an output destination
-        this._gainNode.connect(this._audioContext.destination);
+        this._gainNode.connect(this._audioContext!.destination);
 
         this._audio.playbackRate = playbackRate;
         this._audio.onerror = reject;
 
         this._playOnHover = playOnHover;
         this._stepBackward = false;
-        this.playposition = audioSelection.start.clone();
+        this.playposition = audioSelection.start!.clone();
         this._statusRequest = PlayBackStatus.PLAYING;
         this.changeState(PlayBackStatus.PLAYING);
 
@@ -332,7 +333,7 @@ export class AudioManager {
             });
           })
           .catch((error) => {
-            this._playbackEndChecker.unsubscribe();
+            this._playbackEndChecker!.unsubscribe();
             if (!this.playOnHover) {
               if (error.name && error.name === 'NotAllowedError') {
                 // no permission
@@ -346,7 +347,7 @@ export class AudioManager {
             }
           });
       }).catch((error) => {
-        this._playbackEndChecker.unsubscribe();
+        this._playbackEndChecker!.unsubscribe();
         this.statechange.error(new Error(error));
         reject(error);
       });
@@ -386,7 +387,7 @@ export class AudioManager {
    * prepares the audio manager for play back
    */
   public prepareAudioPlayBack() {
-    this._audio.src = URL.createObjectURL(new File([this._ressource.arraybuffer], this._ressource.info.fullname));
+    this._audio.src = URL.createObjectURL(new File([this._ressource.arraybuffer!], this._ressource.info.fullname));
 
     this._channel = undefined;
     this._state = PlayBackStatus.INITIALIZED;
@@ -413,9 +414,9 @@ export class AudioManager {
     return this._source;
   }*/
 
-  public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk {
+  public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk | undefined {
     if (
-      time.start.samples + time.duration.samples <= this.ressource.info.duration.samples
+      time.start!.samples + time.duration.samples <= this.ressource.info.duration.samples
     ) {
       const chunk = new AudioChunk(time, this, selection);
       this.addChunk(chunk);
@@ -467,8 +468,8 @@ export class AudioManager {
     const result = new Subject<{ progress: number }>();
 
     const format = new WavFormat();
-    format.init(this._ressource.info.name, this._ressource.arraybuffer);
-    AudioManager.decoder = new AudioDecoder(format, this._ressource.info, this._ressource.arraybuffer);
+    format.init(this._ressource.info.name, this._ressource.arraybuffer!);
+    AudioManager.decoder = new AudioDecoder(format, this._ressource.info, this._ressource.arraybuffer!);
     const subj = AudioManager.decoder.onChannelDataCalculate.subscribe((status) => {
         if (status.progress === 1 && status.result !== undefined) {
           AudioManager.decoder.destroy();
@@ -518,9 +519,9 @@ export class AudioManager {
   private removeEventListeners() {
     this._audio.removeEventListener('ended', this.onPlayBackChanged);
     this._audio.removeEventListener('pause', this.onPlayBackChanged);
-    this._gainNode.disconnect();
-    this._source.disconnect();
-    this._playbackEndChecker.unsubscribe();
+    this._gainNode?.disconnect();
+    this._source?.disconnect();
+    this._playbackEndChecker?.unsubscribe();
   }
 
   private onPlayBackChanged = () => {
@@ -543,7 +544,7 @@ export class AudioManager {
     this.callBacksAfterEnded = [];
   }
 
-  private onPlaybackFailed = (error) => {
+  private onPlaybackFailed = (error: any) => {
     console.error(error);
   }
 
@@ -590,7 +591,7 @@ export class AudioChunk {
   }
 
   public get startpos(): SampleUnit {
-    return this._selection.start;
+    return this._selection.start!;
   }
 
   /**
@@ -602,12 +603,12 @@ export class AudioChunk {
       throw new Error('start pos is undefined!');
     }
     if ((this.selection === undefined || this.selection === undefined)) {
-      this.selection = new AudioSelection(value.clone(), this.time.end.clone());
+      this.selection = new AudioSelection(value.clone(), this.time.end!.clone());
     } else {
       this.selection.start = value.clone();
-      this.selection.end = this.time.end.clone();
+      this.selection.end = this.time.end!.clone();
     }
-    this._playposition = this.selection.start.clone() as SampleUnit;
+    this._playposition = this.selection.start!.clone() as SampleUnit;
   }
 
   get relativePlayposition(): SampleUnit | undefined {
@@ -665,7 +666,7 @@ export class AudioChunk {
     return this._status === PlayBackStatus.STOPPED;
   }
 
-  private _selection: AudioSelection = undefined;
+  private _selection!: AudioSelection;
 
   get selection(): AudioSelection {
     return this._selection;
@@ -675,7 +676,7 @@ export class AudioChunk {
     this._selection = value;
   }
 
-  private _time: AudioSelection = undefined;
+  private _time!: AudioSelection;
 
   get time(): AudioSelection {
     return this._time;
@@ -723,7 +724,7 @@ export class AudioChunk {
     }
   }
 
-  private _lastplayedpos: SampleUnit;
+  private _lastplayedpos!: SampleUnit;
 
   get lastplayedpos(): SampleUnit {
     return this._lastplayedpos;
@@ -759,9 +760,9 @@ export class AudioChunk {
     this._id = ++AudioChunk._counter;
   }
 
-  public getChannelBuffer(selection: AudioSelection): Float32Array {
-    if (!(selection === undefined || selection === undefined)) {
-      return this.audioManager.channel.subarray(selection.start.samples, selection.end.samples);
+  public getChannelBuffer(selection: AudioSelection): Float32Array | undefined {
+    if (selection) {
+      return this.audioManager!.channel?.subarray(selection.start.samples, selection.end.samples);
     }
 
     return undefined;
@@ -951,8 +952,8 @@ export class AudioChunk {
   }
 
   private afterPlaybackStopped = () => {
-    this.startpos = this.time.start.clone() as SampleUnit;
-    this._audioManger.playposition = this.time.start.clone();
+    this.startpos = this.time.start!.clone() as SampleUnit;
+    this._audioManger.playposition = this.time.start!.clone();
   }
 
   private afterPlaybackPaused = () => {

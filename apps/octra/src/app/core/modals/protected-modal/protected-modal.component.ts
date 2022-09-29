@@ -16,7 +16,8 @@ export class ProtectedModalComponent extends OctraModal {
   }
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService, private sanitizer: DomSanitizer) {
-    super('messageModal', modalRef, modalService);
+    super('messageModal');
+    this.init(modalService, modalRef);
   }
 
 }

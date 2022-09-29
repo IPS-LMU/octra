@@ -6,7 +6,7 @@ import {getProperties, hasProperty} from '@octra/utilities';
  * Statistic Element Class
  */
 export class KeyStatisticElem extends StatisticElem {
-  get value(): string {
+  override get value(): string {
     return this.data.value;
   }
 
@@ -37,7 +37,7 @@ export class KeyStatisticElem extends StatisticElem {
     };
   }
 
-  public static fromAny(elem: ILog): KeyStatisticElem {
+  public static override fromAny(elem: ILog): KeyStatisticElem {
     const result = {
       value: undefined,
       context: undefined,

@@ -36,7 +36,6 @@ import {Segments} from '@octra/annotation';
 import {TimespanPipe} from '@octra/components';
 import {Subscription, timer} from 'rxjs';
 import {JoditAngularComponent} from 'jodit-angular';
-import {isNumeric} from 'rxjs/internal-compatibility';
 
 declare let tidyUpAnnotation: ((string, any) => any);
 
@@ -782,7 +781,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         dataSample.addEventListener('click', (event) => {
           const samples = getAttr((event.target as any), 'data-samples');
 
-          if (isNumeric(samples)) {
+          if (isNumber(samples)) {
             this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
           }
         });
@@ -857,7 +856,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
         element.addEventListener('click', (event) => {
           const samples = getAttr(event.target, 'data-samples');
 
-          if (isNumeric(samples)) {
+          if (isNumber(samples)) {
             this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
           }
         });
@@ -911,7 +910,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
       rawtext = rawtext.replace(regex, replaceFunc);
     }
 
-    const segTexts = rawtext.split(regex2).filter(a => !isNumeric(a));
+    const segTexts = rawtext.split(regex2).filter(a => !isNumber(a));
 
     let start = 0;
 

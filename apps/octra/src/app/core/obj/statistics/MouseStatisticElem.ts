@@ -34,7 +34,7 @@ export class MouseStatisticElem extends StatisticElem {
     };
   }
 
-  public static fromAny(elem: ILog): MouseStatisticElem {
+  public static override fromAny(elem: ILog): MouseStatisticElem {
     const result = {
       value: undefined,
       context: undefined,

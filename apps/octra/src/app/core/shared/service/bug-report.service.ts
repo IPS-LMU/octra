@@ -10,7 +10,6 @@ import {TranscriptionService} from './transcription.service';
 import {BrowserInfo, getFileSize} from '@octra/utilities';
 import {LoginMode} from '../../store';
 import {DateTime} from 'luxon';
-import {isArray} from 'rxjs/internal-compatibility';
 
 export enum ConsoleType {
   LOG,
@@ -73,7 +72,7 @@ export class BugReportService {
   }
 
   public addEntriesFromDB(entries: ConsoleEntry[]) {
-    if (entries !== undefined && isArray(entries) && entries.length > 0) {
+    if (entries !== undefined && Array.isArray(entries) && entries.length > 0) {
       if (entries.length > 50) {
         // crop down to 100 items
         entries = entries.slice(-50);

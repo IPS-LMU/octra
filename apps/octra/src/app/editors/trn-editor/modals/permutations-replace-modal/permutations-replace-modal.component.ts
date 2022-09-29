@@ -71,7 +71,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
 
   public close() {
     this.modal.hide();
-    this.actionperformed.next();
+    this.actionperformed.next('');
   }
 
   private beforeModalOpened() {

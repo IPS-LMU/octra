@@ -26,7 +26,7 @@ export class Segments {
     this._segments = value;
   }
 
-  constructor(private sampleRate, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
+  constructor(private sampleRate: number, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
     this._segments = [];
     this.onsegmentchange = new EventEmitter<SegmentChangeEvent>();
 
@@ -44,7 +44,7 @@ export class Segments {
           sampleStart: Math.round(segment.sampleStart)
         }, sampleRate);
 
-        this._segments.push(newSegment);
+        this._segments.push(newSegment!);
       }
     }
   }
@@ -52,7 +52,7 @@ export class Segments {
   /**
    * adds new Segment
    */
-  public add(time: SampleUnit, label: string, transcript: string = undefined, triggerChange = true): boolean {
+  public add(time: SampleUnit, label: string, transcript: string | undefined = undefined, triggerChange = true): boolean {
     const newSegment: Segment = new Segment(time, label);
 
     if (transcript !== undefined) {
@@ -60,7 +60,7 @@ export class Segments {
     }
 
     if (this.segments.find((a) => {
-      return a.time.seconds === time.seconds;
+      return a.time!.seconds === time.seconds;
     }) === undefined) {
       this.segments.push(newSegment);
     } else {
@@ -86,7 +86,7 @@ export class Segments {
     for (let i = 0; i < this.segments.length; i++) {
       const segment = this.segments[i];
 
-      if (this.segments[i].time.equals(timeSamples)) {
+      if (this.segments[i].time!.equals(timeSamples)) {
         this.segments.splice(i, 1);
 
         this.onsegmentchange.emit({
@@ -144,17 +144,17 @@ export class Segments {
   public change(i: number, segment: Segment): boolean {
     if (i > -1 && this._segments[i] !== undefined) {
       const old = {
-        samples: this._segments[i].time.samples,
+        samples: this._segments[i].time!.samples,
         transcript: this._segments[i].transcript,
         label: this._segments[i].speakerLabel
       };
 
-      this._segments[i].time = segment.time.clone();
+      this._segments[i].time = segment.time!.clone();
       this._segments[i].speakerLabel = segment.speakerLabel;
       this._segments[i].transcript = segment.transcript;
       this._segments[i].isBlockedBy = segment.isBlockedBy;
 
-      if (old.samples !== segment.time.samples || old.transcript !== segment.transcript
+      if (old.samples !== segment.time!.samples || old.transcript !== segment.transcript
         || old.label !== segment.speakerLabel) {
         this.onsegmentchange.emit({
           type: 'change',
@@ -188,10 +188,10 @@ export class Segments {
    */
   public sort() {
     this.segments.sort((a, b) => {
-      if (a.time.samples < b.time.samples) {
+      if (a.time!.samples < b.time!.samples) {
         return -1;
       }
-      if (a.time.samples === b.time.samples) {
+      if (a.time!.samples === b.time!.samples) {
         return 0;
       }
       return 1;
@@ -201,7 +201,7 @@ export class Segments {
   /**
    * gets Segment by index
    */
-  public get(i: number): Segment {
+  public get(i: number): Segment | undefined {
     if (i > -1 && i < this.segments.length) {
       return this.segments[i];
     }
@@ -239,9 +239,9 @@ export class Segments {
     let begin = 0;
     for (let i = 0; i < this._segments.length; i++) {
       if (i > 0) {
-        begin = this._segments[i - 1].time.samples;
+        begin = this._segments[i - 1].time!.samples;
       }
-      if (samples.samples > begin.valueOf() && samples.samples <= this._segments[i].time.samples) {
+      if (samples.samples > begin.valueOf() && samples.samples <= this._segments[i].time!.samples) {
         return i;
       }
     }
@@ -254,29 +254,29 @@ export class Segments {
 
     for (const segment of this.segments) {
       if (
-        (segment.time.samples >= startSamples.samples && segment.time.samples <= endSamples.samples) ||
+        (segment.time!.samples >= startSamples.samples && segment.time!.samples <= endSamples.samples) ||
         (start.samples >= startSamples.samples && start.samples <= endSamples.samples) ||
-        (start.samples <= startSamples.samples && segment.time.samples >= endSamples.samples)
+        (start.samples <= startSamples.samples && segment.time!.samples >= endSamples.samples)
       ) {
         result.push(segment);
       }
-      start = segment.time.clone();
+      start = segment.time!.clone();
     }
 
     return result;
   }
 
-  public getStartTime(id: number): SampleUnit {
+  public getStartTime(id: number): SampleUnit | undefined {
     const segment = this.get(id);
     let samples = 0;
 
     if (segment) {
       for (let i = 0; i < this.segments.length; i++) {
         if (id === i) {
-          return new SampleUnit(samples, segment.time.sampleRate);
+          return new SampleUnit(samples, segment.time!.sampleRate);
         }
 
-        samples = this.get(i).time.samples;
+        samples = (this.get(i) as any).time.samples;
       }
     }
     return undefined;
@@ -328,9 +328,9 @@ export class Segments {
   }
 
   public clone(): Segments {
-    const result = new Segments(this.sampleRate, this.levelName, undefined, this.segments[this.length - 1].time);
+    const result = new Segments(this.sampleRate, this.levelName, [], this.segments[this.length - 1].time!);
     for (const segment of this.segments) {
-      result.add(segment.time, segment.speakerLabel, segment.transcript);
+      result.add(segment.time!, segment.speakerLabel, segment.transcript);
     }
     return result;
   }
@@ -341,7 +341,7 @@ export class Segments {
     if (this.segments.length > 1) {
       let last = this.segments[0];
       for (let i = 1; i < this.segments.length; i++) {
-        if (last.time.samples === this.segments[i].time.samples) {
+        if (last.time!.samples === this.segments[i].time!.samples) {
           remove.push(i);
         }
         last = this.segments[i - 1];

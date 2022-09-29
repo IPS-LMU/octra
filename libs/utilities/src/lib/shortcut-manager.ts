@@ -149,7 +149,7 @@ export class ShortcutManager {
     this._shortcuts = [];
   }
 
-  public checkKeyEvent(event: KeyboardEvent, timestamp: number, checkPressKey = true): ShortcutEvent {
+  public checkKeyEvent(event: KeyboardEvent, timestamp: number, checkPressKey = true): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
       if (event.type === 'keydown') {
         // run shortcut check
@@ -204,7 +204,7 @@ export class ShortcutManager {
   private getCommand(shortcut: string, platform: 'mac' | 'pc'): {
     shortcut: Shortcut,
     groupName: string
-  } {
+  } | undefined {
     for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
       if (elem !== undefined) {
@@ -241,7 +241,7 @@ export class ShortcutManager {
 
     if (code > -1) {
       if (BrowserInfo.platform === 'mac') {
-        if (BrowserInfo.browser.toLowerCase().indexOf('firefox') > -1) {
+        if (BrowserInfo.browser!.toLowerCase().indexOf('firefox') > -1) {
           // Firefox
           if (code === 224 && (event.code === 'OSLeft' || event.code === 'OSRight')) {
             return 'CMD';

@@ -13,6 +13,6 @@ export class SupportedFilesModalComponent extends OctraModal {
   AppInfo = AppInfo;
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('supportedFilesModal', modalRef, modalService);
+    super('supportedFilesModal');
   }
 }

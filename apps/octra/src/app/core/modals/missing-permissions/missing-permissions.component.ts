@@ -13,7 +13,8 @@ export class MissingPermissionsModalComponent extends OctraModal implements OnDe
   private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('MissingPermissionsModalComponent', modalRef, modalService);
+    super('MissingPermissionsModalComponent');
+    this.init(modalService, modalRef);
   }
 
   ngOnDestroy() {

@@ -22,6 +22,7 @@ export class ShortcutsModalComponent extends OctraModal {
   constructor(public appStorage: AppStorageService,
               public keyMap: KeymappingService,
               modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('ShortcutsModalComponent', modalRef, modalService);
+    super('ShortcutsModalComponent');
+    this.init(modalService, modalRef);
   }
 }

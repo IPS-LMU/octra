@@ -1,12 +1,4 @@
 {
   "name": "@octra/annotation",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^10.0.0",
-    "@angular/core": "^10.0.0",
-    "@angular/router": "^10.0.0",
-    "@octra/utilities": "^0.0.1",
-    "@octra/media": "^0.0.1",
-    "rxjs": "~6.6.3"
-  }
+  "version": "0.0.1"
 }

@@ -12,7 +12,7 @@ import {
 import {AnnotationStartResponseDataItem} from '@octra/db';
 
 export class OnlineModeActions extends AnnotationActions {
-  static context: 'OnlineMode';
+  static override context: 'OnlineMode';
 
   public static login = createAction(
     `[${OnlineModeActions.context}] Login`,

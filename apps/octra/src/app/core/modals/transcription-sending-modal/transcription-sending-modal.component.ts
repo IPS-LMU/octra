@@ -12,6 +12,7 @@ export class TranscriptionSendingModalComponent extends OctraModal {
   public content: string;
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('transcriptionSendingModal', modalRef, modalService);
+    super('transcriptionSendingModal');
+    this.init(modalService, modalRef);
   }
 }

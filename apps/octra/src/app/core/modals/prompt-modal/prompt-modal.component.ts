@@ -17,10 +17,11 @@ export class PromptModalComponent extends OctraModal {
 
   constructor(modalService: MDBModalService, public appStorage: AppStorageService, private settService: SettingsService,
               private cd: ChangeDetectorRef, modalRef: MDBModalRef) {
-    super('promptModal', modalRef, modalService);
+    super('promptModal');
+    this.init(modalService, modalRef);
   }
 
-  public close() {
+  public override close() {
     this.cd.markForCheck();
     this.cd.detectChanges();
     return super.close();

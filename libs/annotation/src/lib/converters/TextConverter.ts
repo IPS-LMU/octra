@@ -3,7 +3,7 @@ import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class TextConverter extends Converter {
 
-  public options = {
+  public override options = {
     showTimestampSamples: false,
     showTimestampString: false
   };

@@ -3,11 +3,11 @@ import {ASRQueueItemType} from './asr';
 import {SampleUnit} from '@octra/media';
 
 export class Segment {
-  get time(): SampleUnit | undefined {
+  get time(): SampleUnit {
     return this._time;
   }
 
-  set time(value: SampleUnit | undefined) {
+  set time(value: SampleUnit) {
     this._time = value;
   }
 
@@ -22,7 +22,7 @@ export class Segment {
   private static counter = 1;
   private readonly _id: number;
 
-  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id: number = undefined) {
+  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id?: number) {
     this._time = time;
     this._speakerLabel = speakerLabel;
     this._transcript = transcript;
@@ -36,7 +36,7 @@ export class Segment {
   }
 
   private _speakerLabel = 'NOLABEL';
-  private _time: SampleUnit;
+  private _time!: SampleUnit;
 
   /**
    * this id is for internal use only!
@@ -68,7 +68,7 @@ export class Segment {
     this._changed = value;
   }
 
-  private _isBlockedBy: ASRQueueItemType;
+  private _isBlockedBy!: ASRQueueItemType;
 
   get isBlockedBy(): ASRQueueItemType {
     return this._isBlockedBy;
@@ -94,11 +94,11 @@ export class Segment {
   /**
    * converts an object to a Segment. The conversion goes from original -> browser samples.
    */
-  public static fromObj(levelName: string, oSegment: OSegment, sampleRate: number): Segment {
+  public static fromObj(levelName: string, oSegment: OSegment, sampleRate: number): Segment | undefined {
     if (oSegment !== undefined) {
       let speakerLabel = '';
 
-      let transcriptLabel: OLabel;
+      let transcriptLabel: OLabel | undefined;
       if (oSegment.labels !== undefined) {
         if (oSegment.labels.length > 1) {
           const foundLabel = oSegment.labels.find(a => a.name.toLowerCase() === 'speaker');

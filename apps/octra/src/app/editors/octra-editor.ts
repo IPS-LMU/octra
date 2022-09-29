@@ -3,11 +3,11 @@ import {AudioViewerComponent} from '@octra/components';
 import {Level} from '@octra/annotation';
 
 export abstract class OCTRAEditor {
-  public abstract afterFirstInitialization();
+  public abstract afterFirstInitialization(): void;
 
-  public abstract disableAllShortcuts();
+  public abstract disableAllShortcuts(): void;
 
-  public abstract enableAllShortcuts();
+  public abstract enableAllShortcuts(): void;
 
   protected doPlayOnHover(audioManager: AudioManager, isPlayingOnhover: boolean, audioChunk: AudioChunk, mouseCursor: SampleUnit) {
     if (!audioManager.isPlaying && isPlayingOnhover) {
@@ -30,7 +30,7 @@ export abstract class OCTRAEditor {
   protected changeArea(
     loupe: AudioViewerComponent, signalDisplay: AudioViewerComponent, audioManager: AudioManager,
     audioChunkLoupe: AudioChunk, cursorTime: SampleUnit, factor: number): Promise<AudioChunk | undefined> {
-    return new Promise<AudioChunk>((resolve) => {
+    return new Promise<AudioChunk | undefined>((resolve) => {
       const cursorLocation = signalDisplay.mouseCursor;
       if (cursorLocation && cursorTime) {
         const halfRate = Math.round(audioManager.sampleRate / factor);
@@ -55,7 +55,7 @@ export abstract class OCTRAEditor {
     });
   }
 
-  abstract openSegment(index: number);
+  abstract openSegment(index: number): void;
 
   protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: Level) {
     const emptySegmentIndex = currentLevel.segments.segments.findIndex((a) => {

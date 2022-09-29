@@ -19,7 +19,7 @@ export enum ModalEndAnswer {
 export class TranscriptionDemoEndModalComponent extends OctraModal {
   constructor(modalService: MDBModalService, private sanitizer: DomSanitizer,
               public languageService: TranslocoService, modalRef: MDBModalRef) {
-    super('transcriptionDemoEnd', modalRef, modalService);
+    super('transcriptionDemoEnd');
   }
 
   sanitize(html: string) {

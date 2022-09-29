@@ -18,7 +18,8 @@ export class HelpModalComponent extends OctraModal implements OnDestroy {
   private subscrManager = new SubscriptionManager<Subscription>();
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('HelpModalComponent', modalRef, modalService);
+    super('HelpModalComponent');
+    this.init(modalService, modalRef);
   }
 
   ngOnDestroy() {

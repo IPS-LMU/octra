@@ -9,7 +9,7 @@ export class OggFormat extends AudioFormat {
 
   public isValid(buffer: ArrayBuffer): boolean {
     const bufferPart = buffer.slice(29, 37);
-    let test = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart));
+    let test = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart) as any);
     test = test.slice(0, 6);
     return ('' + test + '' === 'vorbis');
   }

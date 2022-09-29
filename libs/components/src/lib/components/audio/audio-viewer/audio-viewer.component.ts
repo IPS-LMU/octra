@@ -33,6 +33,11 @@ import Shape = Konva.Shape;
   providers: [AudioViewerService]
 })
 export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
+
+  @Input() set transcriptionLevel(value: Level | undefined) {
+    this._transcriptionLevel = value;
+  }
+
   // Ways to improve performance
   // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
 
@@ -107,10 +112,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   get transcriptionLevel(): Level | undefined {
     return this._transcriptionLevel;
-  }
-
-  @Input() set transcriptionLevel(value: Level | undefined) {
-    this._transcriptionLevel = value;
   }
 
   get focused(): boolean {
@@ -221,14 +222,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['audioChunk'] && changes.audioChunk.currentValue !== undefined) {
+    if (changes['audioChunk'] && changes['audioChunk'].currentValue !== undefined) {
       this.afterChunkUpdated();
     }
-    if (changes['transcriptionLevel'] && changes.transcriptionLevel.currentValue !== undefined) {
+    if (changes['transcriptionLevel'] && changes['transcriptionLevel'].currentValue !== undefined) {
       this.afterLevelUpdated();
     }
 
-    if (changes['breakMarker'] && changes.transcriptionLevel.currentValue !== undefined) {
+    if (changes['breakMarker'] && changes['breakMarker'].currentValue !== undefined) {
       this.av.breakMarker = this.breakMarker;
     }
 
@@ -528,13 +529,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         const startTime = this._transcriptionLevel.segments.getStartTime(segIndex);
 
         // make shure, that segments boundaries are visible
-        if (segment.time?.samples !== undefined && this._transcriptionLevel?.segments !== undefined && this.av.audioTCalculator !== undefined &&
-          startTime.samples >= this.audioChunk.time.start.samples && segment.time.samples <= (this.audioChunk.time.end.samples + 1) &&
+        if (segment?.time?.samples !== undefined && this._transcriptionLevel?.segments !== undefined && this.av.audioTCalculator !== undefined &&
+          (startTime as any).samples >= this.audioChunk.time.start.samples && segment.time.samples <= (this.audioChunk.time.end.samples + 1) &&
           this.av.innerWidth !== undefined) {
           const absX = this.av.audioTCalculator.samplestoAbsX(segment.time);
           let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
           if (segIndex > 0) {
-            begin = this._transcriptionLevel.segments.get(segIndex - 1);
+            begin = this._transcriptionLevel.segments.get(segIndex - 1) as any;
           }
 
           if (begin.time !== undefined) {
@@ -1860,7 +1861,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       const segment = this._transcriptionLevel.segments.get(segmentI);
                       const startTime = this._transcriptionLevel.segments.getStartTime(segmentI);
                       // make shure, that segments boundaries are visible
-                      if (segment?.time !== undefined && startTime.samples >= this.audioChunk.time.start.samples &&
+                      if (segment?.time !== undefined && (startTime as any).samples >= this.audioChunk.time.start.samples &&
                         segment.time.samples <= (this.audioChunk.time.end.samples + 1) &&
                         this.av.audioTCalculator !== undefined) {
                         const absX = this.av.audioTCalculator.samplestoAbsX(
@@ -1873,7 +1874,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
                         let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
                         if (segmentI > 0) {
-                          begin = this._transcriptionLevel.segments.get(segmentI - 1);
+                          begin = this._transcriptionLevel.segments.get(segmentI - 1) as any;
                         }
 
                         if (begin?.time !== undefined && this.av.innerWidth !== undefined) {
@@ -2069,7 +2070,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (segment.isBlockedBy === undefined) {
+                    if (segment?.isBlockedBy === undefined) {
                       this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -2099,7 +2100,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (segment.isBlockedBy === undefined) {
+                    if (segment?.isBlockedBy === undefined) {
                       this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,
@@ -2130,7 +2131,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const segment = this._transcriptionLevel.segments.get(segmentI);
 
                   if (segmentI > -1) {
-                    if (segment.isBlockedBy === undefined) {
+                    if (segment?.isBlockedBy === undefined) {
                       this.shortcutTrigger.emit({
                         shortcut: comboKey,
                         shortcutName,

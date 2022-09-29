@@ -7,9 +7,9 @@
   },
   "files": ["src/test-setup.ts"],
   "include": [
-    "**/*.spec.ts",
+    "jest.config.ts",
     "**/*.test.ts",
-    "**/*.d.ts",
-    "jest.config.ts"
+    "**/*.spec.ts",
+    "**/*.d.ts"
   ]
 }

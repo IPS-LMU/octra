@@ -18,6 +18,7 @@ export class TranscriptionDeleteModalComponent extends OctraModal {
   AppInfo = AppInfo;
 
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('transcriptionDelete', modalRef, modalService);
+    super('transcriptionDelete');
+    this.init(modalService, modalRef);
   }
 }

@@ -9,6 +9,7 @@ import {OctraModal} from '../types';
 })
 export class LoginInvalidModalComponent extends OctraModal {
   constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('yesNoModal', modalRef, modalService);
+    super('yesNoModal');
+    this.init(modalService, modalRef);
   }
 }

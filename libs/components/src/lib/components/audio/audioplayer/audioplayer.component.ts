@@ -108,7 +108,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['audioChunk'] && changes.audioChunk.currentValue !== undefined) {
+    if (changes['audioChunk'] && changes['audioChunk'].currentValue !== undefined) {
       this.afterChunkUpdated();
     }
   }

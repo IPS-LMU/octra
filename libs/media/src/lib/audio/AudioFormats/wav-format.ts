@@ -16,7 +16,7 @@ export class WavFormat extends AudioFormat {
   protected dataStart = -1;
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
 
-  protected _blockAlign: number;
+  protected _blockAlign!: number;
 
   public get blockAlign() {
     return this._blockAlign;
@@ -27,13 +27,13 @@ export class WavFormat extends AudioFormat {
     this._extension = '.wav';
   }
 
-  private static writeString(view, offset, str: string) {
+  private static writeString(view: DataView, offset: number, str: string) {
     for (let i = 0; i < str.length; i++) {
       view.setUint8(offset + i, str.charCodeAt(i));
     }
   }
 
-  public init(filename: string, buffer: ArrayBuffer) {
+  public override init(filename: string, buffer: ArrayBuffer) {
     this.setDataStart(buffer);
     super.init(filename, buffer);
     this.setBlockAlign(buffer);
@@ -45,10 +45,10 @@ export class WavFormat extends AudioFormat {
    */
   public isValid(buffer: ArrayBuffer): boolean {
     let bufferPart = buffer.slice(0, 4);
-    let test1 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart));
+    let test1 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart) as any);
 
     bufferPart = buffer.slice(8, 12);
-    let test2 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart));
+    let test2 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart) as any);
     test1 = test1.slice(0, 4);
     test2 = test2.slice(0, 4);
     const byteCheck = new Uint8Array(buffer.slice(20, 21))[0] === 1;
@@ -209,7 +209,7 @@ export class WavFormat extends AudioFormat {
     : Promise<Uint8Array | Uint16Array> {
     return new Promise<Uint8Array | Uint16Array>((resolve, reject) => {
       let convertedData: Uint8Array | Uint16Array;
-      let result: Uint8Array | Uint16Array;
+      let result: Uint8Array | Uint16Array | undefined = undefined;
 
       // one block contains one sample of each channel
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
@@ -233,12 +233,12 @@ export class WavFormat extends AudioFormat {
         startPos = 44 + Math.round(start);
       }
 
-      if (result !== undefined) {
+      if (result) {
         // start and duration are the position in bytes after the header
-        const endPos = startPos + Math.round(dataChunkLength);
+        const endPos = startPos! + Math.round(dataChunkLength);
 
         if (selectedChannel === undefined || this._channels === 1) {
-          result.set(convertedData.slice(startPos, endPos));
+          result.set(convertedData!.slice(startPos!, endPos));
           resolve(result);
         } else {
           // get data from selected channel only
@@ -255,10 +255,10 @@ export class WavFormat extends AudioFormat {
           }
 
           let pointer = 0;
-          for (let i = startPos; i < endPos * this._channels; i++) {
+          for (let i = startPos!; i < endPos * this._channels; i++) {
             try {
               for (let j = 0; j < this._channels; j++) {
-                channelData[j][dataStart + pointer] = convertedData[dataStart + i + j];
+                channelData[j][dataStart + pointer] = convertedData![dataStart + i + j];
               }
               i++;
               pointer++;
@@ -345,7 +345,7 @@ export class WavFormat extends AudioFormat {
     while (test !== 'data') {
       result++;
       if (result + 4 < buffer.byteLength) {
-        const part = String.fromCharCode.apply(undefined, new Uint8Array(buffer.slice(result, result + 4)));
+        const part = String.fromCharCode.apply(undefined, new Uint8Array(buffer.slice(result, result + 4)) as any);
         test = '' + part.slice(0, 4) + '';
       } else {
         break;
@@ -371,7 +371,7 @@ export class WavFormat extends AudioFormat {
 
   public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): Promise<File[]> {
     return new Promise<File[]>((resolve, reject) => {
-      const result = [];
+      const result: File[] = [];
 
       if (this.isValid(buffer)) {
         if (this._channels > 1) {

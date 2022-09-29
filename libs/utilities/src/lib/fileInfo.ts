@@ -17,23 +17,23 @@ export class FileInfo extends DataInfo {
     return this._extension;
   }
 
-  protected _file: File;
+  protected _file: File | undefined;
 
-  get file(): File {
+  get file(): File | undefined {
     return this._file;
   }
 
-  set file(value: File) {
+  set file(value: File | undefined) {
     this._file = value;
   }
 
-  protected _url: string;
+  protected _url?: string;
 
-  get url(): string {
+  get url(): string | undefined {
     return this._url;
   }
 
-  set url(value: string) {
+  set url(value: string | undefined) {
     this._url = value;
   }
 
@@ -66,7 +66,7 @@ export class FileInfo extends DataInfo {
   private readonly _createdAt: number = 0;
 
   public constructor(fullname: string, type: string, size: number, file?: File, createdAt?: number) {
-    super(FileInfo.extractFileName(fullname).name, type, size);
+    super(FileInfo.extractFileName(fullname)!.name, type, size);
     this._createdAt = (createdAt === undefined) ? 0 : createdAt;
 
     const extraction = FileInfo.extractFileName(fullname);
@@ -82,7 +82,7 @@ export class FileInfo extends DataInfo {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
-  public static fromURL(url: string, type: string, name: string = undefined, createdAt = 0) {
+  public static fromURL(url: string, type: string, name: string | undefined = undefined, createdAt = 0) {
     let fullname = '';
     if (name != undefined) {
       const extension = url.substr(url.lastIndexOf('.') + 1);
@@ -133,7 +133,7 @@ export class FileInfo extends DataInfo {
     );
   }
 
-  public static extractFileName(fullname: string): { name: string, extension: string } {
+  public static extractFileName(fullname: string): { name: string, extension: string } | undefined {
     if (!(fullname === undefined || fullname === undefined) && fullname !== '') {
       const lastSlash = fullname.lastIndexOf('/');
       if (lastSlash > -1) {
@@ -158,7 +158,7 @@ export class FileInfo extends DataInfo {
     return undefined;
   }
 
-  public static fromAny(object): FileInfo {
+  public static fromAny(object: any): FileInfo {
     let file;
     if (object.content !== undefined && object.content !== '') {
       file = this.getFileFromContent(object.content, object.fullname);
@@ -180,7 +180,9 @@ export class FileInfo extends DataInfo {
   }
 
   public static getFileFromContent(content: string, filename: string, type?: string): File {
-    const properties = {
+    const properties: {
+      type?: string;
+    } = {
       type: ''
     };
 
@@ -222,13 +224,14 @@ export class FileInfo extends DataInfo {
   public updateContentFromURL(httpClient: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this._url !== undefined && this._url !== undefined) {
-        httpClient.get(this._url, {responseType: 'text'}).subscribe(
-          result => {
-            this._file = FileInfo.getFileFromContent(result, this.fullname, this._type);
-            this._size = this._file.size;
-            resolve();
-          },
-          error => reject(error)
+        httpClient.get(this._url, {responseType: 'text'}).subscribe({
+            next: (result: any) => {
+              this._file = FileInfo.getFileFromContent(result, this.fullname, this._type);
+              this._size = this._file.size;
+              resolve();
+            },
+            error: (error: any) => reject(error)
+          }
         );
       } else {
         reject(Error('URL of this file is invalid'));

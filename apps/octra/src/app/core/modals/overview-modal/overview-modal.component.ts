@@ -55,14 +55,15 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
               private cd: ChangeDetectorRef,
               private navbarService: NavbarService,
               public modalRef: MDBModalRef) {
-    super('overviewModal', modalRef, modalService);
+    super('overviewModal');
+    this.init(this.modalService, this.modalRef);
   }
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
   }
 
-  public close(fromModal = false) {
+  public override close(fromModal = false) {
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
       this.subscrmanager.removeById(this.shortcutID);

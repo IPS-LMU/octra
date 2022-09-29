@@ -125,25 +125,28 @@ export const modalConfigurations = {
 
 export class OctraModal {
   public readonly name: string;
-  public modalService: MDBModalService;
+  private _modalService: MDBModalService;
   public thisClose: EventEmitter<any>;
-  public modalRef: MDBModalRef;
+  private _modalRef: MDBModalRef;
   public action: Subject<any>;
 
-  protected constructor(name: string, modalRef: MDBModalRef, modalService: MDBModalService) {
+  protected constructor(name: string) {
     this.name = name;
     this.thisClose = new EventEmitter<any>();
-    this.modalService = modalService;
-    this.modalRef = modalRef;
+  }
+
+  public init(modalService: MDBModalService, modalRef: MDBModalRef) {
+    this._modalService = modalService;
+    this._modalRef = modalRef;
   }
 
   protected waitUntil(type: 'opened' | 'closed', action?: any): Promise<any> {
     return new Promise<any>((resolve) => {
       let observable;
       if (type === 'opened') {
-        observable = this.modalService.opened;
+        observable = this._modalService.opened;
       } else {
-        observable = this.modalService.closed;
+        observable = this._modalService.closed;
       }
       const subscr = observable.subscribe(() => {
         subscr.unsubscribe();
@@ -160,7 +163,7 @@ export class OctraModal {
   }
 
   public close(action?: any): Promise<any> {
-    this.modalRef.hide();
+    this._modalRef.hide();
     return this.waitUntil('closed', action);
   }
 

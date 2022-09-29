@@ -79,11 +79,7 @@ export abstract class Converter {
     return this._multitiers;
   }
 
-  protected constructor() {
+  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult | undefined;
 
-  }
-
-  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult;
-
-  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
+  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult | undefined;
 }

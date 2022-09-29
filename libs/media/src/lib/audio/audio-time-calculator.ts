@@ -29,10 +29,10 @@ export class AudioTimeCalculator {
 
   public absXChunktoSampleUnit(absX: number, chunk: AudioChunk): SampleUnit | undefined {
     const start = (chunk.time.start) ? chunk.time.start.samples : 1;
-    const duration = chunk.time.end.samples - start;
+    const duration = chunk.time.end!.samples - start;
     if (absX >= 0 && absX <= this.audioPxWidth) {
       const ratio = absX / this.audioPxWidth;
-      return new SampleUnit(AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start.samples)
+      return new SampleUnit(AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start!.samples)
         , chunk.sampleRate);
     }
 
@@ -41,7 +41,7 @@ export class AudioTimeCalculator {
 
   public absXtoSamples2(absX: number, chunk: AudioChunk): number {
     const start = (chunk.time.start) ? chunk.time.start.samples : 1;
-    const duration = chunk.time.end.samples - start;
+    const duration = chunk.time.end!.samples - start;
     if (absX >= 0 && absX <= this.audioPxWidth) {
       const ratio = absX / this.audioPxWidth;
 

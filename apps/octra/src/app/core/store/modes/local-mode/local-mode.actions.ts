@@ -4,7 +4,7 @@ import {SessionFile} from '../../../obj/SessionFile';
 import {LoginMode} from '../../index';
 
 export class LocalModeActions extends AnnotationActions {
-  static context: 'LocalMode';
+  static override context: 'LocalMode';
 
   public static login = createAction(
     `[${LocalModeActions.context}] Login Local`,
@@ -23,7 +23,7 @@ export class LocalModeActions extends AnnotationActions {
     }>()
   );
 
-  public static clearSessionStorageSuccess = createAction(
+  public static override clearSessionStorageSuccess = createAction(
     `[${LocalModeActions.context}] Clear Session Success`
   );
 }

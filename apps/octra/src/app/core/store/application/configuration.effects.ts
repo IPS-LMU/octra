@@ -11,7 +11,7 @@ import {Subject} from 'rxjs';
 import {exhaustMap} from 'rxjs/operators';
 import '../../schemata/appconfig.schema';
 import {AppConfigSchema} from '../../schemata/appconfig.schema';
-import {GuidelinesSchema, ProjectConfigSchema} from '@octra/assets';
+import {OctraGuidelinesJSONSchema, OctraProjectConfigJSONSchema} from '@octra/assets';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);
@@ -171,11 +171,11 @@ export class ConfigurationEffects {
         },
         {
           json: './config/localmode/projectconfig.json',
-          schema: ProjectConfigSchema
+          schema: OctraProjectConfigJSONSchema
         },
         {
           json: 'projectconfig.json',
-          schema: ProjectConfigSchema
+          schema: OctraProjectConfigJSONSchema
         },
         (projectConfig: ProjectSettings) => {
           subject.next(ConfigurationActions.projectConfigurationLoaded({
@@ -215,11 +215,11 @@ export class ConfigurationEffects {
         },
         {
           json: url,
-          schema: GuidelinesSchema
+          schema: OctraGuidelinesJSONSchema
         },
         {
           json: 'guidelines_' + language + '.json',
-          schema: GuidelinesSchema
+          schema: OctraGuidelinesJSONSchema
         },
         (guidelines: any) => {
           subject.next(ConfigurationActions.loadGuidelinesSuccess({

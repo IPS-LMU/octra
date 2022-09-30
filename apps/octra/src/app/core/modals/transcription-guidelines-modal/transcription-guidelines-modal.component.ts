@@ -13,9 +13,9 @@ import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import videojs from 'video.js/dist/video.js';
 import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import videojs from 'video.js';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',

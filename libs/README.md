@@ -1,7 +1,7 @@
 # OCTRA libraries
 
 **WIP** This sections shows an overview of all custom libraries used by OCTRA:
-
+- assets: library with shared assets in octra applications e.g. JSON schemata
 - components: Angular components e.g. for the signal displays.
 - annotation: Objects and other classes used to handle annotation tasks
 - media: all media related classes (for now audio only: audio playback a.s.o)

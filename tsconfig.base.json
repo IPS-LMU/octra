@@ -24,20 +24,23 @@
       "@octra/annotation": [
         "libs/annotation/src/index.ts"
       ],
+      "@octra/api-types": [
+        "../octra-backend/dist/libs/api-types/src/index.ts"
+      ],
+      "@octra/assets": [
+        "libs/assets/src/index.ts"
+      ],
       "@octra/components": [
         "libs/components/src/index.ts"
       ],
       "@octra/media": [
         "libs/media/src/index.ts"
       ],
-      "@octra/utilities": [
-        "libs/utilities/src/index.ts"
-      ],
       "@octra/ngx-octra-api": [
         "../octra-backend/dist/libs/ngx-octra-api/src/index.ts"
       ],
-      "@octra/api-types": [
-        "../octra-backend/dist/libs/api-types/src/index.ts"
+      "@octra/utilities": [
+        "libs/utilities/src/index.ts"
       ]
     }
   },

@@ -11,8 +11,7 @@ import {Subject} from 'rxjs';
 import {exhaustMap} from 'rxjs/operators';
 import '../../schemata/appconfig.schema';
 import {AppConfigSchema} from '../../schemata/appconfig.schema';
-import {ProjectConfigSchema} from '../../schemata/projectconfig.schema';
-import {GuidelinesSchema} from '../../schemata/guidelines.schema';
+import {GuidelinesSchema, ProjectConfigSchema} from '@octra/assets';
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);

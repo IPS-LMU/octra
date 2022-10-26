@@ -199,10 +199,6 @@ Export: Octra can't create the following tags: Event, Who, Background. Octra cre
                         lastSegmentEndTime = lastSegment.sampleStart + lastSegment.sampleDur;
                       }
 
-                      // TODO CONTINUE HERE
-                      // TODO check case that there is no identified speaker (e.g. ASR)
-                      // TODO there could be a last segment with start equal audio end
-
                       if (lastTurnChild && lastTurnChild.nodeName !== 'Event') {
                         if (!newStartTime) {
                           // use turn start time

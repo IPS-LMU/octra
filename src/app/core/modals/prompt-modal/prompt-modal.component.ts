@@ -4,7 +4,7 @@ import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
 import {OAudiofile} from '../../obj/Annotation';
-import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
+import {AnnotJSONConverter, PartiturConverter, TextConverter, Trans14Converter} from '../../obj/Converters';
 
 @Component({
   selector: 'app-prompt-modal',
@@ -40,7 +40,7 @@ export class PromptModalComponent implements OnInit {
       let found = false;
       if (this.formatConverter === undefined) {
         for (const converter of AppInfo.converters) {
-          if(converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter){
+          if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter || converter instanceof Trans14Converter) {
             const result = converter.import({
               name: audiofile.name,
               content: this.appStorage.prompttext,

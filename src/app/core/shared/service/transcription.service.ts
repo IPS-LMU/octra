@@ -5,7 +5,7 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
+import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter, Trans14Converter} from '../';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
@@ -154,7 +154,7 @@ export class TranscriptionService {
             }).catch(() => {
               // ignore
             });
-          }
+          };
           this.subscrmanager.add(timer(5000).subscribe(() => {
             readNotification();
           }));
@@ -235,14 +235,14 @@ export class TranscriptionService {
     } else {
       console.error(new Error('can not save segments because annotation is null'));
     }
-  }
+  };
   /**
    * resets the parent object values. Call this function after transcription was saved
    */
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
-  }
+  };
 
   public getSegmentFirstLevel(): number {
     for (let i = 0; this.annotation.levels.length; i++) {
@@ -421,7 +421,7 @@ export class TranscriptionService {
                     // check if prompttext ist a transcription format like AnnotJSON
                     let converted: OAnnotJSON;
                     for (const converter of AppInfo.converters) {
-                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter || converter instanceof Trans14Converter) {
                         const result = converter.import({
                           name: this._audiofile.name,
                           content: this.appStorage.prompttext,
@@ -536,7 +536,7 @@ export class TranscriptionService {
             reject(Error('annotation object in appStorage is null'));
           }
           resolve();
-        })
+        });
       }
     );
   }

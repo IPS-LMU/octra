@@ -15,6 +15,7 @@ import {NavigationExtras} from '@angular/router';
 import {ELANConverter} from './core/obj/Converters/ELANConverter';
 import {SRTConverter} from './core/obj/Converters/SRTConverter';
 import {WebVTTConverter} from './core/obj/Converters/WebVTTConverter';
+import {Trans14Converter} from './core/obj/Converters/Trans14Converter/Trans14Converter';
 
 declare var octraVersion: string;
 declare var octraLastUpdated: string;
@@ -40,6 +41,7 @@ export class AppInfo {
     new ELANConverter(),
     new SRTConverter(),
     new WebVTTConverter(),
+    new Trans14Converter(),
     new TextConverter()
   ];
 

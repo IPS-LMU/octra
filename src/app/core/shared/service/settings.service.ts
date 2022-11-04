@@ -8,9 +8,10 @@ import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {UpdateManager} from '../UpdateManager';
-import {Params} from '@angular/router';
+import {Params, Router} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
+import {parseServerDataEntry} from '../../obj/data-entry';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -95,7 +96,8 @@ export class SettingsService {
   }
 
   constructor(private http: HttpClient,
-              private appStorage: AppStorageService, private api: APIService, private langService: TranslocoService) {
+              private appStorage: AppStorageService, private api: APIService,
+              private langService: TranslocoService, private router: Router) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -241,7 +243,7 @@ export class SettingsService {
       this.dbloaded.error(error);
       console.error(error.target.error);
     });
-  }
+  };
 
   public loadProjectSettings: () => Promise<void> = () => {
     return new Promise<void>((resolve, reject) => {
@@ -271,7 +273,7 @@ export class SettingsService {
         }
       );
     });
-  }
+  };
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -298,7 +300,7 @@ export class SettingsService {
         console.error(error);
       }
     );
-  }
+  };
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     console.log('Load methods...');
     return Functions.uniqueHTTPRequest(this.http, false, {
@@ -330,7 +332,7 @@ export class SettingsService {
         this.validationmethodloaded.emit();
       }
     );
-  }
+  };
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
@@ -346,14 +348,13 @@ export class SettingsService {
           src = this.appStorage.audioURL;
         }
         // extract filename
-        this._filename = this.appStorage.audioURL.substr(this.appStorage.audioURL.lastIndexOf('/') + 1);
+        this._filename = src.substr(src.lastIndexOf('/') + 1);
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
         if (this._filename.indexOf('src=') > -1) {
           this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
         }
 
         audioService.loadAudio(src, () => {
-
           this.audioloaded.emit({status: 'success'});
         }).subscribe(
           (progress) => {
@@ -365,12 +366,16 @@ export class SettingsService {
           },
           (err) => {
             this._log = 'Loading audio file failed<br/>';
-            console.error(err);
+            console.error(err.message);
+            if (this.appStorage.usemode === 'online') {
+              // mark job as FAILED and select another job
+              this.failSessionAndSelectNewOne(this.appStorage.dataID, err.message);
+            }
           }
         );
       } else {
         this._log += `No audio source found. Please click on "Back" and try it again.`;
-        console.error('audio src is null');
+        console.error('No audio source found.');
         this.audioloaded.emit({status: 'error'});
       }
     } else if (this.appStorage.usemode === 'local') {
@@ -387,11 +392,78 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  }
+  };
+
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
       this.test.next(true);
+    }
+  };
+
+  private async failSessionAndSelectNewOne(dataID: number, errorMessage: string) {
+    this._log = 'Loading Job failed. Select another one...';
+    console.log('select another job...');
+    const test = await this.api.failSession(dataID, errorMessage);
+    const newJob = await this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno);
+
+    console.log('clear session...');
+    this.appStorage.clearSession();
+    await this.appStorage.clearLocalStorage();
+
+    const res = this.appStorage.setSessionData({
+      id: this.appStorage.user.id,
+      project: this.appStorage.user.project,
+      jobno: this.appStorage.user.jobno
+    }, newJob.data.id, newJob.data.url);
+
+    // get transcript data that already exists
+    const jsonStr = JSON.stringify(newJob.data);
+    this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
+
+    if (isNullOrUndefined(this.appStorage.serverDataEntry.transcript) ||
+      !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+      this.appStorage.serverDataEntry.transcript = [];
+    }
+
+    if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
+      !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+      this.appStorage.serverDataEntry.logtext = [];
+    }
+
+    if (this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
+      // get transcript data that already exists
+      const prompt = this.appStorage.serverDataEntry.prompttext;
+      this.appStorage.prompttext = (prompt) ? prompt : '';
+    } else {
+      this.appStorage.prompttext = '';
+    }
+
+    if (this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
+      // get transcript data that already exists
+      const comment = this.appStorage.serverDataEntry.comment;
+
+      if (comment) {
+        this.appStorage.servercomment = comment;
+      }
+    } else {
+      this.appStorage.servercomment = '';
+    }
+
+    if (newJob.hasOwnProperty('message')) {
+      const counter = (newJob.message === '') ? '0' : newJob.message;
+      this.appStorage.sessStr.store('jobsLeft', Number(counter));
+    }
+
+    console.log('new job prepared');
+    const appStorage = this.appStorage;
+    if (res.error === '') {
+      this._log = 'Found a new job for you. Reloading in 2 seconds...';
+      setTimeout(() => {
+        document.location.reload();
+      }, 2000);
+    } else {
+      this._log = res.error;
     }
   }
 

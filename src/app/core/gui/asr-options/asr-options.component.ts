@@ -28,6 +28,7 @@ export class AsrOptionsComponent implements OnInit {
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
   @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
+  @ViewChild('dropdown2', {static: true}) dropdown2: BsDropdownDirective;
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
@@ -146,5 +147,13 @@ export class AsrOptionsComponent implements OnInit {
     } else {
       console.error(`could not stop ASR because segment number was not found.`);
     }
+  }
+
+  onMAUSLangChanged(language: string, code: string) {
+    this.asrService.selectedMAUSLanguage = {
+      language, code
+    };
+
+    this.dropdown2.hide();
   }
 }

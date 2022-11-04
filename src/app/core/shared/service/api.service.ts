@@ -3,6 +3,8 @@ import {API} from '../../obj/API/api.interface';
 import {DomSanitizer} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
 import {isNullOrUndefined} from '../Functions';
+import {error} from 'protractor';
+import * as moment from 'moment';
 
 @Injectable()
 export class APIService implements API {
@@ -129,6 +131,16 @@ export class APIService implements API {
     }
   }
 
+  public failSession(dataID: number, errorMessage: string): Promise<any> {
+    const date = moment().toISOString(false);
+    return this.post({
+      querytype: 'continueannotation',
+      status: 'FAILED',
+      comment: `${date}: ${errorMessage}`,
+      id: dataID
+    });
+  }
+
   public closeSession(annotator: string, id: number, comment: string): Promise<any> {
     comment = (comment) ? comment : '';
 
@@ -242,5 +254,5 @@ export class APIService implements API {
         resolve();
       }
     });
-  }
+  };
 }

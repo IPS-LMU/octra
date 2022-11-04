@@ -53,7 +53,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const serv = this.bugService;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.log = function (message) {
+        console.log = function(message) {
           serv.addEntry(ConsoleType.LOG, message);
           oldLog.apply(console, arguments);
         };
@@ -63,7 +63,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function (error, context) {
+        console.error = function(error, context) {
           let debug = '';
           let stack = '';
 
@@ -101,7 +101,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldWarn = console.warn;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.warn = function (message) {
+        console.warn = function(message) {
           serv.addEntry(ConsoleType.WARN, message);
           oldWarn.apply(console, arguments);
         };
@@ -127,6 +127,14 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           } else {
             console.error('Could not read ASR language from database');
           }
+        }
+
+        if (!isNullOrUndefined(this.appStorage.mausSelectedLanguage) && !isNullOrUndefined(this.appStorage.mausSelectedLanguage)) {
+          // set asr settings
+          this.asrService.selectedMAUSLanguage = {
+            language: this.appStorage.mausSelectedLanguage.language,
+            code: this.appStorage.mausSelectedLanguage.code
+          };
         }
 
         this.appStorage.loadConsoleEntries().then((dbEntry: any) => {
@@ -208,12 +216,18 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   private getParameterByName(name, url = null) {
-    if (!url) url = document.location.href;
+    if (!url) {
+      url = document.location.href;
+    }
     name = name.replace(/[\[\]]/g, '\\$&');
     const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
       results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
+    if (!results) {
+      return null;
+    }
+    if (!results[2]) {
+      return '';
+    }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 

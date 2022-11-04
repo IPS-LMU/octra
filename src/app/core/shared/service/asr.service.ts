@@ -48,9 +48,18 @@ export class AsrService {
     }
   }
 
-  public static authURL = '';
-  private _selectedLanguage: ASRLanguage = null;
-  private _queue: ASRQueue;
+  get selectedMAUSLanguage(): { language: string; code: string; } {
+    return this._selectedMAUSLanguage;
+  }
+
+  set selectedMAUSLanguage(value: { language: string; code: string; }) {
+    this._selectedMAUSLanguage = value;
+    if (!isNullOrUndefined(value)) {
+      this.appStorage.mausSelectedLanguage = value;
+    } else {
+      this.appStorage.mausSelectedLanguage = null;
+    }
+  }
 
   public get asrSettings(): ASRSettings {
     return this.settingsService.appSettings.octra.plugins.asr;
@@ -60,10 +69,196 @@ export class AsrService {
               private audioService: AudioService, private transcrService: TranscriptionService, private router: Router) {
   }
 
+  public static authURL = '';
+
+  public allowedMAUSLanguages = [
+    {
+      label: 'Aboriginal Languages (AU)',
+      code: 'aus-AU'
+    },
+    {
+      label: 'Afrikaans (ZA)',
+      code: 'afr-ZA'
+    },
+    {
+      label: 'Albanian (AL)',
+      code: 'sqi-AL'
+    },
+    {
+      label: 'Arabic (macro)',
+      code: 'arb'
+    },
+    {
+      label: 'Basque (ES)',
+      code: 'eus-ES'
+    },
+    {
+      label: 'Basque (FR)',
+      code: 'eus-FR'
+    },
+    {
+      label: 'Catalan (ES)',
+      code: 'cat-ES'
+    },
+    {
+      label: 'Dutch (BE)',
+      code: 'nld-BE'
+    },
+    {
+      label: 'Dutch (NL)',
+      code: 'nld-NL'
+    },
+    {
+      label: 'English (AU)',
+      code: 'eng-AU'
+    },
+    {
+      label: 'English (US)',
+      code: 'eng-US'
+    },
+    {
+      label: 'English (GB)',
+      code: 'eng-GB'
+    },
+    {
+      label: 'English (SC)',
+      code: 'eng-SC'
+    },
+    {
+      label: 'English (NZ)',
+      code: 'eng-NZ'
+    },
+    {
+      label: 'Estonian (EE)',
+      code: 'ekk-EE'
+    },
+    {
+      label: 'Finnish (FI)',
+      code: 'fin-FI'
+    },
+    {
+      label: 'French (FR)',
+      code: 'fra-FR'
+    },
+    {
+      label: 'Georgian (GE)',
+      code: 'kat-GE'
+    },
+    {
+      label: 'German (AT)',
+      code: 'deu-AT'
+    },
+    {
+      label: 'German (CH)',
+      code: 'deu-CH'
+    },
+    {
+      label: 'German (DE)',
+      code: 'deu-DE'
+    },
+    {
+      label: 'German Dieth (CH)',
+      code: 'gsw-CH'
+    },
+    {
+      label: 'German Dieth (CH), Bern dialect',
+      code: 'gsw-CH-BE'
+    },
+    {
+      label: 'German Dieth (CH), Basel dialect',
+      code: 'gsw-CH-BS'
+    },
+    {
+      label: 'German Dieth (CH), Graubunden dialect',
+      code: 'gsw-CH-GR'
+    },
+    {
+      label: 'German Dieth (CH), St. Gallen dialect',
+      code: 'gsw-CH-SG'
+    },
+    {
+      label: 'German Dieth (CH), Zurich dialect',
+      code: 'gsw-CH-ZH'
+    },
+    {
+      label: 'Hungarian (HU)',
+      code: 'hun-HU'
+    },
+    {
+      label: 'Icelandic (IS)',
+      code: 'isl-IS'
+    },
+    {
+      label: 'Italian (IT)',
+      code: 'ita-IT'
+    },
+    {
+      label: 'Japanese (JP)',
+      code: 'jpn-JP'
+    },
+    {
+      label: 'Kunwinjku, Western and Central Arnhem Land (AU)',
+      code: 'gup-AU'
+    },
+    {
+      label: 'Luxembourgish (LU)',
+      code: 'ltz-LU'
+    },
+    {
+      label: 'Maltese (MT)',
+      code: 'mlt-MT'
+    },
+    {
+      label: 'Norwegian (NO)',
+      code: 'nor-NO'
+    },
+    {
+      label: 'Persian (IR)',
+      code: 'fas-IR'
+    },
+    {
+      label: 'Polish (PL)',
+      code: 'pol-PL'
+    },
+    {
+      label: 'Romanian (RO)',
+      code: 'ron-RO'
+    },
+    {
+      label: 'Russian (RU)',
+      code: 'rus-RU'
+    },
+    {
+      label: 'Spanish (ES)',
+      code: 'spa-ES'
+    },
+    {
+      label: 'Swedish (SE)',
+      code: 'swe-SE'
+    },
+    {
+      label: 'Thai (TH)',
+      code: 'tha-TH'
+    },
+    {
+      label: 'Yolŋu Matha, Gupapuyngu, Eastern Arnhem Land (AU)',
+      code: 'guf-AU'
+    }
+  ];
+  private _selectedLanguage: ASRLanguage = null;
+  private _selectedMAUSLanguage: {
+    language: string;
+    code: string;
+  } = null;
+  private _queue: ASRQueue;
+
   public init() {
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
     if (!isNullOrUndefined(this.appStorage.asrSelectedLanguage) && !isNullOrUndefined(this.appStorage.asrSelectedService)) {
       this._selectedLanguage = this.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
+    }
+    if (!isNullOrUndefined(this.appStorage.mausSelectedLanguage)) {
+      this._selectedMAUSLanguage = this.appStorage.mausSelectedLanguage;
     }
   }
 
@@ -96,7 +291,7 @@ export class AsrService {
       sampleStart: timeInterval.sampleStart,
       sampleLength: timeInterval.sampleLength,
       browserSampleEnd: timeInterval.browserSampleEnd
-    }, this.queue, this.selectedLanguage, type, transcript);
+    }, this.queue, this.selectedLanguage, type, this.selectedMAUSLanguage, transcript);
     this.queue.add(item);
     return item;
   }
@@ -431,6 +626,7 @@ export class ASRQueueItem {
   }>;
   private parent: ASRQueue;
   private readonly _selectedLanguage: ASRLanguage;
+  private readonly _selectedMAUSLanguage: string;
   private _result: string;
   private readonly _type: ASRQueueItemType;
 
@@ -438,7 +634,10 @@ export class ASRQueueItem {
     sampleStart: number,
     sampleLength: number,
     browserSampleEnd: number
-  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType, transcriptInput = '') {
+  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType, selectedMAUSLanguage?: {
+    language: string;
+    code: string;
+  }, transcriptInput = '') {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
@@ -452,6 +651,7 @@ export class ASRQueueItem {
     }>();
     this.parent = asrQueue;
     this._selectedLanguage = selectedLanguage;
+    this._selectedMAUSLanguage = selectedMAUSLanguage && selectedMAUSLanguage.code ? selectedMAUSLanguage.code : selectedLanguage.code;
     this._type = type;
     this._transcriptInput = transcriptInput;
   }
@@ -482,7 +682,7 @@ export class ASRQueueItem {
         // call ASR and than MAUS
         this.transcribeSignalWithASR('txt', accessCode).then((result) => {
 
-          this.callMAUS(this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
+          this.callMAUS(this._selectedMAUSLanguage, this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
             const reader = new FileReader();
 
             reader.onerror = (error) => {
@@ -560,9 +760,9 @@ export class ASRQueueItem {
         if (json.success === 'true') {
           // TODO set urls to results only
           // json attribute entry is an object
-          resolve(json.fileList.entry['value']);
+          resolve(json.fileList.entry.value);
         } else {
-          reject(json['message']);
+          reject(json.message);
         }
       };
       xhr.send(form);
@@ -622,7 +822,7 @@ export class ASRQueueItem {
     });
   }
 
-  private callMAUS(languageObject: ASRLanguage, audioURL: string, transcriptURL: string): Promise<{
+  private callMAUS(languageCode: string, languageObject: ASRLanguage, audioURL: string, transcriptURL: string): Promise<{
     file: File,
     url: string
   }> {
@@ -630,11 +830,10 @@ export class ASRQueueItem {
       file: File,
       url: string
     }>((resolve, reject) => {
-      let mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
+      const mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
         .replace('{{audioURL}}', audioURL)
         .replace('{{transcriptURL}}', transcriptURL)
-        .replace('{{asrType}}', languageObject.asr)
-        .replace('{{language}}', languageObject.code);
+        .replace('{{language}}', languageCode);
 
       this.parent.httpClient.post(mausURL, {}, {
         headers: {
@@ -710,7 +909,7 @@ export class ASRQueueItem {
                     resolve({
                       audioURL,
                       transcriptURL: asrResult.url
-                    })
+                    });
                   };
 
                   reader.onerror = (error: any) => {
@@ -785,7 +984,7 @@ export class ASRQueueItem {
 
             if (this._status !== ASRProcessStatus.STOPPED) {
               // 3) signal audio url and transcriptURL to MAUS
-              this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
+              this.callMAUS(this._selectedMAUSLanguage, this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
 
                   const reader = new FileReader();

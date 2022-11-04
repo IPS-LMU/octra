@@ -100,7 +100,8 @@
     "Send feedback": "Send feedback",
     "reload": "reload",
     "Options": "Options",
-    "about": "About"
+    "about": "About",
+    "MAUS language": "MAUS language"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -118,7 +119,8 @@
     "send": "Send transcription",
     "complete": "Complete Transcription",
     "invalid": "Only valid transcripts are accepted. Please correct your transcript.",
-    "no prompttext": "The prompt text can not be shown."
+    "no prompttext": "The prompt text can not be shown.",
+    "need audio playback": "You have to start audio playback at least once before sending the transcription."
   },
   "segments": {
     "total": "Total transcription units",
@@ -227,7 +229,7 @@
     "online mode disabled": "Online mode is currently inactive. Please use OCTRA locally.",
     "online mode description": "In online mode you automatically get audio files for transcription.",
     "local mode": "Local Mode",
-    "local mode description": "In local mode you can transcribe audio files from your computer. Your data will not be uploaded to a server.",
+    "local mode description": "In local mode you can transcribe audio files from your computer. Your data will not be uploaded to a server unless you don't want to use one of the web-services (ASR or word-alignment).",
     "old file found": "There is data from a previous transcription available. If you would like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}",
     "online mode data warning": "There is local data available that was created in local mode. If you want to continue in online mode this data will be overwritten.",
     "offline mode data warning": "There is local data available that was created in online mode. If you want to continue in local mode this data will be overwritten.",

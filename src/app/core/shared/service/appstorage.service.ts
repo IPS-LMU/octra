@@ -290,6 +290,23 @@ export class AppStorageService {
     });
   }
 
+
+  get mausSelectedLanguage(): { language: string; code: string; } {
+    return {
+      language: this._maus.selectedLanguage,
+      code: this._maus.selectedCode
+    };
+  }
+
+  set mausSelectedLanguage(value: { language: string; code: string; }) {
+    this._maus.selectedLanguage = value.language;
+    this._maus.selectedCode = value.code;
+
+    this.idb.save('options', 'maus', {value: this._maus}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   get asrSelectedService(): string {
     return this._asr.selectedService;
   }
@@ -518,6 +535,11 @@ export class AppStorageService {
     selectedService: null
   };
 
+  private _maus = {
+    selectedLanguage: null,
+    selectedCode: null
+  };
+
 
   public loginActivityChanged = new Subject<boolean>();
   private _secondsPerLine = 5;
@@ -565,7 +587,7 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  }
+  };
   public getSessionFile = (file: File) => {
     return new SessionFile(
       file.name,
@@ -573,7 +595,7 @@ export class AppStorageService {
       new Date(file.lastModified),
       file.type
     );
-  }
+  };
   public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
@@ -613,7 +635,7 @@ export class AppStorageService {
         console.error(err);
       });
     });
-  }
+  };
 
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
@@ -624,7 +646,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  }
+  };
   private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
@@ -660,7 +682,7 @@ export class AppStorageService {
         );
       }
     );
-  }
+  };
 
   public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): { error: string } {
     if ((this._easymode === null || this._easymode === undefined)) {
@@ -900,6 +922,10 @@ export class AppStorageService {
           key: 'asr'
         },
         {
+          attribute: '_maus',
+          key: 'maus'
+        },
+        {
           attribute: '_accessCode',
           key: 'accessCode'
         },
@@ -963,7 +989,7 @@ export class AppStorageService {
           resolve();
         }, (err) => {
           subscr.unsubscribe();
-          reject(err)
+          reject(err);
         });
       } else {
         resolve();

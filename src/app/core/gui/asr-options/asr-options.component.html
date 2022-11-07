@@ -27,11 +27,12 @@
         <tr>
           <th>{{"general.Language" | transloco}}</th>
           <th>{{"general.Service Provider" | transloco}}</th>
+          <th>Free quota</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-          <td colspan="2" (click)="onASRLangChanged(null)">{{"asr.without asr" | transloco}}</td>
+          <td colspan="3" class="text-center font-weight-bold" (click)="onASRLangChanged(null)">{{"asr.without asr" | transloco}}</td>
         </tr>
         <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
           <tr [ngClass]="{
@@ -89,6 +90,22 @@
                   </tbody>
                 </table>
               </ng-template>
+            </td>
+            <td style="width:100px">
+              <div class="progress h-100">
+                <ng-template #popTemplate><div id="quota-tooltip" [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(lang.asr) + '</div>'"></div></ng-template>
+                <div class="progress-bar bg-success" role="progressbar"  [popover]="popTemplate"
+                     triggers="mouseenter:mouseleave"
+                     [ngStyle]="{
+                            width: (100 - getQuotaPercentage(lang.asr)) + '%'
+                          }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
+                  {{(100 - getQuotaPercentage(lang.asr)) + '%'}}
+                </div>
+                <div class="progress-bar bg-danger" role="progressbar" *ngIf="getQuotaPercentage(lang.asr) > 0" [ngStyle]="{
+                            width: getQuotaPercentage(lang.asr) + '%'
+                          }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                  <ng-container *ngIf="getQuotaPercentage(lang.asr) > 90">{{(100 - getQuotaPercentage(lang.asr)) + '%'}}</ng-container></div>
+              </div>
             </td>
           </tr>
         </ng-container>

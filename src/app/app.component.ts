@@ -172,6 +172,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       }
 
 
+      this.settingsService.updateASRInfo(this.settingsService.appSettings).then((result) => {
+        console.log(`LOADED and updated!`);
+      }).catch((error) => {
+        console.error(error);
+      });
+
+
     }).catch((error) => {
       console.error(error);
     });

@@ -58,25 +58,33 @@ export interface AppSettings {
 }
 
 export interface ASRLanguage {
-  code: string,
-  name: string,
-  asr: string,
-  state: string,
-  host: string
+  code: string;
+  name: string;
+  asr: string;
+  state: string;
+  host: string;
 }
 
 export interface ASRService {
-  provider: string,
-  type: string,
-  termsURL: string,
-  dataStoragePolicy: string,
-  homepageURL: string,
-  logoURL: string
+  provider: string;
+  basName?: string;
+  maxSignalDuration?: number;
+  maxSignalSize?: number;
+  quotaPerMonth?: number;
+  knownIssues?: string;
+  usedQuota?: number;
+  type: string;
+  termsURL: string;
+  dataStoragePolicy: string;
+  homepageURL: string;
+  logoURL: string;
 }
 
 export interface ASRSettings {
-  enabled: boolean,
-  calls: string[],
-  services: ASRService[],
-  languages: ASRLanguage[]
+  enabled: boolean;
+  calls: string[];
+  languages: ASRLanguage[];
+  services: ASRService[];
+  asrInfoURL?: string;
+  asrQuotaInfoURL?: string;
 }

@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
-import {AppSettings, ProjectSettings} from '../../obj/Settings';
+import {AppSettings, ASRSettings, ProjectSettings} from '../../obj/Settings';
 import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {HttpClient} from '@angular/common/http';
@@ -12,6 +12,8 @@ import {Params, Router} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
+import {ASRPluginConfiguration} from '../../obj/oh-config';
+import * as X2JS from 'x2js';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -20,7 +22,7 @@ export class SettingsService {
   public get isASREnabled(): boolean {
     return (!isNullOrUndefined(this.appSettings.octra.plugins.asr) &&
       !isNullOrUndefined(this.appSettings.octra.plugins.asr.enabled)
-      && this.appSettings.octra.plugins.asr.enabled == true
+      && this.appSettings.octra.plugins.asr.enabled === true
       && !isNullOrUndefined(this.appSettings.octra.plugins.asr.calls)
       && this.appSettings.octra.plugins.asr.calls.length === 2
       && this.appSettings.octra.plugins.asr.calls[0] !== ''
@@ -583,5 +585,165 @@ export class SettingsService {
     }
 
     return undefined;
+  }
+
+  updateASRInfo(json: AppSettings): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (json.octra.plugins.asr.asrInfoURL && json.octra.plugins.asr.asrInfoURL.trim() !== '') {
+        this.http.get(
+          json.octra.plugins.asr.asrInfoURL,
+          {responseType: 'text'}
+        ).subscribe({
+          next: (result) => {
+            const html = jQuery(result);
+            const basTable = html.find('#bas-asr-service-table');
+            const basASRInfoContainers = basTable.find('.bas-asr-info-container');
+
+            const asrInfos: {
+              name?: string,
+              maxSignalDuration?: number,
+              maxSignalSize?: number,
+              quotaPerMonth?: number,
+              termsURL?: string,
+              dataStoragePolicy?: string,
+              knownIssues?: string
+            }[] = [];
+
+            jQuery.each(basASRInfoContainers, (key, elem) => {
+              const isStringNumber = (str: string) => !isNaN(Number(str));
+              const sanitizeNumberValue = (el: any, attr: string) => {
+                if (el[attr] && isStringNumber(el[attr])) {
+                  el[attr] = Number(el[attr]);
+                } else {
+                  el[attr] = undefined;
+                }
+              };
+              const sanitizeStringValue = (el: any, attr: string) => {
+                if (el[attr] && typeof el[attr] === 'string') {
+                  el[attr] = el[attr].replace(/[\n\t\r]+/g, '');
+                } else {
+                  el[attr] = undefined;
+                }
+              };
+
+              const newElem: {
+                name?: string,
+                maxSignalDuration?: number,
+                maxSignalSize?: number,
+                quotaPerMonth?: number,
+                termsURL?: string,
+                dataStoragePolicy?: string,
+                knownIssues?: string
+              } = {
+                name: jQuery(elem).attr('data-bas-asr-info-provider-name'),
+                maxSignalDuration: Number(jQuery(elem).find('.bas-asr-info-max-signal-duration-seconds').attr('data-value')),
+                maxSignalSize: Number(jQuery(elem).find('.bas-asr-info-max-signal-size-megabytes').attr('data-value')),
+                quotaPerMonth: Number(jQuery(elem).find('.bas-asr-info-quota-per-month-seconds').attr('data-value')),
+                termsURL: jQuery(elem).find('.bas-asr-info-eula-link').attr('href'),
+                dataStoragePolicy: jQuery(elem).find('.bas-asr-info-data-storage-policy').text(),
+                knownIssues: jQuery(elem).find('.bas-asr-info-known-issues').text()
+              };
+
+              sanitizeNumberValue(newElem, 'maxSignalDuration');
+              sanitizeNumberValue(newElem, 'maxSignalSize');
+              sanitizeNumberValue(newElem, 'quotaPerMonth');
+              sanitizeStringValue(newElem, 'dataStoragePolicy');
+              sanitizeStringValue(newElem, 'knownIssues');
+              newElem.knownIssues = (newElem.knownIssues && newElem.knownIssues.trim() === 'none') ? undefined : newElem.knownIssues;
+
+              asrInfos.push(newElem);
+            });
+
+            // overwrite data of config
+            for (const service of json.octra.plugins.asr.services) {
+              if (service.basName) {
+                const basInfo = asrInfos.find(a => a.name === service.basName);
+                if (basInfo !== undefined) {
+                  service.dataStoragePolicy = basInfo.dataStoragePolicy ? basInfo.dataStoragePolicy : service.dataStoragePolicy;
+                  service.maxSignalDuration = basInfo.maxSignalDuration ? basInfo.maxSignalDuration : service.maxSignalDuration;
+                  service.maxSignalSize = basInfo.maxSignalSize ? basInfo.maxSignalSize : service.maxSignalSize;
+                  service.knownIssues = basInfo.knownIssues ? basInfo.knownIssues : service.knownIssues;
+                  service.quotaPerMonth = basInfo.quotaPerMonth ? basInfo.quotaPerMonth : service.quotaPerMonth;
+                  service.termsURL = basInfo.termsURL ? basInfo.termsURL : service.termsURL;
+                }
+              }
+            }
+            this.updateASRQuotaInfo(json).then(() => {
+              resolve();
+            });
+          },
+          error: (e) => {
+            console.error(e);
+            resolve(e);
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public async updateASRQuotaInfo(json: AppSettings): Promise<void> {
+    const results = [];
+    for (const service of json.octra.plugins.asr.services) {
+      if (service.type === 'ASR' && json.octra.plugins.asr.asrQuotaInfoURL) {
+        results.push(await this.getASRQuotaInfo(json.octra.plugins.asr.asrQuotaInfoURL, service.provider));
+      }
+    }
+
+    for (const result of results) {
+      const serviceIndex = json.octra.plugins.asr.services.findIndex(a => a.provider === result.asrName);
+
+      if (serviceIndex > -1) {
+        json.octra.plugins.asr.services[serviceIndex].usedQuota = result.usedQuota;
+        json.octra.plugins.asr.services[serviceIndex].quotaPerMonth = result.monthlyQuota;
+      } else {
+        console.error(`could not find ${result.asrName}`);
+      }
+    }
+
+    return;
+  }
+
+  getASRQuotaInfo(url: string, asrName: string) {
+    return new Promise<{
+      asrName: string;
+      monthlyQuota?: number,
+      usedQuota?: number
+    }>((resolve, reject) => {
+      this.http.get(
+        `${url}?ASRType=call${asrName}ASR`,
+        {responseType: 'text'}
+      ).subscribe((result) => {
+        const x2js = new X2JS();
+        const response: any = x2js.xml2js(result);
+        const asrQuotaInfo: {
+          asrName: string;
+          monthlyQuota?: number,
+          usedQuota?: number
+        } = {
+          asrName
+        };
+
+        if (response.basQuota) {
+          const info = {
+            monthlyQuota: (response.basQuota && response.basQuota.monthlyQuota && Functions.isNumber(response.basQuota.monthlyQuota))
+              ? Number(response.basQuota.monthlyQuota) : null,
+            secsAvailable: (response.basQuota && response.basQuota.secsAvailable && Functions.isNumber(response.basQuota.secsAvailable))
+              ? Number(response.basQuota.secsAvailable) : null
+          };
+
+          if (info.monthlyQuota && info.monthlyQuota !== 999999) {
+            asrQuotaInfo.monthlyQuota = info.monthlyQuota;
+          }
+
+          if (info.monthlyQuota && info.secsAvailable !== undefined && info.secsAvailable !== null && info.secsAvailable !== 999999) {
+            asrQuotaInfo.usedQuota = info.monthlyQuota - info.secsAvailable;
+          }
+        }
+
+        resolve(asrQuotaInfo);
+      });
+    });
   }
 }

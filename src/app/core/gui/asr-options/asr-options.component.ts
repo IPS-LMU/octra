@@ -7,6 +7,7 @@ import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager
 import {BsDropdownDirective} from 'ngx-bootstrap';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
+import {OHService} from '../../obj/oh-config';
 
 @Component({
   selector: 'app-asr-options',
@@ -44,7 +45,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    console.log(this.settingsService.appSettings.octra.plugins.asr);
   }
 
   onMouseMove() {
@@ -155,5 +156,35 @@ export class AsrOptionsComponent implements OnInit {
     };
 
     this.dropdown2.hide();
+  }
+
+  getQuotaPercentage(langAsr: string) {
+    if (this.serviceProviders[langAsr]) {
+      const ohService: OHService = this.serviceProviders[langAsr];
+      if (ohService.usedQuota && ohService.quotaPerMonth) {
+        return Math.round(ohService.usedQuota / ohService.quotaPerMonth * 100);
+      }
+    }
+    return 0;
+  }
+
+  getQuotaLabel(langAsr: string) {
+    if (this.serviceProviders[langAsr]) {
+      const ohService = this.serviceProviders[langAsr];
+      if (ohService.usedQuota && ohService.quotaPerMonth) {
+        const remainingQuota = (ohService.quotaPerMonth - ohService.usedQuota) / 60;
+        let label = '';
+        if (remainingQuota > 60) {
+          label = `${Math.round(remainingQuota / 60)} hours`;
+        } else {
+          label = `${Math.round(remainingQuota)} minutes`;
+        }
+
+        return `Free quota: Approx.<br/><b>${label}</b><br/>of recording time shared among all BAS users.`;
+      } else {
+        return `Unlimited quota`;
+      }
+    }
+    return '';
   }
 }

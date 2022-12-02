@@ -165,8 +165,8 @@ export const OctraProjectConfigJSONSchema = {
           }
         },
         'type': 'object'
-    }
-  },
+      }
+    },
     'additionalProperties': true
-}
+  }
 ;

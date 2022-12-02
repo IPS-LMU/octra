@@ -12,6 +12,8 @@
 }
 
 .start-time {
+  left: 0;
+  bottom: 0;
   margin-left: 8px;
   margin-bottom: 5px;
 }

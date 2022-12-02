@@ -2,24 +2,9 @@ import {CommonModule} from '@angular/common';
 import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-// icons
-import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {
-  faClock,
-  faForward,
-  faPause,
-  faPlay,
-  faRetweet,
-  faStepBackward,
-  faStepForward,
-  faStop,
-  faVolumeDown,
-  faVolumeUp
-} from '@fortawesome/free-solid-svg-icons';
-import {AudioViewerComponent} from './components/audio/audio-viewer';
 import {AudioplayerComponent} from './components/audio/audioplayer';
 import {LeadingNullPipe, ProcentPipe, TimespanPipe} from './pipe';
+import {AudioViewerComponent} from './components/audio/audio-viewer';
 
 @NgModule({
   declarations: [
@@ -32,10 +17,7 @@ import {LeadingNullPipe, ProcentPipe, TimespanPipe} from './pipe';
   imports: [
     CommonModule,
     FormsModule,
-    FontAwesomeModule,
     HttpClientModule,
-    BrowserAnimationsModule,
-    FontAwesomeModule,
     ReactiveFormsModule
   ],
   exports: [
@@ -47,7 +29,4 @@ import {LeadingNullPipe, ProcentPipe, TimespanPipe} from './pipe';
   ]
 })
 export class OctraComponentsModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
-  }
 }

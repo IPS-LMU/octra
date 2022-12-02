@@ -54,7 +54,7 @@ export class FileInfo extends DataInfo {
   public set fullname(value: string) {
     const point = value.lastIndexOf('.');
     const str1 = value.substr(0, point);
-    const str2 = value.substr(point + 1);
+    const str2 = value.substr(point);
     this._name = str1;
     this._extension = str2;
   }

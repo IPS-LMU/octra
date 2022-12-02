@@ -1,4 +1,4 @@
-import {AudioFormat} from './audio-format';
+import {AudioFormat, IntArray} from './audio-format';
 import {NumeratedSegment} from '../../types';
 import {Subject} from 'rxjs';
 
@@ -7,11 +7,11 @@ export class WavFormat extends AudioFormat {
   public onaudiocut: Subject<{
     finishedSegments: number,
     fileName: string,
-    u8Array: Uint8Array
+    intArray: IntArray
   }> = new Subject<{
     finishedSegments: number,
     fileName: string,
-    u8Array: Uint8Array
+    intArray: IntArray
   }>();
   protected dataStart = -1;
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
@@ -37,6 +37,13 @@ export class WavFormat extends AudioFormat {
     this.setDataStart(buffer);
     super.init(filename, buffer);
     this.setBlockAlign(buffer);
+    if (this.bitsPerSample === 32) {
+      this.formatConstructor = Int32Array;
+    } else if (this.bitsPerSample === 16) {
+      this.formatConstructor = Int16Array;
+    } else if (this.bitsPerSample === 8) {
+      this.formatConstructor = Uint8Array;
+    }
   }
 
   /***
@@ -51,8 +58,10 @@ export class WavFormat extends AudioFormat {
     let test2 = String.fromCharCode.apply(undefined, new Uint8Array(bufferPart) as any);
     test1 = test1.slice(0, 4);
     test2 = test2.slice(0, 4);
-    const byteCheck = new Uint8Array(buffer.slice(20, 21))[0] === 1;
-    return (byteCheck && '' + test1 + '' === 'RIFF' && test2 === 'WAVE');
+    const formatTag = new Uint8Array(buffer.slice(20, 21));
+    //254 = PCM S24LE (s24l)
+    const byteCheck = formatTag[0] === 1;
+    return (test1 + '' === 'RIFF' && test2 === 'WAVE');
   }
 
   /***
@@ -66,11 +75,11 @@ export class WavFormat extends AudioFormat {
     if (pointer > -1 && pointer < segments.length) {
       const segment = segments[pointer];
 
-      this.cutAudioFile(namingConvention, buffer, segment).then(({fileName, u8Array}) => {
+      this.cutAudioFile(namingConvention, buffer, segment).then(({fileName, uint8Array}) => {
         this.onaudiocut.next({
           finishedSegments: pointer + 1,
           fileName,
-          u8Array
+          intArray: uint8Array
         });
 
         if (pointer < segments.length - 1) {
@@ -96,21 +105,21 @@ export class WavFormat extends AudioFormat {
 
   public cutAudioFile(namingConvention: string, buffer: ArrayBuffer, segment: NumeratedSegment): Promise<{
     fileName: string,
-    u8Array: Uint8Array
+    uint8Array: Uint8Array
   }> {
     return new Promise<{
       fileName: string,
-      u8Array: Uint8Array
+      uint8Array: Uint8Array
     }>((resolve, reject) => {
       const fileName = this.getNewFileName(namingConvention, this._filename, segment);
 
       if (this.isValid(buffer)) {
         const u8array = new Uint8Array(buffer);
 
-        this.extractDataFromArray(segment.sampleStart, segment.sampleDur, u8array).then((data: Uint8Array | Uint16Array) => {
+        this.extractDataFromArray(segment.sampleStart, segment.sampleDur, u8array).then((data: IntArray) => {
           resolve({
             fileName,
-            u8Array: new Uint8Array(this.getFileFromBufferPartArrayBuffer(data, this._channels))
+            uint8Array: new Uint8Array(this.getFileFromBufferPartArrayBuffer(data, this._channels))
           });
         }).catch((error) => {
           reject(error);
@@ -121,7 +130,7 @@ export class WavFormat extends AudioFormat {
     });
   }
 
-  public getFileDataView(data: Uint8Array | Uint16Array, channels: number): ArrayBuffer {
+  public getFileDataView(data: Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array, channels: number): ArrayBuffer {
     // creates a mono data view
     const blockAlign = channels * this._bitsPerSample / 8;
     const subChunk2Size = data.length * blockAlign;
@@ -159,9 +168,12 @@ export class WavFormat extends AudioFormat {
     for (let i = 0; i < data.length; i++) {
       if (data instanceof Uint8Array) {
         dataView.setUint8(44 + i, data[i]);
-      } else {
+      } else if (this._bitsPerSample === 16) {
         // little endian must be set!
         dataView.setUint16(44 + (i * 2), data[i], true);
+      } else {
+        //TODO check this
+        dataView.setUint32(44 + (i * 4), data[i], true);
       }
     }
     return dataView.buffer;
@@ -202,14 +214,14 @@ export class WavFormat extends AudioFormat {
    * cuts the data part of selected samples from an Uint8Array
    * @param sampleStart the start of the extraction
    * @param sampleDur the duration of the extraction
-   * @param u8Array the array to be read
+   * @param uint8Array the array to be read
    * @param selectedChannel the selected channel
    */
-  public extractDataFromArray(sampleStart: number, sampleDur: number, u8Array: Uint8Array, selectedChannel?: number)
-    : Promise<Uint8Array | Uint16Array> {
-    return new Promise<Uint8Array | Uint16Array>((resolve, reject) => {
-      let convertedData: Uint8Array | Uint16Array;
-      let result: Uint8Array | Uint16Array | undefined = undefined;
+  public extractDataFromArray(sampleStart: number, sampleDur: number, uint8Array: Uint8Array, selectedChannel?: number)
+    : Promise<IntArray> {
+    return new Promise<IntArray>((resolve, reject) => {
+      let convertedData: IntArray;
+      let result: IntArray | undefined = undefined;
 
       // one block contains one sample of each channel
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
@@ -218,19 +230,16 @@ export class WavFormat extends AudioFormat {
 
       let start = sampleStart * blockAlign;
       let dataChunkLength = sampleDur * blockAlign;
+      const unsigned = this._bitsPerSample === 8;
       let startPos: number;
 
-      if (this._bitsPerSample === 16) {
-        // divide by 2 because it's 16 and not 8 bits per sample
-        dataChunkLength = Math.round(dataChunkLength / 2);
-        result = new Uint16Array(dataChunkLength);
-        convertedData = new Uint16Array(u8Array.buffer, u8Array.byteOffset, u8Array.byteLength / 2);
-        start = Math.round(start / 2);
-        startPos = 22 + Math.round(start);
-      } else if (this._bitsPerSample === 8) {
-        result = new Uint8Array(dataChunkLength);
-        convertedData = u8Array;
-        startPos = 44 + Math.round(start);
+      const divider = this._bitsPerSample / 8;
+      if ([32, 16, 8].includes(this._bitsPerSample)) {
+        dataChunkLength = Math.round(dataChunkLength / divider);
+        result = new this.formatConstructor(dataChunkLength);
+        convertedData = new this.formatConstructor(uint8Array.buffer, uint8Array.byteOffset, uint8Array.byteLength / divider);
+        start = Math.round(start / divider);
+        startPos = (44 / divider) + Math.round(start);
       }
 
       if (result) {
@@ -243,15 +252,11 @@ export class WavFormat extends AudioFormat {
         } else {
           // get data from selected channel only
 
-          const channelData: (Uint8Array | Uint16Array)[] = [];
-          let dataStart = 44;
+          const channelData: (IntArray)[] = [];
+          const dataStart = 44 / divider;
+
           for (let i = 0; i < this._channels; i++) {
-            if (this._bitsPerSample === 16) {
-              dataStart = 22;
-              channelData.push(new Uint16Array(Math.round(dataStart + dataChunkLength)));
-            } else {
-              channelData.push(new Uint8Array(Math.round(dataStart + dataChunkLength)));
-            }
+            channelData.push(new this.formatConstructor(Math.round(dataStart + dataChunkLength)));
           }
 
           let pointer = 0;
@@ -361,11 +366,11 @@ export class WavFormat extends AudioFormat {
     }
   }
 
-  private getFileFromBufferPart(data: Uint8Array | Uint16Array, channels: number, filename: string): File {
+  private getFileFromBufferPart(data: IntArray, channels: number, filename: string): File {
     return new File([this.getFileDataView(data, channels)], `${filename}.wav`, {type: 'audio/wav'});
   }
 
-  private getFileFromBufferPartArrayBuffer(data: Uint8Array | Uint16Array, channels: number): ArrayBuffer {
+  private getFileFromBufferPartArrayBuffer(data: IntArray, channels: number): ArrayBuffer {
     return this.getFileDataView(data, channels);
   }
 
@@ -377,7 +382,7 @@ export class WavFormat extends AudioFormat {
         if (this._channels > 1) {
           const u8array = new Uint8Array(buffer);
 
-          const promises: Promise<Uint8Array | Uint16Array>[] = [];
+          const promises: Promise<IntArray>[] = [];
           promises.push(this.extractDataFromArray(0, this._duration, u8array, 0));
           promises.push(this.extractDataFromArray(0, this._duration, u8array, 1));
 

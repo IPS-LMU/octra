@@ -30,6 +30,10 @@ export class SampleUnit {
 
   private _samples: number;
 
+  private static readonly validSampleRates = [
+    8000, 16000, 22050, 44100, 48000
+  ]
+
   get samples(): number {
     return this._samples;
   }
@@ -50,11 +54,15 @@ export class SampleUnit {
   }
 
   public static calculateSamples(seconds: number, sampleRate: number) {
-    if (sampleRate < 16000 || seconds < 0) {
+    if (!this.isValidSampleRate(sampleRate) || seconds < 0) {
       throw new Error('invalid parameters for sample calculation');
     } else {
       return Math.round(seconds * sampleRate);
     }
+  }
+
+  private static isValidSampleRate(sampleRate: number) {
+    return this.validSampleRates.includes(sampleRate);
   }
 
   public static fromSeconds(seconds: number, sampleRate: number): SampleUnit {

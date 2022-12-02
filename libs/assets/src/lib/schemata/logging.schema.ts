@@ -40,10 +40,10 @@ export const OctraLoggingJSONSchema = {
               'type': 'integer'
             }
           }
-      },
+        },
         'type': 'array'
-    },
+      },
       'additionalProperties': false
+    }
   }
-}
 ;

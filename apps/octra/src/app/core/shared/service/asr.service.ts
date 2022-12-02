@@ -547,10 +547,10 @@ export class ASRQueueItem {
         }).then((file) => {
         if (this._status !== ASRProcessStatus.STOPPED) {
           this.changeProgress(0.2);
-          const serviceRequirementsError = this.fitsServiceRequirements(new File([file.u8Array], file.fileName, {type: 'audio/wav'}));
+          const serviceRequirementsError = this.fitsServiceRequirements(new File([file.uint8Array], file.fileName, {type: 'audio/wav'}));
           if (serviceRequirementsError === '') {
             // 2) upload signal
-            this.uploadFile(new File([file.u8Array], file.fileName, {type: 'audio/wav'}), this.selectedLanguage).then((audioURL: string) => {
+            this.uploadFile(new File([file.uint8Array], file.fileName, {type: 'audio/wav'}), this.selectedLanguage).then((audioURL: string) => {
               if (this._status !== ASRProcessStatus.STOPPED) {
                 this.changeProgress(0.6);
                 // 3) signal audio url to ASR
@@ -625,13 +625,13 @@ export class ASRQueueItem {
           this.changeProgress(0.2);
 
 
-          const serviceRequirementsError = this.fitsServiceRequirements(new File([file.u8Array], file.fileName, {type: 'audio/wav'}));
+          const serviceRequirementsError = this.fitsServiceRequirements(new File([file.uint8Array], file.fileName, {type: 'audio/wav'}));
           if (serviceRequirementsError === '') {
             // 2) upload signal
             const promises: Promise<string>[] = [];
             const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
             promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
-            promises.push(this.uploadFile(new File([file.u8Array], file.fileName, {type: 'audio/wav'}), this.selectedLanguage));
+            promises.push(this.uploadFile(new File([file.uint8Array], file.fileName, {type: 'audio/wav'}), this.selectedLanguage));
 
             Promise.all<string>(promises).then((values) => {
               const transcriptURL = values[0];

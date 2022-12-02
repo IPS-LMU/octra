@@ -13,21 +13,21 @@ export const OctraGuidelinesJSONSchema = {
             'type': 'string'
           },
           'authors': {
-          'type': 'string'
+            'type': 'string'
+          },
+          'version': {
+            'type': 'string'
+          },
+          'date': {
+            'type': 'string'
+          },
+          'encoding': {
+            'type': 'string'
+          },
+          'validation_url': {
+            'type': 'string'
+          }
         },
-        'version': {
-          'type': 'string'
-        },
-        'date': {
-          'type': 'string'
-        },
-        'encoding': {
-          'type': 'string'
-        },
-        'validation_url': {
-          'type': 'string'
-        }
-      },
       'type': 'object',
       'required': [
         'object_language',

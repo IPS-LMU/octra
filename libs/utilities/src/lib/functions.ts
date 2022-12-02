@@ -1,7 +1,5 @@
 import {HttpClient, HttpEventType, HttpRequest, HttpResponse} from '@angular/common/http';
 import {NavigationExtras, Router} from '@angular/router';
-import {Action} from '@ngrx/store';
-import {Actions} from '@ngrx/effects';
 import {Observable, Subject} from 'rxjs';
 
 export interface FileSize {
@@ -296,12 +294,23 @@ export function afterDefined(observable: Observable<any>): Promise<any> {
   });
 }
 
-export function waitTillResultRetrieved(actions: Actions, success: Action, failure: Action) {
-  return new Promise<void>((resolve, reject) => {
-    const subscr = actions.subscribe((action: Action) => {
+export function waitTillResultRetrieved<A1 extends { subscribe: any; }, A2 extends { type: string; }, T>(actions: A1, success: A2, failure: A2) {
+  return new Promise<T>((resolve, reject) => {
+    const subscr = actions.subscribe((action: A2) => {
       if (action.type === success.type) {
         subscr.unsubscribe();
-        resolve();
+        let props = {
+          ...action
+        } as any;
+        delete props['type'];
+        console.log('props are');
+        console.log(props);
+
+        if (Object.keys(props).length === 0) {
+          props = undefined;
+        }
+
+        resolve(props as T);
       } else if (action.type === failure.type) {
         subscr.unsubscribe();
         reject(`${(failure as any).error}`);
@@ -346,4 +355,8 @@ export function setStyle(elem: HTMLElement, styleObj: any) {
 
 export function flatten(values: never[]) {
   return values.reduce((acc: never[], val: never[]) => acc.concat(val), []);
+}
+
+export function isEmpty(obj: unknown) {
+  return ((obj === undefined || obj === null) || (typeof obj === 'string' && obj.trim() === '') || (Array.isArray(obj) && obj.length === 0));
 }

@@ -16,7 +16,7 @@ import {
   OnlineSession,
   RootState
 } from '../../store';
-import {Store} from '@ngrx/store';
+import {Action, Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
 import {Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
@@ -611,7 +611,7 @@ export class AppStorageService {
           });
           break;
         case 'feedback':
-          waitTillResultRetrieved(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
+          waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
             .then(() => {
               this.isSaving = false;
               this.savingNeeded = false;
@@ -674,7 +674,7 @@ export class AppStorageService {
       if (this.annotationLevels !== undefined) {
         if (level !== undefined) {
           if (this.annotationLevels.length > tiernum) {
-            waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationSuccess, IDBActions.saveAnnotationFailed)
+            waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.saveAnnotationSuccess, IDBActions.saveAnnotationFailed)
               .then(() => {
                 resolve();
               })
@@ -703,7 +703,7 @@ export class AppStorageService {
       if (level !== undefined) {
         level.id = getModeState(this._snapshot).transcript.levelCounter + 1;
 
-        waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
+        waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
           .then(() => {
             resolve();
           })
@@ -834,9 +834,9 @@ export class AppStorageService {
   public clearWholeSession(): Promise<void[]> {
     const promises: Promise<void>[] = [];
     promises.push(
-      waitTillResultRetrieved(this.actions, IDBActions.clearAllOptionsSuccess, IDBActions.clearAllOptionsFailed),
-      waitTillResultRetrieved(this.actions, IDBActions.clearLogsSuccess, IDBActions.clearLogsFailed),
-      waitTillResultRetrieved(this.actions, IDBActions.clearAnnotationSuccess, IDBActions.clearAnnotationFailed)
+      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearAllOptionsSuccess, IDBActions.clearAllOptionsFailed),
+      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearLogsSuccess, IDBActions.clearLogsFailed),
+      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearAnnotationSuccess, IDBActions.clearAnnotationFailed)
     );
     this.store.dispatch(AnnotationActions.clearWholeSession({
       mode: this.useMode

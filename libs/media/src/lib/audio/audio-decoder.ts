@@ -1,7 +1,7 @@
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
 import {SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
-import {AudioFormat, WavFormat} from './AudioFormats';
+import {AudioFormat, IntArray, WavFormat} from './AudioFormats';
 import {Subject, timer} from 'rxjs';
 
 declare let window: unknown;
@@ -131,18 +131,17 @@ export class AudioDecoder {
 
           if (sampleStart.samples === 0 && sampleDur.samples === this.audioInfo.duration.samples) {
             this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0)
-              .then((data: Uint8Array | Uint16Array) => {
-                this.getChannelData([data, sampleDur.samples]).then((channelData) => {
-                  const job = new TsWorkerJob(this.getChannelData, [channelData, sampleDur.samples]);
-                  this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
-                }).catch((error) => {
-                  reject(error);
+              .then((data: IntArray) => {
+                this.getChannelData([data, sampleDur.samples, this.format.bitsPerSample]).then((result) => {
+                  const z = '';
                 });
+                const job = new TsWorkerJob(this.getChannelData, [data, sampleDur.samples, this.format.bitsPerSample]);
+                this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
               });
           } else {
             // decode chunked
             this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0).then((result) => {
-              const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples]);
+              const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples, this.format.bitsPerSample]);
               this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
             }).catch((error) => {
               console.error(error);
@@ -232,11 +231,16 @@ export class AudioDecoder {
 
   private getChannelData = (args: any[]) => {
     return new Promise<Float32Array>((resolve) => {
-      const data = args[0];
-      const sampleDuration = args[1];
+      const data: IntArray = args[0];
+      const sampleDuration: number = args[1];
+      const bitsPerSample: number = args[2];
 
       const duration = sampleDuration;
       const result = new Float32Array(duration);
+      const maxNum = Math.pow(2, bitsPerSample) / 2;
+      const unsigned = bitsPerSample === 8;
+
+      let sign = (unsigned) ? -1 : 1;
 
       for (let i = 0; i < duration; i++) {
         let entry = data[i];
@@ -245,13 +249,18 @@ export class AudioDecoder {
           console.error(`entry is NaN at ${i}`);
           break;
         }
-        if (entry > 32768) {
-          entry = (entry % 32768) - 32768;
+        if (unsigned) {
+          entry = entry / 2
         }
-        result[i] = entry / 32768;
+
+        result[i] = entry / maxNum * sign;
+        const t = result[i];
         if (result[i] > 1) {
           console.error(`entry greater than 1: ${result[i]} at ${i}`);
           break;
+        }
+        if (unsigned) {
+          sign = sign * -1;
         }
       }
       resolve(result);

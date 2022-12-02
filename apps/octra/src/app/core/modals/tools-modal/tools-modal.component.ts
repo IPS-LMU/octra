@@ -199,12 +199,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         if (this.tools.audioCutting.archiveStructure === undefined) {
           this.tools.audioCutting.archiveStructure = {};
         }
-        this.tools.audioCutting.archiveStructure[status.fileName + '.wav'] = status.u8Array;
-        totalSize += status.u8Array.byteLength / 2;
+        this.tools.audioCutting.archiveStructure[status.fileName + '.wav'] = status.intArray;
+        totalSize += status.intArray.byteLength / 2;
 
         if (this.tools.audioCutting.cuttingSpeed < 0) {
           const now = Date.now();
-          this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.u8Array.length;
+          this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.intArray.length;
 
           const rest = (this.transcrService.audioManager.ressource.arraybuffer.byteLength - totalSize);
           this.tools.audioCutting.cuttingTimeLeft = this.tools.audioCutting.cuttingSpeed * rest;

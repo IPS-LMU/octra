@@ -37,13 +37,6 @@ export class WavFormat extends AudioFormat {
     this.setDataStart(buffer);
     super.init(filename, buffer);
     this.setBlockAlign(buffer);
-    if (this.bitsPerSample === 32) {
-      this.formatConstructor = Int32Array;
-    } else if (this.bitsPerSample === 16) {
-      this.formatConstructor = Int16Array;
-    } else if (this.bitsPerSample === 8) {
-      this.formatConstructor = Uint8Array;
-    }
   }
 
   /***

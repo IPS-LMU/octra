@@ -31,6 +31,16 @@ export class DataInfo {
     this._attributes = value;
   }
 
+  protected _hash?: string;
+
+  get hash(): string | undefined {
+    return this._hash;
+  }
+
+  set hash(value: string | undefined) {
+    this._hash = value;
+  }
+
   public constructor(name: string, type: string, size?: any) {
     this._name = name;
     this._type = type;

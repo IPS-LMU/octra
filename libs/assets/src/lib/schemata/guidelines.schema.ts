@@ -28,16 +28,16 @@ export const OctraGuidelinesJSONSchema = {
             'type': 'string'
           }
         },
-      'type': 'object',
-      'required': [
-        'object_language',
-        'project',
-        'authors',
-        'version',
-        'date',
-        'encoding',
-        'validation_url'
-      ]
+        'type': 'object',
+        'required': [
+          'object_language',
+          'project',
+          'authors',
+          'version',
+          'date',
+          'encoding',
+          'validation_url'
+        ]
     },
     'instructions': {
       'items': {

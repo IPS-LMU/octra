@@ -167,6 +167,7 @@ export class FileInfo extends DataInfo {
     const result = new FileInfo(object.fullname, object.type, object.size, file);
     result.attributes = object.attributes;
     result.url = object.url;
+    result.hash = object.hash;
     return result;
   }
 
@@ -203,9 +204,11 @@ export class FileInfo extends DataInfo {
         type: this.type,
         url: this.url,
         attributes: this.attributes,
-        content: ''
+        content: '',
+        hash: this.hash
       };
 
+      // TODO better check mime type
       if (this._extension.indexOf('wav') < 0 && this._file !== undefined) {
         FileInfo.getFileContent(this._file).then(
           (content) => {

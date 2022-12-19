@@ -507,10 +507,11 @@ export class TranscriptionService {
               this._annotation.levels.push(level);
             }
 
-            for (let i = 0; i < this.appStorage.annotationLinks.length; i++) {
-              this._annotation.links.push(this.appStorage.annotationLinks[i].link);
+            if (this.appStorage.annotationLinks !== undefined && this.appStorage.annotationLinks !== null) {
+              for (let i = 0; i < this.appStorage.annotationLinks.length; i++) {
+                this._annotation.links.push(this.appStorage.annotationLinks[i].link);
+              }
             }
-
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
             this._feedback.importData(this.appStorage.feedback);
@@ -521,7 +522,7 @@ export class TranscriptionService {
               this._feedback.comment = this.appStorage.comment;
             }
 
-            if (this.appStorage.logs === null) {
+            if (this.appStorage.logs === undefined || this.appStorage.logs === null) {
               this.appStorage.clearLoggingData();
               this.uiService.elements = [];
               this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');

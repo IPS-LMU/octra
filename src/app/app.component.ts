@@ -11,6 +11,7 @@ import {MultiThreadingService} from './core/shared/multi-threading/multi-threadi
 import {AsrService} from './core/shared/service/asr.service';
 import {ASRLanguage} from './core/obj/Settings';
 import {TranslocoService} from '@ngneat/transloco';
+import {ModalService} from './core/modals/modal.service';
 
 @Component({
   selector: 'app-octra',
@@ -46,7 +47,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
               private asrService: AsrService) {
-
     // overwrite console.log
     if (!AppInfo.debugging) {
       const oldLog = console.log;

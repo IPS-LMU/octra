@@ -1,0 +1,24 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     [config]="{
+        backdrop:true,
+        ignoreBackdropClick: true
+        }">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{"modal.feedback-notice.header" | transloco}}</h3>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: justify;" [innerHTML]="'modal.feedback-notice.body' | transloco"></p>
+        <div class="text-center">
+          <img class="w-100" style="max-width:700px;" src="assets/img/giving-feedback.png" alt="giving-feedback-screenshot"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+          {{"general.OK" | transloco}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

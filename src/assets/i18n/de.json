@@ -225,6 +225,10 @@
     },
     "about": {
       "header": "Über OCTRA"
+    },
+    "feedback-notice": {
+      "header": "Feedback gewünscht",
+      "body": "Um Octra weiter zu verbessern oder Fehler zu beheben, benötigen wir dein Feedback. Du kannst uns einfach und schnell deine Meinung mitteilen, indem Du auf das Fragezeichen in der rechten oberen Ecke klickst und das Formular ausfüllst. <b>Wenn es ein technisches Problem gibt, ist es sehr wichtig so schnell wie möglich das Feedback einschl. des Protokolls an uns zu senden.</b> Das Protokoll hilft uns bei einer schnellen Diagnose und einer zeitnahen Fehlerbehebung.<br/><br/>Vielen Dank.<br/><br/><i>Das OCTRA Team</i>"
     }
   },
   "login": {

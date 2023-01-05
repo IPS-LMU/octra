@@ -172,6 +172,7 @@ import {
   TranscriptionPostponeAllModalComponent
 } from './core/modals/transcription-postpone-session/transcription-postpone-all-modal.component';
 import {AboutModalComponent} from './core/modals/about-modal/about-modal.component';
+import {FeedbackNoticeModalComponent} from './core/modals/feedback-notice-modal/feedback-notice-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -257,7 +258,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ErrorOccurredComponent,
     MissingPermissionsModalComponent,
     TranscriptionPostponeAllModalComponent,
-    AboutModalComponent
+    AboutModalComponent,
+    FeedbackNoticeModalComponent
   ],
   entryComponents: [EDITORS, ALERTS, ErrorOccurredComponent],
   imports: [

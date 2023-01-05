@@ -217,6 +217,17 @@ export class AppStorageService {
     });
   }
 
+  get showFeedbackNotice(): boolean {
+    return (this._showFeedbackNotice === undefined || this._showFeedbackNotice === null || this._showFeedbackNotice === true);
+  }
+
+  set showFeedbackNotice(value: boolean) {
+    this._idb.save('options', 'showFeedbackNotice', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._showFeedbackNotice = value;
+  }
+
   get logs(): any[] {
     return this._logs;
   }
@@ -505,6 +516,8 @@ export class AppStorageService {
 
   private _accessCode = '';
   private _editorFont = '';
+
+  private _showFeedbackNotice = true;
 
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
@@ -932,6 +945,10 @@ export class AppStorageService {
         {
           attribute: '_editorFont',
           key: 'editorFont'
+        },
+        {
+          attribute: '_showFeedbackNotice',
+          key: 'showFeedbackNotice'
         }
       ]
     ).then(() => {

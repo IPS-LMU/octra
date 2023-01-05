@@ -39,17 +39,13 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {interval, throwError} from 'rxjs';
-import {
-  TranscriptionGuidelinesModalComponent
-} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {
-  TranscriptionSendingModalComponent
-} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
 import {
@@ -122,7 +118,8 @@ export class TranscriptionComponent implements OnInit,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
-              private alertService: AlertService) {
+              private alertService: AlertService,
+              private modalService: ModalService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -297,12 +294,12 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     }
-  }
+  };
 
   onSendError = (error) => {
     this.sendError = error.message;
     return throwError(error);
-  }
+  };
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -369,11 +366,17 @@ export class TranscriptionComponent implements OnInit,
 
     // first change
     this.changeEditor(this.interface).then(() => {
+      if (this.appStorage.showFeedbackNotice) {
+        console.log('TRUE');
+        this.modalService.show('feedbackNotice');
+      } else {
+        console.log('FALSE');
+      }
+
       (this._currentEditor.instance as any).afterFirstInitialization();
     }).catch((error) => {
       console.error(error);
     });
-
 
     this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {

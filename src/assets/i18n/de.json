@@ -101,7 +101,10 @@
     "reload": "NEU LADEN",
     "Options": "Optionen",
     "about": "Über",
-    "MAUS language": "MAUS language"
+    "MAUS language": "MAUS language",
+    "quit and release": "Beenden & freigeben",
+    "quit continue later": "Beenden & später fortsetzen",
+    "continue transcription": "Transkription fortsetzen"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -120,7 +123,7 @@
     "complete": "Transkription abschließen",
     "invalid": "Es werden nur korrekte Transkriptionen angenommen. Korrigiere bitte die Fehler.",
     "no prompttext": "Der Vorlagentext kann nicht angezeigt werden.",
-    "need audio playback": "Sie müssen die Audiowiedergabe min. einmal starten, bevor sie die Transkription absenden können."
+    "need audio playback": "Du musst die Audiowiedergabe min. einmal starten, bevor sie die Transkription absenden können."
   },
   "segments": {
     "total": "Transkriptionseinheiten insgesamt",
@@ -150,12 +153,12 @@
     "transcription": {
       "delete": {
         "header": "Neue Transkription erstellen?",
-        "text": "Möchten Sie die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
+        "text": "Möchtest Du die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
         "delete old": "Vorherige Transkription entfernen"
       },
       "stop": {
         "header": "Transkription beenden",
-        "text": "Möchten Sie die Transkription wirklich beenden?<br><br>Ihr Fortschritt wird lokal in diesem Browser gespeichert. Um später fortzufahren, sollten Sie nicht den Browserverlauf löschen und ausschließlich diesen Browser nutzen."
+        "text": "Möchtest Du die Transkription wirklich beenden? Während der Transkription sichert Octra deinen Fortschritt in dem Speicher von diesem Webbrowser. Erst wenn Du die Transkription absendest, wird dein Fortschritt auf dem Server gespeichert.<br><br>Entscheide Dich für eine der folgenden Optionen:<ul class='mt-2'><li class='mt-1'><b>Beenden & freigeben</b><br/>Dein Fortschritt wird verworfen und die Aufgabe ggf. anderen TranskribiererInnen angeboten.</li><li class='mt-1'><b>Beenden & später fortsetzen</b><br/>Dein Fortschritt bleibt im Browser gespeichert. Du kannst dich später mit den gleichen Anmeldedaten anmelden und die Transkription fortsetzen. Wichtig: Entferne nicht die Chronik deines Webbrowsers, da sonst dein Fortschritt verloren geht.</li><li class='mt-1'><b>Transkription fortsetzen:</b><br/>Wähle diese Option, wenn Du jetzt weitermachen möchtest.</li></ul>"
       },
       "send": {
         "header": "Transkription senden",
@@ -173,7 +176,7 @@
     },
     "login": {
       "header": "Anmeldung fehlgeschlagen",
-      "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
+      "text": "Bitte überprüfe Deinen Nutzernamen und ihr Passwort."
     },
     "supported": {
       "header": "Unterstützte Dateien für den lokalen Modus",
@@ -233,11 +236,11 @@
   },
   "login": {
     "online mode": "Online Modus",
-    "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Sie können OCTRA stattdessen lokal nutzen.",
+    "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Du kannst OCTRA stattdessen lokal nutzen.",
     "online mode description": "Im Online Modus werden automatisch Audiodateien zugewiesen, die verschriftlicht werden sollen.",
     "local mode": "Lokaler Modus",
-    "local mode description": "Im lokalen Modus können Sie selbst eine Audiodatei von Ihrer Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen, solange sie keine der Web-Services nutzen (ASR oder Word-Alignment).",
-    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
+    "local mode description": "Im lokalen Modus kannst Du selbst eine Audiodatei von Ihrer Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen, solange sie keine der Web-Services nutzen (ASR oder Word-Alignment).",
+    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehe die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}",
@@ -253,25 +256,25 @@
   },
   "browser": {
     "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:",
-    "small window width": "<b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet."
+    "small window width": "<b>Die Fensterbreite ist zu klein.</b> Bitte vergrößere dieses Fenster bis die Meldung verschwindet."
   },
   "reload-file": {
     "header": "Datei erneut einlesen",
-    "text": "Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wählen Sie erneut eine Audiodatei aus um sie einlesen zu lassen. Nach dem Einlesen können Sie ihre Arbeit fortsetzen.",
+    "text": "Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wähle erneut eine Audiodatei aus um sie einlesen zu lassen. Nach dem Einlesen kannst Du deine Arbeit fortsetzen.",
     "file not supported": "Die Datei ist vom Typ '{{type}}' und wird nicht unterstützt.",
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'"
   },
   "logout": {
-    "successful text": "Sie haben sich erfolgreich abgemeldet.",
+    "successful text": "Du hast Dich erfolgreich abgemeldet.",
     "login again": "Erneut anmelden"
   },
   "signal-gui": {
-    "selection text": "Bitte wählen Sie mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicken Sie mit der linken Maustaste an eine gewünschte Position, halten Sie diese gedrückt und ziehen Sie den Mauszeiger bis zur Endposition.",
-    "segment enter text": "Bitte wählen Sie eine Transkriptionseinheit aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
+    "selection text": "Bitte wähle mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicke mit der linken Maustaste an eine gewünschte Position, halte diese gedrückt und ziehe den Mauszeiger bis zur Endposition.",
+    "segment enter text": "Bitte wähle eine Transkriptionseinheit aus, indem Du mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit": {
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Einheiten:",
-    "form fill out": "Bitte füllen Sie kurz das Formular aus",
+    "form fill out": "Bitte fülle kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
   },
@@ -283,7 +286,7 @@
     "no jobs left": "Keine freien Aufgaben verfügbar",
     "transcription sent": "Transkription wurde übertragen.",
     "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
-    "want to do": "Was wollen Sie tun?",
+    "want to do": "Was möchtest Du tun?",
     "quit": "Beenden und Abmelden",
     "next transcription": "Jetzt nächste Transkription durchführen"
   },

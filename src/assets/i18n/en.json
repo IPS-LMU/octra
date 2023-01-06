@@ -101,7 +101,10 @@
     "reload": "reload",
     "Options": "Options",
     "about": "About",
-    "MAUS language": "MAUS language"
+    "MAUS language": "MAUS language",
+    "quit and release": "Quit & release",
+    "quit continue later": "Quit & continue later",
+    "continue transcription": "Continue transcription"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -155,7 +158,7 @@
       },
       "stop": {
         "header": "Stop Transcription",
-        "text": "Do you really want to stop the transcription?<br><br>Your work has been saved in your Browser. If you want to continue later do not delete the browser cache and revisit the application in the same browser (a browser's cache is not shared with other browsers)."
+        "text": "Do you really want to quit the transcription? During the transcription Octra saves your progress in a local storage of this web browser. Only when you submit the finished transcription, your progress will be saved on the server.<br><br>Decide on one of the following options:<ul class='mt-2'><li class='mt-1'><b>Quit & release</b><br/>Your progress will be discarded and the task offered to other transcribers if necessary.</li><li class='mt-1'><b>Quit & continue later</b><br/>Your progress is saved in the browser. You can log in later with the same credentials and continue transcribing. Important: Do not remove your web browser's history, or your progress will be lost.</li><li class='mt-1'><b>Continue transcription:</b><br/>Choose this option if you want to continue now.</li></ul>"
       },
       "send": {
         "header": "Send transcription",

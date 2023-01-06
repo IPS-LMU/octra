@@ -150,10 +150,6 @@
         "text": "Wilt u werkelijk de vorige transcriptie verwijderen en een nieuwe maken? <br><br> Uw voortgang van de vorige transcriptie  zal verwijderd worden. Deze actie kan niet ongedaan gemaakt worden.",
         "delete old": "Verwijder de vorige transcriptie"
       },
-      "stop": {
-        "header": "Stop Transcriptie",
-        "text": "Wilt u echt stoppen met de transcriptie? <br><br>Uw werk is opgeslagen in uw Browser. Als u later verder wilt gaan, verwijder dan niet de browser cache en bezoek de toepassing opnieuw in dezelfde browser (de cache van een browser wordt niet gedeeld met andere browsers)."
-      },
       "send": {
         "header": "Stuur transcriptie",
         "text": "Als u op 'Nu verzenden' klikt, worden uw gegevens naar de server verzonden om te worden opgeslagen. Hierna kunt u uw gegevens niet meer wijzigen."

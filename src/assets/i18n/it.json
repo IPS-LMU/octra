@@ -150,10 +150,6 @@
         "text": "Vuoi davvero eliminare la precedente trascrizione e crearne una nuova?<br><br>I tuoi progressi sulla precedente trascrizione saranno eliminati. Quest'azione è irreversibile.",
         "delete old": "Elimina trascrizione precedente"
       },
-      "stop": {
-        "header": "Ferma trascrizione",
-        "text": "Vuoi davvero fermare la trascrizione?<br><br>Il tuo lavoro è stato salvato nel browser. Se vuoi continuare più tardi non eliminare la cache e riapri l'applicazione nello stesso browser (la cache non è condivisa con altri browser)."
-      },
       "send": {
         "header": "Invia trascrizione",
         "text": "Cliccando su 'Invia ora' invierai i tuoi dati al server per salvarli. Non potrai più cambiare i tuoi dati dopo quest'azione."

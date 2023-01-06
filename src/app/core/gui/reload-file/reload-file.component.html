@@ -10,10 +10,10 @@
 
     <div class="row" role="group">
         <button class="btn btn-secondary btn-raised col-md-4"
-                (click)="askForAbort()">
-            <fa-icon icon="sign-out-alt"></fa-icon>
-            <span
-              class=" d-none d-lg-inline"> {{"transcription.stop" | transloco}}</span>
+                (click)="abortTranscription()">
+          <fa-icon icon="sign-out-alt"></fa-icon>
+          <span
+            class=" d-none d-lg-inline"> {{"transcription.stop" | transloco}}</span>
         </button>
         <button class="btn btn-default btn-raised btn-danger col-md-4" [disabled]="!(dropzone.status === 'valid')"
                 (click)="newTranscription()">

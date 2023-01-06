@@ -6,7 +6,6 @@ import {Router} from '@angular/router';
 import {ModalService} from '../../modals/modal.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {AppInfo} from '../../../app.info';
 
 @Component({
@@ -108,16 +107,6 @@ export class ReloadFileComponent implements OnInit {
       return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
     }
     return '[FILE UNDEFINED]';
-  }
-
-  askForAbort() {
-    this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
-      if (answer === TranscriptionStopModalAnswer.QUIT) {
-        this.abortTranscription();
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
   }
 
   private showErrorMessage(err: string) {

@@ -746,7 +746,6 @@ export class AppStorageService {
   public clearSession(): boolean {
     this._loggedIn = false;
     this.login = false;
-    this.audioURL = null;
 
     this.sessStr.clear();
 
@@ -758,7 +757,8 @@ export class AppStorageService {
     return new Promise<void>((resolve, reject) => {
       this._loggedIn = false;
       this.login = false;
-      this.dataID = null;
+      this._dataID = null;
+      this._audioURL = null;
 
       const promises: Promise<any>[] = [];
       promises.push(this.idb.save('options', 'user', {value: null}));
@@ -954,48 +954,48 @@ export class AppStorageService {
     ).then(() => {
       idb.getAll('logs', 'timestamp').then((logs) => {
         this._logs = logs;
-      });
+      }).then(() => {
+        idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
+          this._annotation = [];
+          let max = 0;
+          for (let i = 0; i < levels.length; i++) {
+            if (!levels[i].hasOwnProperty('id')) {
+              this._annotation.push(
+                {
+                  id: i + 1,
+                  level: levels[i],
+                  sortorder: i
+                }
+              );
+              max = Math.max(i + 1, max);
+            } else {
+              this._annotation.push(levels[i]);
+              max = Math.max(levels[i].id, max);
+            }
+          }
+          this._levelcounter = max;
+        });
+      }).then(() => {
+        idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
+          this._annotationLinks = [];
+          for (let i = 0; i < links.length; i++) {
+            if (!links[i].hasOwnProperty('id')) {
+              this._annotationLinks.push(
+                new OIDBLink(i + 1, links[i].link)
+              );
+            } else {
+              this._annotationLinks.push(links[i]);
+            }
+          }
+        });
+      }).then(
+        () => {
+          this._loaded.complete();
+        }
+      );
 
       console.log(this._audioSettings);
-    }).then(() => {
-      idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
-        this._annotation = [];
-        let max = 0;
-        for (let i = 0; i < levels.length; i++) {
-          if (!levels[i].hasOwnProperty('id')) {
-            this._annotation.push(
-              {
-                id: i + 1,
-                level: levels[i],
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            this._annotation.push(levels[i]);
-            max = Math.max(levels[i].id, max);
-          }
-        }
-        this._levelcounter = max;
-      });
-    }).then(() => {
-      idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
-        this._annotationLinks = [];
-        for (let i = 0; i < links.length; i++) {
-          if (!links[i].hasOwnProperty('id')) {
-            this._annotationLinks.push(
-              new OIDBLink(i + 1, links[i].link)
-            );
-          } else {
-            this._annotationLinks.push(links[i]);
-          }
-        }
-      });
-    }).then(
-      () => {
-        this._loaded.complete();
-      }
-    );
+    });
   }
 
   public afterSaving(): Promise<void> {
@@ -1084,7 +1084,7 @@ export class AppStorageService {
   }
 
   public clearLoggingData(): Promise<any> {
-    this._logs = null;
+    this._logs = [];
     return this.clearIDBTable('logs');
   }
 

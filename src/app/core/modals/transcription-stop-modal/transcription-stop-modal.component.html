@@ -1,18 +1,34 @@
-<ng-template #modal>
-    <div class="modal-header">
-      <h4 class="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h4>
-    </div>
-    <div class="modal-body">
-      <div [innerHTML]="'modal.transcription.stop.text' | transloco">
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     [config]="config">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h4>
+      </div>
+      <div class="modal-body">
+        <div [innerHTML]="'modal.transcription.stop.text' | transloco">
         </div>
+      </div>
+      <div class="row p-3 g-1">
+        <div class="col-12 col-lg-auto order-3 order-lg-1">
+          <button type="button" class="btn btn-raised btn-danger w-100"
+                  (click)="close('QUIT RELEASE');">
+            {{"general.quit and release" | transloco}}
+          </button>
+        </div>
+        <div class="col-12 col-lg-auto order-2 order-lg-2">
+          <button type="button" class="btn btn-raised btn-secondary w-100"
+                  (click)="close('QUIT');">
+            {{"general.quit continue later" | transloco}}
+          </button>
+        </div>
+        <div class="col-12 col-lg order-1 order-lg-3">
+          <button type="button" class="btn btn-raised btn-primary w-100" data-dismiss="modal"
+                  (click)="close('CONTINUE')">
+            {{"general.continue transcription" | transloco}}
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="close('CONTINUE')">
-          {{"general.continue" | transloco}}
-        </button>
-        <button type="button" class="btn btn-primary"
-                (click)="close('QUIT');">
-          {{"general.quit" | transloco}}
-        </button>
-    </div>
-</ng-template>
+  </div>
+</div>

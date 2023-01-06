@@ -249,10 +249,23 @@ export class TranscriptionComponent implements OnInit,
   private _currentEditor: ComponentRef<Component>;
 
   abortTranscription = () => {
+    const redirectDemo = () => {
+      // is demo mode
+      this.appStorage.user.id = '';
+      this.appStorage.user.jobno = -1;
+      this.appStorage.user.project = '';
+      Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
+        this.appStorage.clearSession();
+        this.appStorage.clearLocalStorage().catch((error) => {
+          console.error(error);
+        });
+      });
+    };
+
     if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
       && !isNullOrUndefined(this.settingsService.projectsettings.octra)
       && !isNullOrUndefined(this.settingsService.projectsettings.octra.theme)
-      && (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast'))) {
+      && (this.settingsService.isTheme('secondSegmentFast'))) {
       // clear transcription
 
       this.transcrService.endTranscription();
@@ -272,27 +285,41 @@ export class TranscriptionComponent implements OnInit,
           console.error(error);
         });
       } else {
-        // is demo mode
-        this.appStorage.user.id = '';
-        this.appStorage.user.jobno = -1;
-        this.appStorage.user.project = '';
-        Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-          this.appStorage.clearSession();
-          this.appStorage.clearLocalStorage().catch((error) => {
-            console.error(error);
-          });
-        });
+        redirectDemo();
       }
     } else {
-      this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
-        if (answer === TranscriptionStopModalAnswer.QUIT) {
-          this.transcrService.endTranscription();
+      if (this.appStorage.usemode === 'online') {
+        this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
+          if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
+            this.api.setOnlineSessionToFree(this.appStorage).then(() => {
+              Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
+                this.appStorage.clearSession();
 
+                this.appStorage.clearLocalStorage().then(() => {
+                  this.appStorage.saveUser();
+                }).catch((error) => {
+                  console.error(error);
+                });
+              });
+            }).catch((error) => {
+              console.error(error);
+            });
+          } else if (answer === TranscriptionStopModalAnswer.QUIT) {
+            this.transcrService.endTranscription();
+
+            Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+      } else {
+        if (this.appStorage.usemode === 'demo') {
+          redirectDemo();
+        } else if (this.appStorage.usemode === 'local') {
+          this.transcrService.endTranscription();
           Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
         }
-      }).catch((error) => {
-        console.error(error);
-      });
+      }
     }
   };
 

@@ -182,9 +182,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   // for animation of playcursor
   private anim: CanvasAnimation;
   private oldInnerWidth = 0;
+  private oldInnerHeight = 0;
 
   // size settings
   private _innerWidth = 0;
+  private _innerHeight = 0;
   public secondsPerLine = 5;
 
   private _initialized = false;
@@ -281,6 +283,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           }
 
           this.oldInnerWidth = this._innerWidth;
+          this.oldInnerHeight = this._innerHeight;
           this.updating = false;
         }
       } else {
@@ -962,6 +965,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   ngAfterViewInit() {
     this.viewRect.size.width = this.aview.elementRef.nativeElement.clientWidth;
     this._innerWidth = this.viewRect.size.width - this.settings.margin.left - this.settings.margin.right;
+    this._innerHeight = this.viewRect.size.height - this.settings.margin.bottom - this.settings.margin.top;
+    this.oldInnerHeight = this._innerHeight;
     this.oldInnerWidth = this._innerWidth;
 
     this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
@@ -1035,6 +1040,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   updateCanvasSizes() {
     this.av.viewRect.size.width = Number(this.aview.elementRef.nativeElement.clientWidth);
     this._innerWidth = Number(this.av.viewRect.size.width - this.settings.margin.left - this.settings.margin.right);
+    this._innerHeight = Number(this.viewRect.size.height - this.settings.margin.bottom - this.settings.margin.top);
     const clientheight = this.aview.elementRef.nativeElement.clientHeight;
 
     this.av.updateLines(this._innerWidth);
@@ -1658,10 +1664,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   @HostListener('window:resize', ['$event'])
   onResize($event) {
     this.av.viewRect.size.width = this.aview.elementRef.nativeElement.clientWidth;
+    this.av.viewRect.size.height = this.aview.elementRef.nativeElement.clientHeight;
     this._innerWidth = this.av.viewRect.size.width - this.settings.margin.left - this.settings.margin.right;
+    this._innerHeight = this.viewRect.size.height - this.settings.margin.bottom - this.settings.margin.top;
 
     // only resize if size has changed and resizing not in processing state
-    if (this._innerWidth !== this.oldInnerWidth) {
+    if (this._innerWidth !== this.oldInnerWidth || this._innerHeight !== this.oldInnerHeight) {
       setTimeout(() => {
         if ((!this.settings.multiLine || this.av.AudioPxWidth < this._innerWidth) && !this.resizing) {
           this.resizing = true;

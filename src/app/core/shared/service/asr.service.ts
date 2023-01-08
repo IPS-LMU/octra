@@ -322,7 +322,11 @@ export class AsrService {
         if (!isNullOrUndefined(segment)) {
           segment.isBlockedBy = null;
         }
-        item.stopProcessing();
+        if (item.status === ASRProcessStatus.IDLE || item.status === ASRProcessStatus.NOAUTH || item.status === ASRProcessStatus.NOQUOTA) {
+          this.queue.remove(item.id);
+        } else {
+          item.stopProcessing();
+        }
       } else {
         console.error(new Error(`could not find segment.`));
       }
@@ -414,14 +418,14 @@ class ASRQueue {
   }
 
   public remove(id: number) {
+    console.log('remove id ' + id + '...');
     const index = this._queue.findIndex((a) => {
       return a.id === id;
     });
 
     if (index > -1) {
+      console.log('removed queueitem id ' + id);
       this._queue.splice(index, 1);
-    } else {
-      console.error(new Error(`queueItem with id ${id} does not exist and can't be removed.`));
     }
   }
 
@@ -452,6 +456,7 @@ class ASRQueue {
 
                 if (status.new !== ASRProcessStatus.STARTED && status.new !== ASRProcessStatus.NOAUTH
                   && status.old !== ASRProcessStatus.NOAUTH) {
+                  console.log(`remove after queueitem ${nextItem.id} change state from ${status.old} -> ${status.new}`);
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);

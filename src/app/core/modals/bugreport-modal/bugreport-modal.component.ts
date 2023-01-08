@@ -183,7 +183,6 @@ export class BugreportModalComponent implements OnInit {
   }
 
   update() {
-    console.log(`update!`);
     this.cd.markForCheck();
     this.cd.detectChanges();
   }

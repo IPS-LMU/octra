@@ -371,7 +371,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       }
                     }
                   } else if (item.status === ASRProcessStatus.FAILED) {
-                    const regex = /(can't find a transcript)|(ASR access code not valid or expired)/g;
+                    const regex = /(can't find a transcript)|(ASR access code not valid or expired)|(this can be caused by a very bad signal quality or empty signal)/g;
                     const matches = regex.exec(item.result);
 
                     let clearMessage = '';
@@ -383,6 +383,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                           'This means either a bad signal quality or empty signal.';
                       } else if (matches[2]) {
                         clearMessage += 'ASR on a segment failed: ASR access code not valid or expired.';
+                      } else if (matches[3]) {
+                        clearMessage += 'ASR on a segment failed: Audio signal too short, empty or bad audio quality.';
                       }
                     }
 

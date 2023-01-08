@@ -11,7 +11,6 @@ import {MultiThreadingService} from './core/shared/multi-threading/multi-threadi
 import {AsrService} from './core/shared/service/asr.service';
 import {ASRLanguage} from './core/obj/Settings';
 import {TranslocoService} from '@ngneat/transloco';
-import {ModalService} from './core/modals/modal.service';
 
 @Component({
   selector: 'app-octra',
@@ -53,8 +52,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const serv = this.bugService;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.log = function(message) {
-          serv.addEntry(ConsoleType.LOG, message);
+        console.log = function(message: any, addToProtocol = true) {
+          if (addToProtocol) {
+            serv.addEntry(ConsoleType.LOG, message);
+          }
           oldLog.apply(console, arguments);
         };
       })();
@@ -63,34 +64,36 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function(error, context) {
-          let debug = '';
-          let stack = '';
+        console.error = function(error, context, addToProtocol = true) {
+          if (addToProtocol) {
+            let debug = '';
+            let stack = '';
 
-          if (typeof error === 'string') {
-            debug = error;
+            if (typeof error === 'string') {
+              debug = error;
 
-            if (error === 'ERROR' && !isNullOrUndefined(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
-              debug = context.message;
-              stack = context.stack;
-            }
-          } else {
-            if (error instanceof Error) {
-              debug = error.message;
-              stack = error.stack;
+              if (error === 'ERROR' && !isNullOrUndefined(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
+                debug = context.message;
+                stack = context.stack;
+              }
             } else {
-              if (typeof error === 'object') {
-                // some other type of object
-                debug = 'OBJECT';
-                stack = JSON.stringify(error);
+              if (error instanceof Error) {
+                debug = error.message;
+                stack = error.stack;
               } else {
-                debug = error;
+                if (typeof error === 'object') {
+                  // some other type of object
+                  debug = 'OBJECT';
+                  stack = JSON.stringify(error);
+                } else {
+                  debug = error;
+                }
               }
             }
-          }
 
-          if (debug !== '') {
-            serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== '') ? ' ' + stack : ''}`);
+            if (debug !== '') {
+              serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== '') ? ' ' + stack : ''}`);
+            }
           }
 
           oldError.apply(console, arguments);
@@ -101,8 +104,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldWarn = console.warn;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.warn = function(message) {
-          serv.addEntry(ConsoleType.WARN, message);
+        console.warn = function(message, addToProtocol = true) {
+          if (addToProtocol) {
+            serv.addEntry(ConsoleType.WARN, message);
+          }
           oldWarn.apply(console, arguments);
         };
       })();

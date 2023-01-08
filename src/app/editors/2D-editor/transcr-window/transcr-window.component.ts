@@ -484,9 +484,14 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       }
 
       if (!(segment === null || segment === undefined)) {
+        const volume = this.audiochunk.volume;
+        const speed = this.audiochunk.speed;
+
         this.editor.initialize();
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
+        this.audiochunk.volume = volume;
+        this.audiochunk.speed = speed;
       }
       this.cd.markForCheck();
       this.cd.detectChanges();

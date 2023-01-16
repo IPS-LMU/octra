@@ -441,21 +441,14 @@ export class AudioManager {
     );
   }
 
-  public destroy(disconnect = true) {
+  public async destroy(disconnect = true) {
     if (!(this._audioContext === undefined || this._audioContext === undefined)) {
       if (disconnect) {
-        this._audioContext.close()
-          .then(() => {
-            console.log('AudioManager successfully destroyed its AudioContext');
-          })
-          .catch(
-            (error) => {
-              console.error(error);
-            }
-          );
+        await this._audioContext.close();
       }
     }
     this.subscrManager.destroy();
+    return;
   }
 
   public createSampleUnit(sample: number): SampleUnit {
@@ -768,7 +761,7 @@ export class AudioChunk {
     return undefined;
   }
 
-  public startPlayback(playOnHover = false): Promise<void> {
+  public async startPlayback(playOnHover = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       new Promise<void>((resolve2, reject2) => {
         if (!this._audioManger.isPlaying) {

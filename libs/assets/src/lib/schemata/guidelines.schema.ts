@@ -38,16 +38,16 @@ export const OctraGuidelinesJSONSchema = {
           'encoding',
           'validation_url'
         ]
-    },
-    'instructions': {
-      'items': {
-        'properties': {
-          'group': {
-            'type': 'string'
-          },
-          'entries': {
-            'items': {
-              'properties': {
+      },
+      'instructions': {
+        'items': {
+          'properties': {
+            'group': {
+              'type': 'string'
+            },
+            'entries': {
+              'items': {
+                'properties': {
                 'code': {
                   'type': 'string'
                 },

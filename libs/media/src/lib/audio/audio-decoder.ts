@@ -59,7 +59,7 @@ export class AudioDecoder {
 
       for (let i = 0; i < this.parallelJobs; i++) {
         const worker = new TsWorker();
-        worker.jobstatuschange.subscribe((job: TsWorkerJob) => {
+        worker.jobstatuschange.subscribe(async (job: TsWorkerJob) => {
           const jobItem = this.joblist.findIndex((a) => {
             return a.jobId === job.id;
           });
@@ -74,12 +74,12 @@ export class AudioDecoder {
                 this.channelData = new Float32Array(Math.round(this.audioInfo.duration.samples / this.channelDataFactor));
               }
 
-              this.minimizeChannelData([job.result, this.channelDataFactor]).then((result) => {
+              try {
+                const result = await this.minimizeChannelData([job.result, this.channelDataFactor]);
                 this.insertChannelBuffer(Math.floor(j.start / this.channelDataFactor), result);
-              })
-                .catch((error) => {
-                  console.error(error);
-                });
+              } catch (e) {
+                console.error(e);
+              }
             }
           }
 
@@ -108,74 +108,63 @@ export class AudioDecoder {
     }
   }
 
-  getChunkedChannelData(sampleStart: SampleUnit, sampleDur: SampleUnit): Promise<Float32Array> {
-    return new Promise<Float32Array>((resolve, reject) => {
-      if (this.format instanceof WavFormat) {
-        // cut the audio file into 10 parts:
-        if (sampleStart.samples === 0) {
-          this.stopDecoding = false;
-        }
-
-        if (sampleStart.samples + sampleDur.samples <= this.audioInfo.duration.samples
-          && sampleStart.samples >= 0) {
-
-          if (this.afterChannelDataFinished === undefined) {
-            this.afterChannelDataFinished = new Subject<void>();
-            this.afterChannelDataFinished.subscribe(() => {
-              this.afterChannelDataFinished!.unsubscribe();
-              this.afterChannelDataFinished = undefined;
-              resolve(this.channelData!);
-              this.onChannelDataCalculate.complete();
-            });
-          }
-
-          if (sampleStart.samples === 0 && sampleDur.samples === this.audioInfo.duration.samples) {
-            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0)
-              .then((data: IntArray) => {
-                this.getChannelData([data, sampleDur.samples, this.format.bitsPerSample]).then((result) => {
-                  const z = '';
-                });
-                const job = new TsWorkerJob(this.getChannelData, [data, sampleDur.samples, this.format.bitsPerSample]);
-                this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
-              });
-          } else {
-            // decode chunked
-            this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0).then((result) => {
-              const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples, this.format.bitsPerSample]);
-              this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
-            }).catch((error) => {
-              console.error(error);
-            });
-
-            if (sampleStart.samples + sampleDur.samples < this.audioInfo.duration.samples) {
-              if (!this.stopDecoding) {
-                this.subscrmanager.add(timer(10).subscribe(() => {
-                  let sampleDur2 = Math.min(sampleDur.samples,
-                    this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples);
-
-                  if (this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples < 2 * sampleDur.samples) {
-                    sampleDur2 = this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples;
-                  }
-                  const durationUnit = new SampleUnit(sampleDur2, this.audioInfo.sampleRate);
-                  this.getChunkedChannelData(sampleStart.add(sampleDur), durationUnit).catch((error) => {
-                    console.error(error);
-                  });
-                }));
-              } else {
-                this.onChannelDataCalculate.complete();
-              }
-              this.stopDecoding = false;
-            }
-          }
-
-        } else {
-          reject(`can not decode part because samples are not correct`);
-        }
-      } else {
-        this.onChannelDataCalculate.error(new Error('Unsopported audio file format'));
-        reject(new Error('Unsopported audio file format'));
+  async getChunkedChannelData(sampleStart: SampleUnit, sampleDur: SampleUnit) {
+    if (this.format instanceof WavFormat) {
+      // cut the audio file into 10 parts:
+      if (sampleStart.samples === 0) {
+        this.stopDecoding = false;
       }
-    });
+
+      if (sampleStart.samples + sampleDur.samples <= this.audioInfo.duration.samples
+        && sampleStart.samples >= 0) {
+
+        if (this.afterChannelDataFinished === undefined) {
+          this.afterChannelDataFinished = new Subject<void>();
+          this.afterChannelDataFinished.subscribe(() => {
+            this.afterChannelDataFinished!.unsubscribe();
+            this.afterChannelDataFinished = undefined;
+            this.onChannelDataCalculate.complete();
+          });
+        }
+
+        if (sampleStart.samples === 0 && sampleDur.samples === this.audioInfo.duration.samples) {
+          const data = await this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0);
+          const job = new TsWorkerJob(this.getChannelData, [data, sampleDur.samples, this.format.bitsPerSample]);
+          this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
+        } else {
+          // decode chunked
+          const result = await this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array!, 0);
+          const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples, this.format.bitsPerSample]);
+          this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
+
+          if (sampleStart.samples + sampleDur.samples < this.audioInfo.duration.samples) {
+            if (!this.stopDecoding) {
+              this.subscrmanager.add(timer(10).subscribe(() => {
+                let sampleDur2 = Math.min(sampleDur.samples,
+                  this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples);
+
+                if (this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples < 2 * sampleDur.samples) {
+                  sampleDur2 = this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples;
+                }
+                const durationUnit = new SampleUnit(sampleDur2, this.audioInfo.sampleRate);
+                this.getChunkedChannelData(sampleStart.add(sampleDur), durationUnit).catch((error) => {
+                  console.error(error);
+                });
+              }));
+            } else {
+              this.onChannelDataCalculate.complete();
+            }
+            this.stopDecoding = false;
+          }
+        }
+
+      } else {
+        throw new Error(`can not decode part because samples are not correct`);
+      }
+    } else {
+      this.onChannelDataCalculate.error(new Error('Unsopported audio file format'));
+      throw new Error('Unsopported audio file format');
+    }
   }
 
   public destroy() {
@@ -186,30 +175,28 @@ export class AudioDecoder {
     }
   }
 
-  public minimizeChannelData(args: [any, number]): Promise<Float32Array> {
-    return new Promise<Float32Array>((resolve) => {
-      const channelData = args[0];
-      const factor = args[1];
-      if (factor !== 1) {
-        const result = new Float32Array(Math.round(channelData.length / factor));
+  public async minimizeChannelData(args: [any, number]): Promise<Float32Array> {
+    const channelData = args[0];
+    const factor = args[1];
+    if (factor !== 1) {
+      const result = new Float32Array(Math.round(channelData.length / factor));
 
-        let counter = 0;
-        for (let i = 0; i < channelData.length; i++) {
+      let counter = 0;
+      for (let i = 0; i < channelData.length; i++) {
 
-          let sum = 0;
-          for (let j = 0; j < factor; j++) {
-            sum += channelData[i + j];
-          }
-
-          result[counter] = sum / factor;
-          i += factor - 1;
-          counter++;
+        let sum = 0;
+        for (let j = 0; j < factor; j++) {
+          sum += channelData[i + j];
         }
-        resolve(result);
-      } else {
-        resolve(channelData);
+
+        result[counter] = sum / factor;
+        i += factor - 1;
+        counter++;
       }
-    });
+      return result;
+    } else {
+      return channelData;
+    }
   }
 
   public createOriginalSample(sample: number): SampleUnit {

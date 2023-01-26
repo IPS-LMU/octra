@@ -23,22 +23,17 @@ export class DirectoryInfo extends DataInfo {
     this._entries = value;
   }
 
-  public static fromFolderObject(folder: DataTransferItem): Promise<DirectoryInfo> {
-    return new Promise<DirectoryInfo>((resolve, reject) => {
-      if (folder) {
-        DirectoryInfo.traverseFileTree(folder, '').then((result) => {
-          if (!(result === undefined || result === undefined) && result[0] instanceof DirectoryInfo) {
-            resolve(result[0] as DirectoryInfo);
-          } else {
-            reject('could not parse directory');
-          }
-        }).catch(error => {
-          reject(error);
-        });
+  public static async fromFolderObject(folder: FileSystemEntry | null): Promise<DirectoryInfo> {
+    if (folder) {
+      const result = await this.traverseFileTree(folder, '');
+      if (result && result[0] instanceof DirectoryInfo) {
+        return (result[0] as DirectoryInfo);
       } else {
-        reject('folder not given.');
+        throw new Error('could not parse directory');
       }
-    });
+    } else {
+      throw new Error('folder not given.');
+    }
   }
 
   public static extractFolderName(path: string): string | undefined {
@@ -61,96 +56,87 @@ export class DirectoryInfo extends DataInfo {
     return undefined;
   }
 
-  private static traverseFileTree(item: (DataTransferItem | any), path?: string): Promise<(FileInfo | DirectoryInfo)[]> {
-    // console.log(`search path: ${path}`);
-    return new Promise<(FileInfo | DirectoryInfo)[]>((resolve, reject) => {
-      path = path || '';
-      if (!(item === undefined || item === undefined)) {
-        let webKitEntry: any;
-
-        if (item instanceof DataTransferItem) {
-          webKitEntry = item.webkitGetAsEntry();
-        } else {
-          webKitEntry = item as any;
+  private static async traverseFileTree(item: FileSystemEntry, path?: string): Promise<(FileInfo | DirectoryInfo)[]> {
+    const getFile = async (webKitEntry: FileSystemFileEntry) => {
+      return new Promise<FileInfo[]>((resolve) => {
+        webKitEntry.file((file: File) => {
+          if (file.name.indexOf('.') > -1) {
+            const fileInfo = new FileInfo(file.name, file.type, file.size, file);
+            resolve([fileInfo]);
+          } else {
+            resolve([]);
           }
+        });
+      })
+    };
 
-          if (webKitEntry.isFile) {
-            // console.log(`isFile ${item.fullPath}`);
-            // Get file
+    path = path || '';
+    if (item) {
+      if (item.isFile) {
+        return await getFile(item as FileSystemFileEntry);
+      } else {
+        // Get folder contents
+        const dirEntry = item as FileSystemDirectoryEntry;
+        const dirReader = dirEntry.createReader();
 
-            if (item instanceof DataTransferItem) {
-              const file = item.getAsFile();
-
-              if (file) {
-                if (file.name.indexOf('.') > -1) {
-                  const fileInfo = new FileInfo(file.name, file.type, file.size, file);
-                  resolve([fileInfo]);
-                } else {
-                  resolve([]);
-                }
-              } else {
-                reject(`could not read file`);
-              }
-            } else {
-              // item is FileEntry
-
-              (webKitEntry as any).file((file: any) => {
-                if (file.name.indexOf('.') > -1) {
-                  const fileInfo = new FileInfo(file.name, file.type, file.size, file);
-                  resolve([fileInfo]);
-                } else {
-                  resolve([]);
-                }
-              });
-            }
-          } else if (webKitEntry.isDirectory) {
-            // Get folder contents
-            // console.log(`is dir ${item.fullPath}`);
-            const dirEntry: any = webKitEntry as any;
-            const dirReader = dirEntry.createReader();
-            dirReader.readEntries((entries: any) => {
-              const promises: Promise<(FileInfo | DirectoryInfo)[]>[] = [];
-              for (const entry of entries) {
-                promises.push(this.traverseFileTree(entry, path + dirEntry.name + '/'));
-              }
-              Promise.all(promises).then((values: (FileInfo | DirectoryInfo)[][]) => {
-                const dir = new DirectoryInfo(path + dirEntry.name + '/');
-                let result: (FileInfo | DirectoryInfo)[] = [];
-
-                for (const value of values) {
-                  for (const val of value) {
-                    result.push(val);
-                  }
-                }
-
-                result = result.sort((a, b) => {
-                  if (a instanceof FileInfo && b instanceof FileInfo) {
-                    const a2 = a as FileInfo;
-                    const b2 = b as FileInfo;
-
-                    return a2.name.localeCompare(b2.name);
-                  } else if (a instanceof DirectoryInfo && b instanceof DirectoryInfo) {
-                    const a2 = a as DirectoryInfo;
-                    const b2 = b as DirectoryInfo;
-
-                    return a2.path.localeCompare(b2.path);
-                  } else {
-                    return 0;
-                  }
-                });
-
-                // console.log(result);
-                dir.addEntries(result);
-                // console.log(`dir with ${result.length} found`);
-                resolve([dir]);
-              });
+        const readEntries = async (dirReader: FileSystemDirectoryReader) => {
+          return new Promise<FileSystemEntry[]>((resolve, reject) => {
+            dirReader.readEntries((entries: FileSystemEntry[]) => {
+              resolve(entries);
+            }, (error: DOMException) => {
+              reject(error);
             });
-          }
-        } else {
-          reject(`item is undefined or undefined`);
+          });
+        };
+
+        // there is a possibility that readEntries doesn't return all entries.
+        // => read as long as there are no remaining items
+        let readItems: FileSystemEntry[] = await readEntries(dirReader);
+        let entries: FileSystemEntry[] = [];
+        while (readItems.length !== 0) {
+          entries = [...entries, ...readItems];
+          readItems = await readEntries(dirReader);
         }
+
+        const values: (FileInfo | DirectoryInfo)[][] = [];
+
+        for (const entry of entries) {
+          values.push(await this.traverseFileTree(entry, path + dirEntry.name + '/'));
+        }
+
+        const dir = new DirectoryInfo(path + dirEntry.name + '/');
+        let result: (FileInfo | DirectoryInfo)[] = [];
+
+        for (const value of values) {
+          for (const val of value) {
+            result.push(val);
+          }
+        }
+
+        result = result.sort((a, b) => {
+          if (a instanceof FileInfo && b instanceof FileInfo) {
+            const a2 = a as FileInfo;
+            const b2 = b as FileInfo;
+
+            return a2.name.localeCompare(b2.name);
+          } else if (a instanceof DirectoryInfo && b instanceof DirectoryInfo) {
+            const a2 = a as DirectoryInfo;
+            const b2 = b as DirectoryInfo;
+
+            return a2.path.localeCompare(b2.path);
+          } else {
+            return 0;
+          }
+        });
+
+        console.log(result);
+        dir.addEntries(result);
+        console.log(`dir with ${result.length} found`);
+        return [dir];
       }
-    );
+    } else {
+      throw new Error(`item is undefined or undefined`);
+    }
   }
 
   public addEntries(entries: (FileInfo | DirectoryInfo)[]) {

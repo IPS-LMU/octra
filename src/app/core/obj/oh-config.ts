@@ -1,11 +1,12 @@
 export interface ASRPluginConfiguration {
-  enabled: boolean,
-  calls: string[],
+  enabled: boolean;
+  calls: string[];
   'api': {
     'commands': OHCommand[];
     'languages': OHLanguageObject[];
     'services': OHService[];
     'asrInfoURL'?: string;
+    'basConfigURL'?: string;
     'asrQuotaInfoURL'?: string;
   };
   'plugins': {

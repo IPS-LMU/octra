@@ -67,184 +67,24 @@ export class AsrService {
 
   constructor(private settingsService: SettingsService, private appStorage: AppStorageService, private httpClient: HttpClient,
               private audioService: AudioService, private transcrService: TranscriptionService, private router: Router) {
+
+    this.settingsService.getMAUSLanguages().then((languages) => {
+      this.allowedMAUSLanguages = languages.map(a => ({
+        label: a.ParameterValue.Description,
+        code: a.ParameterValue.Value
+      })).filter(a => a.label !== '');
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   public static authURL = '';
 
-  public allowedMAUSLanguages = [
-    {
-      label: 'Aboriginal Languages (AU)',
-      code: 'aus-AU'
-    },
-    {
-      label: 'Afrikaans (ZA)',
-      code: 'afr-ZA'
-    },
-    {
-      label: 'Albanian (AL)',
-      code: 'sqi-AL'
-    },
-    {
-      label: 'Arabic (macro)',
-      code: 'arb'
-    },
-    {
-      label: 'Basque (ES)',
-      code: 'eus-ES'
-    },
-    {
-      label: 'Basque (FR)',
-      code: 'eus-FR'
-    },
-    {
-      label: 'Catalan (ES)',
-      code: 'cat-ES'
-    },
-    {
-      label: 'Dutch (BE)',
-      code: 'nld-BE'
-    },
-    {
-      label: 'Dutch (NL)',
-      code: 'nld-NL'
-    },
-    {
-      label: 'English (AU)',
-      code: 'eng-AU'
-    },
-    {
-      label: 'English (US)',
-      code: 'eng-US'
-    },
-    {
-      label: 'English (GB)',
-      code: 'eng-GB'
-    },
-    {
-      label: 'English (SC)',
-      code: 'eng-SC'
-    },
-    {
-      label: 'English (NZ)',
-      code: 'eng-NZ'
-    },
-    {
-      label: 'Estonian (EE)',
-      code: 'ekk-EE'
-    },
-    {
-      label: 'Finnish (FI)',
-      code: 'fin-FI'
-    },
-    {
-      label: 'French (FR)',
-      code: 'fra-FR'
-    },
-    {
-      label: 'Georgian (GE)',
-      code: 'kat-GE'
-    },
-    {
-      label: 'German (AT)',
-      code: 'deu-AT'
-    },
-    {
-      label: 'German (CH)',
-      code: 'deu-CH'
-    },
-    {
-      label: 'German (DE)',
-      code: 'deu-DE'
-    },
-    {
-      label: 'German Dieth (CH)',
-      code: 'gsw-CH'
-    },
-    {
-      label: 'German Dieth (CH), Bern dialect',
-      code: 'gsw-CH-BE'
-    },
-    {
-      label: 'German Dieth (CH), Basel dialect',
-      code: 'gsw-CH-BS'
-    },
-    {
-      label: 'German Dieth (CH), Graubunden dialect',
-      code: 'gsw-CH-GR'
-    },
-    {
-      label: 'German Dieth (CH), St. Gallen dialect',
-      code: 'gsw-CH-SG'
-    },
-    {
-      label: 'German Dieth (CH), Zurich dialect',
-      code: 'gsw-CH-ZH'
-    },
-    {
-      label: 'Hungarian (HU)',
-      code: 'hun-HU'
-    },
-    {
-      label: 'Icelandic (IS)',
-      code: 'isl-IS'
-    },
-    {
-      label: 'Italian (IT)',
-      code: 'ita-IT'
-    },
-    {
-      label: 'Japanese (JP)',
-      code: 'jpn-JP'
-    },
-    {
-      label: 'Kunwinjku, Western and Central Arnhem Land (AU)',
-      code: 'gup-AU'
-    },
-    {
-      label: 'Luxembourgish (LU)',
-      code: 'ltz-LU'
-    },
-    {
-      label: 'Maltese (MT)',
-      code: 'mlt-MT'
-    },
-    {
-      label: 'Norwegian (NO)',
-      code: 'nor-NO'
-    },
-    {
-      label: 'Persian (IR)',
-      code: 'fas-IR'
-    },
-    {
-      label: 'Polish (PL)',
-      code: 'pol-PL'
-    },
-    {
-      label: 'Romanian (RO)',
-      code: 'ron-RO'
-    },
-    {
-      label: 'Russian (RU)',
-      code: 'rus-RU'
-    },
-    {
-      label: 'Spanish (ES)',
-      code: 'spa-ES'
-    },
-    {
-      label: 'Swedish (SE)',
-      code: 'swe-SE'
-    },
-    {
-      label: 'Thai (TH)',
-      code: 'tha-TH'
-    },
-    {
-      label: 'Yolŋu Matha, Gupapuyngu, Eastern Arnhem Land (AU)',
-      code: 'guf-AU'
-    }
-  ];
+  public allowedMAUSLanguages: {
+    label: string;
+    code: string;
+  }[] = [];
+
   private _selectedLanguage: ASRLanguage = null;
   private _selectedMAUSLanguage: {
     language: string;

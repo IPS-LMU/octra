@@ -86,5 +86,6 @@ export interface ASRSettings {
   languages: ASRLanguage[];
   services: ASRService[];
   asrInfoURL?: string;
+  basConfigURL?: string;
   asrQuotaInfoURL?: string;
 }

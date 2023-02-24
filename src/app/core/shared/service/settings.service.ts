@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
-import {AppSettings, ASRSettings, ProjectSettings} from '../../obj/Settings';
+import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {HttpClient} from '@angular/common/http';
@@ -12,7 +12,6 @@ import {Params, Router} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
-import {ASRPluginConfiguration} from '../../obj/oh-config';
 import * as X2JS from 'x2js';
 
 declare var validateAnnotation: ((string, any) => any);
@@ -703,6 +702,28 @@ export class SettingsService {
     }
 
     return;
+  }
+
+  public async getMAUSLanguages() {
+    return new Promise<{
+      ParameterValue: { Value: string; Description: string };
+    }[]>((resolve, reject) => {
+      if (this._appSettings.octra.plugins.asr.basConfigURL) {
+        this.http.get(`${this._appSettings.octra.plugins.asr.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runPipeline/Input/LANGUAGE/Values/`, {responseType: 'json'})
+          .subscribe({
+            next: (result: {
+              ParameterValue: { Value: string; Description: string };
+            }[]) => {
+              resolve(result);
+            },
+            error: (err) => {
+              reject(err);
+            }
+          });
+      } else {
+        resolve([]);
+      }
+    });
   }
 
   getASRQuotaInfo(url: string, asrName: string) {

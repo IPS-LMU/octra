@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
@@ -141,7 +132,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  }
+  };
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
@@ -178,10 +169,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  }
+  };
   private navigate = (): void => {
     Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
-  }
+  };
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
@@ -336,14 +327,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 });
               }
 
-              if (this.appStorage.usemode === 'online'
-                && json.data.hasOwnProperty('prompttext')) {
+              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompttext')) {
                 // get transcript data that already exists
                 const prompt = json.data.prompttext;
                 this.appStorage.prompttext = (prompt) ? prompt : '';
               } else {
                 this.appStorage.prompttext = '';
               }
+
+              // TODO 1. If local data is empty => load data from server
+              // TODO 2. If local data is not empty => load local data
 
               const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
               if (res.error === '') {

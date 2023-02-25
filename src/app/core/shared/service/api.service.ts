@@ -1,9 +1,8 @@
 import {Injectable, SecurityContext} from '@angular/core';
-import {API} from '../../obj/API/api.interface';
+import {API, WebTranscribePausedResponse, WebTranscribeProjectsListResponse, WebTranscribeResponse} from '../../obj/API/api.interface';
 import {DomSanitizer} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
 import {isNullOrUndefined} from '../Functions';
-import {error} from 'protractor';
 import * as moment from 'moment';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class APIService implements API {
               private sanitizer: DomSanitizer) {
   }
 
-  public beginSession(project: string, annotator: string, jobno: number, password?: string): Promise<any> {
+  public async beginSession(project: string, annotator: string, jobno: number, password?: string): Promise<WebTranscribeResponse> {
     // validation
     if (project !== '' && (annotator !== '')) {
 
@@ -30,23 +29,7 @@ export class APIService implements API {
     throw new Error('beginSession - validation false');
   }
 
-  public continueSession(project: string, annotator: string, jobno: number): Promise<any> {
-    if (project !== null && project !== '' &&
-      annotator !== null && annotator !== ''
-    ) {
-      const cmdJSON = {
-        querytype: 'continueannotation',
-        project,
-        annotator,
-        jobno
-      };
-      return this.post(cmdJSON);
-    } else {
-      throw new Error('continueSession - validation false');
-    }
-  }
-
-  public fetchAnnotation(id: number): Promise<any> {
+  public async fetchAnnotation(id: number): Promise<WebTranscribeResponse> {
     const cmdJSON = {
       querytype: 'fetchannotation',
       id
@@ -54,59 +37,33 @@ export class APIService implements API {
     return this.post(cmdJSON);
   }
 
-  public lockSession(transcript: any[], project: string, annotator: string, jobno: number,
-                     dataID: number, comment: string, quality: any, log: any[]): Promise<any> {
+  public async pauseSession(transcript: any[], project: string, annotator: string, jobno: number, dataID: number,
+                            status: string, comment: string, quality: any, log: any[]): Promise<WebTranscribePausedResponse> {
     if (
       project !== '' &&
-      transcript.length > 0 &&
-      quality !== null
+      transcript.length > 0
     ) {
       const cmdJSON = {
-        querytype: 'continueannotation',
-        transcript: JSON.stringify(transcript), project,
+        querytype: 'pauseannotation',
+        transcript: JSON.stringify(transcript),
+        project,
         annotator,
         comment,
         jobno,
-        status: 'BUSY',
-        quality: JSON.stringify(quality),
+        status: 'PAUSED',
+        quality,
         id: dataID,
         log
       };
 
       return this.post(cmdJSON);
     } else {
-      throw new Error('saveSession - validation false');
+      throw new Error('pauseSession - validation false');
     }
   }
 
-  /**
-   * this method doesn't work! Do not use it.
-   */
-  public unlockSession(project: string,
-                       dataID: number): Promise<any> {
-    if (
-      project !== ''
-    ) {
-      const cmdJSON = {
-        querytype: 'continueannotation',
-        transcript: '',
-        project,
-        annotator: '',
-        comment: '',
-        status: 'FREE',
-        quality: '',
-        id: dataID,
-        log: []
-      };
-
-      return this.post(cmdJSON);
-    } else {
-      throw new Error('unlockSession - validation false');
-    }
-  }
-
-  public saveSession(transcript: any[], project: string, annotator: string, jobno: number, dataID: number,
-                     status: string, comment: string, quality: any, log: any[]): Promise<any> {
+  public async saveSession(transcript: any[], project: string, annotator: string, jobno: number, dataID: number,
+                           status: string, comment: string, quality: any, log: any[]): Promise<WebTranscribeResponse> {
     if (
       project !== '' &&
       transcript.length > 0 &&
@@ -131,7 +88,7 @@ export class APIService implements API {
     }
   }
 
-  public failSession(dataID: number, errorMessage: string): Promise<any> {
+  public async failSession(dataID: number, errorMessage: string): Promise<any> {
     const date = moment().toISOString(false);
     return this.post({
       querytype: 'continueannotation',
@@ -141,7 +98,7 @@ export class APIService implements API {
     });
   }
 
-  public closeSession(annotator: string, id: number, comment: string): Promise<any> {
+  public async closeSession(annotator: string, id: number, comment: string): Promise<WebTranscribeResponse> {
     comment = (comment) ? comment : '';
 
     if (
@@ -174,7 +131,7 @@ export class APIService implements API {
     }
   }
 
-  public getProjects(): Promise<any> {
+  public async getProjects(): Promise<WebTranscribeProjectsListResponse> {
     const cmdJSON = {
       querytype: 'listprojects'
     };
@@ -197,7 +154,7 @@ export class APIService implements API {
     });
   }
 
-  public post(json: any): Promise<any> {
+  public async post(json: any): Promise<any> {
     const body = JSON.stringify(json);
 
     return new Promise<void>((resolve, reject) => {
@@ -216,7 +173,7 @@ export class APIService implements API {
     this.serverURL = this.sanitizer.sanitize(SecurityContext.URL, serverURL);
   }
 
-  public sendBugReport(email: string = '', description: string = '', log: any): Promise<any> {
+  public async sendBugReport(email: string = '', description: string = '', log: any): Promise<any> {
     const json = JSON.stringify(log);
 
     const cmdJSON = {
@@ -228,7 +185,7 @@ export class APIService implements API {
     return this.post(cmdJSON);
   }
 
-  public setOnlineSessionToFree: (appStorageService) => Promise<void> = (appStorage) => {
+  public setOnlineSessionToFree: (appStorageService) => Promise<void> = async (appStorage) => {
     // check if old annotation is already annotated
     return new Promise<void>((resolve, reject) => {
       if (!isNullOrUndefined(appStorage.dataID) && appStorage.dataID > -1) {

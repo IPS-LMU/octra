@@ -305,9 +305,26 @@ export class TranscriptionComponent implements OnInit,
               console.error(error);
             });
           } else if (answer === TranscriptionStopModalAnswer.QUIT) {
-            this.transcrService.endTranscription();
+            // save on server paused
+            const json: any = this.transcrService.exportDataToJSON();
+            this.api.pauseSession(json.transcript, json.project, json.annotator,
+              json.jobno, json.id, json.status, json.comment, json.quality, json.log)
+              .then((result) => {
+                this.transcrService.endTranscription();
+                this.appStorage.clearSession();
 
-            Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+                this.appStorage.clearLocalStorage().then(() => {
+                  this.appStorage.saveUser();
+                  this.appStorage.dataID = json.id;
+                }).catch((error) => {
+                  console.error(error);
+                });
+                Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+              })
+              .catch((error) => {
+                this.modalService.show('error', 'error occured');
+                console.error(error);
+              });
           }
         }).catch((error) => {
           console.error(error);

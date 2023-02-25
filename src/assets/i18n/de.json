@@ -123,7 +123,7 @@
     "complete": "Transkription abschließen",
     "invalid": "Es werden nur korrekte Transkriptionen angenommen. Korrigiere bitte die Fehler.",
     "no prompttext": "Der Vorlagentext kann nicht angezeigt werden.",
-    "need audio playback": "Du musst die Audiowiedergabe min. einmal starten, bevor sie die Transkription absenden können."
+    "need audio playback": "Du musst die Audiowiedergabe min. einmal starten, bevor Du die Transkription absenden kannst."
   },
   "segments": {
     "total": "Transkriptionseinheiten insgesamt",
@@ -153,7 +153,7 @@
     "transcription": {
       "delete": {
         "header": "Neue Transkription erstellen?",
-        "text": "Möchtest Du die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
+        "text": "Möchtest Du die alte Transkription wirklich entfernen?<br><br>Dein Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
         "delete old": "Vorherige Transkription entfernen"
       },
       "stop": {
@@ -162,11 +162,11 @@
       },
       "send": {
         "header": "Transkription senden",
-        "text": "Durch Klicken auf 'Jetzt senden' werden Ihre Ergebnisse zentral gespeichert und können nicht mehr geändert werden."
+        "text": "Durch Klicken auf 'Jetzt senden' werden Deine Ergebnisse zentral gespeichert und können nicht mehr geändert werden."
       },
       "sending": {
         "header": "Transkription wird übertragen...",
-        "text": "Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
+        "text": "Deine Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
       },
       "demoEnd": {
         "header": "Demo Modus",
@@ -239,7 +239,7 @@
     "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Du kannst OCTRA stattdessen lokal nutzen.",
     "online mode description": "Im Online Modus werden automatisch Audiodateien zugewiesen, die verschriftlicht werden sollen.",
     "local mode": "Lokaler Modus",
-    "local mode description": "Im lokalen Modus kannst Du selbst eine Audiodatei von Ihrer Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen, solange sie keine der Web-Services nutzen (ASR oder Word-Alignment).",
+    "local mode description": "Im lokalen Modus kannst Du selbst eine Audiodatei von Deiner Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen, solange Du keine der Web-Services nutzt (ASR oder Word-Alignment).",
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehe die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
@@ -273,7 +273,7 @@
     "segment enter text": "Bitte wähle eine Transkriptionseinheit aus, indem Du mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit": {
-    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Einheiten:",
+    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Deine definierten Transkriptionseinheiten:",
     "form fill out": "Bitte fülle kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
@@ -285,7 +285,7 @@
   "transcription submitted": {
     "no jobs left": "Keine freien Aufgaben verfügbar",
     "transcription sent": "Transkription wurde übertragen.",
-    "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
+    "transcription sent successfully": "Deine Transkription wurde erfolgreich übertragen.",
     "want to do": "Was möchtest Du tun?",
     "quit": "Beenden und Abmelden",
     "next transcription": "Jetzt nächste Transkription durchführen"

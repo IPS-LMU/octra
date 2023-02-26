@@ -66,6 +66,15 @@ export class TranscriptionService {
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
   }
 
+  get comment(): string {
+    return this.feedback.comment;
+  }
+
+  set comment(value: string) {
+    this.feedback.comment = value;
+    this.appStorage.comment = value;
+  }
+
   get statistic(): any {
     return this._statistic;
   }

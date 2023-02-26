@@ -51,7 +51,7 @@ export class APIService implements API {
         comment,
         jobno,
         status: 'PAUSED',
-        quality,
+        quality: quality === '{}' ? undefined : quality,
         id: dataID,
         log
       };

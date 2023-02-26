@@ -255,7 +255,6 @@ export class TranscriptionComponent implements OnInit,
       this.appStorage.user.jobno = -1;
       this.appStorage.user.project = '';
       Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-        this.appStorage.clearSession();
         this.appStorage.clearLocalStorage().catch((error) => {
           console.error(error);
         });
@@ -273,8 +272,6 @@ export class TranscriptionComponent implements OnInit,
       if (this.appStorage.usemode !== 'demo') {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-            this.appStorage.clearSession();
-
             this.appStorage.clearLocalStorage().then(() => {
               this.appStorage.saveUser();
             }).catch((error) => {
@@ -293,8 +290,6 @@ export class TranscriptionComponent implements OnInit,
           if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
             this.api.setOnlineSessionToFree(this.appStorage).then(() => {
               Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-                this.appStorage.clearSession();
-
                 this.appStorage.clearLocalStorage().then(() => {
                   this.appStorage.saveUser();
                 }).catch((error) => {
@@ -310,16 +305,15 @@ export class TranscriptionComponent implements OnInit,
             this.api.pauseSession(json.transcript, json.project, json.annotator,
               json.jobno, json.id, json.status, json.comment, json.quality, json.log)
               .then((result) => {
-                this.transcrService.endTranscription();
-                this.appStorage.clearSession();
 
                 this.appStorage.clearLocalStorage().then(() => {
                   this.appStorage.saveUser();
                   this.appStorage.dataID = json.id;
+                  this.transcrService.endTranscription();
+                  Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
                 }).catch((error) => {
                   console.error(error);
                 });
-                Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
               })
               .catch((error) => {
                 this.modalService.show('error', 'error occured');

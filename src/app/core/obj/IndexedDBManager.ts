@@ -192,13 +192,13 @@ export class IndexedDBManager {
     this.db.close();
   }
 
-  public saveArraySequential = (array: any[], storeName: string | IDBObjectStore, key: any): Promise<void> => {
+  public saveArraySequential = (array: any[] | undefined, storeName: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
         const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
 
         const wrapper = (acc: number) => {
-          if (acc < array.length) {
+          if (!isNullOrUndefined(array) && acc < array.length) {
             const value = (typeof key === 'string') ? array[acc]['' + key + ''] : array[acc][key];
             this.save(store, value, array[acc]).then(
               () => {

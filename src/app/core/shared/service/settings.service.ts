@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
+import {interval, Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
@@ -92,8 +92,8 @@ export class SettingsService {
     );
   }
 
-  get isDBLoadded(): boolean {
-    return this._isDBLoadded;
+  get isDBLoaded(): boolean {
+    return this._isDBLoaded;
   }
 
   constructor(private http: HttpClient,
@@ -133,7 +133,7 @@ export class SettingsService {
 
   private _tidyUpMethod: (string, any) => string = null;
 
-  private _isDBLoadded = false;
+  private _isDBLoaded = false;
 
   public static queryParamsSet(queryParams: Params): boolean {
     return (
@@ -233,7 +233,7 @@ export class SettingsService {
             }
           }
           umanager.destroy();
-          this._isDBLoadded = true;
+          this._isDBLoaded = true;
           this.dbloaded.emit();
         }
       ).catch((error) => {
@@ -765,6 +765,68 @@ export class SettingsService {
 
         resolve(asrQuotaInfo);
       });
+    });
+  }
+
+  public async waitForDBLoaded() {
+    return new Promise<void>((resolve, reject) => {
+      if (this._isDBLoaded) {
+        resolve();
+        return;
+      }
+
+      const id = this.subscrmanager.add(this.dbloaded.subscribe({
+        next: () => {
+          this.subscrmanager.removeById(id);
+          resolve();
+        },
+        error: (error) => {
+          this.subscrmanager.removeById(id);
+          reject(error);
+        }
+      }));
+    });
+  }
+
+  public async waitForAppSettingsLoaded() {
+    return new Promise<void>((resolve, reject) => {
+      if (!isNullOrUndefined(this._appSettings)) {
+        resolve();
+        return;
+      }
+
+      const id = this.subscrmanager.add(this.appsettingsloaded.subscribe({
+        next: () => {
+          this.subscrmanager.removeById(id);
+          resolve();
+        },
+        error: (error) => {
+          this.subscrmanager.removeById(id);
+          reject(error);
+        }
+      }));
+    });
+  }
+
+  public async waitForAllLoaded() {
+    return new Promise<void>((resolve, reject) => {
+      if (!isNullOrUndefined(this.allloaded)) {
+        resolve();
+        return;
+      }
+
+      const id = this.subscrmanager.add(interval(100).subscribe({
+        next: () => {
+          if (this.allloaded) {
+            this.subscrmanager.removeById(id);
+            resolve();
+          }
+        },
+        error: (error) => {
+          this.subscrmanager.removeById(id);
+          reject(error);
+        }
+      }));
     });
   }
 }

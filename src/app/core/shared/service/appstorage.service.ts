@@ -755,8 +755,6 @@ export class AppStorageService {
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._loggedIn = false;
-      this.login = false;
       this._dataID = null;
       this._audioURL = null;
 
@@ -767,6 +765,8 @@ export class AppStorageService {
       promises.push(this.idb.save('options', 'audioURL', {value: null}));
       promises.push(this.idb.save('options', 'dataID', {value: null}));
       promises.push(this.idb.save('options', 'sessionfile', {value: null}));
+      promises.push(this.idb.save('options', 'prompttext', {value: null}));
+      promises.push(this.idb.save('options', 'comment', {value: null}));
       promises.push(this.clearLoggingData());
 
       this.clearAnnotationData().then(

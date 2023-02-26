@@ -14,7 +14,7 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
 import {AppInfo} from '../../../app.info';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
-import {Observable, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {parseServerDataEntry} from '../../obj/data-entry';
 
 @Component({
@@ -69,12 +69,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
 
   private subscrmanager: SubscriptionManager;
-  onOfflineSubmit = () => {
+
+  async onOfflineSubmit() {
     if (this.appStorage.usemode !== 'demo' && !isNullOrUndefined(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
-      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
+      try {
+        await this.api.setOnlineSessionToFree(this.appStorage);
         this.audioService.registerAudioManager(this.dropzone.audiomanager);
-        this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
+        this.appStorage.beginLocalSession(this.dropzone.files, false, async () => {
           if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
             const newLevels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -85,28 +87,25 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
               newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
             }
-
-            this.appStorage.overwriteAnnotation(newLevels).then(
-              () => {
-                return this.appStorage.overwriteLinks(newLinks);
-              }
-            ).then(() => {
+            try {
+              await this.appStorage.overwriteAnnotation(newLevels);
+              await this.appStorage.overwriteLinks(newLinks);
               this.navigate();
-            }).catch((err) => {
-              console.error(err);
-            });
+            } catch (e) {
+              console.error(e);
+            }
           } else {
             this.navigate();
           }
         }, (error) => {
           alert(error);
         });
-      }).catch((error) => {
-        console.error(error);
-      });
+      } catch (e) {
+        console.error(e);
+      }
     } else {
       this.audioService.registerAudioManager(this.dropzone.audiomanager);
-      this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
+      this.appStorage.beginLocalSession(this.dropzone.files, true, async () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
           const newLevels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -118,13 +117,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.appStorage.overwriteAnnotation(newLevels).then(() => {
-            return this.appStorage.overwriteLinks(newLinks);
-          }).then(() => {
+          try {
+            await this.appStorage.overwriteAnnotation(newLevels);
+            await this.appStorage.overwriteLinks(newLinks);
             this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
+          } catch (e) {
+            console.error(e);
+          }
         } else {
           this.navigate();
         }
@@ -133,10 +132,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       });
     }
   };
+
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
-    this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
+    this.appStorage.beginLocalSession(this.dropzone.files, false, async () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
           const newLevels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -148,15 +148,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.appStorage.overwriteAnnotation(newLevels).then(
-            () => {
-              return this.appStorage.overwriteLinks(newLinks);
-            }
-          ).then(() => {
+          try {
+            await this.appStorage.overwriteAnnotation(newLevels);
+            await this.appStorage.overwriteLinks(newLinks);
             this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
+          } catch (e) {
+            console.error(e);
+          }
         } else {
           this.navigate();
         }
@@ -174,7 +172,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
   };
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
       this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
@@ -214,36 +212,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }
     };
 
-    if (!this.appStorage.idbloaded) {
-      this.subscrmanager.add(this.appStorage.loaded.subscribe(
-        () => {
-        },
-        () => {
-        },
-        () => {
-          loaduser();
-        })
-      );
-    } else {
+    try {
+      await this.settingsService.waitForDBLoaded();
       loaduser();
+      await this.settingsService.loadProjectSettings();
+      await this.loadPojectsList();
+    } catch (e) {
+      console.error(e);
     }
-
-    new Promise<void>((resolve, reject) => {
-      if (this.settingsService.isDBLoadded) {
-        resolve();
-      } else {
-        this.subscrmanager.add(this.settingsService.dbloaded.subscribe(() => {
-          resolve();
-        }));
-      }
-    }).then(() => {
-      this.settingsService.loadProjectSettings().then(() => {
-        this.loadPojectsList();
-      }).catch((error) => {
-        console.error(error);
-      });
-    });
-
   }
 
   ngAfterViewInit() {
@@ -253,7 +229,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager.destroy();
   }
 
-  onSubmit(form: NgForm) {
+  async onSubmit(form: NgForm) {
     let newSession = false;
     let newSessionAfterOld = false;
     let continueSession = false;
@@ -261,7 +237,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (!this.isPasswordCorrect(this.member.project, this.member.password)) {
       this.modService.show('loginInvalid');
     } else {
-
       if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
         this.member.jobno = '0';
       }
@@ -296,20 +271,26 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }
 
       if (newSessionAfterOld) {
-        this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-          this.createNewSession(form);
-        }).catch((error) => {
-          console.error(error);
-        });
+        try {
+          await this.api.setOnlineSessionToFree(this.appStorage);
+        } catch (e) {
+          console.error(e);
+        }
       }
 
-      if (newSession) {
-        this.createNewSession(form);
+      if (newSession || newSessionAfterOld) {
+        try {
+          await this.createNewSession(form);
+        } catch (e) {
+          console.error(e);
+        }
       } else if (continueSession) {
-        this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
+        try {
+          const json = await this.api.fetchAnnotation(this.appStorage.dataID);
+
           if (isNullOrUndefined(json.data)) {
             // job doesn't exist anymore
-            this.createNewSession(form);
+            await this.createNewSession(form);
           } else {
             // continue job
             if (json.hasOwnProperty('message')) {
@@ -317,14 +298,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               this.appStorage.sessStr.store('jobsLeft', Number(counter));
             }
 
-            if (form.valid && this.agreementChecked
-              && json.message !== '0'
-            ) {
+            if (form.valid && this.agreementChecked && json.message !== '0') {
               if (this.appStorage.sessionfile !== null) {
                 // last was offline mode
-                this.appStorage.clearLocalStorage().catch((err) => {
-                  console.error(err);
-                });
+                try {
+                  await this.appStorage.clearLocalStorage();
+                } catch (e) {
+                  console.error(e);
+                }
               }
 
               if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompttext')) {
@@ -335,8 +316,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 this.appStorage.prompttext = '';
               }
 
-              // TODO 1. If local data is empty => load data from server
-              // TODO 2. If local data is not empty => load local data
+              if (!isNullOrUndefined(this.appStorage.dataID) && isNullOrUndefined(this.appStorage.audioURL)) {
+                console.log('load data from server for this task with status ' + json.data.status);
+                this.appStorage.serverDataEntry = parseServerDataEntry(JSON.stringify(json.data));
+                this.appStorage.audioURL = json.data.url;
+              }
 
               const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
               if (res.error === '') {
@@ -348,12 +332,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               this.modService.show('loginInvalid');
             }
           }
-        }).catch((error) => {
+        } catch (e) {
           this.modService.show('error', {
             text: 'Server cannot be requested. Please check if you are online.'
           });
-          console.error(error);
-        });
+          console.error(e);
+        }
       }
     }
   }
@@ -406,8 +390,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     return result;
   }
 
-  loadPojectsList() {
-    this.api.getProjects().then((json) => {
+  async loadPojectsList() {
+    try {
+      const json = await this.api.getProjects();
+
       if (Array.isArray(json.data)) {
         this.projects = json.data;
 
@@ -436,10 +422,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }
 
       this.apiStatus = 'available';
-    }).catch((error) => {
-      console.error(`ERROR: could not load list of projects:\n${error}`);
+    } catch (e) {
+      console.error(e);
+      console.error(`ERROR: could not load list of projects:\n${e}`);
       this.apiStatus = 'unavailable';
-    });
+    }
   }
 
   public selectProject(event: HTMLSelectElement) {
@@ -452,87 +439,79 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     reader.readAsText(file, 'utf-8');
   }
 
-  onTranscriptionDelete() {
-    this.modService.show('transcriptionDelete').then((answer: ModalDeleteAnswer) => {
+  async onTranscriptionDelete() {
+    try {
+      const answer: ModalDeleteAnswer = await this.modService.show('transcriptionDelete');
       if (answer === ModalDeleteAnswer.DELETE) {
         this.newTranscription();
       }
-    }).catch((error) => {
-      console.error(error);
-    });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  private createNewSession(form: NgForm) {
+  private async createNewSession(form: NgForm) {
     this.clearUserName();
-    this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
-
-      if (form.valid && this.agreementChecked
-        && json.message !== '0'
-      ) {
-
+    try {
+      const json = await this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno));
+      if (form.valid && this.agreementChecked && json.message !== '0') {
         // delete old data for fresh new session
         this.appStorage.clearSession();
-        this.appStorage.clearLocalStorage().then(
-          () => {
-            const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
+        await this.appStorage.clearLocalStorage();
+        const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
 
-            // get transcript data that already exists
-            const jsonStr = JSON.stringify(json.data);
-            this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
+        // get transcript data that already exists
+        const jsonStr = JSON.stringify(json.data);
+        this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-            if (isNullOrUndefined(this.appStorage.serverDataEntry.transcript) ||
-              !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
-              this.appStorage.serverDataEntry.transcript = [];
-            }
+        if (isNullOrUndefined(this.appStorage.serverDataEntry.transcript) ||
+          !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+          this.appStorage.serverDataEntry.transcript = [];
+        }
 
-            if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
-              !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-              this.appStorage.serverDataEntry.logtext = [];
-            }
+        if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
+          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+          this.appStorage.serverDataEntry.logtext = [];
+        }
 
-            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
-              // get transcript data that already exists
-              const prompt = this.appStorage.serverDataEntry.prompttext;
-              this.appStorage.prompttext = (prompt) ? prompt : '';
-            } else {
-              this.appStorage.prompttext = '';
-            }
+        if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
+          // get transcript data that already exists
+          const prompt = this.appStorage.serverDataEntry.prompttext;
+          this.appStorage.prompttext = (prompt) ? prompt : '';
+        } else {
+          this.appStorage.prompttext = '';
+        }
 
-            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
-              // get transcript data that already exists
-              const comment = this.appStorage.serverDataEntry.comment;
+        if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
+          // get transcript data that already exists
+          const comment = this.appStorage.serverDataEntry.comment;
 
-              if (comment) {
-                this.appStorage.servercomment = comment;
-              }
-            } else {
-              this.appStorage.servercomment = '';
-            }
-
-            if (json.hasOwnProperty('message')) {
-              const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobsLeft', Number(counter));
-            }
-
-            if (res.error === '') {
-              this.navigate();
-            } else {
-              this.modService.show('error', res.error);
-            }
+          if (comment) {
+            this.appStorage.servercomment = comment;
           }
-        ).catch((err) => {
-          console.error(err);
-        });
+        } else {
+          this.appStorage.servercomment = '';
+        }
+
+        if (json.hasOwnProperty('message')) {
+          const counter = (json.message === '') ? '0' : json.message;
+          this.appStorage.sessStr.store('jobsLeft', Number(counter));
+        }
+
+        if (res.error === '') {
+          this.navigate();
+        } else {
+          this.modService.show('error', res.error);
+        }
       } else {
         this.modService.show('loginInvalid');
       }
-    }).catch((error) => {
+    } catch (e) {
       alert('Server cannot be requested. Please check if you are online.');
-      return throwError(error);
-    });
+    }
   }
 
-  public startDemo() {
+  public async startDemo() {
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (!isNullOrUndefined(audioExample)) {
@@ -540,21 +519,21 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.project = 'DemoProject';
       this.member.jobno = '123';
 
-      // delete old data for fresh new session
-      this.appStorage.clearSession();
-      this.appStorage.clearLocalStorage().then(
-        () => {
-          this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
-          this.appStorage.usemode = 'demo';
-          this.appStorage.prompttext = '';
-          this.appStorage.servercomment = audioExample.description;
-          this.appStorage.sessStr.store('jobsLeft', 1000);
+      try {
+        // delete old data for fresh new session
+        this.appStorage.clearSession();
+        await this.appStorage.clearLocalStorage();
 
-          this.navigate();
-        }
-      ).catch((err) => {
-        console.error(err);
-      });
+        this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
+        this.appStorage.usemode = 'demo';
+        this.appStorage.prompttext = '';
+        this.appStorage.servercomment = audioExample.description;
+        this.appStorage.sessStr.store('jobsLeft', 1000);
+
+        this.navigate();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 

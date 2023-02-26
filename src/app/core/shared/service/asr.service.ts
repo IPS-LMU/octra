@@ -13,6 +13,7 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 import {TranscriptionService} from './transcription.service';
 import {BrowserSample, OriginalSample} from '../../../media-components/obj/media/audio';
 import {Router} from '@angular/router';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Injectable({
   providedIn: 'root'
@@ -68,14 +69,15 @@ export class AsrService {
   constructor(private settingsService: SettingsService, private appStorage: AppStorageService, private httpClient: HttpClient,
               private audioService: AudioService, private transcrService: TranscriptionService, private router: Router) {
 
-    this.settingsService.getMAUSLanguages().then((languages) => {
-      this.allowedMAUSLanguages = languages.map(a => ({
-        label: a.ParameterValue.Description,
-        code: a.ParameterValue.Value
-      })).filter(a => a.label !== '');
-    }).catch((err) => {
-      console.error(err);
-    });
+    if (this.settingsService.allloaded) {
+      this.afterAppSettingssLoaded();
+    } else {
+      this.subscrManager.add(this.settingsService.appsettingsloaded.subscribe({
+        next: () => {
+          this.afterAppSettingssLoaded();
+        }
+      }));
+    }
   }
 
   public static authURL = '';
@@ -85,12 +87,24 @@ export class AsrService {
     code: string;
   }[] = [];
 
+  private subscrManager = new SubscriptionManager();
   private _selectedLanguage: ASRLanguage = null;
   private _selectedMAUSLanguage: {
     language: string;
     code: string;
   } = null;
   private _queue: ASRQueue;
+
+  private afterAppSettingssLoaded() {
+    this.settingsService.getMAUSLanguages().then((languages) => {
+      this.allowedMAUSLanguages = languages.map(a => ({
+        label: a.ParameterValue.Description,
+        code: a.ParameterValue.Value
+      })).filter(a => a.label !== '');
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
 
   public init() {
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);

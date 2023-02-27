@@ -51,7 +51,7 @@ export class APIService implements API {
         comment,
         jobno,
         status: 'PAUSED',
-        quality: quality === '{}' ? undefined : quality,
+        quality: isNullOrUndefined(quality) || quality === '{}' || (typeof quality === 'object' && Object.keys(quality).length === 0) ? undefined : quality,
         id: dataID,
         log
       };
@@ -77,7 +77,7 @@ export class APIService implements API {
         comment,
         jobno,
         status,
-        quality,
+        quality: isNullOrUndefined(quality) || quality === '{}' || (typeof quality === 'object' && Object.keys(quality).length === 0) ? undefined : quality,
         id: dataID,
         log
       };
@@ -191,7 +191,7 @@ export class APIService implements API {
       if (!isNullOrUndefined(appStorage.dataID) && appStorage.dataID > -1) {
         this.fetchAnnotation(appStorage.dataID).then((json) => {
           if (!isNullOrUndefined(json) && !isNullOrUndefined(json.data)) {
-            if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+            if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY' || json.data.status === 'PAUSED') {
               this.closeSession(appStorage.user.id, appStorage.dataID, '').then(() => {
                 resolve();
               }).catch((error) => {
@@ -211,5 +211,5 @@ export class APIService implements API {
         resolve();
       }
     });
-  };
+  }
 }

@@ -158,7 +158,7 @@
       },
       "stop": {
         "header": "Stop Transcription",
-        "text": "Do you really want to quit the transcription? During the transcription Octra saves your progress in a local storage of this web browser. Only when you submit the finished transcription, your progress will be saved on the server.<br><br>Decide on one of the following options:<ul class='mt-2'><li class='mt-1'><b>Quit & release</b><br/>Your progress will be discarded and the task offered to other transcribers if necessary.</li><li class='mt-1'><b>Quit & continue later</b><br/>Your progress is saved in the browser. You can log in later with the same credentials and continue transcribing. Important: Do not remove your web browser's history, or your progress will be lost.</li><li class='mt-1'><b>Continue transcription:</b><br/>Choose this option if you want to continue now.</li></ul>"
+        "text": "Do you really want to quit the transcription? During the transcription Octra saves your progress in a local storage of this web browser.<br><br>Decide on one of the following options:<ul class='mt-2'><li class='mt-1'><b>Quit & release</b><br/>Your progress will be discarded and the task offered to other transcribers if necessary.</li><li class='mt-1'><b>Quit & continue later</b><br/>Your current progress will be transferred to the server. You can log in later with the same credentials and continue transcribing. Important: Do not remove your web browser's data otherwise you will lose your progress.</li><li class='mt-1'><b>Continue transcription:</b><br/>Choose this option if you want to continue now.</li></ul>"
       },
       "send": {
         "header": "Send transcription",

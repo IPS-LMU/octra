@@ -289,12 +289,12 @@ export class TranscriptionComponent implements OnInit,
         this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
           if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
             this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-              Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-                this.appStorage.clearLocalStorage().then(() => {
-                  this.appStorage.saveUser();
-                }).catch((error) => {
-                  console.error(error);
-                });
+              this.appStorage.clearLocalStorage().then(() => {
+                this.appStorage.saveUser();
+                this.transcrService.endTranscription();
+                Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+              }).catch((error) => {
+                console.error(error);
               });
             }).catch((error) => {
               console.error(error);

@@ -348,6 +348,7 @@ export class SettingsService {
         } else {
           src = this.appStorage.audioURL;
         }
+
         // extract filename
         this._filename = src.substr(src.lastIndexOf('/') + 1);
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));

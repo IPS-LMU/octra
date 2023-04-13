@@ -6,7 +6,7 @@
   "scripts": {
     "nx": "nx",
     "start": "npm run modernizr && nx serve",
-    "build": "ng build",
+    "build": "nx build",
     "build:release": "node ./build.js dev=false isUpdate=false url=/",
     "build:dev": "node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/",
     "build:prod": "node ./build.js dev=false isUpdate=true url=/apps/octra/octra/",
@@ -95,6 +95,8 @@
     "@angular-eslint/eslint-plugin-template": "~15.0.0",
     "@angular-eslint/template-parser": "~15.0.0",
     "@angular/cli": "~15.2.0",
+    "ng-packagr": "~15.2.2",
+    "postcss-preset-env": "~8.3.1",
     "@angular/compiler-cli": "~15.2.0",
     "@angular/language-service": "~15.2.0",
     "@nrwl/cypress": "15.9.2",

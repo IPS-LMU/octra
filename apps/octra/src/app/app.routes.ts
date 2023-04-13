@@ -32,4 +32,4 @@ const APP_ROUTES: Routes = [
   {path: '**', redirectTo: '/404', pathMatch: 'full'}
 ];
 
-export const routing = RouterModule.forRoot(APP_ROUTES, {relativeLinkResolution: 'legacy'});
+export const routing = RouterModule.forRoot(APP_ROUTES, {initialNavigation: 'enabledNonBlocking'});

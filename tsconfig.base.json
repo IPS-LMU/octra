@@ -25,7 +25,7 @@
         "libs/annotation/src/index.ts"
       ],
       "@octra/api-types": [
-        "../octra-backend/dist/libs/api-types/src/index.ts"
+        "../octra-backend/extern/api-types/src/index.d.ts"
       ],
       "@octra/assets": [
         "libs/assets/src/index.ts"
@@ -37,7 +37,7 @@
         "libs/media/src/index.ts"
       ],
       "@octra/ngx-octra-api": [
-        "../octra-backend/dist/libs/ngx-octra-api/src/index.ts"
+        "../octra-backend/extern/ngx-octra-api/src/index.d.ts"
       ],
       "@octra/utilities": [
         "libs/utilities/src/index.ts"

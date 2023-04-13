@@ -48,16 +48,16 @@ export const OctraGuidelinesJSONSchema = {
             'entries': {
               'items': {
                 'properties': {
-                'code': {
-                  'type': 'string'
-                },
-                'priority': {
-                  'type': 'number'
-                },
-                'title': {
-                  'type': 'string'
-                },
-                'description': {
+                  'code': {
+                    'type': 'string'
+                  },
+                  'priority': {
+                    'type': 'number'
+                  },
+                  'title': {
+                    'type': 'string'
+                  },
+                  'description': {
                   'type': 'string'
                 },
                 'examples': {

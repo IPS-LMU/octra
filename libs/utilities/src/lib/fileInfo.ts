@@ -5,7 +5,9 @@ export class FileInfo extends DataInfo {
    * returns if the file is ready for processing
    */
   get available(): boolean {
-    return this.online || !(this._file === undefined || this._file === undefined);
+    return (
+      this.online || !(this._file === undefined || this._file === undefined)
+    );
   }
 
   protected _extension: string;
@@ -52,11 +54,9 @@ export class FileInfo extends DataInfo {
   }
 
   public set fullname(value: string) {
-    const point = value.lastIndexOf('.');
-    const str1 = value.substr(0, point);
-    const str2 = value.substr(point);
-    this._name = str1;
-    this._extension = str2;
+    const {name, extension} = FileInfo.extractFileName(value);
+    this._name = name;
+    this._extension = extension;
   }
 
   public get createdAt(): number {
@@ -65,97 +65,144 @@ export class FileInfo extends DataInfo {
 
   private readonly _createdAt: number = 0;
 
-  public constructor(fullname: string, type: string, size: number, file?: File, createdAt?: number) {
-    super(FileInfo.extractFileName(fullname)!.name, type, size);
-    this._createdAt = (createdAt === undefined) ? 0 : createdAt;
-
+  public constructor(
+    fullname: string,
+    type: string,
+    size: number,
+    file?: File,
+    createdAt?: number
+  ) {
     const extraction = FileInfo.extractFileName(fullname);
-    if (!(extraction === undefined || extraction === undefined)) {
-      this._extension = extraction.extension;
-      this._file = file;
-    } else {
-      throw new Error(`could not extract file name: fullname ${fullname}`);
-    }
+    super(extraction.name, type, size);
+    this._createdAt = createdAt === undefined ? 0 : createdAt;
+    this._extension = extraction.extension;
+    this._file = file;
   }
 
   public static fromFileObject(file: File) {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
-  public static fromURL(url: string, type: string, name: string | undefined = undefined, createdAt = 0) {
+  public static fromURL(
+    url: string,
+    type?: string,
+    name?: string,
+    createdAt = 0
+  ) {
     let fullname = '';
+    const extension = url.substr(url.lastIndexOf('.') + 1);
+
     if (name != undefined) {
-      const extension = url.substr(url.lastIndexOf('.') + 1);
       fullname = name + '.' + extension;
     } else {
       fullname = url.substr(url.lastIndexOf('/') + 1);
     }
-    const result = new FileInfo(fullname, type, 0, undefined, createdAt);
+    console.log(type ?? this.getMimeTypeByExtension(extension), extension);
+    const result = new FileInfo(
+      fullname,
+      type ?? this.getMimeTypeByExtension(extension),
+      0,
+      undefined,
+      createdAt
+    );
     result.url = url;
 
     return result;
   }
 
+  private static getMimeTypeByExtension(extension: string) {
+    if (['mp4'].includes(extension)) {
+      return 'video/mp4';
+    }
+    return 'text/plain';
+  }
+
   public static escapeFileName(name: string) {
-    return name.replace(/[\s/?!%*(){}ß&:=+#'<>^;,Ââ°]/g, '_').replace(/([äÄüÜöÖ])/g, (g0, g1) => {
-      switch (g1) {
-        case('ä'):
-          return 'ae';
-        case('Ä'):
-          return 'Ae';
-        case('ö'):
-          return 'oe';
-        case('Ö'):
-          return 'oe';
-        case('ü'):
-          return 'ue';
-        case('Ü'):
-          return 'Ue';
-      }
-      return '_';
+    return name
+      .replace(/[\s/?!%*(){}ß&:=+#'<>^;,Ââ°]/g, '_')
+      .replace(/([äÄüÜöÖ])/g, (g0, g1) => {
+        switch (g1) {
+          case 'ä':
+            return 'ae';
+          case 'Ä':
+            return 'Ae';
+          case 'ö':
+            return 'oe';
+          case 'Ö':
+            return 'oe';
+          case 'ü':
+            return 'ue';
+          case 'Ü':
+            return 'Ue';
+        }
+        return '_';
+      });
+  }
+
+  public static renameFile(
+    file: File,
+    newName: string,
+    attributes: any
+  ): Promise<File> {
+    return new Promise<File>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (result: any) => {
+        resolve(new File([result.target.result], newName, attributes));
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsArrayBuffer(file);
     });
   }
 
-  public static renameFile(file: File, newName: string, attributes: any): Promise<File> {
-    return new Promise<File>(
-      (resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = (result: any) => {
-          resolve(new File([result.target.result], newName, attributes));
-        };
-        reader.onerror = (error) => {
-          reject(error);
-        };
-
-        reader.readAsArrayBuffer(file);
-      }
+  public isMediaFile() {
+    return (
+      this.type.indexOf('audio') > -1 ||
+      this.type.indexOf('video') > -1 ||
+      this.type.indexOf('image') > -1
     );
   }
 
-  public static extractFileName(fullname: string): { name: string, extension: string } | undefined {
-    if (!(fullname === undefined || fullname === undefined) && fullname !== '') {
+  public static extractFileName(fullname: string): {
+    name: string;
+    extension: string;
+  } {
+    if (fullname && fullname !== '') {
       const lastSlash = fullname.lastIndexOf('/');
       if (lastSlash > -1) {
         // if path remove all but the filename
         fullname = fullname.substr(lastSlash + 1);
       }
 
-      const extensionBegin = fullname.lastIndexOf('.');
-      if (extensionBegin > -1) {
-        // split name and extension
-        const name = fullname.substr(0, extensionBegin);
-        const extension = fullname.substr(extensionBegin);
+      let matches = /^(.*)((?:_annot)?\.[^.]+)$/g.exec(fullname);
 
-        return {
-          name, extension
-        };
+      const result = {
+        name: '',
+        extension: '',
+      };
+
+      if (matches && matches.length > 2) {
+        result.name = matches[1];
+        result.extension = matches[2];
+
+        matches = /^(.*)_annot$/g.exec(result.name);
+        if (matches && matches.length > 1) {
+          result.name = matches[1];
+          result.extension = `_annot${result.extension}`;
+        }
       } else {
-        throw new Error('invalid fullname. Fullname must contain the file extension');
+        throw new Error(
+          'invalid fullname. Fullname must contain the file extension'
+        );
       }
-    }
 
-    return undefined;
+      return result;
+    } else {
+      throw new Error(`Empty fullname`);
+    }
   }
 
   public static fromAny(object: any): FileInfo {
@@ -164,7 +211,12 @@ export class FileInfo extends DataInfo {
       file = this.getFileFromContent(object.content, object.fullname);
     }
 
-    const result = new FileInfo(object.fullname, object.type, object.size, file);
+    const result = new FileInfo(
+      object.fullname,
+      object.type,
+      object.size,
+      file
+    );
     result.attributes = object.attributes;
     result.url = object.url;
     result.hash = object.hash;
@@ -176,15 +228,19 @@ export class FileInfo extends DataInfo {
       const reader = new FileReader();
       reader.readAsText(file, encoding);
       reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   }
 
-  public static getFileFromContent(content: string, filename: string, type?: string): File {
+  public static getFileFromContent(
+    content: string,
+    filename: string,
+    type?: string
+  ): File {
     const properties: {
       type?: string;
     } = {
-      type: ''
+      type: '',
     };
 
     if (type !== undefined && type !== '') {
@@ -205,19 +261,19 @@ export class FileInfo extends DataInfo {
         url: this.url,
         attributes: this.attributes,
         content: '',
-        hash: this.hash
+        hash: this.hash,
       };
 
       // TODO better check mime type
       if (this._extension.indexOf('wav') < 0 && this._file !== undefined) {
-        FileInfo.getFileContent(this._file).then(
-          (content) => {
+        FileInfo.getFileContent(this._file)
+          .then((content) => {
             result.content = content;
             resolve(result);
-          }
-        ).catch((err) => {
-          reject(err);
-        });
+          })
+          .catch((err) => {
+            reject(err);
+          });
       } else {
         resolve(result);
       }
@@ -228,14 +284,17 @@ export class FileInfo extends DataInfo {
     return new Promise<void>((resolve, reject) => {
       if (this._url !== undefined && this._url !== undefined) {
         httpClient.get(this._url, {responseType: 'text'}).subscribe({
-            next: (result: any) => {
-              this._file = FileInfo.getFileFromContent(result, this.fullname, this._type);
-              this._size = this._file.size;
-              resolve();
-            },
-            error: (error: any) => reject(error)
-          }
-        );
+          next: (result: any) => {
+            this._file = FileInfo.getFileFromContent(
+              result,
+              this.fullname,
+              this._type
+            );
+            this._size = this._file.size;
+            resolve();
+          },
+          error: (error: any) => reject(error),
+        });
       } else {
         reject(Error('URL of this file is invalid'));
       }
@@ -247,7 +306,7 @@ export class FileInfo extends DataInfo {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   }
 }

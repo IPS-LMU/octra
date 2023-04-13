@@ -32,7 +32,7 @@ import {ILog} from '../../obj/Settings/logging';
 import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
 import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
 import {Observable, Subject, Subscription} from 'rxjs';
-import {AccountRole, SaveAnnotationDto} from '@octra/api-types';
+import {AccountRole} from '@octra/api-types';
 
 @Injectable({
   providedIn: 'root'
@@ -89,11 +89,11 @@ export class AppStorageService {
     }));
   }
 
-  get serverDataEntry(): SaveAnnotationDto {
+  get serverDataEntry(): any {
     return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
   }
 
-  set serverDataEntry(value: SaveAnnotationDto) {
+  set serverDataEntry(value: any) {
     this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
   }
 
@@ -752,8 +752,8 @@ export class AppStorageService {
     return undefined;
   }
 
-  public startOnlineAnnotation(currentProject: CurrentProject): Promise<SaveAnnotationDto> {
-    return new Promise<SaveAnnotationDto>((resolve, reject) => {
+  public startOnlineAnnotation(currentProject: CurrentProject): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
       // TODO
       /* this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
         if (newAnnotation !== undefined) {

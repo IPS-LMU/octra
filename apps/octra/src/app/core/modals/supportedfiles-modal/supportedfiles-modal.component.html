@@ -1,9 +1,12 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{'modal.supported.header' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">{{'modal.supported.header' | transloco}}</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body">
     <h4>{{'modal.supported.audio files' | transloco}} (max. 1,9 GB):</h4>
@@ -11,33 +14,34 @@
       <table>
         <tr>
           <td>
-                                <span *ngFor="let elem of AppInfo.audioformats; let i = index">
-                                    *{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}}
-                                </span>
-        </td>
-      </tr>
+              <span *ngFor="let elem of AppInfo.audioformats; let i = index">
+                  *{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}}
+              </span>
+          </td>
+        </tr>
+      </table>
     </table>
-  </table>
-  <h4>{{'modal.supported.file formats for import' | transloco}}:</h4>
+    <h4>{{'modal.supported.file formats for import' | transloco}}:</h4>
 
-  <table class="table table-striped">
-    <tbody>
-    <ng-container *ngFor="let elem of AppInfo.converters">
-      <tr *ngIf="elem.conversion.import">
-        <td>{{elem.name}}</td>
-        <td>{{elem.application}}</td>
-        <td>*{{elem.extension}}</td>
-        <td>
-          <fa-icon *ngIf="elem.notice !== ''" [mdbTooltip]="elem.notice"
-                   icon="info-circle"></fa-icon>
-        </td>
-      </tr>
-    </ng-container>
-    </tbody>
-  </table>
-</div>
-<div class="modal-footer">
-  <button (click)="close()" class="btn btn-primary" type="button">
-    {{"general.close" | transloco}}
-  </button>
+    <table class="table table-striped">
+      <tbody>
+      <ng-container *ngFor="let elem of AppInfo.converters">
+        <tr *ngIf="elem.conversion.import">
+          <td>{{elem.name}}</td>
+          <td>{{elem.application}}</td>
+          <td>*{{elem.extension}}</td>
+          <td>
+            <fa-icon *ngIf="elem.notice !== ''" [ngbTooltip]="elem.notice"
+                     icon="info-circle"></fa-icon>
+          </td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button (click)="close()" class="btn btn-primary" type="button">
+      {{"general.close" | transloco}}
+    </button>
+  </div>
 </div>

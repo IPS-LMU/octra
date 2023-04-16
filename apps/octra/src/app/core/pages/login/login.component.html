@@ -8,14 +8,14 @@
         [language]="appStorage.language"></octra-maint-banner>
 
       <p style="padding-top:10px;margin-bottom:10px;">
-        <a (click)="startDemo()" fragment="" routerLink>{{"login.demo"| transloco}}</a>
+        <a (click)="startDemo()" class="link pointer">{{"login.demo"| transloco}}</a>
       </p>
     </div>
   </div>
   <div class="row" id="loginrow">
     <div class="col-md-6">
-      <mdb-card #onlinemode class="login-card">
-        <mdb-card-body>
+      <div class="card login-card" #onlinemode>
+        <div class="card-body">
           <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
              class="warning">
           </p>
@@ -44,7 +44,7 @@
               <div class="text-center" *ngIf="apiStatus === 'available'">
                 <!-- Default form login -->
                 <form #f="ngForm" (ngSubmit)="onOnlineShibbolethSubmit(f)">
-                  <button mdbBtn mdbWavesEffect color="primary" [block]="true" class="my-4 waves-light" type="submit">
+                  <button class="my-4 btn btn-primary" type="submit">
                     <fa-icon icon="university"></fa-icon>
                     Sign in with Shibboleth
                   </button>
@@ -53,21 +53,21 @@
                 <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit(f2)">
                   <!-- Username -->
                   <div class="md-form">
-                    <input mdbInput type="text" name="username" [(ngModel)]="member.userName" id="username"
+                    <input type="text" name="username" [(ngModel)]="member.userName" id="username"
                            class="form-control" required="required">
                     <label for="username">Username</label>
                   </div>
 
                   <!-- Password -->
                   <div class="md-form">
-                    <input mdbInput type="password" name="password" [(ngModel)]="member.password" id="password"
+                    <input type="password" name="password" [(ngModel)]="member.password" id="password"
                            class="form-control" required="required">
                     <label for="password">Password</label>
                   </div>
 
                   <!-- Sign in button -->
-                  <button mdbBtn mdbWavesEffect color="info" [disabled]="!f2.valid" [block]="true"
-                          class="my-4 waves-light" type="submit">
+                  <button [disabled]="!f2.valid"
+                          class="my-4 btn btn-info" type="submit">
                     <fa-icon icon="house-user"></fa-icon>
                     Sign in with credentials
                   </button>
@@ -75,14 +75,14 @@
                 <!-- Default form login -->
               </div>
             </div>
-            <br/>
+            <br />
           </section>
-        </mdb-card-body>
-      </mdb-card>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6">
-      <mdb-card #localmode class="login-card">
-        <mdb-card-body>
+    <div class="col-md-6 ">
+      <div class="card login-card" #localmode>
+        <div class="card-body">
           <section>
             <h4>{{'login.local mode' | transloco}}
             </h4>
@@ -114,8 +114,8 @@
               </button>
             </div>
           </section>
-        </mdb-card-body>
-      </mdb-card>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -124,17 +124,17 @@
     <div class="row">
       <div class="col-md-4">
         <a href="http://www.en.phonetik.uni-muenchen.de/" target="_blank">
-          <img alt="IPS LMU Munich" class="logo" src="./assets/img/ipsx60.png"/>
+          <img alt="IPS LMU Munich" class="logo" src="./assets/img/ipsx60.png" />
         </a>
       </div>
       <div class="col-md-4">
         <a href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html" target="_blank">
-          <img alt="BAS" class="logo" src="./assets/img/bas.png"/>
+          <img alt="BAS" class="logo" src="./assets/img/bas.png" />
         </a>
       </div>
       <div class="col-md-4">
         <a href="https://www.clarin-d.de/en/" target="_blank">
-          <img alt="Clarin-D" class="logo" src="./assets/img/clarin-d.png"/>
+          <img alt="Clarin-D" class="logo" src="./assets/img/clarin-d.png" />
         </a>
       </div>
     </div>
@@ -142,7 +142,7 @@
 </div>
 <section>
   <div class="container">
-    <hr/>
+    <hr />
     <h1 style="text-align: center;margin-top: 40px;">About OCTRA</h1>
     <p style="text-align: justify">
       OCTRA is a modern web-application for the orthographic transcription of audio files. It supports four different
@@ -190,5 +190,4 @@
       <li>Customization</li>
     </ul>
   </div>
-
 </section>

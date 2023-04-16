@@ -27,6 +27,6 @@ export class FastbarComponent {
   }
 
   openHelpModal() {
-    this.modalService.openModal(HelpModalComponent, modalConfigurations.help);
+    this.modalService.openModal(HelpModalComponent, HelpModalComponent.options);
   }
 }

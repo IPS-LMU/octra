@@ -2,7 +2,7 @@ import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService} from '../../../../core/shared/service';
-import {MDBModalRef} from 'angular-bootstrap-md';
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-permutations-replace',
@@ -10,7 +10,7 @@ import {MDBModalRef} from 'angular-bootstrap-md';
   styleUrls: ['./permutations-replace-modal.component.scss']
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
-  modalRef: MDBModalRef;
+  modalRef: NgbModalRef;
   public visible = false;
 
   @ViewChild('modal', {static: true}) modal: any;

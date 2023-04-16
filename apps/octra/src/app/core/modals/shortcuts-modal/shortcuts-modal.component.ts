@@ -1,17 +1,24 @@
-import {Component, Input} from '@angular/core';
-import {KeymappingService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
-import {OctraModal} from '../types';
-import {BrowserInfo} from '@octra/utilities';
+import { Component, Input } from "@angular/core";
+import { KeymappingService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { OctraModal } from "../types";
+import { BrowserInfo } from "@octra/utilities";
+import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
-  selector: 'octra-shortcuts-modal',
-  templateUrl: './shortcuts-modal.component.html',
-  styleUrls: ['./shortcuts-modal.component.scss']
+  selector: "octra-shortcuts-modal",
+  templateUrl: "./shortcuts-modal.component.html",
+  styleUrls: ["./shortcuts-modal.component.scss"]
 })
 export class ShortcutsModalComponent extends OctraModal {
-  @Input() editor = '';
+  public static options: NgbModalOptions = {
+    keyboard: false,
+    backdrop: true,
+    scrollable: true,
+    size: "lg"
+  };
+
+  @Input() editor = "";
 
   protected data = undefined;
 
@@ -21,8 +28,7 @@ export class ShortcutsModalComponent extends OctraModal {
 
   constructor(public appStorage: AppStorageService,
               public keyMap: KeymappingService,
-              modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('ShortcutsModalComponent');
-    this.init(modalService, modalRef);
+              protected override activeModal: NgbActiveModal) {
+    super("ShortcutsModalComponent", activeModal);
   }
 }

@@ -1,13 +1,13 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">
-      {{"general.guidelines" | transloco }}<span class="version">
-                     v {{ guidelines.meta.version }}
-                </span>
-    </h5>
+    <h5 class="modal-title" id="modal-title">{{"general.guidelines" | transloco }}<span class="version">
+      v {{ guidelines.meta.version }}</span></h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body">
     <div class="row" style="width:100%;">
@@ -70,10 +70,11 @@
               </div>
               <div class="col-8">
                 <span (click)="toggle(j,k)" class="guidelines-title">{{entry.title}}</span>
-                <div mdbCollapse [isCollapsed]="collapsed[j][k]" [innerHTML]="getGuidelineHTML(entry.description)"
+                <div #collapse="ngbCollapse" [(ngbCollapse)]="collapsed[j][k]"
+                     [innerHTML]="getGuidelineHTML(entry.description)"
                      class="guidelines-descr">
                 </div>
-                <div mdbCollapse [isCollapsed]="collapsed[j][k]" class="row entry-row">
+                <div #collapse="ngbCollapse" [(ngbCollapse)]="collapsed[j][k]" class="row entry-row">
                   <div *ngIf="entry.examples.length > 0" class="col-md-12">
                     <div *ngFor="let example of entry.examples; let i = index;"
                          class="card card-example">
@@ -95,7 +96,7 @@
                           <video
                             class="video-js vjs-default-skin vjs-big-play-centered"
                             controls
-                            data-setup='{}'
+                            data-setup="{}"
                             id="my-player_g{{j}}i{{k}}e{{i}}"
                             preload="auto">
                             <source src="{{example.url}}" type="video/mp4">
@@ -114,7 +115,7 @@
                         <div *ngIf="example.url.indexOf('.png') > -1 || example.url.indexOf('.jpg') > -1"
                              class="media">
                           <a [href]="example.url" target="_blank"><img
-                            [src]="example.url"/></a>
+                            [src]="example.url" /></a>
                         </div>
                         <div class="text">
                           <div [innerHTML]="getGuidelineHTML(example.annotation)"></div>
@@ -134,7 +135,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button (click)="close()" mdbBtn color="primary" data-dismiss="modal" type="button">
+    <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
       {{"general.close" | transloco}}
     </button>
   </div>

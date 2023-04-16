@@ -124,10 +124,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
       if (error === 'file not supported') {
         this.modService.openModal(ErrorModalComponent, {
-          ...modalConfigurations.error,
-          data: {
-            text: this.langService.translate('reload-file.file not supported', {type: ''})
-          }
+          ...modalConfigurations.error
+        }, {
+          text: this.langService.translate('reload-file.file not supported', {type: ''})
         }).catch((error2) => {
           console.error(error2);
         });

@@ -1,6 +1,6 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
   faAlignJustify,
   faArrowDown,
@@ -63,16 +63,19 @@ import {
   faVolumeDown,
   faVolumeUp,
   faWindowMaximize
-} from '@fortawesome/free-solid-svg-icons';
-import {faHandshake} from '@fortawesome/free-regular-svg-icons';
-import {faDropbox, faGithub} from '@fortawesome/free-brands-svg-icons';
-import {TranslocoModule} from '@ngneat/transloco';
-import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
-import {AsrOptionsComponent} from './core/component/asr-options/asr-options.component';
-import {TranscriptionFeedbackComponent} from './core/component/transcription-feedback/transcription-feedback.component';
-import {ClipTextPipe} from './core/shared/clip-text.pipe';
-import {FormsModule} from '@angular/forms';
-import {DragDropModule} from '@angular/cdk/drag-drop';
+} from "@fortawesome/free-solid-svg-icons";
+import { faHandshake } from "@fortawesome/free-regular-svg-icons";
+import { faDropbox, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { TranslocoModule } from "@ngneat/transloco";
+import { TranslocoConfigProvider, TranslocoLoaderProvider } from "./app.transloco";
+import { AsrOptionsComponent } from "./core/component/asr-options/asr-options.component";
+import {
+  TranscriptionFeedbackComponent
+} from "./core/component/transcription-feedback/transcription-feedback.component";
+import { ClipTextPipe } from "./core/shared/clip-text.pipe";
+import { FormsModule } from "@angular/forms";
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
 
 
 @NgModule({
@@ -86,7 +89,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     FormsModule,
     FontAwesomeModule,
     TranslocoModule,
-    DragDropModule
+    DragDropModule,
+    NgbDropdownModule
   ],
   providers: [
     TranslocoConfigProvider,

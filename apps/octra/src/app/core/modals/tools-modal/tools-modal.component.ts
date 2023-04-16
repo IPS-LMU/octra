@@ -13,11 +13,11 @@ import {AudioService, TranscriptionService, UserInteractionsService} from '../..
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
 import {WavFormat} from '@octra/media';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
 import {strToU8, zip, zipSync} from 'fflate';
 import {ModalService} from '../modal.service';
 import {ErrorModalComponent} from '../error-modal/error-modal.component';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-tools-modal',
@@ -105,16 +105,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              modalService: MDBModalService,
+              modalService: NgbModal,
               private modalsService: ModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
               public transloco: TranslocoService,
-              modalRef: MDBModalRef
+              protected override activeModal: NgbActiveModal
   ) {
-    super('toolsModal');
-    this.init(modalService, modalRef);
+    super('toolsModal', activeModal);
   }
 
   ngOnDestroy() {

@@ -1,6 +1,6 @@
 <span class="asr-label">ASR -</span>
 <div id="asr-bar">
-  <div #dropdown mdbDropdown class="btn-group dropend">
+  <div #dropdown ngbDropdown class="btn-group dropend">
 
     <label for="dropdownMenuButton" style="vertical-align: middle;margin-right:10px;">
       {{"general.Language" | transloco}}:
@@ -10,7 +10,7 @@
       type="button"
       id="dropdownMenuButton"
       aria-expanded="false"
-      mdbDropdownToggle
+      ngbDropdownToggle
     >
       <ng-container *ngIf="asrService.selectedLanguage === undefined; else asrAllSet">
         {{"asr.without asr" | transloco}}
@@ -20,7 +20,7 @@
         [{{asrService.selectedLanguage.asr}}]
       </ng-template>
     </button>
-    <div mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+    <div ngbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton"
          style="padding:5px;height:300px;overflow-y: scroll;">
       <p style="font-size: 0.9em;text-align: center;">
         {{"asr.click on logo" | transloco}}
@@ -62,7 +62,6 @@
                    container="#asr-bar"
                    triggers="focus"
               -->
-              <img mdbPopover>
               <ng-template #asrDescription>
                 <table class="table table-sm table-borderless">
                   <tbody>
@@ -119,7 +118,7 @@
       </table>
     </div>
   </div>
-  <div #dropdown2 mdbDropdown class="btn-group dropend" style="margin-left:10px;">
+  <div #dropdown2 ngbDropdown class="btn-group dropend" style="margin-left:10px;">
 
     <label for="dropdownMenuButton2" style="vertical-align: middle;margin-right:10px;">
       {{"general.SELECT ACTION" | transloco}}
@@ -130,7 +129,7 @@
       type="button"
       id="dropdownMenuButton2"
       aria-expanded="false"
-      mdbDropdownToggle
+      ngbDropdownToggle
     >
       <ng-container *ngIf="asrService.selectedLanguage === undefined; else asrAllSet">
         {{"asr.without asr" | transloco}}
@@ -140,7 +139,7 @@
         [{{asrService.selectedLanguage.asr}}]
       </ng-template>
     </button>
-    <div mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:5px;">
+    <div ngbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:5px;">
       <ng-container *ngIf="asrService.queue.status !== 'STARTED'">
         <li role="menuitem">
           <button (click)="startASRForThisSegment()"

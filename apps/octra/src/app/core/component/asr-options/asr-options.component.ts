@@ -6,7 +6,7 @@ import {AlertService, SettingsService, TranscriptionService} from '../../shared/
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {AudioChunk} from '@octra/media';
-import {BsDropdownDirective, PopoverDirective} from 'angular-bootstrap-md';
+import { NgbDropdown, NgbPopover } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-asr-options',
@@ -23,8 +23,8 @@ export class AsrOptionsComponent {
 
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
-  @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
-  @ViewChild('pop', {static: true}) pop: PopoverDirective;
+  @ViewChild('dropdown', {static: true}) dropdown: NgbDropdown;
+  @ViewChild('pop', {static: true}) pop: NgbPopover;
 
   public get appSettings(): AppSettings {
     return this.settingsService.appSettings;
@@ -48,7 +48,7 @@ export class AsrOptionsComponent {
 
   onASRLangChanged(lang: ASRLanguage) {
     this.asrService.selectedLanguage = lang;
-    this.dropdown.hide();
+    this.dropdown.close();
   }
 
   startASRForThisSegment() {

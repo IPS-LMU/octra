@@ -9,21 +9,21 @@
   <octra-dropzone #dropzone></octra-dropzone>
 
   <div class="btn-group w-100" role="group">
-    <button mdbBtn color="secondary" mdbWavesEffect (click)="askForAbort()"
-            class="waves-light">
+    <button (click)="askForAbort()"
+            class="btn btn-secondary">
       <fa-icon icon="sign-out-alt"></fa-icon>
       <span
         class=" d-none d-lg-inline"> {{"transcription.stop" | transloco}}</span>
     </button>
-    <button mdbBtn mdbWavesEffect color="danger" (click)="newTranscription()"
+    <button (click)="newTranscription()"
             [disabled]="!(dropzone.status === 'valid')"
-            class="waves-light">
+            class="danger">
       <fa-icon icon="file"></fa-icon>
       <span class="d-none d-lg-inline"> {{"transcription.new" | transloco}}</span>
     </button>
-    <button mdbBtn mdbWavesEffect color="primary" (click)="onOfflineSubmit()"
+    <button (click)="onOfflineSubmit()"
             [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== undefined && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
-            class="waves-light"
+            class="btn btn-primary"
             type="button">
       <fa-icon icon="edit"></fa-icon>
       <span

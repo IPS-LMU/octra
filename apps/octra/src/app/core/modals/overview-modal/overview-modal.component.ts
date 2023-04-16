@@ -1,26 +1,39 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
-import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
-import {isFunction, SubscriptionManager} from '@octra/utilities';
-import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {LoginMode} from '../../store';
-import {NavbarService} from '../../component/navbar/navbar.service';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
-import {OctraModal} from '../types';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, ViewChild } from "@angular/core";
+import { Subscription } from "rxjs";
+import {
+  TranscriptionFeedbackComponent
+} from "../../component/transcription-feedback/transcription-feedback.component";
+import { isFunction, SubscriptionManager } from "@octra/utilities";
+import {
+  KeymappingService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { LoginMode } from "../../store";
+import { NavbarService } from "../../component/navbar/navbar.service";
+import { OctraModal } from "../types";
+import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 declare let validateAnnotation: ((string, any) => any);
 declare let tidyUpAnnotation: ((string, any) => any);
 
 @Component({
-  selector: 'octra-overview-modal',
-  templateUrl: './overview-modal.component.html',
-  styleUrls: ['./overview-modal.component.scss']
+  selector: "octra-overview-modal",
+  templateUrl: "./overview-modal.component.html",
+  styleUrls: ["./overview-modal.component.scss"]
 })
 
 export class OverviewModalComponent extends OctraModal implements OnDestroy {
-  @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
+  @ViewChild("feedback", { static: false }) feedback: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
+
+  public static options: NgbModalOptions = {
+    size: "xl",
+    keyboard: false,
+    backdrop: true
+  };
 
   protected data = undefined;
   private shortcutID = -1;
@@ -36,7 +49,7 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
       this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly);
   }
 
-  public selectedError: any = '';
+  public selectedError: any = "";
   public shownSegments: {
     transcription: {
       html: string,
@@ -47,16 +60,15 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
   public trnEditorswitch = new EventEmitter<void>();
 
   constructor(public transcrService: TranscriptionService,
-              public modalService: MDBModalService,
+              public modalService: NgbModal,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private keyService: KeymappingService,
               private uiService: UserInteractionsService,
               private cd: ChangeDetectorRef,
               private navbarService: NavbarService,
-              public modalRef: MDBModalRef) {
-    super('overviewModal');
-    this.init(this.modalService, this.modalRef);
+              protected override activeModal: NgbActiveModal) {
+    super("overviewModal", activeModal);
   }
 
   ngOnDestroy() {
@@ -75,8 +87,8 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
     }
 
     if (fromModal) {
-      this.uiService.addElementFromEvent('overview', {value: 'closed'},
-        Date.now(), undefined, undefined, undefined, undefined, 'overview');
+      this.uiService.addElementFromEvent("overview", { value: "closed" },
+        Date.now(), undefined, undefined, undefined, undefined, "overview");
     }
     return super.close();
   }
@@ -93,16 +105,16 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
     this.transcriptionSend.emit();
   }
 
-  public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
+  public sendTranscriptionForShortAudioFiles(type: "bad" | "middle" | "good") {
     switch (type) {
-      case('bad'):
-        this.appStorage.feedback = 'SEVERE';
+      case("bad"):
+        this.appStorage.feedback = "SEVERE";
         break;
-      case('middle'):
-        this.appStorage.feedback = 'SLIGHT';
+      case("middle"):
+        this.appStorage.feedback = "SLIGHT";
         break;
-      case('good'):
-        this.appStorage.feedback = 'OK';
+      case("good"):
+        this.appStorage.feedback = "OK";
         break;
       default:
     }
@@ -112,14 +124,14 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
     }
   }
 
-  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
-    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, '');
+  public sendTranscriptionForKorbinian(type: "NO" | "VE" | "EE" | "AN") {
+    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, "");
 
-    if (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment === '') {
-      this.transcrService.feedback.comment = type + '; ' + this.appStorage.servercomment;
-    } else if ((this.appStorage.servercomment === '' && this.transcrService.feedback.comment !== '')
-      || (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment !== '')) {
-      this.transcrService.feedback.comment = type + '; ' + this.transcrService.feedback.comment;
+    if (this.appStorage.servercomment !== "" && this.transcrService.feedback.comment === "") {
+      this.transcrService.feedback.comment = type + "; " + this.appStorage.servercomment;
+    } else if ((this.appStorage.servercomment === "" && this.transcrService.feedback.comment !== "")
+      || (this.appStorage.servercomment !== "" && this.transcrService.feedback.comment !== "")) {
+      this.transcrService.feedback.comment = type + "; " + this.transcrService.feedback.comment;
     } else {
       this.transcrService.feedback.comment = type;
     }
@@ -149,7 +161,7 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
     let found = 0;
 
     if (this.shownSegments.length > 0) {
-      let resultStr = '';
+      let resultStr = "";
       for (const shownSegment of this.shownSegments) {
         resultStr += shownSegment.transcription.html;
       }
@@ -161,8 +173,8 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
   }
 
   public get validationFound() {
-    return ((typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
-      (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation));
+    return ((typeof validateAnnotation !== "undefined") && isFunction(validateAnnotation) &&
+      (typeof tidyUpAnnotation !== "undefined") && isFunction(tidyUpAnnotation));
   }
 
   updateView() {
@@ -189,11 +201,11 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
         text: rawText,
         html: rawText
       },
-      validation: ''
+      validation: ""
     };
 
     if (this.appStorage.useMode !== LoginMode.URL) {
-      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+      if (typeof validateAnnotation !== "undefined" && typeof validateAnnotation === "function"
         && this.transcrService.validationArray[i] !== undefined) {
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
           this.transcrService.validationArray[i].validation);
@@ -201,22 +213,22 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
 
       obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
       obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 === '[[[') {
-          return '<';
+        if (g1 === "[[[") {
+          return "<";
         }
-        return '>';
+        return ">";
       });
     } else {
       obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
       obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 === '[[[') {
-          return '<';
+        if (g1 === "[[[") {
+          return "<";
         }
-        return '>';
+        return ">";
       });
     }
 
-    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, "");
     return obj;
   }
 
@@ -245,7 +257,7 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
   }
 
   switchToTRNEditor($event) {
-    this.navbarService.interfacechange.emit('TRN-Editor');
+    this.navbarService.interfacechange.emit("TRN-Editor");
     this.close(false);
   }
 }

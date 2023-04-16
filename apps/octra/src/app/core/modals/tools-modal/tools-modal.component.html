@@ -1,9 +1,12 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{"general.tools" | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">{{"general.tools" | transloco}}</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body" #content id="tools-table">
     <table class="table">
@@ -57,7 +60,7 @@
                              type="number"/>
                     </td>
                     <td>
-                      <fa-icon [mdbTooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
+                      <fa-icon [ngbTooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
                                icon="question-circle"
                                placement="right"
                                style="color: darkblue;"></fa-icon>
@@ -73,7 +76,7 @@
                              type="number"/>
                     </td>
                     <td>
-                      <fa-icon [mdbTooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
+                      <fa-icon [ngbTooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
                                icon="question-circle"
                                placement="right"
                                style="color: darkblue;"></fa-icon>

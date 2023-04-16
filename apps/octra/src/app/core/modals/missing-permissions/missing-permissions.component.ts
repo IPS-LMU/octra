@@ -1,8 +1,8 @@
 import {Component, OnDestroy} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-missing-permissions-modal',
@@ -12,9 +12,8 @@ import {OctraModal} from '../types';
 export class MissingPermissionsModalComponent extends OctraModal implements OnDestroy {
   private subscrmanager = new SubscriptionManager<Subscription>();
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('MissingPermissionsModalComponent');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal) {
+    super('MissingPermissionsModalComponent', activeModal);
   }
 
   ngOnDestroy() {

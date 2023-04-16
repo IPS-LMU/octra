@@ -1,16 +1,19 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{"modal.transcription.stop.header" | transloco}}?</h5>
+    <h5 class="modal-title" id="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body" [innerHTML]="'modal.transcription.stop.text' | transloco"></div>
   <div class="modal-footer">
-    <button mdbBtn mdbWavesEffect color="secondary" (click)="close('QUIT');">
+    <button class="btn btn-secondary" (click)="close('QUIT');">
       {{"general.quit" | transloco}}
     </button>
-    <button mdbBtn mdbWavesEffect color="primary" (click)="close('CONTINUE')" class="waves-light"
+    <button class="btn primary"(click)="close('CONTINUE')"
             type="button">
       {{"general.continue" | transloco}}
     </button>

@@ -83,19 +83,6 @@ import {JoditAngularModule} from 'jodit-angular';
 import {
   PermutationsReplaceModalComponent
 } from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
-import {
-  ButtonsModule,
-  CardsModule,
-  CheckboxModule,
-  CollapseModule,
-  DropdownModule,
-  InputsModule,
-  ModalModule,
-  NavbarModule,
-  PopoverModule,
-  TooltipModule,
-  WavesModule
-} from 'angular-bootstrap-md';
 import {AudioNavigationComponent} from './core/component/audio-navigation';
 import {ModalsModule} from './core/modals/modals.module';
 import {AppSharedModule} from './app.shared.module';
@@ -104,6 +91,14 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TranslocoConfigProvider, TranslocoLoaderProvider} from './app.transloco';
 import {NgxOctraApiModule, OctraAPIService} from '@octra/ngx-octra-api';
 import {ProjectsListComponent} from './core/pages/projects-list/projects-list.component';
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbNavModule,
+  NgbPopoverModule,
+  NgbTooltipModule
+} from '@ng-bootstrap/ng-bootstrap';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -185,17 +180,12 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     EffectsModule.forFeature([]),
     MaintenanceModule,
     JoditAngularModule,
-    DropdownModule.forRoot(),
-    NavbarModule,
-    ModalModule.forRoot(),
-    PopoverModule.forRoot(),
-    TooltipModule.forRoot(),
-    ButtonsModule.forRoot(),
-    CardsModule.forRoot(),
-    CheckboxModule,
-    CollapseModule.forRoot(),
-    WavesModule.forRoot(),
-    InputsModule.forRoot(),
+    NgbDropdownModule,
+    NgbNavModule,
+    NgbModalModule,
+    NgbPopoverModule,
+    NgbTooltipModule,
+    NgbCollapseModule,
     ModalsModule,
     FontAwesomeModule,
     TranslocoModule,

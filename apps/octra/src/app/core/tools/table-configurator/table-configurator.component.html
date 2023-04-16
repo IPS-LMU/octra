@@ -1,7 +1,7 @@
 <div style="margin-bottom: 10px">
-  <div class="btn-group" mdbDropdown>
-    <button mdbDropdownToggle size="sm" type="button" mdbBtn color="primary" class="dropdown-toggle waves-light"
-            mdbWavesEffect style="width:100%; margin-left:5px;">
+  <div class="btn-group" ngbDropdown>
+    <button ngbDropdownToggle size="sm" type="button" class="btn btn-primary dropdown-toggle"
+            style="width:100%; margin-left:5px;">
       <fa-icon icon="plus"></fa-icon>
       {{"custom.table configurator.add column" | transloco}}
     </button>
@@ -16,16 +16,14 @@
   </div>
 
   <div class="settings">
-    <mdb-checkbox [default]="false" [inline]="true" [(ngModel)]="includeLineNumbers"
-                  (ngModelChange)="onCheckboxChange()">{{"custom.table configurator.include line numbers"| transloco}}</mdb-checkbox>
+    <input type="checkbox" id="includeLineNumbers" [(ngModel)]="includeLineNumbers"  (ngModelChange)="onCheckboxChange()">
+    <label for="includeLineNumbers">{{"custom.table configurator.include line numbers"| transloco}}</label>
   </div>
   <div class="settings">
     <label>{{"custom.table configurator.time format"| transloco}}: </label>
-
-
-    <div class="btn-group" mdbDropdown>
-      <button mdbDropdownToggle size="sm" type="button" mdbBtn color="primary" class="dropdown-toggle waves-light"
-              mdbWavesEffect style="width:150px; margin-left:5px;">
+    <div class="btn-group" ngbDropdown>
+      <button ngbDropdownToggle size="sm" type="button" class="btn btn-primary dropdown-toggle"
+              style="width:150px; margin-left:5px;">
         {{tableOptions.timeFormat}}
       </button>
 

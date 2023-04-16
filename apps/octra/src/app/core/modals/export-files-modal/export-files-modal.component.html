@@ -1,9 +1,12 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
+    <h5 class="modal-title" id="modal-title">{{"general.export data" | transloco}}</h5>
+    <button type="button"
+            class="btn-close"
+            aria-label="Close"
+            aria-describedby="modal-title"
+            (click)="close()">
     </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{"general.export data" | transloco}}</h5>
   </div>
   <div class="modal-body" id="export-table" #content>
     <table class="table">
@@ -39,7 +42,7 @@
           </td>
           <td (click)="onLineClick(converter, i)">
             <fa-icon *ngIf="converter.notice !== ''" icon="info-circle"
-                     [mdbTooltip]="converter.notice"></fa-icon>
+                     [ngbTooltip]="converter.notice"></fa-icon>
           </td>
         </tr>
         <ng-container *ngIf="converter.conversion.export">

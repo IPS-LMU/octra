@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-transcription-sending-modal',
@@ -11,8 +11,7 @@ import {OctraModal} from '../types';
 export class TranscriptionSendingModalComponent extends OctraModal {
   public content: string;
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('transcriptionSendingModal');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal) {
+    super('transcriptionSendingModal', activeModal);
   }
 }

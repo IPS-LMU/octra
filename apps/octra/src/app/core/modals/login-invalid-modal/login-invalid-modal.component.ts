@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-login-invalid-modal',
@@ -8,8 +8,7 @@ import {OctraModal} from '../types';
   styleUrls: ['./login-invalid-modal.component.scss']
 })
 export class LoginInvalidModalComponent extends OctraModal {
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('yesNoModal');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal) {
+    super('yesNoModal', activeModal);
   }
 }

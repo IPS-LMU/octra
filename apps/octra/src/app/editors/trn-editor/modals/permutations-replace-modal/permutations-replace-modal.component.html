@@ -19,17 +19,17 @@
         <fa-icon [icon]="['fas', 'long-arrow-alt-right']"></fa-icon>
       </td>
       <td class="rightcolumn">
-        <div mdbDropdown class="dropdown">
+        <div ngbDropdown class="dropdown">
           <button
             class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
             type="button"
             id="dropdownMenuButton"
             aria-expanded="false"
-            mdbDropdownToggle
+            ngbDropdownToggle
           >
             {{speaker.replaceWith}} <span class="caret"></span>
           </button>
-          <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <ul ngbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker.replaceWith)" role="menuitem"
                 (click)="setReplacement(i, otherSpeaker.name)" style="cursor:pointer;">
               <span class="dropdown-item" href="#">{{otherSpeaker.name}}</span>

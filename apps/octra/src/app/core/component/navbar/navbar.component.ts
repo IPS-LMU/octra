@@ -1,42 +1,43 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {TranslocoService} from '@ngneat/transloco';
-import {environment} from '../../../../environments/environment';
-import {AppInfo} from '../../../app.info';
-import {editorComponents} from '../../../editors/components';
-import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
-import {ModalService} from '../../modals/modal.service';
-import {navigateTo, SubscriptionManager} from '@octra/utilities';
-import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
-import {NavbarService} from './navbar.service';
-import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
-import {Subscription} from 'rxjs';
-import {ToolsModalComponent} from '../../modals/tools-modal/tools-modal.component';
-import {StatisticsModalComponent} from '../../modals/statistics-modal/statistics-modal.component';
-import {MDBModalRef, NavbarComponent} from 'angular-bootstrap-md';
-import {modalConfigurations} from '../../modals/types';
-import {BugreportModalComponent} from '../../modals/bugreport-modal/bugreport-modal.component';
-import {YesNoModalComponent} from '../../modals/yes-no-modal/yes-no-modal.component';
-import {Router} from '@angular/router';
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { TranslocoService } from "@ngneat/transloco";
+import { environment } from "../../../../environments/environment";
+import { AppInfo } from "../../../app.info";
+import { editorComponents } from "../../../editors/components";
+import { ExportFilesModalComponent } from "../../modals/export-files-modal/export-files-modal.component";
+import { ModalService } from "../../modals/modal.service";
+import { navigateTo, SubscriptionManager } from "@octra/utilities";
+import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { BugReportService, ConsoleType } from "../../shared/service/bug-report.service";
+import { NavbarService } from "./navbar.service";
+import { AnnotationLevelType, Level, OIDBLevel, Segments } from "@octra/annotation";
+import { Subscription } from "rxjs";
+import { ToolsModalComponent } from "../../modals/tools-modal/tools-modal.component";
+import { StatisticsModalComponent } from "../../modals/statistics-modal/statistics-modal.component";
+import { modalConfigurations } from "../../modals/types";
+import { BugreportModalComponent } from "../../modals/bugreport-modal/bugreport-modal.component";
+import { YesNoModalComponent } from "../../modals/yes-no-modal/yes-no-modal.component";
+import { Router } from "@angular/router";
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
-  selector: 'octra-navigation',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  selector: "octra-navigation",
+  templateUrl: "./navbar.component.html",
+  styleUrls: ["./navbar.component.scss"]
 })
 export class NavigationComponent implements OnInit, OnDestroy {
 
-  modalexport: MDBModalRef;
-  modalTools: MDBModalRef;
-  modalStatistics: MDBModalRef;
+  modalexport: NgbModalRef;
+  modalTools: NgbModalRef;
+  modalStatistics: NgbModalRef;
   @Input() version: string;
-  @ViewChild('navbar', {static: true}) navbar: NavbarComponent
 
-  public test = 'ok';
+  public test = "ok";
   public secondsPerLine = 5;
   private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
+
+  isCollapsed = true;
 
   public get environment(): any {
     return environment;
@@ -72,7 +73,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       if (a.type === ConsoleType.ERROR && beginCheck) {
         return true;
       }
-      if (typeof a.message === 'string' && a.message.indexOf('AFTER RELOAD') > -1) {
+      if (typeof a.message === "string" && a.message.indexOf("AFTER RELOAD") > -1) {
         beginCheck = true;
       }
       return false;
@@ -97,8 +98,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.subscrmanager.add(
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
-          case('export'):
-            this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export, {
+          case("export"):
+            this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, ExportFilesModalComponent.options, {
               navbarService: this,
               transcriptionService: this.transcrServ,
               uiService: this.uiService
@@ -129,15 +130,15 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   toggleSettings(option: string) {
     this.appStorage[option] = !this.appStorage[option];
-    if (option === 'logging') {
+    if (option === "logging") {
       this.uiService.enabled = this.appStorage[option];
     }
   }
 
   public openBugReport() {
     console.log(`open bugreport`);
-    this.modService.openModal(BugreportModalComponent, modalConfigurations.bugreport).then(() => {
-      window.location.hash = '';
+    this.modService.openModal(BugreportModalComponent, BugreportModalComponent.options).then(() => {
+      window.location.hash = "";
     }).catch((err) => {
       console.error(err);
     });
@@ -150,9 +151,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
   onLevelNameLeave(event, tiernum: number) {
     // jQuery(event.target).removeClass('selected');
     // save level name
-    if (event.target.value !== undefined && event.target.value !== '') {
+    if (event.target.value !== undefined && event.target.value !== "") {
       const level = this.transcrServ.annotation.levels[tiernum];
-      level.name = event.target.value.replace(' ', '_');
+      level.name = event.target.value.replace(" ", "_");
       this.appStorage.changeAnnotationLevel(tiernum, {
         id: level.id,
         name: level.name,
@@ -162,7 +163,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
         console.error(error);
       });
       // update value for annoation object in transcr service
-      this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
+      this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(" ", "_");
     } else {
       event.target.value = this.transcrServ.annotation.levels[tiernum].name;
     }
@@ -187,7 +188,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       levelname = `OCTRA_${index + 1}`;
     }
 
-    const newlevel = new Level(-1, levelname, 'SEGMENT',
+    const newlevel = new Level(-1, levelname, "SEGMENT",
       new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, levelname, [],
         this.transcrServ.audioManager.ressource.info.duration));
     this.appStorage.addAnnotationLevel(new OIDBLevel(-1,
@@ -201,12 +202,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
   onLevelRemoveClick(tiernum: number, id: number) {
     // jQuery(this.tiersDropdown.nativeElement).addClass('show');
     this.modService.openModal(YesNoModalComponent, {
-      ...modalConfigurations.yesNo,
-      data: {
-        text: 'The Tier will be deleted permanently. Are you sure?'
-      }
+      ...modalConfigurations.yesNo
+    }, {
+      text: "The Tier will be deleted permanently. Are you sure?"
     }).then((answer) => {
-      if (answer === 'yes') {
+      if (answer === "yes") {
         if (this.transcrServ.annotation.levels.length > 1) {
           this.appStorage.removeAnnotationLevel(id).catch((err) => {
             console.error(err);
@@ -239,7 +239,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openExportModal() {
-    this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, modalConfigurations.export, {
+    this.modalexport = this.modService.openModalRef(ExportFilesModalComponent, ExportFilesModalComponent.options, {
       navbarService: this,
       transcriptionService: this.transcrServ,
       uiService: this.uiService
@@ -253,10 +253,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openStatisticsModal() {
-    this.modalStatistics = this.modService.openModalRef(StatisticsModalComponent, modalConfigurations.statistics);
+    this.modalStatistics = this.modService.openModalRef(StatisticsModalComponent, StatisticsModalComponent.options);
   }
 
   backToProjectsList() {
-    navigateTo(this.router, ['user/projects']);
+    navigateTo(this.router, ["user/projects"]);
   }
 }

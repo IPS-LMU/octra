@@ -1,25 +1,25 @@
-import {Component, SecurityContext} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {TranslocoService} from '@ngneat/transloco';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
-import {OctraModal} from '../types';
+import { Component, SecurityContext } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { TranslocoService } from "@ngneat/transloco";
+import { OctraModal } from "../types";
+import { NgbActiveModal, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
 export enum ModalEndAnswer {
-  CANCEL = 'CANCEL',
-  QUIT = 'QUIT',
-  CONTINUE = 'CONTINUE'
+  CANCEL = "CANCEL",
+  QUIT = "QUIT",
+  CONTINUE = "CONTINUE"
 }
 
 @Component({
-  selector: 'octra-transcription-demo-end-modal',
-  templateUrl: './transcription-demo-end-modal.component.html',
-  styleUrls: ['./transcription-demo-end-modal.component.scss']
+  selector: "octra-transcription-demo-end-modal",
+  templateUrl: "./transcription-demo-end-modal.component.html",
+  styleUrls: ["./transcription-demo-end-modal.component.scss"]
 })
 
 export class TranscriptionDemoEndModalComponent extends OctraModal {
-  constructor(modalService: MDBModalService, private sanitizer: DomSanitizer,
-              public languageService: TranslocoService, modalRef: MDBModalRef) {
-    super('transcriptionDemoEnd');
+  constructor(modalService: NgbModal, private sanitizer: DomSanitizer,
+              public languageService: TranslocoService, protected override activeModal: NgbActiveModal) {
+    super("transcriptionDemoEnd", activeModal);
   }
 
   sanitize(html: string) {

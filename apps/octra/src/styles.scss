@@ -1,6 +1,4 @@
-@import "angular-bootstrap-md/assets/scss/bootstrap/bootstrap";
-@import "angular-bootstrap-md/assets/scss/mdb";
-@import "animate.css/animate";
+@import "bootstrap/scss/bootstrap";
 
 .btn.btn-success {
   color: #fff;
@@ -426,4 +424,10 @@ footer {
 
 .modal-content {
   border-radius: 20px !important;
+}
+
+.btn-info,
+.bg-info,
+.btn-info:hover {
+  color: white;
 }

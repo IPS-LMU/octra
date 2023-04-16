@@ -1,9 +1,12 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{'general.overview' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">{{'general.overview' | transloco}}</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body">
     <div class="row" style="overflow: auto; flex:auto;">
@@ -115,7 +118,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button mdbBtn color="primary" (click)="close(true)" type="button">
+    <button class="btn btn-primary" (click)="close(true)" type="button">
       {{"general.close" | transloco}}
     </button>
   </div>

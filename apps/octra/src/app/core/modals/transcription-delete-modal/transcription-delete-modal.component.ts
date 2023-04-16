@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {AppInfo} from '../../../app.info';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 export enum ModalDeleteAnswer {
   DELETE = 'DELETE',
@@ -17,8 +17,7 @@ export enum ModalDeleteAnswer {
 export class TranscriptionDeleteModalComponent extends OctraModal {
   AppInfo = AppInfo;
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('transcriptionDelete');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal) {
+    super('transcriptionDelete', activeModal);
   }
 }

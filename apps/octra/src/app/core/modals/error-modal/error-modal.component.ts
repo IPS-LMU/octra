@@ -1,6 +1,6 @@
 import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {OctraModal} from '../types';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-error-modal',
@@ -11,8 +11,7 @@ export class ErrorModalComponent extends OctraModal {
   @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
   text: ''
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService) {
-    super('errorModal');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal) {
+    super('errorModal', activeModal);
   }
 }

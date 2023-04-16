@@ -1,7 +1,7 @@
 import {Component, SecurityContext} from '@angular/core';
 import {OctraModal} from '../types';
-import {MDBModalRef, MDBModalService} from 'angular-bootstrap-md';
 import {DomSanitizer} from '@angular/platform-browser';
+import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-protected-modal',
@@ -15,9 +15,8 @@ export class ProtectedModalComponent extends OctraModal {
     return this.sanitizer.sanitize(SecurityContext.HTML, this.htmlMessage);
   }
 
-  constructor(modalRef: MDBModalRef, modalService: MDBModalService, private sanitizer: DomSanitizer) {
-    super('messageModal');
-    this.init(modalService, modalRef);
+  constructor(protected override activeModal: NgbActiveModal, private sanitizer: DomSanitizer) {
+    super('messageModal', activeModal);
   }
 
 }

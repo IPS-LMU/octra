@@ -1,6 +1,6 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {OctraModal} from './types';
-import {MDBModalService, ModalOptions} from 'angular-bootstrap-md';
+import { EventEmitter, Injectable } from "@angular/core";
+import { OctraModal } from "./types";
+import { NgbModal, NgbModalOptions, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Injectable()
 export class ModalService {
@@ -8,22 +8,33 @@ export class ModalService {
   public closemodal = new EventEmitter<{ type: string }>();
   private modalaction = new EventEmitter<any>();
 
-  constructor(private modalService: MDBModalService) {
+  constructor(private modalService: NgbModal) {
   }
 
-  public openModal(modal: any, config: ModalOptions, data?: any) {
-    const modalRef = this.modalService.show(modal, {
-      ...config,
-      data
+  public openModal<T, R>(modal: T, config: NgbModalOptions, data?: any) {
+    const modalRef = this.modalService.open(modal, {
+      ...config
     });
 
-    return (modalRef.content as OctraModal).thisClose.toPromise();
+    this.applyData(modalRef, data);
+
+    return modalRef.result as Promise<R>;
   }
 
-  public openModalRef(modal: any, config: ModalOptions, data?: any) {
-    return this.modalService.show(modal, {
-      ...config,
-      data
+  public openModalRef(modal: any, config: NgbModalOptions, data?: any) {
+    const ref = this.modalService.open(modal, {
+      ...config
     });
+    this.applyData(ref, data);
+
+    return ref;
+  }
+
+  public applyData(modalRef: NgbModalRef, data?: any){
+    if (data) {
+      for (const attr in data) {
+        modalRef.componentInstance[attr] = data[attr];
+      }
+    }
   }
 }

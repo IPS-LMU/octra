@@ -1,9 +1,12 @@
 <div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">✕</span>
-    </button>
-    <h5 class="modal-title" id="exampleModalLabel">{{'bug report.give feedback' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">{{'bug report.give feedback' | transloco}}</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
   </div>
   <div class="modal-body">
     <p>
@@ -16,37 +19,31 @@
          class="alert alert-success bugsent">{{'bug report.sent' | transloco}}</div>
 
     <form>
-      <div class="form-row">
+      <div class="row">
         <div class="col-6">
-          <div [ngClass]="{
-              'is-filled': userName !== ''
-              }" class="form-group">
-            <label class="bmd-label-floating" for="inputName">{{'general.name' | transloco}}</label>
-            <input [(ngModel)]="userName" class="form-control" email id="inputName" name="name" type="text">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="inputName" name="name" aria-describedby="name"
+                   [placeholder]="'general.name' | transloco"
+                   [(ngModel)]="userName">
+            <label for="inputName" class="form-label">{{'general.name' | transloco}}</label>
           </div>
         </div>
         <div class="col-6">
-          <div [ngClass]="{
-              'is-filled': email !== ''
-              }" class="form-group">
-            <label class="bmd-label-floating" for="inputEmail">{{'general.email' |
-              transloco}}</label>
-
-            <input [(ngModel)]="email" class="form-control" email id="inputEmail"
-                   name="email" type="email">
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="inputEmail" name="email" aria-describedby="email"
+                   [(ngModel)]="email" placeholder="email@example.com">
+            <label for="inputEmail" class="form-label">{{'general.email' | transloco}}</label>
           </div>
         </div>
       </div>
-      <div class="form-row">
+      <div class="row">
         <div class="col-12">
-          <div class="form-group" style="margin-top:-20px;margin-bottom:20px;">
-            <label class="bmd-label-floating" for="bgDescr">{{'general.description' |
-              transloco}}</label>
-
-            <textarea [(ngModel)]="bgdescr" aria-describedby="descrHelp" class="form-control" id="bgDescr"
-                      maxlength="1000"
-                      name="bgdescr" rows="3"></textarea>
-            <small class="form-text text-muted" id="descrHelp">(German or English)</small>
+          <div class="form-floating mb-3">
+            <textarea [(ngModel)]="bgdescr" class="form-control" aria-describedby="bgDescr"
+                      [placeholder]="'general.description' | transloco" id="bgDescr" maxlength="1000" rows="3"
+                      name="bgdescr" style="height: 100px"></textarea>
+            <label for="bgDescr">{{'general.description' | transloco}}</label>
+            <div id="emailHelp" class="form-text">German or English</div>
           </div>
         </div>
       </div>
@@ -55,22 +52,22 @@
         <div class="col-12">
           <div class="form-group" style="margin-bottom:20px;">
             <label>{{'general.screenshots' |
-              transloco}} (optional):</label><br/>
+              transloco}} (optional):</label><br />
             <div class="preview-images">
               <div (click)="selectFileForUpload(uploadInput2)"
                    *ngFor="let screenshot of screenshots; let i = index;" class="upload-screenshot">
                 <span (click)="removeScreenshot(i)" class="cross rounded-circle">X</span>
                 <input #uploadInput2 (change)="onFileChange($event)" accept=".jpg, .png, .jpeg|image/*"
                        name="upload"
-                       style="display: none;" type="file"/>
+                       style="display: none;" type="file" />
                 <img *ngIf="screenshot.previewURL !== ''"
                      [src]="screenshot.previewURL"
-                     class="preview-image"/>
+                     class="preview-image" />
               </div>
               <div (click)="selectFileForUpload(uploadInput)"
                    *ngIf="screenshots.length < 4" class="upload-screenshot">
                 <input #uploadInput (change)="onFileChange($event)" name="upload" style="display: none;"
-                       type="file"/>
+                       type="file" />
                 <fa-icon [size]="'2x'" icon="plus"></fa-icon>
               </div>
             </div>

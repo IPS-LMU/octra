@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
-import {TranscrEditorComponent} from '../../core/component/transcr-editor';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { ShortcutEvent, ShortcutGroup, SubscriptionManager } from "@octra/utilities";
+import { TranscrEditorComponent } from "../../core/component/transcr-editor";
 
 import {
   AudioService,
@@ -8,14 +8,14 @@ import {
   SettingsService,
   TranscriptionService,
   UserInteractionsService
-} from '../../core/shared/service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {OCTRAEditor} from '../octra-editor';
-import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
-import {Segment, Segments} from '@octra/annotation';
-import {AudioplayerComponent} from '@octra/components';
-import {Subscription} from 'rxjs';
-import {AudioNavigationComponent} from '../../core/component/audio-navigation';
+} from "../../core/shared/service";
+import { AppStorageService } from "../../core/shared/service/appstorage.service";
+import { OCTRAEditor } from "../octra-editor";
+import { AudioChunk, AudioManager, SampleUnit } from "@octra/media";
+import { Segment, Segments } from "@octra/annotation";
+import { AudioplayerComponent } from "@octra/components";
+import { Subscription } from "rxjs";
+import { AudioNavigationComponent } from "../../core/component/audio-navigation";
 
 @Component({
   selector: 'octra-audioplayer-gui',

@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
-import {AppInfo} from '../../../app.info';
-import {AppStorageService} from '../service/appstorage.service';
-import {LoginMode} from '../../store';
-import {navigateTo} from '@octra/utilities';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+import { AppInfo } from "../../../app.info";
+import { AppStorageService } from "../service/appstorage.service";
+import { LoginMode } from "../../store";
+import { navigateTo } from "@octra/utilities";
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {

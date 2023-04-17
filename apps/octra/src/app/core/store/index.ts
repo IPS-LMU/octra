@@ -9,14 +9,14 @@ import {
   OItem,
   OLevel,
   OSegment
-} from '@octra/annotation';
-import {ConsoleEntry} from '../shared/service/bug-report.service';
-import {AppSettings, ProjectSettings} from '../obj/Settings';
-import {SampleUnit} from '@octra/media';
-import {ILog} from '../obj/Settings/logging';
-import {Histories, UndoRedoState} from 'ngrx-wieder';
-import {SessionFile} from '../obj/SessionFile';
-import {TaskDto} from '../../../../../../../octra-backend/dist/libs/api-types';
+} from "@octra/annotation";
+import { ConsoleEntry } from "../shared/service/bug-report.service";
+import { AppSettings, ProjectSettings } from "../obj/Settings";
+import { SampleUnit } from "@octra/media";
+import { ILog } from "../obj/Settings/logging";
+import { Histories, UndoRedoState } from "ngrx-wieder";
+import { SessionFile } from "../obj/SessionFile";
+import { TaskDto } from "../../../../../../../octra-backend/dist/libs/api-types";
 
 export enum LoginMode {
   URL = 'url',

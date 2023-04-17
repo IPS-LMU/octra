@@ -1,9 +1,9 @@
-import {HttpClient} from '@angular/common/http';
-import {Injectable, SecurityContext} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {API} from '../../obj/API/api.interface';
-import {AppStorageService} from './appstorage.service';
-import {hasProperty} from '@octra/utilities';
+import { HttpClient } from "@angular/common/http";
+import { Injectable, SecurityContext } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { API } from "../../obj/API/api.interface";
+import { AppStorageService } from "./appstorage.service";
+import { hasProperty } from "@octra/utilities";
 
 @Injectable()
 export class APIService implements API {

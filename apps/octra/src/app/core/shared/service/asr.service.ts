@@ -1,15 +1,15 @@
-import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
-import * as X2JS from 'x2js';
-import {ASRLanguage, ASRService, ASRSettings} from '../../obj/Settings';
-import {AppStorageService} from './appstorage.service';
-import {AudioService} from './audio.service';
-import {SettingsService} from './settings.service';
-import {TranscriptionService} from './transcription.service';
-import {FileInfo, SubscriptionManager} from '@octra/utilities';
-import {AudioManager, SampleUnit, WavFormat} from '@octra/media';
-import {Subject, Subscription, timer} from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
+import * as X2JS from "x2js";
+import { ASRLanguage, ASRService, ASRSettings } from "../../obj/Settings";
+import { AppStorageService } from "./appstorage.service";
+import { AudioService } from "./audio.service";
+import { SettingsService } from "./settings.service";
+import { TranscriptionService } from "./transcription.service";
+import { FileInfo, SubscriptionManager } from "@octra/utilities";
+import { AudioManager, SampleUnit, WavFormat } from "@octra/media";
+import { Subject, Subscription, timer } from "rxjs";
 
 @Injectable({
   providedIn: 'root'

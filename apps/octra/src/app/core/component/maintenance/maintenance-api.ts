@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 
 export class MaintenanceAPI {
   constructor(private serverURL: string, private httpClient: HttpClient) {

@@ -1,5 +1,4 @@
 import { EventEmitter, Injectable } from "@angular/core";
-import { OctraModal } from "./types";
 import { NgbModal, NgbModalOptions, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Injectable()

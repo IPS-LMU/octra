@@ -1,7 +1,7 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {interval, Subscription} from 'rxjs';
-import {NavbarService} from '../../component/navbar/navbar.service';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { interval, Subscription } from "rxjs";
+import { NavbarService } from "../../component/navbar/navbar.service";
 
 @Component({
   selector: 'octra-auth',

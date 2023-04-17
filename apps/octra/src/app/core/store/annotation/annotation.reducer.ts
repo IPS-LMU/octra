@@ -1,12 +1,12 @@
-import {ActionCreator, on, ReducerTypes} from '@ngrx/store';
-import {AnnotationState, LoginMode} from '../index';
-import {AnnotationActions} from './annotation.actions';
-import {IDBActions} from '../idb/idb.actions';
-import {ConfigurationActions} from '../configuration/configuration.actions';
-import {IIDBModeOptions} from '../../shared/octra-database';
-import {getProperties} from '@octra/utilities';
-import {OnlineModeActions} from '../modes/online-mode/online-mode.actions';
-import {LocalModeActions} from '../modes/local-mode/local-mode.actions';
+import { ActionCreator, on, ReducerTypes } from "@ngrx/store";
+import { AnnotationState, LoginMode } from "../index";
+import { AnnotationActions } from "./annotation.actions";
+import { IDBActions } from "../idb/idb.actions";
+import { ConfigurationActions } from "../configuration/configuration.actions";
+import { IIDBModeOptions } from "../../shared/octra-database";
+import { getProperties } from "@octra/utilities";
+import { OnlineModeActions } from "../modes/online-mode/online-mode.actions";
+import { LocalModeActions } from "../modes/local-mode/local-mode.actions";
 
 export const initialState: AnnotationState = {
   transcript: {

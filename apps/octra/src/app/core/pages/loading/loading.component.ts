@@ -1,21 +1,21 @@
-import {HttpClient} from '@angular/common/http';
-import {Component, OnDestroy, OnInit, Output} from '@angular/core';
-import {Router} from '@angular/router';
-import {TranslocoService} from '@ngneat/transloco';
-import {AppInfo} from '../../../app.info';
-import {afterTrue, hasProperty, navigateTo, SubscriptionManager} from '@octra/utilities';
-import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
-import {LoginMode} from '../../store';
-import * as fromApplication from '../../store/application';
-import * as fromAnnotation from '../../store/annotation';
-import {Store} from '@ngrx/store';
-import {Actions} from '@ngrx/effects';
-import {Subscription} from 'rxjs';
-import {AnnotationActions} from '../../store/annotation/annotation.actions';
-import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
-import {ApplicationActions} from '../../store/application/application.actions';
+import { HttpClient } from "@angular/common/http";
+import { Component, OnDestroy, OnInit, Output } from "@angular/core";
+import { Router } from "@angular/router";
+import { TranslocoService } from "@ngneat/transloco";
+import { AppInfo } from "../../../app.info";
+import { afterTrue, hasProperty, navigateTo, SubscriptionManager } from "@octra/utilities";
+import { AudioService, SettingsService, TranscriptionService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel } from "@octra/annotation";
+import { LoginMode } from "../../store";
+import * as fromApplication from "../../store/application";
+import * as fromAnnotation from "../../store/annotation";
+import { Store } from "@ngrx/store";
+import { Actions } from "@ngrx/effects";
+import { Subscription } from "rxjs";
+import { AnnotationActions } from "../../store/annotation/annotation.actions";
+import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.actions";
+import { ApplicationActions } from "../../store/application/application.actions";
 
 @Component({
   selector: 'octra-loading',

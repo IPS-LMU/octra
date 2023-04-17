@@ -1,5 +1,5 @@
-import {AnnotationActions} from '../../annotation/annotation.actions';
-import {createAction, props} from '@ngrx/store';
+import { AnnotationActions } from "../../annotation/annotation.actions";
+import { createAction, props } from "@ngrx/store";
 import {
   CurrentProject,
   LoginData,
@@ -8,8 +8,8 @@ import {
   SessionData,
   TranscriptionState,
   URLParameters
-} from '../../index';
-import {TaskDto} from '@octra/api-types';
+} from "../../index";
+import { TaskDto } from "@octra/api-types";
 
 export class OnlineModeActions extends AnnotationActions {
   static override context: 'OnlineMode';

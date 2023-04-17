@@ -1,10 +1,10 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
-import {APIService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {LoginMode} from '../../store';
-import {Store} from '@ngrx/store';
-import {ModalService} from '../../modals/modal.service';
-import {Router} from '@angular/router';
+import { Component, ElementRef, ViewChild } from "@angular/core";
+import { APIService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { LoginMode } from "../../store";
+import { Store } from "@ngrx/store";
+import { ModalService } from "../../modals/modal.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'octra-help-tools',

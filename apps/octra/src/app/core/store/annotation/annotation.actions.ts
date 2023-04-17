@@ -1,7 +1,7 @@
-import {createAction, props} from '@ngrx/store';
-import {AnnotationStateLevel, LoginMode, TranscriptionState} from '../index';
-import {OIDBLink} from '@octra/annotation';
-import {ILog} from '../../obj/Settings/logging';
+import { createAction, props } from "@ngrx/store";
+import { AnnotationStateLevel, LoginMode, TranscriptionState } from "../index";
+import { OIDBLink } from "@octra/annotation";
+import { ILog } from "../../obj/Settings/logging";
 
 export class AnnotationActions {
   protected static context = 'Annotation';

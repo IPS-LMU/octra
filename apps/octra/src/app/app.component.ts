@@ -1,20 +1,20 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TranslocoService} from '@ngneat/transloco';
-import {environment} from '../environments/environment';
-import {AppInfo} from './app.info';
-import {NavigationComponent} from './core/component/navbar';
-import {ASRLanguage} from './core/obj/Settings';
-import {SubscriptionManager} from '@octra/utilities';
-import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
-import {APIService, SettingsService} from './core/shared/service';
-import {AppStorageService} from './core/shared/service/appstorage.service';
-import {AsrService} from './core/shared/service/asr.service';
-import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
-import * as fromApplication from './core/store/application'
-import {Store} from '@ngrx/store';
-import {Subscription} from 'rxjs';
-import {OctraAPIService} from '@octra/ngx-octra-api';
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { TranslocoService } from "@ngneat/transloco";
+import { environment } from "../environments/environment";
+import { AppInfo } from "./app.info";
+import { NavigationComponent } from "./core/component/navbar";
+import { ASRLanguage } from "./core/obj/Settings";
+import { SubscriptionManager } from "@octra/utilities";
+import { MultiThreadingService } from "./core/shared/multi-threading/multi-threading.service";
+import { APIService, SettingsService } from "./core/shared/service";
+import { AppStorageService } from "./core/shared/service/appstorage.service";
+import { AsrService } from "./core/shared/service/asr.service";
+import { BugReportService, ConsoleType } from "./core/shared/service/bug-report.service";
+import * as fromApplication from "./core/store/application";
+import { Store } from "@ngrx/store";
+import { Subscription } from "rxjs";
+import { OctraAPIService } from "@octra/ngx-octra-api";
 
 @Component({
   selector: 'octra-app',

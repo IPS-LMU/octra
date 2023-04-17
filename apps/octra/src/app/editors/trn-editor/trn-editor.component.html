@@ -58,8 +58,12 @@
     <tbody>
     <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row"
         [ngClass]="{
-      'segment-selected': segment.isSelected
-    }">
+      'segment-selected': segment.isSelected,
+      'table-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+      'table-info': segment.transcription.text === transcrService.breakMarker.code,
+      'table-danger': segment.transcription.text === '',
+      'active-playback': i === playAllState.currentSegment
+  }">
       <td class="active-column fitwidth" (click)="onTableLineClick($event, i)">
         <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
                  style="color:green;font-size: 10px;"></fa-icon>
@@ -71,36 +75,20 @@
           </fa-icon>
         </ng-template>
       </td>
-      <td class="time-column fitwidth" [ngClass]="{
-    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === '',
-    'active-playback': i === playAllState.currentSegment
-  }" (click)="onTimestampMouseDown($event, i)" (contextmenu)="onContextMenuClick($event)">
+      <td class="time-column fitwidth" (click)="onTimestampMouseDown($event, i)" (contextmenu)="onContextMenuClick($event)">
         {{getStartPoint(i) | timespan: {
         showMilliSeconds: true,
         showHour: true
       }
         }}
       </td>
-      <td class="label-column fitwidth" [ngClass]="{
-    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === '',
-    'active-playback': i === playAllState.currentSegment
-  }" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
+      <td class="alert label-column fitwidth" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
           (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)">
         {{segment.label}}
       </td>
 
-      <td class="transcript-column"
-          *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
-          [ngClass]="{
-    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === '',
-    'active-playback': i === playAllState.currentSegment
-  }">
+      <td class="alert transcript-column"
+          *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive">
         <div id="transcription-panel">
           <octra-audio-navigation
             [easyMode]="appStorage.easymode"
@@ -135,20 +123,10 @@
       <ng-template #editorNotActive>
         <td (mousedown)="onTranscriptCellMouseOver($event, i, scrollContainer); onTranscriptCellMouseDown($event, i);"
             (mousemove)="onTranscriptCellMouseOver($event, i, scrollContainer)"
-            [innerHTML]="segment.transcription.safeHTML" class="transcript-column" [ngClass]="{
-    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === '',
-    'active-playback': i === playAllState.currentSegment
-  }"></td>
+            [innerHTML]="segment.transcription.safeHTML" class="transcript-column"></td>
       </ng-template>
 
-      <td class="control-column" style="width:100px;" [ngClass]="{
-    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === '',
-    'active-playback': i === playAllState.currentSegment
-  }" (click)="onTableLineClick($event, i)">
+      <td class="control-column" style="width:100px;" (click)="onTableLineClick($event, i)">
         <fa-icon (click)="playSelectedSegment(i)" [icon]="['fas', playStateSegments[i].icon]"></fa-icon>
       </td>
     </tr>

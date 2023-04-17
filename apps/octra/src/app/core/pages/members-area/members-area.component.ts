@@ -1,9 +1,9 @@
-import {Component, OnDestroy} from '@angular/core';
-import {Router} from '@angular/router';
-import {SubscriptionManager} from '@octra/utilities';
-import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AsrService} from '../../shared/service/asr.service';
-import {Subscription} from 'rxjs';
+import { Component, OnDestroy } from "@angular/core";
+import { Router } from "@angular/router";
+import { SubscriptionManager } from "@octra/utilities";
+import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
+import { AsrService } from "../../shared/service/asr.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'octra-members-area',

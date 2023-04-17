@@ -431,3 +431,13 @@ footer {
 .btn-info:hover {
   color: white;
 }
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.form-check,
+.form-switch input{
+  cursor: pointer;
+}

@@ -1,18 +1,18 @@
-import {HttpClient} from '@angular/common/http';
-import {EventEmitter, Injectable} from '@angular/core';
-import {Params} from '@angular/router';
-import {TranslocoService} from '@ngneat/transloco';
-import {afterDefined, afterTrue, SubscriptionManager} from '@octra/utilities';
+import { HttpClient } from "@angular/common/http";
+import { EventEmitter, Injectable } from "@angular/core";
+import { Params } from "@angular/router";
+import { TranslocoService } from "@ngneat/transloco";
+import { afterDefined, afterTrue, SubscriptionManager } from "@octra/utilities";
 
-import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {AppStorageService} from './appstorage.service';
-import {AudioService} from './audio.service';
-import {getModeState, LoginMode} from '../../store';
-import {Store} from '@ngrx/store';
-import * as fromApplication from '../../store/application';
-import {ConfigurationActions} from '../../store/configuration/configuration.actions';
-import {Subject, Subscription} from 'rxjs';
-import {OctraAPIService} from '@octra/ngx-octra-api';
+import { AppSettings, ProjectSettings } from "../../obj/Settings";
+import { AppStorageService } from "./appstorage.service";
+import { AudioService } from "./audio.service";
+import { getModeState, LoginMode } from "../../store";
+import { Store } from "@ngrx/store";
+import * as fromApplication from "../../store/application";
+import { ConfigurationActions } from "../../store/configuration/configuration.actions";
+import { Subject, Subscription } from "rxjs";
+import { OctraAPIService } from "@octra/ngx-octra-api";
 
 @Injectable({
   providedIn: 'root'

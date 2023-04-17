@@ -1,7 +1,7 @@
-import Dexie, {Transaction} from 'dexie';
-import {IAnnotJSON} from '@octra/annotation';
-import {LoginMode} from '../store';
-import {Subject} from 'rxjs';
+import Dexie, { Transaction } from "dexie";
+import { IAnnotJSON } from "@octra/annotation";
+import { LoginMode } from "../store";
+import { Subject } from "rxjs";
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;

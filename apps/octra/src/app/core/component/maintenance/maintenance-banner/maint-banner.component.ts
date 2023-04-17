@@ -1,8 +1,8 @@
-import {Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges} from '@angular/core';
-import {MaintenanceAPI, MaintenanceNotification} from '../maintenance-api';
-import {HttpClient} from '@angular/common/http';
-import {hasProperty} from '@octra/utilities';
-import {DateTime} from 'luxon';
+import { Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges } from "@angular/core";
+import { MaintenanceAPI, MaintenanceNotification } from "../maintenance-api";
+import { HttpClient } from "@angular/common/http";
+import { hasProperty } from "@octra/utilities";
+import { DateTime } from "luxon";
 
 @Component({
   // tslint:disable-next-line:component-selector

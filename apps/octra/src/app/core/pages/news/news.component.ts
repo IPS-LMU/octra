@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {SettingsService} from '../../shared/service';
-import {NavbarService} from '../../component/navbar/navbar.service';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { SettingsService } from "../../shared/service";
+import { NavbarService } from "../../component/navbar/navbar.service";
 
 @Component({
   selector: 'octra-news',

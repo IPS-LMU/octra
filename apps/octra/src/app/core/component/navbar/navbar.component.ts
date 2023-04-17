@@ -15,7 +15,6 @@ import { AnnotationLevelType, Level, OIDBLevel, Segments } from "@octra/annotati
 import { Subscription } from "rxjs";
 import { ToolsModalComponent } from "../../modals/tools-modal/tools-modal.component";
 import { StatisticsModalComponent } from "../../modals/statistics-modal/statistics-modal.component";
-import { modalConfigurations } from "../../modals/types";
 import { BugreportModalComponent } from "../../modals/bugreport-modal/bugreport-modal.component";
 import { YesNoModalComponent } from "../../modals/yes-no-modal/yes-no-modal.component";
 import { Router } from "@angular/router";
@@ -201,9 +200,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   onLevelRemoveClick(tiernum: number, id: number) {
     // jQuery(this.tiersDropdown.nativeElement).addClass('show');
-    this.modService.openModal(YesNoModalComponent, {
-      ...modalConfigurations.yesNo
-    }, {
+    this.modService.openModal(YesNoModalComponent, YesNoModalComponent.options, {
       text: "The Tier will be deleted permanently. Are you sure?"
     }).then((answer) => {
       if (answer === "yes") {
@@ -247,7 +244,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openToolsModal() {
-    this.modalTools = this.modService.openModalRef(ToolsModalComponent, modalConfigurations.tools, {
+    this.modalTools = this.modService.openModalRef(ToolsModalComponent, ToolsModalComponent.options, {
       transcrService: this.transcrServ
     });
   }

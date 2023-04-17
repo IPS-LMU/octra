@@ -1,6 +1,6 @@
-import {NavigationExtras} from '@angular/router';
-import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
-import {OggFormat, WavFormat} from '@octra/media';
+import { NavigationExtras } from "@angular/router";
+import { EmailBugReporter } from "./core/obj/BugAPI/EmailBugReporter";
+import { OggFormat, WavFormat } from "@octra/media";
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -13,7 +13,7 @@ import {
   SRTConverter,
   TextConverter,
   WebVTTConverter
-} from '@octra/annotation';
+} from "@octra/annotation";
 
 declare let octraVersion: string;
 declare let octraLastUpdated: string;

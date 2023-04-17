@@ -1,4 +1,4 @@
-import {Group} from '../FeedbackForm/Group';
+import { Group } from "../FeedbackForm/Group";
 
 export interface ProjectSettings {
   version: string;

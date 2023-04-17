@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { OctraModal } from "../types";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 export enum TranscriptionStopModalAnswer {
   CONTINUE = "CONTINUE",
@@ -14,6 +14,11 @@ export enum TranscriptionStopModalAnswer {
 })
 
 export class TranscriptionStopModalComponent extends OctraModal {
+  public static options: NgbModalOptions = {
+    keyboard: false,
+    backdrop: false
+  };
+
   constructor(protected override activeModal: NgbActiveModal) {
     super("transcriptionStopModal", activeModal);
   }

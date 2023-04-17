@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {AppInfo} from '../../../app.info';
-import {SettingsService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import * as fromAnnotation from '../../store/annotation';
-import {Store} from '@ngrx/store';
-import {afterDefined, navigateTo} from '@octra/utilities';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from "@angular/router";
+import { AppInfo } from "../../../app.info";
+import { SettingsService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import * as fromAnnotation from "../../store/annotation";
+import { Store } from "@ngrx/store";
+import { afterDefined, navigateTo } from "@octra/utilities";
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {

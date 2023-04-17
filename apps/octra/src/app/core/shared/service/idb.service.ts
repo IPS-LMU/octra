@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {ConsoleEntry} from './bug-report.service';
-import {DefaultModeOptions, IIDBEntry, IIDBModeOptions, OctraDatabase} from '../octra-database';
-import {LoginMode} from '../../store';
-import {IAnnotJSON, OAnnotJSON} from '@octra/annotation';
+import { Injectable } from "@angular/core";
+import { ConsoleEntry } from "./bug-report.service";
+import { DefaultModeOptions, IIDBEntry, IIDBModeOptions, OctraDatabase } from "../octra-database";
+import { LoginMode } from "../../store";
+import { IAnnotJSON, OAnnotJSON } from "@octra/annotation";
 
 
 @Injectable({

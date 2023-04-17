@@ -7,10 +7,10 @@ import {
   OnInit,
   Output,
   ViewContainerRef
-} from '@angular/core';
+} from "@angular/core";
 
-import {SubscriptionManager} from '@octra/utilities';
-import {Subscription} from 'rxjs';
+import { SubscriptionManager } from "@octra/utilities";
+import { Subscription } from "rxjs";
 
 @Directive({
   selector: '[octraDynComponent]'

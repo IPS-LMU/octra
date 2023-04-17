@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {navigateTo, SubscriptionManager} from '@octra/utilities';
-import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {NavbarService} from '../../component/navbar/navbar.service';
-import {Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { navigateTo, SubscriptionManager } from "@octra/utilities";
+import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { NavbarService } from "../../component/navbar/navbar.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'octra-transcription-submitted',

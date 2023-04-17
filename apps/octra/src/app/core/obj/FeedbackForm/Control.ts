@@ -1,5 +1,5 @@
-import {ControlType} from './ControlType';
-import {Label} from './Label';
+import { ControlType } from "./ControlType";
+import { Label } from "./Label";
 
 export class Control {
 

@@ -1,4 +1,4 @@
-import {APIData} from './APIData';
+import { APIData } from "./APIData";
 
 export class APIResponse {
   private systemstate: string;

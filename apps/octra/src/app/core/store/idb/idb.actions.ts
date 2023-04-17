@@ -1,8 +1,8 @@
-import {createAction, props} from '@ngrx/store';
-import {ConsoleEntry} from '../../shared/service/bug-report.service';
-import {OIDBLink} from '@octra/annotation';
-import {AnnotationStateLevel} from '../index';
-import {IIDBModeOptions} from '../../shared/octra-database';
+import { createAction, props } from "@ngrx/store";
+import { ConsoleEntry } from "../../shared/service/bug-report.service";
+import { OIDBLink } from "@octra/annotation";
+import { AnnotationStateLevel } from "../index";
+import { IIDBModeOptions } from "../../shared/octra-database";
 
 const context = 'IDB';
 

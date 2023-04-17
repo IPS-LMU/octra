@@ -1,5 +1,5 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {SessionFile} from '../../obj/SessionFile';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
+import { SessionFile } from "../../obj/SessionFile";
 
 @Component({
   selector: 'octra-drop-zone',

@@ -1,9 +1,9 @@
-import {Component, Input, ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {TranslocoService} from '@ngneat/transloco';
-import {SettingsService, TranscriptionService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {getProperties} from '@octra/utilities';
+import { Component, Input, ViewChild } from "@angular/core";
+import { NgForm } from "@angular/forms";
+import { TranslocoService } from "@ngneat/transloco";
+import { SettingsService, TranscriptionService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { getProperties } from "@octra/utilities";
 
 @Component({
   selector: 'octra-transcription-feedback',

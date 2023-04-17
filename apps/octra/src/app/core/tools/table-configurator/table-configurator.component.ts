@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {Annotation, Level} from '@octra/annotation';
-import {moveItemInArray} from '@angular/cdk/drag-drop';
+import { Component, Input, OnInit } from "@angular/core";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { Annotation, Level } from "@octra/annotation";
+import { moveItemInArray } from "@angular/cdk/drag-drop";
 
 export interface ColumnDefinition {
   type: string;

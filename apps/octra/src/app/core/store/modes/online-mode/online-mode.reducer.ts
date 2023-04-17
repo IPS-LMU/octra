@@ -1,13 +1,13 @@
-import {Action, ActionReducer, on} from '@ngrx/store';
-import {AnnotationState, LoginMode, OnlineModeState} from '../../index';
-import * as fromAnnotation from '../../annotation/annotation.reducer';
-import {AnnotationStateReducers} from '../../annotation/annotation.reducer';
-import {undoRedo} from 'ngrx-wieder';
-import {AnnotationActions} from '../../annotation/annotation.actions';
-import {OnlineModeActions} from './online-mode.actions';
-import {IDBActions} from '../../idb/idb.actions';
-import {DefaultModeOptions, IIDBModeOptions} from '../../../shared/octra-database';
-import {getProperties, hasProperty} from '@octra/utilities';
+import { Action, ActionReducer, on } from "@ngrx/store";
+import { AnnotationState, LoginMode, OnlineModeState } from "../../index";
+import * as fromAnnotation from "../../annotation/annotation.reducer";
+import { AnnotationStateReducers } from "../../annotation/annotation.reducer";
+import { undoRedo } from "ngrx-wieder";
+import { AnnotationActions } from "../../annotation/annotation.actions";
+import { OnlineModeActions } from "./online-mode.actions";
+import { IDBActions } from "../../idb/idb.actions";
+import { DefaultModeOptions, IIDBModeOptions } from "../../../shared/octra-database";
+import { getProperties, hasProperty } from "@octra/utilities";
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,

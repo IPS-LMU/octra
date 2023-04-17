@@ -1,4 +1,4 @@
-import {RouterModule, Routes} from '@angular/router';
+import { RouterModule, Routes } from "@angular/router";
 
 import {
   BrowserTestComponent,
@@ -7,12 +7,12 @@ import {
   HelpToolsComponent,
   MembersAreaComponent,
   NewsComponent
-} from './core/pages';
-import {ALoginGuard, LoginComponent} from './core/pages/login';
-import {MEMBER_ROUTES} from './core/pages/members-area';
-import {SettingsGuard} from './core/shared/guard';
-import {CompatibilityGuard} from './core/shared/guard/compatibility.guard';
-import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
+} from "./core/pages";
+import { ALoginGuard, LoginComponent } from "./core/pages/login";
+import { MEMBER_ROUTES } from "./core/pages/members-area";
+import { SettingsGuard } from "./core/shared/guard";
+import { CompatibilityGuard } from "./core/shared/guard/compatibility.guard";
+import { StresstestComponent } from "./core/tools/stresstest/stresstest.component";
 
 const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},

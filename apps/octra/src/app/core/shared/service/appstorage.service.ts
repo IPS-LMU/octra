@@ -1,10 +1,10 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {SessionStorageService} from 'ngx-webstorage';
-import {AppInfo} from '../../../app.info';
-import {SessionFile} from '../../obj/SessionFile';
-import {FileProgress} from '../../obj/objects';
-import {afterTrue, getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
-import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import { EventEmitter, Injectable } from "@angular/core";
+import { SessionStorageService } from "ngx-webstorage";
+import { AppInfo } from "../../../app.info";
+import { SessionFile } from "../../obj/SessionFile";
+import { FileProgress } from "../../obj/objects";
+import { afterTrue, getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved } from "@octra/utilities";
+import { OIDBLevel, OIDBLink } from "@octra/annotation";
 import {
   AnnotationState,
   AnnotationStateLevel,
@@ -15,24 +15,24 @@ import {
   LoginMode,
   OnlineSession,
   RootState
-} from '../../store';
-import {Action, Store} from '@ngrx/store';
-import {AudioManager} from '@octra/media';
-import {Actions} from '@ngrx/effects';
-import {ConsoleEntry} from './bug-report.service';
-import {Router} from '@angular/router';
-import {AnnotationActions} from '../../store/annotation/annotation.actions';
-import {UserActions} from '../../store/user/user.actions';
-import {ApplicationActions} from '../../store/application/application.actions';
-import {IDBActions} from '../../store/idb/idb.actions';
-import * as fromAnnotation from '../../store/annotation';
-import * as fromApplication from '../../store/application';
-import {ASRActions} from '../../store/asr/asr.actions';
-import {ILog} from '../../obj/Settings/logging';
-import {OnlineModeActions} from '../../store/modes/online-mode/online-mode.actions';
-import {LocalModeActions} from '../../store/modes/local-mode/local-mode.actions';
-import {Observable, Subject, Subscription} from 'rxjs';
-import {AccountRole} from '@octra/api-types';
+} from "../../store";
+import { Action, Store } from "@ngrx/store";
+import { AudioManager } from "@octra/media";
+import { Actions } from "@ngrx/effects";
+import { ConsoleEntry } from "./bug-report.service";
+import { Router } from "@angular/router";
+import { AnnotationActions } from "../../store/annotation/annotation.actions";
+import { UserActions } from "../../store/user/user.actions";
+import { ApplicationActions } from "../../store/application/application.actions";
+import { IDBActions } from "../../store/idb/idb.actions";
+import * as fromAnnotation from "../../store/annotation";
+import * as fromApplication from "../../store/application";
+import { ASRActions } from "../../store/asr/asr.actions";
+import { ILog } from "../../obj/Settings/logging";
+import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.actions";
+import { LocalModeActions } from "../../store/modes/local-mode/local-mode.actions";
+import { Observable, Subject, Subscription } from "rxjs";
+import { AccountRole } from "@octra/api-types";
 
 @Injectable({
   providedIn: 'root'

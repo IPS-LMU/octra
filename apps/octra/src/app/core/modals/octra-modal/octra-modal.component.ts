@@ -1,24 +1,23 @@
-import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
-import {AppInfo} from '../../../app.info';
-import {hasProperty, SubscriptionManager} from '@octra/utilities';
-import {APIService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {BugReportService} from '../../shared/service/bug-report.service';
-import {ModalService} from '../modal.service';
-import {Subscription} from 'rxjs';
-import {YesNoModalComponent} from '../yes-no-modal/yes-no-modal.component';
-import {LoginInvalidModalComponent} from '../login-invalid-modal/login-invalid-modal.component';
-import {TranscriptionDeleteModalComponent} from '../transcription-delete-modal/transcription-delete-modal.component';
-import {TranscriptionStopModalComponent} from '../transcription-stop-modal/transcription-stop-modal.component';
-import {ErrorModalComponent} from '../error-modal/error-modal.component';
-import {BugreportModalComponent} from '../bugreport-modal/bugreport-modal.component';
-import {SupportedFilesModalComponent} from '../supportedfiles-modal/supportedfiles-modal.component';
-import {modalConfigurations} from '../types';
+import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import { AppInfo } from "../../../app.info";
+import { hasProperty, SubscriptionManager } from "@octra/utilities";
+import { APIService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { BugReportService } from "../../shared/service/bug-report.service";
+import { ModalService } from "../modal.service";
+import { Subscription } from "rxjs";
+import { YesNoModalComponent } from "../yes-no-modal/yes-no-modal.component";
+import { LoginInvalidModalComponent } from "../login-invalid-modal/login-invalid-modal.component";
+import { TranscriptionDeleteModalComponent } from "../transcription-delete-modal/transcription-delete-modal.component";
+import { TranscriptionStopModalComponent } from "../transcription-stop-modal/transcription-stop-modal.component";
+import { ErrorModalComponent } from "../error-modal/error-modal.component";
+import { BugreportModalComponent } from "../bugreport-modal/bugreport-modal.component";
+import { SupportedFilesModalComponent } from "../supportedfiles-modal/supportedfiles-modal.component";
 
 @Component({
-  selector: 'octra-modal',
-  templateUrl: './octra-modal.component.html',
-  styleUrls: ['./octra-modal.component.scss']
+  selector: "octra-modal",
+  templateUrl: "./octra-modal.component.html",
+  styleUrls: ["./octra-modal.component.scss"]
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
   modals = {
@@ -52,8 +51,8 @@ export class OctraModalComponent implements OnInit, OnDestroy {
     }
   };
 
-  public bgdescr = '';
-  public bgemail = '';
+  public bgdescr = "";
+  public bgemail = "";
   public sendproObj = true;
   public bugsent = false;
   public data: any;
@@ -70,7 +69,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.bgemail = (this.appStorage.userProfile.email !== undefined) ? this.appStorage.userProfile.email : '';
+    this.bgemail = (this.appStorage.userProfile.email !== undefined) ? this.appStorage.userProfile.email : "";
     this._subscrmanager = new SubscriptionManager<Subscription>();
 
     this._subscrmanager.add(this.modService.showmodal.subscribe(
@@ -85,7 +84,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
           });
         } else {
           const emitter: EventEmitter<any> = result.emitter;
-          emitter.error('modal function not supported');
+          emitter.error("modal function not supported");
         }
       }));
   }
@@ -96,10 +95,10 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
   openModal(name: string, data?: any): Promise<any> {
     if (hasProperty(this.modals, name)) {
-      if (hasProperty(modalConfigurations, name)) {
+      if (hasProperty(this.modals, name)) {
         if (!this.modals[name].visible) {
           this.modals[name].visible = true;
-          return this.modService.openModal(this.modals[name].type, modalConfigurations[name], data).then(() => {
+          return this.modService.openModal(this.modals[name].type, this.modals[name].type.options, data).then(() => {
             this.modals[name].visible = false;
           });
         }
@@ -113,7 +112,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       }
     }
     return new Promise<any>((reject) => {
-      reject(new Error('Can\'t find modal with that name.'));
+      reject(new Error("Can't find modal with that name."));
     });
   }
 }

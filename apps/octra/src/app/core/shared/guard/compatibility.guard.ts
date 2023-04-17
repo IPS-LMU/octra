@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
-import {AppInfo} from '../../../app.info';
-import {SettingsService} from '../service';
-import {CompatibilityService} from '../service/compatibility.service';
-import * as fromApplication from '../../store/application';
-import {Store} from '@ngrx/store';
-import {afterDefined, navigateTo} from '@octra/utilities';
+import { Injectable } from "@angular/core";
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+import { AppInfo } from "../../../app.info";
+import { SettingsService } from "../service";
+import { CompatibilityService } from "../service/compatibility.service";
+import * as fromApplication from "../../store/application";
+import { Store } from "@ngrx/store";
+import { afterDefined, navigateTo } from "@octra/utilities";
 
 @Injectable({
   providedIn: 'root'

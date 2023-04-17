@@ -1,6 +1,6 @@
-import {createAction, props} from '@ngrx/store';
-import {ConsoleEntry} from '../../shared/service/bug-report.service';
-import {LoginMode} from '../index';
+import { createAction, props } from "@ngrx/store";
+import { ConsoleEntry } from "../../shared/service/bug-report.service";
+import { LoginMode } from "../index";
 
 const context = 'Application';
 

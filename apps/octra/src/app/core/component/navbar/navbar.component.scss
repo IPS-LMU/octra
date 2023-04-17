@@ -29,9 +29,10 @@
   width: auto;
 }
 
-.options-menu .table tr td {
+.options-menu .table tr td,
+.btn-group .btn.btn-sm {
   border: none;
-  font-size: 1.2em;
+  font-size: 0.8rem;
   padding: 1px;
   vertical-align: middle;
 }
@@ -101,4 +102,8 @@
 
 .custom-switch label.custom-control-label {
   cursor: pointer;
+}
+
+.dropdown-toggle::after {
+  content: unset;
 }

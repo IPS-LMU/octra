@@ -1,10 +1,10 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {OLog} from '../../obj/Settings/logging';
-import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
-import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
-import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {contains} from '@octra/utilities';
-import {PlayBackStatus, SampleUnit} from '@octra/media';
+import { EventEmitter, Injectable } from "@angular/core";
+import { OLog } from "../../obj/Settings/logging";
+import { KeyStatisticElem } from "../../obj/statistics/KeyStatisticElem";
+import { MouseStatisticElem } from "../../obj/statistics/MouseStatisticElem";
+import { StatisticElem } from "../../obj/statistics/StatisticElement";
+import { contains } from "@octra/utilities";
+import { PlayBackStatus, SampleUnit } from "@octra/media";
 
 @Injectable({
   providedIn: 'root'

@@ -1,9 +1,9 @@
-import {HttpClient} from '@angular/common/http';
-import {EventEmitter, Injectable} from '@angular/core';
-import {AppInfo} from '../../../app.info';
-import {downloadFile, SubscriptionManager} from '@octra/utilities';
-import {AudioManager} from '@octra/media';
-import {Subject, Subscription} from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { EventEmitter, Injectable } from "@angular/core";
+import { AppInfo } from "../../../app.info";
+import { downloadFile, SubscriptionManager } from "@octra/utilities";
+import { AudioManager } from "@octra/media";
+import { Subject, Subscription } from "rxjs";
 
 @Injectable()
 export class AudioService {

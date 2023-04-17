@@ -7,11 +7,11 @@ import {
   OnDestroy,
   Output,
   ViewChild
-} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
-import {SubscriptionManager} from '@octra/utilities';
-import {Segment} from '@octra/annotation';
-import {moveItemInArray} from '@angular/cdk/drag-drop';
+} from "@angular/core";
+import { Subject, Subscription } from "rxjs";
+import { SubscriptionManager } from "@octra/utilities";
+import { Segment } from "@octra/annotation";
+import { moveItemInArray } from "@angular/cdk/drag-drop";
 
 @Component({
   selector: 'octra-naming-drag-and-drop',

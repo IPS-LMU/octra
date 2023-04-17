@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
-import {SessionStorage, SessionStorageService} from 'ngx-webstorage';
-import {BrowserInfo, getFileSize} from '@octra/utilities';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
+import { SessionStorage, SessionStorageService } from "ngx-webstorage";
+import { BrowserInfo, getFileSize } from "@octra/utilities";
 
 @Component({
   selector: 'octra-stresstest',

@@ -1,5 +1,5 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {hasProperty} from '@octra/utilities';
+import { EventEmitter, Injectable } from "@angular/core";
+import { hasProperty } from "@octra/utilities";
 
 export type AlertType = 'danger' | 'warning' | 'info' | 'success';
 

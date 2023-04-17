@@ -1,8 +1,8 @@
-import {Subscription} from 'rxjs';
-import {Injectable} from '@angular/core';
-import {SubscriptionManager} from '@octra/utilities';
-import {TsWorker} from './ts-worker';
-import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
+import { Subscription } from "rxjs";
+import { Injectable } from "@angular/core";
+import { SubscriptionManager } from "@octra/utilities";
+import { TsWorker } from "./ts-worker";
+import { TsWorkerJob, TsWorkerStatus } from "./ts-worker-job";
 
 @Injectable()
 export class MultiThreadingService {

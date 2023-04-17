@@ -1,5 +1,5 @@
-import {Group} from './Group';
-import {getProperties} from '@octra/utilities';
+import { Group } from "./Group";
+import { getProperties } from "@octra/utilities";
 
 export class FeedBackForm {
   public get groups(): Group[] {

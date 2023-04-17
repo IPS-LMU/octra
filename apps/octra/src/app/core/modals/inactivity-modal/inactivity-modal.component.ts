@@ -12,7 +12,8 @@ import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 export class InactivityModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
-    backdrop: true
+    backdrop: true,
+    keyboard: false
   };
 
   constructor(public appStorage: AppStorageService, public settService: SettingsService,

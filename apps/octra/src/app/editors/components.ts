@@ -1,8 +1,8 @@
-import {TwoDEditorComponent} from './2D-editor';
-import {DictaphoneEditorComponent} from './dictaphone-editor';
-import {LinearEditorComponent} from './linear-editor';
-import {IconName} from '@fortawesome/fontawesome-common-types';
-import {TrnEditorComponent} from './trn-editor';
+import { TwoDEditorComponent } from "./2D-editor";
+import { DictaphoneEditorComponent } from "./dictaphone-editor";
+import { LinearEditorComponent } from "./linear-editor";
+import { IconName } from "@fortawesome/fontawesome-common-types";
+import { TrnEditorComponent } from "./trn-editor";
 
 export const editorComponents: {
   name: string,

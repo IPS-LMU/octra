@@ -2,7 +2,7 @@ import { Component, SecurityContext } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { TranslocoService } from "@ngneat/transloco";
 import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 export enum ModalEndAnswer {
   CANCEL = "CANCEL",
@@ -17,6 +17,11 @@ export enum ModalEndAnswer {
 })
 
 export class TranscriptionDemoEndModalComponent extends OctraModal {
+  public static options: NgbModalOptions = {
+    keyboard: false,
+    backdrop: false
+  };
+
   constructor(modalService: NgbModal, private sanitizer: DomSanitizer,
               public languageService: TranslocoService, protected override activeModal: NgbActiveModal) {
     super("transcriptionDemoEnd", activeModal);

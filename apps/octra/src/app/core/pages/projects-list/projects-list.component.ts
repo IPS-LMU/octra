@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {OctraAPIService} from '@octra/ngx-octra-api';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {Router} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
-import {ProjectDto} from '@octra/api-types';
+import { Component, OnInit } from "@angular/core";
+import { OctraAPIService } from "@octra/ngx-octra-api";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { Router } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import { ProjectDto } from "@octra/api-types";
 
 @Component({
   selector: 'octra-projects-list',

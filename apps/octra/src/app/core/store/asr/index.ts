@@ -1,5 +1,5 @@
-import {RootState} from '../index';
-import {pipe} from 'rxjs';
+import { RootState } from "../index";
+import { pipe } from "rxjs";
 
 const selectASR = (state: RootState) => state.asr;
 export const selectSelectedLanguage = pipe(selectASR, (state) => state.selectedLanguage);

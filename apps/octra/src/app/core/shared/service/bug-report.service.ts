@@ -1,15 +1,15 @@
-import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {TranslocoService} from '@ngneat/transloco';
-import {Observable} from 'rxjs';
-import {AppInfo} from '../../../app.info';
-import {BugReporter} from '../../obj/BugAPI/BugReporter';
-import {AppStorageService} from './appstorage.service';
-import {SettingsService} from './settings.service';
-import {TranscriptionService} from './transcription.service';
-import {BrowserInfo, getFileSize} from '@octra/utilities';
-import {LoginMode} from '../../store';
-import {DateTime} from 'luxon';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { TranslocoService } from "@ngneat/transloco";
+import { Observable } from "rxjs";
+import { AppInfo } from "../../../app.info";
+import { BugReporter } from "../../obj/BugAPI/BugReporter";
+import { AppStorageService } from "./appstorage.service";
+import { SettingsService } from "./settings.service";
+import { TranscriptionService } from "./transcription.service";
+import { BrowserInfo, getFileSize } from "@octra/utilities";
+import { LoginMode } from "../../store";
+import { DateTime } from "luxon";
 
 export enum ConsoleType {
   LOG,

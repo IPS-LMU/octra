@@ -10,9 +10,9 @@ import {
   Output,
   SimpleChanges,
   ViewChild
-} from '@angular/core';
-import {SubscriptionManager} from '@octra/utilities';
-import {AudioChunk, PlayBackStatus} from '@octra/media';
+} from "@angular/core";
+import { SubscriptionManager } from "@octra/utilities";
+import { AudioChunk, PlayBackStatus } from "@octra/media";
 
 export interface Buttons {
   play: {

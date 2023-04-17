@@ -1,7 +1,7 @@
-import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
-import {SubscriptionManager} from '@octra/utilities';
-import {TranscriptionService} from '../../../../core/shared/service';
+import { Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
+import { Subject, Subscription } from "rxjs";
+import { SubscriptionManager } from "@octra/utilities";
+import { TranscriptionService } from "../../../../core/shared/service";
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({

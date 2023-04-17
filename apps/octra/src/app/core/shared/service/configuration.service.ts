@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {hasProperty, uniqueHTTPRequest} from '@octra/utilities';
-import Ajv from 'ajv';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { hasProperty, uniqueHTTPRequest } from "@octra/utilities";
+import Ajv from "ajv";
 
 @Injectable({
   providedIn: 'root'

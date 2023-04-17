@@ -13,7 +13,6 @@ import { AppStorageService } from "../../shared/service/appstorage.service";
 import { OctraDropzoneComponent } from "../../component/octra-dropzone/octra-dropzone.component";
 import { FileSize, getFileSize, navigateTo } from "@octra/utilities";
 import { OIDBLevel, OIDBLink } from "@octra/annotation";
-import { modalConfigurations } from "../../modals/types";
 import {
   TranscriptionDeleteModalComponent
 } from "../../modals/transcription-delete-modal/transcription-delete-modal.component";
@@ -47,7 +46,7 @@ export class ReloadFileComponent {
   };
 
   newTranscription = () => {
-    this.modService.openModal(TranscriptionDeleteModalComponent, modalConfigurations.transcriptionDelete).then((decision) => {
+    this.modService.openModal(TranscriptionDeleteModalComponent, TranscriptionDeleteModalComponent.options).then((decision) => {
       if (decision === "DELETE") {
         let keepData = false;
 
@@ -109,7 +108,7 @@ export class ReloadFileComponent {
   }
 
   askForAbort() {
-    this.modService.openModal(TranscriptionStopModalComponent, modalConfigurations.transcriptionStop).then((answer: TranscriptionStopModalAnswer) => {
+    this.modService.openModal(TranscriptionStopModalComponent, TranscriptionStopModalComponent.options).then((answer: TranscriptionStopModalAnswer) => {
       if (answer === TranscriptionStopModalAnswer.QUIT) {
         this.abortTranscription();
       }
@@ -126,9 +125,7 @@ export class ReloadFileComponent {
 
   private showErrorMessage(err: string) {
     this.error = err;
-    this.modService.openModal(ErrorModalComponent, {
-      ...modalConfigurations.error
-    }, {
+    this.modService.openModal(ErrorModalComponent, ErrorModalComponent.options, {
       text: err
     }).catch((error) => {
       console.error(error);

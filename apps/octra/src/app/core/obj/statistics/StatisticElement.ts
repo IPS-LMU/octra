@@ -1,8 +1,8 @@
 /***
  * Statistic Element Class
  */
-import {ILog, SampleInterval} from '../Settings/logging';
-import {getProperties, hasProperty} from '@octra/utilities';
+import { ILog, SampleInterval } from "../Settings/logging";
+import { getProperties, hasProperty } from "@octra/utilities";
 
 export class StatisticElem {
   protected data: ILog = {

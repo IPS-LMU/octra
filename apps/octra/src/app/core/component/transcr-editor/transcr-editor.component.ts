@@ -11,12 +11,12 @@ import {
   Output,
   ViewChild,
   ViewEncapsulation
-} from '@angular/core';
-import {TranslocoService} from '@ngneat/transloco';
-import {TranscriptionService} from '../../shared/service';
-import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
-import {TranscrEditorConfig} from './config';
-import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
+} from "@angular/core";
+import { TranslocoService } from "@ngneat/transloco";
+import { TranscriptionService } from "../../shared/service";
+import { ASRProcessStatus, ASRQueueItem, AsrService } from "../../shared/service/asr.service";
+import { TranscrEditorConfig } from "./config";
+import { ValidationPopoverComponent } from "./validation-popover/validation-popover.component";
 import {
   BrowserInfo,
   escapeHtml,
@@ -30,12 +30,12 @@ import {
   ShortcutManager,
   SubscriptionManager,
   unEscapeHtml
-} from '@octra/utilities';
-import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
-import {Segments} from '@octra/annotation';
-import {TimespanPipe} from '@octra/components';
-import {Subscription, timer} from 'rxjs';
-import {JoditAngularComponent} from 'jodit-angular';
+} from "@octra/utilities";
+import { AudioChunk, AudioManager, SampleUnit } from "@octra/media";
+import { Segments } from "@octra/annotation";
+import { TimespanPipe } from "@octra/components";
+import { Subscription, timer } from "rxjs";
+import { JoditAngularComponent } from "jodit-angular";
 
 declare let tidyUpAnnotation: ((string, any) => any);
 

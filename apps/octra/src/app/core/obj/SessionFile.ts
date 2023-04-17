@@ -1,4 +1,4 @@
-import {hasProperty} from '@octra/utilities';
+import { hasProperty } from "@octra/utilities";
 
 export class SessionFile {
   get type(): string {

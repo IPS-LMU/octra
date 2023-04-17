@@ -1,6 +1,6 @@
 <div #audioNavContainer class="audio-nav">
-  <div class="row">
-    <div role="group" class="btn-group col-lg-7" style="padding:0;">
+  <div class="row g-0">
+    <div role="group" class="btn-group col-lg-7">
       <button (mousedown)="onButtonClick('play'); " class="waves-light btn btn-info"
               *ngIf="!isAudioPlaying" [disabled]="!isReady"
               name="play" [title]="'general.play' | transloco">
@@ -24,11 +24,11 @@
       </button>
       <button class="btn btn-info" (mousedown)="onButtonClick('backward time')" name="step_back"
               [title]="'general.backwardtime' | transloco">
-        <fa-icon icon="step-backward"></fa-icon>
+        <fa-icon icon="step-backward" class="me-1"></fa-icon>
         <fa-icon [icon]="['fas', 'clock']"></fa-icon>
       </button>
     </div>
-    <div class="btn-group col-lg-5" style="padding:0;">
+    <div class="btn-group col-lg-5">
       <div class="col-6 bg-info">
         <div class="row h-100 align-items-center">
           <div class="col-1 col-sm-4 col-md-3 text-center">

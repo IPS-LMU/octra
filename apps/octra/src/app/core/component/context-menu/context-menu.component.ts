@@ -1,6 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animations';
-import {IconProp} from '@fortawesome/fontawesome-svg-core';
+import { Component, Input } from "@angular/core";
+import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animations";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 @Component({
   selector: 'octra-context-menu',

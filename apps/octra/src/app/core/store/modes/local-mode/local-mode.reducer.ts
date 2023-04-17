@@ -1,13 +1,13 @@
-import {on} from '@ngrx/store';
-import {LocalModeState, LoginMode} from '../../index';
-import * as fromAnnotation from '../../annotation/annotation.reducer';
-import {AnnotationStateReducers} from '../../annotation/annotation.reducer';
-import {undoRedo} from 'ngrx-wieder';
-import {AnnotationActions} from '../../annotation/annotation.actions';
-import {LocalModeActions} from './local-mode.actions';
-import {SessionFile} from '../../../obj/SessionFile';
-import {IDBActions} from '../../idb/idb.actions';
-import {getProperties} from '@octra/utilities';
+import { on } from "@ngrx/store";
+import { LocalModeState, LoginMode } from "../../index";
+import * as fromAnnotation from "../../annotation/annotation.reducer";
+import { AnnotationStateReducers } from "../../annotation/annotation.reducer";
+import { undoRedo } from "ngrx-wieder";
+import { AnnotationActions } from "../../annotation/annotation.actions";
+import { LocalModeActions } from "./local-mode.actions";
+import { SessionFile } from "../../../obj/SessionFile";
+import { IDBActions } from "../../idb/idb.actions";
+import { getProperties } from "@octra/utilities";
 
 export const initialState: LocalModeState = {
   ...fromAnnotation.initialState,

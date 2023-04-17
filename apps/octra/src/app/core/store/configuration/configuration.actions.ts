@@ -1,5 +1,5 @@
-import {createAction, props} from '@ngrx/store';
-import {AppSettings, ProjectSettings} from '../../obj/Settings';
+import { createAction, props } from "@ngrx/store";
+import { AppSettings, ProjectSettings } from "../../obj/Settings";
 
 const context = 'Configuration';
 

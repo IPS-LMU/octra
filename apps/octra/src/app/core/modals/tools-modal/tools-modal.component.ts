@@ -1,66 +1,73 @@
-import {HttpClient} from '@angular/common/http';
-import {Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {TranslocoService} from '@ngneat/transloco';
-import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
-import {SubscriptionManager} from '@octra/utilities';
-import {interval, Subscription, timer} from 'rxjs';
-import {AppInfo} from '../../../app.info';
-import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
-import {NavbarService} from '../../component/navbar/navbar.service';
-import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
-import {AudioService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {Segment} from '@octra/annotation';
-import {WavFormat} from '@octra/media';
-import {OctraModal} from '../types';
-import {strToU8, zip, zipSync} from 'fflate';
-import {ModalService} from '../modal.service';
-import {ErrorModalComponent} from '../error-modal/error-modal.component';
-import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { HttpClient } from "@angular/common/http";
+import { Component, ElementRef, Input, OnDestroy, ViewChild } from "@angular/core";
+import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
+import { TranslocoService } from "@ngneat/transloco";
+import { fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation } from "angular-animations";
+import { SubscriptionManager } from "@octra/utilities";
+import { interval, Subscription, timer } from "rxjs";
+import { AppInfo } from "../../../app.info";
+import { NamingDragAndDropComponent } from "../../tools/naming-drag-and-drop/naming-drag-and-drop.component";
+import { NavbarService } from "../../component/navbar/navbar.service";
+import { JSONConverter, TextTableConverter } from "../../obj/tools/audio-cutting/cutting-format";
+import { AudioService, TranscriptionService, UserInteractionsService } from "../../shared/service";
+import { AppStorageService } from "../../shared/service/appstorage.service";
+import { Segment } from "@octra/annotation";
+import { WavFormat } from "@octra/media";
+import { OctraModal } from "../types";
+import { strToU8, zip, zipSync } from "fflate";
+import { ModalService } from "../modal.service";
+import { ErrorModalComponent } from "../error-modal/error-modal.component";
+import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
-  selector: 'octra-tools-modal',
-  templateUrl: './tools-modal.component.html',
-  styleUrls: ['./tools-modal.component.scss'],
+  selector: "octra-tools-modal",
+  templateUrl: "./tools-modal.component.html",
+  styleUrls: ["./tools-modal.component.scss"],
   animations: [
     fadeOutCollapseOnLeaveAnimation(),
     fadeInExpandOnEnterAnimation()
   ]
 })
 export class ToolsModalComponent extends OctraModal implements OnDestroy {
+  public static options: NgbModalOptions = {
+    keyboard: false,
+    backdrop: false,
+    scrollable: true,
+    size: "xl"
+  };
+
   public parentformat: {
     download: string,
     uri: SafeUrl
   } = {
-    download: '',
-    uri: ''
+    download: "",
+    uri: ""
   };
   public converters = AppInfo.converters;
 
   public tools = {
     audioCutting: {
       opened: false,
-      selectedMethod: 'client',
+      selectedMethod: "client",
       progress: 0,
       result: {
         url: undefined,
-        filename: ''
+        filename: ""
       },
-      status: 'idle',
-      message: '',
-      progressbarType: 'info' as any,
+      status: "idle",
+      message: "",
+      progressbarType: "info" as any,
       showConfigurator: false,
       subscriptionIDs: [-1, -1, -1],
       exportFormats: [
         {
-          label: 'TextTable',
-          value: 'textTable',
+          label: "TextTable",
+          value: "textTable",
           selected: true
         },
         {
-          label: 'JSON',
-          value: 'json',
+          label: "JSON",
+          value: "json",
           selected: true
         }
       ],
@@ -74,8 +81,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     },
     combinePhrases: {
       opened: false,
-      status: 'idle',
-      message: '',
+      status: "idle",
+      message: "",
       showOptions: false,
       options: {
         minSilenceLength: 100,
@@ -84,8 +91,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
   };
 
-  @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
-  @ViewChild('content', {static: false}) contentElement: ElementRef;
+  @ViewChild("namingConvention", { static: false }) namingConvention: NamingDragAndDropComponent;
+  @ViewChild("content", { static: false }) contentElement: ElementRef;
 
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
@@ -113,7 +120,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               public transloco: TranslocoService,
               protected override activeModal: NgbActiveModal
   ) {
-    super('toolsModal', activeModal);
+    super("toolsModal", activeModal);
   }
 
   ngOnDestroy() {
@@ -121,11 +128,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   }
 
   onHidden() {
-    this.tools.audioCutting.status = 'idle';
-    this.tools.audioCutting.progressbarType = 'info';
-    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.status = "idle";
+    this.tools.audioCutting.progressbarType = "info";
+    this.tools.audioCutting.progressbarType = "info";
     this.tools.audioCutting.progress = 0;
-    this.tools.audioCutting.result.filename = '';
+    this.tools.audioCutting.result.filename = "";
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
@@ -149,7 +156,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     const cutList = [];
     let startSample = 0;
     this.tools.audioCutting.progress = 0;
-    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.progressbarType = "info";
     this.tools.audioCutting.result.url = undefined;
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
@@ -198,7 +205,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         if (this.tools.audioCutting.archiveStructure === undefined) {
           this.tools.audioCutting.archiveStructure = {};
         }
-        this.tools.audioCutting.archiveStructure[status.fileName + '.wav'] = status.intArray;
+        this.tools.audioCutting.archiveStructure[status.fileName + ".wav"] = status.intArray;
         totalSize += status.intArray.byteLength / 2;
 
         if (this.tools.audioCutting.cuttingSpeed < 0) {
@@ -233,7 +240,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               this.namingConvention.namingConvention
             );
 
-            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + '_meta.txt'] = strToU8(content);
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + "_meta.txt"] = strToU8(content);
             finished++;
           }
 
@@ -246,14 +253,14 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               this.namingConvention.namingConvention
             );
 
-            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + '_meta.json'] = strToU8(JSON.stringify(content, undefined, 2));
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + "_meta.json"] = strToU8(JSON.stringify(content, undefined, 2));
             finished++;
           }
 
           let sizeProcessed = 0;
           const startZipping = Date.now();
           /** TODO better use stream **/
-          zip(this.tools.audioCutting.archiveStructure, {level: 9}, (error, data) => {
+          zip(this.tools.audioCutting.archiveStructure, { level: 9 }, (error, data) => {
             if (!error) {
               if (sizeProcessed === 0) {
                 // first process
@@ -279,9 +286,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 lastCheck = Date.now();
               }
 
-              this.tools.audioCutting.status = 'finished';
+              this.tools.audioCutting.status = "finished";
               this.tools.audioCutting.progress = 100;
-              this.tools.audioCutting.progressbarType = 'success';
+              this.tools.audioCutting.progressbarType = "success";
 
               if (this.tools.audioCutting.result.url !== undefined) {
                 window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
@@ -289,13 +296,13 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
               try {
 
-                this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new File([data], this.transcrService.audioManager.ressource.info.name + '.zip')));
-                this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
+                this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new File([data], this.transcrService.audioManager.ressource.info.name + ".zip")));
+                this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + ".zip";
 
               } catch (e) {
-                this.modalsService.openModal(ErrorModalComponent, {backdrop: false}, {
+                this.modalsService.openModal(ErrorModalComponent, ErrorModalComponent.options, {
                   text: e.message ?? e
-                })
+                });
               }
             } else {
               console.error(`cutting error`);
@@ -336,9 +343,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       }
     ));
 
-    this.tools.audioCutting.status = 'running';
-    this.tools.audioCutting.wavFormat.status = 'running';
-    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.status = "running";
+    this.tools.audioCutting.wavFormat.status = "running";
+    this.tools.audioCutting.progressbarType = "info";
 
     this.getDurationFactorForZipping().then((zipFactor) => {
       this.tools.audioCutting.zippingSpeed = zipFactor;
@@ -367,7 +374,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
      */
 
-    this.tools.audioCutting.status = 'idle';
+    this.tools.audioCutting.status = "idle";
 
     this.tools.audioCutting.cuttingSpeed = -1;
     this.tools.audioCutting.zippingSpeed = -1;
@@ -393,8 +400,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     return new Promise<number>((resolve, reject) => {
       const started = Date.now();
       zipSync({
-        'test.txt': new Uint8Array(new ArrayBuffer(1024 * 1024))
-      }, {level: 9})
+        "test.txt": new Uint8Array(new ArrayBuffer(1024 * 1024))
+      }, { level: 9 });
       const dur = (Date.now() - started) / 1000;
       resolve(dur / (1024 * 1024));
     });
@@ -404,13 +411,13 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     const maxWords = this.tools.combinePhrases.options.maxWordsPerSegment;
     const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
     const isSilence = (segment: Segment) => {
-      return ((segment.transcript.trim() === '' ||
+      return ((segment.transcript.trim() === "" ||
         segment.transcript.trim() === this.transcrService.breakMarker.code ||
-        segment.transcript.trim() === '<p:>' || segment.transcript.trim() === this.transcrService.breakMarker.code));
+        segment.transcript.trim() === "<p:>" || segment.transcript.trim() === this.transcrService.breakMarker.code));
     };
 
     const countWords = (text: string) => {
-      return text.trim().split(' ').length;
+      return text.trim().split(" ").length;
     };
 
     let wordCounter = 0;
@@ -439,17 +446,17 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               let segmentText = segment.transcript;
 
               if (isSilence(lastSegment)) {
-                lastSegmentText = '';
+                lastSegmentText = "";
               }
 
               if (!isSilence(segment)) {
                 segment.transcript = `${lastSegmentText} ${segment.transcript}`;
                 wordCounter = countWords(segment.transcript);
               } else {
-                segmentText = '';
+                segmentText = "";
                 segment.transcript = `${lastSegmentText}`;
               }
-              this.transcrService.currentlevel.segments.removeByIndex(i - 1, '', false);
+              this.transcrService.currentlevel.segments.removeByIndex(i - 1, "", false);
               i--;
             }
           }
@@ -461,7 +468,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.transcrService.currentLevelSegmentChange.emit();
 
     this.subscrmanager.add(timer(1000).subscribe(() => {
-      this.navbarServ.toolApplied.emit('combinePhrases');
+      this.navbarServ.toolApplied.emit("combinePhrases");
     }));
   }
 }

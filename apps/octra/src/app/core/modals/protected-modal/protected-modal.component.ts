@@ -1,7 +1,7 @@
-import {Component, SecurityContext} from '@angular/core';
-import {OctraModal} from '../types';
-import {DomSanitizer} from '@angular/platform-browser';
-import { NgbActiveModal, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { Component, SecurityContext } from "@angular/core";
+import { OctraModal } from "../types";
+import { DomSanitizer } from "@angular/platform-browser";
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'octra-protected-modal',

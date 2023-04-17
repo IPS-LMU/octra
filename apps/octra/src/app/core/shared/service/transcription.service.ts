@@ -1,18 +1,18 @@
-import {HttpClient} from '@angular/common/http';
-import {EventEmitter, Injectable} from '@angular/core';
-import {escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager} from '@octra/utilities';
-import {AppInfo} from '../../../app.info';
-import {NavbarService} from '../../component/navbar/navbar.service';
-import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
-import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {OLog, OLogging} from '../../obj/Settings/logging';
-import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
-import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
-import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {AppStorageService} from './appstorage.service';
-import {AudioService} from './audio.service';
-import {SettingsService} from './settings.service';
-import {UserInteractionsService} from './userInteractions.service';
+import { HttpClient } from "@angular/common/http";
+import { EventEmitter, Injectable } from "@angular/core";
+import { escapeRegex, getFileSize, hasProperty, insertString, SubscriptionManager } from "@octra/utilities";
+import { AppInfo } from "../../../app.info";
+import { NavbarService } from "../../component/navbar/navbar.service";
+import { FeedBackForm } from "../../obj/FeedbackForm/FeedBackForm";
+import { AppSettings, ProjectSettings } from "../../obj/Settings";
+import { OLog, OLogging } from "../../obj/Settings/logging";
+import { KeyStatisticElem } from "../../obj/statistics/KeyStatisticElem";
+import { MouseStatisticElem } from "../../obj/statistics/MouseStatisticElem";
+import { StatisticElem } from "../../obj/statistics/StatisticElement";
+import { AppStorageService } from "./appstorage.service";
+import { AudioService } from "./audio.service";
+import { SettingsService } from "./settings.service";
+import { UserInteractionsService } from "./userInteractions.service";
 import {
   Annotation,
   AnnotJSONConverter,
@@ -30,13 +30,19 @@ import {
   SegmentChangeEvent,
   Segments,
   TextConverter
-} from '@octra/annotation';
-import {AudioManager} from '@octra/media';
-import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, getModeState, LoginMode} from '../../store';
-import {TranslocoService} from '@ngneat/transloco';
-import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
-import {interval, Subject, Subscription, timer} from 'rxjs';
-import {DateTime} from 'luxon';
+} from "@octra/annotation";
+import { AudioManager } from "@octra/media";
+import {
+  AnnotationStateLevel,
+  convertFromLevelObject,
+  convertToLevelObject,
+  getModeState,
+  LoginMode
+} from "../../store";
+import { TranslocoService } from "@ngneat/transloco";
+import { MaintenanceAPI } from "../../component/maintenance/maintenance-api";
+import { interval, Subject, Subscription, timer } from "rxjs";
+import { DateTime } from "luxon";
 
 declare let validateAnnotation: ((string, any) => any);
 

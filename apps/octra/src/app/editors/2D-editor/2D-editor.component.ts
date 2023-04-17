@@ -8,12 +8,12 @@ import {
   OnInit,
   Output,
   ViewChild
-} from '@angular/core';
-import {TranslocoService} from '@ngneat/transloco';
-import {contains, hasProperty, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
-import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
-import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
-import {TranscrEditorComponent} from '../../core/component';
+} from "@angular/core";
+import { TranslocoService } from "@ngneat/transloco";
+import { contains, hasProperty, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager } from "@octra/utilities";
+import { AuthenticationNeededComponent } from "../../core/alerts/authentication-needed/authentication-needed.component";
+import { ErrorOccurredComponent } from "../../core/alerts/error-occurred/error-occurred.component";
+import { TranscrEditorComponent } from "../../core/component";
 
 
 import {
@@ -24,18 +24,18 @@ import {
   SettingsService,
   TranscriptionService,
   UserInteractionsService
-} from '../../core/shared/service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval} from '../../core/shared/service/asr.service';
-import {OCTRAEditor} from '../octra-editor';
-import {TranscrWindowComponent} from './transcr-window';
-import {AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent} from '@octra/components';
-import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
-import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
-import {ApplicationState} from '../../core/store';
-import {Store} from '@ngrx/store';
-import {interval, Subscription, timer} from 'rxjs';
-import {AudioNavigationComponent} from '../../core/component/audio-navigation';
+} from "../../core/shared/service";
+import { AppStorageService } from "../../core/shared/service/appstorage.service";
+import { ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval } from "../../core/shared/service/asr.service";
+import { OCTRAEditor } from "../octra-editor";
+import { TranscrWindowComponent } from "./transcr-window";
+import { AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent } from "@octra/components";
+import { AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit } from "@octra/media";
+import { ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment } from "@octra/annotation";
+import { ApplicationState } from "../../core/store";
+import { Store } from "@ngrx/store";
+import { interval, Subscription, timer } from "rxjs";
+import { AudioNavigationComponent } from "../../core/component/audio-navigation";
 
 @Component({
   selector: 'octra-overlay-gui',

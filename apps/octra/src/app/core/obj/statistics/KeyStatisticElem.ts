@@ -1,6 +1,6 @@
-import {StatisticElem} from './StatisticElement';
-import {ILog} from '../Settings/logging';
-import {getProperties, hasProperty} from '@octra/utilities';
+import { StatisticElem } from "./StatisticElement";
+import { ILog } from "../Settings/logging";
+import { getProperties, hasProperty } from "@octra/utilities";
 
 /***
  * Statistic Element Class

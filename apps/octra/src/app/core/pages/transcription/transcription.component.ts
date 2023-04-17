@@ -61,7 +61,6 @@ import { IFile, Level, PartiturConverter } from "@octra/annotation";
 import { AudioManager } from "@octra/media";
 import { LoginMode } from "../../store";
 import { ShortcutsModalComponent } from "../../modals/shortcuts-modal/shortcuts-modal.component";
-import { modalConfigurations } from "../../modals/types";
 import { PromptModalComponent } from "../../modals/prompt-modal/prompt-modal.component";
 import { OctraAPIService } from "@octra/ngx-octra-api";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
@@ -334,7 +333,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     }));
 
     this.subscrmanager.add(this.audio.missingPermission.subscribe(() => {
-      this.modService.openModal(MissingPermissionsModalComponent, modalConfigurations.missingPermission);
+      this.modService.openModal(MissingPermissionsModalComponent, MissingPermissionsModalComponent.options);
     }));
   }
 
@@ -359,7 +358,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         this.logout(true);
       }
     } else {
-      this.modService.openModal(TranscriptionStopModalComponent, modalConfigurations.transcriptionStop).then((answer: TranscriptionStopModalAnswer) => {
+      this.modService.openModal(TranscriptionStopModalComponent, TranscriptionStopModalComponent.options).then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.logout(false);
         }
@@ -496,7 +495,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
             if (Date.now() - this.uiService.lastAction > waitTime && !this.modalVisiblities.inactivity) {
               if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
                 this.isInactivityModalVisible = true;
-                this.modService.openModal(InactivityModalComponent, modalConfigurations.inactivity).then((answer) => {
+                this.modService.openModal(InactivityModalComponent, InactivityModalComponent.options).then((answer) => {
                   this.isInactivityModalVisible = false;
                   switch (answer) {
                     case("quit"):
@@ -702,14 +701,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         subscr.unsubscribe();
       });
       */
-      this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
+      this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
         this.modalOverview.close();
       }
 
-      this.modService.openModal(TranscriptionDemoEndModalComponent, modalConfigurations.transcriptionDemoEnd).then((action: ModalEndAnswer) => {
+      this.modService.openModal(TranscriptionDemoEndModalComponent, TranscriptionDemoEndModalComponent.options).then((action: ModalEndAnswer) => {
         this.appStorage.savingNeeded = false;
         this.waitForSend = false;
 
@@ -720,7 +719,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
             this.abortTranscription();
             break;
           case(ModalEndAnswer.CONTINUE):
-            this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, modalConfigurations.transcriptionSending);
+            this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
             this.subscrmanager.add(timer(1000).subscribe(() => {
               // simulate nextTranscription
               this.transcrSendingModal.close();
@@ -952,6 +951,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
   openPromptModal() {
     // TODO mdb: preserve this.transcrServ.audiofile
-    this.modService.openModalRef(PromptModalComponent, modalConfigurations.prompt);
+    this.modService.openModalRef(PromptModalComponent, PromptModalComponent.options);
   }
 }

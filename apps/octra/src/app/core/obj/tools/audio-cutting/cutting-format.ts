@@ -1,5 +1,5 @@
-import {AudioInfo} from '@octra/media';
-import {DateTime} from 'luxon';
+import { AudioInfo } from "@octra/media";
+import { DateTime } from "luxon";
 
 abstract class CuttingFormat {
   public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);

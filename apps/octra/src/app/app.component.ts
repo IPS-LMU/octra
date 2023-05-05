@@ -51,8 +51,7 @@ export class AppComponent implements OnDestroy, OnInit {
     const testfiles = [
       new File(["test"], "test.wav", { type: "audio/wave" }),
       new File(["test"], "test2.wav", { type: "audio/wave" }),
-      new File(["tesasdasdt"], "test3.txt", { type: "audio/wave" }),
-      new File(["tesasdasdt"], "test4.txt", { type: "audio/wave" }),
+      new File(["tesasdasdt"], "test3.txt", { type: "audio/wave" })
     ];
 
     const validator = new FileJSONSetValidator();
@@ -69,7 +68,7 @@ export class AppComponent implements OnDestroy, OnInit {
         },
         {
           name: "transcript file",
-          takeMin: 1,
+          take: 1,
           combination: JSONSetCombination.union,
           constraints: [{
             extension: [".txt"]

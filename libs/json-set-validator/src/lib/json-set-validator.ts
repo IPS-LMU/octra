@@ -208,7 +208,7 @@ export class FileJSONSetValidator extends JSONSetValidator {
       if (takeIndex === undefined) {
         const lengths = validations.map((a, i) => ({
           index: i,
-          hasFileName: a.validationResults.find(b => b.errors.length === 0 && b.filename === filename && !a.isTaken) !== undefined,
+          hasFileName: a.validationResults.find(b => b.errors.length === 0 && b.filename === filename && !b.isTaken) !== undefined,
           length: a.validationResults.map(a => a.errors.length === 0 && !a.isTaken).length
         })).filter((a, i) => a.hasFileName && takesTable[i] > 0);
 
@@ -238,6 +238,15 @@ export class FileJSONSetValidator extends JSONSetValidator {
           }))
         }));
         takesTable[takeIndex]--;
+      } else {
+        // TODO check this
+        validations = validations.map(a => ({
+          ...a,
+          validationResults: a.validationResults.map(b => ({
+            ...b,
+            isTaken: b.filename === filename ? true : b.isTaken
+          }))
+        }));
       }
 
       quantity = this.calculateQuantityTable(validations);
@@ -275,43 +284,6 @@ export class FileJSONSetValidator extends JSONSetValidator {
         takeFileFromSet(lowestQuantity.filename);
       }
     }
-
-    /*
-    if (quantity.filter(a => a.score > 0)) {
-      const remainingFiles = quantity.filter(a => a.score > 0).map(a => a.filename);
-      for (const remainingFile of remainingFiles) {
-        const remainingValidations = validations.filter(a => a.validationResults.find(b => b.filename === remainingFile && !b.isTaken && b.errors.length === 0));
-        if (remainingValidations.length > 0) {
-          for (let i = 0; i < remainingValidations.length; i++) {
-            const remainingValidation = remainingValidations[i];
-            const statement = remainingValidation.statement;
-            if (statement.take) {
-              results.push({
-                filename: remainingFile,
-                path: statement.name,
-                constraint: "take",
-                message: `Only ${statement.take} files may meet the constraints.`
-              });
-            } else if (statement.takeMin) {
-              // success
-              remainingValidations[i].validationResults = remainingValidation.validationResults.map(a => ({
-                ...a,
-                isTaken: true
-              }));
-            } else if (statement.takeMax) {
-              results.push({
-                filename: remainingFile,
-                path: statement.name,
-                constraint: "take",
-                message: `Only max ${statement.takeMax} files may meet the constraints.`
-              });
-            }
-          }
-        }
-      }
-    }
-     */
-
 
     // there are remaining takes. check type of takes
     for (let i = 0; i < takesTable.length; i++) {

@@ -38,9 +38,9 @@ export abstract class OCTRAEditor {
           ? audioManager.createSampleUnit(cursorTime.samples - halfRate)
           : audioManager.createSampleUnit(0);
 
-        const end = (cursorTime.samples < audioManager.ressource.info.duration.samples - halfRate)
+        const end = (cursorTime.samples < audioManager.resource.info.duration.samples - halfRate)
           ? audioManager.createSampleUnit(cursorTime.samples + halfRate)
-          : audioManager.ressource.info.duration.clone();
+          : audioManager.resource.info.duration.clone();
 
         loupe.av.zoomY = factor;
         if (start && end) {

@@ -328,7 +328,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     // only top signal display
     const caretpos = this.editor.caretpos;
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audioManager.playposition, caretpos, {
+      event.timestamp, this.audioManager.playPosition, caretpos, {
         start: this.signalDisplayTop.av.drawnSelection.start.samples,
         length: this.signalDisplayTop.av.drawnSelection.duration.samples
       }, undefined, 'audio_buttons');
@@ -411,7 +411,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       const start = ($event.index > 0) ? this.transcrService.currentlevel.segments.get($event.index - 1).time.samples : 0;
       this.uiService.addElementFromEvent('segment', {
         value: 'entered'
-      }, Date.now(), this.audioManager.playposition, -1, undefined, {
+      }, Date.now(), this.audioManager.playPosition, -1, undefined, {
         start,
         length: this.transcrService.currentlevel.segments.get($event.index).time.samples - start
       }, LinearEditorComponent.editorname);
@@ -555,7 +555,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
             length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
               ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
               - annoSegment.time.samples
-              : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples
+              : this.audioManager.resource.info.duration.samples - annoSegment.time.samples
           };
         }
 
@@ -609,10 +609,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
           - annoSegment.time.samples
-          : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples;
+          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(), this.audioManager.playposition,
+      this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(), this.audioManager.playPosition,
         this.editor.caretpos, undefined, segment, 'texteditor_markers');
     }
   }
@@ -631,10 +631,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
           - annoSegment.time.samples
-          : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples;
+          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(), this.audioManager.playposition,
+      this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(), this.audioManager.playPosition,
         this.editor.caretpos, undefined, segment, 'texteditor_toolbar');
     }
   }
@@ -674,10 +674,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
           - annoSegment.time.samples
-          : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples;
+          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
+      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playPosition,
         this.editor.caretpos, undefined, segment, 'audio_speed');
     }
   }
@@ -695,11 +695,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
             ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
             - annoSegment.time.samples
-            : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples
+            : this.audioManager.resource.info.duration.samples - annoSegment.time.samples
         };
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
+      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playPosition,
         this.editor.caretpos, undefined, segment, 'audio_volume');
     }
   }

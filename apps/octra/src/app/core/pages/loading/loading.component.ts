@@ -75,7 +75,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     };
 
                     // convert par to annotJSON
-                    const audioRessource = this.audio.audiomanagers[0].ressource;
+                    const audioRessource = this.audio.audiomanagers[0].resource;
                     const oAudioFile = new OAudiofile();
                     oAudioFile.arraybuffer = audioRessource.arraybuffer;
                     oAudioFile.duration = audioRessource.info.duration.samples;
@@ -147,7 +147,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
               }
             }).then(() => {
               this.state = "Audio loaded";
-              const audioRessource = this.audio.audiomanagers[0].ressource;
+              const audioRessource = this.audio.audiomanagers[0].resource;
               console.log(`dispatch`);
               this.store.dispatch(AnnotationActions.setAudioLoaded({
                 mode: this.appStorage.useMode,

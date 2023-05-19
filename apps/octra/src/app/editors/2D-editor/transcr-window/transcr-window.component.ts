@@ -87,7 +87,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   get ressource(): AudioRessource {
-    return this.audiochunk.audioManager.ressource;
+    return this.audiochunk.audioManager.resource;
   }
 
   public get hasSegmentBoundaries() {
@@ -513,7 +513,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
 
       this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-        event.timestamp, this.audioManager.playposition,
+        event.timestamp, this.audioManager.playPosition,
         this.editor.caretpos, selection, segment, 'audio_buttons');
     }
 
@@ -567,7 +567,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
           const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
           this.uiService.addElementFromEvent('segment', {value: valueString},
-            Date.now(), this.audioManager.playposition,
+            Date.now(), this.audioManager.playPosition,
             this.editor.caretpos, undefined, {
               start,
               length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
@@ -629,7 +629,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'loupe');
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'loupe');
   }
 
   onMarkerInsert(markerCode
@@ -664,7 +664,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'markers');
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'markers');
   }
 
   onMarkerClick(markerCode: string
@@ -697,7 +697,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
   }
 
   onSpeedChange(event: {
@@ -747,7 +747,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'audio_speed');
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'audio_speed');
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -784,7 +784,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'audio_volume');
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'audio_volume');
   }
 
   onBoundaryClicked(sample: SampleUnit) {
@@ -803,7 +803,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   afterTyping(status) {

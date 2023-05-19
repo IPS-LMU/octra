@@ -871,7 +871,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         console.log(`should be: ${segment.time.seconds - startSampleUnit.seconds}`);
         console.log(`start from ${startSampleUnit.seconds} with duration ${playDuration.duration.seconds}`);
 
-        this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createSampleUnit(startSample);
+        this.audio.audiomanagers[0].playPosition = this.audio.audiomanagers[0].createSampleUnit(startSample);
         this.audio.audiomanagers[0].startPlayback(playDuration, 1, 1).then(() => {
           this.playStateSegments[segmentNumber].state = "stopped";
           this.playStateSegments[segmentNumber].icon = "play";
@@ -935,7 +935,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    const playpos = this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createSampleUnit(0);
+    const playpos = this.audio.audiomanagers[0].playPosition = this.audio.audiomanagers[0].createSampleUnit(0);
 
     if (this.playAllState.icon === "stop") {
       // start
@@ -980,7 +980,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
         this.uiService.addElementFromEvent("mouseclick", {
           value: "play_segment"
-        }, Date.now(), this.audio.audiomanagers[0].playposition, undefined, undefined, {
+        }, Date.now(), this.audio.audiomanagers[0].playPosition, undefined, undefined, {
           start: startSample,
           length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
         }, "overview");
@@ -998,7 +998,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
       this.uiService.addElementFromEvent("mouseclick", {
         value: "stop_segment"
-      }, Date.now(), this.audio.audiomanagers[0].playposition, undefined, undefined, {
+      }, Date.now(), this.audio.audiomanagers[0].playPosition, undefined, undefined, {
         start: startSample,
         length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
       }, "overview");
@@ -1082,7 +1082,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent("shortcut", shortcutObj, Date.now(),
-        this.audioManager.playposition, caretPos, undefined, undefined, "texteditor");
+        this.audioManager.playPosition, caretPos, undefined, undefined, "texteditor");
     };
 
     const shortcutName = $event.shortcutName;

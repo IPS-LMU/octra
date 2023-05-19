@@ -158,7 +158,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
         id: level.id,
         name: level.name,
         type: level.type,
-        items: level.segments.getObj(level.name, this.transcrServ.audioManager.ressource.info.duration.samples)
+        items: level.segments.getObj(level.name, this.transcrServ.audioManager.resource.info.duration.samples)
       }).catch((error) => {
         console.error(error);
       });
@@ -189,10 +189,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
     }
 
     const newlevel = new Level(-1, levelname, "SEGMENT",
-      new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, levelname, [],
-        this.transcrServ.audioManager.ressource.info.duration));
+      new Segments(this.transcrServ.audioManager.resource.info.sampleRate, levelname, [],
+        this.transcrServ.audioManager.resource.info.duration));
     this.appStorage.addAnnotationLevel(new OIDBLevel(-1,
-      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration.clone()),
+      newlevel.getObj(this.transcrServ.audioManager.resource.info.duration.clone()),
       this.transcrServ.annotation.levels.length
     )).catch((error) => {
       console.error(error);
@@ -218,7 +218,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   onLevelDuplicateClick(tiernum: number, id: number) {
     const newlevel = this.transcrServ.annotation.levels[
-      tiernum].getObj(this.transcrServ.audioManager.ressource.info.duration.clone()
+      tiernum].getObj(this.transcrServ.audioManager.resource.info.duration.clone()
     );
     this.appStorage.addAnnotationLevel(new OIDBLevel(-1, newlevel, this.transcrServ.annotation.levels.length))
       .catch((error) => {

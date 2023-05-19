@@ -162,20 +162,20 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audioManager.playposition,
+      event.timestamp, this.audioManager.playPosition,
       this.editor.caretpos, undefined, undefined, 'audio_buttons');
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioSpeed = event.new_value;
-    this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
+    this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playPosition,
       this.editor.caretpos, undefined, undefined, 'audio_speed');
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioVolume = event.new_value;
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'audio_volume');
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -202,7 +202,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     const triggerUIAction = (shortcutObj) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent('shortcut', shortcutObj, $event.timestamp,
-        this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
+        this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor');
     };
 
     if (this.shortcutsEnabled) {
@@ -275,19 +275,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   onMarkerInsert(markerCode: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor');
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor');
   }
 
   onMarkerClick(markerCode: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, undefined, undefined, 'texteditor_toolbar');
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor_toolbar');
   }
 
   saveTranscript() {
@@ -329,12 +329,12 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     const segments: Segment[] = [];
     for (let i = 0; i < segTexts.length; i++) {
       const time = (i < samplesArray.length) ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
-        : this.audioManager.ressource.info.duration;
+        : this.audioManager.resource.info.duration;
 
       const segment = new Segment(time, '', segTexts[i]);
       segments.push(segment);
     }
-    this.transcrService.currentlevel.segments.overwriteAllWith(segments, this.audioManager.ressource.info.duration);
+    this.transcrService.currentlevel.segments.overwriteAllWith(segments, this.audioManager.resource.info.duration);
   }
 
   public update() {

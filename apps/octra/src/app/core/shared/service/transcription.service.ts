@@ -247,7 +247,7 @@ export class TranscriptionService {
 
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
-        level: convertFromLevelObject(level, this._audiomanager.ressource.info.duration)
+        level: convertFromLevelObject(level, this._audiomanager.resource.info.duration)
       });
     } else {
       console.error(new Error('can not save segments because annotation is undefined'));
@@ -322,20 +322,20 @@ export class TranscriptionService {
       if (this.audio.audiomanagers.length > 0) {
         this._audiomanager = this.audio.audiomanagers[0];
 
-        this.filename = this._audiomanager.ressource.name;
+        this.filename = this._audiomanager.resource.name;
 
         this._audiofile = new OAudiofile();
-        this._audiofile.name = this._audiomanager.ressource.info.fullname;
-        this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
-        this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
-        this._audiofile.size = this._audiomanager.ressource.info.size;
+        this._audiofile.name = this._audiomanager.resource.info.fullname;
+        this._audiofile.sampleRate = this._audiomanager.resource.info.sampleRate;
+        this._audiofile.duration = this._audiomanager.resource.info.duration.samples;
+        this._audiofile.size = this._audiomanager.resource.info.size;
         /* TODO api
         this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
           ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';*/
 
         this._audiofile.url = (this.appStorage.useMode === LoginMode.DEMO)
           ? `${this.appStorage.audioURL}` : this._audiofile.url;
-        this._audiofile.type = this._audiomanager.ressource.info.type;
+        this._audiofile.type = this._audiomanager.resource.info.type;
 
         // overwrite logging option using projectconfig
         if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
@@ -346,8 +346,8 @@ export class TranscriptionService {
         this.loadSegments().then(
           () => {
             this.selectedlevel = 0;
-            this.navbarServ.ressource = this._audiomanager.ressource;
-            this.navbarServ.filesize = getFileSize(this._audiomanager.ressource.size);
+            this.navbarServ.ressource = this._audiomanager.resource;
+            this.navbarServ.filesize = getFileSize(this._audiomanager.resource.size);
 
             this.subscrmanager.removeByTag('idbAnnotationChange');
             this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
@@ -370,7 +370,7 @@ export class TranscriptionService {
 
     if (!(this.annotation === undefined)) {
       result = converter.export(
-        this.annotation.getObj(this.audioManager.ressource.info.duration),
+        this.annotation.getObj(this.audioManager.resource.info.duration),
         this.audiofile, 0
       ).file;
 
@@ -411,18 +411,18 @@ export class TranscriptionService {
                 try {
                   const transcript = JSON.stringify(this.appStorage.serverDataEntry.transcript);
                   annotResult = (new AnnotJSONConverter()).import({
-                    name: `${this._audiomanager.ressource.info.name}_annot.json`,
+                    name: `${this._audiomanager.resource.info.name}_annot.json`,
                     content: transcript,
                     type: 'text/plain', encoding: 'utf-8'
                   }, {
-                    name: this._audiomanager.ressource.info.fullname,
+                    name: this._audiomanager.resource.info.fullname,
                     // need type attribute
-                    arraybuffer: this._audiomanager.ressource.arraybuffer,
-                    size: this._audiomanager.ressource.info.size,
-                    duration: this._audiomanager.ressource.info.duration.samples,
-                    sampleRate: this._audiomanager.ressource.info.sampleRate,
+                    arraybuffer: this._audiomanager.resource.arraybuffer,
+                    size: this._audiomanager.resource.info.size,
+                    duration: this._audiomanager.resource.info.duration.samples,
+                    sampleRate: this._audiomanager.resource.info.sampleRate,
                     url: this.appStorage.audioURL,
-                    type: this._audiomanager.ressource.info.type
+                    type: this._audiomanager.resource.info.type
                   });
                 } catch (e) {
                   console.error(`Invalid annotJSON.`);
@@ -502,7 +502,7 @@ export class TranscriptionService {
             resolve2();
           }
         }).then(() => {
-          const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
+          const annotates = this._audiomanager.resource.name + this._audiomanager.resource.extension;
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (this.appStorage.annotationLevels !== undefined) {
@@ -542,7 +542,7 @@ export class TranscriptionService {
 
     for (const annotationStateLevel of levels) {
       const level = convertToLevelObject(annotationStateLevel,
-        this.audioManager.sampleRate, this.audioManager.ressource.info.duration.clone());
+        this.audioManager.sampleRate, this.audioManager.resource.info.duration.clone());
       annotation.levels.push(level);
     }
 
@@ -609,7 +609,7 @@ export class TranscriptionService {
         };
 
         if (i === this.currentlevel.segments.length - 1) {
-          segmentJSON.length = this._audiomanager.ressource.info.duration.samples - lastBound;
+          segmentJSON.length = this._audiomanager.resource.info.duration.samples - lastBound;
         }
 
         transcript.push(segmentJSON);
@@ -935,11 +935,11 @@ export class TranscriptionService {
 
   public createNewAnnotation(): OAnnotJSON {
     const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('OCTRA_1', ''))]));
+    level.items.push(new OSegment(1, 0, this._audiomanager.resource.info.duration.samples, [(new OLabel('OCTRA_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 
-    return new OAnnotJSON(this.filename, this._audiomanager.ressource.info.sampleRate, levels);
+    return new OAnnotJSON(this.filename, this._audiomanager.resource.info.sampleRate, levels);
   }
 
   public validateAll() {

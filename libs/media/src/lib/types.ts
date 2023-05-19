@@ -1,3 +1,4 @@
+// type of audio source
 export const enum SourceType {
   URL,
   FILE,

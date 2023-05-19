@@ -94,7 +94,7 @@
 
       <!-- cut audio files -->
       <tr *ngIf="navbarServ.transcrService !== undefined
-                     && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'">
+                     && navbarServ.transcrService.audioManager.resource.info.extension === '.wav'">
         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
           <fa-icon [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"
                    style="color:gray;"></fa-icon>
@@ -114,7 +114,7 @@
         </td>
       </tr>
       <ng-container
-        *ngIf="navbarServ.transcrService !== undefined && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'">
+        *ngIf="navbarServ.transcrService !== undefined && navbarServ.transcrService.audioManager.resource.info.extension === '.wav'">
         <tr *ngIf="tools.audioCutting.opened"
             [@fadeInExpandOnEnter]
             [@fadeOutCollapseOnLeave]>
@@ -137,7 +137,7 @@
               </a>
               <div [hidden]="!tools.audioCutting.showConfigurator" class="configurator">
                 <octra-naming-drag-and-drop #namingConvention
-                                            [fileName]="navbarServ.transcrService.audioManager.ressource.name"
+                                            [fileName]="navbarServ.transcrService.audioManager.resource.name"
                                             [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
                 ></octra-naming-drag-and-drop>
 

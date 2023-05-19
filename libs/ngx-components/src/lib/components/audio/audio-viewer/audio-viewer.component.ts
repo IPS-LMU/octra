@@ -1152,8 +1152,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               y = lineNum2 * (this.settings.lineheight + this.settings.margin.top);
 
               // draw boundary
-              if (segment.time.samples !== this.audioManager.ressource.info.duration.samples
-                && segment.time.samples <= this.audioManager.ressource.info.duration.samples
+              if (segment.time.samples !== this.audioManager.resource.info.duration.samples
+                && segment.time.samples <= this.audioManager.resource.info.duration.samples
               ) {
                 let relX = 0;
                 if (this.settings.multiLine) {

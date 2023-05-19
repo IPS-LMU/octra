@@ -254,7 +254,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
           // make sure that events from playonhover are not logged
           const currentEditorName = this.appStorage.interface;
-          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playposition, caretpos, undefined, undefined);
+          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playPosition, caretpos, undefined, undefined);
         }
       },
       (error) => {
@@ -273,17 +273,17 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
               this.sendTranscriptionForShortAudioFiles("bad");
               this.uiService.addElementFromEvent("shortcut", {
                 value: "send_transcription:1"
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
             } else if (event.shortcut === "SHIFT + ALT + 2") {
               this.sendTranscriptionForShortAudioFiles("middle");
               this.uiService.addElementFromEvent("shortcut", {
                 value: "send_transcription:2"
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
             } else if (event.shortcut === "SHIFT + ALT + 3") {
               this.sendTranscriptionForShortAudioFiles("good");
               this.uiService.addElementFromEvent("shortcut", {
                 value: "send_transcription:3"
-              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, this.interface);
+              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
             }
           }).catch((error) => {
             console.error(error);
@@ -820,7 +820,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.ressource.info.duration);
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.resource.info.duration);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace("-" + oannotjson.levels[0].name, "");
 

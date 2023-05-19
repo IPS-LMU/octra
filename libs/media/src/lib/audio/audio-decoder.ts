@@ -6,7 +6,14 @@ import {Subject, timer} from 'rxjs';
 
 declare let window: unknown;
 
+/***
+ * The AudioDecoder is used as a replacement for the Web Audio API decoding and makes use of web workers.
+ */
 export class AudioDecoder {
+
+  /**
+   * triggers as soon as new channel data was read. Last event has progress 1.
+   */
   public onChannelDataCalculate: Subject<{
     progress: number,
     result?: Float32Array
@@ -14,21 +21,29 @@ export class AudioDecoder {
     progress: number,
     result?: Float32Array
   }>();
+
+  // timestamp when decoding was started
   public started = 0;
+  // info about the audio file
   private audioInfo: AudioInfo;
+  // the selected audio format
   private readonly format: AudioFormat;
+
   private channelData?: Float32Array;
   private channelDataOffset = 0;
   private audioContext: AudioContext;
+
+  // workers used for decoding
   private tsWorkers: TsWorker[];
   private nextWorker = 0;
   private parallelJobs = 2;
+
   private joblist: {
     jobId: number,
     start: number,
     duration: number
   }[] = [];
-  private subscrmanager = new SubscriptionManager();
+  private subscriptionManager = new SubscriptionManager();
 
   private stopDecoding = false;
   private uint8Array?: Uint8Array;
@@ -50,7 +65,7 @@ export class AudioDecoder {
   }
 
   constructor(format: AudioFormat, audioInfo: AudioInfo, arrayBuffer: ArrayBuffer) {
-    if (!(format === undefined || format === undefined)) {
+    if (!(format === undefined || format === null)) {
       this.format = format;
       this.audioInfo = audioInfo;
       this.uint8Array = new Uint8Array(arrayBuffer);
@@ -70,7 +85,7 @@ export class AudioDecoder {
               this.writtenChannel += j.duration;
               this.joblist.splice(jobItem, 1);
 
-              if (this.channelData === undefined || this.channelData === undefined) {
+              if (this.channelData === undefined || this.channelData === null) {
                 this.channelData = new Float32Array(Math.round(this.audioInfo.duration.samples / this.channelDataFactor));
               }
 
@@ -139,7 +154,7 @@ export class AudioDecoder {
 
           if (sampleStart.samples + sampleDur.samples < this.audioInfo.duration.samples) {
             if (!this.stopDecoding) {
-              this.subscrmanager.add(timer(10).subscribe(() => {
+              this.subscriptionManager.add(timer(10).subscribe(() => {
                 let sampleDur2 = Math.min(sampleDur.samples,
                   this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples);
 
@@ -168,7 +183,7 @@ export class AudioDecoder {
   }
 
   public destroy() {
-    this.subscrmanager.destroy();
+    this.subscriptionManager.destroy();
     this.uint8Array = undefined;
     for (let i = 0; i < this.parallelJobs; i++) {
       this.tsWorkers[i].destroy();

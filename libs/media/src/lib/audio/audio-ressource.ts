@@ -1,8 +1,8 @@
 import {AudioInfo} from './audio-info';
-import {MediaRessource} from '../media-ressource';
+import {MediaResource} from '../media-resource';
 import {SourceType} from '../types';
 
-export class AudioRessource extends MediaRessource {
+export class AudioRessource extends MediaResource {
   private _info: AudioInfo;
 
   get info(): AudioInfo {

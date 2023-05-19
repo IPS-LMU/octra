@@ -88,7 +88,7 @@ export class AudioService {
     if (manager !== undefined) {
       console.log(`register new audio manager`);
       const found = this._audiomanagers.find((a: AudioManager) => {
-        return a.ressource.name === manager.ressource.name;
+        return a.resource.name === manager.resource.name;
       });
 
       if (found === undefined) {

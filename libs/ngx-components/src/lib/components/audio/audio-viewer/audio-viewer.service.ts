@@ -268,7 +268,7 @@ export class AudioViewerService {
   public initializeSettings() {
     if (this.audioPxW !== undefined && this.audioManager !== undefined && this._innerWidth !== undefined) {
       if (this._settings.multiLine) {
-        this.audioPxW = this.audioManager.ressource.info.duration.seconds * this._settings.pixelPerSec;
+        this.audioPxW = this.audioManager.resource.info.duration.seconds * this._settings.pixelPerSec;
         this.audioPxW = (this.audioPxW < this._innerWidth) ? this._innerWidth : this.AudioPxWidth;
       } else {
         this.audioPxW = this._innerWidth;
@@ -463,7 +463,7 @@ export class AudioViewerService {
             // check segment boundary before this segment
             if (absXSeconds < segmentBefore.time.seconds + 0.02) {
               absXTime = this.audioManager.createSampleUnit(
-                segmentBefore.time.samples + Math.round((0.02) * this.audioManager.ressource.info.sampleRate)
+                segmentBefore.time.samples + Math.round((0.02) * this.audioManager.resource.info.sampleRate)
               );
             }
           }
@@ -471,7 +471,7 @@ export class AudioViewerService {
             // check segment boundary after this segment
             if (segmentAfter?.time !== undefined && absXSeconds > segmentAfter.time.seconds - 0.02) {
               absXTime = this.audioManager.createSampleUnit(
-                segmentAfter.time.samples - Math.round((0.02) * this.audioManager.ressource.info.sampleRate)
+                segmentAfter.time.samples - Math.round((0.02) * this.audioManager.resource.info.sampleRate)
               );
             }
           }
@@ -507,7 +507,7 @@ export class AudioViewerService {
           const segment = this._currentTranscriptionLevel.segments.get(i);
           if (segment?.time !== undefined && this.audioManager !== undefined && (segment.time.samples >= absXTime - bWidthTime
               && segment.time.samples <= absXTime + bWidthTime)
-            && segment.time.samples !== this.audioManager.ressource.info.duration.samples
+            && segment.time.samples !== this.audioManager.resource.info.duration.samples
           ) {
 
             const segSamples = segment.time.samples;
@@ -615,7 +615,7 @@ export class AudioViewerService {
           } else if (positionSamples > lastSegment.time.samples) {
             // select in first Boundary
             const seg = lastSegment.time.clone();
-            result = new AudioSelection(seg, this.audioManager.ressource.info.duration);
+            result = new AudioSelection(seg, this.audioManager.resource.info.duration);
           } else {
             for (let i = 1; i < length; i++) {
               const currentSegment = segments.get(i);

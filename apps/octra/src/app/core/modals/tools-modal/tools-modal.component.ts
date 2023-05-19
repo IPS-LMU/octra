@@ -163,9 +163,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
       let sampleDur = segment.time.samples - startSample;
 
-      if (startSample + sampleDur > this.audio.audiomanagers[0].ressource.info.duration.samples) {
+      if (startSample + sampleDur > this.audio.audiomanagers[0].resource.info.duration.samples) {
         console.error(`invalid sampleDur!!`);
-        sampleDur = this.audio.audiomanagers[0].ressource.info.duration.samples - startSample;
+        sampleDur = this.audio.audiomanagers[0].resource.info.duration.samples - startSample;
       }
 
       cutList.push({
@@ -193,7 +193,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     // TODO arraybuffer is c
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
-      this.transcrService.audioManager.ressource.info.fullname, this.transcrService.audioManager.ressource.arraybuffer
+      this.transcrService.audioManager.resource.info.fullname, this.transcrService.audioManager.resource.arraybuffer
     );
 
     let totalSize = 0;
@@ -212,12 +212,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           const now = Date.now();
           this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.intArray.length;
 
-          const rest = (this.transcrService.audioManager.ressource.arraybuffer.byteLength - totalSize);
+          const rest = (this.transcrService.audioManager.resource.arraybuffer.byteLength - totalSize);
           this.tools.audioCutting.cuttingTimeLeft = this.tools.audioCutting.cuttingSpeed * rest;
 
           const zippingSpeed = this.tools.audioCutting.zippingSpeed;
           this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
-            + (this.transcrService.audioManager.ressource.arraybuffer.byteLength * zippingSpeed) + 10) * 1000);
+            + (this.transcrService.audioManager.resource.arraybuffer.byteLength * zippingSpeed) + 10) * 1000);
 
           this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(interval(1000).subscribe(
             () => {
@@ -235,12 +235,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
             // add TextTable
             const converter = new TextTableConverter();
             const content = converter.exportList(
-              cutList, this.transcrService.audioManager.ressource.info,
-              this.transcrService.audioManager.ressource.info.fullname,
+              cutList, this.transcrService.audioManager.resource.info,
+              this.transcrService.audioManager.resource.info.fullname,
               this.namingConvention.namingConvention
             );
 
-            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + "_meta.txt"] = strToU8(content);
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.resource.info.name + "_meta.txt"] = strToU8(content);
             finished++;
           }
 
@@ -248,12 +248,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
             // add JSON
             const converter = new JSONConverter();
             const content = converter.exportList(
-              cutList, this.transcrService.audioManager.ressource.info,
-              this.transcrService.audioManager.ressource.info.fullname,
+              cutList, this.transcrService.audioManager.resource.info,
+              this.transcrService.audioManager.resource.info.fullname,
               this.namingConvention.namingConvention
             );
 
-            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.ressource.info.name + "_meta.json"] = strToU8(JSON.stringify(content, undefined, 2));
+            this.tools.audioCutting.archiveStructure[this.transcrService.audioManager.resource.info.name + "_meta.json"] = strToU8(JSON.stringify(content, undefined, 2));
             finished++;
           }
 
@@ -296,8 +296,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
               try {
 
-                this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new File([data], this.transcrService.audioManager.ressource.info.name + ".zip")));
-                this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + ".zip";
+                this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new File([data], this.transcrService.audioManager.resource.info.name + ".zip")));
+                this.tools.audioCutting.result.filename = this.transcrService.audioManager.resource.info.name + ".zip";
 
               } catch (e) {
                 this.modalsService.openModal(ErrorModalComponent, ErrorModalComponent.options, {
@@ -352,7 +352,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
       cuttingStarted = Date.now();
       this.tools.audioCutting.wavFormat.cutAudioFileSequentially(this.namingConvention.namingConvention,
-        this.transcrService.audioManager.ressource.arraybuffer, cutList);
+        this.transcrService.audioManager.resource.arraybuffer, cutList);
     }).catch((err) => {
       console.error(err);
     });

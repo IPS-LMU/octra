@@ -118,7 +118,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   public override close() {
     this.uiService.addElementFromEvent("export", {
       value: "closed"
-    }, Date.now(), this.audio.audiomanagers[0].playposition, -1, undefined, undefined, "modals");
+    }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, "modals");
 
     return super.close();
   }
@@ -173,7 +173,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
         console.error(`annotation is undefined!`);
         return;
       }
-      const oannotjson = this.transcriptionService.annotation.getObj(this.transcriptionService.audioManager.ressource.info.duration);
+      const oannotjson = this.transcriptionService.annotation.getObj(this.transcriptionService.audioManager.resource.info.duration);
       this.preparing = {
         name: converter.name,
         preparing: true
@@ -182,7 +182,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
         () => {
           if (converter.name === "Bundle") {
             // only this converter needs an array buffer
-            this.transcriptionService.audiofile.arraybuffer = this.transcriptionService.audioManager.ressource.arraybuffer;
+            this.transcriptionService.audiofile.arraybuffer = this.transcriptionService.audioManager.resource.arraybuffer;
           }
 
           const result: IFile = converter.export(oannotjson, this.transcriptionService.audiofile, levelnum).file;

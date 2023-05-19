@@ -1,5 +1,5 @@
 /**
- * class initialized with samples which can output other units like seconds, miliseconds
+ * class initialized with samples which can output other units like seconds, milliseconds
  */
 
 export interface SampleTimeValues {

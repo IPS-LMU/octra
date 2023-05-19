@@ -19,7 +19,7 @@ This sections shows an overview of all custom libraries used by OCTRA. All Angul
 
 # Installation
 
-Currently the libraries are not published to npm because Octra 2.0 and the libraries are still in development. If you
+Currently, the libraries are not published to npm because Octra 2.0 and the libraries are still in development. If you
 want to use the libraries in your project you have to manually install these.
 
 1. Clone the OCTRA repository next to the project folder you want to use the libraries for.

@@ -219,7 +219,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.justifySignalHeight = true;
     this.viewer.settings.scrollbar.enabled = true;
     this.viewer.settings.roundValues = false;
-    this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audioManager.ressource.info.sampleRate);
+    this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audioManager.resource.info.sampleRate);
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
     this.viewer.settings.asr.enabled = this.settingsService.isASREnabled;
@@ -367,12 +367,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       const converter = new PraatTextgridConverter();
 
                       const audiofile = new OAudiofile();
-                      const audioInfo = this.audioManager.ressource.info;
+                      const audioInfo = this.audioManager.resource.info;
                       audiofile.duration = audioInfo.duration.samples;
                       audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
                       audiofile.sampleRate = this.audioManager.sampleRate;
-                      audiofile.size = this.audioManager.ressource.info.size;
-                      audiofile.type = this.audioManager.ressource.info.type;
+                      audiofile.size = this.audioManager.resource.info.size;
+                      audiofile.type = this.audioManager.resource.info.type;
 
                       const convertedResult = converter.import({
                         name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
@@ -522,7 +522,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           this.uiService.addElementFromEvent('segment', {
             value: 'entered'
-          }, Date.now(), this.audioManager.playposition, -1, undefined, {
+          }, Date.now(), this.audioManager.playPosition, -1, undefined, {
             start: start.samples,
             length: this.transcrService.currentlevel.segments.get(selected.index).time.samples - start.samples
           }, TwoDEditorComponent.editorname);
@@ -741,7 +741,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               : 0;
 
             this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
-              this.audioManager.playposition, -1, undefined, {
+              this.audioManager.playPosition, -1, undefined, {
                 start: sampleStart,
                 length: segment.time.samples - sampleStart
               }, 'multi-lines-viewer');
@@ -813,7 +813,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
 
       const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
-      let playPosition = this.audioManager.playposition;
+      let playPosition = this.audioManager.playPosition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
           playPosition = this.viewer.av.MouseClickPos;
@@ -834,7 +834,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, undefined, undefined, 'audio_speed');
+        this.audioManager.playPosition, caretpos, undefined, undefined, 'audio_speed');
     }
   }
 
@@ -844,7 +844,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === undefined || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, undefined, undefined, 'audio_volume');
+        this.audioManager.playPosition, caretpos, undefined, undefined, 'audio_volume');
     }
   }
 
@@ -860,7 +860,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
         event.timestamp,
-        this.audioManager.playposition, caretpos, selection, undefined, 'audio_buttons');
+        this.audioManager.playPosition, caretpos, selection, undefined, 'audio_buttons');
     }
   }
 

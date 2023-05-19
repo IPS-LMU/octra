@@ -9,7 +9,8 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@octra/utilities": ["dist/libs/utilities"]
+      "@octra/utilities": ["dist/libs/utilities"],
+      "@octra/media": ["dist/libs/media"]
     }
   },
   "files": [],

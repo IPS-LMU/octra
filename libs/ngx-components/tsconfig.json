@@ -17,7 +17,12 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@octra/utilities": ["dist/libs/utilities"],
+      "@octra/annotation": ["dist/libs/annotation"],
+      "@octra/media": ["dist/libs/media"],
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

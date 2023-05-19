@@ -15,16 +15,17 @@ import * as fromApplication from "./core/store/application";
 import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
 import { OctraAPIService } from "@octra/ngx-octra-api";
+import { FileJSONSetValidator, JSONSetCombination } from "@octra/json-set-validator";
 
 @Component({
-  selector: 'octra-app',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  selector: "octra-app",
+  templateUrl: "app.component.html",
+  styleUrls: ["app.component.scss"]
 })
 
 export class AppComponent implements OnDestroy, OnInit {
 
-  @ViewChild('navigation', {static: true}) navigation: NavigationComponent | undefined;
+  @ViewChild("navigation", { static: true }) navigation: NavigationComponent | undefined;
   private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get version(): string {
@@ -47,6 +48,36 @@ export class AppComponent implements OnDestroy, OnInit {
               private store: Store,
               private octraAPI: OctraAPIService) {
 
+    const testfiles = [
+      new File(["test"], "test.wav", { type: "audio/wave" }),
+      new File(["test"], "test2.wav", { type: "audio/wave" }),
+      new File(["tesasdasdt"], "test3.txt", { type: "audio/wave" })
+    ];
+
+    const validator = new FileJSONSetValidator();
+    const results = validator.validate(testfiles, {
+      name: "test",
+      statements: [
+        {
+          name: "audio file",
+          take: 1,
+          combination: JSONSetCombination.union,
+          constraints: [{
+            extension: [".wav"]
+          }]
+        },
+        {
+          name: "transcript file",
+          take: 1,
+          combination: JSONSetCombination.union,
+          constraints: [{
+            extension: [".txt"]
+          }]
+        }
+      ]
+    });
+    console.log(results);
+
     this.router.events.subscribe((event: any) => {
         if (event.url) {
           console.log(`route to page: ${event?.url}`);
@@ -62,7 +93,7 @@ export class AppComponent implements OnDestroy, OnInit {
       const serv = this.bugService;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.log = function (message) {
+        console.log = function(message) {
           serv.addEntry(ConsoleType.LOG, message);
           // eslint-disable-next-line prefer-rest-params
           oldLog.apply(console, arguments);
@@ -73,14 +104,14 @@ export class AppComponent implements OnDestroy, OnInit {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function (error, context) {
-          let debug = '';
-          let stack: string | undefined = '';
+        console.error = function(error, context) {
+          let debug = "";
+          let stack: string | undefined = "";
 
-          if (typeof error === 'string') {
+          if (typeof error === "string") {
             debug = error;
 
-            if (error === 'ERROR' && context !== undefined && context.stack && context.message) {
+            if (error === "ERROR" && context !== undefined && context.stack && context.message) {
               debug = context.message;
               stack = context.stack;
             }
@@ -89,9 +120,9 @@ export class AppComponent implements OnDestroy, OnInit {
               debug = error.message;
               stack = error.stack;
             } else {
-              if (typeof error === 'object') {
+              if (typeof error === "object") {
                 // some other type of object
-                debug = 'OBJECT';
+                debug = "OBJECT";
                 stack = JSON.stringify(error);
               } else {
                 debug = error;
@@ -99,8 +130,8 @@ export class AppComponent implements OnDestroy, OnInit {
             }
           }
 
-          if (debug !== '') {
-            serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== '') ? ' ' + stack : ''}`);
+          if (debug !== "") {
+            serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== "") ? " " + stack : ""}`);
           }
 
           // eslint-disable-next-line prefer-rest-params
@@ -112,7 +143,7 @@ export class AppComponent implements OnDestroy, OnInit {
       const oldWarn = console.warn;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.warn = function (message) {
+        console.warn = function(message) {
           serv.addEntry(ConsoleType.WARN, message);
           // eslint-disable-next-line prefer-rest-params
           oldWarn.apply(console, arguments);
@@ -123,10 +154,10 @@ export class AppComponent implements OnDestroy, OnInit {
 
   ngOnInit() {
     const queryParams = {
-      audio: this.getParameterByName('audio'),
-      host: this.getParameterByName('host'),
-      transcript: this.getParameterByName('transcript'),
-      embedded: this.getParameterByName('embedded')
+      audio: this.getParameterByName("audio"),
+      host: this.getParameterByName("host"),
+      transcript: this.getParameterByName("transcript"),
+      embedded: this.getParameterByName("embedded")
     };
 
     this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded as any).subscribe(
@@ -140,7 +171,7 @@ export class AppComponent implements OnDestroy, OnInit {
           if (lang !== undefined) {
             this.asrService.selectedLanguage = lang;
           } else {
-            console.error('Could not read ASR language from database');
+            console.error("Could not read ASR language from database");
           }
 
           if (!this.settingsService.responsive.enabled) {
@@ -163,7 +194,7 @@ export class AppComponent implements OnDestroy, OnInit {
 
       if (this.settingsService.appSettings.octra.tracking !== undefined
         && this.settingsService.appSettings.octra.tracking.active !== undefined
-        && this.settingsService.appSettings.octra.tracking.active !== '') {
+        && this.settingsService.appSettings.octra.tracking.active !== "") {
         this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
 
@@ -173,7 +204,7 @@ export class AppComponent implements OnDestroy, OnInit {
 
     this.route.fragment.subscribe((fragment) => {
       switch (fragment) {
-        case('feedback'):
+        case("feedback"):
           this.navigation?.openBugReport();
           break;
       }
@@ -194,7 +225,7 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   reset(id: string) {
-    this.api.closeSession('julian_test', Number(id), '').then((json) => {
+    this.api.closeSession("julian_test", Number(id), "").then((json) => {
       console.log(json);
     }).catch((error) => {
       console.error(error);
@@ -210,30 +241,30 @@ export class AppComponent implements OnDestroy, OnInit {
     if (!url) {
       url = document.location.href;
     }
-    name = name.replace(/[[]]/g, '\\$&');
-    const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    name = name.replace(/[[]]/g, "\\$&");
+    const regExp = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
     const results = regExp.exec(url);
     if (!results) {
       return undefined;
     }
     if (!results[2]) {
-      return '';
+      return "";
     }
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
   }
 
   private setFixedWidth() {
     // set fixed width
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerText = '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
+    const head = document.head || document.getElementsByTagName("head")[0];
+    const style = document.createElement("style");
+    style.type = "text/css";
+    style.innerText = ".container {width:" + this.settingsService.responsive.fixedwidth + "px}";
     head.appendChild(style);
   }
 
   private appendTrackingCode(type: string) {
     // check if matomo is activated
-    if (type === 'matomo') {
+    if (type === "matomo") {
       if (this.settingsService.appSettings.octra.tracking.matomo !== undefined
         && this.settingsService.appSettings.octra.tracking.matomo.host !== undefined
         && this.settingsService.appSettings.octra.tracking.matomo.siteID !== undefined) {
@@ -258,7 +289,7 @@ export class AppComponent implements OnDestroy, OnInit {
 </script>
 <!-- End Matomo Code -->`;
 
-        document.body.appendChild(trackingCode)
+        document.body.appendChild(trackingCode);
       } else {
         console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
       }

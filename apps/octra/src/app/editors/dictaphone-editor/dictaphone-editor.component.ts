@@ -13,7 +13,7 @@ import { AppStorageService } from "../../core/shared/service/appstorage.service"
 import { OCTRAEditor } from "../octra-editor";
 import { AudioChunk, AudioManager, SampleUnit } from "@octra/media";
 import { Segment, Segments } from "@octra/annotation";
-import { AudioplayerComponent } from "@octra/components";
+import { AudioplayerComponent } from "@octra/ngx-components";
 import { Subscription } from "rxjs";
 import { AudioNavigationComponent } from "../../core/component/audio-navigation";
 

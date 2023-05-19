@@ -2,7 +2,8 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnIn
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
-import { BrowserInfo, FileSize, getFileSize, navigateTo, SubscriptionManager } from "@octra/utilities";
+import { BrowserInfo, FileSize, getFileSize, SubscriptionManager } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { AppInfo } from "../../../app.info";
 import { ModalService } from "../../modals/modal.service";
 import {

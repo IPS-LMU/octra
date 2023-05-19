@@ -1,38 +1,31 @@
 {
-  "name": "media",
+  "name": "ngx-utilities",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/media/src",
+  "sourceRoot": "libs/ngx-utilities/src",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/media",
-        "main": "libs/media/src/index.ts",
-        "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": [],
-        "project": "libs/media/package.json",
-        "compiler": "tsc",
-        "format": [
-          "esm",
-          "cjs"
-        ],
-        "updateBuildableProjectDepsInPackageJson": false
+        "outputPath": "dist/libs/ngx-utilities",
+        "main": "libs/ngx-utilities/src/index.ts",
+        "tsConfig": "libs/ngx-utilities/tsconfig.lib.json",
+        "assets": ["libs/ngx-utilities/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/media/**/*.ts"]
+        "lintFilePatterns": ["libs/ngx-utilities/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/media/jest.config.ts",
+        "jestConfig": "libs/ngx-utilities/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {

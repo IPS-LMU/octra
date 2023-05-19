@@ -10,14 +10,8 @@ import {
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
-import {
-  BrowserInfo,
-  hasProperty,
-  navigateTo,
-  ShortcutGroup,
-  ShortcutManager,
-  SubscriptionManager
-} from "@octra/utilities";
+import { BrowserInfo, hasProperty, ShortcutGroup, ShortcutManager, SubscriptionManager } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { interval, Subscription, throwError, timer } from "rxjs";
 import * as X2JS from "x2js";
 import { AppInfo } from "../../../app.info";

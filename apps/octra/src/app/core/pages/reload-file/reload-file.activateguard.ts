@@ -6,7 +6,8 @@ import { SettingsService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import * as fromAnnotation from "../../store/annotation";
 import { Store } from "@ngrx/store";
-import { afterDefined, navigateTo } from "@octra/utilities";
+import { afterDefined } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {
@@ -24,7 +25,7 @@ export class ReloadFileGuard implements CanActivate {
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
 
-        navigateTo(this.router, ['/login'], params).catch((error) => {
+        navigateTo(this.router, ["/login"], params).catch((error) => {
           console.error(error);
         });
         resolve(false);

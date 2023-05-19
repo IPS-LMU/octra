@@ -1,24 +1,24 @@
 {
-  "name": "components",
+  "name": "ngx-components",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "sourceRoot": "libs/components/src",
+  "sourceRoot": "libs/ngx-components/src",
   "prefix": "octra",
   "targets": {
     "build": {
       "executor": "@nrwl/angular:package",
       "outputs": [
-        "dist/libs/components"
+        "dist/libs/ngx-components"
       ],
       "options": {
-        "project": "libs/components/ng-package.json"
+        "project": "libs/ngx-components/ng-package.json"
       },
       "configurations": {
         "production": {
-          "tsConfig": "libs/components/tsconfig.lib.prod.json"
+          "tsConfig": "libs/ngx-components/tsconfig.lib.prod.json"
         },
         "development": {
-          "tsConfig": "libs/components/tsconfig.lib.json"
+          "tsConfig": "libs/ngx-components/tsconfig.lib.json"
         }
       },
       "defaultConfiguration": "production"
@@ -26,10 +26,10 @@
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [
-        "coverage/libs/components"
+        "coverage/libs/ngx-components"
       ],
       "options": {
-        "jestConfig": "libs/components/jest.config.ts",
+        "jestConfig": "libs/ngx-components/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -37,8 +37,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/components/**/*.ts",
-          "libs/components/**/*.html"
+          "libs/ngx-components/**/*.ts",
+          "libs/ngx-components/**/*.html"
         ]
       }
     }

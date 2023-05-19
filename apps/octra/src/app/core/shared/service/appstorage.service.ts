@@ -3,7 +3,8 @@ import { SessionStorageService } from "ngx-webstorage";
 import { AppInfo } from "../../../app.info";
 import { SessionFile } from "../../obj/SessionFile";
 import { FileProgress } from "../../obj/objects";
-import { afterTrue, getProperties, navigateTo, SubscriptionManager, waitTillResultRetrieved } from "@octra/utilities";
+import { afterTrue, getProperties, SubscriptionManager, waitTillResultRetrieved } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { OIDBLevel, OIDBLink } from "@octra/annotation";
 import {
   AnnotationState,

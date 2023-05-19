@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Observable } from "rxjs";
 import { AppInfo } from "../../../app.info";
 import { AppStorageService } from "../../shared/service/appstorage.service";
-import { navigateTo } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {

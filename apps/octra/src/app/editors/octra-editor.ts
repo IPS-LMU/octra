@@ -1,5 +1,5 @@
 import { AudioChunk, AudioManager, AudioSelection, SampleUnit } from "@octra/media";
-import { AudioViewerComponent } from "@octra/components";
+import { AudioViewerComponent } from "@octra/ngx-components";
 import { Level } from "@octra/annotation";
 
 export abstract class OCTRAEditor {

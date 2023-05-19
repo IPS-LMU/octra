@@ -3,7 +3,8 @@ import { Component, OnDestroy, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
 import { AppInfo } from "../../../app.info";
-import { afterTrue, hasProperty, navigateTo, SubscriptionManager } from "@octra/utilities";
+import { afterTrue, hasProperty, SubscriptionManager } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { AudioService, SettingsService, TranscriptionService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import { IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel } from "@octra/annotation";
@@ -18,16 +19,16 @@ import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.act
 import { ApplicationActions } from "../../store/application/application.actions";
 
 @Component({
-  selector: 'octra-loading',
-  templateUrl: './loading.component.html',
-  styleUrls: ['./loading.component.scss']
+  selector: "octra-loading",
+  templateUrl: "./loading.component.html",
+  styleUrls: ["./loading.component.scss"]
 })
 export class LoadingComponent implements OnInit, OnDestroy {
   @Output() loaded: boolean;
-  public text = '';
+  public text = "";
   public audioLoadingProgress = 0;
-  public state = '';
-  public warning = '';
+  public state = "";
+  public warning = "";
   private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   constructor(private langService: TranslocoService,
@@ -42,35 +43,35 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.langService.selectTranslate('general.please wait').subscribe(
+    this.langService.selectTranslate("general.please wait").subscribe(
       (translation) => {
-        this.text = translation + '... ';
+        this.text = translation + "... ";
       }
     );
 
     this.subscrmanager.add(
       this.settService.audioloaded.subscribe(
         (result) => {
-          if (result.status === 'success') {
+          if (result.status === "success") {
             new Promise<void>((resolve, reject) => {
               if (this.appStorage.useMode === LoginMode.URL && this.appStorage.urlParams.transcript !== undefined) {
                 this.transcrService.defaultFontSize = 16;
 
                 // load transcript file via URL
                 this.http.get(this.appStorage.urlParams.transcript, {
-                  responseType: 'text'
+                  responseType: "text"
                 }).subscribe(
                   (res) => {
 
-                    this.state = 'Import transcript...';
+                    this.state = "Import transcript...";
                     let filename = this.appStorage.urlParams.transcript;
-                    filename = filename.substr(filename.lastIndexOf('/') + 1);
+                    filename = filename.substr(filename.lastIndexOf("/") + 1);
 
                     const file: IFile = {
                       name: filename,
                       content: res,
-                      type: 'text',
-                      encoding: 'utf-8'
+                      type: "text",
+                      encoding: "utf-8"
                     };
 
                     // convert par to annotJSON
@@ -89,7 +90,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         // test converter
                         const tempImportResult = converter.import(file, oAudioFile);
 
-                        if (tempImportResult !== undefined && tempImportResult.error === '') {
+                        if (tempImportResult !== undefined && tempImportResult.error === "") {
                           importResult = tempImportResult;
                           break;
                         } else {
@@ -117,8 +118,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         reject(error);
                       });
                     } else {
-                      this.settService.log = 'Invalid transcript file';
-                      reject('importResult is empty');
+                      this.settService.log = "Invalid transcript file";
+                      reject("importResult is empty");
                     }
                   },
                   (err) => {
@@ -131,7 +132,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   this.transcrService.defaultFontSize = 16;
 
                   const newLevels: OIDBLevel[] = [];
-                  newLevels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
+                  newLevels.push(new OIDBLevel(1, new OLevel("OCTRA_1", "SEGMENT"), 1));
 
                   this.appStorage.overwriteAnnotation(newLevels, [], false).then(
                     () => {
@@ -145,7 +146,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 }
               }
             }).then(() => {
-              this.state = 'Audio loaded';
+              this.state = "Audio loaded";
               const audioRessource = this.audio.audiomanagers[0].ressource;
               console.log(`dispatch`);
               this.store.dispatch(AnnotationActions.setAudioLoaded({
@@ -158,9 +159,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
               console.error(error);
             });
           } else {
-            console.error('audio not loaded');
+            console.error("audio not loaded");
             if (this.appStorage.useMode === LoginMode.LOCAL) {
-              navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
+              navigateTo(this.router, ["/user/transcr/reload-file"], AppInfo.queryParamsHandling).catch((error) => {
                 console.error(error);
               });
             }
@@ -170,7 +171,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     );
 
     afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
-      if (this.appStorage.urlParams !== undefined && hasProperty(this.appStorage.urlParams, 'audio') && this.appStorage.urlParams.audio !== ''
+      if (this.appStorage.urlParams !== undefined && hasProperty(this.appStorage.urlParams, "audio") && this.appStorage.urlParams.audio !== ""
         && this.appStorage.urlParams.audio !== undefined) {
         this.store.dispatch(OnlineModeActions.loginURLParameters({
           urlParams: this.appStorage.urlParams
@@ -178,7 +179,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else if (this.appStorage.useMode === LoginMode.URL) {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        if (this.appStorage.onlineSession.loginData.userName !== undefined && this.appStorage.onlineSession.loginData.userName !== ''
+        if (this.appStorage.onlineSession.loginData.userName !== undefined && this.appStorage.onlineSession.loginData.userName !== ""
           && (this.appStorage.sessionfile === undefined)) {
           this.store.dispatch(ApplicationActions.setMode({
             mode: LoginMode.ONLINE
@@ -192,17 +193,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {
         // not logged in, go back
-        navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
+        navigateTo(this.router, ["/login"], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
         });
       } else if (this.appStorage.loggedIn) {
         if (this.appStorage.useMode === LoginMode.LOCAL && this.audio.audiomanagers.length === 0) {
-          navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
+          navigateTo(this.router, ["/user/transcr/reload-file"], AppInfo.queryParamsHandling).catch((error) => {
             console.error(error);
           });
         } else {
           if (this.appStorage.useMode === LoginMode.URL) {
-            this.state = 'Get transcript from URL...';
+            this.state = "Get transcript from URL...";
             // set audio url from url params
             this.store.dispatch(OnlineModeActions.setAudioURL({
               audioURL: decodeURI(this.appStorage.urlParams.audio),
@@ -231,7 +232,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     Promise.all(promises).then(() => {
       this.transcrService.load().then(() => {
-        navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
+        navigateTo(this.router, ["/user/transcr"], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
         });
       }).catch((err) => {
@@ -252,7 +253,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.appStorage.logout();
-    navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
+    navigateTo(this.router, ["/login"], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
     });
   }

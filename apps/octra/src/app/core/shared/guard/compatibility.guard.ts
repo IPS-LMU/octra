@@ -6,10 +6,11 @@ import { SettingsService } from "../service";
 import { CompatibilityService } from "../service/compatibility.service";
 import * as fromApplication from "../../store/application";
 import { Store } from "@ngrx/store";
-import { afterDefined, navigateTo } from "@octra/utilities";
+import { afterDefined } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class CompatibilityGuard implements CanActivate {
   constructor(private router: Router,
@@ -35,23 +36,23 @@ export class CompatibilityGuard implements CanActivate {
       }).then(() => {
         this.compatibility.testCompability().then((result) => {
           if (result) {
-            if (next.url[0].path === 'test') {
+            if (next.url[0].path === "test") {
               const params = AppInfo.queryParamsHandling;
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              navigateTo(this.router, ['login'], params).catch((error) => {
+              navigateTo(this.router, ["login"], params).catch((error) => {
                 console.error(error);
               });
             }
             resolve(true);
           } else {
-            if (next.url[0].path !== 'test') {
+            if (next.url[0].path !== "test") {
               const params = AppInfo.queryParamsHandling;
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              navigateTo(this.router, ['test'], params).catch((error) => {
+              navigateTo(this.router, ["test"], params).catch((error) => {
                 console.error(error);
               });
               resolve(result);

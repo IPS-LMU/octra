@@ -1,5 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@octra/utilities": ["dist/libs/utilities"]
+    }
+  },
   "files": [],
   "include": [],
   "references": [
@@ -9,11 +21,5 @@
     {
       "path": "./tsconfig.spec.json"
     }
-  ],
-  "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
-    "strict": false,
-    "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": true
-  }
+  ]
 }

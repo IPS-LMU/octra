@@ -5,7 +5,7 @@ import { Observable } from "rxjs";
 import { AppInfo } from "../../../app.info";
 import { AppStorageService } from "../service/appstorage.service";
 import { LoginMode } from "../../store";
-import { navigateTo } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {

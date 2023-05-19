@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { hasProperty, uniqueHTTPRequest } from "@octra/utilities";
+import { hasProperty } from "@octra/utilities";
+import { uniqueHTTPRequest } from "@octra/ngx-utilities";
 import Ajv from "ajv";
 
 @Injectable({

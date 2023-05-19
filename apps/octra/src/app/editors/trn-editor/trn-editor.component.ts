@@ -33,7 +33,7 @@ import {
   ShortcutGroup,
   SubscriptionManager
 } from "@octra/utilities";
-import { AudioViewerComponent, AudioviewerConfig } from "@octra/components";
+import { AudioViewerComponent, AudioviewerConfig } from "@octra/ngx-components";
 import { Segment, Segments } from "@octra/annotation";
 import { ContextMenuAction, ContextMenuComponent } from "../../core/component/context-menu/context-menu.component";
 import { TranslocoService } from "@ngneat/transloco";

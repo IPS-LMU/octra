@@ -86,7 +86,7 @@ import {
 import { AudioNavigationComponent } from "./core/component/audio-navigation";
 import { ModalsModule } from "./core/modals/modals.module";
 import { AppSharedModule } from "./app.shared.module";
-import { OctraComponentsModule } from "@octra/components";
+import { OctraComponentsModule } from "@octra/ngx-components";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { TranslocoConfigProvider, TranslocoLoaderProvider } from "./app.transloco";
 import { NgxOctraApiModule, OctraAPIService } from "@octra/ngx-octra-api";

@@ -1,5 +1,5 @@
 {
-  "name": "@octra/components",
+  "name": "@octra/ngx-components",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "^14.2.0",

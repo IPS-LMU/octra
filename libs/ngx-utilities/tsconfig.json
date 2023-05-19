@@ -1,16 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "es2020",
     "forceConsistentCasingInFileNames": true,
-    "strict": false,
+    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@octra/utilities": ["dist/libs/utilities"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "files": [],
   "include": [],
@@ -21,5 +18,5 @@
     {
       "path": "./tsconfig.spec.json"
     }
-  ],
+  ]
 }

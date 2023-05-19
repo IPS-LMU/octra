@@ -1,7 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { EventEmitter, Injectable } from "@angular/core";
 import { AppInfo } from "../../../app.info";
-import { downloadFile, SubscriptionManager } from "@octra/utilities";
+import { SubscriptionManager } from "@octra/utilities";
+import { downloadFile } from "@octra/ngx-utilities";
 import { AudioManager } from "@octra/media";
 import { Subject, Subscription } from "rxjs";
 

@@ -33,7 +33,7 @@ import {
 } from "@octra/utilities";
 import { AudioChunk, AudioManager, SampleUnit } from "@octra/media";
 import { Segments } from "@octra/annotation";
-import { TimespanPipe } from "@octra/components";
+import { TimespanPipe } from "@octra/ngx-components";
 import { Subscription, timer } from "rxjs";
 import { JoditAngularComponent } from "jodit-angular";
 

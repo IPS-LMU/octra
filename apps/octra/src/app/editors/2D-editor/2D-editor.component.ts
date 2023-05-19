@@ -29,7 +29,7 @@ import { AppStorageService } from "../../core/shared/service/appstorage.service"
 import { ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval } from "../../core/shared/service/asr.service";
 import { OCTRAEditor } from "../octra-editor";
 import { TranscrWindowComponent } from "./transcr-window";
-import { AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent } from "@octra/components";
+import { AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent } from "@octra/ngx-components";
 import { AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit } from "@octra/media";
 import { ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment } from "@octra/annotation";
 import { ApplicationState } from "../../core/store";

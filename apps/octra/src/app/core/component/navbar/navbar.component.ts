@@ -6,7 +6,7 @@ import { AppInfo } from "../../../app.info";
 import { editorComponents } from "../../../editors/components";
 import { ExportFilesModalComponent } from "../../modals/export-files-modal/export-files-modal.component";
 import { ModalService } from "../../modals/modal.service";
-import { navigateTo, SubscriptionManager } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import { BugReportService, ConsoleType } from "../../shared/service/bug-report.service";
@@ -19,6 +19,7 @@ import { BugreportModalComponent } from "../../modals/bugreport-modal/bugreport-
 import { YesNoModalComponent } from "../../modals/yes-no-modal/yes-no-modal.component";
 import { Router } from "@angular/router";
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { SubscriptionManager } from "@octra/utilities";
 
 @Component({
   selector: "octra-navigation",

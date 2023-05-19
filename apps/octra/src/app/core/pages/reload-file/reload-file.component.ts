@@ -11,7 +11,8 @@ import { SessionFile } from "../../obj/SessionFile";
 import { AudioService, TranscriptionService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import { OctraDropzoneComponent } from "../../component/octra-dropzone/octra-dropzone.component";
-import { FileSize, getFileSize, navigateTo } from "@octra/utilities";
+import { FileSize, getFileSize } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { OIDBLevel, OIDBLink } from "@octra/annotation";
 import {
   TranscriptionDeleteModalComponent

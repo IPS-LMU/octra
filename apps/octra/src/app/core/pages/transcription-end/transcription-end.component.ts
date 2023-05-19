@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { navigateTo, SubscriptionManager } from "@octra/utilities";
+import { SubscriptionManager } from "@octra/utilities";
+import { navigateTo } from "@octra/ngx-utilities";
 import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import { NavbarService } from "../../component/navbar/navbar.service";

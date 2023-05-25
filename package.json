@@ -4,13 +4,13 @@
   "license": "MIT",
   "author": "Julian Pömp, Christoph Draxler; Institut für Phonetik und Sprachverarbeitung, LMU München",
   "scripts": {
-    "start": "npm run modernizr && nx serve",
+    "start": "node runner.js start",
     "build": "nx build",
-    "build:release": "node ./build.js dev=false isUpdate=false url=/",
-    "build:dev": "node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/",
-    "build:prod": "node ./build.js dev=false isUpdate=true url=/apps/octra/octra/",
-    "build:extern": "nx build utilities && nx build media && nx build annotation && nx build ngx-components && npm run build:assets && npm run build:json-set-validator && rm -rf extern/* && cp -rf ./dist/libs ./extern/libs",
-    "build:json-set-validator": "nx build json-set-validator && mkdir dist/libs/json-set-validator/src/lib/schema && cp libs/json-set-validator/src/lib/schema/json-set.schema.json dist/libs/json-set-validator/src/lib/schema/json-set-validator.schema.json",
+    "build:release": "node runner.js build:release",
+    "build:dev": "node runner.js build:dev",
+    "build:prod": "node runner.js build:prod",
+    "build:extern": "node runner.js build:extern",
+    "build:json-set-validator": "node runner.js build:json-set-validator",
     "build:assets": "node build_assets.js && nx build assets",
     "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",
@@ -121,6 +121,7 @@
     "eslint": "~8.15.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
+    "fs-extra": "^11.1.1",
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
     "jest-preset-angular": "~13.0.0",
@@ -130,6 +131,7 @@
     "prettier": "^2.6.2",
     "ts-jest": "^29.0.5",
     "ts-node": "10.9.1",
-    "typescript": "~4.9.5"
+    "typescript": "~4.9.5",
+    "yargs": "^17.7.2"
   }
 }

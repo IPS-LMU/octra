@@ -1,5 +1,5 @@
 const fs = require("fs");
-const {execSync, spawn} = require('child_process');
+const { execSync, spawn } = require("child_process");
 
 const buildDir = "dist/apps/octra/";
 const targetFolder = "assets";
@@ -34,22 +34,27 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
-const command = ['--max-old-space-size=12000', './node_modules/@nrwl/cli/bin/nx', 'build', '--prod', '-c', 'public-dev', '--base-href', baseHref];
+const command = ["--max-old-space-size=12000", "./node_modules/@nrwl/cli/bin/nx", "build", "--prod", "--configuration=public-dev", `--base-href=${baseHref}`];
 
 if (dev === "") {
-  command.splice(4, 2);
+  command.splice(4, 1);
 }
 
-const node = spawn('node', command);
-node.stdout.on('data', function (data) {
+const node = spawn("node", command);
+node.stdout.on("data", function(data) {
   console.log(data.toString());
 });
 
-node.stderr.on('data', function (data) {
+node.stderr.on("data", function(data) {
   console.log(data.toString());
 });
-node.on('exit', function (code) {
-  console.log('child process exited with code ' + code.toString());
+
+node.on("error", function(data) {
+  console.log(data.toString());
+});
+
+node.on("exit", function(code) {
+  console.log("child process exited with code " + code.toString());
   console.log(`Change index.html...`);
   let indexHTML = fs.readFileSync(`${buildDir}index.html`, {
     encoding: "utf8"
@@ -114,19 +119,19 @@ function getDateTimeString() {
 
   const yyyy = today.getFullYear();
   if (dd < 10) {
-    dd = '0' + dd;
+    dd = "0" + dd;
   }
   if (mm < 10) {
-    mm = '0' + mm;
+    mm = "0" + mm;
   }
   if (h < 10) {
-    h = '0' + h;
+    h = "0" + h;
   }
   if (min < 10) {
-    min = '0' + min;
+    min = "0" + min;
   }
   if (sec < 10) {
-    sec = '0' + sec;
+    sec = "0" + sec;
   }
   return `${yyyy}-${mm}-${dd} ${h}:${min}:${sec}`;
 }

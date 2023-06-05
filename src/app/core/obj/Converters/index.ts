@@ -8,3 +8,4 @@ export * from './PraatTableConverter';
 export * from './PraatTextgridConverter';
 export * from './TextConverter';
 export * from './Trans14Converter/Trans14Converter';
+export * from './OctraOnlineResultConverter';

@@ -3,6 +3,7 @@ import {
   BundleJSONConverter,
   Converter,
   CTMConverter,
+  OctraOnlineResultConverter,
   PartiturConverter,
   PraatTableConverter,
   PraatTextgridConverter,
@@ -42,6 +43,7 @@ export class AppInfo {
     new SRTConverter(),
     new WebVTTConverter(),
     new Trans14Converter(),
+    new OctraOnlineResultConverter(),
     new TextConverter()
   ];
 

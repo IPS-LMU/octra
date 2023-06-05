@@ -5,7 +5,7 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter, Trans14Converter} from '../';
+import {AnnotJSONConverter, OctraOnlineResultConverter, PartiturConverter, SubscriptionManager, TextConverter, Trans14Converter} from '../';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
@@ -420,7 +420,7 @@ export class TranscriptionService {
             // check if prompttext ist a transcription format like AnnotJSON
             let converted: OAnnotJSON;
             for (const converter of AppInfo.converters) {
-              if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter || converter instanceof Trans14Converter) {
+              if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter || converter instanceof Trans14Converter || converter instanceof OctraOnlineResultConverter) {
                 const result = converter.import({
                   name: this._audiofile.name,
                   content: this.appStorage.prompttext,

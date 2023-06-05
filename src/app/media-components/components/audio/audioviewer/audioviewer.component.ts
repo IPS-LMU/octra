@@ -291,7 +291,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         reject('this.AudioPxWidth is <= 0 ' + this.name);
       }
     });
-  }
+  };
   /**
    * drawSignal(array) draws the min-max pairs of values in the canvas
    *
@@ -348,7 +348,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       return true;
     }
     return false;
-  }
+  };
 
   /**
    * on key pressed down, searches for shortcuts and takes action if shortcut found
@@ -382,7 +382,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     selection = {
                       start: this.av.drawnselection.start.originalSample.value,
                       length: this.av.drawnselection.duration.originalSample.value
-                    }
+                    };
                   }
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio', selection: selection});
                   if (this.audiomanager.state === PlayBackState.PLAYING) {
@@ -539,43 +539,45 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('delete_boundaries'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.av.focused) {
-                    if (this.transcr.currentlevel.segments.length > 0) {
+                    if (this.av.drawnselection.duration.originalSample.value > 0) {
 
-                      this.shortcuttriggered.emit({
-                        shortcut: comboKey,
-                        value: 'remove_interval',
-                        type: 'boundary',
-                        selection: {
-                          start: this.av.drawnselection.start.originalSample.value,
-                          length: this.av.drawnselection.duration.originalSample.value
-                        }
-                      });
+                      if (this.transcr.currentlevel.segments.length > 0) {
 
-                      for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
-                        const segment = this.transcr.currentlevel.segments.get(i);
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'remove_interval',
+                          type: 'boundary',
+                          selection: {
+                            start: this.av.drawnselection.start.originalSample.value,
+                            length: this.av.drawnselection.duration.originalSample.value
+                          }
+                        });
 
-                        if (segment.time.browserSample.value >= this.selection.start.browserSample.value
-                          && segment.time.browserSample.value <= this.selection.end.browserSample.value
-                          && i < this.transcr.currentlevel.segments.length - 1
-                        ) {
-                          this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.breakMarker.code);
-                          i--;
-                        } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
-                          break;
+                        for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
+                          const segment = this.transcr.currentlevel.segments.get(i);
+
+                          if (segment.time.browserSample.value >= this.selection.start.browserSample.value
+                            && segment.time.browserSample.value <= this.selection.end.browserSample.value
+                            && i < this.transcr.currentlevel.segments.length - 1
+                          ) {
+                            this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.breakMarker.code);
+                            i--;
+                          } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
+                            break;
+                          }
                         }
                       }
+
+                      this.selection.start = BrowserAudioTime.fromSamples(
+                        0, this.audiomanager.browserSampleRate, this.audiomanager.originalSampleRate
+                      );
+                      this.selection.end = this.selection.start.clone();
+                      this.av.drawnselection = this.selection.clone();
+                      this.update(false);
+                      this.drawCursor(this.av.Mousecursor.line);
+                      this.transcr.currentlevel.segments.onsegmentchange.emit();
+                      keyActive = true;
                     }
-
-                    this.selection.start = BrowserAudioTime.fromSamples(
-                      0, this.audiomanager.browserSampleRate, this.audiomanager.originalSampleRate
-                    );
-                    this.selection.end = this.selection.start.clone();
-                    this.av.drawnselection = this.selection.clone();
-                    this.update(false);
-                    this.drawCursor(this.av.Mousecursor.line);
-                    this.transcr.currentlevel.segments.onsegmentchange.emit();
-
-                    keyActive = true;
                   }
                   break;
                 case('segment_enter'):
@@ -722,7 +724,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     }
-  }
+  };
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
@@ -763,11 +765,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     ));*/
-  }
+  };
 
   private drawFunc = () => {
     this.anim.requestFrame(this.drawPlayCursor);
-  }
+  };
   /**
    * draw PlayCursor. Call this method only while animation.
    */
@@ -794,7 +796,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
     } else {
     }
-  }
+  };
   /**
    * draw playcursor at its current position. You can call this method to update the playcursor view.
    */
@@ -824,7 +826,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.pContext.stroke();
       }
     }
-  }
+  };
   /**
    * draws the timeline if timeline ist enabled
    */
@@ -887,27 +889,27 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       this.gContext.strokeStyle = null;
     }
-  }
+  };
 
   /**
    * method called when audioplayback ended
    */
   private onAudioChunkStateChange = () => {
-  }
+  };
   /**
    * change the absolute positon of playcursor
    */
   private changePlayCursorAbsX = (newValue: number) => {
     this.av.PlayCursor.changeAbsX(newValue, this.av.audioTCalculator, this.av.AudioPxWidth, this.audiochunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  }
+  };
   /**
    * change samples of playcursor
    */
   private changePlayCursorSamples = (newValue: number, chunk?: AudioChunk) => {
     this.av.PlayCursor.changeSamples(newValue, this.av.audioTCalculator, chunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  }
+  };
 
   private drawSelection = (line: Line) => {
     if (!isNullOrUndefined(this.av.drawnselection) && this.av.drawnselection.length > 0) {
@@ -946,7 +948,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.oContext.globalAlpha = 1.0;
       }
     }
-  }
+  };
 
   ngOnInit() {
     this.anim = new CanvasAnimation(25);
@@ -1907,17 +1909,17 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   private afterAudioPaused = () => {
     this.drawPlayCursor();
-  }
+  };
 
   private afterAudioStepBack = () => {
     this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
     this.startPlayback();
-  }
+  };
 
   private afterAudioStepBackTime = () => {
     // this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
     // this.startPlayback();
-  }
+  };
 
   /**
    * called if audio ended normally because end of segment reached
@@ -1931,7 +1933,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     }
 
     this.drawPlayCursor();
-  }
+  };
 
   public onSecondsPerLineUpdated(seconds: number, initialize = true): Promise<void> {
     return new Promise<void>((resolve2, reject2) => {

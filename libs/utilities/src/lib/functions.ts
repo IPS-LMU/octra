@@ -1,4 +1,4 @@
-import {Observable, Subject} from 'rxjs';
+import { Observable } from "rxjs";
 
 export interface FileSize {
   size: number;
@@ -6,11 +6,11 @@ export interface FileSize {
 }
 
 export function obj() {
-  return (obj === undefined || typeof obj === 'undefined');
+  return (obj === undefined || typeof obj === "undefined");
 }
 
 export function isFunction(value: any) {
-  return typeof value === 'function';
+  return typeof value === "function";
 }
 
 export function contains(haystack: string, needle: string): boolean {
@@ -19,7 +19,7 @@ export function contains(haystack: string, needle: string): boolean {
 
 export function hasPropertyTree(obj: any, treeString: string): boolean {
   if (obj !== undefined) {
-    const properties = treeString.split('.').filter(a => a !== undefined && a.trim() !== '');
+    const properties = treeString.split(".").filter(a => a !== undefined && a.trim() !== "");
     let pointer = obj;
 
     for (let i = 0; i < properties.length; i++) {
@@ -79,7 +79,7 @@ export function equalProperties(elem: any, elem2: any) {
 
   for (const el in elem) {
     if (Object.keys(elem).includes(el)) {
-      const propStr = '' + el + '';
+      const propStr = "" + el + "";
       result = true;
       if (!(propStr in elem2)) {
         return false;
@@ -92,32 +92,32 @@ export function equalProperties(elem: any, elem2: any) {
 
 export function escapeRegex(regexStr: string) {
   // escape special chars in regex
-  return regexStr.replace(/[-/\\^$*+?ß%.()|[\]{}]/g, '\\$&');
+  return regexStr.replace(/[-/\\^$*+?ß%.()|[\]{}]/g, "\\$&");
 }
 
 export function getFileSize(bytes: number): FileSize {
   const result: FileSize = {
     size: 0,
-    label: ''
+    label: ""
   };
 
   if ((bytes / 1000) < 1) {
     // take bytes
     result.size = bytes;
-    result.label = 'B';
+    result.label = "B";
   } else if (bytes / (1000 * 1000) < 1) {
     // take kilobytes
     result.size = bytes / 1000;
-    result.label = 'KB';
+    result.label = "KB";
   } else if (bytes / (1000 * 1000 * 1000) < 1) {
     // take megabyte
     result.size = bytes / 1000 / 1000;
-    result.label = 'MB';
+    result.label = "MB";
   } else if (bytes / (1000 * 1000 * 1000 * 1000) < 1) {
     // take gigabytes
 
     result.size = bytes / 1000 / 1000 / 1000;
-    result.label = 'GB';
+    result.label = "GB";
   }
 
   result.size = Math.round(result.size * 1000) / 1000;
@@ -129,22 +129,22 @@ export function escapeHtml(text: string): string {
   // TODO improve code!
 
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 export function unEscapeHtml(text: string): string {
   // TODO improve code!
 
   return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, '\'');
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#039;/g, "'");
 }
 
 export function insertString(input: string, pos: number, insertion: string): string {
@@ -153,7 +153,7 @@ export function insertString(input: string, pos: number, insertion: string): str
   if (pos <= input.length) {
     result = result.substring(0, pos) + insertion + result.substring(pos);
   } else {
-    throw new Error('String cannot be inserted at position ' + pos);
+    throw new Error("String cannot be inserted at position " + pos);
   }
 
   return result;
@@ -161,7 +161,7 @@ export function insertString(input: string, pos: number, insertion: string): str
 
 export function setCursor(node: any, pos: any) {
 
-  node = (typeof node === 'string' || node instanceof String) ? document.getElementById('' + node + '') : node;
+  node = (typeof node === "string" || node instanceof String) ? document.getElementById("" + node + "") : node;
 
   if (!node) {
     return false;
@@ -207,9 +207,9 @@ export function afterTrue(observable: Observable<boolean>): Promise<void> {
         reject(error);
       },
       () => {
-        reject('comnpleted!');
+        reject("comnpleted!");
       }
-    )
+    );
   });
 }
 
@@ -230,11 +230,13 @@ export function afterDefined(observable: Observable<any>): Promise<any> {
       (error) => {
         reject(error);
       }
-    )
+    );
   });
 }
 
-export function waitTillResultRetrieved<A1 extends { subscribe: any; }, A2 extends { type: string; }, T>(actions: A1, success: A2, failure: A2) {
+export function waitTillResultRetrieved<A1 extends { subscribe: any; }, A2 extends {
+  type: string;
+}, T>(actions: A1, success: A2, failure: A2) {
   return new Promise<T>((resolve, reject) => {
     const subscr = actions.subscribe((action: A2) => {
       if (action.type === success.type) {
@@ -242,8 +244,8 @@ export function waitTillResultRetrieved<A1 extends { subscribe: any; }, A2 exten
         let props = {
           ...action
         } as any;
-        delete props['type'];
-        console.log('props are');
+        delete props["type"];
+        console.log("props are");
         console.log(props);
 
         if (Object.keys(props).length === 0) {
@@ -298,5 +300,83 @@ export function flatten(values: never[]) {
 }
 
 export function isEmpty(obj: unknown) {
-  return ((obj === undefined || obj === null) || (typeof obj === 'string' && obj.trim() === '') || (Array.isArray(obj) && obj.length === 0));
+  return ((obj === undefined || obj === null) || (typeof obj === "string" && obj.trim() === "") || (Array.isArray(obj) && obj.length === 0));
+}
+
+/**
+ * returns the last element of an array.
+ * @param array
+ * @returns undefined if not found
+ */
+export function last<T>(array: T[] | undefined) {
+  if (!Array.isArray(array)) {
+    throw new Error(`Not an array.`);
+  }
+
+  if (!array || array.length === 0) {
+    return undefined;
+  }
+
+  return array.slice(-1)[0];
+}
+
+/**
+ * creates a range with start and end number.
+ * @param start
+ * @param end
+ */
+export const range = (start: number, end: number) => Array.from({ length: (end - start) }, (v, k) => k + start);
+
+/**
+ * removes all empty values from an given object.
+ * @param obj
+ * @param options
+ */
+export function removeEmptyProperties<T>(obj: T, options: {
+  removeEmptyStrings?: boolean,
+  removeNull?: boolean;
+  removeUndefined?: boolean;
+} = {
+  removeEmptyStrings: true, removeNull: true, removeUndefined: true
+}): T {
+  if (Array.isArray(obj)) {
+    return obj.filter(a =>
+      (options.removeUndefined && a !== undefined) &&
+      (options.removeNull && a !== null) &&
+      (options.removeEmptyStrings && typeof a === "string" && a.trim() !== "")
+    ).map(a => removeEmptyProperties<T>(a, options)) as T;
+  } else {
+    if (typeof obj === "object") {
+      const anyObj = obj as any;
+      const keys = Object.keys(anyObj);
+
+      for (const key of keys) {
+        if ((options.removeNull && anyObj[key] === null)
+          || (options.removeUndefined && anyObj[key] === undefined)
+          || anyObj[key].toString() === "NaN" ||
+          (
+            options.removeEmptyStrings && typeof anyObj[key] === "string"
+            && anyObj[key].toString().trim() === ""
+          )) {
+          delete anyObj[key];
+        } else if (typeof anyObj[key] === "object") {
+          anyObj[key] = removeEmptyProperties([anyObj[key]], options);
+        }
+      }
+      return anyObj;
+    }
+  }
+  return obj;
+}
+
+/**
+ * maps a function fn on all property values.
+ * @param obj
+ * @param fn
+ */
+export function mapFnOnObject(obj: Record<string, any>, fn: (key: string, value: any) => any){
+  Object.keys(obj).forEach((key: string) => {
+    obj[key] = fn(key, obj[key]);
+  });
+  return obj;
 }

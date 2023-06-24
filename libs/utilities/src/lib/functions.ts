@@ -374,9 +374,33 @@ export function removeEmptyProperties<T>(obj: T, options: {
  * @param obj
  * @param fn
  */
-export function mapFnOnObject(obj: Record<string, any>, fn: (key: string, value: any) => any){
+export function mapFnOnObject(obj: Record<string, any>, fn: (key: string, value: any) => any) {
   Object.keys(obj).forEach((key: string) => {
     obj[key] = fn(key, obj[key]);
   });
   return obj;
+}
+
+export async function readFileContents<T>(file: File, method: "text" | "binary" | "arraybuffer", encoding?: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("loadend", () => {
+      resolve(reader.result as T);
+    });
+    reader.addEventListener("error", (e) => {
+      reject(e);
+    });
+
+    switch (method) {
+      case "text":
+        reader.readAsText(file, encoding);
+        break;
+      case "binary":
+        reader.readAsBinaryString(file);
+        break;
+      case "arraybuffer":
+        reader.readAsArrayBuffer(file);
+        break;
+    }
+  });
 }

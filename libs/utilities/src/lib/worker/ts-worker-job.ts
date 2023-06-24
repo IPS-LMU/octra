@@ -44,7 +44,7 @@ export class TsWorkerJob {
     return this._status;
   }
 
-  constructor(doFunction: (args: any[]) => Promise<any>, args: any[]) {
+  constructor(doFunction: ((args: any[]) => Promise<any>) | string, args: any[]) {
     this._id = ++TsWorkerJob.jobIDCounter;
     this.doFunction = doFunction;
     this.args = args;
@@ -53,7 +53,7 @@ export class TsWorkerJob {
   /**
    * this function will be run in the web worker
    */
-  doFunction = (args: any[]) => {
+  doFunction: ((args: any[]) => Promise<any>) | string = (args: any[]) => {
     return new Promise<any>((resolve, reject) => {
       reject('not implemented');
     });

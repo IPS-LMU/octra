@@ -1,5 +1,5 @@
-import {Subject} from 'rxjs';
-import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
+import { Subject } from "rxjs";
+import { TsWorkerJob, TsWorkerStatus } from "./ts-worker-job";
 
 export class TsWorker {
   private static workerID = 1;
@@ -34,7 +34,7 @@ export class TsWorker {
         TsWorker.getWorkerScript()
       ],
       {
-        type: 'application/javascript'
+        type: "application/javascript"
       }
     ));
     this.worker = new Worker(this.blobURL);
@@ -44,10 +44,20 @@ export class TsWorker {
    * converts a job to an JSON object
    */
   private static convertJobToObj(job: TsWorkerJob) {
+    let scriptString = (typeof job.doFunction === "string") ? job.doFunction : job.doFunction.toString();
+    scriptString = scriptString
+      // remove comments
+      .replace(/(\/\*+[^**/]+\*+\/)|(\/\/.*)\n*/g, "")
+      .replace(/(function)([^(]*)([^{\n]+)/g, "$3 => ");
+
+    if (eval(`${scriptString}`) === undefined) {
+      throw new Error("Can't eval function.");
+    }
+
     return {
       userName: job.id,
       args: job.args,
-      doFunction: job.doFunction.toString().replace('function (args)', '(args) => ')
+      doFunction: scriptString
     };
   }
 
@@ -59,33 +69,52 @@ export class TsWorker {
 var base = self;
 
 onmessage = (msg) => {
-    var data = msg.data;
-    var command = data.command;
-    var args = data.args;
+  var data = msg.data;
+  var command = data.command;
+  var args = data.args;
 
-    switch (command) {
-        case("run"):
-            base.job = args[0];
-            var func = eval(base.job.doFunction);
-            func(base.job.args).then((result) => {
-                base.postMessage({
-                    status: "finished",
-                    result: result
-                });
-            }).catch((error) => {
-                base.postMessage({
-                    type: "failed",
-                    message: error
-                });
-            });
-            break;
-        default:
-            base.postMessage({
-                status: "failed",
-                message: "invalid command"
-            });
-            break;
+  try {
+    if (command === "run") {
+      base.job = args[0];
+
+      for (let i = 0; i < base.job.args.length; i++) {
+        if (typeof base.job.args[i] === "object" && base.job.args[i].isFunction) {
+          var evaluated = undefined;
+
+          evaluated = eval("(" + base.job.args[i].funcString + ")");
+
+          base.job.args[i] = evaluated;
+
+          if (!evaluated) {
+            throw new Error("Can't evaluate function in args with index " + i);
+          }
+        }
+      }
+
+      var func = eval(base.job.doFunction);
+      func(base.job.args).then((result) => {
+        base.postMessage({
+          status: "finished",
+          result: result
+        });
+      }).catch((error) => {
+        base.postMessage({
+          status: "failed",
+          message: error
+        });
+      });
+    } else {
+      base.postMessage({
+        status: "failed",
+        message: "invalid command"
+      });
     }
+  } catch (error) {
+    base.postMessage({
+      status: "failed",
+      message: error.message
+    });
+  }
 };`;
   }
 
@@ -107,7 +136,7 @@ onmessage = (msg) => {
    * @param id the job's id
    */
   public removeJobByID(id: number) {
-    if (id > -1) {
+    if (id !== undefined && id > -1) {
       const index = this._queue.findIndex((a) => {
         return a.id === id;
       });
@@ -141,7 +170,6 @@ onmessage = (msg) => {
         }).catch((error) => {
           job.changeStatus(TsWorkerStatus.FAILED);
           this._jobstatuschange.error(error);
-
           this.checkBeforeStart();
         });
       }
@@ -153,7 +181,7 @@ onmessage = (msg) => {
    */
   public getFirstFreeJob(): TsWorkerJob | undefined {
     const index = this._queue.findIndex((a) => {
-      return a.status === TsWorkerStatus.INITIALIZED;
+      return a !== undefined && a.status === TsWorkerStatus.INITIALIZED;
     });
 
     if (index > -1) {
@@ -167,7 +195,7 @@ onmessage = (msg) => {
    */
   public getRunningJobID() {
     return this._queue.findIndex((a) => {
-      return a.status === TsWorkerStatus.RUNNING;
+      return a !== undefined && a.status === TsWorkerStatus.RUNNING;
     });
   }
 
@@ -177,7 +205,7 @@ onmessage = (msg) => {
    */
   public hasJob(job: TsWorkerJob) {
     return this._queue.findIndex((a) => {
-      return a.id === job.id;
+      return a !== undefined && a.id === job.id;
     }) > -1;
   }
 
@@ -199,10 +227,10 @@ onmessage = (msg) => {
           job.statistics.ended = Date.now();
           this.status = ev.data.status;
 
-          if (ev.data.status === 'finished') {
+          if (ev.data.status === "finished") {
             this.removeJobByID(job.id);
             resolve(ev.data.result);
-          } else if (ev.data.status === 'failed') {
+          } else if (ev.data.status === "failed") {
             this.removeJobByID(job.id);
             reject(ev.data.message);
           }
@@ -216,10 +244,10 @@ onmessage = (msg) => {
 
         job.statistics.started = Date.now();
         this.worker.postMessage({
-          command: 'run',
+          command: "run",
           args: [TsWorker.convertJobToObj(job)]
         });
       }
     );
-  }
+  };
 }

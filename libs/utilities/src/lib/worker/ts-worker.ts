@@ -92,7 +92,7 @@ onmessage = (msg) => {
       }
 
       var func = eval(base.job.doFunction);
-      func(base.job.args).then((result) => {
+      func(...base.job.args).then((result) => {
         base.postMessage({
           status: "finished",
           result: result
@@ -170,6 +170,7 @@ onmessage = (msg) => {
         }).catch((error) => {
           job.changeStatus(TsWorkerStatus.FAILED);
           this._jobstatuschange.error(error);
+          this._jobstatuschange = new Subject();
           this.checkBeforeStart();
         });
       }

@@ -44,7 +44,7 @@ export class TsWorkerJob {
     return this._status;
   }
 
-  constructor(doFunction: ((args: any[]) => Promise<any>) | string, args: any[]) {
+  constructor(doFunction: ((...args: any[]) => Promise<any>) | string, args: any[]) {
     this._id = ++TsWorkerJob.jobIDCounter;
     this.doFunction = doFunction;
     this.args = args;

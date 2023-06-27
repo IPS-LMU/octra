@@ -90,7 +90,7 @@ export class AudioDecoder {
               }
 
               try {
-                const result = await this.minimizeChannelData([job.result, this.channelDataFactor]);
+                const result = await this.minimizeChannelData(job.result, this.channelDataFactor);
                 this.insertChannelBuffer(Math.floor(j.start / this.channelDataFactor), result);
               } catch (e) {
                 console.error(e);
@@ -190,9 +190,7 @@ export class AudioDecoder {
     }
   }
 
-  public async minimizeChannelData(args: [any, number]): Promise<Float32Array> {
-    const channelData = args[0];
-    const factor = args[1];
+  public async minimizeChannelData(channelData: Float32Array, factor: number): Promise<Float32Array> {
     if (factor !== 1) {
       const result = new Float32Array(Math.round(channelData.length / factor));
 
@@ -231,12 +229,8 @@ export class AudioDecoder {
     }
   }
 
-  private getChannelData = (args: any[]) => {
+  private getChannelData = (data: IntArray, sampleDuration: number, bitsPerSample: number) => {
     return new Promise<Float32Array>((resolve) => {
-      const data: IntArray = args[0];
-      const sampleDuration: number = args[1];
-      const bitsPerSample: number = args[2];
-
       const duration = sampleDuration;
       const result = new Float32Array(duration);
       const maxNum = Math.pow(2, bitsPerSample) / 2;

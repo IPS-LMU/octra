@@ -79,7 +79,6 @@ import { ContextMenuComponent } from "./core/component/context-menu/context-menu
 import { MaintenanceModule } from "./core/component/maintenance/maintenance.module";
 import { ApplicationEffects } from "./core/store/application/application-effects.service";
 import { LoginMode } from "./core/store";
-import { JoditAngularModule } from "jodit-angular";
 import {
   PermutationsReplaceModalComponent
 } from "./editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component";
@@ -98,6 +97,7 @@ import {
   NgbPopoverModule,
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
+import { NgxJoditModule } from "ngx-jodit";
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -178,7 +178,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([]),
     MaintenanceModule,
-    JoditAngularModule,
+    NgxJoditModule,
     NgbDropdownModule,
     NgbNavModule,
     NgbModalModule,

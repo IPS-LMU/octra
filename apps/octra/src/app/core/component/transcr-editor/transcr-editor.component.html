@@ -1,4 +1,4 @@
-<div #transcrEditor (change)="updateTextField()" class="transcr-editor">
+<div #transcrEditor (change)="updateTextField()" class="transcr-editor flex h-100">
   <octra-validation-popover #validationPopover
                             [ngStyle]="{
                                 'margin-left': popoversNew.validation.location.x + 'px',
@@ -19,5 +19,5 @@
       {{"asr.asr running" | transloco}}
     </p>
   </div>
-  <jodit-editor #jodit></jodit-editor>
+  <ngx-jodit #jodit [options]="joditOptions" (joditKeyDown)="onKeyDown($event)" (joditFocus)="this.focused = true" (joditKeyUp)="onKeyUp($event)" (joditChange)="onChange()" (joditPaste)="onPaste($event)" class="flex"></ngx-jodit>
 </div>

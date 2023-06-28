@@ -79,18 +79,18 @@ octra-transcr-editor .jodit-container {
   height: 100%;
 }
 
-octra-transcr-editor jodit-editor {
+octra-transcr-editor ngx-jodit {
   height: 100%;
 }
 
-octra-transcr-editor jodit-editor .jodit-container {
+octra-transcr-editor ngx-jodit .jodit-container {
   height: 100% !important;
   flex: auto;
   display: flex;
   flex-direction: column;
 }
 
-octra-transcr-editor jodit-editor .jodit-workplace {
+octra-transcr-editor ngx-jodit .jodit-workplace {
   height: 100% !important;
   flex: auto;
   display: flex;

@@ -17,6 +17,7 @@ import { ILog } from "../obj/Settings/logging";
 import { Histories, UndoRedoState } from "ngrx-wieder";
 import { SessionFile } from "../obj/SessionFile";
 import { TaskDto } from "@octra/api-types";
+import { AuthenticationState } from "./authentication";
 
 export enum LoginMode {
   URL = 'url',
@@ -150,6 +151,7 @@ export interface UserState {
 }
 
 export interface RootState {
+  authentication: AuthenticationState;
   application: ApplicationState,
   asr: ASRState,
   onlineMode: OnlineModeState,

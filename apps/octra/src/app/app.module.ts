@@ -98,6 +98,7 @@ import {
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
 import { NgxJoditModule } from "ngx-jodit";
+import { AuthenticationEffects, authenticationReducer } from "./core/store/authentication";
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -149,8 +150,8 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     FormsModule,
     HttpClientModule,
     NgxWebstorageModule.forRoot({
-      separator: '.',
-      prefix: 'custom'
+      separator: ".",
+      prefix: "custom"
     }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
@@ -160,6 +161,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
       {
         application: fromApplication.reducer,
         asr: fromASR.reducer,
+        authentication: authenticationReducer,
         onlineMode: new OnlineModeReducers(LoginMode.ONLINE).create(),
         demoMode: new OnlineModeReducers(LoginMode.DEMO).create(),
         localMode: fromLocalMode.reducer,
@@ -173,8 +175,8 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
         }
       }
     ),
-    StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
-    EffectsModule.forRoot([ConfigurationEffects, IDBEffects, ApplicationEffects]),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
+    EffectsModule.forRoot([ConfigurationEffects, IDBEffects, ApplicationEffects, AuthenticationEffects]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([]),
     MaintenanceModule,

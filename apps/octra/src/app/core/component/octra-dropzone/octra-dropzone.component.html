@@ -2,20 +2,19 @@
   <table [hidden]="(files.length === 0)" class="dropzone-table">
     <tr *ngFor="let file of files">
       <td>
-        <fa-icon (click)="onDeleteEntry(file.file.name)" class="icon-delete" icon="trash"
-                 style="font-size:14px; color:dimgray"></fa-icon>
+        <i class="bi bi-trash3-fill icon-delete" (click)="onDeleteEntry(file.file.name)"
+           style="font-size:14px; color:dimgray"></i>
       </td>
       <td>{{getDropzoneFileString(file.file)}}
       </td>
       <td>
-        <fa-icon *ngIf="file.status === 'invalid'" [popoverTitle]="'Validation Error'" [ngbPopover]="file.error"
-                 class="icon-invalid" icon="times" placement="top"
-                 style="font-size:16px"></fa-icon>
-        <fa-icon *ngIf="file.status === 'valid'" class="icon-success" icon="check"
-                 style="font-size:16px"></fa-icon>
+        <i class="bi bi-x-lg icon-invalid" *ngIf="file.status === 'invalid'" [popoverTitle]="'Validation Error'"
+           [ngbPopover]="file.error" style="font-size:16px" placement="top"></i>
+        <i class="bi bi-check" *ngIf="file.status === 'valid'" style="font-size:16px"></i>
         <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
-          <fa-icon *ngIf="file.status === 'progress'" [spin]="true" class="icon-wait" icon="spinner"
-                   style="font-size:16px"></fa-icon>
+          <div class="spinner-border icon-wait" role="status" *ngIf="file.status === 'progress'" style="font-size:16px">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </ng-container>
         <ng-container *ngIf="file.file.name.indexOf('.wav') > -1 && file.status === 'progress'">
           <div class="progress">
@@ -35,7 +34,7 @@
       </td>
     </tr>
   </table>
-  <span *ngIf="files.length === 0">{{ "dropzone.drag&drop here" | transloco }}</span><br/>
+  <span *ngIf="files.length === 0">{{ "dropzone.drag&drop here" | transloco }}</span><br />
 </octra-drop-zone>
 <div (click)="showSupported()" class="link" style="z-index:20;width:100%;text-align:center;height:30px;">
   {{"general.supported files" | transloco}}

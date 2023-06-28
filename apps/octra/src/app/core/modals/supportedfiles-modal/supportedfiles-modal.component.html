@@ -31,8 +31,7 @@
           <td>{{elem.application}}</td>
           <td>*{{elem.extension}}</td>
           <td>
-            <fa-icon *ngIf="elem.notice !== ''" [ngbTooltip]="elem.notice"
-                     icon="info-circle"></fa-icon>
+            <i class="bi bi-info-circle" *ngIf="elem.notice !== ''" [ngbTooltip]="elem.notice"></i>
           </td>
         </tr>
       </ng-container>

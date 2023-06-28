@@ -22,15 +22,18 @@
       <ng-container *ngFor="let converter of converters; let i = index;">
         <tr *ngIf="converter.conversion.export" class="top-tr">
           <td (click)="onLineClick(converter, i)">
-            <fa-icon style="color:gray;"
-                     [icon]="['fas', ((exportStates[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+            <i class="bi" style="color:gray;" [ngClass]="{
+              'bi-chevron-up': exportStates[i] === 'active',
+              'bi-chevron-down': exportStates[i] !== 'active'
+            }"></i>
           </td>
           <td (click)="onLineClick(converter, i)">
             <a #a>
               {{converter.name}} (*{{converter.extension}})
             </a>
-            <fa-icon icon="spinner" [spin]="true"
-                     *ngIf="preparing.name === converter.name && preparing.preparing"></fa-icon>
+            <div *ngIf="preparing.name === converter.name && preparing.preparing" class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
           </td>
           <td (click)="onLineClick(converter, i)">
             {{converter.application}}
@@ -41,8 +44,7 @@
             </a>
           </td>
           <td (click)="onLineClick(converter, i)">
-            <fa-icon *ngIf="converter.notice !== ''" icon="info-circle"
-                     [ngbTooltip]="converter.notice"></fa-icon>
+            <i class="bi bi-info-circle" *ngIf="converter.notice !== ''" [ngbTooltip]="converter.notice"></i>
           </td>
         </tr>
         <ng-container *ngIf="converter.conversion.export">
@@ -74,7 +76,7 @@
                       </td>
                       <td style="line-height: 0.9;">
                         <label
-                          for="timestamp-option-string"> {{"export.options.add timestamps" | transloco}}</label><br/>
+                          for="timestamp-option-string"> {{"export.options.add timestamps" | transloco}}</label><br />
                         <code>
                           This is an example &lt;ts="00:00:03.222"/> of a transcript with timestamps.
                         </code>
@@ -89,7 +91,7 @@
                       </td>
                       <td style="line-height: 0.9;">
                         <label
-                          for="timestamp-option-samples"> {{"export.options.add samplepoints" | transloco}}</label><br/>
+                          for="timestamp-option-samples"> {{"export.options.add samplepoints" | transloco}}</label><br />
                         <code>
                           This is an example &lt;sp="379736"/> of a transcript with timestamps.
                         </code>
@@ -98,7 +100,7 @@
                     </tbody>
                   </table>
                   <p style="margin-top:20px; font-size: 0.9em;">
-                    {{"export.options.timestamp notice" | transloco}}<br/>
+                    {{"export.options.timestamp notice" | transloco}}<br />
                     <code>
                       This is an example &lt;ts="00:00:03.222" sp="379736"/> of a transcript with timestamps.
                     </code>
@@ -110,7 +112,7 @@
                  *ngIf="preparing.name === converter.name && !preparing.preparing"
                  download="{{parentformat.download}}" [href]="parentformat.uri"
                  class="link" (click)="onDownloadClick(i)">
-                <fa-icon icon="save"></fa-icon>
+                <i class="bi bi-save-fill"></i>
                 Download
               </a>
             </td>
@@ -134,8 +136,10 @@
       <tbody>
       <tr>
         <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
-          <fa-icon style="color:gray;"
-                   [icon]="['fas', ((tools.tableConfigurator.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+          <i class="bi" style="color:gray;" [ngClass]="{
+              'bi-chevron-up': tools.tableConfigurator.opened,
+              'bi-chevron-down': !tools.tableConfigurator.opened
+            }"></i>
         </td>
         <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
           <a #a>
@@ -174,8 +178,11 @@
       <tbody>
       <tr>
         <td (click)="getProtocol()">
-          <fa-icon style="color:gray;"
-                   [icon]="['fas', ((preparing.name === 'Protocol') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+
+          <i class="bi" style="color:gray;" [ngClass]="{
+              'bi-chevron-up': preparing.name === 'Protocol',
+              'bi-chevron-down': preparing.name !== 'Protocol'
+            }"></i>
         </td>
         <td (click)="getProtocol()">
           <a #a>
@@ -191,7 +198,7 @@
           <a *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
              download="{{parentformat.download}}" [href]="parentformat.uri"
              class="link">
-            <fa-icon icon="save"></fa-icon>
+            <i class="bi bi-save-fill"></i>
             Download
           </a>
         </td>

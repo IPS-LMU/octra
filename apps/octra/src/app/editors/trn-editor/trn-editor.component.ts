@@ -350,21 +350,21 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
       {
         name: "merge selected lines",
         status: "active",
-        icon: ["fas", "object-group"],
+        icon: "bi-intersect",
         label: this.translocoService.translate("trn-editor.context menu.merge selected lines"),
         func: this.mergeSelectedLinesContextMenu
       },
       {
         name: "remove transcripts of selected lines",
         status: "active",
-        icon: ["fas", "eraser"],
+        icon: "bi-eraser-fill",
         label: this.translocoService.translate("trn-editor.context menu.remove transcripts of selected lines"),
         func: this.removeTranscriptsOfSelectedLinesContextMenu
       },
       {
         name: "remove selected lines completely",
         status: "active",
-        icon: ["fas", "trash"],
+        icon: "bi bi-trash",
         label: this.translocoService.translate("trn-editor.context menu.remove selected lines completely"),
         func: this.removeSelectedLines
       }

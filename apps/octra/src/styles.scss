@@ -1,4 +1,5 @@
 @import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons";
 
 .btn.btn-success {
   color: #fff;
@@ -349,7 +350,7 @@ footer {
   filter: alpha(opacity=20);
 }
 
-.column.ng-star-inserted.gu-mirror .delete-column fa-icon {
+.column.ng-star-inserted.gu-mirror .delete-column {
   color: gray;
 }
 
@@ -438,6 +439,6 @@ a {
 }
 
 .form-check,
-.form-switch input{
+.form-switch input {
   cursor: pointer;
 }

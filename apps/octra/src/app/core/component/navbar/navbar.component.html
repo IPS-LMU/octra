@@ -38,7 +38,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/IPS-LMU/octra" target="_blank">
-            <fa-icon [icon]="['fab', 'github']"></fa-icon>
+            <i class="bi bi-github"></i>
             Github
           </a>
         </li>
@@ -54,7 +54,7 @@
                         'active': appStorage.interface === editor.name
                     }" (click)="isCollapsed = true">
               <span>
-              <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
+              <i [classList]="['bi', editor.icon]"></i>
               <span
                 class="d-none d-xl-inline"> {{editor.translate | transloco}}
               </span>
@@ -65,7 +65,7 @@
           <li *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
               class="nav-item">
             <a (mouseup)="openStatisticsModal()" class="nav-link">
-              <fa-icon class="navbar-icon" icon="th-list"></fa-icon>
+              <i class="bi bi-pie-chart-fill"></i>
               <span class="d-none d-xl-inline"> Statistics</span></a>
           </li>
         </ul>
@@ -82,7 +82,7 @@
           <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
             {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
             '...' : transcrServ.currentlevel.name}}
-            <fa-icon class="navbar-icon" icon="book"></fa-icon>
+            <i class="bi bi-book-half navbar-icon"></i>
           </a>
           <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu"
                style="min-width: 300px;" (click)="$event.stopPropagation();">
@@ -102,16 +102,15 @@
                   type="text" value="{{level.name}}" style="width:100%;" />
                 </td>
                 <td>
-                  <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
-                           style="cursor: pointer;"></fa-icon>
-                  <fa-icon (mousedown)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === annotJSONType.SEGMENT"
-                           [icon]="['fas', 'copy']"
-                           style="margin-left:3px;cursor:pointer;"></fa-icon>
+                  <i class="bi bi-trash" (click)="onLevelRemoveClick(i, level.id)"
+                     style="cursor: pointer;"></i>
+                  <i class="bi bi-back" (mousedown)="onLevelDuplicateClick(i, level.id)"
+                     *ngIf="level.type === annotJSONType.SEGMENT" style="margin-left:3px;cursor:pointer;"></i>
                 </td>
               </tr>
               <tr>
                 <td colspan="3" (click)="onLevelAddClick()" class="level-add-row">
-                  <fa-icon icon="plus"></fa-icon>
+                  <i class="bi bi-plus-lg"></i>
                 </td>
               </tr>
               </tbody>
@@ -124,9 +123,10 @@
         infoDropdown
         -->
         <li class="nav-item dropdown"
-            *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.filesize !== undefined" ngbDropdown  [container]="'body'" display="dynamic" placement="bottom-end">
+            *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.filesize !== undefined" ngbDropdown
+            [container]="'body'" display="dynamic" placement="bottom-end">
           <a ngbDropdownToggle type="button" class="nav-link">
-            <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
+            <i class="bi bi-info-circle-fill navbar-icon"></i>
           </a>
           <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
             <table class="table table-sm table-striped info-menu">
@@ -187,13 +187,13 @@
         </li>
         <li *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport" class="nav-item">
           <a (mouseup)="openToolsModal()" class="nav-link">
-            <fa-icon class="navbar-icon" icon="tools"></fa-icon>
+            <i class="bi bi-tools navbar-icon"></i>
             <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
           </a>
         </li>
         <li *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport" class="nav-item">
           <a (mouseup)="openExportModal()" class="nav-link">
-            <fa-icon class="navbar-icon" icon="download"></fa-icon>
+            <i class="bi bi-download navbar-icon"></i>
             <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>
           </a>
         </li>
@@ -204,7 +204,7 @@
                 'display': (!(appStorage.audioLoaded && appStorage.loggedIn)) ? 'none': 'inherit'
                 }" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
           <a ngbDropdownToggle type="button" class="nav-link">
-            <fa-icon icon="cog"></fa-icon>
+            <i class="bi bi-gear-wide-connected"></i>
           </a>
           <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right options-menu"
                role="menu"
@@ -320,17 +320,18 @@
 
         <!-- profile -->
         <li class="nav-item dropdown"
-            *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
+            *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
+            ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
           <a ngbDropdownToggle type="button" class="nav-link">
-            <fa-icon [icon]="['fas', 'user-circle']"></fa-icon>
+            <i class="bi bi-person-circle"></i>
           </a>
           <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
             <a class="dropdown-item">
-              <fa-icon [icon]="['fas', 'user-circle']"></fa-icon>
+              <i class="bi bi-person-circle"></i>
               Account
             </a>
             <a class="dropdown-item" (click)="backToProjectsList()">
-              <fa-icon icon="door-open"></fa-icon>
+              <i class="bi bi-door-open-fill"></i>
               Back to the list of projects
             </a>
           </div>
@@ -343,10 +344,10 @@
           *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled"
           class="nav-item">
           <a (mouseup)="openBugReport()" class="nav-link">
-            <fa-icon class="navbar-icon" icon="question-circle"
-                     style="color:#fcffba" [ngStyle]="{
+            <i class="bi bi-question-circle-fill navbar-icon" style="color:#fcffba" [ngStyle]="{
                             color: (errorsFound) ? 'red' : '#fcffba'
-                        }"></fa-icon>
+                        }">
+            </i>
             <ng-container *ngIf="!appStorage.loggedIn">
               {{"general.feedback" | transloco}}
             </ng-container>

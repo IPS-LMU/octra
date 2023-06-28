@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
 import { environment } from "../environments/environment";
 import { AppInfo } from "./app.info";
-import { NavigationComponent } from "./core/component/navbar";
-import { ASRLanguage } from "./core/obj/Settings";
+import { NavigationComponent } from "./core/component";
+import { ASRLanguage } from "./core/obj";
 import { SubscriptionManager } from "@octra/utilities";
 import { MultiThreadingService } from "./core/shared/multi-threading/multi-threading.service";
 import { APIService, SettingsService } from "./core/shared/service";
@@ -14,8 +14,6 @@ import { BugReportService, ConsoleType } from "./core/shared/service/bug-report.
 import * as fromApplication from "./core/store/application";
 import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
-import { OctraAPIService } from "@octra/ngx-octra-api";
-import { FileJSONSetValidator, JSONSetCombination } from "@octra/json-set-validator";
 
 @Component({
   selector: "octra-app",
@@ -45,39 +43,7 @@ export class AppComponent implements OnDestroy, OnInit {
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
               private asrService: AsrService,
-              private store: Store,
-              private octraAPI: OctraAPIService) {
-
-    const testfiles = [
-      new File(["test"], "test.wav", { type: "audio/wave" }),
-      new File(["test"], "test2.wav", { type: "audio/wave" }),
-      new File(["tesasdasdt"], "test3.txt", { type: "audio/wave" })
-    ];
-
-    const validator = new FileJSONSetValidator();
-    const results = validator.validate(testfiles, {
-      name: "test",
-      statements: [
-        {
-          name: "audio file",
-          take: 1,
-          combination: JSONSetCombination.union,
-          constraints: [{
-            extension: [".wav"]
-          }]
-        },
-        {
-          name: "transcript file",
-          take: 1,
-          combination: JSONSetCombination.union,
-          constraints: [{
-            extension: [".txt"]
-          }]
-        }
-      ]
-    });
-    console.log(results);
-
+              private store: Store) {
     this.router.events.subscribe((event: any) => {
         if (event.url) {
           console.log(`route to page: ${event?.url}`);

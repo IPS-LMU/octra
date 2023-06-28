@@ -5,7 +5,7 @@
               id="button-basic"
               style="background-color:gray;" type="button">
         {{"tools.cut audio.add placeholder" | transloco}}
-        <fa-icon icon="plus"></fa-icon>
+        <i class="bi bi-plus-lg"></i>
       </button>
       <ul *dropdownMenu aria-labelledby="button-basic" class="dropdown-menu"
           id="dropdown-basic" role="menu">
@@ -31,14 +31,14 @@
     >
       <div *ngIf="i !== clicked" class="naming-content">
         <span class="value">{{item.value}}</span>
-        <fa-icon (click)="remove(i)" [icon]="['fas', 'times-circle']"></fa-icon>
+        <i class="bi bi-x-circle" (click)="remove(i)"></i>
       </div>
       <div *ngIf="i === clicked" class="naming-content">
           <span #text (keydown)="onKeyDown($event, text)" class="value" contenteditable="true"
                 style="min-width: 10px;">
             {{item.value}}
           </span>
-        <fa-icon (click)="remove(i)" [icon]="['fas', 'times-circle']"></fa-icon>
+        <i class="bi bi-x-circle" (click)="remove(i)"></i>
       </div>
     </div>
   </div>

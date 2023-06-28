@@ -9,7 +9,7 @@
     <ng-container *ngFor="let action of actions; let i = index;">
       <tr *ngIf="action.status !== 'inactive'" (click)="doAction(action.func)">
         <td class="icon-column">
-          <fa-icon [icon]="action.icon"></fa-icon>
+          <i [classList]="['bi', action.icon]"></i>
         </td>
         <td class="action-column">
           {{action.label}}

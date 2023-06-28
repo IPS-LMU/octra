@@ -22,8 +22,10 @@
       <!-- combine phrases tool -->
       <tr class="top-tr">
         <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
-          <fa-icon [icon]="['fas', ((tools.combinePhrases.opened) ? 'chevron-up' : 'chevron-down')]"
-                   style="color:gray;"></fa-icon>
+          <i class="bi" style="color:gray;" [ngClass]="{
+              'bi-chevron-up': tools.combinePhrases.opened,
+              'bi-chevron-down': !tools.combinePhrases.opened
+            }"></i>
         </td>
         <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
           <a #a>
@@ -34,7 +36,7 @@
             colspan="2">
           <span>{{'tools.combine phrases.description' | transloco}} </span>
           <a [href]="manualURL + 'using-asr-with-word-alignment'" target="_blank">
-            <fa-icon class="text-info" icon="question-circle"></fa-icon>
+            <i class="bi bi-question-circle text-info"></i>
           </a>
         </td>
       </tr>
@@ -57,13 +59,12 @@
                     <td>
                       <input [(ngModel)]="tools.combinePhrases.options.minSilenceLength" id="minSilenceLength"
                              name="minSilenceLength"
-                             type="number"/>
+                             type="number" />
                     </td>
                     <td>
-                      <fa-icon [ngbTooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
-                               icon="question-circle"
-                               placement="right"
-                               style="color: darkblue;"></fa-icon>
+                      <i class="bi bi-question-circle"
+                         [ngbTooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
+                         placement="right" style="color: darkblue;"></i>
                     </td>
                   </tr>
                   <tr>
@@ -73,13 +74,12 @@
                     <td>
                       <input [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment" id="maxWordsPerSegment"
                              name="maxWordsPerSegment"
-                             type="number"/>
+                             type="number" />
                     </td>
                     <td>
-                      <fa-icon [ngbTooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
-                               icon="question-circle"
-                               placement="right"
-                               style="color: darkblue;"></fa-icon>
+                      <i class="bi bi-question-circle"
+                         [ngbTooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
+                         placement="right" style="color: darkblue;"></i>
                     </td>
                   </tr>
                   </tbody>
@@ -96,8 +96,10 @@
       <tr *ngIf="navbarServ.transcrService !== undefined
                      && navbarServ.transcrService.audioManager.resource.info.extension === '.wav'">
         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
-          <fa-icon [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"
-                   style="color:gray;"></fa-icon>
+          <i class="bi" style="color:gray;" [ngClass]="{
+              'bi-chevron-up': tools.audioCutting.opened,
+              'bi-chevron-down': !tools.audioCutting.opened
+            }"></i>
         </td>
         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
           <a #a>
@@ -109,7 +111,7 @@
 
           <span>{{'tools.cut audio.description' | transloco}} </span>
           <a [href]="manualURL + 'cutting-audio-files'" target="_blank">
-            <fa-icon class="text-info" icon="question-circle"></fa-icon>
+            <i class="bi bi-question-circle text-info"></i>
           </a>
         </td>
       </tr>
@@ -125,13 +127,10 @@
                  class="show-configurator-link"
               >
                 <ng-container *ngIf="tools.audioCutting.showConfigurator">
-                  <fa-icon [icon]="['fas', 'chevron-up']"
-                           style="color:gray;"></fa-icon>
-                  {{"tools.cut audio.hide configurator" | transloco}}
+                  <i class="bi bi-chevron-up" style="gray"></i> {{"tools.cut audio.hide configurator" | transloco}}
                 </ng-container>
                 <ng-container *ngIf="!tools.audioCutting.showConfigurator">
-                  <fa-icon [icon]="['fas', 'chevron-down']"
-                           style="color:gray;"></fa-icon>
+                  <i class="bi bi-chevron-down" style="color:gray;"></i>
                   {{"tools.cut audio.show configurator" | transloco}}
                 </ng-container>
               </a>
@@ -194,7 +193,7 @@
                    class="link"
                    download="{{tools.audioCutting.result.filename}}"
                    style="margin-left:10px;">
-                  <fa-icon icon="save"></fa-icon>
+                  <i class="bi bi-save-fill"></i>
                   {{'general.download' | transloco}}
                 </a>
               </div>
@@ -210,3 +209,4 @@
       {{"general.close" | transloco}}
     </button>
   </div>
+</div>

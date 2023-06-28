@@ -87,7 +87,6 @@ import { AudioNavigationComponent } from "./core/component/audio-navigation";
 import { ModalsModule } from "./core/modals/modals.module";
 import { AppSharedModule } from "./app.shared.module";
 import { OctraComponentsModule } from "@octra/ngx-components";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { TranslocoConfigProvider, TranslocoLoaderProvider } from "./app.transloco";
 import { NgxOctraApiModule, OctraAPIService } from "@octra/ngx-octra-api";
 import { ProjectsListComponent } from "./core/pages/projects-list/projects-list.component";
@@ -187,7 +186,6 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     NgbTooltipModule,
     NgbCollapseModule,
     ModalsModule,
-    FontAwesomeModule,
     TranslocoModule,
     OctraComponentsModule,
     NgxOctraApiModule

@@ -1,6 +1,5 @@
 import { Component, Input } from "@angular/core";
 import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animations";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 @Component({
   selector: 'octra-context-menu',
@@ -52,7 +51,7 @@ export class ContextMenuComponent {
 export interface ContextMenuAction {
   name: string,
   status: 'active' | 'inactive',
-  icon: IconProp,
+  icon: string,
   label: string,
   func: () => void
 }

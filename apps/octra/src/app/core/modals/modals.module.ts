@@ -29,7 +29,6 @@ import { Translation, TranslocoLoader, TranslocoModule } from "@ngneat/transloco
 import { HttpClient } from "@angular/common/http";
 import { AppSharedModule } from "../../app.shared.module";
 import { TranslocoConfigProvider, TranslocoLoaderProvider } from "../../app.transloco";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { OctraComponentsModule } from "@octra/ngx-components";
 import { FormsModule } from "@angular/forms";
 import { NamingDragAndDropComponent } from "../tools/naming-drag-and-drop/naming-drag-and-drop.component";
@@ -80,7 +79,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     CommonModule,
     AppSharedModule,
     TranslocoModule,
-    FontAwesomeModule,
     OctraComponentsModule,
     FormsModule,
     NgbCollapseModule,

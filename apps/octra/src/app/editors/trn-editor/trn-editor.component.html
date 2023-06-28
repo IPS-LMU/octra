@@ -16,7 +16,7 @@
       <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}<br/></th>
       <th style="vertical-align: middle;text-align: center;">{{"general.transcript" | transloco}}</th>
       <th style="text-align: center; vertical-align: middle;">
-        <fa-icon (click)="togglePlayAll()" [icon]="['fas', playAllState.icon]" style="margin-right: 5px;"></fa-icon>
+        <i [classList]="['bi', playAllState.icon]" style="margin-right: 5px;"></i>
         <input (click)="toggleSkipCheckbox()" [checked]="playAllState.skipSilence" id="skip-silence-checkbox"
                type="checkbox">
         <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
@@ -36,13 +36,14 @@
               <tbody>
               <tr (click)="mergeAllWithSameLabel()" class="dropdown-row">
                 <td class="dropdown-icon">
-                  <fa-icon [icon]="['fas', 'object-group']"></fa-icon>
+                  <i class="bi bi"></i>
+                  <i class="bi bi-grid-1x2-fill"></i>
                 </td>
                 <td class="dropdown-option">{{"trn-editor.speaker-actions.merge segments by speaker" | transloco}}</td>
               </tr>
               <tr (click)="openPermutationsReplaceModal()" class="dropdown-row">
                 <td class="dropdown-icon">
-                  <fa-icon [icon]="['fas', 'exchange-alt']"></fa-icon>
+                  <i class="bi bi-arrow-left-right"></i>
                 </td>
                 <td class="dropdown-option">{{"trn-editor.speaker-actions.permutations replace" | transloco}}</td>
               </tr>
@@ -65,14 +66,11 @@
       'active-playback': i === playAllState.currentSegment
   }">
       <td class="active-column fitwidth" (click)="onTableLineClick($event, i)">
-        <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
-                 style="color:green;font-size: 10px;"></fa-icon>
+        <i class="bi bi-circle" *ngIf="i === textEditor.selectedSegment; else checkExclamation;"  style="color:green;font-size: 10px;"></i>
         <ng-template #checkExclamation>
-          <fa-icon [icon]="['fas', 'exclamation-triangle']" [ngStyle]="{
+          <i class="bi bi-exclamation-triangle segment-warning" [ngStyle]="{
                   'color': 'red',
-                  'display': ((segment.transcription.safeHTML.toString().indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"
-                   class="segment-warning">
-          </fa-icon>
+                  'display': ((segment.transcription.safeHTML.toString().indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"></i>
         </ng-template>
       </td>
       <td class="time-column fitwidth" (click)="onTimestampMouseDown($event, i)" (contextmenu)="onContextMenuClick($event)">
@@ -111,12 +109,10 @@
                                 [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
           ></octra-transcr-editor>
           <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('up', i)">
-            <fa-icon [icon]="['fas', 'arrow-up']"></fa-icon>
-            SAVE & UP
+            <i class="bi bi-arrow-up"></i> SAVE & UP
           </button>
           <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('down', i)">
-            <fa-icon [icon]="['fas', 'arrow-down']"></fa-icon>
-            SAVE & DOWN
+            <i class="bi bi-arrow-down"></i> SAVE & DOWN
           </button>
         </div>
       </td>
@@ -127,7 +123,7 @@
       </ng-template>
 
       <td class="control-column" style="width:100px;" (click)="onTableLineClick($event, i)">
-        <fa-icon (click)="playSelectedSegment(i)" [icon]="['fas', playStateSegments[i].icon]"></fa-icon>
+        <i [classList]="['bi', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></i>
       </td>
     </tr>
     <tr>

@@ -1,8 +1,7 @@
 <div *ngIf="queue.length > 0" id="alert">
   <button (click)="clear()" *ngIf="queue.length > 1" [@fadeInOnEnter]
           [@fadeOutOnLeave] class="btn btn-sm btn-secondary clear-all-button">
-    <fa-icon
-      [icon]="['far', 'trash-alt']"></fa-icon>
+    <i class="bi bi-trash3"></i>
     Clear all
   </button>
   <div class="queue">

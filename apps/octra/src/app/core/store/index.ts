@@ -16,7 +16,7 @@ import { SampleUnit } from "@octra/media";
 import { ILog } from "../obj/Settings/logging";
 import { Histories, UndoRedoState } from "ngrx-wieder";
 import { SessionFile } from "../obj/SessionFile";
-import { TaskDto } from "../../../../../../../octra-backend/dist/libs/api-types";
+import { TaskDto } from "@octra/api-types";
 
 export enum LoginMode {
   URL = 'url',

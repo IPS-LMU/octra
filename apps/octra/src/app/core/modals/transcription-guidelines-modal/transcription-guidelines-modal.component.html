@@ -18,7 +18,7 @@
         <button (click)="exportPDF()"
                 *ngIf="isPDFExportEnabled() && !isPDFLinkOnly() else pdfNotEnabled" class="btn btn-sm btn-danger"
                 style="border:1px solid red;">
-          <fa-icon icon="print"></fa-icon>
+          <i class="bi bi-printer-fill"></i>
           PDF
         </button>
         <ng-template #pdfNotEnabled>
@@ -26,7 +26,7 @@
              [href]="settService.projectsettings.plugins.pdfexport.url"
              class="btn btn-sm btn-danger"
              style="border:1px solid red;" target="_blank">
-            <fa-icon icon="print"></fa-icon>
+            <i class="bi bi-printer-fill"></i>
             PDF
           </a>
         </ng-template>
@@ -40,8 +40,9 @@
       <div class="col-md-5">
         <div class="form-group">
           <div class="input-group">
-                                <span class="input-group-addon">
-                                    <fa-icon icon="search"></fa-icon></span>
+            <span class="input-group-addon">
+              <i class="bi bi-search"></i>
+            </span>
             <input #input (keyup)="search(input.value)" class="form-control"
                    id="addon1" placeholder="{{'general.search' |transloco}}" type="text">
           </div>
@@ -62,8 +63,10 @@
           <div *ngIf="collapsed.length > 0" class="card-body">
             <div *ngFor="let entry of instructions.entries;let k = index;" class="row select-row">
               <div (click)="toggle(j,k)" class="col-1 chevron">
-                <fa-icon
-                  [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
+                <i class="bi" [ngClass]="{
+                  'chevron-down': collapsed[j][k],
+                  'chevron-up': !collapsed[j][k]
+                }"></i>
               </div>
               <div (click)="toggle(j,k)" class="col-2 code">
                 {{entry.code}}

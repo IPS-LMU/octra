@@ -1,6 +1,6 @@
 <div #window id="window">
   <div class="window-nav-top">
-    <fa-icon (click)="close();" class="close" icon="times"></fa-icon>
+    <i class="bi bi-x-lg close" (click)="close();"></i>
   </div>
   <div #main>
     <div *ngIf="loading" [ngStyle]="{
@@ -11,7 +11,9 @@
     width: mainSize.width + 'px',
     height: mainSize.height + 'px'
     }" class="background"></div>
-      <fa-icon icon="spinner" size="4x" [spin]="true"></fa-icon>
+      <div class="spinner-border fs-4" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
     <octra-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
                        [enabled]="editor.rawText === ''"></octra-asr-options>
@@ -53,7 +55,7 @@
           <button class="btn btn-info w-100" (click)="save();doDirectionAction('left');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
-                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-left"></fa-icon>
+                              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
                             </span>
             <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
                              {{"general.save" | transloco}} &
@@ -65,7 +67,7 @@
           <button (click)="save();close();" class="btn btn-info w-100">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
-                                <fa-icon icon="save"></fa-icon>
+                              <i class="bi bi-save-fill"></i>
                             </span>
             <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
                              {{"general.save" | transloco}} & {{"general.close" | transloco}}
@@ -77,7 +79,7 @@
                     && segmentIndex < transcrService.currentlevel.segments.length - 1)">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
-                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
+                              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-right"></i>
                             </span>
             <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
                              {{"general.save" | transloco}} &
@@ -92,7 +94,7 @@
                   class="btn btn-info w-100">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
-                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="eye"></fa-icon>
+                              <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
                             </span>
             <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
           {{"general.save" | transloco}} & {{"general.overview" | transloco}}

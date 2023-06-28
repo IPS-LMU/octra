@@ -2,7 +2,7 @@
   <div class="btn-group" ngbDropdown>
     <button ngbDropdownToggle size="sm" type="button" class="btn btn-primary dropdown-toggle"
             style="width:100%; margin-left:5px;">
-      <fa-icon icon="plus"></fa-icon>
+      <i class="bi bi-plus-lg"></i>
       {{"custom.table configurator.add column" | transloco}}
     </button>
 
@@ -45,10 +45,10 @@ width: tableWidth + 'px'
   <div cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="onDropChange($event)" class="inner">
     <div *ngFor="let column of columns; let i = index;" class="column" cdkDrag>
       <div class="grip">
-        <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
+        <i class="bi bi-grip-vertical"></i>
       </div>
       <div (click)="onDeleteColumnClick(i)" class="delete-column">
-        <fa-icon icon="times"></fa-icon>
+        <i class="bi bi-x-lg"></i>
       </div>
       <div class="header">
         <div #title (keydown)="onTitleKeyDown($event)"

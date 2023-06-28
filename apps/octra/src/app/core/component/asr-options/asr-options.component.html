@@ -67,7 +67,7 @@
                   <tbody>
                   <tr>
                     <td>
-                      <fa-icon icon="database"></fa-icon>
+                      <i class="bi bi-database-fill"></i>
                     </td>
                     <td>
                       {{serviceProviders[lang.asr]?.dataStoragePolicy}}
@@ -75,7 +75,7 @@
                   </tr>
                   <tr *ngIf="serviceProviders[lang.asr].maxSignalDuration !== undefined">
                     <td>
-                      <fa-icon icon="exclamation-triangle"></fa-icon>
+                      <i class="bi bi-exclamation-triangle"></i>
                     </td>
                     <td>
                       max audio duration: {{serviceProviders[lang.asr].maxSignalDuration}} seconds
@@ -83,7 +83,7 @@
                   </tr>
                   <tr *ngIf="serviceProviders[lang.asr].maxSignalSize !== undefined">
                     <td>
-                      <fa-icon icon="exclamation-triangle"></fa-icon>
+                      <i class="bi bi-exclamation-triangle"></i>
                     </td>
                     <td>
                       max file size: {{serviceProviders[lang.asr].maxSignalSize}} MB
@@ -91,7 +91,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <fa-icon [icon]="['far', 'handshake']"></fa-icon>
+                      <i class="bi bi-person-check"></i>
                     </td>
                     <td>
                       <a [href]="serviceProviders[lang.asr]?.termsURL"
@@ -101,7 +101,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <fa-icon icon="globe"></fa-icon>
+                      <i class="bi bi-globe-americas"></i>
                     </td>
                     <td>
                       <a [href]="serviceProviders[lang.asr]?.homepageURL"
@@ -165,7 +165,7 @@
     </div>
   </div>
   <a [href]="manualURL + 'using-asr'" style="margin-left: 10px;" target="_blank">
-    <fa-icon class="text-info" icon="question-circle" size="1x" style="display: inline-block;"></fa-icon>
+    <i class="bi bi-question-circle-fill"></i>
   </a>
   <div class="clearfix"></div>
 </div>

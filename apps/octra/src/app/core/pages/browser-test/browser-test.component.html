@@ -4,8 +4,7 @@
   <table class="table table-striped">
     <tr *ngFor="let rule of compatibility.rules">
       <td style="width:40px;text-align:center;">
-        <fa-icon [icon]="['fas', getStateIcon(rule)]" [ngStyle]="{color:getStateColor(rule)}"
-                 [spin]="rule.state === 'processing'"></fa-icon>
+        <i [classList]="['bi', getStateIcon(rule)]" [ngStyle]="{color:getStateColor(rule)}"></i> <!-- spin this using animations -->
       </td>
       <td>{{rule.description}}
         <p *ngIf="rule.state === 'failed' && rule.help !== ''" [innerHTML]="rule.help" style="color:red;"></p>

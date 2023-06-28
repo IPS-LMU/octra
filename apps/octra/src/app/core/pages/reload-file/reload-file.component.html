@@ -11,21 +11,21 @@
   <div class="btn-group w-100" role="group">
     <button (click)="askForAbort()"
             class="btn btn-secondary">
-      <fa-icon icon="sign-out-alt"></fa-icon>
+      <i class="bi bi-box-arrow-left"></i>
       <span
         class=" d-none d-lg-inline"> {{"transcription.stop" | transloco}}</span>
     </button>
     <button (click)="newTranscription()"
             [disabled]="!(dropzone.status === 'valid')"
             class="danger">
-      <fa-icon icon="file"></fa-icon>
+      <i class="bi bi-file-fill"></i>
       <span class="d-none d-lg-inline"> {{"transcription.new" | transloco}}</span>
     </button>
     <button (click)="onOfflineSubmit()"
             [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== undefined && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
             class="btn btn-primary"
             type="button">
-      <fa-icon icon="edit"></fa-icon>
+      <i class="bi bi-pencil-fill"></i>
       <span
         class="d-none d-lg-inline"> {{"transcription.start" | transloco}}</span>
     </button>

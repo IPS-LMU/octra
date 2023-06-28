@@ -4,35 +4,34 @@
       <button (mousedown)="onButtonClick('play'); " class="waves-light btn btn-info"
               *ngIf="!isAudioPlaying" [disabled]="!isReady"
               name="play" [title]="'general.play' | transloco">
-        <fa-icon icon="play"></fa-icon>
+        <i class="bi bi-play-fill"></i>
       </button>
       <button (mousedown)="onButtonClick('pause')" *ngIf="isAudioPlaying"
               class="btn btn-info" name="pause" [title]="'general.pause' | transloco">
-        <fa-icon icon="pause"></fa-icon>
+        <i class="bi bi-pause-fill"></i>
       </button>
       <button (mousedown)="onButtonClick('stop')" class="btn btn-info" name="stop"
               [title]="'general.stop' | transloco">
-        <fa-icon icon="stop"></fa-icon>
+        <i class="bi bi-stop-fill"></i>
       </button>
       <button (mousedown)="onButtonClick('replay')" [ngClass]="{active: replay}"
               class="btn btn-info" name="replay" [title]="'general.replay' | transloco">
-        <fa-icon icon="retweet"></fa-icon>
+        <i class="bi bi-rewind-fill"></i>
       </button>
       <button class="btn btn-info" (mousedown)="onButtonClick('backward')" name="step_back"
               [title]="'general.backward' | transloco">
-        <fa-icon icon="step-backward"></fa-icon>
+        <i class="bi bi-reply-fill"></i>
       </button>
       <button class="btn btn-info" (mousedown)="onButtonClick('backward time')" name="step_back"
               [title]="'general.backwardtime' | transloco">
-        <fa-icon icon="step-backward" class="me-1"></fa-icon>
-        <fa-icon [icon]="['fas', 'clock']"></fa-icon>
+        <i class="bi bi-arrow-counterclockwise"></i> - 2s
       </button>
     </div>
     <div class="btn-group col-lg-5">
       <div class="col-6 bg-info">
         <div class="row h-100 align-items-center">
           <div class="col-1 col-sm-4 col-md-3 text-center">
-            <fa-icon icon="volume-down"></fa-icon>
+            <i class="bi bi-volume-down-fill"></i>
           </div>
           <div class="col-10 col-sm-4 col-md-6">
             <input (change)="afterVolumeChanged()" [(ngModel)]="volume" class="slider" id="volume-slider" max="3"
@@ -40,7 +39,7 @@
                    step="0.2" type="range" value="1"/>
           </div>
           <div class="col-1 col-sm-4 col-md-3">
-            <fa-icon icon="volume-up"></fa-icon>
+            <i class="bi bi-volume-up"></i>
             <div [ngClass]="{'d-none d-sm-inline': responsive}" class="slider-descr">{{volume | procent}}%
             </div>
           </div>

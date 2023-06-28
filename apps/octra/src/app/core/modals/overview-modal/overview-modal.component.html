@@ -70,7 +70,7 @@
                   [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)"
                   class="btn btn-primary btn-outline btn-success"
                   id="transcr-send-btn">
-            <fa-icon icon="paper-plane"></fa-icon>
+            <i class="bi bi-send-fill"></i>
             {{"transcription.send" | transloco}}
           </button>
         </ng-container>
@@ -79,18 +79,18 @@
                id="bottom-navigation1" role="group">
             <button (click)="sendTranscriptionForShortAudioFiles('good')"
                     class="btn btn-raised btn-primary w-100">
-              <fa-icon icon="star"></fa-icon>
-              <fa-icon icon="star"></fa-icon>
-              <fa-icon icon="star"></fa-icon>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
             </button>
             <button (click)="sendTranscriptionForShortAudioFiles('middle')" class="btn btn-raised btn-warning w-100"
                     style="background-color: orange">
-              <fa-icon icon="star"></fa-icon>
-              <fa-icon icon="star"></fa-icon>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
             </button>
             <button (click)="sendTranscriptionForShortAudioFiles('bad')"
                     class="btn btn-raised btn-danger w-100">
-              <fa-icon icon="star"></fa-icon>
+              <i class="bi bi-star-fill"></i>
             </button>
           </div>
         </ng-template>

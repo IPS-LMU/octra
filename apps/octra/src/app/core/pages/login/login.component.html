@@ -33,7 +33,7 @@
                 <ng-container *ngIf="apiStatus === 'unavailable'">
                   <div class="alert alert-danger" style="padding:20px;">
                     <div style="text-align: center;">
-                      <fa-icon [size]="'4x'" icon="exclamation-triangle" style="color:red"></fa-icon>
+                      <i class="bi bi-exclamation-triangle fs-4" style="color:red"></i>
                     </div>
                     <p style="text-align: justify; margin-top:10px;">
                       {{"login.api not available" | transloco}}
@@ -44,31 +44,29 @@
               <div class="text-center" *ngIf="apiStatus === 'available'">
                 <!-- Default form login -->
                 <form #f="ngForm" (ngSubmit)="onOnlineShibbolethSubmit(f)">
-                  <button class="my-4 btn btn-primary" type="submit">
-                    <fa-icon icon="university"></fa-icon>
+                  <button class="my-4 btn btn-secondary w-100" type="submit">
+                    <i class="bi bi-building-fill"></i>
                     Sign in with Shibboleth
                   </button>
                 </form>
                 <span>or</span>
                 <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit(f2)">
                   <!-- Username -->
-                  <div class="md-form">
-                    <input type="text" name="username" [(ngModel)]="member.userName" id="username"
-                           class="form-control" required="required">
-                    <label for="username">Username</label>
+                  <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="username" placeholder="Username or email address">
+                    <label for="username">Username or email address</label>
                   </div>
 
                   <!-- Password -->
-                  <div class="md-form">
-                    <input type="password" name="password" [(ngModel)]="member.password" id="password"
-                           class="form-control" required="required">
-                    <label for="password">Password</label>
+                  <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="password" placeholder="Password">
+                    <label for="username">Password</label>
                   </div>
 
                   <!-- Sign in button -->
                   <button [disabled]="!f2.valid"
-                          class="my-4 btn btn-info" type="submit">
-                    <fa-icon icon="house-user"></fa-icon>
+                          class="my-4 btn btn-primary w-100" type="submit">
+                    <i class="bi bi-house"></i>
                     Sign in with credentials
                   </button>
                 </form>

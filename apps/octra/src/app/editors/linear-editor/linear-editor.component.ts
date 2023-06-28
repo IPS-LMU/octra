@@ -24,7 +24,7 @@ import { AudioNavigationComponent } from "../../core/component/audio-navigation"
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.scss']
 })
-export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
+export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit {
   public static editorname = 'Linear Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('signalDisplayTop', {static: true}) signalDisplayTop: AudioViewerComponent;
@@ -54,7 +54,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   public selectedAudioChunk: AudioChunk;
 
   private oldRaw = '';
-  private subscrManager: SubscriptionManager<Subscription>;
   private saving = false;
   private factor = 6;
   private platform = BrowserInfo.platform;
@@ -314,11 +313,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.cd.detectChanges();
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
     });
-    this.subscrManager.destroy();
     this.keyMap.unregisterAll();
   }
 

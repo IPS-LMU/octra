@@ -4,6 +4,7 @@ import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animati
 import { interval, Subscription } from "rxjs";
 import { DynComponentDirective } from "../../shared/directive/dyn-component.directive";
 import { AlertEntry, AlertService } from "../../shared/service/alert.service";
+import { DefaultComponent } from "../default.component";
 
 @Component({
   selector: 'octra-alert',
@@ -15,7 +16,7 @@ import { AlertEntry, AlertService } from "../../shared/service/alert.service";
   ]
 })
 
-export class AlertComponent implements OnDestroy {
+export class AlertComponent extends DefaultComponent {
   @ViewChild(DynComponentDirective, {static: false}) appDynComponent: DynComponentDirective;
 
   public duration = 20;
@@ -28,6 +29,7 @@ export class AlertComponent implements OnDestroy {
   }
 
   constructor(private alertService: AlertService, private sanitizer: DomSanitizer) {
+    super();
     this.counter = interval(1000).subscribe(
       () => {
         for (const queueItem of this.alertService.queue) {
@@ -41,7 +43,8 @@ export class AlertComponent implements OnDestroy {
     );
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.counter.unsubscribe();
   }
 

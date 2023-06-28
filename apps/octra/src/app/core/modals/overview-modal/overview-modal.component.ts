@@ -25,7 +25,7 @@ declare let tidyUpAnnotation: ((string, any) => any);
   styleUrls: ["./overview-modal.component.scss"]
 })
 
-export class OverviewModalComponent extends OctraModal implements OnDestroy {
+export class OverviewModalComponent extends OctraModal {
   @ViewChild("feedback", { static: false }) feedback: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
@@ -37,7 +37,6 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
 
   protected data = undefined;
   private shortcutID = -1;
-  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
@@ -71,14 +70,10 @@ export class OverviewModalComponent extends OctraModal implements OnDestroy {
     super("overviewModal", activeModal);
   }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
-
   public override close(fromModal = false) {
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
-      this.subscrmanager.removeById(this.shortcutID);
+      this.subscrManager.removeById(this.shortcutID);
       this.shortcutID = -1;
     }
 

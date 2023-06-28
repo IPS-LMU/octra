@@ -9,24 +9,14 @@ import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
   templateUrl: "./missing-permissions.component.html",
   styleUrls: ["./missing-permissions.component.scss"]
 })
-export class MissingPermissionsModalComponent extends OctraModal implements OnDestroy {
+export class MissingPermissionsModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: false
   };
 
-  private subscrmanager = new SubscriptionManager<Subscription>();
-
   constructor(protected override activeModal: NgbActiveModal) {
     super("MissingPermissionsModalComponent", activeModal);
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
-
-  onHidden() {
-    this.subscrmanager.destroy();
   }
 
   reload() {

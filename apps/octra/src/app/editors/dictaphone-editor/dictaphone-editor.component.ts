@@ -152,11 +152,11 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.loadEditor();
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
     });
-    this.subscrmanager.destroy();
     this.keyMap.unregisterAll();
   }
 

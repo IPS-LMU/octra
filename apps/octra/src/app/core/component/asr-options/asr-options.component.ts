@@ -7,13 +7,14 @@ import { AppStorageService } from "../../shared/service/appstorage.service";
 import { ASRQueueItemType, AsrService } from "../../shared/service/asr.service";
 import { AudioChunk } from "@octra/media";
 import { NgbDropdown, NgbPopover } from "@ng-bootstrap/ng-bootstrap";
+import { DefaultComponent } from "../default.component";
 
 @Component({
   selector: 'octra-asr-options',
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss']
 })
-export class AsrOptionsComponent {
+export class AsrOptionsComponent extends DefaultComponent {
 
   public serviceProviders = {};
   public settings = {
@@ -37,6 +38,7 @@ export class AsrOptionsComponent {
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
               private alertService: AlertService, private langService: TranslocoService) {
+    super();
     for (const provider of this.appSettings.octra.plugins.asr.services) {
       this.serviceProviders['' + provider.provider] = provider;
     }

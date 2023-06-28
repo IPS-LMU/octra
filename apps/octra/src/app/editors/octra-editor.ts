@@ -1,8 +1,9 @@
 import { AudioChunk, AudioManager, AudioSelection, SampleUnit } from "@octra/media";
 import { AudioViewerComponent } from "@octra/ngx-components";
 import { Level } from "@octra/annotation";
+import { DefaultComponent } from "../core/component/default.component";
 
-export abstract class OCTRAEditor {
+export abstract class OCTRAEditor extends DefaultComponent {
   public abstract afterFirstInitialization(): void;
 
   public abstract disableAllShortcuts(): void;
@@ -59,7 +60,7 @@ export abstract class OCTRAEditor {
 
   protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: Level) {
     const emptySegmentIndex = currentLevel.segments.segments.findIndex((a) => {
-      return a.transcript === '';
+      return a.transcript === "";
     });
 
     if (audioChunk.time.duration.seconds <= 35) {

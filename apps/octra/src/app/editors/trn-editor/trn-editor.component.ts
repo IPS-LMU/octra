@@ -51,7 +51,7 @@ declare let validateAnnotation: any;
   styleUrls: ["./trn-editor.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy {
+export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
   get textEditor(): Texteditor {
     return this._textEditor;
@@ -121,7 +121,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OnDestroy
     icon: "play" | "stop"
   }[] = [];
   private lastMouseOver = 0;
-  private subscrManager: SubscriptionManager<Subscription>;
 
   private shortcuts: ShortcutGroup = {
     name: "TRN-Editor",
@@ -1325,8 +1324,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     });
   }
 
-  ngOnDestroy() {
-    this.subscrManager.destroy();
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.keyMap.unregisterAll();
   }
 }

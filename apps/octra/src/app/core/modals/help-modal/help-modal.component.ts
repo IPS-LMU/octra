@@ -1,6 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
-import { Subscription } from "rxjs";
-import { SubscriptionManager } from "@octra/utilities";
+import { Component, ElementRef, ViewChild } from "@angular/core";
 import { OctraModal } from "../types";
 import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 
@@ -9,7 +7,7 @@ import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
   templateUrl: "./help-modal.component.html",
   styleUrls: ["./help-modal.component.scss"]
 })
-export class HelpModalComponent extends OctraModal implements OnDestroy {
+export class HelpModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     size: "xl",
     backdrop: true
@@ -19,13 +17,7 @@ export class HelpModalComponent extends OctraModal implements OnDestroy {
   @ViewChild("modal", { static: true }) modal: any;
   @ViewChild("content", { static: false }) contentElement: ElementRef;
 
-  private subscrManager = new SubscriptionManager<Subscription>();
-
   constructor(protected override activeModal: NgbActiveModal) {
     super("HelpModalComponent", activeModal);
-  }
-
-  ngOnDestroy() {
-    this.subscrManager.destroy();
   }
 }

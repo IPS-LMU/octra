@@ -12,6 +12,7 @@ import { Subject, Subscription } from "rxjs";
 import { SubscriptionManager } from "@octra/utilities";
 import { Segment } from "@octra/annotation";
 import { moveItemInArray } from "@angular/cdk/drag-drop";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
@@ -19,7 +20,7 @@ import { moveItemInArray } from "@angular/cdk/drag-drop";
   styleUrls: ['./naming-drag-and-drop.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NamingDragAndDropComponent implements OnDestroy {
+export class NamingDragAndDropComponent extends DefaultComponent {
 
   public namingConventionArray = [
     'text',
@@ -52,7 +53,6 @@ export class NamingDragAndDropComponent implements OnDestroy {
       value: '<sequNumber>'
     }
   ];
-  private subcrManager = new SubscriptionManager<Subscription>();
 
   public get preview(): string {
     let result = '';
@@ -102,6 +102,7 @@ export class NamingDragAndDropComponent implements OnDestroy {
   }
 
   constructor(private cd: ChangeDetectorRef) {
+    super();
   }
 
   remove(i: number) {
@@ -142,10 +143,6 @@ export class NamingDragAndDropComponent implements OnDestroy {
       this.resultConvention[this.clicked].value = text.innerText;
       this.clicked = -1;
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subcrManager.destroy();
   }
 
   private deselect() {

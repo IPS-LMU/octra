@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit } from "@angular/core";
 import { AppInfo } from "../../../app.info";
 import { hasProperty, SubscriptionManager } from "@octra/utilities";
 import { APIService } from "../../shared/service";
@@ -13,13 +13,16 @@ import { TranscriptionStopModalComponent } from "../transcription-stop-modal/tra
 import { ErrorModalComponent } from "../error-modal/error-modal.component";
 import { BugreportModalComponent } from "../bugreport-modal/bugreport-modal.component";
 import { SupportedFilesModalComponent } from "../supportedfiles-modal/supportedfiles-modal.component";
+import { OctraModal } from "../types";
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
   selector: "octra-modal",
   templateUrl: "./octra-modal.component.html",
   styleUrls: ["./octra-modal.component.scss"]
 })
-export class OctraModalComponent implements OnInit, OnDestroy {
+export class OctraModalComponent extends DefaultComponent implements OnInit {
   modals = {
     error: {
       visible: false,
@@ -56,7 +59,6 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   public sendproObj = true;
   public bugsent = false;
   public data: any;
-  private _subscrmanager: SubscriptionManager<Subscription>;
 
   public get AppInfo(): any {
     return AppInfo;
@@ -66,13 +68,14 @@ export class OctraModalComponent implements OnInit, OnDestroy {
               public bugService: BugReportService,
               private api: APIService,
               private appStorage: AppStorageService) {
+    super();
   }
 
   ngOnInit() {
     this.bgemail = (this.appStorage.userProfile.email !== undefined) ? this.appStorage.userProfile.email : "";
-    this._subscrmanager = new SubscriptionManager<Subscription>();
+    this.subscrManager = new SubscriptionManager<Subscription>();
 
-    this._subscrmanager.add(this.modService.showmodal.subscribe(
+    this.subscrManager.add(this.modService.showmodal.subscribe(
       (result: any) => {
         this.data = result;
 
@@ -87,10 +90,6 @@ export class OctraModalComponent implements OnInit, OnDestroy {
           emitter.error("modal function not supported");
         }
       }));
-  }
-
-  ngOnDestroy() {
-    this._subscrmanager.destroy();
   }
 
   openModal(name: string, data?: any): Promise<any> {

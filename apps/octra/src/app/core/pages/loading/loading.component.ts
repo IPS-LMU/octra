@@ -17,19 +17,19 @@ import { Subscription } from "rxjs";
 import { AnnotationActions } from "../../store/annotation/annotation.actions";
 import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.actions";
 import { ApplicationActions } from "../../store/application/application.actions";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
   selector: "octra-loading",
   templateUrl: "./loading.component.html",
   styleUrls: ["./loading.component.scss"]
 })
-export class LoadingComponent implements OnInit, OnDestroy {
+export class LoadingComponent extends DefaultComponent implements OnInit {
   @Output() loaded: boolean;
   public text = "";
   public audioLoadingProgress = 0;
   public state = "";
   public warning = "";
-  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   constructor(private langService: TranslocoService,
               public settService: SettingsService,
@@ -40,6 +40,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
               private http: HttpClient,
               private store: Store,
               private actions: Actions) {
+    super();
   }
 
   ngOnInit() {
@@ -49,7 +50,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subscrmanager.add(
+    this.subscrManager.add(
       this.settService.audioloaded.subscribe(
         (result) => {
           if (result.status === "success") {
@@ -241,10 +242,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
     }).catch((error) => {
       console.error(error);
     });
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
   }
 
   retry() {

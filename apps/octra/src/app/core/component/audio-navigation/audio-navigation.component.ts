@@ -6,13 +6,12 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild
 } from "@angular/core";
-import { SubscriptionManager } from "@octra/utilities";
 import { AudioChunk, PlayBackStatus } from "@octra/media";
+import { DefaultComponent } from "../default.component";
 
 export interface Buttons {
   play: {
@@ -42,12 +41,12 @@ export interface Buttons {
 }
 
 @Component({
-  selector: 'octra-audio-navigation',
-  templateUrl: './audio-navigation.component.html',
-  styleUrls: ['./audio-navigation.component.css'],
+  selector: "octra-audio-navigation",
+  templateUrl: "./audio-navigation.component.html",
+  styleUrls: ["./audio-navigation.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AudioNavigationComponent implements OnChanges, OnDestroy {
+export class AudioNavigationComponent extends DefaultComponent implements OnChanges {
   @Output() buttonClick = new EventEmitter<{ type: string, timestamp: number }>();
   @Output() volumeChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
   @Output() afterVolumeChange = new EventEmitter<{ new_value: number, timestamp: number }>();
@@ -58,9 +57,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
 
-  @ViewChild('audioNavContainer', {static: true}) audioNavContainer: ElementRef | undefined;
-
-  private subscrManager = new SubscriptionManager();
+  @ViewChild("audioNavContainer", { static: true }) audioNavContainer: ElementRef | undefined;
 
   public get height() {
     if (this.audioNavContainer !== undefined) {
@@ -126,6 +123,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   }
 
   constructor(private cd: ChangeDetectorRef) {
+    super();
   }
 
   /**
@@ -149,36 +147,32 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscrManager.destroy();
-  }
-
   /**
    * called when button of navigation has been clicked
    * @param type "play", "pause", "stop", "replay" or "backward"
    */
   onButtonClick(type: string) {
     switch (type) {
-      case('play'):
+      case("play"):
         this.onPlayButtonClicked();
         break;
-      case('pause'):
+      case("pause"):
         this.onPauseButtonClicked();
         break;
-      case('stop'):
+      case("stop"):
         this.onStopButtonClicked();
         break;
-      case('replay'):
+      case("replay"):
         this.onReplayButtonClicked();
         break;
-      case('backward'):
+      case("backward"):
         this.onBackwardButtonClicked();
         break;
-      case('backward time'):
+      case("backward time"):
         this.onBackwardTimeButtonClicked();
         break;
-      case('default'):
-        console.error('button not found');
+      case("default"):
+        console.error("button not found");
         break;
     }
     this.cd.detectChanges();
@@ -225,7 +219,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   }
 
   private onPlayButtonClicked() {
-    this.triggerButtonClick('play');
+    this.triggerButtonClick("play");
     if (this.audioChunk !== undefined) {
       this.audioChunk.startPlayback(false).catch((error) => {
         console.error(error);
@@ -234,7 +228,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   }
 
   private onPauseButtonClicked() {
-    this.triggerButtonClick('pause');
+    this.triggerButtonClick("pause");
     if (this.audioChunk !== undefined) {
       this.audioChunk.pausePlayback().catch((error) => {
         console.error(error);
@@ -243,7 +237,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   }
 
   private onStopButtonClicked() {
-    this.triggerButtonClick('stop');
+    this.triggerButtonClick("stop");
     if (this.audioChunk !== undefined) {
       this.audioChunk.stopPlayback().catch((error) => {
         console.error(error);
@@ -255,14 +249,14 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
 
     if (this.audioChunk !== undefined) {
       this.audioChunk.toggleReplay();
-      this.triggerButtonClick('replay');
+      this.triggerButtonClick("replay");
       this._replay = this.audioChunk.replay;
     }
   }
 
   private onBackwardButtonClicked() {
     if (this.audioChunk !== undefined) {
-      this.triggerButtonClick('backward');
+      this.triggerButtonClick("backward");
       this.audioChunk.stepBackward().catch((error) => {
         console.error(error);
       });
@@ -271,7 +265,7 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
 
   private onBackwardTimeButtonClicked() {
     if (this.audioChunk !== undefined) {
-      this.triggerButtonClick('backward time');
+      this.triggerButtonClick("backward time");
       this.audioChunk.stepBackwardTime(500 / 1000).catch((error) => {
         console.error(error);
       });
@@ -279,10 +273,10 @@ export class AudioNavigationComponent implements OnChanges, OnDestroy {
   }
 
   private triggerButtonClick(type: string) {
-    this.buttonClick.emit({type, timestamp: Date.now()});
+    this.buttonClick.emit({ type, timestamp: Date.now() });
   }
 
   test() {
-    alert('ok, klappt!');
+    alert("ok, klappt!");
   }
 }

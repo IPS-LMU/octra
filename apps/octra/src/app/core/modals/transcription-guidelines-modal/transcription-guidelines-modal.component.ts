@@ -43,7 +43,6 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   protected data = undefined;
   private entries = 0;
   private videoPlayers: any[] = [];
-  private subscrmanager = new SubscriptionManager<Subscription>();
 
   constructor(modalService: NgbModal, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
@@ -54,7 +53,7 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   ngOnInit() {
     this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     this.unCollapseAll();
-    this.subscrmanager.add(timer(1000).subscribe(() => {
+    this.subscrManager.add(timer(1000).subscribe(() => {
       this.initVideoPlayers();
     }));
   }

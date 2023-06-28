@@ -20,13 +20,14 @@ import { YesNoModalComponent } from "../../modals/yes-no-modal/yes-no-modal.comp
 import { Router } from "@angular/router";
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { SubscriptionManager } from "@octra/utilities";
+import { DefaultComponent } from "../default.component";
 
 @Component({
   selector: "octra-navigation",
   templateUrl: "./navbar.component.html",
   styleUrls: ["./navbar.component.scss"]
 })
-export class NavigationComponent implements OnInit, OnDestroy {
+export class NavigationComponent extends DefaultComponent implements OnInit {
 
   modalexport: NgbModalRef;
   modalTools: NgbModalRef;
@@ -35,7 +36,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   public test = "ok";
   public secondsPerLine = 5;
-  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   isCollapsed = true;
 
@@ -88,14 +88,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
               public settService: SettingsService,
               public bugService: BugReportService,
               private router: Router) {
+    super();
   }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
 
   ngOnInit() {
-    this.subscrmanager.add(
+    this.subscrManager.add(
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case("export"):

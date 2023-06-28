@@ -1,28 +1,24 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { SubscriptionManager } from "@octra/utilities";
 import { navigateTo } from "@octra/ngx-utilities";
 import { SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
 import { AppStorageService } from "../../shared/service/appstorage.service";
 import { NavbarService } from "../../component/navbar/navbar.service";
-import { Subscription } from "rxjs";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
-  selector: 'octra-transcription-submitted',
-  templateUrl: './transcription-end.component.html',
-  styleUrls: ['./transcription-end.component.scss']
+  selector: "octra-transcription-submitted",
+  templateUrl: "./transcription-end.component.html",
+  styleUrls: ["./transcription-end.component.scss"]
 })
-export class TranscriptionEndComponent implements OnInit, OnDestroy {
-  private subscrmanager: SubscriptionManager<Subscription>;
-
+export class TranscriptionEndComponent extends DefaultComponent implements OnInit {
   constructor(private router: Router,
               private appStorage: AppStorageService,
               private tranService: TranscriptionService,
               private uiService: UserInteractionsService,
               private settService: SettingsService,
               private navService: NavbarService) {
-
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    super();
     this.navService.showInterfaces = false;
     this.navService.showExport = false;
     this.navService.dataloaded = false;
@@ -30,10 +26,6 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appStorage.submitted = true;
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
   }
 
   leave() {
@@ -44,6 +36,6 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy {
   }
 
   backToProjectsList() {
-    navigateTo(this.router, ['user/projects']);
+    navigateTo(this.router, ["user/projects"]);
   }
 }

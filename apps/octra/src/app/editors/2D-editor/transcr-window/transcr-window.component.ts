@@ -8,7 +8,6 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   ViewChild
@@ -31,19 +30,20 @@ import { AudioViewerComponent, AudioViewerShortcutEvent } from "@octra/ngx-compo
 import { LoginMode } from "../../../core/store";
 import { Subscription, timer } from "rxjs";
 import { AudioNavigationComponent } from "../../../core/component/audio-navigation";
+import { DefaultComponent } from "../../../core/component/default.component";
 
 @Component({
-  selector: 'octra-transcr-window',
-  templateUrl: './transcr-window.component.html',
-  styleUrls: ['./transcr-window.component.scss'],
+  selector: "octra-transcr-window",
+  templateUrl: "./transcr-window.component.html",
+  styleUrls: ["./transcr-window.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
-  @ViewChild('loupe', {static: true}) loupe: AudioViewerComponent;
-  @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
-  @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
-  @ViewChild('window', {static: true}) window: ElementRef;
-  @ViewChild('main', {static: true}) main: ElementRef;
+export class TranscrWindowComponent extends DefaultComponent implements OnInit, AfterContentInit, AfterViewInit, OnChanges {
+  @ViewChild("loupe", { static: true }) loupe: AudioViewerComponent;
+  @ViewChild("editor", { static: true }) editor: TranscrEditorComponent;
+  @ViewChild("audionav", { static: true }) audionav: AudioNavigationComponent;
+  @ViewChild("window", { static: true }) window: ElementRef;
+  @ViewChild("main", { static: true }) main: ElementRef;
   @Output() act: EventEmitter<string> = new EventEmitter<string>();
   @Input() easymode = false;
   @Input() audiochunk: AudioChunk;
@@ -51,21 +51,20 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private;
   public;
   private showWindow = false;
-  private subscrmanager: SubscriptionManager<Subscription>;
   private tempSegments: Segments;
-  private oldRaw = '';
+  private oldRaw = "";
 
-  @Output('shortcuttriggered')
+  @Output("shortcuttriggered")
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
     return this.loupe.shortcutTrigger;
   }
 
-  @Output('marker_insert')
+  @Output("marker_insert")
   get marker_insert(): EventEmitter<string> {
     return this.editor.markerInsert;
   }
 
-  @Output('marker_click')
+  @Output("marker_click")
   get marker_click(): EventEmitter<string> {
     return this.editor.markerClick;
   }
@@ -124,49 +123,49 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   private audioShortcuts: ShortcutGroup = {
-    name: '',
+    name: "",
     enabled: true,
     items: [
       {
-        name: 'play_pause',
+        name: "play_pause",
         keys: {
-          mac: 'TAB',
-          pc: 'TAB'
+          mac: "TAB",
+          pc: "TAB"
         },
-        title: 'play pause',
+        title: "play pause",
         focusonly: false
       },
       {
-        name: 'stop',
+        name: "stop",
         keys: {
-          mac: 'ESC',
-          pc: 'ESC'
+          mac: "ESC",
+          pc: "ESC"
         },
-        title: 'stop playback',
+        title: "stop playback",
         focusonly: false
       },
       {
-        name: 'step_backward',
+        name: "step_backward",
         keys: {
-          mac: 'SHIFT + BACKSPACE',
-          pc: 'SHIFT + BACKSPACE'
+          mac: "SHIFT + BACKSPACE",
+          pc: "SHIFT + BACKSPACE"
         },
-        title: 'step backward',
+        title: "step backward",
         focusonly: false
       },
       {
-        name: 'step_backwardtime',
+        name: "step_backwardtime",
         keys: {
-          mac: 'SHIFT + TAB',
-          pc: 'SHIFT + TAB'
+          mac: "SHIFT + TAB",
+          pc: "SHIFT + TAB"
         },
-        title: 'step backward time',
+        title: "step backward time",
         focusonly: false
       }
     ]
   };
 
-  public transcript = '';
+  public transcript = "";
 
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
@@ -176,19 +175,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public appStorage: AppStorageService,
               public cd: ChangeDetectorRef,
               private asrService: AsrService) {
-
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    super();
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-      this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
-        if (event.shortcut === 'SHIFT + ALT + 1' ||
-          event.shortcut === 'SHIFT + ALT + 2' ||
-          event.shortcut === 'SHIFT + ALT + 3') {
+      this.subscrManager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
+        if (event.shortcut === "SHIFT + ALT + 1" ||
+          event.shortcut === "SHIFT + ALT + 2" ||
+          event.shortcut === "SHIFT + ALT + 3") {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
             this.save();
 
             if (this.oldRaw === this.editor.rawText) {
-              this.appStorage.saving.emit('success');
+              this.appStorage.saving.emit("success");
             }
 
             this.close();
@@ -198,7 +196,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }));
     }
 
-    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+    this.subscrManager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         if (item.time.sampleStart === this.audiochunk.time.start.samples
           && item.time.sampleLength === this.audiochunk.time.duration.samples) {
           if (item.status === ASRProcessStatus.FINISHED && item.result !== undefined) {
@@ -224,7 +222,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     new Promise<void>((resolve) => {
       // timeout to show loading status correctly
-      this.subscrmanager.add(timer(0).subscribe(() => {
+      this.subscrManager.add(timer(0).subscribe(() => {
         this._validationEnabled = false;
         this.editor.updateRawText();
         this.save();
@@ -239,7 +237,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }));
     }).then(() => {
-      if (direction !== 'down') {
+      if (direction !== "down") {
         this.goToSegment(direction).then(() => {
           const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
 
@@ -258,17 +256,17 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
       this._loading = false;
     });
-  }
+  };
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
     if (!this.loading) {
       switch ($event.shortcutName) {
-        case('play_pause'):
+        case("play_pause"):
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
             value: $event.shortcutName,
-            type: 'audio',
+            type: "audio",
             timestamp: $event.timestamp
           });
           if (this.audiochunk.isPlaying) {
@@ -281,63 +279,63 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             });
           }
           break;
-        case('stop'):
+        case("stop"):
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
             value: $event.shortcutName,
-            type: 'audio',
+            type: "audio",
             timestamp: $event.timestamp
           });
           this.audiochunk.stopPlayback().catch((error) => {
             console.error(error);
           });
           break;
-        case('step_backward'):
+        case("step_backward"):
           console.log(`step backward`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
             value: $event.shortcutName,
-            type: 'audio',
+            type: "audio",
             timestamp: $event.timestamp
           });
           this.audiochunk.stepBackward().catch((error) => {
             console.error(error);
           });
           break;
-        case('step_backwardtime'):
+        case("step_backwardtime"):
           console.log(`step backward time`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
             value: $event.shortcutName,
-            type: 'audio',
+            type: "audio",
             timestamp: $event.timestamp
           });
           this.audiochunk.stepBackwardTime(0.5).catch((error) => {
             console.error(error);
           });
           break;
-        case ('jump_right'):
+        case ("jump_right"):
           if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
             && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
-            this.doDirectionAction('right');
+            this.doDirectionAction("right");
           } else {
             this.save();
             this.close();
-            this.act.emit('overview');
+            this.act.emit("overview");
           }
           break;
-        case ('jump_left'):
-          this.doDirectionAction('left');
+        case ("jump_left"):
+          this.doDirectionAction("left");
           break;
-        case ('close_save'):
-          this.doDirectionAction('down');
+        case ("close_save"):
+          this.doDirectionAction("down");
           break;
       }
     }
-  }
+  };
 
   ngOnInit() {
     this._loading = false;
@@ -346,14 +344,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.specialMarkers.boundary = true;
-    this.loupe.name = 'transcr-window viewer';
+    this.loupe.name = "transcr-window viewer";
     this.loupe.settings.margin.top = 5;
     this.loupe.settings.margin.bottom = 0;
     this.loupe.settings.justifySignalHeight = true;
     this.loupe.settings.boundaries.enabled = false;
     this.loupe.settings.boundaries.readonly = true;
     this.loupe.settings.selection.enabled = true;
-    this.loupe.settings.frame.color = '#222222';
+    this.loupe.settings.frame.color = "#222222";
     this.loupe.settings.roundValues = false;
     this.loupe.settings.showTimePerLine = true;
     this.loupe.settings.showProgressBars = true;
@@ -362,28 +360,28 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     const segments = this.transcrService.currentlevel.segments;
     this.tempSegments = segments.clone();
-    this.subscrmanager.removeByTag('editor');
+    this.subscrManager.removeByTag("editor");
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
       this.transcript = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
     }
 
-    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
+    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup("2D-Editor viewer");
     shortcutGroup.enabled = false;
 
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered));
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered));
   }
 
   setValidationEnabledToDefault() {
-    this._validationEnabled = this.appStorage.useMode !== 'url'
-      && (this.appStorage.useMode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
+    this._validationEnabled = this.appStorage.useMode !== "url"
+      && (this.appStorage.useMode === "demo" || this.settingsService.projectsettings.octra.validationEnabled);
   }
 
   ngOnChanges(obj) {
-    if (getProperties(obj).findIndex(([key]) => key === 'audiochunk') > -1) {
+    if (getProperties(obj).findIndex(([key]) => key === "audiochunk") > -1) {
       const previous: AudioChunk = obj.audiochunk.previousValue;
       const current: AudioChunk = obj.audiochunk.currentValue;
 
@@ -400,10 +398,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
   }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
-
   ngAfterViewInit() {
     this.loupe.av.zoomY = 6;
     this.audiochunk.startpos = this.audiochunk.time.start.clone();
@@ -412,7 +406,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.audioManager.createSampleUnit(0)
     );
 
-    this.subscrmanager.add(timer(500).subscribe(() => {
+    this.subscrManager.add(timer(500).subscribe(() => {
       const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
 
       if (segment.isBlockedBy === undefined) {
@@ -424,26 +418,26 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngAfterContentInit() {
-    this.act.emit('open');
+    this.act.emit("open");
   }
 
   close() {
     this.showWindow = false;
 
-    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
+    const shortcutGroup = this.keyMap.shortcutsManager.getShortcutGroup("2D-Editor viewer");
     shortcutGroup.enabled = true;
 
     const startSample = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
 
-    this.uiService.addElementFromEvent('segment', {
-        value: 'exited'
+    this.uiService.addElementFromEvent("segment", {
+        value: "exited"
       }, Date.now(), this.loupe.av.PlayCursor.timePos, -1, undefined,
       {
         start: startSample,
         length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - startSample
-      }, 'transcription window');
+      }, "transcription window");
 
-    this.act.emit('close');
+    this.act.emit("close");
   }
 
   public open() {
@@ -451,7 +445,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   openOverview() {
-    this.act.emit('overview');
+    this.act.emit("overview");
   }
 
   save() {
@@ -459,7 +453,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
-      if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
+      if (this.editor.html.indexOf("<img src=\"assets/img/components/transcr-editor/boundary.png\"") > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
         this.transcrService.currentLevelSegmentChange.emit(undefined);
@@ -512,9 +506,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         };
       }
 
-      this.uiService.addElementFromEvent('mouseclick', {value: event.type},
+      this.uiService.addElementFromEvent("mouseclick", { value: event.type },
         event.timestamp, this.audioManager.playPosition,
-        this.editor.caretpos, selection, segment, 'audio_buttons');
+        this.editor.caretpos, selection, segment, "audio_buttons");
     }
 
     // TODO important what about this?
@@ -537,21 +531,21 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         let startIndex = 0;
         let limitFunc: (i: number) => boolean;
         let counterFunc: (i: number) => number;
-        let appliedDirection = '';
+        let appliedDirection = "";
 
-        if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
+        if (direction === "right" && this.segmentIndex < segmentsLength - 1) {
           startIndex = this.segmentIndex + 1;
           limitFunc = j => j < segmentsLength;
           counterFunc = j => j + 1;
-          appliedDirection = 'right';
-        } else if (direction === 'left' && this.segmentIndex > 0) {
+          appliedDirection = "right";
+        } else if (direction === "left" && this.segmentIndex > 0) {
           startIndex = this.segmentIndex - 1;
           limitFunc = j => j >= 0;
           counterFunc = j => j - 1;
-          appliedDirection = 'left';
+          appliedDirection = "left";
         }
 
-        if (appliedDirection !== '') {
+        if (appliedDirection !== "") {
           for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
             const tempSegment = this.transcrService.currentlevel.segments.get(i);
 
@@ -565,13 +559,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           }
 
           const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
-          const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
-          this.uiService.addElementFromEvent('segment', {value: valueString},
+          const valueString = (appliedDirection === "right") ? "entered next" : "entered previous";
+          this.uiService.addElementFromEvent("segment", { value: valueString },
             Date.now(), this.audioManager.playPosition,
             this.editor.caretpos, undefined, {
               start,
               length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
-            }, 'transcription window');
+            }, "transcription window");
         }
 
         let begin;
@@ -628,8 +622,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       };
     }
 
-    this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
-      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'loupe');
+    this.uiService.addElementFromEvent("shortcut", $event, $event.timestamp,
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, "loupe");
   }
 
   onMarkerInsert(markerCode
@@ -663,8 +657,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       };
     }
 
-    this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(),
-      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'markers');
+    this.uiService.addElementFromEvent("shortcut", { value: markerCode }, Date.now(),
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, "markers");
   }
 
   onMarkerClick(markerCode: string
@@ -696,8 +690,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       };
     }
 
-    this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
+    this.uiService.addElementFromEvent("mouseclick", { value: markerCode }, Date.now(),
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, "texteditor_toolbar");
   }
 
   onSpeedChange(event: {
@@ -709,14 +703,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   listenToAudioChunkStatusChanges() {
-    this.subscrmanager.removeByTag('audiochunkStatus');
-    this.subscrmanager.add(this.audiochunk.statuschange.subscribe((status) => {
+    this.subscrManager.removeByTag("audiochunkStatus");
+    this.subscrManager.add(this.audiochunk.statuschange.subscribe((status) => {
       this.cd.markForCheck();
       this.cd.detectChanges();
     }, (error) => {
       console.error(`couldn't update view for audio chunk in transcription window.`);
       console.error(error);
-    }), 'audiochunkStatus');
+    }), "audiochunkStatus");
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
@@ -746,8 +740,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       };
     }
 
-    this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'audio_speed');
+    this.uiService.addElementFromEvent("slider", event, event.timestamp,
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, "audio_speed");
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -783,8 +777,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       };
     }
 
-    this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audioManager.playPosition, this.editor.caretpos, selection, segment, 'audio_volume');
+    this.uiService.addElementFromEvent("slider_changed", event, event.timestamp,
+      this.audioManager.playPosition, this.editor.caretpos, selection, segment, "audio_volume");
   }
 
   onBoundaryClicked(sample: SampleUnit) {
@@ -802,16 +796,16 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   onBoundaryInserted() {
-    this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, 'texteditor');
+    this.uiService.addElementFromEvent("segment", { value: "boundaries:add" }, Date.now(),
+      this.audioManager.playPosition, this.editor.caretpos, undefined, undefined, "texteditor");
   }
 
   afterTyping(status) {
-    if (status === 'started') {
+    if (status === "started") {
       this.oldRaw = this.editor.rawText;
     }
 
-    if (status === 'stopped') {
+    if (status === "stopped") {
       if (this.oldRaw === this.editor.rawText) {
         // this.appStorage.savingNeeded = false;
       }
@@ -837,7 +831,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     html.replace(/\s?{([0-9]+)}\s?/g,
       (match, g1, g2) => {
         samplesArray.push(Number(g1));
-        return '';
+        return "";
       });
 
     // remove invalid boundaries
@@ -874,22 +868,22 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public highlight() {
-    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+    const html: string = this.editor.html.replace(/&nbsp;/g, " ");
 
     const samplesArray: number[] = [];
-    html.replace(new RegExp(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/, 'g'),
+    html.replace(new RegExp(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/, "g"),
       (match, g1, g2) => {
         samplesArray.push(Number(g1));
-        return '';
+        return "";
       });
 
     let start = 0;
     for (let i = 0; i < samplesArray.length; i++) {
       if (!(samplesArray[i] > start)) {
         // mark boundary red
-        this.editor.wisiwyg.querySelector('img[data-samples]:eq(' + i + ')')[0].css.backgroundColor = 'red';
+        this.editor.wisiwyg.querySelector("img[data-samples]:eq(" + i + ")")[0].css.backgroundColor = "red";
       } else {
-        this.editor.wisiwyg.querySelector('img[data-samples]:eq(' + i + ')')[0].css.backgroundColor = 'transparent';
+        this.editor.wisiwyg.querySelector("img[data-samples]:eq(" + i + ")")[0].css.backgroundColor = "transparent";
         start = samplesArray[i];
       }
     }

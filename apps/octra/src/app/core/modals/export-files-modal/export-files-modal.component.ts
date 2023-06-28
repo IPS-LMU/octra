@@ -23,7 +23,7 @@ import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
     fadeOutCollapseOnLeaveAnimation()
   ]
 })
-export class ExportFilesModalComponent extends OctraModal implements OnInit, OnDestroy {
+export class ExportFilesModalComponent extends OctraModal implements OnInit {
   public static options: NgbModalOptions = {
     size: "xl",
     keyboard: true,
@@ -97,7 +97,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   navbarService: NavbarService;
   uiService: UserInteractionsService;
 
-  private subscriptionManager = new SubscriptionManager<Subscription>();
   public selectedLevel = 0;
 
   constructor(private sanitizer: DomSanitizer,
@@ -178,7 +177,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
         name: converter.name,
         preparing: true
       };
-      this.subscriptionManager.add(timer(300).subscribe(
+      this.subscrManager.add(timer(300).subscribe(
         () => {
           if (converter.name === "Bundle") {
             // only this converter needs an array buffer
@@ -226,13 +225,9 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
   }
 
   onDownloadClick(i: number) {
-    this.subscriptionManager.add(timer(500).subscribe(() => {
+    this.subscrManager.add(timer(500).subscribe(() => {
       this.exportStates[i] = "inactive";
     }));
-  }
-
-  ngOnDestroy() {
-    this.subscriptionManager.destroy();
   }
 
   onHidden() {
@@ -248,7 +243,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit, OnD
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.subscriptionManager.destroy();
+    this.subscrManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);

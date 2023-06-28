@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
 import { environment } from "../environments/environment";
@@ -14,6 +14,7 @@ import { BugReportService, ConsoleType } from "./core/shared/service/bug-report.
 import * as fromApplication from "./core/store/application";
 import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
+import { DefaultComponent } from "./core/component/default.component";
 
 @Component({
   selector: "octra-app",
@@ -21,10 +22,9 @@ import { Subscription } from "rxjs";
   styleUrls: ["app.component.scss"]
 })
 
-export class AppComponent implements OnDestroy, OnInit {
+export class AppComponent extends DefaultComponent implements OnInit {
 
   @ViewChild("navigation", { static: true }) navigation: NavigationComponent | undefined;
-  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
 
   public get version(): string {
     return AppInfo.version;
@@ -44,6 +44,8 @@ export class AppComponent implements OnDestroy, OnInit {
               private multiThreading: MultiThreadingService,
               private asrService: AsrService,
               private store: Store) {
+    super();
+
     this.router.events.subscribe((event: any) => {
         if (event.url) {
           console.log(`route to page: ${event?.url}`);
@@ -126,7 +128,7 @@ export class AppComponent implements OnDestroy, OnInit {
       embedded: this.getParameterByName("embedded")
     };
 
-    this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded as any).subscribe(
+    this.subscrManager.add(this.store.select(fromApplication.selectIDBLoaded as any).subscribe(
       () => {
         if (this.appStorage.asrSelectedService !== undefined && this.appStorage.asrSelectedLanguage !== undefined) {
           // set asr settings
@@ -177,8 +179,8 @@ export class AppComponent implements OnDestroy, OnInit {
     });
   }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.multiThreading.destroy();
   }
 

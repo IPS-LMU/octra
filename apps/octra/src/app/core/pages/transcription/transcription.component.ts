@@ -10,9 +10,9 @@ import {
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
-import { BrowserInfo, hasProperty, ShortcutGroup, ShortcutManager, SubscriptionManager } from "@octra/utilities";
+import { BrowserInfo, hasProperty, ShortcutGroup, ShortcutManager } from "@octra/utilities";
 import { navigateTo } from "@octra/ngx-utilities";
-import { interval, Subscription, throwError, timer } from "rxjs";
+import { interval, throwError, timer } from "rxjs";
 import * as X2JS from "x2js";
 import { AppInfo } from "../../../app.info";
 import { editorComponents } from "../../../editors/components";
@@ -58,6 +58,7 @@ import { ShortcutsModalComponent } from "../../modals/shortcuts-modal/shortcuts-
 import { PromptModalComponent } from "../../modals/prompt-modal/prompt-modal.component";
 import { OctraAPIService } from "@octra/ngx-octra-api";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
   selector: "octra-transcription",
@@ -65,7 +66,7 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ["./transcription.component.scss"],
   providers: [AlertService]
 })
-export class TranscriptionComponent implements OnInit, OnDestroy {
+export class TranscriptionComponent extends DefaultComponent implements OnInit, OnDestroy {
   get selectedTheme(): string {
     return this._selectedTheme;
   }
@@ -89,7 +90,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
   public editorloaded = false;
   user: number;
   public platform = BrowserInfo.platform;
-  private subscrmanager: SubscriptionManager<Subscription>;
   private sendOk = false;
   private _useMode = "";
   private _selectedTheme = "";
@@ -235,7 +235,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
               private alertService: AlertService) {
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    super();
     this.audioManager = this.audio.audiomanagers[0];
 
     this.navbarServ.transcrService = this.transcrService;
@@ -244,7 +244,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     this.shortcutManager = new ShortcutManager();
     this.shortcutManager.registerShortcutGroup(this.modalShortcuts);
 
-    this.subscrmanager.add(this.audioManager.statechange.subscribe(async (state) => {
+    this.subscrManager.add(this.audioManager.statechange.subscribe(async (state) => {
         if (!appStorage.playonhover && !this.modalVisiblities.overview) {
           let caretpos = -1;
 
@@ -261,7 +261,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         console.error(error);
       }));
 
-    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
       if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
         if (["SHIFT + ALT + 1", "SHIFT + ALT + 2", "SHIFT + ALT + 3"].includes(event.shortcut)) {
           event.event.preventDefault();
@@ -292,7 +292,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.subscrmanager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
+    this.subscrManager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
       switch (toolName) {
         case("combinePhrases"):
           this.alertService.showAlert("success", this.langService.translate("tools.alerts.done", {
@@ -307,7 +307,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
+    this.subscrManager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
       if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         console.log(`CALL disable all shortcuts!`);
@@ -317,7 +317,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.subscrmanager.add(this.modService.closemodal.subscribe(() => {
+    this.subscrManager.add(this.modService.closemodal.subscribe(() => {
       if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         console.log(`CALL enable all shortcuts!`);
@@ -326,7 +326,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
     }));
 
-    this.subscrmanager.add(this.audio.missingPermission.subscribe(() => {
+    this.subscrManager.add(this.audio.missingPermission.subscribe(() => {
       this.modService.openModal(MissingPermissionsModalComponent, MissingPermissionsModalComponent.options);
     }));
   }
@@ -380,7 +380,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       ) && (this._useMode === "online" || this._useMode === "demo")
       && this.transcrService.feedback !== undefined;
 
-    this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
+    this.subscrManager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
       this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
     }));
 
@@ -402,13 +402,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     this.interface = this.appStorage.interface;
 
     // load guidelines on language change
-    this.subscrmanager.add(this.langService.langChanges$.subscribe(
+    this.subscrManager.add(this.langService.langChanges$.subscribe(
       () => {
         this.settingsService.loadGuidelines();
       }
     ));
 
-    this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
+    this.subscrManager.add(this.navbarServ.interfacechange.subscribe(
       (editor) => {
         this.changeEditor(editor).catch((error) => {
           console.error(error);
@@ -434,14 +434,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
 
-    this.subscrmanager.add(this.appStorage.saving.subscribe(
+    this.subscrManager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
         if (saving === "saving") {
           this.saving = "saving";
         } else if (saving === "error") {
           this.saving = "error";
         } else if (saving === "success") {
-          this.subscrmanager.add(timer(200).subscribe(() => {
+          this.subscrManager.add(timer(200).subscribe(() => {
             this.saving = "success";
           }));
         }
@@ -451,24 +451,24 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
     if (this.transcrService.annotation !== undefined) {
-      this.levelSubscriptionID = this.subscrmanager.add(
+      this.levelSubscriptionID = this.subscrManager.add(
         this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
       );
     } else {
-      this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.levelSubscriptionID = this.subscrmanager.add(
+      this.subscrManager.add(this.transcrService.dataloaded.subscribe(() => {
+        this.levelSubscriptionID = this.subscrManager.add(
           this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
         );
       }));
     }
 
-    this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
+    this.subscrManager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
         (this.currentEditor.instance as any).update();
 
         // important: subscribe to level changes in order to save proceedings
-        this.subscrmanager.removeById(this.levelSubscriptionID);
-        this.levelSubscriptionID = this.subscrmanager.add(
+        this.subscrManager.removeById(this.levelSubscriptionID);
+        this.levelSubscriptionID = this.subscrManager.add(
           this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
         );
         this.uiService.addElementFromEvent("level", { value: "changed" }, Date.now(),
@@ -484,7 +484,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         // if waitTime is 0 the inactivity modal isn't shown
         let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
-        this.subscrmanager.add(interval(5000).subscribe(
+        this.subscrManager.add(interval(5000).subscribe(
           () => {
             if (Date.now() - this.uiService.lastAction > waitTime && !this.modalVisiblities.inactivity) {
               if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
@@ -529,10 +529,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
     if (found === undefined) {
       this.appStorage.interface = this.projectsettings.interfaces[0];
     }
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
   }
 
   @HostListener("window:keydown", ["$event"])
@@ -599,10 +595,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
       }
 
       if (!(comp === undefined)) {
-        const id = this.subscrmanager.add(comp.initialized.subscribe(
+        const id = this.subscrManager.add(comp.initialized.subscribe(
           () => {
             this.editorloaded = true;
-            this.subscrmanager.removeById(id);
+            this.subscrManager.removeById(id);
             this.cd.detectChanges();
 
             resolve();
@@ -612,14 +608,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
         if (!(this.appLoadeditor === undefined)) {
           const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
-          this.subscrmanager.add(timer(20).subscribe(() => {
+          this.subscrManager.add(timer(20).subscribe(() => {
             const viewContainerRef = this.appLoadeditor.viewContainerRef;
             viewContainerRef.clear();
 
             this._currentEditor = viewContainerRef.createComponent(componentFactory);
 
             if (hasProperty((this.currentEditor.instance as any), "openModal")) {
-              this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
+              this.subscrManager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
                 (this.currentEditor.instance as any).disableAllShortcuts();
                 this.modService.openModal(OverviewModalComponent, OverviewModalComponent.options).then(() => {
                   (this.currentEditor.instance as any).enableAllShortcuts();
@@ -714,7 +710,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
             break;
           case(ModalEndAnswer.CONTINUE):
             this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
-            this.subscrmanager.add(timer(1000).subscribe(() => {
+            this.subscrManager.add(timer(1000).subscribe(() => {
               // simulate nextTranscription
               this.transcrSendingModal.close();
               this.reloadDemo();
@@ -915,7 +911,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy {
 
   private unsubscribeSubscriptionsForThisAnnotation() {
     if (this.levelSubscriptionID > 0) {
-      this.subscrmanager.removeById(this.levelSubscriptionID);
+      this.subscrManager.removeById(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
     }
   }

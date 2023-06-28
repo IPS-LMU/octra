@@ -1,25 +1,25 @@
-import { Component, Input, OnDestroy, ViewChild } from "@angular/core";
+import { Component, Input, ViewChild } from "@angular/core";
 import { AppInfo } from "../../../app.info";
 import { DropZoneComponent } from "../drop-zone";
 import { ModalService } from "../../modals/modal.service";
 import { SessionFile } from "../../obj/SessionFile";
-import { contains, fileListToArray, FileSize, getFileSize, SubscriptionManager } from "@octra/utilities";
+import { contains, fileListToArray, FileSize, getFileSize } from "@octra/utilities";
 import { FileProgress } from "../../obj/objects";
 import { Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment } from "@octra/annotation";
 import { AudioManager } from "@octra/media";
-import { Subscription, timer } from "rxjs";
+import { timer } from "rxjs";
 import { SupportedFilesModalComponent } from "../../modals/supportedfiles-modal/supportedfiles-modal.component";
+import { DefaultComponent } from "../default.component";
 
 @Component({
   selector: "octra-dropzone",
   templateUrl: "./octra-dropzone.component.html",
   styleUrls: ["./octra-dropzone.component.scss"]
 })
-export class OctraDropzoneComponent implements OnDestroy {
+export class OctraDropzoneComponent extends DefaultComponent {
 
   @ViewChild("dropzone", { static: true }) dropzone: DropZoneComponent;
   @Input() height = "250px";
-  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
   private _audiomanager: AudioManager;
 
   get AppInfo(): AppInfo {
@@ -59,6 +59,7 @@ export class OctraDropzoneComponent implements OnDestroy {
   }
 
   constructor(private modService: ModalService) {
+    super();
   }
 
   public afterDrop = () => {
@@ -124,10 +125,6 @@ export class OctraDropzoneComponent implements OnDestroy {
       }
     }
   };
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
 
   public isValidImportData(file: FileProgress) {
     if (this._oaudiofile !== undefined) {
@@ -265,7 +262,7 @@ export class OctraDropzoneComponent implements OnDestroy {
       this.dropzone.clicklocked = true;
       // make sure, that event click does not trigger
 
-      this.subscrmanager.add(timer(300).subscribe(() => {
+      this.subscrManager.add(timer(300).subscribe(() => {
         this.dropzone.clicklocked = false;
       }));
     }
@@ -332,9 +329,9 @@ export class OctraDropzoneComponent implements OnDestroy {
     this.checkState();
     const extension = fileProcess.file.name.substr(fileProcess.file.name.lastIndexOf("."));
 
-    this.subscrmanager.add(timer(200).subscribe(() => {
+    this.subscrManager.add(timer(200).subscribe(() => {
       // check audio
-      this.subscrmanager.add(AudioManager.decodeAudio(fileProcess.file.name, fileProcess.file.type, buffer, AppInfo.audioformats).subscribe(
+      this.subscrManager.add(AudioManager.decodeAudio(fileProcess.file.name, fileProcess.file.type, buffer, AppInfo.audioformats).subscribe(
         (result) => {
           fileProcess.progress = (result.decodeProgress) / 2 + 0.5;
           // console.log((window.performance as any).memory.jsHeapSizeLimit - (window.performance as any).memory.usedJSHeapSize);

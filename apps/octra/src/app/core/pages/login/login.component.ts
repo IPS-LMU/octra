@@ -21,6 +21,7 @@ import { OIDBLevel, OIDBLink } from "@octra/annotation";
 import { Observable, Subscription } from "rxjs";
 import { ErrorModalComponent } from "../../modals/error-modal/error-modal.component";
 import { OctraAPIService } from "@octra/ngx-octra-api";
+import { DefaultComponent } from "../../component/default.component";
 
 @Component({
   selector: "octra-login",
@@ -28,7 +29,7 @@ import { OctraAPIService } from "@octra/ngx-octra-api";
   styleUrls: ["./login.component.scss"],
   providers: [LoginService]
 })
-export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, OnDestroy {
+export class LoginComponent extends DefaultComponent implements OnInit, ComponentCanDeactivate {
   @ViewChild("f", { static: false }) loginform: NgForm;
   @ViewChild("dropzone", { static: true }) dropzone: OctraDropzoneComponent;
   @ViewChild("agreement", { static: false }) agreement: ElementRef;
@@ -43,7 +44,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
   err = "";
   public apiStatus: "init" | "available" | "unavailable" = "available";
-  private subscrmanager: SubscriptionManager<Subscription>;
 
   private windowChecker: Subscription;
 
@@ -67,12 +67,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private langService: TranslocoService,
               private audioService: AudioService,
               private api: OctraAPIService) {
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    super();
     console.log(BrowserInfo.platform + " " + BrowserInfo.browser);
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
   }
 
   onOfflineSubmit = () => {

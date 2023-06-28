@@ -7,7 +7,6 @@ import {
   HostListener,
   Input,
   OnChanges,
-  OnDestroy,
   Output,
   ViewChild,
   ViewEncapsulation
@@ -36,6 +35,7 @@ import { Segments } from "@octra/annotation";
 import { TimespanPipe } from "@octra/ngx-components";
 import { Subscription, timer } from "rxjs";
 import { NgxJoditComponent } from "ngx-jodit";
+import { DefaultComponent } from "../default.component";
 
 declare let tidyUpAnnotation: ((string, any) => any);
 
@@ -48,7 +48,7 @@ declare let document: any;
   providers: [TranscrEditorConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewInit {
+export class TranscrEditorComponent extends DefaultComponent implements OnChanges, AfterViewInit {
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
@@ -113,7 +113,6 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
   private shortcutsManager: ShortcutManager;
   private _lastAudioChunkID = -1;
   private _settings: TranscrEditorConfig;
-  private subscrmanager: SubscriptionManager<Subscription>;
   private init = 0;
   private lastkeypress = 0;
   private lastCursorPosition: {
@@ -141,9 +140,10 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
               private langService: TranslocoService,
               private transcrService: TranscriptionService,
               private asrService: AsrService) {
+    super();
     this.shortcutsManager = new ShortcutManager();
     this._settings = new TranscrEditorConfig();
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   private _highlightingEnabled = true;
@@ -562,7 +562,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
       };
 
       if (later) {
-        this.subscrmanager.add(timer(300).subscribe(() => {
+        this.subscrManager.add(timer(300).subscribe(() => {
           func();
         }));
       } else {
@@ -578,7 +578,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     }
     this.initialize();
 
-    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+    this.subscrManager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         this.onASRItemChange(item);
       },
       (error) => {
@@ -614,13 +614,8 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     }
   }
 
-  ngOnDestroy() {
-    this.destroy();
-    // jQuery(this.transcrEditor.nativeElement).find('.jodit-wysiwyg img').off('click');
-  }
-
   public update() {
-    this.destroy();
+    this.subscrManager.destroy();
     this.initialize();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -798,11 +793,11 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     element.setAttribute("alt", "[|" + this.audiochunk.absolutePlayposition.samples.toString() + "|]");
 
     // timeout needed to fix summernote
-    this.subscrmanager.add(timer(100).subscribe(() => {
+    this.subscrManager.add(timer(100).subscribe(() => {
       this.joditComponent.jodit.selection.insertNode(element);
       this.joditComponent.jodit.selection.insertHTML(" ");
 
-      this.subscrmanager.add(timer(200).subscribe(() => {
+      this.subscrManager.add(timer(200).subscribe(() => {
         // set popover
         element.addEventListener("click", (event) => {
           const samples = getAttr(event.target, "data-samples");
@@ -970,7 +965,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
   public startRecurringHighlight() {
     if (this.highlightingRunning) {
-      this.subscrmanager.removeByTag("highlight");
+      this.subscrManager.removeByTag("highlight");
       this.lockHighlighting = false;
     }
     if (this._highlightingEnabled && this._settings.highlightingEnabled) {
@@ -981,7 +976,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
           if (!this.lockHighlighting) {
             this.highlightCurrentSegment(this.audiochunk.absolutePlayposition);
           }
-          this.subscrmanager.add(timer(100).subscribe(() => {
+          this.subscrManager.add(timer(100).subscribe(() => {
             highlight();
           }), "highlight");
         } else {
@@ -1087,7 +1082,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     return new Promise<void>((resolve, reject) => {
       if (this.validationEnabled) {
         if (this.isValidating) {
-          this.subscrmanager.add(this.validationFinish.subscribe(() => {
+          this.subscrManager.add(this.validationFinish.subscribe(() => {
             resolve();
           }));
         } else {
@@ -1168,7 +1163,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
   private triggerTyping() {
     // this.highlightingRunning = false;
-    this.subscrmanager.add(timer(500).subscribe(() => {
+    this.subscrManager.add(timer(500).subscribe(() => {
       if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
         if (this._isTyping) {
           if (this.audiochunk.id === this._lastAudioChunkID) {
@@ -1189,14 +1184,6 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     }
     this._isTyping = true;
     this.lastkeypress = Date.now();
-  }
-
-  /**
-   * destroys the summernote editor
-   */
-  private destroy() {
-    // delete tooltip overlays
-    this.subscrmanager.destroy();
   }
 
   /**
@@ -1348,8 +1335,8 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
     this.init++;
 
     if (this.init > 1) {
-      this.subscrmanager.removeByTag("typing_change");
-      this.subscrmanager.add(this.internalTyping.subscribe((status) => {
+      this.subscrManager.removeByTag("typing_change");
+      this.subscrManager.add(this.internalTyping.subscribe((status) => {
         if (status === "stopped") {
           this.validate();
           this.initPopover();
@@ -1383,7 +1370,7 @@ export class TranscrEditorComponent implements OnDestroy, OnChanges, AfterViewIn
 
   onAfterInit = () => {
     // fix additional <p><br/></p>
-    this.subscrmanager.add(timer(100).subscribe(() => {
+    this.subscrManager.add(timer(100).subscribe(() => {
       if (this.segments === undefined || this.segments.length === 0) {
         this.setTranscript(this.transcript);
       } else {

@@ -42,7 +42,7 @@ import { AudioNavigationComponent } from "../../core/component/audio-navigation"
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.scss']
 })
-export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
+export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit {
 
   public static editorname = '2D-Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -74,7 +74,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public miniLoupeSettings: AudioviewerConfig;
   private;
   public;
-  private subscrmanager: SubscriptionManager<Subscription>;
   private mousestate = 'initiliazied';
   private intervalID = undefined;
   private factor = 8;
@@ -192,7 +191,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               private store: Store<ApplicationState>) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   ngOnInit() {
@@ -211,7 +210,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       items: this.audioShortcuts.items
     });
     this.keyMap.register(this.windowShortcuts);
-    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered));
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered));
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
     this.viewer.settings.margin.top = 5;
@@ -238,7 +237,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.subscrmanager.add(this.viewer.alert.subscribe(
+    this.subscrManager.add(this.viewer.alert.subscribe(
       (result) => {
         this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
           console.error(error);
@@ -246,16 +245,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     ));
 
-    this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
-    }));
-
-    this.subscrmanager.add(this.transcrService.levelchanged.subscribe(() => {
-    }));
-
-    this.subscrmanager.add(this.transcrService.currentLevelSegmentChange.subscribe(() => {
-    }));
-
-    this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
+    this.subscrManager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
           if (this.appStorage.followPlayCursor !== undefined && this.appStorage.followPlayCursor === true) {
@@ -281,7 +271,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     ));
 
-    this.subscrmanager.add(this.appStorage.settingschange.subscribe(
+    this.subscrManager.add(this.appStorage.settingschange.subscribe(
       (event) => {
         switch (event.key) {
           case('secondsPerLine'):
@@ -291,7 +281,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     ));
 
-    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+    this.subscrManager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         const checkUndoRedo = () => {
           if (this.asrService.queue.statistics.running === 0) {
             this.appStorage.enableUndoRedo();
@@ -338,10 +328,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
                   this.alertService.showAlert('warning', AuthenticationNeededComponent, true, -1).then((alertItem) => {
                     const auth = alertItem.component as AuthenticationNeededComponent;
-                    this.subscrmanager.add(auth.authenticateClick.subscribe(() => {
+                    this.subscrManager.add(auth.authenticateClick.subscribe(() => {
                       this.openAuthWindow();
                     }));
-                    this.subscrmanager.add(auth.confirmationClick.subscribe(() => {
+                    this.subscrManager.add(auth.confirmationClick.subscribe(() => {
                       this.resetQueueItemsWithNoAuth();
                       this.alertService.closeAlert(alertItem.id);
                     }));
@@ -471,18 +461,18 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }));
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
+    super.ngOnDestroy();
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
     });
 
     clearInterval(this.intervalID);
-    this.subscrmanager.destroy();
     if (this.scrolltimer !== undefined) {
       this.scrolltimer.unsubscribe();
     }
 
-    this.subscrmanager.add(
+    this.subscrManager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {
           this.openSegment(segnumber);
@@ -567,7 +557,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     event: MouseEvent | undefined
     time: SampleUnit
   }) {
-    this.subscrmanager.removeByTag('mouseTimer');
+    this.subscrManager.removeByTag('mouseTimer');
     this.mousestate = 'moving';
 
     this.doPlayOnHover(this.audioManager, this.appStorage.playonhover, this.audioChunkLines, this.viewer.av.mouseCursor);
@@ -575,7 +565,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.showLoupe) {
       if (this.viewer.audioChunk.time.duration.seconds !== this.viewer.av.mouseCursor.seconds) {
         this.loupeHidden = false;
-        this.subscrmanager.add(timer(20).subscribe(() => {
+        this.subscrManager.add(timer(20).subscribe(() => {
           this.changeLoupePosition($event.event, $event.time);
           this.mousestate = 'ended';
         }), 'mouseTimer');

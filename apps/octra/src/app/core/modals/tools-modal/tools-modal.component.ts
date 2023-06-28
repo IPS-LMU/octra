@@ -97,7 +97,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
   protected data = undefined;
-  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public get manualURL(): string {
     return AppInfo.manualURL;
@@ -123,10 +122,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     super("toolsModal", activeModal);
   }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-  }
-
   onHidden() {
     this.tools.audioCutting.status = "idle";
     this.tools.audioCutting.progressbarType = "info";
@@ -136,7 +131,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.subscrmanager.destroy();
+    this.subscrManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
@@ -199,7 +194,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     let totalSize = 0;
     let cuttingStarted = 0;
 
-    this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(this.tools.audioCutting.wavFormat.onaudiocut.subscribe(
+    this.tools.audioCutting.subscriptionIDs[1] = this.subscrManager.add(this.tools.audioCutting.wavFormat.onaudiocut.subscribe(
       (status) => {
         this.tools.audioCutting.progress = Math.round(status.finishedSegments / overallTasks * 100);
         if (this.tools.audioCutting.archiveStructure === undefined) {
@@ -219,7 +214,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
             + (this.transcrService.audioManager.resource.arraybuffer.byteLength * zippingSpeed) + 10) * 1000);
 
-          this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(interval(1000).subscribe(
+          this.tools.audioCutting.subscriptionIDs[2] = this.subscrManager.add(interval(1000).subscribe(
             () => {
               this.tools.audioCutting.timeLeft -= 1000;
             }
@@ -265,7 +260,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               if (sizeProcessed === 0) {
                 // first process
                 if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-                  this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
+                  this.subscrManager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
                   this.tools.audioCutting.subscriptionIDs[2] = -1;
                 }
                 this.tools.audioCutting.cuttingSpeed = -1;
@@ -332,7 +327,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       },
       (err) => {
         if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-          this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
+          this.subscrManager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
           this.tools.audioCutting.subscriptionIDs[2] = -1;
         }
         this.tools.audioCutting.cuttingSpeed = -1;
@@ -363,7 +358,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       const subscriptionID = this.tools.audioCutting.subscriptionIDs[i];
 
       if (subscriptionID > -1) {
-        this.subscrmanager.removeById(subscriptionID);
+        this.subscrManager.removeById(subscriptionID);
       }
       this.tools.audioCutting.subscriptionIDs[i] = -1;
     }
@@ -467,7 +462,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.close();
     this.transcrService.currentLevelSegmentChange.emit();
 
-    this.subscrmanager.add(timer(1000).subscribe(() => {
+    this.subscrManager.add(timer(1000).subscribe(() => {
       this.navbarServ.toolApplied.emit("combinePhrases");
     }));
   }

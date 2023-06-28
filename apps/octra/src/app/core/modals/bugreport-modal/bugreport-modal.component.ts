@@ -25,7 +25,6 @@ export class BugreportModalComponent extends OctraModal {
   }[] = [];
   protected data = undefined;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager<Subscription>();
 
   public static options: NgbModalOptions = {
     size: "xl",
@@ -79,7 +78,7 @@ export class BugreportModalComponent extends OctraModal {
     };
 
     this.sendStatus = "sending";
-    this.subscrmanager.add(
+    this.subscrManager.add(
       this.bugService.sendReport(this.userName, this.email, this.bgdescr, this.sendProObj, {
         auth_token: this.settService.appSettings.octra.bugreport.auth_token,
         url: this.settService.appSettings.octra.bugreport.url
@@ -90,7 +89,7 @@ export class BugreportModalComponent extends OctraModal {
           this.update();
           console.log("Bugreport sent");
 
-          this.subscrmanager.add(timer(2000).subscribe(() => {
+          this.subscrManager.add(timer(2000).subscribe(() => {
             this.bgdescr = "";
             this.close();
           }));

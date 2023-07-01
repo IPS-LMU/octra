@@ -7,7 +7,7 @@ import { findElements, getAttr } from "@octra/utilities";
 import { uniqueHTTPRequest } from "@octra/ngx-utilities";
 import { HttpClient } from "@angular/common/http";
 import { TranslocoService } from "@ngneat/transloco";
-import { ConfigurationActions } from "../configuration/configuration.actions";
+import { ConfigurationActions } from "./configuration.actions";
 import { Subject } from "rxjs";
 import { exhaustMap } from "rxjs/operators";
 import "../../schemata/appconfig.schema";

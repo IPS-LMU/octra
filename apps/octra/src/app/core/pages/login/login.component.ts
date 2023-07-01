@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { TranslocoService } from "@ngneat/transloco";
-import { BrowserInfo, FileSize, getFileSize, SubscriptionManager } from "@octra/utilities";
+import { BrowserInfo, FileSize, getFileSize } from "@octra/utilities";
 import { navigateTo } from "@octra/ngx-utilities";
 import { AppInfo } from "../../../app.info";
 import { ModalService } from "../../modals/modal.service";
@@ -18,10 +18,11 @@ import { ComponentCanDeactivate } from "./login.deactivateguard";
 import { LoginService } from "./login.service";
 import { LoginMode } from "../../store";
 import { OIDBLevel, OIDBLink } from "@octra/annotation";
-import { Observable, Subscription } from "rxjs";
+import { Observable } from "rxjs";
 import { ErrorModalComponent } from "../../modals/error-modal/error-modal.component";
-import { OctraAPIService } from "@octra/ngx-octra-api";
 import { DefaultComponent } from "../../component/default.component";
+import { AuthenticationStoreService } from "../../store/authentication";
+import { AccountLoginMethod } from "../../../../../../../../octra-backend/dist/libs/api-types";
 
 @Component({
   selector: "octra-login",
@@ -35,17 +36,38 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
   @ViewChild("agreement", { static: false }) agreement: ElementRef;
   @ViewChild("localmode", { static: true }) localmode: ElementRef;
   @ViewChild("onlinemode", { static: true }) onlinemode: ElementRef;
-  public validSize = false;
-  public projects: string[] = [];
-  valid = false;
-  member = {
-    userName: "",
-    password: ""
-  };
-  err = "";
-  public apiStatus: "init" | "available" | "unavailable" = "available";
 
-  private windowChecker: Subscription;
+  state: {
+    online: {
+      apiStatus: "init" | "available" | "unavailable",
+      user: {
+        nameOrEmail: string;
+        password: string;
+      },
+      form: {
+        valid: boolean;
+        err: string;
+      }
+    },
+    local: {
+      validSize: boolean;
+    }
+  } = {
+    online: {
+      apiStatus: "available",
+      user: {
+        nameOrEmail: "",
+        password: ""
+      },
+      form: {
+        valid: false,
+        err: ""
+      }
+    },
+    local: {
+      validSize: false
+    }
+  };
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -66,7 +88,7 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
               public modService: ModalService,
               private langService: TranslocoService,
               private audioService: AudioService,
-              private api: OctraAPIService) {
+              private authStoreService: AuthenticationStoreService) {
     super();
     console.log(BrowserInfo.platform + " " + BrowserInfo.browser);
   }
@@ -130,9 +152,9 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
-      this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.state.local.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
-      this.validSize = true;
+      this.state.local.validSize = true;
     }
   }
 
@@ -290,32 +312,20 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
   }
 
 
-  onOnlineCredentialsSubmit(form: NgForm) {
-    /* TODO
-    this.api.loginUser('local', this.member.userName, this.member.password).then((result) => {
-      console.log(`after login`);
-      console.log(result);
-      this.appStorage.afterLoginOnlineSuccessful('local', {
-        name: this.member.userName, email: result.user.email, roles: result.user.roles, webToken: result.user.jwt
-      })
-    }).catch((error) => {
-      this.modService.openModal(ErrorModalComponent, modalConfigurations.error, {
-        text: error
-      });
-    });
-     */
+  onOnlineCredentialsSubmit() {
+    this.authStoreService.login(AccountLoginMethod.local, this.state.online.user.nameOrEmail, this.state.online.user.password);
   }
 
   canDeactivate(): Observable<boolean> | boolean {
-    return (this.valid);
+    return (this.state.online.form.valid);
   }
 
   @HostListener("window:resize", ["$event"])
   onResize() {
     if (this.settingsService.responsive.enabled === false) {
-      this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.state.local.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
-      this.validSize = true;
+      this.state.local.validSize = true;
     }
   }
 

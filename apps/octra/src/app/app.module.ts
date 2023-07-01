@@ -74,10 +74,10 @@ import * as fromLocalMode from "./core/store/modes/local-mode/local-mode.reducer
 import * as fromUser from "./core/store/user/user.reducer";
 import { IDBEffects } from "./core/store/idb/idb-effects.service";
 import { IDBService } from "./core/shared/service/idb.service";
-import { ConfigurationEffects } from "./core/store/application/configuration.effects";
+import { ConfigurationEffects } from "./core/store/configuration/configuration.effects";
 import { ContextMenuComponent } from "./core/component/context-menu/context-menu.component";
 import { MaintenanceModule } from "./core/component/maintenance/maintenance.module";
-import { ApplicationEffects } from "./core/store/application/application-effects.service";
+import { ApplicationEffects } from "./core/store/application/application.effects";
 import { LoginMode } from "./core/store";
 import {
   PermutationsReplaceModalComponent

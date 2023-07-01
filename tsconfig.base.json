@@ -17,12 +17,12 @@
     "paths": {
       "@angular/*": ["node_modules/@angular/*"],
       "@octra/annotation": ["libs/annotation/src/index.ts"],
-      "@octra/api-types": ["../octra-backend/extern/api-types"],
+      "@octra/api-types": ["../octra-backend/libs/api-types"],
       "@octra/assets": ["libs/assets/src/lib/index.ts"],
       "@octra/json-set-validator": ["libs/json-set-validator/src/index.ts"],
       "@octra/media": ["libs/media/src/index.ts"],
       "@octra/ngx-components": ["libs/ngx-components/src/index.ts"],
-      "@octra/ngx-octra-api": ["../octra-backend/extern/ngx-octra-api"],
+      "@octra/ngx-octra-api": ["../octra-backend/libs/ngx-octra-api"],
       "@octra/ngx-utilities": ["libs/ngx-utilities/src/index.ts"],
       "@octra/utilities": ["libs/utilities/src/index.ts"]
     }

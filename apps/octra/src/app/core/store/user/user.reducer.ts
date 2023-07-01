@@ -1,8 +1,8 @@
 import { createReducer, on } from "@ngrx/store";
-import { UserState } from "../index";
 import { UserActions } from "./user.actions";
 import { IDBActions } from "../idb/idb.actions";
 import { hasProperty } from "@octra/utilities";
+import { UserState } from "./index";
 
 export const initialState: UserState = {
   name: '',

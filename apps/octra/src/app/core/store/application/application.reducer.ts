@@ -1,11 +1,12 @@
 import { createReducer, on } from "@ngrx/store";
-import { ApplicationState, LoadingStatus, LoginMode } from "../index";
+import { LoadingStatus, LoginMode } from "../index";
 import { ApplicationActions } from "./application.actions";
 import { ConfigurationActions } from "../configuration/configuration.actions";
 import { IDBActions } from "../idb/idb.actions";
 import { OnlineModeActions } from "../modes/online-mode/online-mode.actions";
 import { AnnotationActions } from "../annotation/annotation.actions";
 import { LocalModeActions } from "../modes/local-mode/local-mode.actions";
+import { ApplicationState } from "./index";
 
 export const initialState: ApplicationState = {
   loading: {

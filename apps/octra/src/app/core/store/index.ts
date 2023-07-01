@@ -10,27 +10,29 @@ import {
   OLevel,
   OSegment
 } from "@octra/annotation";
-import { ConsoleEntry } from "../shared/service/bug-report.service";
-import { AppSettings, ProjectSettings } from "../obj/Settings";
+import { ProjectSettings } from "../obj/Settings";
 import { SampleUnit } from "@octra/media";
 import { ILog } from "../obj/Settings/logging";
 import { Histories, UndoRedoState } from "ngrx-wieder";
 import { SessionFile } from "../obj/SessionFile";
 import { TaskDto } from "@octra/api-types";
 import { AuthenticationState } from "./authentication";
+import { ApplicationState } from "./application";
+import { ASRState } from "./asr";
+import { UserState } from "./user";
 
 export enum LoginMode {
-  URL = 'url',
-  DEMO = 'demo',
-  ONLINE = 'online',
-  LOCAL = 'local'
+  URL = "url",
+  DEMO = "demo",
+  ONLINE = "online",
+  LOCAL = "local"
 }
 
 export enum LoadingStatus {
-  INITIALIZE = 'INITIALIZE',
-  LOADING = 'LOADING',
-  FAILED = 'FAILED',
-  FINISHED = 'FINISHED'
+  INITIALIZE = "INITIALIZE",
+  LOADING = "LOADING",
+  FAILED = "FAILED",
+  FINISHED = "FINISHED"
 }
 
 export interface LoginData {
@@ -70,42 +72,6 @@ export interface URLParameters {
   host: string;
 }
 
-export interface ApplicationState {
-  mode?: LoginMode;
-  queryParams?: URLParameters,
-  loggedIn: boolean;
-  loading: {
-    status: LoadingStatus;
-    progress: number;
-    errors: string[]
-  };
-  reloaded: boolean;
-  idb: {
-    loaded: boolean;
-    version?: number;
-  },
-  language: string;
-  appConfiguration: AppSettings;
-  consoleEntries: ConsoleEntry[];
-  options: {
-    playOnHover: boolean;
-    followPlayCursor: boolean;
-    showLoupe: boolean;
-    audioSettings: {
-      volume: number;
-      speed: number;
-    },
-    easyMode: boolean;
-    secondsPerLine: number;
-    highlightingEnabled: boolean;
-  };
-}
-
-export interface ASRState {
-  selectedLanguage?: string;
-  selectedService?: string;
-}
-
 export interface AnnotationState extends UndoRedoState {
   savingNeeded: boolean;
   isSaving: boolean;
@@ -114,7 +80,7 @@ export interface AnnotationState extends UndoRedoState {
     loaded: boolean;
     fileName: string;
     sampleRate: number;
-  }
+  };
   guidelines?: any;
   logs: ILog[];
   logging: boolean;
@@ -122,7 +88,7 @@ export interface AnnotationState extends UndoRedoState {
   methods?: {
     validate: ((transcript: string, guidelines: any) => any);
     tidyUp: ((transcript: string, guidelines: any) => any);
-  }
+  };
   transcript: TranscriptionState;
   histories: Histories;
   onlineSession?: any;
@@ -145,11 +111,6 @@ export interface TranscriptionState {
   levelCounter: number;
 }
 
-export interface UserState {
-  name: string;
-  email: string;
-}
-
 export interface RootState {
   authentication: AuthenticationState;
   application: ApplicationState,
@@ -169,7 +130,7 @@ export interface AnnotationStateLevel {
 
 export class AnnotationStateSegment extends OSegment {
   public isBlockedBy: ASRQueueItemType;
-  public progressInfo: { progress: number; statusLabel: string }
+  public progressInfo: { progress: number; statusLabel: string };
 }
 
 export function
@@ -184,7 +145,7 @@ convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastS
   for (const item of stateLevel.items) {
     if (stateLevel.type === AnnotationLevelType.SEGMENT) {
       const segment = item as AnnotationStateSegment;
-      const annoSegment = level.segments.getByID(segment.id)
+      const annoSegment = level.segments.getByID(segment.id);
 
       if (annoSegment !== undefined) {
         annoSegment.isBlockedBy = segment.isBlockedBy;
@@ -192,7 +153,7 @@ convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastS
           annoSegment.progressInfo = segment.progressInfo;
         } else {
           annoSegment.progressInfo = {
-            statusLabel: 'ASR',
+            statusLabel: "ASR",
             progress: 0
           };
         }
@@ -238,12 +199,12 @@ export function convertFromLevelObject(level: Level, lastOriginalBoundary: Sampl
           ...a,
           isBlockedBy: segment.isBlockedBy,
           progressInfo: segment.progressInfo
-        }
+        };
       } else {
         return a;
       }
     })
-  }
+  };
 
   return result;
 }

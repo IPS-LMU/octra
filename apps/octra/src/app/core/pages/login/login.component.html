@@ -16,7 +16,7 @@
     <div class="col-md-6">
       <div class="card login-card" #onlinemode>
         <div class="card-body">
-          <p *ngIf="!apc.octra.responsive.enabled && !validSize" [innerHTML]="'browser.small window width' | transloco"
+          <p *ngIf="!apc.octra.responsive.enabled && !state.local.validSize" [innerHTML]="'browser.small window width' | transloco"
              class="warning">
           </p>
           <section>
@@ -29,8 +29,8 @@
             </div>
             <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
 
-              <div *ngIf="apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
-                <ng-container *ngIf="apiStatus === 'unavailable'">
+              <div *ngIf="state.online.apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
+                <ng-container *ngIf="state.online.apiStatus === 'unavailable'">
                   <div class="alert alert-danger" style="padding:20px;">
                     <div style="text-align: center;">
                       <i class="bi bi-exclamation-triangle fs-4" style="color:red"></i>
@@ -41,7 +41,7 @@
                   </div>
                 </ng-container>
               </div>
-              <div class="text-center" *ngIf="apiStatus === 'available'">
+              <div class="text-center" *ngIf="state.online.apiStatus === 'available'">
                 <!-- Default form login -->
                 <form #f="ngForm" (ngSubmit)="onOnlineShibbolethSubmit(f)">
                   <button class="my-4 btn btn-secondary w-100" type="submit">
@@ -50,16 +50,16 @@
                   </button>
                 </form>
                 <span>or</span>
-                <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit(f2)">
+                <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit()">
                   <!-- Username -->
                   <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="username" placeholder="Username or email address">
+                    <input type="email" class="form-control" id="username" placeholder="Username or email address" name="nameOrEmail" [(ngModel)]="state.online.user.nameOrEmail">
                     <label for="username">Username or email address</label>
                   </div>
 
                   <!-- Password -->
                   <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="password" placeholder="Password">
+                    <input type="password" class="form-control" id="password" placeholder="Password" name="password" [(ngModel)]="state.online.user.password">
                     <label for="username">Password</label>
                   </div>
 

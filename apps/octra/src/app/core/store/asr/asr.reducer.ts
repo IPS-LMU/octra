@@ -1,8 +1,8 @@
 import { createReducer, on } from "@ngrx/store";
-import { ASRState } from "../index";
 import { ASRActions } from "./asr.actions";
 import { IDBActions } from "../idb/idb.actions";
 import { hasProperty } from "@octra/utilities";
+import { ASRState } from "./index";
 
 export const initialState: ASRState = {};
 

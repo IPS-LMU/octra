@@ -19,10 +19,12 @@ import { LocalModeActions } from "../modes/local-mode/local-mode.actions";
 import { IIDBModeOptions } from "../../shared/octra-database";
 import { hasProperty } from "@octra/utilities";
 import { exhaustMap, filter, mergeMap, withLatestFrom } from "rxjs/operators";
+import { OctraAPIService } from "../../../../../../../../octra-backend/dist/libs/ngx-octra-api";
+import { APIActions } from "../api";
 
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class IDBEffects {
   saveAfterUndo$ = createEffect(() =>
@@ -46,7 +48,7 @@ export class IDBEffects {
           });
         } else {
           subject.next(ApplicationActions.undoFailed({
-            error: 'Can\'t find modeState'
+            error: "Can't find modeState"
           }));
         }
         return subject;
@@ -76,7 +78,7 @@ export class IDBEffects {
           });
         } else {
           subject.next(ApplicationActions.undoFailed({
-            error: 'Can\'t find modeState'
+            error: "Can't find modeState"
           }));
         }
 
@@ -90,10 +92,22 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
+      const webToken = this.sessStr.retrieve('webToken');
+      const authType = this.sessStr.retrieve('authType');
+      const authenticated = this.sessStr.retrieve('authenticated');
+
+      this.store.dispatch(APIActions.init.do({
+        url: action.appConfiguration.api.url,
+        appToken: action.appConfiguration.api.appToken,
+        webToken,
+        authType,
+        authenticated
+      }));
+
       this.idbService.initialize(action.appConfiguration.octra.database.name).then(() => {
         console.log(`load options...`);
         const loadApplicationOptions = this.idbService.loadOptions([
-            'version', 'easymode', 'language', 'usemode', 'user', 'showLoupe', 'secondsPerLine', 'audioSettings', 'highlightingEnabled', 'asr'
+            "version", "easymode", "language", "usemode", "user", "showLoupe", "secondsPerLine", "audioSettings", "highlightingEnabled", "asr"
           ]
         );
 
@@ -169,7 +183,7 @@ export class IDBEffects {
         let max = 0;
         const convertToStateLevel = (level: ILevel, i) => {
           const annotationStateLevel = convertFromOIDLevel(level, i + 1);
-          if (!hasProperty(level, 'id')) {
+          if (!hasProperty(level, "id")) {
             annotationStateLevel.id = i + 1;
           }
 
@@ -178,7 +192,7 @@ export class IDBEffects {
         };
 
         const convertLink = (link: ILink, i) => {
-          if (!hasProperty(link, 'id')) {
+          if (!hasProperty(link, "id")) {
             return new OIDBLink(i + 1, link);
           } else {
             return link;
@@ -265,7 +279,7 @@ export class IDBEffects {
       || action.type === OnlineModeActions.clearWholeSession.type || action.type === AnnotationActions.logout.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-      if (!hasProperty(action, 'clearSession') || (action as any).clearSession) {
+      if (!hasProperty(action, "clearSession") || (action as any).clearSession) {
         this.idbService.clearAnnotationData((action as any).mode).then(() => {
           subject.next(IDBActions.clearAnnotationSuccess());
           subject.complete();
@@ -279,7 +293,7 @@ export class IDBEffects {
       } else {
         timer(10).subscribe(() => {
           subject.complete();
-        })
+        });
       }
       return subject;
     })
@@ -312,7 +326,7 @@ export class IDBEffects {
     exhaustMap(() => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', false);
+      this.sessStr.store("loggedIn", false);
       timer(0).subscribe(() => {
         subject.next(IDBActions.logoutSessionSuccess());
         subject.complete();
@@ -383,7 +397,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('userProfile', {name: action.name, email: action.email}).then(() => {
+      this.idbService.saveOption("userProfile", { name: action.name, email: action.email }).then(() => {
         subject.next(IDBActions.saveUserProfileSuccess());
         subject.complete();
       }).catch((error) => {
@@ -402,7 +416,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('language', action.language).then(() => {
+      this.idbService.saveOption("language", action.language).then(() => {
         subject.next(IDBActions.saveAppLanguageSuccess());
         subject.complete();
       }).catch((error) => {
@@ -421,7 +435,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('version', action.version).then(() => {
+      this.idbService.saveOption("version", action.version).then(() => {
         subject.next(IDBActions.saveIDBVersionSuccess());
         subject.complete();
       }).catch((error) => {
@@ -440,7 +454,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('showLoupe', action.showLoupe).then(() => {
+      this.idbService.saveOption("showLoupe", action.showLoupe).then(() => {
         subject.next(IDBActions.saveShowLoupeSuccess());
         subject.complete();
       }).catch((error) => {
@@ -459,7 +473,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('easymode', action.easyMode).then(() => {
+      this.idbService.saveOption("easymode", action.easyMode).then(() => {
         subject.next(IDBActions.saveEasyModeSucess());
         subject.complete();
       }).catch((error) => {
@@ -479,7 +493,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       if (this.idbService.isReady) {
-        this.idbService.saveOption('secondsPerLine', action.secondsPerLine).then(() => {
+        this.idbService.saveOption("secondsPerLine", action.secondsPerLine).then(() => {
           subject.next(IDBActions.saveSecondsPerLineSuccess());
           subject.complete();
         }).catch((error) => {
@@ -499,7 +513,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('highlightingEnabled', action.highlightingEnabled).then(() => {
+      this.idbService.saveOption("highlightingEnabled", action.highlightingEnabled).then(() => {
         subject.next(IDBActions.saveHighlightingEnabledSuccess());
         subject.complete();
       }).catch((error) => {
@@ -518,7 +532,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', true);
+      this.sessStr.store("loggedIn", true);
 
       timer(0).toPromise().then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
@@ -534,7 +548,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', true);
+      this.sessStr.store("loggedIn", true);
       // TODO api: move this to new effect
       // this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
       // this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
@@ -553,9 +567,9 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', true);
+      this.sessStr.store("loggedIn", true);
       const promises: Promise<any>[] = [];
-      promises.push(this.idbService.saveOption('usemode', action.mode));
+      promises.push(this.idbService.saveOption("usemode", action.mode));
       Promise.all(promises).then(() => {
         subject.next(IDBActions.saveLoginSessionSuccess());
         subject.complete();
@@ -575,9 +589,9 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.sessStr.store('loggedIn', false);
+      this.sessStr.store("loggedIn", false);
       const promises: Promise<any>[] = [];
-      promises.push(this.idbService.saveOption('usemode', undefined));
+      promises.push(this.idbService.saveOption("usemode", undefined));
       Promise.all(promises).then(() => {
         subject.next(IDBActions.saveLogoutSuccess());
         subject.complete();
@@ -598,7 +612,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       try {
-        this.sessStr.store('playonhover', action.playOnHover);
+        this.sessStr.store("playonhover", action.playOnHover);
         setTimeout(() => {
           subject.next(IDBActions.saveFollowPlayCursorSuccess());
           subject.complete();
@@ -622,7 +636,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       try {
-        this.sessStr.store('followplaycursor', action.followPlayCursor);
+        this.sessStr.store("followplaycursor", action.followPlayCursor);
         setTimeout(() => {
           subject.next(IDBActions.saveFollowPlayCursorSuccess());
           subject.complete();
@@ -647,7 +661,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       try {
-        this.sessStr.store('reloaded', action.reloaded);
+        this.sessStr.store("reloaded", action.reloaded);
         setTimeout(() => {
           subject.next(IDBActions.saveAppReloadedSuccess());
           subject.complete();
@@ -672,7 +686,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       try {
-        this.sessStr.store('serverDataEntry', action.serverDataEntry);
+        this.sessStr.store("serverDataEntry", action.serverDataEntry);
         setTimeout(() => {
           subject.next(IDBActions.saveServerDataEntrySuccess());
           subject.complete();
@@ -696,7 +710,7 @@ export class IDBEffects {
     mergeMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('asr', {
+      this.idbService.saveOption("asr", {
         selectedLanguage: action.selectedLanguage,
         selectedService: action.selectedService
       }).then(() => {
@@ -718,7 +732,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('audioSettings', {
+      this.idbService.saveOption("audioSettings", {
         volume: action.volume,
         speed: action.speed
       }).then(() => {
@@ -740,7 +754,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveOption('interface', action.currentEditor).then(() => {
+      this.idbService.saveOption("interface", action.currentEditor).then(() => {
         subject.next(IDBActions.saveCurrentEditorSuccess());
         subject.complete();
       }).catch((error) => {
@@ -774,7 +788,7 @@ export class IDBEffects {
         });
       } else {
         subject.next(IDBActions.saveLogsFailed({
-          error: 'Can\'t find modeState'
+          error: "Can't find modeState"
         }));
         subject.complete();
       }
@@ -802,7 +816,7 @@ export class IDBEffects {
         });
       } else {
         subject.next(IDBActions.saveAnnotationFailed({
-          error: 'Can\'t find modeState'
+          error: "Can't find modeState"
         }));
         subject.complete();
       }
@@ -857,11 +871,12 @@ export class IDBEffects {
               private appStorage: AppStorageService,
               private idbService: IDBService,
               private sessStr: SessionStorageService,
-              private store: Store<RootState>) {
+              private store: Store<RootState>,
+              private api: OctraAPIService) {
 
     // TODO add this as effect
     actions$.subscribe((action) => {
-      if (action.type.toLocaleLowerCase().indexOf('failed') > -1) {
+      if (action.type.toLocaleLowerCase().indexOf("failed") > -1) {
         const errorMessage = (action as any).error;
         console.error(`${action.type}: ${errorMessage}`);
       }
@@ -870,12 +885,12 @@ export class IDBEffects {
 
   getModeStateFromString(appState: RootState, mode: LoginMode) {
     let modeState: OnlineModeState | LocalModeState = undefined;
-    if (mode === 'online') {
-      modeState = appState.onlineMode
-    } else if (mode === 'local') {
-      modeState = appState.localMode
-    } else if (mode === 'demo') {
-      modeState = appState.demoMode
+    if (mode === "online") {
+      modeState = appState.onlineMode;
+    } else if (mode === "local") {
+      modeState = appState.localMode;
+    } else if (mode === "demo") {
+      modeState = appState.demoMode;
     }
     return modeState;
   }

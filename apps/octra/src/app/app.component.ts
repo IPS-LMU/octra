@@ -5,7 +5,6 @@ import { environment } from "../environments/environment";
 import { AppInfo } from "./app.info";
 import { NavigationComponent } from "./core/component";
 import { ASRLanguage } from "./core/obj";
-import { SubscriptionManager } from "@octra/utilities";
 import { MultiThreadingService } from "./core/shared/multi-threading/multi-threading.service";
 import { APIService, SettingsService } from "./core/shared/service";
 import { AppStorageService } from "./core/shared/service/appstorage.service";
@@ -13,8 +12,8 @@ import { AsrService } from "./core/shared/service/asr.service";
 import { BugReportService, ConsoleType } from "./core/shared/service/bug-report.service";
 import * as fromApplication from "./core/store/application";
 import { Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
 import { DefaultComponent } from "./core/component/default.component";
+import { ApplicationStoreService } from "./core/store/application/application-store.service";
 
 @Component({
   selector: "octra-app",
@@ -43,8 +42,11 @@ export class AppComponent extends DefaultComponent implements OnInit {
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
               private asrService: AsrService,
+              private appStoreService: ApplicationStoreService,
               private store: Store) {
     super();
+
+    this.appStoreService.initApplication();
 
     this.router.events.subscribe((event: any) => {
         if (event.url) {

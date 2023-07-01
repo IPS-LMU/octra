@@ -190,7 +190,7 @@ export class SettingsService {
     console.log(`load app settings`);
 
     return new Promise<void>((resolve, reject) => {
-      this.store.dispatch(ConfigurationActions.loadAppConfiguration());
+      // TODO remove this this.store.dispatch(ConfigurationActions.loadAppConfiguration());
 
       afterDefined(this.store.select(fromApplication.selectApplication)).then(() => {
         console.log('AppSettings loaded.');

@@ -19,7 +19,7 @@ export const initialState: ApplicationState = {
     loaded: false,
     version: 1
   },
-  language: 'en',
+  language: "en",
   appConfiguration: undefined,
   loggedIn: false,
   consoleEntries: [],
@@ -39,7 +39,7 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
-  on(ApplicationActions.addError, (state: ApplicationState, {error}) => ({
+  on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
       ...state.loading,
@@ -47,7 +47,17 @@ export const reducer = createReducer(
       errors: [...state.loading.errors, error]
     }
   })),
-  on(ApplicationActions.setReloaded, (state: ApplicationState, {reloaded}) => ({
+  on(ApplicationActions.loadSettings.success, (state: ApplicationState, { settings }) => ({
+    ...state,
+    appSettingsLoaded: true,
+    appConfiguration: settings,
+    loading: {
+      ...state.loading,
+      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
+      progress: state.loading.progress + 25
+    },
+  })),
+  on(ApplicationActions.setReloaded, (state: ApplicationState, { reloaded }) => ({
     ...state,
     reloaded
   })),
@@ -58,40 +68,27 @@ export const reducer = createReducer(
       status: LoadingStatus.FINISHED
     }
   })),
-  on(ApplicationActions.setAppLanguage, (state: ApplicationState, {language}) => ({
+  on(ApplicationActions.setAppLanguage, (state: ApplicationState, { language }) => ({
     ...state,
     language
   })),
-  on(ApplicationActions.setDBVersion, (state: ApplicationState, {version}) => ({
+  on(ApplicationActions.setDBVersion, (state: ApplicationState, { version }) => ({
     ...state,
     version
   })),
-  on(ConfigurationActions.appConfigurationLoadSuccess, (state: ApplicationState) => ({
-    ...state,
-    appSettingsLoaded: true
-  })),
-  on(ApplicationActions.setConsoleEntries, (state: ApplicationState, {consoleEntries}) => ({
+  on(ApplicationActions.setConsoleEntries, (state: ApplicationState, { consoleEntries }) => ({
     ...state,
     consoleEntries
   })),
-  on(IDBActions.loadOptionsSuccess, (state: ApplicationState, {applicationOptions}) => {
+  on(IDBActions.loadOptionsSuccess, (state: ApplicationState, { applicationOptions }) => {
     let result = state;
 
     for (const option of applicationOptions) {
-        result = writeOptionToStore(result, option.name, option.value);
+      result = writeOptionToStore(result, option.name, option.value);
     }
 
     return result;
   }),
-  on(ConfigurationActions.appConfigurationLoadSuccess, (state: ApplicationState, {appConfiguration}) => ({
-    ...state,
-    loading: {
-      ...state.loading,
-      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
-      progress: state.loading.progress + 25
-    },
-    appConfiguration
-  })),
   on(ConfigurationActions.loadGuidelinesSuccess, (state: ApplicationState) => ({
     ...state,
     loading: {
@@ -133,22 +130,22 @@ export const reducer = createReducer(
     mode: LoginMode.LOCAL,
     loggedIn: true
   })),
-  on(OnlineModeActions.loginURLParameters, (state: ApplicationState, {urlParams}) => ({
+  on(OnlineModeActions.loginURLParameters, (state: ApplicationState, { urlParams }) => ({
     ...state,
     mode: LoginMode.URL,
     loggedIn: true,
     queryParams: urlParams
   })),
-  on(OnlineModeActions.loginDemo, (state: ApplicationState, {mode}) => ({
+  on(OnlineModeActions.loginDemo, (state: ApplicationState, { mode }) => ({
     ...state,
     mode: LoginMode.DEMO,
     loggedIn: true
   })),
-  on(ApplicationActions.setMode, (state: ApplicationState, {mode}) => ({
+  on(ApplicationActions.setMode, (state: ApplicationState, { mode }) => ({
     ...state,
     mode
   })),
-  on(ApplicationActions.setLoggedIn, (state: ApplicationState, {loggedIn}) => ({
+  on(ApplicationActions.setLoggedIn, (state: ApplicationState, { loggedIn }) => ({
     ...state,
     loggedIn
   })),
@@ -160,7 +157,7 @@ export const reducer = createReducer(
       loggedIn: false
     };
   }),
-  on(ApplicationActions.setPlayOnHover, (state: ApplicationState, {playOnHover}) => ({
+  on(ApplicationActions.setPlayOnHover, (state: ApplicationState, { playOnHover }) => ({
     ...state,
     options: {
       ...state.options,
@@ -175,28 +172,28 @@ export const reducer = createReducer(
       audioSettings: data
     }
   })),
-  on(ApplicationActions.setShowLoupe, (state: ApplicationState, {showLoupe}) => ({
+  on(ApplicationActions.setShowLoupe, (state: ApplicationState, { showLoupe }) => ({
     ...state,
     options: {
       ...state.options,
       showLoupe
     }
   })),
-  on(ApplicationActions.setEasyMode, (state: ApplicationState, {easyMode}) => ({
+  on(ApplicationActions.setEasyMode, (state: ApplicationState, { easyMode }) => ({
     ...state,
     options: {
       ...state.options,
       easyMode
     }
   })),
-  on(ApplicationActions.setSecondsPerLine, (state: ApplicationState, {secondsPerLine}) => ({
+  on(ApplicationActions.setSecondsPerLine, (state: ApplicationState, { secondsPerLine }) => ({
     ...state,
     options: {
       ...state.options,
       secondsPerLine
     }
   })),
-  on(ApplicationActions.setHighlightingEnabled, (state: ApplicationState, {highlightingEnabled}) => ({
+  on(ApplicationActions.setHighlightingEnabled, (state: ApplicationState, { highlightingEnabled }) => ({
     ...state,
     options: {
       ...state.options,
@@ -208,7 +205,7 @@ export const reducer = createReducer(
 
 function writeOptionToStore(state: ApplicationState, attribute: string, value: any): ApplicationState {
   switch (attribute) {
-    case('version'):
+    case("version"):
       return {
         ...state,
         idb: {
@@ -216,17 +213,17 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
           version: value
         }
       };
-    case('language'):
+    case("language"):
       return {
         ...state,
-        language: (value !== undefined) ? value : 'en'
+        language: (value !== undefined) ? value : "en"
       };
-    case('usemode'):
+    case("usemode"):
       return {
         ...state,
         mode: value
       };
-    case('easymode'):
+    case("easymode"):
       return {
         ...state,
         options: {
@@ -234,7 +231,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
           easyMode: (value !== undefined) ? value : false
         }
       };
-    case('showLoupe'):
+    case("showLoupe"):
       return {
         ...state,
         options: {
@@ -242,7 +239,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
           showLoupe: (value !== undefined) ? value : false
         }
       };
-    case('secondsPerLine'):
+    case("secondsPerLine"):
       return {
         ...state,
         options: {
@@ -250,7 +247,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
           secondsPerLine: (value !== undefined) ? value : 5
         }
       };
-    case('audioSettings'):
+    case("audioSettings"):
       return {
         ...state,
         options: {
@@ -261,7 +258,7 @@ function writeOptionToStore(state: ApplicationState, attribute: string, value: a
           }
         }
       };
-    case('highlightingEnabled'):
+    case("highlightingEnabled"):
       return {
         ...state,
         options: {

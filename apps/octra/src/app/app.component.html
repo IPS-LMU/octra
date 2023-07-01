@@ -5,11 +5,6 @@
   </header>
   <main>
     <div *ngIf="environment.dev_version" class="d-none d-md-block" id="beta_mark">in development</div>
-    <!--
-        <button (click)="test(textfield.value)">fetch</button>
-        <input type="text" value="" #textfield/>
-        <button (click)="reset(textfield.value)">reset</button>
-    -->
     <div class="container-fluid flex">
       <router-outlet></router-outlet>
     </div><!-- /.container -->

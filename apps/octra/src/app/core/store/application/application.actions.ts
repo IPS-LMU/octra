@@ -1,10 +1,72 @@
-import { createAction, props } from "@ngrx/store";
+import { createAction, createActionGroup, emptyProps, props } from "@ngrx/store";
 import { ConsoleEntry } from "../../shared/service/bug-report.service";
 import { LoginMode } from "../index";
+import { AppSettings } from "../../obj";
+import { HttpErrorResponse } from "@angular/common/http";
 
 const context = 'Application';
 
 export class ApplicationActions {
+  static initApplication = createActionGroup({
+    source: 'app/init',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
+    },
+  });
+
+  static loadASRSettings = createActionGroup({
+    source: 'api/load asr settings',
+    events: {
+      do: props<{
+        settings: AppSettings
+      }>(),
+      success: props<{
+        settings: AppSettings
+      }>(),
+      fail: props<{
+        error: HttpErrorResponse;
+      }>(),
+    },
+  });
+
+  static loadSettings = createActionGroup({
+    source: 'api/load settings',
+    events: {
+      do: emptyProps(),
+      success: props<{
+        settings: AppSettings;
+      }>(),
+      fail: props<{
+        error: HttpErrorResponse;
+      }>(),
+    },
+  });
+
+  static loadLanguage = createActionGroup({
+    source: 'api/load language',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
+    },
+  });
+
+  static changeLanguage = createActionGroup({
+    source: 'app/change language',
+    events: {
+      success: emptyProps(),
+    },
+  });
+
+  static setRedirectionTo = createActionGroup({
+    source: 'app/set redirection',
+    events: {
+      success: props<{
+        needsRedirectionTo?: string;
+      }>(),
+    },
+  });
+
   public static undo = createAction(
     `UNDO`
   );

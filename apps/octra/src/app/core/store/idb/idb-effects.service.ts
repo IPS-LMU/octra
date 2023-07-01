@@ -10,7 +10,6 @@ import { SessionStorageService } from "ngx-webstorage";
 import { ConsoleEntry } from "../../shared/service/bug-report.service";
 import { AnnotationActions } from "../annotation/annotation.actions";
 import { IDBActions } from "./idb.actions";
-import { ConfigurationActions } from "../configuration/configuration.actions";
 import { ApplicationActions } from "../application/application.actions";
 import { ASRActions } from "../asr/asr.actions";
 import { UserActions } from "../user/user.actions";
@@ -20,7 +19,6 @@ import { IIDBModeOptions } from "../../shared/octra-database";
 import { hasProperty } from "@octra/utilities";
 import { exhaustMap, filter, mergeMap, withLatestFrom } from "rxjs/operators";
 import { OctraAPIService } from "../../../../../../../../octra-backend/dist/libs/ngx-octra-api";
-import { APIActions } from "../api";
 
 
 @Injectable({
@@ -88,23 +86,11 @@ export class IDBEffects {
   );
 
   loadOptions$ = createEffect(() => this.actions$.pipe(
-    ofType(ConfigurationActions.appConfigurationLoadSuccess),
+    ofType(ApplicationActions.loadSettings.success),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      const webToken = this.sessStr.retrieve('webToken');
-      const authType = this.sessStr.retrieve('authType');
-      const authenticated = this.sessStr.retrieve('authenticated');
-
-      this.store.dispatch(APIActions.init.do({
-        url: action.appConfiguration.api.url,
-        appToken: action.appConfiguration.api.appToken,
-        webToken,
-        authType,
-        authenticated
-      }));
-
-      this.idbService.initialize(action.appConfiguration.octra.database.name).then(() => {
+      this.idbService.initialize(action.settings.octra.database.name).then(() => {
         console.log(`load options...`);
         const loadApplicationOptions = this.idbService.loadOptions([
             "version", "easymode", "language", "usemode", "user", "showLoupe", "secondsPerLine", "audioSettings", "highlightingEnabled", "asr"

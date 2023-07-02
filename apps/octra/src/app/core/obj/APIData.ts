@@ -1,5 +1,4 @@
 export class APIData {
-
   private readonly _id: number;
   private readonly _annotator: string;
   private readonly _annobegin: string;
@@ -56,17 +55,19 @@ export class APIData {
     return this._jobno;
   }
 
-  constructor(id: number,
-              annotator: string,
-              annobegin: string,
-              annoend: string,
-              url: string,
-              segmentbegin: number,
-              segmentend: number,
-              priority: number,
-              status: string,
-              project: string,
-              jobno: number) {
+  constructor(
+    id: number,
+    annotator: string,
+    annobegin: string,
+    annoend: string,
+    url: string,
+    segmentbegin: number,
+    segmentend: number,
+    priority: number,
+    status: string,
+    project: string,
+    jobno: number
+  ) {
     this._id = id;
     this._annotator = annotator;
     this._annobegin = annobegin;

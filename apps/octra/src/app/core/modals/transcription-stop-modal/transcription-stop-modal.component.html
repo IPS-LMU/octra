@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'modal.transcription.stop.header' | transloco }}?
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -8,13 +10,16 @@
       (click)="close()"
     ></button>
   </div>
-  <div class="modal-body" [innerHTML]="'modal.transcription.stop.text' | transloco"></div>
+  <div
+    class="modal-body"
+    [innerHTML]="'modal.transcription.stop.text' | transloco"
+  ></div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="close('QUIT');">
-      {{"general.quit" | transloco}}
+    <button class="btn btn-secondary" (click)="close('QUIT')">
+      {{ 'general.quit' | transloco }}
     </button>
-    <button class="btn primary"(click)="close('CONTINUE')"
-            type="button">
-      {{"general.continue" | transloco}}
+    <button class="btn primary" (click)="close('CONTINUE')" type="button">
+      {{ 'general.continue' | transloco }}
     </button>
   </div>
+</div>

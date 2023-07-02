@@ -1,61 +1,68 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 
 @Component({
   selector: 'octra-shortcut',
   templateUrl: './shortcut.component.html',
   styleUrls: ['./shortcut.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShortcutComponent implements OnInit {
-
   parts: {
-    type: 'key' | 'separator',
-    content: string
-  }[] = []
+    type: 'key' | 'separator';
+    content: string;
+  }[] = [];
 
   @Input() shortcut = '';
   @Input() theme: 'dark' | 'light' = 'light';
 
   ngOnInit(): void {
     const shortcut = this.replaceWithUTF8Symbols(this.shortcut);
-    const splitted = shortcut.split(' ').filter(a => a !== undefined && a !== '');
+    const splitted = shortcut
+      .split(' ')
+      .filter((a) => a !== undefined && a !== '');
 
     this.parts = [];
     for (const part of splitted) {
       this.parts.push({
-        type: (part.trim() !== '+') ? 'key' : 'separator',
-        content: part
+        type: part.trim() !== '+' ? 'key' : 'separator',
+        content: part,
       });
     }
   }
 
-
   private replaceWithUTF8Symbols(keyString: string) {
     let result = keyString;
 
-    const regex = new RegExp(/((?:ARROW(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g);
+    const regex = new RegExp(
+      /((?:ARROW(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g
+    );
 
     result = result.replace(regex, (g0, g1) => {
       switch (g1) {
-        case('ARROWUP'):
+        case 'ARROWUP':
           return '⬆';
-        case('ARROWLEFT'):
+        case 'ARROWLEFT':
           return '⬅';
-        case('ARROWRIGHT'):
+        case 'ARROWRIGHT':
           return '⮕';
-        case('ARROWDOWN'):
+        case 'ARROWDOWN':
           return '⬇';
-        case('STRG'):
+        case 'STRG':
           return 'strg';
-        case('CMD'):
+        case 'CMD':
           return '⌘';
-        case('ENTER'):
+        case 'ENTER':
           return '⮐';
-        case('BACKSPACE'):
+        case 'BACKSPACE':
           return '⭠';
-        case('TAB'):
+        case 'TAB':
           return '⇥';
-        case('SHIFT'):
+        case 'SHIFT':
           return '⇧';
         default:
           return g1.toLowerCase();

@@ -1,8 +1,7 @@
-import { ControlType } from "./ControlType";
-import { Label } from "./Label";
+import { ControlType } from './ControlType';
+import { Label } from './Label';
 
 export class Control {
-
   public get value(): string {
     return this._value;
   }
@@ -31,12 +30,13 @@ export class Control {
     this._custom = value;
   }
 
-  constructor(private _value: string,
-              private _label: Label,
-              private _required: boolean,
-              private _type: ControlType,
-              private _custom: any) {
-  }
+  constructor(
+    private _value: string,
+    private _label: Label,
+    private _required: boolean,
+    private _type: ControlType,
+    private _custom: any
+  ) {}
 
   public static fromAny(control: any): Control {
     return new Control(
@@ -54,7 +54,7 @@ export class Control {
       label: this._label,
       required: this._required,
       type: this._type.type,
-      custom: this._custom
+      custom: this._custom,
     };
   }
 }

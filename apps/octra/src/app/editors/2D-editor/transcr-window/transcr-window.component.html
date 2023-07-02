@@ -1,104 +1,158 @@
 <div #window id="window">
   <div class="window-nav-top">
-    <i class="bi bi-x-lg close" (click)="close();"></i>
+    <i class="bi bi-x-lg close" (click)="close()"></i>
   </div>
   <div #main>
-    <div *ngIf="loading" [ngStyle]="{
-    width: mainSize.width + 'px',
-    height: mainSize.height + 'px'
-    }" class="tw-loading">
-      <div [ngStyle]="{
-    width: mainSize.width + 'px',
-    height: mainSize.height + 'px'
-    }" class="background"></div>
+    <div
+      *ngIf="loading"
+      [ngStyle]="{
+        width: mainSize.width + 'px',
+        height: mainSize.height + 'px'
+      }"
+      class="tw-loading"
+    >
+      <div
+        [ngStyle]="{
+          width: mainSize.width + 'px',
+          height: mainSize.height + 'px'
+        }"
+        class="background"
+      ></div>
       <div class="spinner-border fs-4" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-    <octra-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
-                       [enabled]="editor.rawText === ''"></octra-asr-options>
-    <octra-audio-navigation #audionav
-                            (afterPlaybackRateChange)="afterSpeedChange($event)"
-                            (afterVolumeChange)="afterVolumeChange($event)"
-                            (buttonClick)="onButtonClick($event)"
-                            (keyup)="onKeyUp()"
-                            [audioChunk]="audiochunk"
-                            [easyMode]="easymode"
-                            [playbackRate]="appStorage.audioSpeed"
-                            [responsive]="settingsService.responsive.enabled"
-                            [volume]="appStorage.audioVolume"
-
+    <octra-asr-options
+      *ngIf="settingsService.isASREnabled"
+      [audioChunk]="audiochunk"
+      [enabled]="editor.rawText === ''"
+    ></octra-asr-options>
+    <octra-audio-navigation
+      #audionav
+      (afterPlaybackRateChange)="afterSpeedChange($event)"
+      (afterVolumeChange)="afterVolumeChange($event)"
+      (buttonClick)="onButtonClick($event)"
+      (keyup)="onKeyUp()"
+      [audioChunk]="audiochunk"
+      [easyMode]="easymode"
+      [playbackRate]="appStorage.audioSpeed"
+      [responsive]="settingsService.responsive.enabled"
+      [volume]="appStorage.audioVolume"
     ></octra-audio-navigation>
-    <octra-audio-viewer #loupe
-                        [audioChunk]="audiochunk"
-                        [transcriptionLevel]="transcrService.currentlevel"
-                        (shortcutTrigger)="triggerUIAction($event)"
-                        id="loupe"
+    <octra-audio-viewer
+      #loupe
+      [audioChunk]="audiochunk"
+      [transcriptionLevel]="transcrService.currentlevel"
+      (shortcutTrigger)="triggerUIAction($event)"
+      id="loupe"
     ></octra-audio-viewer>
-    <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
-                          [transcript]="transcript"
-                          (boundaryinserted)="onBoundaryInserted()"
-                          (markerClick)="onMarkerClick($event)"
-                          (markerInsert)="onMarkerInsert($event)"
-                          (typing)="afterTyping($event)"
-                          [audiochunk]="audiochunk"
-                          [easymode]="easymode"
-                          [height]="100"
-                          [markers]="transcrService.guidelines?.markers"
-                          [validationEnabled]="validationEnabled"
-                          [externalShortcutManager]="keyMap.shortcutsManager"
-                          id="trancr"
+    <octra-transcr-editor
+      #editor
+      (boundaryclicked)="onBoundaryClicked($event)"
+      [transcript]="transcript"
+      (boundaryinserted)="onBoundaryInserted()"
+      (markerClick)="onMarkerClick($event)"
+      (markerInsert)="onMarkerInsert($event)"
+      (typing)="afterTyping($event)"
+      [audiochunk]="audiochunk"
+      [easymode]="easymode"
+      [height]="100"
+      [markers]="transcrService.guidelines?.markers"
+      [validationEnabled]="validationEnabled"
+      [externalShortcutManager]="keyMap.shortcutsManager"
+      id="trancr"
     ></octra-transcr-editor>
     <div class="window-nav-bottom">
       <div class="row">
         <div class="col-md-4">
-          <button class="btn btn-info w-100" (click)="save();doDirectionAction('left');">
-                            <span *ngIf="responsive || easymode"
-                                  [ngClass]="{'d-lg-none': responsive && !easymode}">
-                              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
-                            </span>
-            <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
-                             {{"general.save" | transloco}} &
-              {{"segments.previous" | transloco}}
-                            </span>
+          <button
+            class="btn btn-info w-100"
+            (click)="save(); doDirectionAction('left')"
+          >
+            <span
+              *ngIf="responsive || easymode"
+              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+            >
+              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
+            </span>
+            <span
+              *ngIf="!easymode"
+              [ngClass]="{ 'd-none d-lg-inline': responsive }"
+            >
+              {{ 'general.save' | transloco }} &
+              {{ 'segments.previous' | transloco }}
+            </span>
           </button>
         </div>
         <div class="col-md-4">
-          <button (click)="save();close();" class="btn btn-info w-100">
-                            <span *ngIf="responsive || easymode"
-                                  [ngClass]="{'d-lg-none': responsive && !easymode}">
-                              <i class="bi bi-save-fill"></i>
-                            </span>
-            <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
-                             {{"general.save" | transloco}} & {{"general.close" | transloco}}
-                            </span>
+          <button (click)="save(); close()" class="btn btn-info w-100">
+            <span
+              *ngIf="responsive || easymode"
+              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+            >
+              <i class="bi bi-save-fill"></i>
+            </span>
+            <span
+              *ngIf="!easymode"
+              [ngClass]="{ 'd-none d-lg-inline': responsive }"
+            >
+              {{ 'general.save' | transloco }} &
+              {{ 'general.close' | transloco }}
+            </span>
           </button>
         </div>
         <div class="col-md-4">
-          <button class="btn btn-info w-100" (click)="save();doDirectionAction('right');" *ngIf="hasSegmentBoundaries || (!isNextSegmentLastAndBreak(segmentIndex)
-                    && segmentIndex < transcrService.currentlevel.segments.length - 1)">
-                            <span *ngIf="responsive || easymode"
-                                  [ngClass]="{'d-lg-none': responsive && !easymode}">
-                              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-right"></i>
-                            </span>
-            <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
-                             {{"general.save" | transloco}} &
-              {{"segments.next" | transloco}}
-                            </span>
+          <button
+            class="btn btn-info w-100"
+            (click)="save(); doDirectionAction('right')"
+            *ngIf="
+              hasSegmentBoundaries ||
+              (!isNextSegmentLastAndBreak(segmentIndex) &&
+                segmentIndex < transcrService.currentlevel.segments.length - 1)
+            "
+          >
+            <span
+              *ngIf="responsive || easymode"
+              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+            >
+              <i class="bi bi-save-fill"></i> &
+              <i class="bi bi-arrow-right"></i>
+            </span>
+            <span
+              *ngIf="!easymode"
+              [ngClass]="{ 'd-none d-lg-inline': responsive }"
+            >
+              {{ 'general.save' | transloco }} &
+              {{ 'segments.next' | transloco }}
+            </span>
           </button>
         </div>
-        <div class="col-md-4" *ngIf="!hasSegmentBoundaries && (segmentIndex === transcrService.currentlevel.segments.length - 1
-                    || isNextSegmentLastAndBreak(segmentIndex))">
+        <div
+          class="col-md-4"
+          *ngIf="
+            !hasSegmentBoundaries &&
+            (segmentIndex === transcrService.currentlevel.segments.length - 1 ||
+              isNextSegmentLastAndBreak(segmentIndex))
+          "
+        >
           <!-- check if last segment ord if the next segment is a break -->
-          <button (click)="save();close();openOverview();"
-                  class="btn btn-info w-100">
-                            <span *ngIf="responsive || easymode"
-                                  [ngClass]="{'d-lg-none': responsive && !easymode}">
-                              <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
-                            </span>
-            <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
-          {{"general.save" | transloco}} & {{"general.overview" | transloco}}
-        </span>
+          <button
+            (click)="save(); close(); openOverview()"
+            class="btn btn-info w-100"
+          >
+            <span
+              *ngIf="responsive || easymode"
+              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+            >
+              <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
+            </span>
+            <span
+              *ngIf="!easymode"
+              [ngClass]="{ 'd-none d-lg-inline': responsive }"
+            >
+              {{ 'general.save' | transloco }} &
+              {{ 'general.overview' | transloco }}
+            </span>
           </button>
         </div>
       </div>

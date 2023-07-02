@@ -1,6 +1,6 @@
-@import "bootstrap/scss/bootstrap";
-@import "bootstrap-icons/font/bootstrap-icons";
-@import "jodit/build/jodit.min.css";
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+@import 'jodit/build/jodit.min.css';
 
 .btn.btn-success {
   color: #fff;
@@ -23,7 +23,7 @@
 .btn.btn-primary {
   color: #fff !important;
   background-color: #009688 !important;
-  border-color: #009688 !important;;
+  border-color: #009688 !important;
 }
 
 .btn.btn-secondary {
@@ -113,13 +113,14 @@ footer {
   width: 90%;
 }
 
-.note-popover .popover-content, .panel-heading.note-toolbar {
+.note-popover .popover-content,
+.panel-heading.note-toolbar {
   padding: 0;
   margin: 0;
 }
 
 .transcr-editor .btn-description {
-  font-size: 0.90em;
+  font-size: 0.9em;
 }
 
 .transcr-editor .btn-shortcut {
@@ -181,7 +182,7 @@ footer {
   width: 100%;
   display: block;
   font-size: 5em;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 300;
 }
 
@@ -304,7 +305,8 @@ footer {
   /* padding: 1px; */
 }
 
-.radio label .bmd-radio, label.radio-inline .bmd-radio {
+.radio label .bmd-radio,
+label.radio-inline .bmd-radio {
   margin-top: 0;
 }
 
@@ -326,7 +328,7 @@ footer {
   margin: 0 !important;
   z-index: 9999 !important;
   opacity: 0.8;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
   filter: alpha(opacity=80);
   pointer-events: none;
 }
@@ -347,7 +349,7 @@ footer {
 /* added to the source element while its mirror is dragged */
 .gu-transit {
   opacity: 0.2;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=20)';
   filter: alpha(opacity=20);
 }
 

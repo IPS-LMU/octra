@@ -9,7 +9,6 @@ interface NodeModule {
 }
 
 declare var System: any;
-declare var tidyUpAnnotation: ((string, any) => any);
+declare var tidyUpAnnotation: (string, any) => any;
 declare var navigator: Navigator;
 declare var document: Document;
-

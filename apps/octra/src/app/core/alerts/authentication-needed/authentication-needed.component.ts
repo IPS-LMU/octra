@@ -1,9 +1,15 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 @Component({
   selector: 'octra-authentication-needed',
   templateUrl: './authentication-needed.component.html',
-  styleUrls: ['./authentication-needed.component.scss']
+  styleUrls: ['./authentication-needed.component.scss'],
 })
 export class AuthenticationNeededComponent implements OnInit, OnDestroy {
   public static componentName = 'AuthenticationNeededComponent';

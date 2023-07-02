@@ -1,22 +1,22 @@
-import { Component, TemplateRef, ViewChild } from "@angular/core";
-import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { OctraModal } from '../types';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: "octra-error-modal",
-  templateUrl: "./error-modal.component.html",
-  styleUrls: ["./error-modal.component.scss"]
+  selector: 'octra-error-modal',
+  templateUrl: './error-modal.component.html',
+  styleUrls: ['./error-modal.component.scss'],
 })
 export class ErrorModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: true
+    backdrop: true,
   };
 
-  @ViewChild("modal", { static: true }) modal: TemplateRef<any>;
-  text: "";
+  @ViewChild('modal', { static: true }) modal: TemplateRef<any>;
+  text: '';
 
   constructor(protected override activeModal: NgbActiveModal) {
-    super("errorModal", activeModal);
+    super('errorModal', activeModal);
   }
 }

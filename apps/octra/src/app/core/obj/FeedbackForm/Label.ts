@@ -3,7 +3,5 @@ export class Label {
     return this._languages;
   }
 
-  constructor(private _languages: any) {
-
-  }
+  constructor(private _languages: any) {}
 }

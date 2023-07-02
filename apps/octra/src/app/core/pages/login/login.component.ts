@@ -1,72 +1,82 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from "@angular/core";
-import { NgForm } from "@angular/forms";
-import { Router } from "@angular/router";
-import { TranslocoService } from "@ngneat/transloco";
-import { BrowserInfo, FileSize, getFileSize } from "@octra/utilities";
-import { navigateTo } from "@octra/ngx-utilities";
-import { AppInfo } from "../../../app.info";
-import { ModalService } from "../../modals/modal.service";
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
+import { BrowserInfo, FileSize, getFileSize } from '@octra/utilities';
+import { navigateTo } from '@octra/ngx-utilities';
+import { AppInfo } from '../../../app.info';
+import { ModalService } from '../../modals/modal.service';
 import {
   ModalDeleteAnswer,
-  TranscriptionDeleteModalComponent
-} from "../../modals/transcription-delete-modal/transcription-delete-modal.component";
-import { SessionFile } from "../../obj/SessionFile";
-import { AudioService, SettingsService } from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { OctraDropzoneComponent } from "../../component/octra-dropzone/octra-dropzone.component";
-import { ComponentCanDeactivate } from "./login.deactivateguard";
-import { LoginService } from "./login.service";
-import { LoginMode } from "../../store";
-import { OIDBLevel, OIDBLink } from "@octra/annotation";
-import { Observable } from "rxjs";
-import { ErrorModalComponent } from "../../modals/error-modal/error-modal.component";
-import { DefaultComponent } from "../../component/default.component";
-import { AuthenticationStoreService } from "../../store/authentication";
-import { AccountLoginMethod } from "../../../../../../../../octra-backend/dist/libs/api-types";
+  TranscriptionDeleteModalComponent,
+} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import { SessionFile } from '../../obj/SessionFile';
+import { AudioService, SettingsService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
+import { ComponentCanDeactivate } from './login.deactivateguard';
+import { LoginService } from './login.service';
+import { LoginMode } from '../../store';
+import { OIDBLevel, OIDBLink } from '@octra/annotation';
+import { Observable } from 'rxjs';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { DefaultComponent } from '../../component/default.component';
+import { AuthenticationStoreService } from '../../store/authentication';
+import { AccountLoginMethod } from '../../../../../../../../octra-backend/dist/libs/api-types';
 
 @Component({
-  selector: "octra-login",
-  templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.scss"],
-  providers: [LoginService]
+  selector: 'octra-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+  providers: [LoginService],
 })
-export class LoginComponent extends DefaultComponent implements OnInit, ComponentCanDeactivate {
-  @ViewChild("f", { static: false }) loginform: NgForm;
-  @ViewChild("dropzone", { static: true }) dropzone: OctraDropzoneComponent;
-  @ViewChild("agreement", { static: false }) agreement: ElementRef;
-  @ViewChild("localmode", { static: true }) localmode: ElementRef;
-  @ViewChild("onlinemode", { static: true }) onlinemode: ElementRef;
+export class LoginComponent
+  extends DefaultComponent
+  implements OnInit, ComponentCanDeactivate
+{
+  @ViewChild('f', { static: false }) loginform: NgForm;
+  @ViewChild('dropzone', { static: true }) dropzone: OctraDropzoneComponent;
+  @ViewChild('agreement', { static: false }) agreement: ElementRef;
+  @ViewChild('localmode', { static: true }) localmode: ElementRef;
+  @ViewChild('onlinemode', { static: true }) onlinemode: ElementRef;
 
   state: {
     online: {
-      apiStatus: "init" | "available" | "unavailable",
+      apiStatus: 'init' | 'available' | 'unavailable';
       user: {
         nameOrEmail: string;
         password: string;
-      },
+      };
       form: {
         valid: boolean;
         err: string;
-      }
-    },
+      };
+    };
     local: {
       validSize: boolean;
-    }
+    };
   } = {
     online: {
-      apiStatus: "available",
+      apiStatus: 'available',
       user: {
-        nameOrEmail: "",
-        password: ""
+        nameOrEmail: '',
+        password: '',
       },
       form: {
         valid: false,
-        err: ""
-      }
+        err: '',
+      },
     },
     local: {
-      validSize: false
-    }
+      validSize: false,
+    },
   };
 
   get sessionfile(): SessionFile {
@@ -81,20 +91,26 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
     return Math;
   }
 
-  constructor(private router: Router,
-              public appStorage: AppStorageService,
-              private cd: ChangeDetectorRef,
-              public settingsService: SettingsService,
-              public modService: ModalService,
-              private langService: TranslocoService,
-              private audioService: AudioService,
-              private authStoreService: AuthenticationStoreService) {
+  constructor(
+    private router: Router,
+    public appStorage: AppStorageService,
+    private cd: ChangeDetectorRef,
+    public settingsService: SettingsService,
+    public modService: ModalService,
+    private langService: TranslocoService,
+    private audioService: AudioService,
+    private authStoreService: AuthenticationStoreService
+  ) {
     super();
-    console.log(BrowserInfo.platform + " " + BrowserInfo.browser);
+    console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
   }
 
   onOfflineSubmit = () => {
-    if (this.appStorage.useMode !== LoginMode.DEMO && this.appStorage.transcriptID !== undefined && typeof this.appStorage.transcriptID === "number") {
+    if (
+      this.appStorage.useMode !== LoginMode.DEMO &&
+      this.appStorage.transcriptID !== undefined &&
+      typeof this.appStorage.transcriptID === 'number'
+    ) {
       // last was online mode
       /*
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
@@ -108,9 +124,12 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
       */
     } else {
       this.audioService.registerAudioManager(this.dropzone.audioManager);
-      this.appStorage.beginLocalSession(this.dropzone.files, true).then(this.beforeNavigation).catch((error) => {
-        alert(error);
-      });
+      this.appStorage
+        .beginLocalSession(this.dropzone.files, true)
+        .then(this.beforeNavigation)
+        .catch((error) => {
+          alert(error);
+        });
     }
   };
 
@@ -118,7 +137,9 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
     if (!(this.dropzone.oannotation === undefined)) {
       const newLevels: OIDBLevel[] = [];
       for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-        newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+        newLevels.push(
+          new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i)
+        );
       }
 
       const newLinks: OIDBLink[] = [];
@@ -128,7 +149,6 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
 
       this.appStorage.overwriteAnnotation(newLevels, newLinks);
       this.navigate();
-
     } else {
       this.navigate();
     }
@@ -139,20 +159,29 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
 
     this.appStorage.clearAnnotationPermanently();
     this.appStorage.clearLoggingDataPermanently();
-    this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
-      if (error === "file not supported") {
-        this.modService.openModal(ErrorModalComponent, ErrorModalComponent.options, {
-          text: this.langService.translate("reload-file.file not supported", { type: "" })
-        }).catch((error2) => {
-          console.error(error2);
-        });
-      }
-    });
+    this.appStorage
+      .beginLocalSession(this.dropzone.files, false)
+      .then(this.beforeNavigation)
+      .catch((error) => {
+        if (error === 'file not supported') {
+          this.modService
+            .openModal(ErrorModalComponent, ErrorModalComponent.options, {
+              text: this.langService.translate(
+                'reload-file.file not supported',
+                { type: '' }
+              ),
+            })
+            .catch((error2) => {
+              console.error(error2);
+            });
+        }
+      });
   };
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
-      this.state.local.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.state.local.validSize =
+        window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
       this.state.local.validSize = true;
     }
@@ -311,19 +340,23 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
     */
   }
 
-
   onOnlineCredentialsSubmit() {
-    this.authStoreService.login(AccountLoginMethod.local, this.state.online.user.nameOrEmail, this.state.online.user.password);
+    this.authStoreService.login(
+      AccountLoginMethod.local,
+      this.state.online.user.nameOrEmail,
+      this.state.online.user.password
+    );
   }
 
   canDeactivate(): Observable<boolean> | boolean {
-    return (this.state.online.form.valid);
+    return this.state.online.form.valid;
   }
 
-  @HostListener("window:resize", ["$event"])
+  @HostListener('window:resize', ['$event'])
   onResize() {
     if (this.settingsService.responsive.enabled === false) {
-      this.state.local.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.state.local.validSize =
+        window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
       this.state.local.validSize = true;
     }
@@ -332,40 +365,62 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
   getDropzoneFileString(file: File | SessionFile) {
     if (file !== undefined) {
       const fsize: FileSize = getFileSize(file.size);
-      return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
+      return `${file.name} (${Math.round(fsize.size * 100) / 100} ${
+        fsize.label
+      })`;
     }
-    return "";
+    return '';
   }
 
   getFileStatus(): string {
-    if (!(this.dropzone.files === undefined) && this.dropzone.files.length > 0 && !(this.dropzone.oaudiofile === undefined)) {
+    if (
+      !(this.dropzone.files === undefined) &&
+      this.dropzone.files.length > 0 &&
+      !(this.dropzone.oaudiofile === undefined)
+    ) {
       // check conditions
-      if ((this.appStorage.sessionfile === undefined) || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name) && (this.dropzone.oannotation === undefined)) {
-        return "start";
+      if (
+        this.appStorage.sessionfile === undefined ||
+        (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name &&
+          this.dropzone.oannotation === undefined)
+      ) {
+        return 'start';
       } else {
-        return "new";
+        return 'new';
       }
     }
 
-    return "unknown";
+    return 'unknown';
   }
 
   onTranscriptionDelete() {
-    this.modService.openModal(TranscriptionDeleteModalComponent, TranscriptionDeleteModalComponent.options).then((answer: ModalDeleteAnswer) => {
-      if (answer === ModalDeleteAnswer.DELETE) {
-        this.newTranscription();
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.modService
+      .openModal(
+        TranscriptionDeleteModalComponent,
+        TranscriptionDeleteModalComponent.options
+      )
+      .then((answer: ModalDeleteAnswer) => {
+        if (answer === ModalDeleteAnswer.DELETE) {
+          this.newTranscription();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   public startDemo() {
-    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
+    const audioExample = this.settingsService.getAudioExample(
+      this.langService.getActiveLang()
+    );
 
     if (audioExample !== undefined) {
       // delete old data for fresh new session
-      this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
+      this.appStorage.setDemoSession(
+        audioExample.url,
+        audioExample.description,
+        1000
+      );
       this.navigate();
     }
   }
@@ -391,9 +446,11 @@ export class LoginComponent extends DefaultComponent implements OnInit, Componen
   }
 
   private navigate = (): void => {
-    navigateTo(this.router, ["user"], AppInfo.queryParamsHandling).catch((error) => {
-      console.error(error);
-    });
+    navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch(
+      (error) => {
+        console.error(error);
+      }
+    );
   };
 
   private createNewOnlineSession(form: NgForm) {

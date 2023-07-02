@@ -1,15 +1,15 @@
 /***
  * Statistic Element Class
  */
-import { ILog, SampleInterval } from "../Settings/logging";
-import { getProperties, hasProperty } from "@octra/utilities";
+import { ILog, SampleInterval } from '../Settings/logging';
+import { getProperties, hasProperty } from '@octra/utilities';
 
 export class StatisticElem {
   protected data: ILog = {
     timestamp: undefined,
     type: undefined,
     context: undefined,
-    value: undefined
+    value: undefined,
   };
 
   get selection(): SampleInterval {
@@ -57,7 +57,12 @@ export class StatisticElem {
   }
 
   constructor(
-    type: string, context: string, value: any, timestamp: number, playpos: number, selection: SampleInterval,
+    type: string,
+    context: string,
+    value: any,
+    timestamp: number,
+    playpos: number,
+    selection: SampleInterval,
     segment: SampleInterval
   ) {
     this.data.type = type;
@@ -79,12 +84,17 @@ export class StatisticElem {
       type: undefined,
       playpos: undefined,
       selection: undefined,
-      segment: undefined
+      segment: undefined,
     };
 
     for (const [name, value] of getProperties(elem)) {
-      if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp') ||
-        hasProperty(elem, 'type') || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos') ||
+      if (
+        hasProperty(elem, 'value') ||
+        hasProperty(elem, 'context') ||
+        hasProperty(elem, 'timestamp') ||
+        hasProperty(elem, 'type') ||
+        hasProperty(elem, 'playpos') ||
+        hasProperty(elem, 'playerpos') ||
         hasProperty(elem, 'cursorpos')
       ) {
         if (name === 'playerpos') {
@@ -108,7 +118,7 @@ export class StatisticElem {
 
   public getDataClone(): ILog {
     return {
-      ...this.data
+      ...this.data,
     };
   }
 }

@@ -1,19 +1,24 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from "@angular/router";
-import { Observable } from "rxjs";
-import { AppInfo } from "../../../app.info";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { navigateTo } from "@octra/ngx-utilities";
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { Observable } from 'rxjs';
+import { AppInfo } from '../../../app.info';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { navigateTo } from '@octra/ngx-utilities';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
+  constructor(private appStorage: AppStorageService, private router: Router) {}
 
-  constructor(private appStorage: AppStorageService, private router: Router) {
-
-  }
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | boolean {
     if (this.appStorage.loggedIn !== true) {
       console.log(`members area logged in false`);
       const params = AppInfo.queryParamsHandling;

@@ -1,31 +1,38 @@
-<octra-audio-navigation #nav
-                      (afterPlaybackRateChange)="afterSpeedChange($event)"
-                      (afterVolumeChange)="afterVolumeChange($event)"
-                      (buttonClick)="onButtonClick($event)"
-                      [audioChunk]="audiochunk"
-                      [easyMode]="appStorage.easymode"
-                      [playbackRate]="appStorage.audioSpeed"
-
-                      [responsive]="settingsService.responsive.enabled"
-                      [volume]="appStorage.audioVolume"
+<octra-audio-navigation
+  #nav
+  (afterPlaybackRateChange)="afterSpeedChange($event)"
+  (afterVolumeChange)="afterVolumeChange($event)"
+  (buttonClick)="onButtonClick($event)"
+  [audioChunk]="audiochunk"
+  [easyMode]="appStorage.easymode"
+  [playbackRate]="appStorage.audioSpeed"
+  [responsive]="settingsService.responsive.enabled"
+  [volume]="appStorage.audioVolume"
 ></octra-audio-navigation>
-<octra-audioplayer #audioplayer
-                 [audioChunk]="audiochunk"
-></octra-audioplayer>
-<octra-transcr-editor #transcr
-                      (boundaryclicked)="onBoundaryClicked($event)"
-                      (boundaryinserted)="onBoundaryInserted()"
-                      (keyup)="onKeyUp()"
-                      (markerClick)="onMarkerClick($event)"
-                      (markerInsert)="onMarkerInsert($event)"
-                      (typing)="afterTyping($event);"
-                      [audiochunk]="audiochunk"
-                      [segments]="segments"
-                      [easymode]="appStorage.easymode"
-                      [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
-                      [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
-                      [(highlightingEnabled)]="highlighting"
-                      [externalShortcutManager]="keyMap.shortcutsManager"
-                      (redoUndo)="onTranscrEditorRedoUndo($event)"
+<octra-audioplayer #audioplayer [audioChunk]="audiochunk"></octra-audioplayer>
+<octra-transcr-editor
+  #transcr
+  (boundaryclicked)="onBoundaryClicked($event)"
+  (boundaryinserted)="onBoundaryInserted()"
+  (keyup)="onKeyUp()"
+  (markerClick)="onMarkerClick($event)"
+  (markerInsert)="onMarkerInsert($event)"
+  (typing)="afterTyping($event)"
+  [audiochunk]="audiochunk"
+  [segments]="segments"
+  [easymode]="appStorage.easymode"
+  [markers]="
+    transcrService.guidelines !== undefined
+      ? transcrService.guidelines.markers
+      : undefined
+  "
+  [validationEnabled]="
+    appStorage.useMode !== 'url' &&
+    (appStorage.useMode === 'demo' ||
+      settingsService.projectsettings.octra.validationEnabled)
+  "
+  [(highlightingEnabled)]="highlighting"
+  [externalShortcutManager]="keyMap.shortcutsManager"
+  (redoUndo)="onTranscrEditorRedoUndo($event)"
 >
 </octra-transcr-editor>

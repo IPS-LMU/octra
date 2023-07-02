@@ -1,5 +1,5 @@
-import { AnnotationActions } from "../../annotation/annotation.actions";
-import { createAction, props } from "@ngrx/store";
+import { AnnotationActions } from '../../annotation/annotation.actions';
+import { createAction, props } from '@ngrx/store';
 import {
   CurrentProject,
   LoginData,
@@ -7,24 +7,22 @@ import {
   OnlineSession,
   SessionData,
   TranscriptionState,
-  URLParameters
-} from "../../index";
-import { TaskDto } from "@octra/api-types";
+  URLParameters,
+} from '../../index';
+import { TaskDto } from '@octra/api-types';
 
 export class OnlineModeActions extends AnnotationActions {
-  static override context: 'OnlineMode';
-
   public static login = createAction(
-    `[${OnlineModeActions.context}] Login`,
+    `online mode Login`,
     props<{
-      loginData: LoginData,
+      loginData: LoginData;
       removeData: boolean;
       mode: LoginMode.ONLINE;
     }>()
   );
 
   public static loginDemo = createAction(
-    `[${OnlineModeActions.context}] Login Demo`,
+    `online mode Login Demo`,
     props<{
       onlineSession: OnlineSession;
       mode: LoginMode.DEMO;
@@ -32,14 +30,14 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static loginURLParameters = createAction(
-    `[${OnlineModeActions.context}] Login URLParameters`,
+    `online mode Login URLParameters`,
     props<{
-      urlParams: URLParameters
+      urlParams: URLParameters;
     }>()
   );
 
   public static setComment = createAction(
-    `[${OnlineModeActions.context}] Set user comment`,
+    `online mode Set user comment`,
     props<{
       comment: string;
       mode: string;
@@ -47,7 +45,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setPromptText = createAction(
-    `[${OnlineModeActions.context}] Set promptText`,
+    `online mode Set promptText`,
     props<{
       promptText: string;
       mode: string;
@@ -55,7 +53,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setServerComment = createAction(
-    `[${OnlineModeActions.context}] Set serverComment`,
+    `online mode Set serverComment`,
     props<{
       serverComment: string;
       mode: LoginMode;
@@ -63,7 +61,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setJobsLeft = createAction(
-    `[${OnlineModeActions.context}] Set jobsLeft`,
+    `online mode Set jobsLeft`,
     props<{
       jobsLeft: number;
       mode: LoginMode;
@@ -71,7 +69,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setServerDataEntry = createAction(
-    `[${OnlineModeActions.context}] Set serverDataEntry`,
+    `online mode Set serverDataEntry`,
     props<{
       serverDataEntry: TaskDto;
       mode: LoginMode;
@@ -79,7 +77,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setSubmitted = createAction(
-    `[${AnnotationActions.context}] set submitted`,
+    `annotation set submitted`,
     props<{
       submitted: boolean;
       mode: LoginMode;
@@ -87,7 +85,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static setFeedback = createAction(
-    `[${AnnotationActions.context}] Set feedback`,
+    `annotation Set feedback`,
     props<{
       feedback: any;
       mode: LoginMode;
@@ -95,7 +93,7 @@ export class OnlineModeActions extends AnnotationActions {
   );
 
   public static startOnlineAnnotation = createAction(
-    `[${AnnotationActions.context}] Start Annotation`,
+    `annotation Start Annotation`,
     props<{
       mode: LoginMode;
       currentProject: CurrentProject;
@@ -104,5 +102,3 @@ export class OnlineModeActions extends AnnotationActions {
     }>()
   );
 }
-
-

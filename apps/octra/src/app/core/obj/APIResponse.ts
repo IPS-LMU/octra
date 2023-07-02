@@ -1,4 +1,4 @@
-import { APIData } from "./APIData";
+import { APIData } from './APIData';
 
 export class APIResponse {
   private systemstate: string;
@@ -6,10 +6,12 @@ export class APIResponse {
   private data: any;
   private message: string;
 
-  constructor(systemstate: string,
-              type: string,
-              data: APIData,
-              message: string) {
+  constructor(
+    systemstate: string,
+    type: string,
+    data: APIData,
+    message: string
+  ) {
     this.systemstate = systemstate;
     this.type = type;
     this.data = data;

@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{"modal.transcription.delete.header" | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'modal.transcription.delete.header' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -12,11 +14,16 @@
     <div [innerHTML]="'modal.transcription.delete.text' | transloco"></div>
   </div>
   <div class="modal-footer">
-    <button (click)="close('ABORT')" class="btn btn-default" data-dismiss="modal" type="button">
-      {{"general.abort" | transloco}}
+    <button
+      (click)="close('ABORT')"
+      class="btn btn-default"
+      data-dismiss="modal"
+      type="button"
+    >
+      {{ 'general.abort' | transloco }}
     </button>
-    <button (click)="close('DELETE')" class="btn btn-danger"
-            type="button">
-      {{"modal.transcription.delete.delete old" | transloco}}
-  </button>
+    <button (click)="close('DELETE')" class="btn btn-danger" type="button">
+      {{ 'modal.transcription.delete.delete old' | transloco }}
+    </button>
+  </div>
 </div>

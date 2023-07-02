@@ -1,11 +1,16 @@
-import { EventEmitter, Injectable } from "@angular/core";
-import { SessionStorageService } from "ngx-webstorage";
-import { AppInfo } from "../../../app.info";
-import { SessionFile } from "../../obj/SessionFile";
-import { FileProgress } from "../../obj/objects";
-import { afterTrue, getProperties, SubscriptionManager, waitTillResultRetrieved } from "@octra/utilities";
-import { navigateTo } from "@octra/ngx-utilities";
-import { OIDBLevel, OIDBLink } from "@octra/annotation";
+import { EventEmitter, Injectable } from '@angular/core';
+import { SessionStorageService } from 'ngx-webstorage';
+import { AppInfo } from '../../../app.info';
+import { SessionFile } from '../../obj/SessionFile';
+import { FileProgress } from '../../obj/objects';
+import {
+  afterTrue,
+  getProperties,
+  SubscriptionManager,
+  waitTillResultRetrieved,
+} from '@octra/utilities';
+import { navigateTo } from '@octra/ngx-utilities';
+import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import {
   AnnotationState,
   AnnotationStateLevel,
@@ -15,28 +20,28 @@ import {
   LoadingStatus,
   LoginMode,
   OnlineSession,
-  RootState
-} from "../../store";
-import { Action, Store } from "@ngrx/store";
-import { AudioManager } from "@octra/media";
-import { Actions } from "@ngrx/effects";
-import { ConsoleEntry } from "./bug-report.service";
-import { Router } from "@angular/router";
-import { AnnotationActions } from "../../store/annotation/annotation.actions";
-import { UserActions } from "../../store/user/user.actions";
-import { ApplicationActions } from "../../store/application/application.actions";
-import { IDBActions } from "../../store/idb/idb.actions";
-import * as fromAnnotation from "../../store/annotation";
-import * as fromApplication from "../../store/application";
-import { ASRActions } from "../../store/asr/asr.actions";
-import { ILog } from "../../obj/Settings/logging";
-import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.actions";
-import { LocalModeActions } from "../../store/modes/local-mode/local-mode.actions";
-import { Observable, Subject, Subscription } from "rxjs";
-import { AccountRole } from "@octra/api-types";
+  RootState,
+} from '../../store';
+import { Action, Store } from '@ngrx/store';
+import { AudioManager } from '@octra/media';
+import { Actions } from '@ngrx/effects';
+import { ConsoleEntry } from './bug-report.service';
+import { Router } from '@angular/router';
+import { AnnotationActions } from '../../store/annotation/annotation.actions';
+import { UserActions } from '../../store/user/user.actions';
+import { ApplicationActions } from '../../store/application/application.actions';
+import { IDBActions } from '../../store/idb/idb.actions';
+import * as fromAnnotation from '../../store/annotation';
+import * as fromApplication from '../../store/application';
+import { ASRActions } from '../../store/asr/asr.actions';
+import { ILog } from '../../obj/Settings/logging';
+import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
+import { LocalModeActions } from '../../store/modes/local-mode/local-mode.actions';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { AccountRole } from '@octra/api-types';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppStorageService {
   get undoRedoDisabled(): boolean {
@@ -68,7 +73,9 @@ export class AppStorageService {
   }
 
   set playonhover(value: boolean) {
-    this.store.dispatch(ApplicationActions.setPlayOnHover({playOnHover: value}));
+    this.store.dispatch(
+      ApplicationActions.setPlayOnHover({ playOnHover: value })
+    );
   }
 
   public get annotationChanged(): Observable<AnnotationState> {
@@ -85,17 +92,25 @@ export class AppStorageService {
   }
 
   set reloaded(value: boolean) {
-    this.store.dispatch(ApplicationActions.setReloaded({
-      reloaded: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setReloaded({
+        reloaded: value,
+      })
+    );
   }
 
   get serverDataEntry(): any {
-    return getModeState(this._snapshot)?.onlineSession.sessionData?.serverDataEntry;
+    return getModeState(this._snapshot)?.onlineSession.sessionData
+      ?.serverDataEntry;
   }
 
   set serverDataEntry(value: any) {
-    this.store.dispatch(OnlineModeActions.setServerDataEntry({serverDataEntry: value, mode: this.useMode}));
+    this.store.dispatch(
+      OnlineModeActions.setServerDataEntry({
+        serverDataEntry: value,
+        mode: this.useMode,
+      })
+    );
   }
 
   get submitted(): boolean {
@@ -104,10 +119,12 @@ export class AppStorageService {
   }
 
   set submitted(value: boolean) {
-    this.store.dispatch(OnlineModeActions.setSubmitted({
-      submitted: value,
-      mode: this._snapshot.application.mode
-    }));
+    this.store.dispatch(
+      OnlineModeActions.setSubmitted({
+        submitted: value,
+        mode: this._snapshot.application.mode,
+      })
+    );
   }
 
   get feedback(): any {
@@ -115,15 +132,17 @@ export class AppStorageService {
   }
 
   set feedback(value: any) {
-    this.store.dispatch(OnlineModeActions.setFeedback(
-      {
+    this.store.dispatch(
+      OnlineModeActions.setFeedback({
         feedback: value,
-        mode: this.useMode
-      }));
+        mode: this.useMode,
+      })
+    );
   }
 
   get transcriptID(): number {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.transcriptID;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData
+      ?.transcriptID;
   }
 
   get language(): string {
@@ -131,7 +150,7 @@ export class AppStorageService {
   }
 
   set language(value: string) {
-    this.store.dispatch(ApplicationActions.setAppLanguage({language: value}));
+    this.store.dispatch(ApplicationActions.setAppLanguage({ language: value }));
   }
 
   /* Getter/Setter IDB Storage */
@@ -144,10 +163,12 @@ export class AppStorageService {
   }
 
   set logging(value: boolean) {
-    this.store.dispatch(AnnotationActions.setLogging({
-      logging: value,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.setLogging.do({
+        logging: value,
+        mode: this.useMode,
+      })
+    );
   }
 
   get showLoupe(): boolean {
@@ -155,9 +176,11 @@ export class AppStorageService {
   }
 
   set showLoupe(value: boolean) {
-    this.store.dispatch(ApplicationActions.setShowLoupe({
-      showLoupe: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setShowLoupe({
+        showLoupe: value,
+      })
+    );
   }
 
   get consoleEntries(): ConsoleEntry[] {
@@ -165,9 +188,11 @@ export class AppStorageService {
   }
 
   set consoleEntries(consoleEntries: ConsoleEntry[]) {
-    this.store.dispatch(ApplicationActions.setConsoleEntries({
-      consoleEntries
-    }));
+    this.store.dispatch(
+      ApplicationActions.setConsoleEntries({
+        consoleEntries,
+      })
+    );
   }
 
   get prompttext(): string {
@@ -183,9 +208,11 @@ export class AppStorageService {
   }
 
   set easymode(value: boolean) {
-    this.store.dispatch(ApplicationActions.setEasyMode({
-      easyMode: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setEasyMode({
+        easyMode: value,
+      })
+    );
   }
 
   get comment(): string {
@@ -193,14 +220,17 @@ export class AppStorageService {
   }
 
   set comment(value: string) {
-    this.store.dispatch(OnlineModeActions.setComment({
-      comment: value,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      OnlineModeActions.setComment({
+        comment: value,
+        mode: this.useMode,
+      })
+    );
   }
 
   get servercomment(): string {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.serverComment;
+    return getModeState(this._snapshot)?.onlineSession?.sessionData
+      ?.serverComment;
   }
 
   get annotationLevels(): AnnotationStateLevel[] {
@@ -216,12 +246,14 @@ export class AppStorageService {
   }
 
   set secondsPerLine(value: number) {
-    this.store.dispatch(ApplicationActions.setSecondsPerLine({
-      secondsPerLine: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setSecondsPerLine({
+        secondsPerLine: value,
+      })
+    );
     this.settingschange.next({
       key: 'secondsPerLine',
-      value
+      value,
     });
   }
 
@@ -234,36 +266,44 @@ export class AppStorageService {
   }
 
   set highlightingEnabled(value: boolean) {
-    this.store.dispatch(ApplicationActions.setHighlightingEnabled({
-      highlightingEnabled: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setHighlightingEnabled({
+        highlightingEnabled: value,
+      })
+    );
   }
 
   private _undoRedoDisabled = false;
 
-  constructor(public sessStr: SessionStorageService,
-              private store: Store<RootState>,
-              private actions: Actions,
-              private router: Router) {
-    this.subscrManager.add(this.store.subscribe((state: RootState) => {
-      this._snapshot = state;
-    }));
+  constructor(
+    public sessStr: SessionStorageService,
+    private store: Store<RootState>,
+    private actions: Actions,
+    private router: Router
+  ) {
+    this.subscrManager.add(
+      this.store.subscribe((state: RootState) => {
+        this._snapshot = state;
+      })
+    );
 
-    this.subscrManager.add(actions.subscribe((action) => {
-      if (action.type === '@ngrx/effects/init') {
-        this.playonhover = this.sessStr.retrieve('playonhover');
-        this.followPlayCursor = this.sessStr.retrieve('followplaycursor');
-        this.jobsLeft = this.sessStr.retrieve('jobsLeft');
-        this.loggedIn = this.sessStr.retrieve('loggedIn');
-        this.reloaded = this.sessStr.retrieve('reloaded');
-        this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
-        const test = '';
-      }
-    }));
+    this.subscrManager.add(
+      actions.subscribe((action) => {
+        if (action.type === '@ngrx/effects/init') {
+          this.playonhover = this.sessStr.retrieve('playonhover');
+          this.followPlayCursor = this.sessStr.retrieve('followplaycursor');
+          this.jobsLeft = this.sessStr.retrieve('jobsLeft');
+          this.loggedIn = this.sessStr.retrieve('loggedIn');
+          this.reloaded = this.sessStr.retrieve('reloaded');
+          this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
+          const test = '';
+        }
+      })
+    );
   }
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
-  public settingschange = new Subject<{ key: string, value: any }>();
+  public settingschange = new Subject<{ key: string; value: any }>();
 
   private subscrManager = new SubscriptionManager<Subscription>();
 
@@ -276,16 +316,20 @@ export class AppStorageService {
   }
 
   set savingNeeded(value: boolean) {
-    this.store.dispatch(AnnotationActions.setSavingNeeded({
-      savingNeeded: value,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.setSavingNeeded.do({
+        savingNeeded: value,
+        mode: this.useMode,
+      })
+    );
   }
 
   set followPlayCursor(value: boolean) {
-    this.store.dispatch(ApplicationActions.setFollowPlayCursor({
-      followPlayCursor: value
-    }));
+    this.store.dispatch(
+      ApplicationActions.setFollowPlayCursor({
+        followPlayCursor: value,
+      })
+    );
   }
 
   get followPlayCursor(): boolean {
@@ -296,15 +340,17 @@ export class AppStorageService {
     return this._snapshot.application.idb.loaded;
   }
 
-
   get jobsLeft(): number {
-    return getModeState(this._snapshot)?.onlineSession?.currentProject?.jobsLeft;
+    return getModeState(this._snapshot)?.onlineSession?.currentProject
+      ?.jobsLeft;
   }
 
   set jobsLeft(jobsLeft: number) {
-    this.store.dispatch(ApplicationActions.setJobsLeft({
-      jobsLeft
-    }));
+    this.store.dispatch(
+      ApplicationActions.setJobsLeft({
+        jobsLeft,
+      })
+    );
   }
 
   get logs(): any[] {
@@ -316,10 +362,12 @@ export class AppStorageService {
   }
 
   setLogs(value: any[]) {
-    this.store.dispatch(AnnotationActions.saveLogs({
-      logs: value,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.saveLogs.do({
+        logs: value,
+        mode: this.useMode,
+      })
+    );
   }
 
   get asrSelectedLanguage(): string {
@@ -327,10 +375,12 @@ export class AppStorageService {
   }
 
   set asrSelectedLanguage(value: string) {
-    this.store.dispatch(ASRActions.setASRSettings({
-      selectedLanguage: value,
-      selectedService: this.asrSelectedService
-    }));
+    this.store.dispatch(
+      ASRActions.setASRSettings({
+        selectedLanguage: value,
+        selectedService: this.asrSelectedService,
+      })
+    );
   }
 
   get audioLoaded() {
@@ -346,10 +396,12 @@ export class AppStorageService {
   }
 
   set asrSelectedService(value: string) {
-    this.store.dispatch(ASRActions.setASRSettings({
-      selectedLanguage: this.asrSelectedLanguage,
-      selectedService: value
-    }));
+    this.store.dispatch(
+      ASRActions.setASRSettings({
+        selectedLanguage: this.asrSelectedLanguage,
+        selectedService: value,
+      })
+    );
   }
 
   public get audioVolume(): number {
@@ -357,10 +409,12 @@ export class AppStorageService {
   }
 
   public set audioVolume(value: number) {
-    this.store.dispatch(ApplicationActions.setAudioSettings({
-      volume: value,
-      speed: this.audioSpeed
-    }));
+    this.store.dispatch(
+      ApplicationActions.setAudioSettings({
+        volume: value,
+        speed: this.audioSpeed,
+      })
+    );
   }
 
   public get audioSpeed(): number {
@@ -368,10 +422,12 @@ export class AppStorageService {
   }
 
   public set audioSpeed(value: number) {
-    this.store.dispatch(ApplicationActions.setAudioSettings({
-      speed: value,
-      volume: this.audioVolume
-    }));
+    this.store.dispatch(
+      ApplicationActions.setAudioSettings({
+        speed: value,
+        volume: this.audioVolume,
+      })
+    );
   }
 
   get isSaving(): boolean {
@@ -379,9 +435,11 @@ export class AppStorageService {
   }
 
   set isSaving(value: boolean) {
-    this.store.dispatch(AnnotationActions.setIsSaving({
-      isSaving: value
-    }));
+    this.store.dispatch(
+      AnnotationActions.setIsSaving.do({
+        isSaving: value,
+      })
+    );
   }
 
   get audioURL(): string {
@@ -397,9 +455,11 @@ export class AppStorageService {
   }
 
   set loggedIn(loggedIn: boolean) {
-    this.store.dispatch(ApplicationActions.setLoggedIn({
-      loggedIn
-    }));
+    this.store.dispatch(
+      ApplicationActions.setLoggedIn({
+        loggedIn,
+      })
+    );
   }
 
   get interface(): string {
@@ -407,27 +467,36 @@ export class AppStorageService {
   }
 
   set interface(newInterface: string) {
-    this.store.dispatch(AnnotationActions.setCurrentEditor({
-      currentEditor: newInterface,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.setCurrentEditor.do({
+        currentEditor: newInterface,
+        mode: this.useMode,
+      })
+    );
   }
 
-  public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
+  public beginLocalSession = async (
+    files: FileProgress[],
+    keepData: boolean
+  ) => {
     return new Promise<void>((resolve, reject) => {
       if (files !== undefined) {
         // get audio file
         let audiofile;
         for (const file of files) {
-          if (AudioManager.isValidAudioFileName(file.file.name, AppInfo.audioformats)) {
+          if (
+            AudioManager.isValidAudioFileName(
+              file.file.name,
+              AppInfo.audioformats
+            )
+          ) {
             audiofile = file.file;
             break;
           }
         }
 
-
         if (audiofile !== undefined) {
-          const storeFiles = files.map(a => (a.file));
+          const storeFiles = files.map((a) => a.file);
           this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
           resolve();
         } else {
@@ -446,7 +515,11 @@ export class AppStorageService {
     );
   };
 
-  public overwriteAnnotation = (levels: OIDBLevel[], links: OIDBLink[], saveToDB = true): Promise<any> => {
+  public overwriteAnnotation = (
+    levels: OIDBLevel[],
+    links: OIDBLink[],
+    saveToDB = true
+  ): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       let max = 0;
 
@@ -464,47 +537,58 @@ export class AppStorageService {
         }
       });
 
-      this.store.dispatch(AnnotationActions.overwriteTranscript({
-        mode: this.useMode,
-        transcript: {
-          levels: (levels.map((a) => {
-            return convertFromOIDLevel(a.level, a.id);
-          })),
-          links,
-          levelCounter: max
-        },
-        saveToDB
-      }));
+      this.store.dispatch(
+        AnnotationActions.overwriteTranscript.do({
+          mode: this.useMode,
+          transcript: {
+            levels: levels.map((a) => {
+              return convertFromOIDLevel(a.level, a.id);
+            }),
+            links,
+            levelCounter: max,
+          },
+          saveToDB,
+        })
+      );
     });
   };
 
   public overwriteLinks = (value: OIDBLink[]) => {
-    this.store.dispatch(AnnotationActions.overwriteLinks({
-      links: value
-    }));
+    this.store.dispatch(
+      AnnotationActions.overwriteLinks.do({
+        links: value,
+      })
+    );
   };
 
-  afterLoginOnlineSuccessful(type: 'local' | 'shibboleth', user: {
-    name: string,
-    email: string,
-    roles: AccountRole[],
-    webToken: string
-  }) {
-    afterTrue(this.store.select(fromApplication.selectLoggedIn)).then(() => {
-      navigateTo(this.router, ['/user/projects'])
-    }).catch((error) => {
-      console.error(error);
-    });
+  afterLoginOnlineSuccessful(
+    type: 'local' | 'shibboleth',
+    user: {
+      name: string;
+      email: string;
+      roles: AccountRole[];
+      webToken: string;
+    }
+  ) {
+    afterTrue(this.store.select(fromApplication.selectLoggedIn))
+      .then(() => {
+        navigateTo(this.router, ['/user/projects']);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
-    this.store.dispatch(OnlineModeActions.login({
-      mode: LoginMode.ONLINE,
-      loginData: {
-        userName: user.name,
-        email: user.email,
-        webToken: user.webToken
-      },
-      removeData: false
-    }));
+    this.store.dispatch(
+      OnlineModeActions.login({
+        mode: LoginMode.ONLINE,
+        loginData: {
+          userName: user.name,
+          email: user.email,
+          webToken: user.webToken,
+        },
+        removeData: false,
+      })
+    );
 
     // TODO api
     // 1. Save loginData to store and IDB
@@ -528,7 +612,14 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(LocalModeActions.login({files, sessionFile, removeData: false, mode: LoginMode.LOCAL}));
+    this.store.dispatch(
+      LocalModeActions.login({
+        files,
+        sessionFile,
+        removeData: false,
+        mode: LoginMode.LOCAL,
+      })
+    );
   }
 
   setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
@@ -540,35 +631,42 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(OnlineModeActions.loginDemo({
-      mode: LoginMode.DEMO,
-      onlineSession: {
-        loginData: {
-          userName: 'demo_user',
-          email: 'john-doe@email.com',
-          webToken: '270858034895u23894ruz827z030r983jr02h7'
+    this.store.dispatch(
+      OnlineModeActions.loginDemo({
+        mode: LoginMode.DEMO,
+        onlineSession: {
+          loginData: {
+            userName: 'demo_user',
+            email: 'john-doe@email.com',
+            webToken: '270858034895u23894ruz827z030r983jr02h7',
+          },
+          currentProject: {
+            id: 234267,
+            name: 'DemoProject',
+            description: 'This is a demo project.',
+            jobsLeft,
+          },
+          sessionData: {
+            transcriptID: 21343134,
+            promptText: '',
+            serverDataEntry: undefined,
+            comment: '',
+            audioURL,
+            serverComment,
+            submitted: false,
+            feedback: undefined,
+          },
         },
-        currentProject: {
-          id: 234267,
-          name: 'DemoProject',
-          description: 'This is a demo project.',
-          jobsLeft
-        },
-        sessionData: {
-          transcriptID: 21343134,
-          promptText: '',
-          serverDataEntry: undefined,
-          comment: '',
-          audioURL,
-          serverComment,
-          submitted: false,
-          feedback: undefined
-        }
-      }
-    }));
+      })
+    );
   }
 
-  setURLSession(audio: string, transcript: string, embedded: boolean, host: string) {
+  setURLSession(
+    audio: string,
+    transcript: string,
+    embedded: boolean,
+    host: string
+  ) {
     if (this.easymode === undefined) {
       this.easymode = false;
     }
@@ -577,14 +675,16 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(OnlineModeActions.loginURLParameters({
-      urlParams: {
-        audio,
-        transcript,
-        embedded,
-        host
-      }
-    }));
+    this.store.dispatch(
+      OnlineModeActions.loginURLParameters({
+        urlParams: {
+          audio,
+          transcript,
+          embedded,
+          host,
+        },
+      })
+    );
   }
 
   public save(key: string, value: any): boolean {
@@ -597,36 +697,43 @@ export class AppStorageService {
 
       switch (key) {
         case 'annotation':
-          this.changeAnnotationLevel(value.num, value.level).then(
-            () => {
-              this.isSaving = false;
-              this.savingNeeded = false;
-              this.saving.emit('success');
-            }
-          ).catch((err) => {
-            this.isSaving = false;
-            this.savingNeeded = false;
-            this.saving.emit('error');
-            console.error(`error on saving`);
-            console.error(err);
-          });
-          break;
-        case 'feedback':
-          waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
+          this.changeAnnotationLevel(value.num, value.level)
             .then(() => {
               this.isSaving = false;
               this.savingNeeded = false;
               this.saving.emit('success');
-            }).catch((error) => {
-            console.error(error);
-            this.isSaving = false;
-            this.savingNeeded = false;
-            this.saving.emit('success');
-          });
-          this.store.dispatch(OnlineModeActions.setFeedback({
-            mode: LoginMode.ONLINE,
-            feedback: value
-          }));
+            })
+            .catch((err) => {
+              this.isSaving = false;
+              this.savingNeeded = false;
+              this.saving.emit('error');
+              console.error(`error on saving`);
+              console.error(err);
+            });
+          break;
+        case 'feedback':
+          waitTillResultRetrieved<Actions, Action, void>(
+            this.actions,
+            IDBActions.saveTranscriptionFeedbackSuccess,
+            IDBActions.saveTranscriptionFeedbackFailed
+          )
+            .then(() => {
+              this.isSaving = false;
+              this.savingNeeded = false;
+              this.saving.emit('success');
+            })
+            .catch((error) => {
+              console.error(error);
+              this.isSaving = false;
+              this.savingNeeded = false;
+              this.saving.emit('success');
+            });
+          this.store.dispatch(
+            OnlineModeActions.setFeedback({
+              mode: LoginMode.ONLINE,
+              feedback: value,
+            })
+          );
 
           break;
         default:
@@ -645,37 +752,49 @@ export class AppStorageService {
         }
       }
 
-      this.store.dispatch(AnnotationActions.addLog({
-        mode: this.useMode,
-        log: log
-      }));
+      this.store.dispatch(
+        AnnotationActions.addLog.do({
+          mode: this.useMode,
+          log: log,
+        })
+      );
     } else {
-      console.error('Can\'t save log because it is undefined.');
+      console.error("Can't save log because it is undefined.");
     }
   }
 
   public afterSaving(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.isSaving || this.savingNeeded) {
-        const subscr = this.saving.subscribe(() => {
-          subscr.unsubscribe();
-          resolve();
-        }, (err) => {
-          subscr.unsubscribe();
-          reject(err);
-        });
+        const subscr = this.saving.subscribe(
+          () => {
+            subscr.unsubscribe();
+            resolve();
+          },
+          (err) => {
+            subscr.unsubscribe();
+            reject(err);
+          }
+        );
       } else {
         resolve();
       }
     });
   }
 
-  public changeAnnotationLevel(tiernum: number, level: AnnotationStateLevel): Promise<void> {
+  public changeAnnotationLevel(
+    tiernum: number,
+    level: AnnotationStateLevel
+  ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.annotationLevels !== undefined) {
         if (level !== undefined) {
           if (this.annotationLevels.length > tiernum) {
-            waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.saveAnnotationSuccess, IDBActions.saveAnnotationFailed)
+            waitTillResultRetrieved<Actions, Action, void>(
+              this.actions,
+              IDBActions.saveAnnotationSuccess,
+              IDBActions.saveAnnotationFailed
+            )
               .then(() => {
                 resolve();
               })
@@ -683,10 +802,12 @@ export class AppStorageService {
                 reject(error);
               });
 
-            this.store.dispatch(AnnotationActions.changeAnnotationLevel({
-              level,
-              mode: this.useMode
-            }));
+            this.store.dispatch(
+              AnnotationActions.changeAnnotationLevel.do({
+                level,
+                mode: this.useMode,
+              })
+            );
           } else {
             reject('number of level that should be changed is invalid');
           }
@@ -704,7 +825,11 @@ export class AppStorageService {
       if (level !== undefined) {
         level.id = getModeState(this._snapshot).transcript.levelCounter + 1;
 
-        waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
+        waitTillResultRetrieved<Actions, Action, void>(
+          this.actions,
+          IDBActions.addAnnotationLevelSuccess,
+          IDBActions.addAnnotationLevelFailed
+        )
           .then(() => {
             resolve();
           })
@@ -712,10 +837,12 @@ export class AppStorageService {
             reject(error);
           });
 
-        this.store.dispatch(AnnotationActions.addAnnotationLevel({
-          level: convertFromOIDLevel(level.level, level.id),
-          mode: this.useMode
-        }));
+        this.store.dispatch(
+          AnnotationActions.addAnnotationLevel.do({
+            level: convertFromOIDLevel(level.level, level.id),
+            mode: this.useMode,
+          })
+        );
       } else {
         console.error('level is undefined or undefined');
       }
@@ -724,10 +851,12 @@ export class AppStorageService {
 
   public removeAnnotationLevel(id: number): Promise<void> {
     if (id > -1) {
-      this.store.dispatch(AnnotationActions.removeAnnotationLevel({
-        id,
-        mode: this.useMode
-      }));
+      this.store.dispatch(
+        AnnotationActions.removeAnnotationLevel.do({
+          id,
+          mode: this.useMode,
+        })
+      );
       return new Promise<void>((resolve) => {
         resolve();
       });
@@ -739,9 +868,11 @@ export class AppStorageService {
   }
 
   public clearLoggingDataPermanently() {
-    this.store.dispatch(AnnotationActions.clearLogs({
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.clearLogs.do({
+        mode: this.useMode,
+      })
+    );
   }
 
   public getLevelByID(id: number) {
@@ -788,14 +919,18 @@ export class AppStorageService {
   }
 
   public logout(clearSession = false) {
-    this.store.dispatch(AnnotationActions.logout({
-      clearSession,
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.logout.do({
+        clearSession,
+        mode: this.useMode,
+      })
+    );
     // TODO WAIT?
-    navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
-      console.error(error);
-    });
+    navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch(
+      (error) => {
+        console.error(error);
+      }
+    );
   }
 
   public undo() {
@@ -827,21 +962,37 @@ export class AppStorageService {
   }
 
   public clearAnnotationPermanently() {
-    this.store.dispatch(AnnotationActions.clearAnnotation({
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.clearAnnotation.do({
+        mode: this.useMode,
+      })
+    );
   }
 
   public clearWholeSession(): Promise<void[]> {
     const promises: Promise<void>[] = [];
     promises.push(
-      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearAllOptionsSuccess, IDBActions.clearAllOptionsFailed),
-      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearLogsSuccess, IDBActions.clearLogsFailed),
-      waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearAnnotationSuccess, IDBActions.clearAnnotationFailed)
+      waitTillResultRetrieved<Actions, Action, void>(
+        this.actions,
+        IDBActions.clearAllOptionsSuccess,
+        IDBActions.clearAllOptionsFailed
+      ),
+      waitTillResultRetrieved<Actions, Action, void>(
+        this.actions,
+        IDBActions.clearLogsSuccess,
+        IDBActions.clearLogsFailed
+      ),
+      waitTillResultRetrieved<Actions, Action, void>(
+        this.actions,
+        IDBActions.clearAnnotationSuccess,
+        IDBActions.clearAnnotationFailed
+      )
     );
-    this.store.dispatch(AnnotationActions.clearWholeSession({
-      mode: this.useMode
-    }));
+    this.store.dispatch(
+      AnnotationActions.clearWholeSession.success({
+        mode: this.useMode,
+      })
+    );
 
     return Promise.all(promises);
   }

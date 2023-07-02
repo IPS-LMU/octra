@@ -1,31 +1,38 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { AudioService, SettingsService, TranscriptionService, UserInteractionsService } from "../../shared/service";
-import { AppInfo } from "../../../app.info";
-import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
-import { HttpClient } from "@angular/common/http";
-import { Subscription, timer } from "rxjs";
-import { fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation } from "angular-animations";
-import { NamingDragAndDropComponent } from "../../tools/naming-drag-and-drop/naming-drag-and-drop.component";
-import { TableConfiguratorComponent } from "../../tools/table-configurator/table-configurator.component";
-import { SubscriptionManager } from "@octra/utilities";
-import { NavbarService } from "../../component/navbar/navbar.service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { Converter, IFile } from "@octra/annotation";
-import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  AudioService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService,
+} from '../../shared/service';
+import { AppInfo } from '../../../app.info';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { timer } from 'rxjs';
+import {
+  fadeInExpandOnEnterAnimation,
+  fadeOutCollapseOnLeaveAnimation,
+} from 'angular-animations';
+import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
+import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
+import { NavbarService } from '../../component/navbar/navbar.service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { Converter, IFile } from '@octra/annotation';
+import { OctraModal } from '../types';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: "octra-export-files-modal",
-  templateUrl: "./export-files-modal.component.html",
-  styleUrls: ["./export-files-modal.component.scss"],
+  selector: 'octra-export-files-modal',
+  templateUrl: './export-files-modal.component.html',
+  styleUrls: ['./export-files-modal.component.scss'],
   animations: [
     fadeInExpandOnEnterAnimation(),
-    fadeOutCollapseOnLeaveAnimation()
-  ]
+    fadeOutCollapseOnLeaveAnimation(),
+  ],
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {
   public static options: NgbModalOptions = {
-    size: "xl",
+    size: 'xl',
     keyboard: true,
     backdrop: true,
     scrollable: true,
@@ -34,50 +41,50 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   AppInfo = AppInfo;
   public exportStates = [];
   public preparing = {
-    name: "",
-    preparing: false
+    name: '',
+    preparing: false,
   };
   public parentformat: {
-    download: string,
-    uri: SafeUrl
+    download: string;
+    uri: SafeUrl;
   } = {
-    download: "",
-    uri: ""
+    download: '',
+    uri: '',
   };
   public converters = AppInfo.converters;
 
   public tools = {
     audioCutting: {
       opened: false,
-      selectedMethod: "client",
+      selectedMethod: 'client',
       progress: 0,
       result: {
         url: undefined,
-        filename: ""
+        filename: '',
       },
-      status: "idle",
-      message: "",
-      progressbarType: "info",
+      status: 'idle',
+      message: '',
+      progressbarType: 'info',
       showConfigurator: false,
       subscriptionIDs: [-1, -1, -1],
       exportFormats: [
         {
-          label: "TextTable",
-          value: "textTable",
-          selected: true
+          label: 'TextTable',
+          value: 'textTable',
+          selected: true,
         },
         {
-          label: "JSON",
-          value: "json",
-          selected: true
-        }
+          label: 'JSON',
+          value: 'json',
+          selected: true,
+        },
       ],
       clientStreamHelper: undefined,
       zippingSpeed: -1,
       cuttingSpeed: -1,
       cuttingTimeLeft: 0,
       timeLeft: 0,
-      wavFormat: undefined
+      wavFormat: undefined,
     },
     tableConfigurator: {
       opened: false,
@@ -85,13 +92,15 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       columns: [],
       result: {
         url: undefined,
-        filename: ""
-      }
-    }
+        filename: '',
+      },
+    },
   };
 
-  @ViewChild("namingConvention", { static: false }) namingConvention: NamingDragAndDropComponent;
-  @ViewChild("tableConfigurator", { static: false }) tableConfigurator: TableConfiguratorComponent;
+  @ViewChild('namingConvention', { static: false })
+  namingConvention: NamingDragAndDropComponent;
+  @ViewChild('tableConfigurator', { static: false })
+  tableConfigurator: TableConfiguratorComponent;
 
   transcriptionService: TranscriptionService;
   navbarService: NavbarService;
@@ -99,31 +108,46 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   public selectedLevel = 0;
 
-  constructor(private sanitizer: DomSanitizer,
-              private httpClient: HttpClient,
-              private appStorage: AppStorageService,
-              private audio: AudioService,
-              private settService: SettingsService,
-              protected override activeModal: NgbActiveModal) {
-    super("ExportFilesModalComponent", activeModal);
+  constructor(
+    private sanitizer: DomSanitizer,
+    private httpClient: HttpClient,
+    private appStorage: AppStorageService,
+    private audio: AudioService,
+    private settService: SettingsService,
+    protected override activeModal: NgbActiveModal
+  ) {
+    super('ExportFilesModalComponent', activeModal);
   }
 
   ngOnInit() {
     for (const converter of AppInfo.converters) {
-      this.exportStates.push("inactive");
+      this.exportStates.push('inactive');
     }
   }
 
   public override close() {
-    this.uiService.addElementFromEvent("export", {
-      value: "closed"
-    }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, "modals");
+    this.uiService.addElementFromEvent(
+      'export',
+      {
+        value: 'closed',
+      },
+      Date.now(),
+      this.audio.audiomanagers[0].playPosition,
+      -1,
+      undefined,
+      undefined,
+      'modals'
+    );
 
     return super.close();
   }
 
   onLineClick(converter: Converter, index: number) {
-    if (converter.multitiers || (!converter.multitiers && this.transcriptionService.annotation.levels.length === 1)) {
+    if (
+      converter.multitiers ||
+      (!converter.multitiers &&
+        this.transcriptionService.annotation.levels.length === 1)
+    ) {
       this.updateParentFormat(converter);
     }
     this.toggleLine(index);
@@ -135,29 +159,31 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   toggleLine(index: number) {
     for (let i = 0; i < this.exportStates.length; i++) {
-      if (this.exportStates[i] === "active") {
-        this.exportStates[i] = "close";
+      if (this.exportStates[i] === 'active') {
+        this.exportStates[i] = 'close';
       }
     }
 
     if (index < this.exportStates.length) {
-      if (this.exportStates[index] === "active") {
-        this.exportStates[index] = "inactive";
+      if (this.exportStates[index] === 'active') {
+        this.exportStates[index] = 'inactive';
       } else {
-        this.exportStates[index] = "active";
+        this.exportStates[index] = 'active';
       }
     }
   }
 
   private setParentFormatURI(url: string) {
     if (this.parentformat.uri !== undefined) {
-      window.URL.revokeObjectURL(this.parentformat.uri["changingThisBreaksApplicationSecurity"]);
+      window.URL.revokeObjectURL(
+        this.parentformat.uri['changingThisBreaksApplicationSecurity']
+      );
     }
     this.parentformat.uri = this.sanitize(url);
   }
 
   onSelectionChange(converter: Converter, value: any) {
-    if (value !== "") {
+    if (value !== '') {
       this.updateParentFormat(converter, value);
     }
   }
@@ -172,19 +198,26 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         console.error(`annotation is undefined!`);
         return;
       }
-      const oannotjson = this.transcriptionService.annotation.getObj(this.transcriptionService.audioManager.resource.info.duration);
+      const oannotjson = this.transcriptionService.annotation.getObj(
+        this.transcriptionService.audioManager.resource.info.duration
+      );
       this.preparing = {
         name: converter.name,
-        preparing: true
+        preparing: true,
       };
-      this.subscrManager.add(timer(300).subscribe(
-        () => {
-          if (converter.name === "Bundle") {
+      this.subscrManager.add(
+        timer(300).subscribe(() => {
+          if (converter.name === 'Bundle') {
             // only this converter needs an array buffer
-            this.transcriptionService.audiofile.arraybuffer = this.transcriptionService.audioManager.resource.arraybuffer;
+            this.transcriptionService.audiofile.arraybuffer =
+              this.transcriptionService.audioManager.resource.arraybuffer;
           }
 
-          const result: IFile = converter.export(oannotjson, this.transcriptionService.audiofile, levelnum).file;
+          const result: IFile = converter.export(
+            oannotjson,
+            this.transcriptionService.audiofile,
+            levelnum
+          ).file;
 
           this.parentformat.download = result.name;
 
@@ -195,29 +228,39 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
           this.setParentFormatURI(window.URL.createObjectURL(test));
           this.preparing = {
             name: converter.name,
-            preparing: false
+            preparing: false,
           };
-        }
-      ));
+        })
+      );
     }
   }
 
   getProtocol() {
     if (!(this.transcriptionService === undefined)) {
       this.preparing = {
-        name: "Protocol",
-        preparing: true
+        name: 'Protocol',
+        preparing: true,
       };
-      this.parentformat.download = this.transcriptionService.audiofile.name + ".json";
+      this.parentformat.download =
+        this.transcriptionService.audiofile.name + '.json';
 
       if (this.parentformat.uri !== undefined) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
-      const json = new File([JSON.stringify(this.transcriptionService.extractUI(this.uiService.elements), undefined, 2)], this.parentformat.download);
+      const json = new File(
+        [
+          JSON.stringify(
+            this.transcriptionService.extractUI(this.uiService.elements),
+            undefined,
+            2
+          ),
+        ],
+        this.parentformat.download
+      );
       this.setParentFormatURI(window.URL.createObjectURL(json));
       this.preparing = {
-        name: "Protocol",
-        preparing: false
+        name: 'Protocol',
+        preparing: false,
       };
     } else {
       console.error("can't get protocol file");
@@ -225,21 +268,23 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onDownloadClick(i: number) {
-    this.subscrManager.add(timer(500).subscribe(() => {
-      this.exportStates[i] = "inactive";
-    }));
+    this.subscrManager.add(
+      timer(500).subscribe(() => {
+        this.exportStates[i] = 'inactive';
+      })
+    );
   }
 
   onHidden() {
     for (let i = 0; i < this.exportStates.length; i++) {
-      this.exportStates[i] = "inactive";
+      this.exportStates[i] = 'inactive';
     }
 
-    this.tools.audioCutting.status = "idle";
-    this.tools.audioCutting.progressbarType = "idle";
-    this.tools.audioCutting.progressbarType = "idle";
+    this.tools.audioCutting.status = 'idle';
+    this.tools.audioCutting.progressbarType = 'idle';
+    this.tools.audioCutting.progressbarType = 'idle';
     this.tools.audioCutting.progress = 0;
-    this.tools.audioCutting.result.filename = "";
+    this.tools.audioCutting.result.filename = '';
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];

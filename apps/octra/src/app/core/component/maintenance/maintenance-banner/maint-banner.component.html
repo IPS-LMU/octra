@@ -1,11 +1,15 @@
 <div class="alert alert-warning">
   <div>
     <i class="bi bi-exclamation-triangle-fill fs-2"></i>
-    <p [innerHTML]="'maintenance.banner' | transloco:
-    {
-      start: parsedNotification?.begin,
-      end: parsedNotification?.end
-    }">
-    </p>
+    <p
+      [innerHTML]="
+        'maintenance.banner'
+          | transloco
+            : {
+                start: parsedNotification?.begin,
+                end: parsedNotification?.end
+              }
+      "
+    ></p>
   </div>
 </div>

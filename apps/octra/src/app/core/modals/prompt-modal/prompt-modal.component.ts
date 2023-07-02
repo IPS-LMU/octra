@@ -1,30 +1,42 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
-import { SettingsService } from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from '@angular/core';
+import { SettingsService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { OctraModal } from '../types';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: "octra-prompt-modal",
-  templateUrl: "./prompt-modal.component.html",
-  styleUrls: ["./prompt-modal.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'octra-prompt-modal',
+  templateUrl: './prompt-modal.component.html',
+  styleUrls: ['./prompt-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class PromptModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: false,
     scrollable: true,
-    size: "lg"
+    size: 'lg',
   };
 
   public formatConverter;
   protected data = undefined;
 
-  constructor(modalService: NgbModal, public appStorage: AppStorageService, private settService: SettingsService,
-              private cd: ChangeDetectorRef, protected override activeModal: NgbActiveModal) {
-    super("promptModal", activeModal);
+  constructor(
+    modalService: NgbModal,
+    public appStorage: AppStorageService,
+    private settService: SettingsService,
+    private cd: ChangeDetectorRef,
+    protected override activeModal: NgbActiveModal
+  ) {
+    super('promptModal', activeModal);
   }
 
   public override close() {

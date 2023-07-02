@@ -7,17 +7,19 @@ export class ControlType {
 
   constructor(type: string) {
     switch (type) {
-      case('radiobutton'):
+      case 'radiobutton':
         this._type = 'radiobutton';
         break;
-      case('checkbox'):
+      case 'checkbox':
         this._type = 'checkbox';
         break;
-      case('textarea'):
+      case 'textarea':
         this._type = 'textarea';
         break;
       default:
-        console.error('type \'${type}\' not valid control type for the feedback form');
+        console.error(
+          "type '${type}' not valid control type for the feedback form"
+        );
         break;
     }
   }

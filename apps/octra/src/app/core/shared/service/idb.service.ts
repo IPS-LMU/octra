@@ -1,12 +1,16 @@
-import { Injectable } from "@angular/core";
-import { ConsoleEntry } from "./bug-report.service";
-import { DefaultModeOptions, IIDBEntry, IIDBModeOptions, OctraDatabase } from "../octra-database";
-import { LoginMode } from "../../store";
-import { IAnnotJSON, OAnnotJSON } from "@octra/annotation";
-
+import { Injectable } from '@angular/core';
+import { ConsoleEntry } from './bug-report.service';
+import {
+  DefaultModeOptions,
+  IIDBEntry,
+  IIDBModeOptions,
+  OctraDatabase,
+} from '../octra-database';
+import { LoginMode } from '../../store';
+import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IDBService {
   private _isReady = false;
@@ -33,15 +37,18 @@ export class IDBService {
         }
       });
 
-      this.database.open().then(() => {
-        this._isOpened = true;
+      this.database
+        .open()
+        .then(() => {
+          this._isOpened = true;
 
-        if (this._isReady) {
-          resolve();
-        }
-      }).catch((error) => {
-        reject(error);
-      });
+          if (this._isReady) {
+            resolve();
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -71,15 +78,18 @@ export class IDBService {
    */
   public loadConsoleEntries(): Promise<ConsoleEntry[]> {
     return new Promise<ConsoleEntry[]>((resolve, reject) => {
-      this.database.options.get('console').then((entry) => {
-        if (entry !== undefined) {
-          resolve(entry.value as ConsoleEntry[]);
-        } else {
-          resolve([]);
-        }
-      }).catch((error) => {
-        reject(error);
-      });
+      this.database.options
+        .get('console')
+        .then((entry) => {
+          if (entry !== undefined) {
+            resolve(entry.value as ConsoleEntry[]);
+          } else {
+            resolve([]);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -90,7 +100,7 @@ export class IDBService {
   public saveConsoleEntries(entries: ConsoleEntry[]) {
     return this.database.options.put({
       name: 'console',
-      value: entries
+      value: entries,
     });
   }
 
@@ -98,17 +108,22 @@ export class IDBService {
    * load options
    */
   public loadOptions = (keys: string[]): Promise<IIDBEntry[]> => {
-    return new Promise<{
-      value: any;
-      name: string;
-    }[]>((resolve, reject) => {
-      this.database.options.bulkGet(keys).then((values) => {
-        resolve(values.filter(a => a !== undefined));
-      }).catch((error) => {
-        reject(error);
-      });
+    return new Promise<
+      {
+        value: any;
+        name: string;
+      }[]
+    >((resolve, reject) => {
+      this.database.options
+        .bulkGet(keys)
+        .then((values) => {
+          resolve(values.filter((a) => a !== undefined));
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
-  }
+  };
 
   /**
    * load all logs
@@ -121,7 +136,11 @@ export class IDBService {
    * load annotation
    */
   public loadAnnotation(mode: LoginMode) {
-    return this.database.loadDataOfMode<IAnnotJSON>(mode, 'annotation', undefined);
+    return this.database.loadDataOfMode<IAnnotJSON>(
+      mode,
+      'annotation',
+      undefined
+    );
   }
 
   /**
@@ -130,15 +149,20 @@ export class IDBService {
    * @param value
    */
   public saveOption(key: string, value: any) {
-    return new Promise<string>((resolve, reject)=>{
+    return new Promise<string>((resolve, reject) => {
       if (this.isReady) {
-        this.database.options.put({name: key, value}, key).then((result) => {
+        this.database.options
+          .put({ name: key, value }, key)
+          .then((result) => {
             resolve(result);
-          }).catch((error)=>{
+          })
+          .catch((error) => {
             reject(error);
           });
       } else {
-        reject(new Error(`can't save option ${key}, because idb is not ready.`));
+        reject(
+          new Error(`can't save option ${key}, because idb is not ready.`)
+        );
       }
     });
   }
@@ -148,7 +172,11 @@ export class IDBService {
   }
 
   public loadModeOptions(mode: LoginMode) {
-    return this.database.loadDataOfMode<IIDBModeOptions>(mode, 'options', DefaultModeOptions);
+    return this.database.loadDataOfMode<IIDBModeOptions>(
+      mode,
+      'options',
+      DefaultModeOptions
+    );
   }
 
   /**

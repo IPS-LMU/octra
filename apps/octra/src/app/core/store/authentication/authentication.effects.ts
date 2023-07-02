@@ -9,15 +9,18 @@ import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
 import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RootState } from "../index";
-import { ModalService } from "../../modals/modal.service";
-import { RoutingService } from "../../shared/service/routing.service";
+import { RootState } from '../index';
+import { ModalService } from '../../modals/modal.service';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Injectable()
 export class AuthenticationEffects {
   login$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthenticationActions.login.do, AuthenticationActions.reauthenticate.do),
+      ofType(
+        AuthenticationActions.login.do,
+        AuthenticationActions.reauthenticate.do
+      ),
       exhaustMap((a) => {
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((dto) => {
@@ -29,7 +32,9 @@ export class AuthenticationEffects {
 
               if (a.type === AuthenticationActions.login.do.type) {
                 // redirect directly
-                url = `${url}?cid=${cid}&r=${encodeURIComponent(document.location.href)}`;
+                url = `${url}?cid=${cid}&r=${encodeURIComponent(
+                  document.location.href
+                )}`;
 
                 if (dto.agreementToken) {
                   url = `${url}&t=${dto.agreementToken}`;
@@ -46,7 +51,10 @@ export class AuthenticationEffects {
               } else {
                 // redirect to new tab
                 const match = /(.+\/intern\/)/g.exec(document.location.href);
-                const baseURL = match && match.length === 2 ? match[1] : document.location.href;
+                const baseURL =
+                  match && match.length === 2
+                    ? match[1]
+                    : document.location.href;
                 console.log('OPEN WINDOW');
                 console.log(joinURL(baseURL, 're-authentication'));
 
@@ -62,7 +70,12 @@ export class AuthenticationEffects {
                   }
                 });
 
-                window.open(`${url}?cid=${cid}&r=${encodeURIComponent(joinURL(baseURL, 're-authentication'))}`, '_blank');
+                window.open(
+                  `${url}?cid=${cid}&r=${encodeURIComponent(
+                    joinURL(baseURL, 're-authentication')
+                  )}`,
+                  '_blank'
+                );
 
                 return AuthenticationActions.reauthenticate.wait();
               }
@@ -178,7 +191,11 @@ export class AuthenticationEffects {
             });
           }),
           catchError((error: HttpErrorResponse) => {
-            return of(AuthenticationActions.continueSessionAfterAgreement.fail({ error }));
+            return of(
+              AuthenticationActions.continueSessionAfterAgreement.fail({
+                error,
+              })
+            );
           })
         );
       })
@@ -190,7 +207,11 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.continueSessionAfterAgreement.success),
         tap((a) => {
-          this.routingService.navigate(['/loading'], { queryParams: a.params }, null);
+          this.routingService.navigate(
+            ['/loading'],
+            { queryParams: a.params },
+            null
+          );
         })
       ),
     { dispatch: false }

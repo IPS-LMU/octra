@@ -115,11 +115,10 @@
 
 #editor-loading {
   z-index: 30;
-  position:absolute;
+  position: absolute;
   color: gray;
   background-color: rgba(255, 255, 255, 0.5);
 }
-
 
 @media (max-width: 765px) {
   #subnav {

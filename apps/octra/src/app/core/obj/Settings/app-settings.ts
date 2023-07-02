@@ -6,55 +6,55 @@ export interface AppSettings {
   };
   octra: {
     database: {
-      name: string
-    },
+      name: string;
+    };
     login: {
-      enabled: boolean
-    },
-    showdetails: boolean,
+      enabled: boolean;
+    };
+    showdetails: boolean;
     responsive: {
-      enabled: boolean,
-      fixedwidth: number
-    },
+      enabled: boolean;
+      fixedwidth: number;
+    };
     bugreport: {
-      enabled: boolean,
-      name: string,
-      auth_token: string,
-      url: string
-    },
+      enabled: boolean;
+      name: string;
+      auth_token: string;
+      url: string;
+    };
     plugins: {
       audioCutter: {
-        enabled: boolean,
-        authToken: string,
-        url: string
-      },
-      asr: ASRSettings
-    },
-    allowed_browsers: any[],
+        enabled: boolean;
+        authToken: string;
+        url: string;
+      };
+      asr: ASRSettings;
+    };
+    allowed_browsers: any[];
     allowed_projects: {
-      name: string,
-      password: string
-    }[],
-    languages: string[],
+      name: string;
+      password: string;
+    }[];
+    languages: string[];
     tracking: {
-      active: string
+      active: string;
       matomo: {
-        host: string,
-        siteID: number
-      }
-    },
+        host: string;
+        siteID: number;
+      };
+    };
     audioExamples: {
       language: string;
       url: string;
       description: string;
-    }[],
-    'inactivityNotice': {
-      'showAfter': number;
-    },
-    'maintenanceNotification': {
+    }[];
+    inactivityNotice: {
+      showAfter: number;
+    };
+    maintenanceNotification: {
       active: string;
       apiURL: string;
-    }
+    };
   };
 }
 

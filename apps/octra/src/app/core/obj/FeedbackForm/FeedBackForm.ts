@@ -1,5 +1,5 @@
-import { Group } from "./Group";
-import { getProperties } from "@octra/utilities";
+import { Group } from './Group';
+import { getProperties } from '@octra/utilities';
 
 export class FeedBackForm {
   public get groups(): Group[] {
@@ -24,9 +24,7 @@ export class FeedBackForm {
     this._required = value;
   }
 
-  constructor(private _groups: Group[], private _comment: string) {
-
-  }
+  constructor(private _groups: Group[], private _comment: string) {}
 
   public static fromAny(feedbackData: any[], comment: string): FeedBackForm {
     const groups: Group[] = [];
@@ -42,10 +40,7 @@ export class FeedBackForm {
       }
     }
 
-    const result = new FeedBackForm(
-      groups,
-      comment
-    );
+    const result = new FeedBackForm(groups, comment);
 
     result.required = required;
 
@@ -59,7 +54,12 @@ export class FeedBackForm {
       for (const control of group.controls) {
         if (control.type.type !== 'textarea') {
           if (control.type.type === 'radiobutton') {
-            if (!(control.custom.checked === undefined || control.custom.checked === undefined)) {
+            if (
+              !(
+                control.custom.checked === undefined ||
+                control.custom.checked === undefined
+              )
+            ) {
               if (control.custom.checked) {
                 result['' + group.name + ''] = control.value;
                 break;
@@ -69,11 +69,19 @@ export class FeedBackForm {
               result['' + group.name + ''] = '';
             }
           } else if (control.type.type === 'checkbox') {
-            if ((result['' + group.name + ''] === undefined || result['' + group.name + ''] === undefined)) {
+            if (
+              result['' + group.name + ''] === undefined ||
+              result['' + group.name + ''] === undefined
+            ) {
               result['' + group.name + ''] = [];
             }
 
-            if (!(control.custom.checked === undefined || control.custom.checked === undefined)) {
+            if (
+              !(
+                control.custom.checked === undefined ||
+                control.custom.checked === undefined
+              )
+            ) {
               if (control.custom.checked) {
                 result['' + group.name + ''].push(control.value);
               }
@@ -100,12 +108,15 @@ export class FeedBackForm {
           this.setValueForControl(name, value as string);
         }
       }
-
     }
     return result;
   }
 
-  public setValueForControl(name: string, value: string, custom?: any): boolean {
+  public setValueForControl(
+    name: string,
+    value: string,
+    custom?: any
+  ): boolean {
     let found = false;
 
     for (const group of this.groups) {
@@ -116,13 +127,22 @@ export class FeedBackForm {
             return true;
           } else {
             // type of control is not textarea
-            if (control.type.type === 'radiobutton' || control.type.type === 'checkbox') {
+            if (
+              control.type.type === 'radiobutton' ||
+              control.type.type === 'checkbox'
+            ) {
               found = true;
               if (control.type.type === 'radiobutton') {
-                control.custom.checked = (control.value === value);
+                control.custom.checked = control.value === value;
               } else if (control.type.type === 'checkbox') {
                 if (control.value === value) {
-                  if (!(custom === undefined || custom === undefined) && !(custom.checked === undefined || custom.checked === undefined)) {
+                  if (
+                    !(custom === undefined || custom === undefined) &&
+                    !(
+                      custom.checked === undefined ||
+                      custom.checked === undefined
+                    )
+                  ) {
                     control.custom.checked = custom.checked;
                   } else {
                     // call from importData

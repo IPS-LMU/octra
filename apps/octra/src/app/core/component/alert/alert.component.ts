@@ -1,23 +1,23 @@
-import { Component, OnDestroy, SecurityContext, ViewChild } from "@angular/core";
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
-import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animations";
-import { interval, Subscription } from "rxjs";
-import { DynComponentDirective } from "../../shared/directive/dyn-component.directive";
-import { AlertEntry, AlertService } from "../../shared/service/alert.service";
-import { DefaultComponent } from "../default.component";
+import { Component, SecurityContext, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import {
+  fadeInOnEnterAnimation,
+  fadeOutOnLeaveAnimation,
+} from 'angular-animations';
+import { interval, Subscription } from 'rxjs';
+import { DynComponentDirective } from '../../shared/directive/dyn-component.directive';
+import { AlertEntry, AlertService } from '../../shared/service/alert.service';
+import { DefaultComponent } from '../default.component';
 
 @Component({
   selector: 'octra-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.scss'],
-  animations: [
-    fadeInOnEnterAnimation(),
-    fadeOutOnLeaveAnimation()
-  ]
+  animations: [fadeInOnEnterAnimation(), fadeOutOnLeaveAnimation()],
 })
-
 export class AlertComponent extends DefaultComponent {
-  @ViewChild(DynComponentDirective, {static: false}) appDynComponent: DynComponentDirective;
+  @ViewChild(DynComponentDirective, { static: false })
+  appDynComponent: DynComponentDirective;
 
   public duration = 20;
   public animation = 'closed';
@@ -28,19 +28,20 @@ export class AlertComponent extends DefaultComponent {
     return this.alertService.queue;
   }
 
-  constructor(private alertService: AlertService, private sanitizer: DomSanitizer) {
+  constructor(
+    private alertService: AlertService,
+    private sanitizer: DomSanitizer
+  ) {
     super();
-    this.counter = interval(1000).subscribe(
-      () => {
-        for (const queueItem of this.alertService.queue) {
-          queueItem.duration--;
-          if (queueItem.duration === 0) {
-            queueItem.animation = 'closed';
-            this.removeFromQueue(queueItem);
-          }
+    this.counter = interval(1000).subscribe(() => {
+      for (const queueItem of this.alertService.queue) {
+        queueItem.duration--;
+        if (queueItem.duration === 0) {
+          queueItem.animation = 'closed';
+          this.removeFromQueue(queueItem);
         }
       }
-    );
+    });
   }
 
   override ngOnDestroy() {
@@ -67,19 +68,14 @@ export class AlertComponent extends DefaultComponent {
     return this.sanitizer.sanitize(SecurityContext.HTML, message);
   }
 
-  public afterComponentInitialized(item: {
-    id: number;
-    instance: any;
-  }) {
+  public afterComponentInitialized(item: { id: number; instance: any }) {
     this.alertService.alertInitialized.emit({
       id: item.id,
-      component: item.instance
+      component: item.instance,
     });
   }
 
-  afterComponentDestroyed(item: {
-    id: number
-  }) {
+  afterComponentDestroyed(item: { id: number }) {
     console.log(`alert with id ${item.id}`);
   }
 

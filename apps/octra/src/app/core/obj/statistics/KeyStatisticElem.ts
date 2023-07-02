@@ -10,20 +10,22 @@ export class KeyStatisticElem extends StatisticElem {
     return this.data.value;
   }
 
-  constructor(type: string,
-              name: string,
-              value: any,
-              timestamp: number,
-              playpos: number,
-              caretpos: number,
-              selection: {
-                start: number,
-                length: number
-              },
-              segment: {
-                start: number,
-                length: number
-              }) {
+  constructor(
+    type: string,
+    name: string,
+    value: any,
+    timestamp: number,
+    playpos: number,
+    caretpos: number,
+    selection: {
+      start: number;
+      length: number;
+    },
+    segment: {
+      start: number;
+      length: number;
+    }
+  ) {
     super(type, name, value, timestamp, playpos, selection, segment);
     this.data = {
       timestamp,
@@ -33,7 +35,7 @@ export class KeyStatisticElem extends StatisticElem {
       playpos,
       caretpos,
       selection,
-      segment
+      segment,
     };
   }
 
@@ -46,15 +48,24 @@ export class KeyStatisticElem extends StatisticElem {
       playpos: -1,
       caretpos: -1,
       selection: undefined,
-      segment: undefined
+      segment: undefined,
     };
 
-    for (const [name,] of getProperties(elem)) {
-      if (hasProperty(elem, 'value') || hasProperty(elem, 'context') || hasProperty(elem, 'timestamp')
-        || hasProperty(elem, 'type') || hasProperty(elem, 'keyCode') || hasProperty(elem, 'shiftPressed')
-        || hasProperty(elem, 'ctrlPressed') || hasProperty(elem, 'altPressed') || hasProperty(elem, 'char')
-        || hasProperty(elem, 'playpos') || hasProperty(elem, 'playerpos') || hasProperty(elem, 'caretpos')
-        || hasProperty(elem, 'control')
+    for (const [name] of getProperties(elem)) {
+      if (
+        hasProperty(elem, 'value') ||
+        hasProperty(elem, 'context') ||
+        hasProperty(elem, 'timestamp') ||
+        hasProperty(elem, 'type') ||
+        hasProperty(elem, 'keyCode') ||
+        hasProperty(elem, 'shiftPressed') ||
+        hasProperty(elem, 'ctrlPressed') ||
+        hasProperty(elem, 'altPressed') ||
+        hasProperty(elem, 'char') ||
+        hasProperty(elem, 'playpos') ||
+        hasProperty(elem, 'playerpos') ||
+        hasProperty(elem, 'caretpos') ||
+        hasProperty(elem, 'control')
       ) {
         if (name === 'playerpos') {
           result.playpos = elem[`${name}`];
@@ -64,7 +75,15 @@ export class KeyStatisticElem extends StatisticElem {
       }
     }
 
-    return new KeyStatisticElem(result.type, result.context, result.value, result.timestamp,
-      result.playpos, result.caretpos, result.selection, result.segment);
+    return new KeyStatisticElem(
+      result.type,
+      result.context,
+      result.value,
+      result.timestamp,
+      result.playpos,
+      result.caretpos,
+      result.selection,
+      result.segment
+    );
   }
 }

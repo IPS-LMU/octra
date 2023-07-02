@@ -1,13 +1,21 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, SecurityContext, ViewChild } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  SecurityContext,
+  ViewChild,
+} from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'octra-validation-popover',
   templateUrl: './validation-popover.component.html',
-  styleUrls: ['./validation-popover.component.scss']
+  styleUrls: ['./validation-popover.component.scss'],
 })
 export class ValidationPopoverComponent {
-  @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;
+  @ViewChild('validationContainer', { static: true })
+  validationContainer: ElementRef;
   public visible = false;
 
   public get sanitizedDescription(): string {
@@ -44,8 +52,11 @@ export class ValidationPopoverComponent {
     return this.validationContainer.nativeElement.offsetHeight;
   }
 
-  constructor(private el: ElementRef, private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
-  }
+  constructor(
+    private el: ElementRef,
+    private cd: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
+  ) {}
 
   public show() {
     if (!this.visible) {

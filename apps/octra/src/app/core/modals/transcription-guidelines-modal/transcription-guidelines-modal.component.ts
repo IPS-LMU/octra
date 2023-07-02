@@ -4,33 +4,38 @@ import {
   Component,
   OnInit,
   SecurityContext,
-  ViewEncapsulation
-} from "@angular/core";
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
-import { TranslocoService } from "@ngneat/transloco";
-import { Subscription, timer } from "rxjs";
-import { SubscriptionManager } from "@octra/utilities";
-import { SettingsService, TranscriptionService } from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { BugReportService } from "../../shared/service/bug-report.service";
-import { OctraModal } from "../types";
-import videojs from "video.js";
-import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+  ViewEncapsulation,
+} from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoService } from '@ngneat/transloco';
+import { timer } from 'rxjs';
+import { SettingsService, TranscriptionService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { BugReportService } from '../../shared/service/bug-report.service';
+import { OctraModal } from '../types';
+import videojs from 'video.js';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: "octra-transcription-guidelines-modal",
-  templateUrl: "./transcription-guidelines-modal.component.html",
-  styleUrls: ["./transcription-guidelines-modal.component.scss"],
+  selector: 'octra-transcription-guidelines-modal',
+  templateUrl: './transcription-guidelines-modal.component.html',
+  styleUrls: ['./transcription-guidelines-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-
-export class TranscriptionGuidelinesModalComponent extends OctraModal implements OnInit {
+export class TranscriptionGuidelinesModalComponent
+  extends OctraModal
+  implements OnInit
+{
   public static options: NgbModalOptions = {
-    size: "xl",
+    size: 'xl',
     backdrop: true,
     keyboard: false,
-    scrollable: true
+    scrollable: true,
   };
 
   public get guidelines() {
@@ -44,18 +49,28 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   private entries = 0;
   private videoPlayers: any[] = [];
 
-  constructor(modalService: NgbModal, private lang: TranslocoService, public transcrService: TranscriptionService,
-              private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
-              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer, protected override activeModal: NgbActiveModal) {
-    super("transcriptionGuidelinesModal", activeModal);
+  constructor(
+    modalService: NgbModal,
+    private lang: TranslocoService,
+    public transcrService: TranscriptionService,
+    private appStorage: AppStorageService,
+    private bugService: BugReportService,
+    public settService: SettingsService,
+    private cd: ChangeDetectorRef,
+    private sanitizer: DomSanitizer,
+    protected override activeModal: NgbActiveModal
+  ) {
+    super('transcriptionGuidelinesModal', activeModal);
   }
 
   ngOnInit() {
     this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     this.unCollapseAll();
-    this.subscrManager.add(timer(1000).subscribe(() => {
-      this.initVideoPlayers();
-    }));
+    this.subscrManager.add(
+      timer(1000).subscribe(() => {
+        this.initVideoPlayers();
+      })
+    );
   }
 
   videoplayerExists(player: string): number {
@@ -70,10 +85,13 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   initVideoPlayers() {
     for (let g = 0; g < this.guidelines.instructions.length; g++) {
       for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
-        for (let e = 0; e < this.guidelines.instructions[g].entries[i].examples.length; e++) {
-          const idV = "my-player_g" + g + "i" + i + "e" + e;
+        for (
+          let e = 0;
+          e < this.guidelines.instructions[g].entries[i].examples.length;
+          e++
+        ) {
+          const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
           if (document.getElementById(idV)) {
-
             const oldPlayer = this.videoplayerExists(idV);
 
             if (oldPlayer > -1) {
@@ -82,7 +100,7 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
               const player = videojs(idV, {
                 fluid: true,
                 autoplay: false,
-                preload: "auto"
+                preload: 'auto',
               });
 
               this.videoPlayers.push(player);
@@ -95,28 +113,31 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
 
   public exportPDF() {
     if (
-      this.settService.projectsettings !== undefined
-      && this.settService.projectsettings.plugins !== undefined
-      && this.settService.projectsettings.plugins.pdfexport !== undefined
-      && this.settService.projectsettings.plugins.pdfexport.url !== undefined
+      this.settService.projectsettings !== undefined &&
+      this.settService.projectsettings.plugins !== undefined &&
+      this.settService.projectsettings.plugins.pdfexport !== undefined &&
+      this.settService.projectsettings.plugins.pdfexport.url !== undefined
     ) {
-      const form = document.createElement("form");
-      form.setAttribute("method", "post");
-      form.setAttribute("target", "blank");
-      form.style.display = "none";
-      form.setAttribute("action", this.settService.projectsettings.plugins.pdfexport.url);
+      const form = document.createElement('form');
+      form.setAttribute('method', 'post');
+      form.setAttribute('target', 'blank');
+      form.style.display = 'none';
+      form.setAttribute(
+        'action',
+        this.settService.projectsettings.plugins.pdfexport.url
+      );
 
       document.body.appendChild(form);
 
       const jsonObj = {
-        translation: this.lang.translate("general"),
-        guidelines: this.guidelines
+        translation: this.lang.translate('general'),
+        guidelines: this.guidelines,
       };
 
-      const json = document.createElement("input");
-      json.setAttribute("name", "json");
-      json.setAttribute("type", "text");
-      json.setAttribute("value", JSON.stringify(jsonObj));
+      const json = document.createElement('input');
+      json.setAttribute('name', 'json');
+      json.setAttribute('type', 'text');
+      json.setAttribute('value', JSON.stringify(jsonObj));
 
       form.append(json);
       form.submit();
@@ -136,7 +157,7 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   }
 
   search(text: string) {
-    if (text !== "") {
+    if (text !== '') {
       this.shownGuidelines.instructions = [];
 
       for (const instruction of this.guidelines.instructions) {
@@ -147,8 +168,9 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
           instr.entries = [];
 
           for (const entry of instruction.entries) {
-            if (entry.title.indexOf(text) > -1
-              || entry.description.indexOf(text) > -1
+            if (
+              entry.title.indexOf(text) > -1 ||
+              entry.description.indexOf(text) > -1
             ) {
               instr.entries.push(entry);
             }
@@ -166,9 +188,11 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
 
   public getGuidelineHTML(text): SafeHtml {
     let html = text;
-    if (text.indexOf("{{") > -1) {
+    if (text.indexOf('{{') > -1) {
       html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
-        return this.transcrService.rawToHTML(g1).replace(/(<p>)|(<\/p>)|(<br\/>)/g, "");
+        return this.transcrService
+          .rawToHTML(g1)
+          .replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
       });
     } else {
       html = `${html}`;
@@ -178,21 +202,28 @@ export class TranscriptionGuidelinesModalComponent extends OctraModal implements
   }
 
   public isPDFExportEnabled() {
-    return this.settService.projectsettings.plugins.pdfexport !== undefined
-      && this.settService.projectsettings.plugins.pdfexport.url !== undefined;
+    return (
+      this.settService.projectsettings.plugins.pdfexport !== undefined &&
+      this.settService.projectsettings.plugins.pdfexport.url !== undefined
+    );
   }
 
   public isPDFLinkOnly() {
-    return this.isPDFExportEnabled() && this.settService.projectsettings.plugins.pdfexport.url.indexOf("pdfconverter") < 0;
+    return (
+      this.isPDFExportEnabled() &&
+      this.settService.projectsettings.plugins.pdfexport.url.indexOf(
+        'pdfconverter'
+      ) < 0
+    );
   }
 
   public getPDFNameFromLink() {
     const url = this.settService.projectsettings.plugins.pdfexport.url;
-    if (this.isPDFLinkOnly() && url.lastIndexOf("/") > -1) {
-      return url.substr(url.lastIndexOf("/") + 1);
+    if (this.isPDFLinkOnly() && url.lastIndexOf('/') > -1) {
+      return url.substr(url.lastIndexOf('/') + 1);
     }
 
-    return "";
+    return '';
   }
 
   private unCollapseAll() {

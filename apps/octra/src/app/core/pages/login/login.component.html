@@ -1,14 +1,23 @@
 <div class="section" id="login">
   <div class="row">
-    <div class="col-12" style="text-align: center;">
+    <div class="col-12" style="text-align: center">
       <octra-maint-banner
-        *ngIf="settingsService.appSettings.octra.maintenanceNotification !== undefined &&
-        settingsService.appSettings.octra.maintenanceNotification.active === 'active'"
-        [serverURL]="settingsService.appSettings.octra.maintenanceNotification.apiURL"
-        [language]="appStorage.language"></octra-maint-banner>
+        *ngIf="
+          settingsService.appSettings.octra.maintenanceNotification !==
+            undefined &&
+          settingsService.appSettings.octra.maintenanceNotification.active ===
+            'active'
+        "
+        [serverURL]="
+          settingsService.appSettings.octra.maintenanceNotification.apiURL
+        "
+        [language]="appStorage.language"
+      ></octra-maint-banner>
 
-      <p style="padding-top:10px;margin-bottom:10px;">
-        <a (click)="startDemo()" class="link pointer">{{"login.demo"| transloco}}</a>
+      <p style="padding-top: 10px; margin-bottom: 10px">
+        <a (click)="startDemo()" class="link pointer">{{
+          'login.demo' | transloco
+        }}</a>
       </p>
     </div>
   </div>
@@ -16,32 +25,42 @@
     <div class="col-md-6">
       <div class="card login-card" #onlinemode>
         <div class="card-body">
-          <p *ngIf="!apc.octra.responsive.enabled && !state.local.validSize" [innerHTML]="'browser.small window width' | transloco"
-             class="warning">
-          </p>
+          <p
+            *ngIf="!apc.octra.responsive.enabled && !state.local.validSize"
+            [innerHTML]="'browser.small window width' | transloco"
+            class="warning"
+          ></p>
           <section>
-            <h4>{{ 'login.online mode' | transloco}}</h4>
-            <p style="text-align: center;">
-              {{"login.online mode description" | transloco}}
+            <h4>{{ 'login.online mode' | transloco }}</h4>
+            <p style="text-align: center">
+              {{ 'login.online mode description' | transloco }}
             </p>
             <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
-              {{'login.online mode disabled' | transloco}}
+              {{ 'login.online mode disabled' | transloco }}
             </div>
             <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
-
-              <div *ngIf="state.online.apiStatus !== 'available'" style="text-align: center;margin-top:20%;">
+              <div
+                *ngIf="state.online.apiStatus !== 'available'"
+                style="text-align: center; margin-top: 20%"
+              >
                 <ng-container *ngIf="state.online.apiStatus === 'unavailable'">
-                  <div class="alert alert-danger" style="padding:20px;">
-                    <div style="text-align: center;">
-                      <i class="bi bi-exclamation-triangle fs-4" style="color:red"></i>
+                  <div class="alert alert-danger" style="padding: 20px">
+                    <div style="text-align: center">
+                      <i
+                        class="bi bi-exclamation-triangle fs-4"
+                        style="color: red"
+                      ></i>
                     </div>
-                    <p style="text-align: justify; margin-top:10px;">
-                      {{"login.api not available" | transloco}}
+                    <p style="text-align: justify; margin-top: 10px">
+                      {{ 'login.api not available' | transloco }}
                     </p>
                   </div>
                 </ng-container>
               </div>
-              <div class="text-center" *ngIf="state.online.apiStatus === 'available'">
+              <div
+                class="text-center"
+                *ngIf="state.online.apiStatus === 'available'"
+              >
                 <!-- Default form login -->
                 <form #f="ngForm" (ngSubmit)="onOnlineShibbolethSubmit(f)">
                   <button class="my-4 btn btn-secondary w-100" type="submit">
@@ -53,19 +72,36 @@
                 <form #f2="ngForm" (ngSubmit)="onOnlineCredentialsSubmit()">
                   <!-- Username -->
                   <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="username" placeholder="Username or email address" name="nameOrEmail" [(ngModel)]="state.online.user.nameOrEmail">
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="username"
+                      placeholder="Username or email address"
+                      name="nameOrEmail"
+                      [(ngModel)]="state.online.user.nameOrEmail"
+                    />
                     <label for="username">Username or email address</label>
                   </div>
 
                   <!-- Password -->
                   <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" placeholder="Password" name="password" [(ngModel)]="state.online.user.password">
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      placeholder="Password"
+                      name="password"
+                      [(ngModel)]="state.online.user.password"
+                    />
                     <label for="username">Password</label>
                   </div>
 
                   <!-- Sign in button -->
-                  <button [disabled]="!f2.valid"
-                          class="my-4 btn btn-primary w-100" type="submit">
+                  <button
+                    [disabled]="!f2.valid"
+                    class="my-4 btn btn-primary w-100"
+                    type="submit"
+                  >
                     <i class="bi bi-house"></i>
                     Sign in with credentials
                   </button>
@@ -78,21 +114,25 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6 ">
+    <div class="col-md-6">
       <div class="card login-card" #localmode>
         <div class="card-body">
           <section>
-            <h4>{{'login.local mode' | transloco}}
-            </h4>
-            <p style="text-align: center;">
-              {{"login.local mode description" | transloco}}
+            <h4>{{ 'login.local mode' | transloco }}</h4>
+            <p style="text-align: center">
+              {{ 'login.local mode description' | transloco }}
             </p>
             <div>
-              <div *ngIf="appStorage.sessionfile !== undefined"
-                   [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
-                   class="alert alert-warning">
-              </div>
-              <div style="margin-top: 40px;">
+              <div
+                *ngIf="appStorage.sessionfile !== undefined"
+                [innerHTML]="
+                  'login.old file found'
+                    | transloco
+                      : { file_label: getDropzoneFileString(sessionfile) }
+                "
+                class="alert alert-warning"
+              ></div>
+              <div style="margin-top: 40px">
                 <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
               </div>
               <button
@@ -101,14 +141,16 @@
                 [disabled]="getFileStatus() !== 'start'"
                 class="btn btn-raised btn-primary"
                 id="offline-submit"
-                type="submit">
-                {{'transcription.start' | transloco}}
+                type="submit"
+              >
+                {{ 'transcription.start' | transloco }}
               </button>
               <button
                 (click)="onTranscriptionDelete()"
-                *ngIf="(getFileStatus() === 'new' || getFileStatus() === 'start')"
-                class="btn btn-raised btn-danger offline-delete-btn">
-                {{'transcription.new' |transloco}}
+                *ngIf="getFileStatus() === 'new' || getFileStatus() === 'start'"
+                class="btn btn-raised btn-danger offline-delete-btn"
+              >
+                {{ 'transcription.new' | transloco }}
               </button>
             </div>
           </section>
@@ -122,11 +164,18 @@
     <div class="row">
       <div class="col-md-4">
         <a href="http://www.en.phonetik.uni-muenchen.de/" target="_blank">
-          <img alt="IPS LMU Munich" class="logo" src="./assets/img/ipsx60.png" />
+          <img
+            alt="IPS LMU Munich"
+            class="logo"
+            src="./assets/img/ipsx60.png"
+          />
         </a>
       </div>
       <div class="col-md-4">
-        <a href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html" target="_blank">
+        <a
+          href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html"
+          target="_blank"
+        >
           <img alt="BAS" class="logo" src="./assets/img/bas.png" />
         </a>
       </div>
@@ -141,43 +190,46 @@
 <section>
   <div class="container">
     <hr />
-    <h1 style="text-align: center;margin-top: 40px;">About OCTRA</h1>
+    <h1 style="text-align: center; margin-top: 40px">About OCTRA</h1>
     <p style="text-align: justify">
-      OCTRA is a modern web-application for the orthographic transcription of audio files. It supports four different
-      editors for different needs. You can switch between these editors, they share the same transcript. Your
-      proceedings
-      are saved automatically to your browser. If your web browser or computer crashes just reopen your web browser and
-      continue your work. Overall OCTRA supports these features:
+      OCTRA is a modern web-application for the orthographic transcription of
+      audio files. It supports four different editors for different needs. You
+      can switch between these editors, they share the same transcript. Your
+      proceedings are saved automatically to your browser. If your web browser
+      or computer crashes just reopen your web browser and continue your work.
+      Overall OCTRA supports these features:
     </p>
     <ul>
       <li>
         Four editors
         <ul>
           <li>
-            Dictaphone-Editor: A simple editor without a signal display. It consists of an audio player and a
-            text-editor.
+            Dictaphone-Editor: A simple editor without a signal display. It
+            consists of an audio player and a text-editor.
           </li>
           <li>
-            Linear-Editor: A classic editor with two signal displays and a text editor. The top signal display shows an
-            audio signal of the whole audio file. After you select a part of the audio signal the bottom display shows a
-            zoomed version of the selected part. You can transcribe the selected audio sequence with a text-editor.
+            Linear-Editor: A classic editor with two signal displays and a text
+            editor. The top signal display shows an audio signal of the whole
+            audio file. After you select a part of the audio signal the bottom
+            display shows a zoomed version of the selected part. You can
+            transcribe the selected audio sequence with a text-editor.
           </li>
           <li>
-            2D-Editor: A multiline signal display shows the whole audio signal. You can scroll through the lines, add
-            segment boundaries and much more. Using the ENTER key you can open a transcription window that shows the
-            selected audio signal and a text-editor.
+            2D-Editor: A multiline signal display shows the whole audio signal.
+            You can scroll through the lines, add segment boundaries and much
+            more. Using the ENTER key you can open a transcription window that
+            shows the selected audio signal and a text-editor.
           </li>
         </ul>
       </li>
       <li>Automatic speech recognition and alignment</li>
-      <li>
-        Four modes: Online-mode, Local-mode, URL-mode and Demo-mode
-      </li>
+      <li>Four modes: Online-mode, Local-mode, URL-mode and Demo-mode</li>
       <li>Auto-Saving</li>
       <li>Import &amp; Export of various annotation file formats</li>
       <li>Inline validation using transcription guidelines</li>
       <li>Shortcuts for faster annotation</li>
-      <li>Additional tools
+      <li>
+        Additional tools
         <ul>
           <li>Cutting Audio files</li>
           <li>Combine phrases into bigger segments</li>

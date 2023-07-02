@@ -1,30 +1,37 @@
-import { Component, SecurityContext } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
-import { TranslocoService } from "@ngneat/transloco";
-import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+import { Component, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { TranslocoService } from '@ngneat/transloco';
+import { OctraModal } from '../types';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 
 export enum ModalEndAnswer {
-  CANCEL = "CANCEL",
-  QUIT = "QUIT",
-  CONTINUE = "CONTINUE"
+  CANCEL = 'CANCEL',
+  QUIT = 'QUIT',
+  CONTINUE = 'CONTINUE',
 }
 
 @Component({
-  selector: "octra-transcription-demo-end-modal",
-  templateUrl: "./transcription-demo-end-modal.component.html",
-  styleUrls: ["./transcription-demo-end-modal.component.scss"]
+  selector: 'octra-transcription-demo-end-modal',
+  templateUrl: './transcription-demo-end-modal.component.html',
+  styleUrls: ['./transcription-demo-end-modal.component.scss'],
 })
-
 export class TranscriptionDemoEndModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false
+    backdrop: false,
   };
 
-  constructor(modalService: NgbModal, private sanitizer: DomSanitizer,
-              public languageService: TranslocoService, protected override activeModal: NgbActiveModal) {
-    super("transcriptionDemoEnd", activeModal);
+  constructor(
+    modalService: NgbModal,
+    private sanitizer: DomSanitizer,
+    public languageService: TranslocoService,
+    protected override activeModal: NgbActiveModal
+  ) {
+    super('transcriptionDemoEnd', activeModal);
   }
 
   sanitize(html: string) {

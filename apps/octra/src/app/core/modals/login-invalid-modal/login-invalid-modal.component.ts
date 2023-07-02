@@ -1,11 +1,11 @@
-import { Component } from "@angular/core";
-import { OctraModal } from "../types";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component } from '@angular/core';
+import { OctraModal } from '../types';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-login-invalid-modal',
   templateUrl: './login-invalid-modal.component.html',
-  styleUrls: ['./login-invalid-modal.component.scss']
+  styleUrls: ['./login-invalid-modal.component.scss'],
 })
 export class LoginInvalidModalComponent extends OctraModal {
   constructor(protected override activeModal: NgbActiveModal) {

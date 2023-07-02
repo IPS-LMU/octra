@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Data, NavigationExtras, Params, QueryParamsHandling, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { SubscriptionManager } from '@octra/utilities';
-import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +30,11 @@ export class RoutingService {
     };
   }
 
-  public navigate(commands: any[], extras?: NavigationExtras, queryParamsHandling: QueryParamsHandling | null | undefined = 'merge') {
+  public navigate(
+    commands: any[],
+    extras?: NavigationExtras,
+    queryParamsHandling: QueryParamsHandling | null | undefined = 'merge'
+  ) {
     console.error(`RS navigate to ${commands.join('/')}`);
     return this.router.navigate(commands, {
       ...extras,

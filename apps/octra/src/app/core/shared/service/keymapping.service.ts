@@ -1,5 +1,11 @@
-import { EventEmitter, Injectable } from "@angular/core";
-import { BrowserInfo, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager } from "@octra/utilities";
+import { EventEmitter, Injectable } from '@angular/core';
+import {
+  BrowserInfo,
+  Shortcut,
+  ShortcutEvent,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/utilities';
 
 @Injectable()
 export class KeymappingService {
@@ -88,23 +94,32 @@ export class KeymappingService {
   }
 
   private onKeyDown = ($event: KeyboardEvent) => {
-    const shortcutInfo = this._shortcutsManager.checkKeyEvent($event, Date.now());
+    const shortcutInfo = this._shortcutsManager.checkKeyEvent(
+      $event,
+      Date.now()
+    );
     if (shortcutInfo !== undefined) {
-      this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
-      this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
+      this._beforeShortcutTriggered.emit({ ...shortcutInfo, event: $event });
+      this._onShortcutTriggered.emit({ ...shortcutInfo, event: $event });
     }
-  }
+  };
 
   private onKeyUp = ($event) => {
     this._shortcutsManager.checkKeyEvent($event, Date.now());
-  }
+  };
 
-  public checkShortcutAction(shortcut: string, shortcutGroup: ShortcutGroup, shortcutsEnabled: boolean) {
+  public checkShortcutAction(
+    shortcut: string,
+    shortcutGroup: ShortcutGroup,
+    shortcutsEnabled: boolean
+  ) {
     return new Promise<string>((resolve) => {
       if (shortcutsEnabled) {
         const platform = BrowserInfo.platform;
         if (shortcutGroup !== undefined) {
-          const foundShortcut = shortcutGroup.items.find(a => a.keys['' + platform] === shortcut);
+          const foundShortcut = shortcutGroup.items.find(
+            (a) => a.keys['' + platform] === shortcut
+          );
 
           if (foundShortcut !== undefined) {
             resolve(foundShortcut.name);

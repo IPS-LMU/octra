@@ -1,6 +1,6 @@
-import { Subject } from "rxjs";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { DefaultComponent } from "../component/default.component";
+import { Subject } from 'rxjs';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DefaultComponent } from '../component/default.component';
 
 export class OctraModal extends DefaultComponent {
   public readonly name: string;

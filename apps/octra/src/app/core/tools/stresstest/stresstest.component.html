@@ -1,49 +1,67 @@
 <h2>Browser Stresstest</h2>
-<br/>
+<br />
 <div class="row">
   <div class="col-md-6">
     <h3>Memory Test</h3>
     <p>
-      This tool measures the size of memory allocated by your browser. After you clicked on "START", the tool
-      will test your browser's memory. If the memory limit is reached this page will crash. After you reloads this
-      page the result is shown under "last result".
+      This tool measures the size of memory allocated by your browser. After you
+      clicked on "START", the tool will test your browser's memory. If the
+      memory limit is reached this page will crash. After you reloads this page
+      the result is shown under "last result".
     </p>
     <div class="alert alert-warning">
-      Before you start please make sure to close all other tabs and windows of this browser and keep this page
-      open until the test has finished.
+      Before you start please make sure to close all other tabs and windows of
+      this browser and keep this page open until the test has finished.
     </div>
-    <button (click)="doStresstest()" *ngIf="status === 'init'" class="btn btn-primary btn-raised">START</button>
-    <br/>
-    <span id="measuredSize">{{measuredString}}</span>
+    <button
+      (click)="doStresstest()"
+      *ngIf="status === 'init'"
+      class="btn btn-primary btn-raised"
+    >
+      START
+    </button>
+    <br />
+    <span id="measuredSize">{{ measuredString }}</span>
     <span *ngIf="status === 'running'" id="status">running...</span>
-    <span *ngIf="status === 'init'" id="lastResult">last result: {{lastResultString}}</span>
+    <span *ngIf="status === 'init'" id="lastResult"
+      >last result: {{ lastResultString }}</span
+    >
   </div>
   <div class="col-md-6">
     <h3>Information</h3>
     <table class="table table-striped">
       <tbody>
-      <tr>
-        <td>Browser:</td>
-        <td>{{info.browser}} {{info.version}}</td>
-      </tr>
-      <tr>
-        <td>System:</td>
-        <td>{{info.os}}</td>
-      </tr>
-      <ng-container *ngIf="info.browser.indexOf('Chrome') > -1">
         <tr>
-          <td>JS Heap Size Limit:</td>
-          <td>{{performance.heapSizeLimit.size}} {{performance.heapSizeLimit.label}}</td>
+          <td>Browser:</td>
+          <td>{{ info.browser }} {{ info.version }}</td>
         </tr>
         <tr>
-          <td>JS Heap Size Used:</td>
-          <td>{{performance.heapSizeUsed.size}} {{performance.heapSizeUsed.label}}</td>
+          <td>System:</td>
+          <td>{{ info.os }}</td>
         </tr>
-        <tr>
-          <td>JS Total Heap SIzeUsed:</td>
-          <td>{{performance.totalHeapSize.size}} {{performance.totalHeapSize.label}}</td>
-        </tr>
-      </ng-container>
+        <ng-container *ngIf="info.browser.indexOf('Chrome') > -1">
+          <tr>
+            <td>JS Heap Size Limit:</td>
+            <td>
+              {{ performance.heapSizeLimit.size }}
+              {{ performance.heapSizeLimit.label }}
+            </td>
+          </tr>
+          <tr>
+            <td>JS Heap Size Used:</td>
+            <td>
+              {{ performance.heapSizeUsed.size }}
+              {{ performance.heapSizeUsed.label }}
+            </td>
+          </tr>
+          <tr>
+            <td>JS Total Heap SIzeUsed:</td>
+            <td>
+              {{ performance.totalHeapSize.size }}
+              {{ performance.totalHeapSize.label }}
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

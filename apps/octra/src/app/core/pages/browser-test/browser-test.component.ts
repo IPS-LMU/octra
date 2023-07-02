@@ -1,29 +1,30 @@
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
-import { CompatibilityService } from "../../shared/service/compatibility.service";
-import { BrowserInfo } from "@octra/utilities";
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CompatibilityService } from '../../shared/service/compatibility.service';
+import { BrowserInfo } from '@octra/utilities';
 
 @Component({
   selector: 'octra-browser-test',
   templateUrl: './browser-test.component.html',
-  styleUrls: ['./browser-test.component.scss']
+  styleUrls: ['./browser-test.component.scss'],
 })
 export class BrowserTestComponent {
-
   public get browserName(): string {
     return BrowserInfo.browser;
   }
 
-  constructor(private router: Router, public compatibility: CompatibilityService) {
-  }
+  constructor(
+    private router: Router,
+    public compatibility: CompatibilityService
+  ) {}
 
   getStateIcon(rule: any): 'spinner' | 'times' | 'check' {
     switch (rule.state) {
-      case('processing'):
+      case 'processing':
         return 'spinner';
-      case('failed'):
+      case 'failed':
         return 'times';
-      case('ok'):
+      case 'ok':
         return 'check';
     }
     return 'spinner';
@@ -31,11 +32,11 @@ export class BrowserTestComponent {
 
   getStateColor(rule: any): string {
     switch (rule.state) {
-      case('processing'):
+      case 'processing':
         return 'cornflowerblue';
-      case('failed'):
+      case 'failed':
         return 'red';
-      case('ok'):
+      case 'ok':
         return 'forestgreen';
     }
     return 'processing';
@@ -44,5 +45,4 @@ export class BrowserTestComponent {
   test() {
     window.location.href = 'chrome://settings/content/cookies';
   }
-
 }

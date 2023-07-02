@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
-import { Annotation, Level } from "@octra/annotation";
-import { moveItemInArray } from "@angular/cdk/drag-drop";
+import { Component, Input, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Annotation, Level } from '@octra/annotation';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 export interface ColumnDefinition {
   type: string;
@@ -12,29 +12,32 @@ export interface ColumnFormat {
   name: string;
   defaultValue: string;
   formatString: string;
-  formatFunction: (level: Level, segmentNumber: number, counter: number) => string;
+  formatFunction: (
+    level: Level,
+    segmentNumber: number,
+    counter: number
+  ) => string;
 }
 
 @Component({
   selector: 'octra-table-configurator',
   templateUrl: './table-configurator.component.html',
   styleUrls: ['./table-configurator.component.scss'],
-  providers: []
+  providers: [],
 })
 export class TableConfiguratorComponent implements OnInit {
-
   @Input() columns: {
-    title: string,
+    title: string;
     columnDefinition: {
-      type: string,
-      selectedFormat: ColumnFormat,
-      formats: ColumnFormat[],
+      type: string;
+      selectedFormat: ColumnFormat;
+      formats: ColumnFormat[];
       cells: {
-        level: number,
-        text: string,
-        samples: number
-      }[]
-    }
+        level: number;
+        text: string;
+        samples: number;
+      }[];
+    };
   }[] = [];
   @Input() annotation: Annotation;
   @Input() options = {};
@@ -50,98 +53,136 @@ export class TableConfiguratorComponent implements OnInit {
     fileExtension: '.csv',
     divider: {
       name: 'Tabulator',
-      value: '\\t'
+      value: '\\t',
     },
     selection: {
       dividers: [
         {
           name: 'Semikolon',
-          value: ';'
+          value: ';',
         },
         {
           name: 'Komma',
-          value: ','
+          value: ',',
         },
         {
           name: 'Tabulator',
-          value: '\\t'
-        }
+          value: '\\t',
+        },
       ],
-      extension: [
-        '.csv', '.txt', '.table', '.tsv'
-      ]
+      extension: ['.csv', '.txt', '.table', '.tsv'],
     },
     timeFormat: 'Timestamp',
-    timeFormats: [
-      'Timestamp',
-      'Seconds',
-      'Samples'
-    ]
+    timeFormats: ['Timestamp', 'Seconds', 'Samples'],
   };
 
-  private columnDefinitions: ColumnDefinition[] = [{
-    type: 'segmentStart',
-    formats: [{
-      name: 'Timestamp',
-      defaultValue: '01:30:02.234',
-      formatString: 'HH:mm:ss.mss',
-      formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-        // the value must be a unix timestamp
-        let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds * 1000 : 0;
-        segmentStart = Math.round(segmentStart);
-
-        return this.convertMilliSecondsIntoLegibleString(segmentStart);
-      }
-    },
-      {
-        name: 'Samples',
-        defaultValue: '120345',
-        formatString: '120345',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1) + '';
-        }
-      },
-      {
-        name: 'Seconds',
-        formatString: '23.4567...',
-        defaultValue: '23.4567',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds.toFixed(4) : '0') + '';
-        }
-      }]
-  },
+  private columnDefinitions: ColumnDefinition[] = [
     {
-      type: 'segmentEnd',
-      formats: [{
-        name: 'Timestamp',
-        defaultValue: '01:30:02.234',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          const segment = level.segments.get(segmentNumber);
-          return this.convertMilliSecondsIntoLegibleString(Math.round(segment.time.seconds * 1000));
+      type: 'segmentStart',
+      formats: [
+        {
+          name: 'Timestamp',
+          defaultValue: '01:30:02.234',
+          formatString: 'HH:mm:ss.mss',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            let segmentStart =
+              segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.seconds * 1000
+                : 0;
+            segmentStart = Math.round(segmentStart);
+
+            return this.convertMilliSecondsIntoLegibleString(segmentStart);
+          },
         },
-        formatString: 'HH:mm:ss.mss'
-      },
         {
           name: 'Samples',
-          formatString: '120345',
           defaultValue: '120345',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatString: '120345',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.samples + '';
-          }
+            return (
+              (segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.samples + 1
+                : 1) + ''
+            );
+          },
         },
         {
           name: 'Seconds',
           formatString: '23.4567...',
           defaultValue: '23.4567',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.seconds.toFixed(4) + '';
-          }
-        }]
+            return (
+              (segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.seconds.toFixed(4)
+                : '0') + ''
+            );
+          },
+        },
+      ],
+    },
+    {
+      type: 'segmentEnd',
+      formats: [
+        {
+          name: 'Timestamp',
+          defaultValue: '01:30:02.234',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            const segment = level.segments.get(segmentNumber);
+            return this.convertMilliSecondsIntoLegibleString(
+              Math.round(segment.time.seconds * 1000)
+            );
+          },
+          formatString: 'HH:mm:ss.mss',
+        },
+        {
+          name: 'Samples',
+          formatString: '120345',
+          defaultValue: '120345',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return level.segments.get(segmentNumber).time.samples + '';
+          },
+        },
+        {
+          name: 'Seconds',
+          formatString: '23.4567...',
+          defaultValue: '23.4567',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return (
+              level.segments.get(segmentNumber).time.seconds.toFixed(4) + ''
+            );
+          },
+        },
+      ],
     },
     {
       type: 'segmentDuration',
@@ -149,102 +190,162 @@ export class TableConfiguratorComponent implements OnInit {
         {
           name: 'Timestamp',
           defaultValue: '01:30:02.234',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
-            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
+            const segmentStart =
+              segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.seconds
+                : 0;
             const segment = level.segments.get(segmentNumber);
-            return this.convertMilliSecondsIntoLegibleString(Math.round((segment.time.seconds - segmentStart) * 1000));
+            return this.convertMilliSecondsIntoLegibleString(
+              Math.round((segment.time.seconds - segmentStart) * 1000)
+            );
           },
-          formatString: 'HH:mm:ss.mss'
+          formatString: 'HH:mm:ss.mss',
         },
         {
           name: 'Samples',
           formatString: '120345',
           defaultValue: '120345',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
-            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1;
-            return (level.segments.get(segmentNumber).time.samples - segmentStart) + '';
-          }
+            const segmentStart =
+              segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.samples + 1
+                : 1;
+            return (
+              level.segments.get(segmentNumber).time.samples - segmentStart + ''
+            );
+          },
         },
         {
           name: 'Seconds',
           formatString: '23.4567...',
           defaultValue: '23.4567',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
-            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
-            return (level.segments.get(segmentNumber).time.seconds - segmentStart).toFixed(4) + '';
-          }
-        }
-      ]
+            const segmentStart =
+              segmentNumber > 0
+                ? level.segments.get(segmentNumber - 1).time.seconds
+                : 0;
+            return (
+              (
+                level.segments.get(segmentNumber).time.seconds - segmentStart
+              ).toFixed(4) + ''
+            );
+          },
+        },
+      ],
     },
     {
       type: 'transcript',
-      formats: [{
-        name: 'raw text',
-        defaultValue: 'Some transcript...',
-        formatString: '',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return level.segments.get(segmentNumber).transcript;
-        }
-      }]
+      formats: [
+        {
+          name: 'raw text',
+          defaultValue: 'Some transcript...',
+          formatString: '',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return level.segments.get(segmentNumber).transcript;
+          },
+        },
+      ],
     },
     {
       type: 'tier',
-      formats: [{
-        name: 'tier name',
-        defaultValue: 'OCTRA_1',
-        formatString: '',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return level.name;
-        }
-      }]
+      formats: [
+        {
+          name: 'tier name',
+          defaultValue: 'OCTRA_1',
+          formatString: '',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return level.name;
+          },
+        },
+      ],
     },
     {
       type: 'sampleRate',
-      formats: [{
-        name: 'full',
-        defaultValue: '44100',
-        formatString: '44100',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return `${level.segments.get(0).time.sampleRate}`;
-        }
-      },
+      formats: [
+        {
+          name: 'full',
+          defaultValue: '44100',
+          formatString: '44100',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return `${level.segments.get(0).time.sampleRate}`;
+          },
+        },
         {
           name: 'short',
           defaultValue: '44,1kHz',
           formatString: '44,1kHz',
-          formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
             // the value must be a unix timestamp
             return `${level.segments.get(0).time.sampleRate / 1000}kHz`;
-          }
-        }]
+          },
+        },
+      ],
     },
     {
       type: 'lineNumber',
-      formats: [{
-        name: 'short',
-        defaultValue: '1',
-        formatString: '1',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return `${counter}`;
-        }
-      }]
-    }
+      formats: [
+        {
+          name: 'short',
+          defaultValue: '1',
+          formatString: '1',
+          formatFunction: (
+            level: Level,
+            segmentNumber: number,
+            counter: number
+          ) => {
+            // the value must be a unix timestamp
+            return `${counter}`;
+          },
+        },
+      ],
+    },
   ];
 
   public get remainingColDefs(): ColumnDefinition[] {
     const remaining: ColumnDefinition[] = [];
 
     for (const colDef of this.columnDefinitions) {
-      if (this.columns.find((a) => {
-        return a.columnDefinition.type === colDef.type;
-      }) === undefined && colDef.type !== 'lineNumber') {
+      if (
+        this.columns.find((a) => {
+          return a.columnDefinition.type === colDef.type;
+        }) === undefined &&
+        colDef.type !== 'lineNumber'
+      ) {
         remaining.push(colDef);
       }
     }
@@ -252,8 +353,7 @@ export class TableConfiguratorComponent implements OnInit {
     return remaining;
   }
 
-  constructor(private sanitizer: DomSanitizer) {
-  }
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.tableConfiguratorAddColumn();
@@ -281,8 +381,8 @@ export class TableConfiguratorComponent implements OnInit {
           type: colDef.type,
           selectedFormat: colDef.formats[0],
           formats: colDef.formats,
-          cells: []
-        }
+          cells: [],
+        },
       };
       if (position < 0) {
         this.columns.push(item);
@@ -303,15 +403,13 @@ export class TableConfiguratorComponent implements OnInit {
     let minutes: any = Math.floor(remainder / 60);
     let seconds: any = Math.floor(remainder % 60);
 
-    hours = (hours < 10) ? '0' + hours : hours;
-    minutes = (minutes < 10) ? '0' + minutes : minutes;
-    milliSecs = (milliSecs < 100) ? '0' + milliSecs : milliSecs;
-    milliSecs = (milliSecs < 10) ? '0' + milliSecs : milliSecs;
-    seconds = (seconds < 10) ? '0' + seconds : seconds;
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    milliSecs = milliSecs < 100 ? '0' + milliSecs : milliSecs;
+    milliSecs = milliSecs < 10 ? '0' + milliSecs : milliSecs;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
 
-    return (hours + ':'
-      + minutes + ':'
-      + seconds + '.' + milliSecs);
+    return hours + ':' + minutes + ':' + seconds + '.' + milliSecs;
   }
 
   onFormatClick(format: string) {
@@ -330,7 +428,7 @@ export class TableConfiguratorComponent implements OnInit {
           type: column.columnDefinition.type,
           selectedFormat: selFormat,
           formats: column.columnDefinition.formats,
-          cells: column.columnDefinition.cells
+          cells: column.columnDefinition.cells,
         };
       }
     }
@@ -355,7 +453,11 @@ export class TableConfiguratorComponent implements OnInit {
       }
     }
 
-    if (oldTitleIsType && newTitleIsType || (column.title === 'Title' || column.title === '')) {
+    if (
+      (oldTitleIsType && newTitleIsType) ||
+      column.title === 'Title' ||
+      column.title === ''
+    ) {
       // change title
       column.title = newTitle;
     }
@@ -365,7 +467,7 @@ export class TableConfiguratorComponent implements OnInit {
     let header = '';
     const textLines: {
       text: string;
-      samples: number
+      samples: number;
     }[] = [];
     const divider = this.tableOptions.divider.value.replace('\\t', '\t');
     let colOfLineNum = -1;
@@ -388,7 +490,7 @@ export class TableConfiguratorComponent implements OnInit {
 
     let counter = 0;
     const levelNum = this.getLevelNumber();
-    const startAt = (hasTierColumn) ? 0 : levelNum;
+    const startAt = hasTierColumn ? 0 : levelNum;
     for (let i = startAt; i < this.annotation.levels.length; i++) {
       const level = this.annotation.levels[i];
 
@@ -406,7 +508,7 @@ export class TableConfiguratorComponent implements OnInit {
 
         textLines.push({
           text,
-          samples: segment.time.samples
+          samples: segment.time.samples,
         });
         counter++;
       }
@@ -417,7 +519,7 @@ export class TableConfiguratorComponent implements OnInit {
       }
     }
 
-    let result = (this.tableOptions.addHeader) ? header : '';
+    let result = this.tableOptions.addHeader ? header : '';
 
     for (const textLine of textLines) {
       result += `${textLine.text}\n`;
@@ -425,7 +527,9 @@ export class TableConfiguratorComponent implements OnInit {
     result += '\n';
 
     const file = new File([result], 'test' + this.tableOptions.fileExtension);
-    this.resultURL = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
+    this.resultURL = this.sanitizer.bypassSecurityTrustResourceUrl(
+      URL.createObjectURL(file)
+    );
   }
 
   onExtensionClick(extension) {
@@ -434,17 +538,20 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   onDividerClick(dividerValue: string) {
-    this.tableOptions.divider = this.tableOptions.selection.dividers.find((a) => {
-      return a.value === dividerValue;
-    });
+    this.tableOptions.divider = this.tableOptions.selection.dividers.find(
+      (a) => {
+        return a.value === dividerValue;
+      }
+    );
     this.onSomethingDone();
   }
 
   findNextUnusedColumnDefinition(): ColumnDefinition {
     for (const columnDefinition of this.columnDefinitions) {
-      const alreadyUsed = this.columns.findIndex((a) => {
-        return a.columnDefinition.type === columnDefinition.type;
-      }) > -1;
+      const alreadyUsed =
+        this.columns.findIndex((a) => {
+          return a.columnDefinition.type === columnDefinition.type;
+        }) > -1;
 
       if (!alreadyUsed) {
         return columnDefinition;
@@ -476,7 +583,7 @@ export class TableConfiguratorComponent implements OnInit {
 
     let counter = 1;
     const levelNum = this.getLevelNumber();
-    const startAt = (hasTierColumn) ? 0 : levelNum;
+    const startAt = hasTierColumn ? 0 : levelNum;
     this.columns[index].columnDefinition.cells = [];
 
     for (let i = startAt; i < this.annotation.levels.length; i++) {
@@ -490,7 +597,7 @@ export class TableConfiguratorComponent implements OnInit {
         this.columns[index].columnDefinition.cells.push({
           level: i,
           text,
-          samples: start
+          samples: start,
         });
         counter++;
         start = segment.time.samples;
@@ -503,23 +610,22 @@ export class TableConfiguratorComponent implements OnInit {
     }
 
     if (this.columns[index].columnDefinition.type !== 'lineNumber') {
-      this.columns[index].columnDefinition.cells = this.columns[index].columnDefinition.cells.sort(
-        (a, b) => {
-          if (a.samples === b.samples) {
-            if (a.level > b.level) {
-              return 1;
-            } else if (a.level < b.level) {
-              return -1;
-            }
-            return 0;
-          } else if (a.samples > b.samples) {
+      this.columns[index].columnDefinition.cells = this.columns[
+        index
+      ].columnDefinition.cells.sort((a, b) => {
+        if (a.samples === b.samples) {
+          if (a.level > b.level) {
             return 1;
+          } else if (a.level < b.level) {
+            return -1;
           }
-          return -1;
+          return 0;
+        } else if (a.samples > b.samples) {
+          return 1;
         }
-      );
+        return -1;
+      });
     }
-
   }
 
   onDropChange(event) {
@@ -567,12 +673,15 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   private getLevelNumber(): number {
-    if (!this.currentLevelID !== undefined && this.annotation?.levels !== undefined) {
-      const result = (this.annotation.levels.findIndex((a) => {
+    if (
+      !this.currentLevelID !== undefined &&
+      this.annotation?.levels !== undefined
+    ) {
+      const result = this.annotation.levels.findIndex((a) => {
         return a.id === this.currentLevelID;
-      }));
+      });
 
-      return (result !== undefined) ? result : 0;
+      return result !== undefined ? result : 0;
     }
 
     return 0;

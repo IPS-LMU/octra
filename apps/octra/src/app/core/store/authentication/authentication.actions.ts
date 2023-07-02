@@ -1,5 +1,9 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
-import { AccountLoginMethod, AuthDto, CurrentAccountDto } from '@octra/api-types';
+import {
+  AccountLoginMethod,
+  AuthDto,
+  CurrentAccountDto,
+} from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export class AdaptedAuthDto extends AuthDto {

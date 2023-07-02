@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{"modal.inactivity.header" | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'modal.inactivity.header' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -8,21 +10,43 @@
       (click)="close()"
     ></button>
   </div>
-  <div class="modal-body"
-       [innerHTML]="'modal.inactivity.body' | transloco:{value: (settService.appSettings.octra.inactivityNotice.showAfter+'')}">
-  </div>
+  <div
+    class="modal-body"
+    [innerHTML]="
+      'modal.inactivity.body'
+        | transloco
+          : {
+              value:
+                settService.appSettings.octra.inactivityNotice.showAfter + ''
+            }
+    "
+  ></div>
   <div class="modal-footer">
     <div class="btn-group-vertical w-100">
-      <button (click)="close('new')" class="btn btn-primary btn-raised w-100" data-dismiss="modal"
-              type="button">
-        {{"modal.inactivity.new" | transloco}}
+      <button
+        (click)="close('new')"
+        class="btn btn-primary btn-raised w-100"
+        data-dismiss="modal"
+        type="button"
+      >
+        {{ 'modal.inactivity.new' | transloco }}
       </button>
-    <button (click)="close('continue')" class="btn btn-secondary btn-raised w-100" data-dismiss="modal"
-            type="button">
-      {{"modal.inactivity.continue" | transloco}}
-    </button>
-    <button (click)="close('quit')" class="btn btn-secondary w-100" data-dismiss="modal" type="button">
-      {{"modal.inactivity.quit" | transloco}}
-    </button>
+      <button
+        (click)="close('continue')"
+        class="btn btn-secondary btn-raised w-100"
+        data-dismiss="modal"
+        type="button"
+      >
+        {{ 'modal.inactivity.continue' | transloco }}
+      </button>
+      <button
+        (click)="close('quit')"
+        class="btn btn-secondary w-100"
+        data-dismiss="modal"
+        type="button"
+      >
+        {{ 'modal.inactivity.quit' | transloco }}
+      </button>
+    </div>
   </div>
 </div>

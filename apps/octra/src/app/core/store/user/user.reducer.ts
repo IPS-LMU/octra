@@ -1,12 +1,12 @@
-import { createReducer, on } from "@ngrx/store";
-import { UserActions } from "./user.actions";
-import { IDBActions } from "../idb/idb.actions";
-import { hasProperty } from "@octra/utilities";
-import { UserState } from "./index";
+import { createReducer, on } from '@ngrx/store';
+import { UserActions } from './user.actions';
+import { IDBActions } from '../idb/idb.actions';
+import { hasProperty } from '@octra/utilities';
+import { UserState } from './index';
 
 export const initialState: UserState = {
   name: '',
-  email: ''
+  email: '',
 };
 
 export const reducer = createReducer(
@@ -14,10 +14,12 @@ export const reducer = createReducer(
   on(UserActions.setUserProfile, (state: UserState, user) => {
     return {
       ...state,
-      ...user
-    }
+      ...user,
+    };
   }),
-  on(IDBActions.loadOptionsSuccess, (state: UserState, {applicationOptions}) => {
+  on(
+    IDBActions.loadOptionsSuccess,
+    (state: UserState, { applicationOptions }) => {
       let result = state;
 
       for (const option of applicationOptions) {
@@ -26,31 +28,35 @@ export const reducer = createReducer(
 
       return result;
     }
-  ));
+  )
+);
 
-function writeOptionToStore(state: UserState, attribute: string, value: any): UserState {
+function writeOptionToStore(
+  state: UserState,
+  attribute: string,
+  value: any
+): UserState {
   const userProfile = {
     name: '',
-    email: ''
+    email: '',
   };
 
   switch (attribute) {
-    case('userProfile'):
+    case 'userProfile':
       if (value !== undefined) {
         if (hasProperty(value, 'name')) {
           userProfile.name = value.name;
         }
-        if (hasProperty(value,'email')) {
+        if (hasProperty(value, 'email')) {
           userProfile.email = value.email;
         }
       }
 
       return {
         ...state,
-        ...userProfile
+        ...userProfile,
       };
   }
 
   return state;
 }
-

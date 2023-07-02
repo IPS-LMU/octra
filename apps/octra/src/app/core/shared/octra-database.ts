@@ -1,7 +1,7 @@
-import Dexie, { Transaction } from "dexie";
-import { IAnnotJSON } from "@octra/annotation";
-import { LoginMode } from "../store";
-import { Subject } from "rxjs";
+import Dexie, { Transaction } from 'dexie';
+import { IAnnotJSON } from '@octra/annotation';
+import { LoginMode } from '../store';
+import { Subject } from 'rxjs';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -13,92 +13,92 @@ export class OctraDatabase extends Dexie {
   private defaultOptions: IIDBEntry[] = [
     {
       name: 'submitted',
-      value: false
+      value: false,
     },
     {
       name: 'version',
-      value: 3
+      value: 3,
     },
     {
       name: 'easymode',
-      value: false
+      value: false,
     },
     {
       name: 'audioURL',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'comment',
-      value: ''
+      value: '',
     },
     {
       name: 'dataID',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'feedback',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'language',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'sessionfile',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'usemode',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'user',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'interface',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'logging',
-      value: true
+      value: true,
     },
     {
       name: 'showLoupe',
-      value: false
+      value: false,
     },
     {
       name: 'prompttext',
-      value: ''
+      value: '',
     },
     {
       name: 'servercomment',
-      value: ''
+      value: '',
     },
     {
       name: 'secondsPerLine',
-      value: 5
+      value: 5,
     },
     {
       name: 'audioSettings',
       value: {
         volume: 1,
-        speed: 1
-      }
+        speed: 1,
+      },
     },
     {
       name: 'asr',
-      value: undefined
+      value: undefined,
     },
     {
       name: 'highlightingEnabled',
-      value: false
+      value: false,
     },
     {
       name: 'console',
-      value: []
-    }
-  ]
+      value: [],
+    },
+  ];
 
   //...other tables goes here...
 
@@ -106,29 +106,35 @@ export class OctraDatabase extends Dexie {
     super(dbName);
     this.onReady = new Subject<void>();
 
-    this.version(0.2).stores({
-      annotation_levels: '++id',
-      annotation_links: '++id',
-      logs: 'timestamp',
-      options: 'name'
-    }).upgrade(this.upgradeToDatabaseV2);
+    this.version(0.2)
+      .stores({
+        annotation_levels: '++id',
+        annotation_links: '++id',
+        logs: 'timestamp',
+        options: 'name',
+      })
+      .upgrade(this.upgradeToDatabaseV2);
 
-    this.version(0.3).stores({
-      annotation_levels: '++id',
-      annotation_links: '++id',
-      logs: 'timestamp',
-      options: 'name'
-    }).upgrade(this.upgradeToDatabaseV3);
+    this.version(0.3)
+      .stores({
+        annotation_levels: '++id',
+        annotation_links: '++id',
+        logs: 'timestamp',
+        options: 'name',
+      })
+      .upgrade(this.upgradeToDatabaseV3);
 
-    this.version(0.4).stores({
-      annotation_levels: '++id',
-      annotation_links: '++id',
-      logs: 'timestamp',
-      demo_data: 'name',
-      online_data: 'name',
-      local_data: 'name',
-      options: 'name'
-    }).upgrade(this.upgradeToDatabaseV4);
+    this.version(0.4)
+      .stores({
+        annotation_levels: '++id',
+        annotation_links: '++id',
+        logs: 'timestamp',
+        demo_data: 'name',
+        online_data: 'name',
+        local_data: 'name',
+        options: 'name',
+      })
+      .upgrade(this.upgradeToDatabaseV4);
 
     this.demoData = this.table('demo_data');
     this.onlineData = this.table('online_data');
@@ -137,12 +143,14 @@ export class OctraDatabase extends Dexie {
     this.options = this.table('options');
 
     this.on('ready', () => {
-      this.checkAndFillPopulation().then(() => {
-        this.onReady.next();
-        this.onReady.complete();
-      }).catch((error) => {
-        this.onReady.error(error);
-      });
+      this.checkAndFillPopulation()
+        .then(() => {
+          this.onReady.next();
+          this.onReady.complete();
+        })
+        .catch((error) => {
+          this.onReady.error(error);
+        });
     });
   }
 
@@ -153,31 +161,37 @@ export class OctraDatabase extends Dexie {
 
   private upgradeToDatabaseV3(transaction: Transaction) {
     console.log(`UPGRADE to v3`);
-    return transaction.table('options').toCollection().modify((option: IIDBEntry) => {
-      if (option.name === 'uselocalmode') {
-        option.name = 'usemode';
-        if (option.value === false) {
-          option.value = 'online';
-        } else if (option.value === true) {
-          option.value = 'local';
+    return transaction
+      .table('options')
+      .toCollection()
+      .modify((option: IIDBEntry) => {
+        if (option.name === 'uselocalmode') {
+          option.name = 'usemode';
+          if (option.value === false) {
+            option.value = 'online';
+          } else if (option.value === true) {
+            option.value = 'local';
+          }
         }
-      }
-    });
+      });
   }
-
 
   private upgradeToDatabaseV4(transaction: Transaction) {
     console.log(`UPGRADE to v4`);
 
     return new Promise<void>((resolve, reject) => {
-      transaction.table('options').get('usemode').then((usemode) => {
-        if (usemode === 'local') {
-          // TODO db: migrate old local data to localData, remove old tables
-          resolve();
-        }
-      }).catch((error) => {
-        reject(error);
-      });
+      transaction
+        .table('options')
+        .get('usemode')
+        .then((usemode) => {
+          if (usemode === 'local') {
+            // TODO db: migrate old local data to localData, remove old tables
+            resolve();
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -186,15 +200,18 @@ export class OctraDatabase extends Dexie {
       const table = this.getTableFromString(mode);
 
       if (table) {
-        table.get('options').then((options) => {
-          if (options !== undefined) {
-            resolve(options.value)
-          } else {
-            resolve(DefaultModeOptions);
-          }
-        }).catch((e) => {
-          reject(e);
-        });
+        table
+          .get('options')
+          .then((options) => {
+            if (options !== undefined) {
+              resolve(options.value);
+            } else {
+              resolve(DefaultModeOptions);
+            }
+          })
+          .catch((e) => {
+            reject(e);
+          });
       } else {
         resolve(DefaultModeOptions);
       }
@@ -206,15 +223,18 @@ export class OctraDatabase extends Dexie {
       const table = this.getTableFromString(mode);
 
       if (table !== undefined) {
-        table.get('logs').then((logs) => {
-          if (logs !== undefined) {
-            resolve(logs.value)
-          } else {
-            resolve([]);
-          }
-        }).catch((e) => {
-          reject(e);
-        });
+        table
+          .get('logs')
+          .then((logs) => {
+            if (logs !== undefined) {
+              resolve(logs.value);
+            } else {
+              resolve([]);
+            }
+          })
+          .catch((e) => {
+            reject(e);
+          });
       }
     });
   }
@@ -245,13 +265,15 @@ export class OctraDatabase extends Dexie {
             this.populateOptions(),
             this.populateModeOptions(this.demoData),
             this.populateModeOptions(this.onlineData),
-            this.populateModeOptions(this.localData)
-          ]).then(() => {
-            console.log(`population of options finished!`);
-            resolve();
-          }).catch((error) => {
-            reject(error);
-          });
+            this.populateModeOptions(this.localData),
+          ])
+            .then(() => {
+              console.log(`population of options finished!`);
+              resolve();
+            })
+            .catch((error) => {
+              reject(error);
+            });
         } else {
           resolve();
         }
@@ -276,18 +298,18 @@ export class OctraDatabase extends Dexie {
       user: {
         name: '',
         email: '',
-        webToken: ''
+        webToken: '',
       },
       project: {
         id: -1,
         name: '',
-        description: ''
-      }
+        description: '',
+      },
     };
 
     return table.add({
       name: 'options',
-      value: modeOptions
+      value: modeOptions,
     });
   }
 
@@ -295,11 +317,14 @@ export class OctraDatabase extends Dexie {
     return new Promise<void>((resolve, reject) => {
       const table = this.getTableFromString(mode);
       if (table) {
-        table.put({name, value}, name).then(() => {
-          resolve();
-        }).catch((error) => {
-          reject(error);
-        });
+        table
+          .put({ name, value }, name)
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         resolve();
       }
@@ -310,14 +335,20 @@ export class OctraDatabase extends Dexie {
     return new Promise<void>((resolve, reject) => {
       const table = this.getTableFromString(mode);
       if (table) {
-        table.put({
-          name: name,
-          value: {}
-        }, name).then(() => {
-          resolve();
-        }).catch((error) => {
-          reject(error);
-        });
+        table
+          .put(
+            {
+              name: name,
+              value: {},
+            },
+            name
+          )
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         resolve();
       }
@@ -328,15 +359,18 @@ export class OctraDatabase extends Dexie {
     return new Promise<T>((resolve, reject) => {
       const table = this.getTableFromString(mode);
       if (table) {
-        table.get(name).then((result) => {
-          if (result && result.value) {
-            resolve(result.value as T);
-          } else {
-            resolve(emptyValue);
-          }
-        }).catch((error) => {
-          reject(error);
-        });
+        table
+          .get(name)
+          .then((result) => {
+            if (result && result.value) {
+              resolve(result.value as T);
+            } else {
+              resolve(emptyValue);
+            }
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         resolve(emptyValue);
       }
@@ -347,55 +381,55 @@ export class OctraDatabase extends Dexie {
     return this.options.bulkPut([
       {
         name: 'version',
-        value: 3
+        value: 3,
       },
       {
         name: 'easymode',
-        value: false
+        value: false,
       },
       {
         name: 'language',
-        value: undefined
+        value: undefined,
       },
       {
         name: 'usemode',
-        value: undefined
+        value: undefined,
       },
       {
         name: 'user',
-        value: undefined
+        value: undefined,
       },
       {
         name: 'interface',
-        value: undefined
+        value: undefined,
       },
       {
         name: 'showLoupe',
-        value: false
+        value: false,
       },
       {
         name: 'secondsPerLine',
-        value: 5
+        value: 5,
       },
       {
         name: 'audioSettings',
         value: {
           volume: 1,
-          speed: 1
-        }
+          speed: 1,
+        },
       },
       {
         name: 'asr',
-        value: undefined
+        value: undefined,
       },
       {
         name: 'highlightingEnabled',
-        value: false
+        value: false,
       },
       {
         name: 'console',
-        value: []
-      }
+        value: [],
+      },
     ]);
   }
 }
@@ -430,12 +464,12 @@ export interface IIDBModeOptions {
     name: string;
     email: string;
     webToken: string;
-  },
+  };
   project: {
     id: number;
     name: string;
     description: string;
-  }
+  };
 }
 
 export const DefaultModeOptions: IIDBModeOptions = {
@@ -454,11 +488,11 @@ export const DefaultModeOptions: IIDBModeOptions = {
   user: {
     name: '',
     email: '',
-    webToken: ''
+    webToken: '',
   },
   project: {
     id: -1,
     name: '',
-    description: ''
-  }
-}
+    description: '',
+  },
+};

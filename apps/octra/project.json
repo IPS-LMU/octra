@@ -15,10 +15,7 @@
         "main": "apps/octra/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/octra/tsconfig.app.json",
-        "allowedCommonJsDependencies": [
-          "jodit-angular",
-          "ajv"
-        ],
+        "allowedCommonJsDependencies": ["jodit-angular", "ajv"],
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/octra/src/assets",

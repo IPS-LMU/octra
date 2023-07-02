@@ -1,8 +1,8 @@
-import { createAction, props } from "@ngrx/store";
-import { ConsoleEntry } from "../../shared/service/bug-report.service";
-import { OIDBLink } from "@octra/annotation";
-import { AnnotationStateLevel } from "../index";
-import { IIDBModeOptions } from "../../shared/octra-database";
+import { createAction, props } from '@ngrx/store';
+import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import { OIDBLink } from '@octra/annotation';
+import { AnnotationStateLevel } from '../index';
+import { IIDBModeOptions } from '../../shared/octra-database';
 
 const context = 'IDB';
 
@@ -20,30 +20,30 @@ export class IDBActions {
   public static loadOptionsFailed = createAction(
     `[${context}] Load Options Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
   public static loadLogsSuccess = createAction(
     `[${context}] Load Logs Success`,
     props<{
-      online: any[],
-      demo: any[],
-      local: any[]
+      online: any[];
+      demo: any[];
+      local: any[];
     }>()
   );
 
   public static loadLogsFailed = createAction(
     `[${context}] Load Logs Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
   public static loadAnnotationLinksSuccess = createAction(
     `[${context}] Load AnnotationLinks Success`,
     props<{
-      links: OIDBLink[]
+      links: OIDBLink[];
     }>()
   );
 
@@ -53,50 +53,50 @@ export class IDBActions {
       online: {
         levels: AnnotationStateLevel[];
         levelCounter: number;
-      },
+      };
       demo: {
         levels: AnnotationStateLevel[];
         levelCounter: number;
-      },
+      };
       local: {
         levels: AnnotationStateLevel[];
         levelCounter: number;
-      },
+      };
     }>()
   );
 
   public static loadAnnotationFailed = createAction(
     `[${context}] Load Annotation Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
   public static loadConsoleEntriesSuccess = createAction(
     `[${context}] Load ConsoleEntries Success`,
     props<{
-      consoleEntries: ConsoleEntry[]
+      consoleEntries: ConsoleEntry[];
     }>()
   );
 
   public static loadConsoleEntriesFailed = createAction(
     `[${context}] Load ConsoleEntries Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
   public static clearLogsSuccess = createAction(
     `[${context}] Clear Logs Success`,
     props<{
-      mode: string
+      mode: string;
     }>()
   );
 
   public static clearLogsFailed = createAction(
     `[${context}] Clear Logs Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -111,7 +111,7 @@ export class IDBActions {
   public static clearAllOptionsFailed = createAction(
     `[${context}] Clear All Options Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -122,7 +122,7 @@ export class IDBActions {
   public static saveUserProfileFailed = createAction(
     `[${context}] Save User Profile Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -133,7 +133,7 @@ export class IDBActions {
   public static saveTranscriptionSubmittedFailed = createAction(
     `[${context}] Save Submitted Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -144,7 +144,7 @@ export class IDBActions {
   public static saveTranscriptionFeedbackFailed = createAction(
     `[${context}] Save Transcription Feedback Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -155,7 +155,7 @@ export class IDBActions {
   public static saveAppLanguageFailed = createAction(
     `[${context}] Save App Language Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -166,7 +166,7 @@ export class IDBActions {
   public static saveIDBVersionFailed = createAction(
     `[${context}] Save IDB Version Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -177,7 +177,7 @@ export class IDBActions {
   public static saveTranscriptionLoggingFailed = createAction(
     `[${context}] Save Transcription Logging Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -188,7 +188,7 @@ export class IDBActions {
   public static saveShowLoupeFailed = createAction(
     `[${context}] Save showLoupe Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -199,7 +199,7 @@ export class IDBActions {
   public static saveEasyModeFailed = createAction(
     `[${context}] Save easyMode Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -210,7 +210,7 @@ export class IDBActions {
   public static saveTranscriptionCommentFailed = createAction(
     `[${context}] Save Transcription Comment Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -221,7 +221,7 @@ export class IDBActions {
   public static saveSecondsPerLineFailed = createAction(
     `[${context}] Save SecondsPerLine Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -232,7 +232,7 @@ export class IDBActions {
   public static saveHighlightingEnabledFailed = createAction(
     `[${context}] Save highlightingEnabled Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -243,7 +243,7 @@ export class IDBActions {
   public static saveDemoSessionFailed = createAction(
     `[${context}] Save demoSession Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -254,7 +254,7 @@ export class IDBActions {
   public static saveOnlineSessionFailed = createAction(
     `[${context}] Save OnlineSession Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -265,7 +265,7 @@ export class IDBActions {
   public static saveLoggedInFailed = createAction(
     `[SessionStore] Save LoggedIn Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -276,7 +276,7 @@ export class IDBActions {
   public static savePlayOnHoverFailed = createAction(
     `[SessionStore] Save PlayOnHover Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -287,7 +287,7 @@ export class IDBActions {
   public static saveFollowPlayCursorFailed = createAction(
     `[SessionStore] Save FollowPlayCursor Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -298,7 +298,7 @@ export class IDBActions {
   public static saveAppReloadedFailed = createAction(
     `[SessionStore] Save AppReloaded Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -309,7 +309,7 @@ export class IDBActions {
   public static saveServerDataEntryFailed = createAction(
     `[SessionStore] Save ServerDataEntry Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -320,7 +320,7 @@ export class IDBActions {
   public static saveLoginSessionFailed = createAction(
     `[${context}] Save LoginSession Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -331,7 +331,7 @@ export class IDBActions {
   public static saveLogoutFailed = createAction(
     `[${context}] Save Logout Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -342,7 +342,7 @@ export class IDBActions {
   public static saveLogsFailed = createAction(
     `[${context}] Save Logs Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -353,7 +353,7 @@ export class IDBActions {
   public static saveASRSettingsFailed = createAction(
     `[${context}] Save ASRSettings Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -364,7 +364,7 @@ export class IDBActions {
   public static saveAudioSettingsFailed = createAction(
     `[${context}] Save AudioSettings Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -375,7 +375,7 @@ export class IDBActions {
   public static saveCurrentEditorFailed = createAction(
     `[${context}] Save CurrentEditor Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -386,7 +386,7 @@ export class IDBActions {
   public static clearAnnotationFailed = createAction(
     `[${context}] Save Annotation Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -397,7 +397,7 @@ export class IDBActions {
   public static overwriteTranscriptFailed = createAction(
     `[${context}] Overwrite Transcript Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -408,7 +408,7 @@ export class IDBActions {
   public static overwriteAnnotationLinksFailed = createAction(
     `[${context}] Overwrite AnnotationLinks Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -433,7 +433,7 @@ export class IDBActions {
   public static logoutSessionFailed = createAction(
     `[${context}] Logout Session Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -444,7 +444,7 @@ export class IDBActions {
   public static saveAnnotationFailed = createAction(
     `[${context}] Save Annotation Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -455,7 +455,7 @@ export class IDBActions {
   public static addAnnotationLevelFailed = createAction(
     `[${context}] Add AnnotationLevel Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -466,7 +466,7 @@ export class IDBActions {
   public static removeAnnotationLevelFailed = createAction(
     `[${context}] Remove AnnotationLevel Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -477,7 +477,7 @@ export class IDBActions {
   public static saveConsoleEntriesFailed = createAction(
     `[${context}] Save ConsoleEntries Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 }

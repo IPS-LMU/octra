@@ -1,7 +1,12 @@
-import { AudioChunk, AudioManager, AudioSelection, SampleUnit } from "@octra/media";
-import { AudioViewerComponent } from "@octra/ngx-components";
-import { Level } from "@octra/annotation";
-import { DefaultComponent } from "../core/component/default.component";
+import {
+  AudioChunk,
+  AudioManager,
+  AudioSelection,
+  SampleUnit,
+} from '@octra/media';
+import { AudioViewerComponent } from '@octra/ngx-components';
+import { Level } from '@octra/annotation';
+import { DefaultComponent } from '../core/component/default.component';
 
 export abstract class OCTRAEditor extends DefaultComponent {
   public abstract afterFirstInitialization(): void;
@@ -10,7 +15,12 @@ export abstract class OCTRAEditor extends DefaultComponent {
 
   public abstract enableAllShortcuts(): void;
 
-  protected doPlayOnHover(audioManager: AudioManager, isPlayingOnhover: boolean, audioChunk: AudioChunk, mouseCursor: SampleUnit) {
+  protected doPlayOnHover(
+    audioManager: AudioManager,
+    isPlayingOnhover: boolean,
+    audioChunk: AudioChunk,
+    mouseCursor: SampleUnit
+  ) {
     if (!audioManager.isPlaying && isPlayingOnhover) {
       // play audio on hover
 
@@ -29,19 +39,27 @@ export abstract class OCTRAEditor extends DefaultComponent {
   }
 
   protected changeArea(
-    loupe: AudioViewerComponent, signalDisplay: AudioViewerComponent, audioManager: AudioManager,
-    audioChunkLoupe: AudioChunk, cursorTime: SampleUnit, factor: number): Promise<AudioChunk | undefined> {
+    loupe: AudioViewerComponent,
+    signalDisplay: AudioViewerComponent,
+    audioManager: AudioManager,
+    audioChunkLoupe: AudioChunk,
+    cursorTime: SampleUnit,
+    factor: number
+  ): Promise<AudioChunk | undefined> {
     return new Promise<AudioChunk | undefined>((resolve) => {
       const cursorLocation = signalDisplay.mouseCursor;
       if (cursorLocation && cursorTime) {
         const halfRate = Math.round(audioManager.sampleRate / factor);
-        const start = (cursorTime.samples > halfRate)
-          ? audioManager.createSampleUnit(cursorTime.samples - halfRate)
-          : audioManager.createSampleUnit(0);
+        const start =
+          cursorTime.samples > halfRate
+            ? audioManager.createSampleUnit(cursorTime.samples - halfRate)
+            : audioManager.createSampleUnit(0);
 
-        const end = (cursorTime.samples < audioManager.resource.info.duration.samples - halfRate)
-          ? audioManager.createSampleUnit(cursorTime.samples + halfRate)
-          : audioManager.resource.info.duration.clone();
+        const end =
+          cursorTime.samples <
+          audioManager.resource.info.duration.samples - halfRate
+            ? audioManager.createSampleUnit(cursorTime.samples + halfRate)
+            : audioManager.resource.info.duration.clone();
 
         loupe.av.zoomY = factor;
         if (start && end) {
@@ -58,9 +76,12 @@ export abstract class OCTRAEditor extends DefaultComponent {
 
   abstract openSegment(index: number): void;
 
-  protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: Level) {
+  protected checkIfSmallAudioChunk(
+    audioChunk: AudioChunk,
+    currentLevel: Level
+  ) {
     const emptySegmentIndex = currentLevel.segments.segments.findIndex((a) => {
-      return a.transcript === "";
+      return a.transcript === '';
     });
 
     if (audioChunk.time.duration.seconds <= 35) {
@@ -72,4 +93,3 @@ export abstract class OCTRAEditor extends DefaultComponent {
     }
   }
 }
-

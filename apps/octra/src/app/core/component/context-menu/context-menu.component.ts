@@ -1,5 +1,8 @@
-import { Component, Input } from "@angular/core";
-import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animations";
+import { Component, Input } from '@angular/core';
+import {
+  fadeInOnEnterAnimation,
+  fadeOutOnLeaveAnimation,
+} from 'angular-animations';
 
 @Component({
   selector: 'octra-context-menu',
@@ -7,12 +10,12 @@ import { fadeInOnEnterAnimation, fadeOutOnLeaveAnimation } from "angular-animati
   styleUrls: ['./context-menu.component.scss'],
   animations: [
     fadeInOnEnterAnimation({
-      duration: 100
+      duration: 100,
     }),
     fadeOutOnLeaveAnimation({
-      duration: 100
-    })
-  ]
+      duration: 100,
+    }),
+  ],
 })
 export class ContextMenuComponent {
   isVisible = false;
@@ -40,7 +43,7 @@ export class ContextMenuComponent {
   }
 
   public changeActionStatus(name: string, status: 'active' | 'inactive') {
-    const index = this.actions.findIndex(a => a.name === name);
+    const index = this.actions.findIndex((a) => a.name === name);
 
     if (index > -1) {
       this.actions[index].status = status;
@@ -49,9 +52,9 @@ export class ContextMenuComponent {
 }
 
 export interface ContextMenuAction {
-  name: string,
-  status: 'active' | 'inactive',
-  icon: string,
-  label: string,
-  func: () => void
+  name: string;
+  status: 'active' | 'inactive';
+  icon: string;
+  label: string;
+  func: () => void;
 }

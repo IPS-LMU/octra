@@ -1,12 +1,17 @@
-import { Injectable } from "@angular/core";
-import { Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoLoader } from "@ngneat/transloco";
-import { HttpClient } from "@angular/common/http";
-import { environment } from "../environments/environment";
+import { Injectable } from '@angular/core';
+import {
+  Translation,
+  TRANSLOCO_CONFIG,
+  TRANSLOCO_LOADER,
+  translocoConfig,
+  TranslocoLoader,
+} from '@ngneat/transloco';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   getTranslation(lang: string) {
     console.log(`load translation...`);
@@ -21,8 +26,11 @@ export const TranslocoConfigProvider = {
     defaultLang: 'en',
     fallbackLang: 'en',
     prodMode: environment.production,
-    reRenderOnLangChange: true
-  })
+    reRenderOnLangChange: true,
+  }),
 };
 
-export const TranslocoLoaderProvider = {provide: TRANSLOCO_LOADER, useClass: TranslocoHttpLoader};
+export const TranslocoLoaderProvider = {
+  provide: TRANSLOCO_LOADER,
+  useClass: TranslocoHttpLoader,
+};

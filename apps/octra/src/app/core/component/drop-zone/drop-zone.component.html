@@ -1,12 +1,26 @@
-<div style="position: relative;">
-  <div #dropzone (click)="onClick()" (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" [ngStyle]="{
-  height: height
-}" class="dropzone">
-    <div class="inner" style="margin: auto 0;">
+<div style="position: relative">
+  <div
+    #dropzone
+    (click)="onClick()"
+    (dragover)="onDragOver($event)"
+    (drop)="onFileDrop($event)"
+    [ngStyle]="{
+      height: height
+    }"
+    class="dropzone"
+  >
+    <div class="inner" style="margin: auto 0">
       <ng-content></ng-content>
       <i class="bi bi-folder2-open dragndrop"></i>
-      <input #fileinput (change)="onFileChange($event)" class="fileinput" multiple style="display:none;" type="file"
-             value="Select audio file"/>
+      <input
+        #fileinput
+        (change)="onFileChange($event)"
+        class="fileinput"
+        multiple
+        style="display: none"
+        type="file"
+        value="Select audio file"
+      />
     </div>
   </div>
 </div>

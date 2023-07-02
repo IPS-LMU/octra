@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{"general.help" | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'general.help' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -8,12 +10,22 @@
       (click)="close()"
     ></button>
   </div>
-  <div class="modal-body" style="text-align: center;">
-    <a class="btn btn-raised btn-info" href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/"
-       target="_blank">Open Manual</a>
+  <div class="modal-body" style="text-align: center">
+    <a
+      class="btn btn-raised btn-info"
+      href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/"
+      target="_blank"
+      >Open Manual</a
+    >
   </div>
   <div class="modal-footer">
-    <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
-      {{"general.close" | transloco}}
+    <button
+      (click)="close()"
+      class="btn btn-primary"
+      data-dismiss="modal"
+      type="button"
+    >
+      {{ 'general.close' | transloco }}
     </button>
+  </div>
 </div>

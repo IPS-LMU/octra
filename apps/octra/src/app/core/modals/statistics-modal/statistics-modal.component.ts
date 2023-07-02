@@ -1,30 +1,36 @@
-import { Component } from "@angular/core";
-import { NavbarService } from "../../component/navbar/navbar.service";
-import { StatisticElem } from "../../obj/statistics/StatisticElement";
-import { TranscriptionService, UserInteractionsService } from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { TextConverter } from "@octra/annotation";
-import { OctraModal } from "../types";
-import { NgbActiveModal, NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
+import { Component } from '@angular/core';
+import { NavbarService } from '../../component/navbar/navbar.service';
+import { StatisticElem } from '../../obj/statistics/StatisticElement';
+import {
+  TranscriptionService,
+  UserInteractionsService,
+} from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { TextConverter } from '@octra/annotation';
+import { OctraModal } from '../types';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: "octra-statistics-modal",
-  templateUrl: "./statistics-modal.component.html",
-  styleUrls: ["./statistics-modal.component.scss"]
+  selector: 'octra-statistics-modal',
+  templateUrl: './statistics-modal.component.html',
+  styleUrls: ['./statistics-modal.component.scss'],
 })
-
 export class StatisticsModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
     scrollable: true,
-    size: "lg"
-  }
+    size: 'lg',
+  };
 
-  public bgdescr = "";
+  public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
-  public transcrObjStr = "";
+  public transcrObjStr = '';
   protected data = undefined;
 
   public get transcrServ(): TranscriptionService {
@@ -36,16 +42,20 @@ export class StatisticsModalComponent extends OctraModal {
   }
 
   public get isvalid(): boolean {
-    return this.sendProObj || this.bgdescr !== "";
+    return this.sendProObj || this.bgdescr !== '';
   }
 
   get UIElements(): StatisticElem[] {
     return this.uiService !== undefined ? this.uiService.elements : undefined;
   }
 
-  constructor(modalService: NgbModal, private navbarService: NavbarService, private appStorage: AppStorageService,
-              protected override activeModal: NgbActiveModal) {
-    super("statisticsModal", activeModal);
+  constructor(
+    modalService: NgbModal,
+    private navbarService: NavbarService,
+    private appStorage: AppStorageService,
+    protected override activeModal: NgbActiveModal
+  ) {
+    super('statisticsModal', activeModal);
   }
 
   clearElements() {
@@ -55,10 +65,12 @@ export class StatisticsModalComponent extends OctraModal {
 
   getText() {
     if (this.transcrServ !== undefined) {
-      return this.navbarService.transcrService.getTranscriptString(new TextConverter());
+      return this.navbarService.transcrService.getTranscriptString(
+        new TextConverter()
+      );
     }
 
-    return "";
+    return '';
   }
 
   public stringify(value: string) {

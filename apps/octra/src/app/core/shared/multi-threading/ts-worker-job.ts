@@ -3,7 +3,7 @@ export enum TsWorkerStatus {
   RUNNING = 'running',
   FINISHED = 'finished',
   FAILED = 'failed',
-  STOPPED = 'stopped'
+  STOPPED = 'stopped',
 }
 
 export class TsWorkerJob {
@@ -17,7 +17,7 @@ export class TsWorkerJob {
 
   private _statistics = {
     started: -1,
-    ended: -1
+    ended: -1,
   };
 
   get statistics(): { ended: number; started: number } {
@@ -57,7 +57,7 @@ export class TsWorkerJob {
     return new Promise<any>((resolve, reject) => {
       reject('not implemented');
     });
-  }
+  };
 
   /**
    * changes this job's status

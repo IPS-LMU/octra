@@ -1,20 +1,20 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
-import { Subject, Subscription } from "rxjs";
-import { SubscriptionManager } from "@octra/utilities";
-import { TranscriptionService } from "../../../../core/shared/service";
-import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { SubscriptionManager } from '@octra/utilities';
+import { TranscriptionService } from '../../../../core/shared/service';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-permutations-replace',
   templateUrl: './permutations-replace-modal.component.html',
-  styleUrls: ['./permutations-replace-modal.component.scss']
+  styleUrls: ['./permutations-replace-modal.component.scss'],
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
   modalRef: NgbModalRef;
   public visible = false;
 
-  @ViewChild('modal', {static: true}) modal: any;
-  @ViewChild('content', {static: false}) contentElement: ElementRef;
+  @ViewChild('modal', { static: true }) modal: any;
+  @ViewChild('content', { static: false }) contentElement: ElementRef;
 
   protected data = undefined;
   private actionperformed: Subject<string> = new Subject<string>();
@@ -25,16 +25,15 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
     replaceWith: string;
   }[] = [];
 
-  constructor(private transcrService: TranscriptionService) {
-  }
+  constructor(private transcrService: TranscriptionService) {}
 
   private readListOfSpeakers() {
     const result = [];
     for (const segment of this.transcrService.currentlevel.segments.segments) {
-      if (result.findIndex(a => a.name === segment.speakerLabel) < 0) {
+      if (result.findIndex((a) => a.name === segment.speakerLabel) < 0) {
         result.push({
           name: segment.speakerLabel,
-          replaceWith: segment.speakerLabel
+          replaceWith: segment.speakerLabel,
         });
       }
     }
@@ -65,7 +64,6 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
           reject(err);
         }
       );
-
     });
   }
 
@@ -79,7 +77,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
   }
 
   getSpeakerListWithout(exceptSpeaker: string) {
-    return this.listOfSpeakers.filter(a => a.name !== exceptSpeaker);
+    return this.listOfSpeakers.filter((a) => a.name !== exceptSpeaker);
   }
 
   ngOnDestroy() {

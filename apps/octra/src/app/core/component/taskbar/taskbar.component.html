@@ -2,28 +2,61 @@
   <div class="btn-group w-100 p-2">
     <a (click)="shortcutbtnclicked.emit()" class="w-100">
       <i class="bi bi-keyboard align-middle"></i>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.shortcuts}}</span>
-      <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT +
-                            8]</span></a>
-    <a (click)="guidelinesbtnclicked.emit()" *ngIf="appStorage.useMode !== 'url'" class='w-100'>
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-md-inline': responsive }"
+      >
+        {{ buttonLabels.shortcuts }}</span
+      >
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-lg-inline': responsive }"
+      >
+        [ALT + 8]</span
+      ></a
+    >
+    <a
+      (click)="guidelinesbtnclicked.emit()"
+      *ngIf="appStorage.useMode !== 'url'"
+      class="w-100"
+    >
       <i class="bi bi-card-list"></i>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.guidelines}}</span>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 9]</span>
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-md-inline': responsive }"
+      >
+        {{ buttonLabels.guidelines }}</span
+      >
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-lg-inline': responsive }"
+      >
+        [ALT + 9]</span
+      >
     </a>
-    <a (click)="overviewbtnclicked.emit()" class='w-100'>
+    <a (click)="overviewbtnclicked.emit()" class="w-100">
       <i class="bi bi-eye-fill"></i>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.overview}}</span>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 0]</span>
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-md-inline': responsive }"
+      >
+        {{ buttonLabels.overview }}</span
+      >
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-lg-inline': responsive }"
+      >
+        [ALT + 0]</span
+      >
     </a>
     <a (click)="openHelpModal()" class="w-100">
       <i class="bi bi-question-circle-fill"></i>
-      <span *ngIf="!appStorage.easymode"
-            [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.help}}</span>
+      <span
+        *ngIf="!appStorage.easymode"
+        [ngClass]="{ 'd-none d-md-inline': responsive }"
+      >
+        {{ buttonLabels.help }}</span
+      >
     </a>
   </div>
 </div>

@@ -2,33 +2,47 @@
  * API Interface which have to be implemented by an API Service
  */
 export interface API {
-  beginSession(project: string, annotator: string, jobno: number, errorhandler: any, password?: string): Promise<any>;
+  beginSession(
+    project: string,
+    annotator: string,
+    jobno: number,
+    errorhandler: any,
+    password?: string
+  ): Promise<any>;
 
-  continueSession(project: string, annotator: string, jobno: number, errorhandler: any): Promise<any>;
+  continueSession(
+    project: string,
+    annotator: string,
+    jobno: number,
+    errorhandler: any
+  ): Promise<any>;
 
   fetchAnnotation(id: number): Promise<any>;
 
-  saveSession(transcript: any[],
-              project: string,
-              annotator: string,
-              jobno: number,
-              dataID: number,
-              status: string,
-              comment: string,
-              quality: any,
-              log: any[]): Promise<any>;
+  saveSession(
+    transcript: any[],
+    project: string,
+    annotator: string,
+    jobno: number,
+    dataID: number,
+    status: string,
+    comment: string,
+    quality: any,
+    log: any[]
+  ): Promise<any>;
 
-  lockSession(transcript: any[],
-              project: string,
-              annotator: string,
-              jobno: number,
-              dataID: number,
-              comment: string,
-              quality: any,
-              log: any[]): Promise<any>;
+  lockSession(
+    transcript: any[],
+    project: string,
+    annotator: string,
+    jobno: number,
+    dataID: number,
+    comment: string,
+    quality: any,
+    log: any[]
+  ): Promise<any>;
 
-  unlockSession(project: string,
-                dataID: number): Promise<any>;
+  unlockSession(project: string, dataID: number): Promise<any>;
 
   closeSession(annotator: string, id: number, comment: string): Promise<any>;
 

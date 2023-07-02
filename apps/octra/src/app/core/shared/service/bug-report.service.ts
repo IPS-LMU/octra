@@ -1,21 +1,21 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { TranslocoService } from "@ngneat/transloco";
-import { Observable } from "rxjs";
-import { AppInfo } from "../../../app.info";
-import { BugReporter } from "../../obj/BugAPI/BugReporter";
-import { AppStorageService } from "./appstorage.service";
-import { SettingsService } from "./settings.service";
-import { TranscriptionService } from "./transcription.service";
-import { BrowserInfo, getFileSize } from "@octra/utilities";
-import { LoginMode } from "../../store";
-import { DateTime } from "luxon";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { TranslocoService } from '@ngneat/transloco';
+import { Observable } from 'rxjs';
+import { AppInfo } from '../../../app.info';
+import { BugReporter } from '../../obj/BugAPI/BugReporter';
+import { AppStorageService } from './appstorage.service';
+import { SettingsService } from './settings.service';
+import { TranscriptionService } from './transcription.service';
+import { BrowserInfo, getFileSize } from '@octra/utilities';
+import { LoginMode } from '../../store';
+import { DateTime } from 'luxon';
 
 export enum ConsoleType {
   LOG,
   INFO,
   WARN,
-  ERROR
+  ERROR,
 }
 
 export interface ConsoleEntry {
@@ -41,11 +41,12 @@ export class BugReportService {
     return this._console;
   }
 
-  constructor(private langService: TranslocoService,
-              private appStorage: AppStorageService,
-              private settService: SettingsService,
-              private http: HttpClient) {
-  }
+  constructor(
+    private langService: TranslocoService,
+    private appStorage: AppStorageService,
+    private settService: SettingsService,
+    private http: HttpClient
+  ) {}
 
   public init(transcrService: TranscriptionService) {
     this.transcrService = transcrService;
@@ -54,15 +55,14 @@ export class BugReportService {
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {
       type,
-      timestamp: DateTime.now().setLocale('de').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
-      message
+      timestamp: DateTime.now()
+        .setLocale('de')
+        .toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+      message,
     };
 
     if (this._console !== undefined) {
-      this._console = [
-        ...this._console,
-        consoleItem
-      ];
+      this._console = [...this._console, consoleItem];
       this.appStorage.consoleEntries = this._console;
     }
   }
@@ -78,11 +78,18 @@ export class BugReportService {
         entries = entries.slice(-50);
       }
 
-      this._console = entries.concat([{
-        type: 0,
-        timestamp: DateTime.now().setLocale('de').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
-        message: '--- AFTER RELOAD ---'
-      }], this._console);
+      this._console = entries.concat(
+        [
+          {
+            type: 0,
+            timestamp: DateTime.now()
+              .setLocale('de')
+              .toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+            message: '--- AFTER RELOAD ---',
+          },
+        ],
+        this._console
+      );
     }
     this.appStorage.consoleEntries = this._console;
     this.fromDBLoaded = true;
@@ -108,17 +115,17 @@ export class BugReportService {
         audiofile_type: undefined,
         levels: undefined,
         currentlevel: undefined,
-        segments: undefined
+        segments: undefined,
       },
       system: {
         os: {
           name: BrowserInfo.os.family,
-          version: BrowserInfo.os.version
+          version: BrowserInfo.os.version,
         },
         browser: BrowserInfo.browser + ' ' + BrowserInfo.version,
-        version: BrowserInfo.os.version
+        version: BrowserInfo.os.version,
       },
-      entries: this._console
+      entries: this._console,
     };
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
@@ -130,11 +137,16 @@ export class BugReportService {
     if (!(this.transcrService === undefined)) {
       const file = getFileSize(this.transcrService.audiofile.size);
       result.octra.audiofile_size = file.size + ' ' + file.label;
-      result.octra.audiofile_duration = this.transcrService.audioManager.resource.info.duration.seconds;
-      result.octra.audiofile_samplerate = this.transcrService.audiofile.sampleRate;
-      result.octra.audiofile_bitrate = this.transcrService.audioManager.resource.info.bitrate;
-      result.octra.audiofile_channels = this.transcrService.audioManager.resource.info.channels;
-      result.octra.audiofile_type = this.transcrService.audioManager.resource.extension;
+      result.octra.audiofile_duration =
+        this.transcrService.audioManager.resource.info.duration.seconds;
+      result.octra.audiofile_samplerate =
+        this.transcrService.audiofile.sampleRate;
+      result.octra.audiofile_bitrate =
+        this.transcrService.audioManager.resource.info.bitrate;
+      result.octra.audiofile_channels =
+        this.transcrService.audioManager.resource.info.channels;
+      result.octra.audiofile_type =
+        this.transcrService.audioManager.resource.extension;
       result.octra.levels = this.transcrService.annotation.levels.length;
       result.octra.currentlevel = this.transcrService.selectedlevel;
       result.octra.segments = this.transcrService.currentlevel.segments.length;
@@ -161,8 +173,12 @@ export class BugReportService {
   }
 
   sendReport(
-    name: string, email: string, description: string, sendbugreport: boolean,
-    credentials: BugReportCredentials, screenshots: any[]
+    name: string,
+    email: string,
+    description: string,
+    sendbugreport: boolean,
+    credentials: BugReportCredentials,
+    screenshots: any[]
   ): Observable<any> {
     const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
@@ -172,13 +188,20 @@ export class BugReportService {
       const form = {
         email,
         name,
-        description
+        description,
       };
 
-      return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport, screenshots);
+      return this.reporter.sendBugReport(
+        this.http,
+        this.getPackage(),
+        form,
+        url,
+        auth_token,
+        sendbugreport,
+        screenshots
+      );
     }
 
     return undefined;
   }
-
 }

@@ -1,5 +1,5 @@
-import { Subject } from "rxjs";
-import { TsWorkerJob, TsWorkerStatus } from "./ts-worker-job";
+import { Subject } from 'rxjs';
+import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
 
 export class TsWorker {
   private static workerID = 1;
@@ -30,13 +30,11 @@ export class TsWorker {
   constructor() {
     this._id = TsWorker.workerID++;
     // creates an worker that runs a job
-    this.blobURL = URL.createObjectURL(new Blob([
-        this.getWorkerScript()
-      ],
-      {
-        type: 'application/javascript'
-      }
-    ));
+    this.blobURL = URL.createObjectURL(
+      new Blob([this.getWorkerScript()], {
+        type: 'application/javascript',
+      })
+    );
     this.worker = new Worker(this.blobURL);
   }
 
@@ -49,7 +47,9 @@ export class TsWorker {
       this._queue.push(job);
       this.checkBeforeStart();
     } else {
-      console.error(`job ${job.id} is already in job list of worker ${this._id}`);
+      console.error(
+        `job ${job.id} is already in job list of worker ${this._id}`
+      );
     }
   }
 
@@ -80,21 +80,23 @@ export class TsWorker {
       const job = this.getFirstFreeJob();
       if (!(job === undefined || job === undefined)) {
         job.changeStatus(TsWorkerStatus.RUNNING);
-        this.run(this._queue[0]).then((result: any) => {
-          // remove job from job list
-          this.removeJobByID(job.id);
+        this.run(this._queue[0])
+          .then((result: any) => {
+            // remove job from job list
+            this.removeJobByID(job.id);
 
-          job.result = result;
-          job.changeStatus(TsWorkerStatus.FINISHED);
-          this._jobstatuschange.next(job);
+            job.result = result;
+            job.changeStatus(TsWorkerStatus.FINISHED);
+            this._jobstatuschange.next(job);
 
-          this.checkBeforeStart();
-        }).catch((error) => {
-          job.changeStatus(TsWorkerStatus.FAILED);
-          this._jobstatuschange.error(error);
+            this.checkBeforeStart();
+          })
+          .catch((error) => {
+            job.changeStatus(TsWorkerStatus.FAILED);
+            this._jobstatuschange.error(error);
 
-          this.checkBeforeStart();
-        });
+            this.checkBeforeStart();
+          });
       }
     }
   }
@@ -127,9 +129,11 @@ export class TsWorker {
    * @param job job to check
    */
   public hasJob(job: TsWorkerJob) {
-    return this._queue.findIndex((a) => {
-      return a.id === job.id;
-    }) > -1;
+    return (
+      this._queue.findIndex((a) => {
+        return a.id === job.id;
+      }) > -1
+    );
   }
 
   /**
@@ -144,35 +148,33 @@ export class TsWorker {
    * @param job the job to run
    */
   private run = (job: TsWorkerJob): Promise<any> => {
-    return new Promise<any>(
-      (resolve, reject) => {
-        this.worker.onmessage = (ev: MessageEvent) => {
-          job.statistics.ended = Date.now();
-          this.status = ev.data.status;
+    return new Promise<any>((resolve, reject) => {
+      this.worker.onmessage = (ev: MessageEvent) => {
+        job.statistics.ended = Date.now();
+        this.status = ev.data.status;
 
-          if (ev.data.status === 'finished') {
-            this.removeJobByID(job.id);
-            resolve(ev.data.result);
-          } else if (ev.data.status === 'failed') {
-            this.removeJobByID(job.id);
-            reject(ev.data.message);
-          }
-        };
-
-        this.worker.onerror = (err) => {
-          this.status = TsWorkerStatus.FAILED;
+        if (ev.data.status === 'finished') {
           this.removeJobByID(job.id);
-          reject(err);
-        };
+          resolve(ev.data.result);
+        } else if (ev.data.status === 'failed') {
+          this.removeJobByID(job.id);
+          reject(ev.data.message);
+        }
+      };
 
-        job.statistics.started = Date.now();
-        this.worker.postMessage({
-          command: 'run',
-          args: [this.convertJobToObj(job)]
-        });
-      }
-    );
-  }
+      this.worker.onerror = (err) => {
+        this.status = TsWorkerStatus.FAILED;
+        this.removeJobByID(job.id);
+        reject(err);
+      };
+
+      job.statistics.started = Date.now();
+      this.worker.postMessage({
+        command: 'run',
+        args: [this.convertJobToObj(job)],
+      });
+    });
+  };
 
   /**
    * converts a job to an JSON object
@@ -181,7 +183,7 @@ export class TsWorker {
     return {
       userName: job.id,
       args: job.args,
-      doFunction: job.doFunction.toString()
+      doFunction: job.doFunction.toString(),
     };
   }
 

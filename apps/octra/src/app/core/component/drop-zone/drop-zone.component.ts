@@ -1,18 +1,27 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
-import { SessionFile } from "../../obj/SessionFile";
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { SessionFile } from '../../obj/SessionFile';
 
 @Component({
   selector: 'octra-drop-zone',
   templateUrl: './drop-zone.component.html',
-  styleUrls: ['./drop-zone.component.scss']
+  styleUrls: ['./drop-zone.component.scss'],
 })
 export class DropZoneComponent implements OnInit {
   @Input()
   innerhtml = '';
   @Input() height = 'auto';
   public clicklocked = false;
-  @Output() public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
-  @ViewChild('fileinput', {static: true}) public fileinput: ElementRef;
+  @Output() public afterdrop: EventEmitter<FileList> =
+    new EventEmitter<FileList>();
+  @ViewChild('fileinput', { static: true }) public fileinput: ElementRef;
   private fileAPIsupported = false;
 
   private _files: FileList = undefined;

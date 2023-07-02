@@ -1,145 +1,254 @@
 <div id="scroll-container" #scrollContainer>
-  <octra-context-menu #contextMenu [x]="contextMenuProperties.x" [y]="contextMenuProperties.y"
-                      [actions]="contextMenuProperties.actions"
+  <octra-context-menu
+    #contextMenu
+    [x]="contextMenuProperties.x"
+    [y]="contextMenuProperties.y"
+    [actions]="contextMenuProperties.actions"
   ></octra-context-menu>
-  <octra-validation-popover #validationPopover
-                            [ngStyle]="{
-                                'margin-left': popovers.validation.location.x + 'px',
-                                'margin-top': popovers.validation.location.y + 'px'
-                            }">
+  <octra-validation-popover
+    #validationPopover
+    [ngStyle]="{
+      'margin-left': popovers.validation.location.x + 'px',
+      'margin-top': popovers.validation.location.y + 'px'
+    }"
+  >
   </octra-validation-popover>
   <table class="table table-bordered bg-white">
     <thead>
-    <tr id="table-head">
-      <th></th>
-      <th style="vertical-align: middle;text-align: center;">{{"general.time" | transloco}}</th>
-      <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}<br/></th>
-      <th style="vertical-align: middle;text-align: center;">{{"general.transcript" | transloco}}</th>
-      <th style="text-align: center; vertical-align: middle;">
-        <i [classList]="['bi', playAllState.icon]" style="margin-right: 5px;"></i>
-        <input (click)="toggleSkipCheckbox()" [checked]="playAllState.skipSilence" id="skip-silence-checkbox"
-               type="checkbox">
-        <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
-      </th>
-    </tr>
-    <tr class="sub-header">
-      <td></td>
-      <td></td>
-      <td>
-        <div class="dropdown">
-          <button class="btn btn-primary btn-sm btn-outline-info dropdown-toggle" type="button" id="actionsDropdown"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{"general.actions" | transloco}}
-          </button>
-          <div class="dropdown-menu" aria-labelledby="actionsDropdown">
-            <table>
-              <tbody>
-              <tr (click)="mergeAllWithSameLabel()" class="dropdown-row">
-                <td class="dropdown-icon">
-                  <i class="bi bi"></i>
-                  <i class="bi bi-grid-1x2-fill"></i>
-                </td>
-                <td class="dropdown-option">{{"trn-editor.speaker-actions.merge segments by speaker" | transloco}}</td>
-              </tr>
-              <tr (click)="openPermutationsReplaceModal()" class="dropdown-row">
-                <td class="dropdown-icon">
-                  <i class="bi bi-arrow-left-right"></i>
-                </td>
-                <td class="dropdown-option">{{"trn-editor.speaker-actions.permutations replace" | transloco}}</td>
-              </tr>
-              </tbody>
-            </table>
+      <tr id="table-head">
+        <th></th>
+        <th style="vertical-align: middle; text-align: center">
+          {{ 'general.time' | transloco }}
+        </th>
+        <th style="vertical-align: middle; text-align: center">
+          {{ 'general.speaker' | transloco }}<br />
+        </th>
+        <th style="vertical-align: middle; text-align: center">
+          {{ 'general.transcript' | transloco }}
+        </th>
+        <th style="text-align: center; vertical-align: middle">
+          <i
+            [classList]="['bi', playAllState.icon]"
+            style="margin-right: 5px"
+          ></i>
+          <input
+            (click)="toggleSkipCheckbox()"
+            [checked]="playAllState.skipSilence"
+            id="skip-silence-checkbox"
+            type="checkbox"
+          />
+          <label for="skip-silence-checkbox">{{
+            'general.skip silence' | transloco
+          }}</label>
+        </th>
+      </tr>
+      <tr class="sub-header">
+        <td></td>
+        <td></td>
+        <td>
+          <div class="dropdown">
+            <button
+              class="btn btn-primary btn-sm btn-outline-info dropdown-toggle"
+              type="button"
+              id="actionsDropdown"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {{ 'general.actions' | transloco }}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="actionsDropdown">
+              <table>
+                <tbody>
+                  <tr (click)="mergeAllWithSameLabel()" class="dropdown-row">
+                    <td class="dropdown-icon">
+                      <i class="bi bi"></i>
+                      <i class="bi bi-grid-1x2-fill"></i>
+                    </td>
+                    <td class="dropdown-option">
+                      {{
+                        'trn-editor.speaker-actions.merge segments by speaker'
+                          | transloco
+                      }}
+                    </td>
+                  </tr>
+                  <tr
+                    (click)="openPermutationsReplaceModal()"
+                    class="dropdown-row"
+                  >
+                    <td class="dropdown-icon">
+                      <i class="bi bi-arrow-left-right"></i>
+                    </td>
+                    <td class="dropdown-option">
+                      {{
+                        'trn-editor.speaker-actions.permutations replace'
+                          | transloco
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </td>
-      <td></td>
-      <td></td>
-    </tr>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row"
+      <tr
+        *ngFor="let segment of shownSegments; let i = index"
+        class="segment-row"
         [ngClass]="{
-      'segment-selected': segment.isSelected,
-      'table-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
-      'table-info': segment.transcription.text === transcrService.breakMarker.code,
-      'table-danger': segment.transcription.text === '',
-      'active-playback': i === playAllState.currentSegment
-  }">
-      <td class="active-column fitwidth" (click)="onTableLineClick($event, i)">
-        <i class="bi bi-circle" *ngIf="i === textEditor.selectedSegment; else checkExclamation;"  style="color:green;font-size: 10px;"></i>
-        <ng-template #checkExclamation>
-          <i class="bi bi-exclamation-triangle segment-warning" [ngStyle]="{
-                  'color': 'red',
-                  'display': ((segment.transcription.safeHTML.toString().indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"></i>
-        </ng-template>
-      </td>
-      <td class="time-column fitwidth" (click)="onTimestampMouseDown($event, i)" (contextmenu)="onContextMenuClick($event)">
-        {{getStartPoint(i) | timespan: {
-        showMilliSeconds: true,
-        showHour: true
-      }
-        }}
-      </td>
-      <td class="alert label-column fitwidth" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
-          (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)">
-        {{segment.label}}
-      </td>
+          'segment-selected': segment.isSelected,
+          'table-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !== transcrService.breakMarker.code,
+          'table-info':
+            segment.transcription.text === transcrService.breakMarker.code,
+          'table-danger': segment.transcription.text === '',
+          'active-playback': i === playAllState.currentSegment
+        }"
+      >
+        <td
+          class="active-column fitwidth"
+          (click)="onTableLineClick($event, i)"
+        >
+          <i
+            class="bi bi-circle"
+            *ngIf="i === textEditor.selectedSegment; else checkExclamation"
+            style="color: green; font-size: 10px"
+          ></i>
+          <ng-template #checkExclamation>
+            <i
+              class="bi bi-exclamation-triangle segment-warning"
+              [ngStyle]="{
+                color: 'red',
+                display:
+                  segment.transcription.safeHTML
+                    .toString()
+                    .indexOf('<span class=\'val-error\'') > -1
+                    ? 'normal'
+                    : 'none'
+              }"
+            ></i>
+          </ng-template>
+        </td>
+        <td
+          class="time-column fitwidth"
+          (click)="onTimestampMouseDown($event, i)"
+          (contextmenu)="onContextMenuClick($event)"
+        >
+          {{
+            getStartPoint(i)
+              | timespan
+                : {
+                    showMilliSeconds: true,
+                    showHour: true
+                  }
+          }}
+        </td>
+        <td
+          class="alert label-column fitwidth"
+          #labelCol
+          (keyup)="onLabelKeyUp(labelCol)"
+          (keydown)="onLabelKeyDown($event, labelCol, i)"
+          (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)"
+        >
+          {{ segment.label }}
+        </td>
 
-      <td class="alert transcript-column"
-          *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive">
-        <div id="transcription-panel">
-          <octra-audio-navigation
-            [easyMode]="appStorage.easymode"
-            [playbackRate]="appStorage.audioSpeed"
-            [audioChunk]="textEditor.audiochunk"
-            [responsive]="settingsService.responsive.enabled"
-            [volume]="appStorage.audioVolume"
-          ></octra-audio-navigation>
-          <octra-audio-viewer *ngIf="!showSignalDisplay" class="viewer" #viewer [settings]="audioViewerSettings"
-                              [audioChunk]="textEditor.audiochunk"
-                              [isMultiLine]="false" [transcriptionLevel]="transcrService.currentlevel"
-                              style="height:50px;"
-          >
-          </octra-audio-viewer>
-          <octra-transcr-editor #transcrEditor
-                                (onkeyup)="onKeyUp($event, i)"
-                                [transcript]="textEditor.transcript"
-                                [audiochunk]="textEditor.audiochunk"
-                                [height]="60"
-                                [markers]="(transcrService.guidelines !== undefined) ? transcrService.guidelines.markers : undefined"
-          ></octra-transcr-editor>
-          <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('up', i)">
-            <i class="bi bi-arrow-up"></i> SAVE & UP
-          </button>
-          <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('down', i)">
-            <i class="bi bi-arrow-down"></i> SAVE & DOWN
-          </button>
-        </div>
-      </td>
-      <ng-template #editorNotActive>
-        <td (mousedown)="onTranscriptCellMouseOver($event, i, scrollContainer); onTranscriptCellMouseDown($event, i);"
+        <td
+          class="alert transcript-column"
+          *ngIf="
+            textEditor.state === 'active' && textEditor.selectedSegment === i;
+            else editorNotActive
+          "
+        >
+          <div id="transcription-panel">
+            <octra-audio-navigation
+              [easyMode]="appStorage.easymode"
+              [playbackRate]="appStorage.audioSpeed"
+              [audioChunk]="textEditor.audiochunk"
+              [responsive]="settingsService.responsive.enabled"
+              [volume]="appStorage.audioVolume"
+            ></octra-audio-navigation>
+            <octra-audio-viewer
+              *ngIf="!showSignalDisplay"
+              class="viewer"
+              #viewer
+              [settings]="audioViewerSettings"
+              [audioChunk]="textEditor.audiochunk"
+              [isMultiLine]="false"
+              [transcriptionLevel]="transcrService.currentlevel"
+              style="height: 50px"
+            >
+            </octra-audio-viewer>
+            <octra-transcr-editor
+              #transcrEditor
+              (onkeyup)="onKeyUp($event, i)"
+              [transcript]="textEditor.transcript"
+              [audiochunk]="textEditor.audiochunk"
+              [height]="60"
+              [markers]="
+                transcrService.guidelines !== undefined
+                  ? transcrService.guidelines.markers
+                  : undefined
+              "
+            ></octra-transcr-editor>
+            <button
+              class="btn btn-sm btn-primary btn-info btn-raised w-50"
+              (click)="navigateBetweenCells('up', i)"
+            >
+              <i class="bi bi-arrow-up"></i> SAVE & UP
+            </button>
+            <button
+              class="btn btn-sm btn-primary btn-info btn-raised w-50"
+              (click)="navigateBetweenCells('down', i)"
+            >
+              <i class="bi bi-arrow-down"></i> SAVE & DOWN
+            </button>
+          </div>
+        </td>
+        <ng-template #editorNotActive>
+          <td
+            (mousedown)="
+              onTranscriptCellMouseOver($event, i, scrollContainer);
+              onTranscriptCellMouseDown($event, i)
+            "
             (mousemove)="onTranscriptCellMouseOver($event, i, scrollContainer)"
-            [innerHTML]="segment.transcription.safeHTML" class="transcript-column"></td>
-      </ng-template>
+            [innerHTML]="segment.transcription.safeHTML"
+            class="transcript-column"
+          ></td>
+        </ng-template>
 
-      <td class="control-column" style="width:100px;" (click)="onTableLineClick($event, i)">
-        <i [classList]="['bi', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></i>
-      </td>
-    </tr>
-    <tr>
-      <td class="active-column fitwidth">
-      </td>
-      <td class="time-column fitwidth">
-        {{ audioChunk.time.duration.unix| timespan: {
-        showMilliSeconds: true,
-        showHour: true
-      }
-        }}
-      </td>
-      <td class="transcript-column" colspan="3" style="text-align: center;">
-        <hr/>
-      </td>
-    </tr>
+        <td
+          class="control-column"
+          style="width: 100px"
+          (click)="onTableLineClick($event, i)"
+        >
+          <i
+            [classList]="['bi', playStateSegments[i].icon]"
+            (click)="playSelectedSegment(i)"
+          ></i>
+        </td>
+      </tr>
+      <tr>
+        <td class="active-column fitwidth"></td>
+        <td class="time-column fitwidth">
+          {{
+            audioChunk.time.duration.unix
+              | timespan
+                : {
+                    showMilliSeconds: true,
+                    showHour: true
+                  }
+          }}
+        </td>
+        <td class="transcript-column" colspan="3" style="text-align: center">
+          <hr />
+        </td>
+      </tr>
     </tbody>
   </table>
 </div>

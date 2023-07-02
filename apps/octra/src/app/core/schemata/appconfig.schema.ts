@@ -1,115 +1,107 @@
 export const AppConfigSchema = {
-  'properties': {
-    'version': {
-      'type': 'string'
+  properties: {
+    version: {
+      type: 'string',
     },
-    'api': {
-      'properties': {
-        'url': {
-          'type': 'string'
+    api: {
+      properties: {
+        url: {
+          type: 'string',
         },
-        'appToken': {
-          "type": "string"
-        }
+        appToken: {
+          type: 'string',
+        },
       },
-      "type": "object"
+      type: 'object',
     },
-    "octra": {
-      "properties": {
-        "database": {
-          "properties": {
-            "name": {
-              "type": "string"
-            }
-          },
-          "type": "object",
-          "required": [
-            "name"
-          ]
-        },
-        "login": {
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            }
-          },
-          "type": "object"
-        },
-        "showdetails": {
-          "type": "boolean"
-        },
-        "responsive": {
-          "$id": "/properties/octra/responsive",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
+    octra: {
+      properties: {
+        database: {
+          properties: {
+            name: {
+              type: 'string',
             },
-            "fixedwidth": {
-              "type": "number"
-            }
           },
-          "type": "object"
+          type: 'object',
+          required: ['name'],
         },
-        "bugreport": {
-          "properties": {
-            "enabled": {
-              "type": "boolean"
+        login: {
+          properties: {
+            enabled: {
+              type: 'boolean',
             },
-            "name": {
-              "type": "string"
-            },
-            "auth_token": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            }
           },
-          "type": "object"
+          type: 'object',
         },
-        "allowed_browsers": {
-          "items": {
-            "properties": {
-              "name": {
-                "type": "string"
+        showdetails: {
+          type: 'boolean',
+        },
+        responsive: {
+          $id: '/properties/octra/responsive',
+          properties: {
+            enabled: {
+              type: 'boolean',
+            },
+            fixedwidth: {
+              type: 'number',
+            },
+          },
+          type: 'object',
+        },
+        bugreport: {
+          properties: {
+            enabled: {
+              type: 'boolean',
+            },
+            name: {
+              type: 'string',
+            },
+            auth_token: {
+              type: 'string',
+            },
+            url: {
+              type: 'string',
+            },
+          },
+          type: 'object',
+        },
+        allowed_browsers: {
+          items: {
+            properties: {
+              name: {
+                type: 'string',
               },
-              "version": {
-                "type": "string"
-              }
+              version: {
+                type: 'string',
+              },
             },
-            "type": "object"
+            type: 'object',
           },
-          "type": "array"
+          type: 'array',
         },
-        "allowed_projects": {
-          "items": {
-            "properties": {
-              "name": {
-                "type": "string"
-              }
+        allowed_projects: {
+          items: {
+            properties: {
+              name: {
+                type: 'string',
+              },
             },
-            "type": "object"
+            type: 'object',
           },
-          "type": "array"
+          type: 'array',
         },
-        "languages": {
-          "items": {
-            "type": "string"
+        languages: {
+          items: {
+            type: 'string',
           },
-          "type": "array"
-        }
+          type: 'array',
+        },
       },
-      "type": "object",
-      "required": [
-        "database"
-      ]
-    }
+      type: 'object',
+      required: ['database'],
+    },
   },
-  "type": "object",
-  "required": [
-    "version",
-    "api",
-    "octra"
-  ],
-  "additionalProperties": true
-}
+  type: 'object',
+  required: ['version', 'api', 'octra'],
+  additionalProperties: true,
+};

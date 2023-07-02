@@ -1,6 +1,6 @@
-import { NavigationExtras } from "@angular/router";
-import { EmailBugReporter } from "./core/obj/BugAPI/EmailBugReporter";
-import { OggFormat, WavFormat } from "@octra/media";
+import { NavigationExtras } from '@angular/router';
+import { EmailBugReporter } from './core/obj/BugAPI/EmailBugReporter';
+import { OggFormat, WavFormat } from '@octra/media';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -12,21 +12,16 @@ import {
   PraatTextgridConverter,
   SRTConverter,
   TextConverter,
-  WebVTTConverter
-} from "@octra/annotation";
+  WebVTTConverter,
+} from '@octra/annotation';
 
 declare let octraVersion: string;
 declare let octraLastUpdated: string;
 
 export class AppInfo {
-  public static readonly audioformats = [
-    new WavFormat(),
-    new OggFormat()
-  ];
+  public static readonly audioformats = [new WavFormat(), new OggFormat()];
 
-  public static readonly bugreporters = [
-    new EmailBugReporter()
-  ];
+  public static readonly bugreporters = [new EmailBugReporter()];
 
   public static readonly converters: Converter[] = [
     new AnnotJSONConverter(),
@@ -38,17 +33,15 @@ export class AppInfo {
     new ELANConverter(),
     new SRTConverter(),
     new WebVTTConverter(),
-    new TextConverter()
+    new TextConverter(),
   ];
 
-  public static readonly themes: string[] = [
-    'default',
-    'shortAudioFiles'
-  ];
+  public static readonly themes: string[] = ['default', 'shortAudioFiles'];
 
   static readonly version = octraVersion;
   static readonly lastUpdate = octraLastUpdated;
-  static readonly manualURL = 'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
+  static readonly manualURL =
+    'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
 
   static readonly debugging = true;
 
@@ -56,6 +49,6 @@ export class AppInfo {
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',
-    preserveFragment: false
+    preserveFragment: false,
   };
 }

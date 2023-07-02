@@ -1,6 +1,10 @@
-<div #validationContainer [ngClass]="{
+<div
+  #validationContainer
+  [ngClass]="{
     'hide-popover': visible
-}" class="card shadow">
-  <div class="card-header">{{title}}</div>
+  }"
+  class="card shadow"
+>
+  <div class="card-header">{{ title }}</div>
   <div [innerHTML]="sanitizedDescription" class="card-body"></div>
 </div>

@@ -1,28 +1,28 @@
-import { createAction, props } from "@ngrx/store";
-import { ProjectSettings } from "../../obj/Settings";
+import { createAction, props } from '@ngrx/store';
+import { ProjectSettings } from '../../obj/Settings';
 
-const context = "Configuration";
+const context = 'Configuration';
 
 export class ConfigurationActions {
   // TODO remove this class
   public static projectConfigurationLoaded = createAction(
     `[${context}] Project config loaded success`,
     props<{
-      projectConfig: ProjectSettings
+      projectConfig: ProjectSettings;
     }>()
   );
 
   public static loadGuidelines = createAction(
     `[${context}] Load guidelines`,
     props<{
-      projectConfig: ProjectSettings
+      projectConfig: ProjectSettings;
     }>()
   );
 
   public static loadGuidelinesSuccess = createAction(
     `[${context}] Load Guidelines Success`,
     props<{
-      guidelines: any
+      guidelines: any;
     }>()
   );
 
@@ -37,7 +37,7 @@ export class ConfigurationActions {
   public static loadMethodsFailed = createAction(
     `[${context}] Load Methods Failed`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 }

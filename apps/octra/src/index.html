@@ -1,97 +1,124 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <base href="/">
-  <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control">
-  <meta content="no-cache" http-equiv="Pragma">
-  <meta content="0" http-equiv="Expires">
-  <meta content="noindex" name="robots">
-  <link href="assets/img/octra.ico" rel="shortcut icon" type="image/x-icon">
-  <title>OCTRA - Orthographic Transcription</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-  <meta name="generator" content="Hugo 0.80.0">
-  <title>OCTRA - Orthographic Transcription</title>
-  <meta content="OCTRA is a modern online tool for the orthographic transcription of audio files.
+  <head>
+    <base href="/" />
+    <meta
+      content="no-cache, no-store, must-revalidate"
+      http-equiv="Cache-Control"
+    />
+    <meta content="no-cache" http-equiv="Pragma" />
+    <meta content="0" http-equiv="Expires" />
+    <meta content="noindex" name="robots" />
+    <link href="assets/img/octra.ico" rel="shortcut icon" type="image/x-icon" />
+    <title>OCTRA - Orthographic Transcription</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta
+      name="author"
+      content="Mark Otto, Jacob Thornton, and Bootstrap contributors"
+    />
+    <meta name="generator" content="Hugo 0.80.0" />
+    <title>OCTRA - Orthographic Transcription</title>
+    <meta
+      content="OCTRA is a modern online tool for the orthographic transcription of audio files.
     It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features:
     multiple editors and tiers, auto-saving, transcription guidelines support of various file formats and a lot more."
-        name="description"/>
-  <!-- Twitter Card data -->
-  <meta content="summary" name="twitter:card">
-  <meta content="OCTRA - modern web-application for the orthographic transcription" name="twitter:title">
-  <meta content="OCTRA is a modern online tool for the orthographic transcription of audio files.
+      name="description"
+    />
+    <!-- Twitter Card data -->
+    <meta content="summary" name="twitter:card" />
+    <meta
+      content="OCTRA - modern web-application for the orthographic transcription"
+      name="twitter:title"
+    />
+    <meta
+      content="OCTRA is a modern online tool for the orthographic transcription of audio files.
     It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features:
     multiple editors and tiers, auto-saving, transcription guidelines support of various file formats and a lot more."
-        name="twitter:description">
-  <meta content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_twitter.jpg"
-        name="twitter:image">
+      name="twitter:description"
+    />
+    <meta
+      content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_twitter.jpg"
+      name="twitter:image"
+    />
 
-  <!-- Open Graph data -->
-  <meta content="OCTRA - modern web-application for the orthographic transcription" property="og:title"/>
-  <meta content="article" property="og:type"/>
-  <meta content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/features" property="og:url"/>
-  <meta content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_fb.jpg"
-        property="og:image"/>
-  <meta
-    content="OCTRA is a modern online tool for the orthographic transcription of audio files. It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features: multiple editors and tiers, auto-saving, transcription guidelines support various file formats and a lot more."
-    property="og:description"/>
-  <style>
-    #logo {
-      text-align: center;
-      width: 100%;
-      display: block;
-      font-size: 4em;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-weight: 300;
-    }
+    <!-- Open Graph data -->
+    <meta
+      content="OCTRA - modern web-application for the orthographic transcription"
+      property="og:title"
+    />
+    <meta content="article" property="og:type" />
+    <meta
+      content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/features"
+      property="og:url"
+    />
+    <meta
+      content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_fb.jpg"
+      property="og:image"
+    />
+    <meta
+      content="OCTRA is a modern online tool for the orthographic transcription of audio files. It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features: multiple editors and tiers, auto-saving, transcription guidelines support various file formats and a lot more."
+      property="og:description"
+    />
+    <style>
+      #logo {
+        text-align: center;
+        width: 100%;
+        display: block;
+        font-size: 4em;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-weight: 300;
+      }
 
-    /* copy from bootstrap-material */
-    .progress {
-      height: 4px;
-      border-radius: 0;
-      -webkit-box-shadow: none;
-      box-shadow: none;
-      background: #c8c8c8;
-    }
+      /* copy from bootstrap-material */
+      .progress {
+        height: 4px;
+        border-radius: 0;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        background: #c8c8c8;
+      }
 
-    .progress .progress-bar {
-      -webkit-box-shadow: none;
-      box-shadow: none;
-    }
+      .progress .progress-bar {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+      }
 
-    .progress {
-      height: 10px !important;
-      background: transparent !important;
-      border: 1px solid #009688 !important;
-    }
+      .progress {
+        height: 10px !important;
+        background: transparent !important;
+        border: 1px solid #009688 !important;
+      }
 
-    .progress-bar {
-      background-color: #009688 !important;
-    }
-  </style>
-  <script type="application/javascript">
-    const octraLastUpdated = "2015-02-26T14:10:43+01:00";
-    const octraVersion = "2.0.0";
-  </script>
-</head>
-<body>
-<octra-app>
-  <div id="loading" style="margin-top:150px;padding:20px;">
-    <span id="logo" style="font-size:5em;">OCTRA</span>
-    <div class="progress">
-      <div class="progress-bar progress-animated" style="width:100%">
+      .progress-bar {
+        background-color: #009688 !important;
+      }
+    </style>
+    <script type="application/javascript">
+      const octraLastUpdated = '2015-02-26T14:10:43+01:00';
+      const octraVersion = '2.0.0';
+    </script>
+  </head>
+  <body>
+    <octra-app>
+      <div id="loading" style="margin-top: 150px; padding: 20px">
+        <span id="logo" style="font-size: 5em">OCTRA</span>
+        <div class="progress">
+          <div class="progress-bar progress-animated" style="width: 100%"></div>
+        </div>
+        <div class="description" style="margin-top: 20px; text-align: center">
+          Please wait... OCTRA is loading...
+        </div>
+        <noscript>
+          <p style="text-align: center; color: red">
+            You need Javascript to use this Web-application
+          </p>
+        </noscript>
       </div>
-    </div>
-    <div class="description" style="margin-top:20px;text-align:center;">
-      Please wait... OCTRA is loading...
-    </div>
-    <noscript>
-      <p style="text-align:center;color:red"> You need Javascript to use this Web-application</p>
-    </noscript>
-  </div>
-</octra-app>
-</body>
+    </octra-app>
+  </body>
 </html>

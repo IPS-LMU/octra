@@ -1,6 +1,19 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { BrowserInfo, contains, ShortcutEvent, ShortcutGroup, SubscriptionManager } from "@octra/utilities";
-import { TranscrEditorComponent } from "../../core/component/transcr-editor";
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  BrowserInfo,
+  contains,
+  ShortcutEvent,
+  ShortcutGroup,
+  SubscriptionManager,
+} from '@octra/utilities';
+import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 
 import {
   AlertService,
@@ -9,29 +22,44 @@ import {
   KeymappingService,
   SettingsService,
   TranscriptionService,
-  UserInteractionsService
-} from "../../core/shared/service";
-import { AppStorageService } from "../../core/shared/service/appstorage.service";
-import { OCTRAEditor } from "../octra-editor";
-import { AudioViewerComponent, AudioviewerConfig, AudioViewerShortcutEvent } from "@octra/ngx-components";
-import { AudioChunk, AudioManager, AudioSelection, SampleUnit } from "@octra/media";
-import { LoginMode } from "../../core/store";
-import { Subscription, timer } from "rxjs";
-import { AudioNavigationComponent } from "../../core/component/audio-navigation";
+  UserInteractionsService,
+} from '../../core/shared/service';
+import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { OCTRAEditor } from '../octra-editor';
+import {
+  AudioViewerComponent,
+  AudioviewerConfig,
+  AudioViewerShortcutEvent,
+} from '@octra/ngx-components';
+import {
+  AudioChunk,
+  AudioManager,
+  AudioSelection,
+  SampleUnit,
+} from '@octra/media';
+import { LoginMode } from '../../core/store';
+import { Subscription, timer } from 'rxjs';
+import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 
 @Component({
   selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
-  styleUrls: ['./linear-editor.component.scss']
+  styleUrls: ['./linear-editor.component.scss'],
 })
-export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit {
+export class LinearEditorComponent
+  extends OCTRAEditor
+  implements OnInit, AfterViewInit
+{
   public static editorname = 'Linear Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
-  @ViewChild('signalDisplayTop', {static: true}) signalDisplayTop: AudioViewerComponent;
-  @ViewChild('miniloupeComponent', {static: false}) miniloupeComponent: AudioViewerComponent;
-  @ViewChild('signalDisplayDown', {static: false}) signalDisplayDown: AudioViewerComponent;
-  @ViewChild('nav', {static: true}) nav: AudioNavigationComponent;
-  @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
+  @ViewChild('signalDisplayTop', { static: true })
+  signalDisplayTop: AudioViewerComponent;
+  @ViewChild('miniloupeComponent', { static: false })
+  miniloupeComponent: AudioViewerComponent;
+  @ViewChild('signalDisplayDown', { static: false })
+  signalDisplayDown: AudioViewerComponent;
+  @ViewChild('nav', { static: true }) nav: AudioNavigationComponent;
+  @ViewChild('transcr', { static: true }) public editor: TranscrEditorComponent;
   public segmentselected = false;
   public loupeSettings: AudioviewerConfig;
   public miniloupe = {
@@ -39,12 +67,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     isHidden: true,
     size: {
       width: 160,
-      height: 160
+      height: 160,
     },
     location: {
       x: 0,
-      y: 0
-    }
+      y: 0,
+    },
   };
   public audioManager: AudioManager;
   public audioChunkTop: AudioChunk;
@@ -69,39 +97,39 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         name: 'play_pause',
         keys: {
           mac: 'TAB',
-          pc: 'TAB'
+          pc: 'TAB',
         },
         title: 'play pause',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'stop',
         keys: {
           mac: 'ESC',
-          pc: 'ESC'
+          pc: 'ESC',
         },
         title: 'stop playback',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'step_backward',
         keys: {
           mac: 'SHIFT + BACKSPACE',
-          pc: 'SHIFT + BACKSPACE'
+          pc: 'SHIFT + BACKSPACE',
         },
         title: 'step backward',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'step_backwardtime',
         keys: {
           mac: 'SHIFT + TAB',
-          pc: 'SHIFT + TAB'
+          pc: 'SHIFT + TAB',
         },
         title: 'step backward time',
-        focusonly: false
-      }
-    ]
+        focusonly: false,
+      },
+    ],
   };
 
   private audioShortcutsBottomDisplay: ShortcutGroup = {
@@ -112,39 +140,39 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         name: 'play_pause',
         keys: {
           mac: 'SHIFT + SPACE',
-          pc: 'SHIFT + SPACE'
+          pc: 'SHIFT + SPACE',
         },
         title: 'play pause',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'stop',
         keys: {
           mac: 'ESC',
-          pc: 'ESC'
+          pc: 'ESC',
         },
         title: 'stop playback',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'step_backward',
         keys: {
           mac: 'SHIFT + ENTER',
-          pc: 'SHIFT + ENTER'
+          pc: 'SHIFT + ENTER',
         },
         title: 'step backward',
-        focusonly: false
+        focusonly: false,
       },
       {
         name: 'step_backwardtime',
         keys: {
           mac: 'SHIFT + ´',
-          pc: 'SHIFT + ´'
+          pc: 'SHIFT + ´',
         },
         title: 'step backward time',
-        focusonly: false
-      }
-    ]
+        focusonly: false,
+      },
+    ],
   };
 
   public transcript = '';
@@ -158,9 +186,15 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   get segmententer_shortc(): string {
-    const segmentEnterShortcut = this.signalDisplayTop.settings.shortcuts.items.find(a => a.name === 'segment_enter');
-    if (segmentEnterShortcut !== undefined && this.signalDisplayTop.settings !== undefined) {
-      return segmentEnterShortcut.keys[this.platform]
+    const segmentEnterShortcut =
+      this.signalDisplayTop.settings.shortcuts.items.find(
+        (a) => a.name === 'segment_enter'
+      );
+    if (
+      segmentEnterShortcut !== undefined &&
+      this.signalDisplayTop.settings !== undefined
+    ) {
+      return segmentEnterShortcut.keys[this.platform];
     }
     return '';
   }
@@ -173,34 +207,50 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   private shortcutsEnabled = true;
 
-  constructor(public audio: AudioService,
-              public alertService: AlertService,
-              public keyMap: KeymappingService,
-              public transcrService: TranscriptionService,
-              public cd: ChangeDetectorRef,
-              public uiService: UserInteractionsService,
-              public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+  constructor(
+    public audio: AudioService,
+    public alertService: AlertService,
+    public keyMap: KeymappingService,
+    public transcrService: TranscriptionService,
+    public cd: ChangeDetectorRef,
+    public uiService: UserInteractionsService,
+    public settingsService: SettingsService,
+    public appStorage: AppStorageService
+  ) {
     super();
     this.subscrManager = new SubscriptionManager<Subscription>();
 
-    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-      this.subscrManager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
-        if (event.shortcut === 'SHIFT + ALT + 1' ||
-          event.shortcut === 'SHIFT + ALT + 2' ||
-          event.shortcut === 'SHIFT + ALT + 3') {
-
-          this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            if (this.audioChunkDown !== undefined && this.segmentselected && this.selectedIndex > -1) {
-              this.editor.updateRawText();
-              this.save();
-              resolve();
-            } else {
-              resolve();
+    if (
+      this.appStorage.useMode === LoginMode.ONLINE ||
+      this.appStorage.useMode === LoginMode.DEMO
+    ) {
+      this.subscrManager.add(
+        this.keyMap.beforeShortcutTriggered.subscribe(
+          (event: ShortcutEvent) => {
+            if (
+              event.shortcut === 'SHIFT + ALT + 1' ||
+              event.shortcut === 'SHIFT + ALT + 2' ||
+              event.shortcut === 'SHIFT + ALT + 3'
+            ) {
+              this.transcrService.tasksBeforeSend.push(
+                new Promise<void>((resolve) => {
+                  if (
+                    this.audioChunkDown !== undefined &&
+                    this.segmentselected &&
+                    this.selectedIndex > -1
+                  ) {
+                    this.editor.updateRawText();
+                    this.save();
+                    resolve();
+                  } else {
+                    resolve();
+                  }
+                })
+              );
             }
-          }));
-        }
-      }));
+          }
+        )
+      );
     }
   }
 
@@ -228,7 +278,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.appStorage.saving.emit('success');
       }
     }
-  }
+  };
 
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
@@ -239,13 +289,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.keyMap.register({
       name: 'signaldisplay_top_audio',
       enabled: true,
-      items: this.audioShortcutsTopDisplay.items
+      items: this.audioShortcutsTopDisplay.items,
     });
 
     this.keyMap.register({
       name: 'signaldisplay_top',
       enabled: true,
-      items: this.signalDisplayTop.settings.shortcuts.items
+      items: this.signalDisplayTop.settings.shortcuts.items,
     });
 
     this.signalDisplayTop.settings.shortcutsEnabled = true;
@@ -260,12 +310,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.keyMap.register({
       name: 'signaldisplay_down_audio',
       enabled: true,
-      items: this.audioShortcutsBottomDisplay.items
+      items: this.audioShortcutsBottomDisplay.items,
     });
     this.keyMap.register({
       name: 'signaldisplay_down',
       enabled: true,
-      items: this.loupeSettings.shortcuts.items
+      items: this.loupeSettings.shortcuts.items,
     });
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
@@ -288,26 +338,33 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.disabledKeys.push('SHIFT + SPACE');
 
-    this.subscrManager.add(this.transcrService.currentLevelSegmentChange.subscribe(
-      ($event) => {
+    this.subscrManager.add(
+      this.transcrService.currentLevelSegmentChange.subscribe(($event) => {
         if (!this.saving) {
-          this.subscrManager.add(timer(1000).subscribe(() => {
-            this.saving = true;
-            this.onSegmentChange();
-          }));
+          this.subscrManager.add(
+            timer(1000).subscribe(() => {
+              this.saving = true;
+              this.onSegmentChange();
+            })
+          );
         }
-      }
-    ));
+      })
+    );
 
-    this.subscrManager.add(this.signalDisplayTop.alert.subscribe(
-      (result) => {
-        this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
-          console.error(error);
-        });
-      }
-    ));
+    this.subscrManager.add(
+      this.signalDisplayTop.alert.subscribe((result) => {
+        this.alertService
+          .showAlert(result.type as AlertType, result.message)
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+    );
 
-    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered), 'shortcut');
+    this.subscrManager.add(
+      this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered),
+      'shortcut'
+    );
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -321,16 +378,22 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.keyMap.unregisterAll();
   }
 
-  onButtonClick(event: {
-    type: string, timestamp: number
-  }) {
+  onButtonClick(event: { type: string; timestamp: number }) {
     // only top signal display
     const caretpos = this.editor.caretpos;
-    this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audioManager.playPosition, caretpos, {
+    this.uiService.addElementFromEvent(
+      'mouseclick',
+      { value: event.type },
+      event.timestamp,
+      this.audioManager.playPosition,
+      caretpos,
+      {
         start: this.signalDisplayTop.av.drawnSelection.start.samples,
-        length: this.signalDisplayTop.av.drawnSelection.duration.samples
-      }, undefined, 'audio_buttons');
+        length: this.signalDisplayTop.av.drawnSelection.duration.samples,
+      },
+      undefined,
+      'audio_buttons'
+    );
   }
 
   ngAfterViewInit() {
@@ -340,18 +403,15 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
 
     this.subscrManager.add(
-      this.transcrService.segmentrequested.subscribe(
-        (segnumber: number) => {
-          this.openSegment(segnumber);
-        }
-      )
+      this.transcrService.segmentrequested.subscribe((segnumber: number) => {
+        this.openSegment(segnumber);
+      })
     );
 
-    const subscr = this.signalDisplayTop.onInitialized.subscribe(
-      () => {
-        LinearEditorComponent.initialized.emit();
-        subscr.unsubscribe();
-      });
+    const subscr = this.signalDisplayTop.onInitialized.subscribe(() => {
+      LinearEditorComponent.initialized.emit();
+      subscr.unsubscribe();
+    });
   }
 
   onSelectionChanged(selection: AudioSelection) {
@@ -362,7 +422,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         if (this.audioChunkDown !== undefined) {
           this.audioChunkDown.destroy();
         }
-        this.audioChunkDown = new AudioChunk(this.audioChunkTop.selection.clone(), this.audioManager);
+        this.audioChunkDown = new AudioChunk(
+          this.audioChunkTop.selection.clone(),
+          this.audioManager
+        );
       } else {
         this.audioChunkDown = undefined;
         this.selectedAudioChunk = this.audioChunkTop;
@@ -380,21 +443,27 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.saving = false;
   }
 
-  onMouseOver($event: {
-    event: MouseEvent | undefined, time: SampleUnit
-  }) {
+  onMouseOver($event: { event: MouseEvent | undefined; time: SampleUnit }) {
     this.subscrManager.removeByTag('mouseTimer');
 
     this.miniloupe.component = this.signalDisplayTop;
 
-    this.doPlayOnHover(this.audioManager, this.appStorage.playonhover, this.audioChunkTop, this.signalDisplayTop.av.mouseCursor);
+    this.doPlayOnHover(
+      this.audioManager,
+      this.appStorage.playonhover,
+      this.audioChunkTop,
+      this.signalDisplayTop.av.mouseCursor
+    );
 
     if (this.appStorage.showLoupe) {
       this.miniloupe.isHidden = false;
-      this.subscrManager.add(timer(20).subscribe(() => {
-        this.changeLoupePosition($event.event, $event.time);
-        this.mousestate = 'ended';
-      }), 'mouseTimer');
+      this.subscrManager.add(
+        timer(20).subscribe(() => {
+          this.changeLoupePosition($event.event, $event.time);
+          this.mousestate = 'ended';
+        }),
+        'mouseTimer'
+      );
     }
   }
 
@@ -407,13 +476,28 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     });
 
     if (this.appStorage.logging) {
-      const start = ($event.index > 0) ? this.transcrService.currentlevel.segments.get($event.index - 1).time.samples : 0;
-      this.uiService.addElementFromEvent('segment', {
-        value: 'entered'
-      }, Date.now(), this.audioManager.playPosition, -1, undefined, {
-        start,
-        length: this.transcrService.currentlevel.segments.get($event.index).time.samples - start
-      }, LinearEditorComponent.editorname);
+      const start =
+        $event.index > 0
+          ? this.transcrService.currentlevel.segments.get($event.index - 1).time
+              .samples
+          : 0;
+      this.uiService.addElementFromEvent(
+        'segment',
+        {
+          value: 'entered',
+        },
+        Date.now(),
+        this.audioManager.playPosition,
+        -1,
+        undefined,
+        {
+          start,
+          length:
+            this.transcrService.currentlevel.segments.get($event.index).time
+              .samples - start,
+        },
+        LinearEditorComponent.editorname
+      );
     }
   }
 
@@ -446,17 +530,27 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     if (this.shortcutsEnabled) {
       const comboKey = $event.shortcut;
 
-      if (this.audioShortcutsTopDisplay !== undefined && this.audioShortcutsBottomDisplay !== undefined) {
-        const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top_audio') ? this.audioChunkTop : this.audioChunkDown;
+      if (
+        this.audioShortcutsTopDisplay !== undefined &&
+        this.audioShortcutsBottomDisplay !== undefined
+      ) {
+        const currentAudioChunk =
+          $event.shortcutGroupName === 'signaldisplay_top_audio'
+            ? this.audioChunkTop
+            : this.audioChunkDown;
         const controlName = $event.shortcutGroupName.replace('_audio', '');
         if (currentAudioChunk !== undefined) {
           switch ($event.shortcutName) {
-            case('play_pause'):
+            case 'play_pause':
               this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut({
-                shortcut: comboKey,
-                value: $event.shortcutName
-              }, controlName, $event.timestamp);
+              this.triggerUIActionAfterShortcut(
+                {
+                  shortcut: comboKey,
+                  value: $event.shortcutName,
+                },
+                controlName,
+                $event.timestamp
+              );
               if (currentAudioChunk.isPlaying) {
                 currentAudioChunk.pausePlayback().catch((error) => {
                   console.error(error);
@@ -467,34 +561,46 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
                 });
               }
               break;
-            case('stop'):
+            case 'stop':
               this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut({
-                shortcut: comboKey,
-                value: $event.shortcutName
-              }, controlName, $event.timestamp);
+              this.triggerUIActionAfterShortcut(
+                {
+                  shortcut: comboKey,
+                  value: $event.shortcutName,
+                },
+                controlName,
+                $event.timestamp
+              );
               currentAudioChunk.stopPlayback().catch((error) => {
                 console.error(error);
               });
               break;
-            case('step_backward'):
+            case 'step_backward':
               this.selectedAudioChunk = currentAudioChunk;
               console.log(`step backward`);
-              this.triggerUIActionAfterShortcut({
-                shortcut: comboKey,
-                value: $event.shortcutName
-              }, controlName, $event.timestamp);
+              this.triggerUIActionAfterShortcut(
+                {
+                  shortcut: comboKey,
+                  value: $event.shortcutName,
+                },
+                controlName,
+                $event.timestamp
+              );
               currentAudioChunk.stepBackward().catch((error) => {
                 console.error(error);
               });
               break;
-            case('step_backwardtime'):
+            case 'step_backwardtime':
               this.selectedAudioChunk = currentAudioChunk;
               console.log(`step backward time`);
-              this.triggerUIActionAfterShortcut({
-                shortcut: comboKey,
-                value: $event.shortcutName
-              }, controlName, $event.timestamp);
+              this.triggerUIActionAfterShortcut(
+                {
+                  shortcut: comboKey,
+                  value: $event.shortcutName,
+                },
+                controlName,
+                $event.timestamp
+              );
               currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
                 console.error(error);
               });
@@ -516,30 +622,45 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
                 }
               }
 
-              this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe,
-                this.signalDisplayTop.av.mouseCursor, this.factor)
-                .then((newLoupeChunk) => {
-                  if (newLoupeChunk !== undefined) {
-                    this.audioChunkLoupe = newLoupeChunk;
-                  }
-                });
+              this.changeArea(
+                this.miniloupeComponent,
+                this.signalDisplayTop,
+                this.audioManager,
+                this.audioChunkLoupe,
+                this.signalDisplayTop.av.mouseCursor,
+                this.factor
+              ).then((newLoupeChunk) => {
+                if (newLoupeChunk !== undefined) {
+                  this.audioChunkLoupe = newLoupeChunk;
+                }
+              });
             }
           }
         }
       }
     }
-  }
+  };
 
-  private triggerUIActionAfterShortcut($event, control: string, timestamp: number) {
-    const component: AudioViewerComponent = (control === 'signaldisplay_top') ? this.signalDisplayTop : this.signalDisplayDown;
+  private triggerUIActionAfterShortcut(
+    $event,
+    control: string,
+    timestamp: number
+  ) {
+    const component: AudioViewerComponent =
+      control === 'signaldisplay_top'
+        ? this.signalDisplayTop
+        : this.signalDisplayDown;
     if (this.appStorage.logging) {
       if (
-        $event.value === undefined || !(
+        $event.value === undefined ||
+        !(
           // cursor move by keyboard events are note saved because this would be too much
-          contains($event.value, 'cursor') ||
-          // disable logging for user test phase, because it would be too much
-          contains($event.value, 'segment_enter') ||
-          contains($event.value, 'playonhover')
+          (
+            contains($event.value, 'cursor') ||
+            // disable logging for user test phase, because it would be too much
+            contains($event.value, 'segment_enter') ||
+            contains($event.value, 'playonhover')
+          )
         )
       ) {
         const caretpos = this.editor.caretpos;
@@ -548,19 +669,25 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         let segment = undefined;
 
         if (this.segmentselected && this.selectedIndex > -1) {
-          const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+          const annoSegment = this.transcrService.currentlevel.segments.get(
+            this.selectedIndex
+          );
           segment = {
             start: annoSegment.time.samples,
-            length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-              ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-              - annoSegment.time.samples
-              : this.audioManager.resource.info.duration.samples - annoSegment.time.samples
+            length:
+              this.selectedIndex <
+              this.transcrService.currentlevel.segments.length - 1
+                ? this.transcrService.currentlevel.segments.get(
+                    this.selectedIndex + 1
+                  ).time.samples - annoSegment.time.samples
+                : this.audioManager.resource.info.duration.samples -
+                  annoSegment.time.samples,
           };
         }
 
         const selection = {
           start: -1,
-          length: 0
+          length: 0,
         };
 
         let playPosition = component.audioChunk.absolutePlayposition;
@@ -574,8 +701,20 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           }
         }
 
-        this.uiService.addElementFromEvent('shortcut', $event, timestamp, playPosition, caretpos, selection, segment, control);
-      } else if ($event.value !== undefined && contains($event.value, 'playonhover')) {
+        this.uiService.addElementFromEvent(
+          'shortcut',
+          $event,
+          timestamp,
+          playPosition,
+          caretpos,
+          selection,
+          segment,
+          control
+        );
+      } else if (
+        $event.value !== undefined &&
+        contains($event.value, 'playonhover')
+      ) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }
     }
@@ -583,13 +722,19 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onLoupeClick(event) {
     if (this.selectedIndex > -1) {
-      const endSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex).time.samples;
+      const endSamples = this.transcrService.currentlevel.segments.get(
+        this.selectedIndex
+      ).time.samples;
       let startSamples = 0;
       if (this.selectedIndex > 0) {
-        startSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex - 1).time.samples;
+        startSamples = this.transcrService.currentlevel.segments.get(
+          this.selectedIndex - 1
+        ).time.samples;
       }
-      if (this.signalDisplayDown.av.MouseClickPos.samples < startSamples
-        || this.signalDisplayDown.av.MouseClickPos.samples > endSamples) {
+      if (
+        this.signalDisplayDown.av.MouseClickPos.samples < startSamples ||
+        this.signalDisplayDown.av.MouseClickPos.samples > endSamples
+      ) {
         this.segmentselected = false;
       }
     }
@@ -599,20 +744,34 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     if (this.appStorage.logging) {
       const segment = {
         start: -1,
-        length: -1
+        length: -1,
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        const annoSegment = this.transcrService.currentlevel.segments.get(
+          this.selectedIndex
+        );
         segment.start = annoSegment.time.samples;
-        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-          - annoSegment.time.samples
-          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
+        segment.length =
+          this.selectedIndex <
+          this.transcrService.currentlevel.segments.length - 1
+            ? this.transcrService.currentlevel.segments.get(
+                this.selectedIndex + 1
+              ).time.samples - annoSegment.time.samples
+            : this.audioManager.resource.info.duration.samples -
+              annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(), this.audioManager.playPosition,
-        this.editor.caretpos, undefined, segment, 'texteditor_markers');
+      this.uiService.addElementFromEvent(
+        'shortcut',
+        { value: markerCode },
+        Date.now(),
+        this.audioManager.playPosition,
+        this.editor.caretpos,
+        undefined,
+        segment,
+        'texteditor_markers'
+      );
     }
   }
 
@@ -621,36 +780,56 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     if (this.appStorage.logging) {
       const segment = {
         start: -1,
-        length: -1
+        length: -1,
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        const annoSegment = this.transcrService.currentlevel.segments.get(
+          this.selectedIndex
+        );
         segment.start = annoSegment.time.samples;
-        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-          - annoSegment.time.samples
-          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
+        segment.length =
+          this.selectedIndex <
+          this.transcrService.currentlevel.segments.length - 1
+            ? this.transcrService.currentlevel.segments.get(
+                this.selectedIndex + 1
+              ).time.samples - annoSegment.time.samples
+            : this.audioManager.resource.info.duration.samples -
+              annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(), this.audioManager.playPosition,
-        this.editor.caretpos, undefined, segment, 'texteditor_toolbar');
+      this.uiService.addElementFromEvent(
+        'mouseclick',
+        { value: markerCode },
+        Date.now(),
+        this.audioManager.playPosition,
+        this.editor.caretpos,
+        undefined,
+        segment,
+        'texteditor_toolbar'
+      );
     }
   }
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
-    const x = mouseEvent.offsetX - ((this.miniloupe.size.width - 10) / 2) - 2;
+    const x = mouseEvent.offsetX - (this.miniloupe.size.width - 10) / 2 - 2;
 
     // loupe is fully visible
     this.miniloupe.location.y = mouseEvent.offsetY + 60;
     this.miniloupe.location.x = x;
 
-    this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe, cursorTime, this.factor)
-      .then((newLoupeChunk) => {
-        if (newLoupeChunk !== undefined) {
-          this.audioChunkLoupe = newLoupeChunk;
-        }
-      });
+    this.changeArea(
+      this.miniloupeComponent,
+      this.signalDisplayTop,
+      this.audioManager,
+      this.audioChunkLoupe,
+      cursorTime,
+      this.factor
+    ).then((newLoupeChunk) => {
+      if (newLoupeChunk !== undefined) {
+        this.audioChunkLoupe = newLoupeChunk;
+      }
+    });
     this.cd.detectChanges();
   }
 
@@ -658,53 +837,77 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.segmentselected = false;
   }
 
-  afterSpeedChange(event: {
-    new_value: number, timestamp: number
-  }) {
+  afterSpeedChange(event: { new_value: number; timestamp: number }) {
     if (this.appStorage.logging) {
       const segment = {
         start: -1,
-        length: -1
+        length: -1,
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        const annoSegment = this.transcrService.currentlevel.segments.get(
+          this.selectedIndex
+        );
         segment.start = annoSegment.time.samples;
-        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-          - annoSegment.time.samples
-          : this.audioManager.resource.info.duration.samples - annoSegment.time.samples;
+        segment.length =
+          this.selectedIndex <
+          this.transcrService.currentlevel.segments.length - 1
+            ? this.transcrService.currentlevel.segments.get(
+                this.selectedIndex + 1
+              ).time.samples - annoSegment.time.samples
+            : this.audioManager.resource.info.duration.samples -
+              annoSegment.time.samples;
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playPosition,
-        this.editor.caretpos, undefined, segment, 'audio_speed');
+      this.uiService.addElementFromEvent(
+        'slider',
+        event,
+        event.timestamp,
+        this.audioManager.playPosition,
+        this.editor.caretpos,
+        undefined,
+        segment,
+        'audio_speed'
+      );
     }
   }
 
-  afterVolumeChange(event: {
-    new_value: number, timestamp: number
-  }) {
+  afterVolumeChange(event: { new_value: number; timestamp: number }) {
     if (this.appStorage.logging) {
       let segment = undefined;
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        const annoSegment = this.transcrService.currentlevel.segments.get(
+          this.selectedIndex
+        );
         segment = {
           start: annoSegment.time.samples,
-          length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-            ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-            - annoSegment.time.samples
-            : this.audioManager.resource.info.duration.samples - annoSegment.time.samples
+          length:
+            this.selectedIndex <
+            this.transcrService.currentlevel.segments.length - 1
+              ? this.transcrService.currentlevel.segments.get(
+                  this.selectedIndex + 1
+                ).time.samples - annoSegment.time.samples
+              : this.audioManager.resource.info.duration.samples -
+                annoSegment.time.samples,
         };
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playPosition,
-        this.editor.caretpos, undefined, segment, 'audio_volume');
+      this.uiService.addElementFromEvent(
+        'slider',
+        event,
+        event.timestamp,
+        this.audioManager.playPosition,
+        this.editor.caretpos,
+        undefined,
+        segment,
+        'audio_volume'
+      );
     }
   }
 
   public openSegment(segnumber: number) {
-    this.onSegmentEnter({index: segnumber});
+    this.onSegmentEnter({ index: segnumber });
   }
 
   public update() {
@@ -714,7 +917,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   afterFirstInitialization() {
-    this.checkIfSmallAudioChunk(this.audioChunkTop, this.transcrService.currentlevel);
+    this.checkIfSmallAudioChunk(
+      this.audioChunkTop,
+      this.transcrService.currentlevel
+    );
   }
 
   onKeyUp() {
@@ -736,41 +942,51 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   private selectSegment(index: number): Promise<AudioSelection> {
-    return new Promise<AudioSelection>(
-      (resolve) => {
-        const segment = this.transcrService.currentlevel.segments.get(index);
-        this.transcript = segment.transcript;
-        this.selectedIndex = index;
-        this.segmentselected = true;
-        let start = this.audioManager.createSampleUnit(0);
-        if (index > 0) {
-          start = this.transcrService.currentlevel.segments.get(index - 1).time;
-        }
-        resolve(new AudioSelection(start, segment.time));
+    return new Promise<AudioSelection>((resolve) => {
+      const segment = this.transcrService.currentlevel.segments.get(index);
+      this.transcript = segment.transcript;
+      this.selectedIndex = index;
+      this.segmentselected = true;
+      let start = this.audioManager.createSampleUnit(0);
+      if (index > 0) {
+        start = this.transcrService.currentlevel.segments.get(index - 1).time;
       }
-    );
+      resolve(new AudioSelection(start, segment.time));
+    });
   }
 
   private save() {
     if (this.segmentselected) {
-      if (this.selectedIndex > -1 && this.transcrService.currentlevel.segments &&
-        this.selectedIndex < this.transcrService.currentlevel.segments.length) {
-        const segment = this.transcrService.currentlevel.segments.get(this.selectedIndex).clone();
+      if (
+        this.selectedIndex > -1 &&
+        this.transcrService.currentlevel.segments &&
+        this.selectedIndex < this.transcrService.currentlevel.segments.length
+      ) {
+        const segment = this.transcrService.currentlevel.segments
+          .get(this.selectedIndex)
+          .clone();
         // this.viewer.focused = false;
         // this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        this.transcrService.currentlevel.segments.change(this.selectedIndex, segment);
+        this.transcrService.currentlevel.segments.change(
+          this.selectedIndex,
+          segment
+        );
         this.cd.markForCheck();
         this.cd.detectChanges();
       }
     }
   }
 
-  public onAudioViewerMouseLeave(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
+  public onAudioViewerMouseLeave(
+    keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
+  ) {
     this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
   }
 
-  public onAudioViewerMouseEnter(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
+  public onAudioViewerMouseEnter(
+    keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
+  ) {
     this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 }

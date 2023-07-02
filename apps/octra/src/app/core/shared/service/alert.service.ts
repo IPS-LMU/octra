@@ -1,5 +1,5 @@
-import { EventEmitter, Injectable } from "@angular/core";
-import { hasProperty } from "@octra/utilities";
+import { EventEmitter, Injectable } from '@angular/core';
+import { hasProperty } from '@octra/utilities';
 
 export type AlertType = 'danger' | 'warning' | 'info' | 'success';
 
@@ -13,8 +13,12 @@ export class AlertService {
   public counter = 0;
   public queue: AlertEntry[] = [];
 
-  public showAlert(type: AlertType, data: string | any, unique: boolean = true, duration?: number)
-    : Promise<{
+  public showAlert(
+    type: AlertType,
+    data: string | any,
+    unique: boolean = true,
+    duration?: number
+  ): Promise<{
     id: number;
     component: any;
   }> {
@@ -22,14 +26,19 @@ export class AlertService {
       id: number;
       component: any;
     }>((resolve) => {
-      const alreadyExists = this.queue.findIndex((a) => {
-        if (a.message !== data) {
-          return (typeof data !== 'string' && a.component !== undefined
-            && hasProperty(data, 'componentName') && hasProperty(a.component.class, 'componentName')
-            && data.componentName === a.component.class.componentName);
-        }
-        return true;
-      }) > -1;
+      const alreadyExists =
+        this.queue.findIndex((a) => {
+          if (a.message !== data) {
+            return (
+              typeof data !== 'string' &&
+              a.component !== undefined &&
+              hasProperty(data, 'componentName') &&
+              hasProperty(a.component.class, 'componentName') &&
+              data.componentName === a.component.class.componentName
+            );
+          }
+          return true;
+        }) > -1;
 
       if (!unique || !alreadyExists) {
         const id = ++this.counter;
@@ -44,15 +53,18 @@ export class AlertService {
         const entry: AlertEntry = {
           type,
           animation: 'opened',
-          duration: (duration) ? duration : 5,
-          message: (typeof data === 'string') ? data : '',
+          duration: duration ? duration : 5,
+          message: typeof data === 'string' ? data : '',
           unique,
           id,
-          component: (typeof data !== 'string') ? {
-            id,
-            class: data,
-            instance: undefined
-          } : undefined
+          component:
+            typeof data !== 'string'
+              ? {
+                  id,
+                  class: data,
+                  instance: undefined,
+                }
+              : undefined,
         };
 
         this.queue.push(entry);

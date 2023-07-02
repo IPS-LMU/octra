@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{'general.prompt' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'general.prompt' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -9,15 +11,25 @@
     ></button>
   </div>
   <div class="modal-body">
-    <ng-container *ngIf="formatConverter === undefined || formatConverter === undefined">
-      {{appStorage.prompttext}}
+    <ng-container
+      *ngIf="formatConverter === undefined || formatConverter === undefined"
+    >
+      {{ appStorage.prompttext }}
     </ng-container>
-    <ng-container *ngIf="formatConverter !== undefined && formatConverter !== undefined">
-      {{"transcription.no prompttext" | transloco}}
+    <ng-container
+      *ngIf="formatConverter !== undefined && formatConverter !== undefined"
+    >
+      {{ 'transcription.no prompttext' | transloco }}
     </ng-container>
   </div>
-<div class="modal-footer">
-  <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
-    {{"general.close" | transloco}}
-  </button>
+  <div class="modal-footer">
+    <button
+      (click)="close()"
+      class="btn btn-primary"
+      data-dismiss="modal"
+      type="button"
+    >
+      {{ 'general.close' | transloco }}
+    </button>
+  </div>
 </div>

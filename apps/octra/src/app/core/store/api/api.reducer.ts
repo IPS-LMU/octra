@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { APIActions } from './api.actions';
-import { APIState } from "./index";
+import { APIState } from './index';
 
 export const initialState: APIState = {
   initialized: false,

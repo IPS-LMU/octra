@@ -1,8 +1,12 @@
-<p>{{"alerts.authentication needed" | transloco}}</p>
+<p>{{ 'alerts.authentication needed' | transloco }}</p>
 <button (click)="onAuthenticateClick()" class="btn btn-sm btn-info btn-raised">
-  {{"general.authenticate" | transloco}}
+  {{ 'general.authenticate' | transloco }}
 </button>
-<button (click)="onConfirmationClick()" [disabled]="!clickedOnAuthenticate"
-        class="btn btn-sm btn-success btn-raised" style="margin-left: 5px;">
-  {{"general.im authenticated" | transloco}}
+<button
+  (click)="onConfirmationClick()"
+  [disabled]="!clickedOnAuthenticate"
+  class="btn btn-sm btn-success btn-raised"
+  style="margin-left: 5px"
+>
+  {{ 'general.im authenticated' | transloco }}
 </button>

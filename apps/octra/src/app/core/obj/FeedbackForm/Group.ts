@@ -1,4 +1,4 @@
-import { Control } from "./Control";
+import { Control } from './Control';
 
 export class Group {
   public get title(): string {
@@ -23,7 +23,11 @@ export class Group {
     this._required = value;
   }
 
-  constructor(private _title: string, private _name: string, private _controls: Control[]) {
+  constructor(
+    private _title: string,
+    private _name: string,
+    private _controls: Control[]
+  ) {
     // check if group is required
     for (const control of _controls) {
       if (control.required) {
@@ -46,7 +50,9 @@ export class Group {
 
     const result = new Group(
       group.title,
-      (!(group.name === undefined || group.name === undefined)) ? group.name : group.controls[0].name,
+      !(group.name === undefined || group.name === undefined)
+        ? group.name
+        : group.controls[0].name,
       controls
     );
 
@@ -58,7 +64,7 @@ export class Group {
   public toAny(): any {
     const result = {
       title: this._title,
-      controls: []
+      controls: [],
     };
 
     for (const control of this._controls) {

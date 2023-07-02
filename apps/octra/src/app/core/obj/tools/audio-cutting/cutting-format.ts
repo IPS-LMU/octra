@@ -1,8 +1,13 @@
-import { AudioInfo } from "@octra/media";
-import { DateTime } from "luxon";
+import { AudioInfo } from '@octra/media';
+import { DateTime } from 'luxon';
 
 abstract class CuttingFormat {
-  public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);
+  public abstract exportList(
+    cutList: Segment[],
+    audioInfo: AudioInfo,
+    fileName: string,
+    nameConvention: string
+  );
 }
 
 export interface Segment {
@@ -16,7 +21,12 @@ export class JSONConverter extends CuttingFormat {
     super();
   }
 
-  public exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string) {
+  public exportList(
+    cutList: Segment[],
+    audioInfo: AudioInfo,
+    fileName: string,
+    nameConvention: string
+  ) {
     const json = {
       meta: {
         creationTime: DateTime.now().toLocaleString(DateTime.DATETIME_SHORT),
@@ -27,20 +37,26 @@ export class JSONConverter extends CuttingFormat {
           channels: audioInfo.channels,
           duration: audioInfo.duration.samples,
           sampleEncoding: audioInfo.duration.sampleRate,
-          bitRate: audioInfo.bitrate
-        }
+          bitRate: audioInfo.bitrate,
+        },
       },
-      segments: []
+      segments: [],
     };
 
     for (let i = 0; i < cutList.length; i++) {
       const segment = cutList[i];
 
       json.segments.push({
-        fileName: getNewFileName(nameConvention, fileName, i, cutList, audioInfo),
+        fileName: getNewFileName(
+          nameConvention,
+          fileName,
+          i,
+          cutList,
+          audioInfo
+        ),
         sampleStart: segment.sampleStart,
         sampleDur: segment.sampleDur,
-        transcript: segment.transcript
+        transcript: segment.transcript,
       });
     }
 
@@ -53,26 +69,45 @@ export class TextTableConverter extends CuttingFormat {
     super();
   }
 
-  public exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string) {
-    let text = 'Name\tFile\tSecondsStart\tSecondsDuration\tSampleStart\tSampleDuration\tSampleRate\tTranscript\n';
+  public exportList(
+    cutList: Segment[],
+    audioInfo: AudioInfo,
+    fileName: string,
+    nameConvention: string
+  ) {
+    let text =
+      'Name\tFile\tSecondsStart\tSecondsDuration\tSampleStart\tSampleDuration\tSampleRate\tTranscript\n';
 
     for (let i = 0; i < cutList.length; i++) {
       const segment = cutList[i];
-      const secondsStart = (segment.sampleStart / audioInfo.duration.sampleRate) + '';
-      const secondsDuration = (segment.sampleDur / audioInfo.duration.sampleRate) + '';
+      const secondsStart =
+        segment.sampleStart / audioInfo.duration.sampleRate + '';
+      const secondsDuration =
+        segment.sampleDur / audioInfo.duration.sampleRate + '';
 
-      text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
-        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.sampleRate}`
-        + `\t${segment.transcript}\n`;
-
+      text +=
+        `${getNewFileName(
+          nameConvention,
+          fileName,
+          i,
+          cutList,
+          audioInfo
+        )}\t${fileName}\t${secondsStart}\t${secondsDuration}\t` +
+        `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.sampleRate}` +
+        `\t${segment.transcript}\n`;
     }
 
     return text;
   }
 }
 
-export function getNewFileName(namingConvention: string, fileName: string, segmentNumber: number,
-                               cutList: Segment[], audioInfo: AudioInfo) {
+export function getNewFileName(
+  namingConvention: string,
+  fileName: string,
+  segmentNumber: number,
+  cutList: Segment[],
+  audioInfo: AudioInfo
+) {
   const name = fileName.substring(0, fileName.lastIndexOf('.'));
   const extension = fileName.substring(fileName.lastIndexOf('.'));
 
@@ -84,21 +119,35 @@ export function getNewFileName(namingConvention: string, fileName: string, segme
     leadingNull += '0';
   }
 
-  return namingConvention.replace(/<([^<>]+)>/g, (g0, g1) => {
-    switch (g1) {
-      case('name'):
-        return name;
-      case('sequNumber'):
-        return `${leadingNull}${segmentNumber + 1}`;
-      case('sampleStart'):
-        return cutList[segmentNumber].sampleStart;
-      case('sampleDur'):
-        return cutList[segmentNumber].sampleDur;
-      case('secondsStart'):
-        return Math.round(cutList[segmentNumber].sampleStart / audioInfo.duration.sampleRate * 1000) / 1000;
-      case('secondsDur'):
-        return Math.round(cutList[segmentNumber].sampleDur / audioInfo.duration.sampleRate * 1000) / 1000;
-    }
-    return g1;
-  }) + extension;
+  return (
+    namingConvention.replace(/<([^<>]+)>/g, (g0, g1) => {
+      switch (g1) {
+        case 'name':
+          return name;
+        case 'sequNumber':
+          return `${leadingNull}${segmentNumber + 1}`;
+        case 'sampleStart':
+          return cutList[segmentNumber].sampleStart;
+        case 'sampleDur':
+          return cutList[segmentNumber].sampleDur;
+        case 'secondsStart':
+          return (
+            Math.round(
+              (cutList[segmentNumber].sampleStart /
+                audioInfo.duration.sampleRate) *
+                1000
+            ) / 1000
+          );
+        case 'secondsDur':
+          return (
+            Math.round(
+              (cutList[segmentNumber].sampleDur /
+                audioInfo.duration.sampleRate) *
+                1000
+            ) / 1000
+          );
+      }
+      return g1;
+    }) + extension
+  );
 }

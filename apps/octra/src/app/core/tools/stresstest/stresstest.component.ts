@@ -1,16 +1,19 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
-import { SessionStorage, SessionStorageService } from "ngx-webstorage";
-import { BrowserInfo, getFileSize } from "@octra/utilities";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from '@angular/core';
+import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
+import { BrowserInfo, getFileSize } from '@octra/utilities';
 
 @Component({
   selector: 'octra-stresstest',
   templateUrl: './stresstest.component.html',
   styleUrls: ['./stresstest.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [SessionStorageService]
+  providers: [SessionStorageService],
 })
 export class StresstestComponent {
-
   @SessionStorage('stresstest_js_result') lastResult;
   public measured = 0;
   public status = 'init';
@@ -24,9 +27,15 @@ export class StresstestComponent {
 
   public get performance() {
     return {
-      heapSizeLimit: getFileSize((window.performance as any).memory.jsHeapSizeLimit),
-      totalHeapSize: getFileSize((window.performance as any).memory.totalJSHeapSize),
-      heapSizeUsed: getFileSize((window.performance as any).memory.usedJSHeapSize)
+      heapSizeLimit: getFileSize(
+        (window.performance as any).memory.jsHeapSizeLimit
+      ),
+      totalHeapSize: getFileSize(
+        (window.performance as any).memory.totalJSHeapSize
+      ),
+      heapSizeUsed: getFileSize(
+        (window.performance as any).memory.usedJSHeapSize
+      ),
     };
   }
 
@@ -39,8 +48,10 @@ export class StresstestComponent {
     return BrowserInfo;
   }
 
-  constructor(private cd: ChangeDetectorRef, private sessionStorage: SessionStorageService) {
-  }
+  constructor(
+    private cd: ChangeDetectorRef,
+    private sessionStorage: SessionStorageService
+  ) {}
 
   public getSampleData(mb: number) {
     const array: ArrayBuffer = new ArrayBuffer(1024 * 1024 * mb);
@@ -56,16 +67,18 @@ export class StresstestComponent {
 
   public start() {
     this.status = 'running';
-    this.readFile().then(() => {
-      this.measured = this.sampleData.size - this.arrayBuffer.byteLength;
-      this.lastResult = this.measured;
-      this.cd.detectChanges();
-      this.start();
-    }).catch((error) => {
-      this.cd.detectChanges();
-      alert('The browser reached its memory limit.');
-      console.error(error);
-    });
+    this.readFile()
+      .then(() => {
+        this.measured = this.sampleData.size - this.arrayBuffer.byteLength;
+        this.lastResult = this.measured;
+        this.cd.detectChanges();
+        this.start();
+      })
+      .catch((error) => {
+        this.cd.detectChanges();
+        alert('The browser reached its memory limit.');
+        console.error(error);
+      });
   }
 
   private readFile(): Promise<void> {
@@ -74,7 +87,10 @@ export class StresstestComponent {
         const reader = new FileReader();
 
         reader.onloadend = () => {
-          this.sampleData = new File([this.arrayBuffer, reader.result], 'test2');
+          this.sampleData = new File(
+            [this.arrayBuffer, reader.result],
+            'test2'
+          );
           resolve();
         };
 
@@ -90,5 +106,4 @@ export class StresstestComponent {
       }
     });
   }
-
 }

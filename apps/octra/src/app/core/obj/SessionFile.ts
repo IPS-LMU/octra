@@ -1,4 +1,4 @@
-import { hasProperty } from "@octra/utilities";
+import { hasProperty } from '@octra/utilities';
 
 export class SessionFile {
   get type(): string {
@@ -25,11 +25,12 @@ export class SessionFile {
     this._size = value;
   }
 
-  constructor(private _name: string,
-              private _size: number,
-              private _timestamp: Date,
-              private _type: string) {
-  }
+  constructor(
+    private _name: string,
+    private _size: number,
+    private _timestamp: Date,
+    private _type: string
+  ) {}
 
   public static fromAny(element: any) {
     if (element === undefined || element === undefined) {
@@ -37,13 +38,20 @@ export class SessionFile {
     }
 
     if (
-      hasProperty(element, 'name')
-      && hasProperty(element, 'type')
-      && hasProperty(element, 'size')
+      hasProperty(element, 'name') &&
+      hasProperty(element, 'type') &&
+      hasProperty(element, 'size')
     ) {
-      return new SessionFile(element.name, element.size, element.timestamp, element.type);
+      return new SessionFile(
+        element.name,
+        element.size,
+        element.timestamp,
+        element.type
+      );
     } else {
-      console.error('Can not convert to SessionFile. Properties are not valid.');
+      console.error(
+        'Can not convert to SessionFile. Properties are not valid.'
+      );
     }
     return undefined;
   }
@@ -52,7 +60,7 @@ export class SessionFile {
     return {
       name: this._name,
       type: this._type,
-      size: this._size
+      size: this._size,
     };
   }
 }

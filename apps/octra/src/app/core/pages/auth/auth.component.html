@@ -4,27 +4,29 @@
 
     <table>
       <tbody>
-      <tr>
-        <td>
-          <i class="bi bi-person-check fs-3" style="color:forestgreen;"></i>
-        </td>
-        <td>
-          <h2>{{"authentication.you are authenticated" | transloco}}</h2>
-        </td>
-      </tr>
+        <tr>
+          <td>
+            <i class="bi bi-person-check fs-3" style="color: forestgreen"></i>
+          </td>
+          <td>
+            <h2>{{ 'authentication.you are authenticated' | transloco }}</h2>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
   <div class="col-md-8">
-    <img src="../../../../assets/img/authenticated.jpg"/>
+    <img src="../../../../assets/img/authenticated.jpg" />
   </div>
 </div>
 
-<p style="margin-top: 20px;">{{"authentication.description" | transloco}}</p>
+<p style="margin-top: 20px">{{ 'authentication.description' | transloco }}</p>
 <p style="font-weight: bold">
-  {{"authentication.window closed" | transloco:
-  {
-    "seconds": secondsToClose
-  }
+  {{
+    'authentication.window closed'
+      | transloco
+        : {
+            seconds: secondsToClose
+          }
   }}
 </p>

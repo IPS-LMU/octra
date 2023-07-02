@@ -13,25 +13,23 @@ export class Logger {
   }
 
   public addEntry(type: string, message: any) {
-    this.entries.push(
-      {
-        type,
-        message
-      }
-    );
+    this.entries.push({
+      type,
+      message,
+    });
   }
 
   public output() {
     console.groupCollapsed(this.groupName);
     for (const entry of this.entries) {
       switch (entry.type) {
-        case('log'):
+        case 'log':
           console.log(entry.message);
           break;
-        case('err'):
+        case 'err':
           console.error(entry.message);
           break;
-        case('warn'):
+        case 'warn':
           console.warn(entry.message);
           break;
       }

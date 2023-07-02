@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{'bug report.give feedback' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'bug report.give feedback' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -10,39 +12,76 @@
   </div>
   <div class="modal-body">
     <p>
-      {{"bug report.description" | transloco}}
+      {{ 'bug report.description' | transloco }}
     </p>
-    <div *ngIf="sendStatus === 'error'" [innerHTML]="'bug report.error' | transloco : {
-          email: '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' + bgdescr +'\'>octra@phonetik.uni-muenchen.de</a>'
-        }" class="alert alert-danger bugsent"></div>
-    <div *ngIf="sendStatus === 'success'"
-         class="alert alert-success bugsent">{{'bug report.sent' | transloco}}</div>
+    <div
+      *ngIf="sendStatus === 'error'"
+      [innerHTML]="
+        'bug report.error'
+          | transloco
+            : {
+                email:
+                  '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' +
+                  bgdescr +
+                  '\'>octra@phonetik.uni-muenchen.de</a>'
+              }
+      "
+      class="alert alert-danger bugsent"
+    ></div>
+    <div *ngIf="sendStatus === 'success'" class="alert alert-success bugsent">
+      {{ 'bug report.sent' | transloco }}
+    </div>
 
     <form>
       <div class="row">
         <div class="col-6">
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="inputName" name="name" aria-describedby="name"
-                   [placeholder]="'general.name' | transloco"
-                   [(ngModel)]="userName">
-            <label for="inputName" class="form-label">{{'general.name' | transloco}}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="inputName"
+              name="name"
+              aria-describedby="name"
+              [placeholder]="'general.name' | transloco"
+              [(ngModel)]="userName"
+            />
+            <label for="inputName" class="form-label">{{
+              'general.name' | transloco
+            }}</label>
           </div>
         </div>
         <div class="col-6">
           <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="inputEmail" name="email" aria-describedby="email"
-                   [(ngModel)]="email" placeholder="email@example.com">
-            <label for="inputEmail" class="form-label">{{'general.email' | transloco}}</label>
+            <input
+              type="email"
+              class="form-control"
+              id="inputEmail"
+              name="email"
+              aria-describedby="email"
+              [(ngModel)]="email"
+              placeholder="email@example.com"
+            />
+            <label for="inputEmail" class="form-label">{{
+              'general.email' | transloco
+            }}</label>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-12">
           <div class="form-floating mb-3">
-            <textarea [(ngModel)]="bgdescr" class="form-control" aria-describedby="bgDescr"
-                      [placeholder]="'general.description' | transloco" id="bgDescr" maxlength="1000" rows="3"
-                      name="bgdescr" style="height: 100px"></textarea>
-            <label for="bgDescr">{{'general.description' | transloco}}</label>
+            <textarea
+              [(ngModel)]="bgdescr"
+              class="form-control"
+              aria-describedby="bgDescr"
+              [placeholder]="'general.description' | transloco"
+              id="bgDescr"
+              maxlength="1000"
+              rows="3"
+              name="bgdescr"
+              style="height: 100px"
+            ></textarea>
+            <label for="bgDescr">{{ 'general.description' | transloco }}</label>
             <div id="emailHelp" class="form-text">German or English</div>
           </div>
         </div>
@@ -50,24 +89,44 @@
 
       <div class="form-row">
         <div class="col-12">
-          <div class="form-group" style="margin-bottom:20px;">
-            <label>{{'general.screenshots' |
-              transloco}} (optional):</label><br />
+          <div class="form-group" style="margin-bottom: 20px">
+            <label>{{ 'general.screenshots' | transloco }} (optional):</label
+            ><br />
             <div class="preview-images">
-              <div (click)="selectFileForUpload(uploadInput2)"
-                   *ngFor="let screenshot of screenshots; let i = index;" class="upload-screenshot">
-                <span (click)="removeScreenshot(i)" class="cross rounded-circle">X</span>
-                <input #uploadInput2 (change)="onFileChange($event)" accept=".jpg, .png, .jpeg|image/*"
-                       name="upload"
-                       style="display: none;" type="file" />
-                <img *ngIf="screenshot.previewURL !== ''"
-                     [src]="screenshot.previewURL"
-                     class="preview-image" />
+              <div
+                (click)="selectFileForUpload(uploadInput2)"
+                *ngFor="let screenshot of screenshots; let i = index"
+                class="upload-screenshot"
+              >
+                <span (click)="removeScreenshot(i)" class="cross rounded-circle"
+                  >X</span
+                >
+                <input
+                  #uploadInput2
+                  (change)="onFileChange($event)"
+                  accept=".jpg, .png, .jpeg|image/*"
+                  name="upload"
+                  style="display: none"
+                  type="file"
+                />
+                <img
+                  *ngIf="screenshot.previewURL !== ''"
+                  [src]="screenshot.previewURL"
+                  class="preview-image"
+                />
               </div>
-              <div (click)="selectFileForUpload(uploadInput)"
-                   *ngIf="screenshots.length < 4" class="upload-screenshot">
-                <input #uploadInput (change)="onFileChange($event)" name="upload" style="display: none;"
-                       type="file" />
+              <div
+                (click)="selectFileForUpload(uploadInput)"
+                *ngIf="screenshots.length < 4"
+                class="upload-screenshot"
+              >
+                <input
+                  #uploadInput
+                  (change)="onFileChange($event)"
+                  name="upload"
+                  style="display: none"
+                  type="file"
+                />
                 <i class="bi bi-plus-lg"></i>
               </div>
             </div>
@@ -78,21 +137,34 @@
 
       <div class="form-row">
         <div class="col-12">
-          <div class="form-group" style="padding-top:0;margin-bottom: 0;">
+          <div class="form-group" style="padding-top: 0; margin-bottom: 0">
             <div class="checkbox">
               <label>
-                <input #sendpro [(ngModel)]="sendProObj" checked name="sendpro"
-                       type="checkbox">
-                {{"bug report.send protocol" | transloco}}
+                <input
+                  #sendpro
+                  [(ngModel)]="sendProObj"
+                  checked
+                  name="sendpro"
+                  type="checkbox"
+                />
+                {{ 'bug report.send protocol' | transloco }}
               </label>
             </div>
           </div>
-          <div [hidden]="!sendpro.checked" class="form-group" style="padding-top:0;margin-top:0;">
-            <span>{{'general.protocol' | transloco}}:</span>
-            <textarea #bgProtocol [innerHTML]="(visible) ? bugService.getText(): ''" class="form-control"
-                      disabled
-                      id="bgProtocol">
-                </textarea>
+          <div
+            [hidden]="!sendpro.checked"
+            class="form-group"
+            style="padding-top: 0; margin-top: 0"
+          >
+            <span>{{ 'general.protocol' | transloco }}:</span>
+            <textarea
+              #bgProtocol
+              [innerHTML]="visible ? bugService.getText() : ''"
+              class="form-control"
+              disabled
+              id="bgProtocol"
+            >
+            </textarea>
           </div>
         </div>
       </div>
@@ -100,11 +172,15 @@
   </div>
   <div class="modal-footer">
     <button (click)="close()" class="btn btn-secondary" type="button">
-      {{"general.abort" | transloco}}
+      {{ 'general.abort' | transloco }}
     </button>
-    <button (click)="sendBugReport();" [disabled]="!isvalid || sendStatus === 'sending'" class="btn btn-primary"
-            type="button">
-      {{"bug report.give feedback" | transloco}}
+    <button
+      (click)="sendBugReport()"
+      [disabled]="!isvalid || sendStatus === 'sending'"
+      class="btn btn-primary"
+      type="button"
+    >
+      {{ 'bug report.give feedback' | transloco }}
     </button>
   </div>
 </div>

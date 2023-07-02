@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{'modal.missing permissions.header' |transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'modal.missing permissions.header' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -10,21 +12,35 @@
   </div>
   <div class="modal-body">
     <p>
-      {{'modal.missing permissions.description' | transloco}}
+      {{ 'modal.missing permissions.description' | transloco }}
     </p>
     <ol>
-      <li>{{'modal.missing permissions.step1' | transloco}}<br />
-        <img alt="missing permission 1" src="assets/img/octraMissingAudioPermi01.png" />
+      <li>
+        {{ 'modal.missing permissions.step1' | transloco }}<br />
+        <img
+          alt="missing permission 1"
+          src="assets/img/octraMissingAudioPermi01.png"
+        />
       </li>
-      <li>{{'modal.missing permissions.step2' | transloco}}<br />
-        <img alt="missing permission 1" src="assets/img/octraMissingAudioPermi02.png" />
+      <li>
+        {{ 'modal.missing permissions.step2' | transloco }}<br />
+        <img
+          alt="missing permission 1"
+          src="assets/img/octraMissingAudioPermi02.png"
+        />
       </li>
-      <li>{{'modal.missing permissions.step3' | transloco}}<br />
-        <img alt="missing permission 1" src="assets/img/octraMissingAudioPermi03.png" />
+      <li>
+        {{ 'modal.missing permissions.step3' | transloco }}<br />
+        <img
+          alt="missing permission 1"
+          src="assets/img/octraMissingAudioPermi03.png"
+        />
       </li>
-      <li>{{'modal.missing permissions.step4' | transloco}}</li>
+      <li>{{ 'modal.missing permissions.step4' | transloco }}</li>
     </ol>
 
-    <button (click)="reload()" class="btn btn-primary btn-raised w-100">{{"general.reload" |transloco }}</button>
+    <button (click)="reload()" class="btn btn-primary btn-raised w-100">
+      {{ 'general.reload' | transloco }}
+    </button>
   </div>
 </div>

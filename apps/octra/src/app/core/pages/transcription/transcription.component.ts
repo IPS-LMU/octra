@@ -6,38 +6,39 @@ import {
   HostListener,
   OnDestroy,
   OnInit,
-  ViewChild
-} from "@angular/core";
-import { Router } from "@angular/router";
-import { TranslocoService } from "@ngneat/transloco";
-import { BrowserInfo, hasProperty, ShortcutGroup, ShortcutManager } from "@octra/utilities";
-import { navigateTo } from "@octra/ngx-utilities";
-import { interval, throwError, timer } from "rxjs";
-import * as X2JS from "x2js";
-import { AppInfo } from "../../../app.info";
-import { editorComponents } from "../../../editors/components";
-import { OCTRAEditor } from "../../../editors/octra-editor";
-import { InactivityModalComponent } from "../../modals/inactivity-modal/inactivity-modal.component";
-import { MissingPermissionsModalComponent } from "../../modals/missing-permissions/missing-permissions.component";
-import { ModalService } from "../../modals/modal.service";
-import { OverviewModalComponent } from "../../modals/overview-modal/overview-modal.component";
+  ViewChild,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
+import {
+  BrowserInfo,
+  hasProperty,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/utilities';
+import { navigateTo } from '@octra/ngx-utilities';
+import { interval, throwError, timer } from 'rxjs';
+import * as X2JS from 'x2js';
+import { AppInfo } from '../../../app.info';
+import { editorComponents } from '../../../editors/components';
+import { OCTRAEditor } from '../../../editors/octra-editor';
+import { InactivityModalComponent } from '../../modals/inactivity-modal/inactivity-modal.component';
+import { MissingPermissionsModalComponent } from '../../modals/missing-permissions/missing-permissions.component';
+import { ModalService } from '../../modals/modal.service';
+import { OverviewModalComponent } from '../../modals/overview-modal/overview-modal.component';
 import {
   ModalEndAnswer,
-  TranscriptionDemoEndModalComponent
-} from "../../modals/transcription-demo-end/transcription-demo-end-modal.component";
-import {
-  TranscriptionGuidelinesModalComponent
-} from "../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component";
-import {
-  TranscriptionSendingModalComponent
-} from "../../modals/transcription-sending-modal/transcription-sending-modal.component";
+  TranscriptionDemoEndModalComponent,
+} from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
+import { TranscriptionGuidelinesModalComponent } from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   TranscriptionStopModalAnswer,
-  TranscriptionStopModalComponent
-} from "../../modals/transcription-stop-modal/transcription-stop-modal.component";
-import { ProjectSettings } from "../../obj/Settings";
+  TranscriptionStopModalComponent,
+} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import { ProjectSettings } from '../../obj/Settings';
 
-import { LoadeditorDirective } from "../../shared/directive/loadeditor.directive";
+import { LoadeditorDirective } from '../../shared/directive/loadeditor.directive';
 
 import {
   AlertService,
@@ -45,28 +46,31 @@ import {
   KeymappingService,
   SettingsService,
   TranscriptionService,
-  UserInteractionsService
-} from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { AsrService } from "../../shared/service/asr.service";
-import { BugReportService } from "../../shared/service/bug-report.service";
-import { NavbarService } from "../../component/navbar/navbar.service";
-import { IFile, Level, PartiturConverter } from "@octra/annotation";
-import { AudioManager } from "@octra/media";
-import { LoginMode } from "../../store";
-import { ShortcutsModalComponent } from "../../modals/shortcuts-modal/shortcuts-modal.component";
-import { PromptModalComponent } from "../../modals/prompt-modal/prompt-modal.component";
-import { OctraAPIService } from "@octra/ngx-octra-api";
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { DefaultComponent } from "../../component/default.component";
+  UserInteractionsService,
+} from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { AsrService } from '../../shared/service/asr.service';
+import { BugReportService } from '../../shared/service/bug-report.service';
+import { NavbarService } from '../../component/navbar/navbar.service';
+import { IFile, Level, PartiturConverter } from '@octra/annotation';
+import { AudioManager } from '@octra/media';
+import { LoginMode } from '../../store';
+import { ShortcutsModalComponent } from '../../modals/shortcuts-modal/shortcuts-modal.component';
+import { PromptModalComponent } from '../../modals/prompt-modal/prompt-modal.component';
+import { OctraAPIService } from '@octra/ngx-octra-api';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { DefaultComponent } from '../../component/default.component';
 
 @Component({
-  selector: "octra-transcription",
-  templateUrl: "./transcription.component.html",
-  styleUrls: ["./transcription.component.scss"],
-  providers: [AlertService]
+  selector: 'octra-transcription',
+  templateUrl: './transcription.component.html',
+  styleUrls: ['./transcription.component.scss'],
+  providers: [AlertService],
 })
-export class TranscriptionComponent extends DefaultComponent implements OnInit, OnDestroy {
+export class TranscriptionComponent
+  extends DefaultComponent
+  implements OnInit, OnDestroy
+{
   get selectedTheme(): string {
     return this._selectedTheme;
   }
@@ -82,17 +86,18 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   modalGuidelines: NgbModalRef;
   inactivityModal: NgbModalRef;
   missingPermissionsModal: NgbModalRef;
-  @ViewChild(LoadeditorDirective, { static: true }) appLoadeditor: LoadeditorDirective;
+  @ViewChild(LoadeditorDirective, { static: true })
+  appLoadeditor: LoadeditorDirective;
 
-  public sendError = "";
-  public saving = "";
-  public interface = "";
+  public sendError = '';
+  public saving = '';
+  public interface = '';
   public editorloaded = false;
   user: number;
   public platform = BrowserInfo.platform;
   private sendOk = false;
-  private _useMode = "";
-  private _selectedTheme = "";
+  private _useMode = '';
+  private _selectedTheme = '';
   private levelSubscriptionID = 0;
   private audioManager: AudioManager;
 
@@ -105,75 +110,75 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     permissions: false,
     sending: false,
     demoEnd: false,
-    guidelines: false
+    guidelines: false,
   };
 
   private modalShortcuts: ShortcutGroup = {
-    name: "modal shortcuts",
+    name: 'modal shortcuts',
     enabled: true,
     items: [
       {
-        name: "shortcuts",
-        title: "shortcuts",
+        name: 'shortcuts',
+        title: 'shortcuts',
         focusonly: false,
         keys: {
-          mac: "ALT + 8",
-          pc: "ALT + 8"
-        }
+          mac: 'ALT + 8',
+          pc: 'ALT + 8',
+        },
       },
       {
-        name: "guidelines",
-        title: "guidelines",
+        name: 'guidelines',
+        title: 'guidelines',
         focusonly: false,
         keys: {
-          mac: "ALT + 9",
-          pc: "ALT + 9"
-        }
+          mac: 'ALT + 9',
+          pc: 'ALT + 9',
+        },
       },
       {
-        name: "overview",
-        title: "overview",
+        name: 'overview',
+        title: 'overview',
         focusonly: false,
         keys: {
-          mac: "ALT + 0",
-          pc: "ALT + 0"
-        }
-      }
-    ]
+          mac: 'ALT + 0',
+          pc: 'ALT + 0',
+        },
+      },
+    ],
   };
 
   public generalShortcuts: ShortcutGroup = {
-    name: "general shortcuts",
+    name: 'general shortcuts',
     enabled: true,
     items: [
       {
-        name: "feedback1",
-        title: "feedback and send 1",
+        name: 'feedback1',
+        title: 'feedback and send 1',
         focusonly: false,
         keys: {
-          mac: "SHIFT + ALT + 1",
-          pc: "SHIFT + ALT + 1"
-        }
+          mac: 'SHIFT + ALT + 1',
+          pc: 'SHIFT + ALT + 1',
+        },
       },
       {
-        name: "feedback2",
-        title: "feedback and send 2",
+        name: 'feedback2',
+        title: 'feedback and send 2',
         focusonly: false,
         keys: {
-          mac: "SHIFT + ALT + 2",
-          pc: "SHIFT + ALT + 2"
-        }
+          mac: 'SHIFT + ALT + 2',
+          pc: 'SHIFT + ALT + 2',
+        },
       },
       {
-        name: "feedback3",
-        title: "feedback and send 3",
+        name: 'feedback3',
+        title: 'feedback and send 3',
         focusonly: false,
         keys: {
-          mac: "SHIFT + ALT + 3",
-          pc: "SHIFT + ALT + 3"
-        }
-      }
-    ]
+          mac: 'SHIFT + ALT + 3',
+          pc: 'SHIFT + ALT + 3',
+        },
+      },
+    ],
   };
 
   showCommentSection = false;
@@ -184,7 +189,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   }
 
   get loaded(): boolean {
-    return (this.audio.loaded && this.transcrService.guidelines !== undefined);
+    return this.audio.loaded && this.transcrService.guidelines !== undefined;
   }
 
   get appc(): any {
@@ -218,23 +223,25 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     return this.transcrService?.feedback?.comment;
   }
 
-  constructor(public router: Router,
-              private _componentFactoryResolver: ComponentFactoryResolver,
-              public audio: AudioService,
-              public uiService: UserInteractionsService,
-              public transcrService: TranscriptionService,
-              public appStorage: AppStorageService,
-              public keyMap: KeymappingService,
-              public navbarServ: NavbarService,
-              public settingsService: SettingsService,
-              public modService: ModalService,
-              private modalService: NgbModal,
-              public langService: TranslocoService,
-              private api: OctraAPIService,
-              private bugService: BugReportService,
-              private cd: ChangeDetectorRef,
-              private asrService: AsrService,
-              private alertService: AlertService) {
+  constructor(
+    public router: Router,
+    private _componentFactoryResolver: ComponentFactoryResolver,
+    public audio: AudioService,
+    public uiService: UserInteractionsService,
+    public transcrService: TranscriptionService,
+    public appStorage: AppStorageService,
+    public keyMap: KeymappingService,
+    public navbarServ: NavbarService,
+    public settingsService: SettingsService,
+    public modService: ModalService,
+    private modalService: NgbModal,
+    public langService: TranslocoService,
+    private api: OctraAPIService,
+    private bugService: BugReportService,
+    private cd: ChangeDetectorRef,
+    private asrService: AsrService,
+    private alertService: AlertService
+  ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
 
@@ -244,98 +251,180 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.shortcutManager = new ShortcutManager();
     this.shortcutManager.registerShortcutGroup(this.modalShortcuts);
 
-    this.subscrManager.add(this.audioManager.statechange.subscribe(async (state) => {
-        if (!appStorage.playonhover && !this.modalVisiblities.overview) {
-          let caretpos = -1;
+    this.subscrManager.add(
+      this.audioManager.statechange.subscribe(
+        async (state) => {
+          if (!appStorage.playonhover && !this.modalVisiblities.overview) {
+            let caretpos = -1;
 
-          if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
-            caretpos = (this.currentEditor.instance as any).editor.caretpos;
-          }
-
-          // make sure that events from playonhover are not logged
-          const currentEditorName = this.appStorage.interface;
-          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playPosition, caretpos, undefined, undefined);
-        }
-      },
-      (error) => {
-        console.error(error);
-      }));
-
-    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
-      if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
-        if (["SHIFT + ALT + 1", "SHIFT + ALT + 2", "SHIFT + ALT + 3"].includes(event.shortcut)) {
-          event.event.preventDefault();
-          this.waitForSend = true;
-
-          this.appStorage.afterSaving().then(() => {
-            this.waitForSend = false;
-            if (event.shortcut === "SHIFT + ALT + 1") {
-              this.sendTranscriptionForShortAudioFiles("bad");
-              this.uiService.addElementFromEvent("shortcut", {
-                value: "send_transcription:1"
-              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
-            } else if (event.shortcut === "SHIFT + ALT + 2") {
-              this.sendTranscriptionForShortAudioFiles("middle");
-              this.uiService.addElementFromEvent("shortcut", {
-                value: "send_transcription:2"
-              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
-            } else if (event.shortcut === "SHIFT + ALT + 3") {
-              this.sendTranscriptionForShortAudioFiles("good");
-              this.uiService.addElementFromEvent("shortcut", {
-                value: "send_transcription:3"
-              }, Date.now(), this.audio.audiomanagers[0].playPosition, -1, undefined, undefined, this.interface);
+            if (
+              this.currentEditor !== undefined &&
+              (this.currentEditor.instance as any).editor !== undefined
+            ) {
+              caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
-          }).catch((error) => {
-            console.error(error);
-          });
-        }
-      }
-    }));
 
-    this.subscrManager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
-      switch (toolName) {
-        case("combinePhrases"):
-          this.alertService.showAlert("success", this.langService.translate("tools.alerts.done", {
-            value: toolName
-          })).catch((error) => {
-            console.error(error);
-          });
-          if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
-            (this._currentEditor.instance as any).update();
+            // make sure that events from playonhover are not logged
+            const currentEditorName = this.appStorage.interface;
+            this.uiService.logAudioEvent(
+              currentEditorName,
+              state,
+              this.audioManager.playPosition,
+              caretpos,
+              undefined,
+              undefined
+            );
           }
-          break;
-      }
-    }));
+        },
+        (error) => {
+          console.error(error);
+        }
+      )
+    );
 
-    this.subscrManager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
-      if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
-        const editor = this._currentEditor.instance as OCTRAEditor;
-        console.log(`CALL disable all shortcuts!`);
-        editor.disableAllShortcuts();
-      } else {
-        console.log(``);
-      }
-    }));
+    this.subscrManager.add(
+      this.keyMap.onShortcutTriggered.subscribe((event) => {
+        if (
+          this._useMode === LoginMode.ONLINE ||
+          this._useMode === LoginMode.DEMO
+        ) {
+          if (
+            ['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(
+              event.shortcut
+            )
+          ) {
+            event.event.preventDefault();
+            this.waitForSend = true;
 
-    this.subscrManager.add(this.modService.closemodal.subscribe(() => {
-      if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
-        const editor = this._currentEditor.instance as OCTRAEditor;
-        console.log(`CALL enable all shortcuts!`);
-        editor.enableAllShortcuts();
-      }
+            this.appStorage
+              .afterSaving()
+              .then(() => {
+                this.waitForSend = false;
+                if (event.shortcut === 'SHIFT + ALT + 1') {
+                  this.sendTranscriptionForShortAudioFiles('bad');
+                  this.uiService.addElementFromEvent(
+                    'shortcut',
+                    {
+                      value: 'send_transcription:1',
+                    },
+                    Date.now(),
+                    this.audio.audiomanagers[0].playPosition,
+                    -1,
+                    undefined,
+                    undefined,
+                    this.interface
+                  );
+                } else if (event.shortcut === 'SHIFT + ALT + 2') {
+                  this.sendTranscriptionForShortAudioFiles('middle');
+                  this.uiService.addElementFromEvent(
+                    'shortcut',
+                    {
+                      value: 'send_transcription:2',
+                    },
+                    Date.now(),
+                    this.audio.audiomanagers[0].playPosition,
+                    -1,
+                    undefined,
+                    undefined,
+                    this.interface
+                  );
+                } else if (event.shortcut === 'SHIFT + ALT + 3') {
+                  this.sendTranscriptionForShortAudioFiles('good');
+                  this.uiService.addElementFromEvent(
+                    'shortcut',
+                    {
+                      value: 'send_transcription:3',
+                    },
+                    Date.now(),
+                    this.audio.audiomanagers[0].playPosition,
+                    -1,
+                    undefined,
+                    undefined,
+                    this.interface
+                  );
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        }
+      })
+    );
 
-    }));
+    this.subscrManager.add(
+      this.navbarServ.toolApplied.subscribe((toolName: string) => {
+        switch (toolName) {
+          case 'combinePhrases':
+            this.alertService
+              .showAlert(
+                'success',
+                this.langService.translate('tools.alerts.done', {
+                  value: toolName,
+                })
+              )
+              .catch((error) => {
+                console.error(error);
+              });
+            if (
+              this.currentEditor !== undefined &&
+              (this.currentEditor.instance as any).editor !== undefined
+            ) {
+              (this._currentEditor.instance as any).update();
+            }
+            break;
+        }
+      })
+    );
 
-    this.subscrManager.add(this.audio.missingPermission.subscribe(() => {
-      this.modService.openModal(MissingPermissionsModalComponent, MissingPermissionsModalComponent.options);
-    }));
+    this.subscrManager.add(
+      this.modService.showmodal.subscribe(
+        (event: { type: string; data; emitter: any }) => {
+          if (
+            this.currentEditor !== undefined &&
+            (this.currentEditor.instance as any).editor !== undefined
+          ) {
+            const editor = this._currentEditor.instance as OCTRAEditor;
+            console.log(`CALL disable all shortcuts!`);
+            editor.disableAllShortcuts();
+          } else {
+            console.log(``);
+          }
+        }
+      )
+    );
+
+    this.subscrManager.add(
+      this.modService.closemodal.subscribe(() => {
+        if (
+          this.currentEditor !== undefined &&
+          (this.currentEditor.instance as any).editor !== undefined
+        ) {
+          const editor = this._currentEditor.instance as OCTRAEditor;
+          console.log(`CALL enable all shortcuts!`);
+          editor.enableAllShortcuts();
+        }
+      })
+    );
+
+    this.subscrManager.add(
+      this.audio.missingPermission.subscribe(() => {
+        this.modService.openModal(
+          MissingPermissionsModalComponent,
+          MissingPermissionsModalComponent.options
+        );
+      })
+    );
   }
 
   abortTranscription = () => {
-    if ((this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO)
-      && this.settingsService.projectsettings.octra !== undefined
-      && this.settingsService.projectsettings.octra.theme !== undefined
-      && this.settingsService.isTheme("shortAudioFiles")) {
+    if (
+      (this._useMode === LoginMode.ONLINE ||
+        this._useMode === LoginMode.DEMO) &&
+      this.settingsService.projectsettings.octra !== undefined &&
+      this.settingsService.projectsettings.octra.theme !== undefined &&
+      this.settingsService.isTheme('shortAudioFiles')
+    ) {
       // clear transcription
 
       this.transcrService.endTranscription();
@@ -352,13 +441,19 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         this.logout(true);
       }
     } else {
-      this.modService.openModal(TranscriptionStopModalComponent, TranscriptionStopModalComponent.options).then((answer: TranscriptionStopModalAnswer) => {
-        if (answer === TranscriptionStopModalAnswer.QUIT) {
-          this.logout(false);
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
+      this.modService
+        .openModal(
+          TranscriptionStopModalComponent,
+          TranscriptionStopModalComponent.options
+        )
+        .then((answer: TranscriptionStopModalAnswer) => {
+          if (answer === TranscriptionStopModalAnswer.QUIT) {
+            this.logout(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   };
 
@@ -369,20 +464,27 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
   ngOnInit() {
     this._useMode = this.appStorage.useMode;
-    this._selectedTheme = (
-      this.projectsettings?.octra === undefined
-      || this.projectsettings?.octra?.theme === undefined
-    )
-      ? "default" : this.projectsettings?.octra.theme;
-    this.showCommentSection = (
-        this.settingsService.isTheme("shortAudioFiles") ||
-        this.settingsService.isTheme("korbinian")
-      ) && (this._useMode === "online" || this._useMode === "demo")
-      && this.transcrService.feedback !== undefined;
+    this._selectedTheme =
+      this.projectsettings?.octra === undefined ||
+      this.projectsettings?.octra?.theme === undefined
+        ? 'default'
+        : this.projectsettings?.octra.theme;
+    this.showCommentSection =
+      (this.settingsService.isTheme('shortAudioFiles') ||
+        this.settingsService.isTheme('korbinian')) &&
+      (this._useMode === 'online' || this._useMode === 'demo') &&
+      this.transcrService.feedback !== undefined;
 
-    this.subscrManager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
-      this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
-    }));
+    this.subscrManager.add(
+      this.transcrService.alertTriggered.subscribe((alertConfig) => {
+        this.alertService.showAlert(
+          alertConfig.type,
+          alertConfig.data,
+          alertConfig.unique,
+          alertConfig.duration
+        );
+      })
+    );
 
     console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
@@ -390,31 +492,32 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
 
     for (const marker of this.transcrService.guidelines.markers) {
-      if (marker.type === "break") {
+      if (marker.type === 'break') {
         this.transcrService.breakMarker = marker;
         break;
       }
     }
 
     // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
-    this.navbarServ.showInterfaces = this.settingsService.projectsettings.navigation.interfaces;
+    this.navbarServ.showInterfaces =
+      this.settingsService.projectsettings.navigation.interfaces;
     this.checkCurrentEditor();
     this.interface = this.appStorage.interface;
 
     // load guidelines on language change
-    this.subscrManager.add(this.langService.langChanges$.subscribe(
-      () => {
+    this.subscrManager.add(
+      this.langService.langChanges$.subscribe(() => {
         this.settingsService.loadGuidelines();
-      }
-    ));
+      })
+    );
 
-    this.subscrManager.add(this.navbarServ.interfacechange.subscribe(
-      (editor) => {
+    this.subscrManager.add(
+      this.navbarServ.interfacechange.subscribe((editor) => {
         this.changeEditor(editor).catch((error) => {
           console.error(error);
         });
-      }
-    ));
+      })
+    );
 
     this.bugService.init(this.transcrService);
 
@@ -425,93 +528,132 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.asrService.init();
 
     // first change
-    this.changeEditor(this.interface).then(() => {
-      (this._currentEditor.instance as any).afterFirstInitialization();
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.changeEditor(this.interface)
+      .then(() => {
+        (this._currentEditor.instance as any).afterFirstInitialization();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
 
-    this.subscrManager.add(this.appStorage.saving.subscribe(
-      (saving: string) => {
-        if (saving === "saving") {
-          this.saving = "saving";
-        } else if (saving === "error") {
-          this.saving = "error";
-        } else if (saving === "success") {
-          this.subscrManager.add(timer(200).subscribe(() => {
-            this.saving = "success";
-          }));
+    this.subscrManager.add(
+      this.appStorage.saving.subscribe((saving: string) => {
+        if (saving === 'saving') {
+          this.saving = 'saving';
+        } else if (saving === 'error') {
+          this.saving = 'error';
+        } else if (saving === 'success') {
+          this.subscrManager.add(
+            timer(200).subscribe(() => {
+              this.saving = 'success';
+            })
+          );
         }
-      }
-    ));
+      })
+    );
 
-    this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
+    this.navbarServ.showExport =
+      this.settingsService.projectsettings.navigation.export;
 
     if (this.transcrService.annotation !== undefined) {
       this.levelSubscriptionID = this.subscrManager.add(
-        this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
+        this.transcrService.currentLevelSegmentChange.subscribe(
+          this.transcrService.saveSegments
+        )
       );
     } else {
-      this.subscrManager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.levelSubscriptionID = this.subscrManager.add(
-          this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
-        );
-      }));
+      this.subscrManager.add(
+        this.transcrService.dataloaded.subscribe(() => {
+          this.levelSubscriptionID = this.subscrManager.add(
+            this.transcrService.currentLevelSegmentChange.subscribe(
+              this.transcrService.saveSegments
+            )
+          );
+        })
+      );
     }
 
-    this.subscrManager.add(this.transcrService.levelchanged.subscribe(
-      (level: Level) => {
+    this.subscrManager.add(
+      this.transcrService.levelchanged.subscribe((level: Level) => {
         (this.currentEditor.instance as any).update();
 
         // important: subscribe to level changes in order to save proceedings
         this.subscrManager.removeById(this.levelSubscriptionID);
         this.levelSubscriptionID = this.subscrManager.add(
-          this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
+          this.transcrService.currentLevelSegmentChange.subscribe(
+            this.transcrService.saveSegments
+          )
         );
-        this.uiService.addElementFromEvent("level", { value: "changed" }, Date.now(),
+        this.uiService.addElementFromEvent(
+          'level',
+          { value: 'changed' },
+          Date.now(),
           this.audioManager.createSampleUnit(0),
-          -1, undefined, undefined, level.name);
-      }
-    ));
+          -1,
+          undefined,
+          undefined,
+          level.name
+        );
+      })
+    );
 
-    if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
-      if (this.settingsService.appSettings.octra.inactivityNotice !== undefined
-        && this.settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined
-        && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
+    if (
+      this._useMode === LoginMode.ONLINE ||
+      this._useMode === LoginMode.DEMO
+    ) {
+      if (
+        this.settingsService.appSettings.octra.inactivityNotice !== undefined &&
+        this.settingsService.appSettings.octra.inactivityNotice.showAfter !==
+          undefined &&
+        this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0
+      ) {
         // if waitTime is 0 the inactivity modal isn't shown
-        let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
+        let waitTime =
+          this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
-        this.subscrManager.add(interval(5000).subscribe(
-          () => {
-            if (Date.now() - this.uiService.lastAction > waitTime && !this.modalVisiblities.inactivity) {
-              if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
+        this.subscrManager.add(
+          interval(5000).subscribe(() => {
+            if (
+              Date.now() - this.uiService.lastAction > waitTime &&
+              !this.modalVisiblities.inactivity
+            ) {
+              if (
+                this.inactivityModal === undefined &&
+                !this.isInactivityModalVisible
+              ) {
                 this.isInactivityModalVisible = true;
-                this.modService.openModal(InactivityModalComponent, InactivityModalComponent.options).then((answer) => {
-                  this.isInactivityModalVisible = false;
-                  switch (answer) {
-                    case("quit"):
-                      this.abortTranscription();
-                      break;
-                    case("new"):
-                      this.closeTranscriptionAndGetNew();
-                      break;
-                    case("continue"):
-                      // reload OCTRA to continue
-                      break;
-                  }
-                  this.uiService.lastAction = Date.now();
-                  this.inactivityModal = undefined;
-                }).catch((error) => {
-                  this.inactivityModal = undefined;
-                  console.error(error);
-                });
+                this.modService
+                  .openModal(
+                    InactivityModalComponent,
+                    InactivityModalComponent.options
+                  )
+                  .then((answer) => {
+                    this.isInactivityModalVisible = false;
+                    switch (answer) {
+                      case 'quit':
+                        this.abortTranscription();
+                        break;
+                      case 'new':
+                        this.closeTranscriptionAndGetNew();
+                        break;
+                      case 'continue':
+                        // reload OCTRA to continue
+                        break;
+                    }
+                    this.uiService.lastAction = Date.now();
+                    this.inactivityModal = undefined;
+                  })
+                  .catch((error) => {
+                    this.inactivityModal = undefined;
+                    console.error(error);
+                  });
               }
             }
-          }
-        ));
+          })
+        );
       }
     }
 
@@ -531,35 +673,44 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     }
   }
 
-  @HostListener("window:keydown", ["$event"])
+  @HostListener('window:keydown', ['$event'])
   onKeyDown($event) {
     const shortcutInfo = this.shortcutManager.checkKeyEvent($event, Date.now());
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
 
       switch (shortcutInfo.shortcutName) {
-        case ("shortcuts"):
+        case 'shortcuts':
           if (!this.modalVisiblities.shortcuts) {
-            this.modalShortcutsDialogue = this.modService.openModalRef(ShortcutsModalComponent, ShortcutsModalComponent.options);
+            this.modalShortcutsDialogue = this.modService.openModalRef(
+              ShortcutsModalComponent,
+              ShortcutsModalComponent.options
+            );
             this.modalVisiblities.shortcuts = true;
           } else {
             this.modalShortcutsDialogue.close();
             this.modalVisiblities.shortcuts = false;
           }
           break;
-        case("guidelines"):
+        case 'guidelines':
           if (!this.modalVisiblities.guidelines) {
-            this.modalGuidelines = this.modService.openModalRef(TranscriptionGuidelinesModalComponent, TranscriptionGuidelinesModalComponent.options);
+            this.modalGuidelines = this.modService.openModalRef(
+              TranscriptionGuidelinesModalComponent,
+              TranscriptionGuidelinesModalComponent.options
+            );
             this.modalVisiblities.guidelines = true;
           } else {
             this.modalGuidelines.close();
             this.modalVisiblities.guidelines = false;
           }
           break;
-        case("overview"):
+        case 'overview':
           if (!this.modalVisiblities.overview) {
             this.transcrService.analyse();
-            this.modalOverview = this.modService.openModalRef(OverviewModalComponent, OverviewModalComponent.options);
+            this.modalOverview = this.modService.openModalRef(
+              OverviewModalComponent,
+              OverviewModalComponent.options
+            );
             this.modalVisiblities.overview = true;
           } else {
             this.modalOverview.close();
@@ -570,7 +721,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     }
   }
 
-  @HostListener("window:keyup", ["$event"])
+  @HostListener('window:keyup', ['$event'])
   onKeyUp($event) {
     this.shortcutManager.checkKeyEvent($event, Date.now());
   }
@@ -581,7 +732,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
       this.cd.detectChanges();
       let comp: any = undefined;
 
-      if ((name === undefined) || name === "") {
+      if (name === undefined || name === '') {
         // fallback to last editor
         name = editorComponents[editorComponents.length - 1].name;
       }
@@ -595,50 +746,77 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
       }
 
       if (!(comp === undefined)) {
-        const id = this.subscrManager.add(comp.initialized.subscribe(
-          () => {
+        const id = this.subscrManager.add(
+          comp.initialized.subscribe(() => {
             this.editorloaded = true;
             this.subscrManager.removeById(id);
             this.cd.detectChanges();
 
             resolve();
-          }
-        ));
+          })
+        );
 
         if (!(this.appLoadeditor === undefined)) {
-          const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
+          const componentFactory =
+            this._componentFactoryResolver.resolveComponentFactory(comp);
 
-          this.subscrManager.add(timer(20).subscribe(() => {
-            const viewContainerRef = this.appLoadeditor.viewContainerRef;
-            viewContainerRef.clear();
+          this.subscrManager.add(
+            timer(20).subscribe(() => {
+              const viewContainerRef = this.appLoadeditor.viewContainerRef;
+              viewContainerRef.clear();
 
-            this._currentEditor = viewContainerRef.createComponent(componentFactory);
+              this._currentEditor =
+                viewContainerRef.createComponent(componentFactory);
 
-            if (hasProperty((this.currentEditor.instance as any), "openModal")) {
-              this.subscrManager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-                (this.currentEditor.instance as any).disableAllShortcuts();
-                this.modService.openModal(OverviewModalComponent, OverviewModalComponent.options).then(() => {
-                  (this.currentEditor.instance as any).enableAllShortcuts();
-                }).catch((error) => {
-                  console.error(error);
-                });
-              }));
-            }
+              if (
+                hasProperty(this.currentEditor.instance as any, 'openModal')
+              ) {
+                this.subscrManager.add(
+                  (this.currentEditor.instance as any).openModal.subscribe(
+                    () => {
+                      (
+                        this.currentEditor.instance as any
+                      ).disableAllShortcuts();
+                      this.modService
+                        .openModal(
+                          OverviewModalComponent,
+                          OverviewModalComponent.options
+                        )
+                        .then(() => {
+                          (
+                            this.currentEditor.instance as any
+                          ).enableAllShortcuts();
+                        })
+                        .catch((error) => {
+                          console.error(error);
+                        });
+                    }
+                  )
+                );
+              }
 
-            this.uiService.addElementFromEvent("editor:changed", { value: name }, Date.now(),
-              undefined, undefined, undefined, undefined, "editors");
-            console.log(`opened ${name}`);
+              this.uiService.addElementFromEvent(
+                'editor:changed',
+                { value: name },
+                Date.now(),
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                'editors'
+              );
+              console.log(`opened ${name}`);
 
-            this.cd.detectChanges();
-          }));
-
+              this.cd.detectChanges();
+            })
+          );
         } else {
-          reject("ERROR appLoadeditor is undefined");
-          console.error("ERROR appLoadeditor is undefined");
+          reject('ERROR appLoadeditor is undefined');
+          console.error('ERROR appLoadeditor is undefined');
         }
       } else {
-        reject("ERROR appLoadeditor is undefined");
-        console.error("ERROR editor component is undefined");
+        reject('ERROR appLoadeditor is undefined');
+        console.error('ERROR editor component is undefined');
       }
     });
   }
@@ -691,35 +869,49 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         subscr.unsubscribe();
       });
       */
-      this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
+      this.transcrSendingModal = this.modService.openModalRef(
+        TranscriptionSendingModalComponent,
+        TranscriptionSendingModalComponent.options
+      );
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
         this.modalOverview.close();
       }
 
-      this.modService.openModal(TranscriptionDemoEndModalComponent, TranscriptionDemoEndModalComponent.options).then((action: ModalEndAnswer) => {
-        this.appStorage.savingNeeded = false;
-        this.waitForSend = false;
+      this.modService
+        .openModal(
+          TranscriptionDemoEndModalComponent,
+          TranscriptionDemoEndModalComponent.options
+        )
+        .then((action: ModalEndAnswer) => {
+          this.appStorage.savingNeeded = false;
+          this.waitForSend = false;
 
-        switch (action) {
-          case(ModalEndAnswer.CANCEL):
-            break;
-          case(ModalEndAnswer.QUIT):
-            this.abortTranscription();
-            break;
-          case(ModalEndAnswer.CONTINUE):
-            this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
-            this.subscrManager.add(timer(1000).subscribe(() => {
-              // simulate nextTranscription
-              this.transcrSendingModal.close();
-              this.reloadDemo();
-            }));
-            break;
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
+          switch (action) {
+            case ModalEndAnswer.CANCEL:
+              break;
+            case ModalEndAnswer.QUIT:
+              this.abortTranscription();
+              break;
+            case ModalEndAnswer.CONTINUE:
+              this.transcrSendingModal = this.modService.openModalRef(
+                TranscriptionSendingModalComponent,
+                TranscriptionSendingModalComponent.options
+              );
+              this.subscrManager.add(
+                timer(1000).subscribe(() => {
+                  // simulate nextTranscription
+                  this.transcrSendingModal.close();
+                  this.reloadDemo();
+                })
+              );
+              break;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }
 
@@ -744,22 +936,34 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         this.transcrService.validateAll();
         const validTranscript = this.transcrService.transcriptValid;
 
-        if (this.projectsettings.octra !== undefined &&
-          this.projectsettings.octra.showOverviewIfTranscriptNotValid !== undefined) {
-          showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
+        if (
+          this.projectsettings.octra !== undefined &&
+          this.projectsettings.octra.showOverviewIfTranscriptNotValid !==
+            undefined
+        ) {
+          showOverview =
+            this.projectsettings.octra.showOverviewIfTranscriptNotValid;
         }
 
-        if (this.projectsettings.octra !== undefined
-          && this.projectsettings.octra.sendValidatedTranscriptionOnly !== undefined) {
-          validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
+        if (
+          this.projectsettings.octra !== undefined &&
+          this.projectsettings.octra.sendValidatedTranscriptionOnly !==
+            undefined
+        ) {
+          validTranscriptOnly =
+            this.projectsettings.octra.sendValidatedTranscriptionOnly;
         }
 
-        if ((
-            (!validTranscript && showOverview) /*||  !this.modalOverview.feedBackComponent.valid*/)
-          || (validTranscriptOnly && !validTranscript)
+        if (
+          (!validTranscript &&
+            showOverview) /*||  !this.modalOverview.feedBackComponent.valid*/ ||
+          (validTranscriptOnly && !validTranscript)
         ) {
           this.waitForSend = false;
-          this.modalOverview = this.modService.openModalRef(OverviewModalComponent, OverviewModalComponent.options);
+          this.modalOverview = this.modService.openModalRef(
+            OverviewModalComponent,
+            OverviewModalComponent.options
+          );
         } else {
           this.onSendNowClick();
         }
@@ -770,13 +974,23 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   reloadDemo() {
     this.transcrService.endTranscription(false);
     this.clearDataPermanently();
-    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
+    const audioExample = this.settingsService.getAudioExample(
+      this.langService.getActiveLang()
+    );
 
     if (audioExample !== undefined) {
       // transcription available
-      this.appStorage.setDemoSession(audioExample.url, audioExample.description, this.appStorage.jobsLeft - 1);
+      this.appStorage.setDemoSession(
+        audioExample.url,
+        audioExample.description,
+        this.appStorage.jobsLeft - 1
+      );
 
-      navigateTo(this.router, ["/user/load"], AppInfo.queryParamsHandling).catch((error) => {
+      navigateTo(
+        this.router,
+        ['/user/load'],
+        AppInfo.queryParamsHandling
+      ).catch((error) => {
         console.error(`navigation failed`);
         console.error(error);
       });
@@ -809,20 +1023,27 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.appStorage.submitted = false; // ok
     this.appStorage.clearAnnotationPermanently(); // ok
     this.appStorage.feedback = {}; // ok
-    this.appStorage.comment = ""; // ok
+    this.appStorage.comment = ''; // ok
     this.appStorage.clearLoggingDataPermanently(); // ok
     this.uiService.elements = [];
   }
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.resource.info.duration);
-    const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
-    result.name = result.name.replace("-" + oannotjson.levels[0].name, "");
+    const oannotjson = this.transcrService.annotation.getObj(
+      this.transcrService.audioManager.resource.info.duration
+    );
+    const result: IFile = converter.export(
+      oannotjson,
+      this.transcrService.audiofile,
+      0
+    ).file;
+    result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 
     // upload transcript
     const form: FormData = new FormData();
-    let host = "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/";
+    let host =
+      'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
     if (!(this.appStorage.urlParams.host === undefined)) {
       host = this.appStorage.urlParams.host;
@@ -830,13 +1051,16 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
     const url = `${host}uploadFileMulti`;
 
-    form.append("file0", new File([result.content], result.name, { type: "text/plain" }));
+    form.append(
+      'file0',
+      new File([result.content], result.name, { type: 'text/plain' })
+    );
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", url);
+    xhr.open('POST', url);
 
     xhr.onloadstart = () => {
-      console.log("start");
+      console.log('start');
     };
 
     xhr.onerror = (e) => {
@@ -850,9 +1074,9 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
       let json: any = x2js.xml2js(result2);
       json = json.UploadFileMultiResponse;
 
-      if (json.success === "true") {
+      if (json.success === 'true') {
         // TODO set urls to results only
-        let resulturl = "";
+        let resulturl = '';
         if (Array.isArray(json.fileList.entry)) {
           resulturl = json.fileList.entry[0].value;
         } else {
@@ -861,32 +1085,38 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         }
 
         // send upload url to iframe owner
-        window.parent.postMessage({
-          data: {
-            transcript_url: resulturl
+        window.parent.postMessage(
+          {
+            data: {
+              transcript_url: resulturl,
+            },
+            status: 'success',
           },
-          status: "success"
-        }, "*");
+          '*'
+        );
       } else {
-        window.parent.postMessage({
-          status: "error",
-          error: json.message
-        }, "*");
+        window.parent.postMessage(
+          {
+            status: 'error',
+            error: json.message,
+          },
+          '*'
+        );
       }
     };
     xhr.send(form);
   }
 
-  public sendTranscriptionForShortAudioFiles(type: "bad" | "middle" | "good") {
+  public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
     switch (type) {
-      case("bad"):
-        this.appStorage.feedback = "SEVERE";
+      case 'bad':
+        this.appStorage.feedback = 'SEVERE';
         break;
-      case("middle"):
-        this.appStorage.feedback = "SLIGHT";
+      case 'middle':
+        this.appStorage.feedback = 'SLIGHT';
         break;
-      case("good"):
-        this.appStorage.feedback = "OK";
+      case 'good':
+        this.appStorage.feedback = 'OK';
         break;
       default:
     }
@@ -894,15 +1124,25 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.onSendButtonClick();
   }
 
-  public sendTranscriptionForKorbinian(type: "NO" | "VE" | "EE" | "AN") {
-    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, "");
-    const servercomment = this.appStorage.servercomment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, "");
+  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
+    this.transcrService.feedback.comment =
+      this.transcrService.feedback.comment.replace(
+        /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
+        ''
+      );
+    const servercomment = this.appStorage.servercomment.replace(
+      /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
+      ''
+    );
 
-    if (servercomment !== "" && this.transcrService.feedback.comment === "") {
-      this.transcrService.feedback.comment = type + "; " + servercomment;
-    } else if ((servercomment === "" && this.transcrService.feedback.comment !== "")
-      || (servercomment !== "" && this.transcrService.feedback.comment !== "")) {
-      this.transcrService.feedback.comment = type + "; " + this.transcrService.feedback.comment;
+    if (servercomment !== '' && this.transcrService.feedback.comment === '') {
+      this.transcrService.feedback.comment = type + '; ' + servercomment;
+    } else if (
+      (servercomment === '' && this.transcrService.feedback.comment !== '') ||
+      (servercomment !== '' && this.transcrService.feedback.comment !== '')
+    ) {
+      this.transcrService.feedback.comment =
+        type + '; ' + this.transcrService.feedback.comment;
     } else {
       this.transcrService.feedback.comment = type;
     }
@@ -925,22 +1165,34 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   }
 
   openGuidelines() {
-    this.modalGuidelines = this.modService.openModalRef(TranscriptionGuidelinesModalComponent, TranscriptionGuidelinesModalComponent.options);
+    this.modalGuidelines = this.modService.openModalRef(
+      TranscriptionGuidelinesModalComponent,
+      TranscriptionGuidelinesModalComponent.options
+    );
     this.modalVisiblities.guidelines = true;
   }
 
   openOverview() {
-    this.modalOverview = this.modService.openModalRef(OverviewModalComponent, OverviewModalComponent.options);
+    this.modalOverview = this.modService.openModalRef(
+      OverviewModalComponent,
+      OverviewModalComponent.options
+    );
     this.modalVisiblities.overview = true;
   }
 
   openShortcutsModal() {
-    this.modalShortcutsDialogue = this.modService.openModalRef(ShortcutsModalComponent, ShortcutsModalComponent.options);
+    this.modalShortcutsDialogue = this.modService.openModalRef(
+      ShortcutsModalComponent,
+      ShortcutsModalComponent.options
+    );
     this.modalVisiblities.shortcuts = true;
   }
 
   openPromptModal() {
     // TODO mdb: preserve this.transcrServ.audiofile
-    this.modService.openModalRef(PromptModalComponent, PromptModalComponent.options);
+    this.modService.openModalRef(
+      PromptModalComponent,
+      PromptModalComponent.options
+    );
   }
 }

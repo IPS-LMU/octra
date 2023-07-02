@@ -1,7 +1,7 @@
-import { HttpClient, HttpResponse } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { BugReporter } from "./BugReporter";
-import { getProperties } from "@octra/utilities";
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { BugReporter } from './BugReporter';
+import { getProperties } from '@octra/utilities';
 
 export class EmailBugReporter extends BugReporter {
   constructor() {
@@ -9,12 +9,18 @@ export class EmailBugReporter extends BugReporter {
     this._name = 'Email';
   }
 
-  public sendBugReport(http: HttpClient, pkg: any, form: any, url: string,
-                       authToken: string, sendbugreport: boolean, screenshots: {
-      blob: File
-    }[]): Observable<HttpResponse<any>> {
-
-    const report = (sendbugreport) ? JSON.parse(JSON.stringify(pkg)) : undefined;
+  public sendBugReport(
+    http: HttpClient,
+    pkg: any,
+    form: any,
+    url: string,
+    authToken: string,
+    sendbugreport: boolean,
+    screenshots: {
+      blob: File;
+    }[]
+  ): Observable<HttpResponse<any>> {
+    const report = sendbugreport ? JSON.parse(JSON.stringify(pkg)) : undefined;
 
     const json = pkg;
 
@@ -22,13 +28,13 @@ export class EmailBugReporter extends BugReporter {
       description: form.description,
       additional_information: {
         email: form.email,
-        name: form.name
+        name: form.name,
       },
       os: json.system.os.name,
       os_build: json.system.os.version,
       platform: json.system.browser,
       version: json.octra.version,
-      report
+      report,
     };
 
     const formData = new FormData();
@@ -41,10 +47,10 @@ export class EmailBugReporter extends BugReporter {
 
     return http.post(url, formData, {
       headers: {
-        Authorization: authToken
+        Authorization: authToken,
       },
       observe: 'response',
-      responseType: 'json'
+      responseType: 'json',
     });
   }
 
@@ -69,7 +75,12 @@ export class EmailBugReporter extends BugReporter {
           if (typeof value2.message === 'string') {
             result += '  ' + value2.type + '  ' + value2.message + '\n';
           } else if (typeof value2.message === 'object') {
-            result += '  ' + value2.type + '\n' + JSON.stringify(value2.message, undefined, 2) + '\n';
+            result +=
+              '  ' +
+              value2.type +
+              '\n' +
+              JSON.stringify(value2.message, undefined, 2) +
+              '\n';
           }
         }
       }

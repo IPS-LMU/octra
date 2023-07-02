@@ -1,8 +1,13 @@
-import { createAction, createActionGroup, emptyProps, props } from "@ngrx/store";
-import { ConsoleEntry } from "../../shared/service/bug-report.service";
-import { LoginMode } from "../index";
-import { AppSettings } from "../../obj";
-import { HttpErrorResponse } from "@angular/common/http";
+import {
+  createAction,
+  createActionGroup,
+  emptyProps,
+  props,
+} from '@ngrx/store';
+import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import { LoginMode } from '../index';
+import { AppSettings } from '../../obj';
+import { HttpErrorResponse } from '@angular/common/http';
 
 const context = 'Application';
 
@@ -19,10 +24,10 @@ export class ApplicationActions {
     source: 'api/load asr settings',
     events: {
       do: props<{
-        settings: AppSettings
+        settings: AppSettings;
       }>(),
       success: props<{
-        settings: AppSettings
+        settings: AppSettings;
       }>(),
       fail: props<{
         error: HttpErrorResponse;
@@ -67,21 +72,13 @@ export class ApplicationActions {
     },
   });
 
-  public static undo = createAction(
-    `UNDO`
-  );
+  public static undo = createAction(`UNDO`);
 
-  public static redo = createAction(
-    `REDO`
-  );
+  public static redo = createAction(`REDO`);
 
-  public static clear = createAction(
-    `CLEAR`
-  );
+  public static clear = createAction(`CLEAR`);
 
-  public static undoSuccess = createAction(
-    `UNDO SUCCESS`
-  );
+  public static undoSuccess = createAction(`UNDO SUCCESS`);
 
   public static undoFailed = createAction(
     `UNDO FAILED`,
@@ -90,9 +87,7 @@ export class ApplicationActions {
     }>()
   );
 
-  public static redoSuccess = createAction(
-    `REDO SUCCESS`
-  );
+  public static redoSuccess = createAction(`REDO SUCCESS`);
 
   public static redoFailed = createAction(
     `REDO FAILED`,
@@ -110,7 +105,8 @@ export class ApplicationActions {
     }>()
   );
 
-  public static setMode = createAction(`[${context}] Set Mode`,
+  public static setMode = createAction(
+    `[${context}] Set Mode`,
     props<{
       mode: LoginMode;
     }>()
@@ -119,7 +115,7 @@ export class ApplicationActions {
   public static addError = createAction(
     `[${context}] Add Error`,
     props<{
-      error: string
+      error: string;
     }>()
   );
 
@@ -219,9 +215,5 @@ export class ApplicationActions {
     }>()
   );
 
-  public static clearSettings = createAction(
-    `[Configuration] Clear Settings`
-  );
+  public static clearSettings = createAction(`[Configuration] Clear Settings`);
 }
-
-

@@ -1,13 +1,14 @@
-import { Subscription } from "rxjs";
-import { Injectable } from "@angular/core";
-import { SubscriptionManager } from "@octra/utilities";
-import { TsWorker } from "./ts-worker";
-import { TsWorkerJob, TsWorkerStatus } from "./ts-worker-job";
+import { Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { SubscriptionManager } from '@octra/utilities';
+import { TsWorker } from './ts-worker';
+import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
 
 @Injectable()
 export class MultiThreadingService {
   private numberOfThreads = 2;
-  private subscrManager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
+  private subscrManager: SubscriptionManager<Subscription> =
+    new SubscriptionManager<Subscription>();
 
   private _workers: TsWorker[] = [];
 
@@ -26,35 +27,39 @@ export class MultiThreadingService {
       const bestWorker = this.getBestWorker();
 
       if (bestWorker !== undefined) {
-        const id = this.subscrManager.add(bestWorker.jobstatuschange.subscribe(
-          (changedJob: TsWorkerJob) => {
-            if (changedJob.id === job.id) {
-              if (changedJob.status === TsWorkerStatus.FINISHED) {
-                resolve(changedJob.result);
-              } else if (changedJob.status === TsWorkerStatus.FAILED) {
-                reject(`job id ${job.id} failed in worker ${bestWorker.id}`);
-              }
+        const id = this.subscrManager.add(
+          bestWorker.jobstatuschange.subscribe(
+            (changedJob: TsWorkerJob) => {
+              if (changedJob.id === job.id) {
+                if (changedJob.status === TsWorkerStatus.FINISHED) {
+                  resolve(changedJob.result);
+                } else if (changedJob.status === TsWorkerStatus.FAILED) {
+                  reject(`job id ${job.id} failed in worker ${bestWorker.id}`);
+                }
 
-              // unsubscribe because not needed anymore
-              this.subscrManager.removeById(id);
+                // unsubscribe because not needed anymore
+                this.subscrManager.removeById(id);
+              }
+            },
+            (error) => {
+              reject(error);
             }
-          }, (error) => {
-            reject(error);
-          }
-        ));
+          )
+        );
 
         bestWorker.addJob(job);
       } else {
         console.error(new Error(`found no worker to run job ${job.id}`));
       }
-
     });
   }
 
   public getStatistics(): string {
     let result = '';
     for (const worker of this.workers) {
-      result += `----- worker id ${worker.id} ----\n` + `jobs: ${worker.queue.length}\n----\n`;
+      result +=
+        `----- worker id ${worker.id} ----\n` +
+        `jobs: ${worker.queue.length}\n----\n`;
     }
 
     return result;

@@ -1,8 +1,8 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { SubscriptionManager } from "@octra/utilities";
-import { Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { SubscriptionManager } from '@octra/utilities';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 
 @Injectable()
 export class LoginService {

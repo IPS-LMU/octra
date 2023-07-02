@@ -35,8 +35,16 @@ export class OLogging implements ILogging {
   sampleRate: number;
   logs: ILog[];
 
-  constructor(version: string, encoding: string, projectname: string, lastupdate: string, audiofile: string,
-              sampleRate: number, duration: number, logs: OLog[]) {
+  constructor(
+    version: string,
+    encoding: string,
+    projectname: string,
+    lastupdate: string,
+    audiofile: string,
+    sampleRate: number,
+    duration: number,
+    logs: OLog[]
+  ) {
     this.version = version;
     this.encoding = encoding;
     this.projectname = projectname;
@@ -62,8 +70,16 @@ export class OLog implements ILog {
   selection: SampleInterval;
   segment: SampleInterval;
 
-  constructor(timestamp: number, type: string, context: string, value: any, playpos: number, caretpos: number,
-              selection?: SampleInterval, segment?: SampleInterval) {
+  constructor(
+    timestamp: number,
+    type: string,
+    context: string,
+    value: any,
+    playpos: number,
+    caretpos: number,
+    selection?: SampleInterval,
+    segment?: SampleInterval
+  ) {
     this.timestamp = timestamp;
     this.type = type;
     this.context = context;

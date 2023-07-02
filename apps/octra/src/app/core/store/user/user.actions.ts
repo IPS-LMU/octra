@@ -1,4 +1,4 @@
-import { createAction, props } from "@ngrx/store";
+import { createAction, props } from '@ngrx/store';
 
 const context = 'Feedback';
 export class UserActions {
@@ -10,5 +10,3 @@ export class UserActions {
     }>()
   );
 }
-
-

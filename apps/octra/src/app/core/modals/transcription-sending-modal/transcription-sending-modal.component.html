@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{"modal.transcription.sending.header" | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'modal.transcription.sending.header' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -9,11 +11,14 @@
     ></button>
   </div>
   <div class="modal-body">
-    {{"modal.transcription.sending.text" | transloco}}<br/><br/>
-    <div style="color:red">{{content}}</div>
-    <div *ngIf="content === ''" class="text-success" style="text-align: center;display:block;">
-      {{"general.submission success" |
-      transloco}}
+    {{ 'modal.transcription.sending.text' | transloco }}<br /><br />
+    <div style="color: red">{{ content }}</div>
+    <div
+      *ngIf="content === ''"
+      class="text-success"
+      style="text-align: center; display: block"
+    >
+      {{ 'general.submission success' | transloco }}
     </div>
   </div>
 </div>

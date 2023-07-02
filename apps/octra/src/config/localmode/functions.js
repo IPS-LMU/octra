@@ -12,7 +12,7 @@ function validateAnnotation(annotation, guidelines) {
     result.push({
       start: match.index,
       length: match[0].length,
-      code: "R06"
+      code: 'R06',
     });
   }
 
@@ -20,12 +20,15 @@ function validateAnnotation(annotation, guidelines) {
   for (var i = 0; i < guidelines.markers.length; i++) {
     var marker = guidelines.markers[i].code;
 
-    re = new RegExp("(" + escapeRegex(marker) + ")( *(" + escapeRegex(marker) + "))+", "g");
+    re = new RegExp(
+      '(' + escapeRegex(marker) + ')( *(' + escapeRegex(marker) + '))+',
+      'g'
+    );
     while ((match = re.exec(annotation)) != undefined) {
       result.push({
         start: match.index,
         length: match[0].length,
-        code: "M01"
+        code: 'M01',
       });
     }
   }
@@ -45,21 +48,20 @@ function tidyUpAnnotation(annotation, guidelines) {
   var result = annotation;
 
   result = result.replace(/<[~^a-z0-9]+>/g, function (x) {
-    return " " + x + " ";
+    return ' ' + x + ' ';
   });
   //set whitespaces before *
-  result = result.replace(/(\w|ä|ü|ö|ß|Ü|Ö|Ä)\*(\w|ä|ü|ö|ß|Ü|Ö|Ä)/g, "$1 *$2");
+  result = result.replace(/(\w|ä|ü|ö|ß|Ü|Ö|Ä)\*(\w|ä|ü|ö|ß|Ü|Ö|Ä)/g, '$1 *$2');
   //set whitespaces before and after **
-  result = result.replace(/(\*\*)|(\s\*\*)|(\*\*\s)/g, " ** ");
+  result = result.replace(/(\*\*)|(\s\*\*)|(\*\*\s)/g, ' ** ');
 
   //replace all numbers of whitespaces to one
-  result = result.replace(/\s+/g, " ");
+  result = result.replace(/\s+/g, ' ');
   //replace whitespaces at start an end
-  result = result.replace(/^\s+/g, "");
-  result = result.replace(/\s$/g, "");
+  result = result.replace(/^\s+/g, '');
+  result = result.replace(/\s$/g, '');
   return result;
 }
-
 
 /*
 ###### Default methods.
@@ -71,11 +73,8 @@ function escapeRegex(regex_str) {
 
 function sortValidationResult(result) {
   return result.sort(function (a, b) {
-    if (a.start === b.start)
-      return 0;
-    if (a.start < b.start)
-      return -1;
-    if (a.start > b.start)
-      return 1;
+    if (a.start === b.start) return 0;
+    if (a.start < b.start) return -1;
+    if (a.start > b.start) return 1;
   });
 }

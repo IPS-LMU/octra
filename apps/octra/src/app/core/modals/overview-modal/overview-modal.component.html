@@ -1,6 +1,8 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">{{'general.overview' | transloco}}</h5>
+    <h5 class="modal-title" id="modal-title">
+      {{ 'general.overview' | transloco }}
+    </h5>
     <button
       type="button"
       class="btn-close"
@@ -9,107 +11,177 @@
     ></button>
   </div>
   <div class="modal-body">
-    <div class="row" style="overflow: auto; flex:auto;">
-      <div [ngClass]="{
-                        'col-md-6 col-lg-9': appStorage.useMode === 'online' || this.appStorage.useMode === 'demo',
-                        'col-12': appStorage.useMode !== 'online' && this.appStorage.useMode !== 'demo'
-                    }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-        <h4>{{"general.statistics" | transloco}}</h4>
+    <div class="row" style="overflow: auto; flex: auto">
+      <div
+        [ngClass]="{
+          'col-md-6 col-lg-9':
+            appStorage.useMode === 'online' ||
+            this.appStorage.useMode === 'demo',
+          'col-12':
+            appStorage.useMode !== 'online' &&
+            this.appStorage.useMode !== 'demo'
+        }"
+        class="col-md-6"
+        style="
+          overflow: auto;
+          max-height: 1200px;
+          border-right: 1px solid lightgray;
+        "
+      >
+        <h4>{{ 'general.statistics' | transloco }}</h4>
 
         <table class="table table-bordered" id="statistics">
           <thead>
-          <tr>
-            <th>{{"segments.total" | transloco}}</th>
-            <th>{{"segments.transcribed" | transloco}}</th>
-            <th>{{"segments.with breaks" | transloco}}</th>
-            <th>{{"segments.not transcribed" | transloco}}</th>
-          </tr>
+            <tr>
+              <th>{{ 'segments.total' | transloco }}</th>
+              <th>{{ 'segments.transcribed' | transloco }}</th>
+              <th>{{ 'segments.with breaks' | transloco }}</th>
+              <th>{{ 'segments.not transcribed' | transloco }}</th>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <td class="table-default text-center">{{numberOfSegments}}</td>
-            <td class="table-success text-center">{{transcrSegments}}</td>
-            <td class="table-info text-center">{{pauseSegments}}</td>
-            <td class="table-danger text-center"><b><u>{{emptySegments}}</u></b></td>
-          </tr>
+            <tr>
+              <td class="table-default text-center">{{ numberOfSegments }}</td>
+              <td class="table-success text-center">{{ transcrSegments }}</td>
+              <td class="table-info text-center">{{ pauseSegments }}</td>
+              <td class="table-danger text-center">
+                <b
+                  ><u>{{ emptySegments }}</u></b
+                >
+              </td>
+            </tr>
           </tbody>
         </table>
         <p [hidden]="shownSegments.length === 0" style="text-align: center">
           <ng-container *ngIf="validationFound">
-        <span *ngIf="foundErrors === 0"
-              class="text-success found-errors">{{"general.no errors found" | transloco}}</span>
+            <span *ngIf="foundErrors === 0" class="text-success found-errors">{{
+              'general.no errors found' | transloco
+            }}</span>
           </ng-container>
         </p>
         <div *ngIf="foundErrors > 0">
           <div class="text-danger found-errors">
-            {{"general.errors found" | transloco : {errors: foundErrors + ''} }}<br/>
-            {{"modal.overview.check transcription" | transloco}}
+            {{
+              'general.errors found' | transloco : { errors: foundErrors + '' }
+            }}<br />
+            {{ 'modal.overview.check transcription' | transloco }}
           </div>
-          <button class="btn btn-primary btn-raised"
-                  (click)="switchToTRNEditor($event)">{{"general.switch to" | transloco:{
-            editor: 'interfaces.TRN editor' | transloco
-          } }}</button>
+          <button
+            class="btn btn-primary btn-raised"
+            (click)="switchToTRNEditor($event)"
+          >
+            {{
+              'general.switch to'
+                | transloco
+                  : {
+                      editor: 'interfaces.TRN editor' | transloco
+                    }
+            }}
+          </button>
         </div>
         <span *ngIf="!validationFound">No validation methods found</span>
       </div>
-      <div *ngIf="appStorage.useMode === 'online' || this.appStorage.useMode === 'demo'" class="col-md-6 col-lg-3"
-           style="overflow: auto;max-height:1200px;">
+      <div
+        *ngIf="
+          appStorage.useMode === 'online' || this.appStorage.useMode === 'demo'
+        "
+        class="col-md-6 col-lg-3"
+        style="overflow: auto; max-height: 1200px"
+      >
         <h4>Feedback</h4>
-        <octra-transcription-feedback #feedback
-                                      [feedbackData]="appStorage.feedback"
-                                      [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
+        <octra-transcription-feedback
+          #feedback
+          [feedbackData]="appStorage.feedback"
+          [showCommentFieldOnly]="
+            settingsService.isTheme('shortAudioFiles') ||
+            settingsService.isTheme('korbinian')
+          "
+        >
         </octra-transcription-feedback>
 
-        <p *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid"
-           style="color:red; text-align: center">
-          {{"transcription.invalid" | transloco}}
+        <p
+          *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid"
+          style="color: red; text-align: center"
+        >
+          {{ 'transcription.invalid' | transloco }}
         </p>
         <ng-container
-          *ngIf="settingsService.isTheme('default'); else isShortAudioFilesTheme">
-          <button (click)="sendTranscription()"
-                  [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)"
-                  class="btn btn-primary btn-outline btn-success"
-                  id="transcr-send-btn">
+          *ngIf="
+            settingsService.isTheme('default');
+            else isShortAudioFilesTheme
+          "
+        >
+          <button
+            (click)="sendTranscription()"
+            [disabled]="
+              !feedback.valid ||
+              (sendValidTranscriptOnly && !transcrService.transcriptValid)
+            "
+            class="btn btn-primary btn-outline btn-success"
+            id="transcr-send-btn"
+          >
             <i class="bi bi-send-fill"></i>
-            {{"transcription.send" | transloco}}
+            {{ 'transcription.send' | transloco }}
           </button>
         </ng-container>
         <ng-template #isShortAudioFilesTheme>
-          <div *ngIf="settingsService.isTheme('shortAudioFiles'); else isKorbinianTheme" class="row"
-               id="bottom-navigation1" role="group">
-            <button (click)="sendTranscriptionForShortAudioFiles('good')"
-                    class="btn btn-raised btn-primary w-100">
+          <div
+            *ngIf="
+              settingsService.isTheme('shortAudioFiles');
+              else isKorbinianTheme
+            "
+            class="row"
+            id="bottom-navigation1"
+            role="group"
+          >
+            <button
+              (click)="sendTranscriptionForShortAudioFiles('good')"
+              class="btn btn-raised btn-primary w-100"
+            >
               <i class="bi bi-star-fill"></i>
               <i class="bi bi-star-fill"></i>
               <i class="bi bi-star-fill"></i>
             </button>
-            <button (click)="sendTranscriptionForShortAudioFiles('middle')" class="btn btn-raised btn-warning w-100"
-                    style="background-color: orange">
+            <button
+              (click)="sendTranscriptionForShortAudioFiles('middle')"
+              class="btn btn-raised btn-warning w-100"
+              style="background-color: orange"
+            >
               <i class="bi bi-star-fill"></i>
               <i class="bi bi-star-fill"></i>
             </button>
-            <button (click)="sendTranscriptionForShortAudioFiles('bad')"
-                    class="btn btn-raised btn-danger w-100">
+            <button
+              (click)="sendTranscriptionForShortAudioFiles('bad')"
+              class="btn btn-raised btn-danger w-100"
+            >
               <i class="bi bi-star-fill"></i>
             </button>
           </div>
         </ng-template>
         <ng-template #isKorbinianTheme>
           <div class="row" id="bottom-navigation" role="group">
-            <button (click)="sendTranscriptionForKorbinian('NO')"
-                    class="btn btn-raised btn-info w-100">
+            <button
+              (click)="sendTranscriptionForKorbinian('NO')"
+              class="btn btn-raised btn-info w-100"
+            >
               NO
             </button>
-            <button (click)="sendTranscriptionForKorbinian('VE')"
-                    class="btn btn-raised btn-danger w-100">
+            <button
+              (click)="sendTranscriptionForKorbinian('VE')"
+              class="btn btn-raised btn-danger w-100"
+            >
               VE
             </button>
-            <button (click)="sendTranscriptionForKorbinian('EE')"
-                    class="btn btn-raised btn-secondary w-100">
+            <button
+              (click)="sendTranscriptionForKorbinian('EE')"
+              class="btn btn-raised btn-secondary w-100"
+            >
               EE
             </button>
-            <button (click)="sendTranscriptionForKorbinian('AN')"
-                    class="btn btn-raised btn-primary w-100">
+            <button
+              (click)="sendTranscriptionForKorbinian('AN')"
+              class="btn btn-raised btn-primary w-100"
+            >
               AN
             </button>
           </div>
@@ -119,7 +191,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary" (click)="close(true)" type="button">
-      {{"general.close" | transloco}}
+      {{ 'general.close' | transloco }}
     </button>
   </div>
 </div>

@@ -4,24 +4,21 @@ import {
   Component,
   ElementRef,
   Input,
-  OnDestroy,
   Output,
-  ViewChild
-} from "@angular/core";
-import { Subject, Subscription } from "rxjs";
-import { SubscriptionManager } from "@octra/utilities";
-import { Segment } from "@octra/annotation";
-import { moveItemInArray } from "@angular/cdk/drag-drop";
-import { DefaultComponent } from "../../component/default.component";
+  ViewChild,
+} from '@angular/core';
+import { Subject } from 'rxjs';
+import { Segment } from '@octra/annotation';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { DefaultComponent } from '../../component/default.component';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
   templateUrl: './naming-drag-and-drop.component.html',
   styleUrls: ['./naming-drag-and-drop.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NamingDragAndDropComponent extends DefaultComponent {
-
   public namingConventionArray = [
     'text',
     '<name>',
@@ -29,10 +26,10 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     '<sampleStart>',
     '<sampleDur>',
     '<secondsStart>',
-    '<secondsDur>'
+    '<secondsDur>',
   ];
 
-  @ViewChild('list', {static: true}) list: ElementRef;
+  @ViewChild('list', { static: true }) list: ElementRef;
   @Input() fileName = '';
   @Input() firstSegment: Segment;
 
@@ -42,16 +39,16 @@ export class NamingDragAndDropComponent extends DefaultComponent {
   public resultConvention = [
     {
       type: 'placeholder',
-      value: '<name>'
+      value: '<name>',
     },
     {
       type: 'text',
-      value: '_'
+      value: '_',
     },
     {
       type: 'placeholder',
-      value: '<sequNumber>'
-    }
+      value: '<sequNumber>',
+    },
   ];
 
   public get preview(): string {
@@ -63,24 +60,30 @@ export class NamingDragAndDropComponent extends DefaultComponent {
           result += item.value;
         } else if (item.type === 'placeholder') {
           switch (item.value) {
-            case('<name>'):
-              result += (this.fileName.lastIndexOf('.') > -1) ? this.fileName.substring(0, this.fileName.lastIndexOf('.')) : this.fileName;
+            case '<name>':
+              result +=
+                this.fileName.lastIndexOf('.') > -1
+                  ? this.fileName.substring(0, this.fileName.lastIndexOf('.'))
+                  : this.fileName;
               break;
-            case('<sequNumber>'):
+            case '<sequNumber>':
               result += '0001';
               break;
-            case('<sampleStart>'):
+            case '<sampleStart>':
               result += '0';
               break;
-            case('<sampleDur>'):
+            case '<sampleDur>':
               result += this.firstSegment.time.samples.toString();
               break;
-            case('<secondsStart>'):
+            case '<secondsStart>':
               result += '0';
               break;
-            case('<secondsDur>'):
-              result += (Math.round((this.firstSegment.time.seconds * 10000)) / 10000)
-                .toString().replace('.', ',');
+            case '<secondsDur>':
+              result += (
+                Math.round(this.firstSegment.time.seconds * 10000) / 10000
+              )
+                .toString()
+                .replace('.', ',');
               break;
           }
         }
@@ -117,12 +120,12 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     if (item === 'text') {
       this.resultConvention.push({
         type: 'text',
-        value: 'text'
+        value: 'text',
       });
     } else {
       this.resultConvention.push({
         type: 'placeholder',
-        value: item
+        value: item,
       });
     }
     this.namingConventionchanged.next(this.namingConvention);
@@ -147,15 +150,21 @@ export class NamingDragAndDropComponent extends DefaultComponent {
 
   private deselect() {
     if (window.getSelection) {
-      if (window.getSelection().empty) {  // Chrome
+      if (window.getSelection().empty) {
+        // Chrome
         window.getSelection().empty();
-      } else if (window.getSelection().removeAllRanges) {  // Firefox
+      } else if (window.getSelection().removeAllRanges) {
+        // Firefox
         window.getSelection().removeAllRanges();
       }
     }
   }
 
   onDrop($event) {
-    moveItemInArray(this.resultConvention, $event.previousIndex, $event.currentIndex);
+    moveItemInArray(
+      this.resultConvention,
+      $event.previousIndex,
+      $event.currentIndex
+    );
   }
 }

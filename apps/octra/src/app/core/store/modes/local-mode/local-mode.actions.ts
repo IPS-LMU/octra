@@ -1,31 +1,36 @@
-import { AnnotationActions } from "../../annotation/annotation.actions";
-import { createAction, props } from "@ngrx/store";
-import { SessionFile } from "../../../obj/SessionFile";
-import { LoginMode } from "../../index";
+import { AnnotationActions } from '../../annotation/annotation.actions';
+import {
+  createAction,
+  createActionGroup,
+  emptyProps,
+  props,
+} from '@ngrx/store';
+import { SessionFile } from '../../../obj/SessionFile';
+import { LoginMode } from '../../index';
 
 export class LocalModeActions extends AnnotationActions {
-  static override context: 'LocalMode';
-
   public static login = createAction(
-    `[${LocalModeActions.context}] Login Local`,
+    `local mode Login Local`,
     props<{
-      files: File[],
-      sessionFile: SessionFile,
-      removeData: boolean,
-      mode: LoginMode.LOCAL
+      files: File[];
+      sessionFile: SessionFile;
+      removeData: boolean;
+      mode: LoginMode.LOCAL;
     }>()
   );
 
   public static setSessionFile = createAction(
-    `[${LocalModeActions.context}] Set SessionFile`,
+    `local mode Set SessionFile`,
     props<{
-      sessionFile: SessionFile
+      sessionFile: SessionFile;
     }>()
   );
 
-  public static override clearSessionStorageSuccess = createAction(
-    `[${LocalModeActions.context}] Clear Session Success`
-  );
+  static override clearSessionStorage = createActionGroup({
+    source: `local mode/ session storage/ clear`,
+    events: {
+      success: emptyProps(),
+      fail: emptyProps(),
+    },
+  }) as any;
 }
-
-

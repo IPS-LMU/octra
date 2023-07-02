@@ -1,16 +1,17 @@
-import { EventEmitter, Injectable } from "@angular/core";
-import { OLog } from "../../obj/Settings/logging";
-import { KeyStatisticElem } from "../../obj/statistics/KeyStatisticElem";
-import { MouseStatisticElem } from "../../obj/statistics/MouseStatisticElem";
-import { StatisticElem } from "../../obj/statistics/StatisticElement";
-import { contains } from "@octra/utilities";
-import { PlayBackStatus, SampleUnit } from "@octra/media";
+import { EventEmitter, Injectable } from '@angular/core';
+import { OLog } from '../../obj/Settings/logging';
+import { KeyStatisticElem } from '../../obj/statistics/KeyStatisticElem';
+import { MouseStatisticElem } from '../../obj/statistics/MouseStatisticElem';
+import { StatisticElem } from '../../obj/statistics/StatisticElement';
+import { contains } from '@octra/utilities';
+import { PlayBackStatus, SampleUnit } from '@octra/media';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserInteractionsService {
-  private _afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
+  private _afteradd: EventEmitter<StatisticElem> =
+    new EventEmitter<StatisticElem>();
 
   get afteradd(): EventEmitter<StatisticElem> {
     return this._afteradd;
@@ -56,18 +57,25 @@ export class UserInteractionsService {
   /**
    * Parse Events
    */
-  public addElementFromEvent(type: string, event: any, timestamp: number, playpos: SampleUnit, caretpos: number,
-                             selection: {
-                               start: number,
-                               length: number
-                             },
-                             segment: {
-                               start: number,
-                               length: number
-                               // tslint:disable-next-line:align
-                             }, targetName?: string) {
+  public addElementFromEvent(
+    type: string,
+    event: any,
+    timestamp: number,
+    playpos: SampleUnit,
+    caretpos: number,
+    selection: {
+      start: number;
+      length: number;
+    },
+    segment: {
+      start: number;
+      length: number;
+      // tslint:disable-next-line:align
+    },
+    targetName?: string
+  ) {
     this._lastAction = Date.now();
-    const originalPlayerPos = (playpos !== undefined) ? playpos.samples : -1;
+    const originalPlayerPos = playpos !== undefined ? playpos.samples : -1;
 
     if (this._enabled) {
       let name = '';
@@ -95,20 +103,43 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          (playpos !== undefined) ? playpos.samples : -1,
+          playpos !== undefined ? playpos.samples : -1,
           caretpos,
           selection,
           segment
         );
       } else if (contains(type, 'mouse')) {
-        elem = new MouseStatisticElem(type, name, event.value, timestamp, originalPlayerPos, caretpos,
-          selection, segment);
+        elem = new MouseStatisticElem(
+          type,
+          name,
+          event.value,
+          timestamp,
+          originalPlayerPos,
+          caretpos,
+          selection,
+          segment
+        );
       } else if (contains(type, 'slider')) {
-        elem = new MouseStatisticElem(type, name, event.new_value, timestamp, originalPlayerPos, caretpos,
-          selection, segment);
+        elem = new MouseStatisticElem(
+          type,
+          name,
+          event.new_value,
+          timestamp,
+          originalPlayerPos,
+          caretpos,
+          selection,
+          segment
+        );
       } else {
-        elem = new StatisticElem(type, name, event.value, timestamp, originalPlayerPos,
-          selection, segment);
+        elem = new StatisticElem(
+          type,
+          name,
+          event.value,
+          timestamp,
+          originalPlayerPos,
+          selection,
+          segment
+        );
       }
 
       if (elem) {
@@ -134,13 +165,29 @@ export class UserInteractionsService {
     }
   }
 
-  public logAudioEvent(context: string, state: PlayBackStatus, playposition: SampleUnit, caretpos: number,
-                       selection: { start: number, length: number }, segment: { start: number, length: number }) {
-    if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
-      this.addElementFromEvent('audio',
-        {value: state.toLowerCase()}, Date.now(),
+  public logAudioEvent(
+    context: string,
+    state: PlayBackStatus,
+    playposition: SampleUnit,
+    caretpos: number,
+    selection: { start: number; length: number },
+    segment: { start: number; length: number }
+  ) {
+    if (
+      state !== PlayBackStatus.PLAYING &&
+      state !== PlayBackStatus.INITIALIZED &&
+      state !== PlayBackStatus.PREPARE
+    ) {
+      this.addElementFromEvent(
+        'audio',
+        { value: state.toLowerCase() },
+        Date.now(),
         playposition,
-        caretpos, selection, segment, context);
+        caretpos,
+        selection,
+        segment,
+        context
+      );
     }
   }
 
@@ -175,8 +222,7 @@ export class UserInteractionsService {
     this._elements = [];
   }
 
-  private getElements(typeStr: string):
-    StatisticElem[] {
+  private getElements(typeStr: string): StatisticElem[] {
     const result: StatisticElem[] = [];
 
     let type: any;

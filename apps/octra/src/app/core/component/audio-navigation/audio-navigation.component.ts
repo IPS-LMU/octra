@@ -8,56 +8,78 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
-  ViewChild
-} from "@angular/core";
-import { AudioChunk, PlayBackStatus } from "@octra/media";
-import { DefaultComponent } from "../default.component";
+  ViewChild,
+} from '@angular/core';
+import { AudioChunk, PlayBackStatus } from '@octra/media';
+import { DefaultComponent } from '../default.component';
 
 export interface Buttons {
   play: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
   pause: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
   stop: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
   replay: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
   backward: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
   backwardtime: {
-    label: string,
-    shortcut: string
+    label: string;
+    shortcut: string;
   };
 }
 
 @Component({
-  selector: "octra-audio-navigation",
-  templateUrl: "./audio-navigation.component.html",
-  styleUrls: ["./audio-navigation.component.css"],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'octra-audio-navigation',
+  templateUrl: './audio-navigation.component.html',
+  styleUrls: ['./audio-navigation.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AudioNavigationComponent extends DefaultComponent implements OnChanges {
-  @Output() buttonClick = new EventEmitter<{ type: string, timestamp: number }>();
-  @Output() volumeChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
-  @Output() afterVolumeChange = new EventEmitter<{ new_value: number, timestamp: number }>();
-  @Output() playbackRateChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
-  @Output() afterPlaybackRateChange = new EventEmitter<{ new_value: number, timestamp: number }>();
+export class AudioNavigationComponent
+  extends DefaultComponent
+  implements OnChanges
+{
+  @Output() buttonClick = new EventEmitter<{
+    type: string;
+    timestamp: number;
+  }>();
+  @Output() volumeChange = new EventEmitter<{
+    old_value: number;
+    new_value: number;
+    timestamp: number;
+  }>();
+  @Output() afterVolumeChange = new EventEmitter<{
+    new_value: number;
+    timestamp: number;
+  }>();
+  @Output() playbackRateChange = new EventEmitter<{
+    old_value: number;
+    new_value: number;
+    timestamp: number;
+  }>();
+  @Output() afterPlaybackRateChange = new EventEmitter<{
+    new_value: number;
+    timestamp: number;
+  }>();
   @Input() responsive = false;
   @Input() easyMode = false;
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
 
-  @ViewChild("audioNavContainer", { static: true }) audioNavContainer: ElementRef | undefined;
+  @ViewChild('audioNavContainer', { static: true }) audioNavContainer:
+    | ElementRef
+    | undefined;
 
   public get height() {
     if (this.audioNavContainer !== undefined) {
@@ -95,7 +117,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
     this.volumeChange.emit({
       old_value: Number(this._volume),
       new_value: Number(value),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     this._volume = value;
     if (this.audioChunk) {
@@ -113,7 +135,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
     this.playbackRateChange.emit({
       old_value: Number(this._playbackRate),
       new_value: Number(value),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     this._playbackRate = value;
 
@@ -153,26 +175,26 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
    */
   onButtonClick(type: string) {
     switch (type) {
-      case("play"):
+      case 'play':
         this.onPlayButtonClicked();
         break;
-      case("pause"):
+      case 'pause':
         this.onPauseButtonClicked();
         break;
-      case("stop"):
+      case 'stop':
         this.onStopButtonClicked();
         break;
-      case("replay"):
+      case 'replay':
         this.onReplayButtonClicked();
         break;
-      case("backward"):
+      case 'backward':
         this.onBackwardButtonClicked();
         break;
-      case("backward time"):
+      case 'backward time':
         this.onBackwardTimeButtonClicked();
         break;
-      case("default"):
-        console.error("button not found");
+      case 'default':
+        console.error('button not found');
         break;
     }
     this.cd.detectChanges();
@@ -184,7 +206,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   afterVolumeChanged() {
     this.afterVolumeChange.emit({
       new_value: this.volume,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -194,7 +216,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   afterPlaybackRateChanged() {
     this.afterPlaybackRateChange.emit({
       new_value: this.playbackRate,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -207,19 +229,23 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
 
   private connectEvents() {
     if (this.audioChunk !== undefined) {
-      this.subscrManager.add(this.audioChunk.statuschange.subscribe((status: PlayBackStatus) => {
-          this._isAudioPlaying = status === PlayBackStatus.PLAYING;
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-        },
-        (error) => {
-          console.error(error);
-        }));
+      this.subscrManager.add(
+        this.audioChunk.statuschange.subscribe(
+          (status: PlayBackStatus) => {
+            this._isAudioPlaying = status === PlayBackStatus.PLAYING;
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          },
+          (error) => {
+            console.error(error);
+          }
+        )
+      );
     }
   }
 
   private onPlayButtonClicked() {
-    this.triggerButtonClick("play");
+    this.triggerButtonClick('play');
     if (this.audioChunk !== undefined) {
       this.audioChunk.startPlayback(false).catch((error) => {
         console.error(error);
@@ -228,7 +254,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   }
 
   private onPauseButtonClicked() {
-    this.triggerButtonClick("pause");
+    this.triggerButtonClick('pause');
     if (this.audioChunk !== undefined) {
       this.audioChunk.pausePlayback().catch((error) => {
         console.error(error);
@@ -237,7 +263,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   }
 
   private onStopButtonClicked() {
-    this.triggerButtonClick("stop");
+    this.triggerButtonClick('stop');
     if (this.audioChunk !== undefined) {
       this.audioChunk.stopPlayback().catch((error) => {
         console.error(error);
@@ -246,17 +272,16 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   }
 
   private onReplayButtonClicked() {
-
     if (this.audioChunk !== undefined) {
       this.audioChunk.toggleReplay();
-      this.triggerButtonClick("replay");
+      this.triggerButtonClick('replay');
       this._replay = this.audioChunk.replay;
     }
   }
 
   private onBackwardButtonClicked() {
     if (this.audioChunk !== undefined) {
-      this.triggerButtonClick("backward");
+      this.triggerButtonClick('backward');
       this.audioChunk.stepBackward().catch((error) => {
         console.error(error);
       });
@@ -265,7 +290,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
 
   private onBackwardTimeButtonClicked() {
     if (this.audioChunk !== undefined) {
-      this.triggerButtonClick("backward time");
+      this.triggerButtonClick('backward time');
       this.audioChunk.stepBackwardTime(500 / 1000).catch((error) => {
         console.error(error);
       });
@@ -277,6 +302,6 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
   }
 
   test() {
-    alert("ok, klappt!");
+    alert('ok, klappt!');
   }
 }

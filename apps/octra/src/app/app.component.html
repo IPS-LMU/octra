@@ -4,9 +4,16 @@
     <octra-navigation #navigation [version]="version"></octra-navigation>
   </header>
   <main>
-    <div *ngIf="environment.dev_version" class="d-none d-md-block" id="beta_mark">in development</div>
+    <div
+      *ngIf="environment.dev_version"
+      class="d-none d-md-block"
+      id="beta_mark"
+    >
+      in development
+    </div>
     <div class="container-fluid flex">
       <router-outlet></router-outlet>
-    </div><!-- /.container -->
+    </div>
+    <!-- /.container -->
   </main>
 </div>

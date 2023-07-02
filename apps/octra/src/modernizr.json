@@ -1,8 +1,6 @@
 {
   "minify": true,
-  "options": [
-    "setClasses"
-  ],
+  "options": ["setClasses"],
   "feature-detects": [
     "test/canvas",
     "test/canvastext",

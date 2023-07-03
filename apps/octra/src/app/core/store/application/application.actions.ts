@@ -16,12 +16,15 @@ export class ApplicationActions {
     source: 'app/init',
     events: {
       do: emptyProps(),
-      success: emptyProps(),
+      success: props<{
+        playOnHover: boolean,
+        followPlayCursor: boolean
+      }>(),
     },
   });
 
   static loadASRSettings = createActionGroup({
-    source: 'api/load asr settings',
+    source: 'app/load asr settings',
     events: {
       do: props<{
         settings: AppSettings;
@@ -36,7 +39,7 @@ export class ApplicationActions {
   });
 
   static loadSettings = createActionGroup({
-    source: 'api/load settings',
+    source: 'app/load settings',
     events: {
       do: emptyProps(),
       success: props<{
@@ -49,7 +52,7 @@ export class ApplicationActions {
   });
 
   static loadLanguage = createActionGroup({
-    source: 'api/load language',
+    source: 'app/load language',
     events: {
       do: emptyProps(),
       success: emptyProps(),

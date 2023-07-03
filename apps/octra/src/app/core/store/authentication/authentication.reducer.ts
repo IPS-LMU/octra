@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { AuthenticationActions } from './authentication.actions';
 import { AuthenticationState } from './index';
+import { APIActions } from '../api';
 
 export const initialState: AuthenticationState = {
   authenticated: false,
@@ -57,5 +58,13 @@ export const authenticationReducer = createReducer(
         authenticated: true,
       };
     }
-  )
+  ),
+  on(APIActions.init.success, (state: AuthenticationState, data) => {
+    return {
+      ...state,
+      webToken: data.webToken,
+      type: data.authType,
+      authenticated: data.authenticated,
+    };
+  })
 );

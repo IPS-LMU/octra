@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 
 @Component({
   selector: 'octra-fastbar',
@@ -23,7 +23,7 @@ export class FastbarComponent {
 
   constructor(
     public appStorage: AppStorageService,
-    private modalService: ModalService
+    private modalService: OctraModalService
   ) {}
 
   openHelpModal() {

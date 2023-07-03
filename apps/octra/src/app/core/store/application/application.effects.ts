@@ -6,7 +6,7 @@ import { ApplicationActions } from '../application/application.actions';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
 import { catchError, forkJoin, map, of, Subject, tap, timer } from 'rxjs';
-import { exhaustMap } from 'rxjs/operators';
+import { exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { APIActions } from '../api';
 import { getBrowserLang, TranslocoService } from '@ngneat/transloco';
@@ -19,6 +19,12 @@ import {
   BugReportService,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
+import { AppSettings, ASRLanguage } from '../../obj';
+import { IDBActions } from '../idb/idb.actions';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { AsrService } from '../../shared/service/asr.service';
+import { SettingsService } from '../../shared/service';
+import { RootState } from '../index';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +35,7 @@ export class ApplicationEffects {
       this.actions$.pipe(
         ofType(ApplicationActions.initApplication.do),
         tap(() => {
+          this.transloco.setActiveLang('en');
           this.store.dispatch(ApplicationActions.loadLanguage.do());
           this.store.dispatch(ApplicationActions.loadSettings.do());
 
@@ -284,9 +291,119 @@ export class ApplicationEffects {
             webToken,
           })
         );
-        return of(ApplicationActions.initApplication.success());
+
+        this.transloco.setAvailableLangs(a.settings.octra.languages);
+
+        if (
+          a.settings.octra.tracking !== undefined &&
+          a.settings.octra.tracking.active !== undefined &&
+          a.settings.octra.tracking.active !== ''
+        ) {
+          this.appendTrackingCode(a.settings.octra.tracking.active, a.settings);
+        }
+
+        return of(
+          ApplicationActions.initApplication.success({
+            playOnHover: this.sessStr.retrieve('playonhover'),
+            followPlayCursor: this.sessStr.retrieve('followplaycursor'),
+          })
+        );
       })
     )
+  );
+
+  afterIDBLoaded$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(IDBActions.loadAnnotationSuccess),
+        withLatestFrom(this.store),
+        tap(([a, store]: [Action, RootState]) => {
+          if (
+            this.appStorage.asrSelectedService !== undefined &&
+            this.appStorage.asrSelectedLanguage !== undefined
+          ) {
+            // set asr settings
+            const selectedLanguage = this.appStorage.asrSelectedLanguage;
+            const selectedService = this.appStorage.asrSelectedService;
+            const lang: ASRLanguage = this.asrService.getLanguageByCode(
+              selectedLanguage,
+              selectedService
+            );
+
+            if (lang !== undefined) {
+              this.asrService.selectedLanguage = lang;
+            } else {
+              console.error('Could not read ASR language from database');
+            }
+
+            if (!this.settingsService.responsive.enabled) {
+              this.setFixedWidth();
+            }
+          }
+          this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
+
+          const queryParams = {
+            audio: this.getParameterByName('audio'),
+            host: this.getParameterByName('host'),
+            transcript: this.getParameterByName('transcript'),
+            embedded: this.getParameterByName('embedded'),
+          };
+
+          console.log(`then!`);
+          const transcriptURL =
+            queryParams.transcript !== undefined
+              ? queryParams.transcript
+              : undefined;
+          // define languages
+          const languages = store.application.appConfiguration.octra.languages;
+          const browserLang =
+            navigator.language || (navigator as any).userLanguage;
+
+          // check if browser language is available in translations
+          if (
+            this.appStorage.language === undefined ||
+            this.appStorage.language === ''
+          ) {
+            if (
+              store.application.appConfiguration.octra.languages.find(
+                (value) => {
+                  return value === browserLang;
+                }
+              ) !== undefined
+            ) {
+              this.transloco.setActiveLang(browserLang);
+            } else {
+              // use first language defined as default language
+              this.transloco.setActiveLang(languages[0]);
+            }
+          } else {
+            if (
+              store.application.appConfiguration.octra.languages.find(
+                (value) => {
+                  return value === this.appStorage.language;
+                }
+              ) !== undefined
+            ) {
+              this.transloco.setActiveLang(this.appStorage.language);
+            } else {
+              this.transloco.setActiveLang(languages[0]);
+            }
+          }
+
+          // if url mode, set it in options
+          if (SettingsService.queryParamsSet(queryParams)) {
+            this.appStorage.setURLSession(
+              queryParams.audio,
+              transcriptURL,
+              queryParams.embedded === '1',
+              queryParams.host
+            );
+          }
+
+          // settings finally loaded
+        })
+      ),
+    { dispatch: false }
   );
 
   loadLanguage$ = createEffect(() =>
@@ -331,10 +448,13 @@ export class ApplicationEffects {
     private transloco: TranslocoService,
     private sessStr: SessionStorageService,
     private localStorage: LocalStorageService,
-    private store: Store,
+    private store: Store<RootState>,
     private http: HttpClient,
     private configurationService: ConfigurationService,
-    private bugService: BugReportService
+    private bugService: BugReportService,
+    private appStorage: AppStorageService,
+    private asrService: AsrService,
+    private settingsService: SettingsService
   ) {}
 
   private initConsoleLogging() {
@@ -409,5 +529,71 @@ export class ApplicationEffects {
         };
       })();
     }
+  }
+
+  private appendTrackingCode(type: string, settings: AppSettings) {
+    // check if matomo is activated
+    if (type === 'matomo') {
+      if (
+        settings.octra.tracking.matomo !== undefined &&
+        settings.octra.tracking.matomo.host !== undefined &&
+        settings.octra.tracking.matomo.siteID !== undefined
+      ) {
+        const matomoSettings = settings.octra.tracking.matomo;
+
+        const trackingCode = document.createElement('script');
+        trackingCode.setAttribute('type', 'text/javascript');
+        trackingCode.innerHTML = `
+<!-- Matomo -->
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="${matomoSettings.host}";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '${matomoSettings.siteID}']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->`;
+
+        document.body.appendChild(trackingCode);
+      } else {
+        console.error(
+          `attributes for piwik tracking in appconfig.json are invalid.`
+        );
+      }
+    } else {
+      console.error(`tracking type ${type} is not supported.`);
+    }
+  }
+
+  private setFixedWidth() {
+    // set fixed width
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerText =
+      '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
+    head.appendChild(style);
+  }
+
+  private getParameterByName(name: string, url?: string) {
+    if (!url) {
+      url = document.location.href;
+    }
+    name = name.replace(/[[]]/g, '\\$&');
+    const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    const results = regExp.exec(url);
+    if (!results) {
+      return undefined;
+    }
+    if (!results[2]) {
+      return '';
+    }
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 }

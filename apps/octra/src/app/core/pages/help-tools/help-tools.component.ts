@@ -3,7 +3,7 @@ import { APIService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoginMode } from '../../store';
 import { Store } from '@ngrx/store';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -18,7 +18,7 @@ export class HelpToolsComponent {
     private appStorage: AppStorageService,
     private api: APIService,
     private store: Store,
-    private modalService: ModalService,
+    private modalService: OctraModalService,
     private router: Router
   ) {}
 

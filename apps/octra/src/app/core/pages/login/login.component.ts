@@ -12,7 +12,7 @@ import { TranslocoService } from '@ngneat/transloco';
 import { BrowserInfo, FileSize, getFileSize } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
 import { AppInfo } from '../../../app.info';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent,
@@ -96,7 +96,7 @@ export class LoginComponent
     public appStorage: AppStorageService,
     private cd: ChangeDetectorRef,
     public settingsService: SettingsService,
-    public modService: ModalService,
+    public modService: OctraModalService,
     private langService: TranslocoService,
     private audioService: AudioService,
     private authStoreService: AuthenticationStoreService

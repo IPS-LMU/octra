@@ -291,7 +291,7 @@ export class AnnotationStateReducers {
         }
         return state;
       }),
-      on(OnlineModeActions.login, (state: AnnotationState, { mode }) => {
+      on(OnlineModeActions.readLoginData, (state: AnnotationState, { mode }) => {
         if (this.mode === mode) {
           return {
             ...state,

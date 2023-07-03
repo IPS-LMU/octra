@@ -4,7 +4,7 @@ import { hasProperty, SubscriptionManager } from '@octra/utilities';
 import { APIService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
-import { ModalService } from '../modal.service';
+import { OctraModalService } from '../octra-modal.service';
 import { Subscription } from 'rxjs';
 import { YesNoModalComponent } from '../yes-no-modal/yes-no-modal.component';
 import { LoginInvalidModalComponent } from '../login-invalid-modal/login-invalid-modal.component';
@@ -63,7 +63,7 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
   }
 
   constructor(
-    private modService: ModalService,
+    private modService: OctraModalService,
     public bugService: BugReportService,
     private api: APIService,
     private appStorage: AppStorageService

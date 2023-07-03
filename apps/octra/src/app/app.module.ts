@@ -43,7 +43,7 @@ import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dr
 
 import { ReloadFileGuard } from './core/pages/reload-file/reload-file.activateguard';
 
-import { ModalService } from './core/modals/modal.service';
+import { OctraModalService } from './core/modals/octra-modal.service';
 
 // modules
 import { DynComponentDirective } from './core/shared/directive/dyn-component.directive';
@@ -117,6 +117,7 @@ import {
   AuthenticationEffects,
   authenticationReducer,
 } from './core/store/authentication';
+import { APIEffects } from './core/store/api';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -201,6 +202,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
       ConfigurationEffects,
       IDBEffects,
       ApplicationEffects,
+      APIEffects,
       AuthenticationEffects,
     ]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
@@ -227,7 +229,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     DeALoginGuard,
     KeymappingService,
     MembersAreaGuard,
-    ModalService,
+    OctraModalService,
     NavbarService,
     ReloadFileGuard,
     AppStorageService,

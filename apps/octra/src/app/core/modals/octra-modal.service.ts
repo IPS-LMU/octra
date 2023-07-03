@@ -6,7 +6,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable()
-export class ModalService {
+export class OctraModalService {
   public showmodal = new EventEmitter<{
     type: string;
     data?: any;

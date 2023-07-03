@@ -39,6 +39,14 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
+  on(ApplicationActions.initApplication.success, (state: ApplicationState, { followPlayCursor, playOnHover }) => ({
+    ...state,
+    options: {
+      ...state.options,
+      followPlayCursor,
+      playOnHover
+    }
+  })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
@@ -153,7 +161,7 @@ export const reducer = createReducer(
       loaded: true,
     },
   })),
-  on(OnlineModeActions.login, (state: ApplicationState) => ({
+  on(OnlineModeActions.readLoginData, (state: ApplicationState) => ({
     ...state,
     mode: LoginMode.ONLINE,
     loggedIn: true,

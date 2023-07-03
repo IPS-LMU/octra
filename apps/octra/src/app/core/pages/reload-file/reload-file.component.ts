@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppInfo } from '../../../app.info';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import {
   TranscriptionStopModalAnswer,
   TranscriptionStopModalComponent,
@@ -34,7 +34,7 @@ export class ReloadFileComponent {
     public router: Router,
     public appStorage: AppStorageService,
     public transcrServ: TranscriptionService,
-    public modService: ModalService,
+    public modService: OctraModalService,
     public langService: TranslocoService,
     private audioService: AudioService
   ) {}

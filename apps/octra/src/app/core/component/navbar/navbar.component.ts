@@ -5,7 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import { navigateTo } from '@octra/ngx-utilities';
 import {
   SettingsService,
@@ -99,7 +99,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public navbarServ: NavbarService,
     public sanitizer: DomSanitizer,
     public langService: TranslocoService,
-    public modService: ModalService,
+    public modService: OctraModalService,
     public settService: SettingsService,
     public bugService: BugReportService,
     private router: Router

@@ -12,7 +12,7 @@ import {
 import { TaskDto } from '@octra/api-types';
 
 export class OnlineModeActions extends AnnotationActions {
-  public static login = createAction(
+  public static readLoginData = createAction(
     `online mode Login`,
     props<{
       loginData: LoginData;

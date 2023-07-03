@@ -100,7 +100,8 @@
     "time": "Time",
     "speaker": "Speaker",
     "switch to": "Switch to {{editor}}",
-    "actions": "Actions"
+    "actions": "Actions",
+    "error": "Error"
   },
   "bug report": {
     "give feedback": "Give feedback",

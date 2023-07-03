@@ -9,9 +9,11 @@ import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
 import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RootState } from '../index';
-import { ModalService } from '../../modals/modal.service';
+import { LoginMode, RootState } from '../index';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -111,9 +113,9 @@ export class AuthenticationEffects {
           }),
           catchError((err: HttpErrorResponse) => {
             if (a.type === AuthenticationActions.login.do.type) {
-              return of(AuthenticationActions.login.fail(err));
+              return of(AuthenticationActions.login.fail({ error: err }));
             } else {
-              return of(AuthenticationActions.login.fail(err));
+              return of(AuthenticationActions.login.fail({ error: err }));
             }
           })
         );
@@ -167,6 +169,40 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.logout.success),
         tap((a) => {
           this.routingService.navigate(['/login']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.login.success),
+        tap((a) => {
+          this.store.dispatch(
+            OnlineModeActions.readLoginData({
+              mode: LoginMode.ONLINE,
+              loginData: {
+                userName: a.me.username,
+                email: '',
+                webToken: a.accessToken,
+              },
+              removeData: false,
+            })
+          );
+          this.routingService.navigate(['/user/projects']);
+
+          // TODO api
+          // 1. Save loginData to store and IDB
+          // 2. Create Actions and Reducers for startOnlineAnnotation
+          // 4. After project selected, dispatch startOnlineAnnotation with retrieved transcript, save data to store and IDB
+          // 5. Redirect to transcr section
+          // 6. Make sure that all data persists, even after reload
+          // 7. Send transcription to server and retrieve next one (it's AnnotJSON). Make sure it's saved.
+          // 8. Load new transcript and redirect to transcr
+          // 9. Check logout/login
+          // 10. Add person icon to navbar with menu for signout, etc.
+          // 11. Add information about project to the navbar.
         })
       ),
     { dispatch: false }
@@ -244,6 +280,26 @@ export class AuthenticationEffects {
     { dispatch: false }
   );
 
+  showErrorModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.login.fail),
+        tap((a) => {
+          this.modalsService.openModal(
+            ErrorModalComponent,
+            ErrorModalComponent.options,
+            {
+              text:
+                typeof a.error === 'string'
+                  ? a.error
+                  : a.error?.message ?? a.error.error?.message,
+            }
+          );
+        })
+      ),
+    { dispatch: false }
+  );
+
   private reauthenticationRef?: NgbModalRef;
 
   constructor(
@@ -256,6 +312,6 @@ export class AuthenticationEffects {
     private sessionStorageService: SessionStorageService,
     private transloco: TranslocoService,
     private routingService: RoutingService,
-    private modalsService: ModalService
+    private modalsService: OctraModalService
   ) {}
 }

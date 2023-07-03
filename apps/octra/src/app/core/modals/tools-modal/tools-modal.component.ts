@@ -30,7 +30,7 @@ import { Segment } from '@octra/annotation';
 import { WavFormat } from '@octra/media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
-import { ModalService } from '../modal.service';
+import { OctraModalService } from '../octra-modal.service';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
 import {
   NgbActiveModal,
@@ -135,7 +135,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     private sanitizer: DomSanitizer,
     public navbarServ: NavbarService,
     modalService: NgbModal,
-    private modalsService: ModalService,
+    private modalsService: OctraModalService,
     private httpClient: HttpClient,
     private appStorage: AppStorageService,
     private audio: AudioService,

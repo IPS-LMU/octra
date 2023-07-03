@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { AppInfo } from '../../../app.info';
 import { DropZoneComponent } from '../drop-zone';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import { SessionFile } from '../../obj/SessionFile';
 import {
   contains,
@@ -70,7 +70,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
     return this.dropzone.fileinput;
   }
 
-  constructor(private modService: ModalService) {
+  constructor(private modService: OctraModalService) {
     super();
   }
 

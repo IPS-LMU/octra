@@ -1,40 +1,53 @@
 import { Component, OnInit } from '@angular/core';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { ProjectDto } from '@octra/api-types';
+import { DefaultComponent } from '../../component/default.component';
+import { OctraModalService } from '../../modals/octra-modal.service';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 
 @Component({
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
 })
-export class ProjectsListComponent implements OnInit {
+export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects: ProjectDto[] = [];
   selectedFile: File;
 
   constructor(
     private api: OctraAPIService,
     public appStorage: AppStorageService,
-    private router: Router,
-    private http: HttpClient
-  ) {}
+    private modalService: OctraModalService
+  ) {
+    super();
+  }
 
-  ngOnInit(): void {
-    /* TODO
-    this.api.listProjects().then((projects: ProjectResponseDataItem[]) => {
-      projects = projects.filter(a => a.active === true);
-      projects.sort((a, b) => {
-        if (a.transcripts_count_free <= b.transcripts_count_free && a.active && b.active) {
-          return 1;
-        }
-        return -1;
-      });
-      this.projects = projects;
-    }).catch((error) => {
-      console.error(error);
-    }); */
+  async ngOnInit() {
+    this.subscrManager.add(
+      this.api.listProjects().subscribe({
+        next: (projects) => {
+          this.projects = projects.filter((a) => a.active === true);
+          this.projects.sort((a, b) => {
+            if (
+              a.statistics.freeTasks <= b.statistics.freeTasks &&
+              a.active &&
+              b.active
+            ) {
+              return 1;
+            }
+            return -1;
+          });
+        },
+        error: (error) => {
+          const ref = this.modalService.openModalRef(
+            ErrorModalComponent,
+            ErrorModalComponent.options
+          );
+          ref.componentInstance.text = error.message;
+        },
+      })
+    );
   }
 
   onProjectClick(project: ProjectDto) {

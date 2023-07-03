@@ -24,7 +24,7 @@ import { editorComponents } from '../../../editors/components';
 import { OCTRAEditor } from '../../../editors/octra-editor';
 import { InactivityModalComponent } from '../../modals/inactivity-modal/inactivity-modal.component';
 import { MissingPermissionsModalComponent } from '../../modals/missing-permissions/missing-permissions.component';
-import { ModalService } from '../../modals/modal.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import { OverviewModalComponent } from '../../modals/overview-modal/overview-modal.component';
 import {
   ModalEndAnswer,
@@ -233,7 +233,7 @@ export class TranscriptionComponent
     public keyMap: KeymappingService,
     public navbarServ: NavbarService,
     public settingsService: SettingsService,
-    public modService: ModalService,
+    public modService: OctraModalService,
     private modalService: NgbModal,
     public langService: TranslocoService,
     private api: OctraAPIService,

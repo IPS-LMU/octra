@@ -4,7 +4,6 @@ import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
 import { FileProgress } from '../../obj/objects';
 import {
-  afterTrue,
   getProperties,
   SubscriptionManager,
   waitTillResultRetrieved,
@@ -32,7 +31,6 @@ import { UserActions } from '../../store/user/user.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
 import * as fromAnnotation from '../../store/annotation';
-import * as fromApplication from '../../store/application';
 import { ASRActions } from '../../store/asr/asr.actions';
 import { ILog } from '../../obj/Settings/logging';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
@@ -290,13 +288,10 @@ export class AppStorageService {
     this.subscrManager.add(
       actions.subscribe((action) => {
         if (action.type === '@ngrx/effects/init') {
-          this.playonhover = this.sessStr.retrieve('playonhover');
-          this.followPlayCursor = this.sessStr.retrieve('followplaycursor');
           this.jobsLeft = this.sessStr.retrieve('jobsLeft');
           this.loggedIn = this.sessStr.retrieve('loggedIn');
           this.reloaded = this.sessStr.retrieve('reloaded');
           this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
-          const test = '';
         }
       })
     );
@@ -569,39 +564,7 @@ export class AppStorageService {
       roles: AccountRole[];
       webToken: string;
     }
-  ) {
-    afterTrue(this.store.select(fromApplication.selectLoggedIn))
-      .then(() => {
-        navigateTo(this.router, ['/user/projects']);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    this.store.dispatch(
-      OnlineModeActions.login({
-        mode: LoginMode.ONLINE,
-        loginData: {
-          userName: user.name,
-          email: user.email,
-          webToken: user.webToken,
-        },
-        removeData: false,
-      })
-    );
-
-    // TODO api
-    // 1. Save loginData to store and IDB
-    // 2. Create Actions and Reducers for startOnlineAnnotation
-    // 4. After project selected, dispatch startOnlineAnnotation with retrieved transcript, save data to store and IDB
-    // 5. Redirect to transcr section
-    // 6. Make sure that all data persists, even after reload
-    // 7. Send transcription to server and retrieve next one (it's AnnotJSON). Make sure it's saved.
-    // 8. Load new transcript and redirect to transcr
-    // 9. Check logout/login
-    // 10. Add person icon to navbar with menu for signout, etc.
-    // 11. Add information about project to the navbar.
-  }
+  ) {}
 
   setLocalSession(files: File[], sessionFile: SessionFile) {
     if (this.easymode === undefined) {

@@ -25,7 +25,7 @@ import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
 import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
-import { OctraAPIService } from '../../../../../../../../octra-backend/dist/libs/ngx-octra-api';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Injectable({
   providedIn: 'root',
@@ -482,7 +482,7 @@ export class IDBEffects {
         LocalModeActions.login,
         AnnotationActions.setCurrentEditor.do,
         OnlineModeActions.loginDemo,
-        OnlineModeActions.login,
+        OnlineModeActions.readLoginData,
         OnlineModeActions.startOnlineAnnotation,
         LocalModeActions.login
       ),
@@ -757,7 +757,7 @@ export class IDBEffects {
 
   saveLoginOnline$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.login),
+      ofType(OnlineModeActions.readLoginData),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 
@@ -783,7 +783,7 @@ export class IDBEffects {
       ofType(
         LocalModeActions.login,
         OnlineModeActions.loginDemo,
-        OnlineModeActions.login
+        OnlineModeActions.readLoginData
       ),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
@@ -1083,7 +1083,7 @@ export class IDBEffects {
         AnnotationActions.removeAnnotationLevel.do
       ),
       withLatestFrom(this.store),
-      mergeMap(([action, appState]: [Action, RootState]) => {
+      mergeMap(([action, appState]) => {
         const subject = new Subject<Action>();
         const modeState = this.getModeStateFromString(
           appState,

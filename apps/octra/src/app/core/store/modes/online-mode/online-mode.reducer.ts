@@ -52,7 +52,7 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.login,
+        OnlineModeActions.readLoginData,
         (state: OnlineModeState, { loginData, removeData, mode }) => {
           if (this.mode === mode) {
             if (removeData) {

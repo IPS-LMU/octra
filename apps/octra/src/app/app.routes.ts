@@ -8,35 +8,40 @@ import {
   MembersAreaComponent,
   NewsComponent,
 } from './core/pages';
-import { ALoginGuard, LoginComponent } from './core/pages/login';
+import { LoginComponent } from './core/pages/login';
 import { MEMBER_ROUTES } from './core/pages/members-area';
-import { SettingsGuard } from './core/shared/guard';
 import { CompatibilityGuard } from './core/shared/guard/compatibility.guard';
 import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
+import { CONFIG_LOADED_GUARD } from './core/shared/guard/appconfig-load.guard';
+import { IDB_LOADED_GUARD } from './core/shared/guard/idb.activateguard';
 
 const APP_ROUTES: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [SettingsGuard, CompatibilityGuard, ALoginGuard],
+    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
   },
   {
     path: 'test',
     component: BrowserTestComponent,
-    canActivate: [SettingsGuard, CompatibilityGuard],
+    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD, CompatibilityGuard],
   },
   { path: '404', component: Error404Component },
-  { path: 'news', component: NewsComponent, canActivate: [SettingsGuard] },
+  {
+    path: 'news',
+    component: NewsComponent,
+    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+  },
   {
     path: 'features',
     component: FeaturesComponent,
-    canActivate: [SettingsGuard],
+    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
   },
   {
     path: 'user',
     component: MembersAreaComponent,
-    canActivate: [SettingsGuard, CompatibilityGuard],
+    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD, CompatibilityGuard],
     children: MEMBER_ROUTES,
   },
   { path: 'help-tools', component: HelpToolsComponent },

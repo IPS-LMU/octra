@@ -3,7 +3,7 @@ import { Component, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppInfo } from '../../../app.info';
-import { afterTrue, hasProperty } from '@octra/utilities';
+import { hasProperty } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
 import {
   AudioService,
@@ -12,8 +12,6 @@ import {
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoadingStatus, LoginMode } from '../../store';
-import * as fromApplication from '../../store/application';
-import * as fromAnnotation from '../../store/annotation';
 import { Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
@@ -68,108 +66,75 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
       })
     );
 
-    afterTrue(this.store.select(fromApplication.selectIDBLoaded))
-      .then(() => {
-        if (
-          this.appStorage.urlParams !== undefined &&
-          hasProperty(this.appStorage.urlParams, 'audio') &&
-          this.appStorage.urlParams.audio !== '' &&
-          this.appStorage.urlParams.audio !== undefined
-        ) {
+    if (
+      this.appStorage.urlParams !== undefined &&
+      hasProperty(this.appStorage.urlParams, 'audio') &&
+      this.appStorage.urlParams.audio !== '' &&
+      this.appStorage.urlParams.audio !== undefined
+    ) {
+      this.store.dispatch(
+        OnlineModeActions.loginURLParameters({
+          urlParams: this.appStorage.urlParams,
+        })
+      );
+    } else if (this.appStorage.useMode === LoginMode.URL) {
+      // url mode set, but no params => change mode
+      console.warn(`use mode is url but no params found. Reset use mode.`);
+      if (
+        this.appStorage.onlineSession.loginData.userName !== undefined &&
+        this.appStorage.onlineSession.loginData.userName !== '' &&
+        this.appStorage.sessionfile === undefined
+      ) {
+        this.store.dispatch(
+          ApplicationActions.setMode({
+            mode: LoginMode.ONLINE,
+          })
+        );
+      } else {
+        this.store.dispatch(
+          ApplicationActions.setMode({
+            mode: LoginMode.LOCAL,
+          })
+        );
+      }
+    }
+
+    if (
+      this.appStorage.useMode !== LoginMode.URL &&
+      !this.appStorage.loggedIn
+    ) {
+      // not logged in, go back
+    } else if (this.appStorage.loggedIn) {
+      if (
+        this.appStorage.useMode === LoginMode.LOCAL &&
+        this.audio.audiomanagers.length === 0
+      ) {
+        navigateTo(
+          this.router,
+          ['/user/transcr/reload-file'],
+          AppInfo.queryParamsHandling
+        ).catch((error) => {
+          console.error(error);
+        });
+      } else {
+        if (this.appStorage.useMode === LoginMode.URL) {
+          this.state = 'Get transcript from URL...';
+          // set audio url from url params
           this.store.dispatch(
-            OnlineModeActions.loginURLParameters({
-              urlParams: this.appStorage.urlParams,
+            OnlineModeActions.setAudioURL.do({
+              audioURL: decodeURI(this.appStorage.urlParams.audio),
+              mode: this.appStorage.useMode,
             })
           );
-        } else if (this.appStorage.useMode === LoginMode.URL) {
-          // url mode set, but no params => change mode
-          console.warn(`use mode is url but no params found. Reset use mode.`);
-          if (
-            this.appStorage.onlineSession.loginData.userName !== undefined &&
-            this.appStorage.onlineSession.loginData.userName !== '' &&
-            this.appStorage.sessionfile === undefined
-          ) {
-            this.store.dispatch(
-              ApplicationActions.setMode({
-                mode: LoginMode.ONLINE,
-              })
-            );
-          } else {
-            this.store.dispatch(
-              ApplicationActions.setMode({
-                mode: LoginMode.LOCAL,
-              })
-            );
-          }
         }
 
-        if (
-          this.appStorage.useMode !== LoginMode.URL &&
-          !this.appStorage.loggedIn
-        ) {
-          // not logged in, go back
-        } else if (this.appStorage.loggedIn) {
-          if (
-            this.appStorage.useMode === LoginMode.LOCAL &&
-            this.audio.audiomanagers.length === 0
-          ) {
-            navigateTo(
-              this.router,
-              ['/user/transcr/reload-file'],
-              AppInfo.queryParamsHandling
-            ).catch((error) => {
-              console.error(error);
-            });
-          } else {
-            if (this.appStorage.useMode === LoginMode.URL) {
-              this.state = 'Get transcript from URL...';
-              // set audio url from url params
-              this.store.dispatch(
-                OnlineModeActions.setAudioURL.do({
-                  audioURL: decodeURI(this.appStorage.urlParams.audio),
-                  mode: this.appStorage.useMode,
-                })
-              );
-            }
-
-            this.settService.loadAudioFile(this.audio);
-          }
-        } else {
-          console.warn(
-            `special situation: loggedIn is undefined! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`
-          );
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    // do navigation after all is loaded
-    const promises: Promise<any>[] = [];
-    promises.push(
-      afterTrue(this.store.select(fromAnnotation.selectAudioLoaded))
-    );
-
-    Promise.all(promises)
-      .then(() => {
-        this.transcrService
-          .load()
-          .then(() => {
-            navigateTo(
-              this.router,
-              ['/user/transcr'],
-              AppInfo.queryParamsHandling
-            ).catch((error) => {
-              console.error(error);
-            });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        this.settService.loadAudioFile(this.audio);
+      }
+    } else {
+      console.warn(
+        `special situation: loggedIn is undefined! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`
+      );
+    }
   }
 
   retry() {

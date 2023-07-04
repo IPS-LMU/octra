@@ -117,6 +117,7 @@ export class AnnotationEffects {
                     this.store.dispatch(
                       AnnotationActions.loadAudio.success({
                         mode: state.application.mode,
+                        audioFile: a.audioFile,
                       })
                     );
                   }
@@ -148,6 +149,7 @@ export class AnnotationEffects {
               this.store.dispatch(
                 AnnotationActions.loadAudio.success({
                   mode: state.application.mode,
+                  audioFile: a.audioFile,
                 })
               );
             } else {
@@ -190,18 +192,6 @@ export class AnnotationEffects {
         ofType(AnnotationActions.loadAudio.success),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          const then = () => {
-            const audioRessource = this.audio.audiomanagers[0].resource;
-            this.store.dispatch(
-              AnnotationActions.setAudioLoaded.do({
-                mode: this.appStorage.useMode,
-                loaded: true,
-                fileName: audioRessource.info.fullname,
-                sampleRate: audioRessource.info.sampleRate,
-              })
-            );
-          };
-
           if (
             state.application.mode === LoginMode.URL &&
             state.application.queryParams.transcript !== undefined
@@ -312,7 +302,17 @@ export class AnnotationEffects {
 
               this.appStorage.overwriteAnnotation(newLevels, [], false);
             } else {
-              then();
+              this.transcrService
+                .load()
+                .then(() => {
+                  this.routingService.navigate(
+                    ['/user/transcr'],
+                    AppInfo.queryParamsHandling
+                  );
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
             }
           }
         })

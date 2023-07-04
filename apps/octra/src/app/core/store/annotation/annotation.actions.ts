@@ -19,6 +19,7 @@ export class AnnotationActions {
         value: number;
       }>(),
       success: props<{
+        audioFile?: TaskInputOutputDto;
         mode: LoginMode;
       }>(),
       fail: props<{
@@ -176,18 +177,6 @@ export class AnnotationActions {
     events: {
       do: props<{
         mode: LoginMode;
-      }>(),
-    },
-  });
-
-  static setAudioLoaded = createActionGroup({
-    source: `annotation/ set audio loaded`,
-    events: {
-      do: props<{
-        mode: LoginMode;
-        loaded: boolean;
-        fileName: string;
-        sampleRate: number;
       }>(),
     },
   });

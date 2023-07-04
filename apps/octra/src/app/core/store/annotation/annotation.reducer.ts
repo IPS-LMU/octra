@@ -296,25 +296,6 @@ export class AnnotationStateReducers {
           methods,
         })
       ),
-      on(
-        AnnotationActions.setAudioLoaded.do,
-        (state: AnnotationState, { loaded, fileName, sampleRate, mode }) => {
-          if (this.mode === mode) {
-            console.log(`set audio loaded ${loaded} for mode ${this.mode}`);
-            console.log(state);
-            return {
-              ...state,
-              audio: {
-                ...state.audio,
-                loaded,
-                fileName,
-                sampleRate,
-              },
-            };
-          }
-          return state;
-        }
-      ),
       on(OnlineModeActions.loginDemo, (state: AnnotationState, { mode }) => {
         if (this.mode === mode) {
           return {

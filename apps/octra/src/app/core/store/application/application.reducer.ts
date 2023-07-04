@@ -7,6 +7,7 @@ import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { AnnotationActions } from '../annotation/annotation.actions';
 import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
 import { ApplicationState } from './index';
+import { AuthenticationActions } from '../authentication';
 
 export const initialState: ApplicationState = {
   loading: {
@@ -39,14 +40,22 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
-  on(ApplicationActions.initApplication.success, (state: ApplicationState, { followPlayCursor, playOnHover }) => ({
-    ...state,
-    options: {
-      ...state.options,
-      followPlayCursor,
-      playOnHover
-    }
-  })),
+  on(
+    ApplicationActions.initApplication.success,
+    (
+      state: ApplicationState,
+      { followPlayCursor, playOnHover, reloaded, loggedIn }
+    ) => ({
+      ...state,
+      options: {
+        ...state.options,
+        followPlayCursor,
+        playOnHover,
+      },
+      reloaded,
+      loggedIn,
+    })
+  ),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
@@ -196,7 +205,7 @@ export const reducer = createReducer(
       loggedIn,
     })
   ),
-  on(AnnotationActions.logout.do, (state: ApplicationState) => {
+  on(AuthenticationActions.logout.success, (state: ApplicationState) => {
     return {
       ...state,
       mode: undefined,
@@ -259,6 +268,50 @@ export const reducer = createReducer(
       options: {
         ...state.options,
         highlightingEnabled,
+      },
+    })
+  ),
+  on(AnnotationActions.loadAudio.do, (state: ApplicationState, { mode }) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.INITIALIZE,
+      progress: 0,
+      errors: [],
+    },
+  })),
+  on(
+    AnnotationActions.loadAudio.progress,
+    (state: ApplicationState, { mode, value }) => ({
+      ...state,
+      loading: {
+        ...state.loading,
+        status: LoadingStatus.LOADING,
+        progress: Math.round(value * 100),
+        errors: [],
+      },
+    })
+  ),
+  on(
+    AnnotationActions.loadAudio.success,
+    (state: ApplicationState, { mode }) => ({
+      ...state,
+      loading: {
+        ...state.loading,
+        status: LoadingStatus.FINISHED,
+        progress: 100,
+        errors: [],
+      },
+    })
+  ),
+  on(
+    AnnotationActions.loadAudio.fail,
+    (state: ApplicationState, { error }) => ({
+      ...state,
+      loading: {
+        ...state.loading,
+        status: LoadingStatus.FAILED,
+        errors: [error],
       },
     })
   )

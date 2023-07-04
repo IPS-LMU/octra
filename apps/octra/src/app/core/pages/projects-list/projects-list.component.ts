@@ -5,6 +5,7 @@ import { ProjectDto } from '@octra/api-types';
 import { DefaultComponent } from '../../component/default.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-projects-list',
@@ -18,7 +19,8 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   constructor(
     private api: OctraAPIService,
     public appStorage: AppStorageService,
-    private modalService: OctraModalService
+    private modalService: OctraModalService,
+    private routingService: RoutingService
   ) {
     super();
   }
@@ -27,14 +29,15 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.subscrManager.add(
       this.api.listProjects().subscribe({
         next: (projects) => {
-          this.projects = projects.filter((a) => a.active === true);
+          this.projects = projects;
           this.projects.sort((a, b) => {
-            if (
-              a.statistics.freeTasks <= b.statistics.freeTasks &&
-              a.active &&
-              b.active
-            ) {
+            if (a.active && !b.active) {
               return 1;
+            } else if (a.active && b.active) {
+              if (a.statistics.freeTasks > b.statistics.freeTasks) {
+                return 1;
+              }
+              return 0;
             }
             return -1;
           });
@@ -51,20 +54,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   onProjectClick(project: ProjectDto) {
-    /* TODO
-    if (project.active && project.transcripts_count_free > 0) {
-      this.appStorage.startOnlineAnnotation({
-        name: project.name,
-        id: project.id,
-        description: project.description,
-        jobsLeft: project.transcripts_count_free - 1
-      }).then(() => {
-        navigateTo(this.router, ['user/transcr']);
-      }).catch((error) => {
-        console.error(error);
-      });
+    if (project.statistics.freeTasks > 0) {
+      this.appStorage.startOnlineAnnotation(project);
     }
-     */
   }
 
   onFileChange(event: any) {

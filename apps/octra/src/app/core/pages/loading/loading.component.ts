@@ -11,23 +11,15 @@ import {
   TranscriptionService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import {
-  IFile,
-  ImportResult,
-  OAudiofile,
-  OIDBLevel,
-  OIDBLink,
-  OLevel,
-} from '@octra/annotation';
-import { LoginMode } from '../../store';
+import { LoadingStatus, LoginMode } from '../../store';
 import * as fromApplication from '../../store/application';
 import * as fromAnnotation from '../../store/annotation';
 import { Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
-import { AnnotationActions } from '../../store/annotation/annotation.actions';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { DefaultComponent } from '../../component/default.component';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
 
 @Component({
   selector: 'octra-loading',
@@ -37,9 +29,14 @@ import { DefaultComponent } from '../../component/default.component';
 export class LoadingComponent extends DefaultComponent implements OnInit {
   @Output() loaded: boolean;
   public text = '';
-  public audioLoadingProgress = 0;
   public state = '';
   public warning = '';
+
+  loading?: {
+    status: LoadingStatus;
+    progress: number;
+    errors: string[];
+  };
 
   constructor(
     private langService: TranslocoService,
@@ -50,7 +47,8 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
     private transcrService: TranscriptionService,
     private http: HttpClient,
     private store: Store,
-    private actions: Actions
+    private actions: Actions,
+    private applicationStore: ApplicationStoreService
   ) {
     super();
   }
@@ -63,163 +61,10 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
       });
 
     this.subscrManager.add(
-      this.settService.audioloaded.subscribe((result) => {
-        if (result.status === 'success') {
-          new Promise<void>((resolve, reject) => {
-            if (
-              this.appStorage.useMode === LoginMode.URL &&
-              this.appStorage.urlParams.transcript !== undefined
-            ) {
-              this.transcrService.defaultFontSize = 16;
-
-              // load transcript file via URL
-              this.http
-                .get(this.appStorage.urlParams.transcript, {
-                  responseType: 'text',
-                })
-                .subscribe(
-                  (res) => {
-                    this.state = 'Import transcript...';
-                    let filename = this.appStorage.urlParams.transcript;
-                    filename = filename.substr(filename.lastIndexOf('/') + 1);
-
-                    const file: IFile = {
-                      name: filename,
-                      content: res,
-                      type: 'text',
-                      encoding: 'utf-8',
-                    };
-
-                    // convert par to annotJSON
-                    const audioRessource = this.audio.audiomanagers[0].resource;
-                    const oAudioFile = new OAudiofile();
-                    oAudioFile.arraybuffer = audioRessource.arraybuffer;
-                    oAudioFile.duration = audioRessource.info.duration.samples;
-                    oAudioFile.name = audioRessource.info.fullname;
-                    oAudioFile.sampleRate =
-                      audioRessource.info.duration.sampleRate;
-                    oAudioFile.size = audioRessource.size;
-
-                    let importResult: ImportResult;
-                    // find valid converter...
-                    for (const converter of AppInfo.converters) {
-                      if (filename.indexOf(converter.extension) > -1) {
-                        // test converter
-                        const tempImportResult = converter.import(
-                          file,
-                          oAudioFile
-                        );
-
-                        if (
-                          tempImportResult !== undefined &&
-                          tempImportResult.error === ''
-                        ) {
-                          importResult = tempImportResult;
-                          break;
-                        } else {
-                          console.error(tempImportResult.error);
-                        }
-                      }
-                    }
-
-                    if (
-                      !(importResult === undefined) &&
-                      !(importResult.annotjson === undefined)
-                    ) {
-                      // conversion successfully finished
-                      const newLevels: OIDBLevel[] = [];
-                      const newLinks: OIDBLink[] = [];
-                      for (
-                        let i = 0;
-                        i < importResult.annotjson.levels.length;
-                        i++
-                      ) {
-                        newLevels.push(
-                          new OIDBLevel(
-                            i + 1,
-                            importResult.annotjson.levels[i],
-                            i
-                          )
-                        );
-                      }
-                      for (
-                        let i = 0;
-                        i < importResult.annotjson.links.length;
-                        i++
-                      ) {
-                        newLinks.push(
-                          new OIDBLink(i + 1, importResult.annotjson.links[i])
-                        );
-                      }
-
-                      this.appStorage
-                        .overwriteAnnotation(newLevels, newLinks, false)
-                        .then(() => {
-                          resolve();
-                        })
-                        .catch((error) => {
-                          reject(error);
-                        });
-                    } else {
-                      this.settService.log = 'Invalid transcript file';
-                      reject('importResult is empty');
-                    }
-                  },
-                  (err) => {
-                    reject(err);
-                  }
-                );
-            } else {
-              if (this.appStorage.useMode === LoginMode.URL) {
-                // overwrite
-                this.transcrService.defaultFontSize = 16;
-
-                const newLevels: OIDBLevel[] = [];
-                newLevels.push(
-                  new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1)
-                );
-
-                this.appStorage
-                  .overwriteAnnotation(newLevels, [], false)
-                  .then(() => {
-                    resolve();
-                  })
-                  .catch((error) => {
-                    reject(error);
-                  });
-              } else {
-                resolve();
-              }
-            }
-          })
-            .then(() => {
-              this.state = 'Audio loaded';
-              const audioRessource = this.audio.audiomanagers[0].resource;
-              console.log(`dispatch`);
-              this.store.dispatch(
-                AnnotationActions.setAudioLoaded.do({
-                  mode: this.appStorage.useMode,
-                  loaded: true,
-                  fileName: audioRessource.info.fullname,
-                  sampleRate: audioRessource.info.sampleRate,
-                })
-              );
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        } else {
-          console.error('audio not loaded');
-          if (this.appStorage.useMode === LoginMode.LOCAL) {
-            navigateTo(
-              this.router,
-              ['/user/transcr/reload-file'],
-              AppInfo.queryParamsHandling
-            ).catch((error) => {
-              console.error(error);
-            });
-          }
-        }
+      this.applicationStore.loading$.subscribe({
+        next: (a) => {
+          this.loading = a;
+        },
       })
     );
 
@@ -263,13 +108,6 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
           !this.appStorage.loggedIn
         ) {
           // not logged in, go back
-          navigateTo(
-            this.router,
-            ['/login'],
-            AppInfo.queryParamsHandling
-          ).catch((error) => {
-            console.error(error);
-          });
         } else if (this.appStorage.loggedIn) {
           if (
             this.appStorage.useMode === LoginMode.LOCAL &&
@@ -293,10 +131,6 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
                 })
               );
             }
-
-            this.settService.audioloading.subscribe((progress) => {
-              this.audioLoadingProgress = progress * 100;
-            });
 
             this.settService.loadAudioFile(this.audio);
           }

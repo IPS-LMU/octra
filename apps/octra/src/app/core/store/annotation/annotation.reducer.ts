@@ -1,5 +1,5 @@
 import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
-import { AnnotationState, LoginMode } from '../index';
+import { LoginMode } from '../index';
 import { AnnotationActions } from './annotation.actions';
 import { IDBActions } from '../idb/idb.actions';
 import { ConfigurationActions } from '../configuration/configuration.actions';
@@ -7,6 +7,7 @@ import { IIDBModeOptions } from '../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
+import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -69,6 +70,38 @@ export class AnnotationStateReducers {
             return {
               ...state,
               transcript,
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.loadAudio.do,
+        (state: AnnotationState, { audioFile, mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              audio: {
+                ...state.audio,
+                loaded: false,
+                sampleRate: audioFile?.metadata?.sampleRate,
+                fileName: audioFile.filename
+              }
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.loadAudio.success,
+        (state: AnnotationState, { mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              audio: {
+                ...state.audio,
+                loaded: true
+              }
             };
           }
           return state;
@@ -308,7 +341,7 @@ export class AnnotationStateReducers {
           };
         }
         return state;
-      }),
+      })
     ];
   }
 

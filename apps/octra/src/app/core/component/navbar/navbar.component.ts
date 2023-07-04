@@ -315,4 +315,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   backToProjectsList() {
     navigateTo(this.router, ['user/projects']);
   }
+
+  logout() {
+    this.appStorage.logout(true);
+  }
 }

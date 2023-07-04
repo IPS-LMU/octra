@@ -52,7 +52,6 @@ import { LoadeditorDirective } from './core/shared/directive/loadeditor.directiv
 import {
   ALoginGuard,
   DeALoginGuard,
-  MembersAreaGuard,
   SettingsGuard,
   TranscrEndGuard,
 } from './core/shared/guard';
@@ -118,6 +117,7 @@ import {
   authenticationReducer,
 } from './core/store/authentication';
 import { APIEffects } from './core/store/api';
+import { AnnotationEffects } from './core/store/annotation/annotation.effects';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -203,6 +203,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
       IDBEffects,
       ApplicationEffects,
       APIEffects,
+      AnnotationEffects,
       AuthenticationEffects,
     ]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
@@ -228,7 +229,6 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     AudioService,
     DeALoginGuard,
     KeymappingService,
-    MembersAreaGuard,
     OctraModalService,
     NavbarService,
     ReloadFileGuard,

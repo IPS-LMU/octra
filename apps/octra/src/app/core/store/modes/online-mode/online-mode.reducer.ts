@@ -1,5 +1,4 @@
 import { Action, ActionReducer, on } from '@ngrx/store';
-import { AnnotationState, LoginMode, OnlineModeState } from '../../index';
 import * as fromAnnotation from '../../annotation/annotation.reducer';
 import { AnnotationStateReducers } from '../../annotation/annotation.reducer';
 import { undoRedo } from 'ngrx-wieder';
@@ -11,6 +10,9 @@ import {
   IIDBModeOptions,
 } from '../../../shared/octra-database';
 import { getProperties, hasProperty } from '@octra/utilities';
+import { AuthenticationActions } from '../../authentication';
+import { AnnotationState, OnlineModeState } from '../../annotation';
+import { LoginMode } from '../../index';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -81,7 +83,7 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.logout.do,
+        AuthenticationActions.logout.success,
         (state: OnlineModeState, { clearSession, mode }) => {
           if (mode === this.mode) {
             return clearSession
@@ -137,26 +139,8 @@ export class OnlineModeReducers {
               onlineSession: {
                 ...state.onlineSession,
                 sessionData: {
-                  ...state.onlineSession.sessionData,
+                  ...state.onlineSession,
                   feedback,
-                },
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
-        OnlineModeActions.setServerDataEntry,
-        (state: OnlineModeState, { serverDataEntry, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  ...state.onlineSession.sessionData,
-                  serverDataEntry,
                 },
               },
             };
@@ -170,13 +154,10 @@ export class OnlineModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  ...state.onlineSession.sessionData,
-                  comment,
-                },
-              },
+              changedTask: {
+                ...state.changedTask,
+                comment
+              }
             };
           }
           return state;
@@ -188,13 +169,10 @@ export class OnlineModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  ...state.onlineSession.sessionData,
-                  promptText,
-                },
-              },
+              changedTask: {
+                ...state.changedTask,
+                orgtext: promptText
+              }
             };
           }
           return state;
@@ -206,13 +184,10 @@ export class OnlineModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  ...state.onlineSession.sessionData,
-                  serverComment,
-                },
-              },
+              changedTask: {
+                ...state.changedTask,
+                comment: serverComment
+              }
             };
           }
           return state;
@@ -294,6 +269,21 @@ export class OnlineModeReducers {
           }
           return state;
         }
+      ),
+      on(
+        AnnotationActions.startAnnotation.success,
+        (state: OnlineModeState, { task, project }) => {
+          return {
+            ...state,
+            projectConfig: task.tool_configuration.value,
+            onlineSession: {
+              ...state.onlineSession,
+              currentProject: project,
+              task
+            },
+            changedTask: task
+          };
+        }
       )
     );
   }
@@ -310,39 +300,6 @@ export class OnlineModeReducers {
     };
 
     switch (attribute) {
-      case 'audioURL':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              audioURL: value,
-            },
-          },
-        };
-      case 'comment':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              comment: value,
-            },
-          },
-        };
-      case 'transcriptID':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              transcriptID: value,
-            },
-          },
-        };
       case 'user':
         if (value !== undefined) {
           if (hasProperty(value, 'name')) {
@@ -362,86 +319,6 @@ export class OnlineModeReducers {
           onlineSession: {
             ...state.onlineSession,
             loginData: onlineSessionData,
-          },
-        };
-      case 'prompttext':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              promptText: value,
-            },
-          },
-        };
-      case 'jobsLeft':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            currentProject: {
-              ...state.onlineSession.currentProject,
-              jobsLeft: value,
-            },
-          },
-        };
-      case 'serverDataEntry':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            currentProject: state.onlineSession.currentProject,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              serverDataEntry: value,
-            },
-          },
-        };
-      case 'servercomment':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              serverComment: value,
-            },
-          },
-        };
-      case 'submitted':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              submitted: value !== undefined ? value : false,
-            },
-          },
-        };
-      case 'feedback':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            sessionData: {
-              ...state.onlineSession.sessionData,
-              feedback: value,
-            },
-          },
-        };
-      case 'project':
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            currentProject: {
-              ...state.onlineSession.currentProject,
-              name: value?.name,
-              id: value?.id,
-              description: value?.description,
-            },
           },
         };
     }

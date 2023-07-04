@@ -18,7 +18,9 @@ export class ApplicationActions {
       do: emptyProps(),
       success: props<{
         playOnHover: boolean,
-        followPlayCursor: boolean
+        followPlayCursor: boolean,
+        loggedIn: boolean,
+        reloaded: boolean;
       }>(),
     },
   });

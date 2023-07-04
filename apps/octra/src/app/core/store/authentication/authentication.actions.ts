@@ -5,6 +5,7 @@ import {
   CurrentAccountDto,
 } from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LoginMode } from '../index';
 
 export class AdaptedAuthDto extends AuthDto {
   method!: AccountLoginMethod;
@@ -66,10 +67,14 @@ export class AuthenticationActions {
       do: props<{
         message?: string;
         messageType?: string;
+        clearSession: boolean;
+        mode: LoginMode;
       }>(),
       success: props<{
         message?: string;
         messageType?: string;
+        clearSession: boolean;
+        mode: LoginMode;
       }>(),
     },
   });

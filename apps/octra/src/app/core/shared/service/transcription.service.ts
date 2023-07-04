@@ -599,15 +599,7 @@ export class TranscriptionService {
             }
           }
 
-          this.appStorage
-            .overwriteAnnotation(newLevels, newLinks, true)
-            .then(() => {
-              resolve2();
-            })
-            .catch((err) => {
-              console.error(err);
-              resolve2();
-            });
+          this.appStorage.overwriteAnnotation(newLevels, newLinks, true);
         } else {
           resolve2();
         }

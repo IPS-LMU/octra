@@ -284,15 +284,9 @@ export class OctraDatabase extends Dexie {
   private populateModeOptions(table: Dexie.Table<IIDBEntry, string>) {
     const modeOptions: IIDBModeOptions = {
       submitted: false,
-      audioURL: '',
-      comment: '',
-      transcriptID: -1,
-      jobsLeft: -1,
-      serverDataEntry: undefined,
+      transcriptID: '-1',
       feedback: undefined,
       sessionfile: undefined,
-      prompttext: '',
-      servercomment: '',
       currentEditor: 'Dictaphone-Editor',
       logging: true,
       user: {
@@ -301,7 +295,7 @@ export class OctraDatabase extends Dexie {
         webToken: '',
       },
       project: {
-        id: -1,
+        id: '-1',
         name: '',
         description: '',
       },
@@ -449,15 +443,9 @@ export interface IIDBLogs extends IIDBEntry {
 
 export interface IIDBModeOptions {
   submitted: boolean;
-  audioURL: string;
-  comment: string;
-  transcriptID: number;
+  transcriptID: string;
   feedback: any;
-  jobsLeft: number;
-  serverDataEntry: any;
   sessionfile: any;
-  prompttext: string;
-  servercomment: string;
   currentEditor: string;
   logging: boolean;
   user: {
@@ -466,7 +454,7 @@ export interface IIDBModeOptions {
     webToken: string;
   };
   project: {
-    id: number;
+    id: string;
     name: string;
     description: string;
   };
@@ -474,16 +462,10 @@ export interface IIDBModeOptions {
 
 export const DefaultModeOptions: IIDBModeOptions = {
   submitted: false,
-  audioURL: '',
-  comment: '',
-  transcriptID: -1,
+  transcriptID: "-1",
   feedback: undefined,
   sessionfile: undefined,
-  prompttext: '',
-  servercomment: '',
   currentEditor: '',
-  jobsLeft: -1,
-  serverDataEntry: undefined,
   logging: true,
   user: {
     name: '',
@@ -491,7 +473,7 @@ export const DefaultModeOptions: IIDBModeOptions = {
     webToken: '',
   },
   project: {
-    id: -1,
+    id: '-1',
     name: '',
     description: '',
   },

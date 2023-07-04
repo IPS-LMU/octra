@@ -24,7 +24,9 @@ import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AsrService } from '../../shared/service/asr.service';
 import { SettingsService } from '../../shared/service';
-import { RootState } from '../index';
+import { LoginMode, RootState } from '../index';
+import { AuthenticationActions } from '../authentication';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Injectable({
   providedIn: 'root',
@@ -302,10 +304,15 @@ export class ApplicationEffects {
           this.appendTrackingCode(a.settings.octra.tracking.active, a.settings);
         }
 
+        const loggedIn = this.sessStr.retrieve('loggedIn');
+
         return of(
           ApplicationActions.initApplication.success({
-            playOnHover: this.sessStr.retrieve('playonhover'),
-            followPlayCursor: this.sessStr.retrieve('followplaycursor'),
+            playOnHover: this.sessStr.retrieve('playonhover') ?? false,
+            followPlayCursor:
+              this.sessStr.retrieve('followplaycursor') ?? false,
+            loggedIn: this.sessStr.retrieve('loggedIn') ?? false,
+            reloaded: this.sessStr.retrieve('reloaded') ?? false,
           })
         );
       })
@@ -401,6 +408,16 @@ export class ApplicationEffects {
           }
 
           // settings finally loaded
+
+          if (
+            !store.application.loggedIn &&
+            this.appStorage.useMode !== LoginMode.URL
+          ) {
+            this.routerService.navigate(
+              ['/login'],
+              AppInfo.queryParamsHandling
+            );
+          }
         })
       ),
     { dispatch: false }
@@ -421,7 +438,7 @@ export class ApplicationEffects {
 
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.logout.do, LocalModeActions.logout.do),
+      ofType(AuthenticationActions.logout.success),
       exhaustMap((action) => {
         this.sessStr.clear();
         // clear undo history
@@ -430,12 +447,18 @@ export class ApplicationEffects {
         const subject = new Subject<Action>();
 
         timer(10).subscribe(() => {
-          if (action.type === OnlineModeActions.logout.do.type) {
+          if (action.type === AuthenticationActions.logout.success.type) {
             subject.next(OnlineModeActions.clearSessionStorage.success());
           } else {
             subject.next(LocalModeActions.clearSessionStorage.success());
           }
           subject.complete();
+
+          this.routerService
+            .navigate(['login'], AppInfo.queryParamsHandling)
+            .catch((error) => {
+              console.error(error);
+            });
         });
 
         return subject;
@@ -454,7 +477,8 @@ export class ApplicationEffects {
     private bugService: BugReportService,
     private appStorage: AppStorageService,
     private asrService: AsrService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private routerService: RoutingService
   ) {}
 
   private initConsoleLogging() {

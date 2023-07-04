@@ -8,13 +8,10 @@ import {
   SubscriptionManager,
   waitTillResultRetrieved,
 } from '@octra/utilities';
-import { navigateTo } from '@octra/ngx-utilities';
 import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import {
-  AnnotationState,
   AnnotationStateLevel,
   convertFromOIDLevel,
-  CurrentProject,
   getModeState,
   LoadingStatus,
   LoginMode,
@@ -31,12 +28,14 @@ import { UserActions } from '../../store/user/user.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
 import * as fromAnnotation from '../../store/annotation';
+import { AnnotationState } from '../../store/annotation';
 import { ASRActions } from '../../store/asr/asr.actions';
 import { ILog } from '../../obj/Settings/logging';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
 import { LocalModeActions } from '../../store/modes/local-mode/local-mode.actions';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { AccountRole } from '@octra/api-types';
+import { ProjectDto } from '@octra/api-types';
+import { AuthenticationActions } from '../../store/authentication';
 
 @Injectable({
   providedIn: 'root',
@@ -284,17 +283,6 @@ export class AppStorageService {
         this._snapshot = state;
       })
     );
-
-    this.subscrManager.add(
-      actions.subscribe((action) => {
-        if (action.type === '@ngrx/effects/init') {
-          this.jobsLeft = this.sessStr.retrieve('jobsLeft');
-          this.loggedIn = this.sessStr.retrieve('loggedIn');
-          this.reloaded = this.sessStr.retrieve('reloaded');
-          this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
-        }
-      })
-    );
   }
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
@@ -514,38 +502,26 @@ export class AppStorageService {
     levels: OIDBLevel[],
     links: OIDBLink[],
     saveToDB = true
-  ): Promise<any> => {
-    return new Promise<any>((resolve, reject) => {
-      let max = 0;
+  ) => {
+    let max = 0;
 
-      for (const valueElem of levels) {
-        max = Math.max(max, valueElem.id);
-      }
+    for (const valueElem of levels) {
+      max = Math.max(max, valueElem.id);
+    }
 
-      const subscr = this.actions.subscribe((a) => {
-        if (a.type === IDBActions.overwriteTranscriptSuccess.type) {
-          resolve(undefined);
-          subscr.unsubscribe();
-        } else if (a.type === IDBActions.overwriteTranscriptFailed.type) {
-          reject((a as any).error);
-          subscr.unsubscribe();
-        }
-      });
-
-      this.store.dispatch(
-        AnnotationActions.overwriteTranscript.do({
-          mode: this.useMode,
-          transcript: {
-            levels: levels.map((a) => {
-              return convertFromOIDLevel(a.level, a.id);
-            }),
-            links,
-            levelCounter: max,
-          },
-          saveToDB,
-        })
-      );
-    });
+    this.store.dispatch(
+      AnnotationActions.overwriteTranscript.do({
+        mode: this.useMode,
+        transcript: {
+          levels: levels.map((a) => {
+            return convertFromOIDLevel(a.level, a.id);
+          }),
+          links,
+          levelCounter: max,
+        },
+        saveToDB,
+      })
+    );
   };
 
   public overwriteLinks = (value: OIDBLink[]) => {
@@ -555,16 +531,6 @@ export class AppStorageService {
       })
     );
   };
-
-  afterLoginOnlineSuccessful(
-    type: 'local' | 'shibboleth',
-    user: {
-      name: string;
-      email: string;
-      roles: AccountRole[];
-      webToken: string;
-    }
-  ) {}
 
   setLocalSession(files: File[], sessionFile: SessionFile) {
     if (this.easymode === undefined) {
@@ -604,20 +570,14 @@ export class AppStorageService {
             webToken: '270858034895u23894ruz827z030r983jr02h7',
           },
           currentProject: {
-            id: 234267,
+            id: '234267',
             name: 'DemoProject',
             description: 'This is a demo project.',
-            jobsLeft,
-          },
-          sessionData: {
-            transcriptID: 21343134,
-            promptText: '',
-            serverDataEntry: undefined,
-            comment: '',
-            audioURL,
-            serverComment,
-            submitted: false,
-            feedback: undefined,
+            creationdate: new Date().toISOString(),
+            updatedate: new Date().toISOString(),
+            active: true,
+            visibility: 'public',
+            roles: [],
           },
         },
       })
@@ -847,52 +807,22 @@ export class AppStorageService {
     return undefined;
   }
 
-  public startOnlineAnnotation(currentProject: CurrentProject): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      // TODO
-      /* this.api.startAnnotation(currentProject.id).then((newAnnotation: AnnotationStartResponseDataItem) => {
-        if (newAnnotation !== undefined) {
-          console.log(`got new annotation`);
-          console.log(newAnnotation);
-
-          this.store.dispatch(OnlineModeActions.startOnlineAnnotation({
-            mode: this.useMode,
-            currentProject: {
-              ...currentProject,
-              jobsLeft: newAnnotation.transcripts_free_count
-            },
-            sessionData: {
-              transcriptID: newAnnotation.id,
-              audioURL: newAnnotation.file.url,
-              promptText: newAnnotation.orgtext,
-              serverComment: newAnnotation.comment,
-              serverDataEntry: newAnnotation,
-              comment: '',
-              submitted: false,
-              feedback: undefined
-            },
-            transcript: undefined //TODO api: enable to continue online session
-          }));
-        }
-        resolve(newAnnotation);
-      }).catch((error) => {
-        reject(error);
-      });*/
-    });
+  public startOnlineAnnotation(project: ProjectDto) {
+    this.store.dispatch(
+      AnnotationActions.startAnnotation.do({
+        project,
+        mode: LoginMode.ONLINE,
+      })
+    );
   }
 
   public logout(clearSession = false) {
     this.store.dispatch(
-      AnnotationActions.logout.do({
+      AuthenticationActions.logout.do({
+        message: 'You were logged out',
         clearSession,
         mode: this.useMode,
       })
-    );
-    // TODO WAIT?
-    navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch(
-      (error) => {
-        console.error(error);
-      }
     );
   }
 

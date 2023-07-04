@@ -4,7 +4,7 @@
     <div
       *ngIf="settService.log === ''"
       [ngStyle]="{
-        width: audioLoadingProgress + '%'
+        width: (loading.progress * 100) + '%'
       }"
       class="progress-bar"
     ></div>

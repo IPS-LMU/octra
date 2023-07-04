@@ -7,9 +7,7 @@ import { IDBService } from '../../shared/service/idb.service';
 import {
   convertFromOIDLevel,
   getModeState,
-  LocalModeState,
   LoginMode,
-  OnlineModeState,
   RootState,
 } from '../index';
 import { ILevel, ILink, OAnnotJSON, OIDBLink } from '@octra/annotation';
@@ -26,6 +24,8 @@ import { IIDBModeOptions } from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
 import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { AuthenticationActions } from '../authentication';
+import { LocalModeState, OnlineModeState } from '../annotation';
 
 @Injectable({
   providedIn: 'root',
@@ -393,7 +393,7 @@ export class IDBEffects {
         (action) =>
           action.type === AnnotationActions.clearAnnotation.do.type ||
           action.type === OnlineModeActions.clearWholeSession.do.type ||
-          action.type === AnnotationActions.logout.do.type
+          action.type === AuthenticationActions.logout.success.type
       ),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
@@ -456,7 +456,7 @@ export class IDBEffects {
 
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.logout.do),
+      ofType(AuthenticationActions.logout.success),
       exhaustMap(() => {
         const subject = new Subject<Action>();
 
@@ -474,7 +474,7 @@ export class IDBEffects {
   savemodeOptions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        AnnotationActions.logout.do,
+        AuthenticationActions.logout.success,
         OnlineModeActions.setSubmitted,
         OnlineModeActions.setComment,
         OnlineModeActions.setFeedback,
@@ -500,20 +500,7 @@ export class IDBEffects {
 
           this.idbService
             .saveModeOptions((action as any).mode, {
-              submitted: onlineModeState.onlineSession?.sessionData?.submitted,
-              audioURL: onlineModeState.onlineSession?.sessionData?.audioURL,
-              comment: onlineModeState.onlineSession?.sessionData?.comment,
-              transcriptID:
-                onlineModeState.onlineSession?.sessionData?.transcriptID,
-              jobsLeft: onlineModeState.onlineSession?.currentProject?.jobsLeft,
-              serverDataEntry:
-                onlineModeState.onlineSession?.sessionData?.serverDataEntry,
-              feedback: onlineModeState.onlineSession?.sessionData?.feedback,
               sessionfile: localModeState?.sessionFile?.toAny(),
-              prompttext:
-                onlineModeState?.onlineSession?.sessionData?.promptText,
-              servercomment:
-                onlineModeState?.onlineSession?.sessionData?.serverComment,
               currentEditor: modeState.currentEditor,
               logging: modeState?.logging,
               user: {
@@ -527,6 +514,9 @@ export class IDBEffects {
                 description:
                   onlineModeState?.onlineSession?.currentProject?.description,
               },
+              submitted: false,
+              transcriptID: '0',
+              feedback: undefined, // TODO change
             })
             .then(() => {
               subject.next(
@@ -812,7 +802,7 @@ export class IDBEffects {
 
   saveLogout$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.logout.do),
+      ofType(AuthenticationActions.logout.success),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 

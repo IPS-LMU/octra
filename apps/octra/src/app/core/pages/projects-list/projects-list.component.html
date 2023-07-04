@@ -7,23 +7,28 @@
     <div class="table-wrapper flex overflow-y-scroll h-100">
       <table class="table table-striped table-hover">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th class="text-center">Free Tasks</th>
-            <th class="text-center">Action</th>
-          </tr>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Description</th>
+          <th class="text-center">Free Tasks</th>
+          <th class="text-center">Action</th>
+        </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let project of projects" [ngClass]="{
-        'deactivated': project.statistics?.freeTasks < 1 || !project.active
+        <tr *ngFor="let project of projects" [ngClass]="{
+        'deactivated': project.statistics?.freeTasks < 1
       }">
+          <td>
+            <i *ngIf="project.active" class="bi bi-check-circle" style="color: green;"></i>
+            <i *ngIf="!project.active" class="bi bi-dash-circle" style="color: red;"></i>
+          </td>
           <td>{{project.name}}</td>
           <td class="description">{{project.description}}</td>
           <td class="text-center">{{project.statistics?.freeTasks}}</td>
           <td class="text-center">
             <button class="btn btn-primary btn-sm" size="sm" (click)="onProjectClick(project)"
-                    [disabled]="project.statistics?.freeTasks < 1 || !project.active">Start
+                    [disabled]="project.statistics?.freeTasks < 1">Start
             </button>
           </td>
         </tr>

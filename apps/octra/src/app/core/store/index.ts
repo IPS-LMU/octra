@@ -5,21 +5,17 @@ import {
   Level,
   OEvent,
   OIDBLevel,
-  OIDBLink,
   OItem,
   OLevel,
   OSegment,
 } from '@octra/annotation';
-import { ProjectSettings } from '../obj/Settings';
 import { SampleUnit } from '@octra/media';
-import { ILog } from '../obj/Settings/logging';
-import { Histories, UndoRedoState } from 'ngrx-wieder';
-import { SessionFile } from '../obj/SessionFile';
-import { TaskDto } from '@octra/api-types';
+import { ProjectDto, TaskDto } from '@octra/api-types';
 import { AuthenticationState } from './authentication';
 import { ApplicationState } from './application';
 import { ASRState } from './asr';
 import { UserState } from './user';
+import { LocalModeState, OnlineModeState } from './annotation';
 
 export enum LoginMode {
   URL = 'url',
@@ -61,8 +57,8 @@ export interface SessionData {
 
 export interface OnlineSession {
   loginData: LoginData;
-  currentProject?: CurrentProject;
-  sessionData?: SessionData;
+  currentProject?: ProjectDto;
+  task?: TaskDto;
 }
 
 export interface URLParameters {
@@ -70,45 +66,6 @@ export interface URLParameters {
   transcript: string;
   embedded: boolean;
   host: string;
-}
-
-export interface AnnotationState extends UndoRedoState {
-  savingNeeded: boolean;
-  isSaving: boolean;
-  currentEditor?: string;
-  audio: {
-    loaded: boolean;
-    fileName: string;
-    sampleRate: number;
-  };
-  guidelines?: any;
-  logs: ILog[];
-  logging: boolean;
-  projectConfig?: ProjectSettings;
-  methods?: {
-    validate: (transcript: string, guidelines: any) => any;
-    tidyUp: (transcript: string, guidelines: any) => any;
-  };
-  transcript: TranscriptionState;
-  histories: Histories;
-  onlineSession?: any;
-  files?: any;
-  sessionFile?: any;
-}
-
-export interface OnlineModeState extends AnnotationState {
-  onlineSession: OnlineSession;
-}
-
-export interface LocalModeState extends AnnotationState {
-  files?: any[];
-  sessionFile?: SessionFile;
-}
-
-export interface TranscriptionState {
-  levels: AnnotationStateLevel[];
-  links: OIDBLink[];
-  levelCounter: number;
 }
 
 export interface RootState {

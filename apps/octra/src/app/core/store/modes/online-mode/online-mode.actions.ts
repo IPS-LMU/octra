@@ -6,10 +6,10 @@ import {
   LoginMode,
   OnlineSession,
   SessionData,
-  TranscriptionState,
   URLParameters,
 } from '../../index';
 import { TaskDto } from '@octra/api-types';
+import { TranscriptionState } from '../../annotation';
 
 export class OnlineModeActions extends AnnotationActions {
   public static readLoginData = createAction(

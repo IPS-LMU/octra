@@ -1,5 +1,5 @@
 import { on } from '@ngrx/store';
-import { LocalModeState, LoginMode } from '../../index';
+import { LoginMode } from '../../index';
 import * as fromAnnotation from '../../annotation/annotation.reducer';
 import { AnnotationStateReducers } from '../../annotation/annotation.reducer';
 import { undoRedo } from 'ngrx-wieder';
@@ -8,6 +8,8 @@ import { LocalModeActions } from './local-mode.actions';
 import { SessionFile } from '../../../obj/SessionFile';
 import { IDBActions } from '../../idb/idb.actions';
 import { getProperties } from '@octra/utilities';
+import { AuthenticationActions } from '../../authentication';
+import { LocalModeState } from '../../annotation';
 
 export const initialState: LocalModeState = {
   ...fromAnnotation.initialState,
@@ -35,7 +37,7 @@ export const reducer = createUndoRedoReducer(
     })
   ),
   on(
-    LocalModeActions.logout.do,
+    AuthenticationActions.logout.success,
     (state: LocalModeState, { clearSession, mode }) => {
       if (mode === LoginMode.LOCAL) {
         return clearSession

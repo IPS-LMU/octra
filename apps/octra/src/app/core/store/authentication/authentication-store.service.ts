@@ -32,15 +32,6 @@ export class AuthenticationStoreService {
     );
   }
 
-  logout(message?: string, messageType?: string) {
-    this.store.dispatch(
-      AuthenticationActions.logout.do({
-        message,
-        messageType,
-      })
-    );
-  }
-
   loginAuto(method: AccountLoginMethod, params?: any) {
     this.store.dispatch(AuthenticationActions.loginAuto.do({ method, params }));
   }

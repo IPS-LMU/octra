@@ -1,17 +1,29 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { AnnotationStateLevel, LoginMode, TranscriptionState } from '../index';
+import { AnnotationStateLevel, LoginMode } from '../index';
 import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
+import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
+import { HttpErrorResponse } from '@angular/common/http';
+import { TranscriptionState } from './index';
 
 export class AnnotationActions {
-  static logout = createActionGroup({
-    source: `annotation/init`,
+  static loadAudio = createActionGroup({
+    source: 'annotation/audio/load',
     events: {
       do: props<{
-        clearSession: boolean;
+        audioFile?: TaskInputOutputDto;
         mode: LoginMode;
       }>(),
-      success: emptyProps(),
+      progress: props<{
+        mode: LoginMode;
+        value: number;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
     },
   });
 
@@ -196,6 +208,24 @@ export class AnnotationActions {
       do: props<{
         audioURL: string;
         mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static startAnnotation = createActionGroup({
+    source: `annotation/ start`,
+    events: {
+      do: props<{
+        project: ProjectDto;
+        mode: LoginMode;
+      }>(),
+      success: props<{
+        project: ProjectDto;
+        task: TaskDto;
+        mode: LoginMode;
+      }>(),
+      fail: props<{
+        error: HttpErrorResponse;
       }>(),
     },
   });

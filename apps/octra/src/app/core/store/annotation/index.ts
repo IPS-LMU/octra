@@ -1,5 +1,56 @@
 import { pipe } from 'rxjs';
-import { getModeState, RootState } from '../index';
+import {
+  AnnotationStateLevel,
+  getModeState,
+  OnlineSession,
+  RootState,
+} from '../index';
+import { Histories, UndoRedoState } from 'ngrx-wieder';
+import { ILog } from '../../obj/Settings/logging';
+import { ProjectSettings } from '../../obj';
+import { TaskDto } from '@octra/api-types';
+import { SessionFile } from '../../obj/SessionFile';
+import { OIDBLink } from '@octra/annotation';
+
+export interface AnnotationState extends UndoRedoState {
+  savingNeeded: boolean;
+  isSaving: boolean;
+  currentEditor?: string;
+  audio: {
+    loaded: boolean;
+    fileName: string;
+    sampleRate: number;
+  };
+  guidelines?: any;
+  logs: ILog[];
+  logging: boolean;
+  projectConfig?: ProjectSettings;
+  methods?: {
+    validate: (transcript: string, guidelines: any) => any;
+    tidyUp: (transcript: string, guidelines: any) => any;
+  };
+  transcript: TranscriptionState;
+  histories: Histories;
+  onlineSession?: any;
+  files?: any;
+  sessionFile?: any;
+  changedTask?: TaskDto;
+}
+
+export interface OnlineModeState extends AnnotationState {
+  onlineSession: OnlineSession;
+}
+
+export interface LocalModeState extends AnnotationState {
+  files?: any[];
+  sessionFile?: SessionFile;
+}
+
+export interface TranscriptionState {
+  levels: AnnotationStateLevel[];
+  links: OIDBLink[];
+  levelCounter: number;
+}
 
 export const selectAnnotation = (state: RootState) => {
   const mode = getModeState(state);

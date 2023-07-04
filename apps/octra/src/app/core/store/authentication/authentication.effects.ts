@@ -130,19 +130,11 @@ export class AuthenticationEffects {
         return this.apiService.logout().pipe(
           map(() => {
             this.sessionStorageService.clear();
-            return AuthenticationActions.logout.success({
-              message: a.message,
-              messageType: a.messageType,
-            });
+            return AuthenticationActions.logout.success(a);
           }),
           catchError((err: HttpErrorResponse) => {
             this.sessionStorageService.clear();
-            return of(
-              AuthenticationActions.logout.success({
-                message: undefined,
-                messageType: undefined,
-              })
-            );
+            return of(AuthenticationActions.logout.success(a));
           })
         );
       })

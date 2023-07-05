@@ -1232,7 +1232,7 @@ export class TwoDEditorComponent
 
     if (tempWindow !== undefined) {
       console.log('window opened');
-      this.authWindow = tempWindow;
+      this.authWindow = tempWindow as any;
     } else {
       console.log("window can't be opened!");
     }
@@ -1265,7 +1265,7 @@ export class TwoDEditorComponent
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     // this.viewer.height = this.linesViewHeight;
   }
 }

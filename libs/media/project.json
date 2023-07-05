@@ -5,21 +5,21 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/media",
         "main": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": [],
-        "project": "libs/media/package.json",
-        "compiler": "tsc",
-        "format": [
-          "esm",
-          "cjs"
-        ],
-        "updateBuildableProjectDepsInPackageJson": false
+        "assets": ["libs/media/*.md"]
       }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs media {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
@@ -34,12 +34,6 @@
       "options": {
         "jestConfig": "libs/media/jest.config.ts",
         "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
       }
     }
   },

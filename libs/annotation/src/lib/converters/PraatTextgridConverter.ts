@@ -1,6 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {contains} from '@octra/utilities';
-import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../annotjson';
+import { AnnotationLevelType, OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment } from "../annotjson";
 
 export class PraatTextgridConverter extends Converter {
 
@@ -16,7 +16,7 @@ export class PraatTextgridConverter extends Converter {
     this._encoding = 'UTF-8';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult | undefined {
     if (annotation) {
       let result = '';
       const durSeconds = (audiofile.duration / audiofile.sampleRate);
@@ -57,8 +57,8 @@ export class PraatTextgridConverter extends Converter {
           for (let j = 0; j < level.items.length; j++) {
             const segment = level.items[j];
 
-            const secondsStart = segment.sampleStart / audiofile.sampleRate;
-            const secondsEnd = (segment.sampleStart + segment.sampleDur) / audiofile.sampleRate;
+            const secondsStart = segment.sampleStart! / audiofile.sampleRate;
+            const secondsEnd = (segment.sampleStart! + segment.sampleDur!) / audiofile.sampleRate;
 
             result += `        intervals [${j + 1}]:\n` +
               `            xmin = ${secondsStart} \n` +
@@ -139,7 +139,7 @@ export class PraatTextgridConverter extends Converter {
                       };
                     }
                     lvlName = test[1];
-                    const olevel = (classStr === 'IntervalTier') ? new OLevel(lvlName, 'SEGMENT') : new OLevel(lvlName, 'EVENT');
+                    const olevel = (classStr === 'IntervalTier') ? new OLevel(lvlName, AnnotationLevelType.SEGMENT) : new OLevel(lvlName, AnnotationLevelType.EVENT);
                     i++;
 
                     // ignore xmin and xmax, interval size

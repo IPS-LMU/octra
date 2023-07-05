@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import { AnnotationLevelType, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment } from "../annotjson";
 
 export class SRTConverter extends Converter {
 
@@ -22,7 +22,7 @@ export class SRTConverter extends Converter {
 
       const matches = regex.exec(timeString);
 
-      if (matches.length > -1) {
+      if (matches && matches.length > -1) {
         const hours = Number(matches[1]);
         const minutes = Number(matches[2]);
         const seconds = Number(matches[3]);
@@ -45,7 +45,7 @@ export class SRTConverter extends Converter {
     return -1;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult | undefined {
     if (annotation) {
       let result = '';
       let filename = '';
@@ -63,8 +63,8 @@ export class SRTConverter extends Converter {
         if (level.type === 'SEGMENT') {
           for (const item of level.items) {
             const transcript = item.labels[0].value;
-            const start = this.getTimeStringFromSamples(item.sampleStart, annotation.sampleRate);
-            const end = this.getTimeStringFromSamples(item.sampleStart + item.sampleDur, annotation.sampleRate);
+            const start = this.getTimeStringFromSamples(item.sampleStart!, annotation.sampleRate);
+            const end = this.getTimeStringFromSamples(item.sampleStart! + item.sampleDur!, annotation.sampleRate);
 
             if (transcript !== '') {
               result += `${counter}\n`;
@@ -100,7 +100,7 @@ export class SRTConverter extends Converter {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
-      const olevel = new OLevel('OCTRA_1', 'SEGMENT');
+      const olevel = new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT);
 
       let counterID = 1;
       let lastEnd = 0;
@@ -110,7 +110,7 @@ export class SRTConverter extends Converter {
           '((?:(?:(?![0-9]).+)?\n?)+)', 'g');
 
         let matches = regex.exec(content);
-        while (matches !== undefined) {
+        while (matches !== null) {
           const timeStart = SRTConverter.getSamplesFromTimeString(matches[2], audiofile.sampleRate);
           const timeEnd = SRTConverter.getSamplesFromTimeString(matches[3], audiofile.sampleRate);
           const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
@@ -167,7 +167,7 @@ export class SRTConverter extends Converter {
     return `${hoursStr}:${minutesStr}:${secondsStr},${miliStr}`;
   }
 
-  public formatNumber = (num, length): string => {
+  public formatNumber = (num: number, length: number): string => {
     let result = '' + num.toFixed(0);
     while (result.length < length) {
       result = '0' + result;

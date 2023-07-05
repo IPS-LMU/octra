@@ -4,14 +4,14 @@ import {AudioFormat} from './audio-format';
 // https://www.ietf.org/rfc/rfc3533.txt
 // https://web.mit.edu/cfox/share/doc/libvorbis-1.0/vorbis-spec-ref.html
 export class OggFormat extends AudioFormat {
-  version: number;
-  headerType: number;
+  version!: number;
+  headerType!: number;
   /**
    * A granule position is the time marker in Ogg files. It is an abstract value, whose meaning is determined by the codec.
    * It may, for example, be a count of the number of samples, the number of frames or a more complex scheme.
    */
-  granulePosition: number;
-  bitStreamLength: number;
+  granulePosition!: number;
+  bitStreamLength!: number;
 
   constructor() {
     super();
@@ -49,7 +49,7 @@ export class OggFormat extends AudioFormat {
   }
 
   protected setDuration() {
-
+    // TODO implement
   }
 
   override init(filename: string, buffer: ArrayBuffer) {
@@ -66,14 +66,14 @@ enum OggVorbisHeaderType {
 }
 
 class OggVorbisPage {
-  capturePattern: string;
-  version: number;
-  headerType: number;
-  granulePosition: number;
-  bitstreamSerialNumber: number;
-  pageSequenceNumber: number;
-  checksum: number;
-  pageSegments: number;
+  capturePattern!: string;
+  version!: number;
+  headerType!: number;
+  granulePosition!: number;
+  bitstreamSerialNumber!: number;
+  pageSequenceNumber!: number;
+  checksum!: number;
+  pageSegments!: number;
 
   segmentLengthTable: number[] = [];
   byteLength = 0;
@@ -134,12 +134,12 @@ class OggVorbisPage {
       this.identificationHeader = {
         packetType,
         vorbis: this.sliceString(buffer, 6),
-        vorbisVersion: this.sliceInt(buffer, 4, 'uint32'),
-        audioChannels: this.sliceInt(buffer, 1, 'uint8'),
-        audioSampleRate: this.sliceInt(buffer, 4, 'uint32'),
-        bitrateMaximum: this.sliceInt(buffer, 4, 'int32') + 1,
-        bitrateNominal: this.sliceInt(buffer, 4, 'int32'),
-        bitrateMinimum: this.sliceInt(buffer, 4, 'int32') + 1,
+        vorbisVersion: this.sliceInt(buffer, 4, 'uint32')!,
+        audioChannels: this.sliceInt(buffer, 1, 'uint8')!,
+        audioSampleRate: this.sliceInt(buffer, 4, 'uint32')!,
+        bitrateMaximum: this.sliceInt(buffer, 4, 'int32')! + 1,
+        bitrateNominal: this.sliceInt(buffer, 4, 'int32')!,
+        bitrateMinimum: this.sliceInt(buffer, 4, 'int32')! + 1,
         blocksize0: -1,
         blocksize1: -1,
         framingFlag: -1
@@ -148,7 +148,7 @@ class OggVorbisPage {
       const blockSizes = this.sliceBits(buffer, 1, [4, 4], 'uint8');
       this.identificationHeader.blocksize0 = blockSizes[0];
       this.identificationHeader.blocksize1 = blockSizes[1];
-      this.identificationHeader.framingFlag = this.sliceInt(buffer, 1, 'uint8')
+      this.identificationHeader.framingFlag = this.sliceInt(buffer, 1, 'uint8')!
     }
   }
 
@@ -164,12 +164,12 @@ class OggVorbisPage {
         fields: []
       };
 
-      const firstLength = this.sliceInt(buffer, 4, 'uint32');
+      const firstLength = this.sliceInt(buffer, 4, 'uint32')!;
       const vendor = this.sliceString(buffer, firstLength);
-      const commentListLength = this.sliceInt(buffer, 4, 'uint32');
+      const commentListLength = this.sliceInt(buffer, 4, 'uint32')!;
 
       for (let i = 0; i < commentListLength; i++) {
-        const length = this.sliceInt(buffer, 4, 'uint32');
+        const length = this.sliceInt(buffer, 4, 'uint32')!;
         const comment = this.sliceString(buffer, length);
 
         if (comment.indexOf('=') > -1) {
@@ -180,7 +180,7 @@ class OggVorbisPage {
           });
         }
 
-        this.commentHeader.framingBit = this.sliceInt(buffer, 1, 'uint8');
+        this.commentHeader.framingBit = this.sliceInt(buffer, 1, 'uint8')!;
 
         if (this.commentHeader.framingBit !== 1) {
           throw new Error('Error reading comment header, framing bit is unset.')
@@ -211,7 +211,7 @@ class OggVorbisPage {
   }
 
   private sliceInt(buffer: ArrayBuffer, length: number, type: 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'int8'
-    | 'int16' | 'int32' | 'int64', littleEndian = true, incrementPointer = true): number {
+    | 'int16' | 'int32' | 'int64', littleEndian = true, incrementPointer = true): number | undefined {
     const view = this.sliceBytes(buffer, length, incrementPointer);
 
     switch (type) {
@@ -256,7 +256,7 @@ class OggVorbisPage {
     const array = new Uint8Array(bufferPart);
     this.byteLength += length;
     this.pointer += length;
-    return String.fromCharCode.apply(undefined, array);
+    return String.fromCharCode.apply(undefined, Array.from(array));
   }
 
   private readCapturePattern(buffer: ArrayBuffer) {
@@ -264,38 +264,38 @@ class OggVorbisPage {
   }
 
   private readVersion(buffer: ArrayBuffer) {
-    this.version = this.sliceInt(buffer, 1, 'uint8');
+    this.version = this.sliceInt(buffer, 1, 'uint8')!;
   }
 
   private readHeaderType(buffer: ArrayBuffer) {
-    this.headerType = this.sliceInt(buffer, 1, 'uint8');
+    this.headerType = this.sliceInt(buffer, 1, 'uint8')!;
   }
 
   private setGranulePosition(buffer: ArrayBuffer) {
-    this.granulePosition = this.sliceInt(buffer, 8, 'uint32');
+    this.granulePosition = this.sliceInt(buffer, 8, 'uint32')!;
   }
 
   private setBitstreamSerialNumber(buffer: ArrayBuffer) {
-    this.bitstreamSerialNumber = this.sliceInt(buffer, 4, 'uint32');
+    this.bitstreamSerialNumber = this.sliceInt(buffer, 4, 'uint32')!;
   }
 
   private readPageSequenceNumber(buffer: ArrayBuffer) {
-    this.pageSequenceNumber = this.sliceInt(buffer, 4, 'uint32');
+    this.pageSequenceNumber = this.sliceInt(buffer, 4, 'uint32')!;
   }
 
   private readChecksum(buffer: ArrayBuffer) {
-    this.checksum = this.sliceInt(buffer, 4, 'uint32');
+    this.checksum = this.sliceInt(buffer, 4, 'uint32')!;
   }
 
   private readPageSegments(buffer: ArrayBuffer) {
-    this.pageSegments = this.sliceInt(buffer, 1, 'uint8');
+    this.pageSegments = this.sliceInt(buffer, 1, 'uint8')!;
   }
 
   private readSegmentTable(buffer: ArrayBuffer) {
     //length is equal to pageSegments
     for (let i = 0; i < this.pageSegments; i++) {
       this.segmentLengthTable.push(
-        this.sliceInt(buffer, 1, 'uint8')
+        this.sliceInt(buffer, 1, 'uint8')!
       );
     }
   }

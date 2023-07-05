@@ -30,7 +30,7 @@ export class BundleJSONConverter extends Converter {
     this._notice = 'Export to Bundle is currenty not possible';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult | undefined {
     let result = '';
     let filename = '';
 

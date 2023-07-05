@@ -14,7 +14,7 @@ export class AnnotJSONConverter extends Converter {
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON): ExportResult {
+  public export(annotation: OAnnotJSON): ExportResult | undefined {
     if (annotation) {
       return {
         file: {

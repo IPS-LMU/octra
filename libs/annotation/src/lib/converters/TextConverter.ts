@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import { AnnotationLevelType, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment } from "../annotjson";
 
 export class TextConverter extends Converter {
 
@@ -21,7 +21,7 @@ export class TextConverter extends Converter {
     this._multitiers = false;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult | undefined {
     if (annotation) {
 
       let result = '';
@@ -41,7 +41,7 @@ export class TextConverter extends Converter {
 
             result += transcript;
             if (j < level.items.length - 1) {
-              const sampleEnd = level.items[j].sampleStart + level.items[j].sampleDur;
+              const sampleEnd = level.items[j].sampleStart! + level.items[j].sampleDur!;
               const unixTimestamp = Math.ceil(sampleEnd * 1000 / audiofile.sampleRate);
 
               if (this.options && (this.options.showTimestampString || this.options.showTimestampSamples)) {
@@ -90,7 +90,7 @@ export class TextConverter extends Converter {
     if (audiofile) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
-      const olevel = new OLevel('OCTRA_1', 'SEGMENT');
+      const olevel = new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT);
       const samplerate = audiofile.sampleRate;
 
       if (file.content.indexOf('<ts') > -1 || file.content.indexOf('<sp') > -1) {
@@ -105,7 +105,7 @@ export class TextConverter extends Converter {
         if (match !== undefined) {
           // all fine
 
-          while (match !== undefined) {
+          while (match !== null) {
             const olabels: OLabel[] = [];
             let samplePoint = 0;
             const samplePointIndex = match.findIndex(a => a === 'sp');
@@ -202,7 +202,7 @@ export class TextConverter extends Converter {
     const regex = new RegExp(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{1,3})/g);
     const match = regex.exec(timeString);
 
-    if (match !== undefined && match.length > 4) {
+    if (match !== null && match.length > 4) {
       hours = Number(match[1]);
       minutes = Number(match[2]);
       seconds = Number(match[3]);
@@ -245,7 +245,7 @@ export class TextConverter extends Converter {
 
     args = {...defaultArgs, ...args};
 
-    const forceHours = (Math.floor(args.maxDuration / 1000 / 60 / 60)) > 0;
+    const forceHours = (Math.floor(args.maxDuration! / 1000 / 60 / 60)) > 0;
 
     let result = '';
 

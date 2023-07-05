@@ -41,8 +41,8 @@ const OCTRA = {
 const JSONValidator = {
   build: async function() {
     await run("nx build json-set-validator");
-    await fs.mkdir("dist/libs/json-set-validator/src/lib/schema", { recursive: true });
-    await fs.copyFile("libs/json-set-validator/src/lib/schema/json-set.schema.json", "dist/libs/json-set-validator/src/lib/schema/json-set-validator.schema.json");
+    await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
+    await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
   }
 };
 

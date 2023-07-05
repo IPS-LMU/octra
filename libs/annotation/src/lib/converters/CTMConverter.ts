@@ -1,9 +1,15 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains} from '@octra/utilities';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import { contains } from '@octra/utilities';
+import {
+  AnnotationLevelType,
+  OAnnotJSON,
+  OAudiofile,
+  OLabel,
+  OLevel,
+  OSegment,
+} from '../annotjson';
 
 export class CTMConverter extends Converter {
-
   // http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#ctm_fmt_name_0
 
   public constructor() {
@@ -12,20 +18,30 @@ export class CTMConverter extends Converter {
     this._name = 'CTM';
     this._extension = '.ctm';
     this._website.title = 'CTM Format';
-    this._website.url = 'http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm';
+    this._website.url =
+      'http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm';
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
     this._multitiers = false;
-    this._notice = 'OCTRA does not take the confidency level into account. ' +
+    this._notice =
+      'OCTRA does not take the confidency level into account. ' +
       'On export to CTM the confidency value will be set to 1 to all values.';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(
+    annotation: OAnnotJSON,
+    audiofile: OAudiofile,
+    levelnum: number
+  ): ExportResult | undefined {
     let result = '';
     let filename = '';
 
-    if (levelnum === undefined || levelnum < 0 || levelnum > annotation.levels.length) {
+    if (
+      levelnum === undefined ||
+      levelnum < 0 ||
+      levelnum > annotation.levels.length
+    ) {
       console.error(`CTMConverter needs a levelnumber`);
       return undefined;
     }
@@ -34,8 +50,11 @@ export class CTMConverter extends Converter {
 
       for (const levelItem of level.items) {
         const transcript = levelItem.labels[0].value;
-        const start = Math.round((levelItem.sampleStart / audiofile.sampleRate) * 100) / 100;
-        const duration = Math.round((levelItem.sampleDur / audiofile.sampleRate) * 100) / 100;
+        const start =
+          Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) /
+          100;
+        const duration =
+          Math.round((levelItem.sampleDur! / audiofile.sampleRate) * 100) / 100;
         result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
       }
 
@@ -46,15 +65,15 @@ export class CTMConverter extends Converter {
           name: filename,
           content: result,
           encoding: 'UTF-8',
-          type: 'text/plain'
-        }
+          type: 'text/plain',
+        },
       };
     }
 
     return undefined;
   }
 
-  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+  public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
     if (audiofile) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
@@ -65,7 +84,7 @@ export class CTMConverter extends Converter {
       const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
       if (contains(file.name, filename) && contains(audiofile.name, filename)) {
-        const olevel = new OLevel('Tier_1', 'SEGMENT');
+        const olevel = new OLevel('Tier_1', AnnotationLevelType.SEGMENT);
 
         let start = 0;
         for (let i = 0; i < lines.length; i++) {
@@ -88,19 +107,17 @@ export class CTMConverter extends Converter {
 
             if (i === 0 && start > 0) {
               // first segment not set
-              osegment = new OSegment((i + 1),
-                0,
-                start * sampleRate,
-                [(new OLabel('Tier_1', ''))]
-              );
+              osegment = new OSegment(i + 1, 0, start * sampleRate, [
+                new OLabel('Tier_1', ''),
+              ]);
 
               olevel.items.push(osegment);
             }
 
             const olabels: OLabel[] = [];
-            olabels.push((new OLabel('Tier_1', columns[4])));
+            olabels.push(new OLabel('Tier_1', columns[4]));
             osegment = new OSegment(
-              (i + 1),
+              i + 1,
               Math.round(start * sampleRate),
               Math.round(length * sampleRate),
               olabels
@@ -109,12 +126,14 @@ export class CTMConverter extends Converter {
             olevel.items.push(osegment);
 
             if (i === lines.length - 2) {
-              if ((start + length) < audiofile.duration) {
+              if (start + length < audiofile.duration) {
                 const osegmentEnd = new OSegment(
-                  (i + 2),
+                  i + 2,
                   Math.round((start + length) * sampleRate),
-                  Math.round((audiofile.duration - (start + length)) * sampleRate),
-                  [(new OLabel('Tier_1', ''))]
+                  Math.round(
+                    (audiofile.duration - (start + length)) * sampleRate
+                  ),
+                  [new OLabel('Tier_1', '')]
                 );
 
                 olevel.items.push(osegmentEnd);
@@ -129,13 +148,13 @@ export class CTMConverter extends Converter {
         return {
           annotjson: result,
           audiofile: undefined,
-          error: ''
+          error: '',
         };
       } else {
         return {
           annotjson: undefined,
           audiofile: undefined,
-          error: `The file name stated in the CTM file is not the same as the audio file's.`
+          error: `The file name stated in the CTM file is not the same as the audio file's.`,
         };
       }
     }
@@ -143,7 +162,7 @@ export class CTMConverter extends Converter {
     return {
       annotjson: undefined,
       audiofile: undefined,
-      error: `This CTM file is not compatible with this audio file.`
+      error: `This CTM file is not compatible with this audio file.`,
     };
   }
 }

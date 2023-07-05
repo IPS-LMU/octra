@@ -1,12 +1,12 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/dist
-/tmp
+dist
+tmp
 /out-tsc
 
 # dependencies
-/node_modules
+node_modules
 
 # IDEs and editors
 /.idea
@@ -18,7 +18,6 @@
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -26,7 +25,6 @@
 !.vscode/extensions.json
 
 # misc
-/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -47,3 +45,5 @@ Thumbs.db
 /apps/octra/src/config/appconfig.json
 future_features.txt
 /src/
+
+.angular

@@ -1,6 +1,6 @@
 import * as X2JS from 'x2js';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import { AnnotationLevelType, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment } from "../annotjson";
 import {DateTime} from 'luxon';
 
 export class ELANConverter extends Converter {
@@ -20,7 +20,7 @@ export class ELANConverter extends Converter {
       'transcript in ELAN the transcript file must be in the same folder as the audio file.';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult | undefined {
     if (!(annotation === undefined)) {
       let filename = '';
 
@@ -48,9 +48,9 @@ export class ELANConverter extends Converter {
             }
           },
           TIME_ORDER: {
-            TIME_SLOT: []
+            TIME_SLOT: [] as any
           },
-          TIER: [],
+          TIER: [] as any,
           LINGUISTIC_TYPE: {
             _LINGUISTIC_TYPE_ID: 'default'
           }
@@ -64,7 +64,7 @@ export class ELANConverter extends Converter {
 
         jsonObj.ANNOTATION_DOCUMENT.TIER.push(
           {
-            ANNOTATION: [],
+            ANNOTATION: [] as any,
             _TIER_ID: level.name,
             _LINGUISTIC_TYPE_REF: 'default'
           }
@@ -79,7 +79,7 @@ export class ELANConverter extends Converter {
 
           // read annotation
           for (const segment of level.items) {
-            const miliseconds = Math.round((segment.sampleStart + segment.sampleDur) / annotation.sampleRate * 1000);
+            const miliseconds = Math.round((segment.sampleStart! + segment.sampleDur!) / annotation.sampleRate * 1000);
 
             // add time slot
             jsonObj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT.push({
@@ -139,8 +139,8 @@ export class ELANConverter extends Converter {
       if (timeUnit !== undefined && timeUnit === 'milliseconds') {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
-          const level = new OLevel(tier._TIER_ID, 'SEGMENT', []);
-          const readTier = (annotationElement) => {
+          const level = new OLevel(tier._TIER_ID, AnnotationLevelType.SEGMENT, []);
+          const readTier = (annotationElement: any) => {
             const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
             const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
@@ -183,9 +183,9 @@ export class ELANConverter extends Converter {
   }
 
   private getSamplesFromTimeSlot(obj: ELAN30Object, slotID: string, sampleRate: number) {
-    for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT) {
+    for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT!) {
       if (timeorderElement._TIME_SLOT_ID === slotID) {
-        const miliseconds = timeorderElement._TIME_VALUE;
+        const miliseconds = timeorderElement._TIME_VALUE!;
         return Math.round((miliseconds / 1000) * sampleRate);
       }
     }
@@ -194,7 +194,7 @@ export class ELANConverter extends Converter {
   }
 }
 
-export class ELAN30Object {
+export interface ELAN30Object {
   ANNOTATION_DOCUMENT: {
     _AUTHOR: string,
     _DATE: string,

@@ -7,11 +7,15 @@
       "path": "./tsconfig.lib.json"
     },
     {
+      "path": "./tsconfig.lib.prod.json"
+    },
+    {
       "path": "./tsconfig.spec.json"
     }
   ],
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2022",
+    "useDefineForClassFields": false,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
@@ -19,9 +23,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@octra/utilities": ["dist/libs/utilities"],
-      "@octra/annotation": ["dist/libs/annotation"],
-      "@octra/media": ["dist/libs/media"],
+      "@octra/utilities": ["libs/utilities/src/index.ts"],
+      "@octra/annotation": ["libs/annotation/src/index.ts"],
+      "@octra/media": ["libs/media/src/index.ts"],
     }
   },
   "angularCompilerOptions": {

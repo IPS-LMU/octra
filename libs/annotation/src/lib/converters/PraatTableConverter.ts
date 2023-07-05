@@ -1,9 +1,16 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains} from '@octra/utilities';
-import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import { contains } from '@octra/utilities';
+import {
+  AnnotationLevelType,
+  ISegment,
+  OAnnotJSON,
+  OAudiofile,
+  OLabel,
+  OLevel,
+  OSegment
+} from "../annotjson";
 
 export class PraatTableConverter extends Converter {
-
   public constructor() {
     super();
     this._application = 'Praat';
@@ -16,7 +23,10 @@ export class PraatTableConverter extends Converter {
     this._encoding = 'UTF-8';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(
+    annotation: OAnnotJSON,
+    audiofile: OAudiofile
+  ): ExportResult | undefined {
     let result = '';
     let filename = '';
 
@@ -24,9 +34,10 @@ export class PraatTableConverter extends Converter {
       return res + 'tmin\ttier\ttext\ttmax\n';
     };
 
-    const addEntry = (res: string, level: ILevel, segment: ISegment) => {
+    const addEntry = (res: string, level: OLevel, segment: ISegment) => {
       const tmin = segment.sampleStart / annotation.sampleRate;
-      const tmax = (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
+      const tmax =
+        (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
       const transcript = segment.labels[0].value;
 
       return `${res}${tmin}\t${level.name}\t${transcript}\t${tmax}\n`;
@@ -51,15 +62,15 @@ export class PraatTableConverter extends Converter {
           name: filename,
           content: result,
           encoding: 'UTF-8',
-          type: 'text/plain'
-        }
+          type: 'text/plain',
+        },
       };
     }
 
     return undefined;
   }
 
-  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+  public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
     if (audiofile) {
       const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
@@ -77,14 +88,14 @@ export class PraatTableConverter extends Converter {
             const columns: string[] = lines[i].split('\t');
             const tier = columns[1];
 
-            if (tiers.filter(a => a === tier).length === 0) {
+            if (tiers.filter((a) => a === tier).length === 0) {
               tiers.push(tier);
             }
           }
         }
 
         for (const tierElement of tiers) {
-          const olevel = new OLevel(tierElement, 'SEGMENT');
+          const olevel = new OLevel(tierElement, AnnotationLevelType.SEGMENT);
           let start = 0;
           let puffer = 0;
           let id = 1;
@@ -110,10 +121,19 @@ export class PraatTableConverter extends Converter {
                 if (isNaN(tmin)) {
                   return undefined;
                 } else {
-                  const last = (olevel.items.length > 0
-                    && !(olevel.items[olevel.items.length - 1] === undefined || olevel.items[olevel.items.length - 1] === undefined))
-                    ? olevel.items[olevel.items.length - 1] : undefined;
-                  if (last !== undefined && last.sampleStart + last.sampleDur === Math.round(Number(tmin))) {
+                  const last =
+                    olevel.items.length > 0 &&
+                    !(
+                      olevel.items[olevel.items.length - 1] === undefined ||
+                      olevel.items[olevel.items.length - 1] === undefined
+                    )
+                      ? olevel.items[olevel.items.length - 1]
+                      : undefined;
+                  if (
+                    last !== undefined &&
+                    last.sampleStart! + last.sampleDur! ===
+                      Math.round(Number(tmin))
+                  ) {
                     start = tmin;
                   }
                 }
@@ -121,7 +141,10 @@ export class PraatTableConverter extends Converter {
                 if (puffer > 0) {
                   // fill
                   const pufferItem = new OSegment(
-                    id, Math.round(start * sampleRate), Math.round(puffer * sampleRate), [new OLabel(tier, '')]
+                    id,
+                    Math.round(start * sampleRate),
+                    Math.round(puffer * sampleRate),
+                    [new OLabel(tier, '')]
                   );
                   start = start + puffer;
                   olevel.items.push(pufferItem);
@@ -129,9 +152,9 @@ export class PraatTableConverter extends Converter {
                   id++;
                 }
                 const olabels: OLabel[] = [];
-                olabels.push((new OLabel(tier, text)));
+                olabels.push(new OLabel(tier, text));
                 const osegment = new OSegment(
-                  (id),
+                  id,
                   Math.round(start * sampleRate),
                   Math.round(length * sampleRate),
                   olabels
@@ -150,13 +173,13 @@ export class PraatTableConverter extends Converter {
         return {
           annotjson: result,
           audiofile: undefined,
-          error: ''
+          error: '',
         };
       } else {
         return {
           annotjson: undefined,
           audiofile: undefined,
-          error: `Filenames for .Table extension does not match.`
+          error: `Filenames for .Table extension does not match.`,
         };
       }
     }
@@ -164,7 +187,7 @@ export class PraatTableConverter extends Converter {
     return {
       annotjson: undefined,
       audiofile: undefined,
-      error: `This PraatTable file is not compatible with this audio file`
+      error: `This PraatTable file is not compatible with this audio file`,
     };
   }
 }

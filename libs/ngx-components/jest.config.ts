@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'components',
+  displayName: 'ngx-components',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {

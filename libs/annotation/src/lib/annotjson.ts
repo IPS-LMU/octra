@@ -80,27 +80,27 @@ export class OAnnotJSON implements IAnnotJSON {
 }
 // TODO add extension and use name without it
 export class OAudiofile implements IAudioFile {
-  name: string;
+  name!: string;
   // need type attribute
-  arraybuffer: ArrayBuffer;
-  size: number;
-  duration: number;
-  sampleRate: number;
-  url: string;
-  type: string;
+  arraybuffer!: ArrayBuffer;
+  size!: number;
+  duration!: number;
+  sampleRate!: number;
+  url!: string;
+  type!: string;
 }
 
 export class OLevel implements ILevel {
   name = '';
-  type;
+  type: AnnotationLevelType;
   items: IItem[];
 
-  constructor(name: string, type: string, items?: IItem[]) {
+  constructor(name: string, type: AnnotationLevelType, items?: IItem[]) {
     this.name = name;
     this.type = type;
     this.items = [];
 
-    if (!(items === undefined || items === undefined)) {
+    if (items) {
       this.items = items;
     }
   }

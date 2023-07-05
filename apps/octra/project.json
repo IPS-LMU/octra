@@ -2,9 +2,8 @@
   "name": "octra",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "octra",
   "sourceRoot": "apps/octra/src",
-  "tags": [],
+  "prefix": "octra",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -48,33 +47,6 @@
               "maximumError": "10kb"
             }
           ],
-          "fileReplacements": [
-            {
-              "replace": "apps/octra/src/environments/environment.ts",
-              "with": "apps/octra/src/environments/environment.prod.ts"
-            }
-          ],
-          "outputHashing": "all"
-        },
-        "public-dev": {
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "2mb",
-              "maximumError": "6mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "6kb",
-              "maximumError": "10kb"
-            }
-          ],
-          "fileReplacements": [
-            {
-              "replace": "apps/octra/src/environments/environment.ts",
-              "with": "apps/octra/src/environments/environment.dev.ts"
-            }
-          ],
           "outputHashing": "all"
         },
         "development": {
@@ -110,7 +82,6 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/octra/**/*.ts", "apps/octra/**/*.html"]
       }
@@ -121,19 +92,8 @@
       "options": {
         "jestConfig": "apps/octra/jest.config.ts",
         "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
-    },
-    "serve-static": {
-      "executor": "@nrwl/web:file-server",
-      "options": {
-        "buildTarget": "octra:build"
       }
     }
-  }
+  },
+  "tags": []
 }

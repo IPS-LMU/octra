@@ -14,9 +14,6 @@
       "configurations": {
         "production": {
           "devServerTarget": "octra:serve:production"
-        },
-        "ci": {
-          "devServerTarget": "octra:serve-static"
         }
       }
     },

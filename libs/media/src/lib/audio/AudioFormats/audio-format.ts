@@ -4,7 +4,7 @@ export type IntArray = Uint8Array | Int16Array | Int32Array;
 
 export abstract class AudioFormat {
   protected _extension!: string;
-  public formatConstructor: Uint8ArrayConstructor | Int16ArrayConstructor | Int32ArrayConstructor;
+  public formatConstructor!: Uint8ArrayConstructor | Int16ArrayConstructor | Int32ArrayConstructor;
 
   get extension(): string {
     return this._extension;

@@ -1,25 +1,25 @@
 {
   "name": "ngx-utilities",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/ngx-utilities/src",
   "projectType": "library",
+  "sourceRoot": "libs/ngx-utilities/src",
+  "prefix": "octra",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nrwl/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "outputPath": "dist/libs/ngx-utilities",
-        "main": "libs/ngx-utilities/src/index.ts",
-        "tsConfig": "libs/ngx-utilities/tsconfig.lib.json",
-        "assets": ["libs/ngx-utilities/*.md"]
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/ngx-utilities/**/*.ts"]
-      }
+        "project": "libs/ngx-utilities/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ngx-utilities/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ngx-utilities/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
     },
     "test": {
       "executor": "@nrwl/jest:jest",
@@ -27,12 +27,15 @@
       "options": {
         "jestConfig": "libs/ngx-utilities/jest.config.ts",
         "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/ngx-utilities/**/*.ts",
+          "libs/ngx-utilities/**/*.html"
+        ]
       }
     }
   },

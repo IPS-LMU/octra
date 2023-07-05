@@ -9,11 +9,11 @@ import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
 import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { LoginMode, RootState } from '../index';
+import { RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { withLatestFrom } from 'rxjs/operators';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -23,7 +23,8 @@ export class AuthenticationEffects {
         AuthenticationActions.login.do,
         AuthenticationActions.reauthenticate.do
       ),
-      exhaustMap((a) => {
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((dto) => {
             if (dto.openURL !== undefined) {
@@ -47,8 +48,9 @@ export class AuthenticationEffects {
                 document.location.href = url;
 
                 return AuthenticationActions.login.success({
-                  ...dto,
+                  auth: dto,
                   method: a.method,
+                  mode: state.application.mode,
                 });
               } else {
                 // redirect to new tab
@@ -97,8 +99,9 @@ export class AuthenticationEffects {
                   this.routingService.navigate(['/loading']);
                 }
                 return AuthenticationActions.login.success({
-                  ...dto,
+                  auth: dto,
                   method: a.method,
+                  mode: state.application.mode,
                 });
               } else {
                 return AuthenticationActions.needReAuthentication.success({
@@ -107,8 +110,9 @@ export class AuthenticationEffects {
               }
             }
             return AuthenticationActions.login.success({
-              ...dto,
+              auth: dto,
               method: a.method,
+              mode: state.application.mode,
             });
           }),
           catchError((err: HttpErrorResponse) => {
@@ -171,17 +175,6 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.login.success),
         tap((a) => {
-          this.store.dispatch(
-            OnlineModeActions.readLoginData({
-              mode: LoginMode.ONLINE,
-              loginData: {
-                userName: a.me.username,
-                email: '',
-                webToken: a.accessToken,
-              },
-              removeData: false,
-            })
-          );
           this.routingService.navigate(['/user/projects']);
 
           // TODO api

@@ -1,5 +1,5 @@
 import { pipe } from 'rxjs';
-import { LoadingStatus, LoginMode, RootState, URLParameters } from '../index';
+import { LoadingStatus, LoginMode, RootState } from '../index';
 import { AppSettings } from '../../obj';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 
@@ -28,6 +28,13 @@ export const selectAppSettings = pipe(
   selectApplication,
   (state) => state.appConfiguration
 );
+
+export interface URLParameters {
+  audio: string;
+  transcript: string;
+  embedded: boolean;
+  host: string;
+}
 
 export interface ApplicationState {
   mode?: LoginMode;

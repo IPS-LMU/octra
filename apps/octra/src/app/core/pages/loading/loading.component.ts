@@ -81,8 +81,8 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
       // url mode set, but no params => change mode
       console.warn(`use mode is url but no params found. Reset use mode.`);
       if (
-        this.appStorage.onlineSession.loginData.userName !== undefined &&
-        this.appStorage.onlineSession.loginData.userName !== '' &&
+        this.appStorage.snapshot.authentication.me.username !== undefined &&
+        this.appStorage.snapshot.authentication.me.username !== '' &&
         this.appStorage.sessionfile === undefined
       ) {
         this.store.dispatch(
@@ -128,7 +128,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
           );
         }
 
-        this.settService.loadAudioFile(this.audio);
+        // this.settService.loadAudioFile(this.audio);
       }
     } else {
       console.warn(

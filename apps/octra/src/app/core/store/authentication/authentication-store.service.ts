@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from './authentication.actions';
-import { RootState } from '../index';
+import { LoginMode, RootState } from '../index';
 
 @Injectable({
   providedIn: 'root',
@@ -26,9 +26,18 @@ export class AuthenticationStoreService {
     (store: RootState) => store.authentication.loginErrorMessage
   );
 
-  login(method: AccountLoginMethod, username?: string, password?: string) {
+  loginOnline(
+    method: AccountLoginMethod,
+    username?: string,
+    password?: string
+  ) {
     this.store.dispatch(
-      AuthenticationActions.login.do({ method, username, password })
+      AuthenticationActions.login.do({
+        method,
+        username,
+        password,
+        mode: LoginMode.ONLINE,
+      })
     );
   }
 

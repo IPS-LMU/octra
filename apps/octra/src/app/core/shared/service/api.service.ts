@@ -257,7 +257,7 @@ export class APIService implements API {
                 json.data.status === 'BUSY'
               ) {
                 this.closeSession(
-                  appStorage.onlineSession.loginData.userName,
+                  appStorage.snapshot.authentication.me.username,
                   appStorage.transcriptID,
                   ''
                 )

@@ -9,26 +9,22 @@ import {
   waitTillResultRetrieved,
 } from '@octra/utilities';
 import { OIDBLevel, OIDBLink } from '@octra/annotation';
-import {
-  AnnotationStateLevel,
-  convertFromOIDLevel,
-  getModeState,
-  LoadingStatus,
-  LoginMode,
-  OnlineSession,
-  RootState,
-} from '../../store';
+import { getModeState, LoadingStatus, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { AudioManager } from '@octra/media';
 import { Actions } from '@ngrx/effects';
 import { ConsoleEntry } from './bug-report.service';
 import { Router } from '@angular/router';
 import { AnnotationActions } from '../../store/annotation/annotation.actions';
-import { UserActions } from '../../store/user/user.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
 import * as fromAnnotation from '../../store/annotation';
-import { AnnotationState } from '../../store/annotation';
+import {
+  AnnotationState,
+  AnnotationStateLevel,
+  convertFromOIDLevel,
+  OnlineSession,
+} from '../../store/annotation';
 import { ASRActions } from '../../store/asr/asr.actions';
 import { ILog } from '../../obj/Settings/logging';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
@@ -49,20 +45,8 @@ export class AppStorageService {
     return this._snapshot;
   }
 
-  get loaded(): EventEmitter<any> {
-    return this._loaded;
-  }
-
   get sessionfile(): SessionFile {
     return this._snapshot.localMode.sessionFile;
-  }
-
-  set userProfile(value: { name: string; email: string }) {
-    this.store.dispatch(UserActions.setUserProfile(value));
-  }
-
-  get userProfile(): { name: string; email: string } {
-    return this.snapshot.user;
   }
 
   get playonhover(): boolean {
@@ -344,15 +328,6 @@ export class AppStorageService {
     return getModeState(this._snapshot)?.onlineSession;
   }
 
-  setLogs(value: any[]) {
-    this.store.dispatch(
-      AnnotationActions.saveLogs.do({
-        logs: value,
-        mode: this.useMode,
-      })
-    );
-  }
-
   get asrSelectedLanguage(): string {
     return this._snapshot.asr.selectedLanguage;
   }
@@ -564,11 +539,6 @@ export class AppStorageService {
       OnlineModeActions.loginDemo({
         mode: LoginMode.DEMO,
         onlineSession: {
-          loginData: {
-            userName: 'demo_user',
-            email: 'john-doe@email.com',
-            webToken: '270858034895u23894ruz827z030r983jr02h7',
-          },
           currentProject: {
             id: '234267',
             name: 'DemoProject',

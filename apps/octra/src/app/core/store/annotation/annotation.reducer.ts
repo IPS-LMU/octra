@@ -5,8 +5,6 @@ import { IDBActions } from '../idb/idb.actions';
 import { ConfigurationActions } from '../configuration/configuration.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
-import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
 import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
@@ -77,15 +75,13 @@ export class AnnotationStateReducers {
       ),
       on(
         AnnotationActions.loadAudio.do,
-        (state: AnnotationState, { audioFile, mode }) => {
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               audio: {
                 ...state.audio,
-                loaded: false,
-                sampleRate: audioFile?.metadata?.sampleRate,
-                fileName: audioFile.filename
+                loaded: false
               }
             };
           }
@@ -94,13 +90,16 @@ export class AnnotationStateReducers {
       ),
       on(
         AnnotationActions.loadAudio.success,
-        (state: AnnotationState, { mode }) => {
+        (state: AnnotationState, { mode, audioFile }) => {
           if (this.mode === mode) {
             return {
               ...state,
               audio: {
                 ...state.audio,
-                loaded: true
+                loaded: true,
+                sampleRate: audioFile?.metadata?.sampleRate,
+                fileName: audioFile?.filename,
+                file: audioFile
               }
             };
           }
@@ -295,34 +294,7 @@ export class AnnotationStateReducers {
           ...state,
           methods,
         })
-      ),
-      on(OnlineModeActions.loginDemo, (state: AnnotationState, { mode }) => {
-        if (this.mode === mode) {
-          return {
-            ...state,
-            audio: initialState.audio,
-          };
-        }
-        return state;
-      }),
-      on(OnlineModeActions.readLoginData, (state: AnnotationState, { mode }) => {
-        if (this.mode === mode) {
-          return {
-            ...state,
-            audio: initialState.audio,
-          };
-        }
-        return state;
-      }),
-      on(LocalModeActions.login, (state: AnnotationState, { mode }) => {
-        if (this.mode === mode) {
-          return {
-            ...state,
-            audio: initialState.audio,
-          };
-        }
-        return state;
-      })
+      )
     ];
   }
 

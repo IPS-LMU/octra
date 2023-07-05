@@ -2,8 +2,9 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnInit,
 } from '@angular/core';
-import { Subject, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
@@ -20,7 +21,7 @@ import {
   styleUrls: ['./bugreport-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BugreportModalComponent extends OctraModal {
+export class BugreportModalComponent extends OctraModal implements OnInit {
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
@@ -31,7 +32,6 @@ export class BugreportModalComponent extends OctraModal {
     previewURL: string;
   }[] = [];
   protected data = undefined;
-  private actionperformed: Subject<void> = new Subject<void>();
 
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -39,27 +39,10 @@ export class BugreportModalComponent extends OctraModal {
     backdrop: true,
   };
 
-  public get email(): string {
-    return this.appStorage.userProfile.email;
-  }
-
-  public set email(value: string) {
-    this.appStorage.userProfile = {
-      name: this.userName,
-      email: value,
-    };
-  }
-
-  public get userName(): string {
-    return this.appStorage.userProfile.name;
-  }
-
-  public set userName(value: string) {
-    this.appStorage.userProfile = {
-      name: value,
-      email: this.email,
-    };
-  }
+  profile = {
+    email: '',
+    username: '',
+  };
 
   public get isvalid(): boolean {
     return this.sendProObj || this.bgdescr !== '';
@@ -76,6 +59,13 @@ export class BugreportModalComponent extends OctraModal {
     super('bugreportModal', activeModal);
   }
 
+  ngOnInit() {
+    this.profile = {
+      username: this.appStorage.snapshot.authentication.me?.username ?? '',
+      email: this.appStorage.snapshot.authentication.me?.email ?? '',
+    };
+  }
+
   onHidden() {
     this.visible = false;
     this.bugsent = false;
@@ -84,17 +74,12 @@ export class BugreportModalComponent extends OctraModal {
   }
 
   sendBugReport() {
-    this.appStorage.userProfile = {
-      ...this.appStorage.userProfile,
-      email: this.email,
-    };
-
     this.sendStatus = 'sending';
     this.subscrManager.add(
       this.bugService
         .sendReport(
-          this.userName,
-          this.email,
+          this.profile.username,
+          this.profile.email,
           this.bgdescr,
           this.sendProObj,
           {

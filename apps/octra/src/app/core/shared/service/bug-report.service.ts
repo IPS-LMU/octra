@@ -130,7 +130,7 @@ export class BugReportService {
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
       result.octra.project = this.appStorage.onlineSession.currentProject?.name;
-      result.octra.user = this.appStorage.onlineSession.loginData.userName;
+      result.octra.user = this.appStorage.snapshot.authentication.me.username;
       result.octra.jobID = this.appStorage.transcriptID;
     }
 

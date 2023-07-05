@@ -1,26 +1,15 @@
 import { AnnotationActions } from '../../annotation/annotation.actions';
 import { createAction, props } from '@ngrx/store';
+import { CurrentProject, LoginMode } from '../../index';
+import { TaskDto } from '@octra/api-types';
 import {
-  CurrentProject,
-  LoginData,
-  LoginMode,
   OnlineSession,
   SessionData,
-  URLParameters,
-} from '../../index';
-import { TaskDto } from '@octra/api-types';
-import { TranscriptionState } from '../../annotation';
+  TranscriptionState,
+} from '../../annotation';
+import { URLParameters } from '../../application';
 
 export class OnlineModeActions extends AnnotationActions {
-  public static readLoginData = createAction(
-    `online mode Login`,
-    props<{
-      loginData: LoginData;
-      removeData: boolean;
-      mode: LoginMode.ONLINE;
-    }>()
-  );
-
   public static loginDemo = createAction(
     `online mode Login Demo`,
     props<{

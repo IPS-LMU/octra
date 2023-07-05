@@ -43,7 +43,7 @@
               name="name"
               aria-describedby="name"
               [placeholder]="'general.name' | transloco"
-              [(ngModel)]="userName"
+              [(ngModel)]="profile.username"
             />
             <label for="inputName" class="form-label">{{
               'general.name' | transloco
@@ -58,7 +58,7 @@
               id="inputEmail"
               name="email"
               aria-describedby="email"
-              [(ngModel)]="email"
+              [(ngModel)]="profile.email"
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{

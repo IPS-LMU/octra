@@ -52,7 +52,6 @@ import { LoadeditorDirective } from './core/shared/directive/loadeditor.directiv
 import {
   ALoginGuard,
   DeALoginGuard,
-  SettingsGuard,
   TranscrEndGuard,
 } from './core/shared/guard';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
@@ -235,7 +234,6 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     AppStorageService,
     IDBService,
     TranscActivateGuard,
-    SettingsGuard,
     SettingsService,
     TranscrEndGuard,
     BugReportService,

@@ -341,7 +341,7 @@ export class LoginComponent
   }
 
   onOnlineCredentialsSubmit() {
-    this.authStoreService.login(
+    this.authStoreService.loginOnline(
       AccountLoginMethod.local,
       this.state.online.user.nameOrEmail,
       this.state.online.user.password

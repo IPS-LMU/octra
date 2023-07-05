@@ -21,9 +21,9 @@ import { SettingsService } from './settings.service';
 import { UserInteractionsService } from './userInteractions.service';
 import {
   Annotation,
-  AnnotJSONConverter,
   Converter,
   IFile,
+  ImportResult,
   Level,
   OAnnotJSON,
   OAudiofile,
@@ -32,23 +32,25 @@ import {
   OLabel,
   OLevel,
   OSegment,
-  PartiturConverter,
   SegmentChangeEvent,
   Segments,
-  TextConverter,
 } from '@octra/annotation';
 import { AudioManager } from '@octra/media';
-import {
-  AnnotationStateLevel,
-  convertFromLevelObject,
-  convertToLevelObject,
-  getModeState,
-  LoginMode,
-} from '../../store';
+import { getModeState, LoginMode, RootState } from '../../store';
 import { TranslocoService } from '@ngneat/transloco';
 import { MaintenanceAPI } from '../../component/maintenance/maintenance-api';
 import { interval, Subject, Subscription, timer } from 'rxjs';
 import { DateTime } from 'luxon';
+import {
+  AnnotationStateLevel,
+  convertFromLevelObject,
+  convertToLevelObject,
+  LocalModeState,
+  OnlineModeState,
+} from '../../store/annotation';
+import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
+import { TaskDto } from '@octra/api-types';
+import { RoutingService } from './routing.service';
 
 declare let validateAnnotation: (string, any) => any;
 
@@ -196,6 +198,8 @@ export class TranscriptionService {
     private navbarServ: NavbarService,
     private settingsService: SettingsService,
     private languageService: TranslocoService,
+    private annotationStoreService: AnnotationStoreService,
+    private routingService: RoutingService,
     private http: HttpClient
   ) {
     this.alertTriggered = new Subject<{
@@ -375,68 +379,57 @@ export class TranscriptionService {
   /**
    * metod after audio was loaded
    */
-  public load(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (this.audio.audiomanagers.length > 0) {
-        this._audiomanager = this.audio.audiomanagers[0];
+  public async load(state: RootState): Promise<void> {
+    if (this.audio.audiomanagers.length > 0) {
+      const modeState = getModeState(state);
+      this._audiomanager = this.audio.audiomanagers[0];
 
-        this.filename = this._audiomanager.resource.name;
+      this.filename = modeState.audio.fileName;
 
-        this._audiofile = new OAudiofile();
-        this._audiofile.name = this._audiomanager.resource.info.fullname;
-        this._audiofile.sampleRate =
-          this._audiomanager.resource.info.sampleRate;
-        this._audiofile.duration =
-          this._audiomanager.resource.info.duration.samples;
-        this._audiofile.size = this._audiomanager.resource.info.size;
-        /* TODO api
-        this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
-          ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';*/
+      this._audiofile = new OAudiofile();
+      this._audiofile.name = this._audiomanager.resource.info.fullname;
+      this._audiofile.sampleRate = this._audiomanager.resource.info.sampleRate;
+      this._audiofile.duration =
+        this._audiomanager.resource.info.duration.samples;
+      this._audiofile.size = this._audiomanager.resource.info.size;
 
-        this._audiofile.url =
-          this.appStorage.useMode === LoginMode.DEMO
-            ? `${this.appStorage.audioURL}`
-            : this._audiofile.url;
-        this._audiofile.type = this._audiomanager.resource.info.type;
+      this._audiofile.url =
+        state.application.mode === LoginMode.DEMO
+          ? `${this.appStorage.audioURL}`
+          : modeState.audio.file.url;
+      this._audiofile.type = this._audiomanager.resource.info.type;
 
-        // overwrite logging option using projectconfig
-        if (
-          this.appStorage.useMode === LoginMode.ONLINE ||
-          this.appStorage.useMode === LoginMode.DEMO
-        ) {
-          this.appStorage.logging =
-            this.settingsService.projectsettings.logging.forced;
-        }
-        this.uiService.enabled = this.appStorage.logging;
-
-        this.loadSegments()
-          .then(() => {
-            this.selectedlevel = 0;
-            this.navbarServ.ressource = this._audiomanager.resource;
-            this.navbarServ.filesize = getFileSize(
-              this._audiomanager.resource.size
-            );
-
-            this.subscrmanager.removeByTag('idbAnnotationChange');
-            this.subscrmanager.add(
-              this.appStorage.annotationChanged.subscribe((state) => {
-                this.updateAnnotation(
-                  state.transcript.levels,
-                  state.transcript.links
-                );
-              }),
-              'idbAnnotationChange'
-            );
-            resolve();
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      } else {
-        console.error(`no audio managers`);
-        alert('an error occured. Please reload this page');
+      // overwrite logging option using projectconfig
+      if (
+        state.application.mode === LoginMode.ONLINE ||
+        state.application.mode === LoginMode.DEMO
+      ) {
+        this.appStorage.logging =
+          this.settingsService.projectsettings.logging.forced;
       }
-    });
+      this.uiService.enabled = this.appStorage.logging;
+
+      await this.loadSegments(modeState, state);
+
+      this.selectedlevel = 0;
+      this.navbarServ.ressource = this._audiomanager.resource;
+      this.navbarServ.filesize = getFileSize(this._audiomanager.resource.size);
+
+      this.subscrmanager.removeByTag('idbAnnotationChange');
+      this.subscrmanager.add(
+        this.appStorage.annotationChanged.subscribe((state) => {
+          this.updateAnnotation(
+            state.transcript.levels,
+            state.transcript.links
+          );
+        }),
+        'idbAnnotationChange'
+      );
+    } else {
+      console.error(`no audio managers`);
+      alert('an error occured. Please reload this page');
+      throw new Error('no audio managers');
+    }
   }
 
   public getTranscriptString(converter: Converter): string {
@@ -455,203 +448,182 @@ export class TranscriptionService {
     return '';
   }
 
-  public loadSegments(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      new Promise<void>((resolve2) => {
-        if (
-          this.appStorage.annotationLevels === undefined ||
-          this.appStorage.annotationLevels.length === 0
-        ) {
-          let newLevels: OIDBLevel[] = [];
-          let newLinks: OIDBLink[] = [];
-          const newAnnotJSON = this.createNewAnnotation();
-          const levels = newAnnotJSON.levels;
-          for (let i = 0; i < levels.length; i++) {
-            newLevels.push(new OIDBLevel(i + 1, levels[i], i));
-          }
+  public async loadSegments(
+    modeState: OnlineModeState | LocalModeState,
+    rootState: RootState
+  ): Promise<void> {
+    if (
+      modeState.transcript.levels === undefined ||
+      modeState.transcript.levels.length === 0
+    ) {
+      let newLevels: OIDBLevel[] = [];
+      let newLinks: OIDBLink[] = [];
+      const newAnnotJSON = this.createNewAnnotation();
+      const levels = newAnnotJSON.levels;
+      for (let i = 0; i < levels.length; i++) {
+        newLevels.push(new OIDBLevel(i + 1, levels[i], i));
+      }
 
-          for (let i = 0; i < newAnnotJSON.links.length; i++) {
-            newLinks.push(new OIDBLink(i + 1, newAnnotJSON.links[i]));
-          }
+      for (let i = 0; i < newAnnotJSON.links.length; i++) {
+        newLinks.push(new OIDBLink(i + 1, newAnnotJSON.links[i]));
+      }
 
-          if (
-            this.appStorage.useMode === LoginMode.ONLINE ||
-            this.appStorage.useMode === LoginMode.URL
-          ) {
-            const test = this.appStorage.serverDataEntry;
-            const test2 = '';
+      if (rootState.application.mode === LoginMode.ONLINE || rootState.application.mode === LoginMode.URL) {
+        const task: TaskDto = modeState.onlineSession?.task;
 
+        const serverTranscript =
+          this.annotationStoreService.getTranscriptFromIO(task.inputs);
+
+        // import logs
+        this.annotationStoreService.setLogs(task.log, rootState.application.mode);
+        if (serverTranscript) {
+          // check if it's AnnotJSON
+          const annotResult: ImportResult =
+            this.annotationStoreService.convertFromSupportedConverters(
+              AppInfo.converters,
+              {
+                name: `${this._audiomanager.resource.info.name}_annot.json`,
+                content: serverTranscript.content,
+                type: serverTranscript.fileType,
+                encoding: 'utf-8',
+              },
+              {
+                name: this._audiomanager.resource.info.fullname,
+                arraybuffer: this._audiomanager.resource.arraybuffer,
+                size: this._audiomanager.resource.info.size,
+                duration: this._audiomanager.resource.info.duration.samples,
+                sampleRate: this._audiomanager.resource.info.sampleRate,
+                url: this.appStorage.audioURL,
+                type: this._audiomanager.resource.info.type,
+              }
+            );
+
+          // import servertranscript
+          if (annotResult && annotResult.annotjson) {
+            newLevels = [];
+            newLinks = [];
+
+            for (let i = 0; i < annotResult.annotjson.levels.length; i++) {
+              const level = annotResult.annotjson.levels[i];
+              newLevels.push(new OIDBLevel(i + 1, level, i));
+            }
+            for (let i = 0; i < annotResult.annotjson.links.length; i++) {
+              const link = annotResult.annotjson.links[i];
+              newLinks.push(new OIDBLink(i + 1, link));
+            }
+          } else {
+            // no transcript found
             if (
-              this.appStorage.serverDataEntry &&
-              this.appStorage.serverDataEntry.transcript &&
-              this.appStorage.serverDataEntry.transcript !== ''
+              task.orgtext !== undefined &&
+              task.orgtext !== '' &&
+              typeof task.orgtext === 'string'
             ) {
-              // import logs
-              this.appStorage.setLogs(this.appStorage.serverDataEntry.log);
+              // prompt text available and server transcript is undefined
+              // set prompt as new transcript
 
-              // check if it's AnnotJSON
-              let annotResult = undefined;
-              try {
-                const transcript = JSON.stringify(
-                  this.appStorage.serverDataEntry.transcript
-                );
-                annotResult = new AnnotJSONConverter().import(
+              // check if prompttext ist a transcription format like AnnotJSON
+              const converted: ImportResult =
+                this.annotationStoreService.convertFromSupportedConverters(
+                  AppInfo.converters,
                   {
-                    name: `${this._audiomanager.resource.info.name}_annot.json`,
-                    content: transcript,
-                    type: 'text/plain',
-                    encoding: 'utf-8',
+                    name: this._audiofile.name,
+                    content: this.appStorage.prompttext,
+                    type: 'text',
+                    encoding: 'utf8',
                   },
-                  {
-                    name: this._audiomanager.resource.info.fullname,
-                    // need type attribute
-                    arraybuffer: this._audiomanager.resource.arraybuffer,
-                    size: this._audiomanager.resource.info.size,
-                    duration: this._audiomanager.resource.info.duration.samples,
-                    sampleRate: this._audiomanager.resource.info.sampleRate,
-                    url: this.appStorage.audioURL,
-                    type: this._audiomanager.resource.info.type,
-                  }
+                  this._audiofile
                 );
-              } catch (e) {
-                console.error(`Invalid annotJSON.`);
-                console.error(e);
-              }
 
-              // import servertranscript
-              if (annotResult && annotResult.annotjson) {
-                newLevels = [];
-                newLinks = [];
-
-                for (let i = 0; i < annotResult.annotjson.levels.length; i++) {
-                  const level = annotResult.annotjson.levels[i];
-                  newLevels.push(new OIDBLevel(i + 1, level, i));
-                }
-                for (let i = 0; i < annotResult.annotjson.links.length; i++) {
-                  const link = annotResult.annotjson.links[i];
-                  newLinks.push(new OIDBLink(i + 1, link));
-                }
-              }
-            } else {
-              if (
-                this.appStorage.prompttext !== undefined &&
-                this.appStorage.prompttext !== '' &&
-                typeof this.appStorage.prompttext === 'string'
-              ) {
-                // prompt text available and server transcript is undefined
-                // set prompt as new transcript
-
-                // check if prompttext ist a transcription format like AnnotJSON
-                let converted: OAnnotJSON;
-                try {
-                  for (const converter of AppInfo.converters) {
-                    if (
-                      converter instanceof AnnotJSONConverter ||
-                      converter instanceof PartiturConverter
-                    ) {
-                      const result = converter.import(
-                        {
-                          name: this._audiofile.name,
-                          content: this.appStorage.prompttext,
-                          type: 'text',
-                          encoding: 'utf8',
-                        },
-                        this._audiofile
-                      );
-
-                      if (
-                        result !== undefined &&
-                        result.annotjson !== undefined &&
-                        result.annotjson.levels.length > 0 &&
-                        result.annotjson.levels[0] !== undefined &&
-                        !(converter instanceof TextConverter)
-                      ) {
-                        converted = result.annotjson;
-                        break;
-                      }
-                    }
-                  }
-                } catch (e) {
-                  // ignore...
-                }
-
-                if (converted === undefined) {
-                  // prompttext is raw text
-                  newLevels[0].level.items[0].labels[0] = new OLabel(
-                    'OCTRA_1',
-                    this.appStorage.prompttext
-                  );
-                } else {
-                  // use imported annotJSON
-                  for (let i = 0; i < converted.levels.length; i++) {
-                    if (i >= newLevels.length) {
-                      newLevels.push(
-                        new OIDBLevel(i + 1, converted.levels[i], i)
-                      );
-                    } else {
-                      newLevels[i].level.name = converted.levels[i].name;
-                      newLevels[i].level.type = converted.levels[i].type;
-                      newLevels[i].level.items = converted.levels[i].items;
-                    }
+              if (converted === undefined) {
+                // prompttext is raw text
+                newLevels[0].level.items[0].labels[0] = new OLabel(
+                  'OCTRA_1',
+                  this.appStorage.prompttext
+                );
+              } else if (converted.annotjson) {
+                // use imported annotJSON
+                for (let i = 0; i < converted.annotjson.levels.length; i++) {
+                  if (i >= newLevels.length) {
+                    newLevels.push(
+                      new OIDBLevel(i + 1, converted.annotjson.levels[i], i)
+                    );
+                  } else {
+                    newLevels[i].level.name =
+                      converted.annotjson.levels[i].name;
+                    newLevels[i].level.type =
+                      converted.annotjson.levels[i].type;
+                    newLevels[i].level.items =
+                      converted.annotjson.levels[i].items;
                   }
                 }
               }
             }
           }
-
-          this.appStorage.overwriteAnnotation(newLevels, newLinks, true);
-        } else {
-          resolve2();
         }
-      }).then(() => {
-        const annotates =
-          this._audiomanager.resource.name +
-          this._audiomanager.resource.extension;
-        this._annotation = new Annotation(annotates, this._audiofile);
+      }
+      this.appStorage.overwriteAnnotation(newLevels, newLinks, true);
+      this._annotation = new Annotation(
+        this._audiofile.name,
+        this._audiofile,
+        newLevels.map((a) =>
+          Level.fromObj(
+            a,
+            this._audiofile.sampleRate,
+            this.audioManager.createSampleUnit(this._audiofile.duration)
+          )
+        )
+      );
+      this.routingService.navigate(
+        ['/user/transcr'],
+        AppInfo.queryParamsHandling
+      );
+    } else {
+      const annotates =
+        this._audiomanager.resource.name +
+        this._audiomanager.resource.extension;
+      this._annotation = new Annotation(annotates, this._audiofile);
 
-        if (this.appStorage.annotationLevels !== undefined) {
-          this.updateAnnotation(
-            this.appStorage.annotationLevels,
-            this.appStorage.annotationLinks
-          );
+      if (this.appStorage.annotationLevels !== undefined) {
+        this.updateAnnotation(
+          this.appStorage.annotationLevels,
+          this.appStorage.annotationLinks
+        );
 
-          this._feedback = FeedBackForm.fromAny(
-            this.settingsService.projectsettings.feedback_form,
-            this.appStorage.comment
-          );
-          this._feedback.importData(this.appStorage.feedback);
+        this._feedback = FeedBackForm.fromAny(
+          this.settingsService.projectsettings.feedback_form,
+          this.appStorage.comment
+        );
+        this._feedback.importData(this.appStorage.feedback);
 
-          if (this.appStorage.comment === undefined) {
-            this.appStorage.comment = '';
-          } else {
-            this._feedback.comment = this.appStorage.comment;
-          }
-
-          if (this.appStorage.logs === undefined) {
-            this.appStorage.clearLoggingDataPermanently();
-            this.uiService.elements = [];
-          } else if (Array.isArray(this.appStorage.logs)) {
-            this.uiService.fromAnyArray(this.appStorage.logs);
-          }
-          this.uiService.addElementFromEvent(
-            'octra',
-            { value: AppInfo.version },
-            Date.now(),
-            undefined,
-            -1,
-            undefined,
-            undefined,
-            'version'
-          );
-
-          // this.navbarServ.dataloaded = true;
-          this.dataloaded.emit();
+        if (this.appStorage.comment === undefined) {
+          this.appStorage.comment = '';
         } else {
-          reject(Error('annotation object in appStorage is undefined'));
+          this._feedback.comment = this.appStorage.comment;
         }
-        resolve();
-      });
-    });
+
+        if (this.appStorage.logs === undefined) {
+          this.appStorage.clearLoggingDataPermanently();
+          this.uiService.elements = [];
+        } else if (Array.isArray(this.appStorage.logs)) {
+          this.uiService.fromAnyArray(this.appStorage.logs);
+        }
+        this.uiService.addElementFromEvent(
+          'octra',
+          { value: AppInfo.version },
+          Date.now(),
+          undefined,
+          -1,
+          undefined,
+          undefined,
+          'version'
+        );
+
+        // this.navbarServ.dataloaded = true;
+        this.dataloaded.emit();
+      } else {
+        throw new Error('annotation object in appStorage is undefined');
+      }
+    }
   }
 
   private updateAnnotation(levels: AnnotationStateLevel[], links: OIDBLink[]) {
@@ -702,9 +674,9 @@ export class TranscriptionService {
             ? 'NOT AVAILABLE'
             : this.appStorage.onlineSession.currentProject?.name,
         annotator:
-          this.appStorage.onlineSession.loginData.userName === undefined
+          this.appStorage.snapshot.authentication.me.username === undefined
             ? 'NOT AVAILABLE'
-            : this.appStorage.onlineSession.loginData.userName,
+            : this.appStorage.snapshot.authentication.me.username,
         transcript: undefined,
         comment: this._feedback.comment,
         quality: this.settingsService.isTheme('shortAudioFiles')

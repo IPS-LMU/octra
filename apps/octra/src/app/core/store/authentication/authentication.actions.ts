@@ -16,11 +16,16 @@ export class AuthenticationActions {
     source: 'auth/login',
     events: {
       do: props<{
+        mode: LoginMode,
         method: AccountLoginMethod;
         username?: string;
         password?: string;
       }>(),
-      success: props<AdaptedAuthDto>(),
+      success: props<{
+        mode: LoginMode,
+        method: AccountLoginMethod
+        auth: AuthDto
+      }>(),
       fail: props<{
         error: HttpErrorResponse;
       }>(),
@@ -89,11 +94,9 @@ export class AuthenticationActions {
         actionAfterSuccess: Action;
       }>(),
       success: props<{
-        me?: CurrentAccountDto;
-        openURL?: string;
-        method: AccountLoginMethod;
-        accessToken?: string;
-        actionAfterSuccess: Action;
+        auth: AuthDto,
+        method: AccountLoginMethod,
+        mode: LoginMode
       }>(),
       fail: props<{
         error: HttpErrorResponse;

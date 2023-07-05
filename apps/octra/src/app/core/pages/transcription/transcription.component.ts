@@ -504,13 +504,6 @@ export class TranscriptionComponent
     this.checkCurrentEditor();
     this.interface = this.appStorage.interface;
 
-    // load guidelines on language change
-    this.subscrManager.add(
-      this.langService.langChanges$.subscribe(() => {
-        this.settingsService.loadGuidelines();
-      })
-    );
-
     this.subscrManager.add(
       this.navbarServ.interfacechange.subscribe((editor) => {
         this.changeEditor(editor).catch((error) => {

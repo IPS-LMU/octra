@@ -186,7 +186,7 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
-  onAnnotationLoadSuccess$ = createEffect(
+  onAudioLoadSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AnnotationActions.loadAudio.success),
@@ -282,6 +282,8 @@ export class AnnotationEffects {
                       newLinks,
                       false
                     );
+                    console.log('NAVIGATE TRANSCR');
+                    this.routingService.navigate(['/user/transcr']);
                   } else {
                     // TODO reject
                   }
@@ -303,7 +305,7 @@ export class AnnotationEffects {
               this.appStorage.overwriteAnnotation(newLevels, [], false);
             } else {
               this.transcrService
-                .load()
+                .load(state)
                 .then(() => {
                   this.routingService.navigate(
                     ['/user/transcr'],

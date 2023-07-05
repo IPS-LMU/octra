@@ -1,25 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
-import { Params } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
-import { afterDefined, afterTrue, SubscriptionManager } from '@octra/utilities';
+import { Injectable } from '@angular/core';
+import { SubscriptionManager } from '@octra/utilities';
 
 import { AppSettings, ProjectSettings } from '../../obj/Settings';
 import { AppStorageService } from './appstorage.service';
-import { AudioService } from './audio.service';
-import { getModeState, LoginMode } from '../../store';
-import { Store } from '@ngrx/store';
-import * as fromApplication from '../../store/application';
-import { ConfigurationActions } from '../../store/configuration/configuration.actions';
-import { Subject, Subscription } from 'rxjs';
-import { OctraAPIService } from '@octra/ngx-octra-api';
+import { getModeState } from '../../store';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService {
-  public audioloaded: EventEmitter<any> = new EventEmitter<any>();
-  public audioloading = new Subject<number>();
   private subscrmanager: SubscriptionManager<Subscription>;
 
   public get isASREnabled(): boolean {
@@ -81,96 +72,9 @@ export class SettingsService {
     return this._filename;
   }
 
-  get validationmethod(): (str: string, obj: any) => any[] {
-    return getModeState(this.appStorage.snapshot).methods.validate;
-  }
-
-  get tidyUpMethod(): (str: string, obj: any) => string {
-    return getModeState(this.appStorage.snapshot).methods.tidyUp;
-  }
-
-  constructor(
-    private http: HttpClient,
-    private appStorage: AppStorageService,
-    private api: OctraAPIService,
-    private langService: TranslocoService,
-    private store: Store
-  ) {
+  constructor(private http: HttpClient, private appStorage: AppStorageService) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
   }
-
-  public static queryParamsSet(queryParams: Params): boolean {
-    return (
-      queryParams.audio !== undefined && queryParams.embedded !== undefined
-    );
-  }
-
-  public loadAudioFile: (audioService: AudioService) => void = (
-    audioService: AudioService
-  ) => {
-    console.log('Load audio file 2...');
-    if (this.appStorage.useMode === undefined) {
-      this._log += `An error occured. Please click on "Back" and try it again.`;
-    }
-    if (
-      this.appStorage.useMode === LoginMode.ONLINE ||
-      this.appStorage.useMode === LoginMode.URL ||
-      this.appStorage.useMode === LoginMode.DEMO
-    ) {
-      // online, url or demo
-      if (!(this.appStorage.audioURL === undefined)) {
-        const src = this.appStorage.audioURL;
-        // extract filename
-        this._filename = this.appStorage.audioURL.substr(
-          this.appStorage.audioURL.lastIndexOf('/') + 1
-        );
-        this._filename = this._filename.substr(
-          0,
-          this._filename.lastIndexOf('.')
-        );
-        if (this._filename.indexOf('src=') > -1) {
-          this._filename = this._filename.substr(
-            this._filename.indexOf('src=') + 4
-          );
-        }
-
-        audioService.loadAudio(src).subscribe(
-          (progress) => {
-            this.audioloading.next(progress);
-
-            if (progress === 1) {
-              this.audioloading.complete();
-            }
-          },
-          (err) => {
-            this._log = 'Loading audio file failed<br/>';
-            console.error(err);
-          },
-          () => {
-            this.audioloaded.emit({ status: 'success' });
-          }
-        );
-      } else {
-        this._log += `No audio source found. Please click on "Back" and try it again.`;
-        console.error('audio src is undefined');
-        this.audioloaded.emit({ status: 'error' });
-      }
-    } else if (this.appStorage.useMode === LoginMode.LOCAL) {
-      // local mode
-      if (this.appStorage.sessionfile !== undefined) {
-        this._filename = this.appStorage.sessionfile.name;
-        this._filename = this._filename.substr(
-          0,
-          this._filename.lastIndexOf('.')
-        );
-
-        console.log('Audio loaded.');
-        this.audioloaded.emit({ status: 'success' });
-      } else {
-        console.error('session file is undefined.');
-      }
-    }
-  };
 
   public destroy() {
     this.subscrmanager.destroy();
@@ -203,25 +107,5 @@ export class SettingsService {
     }
 
     return undefined;
-  }
-
-  public loadGuidelines = () => {
-    this.store.dispatch(
-      ConfigurationActions.loadGuidelines({
-        projectConfig: this.projectsettings,
-      })
-    );
-  };
-
-  public allLoaded() {
-    const promises: Promise<void>[] = [];
-    promises.push(
-      afterTrue(this.store.select(fromApplication.selectIDBLoaded))
-    );
-    promises.push(
-      afterDefined(this.store.select(fromApplication.selectAppSettings))
-    );
-
-    return Promise.all(promises);
   }
 }

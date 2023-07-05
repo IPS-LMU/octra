@@ -1,15 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Subject, timer } from 'rxjs';
+import { Subject, tap, timer } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import { IDBService } from '../../shared/service/idb.service';
-import {
-  convertFromOIDLevel,
-  getModeState,
-  LoginMode,
-  RootState,
-} from '../index';
+import { getModeState, LoginMode, RootState } from '../index';
 import { ILevel, ILink, OAnnotJSON, OIDBLink } from '@octra/annotation';
 import { SessionStorageService } from 'ngx-webstorage';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
@@ -25,7 +20,11 @@ import { hasProperty } from '@octra/utilities';
 import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
-import { LocalModeState, OnlineModeState } from '../annotation';
+import {
+  convertFromOIDLevel,
+  LocalModeState,
+  OnlineModeState,
+} from '../annotation';
 
 @Injectable({
   providedIn: 'root',
@@ -474,6 +473,7 @@ export class IDBEffects {
   savemodeOptions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
+        AuthenticationActions.login.success,
         AuthenticationActions.logout.success,
         OnlineModeActions.setSubmitted,
         OnlineModeActions.setComment,
@@ -482,7 +482,6 @@ export class IDBEffects {
         LocalModeActions.login,
         AnnotationActions.setCurrentEditor.do,
         OnlineModeActions.loginDemo,
-        OnlineModeActions.readLoginData,
         OnlineModeActions.startOnlineAnnotation,
         LocalModeActions.login
       ),
@@ -503,11 +502,6 @@ export class IDBEffects {
               sessionfile: localModeState?.sessionFile?.toAny(),
               currentEditor: modeState.currentEditor,
               logging: modeState?.logging,
-              user: {
-                name: onlineModeState?.onlineSession?.loginData?.userName,
-                email: onlineModeState?.onlineSession?.loginData?.email,
-                webToken: onlineModeState?.onlineSession?.loginData?.webToken,
-              },
               project: {
                 id: onlineModeState?.onlineSession?.currentProject?.id,
                 name: onlineModeState?.onlineSession?.currentProject?.name,
@@ -745,59 +739,31 @@ export class IDBEffects {
     )
   );
 
-  saveLoginOnline$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(OnlineModeActions.readLoginData),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.sessStr.store('loggedIn', true);
-        // TODO api: move this to new effect
-        // this.sessStr.store('jobsLeft', action.onlineSession.currentProject?.jobsLeft);
-        // this.sessStr.store('serverDataEntry', action.onlineSession.sessionData?.serverDataEntry);
-
-        timer(0)
-          .toPromise()
-          .then(() => {
-            subject.next(IDBActions.saveOnlineSessionSuccess());
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
+  saveLoggedIn$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.login.success),
+        tap(() => {
+          this.sessStr.store('loggedIn', true);
+        })
+      ),
+    { dispatch: false }
   );
 
-  saveLogin$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(
-        LocalModeActions.login,
-        OnlineModeActions.loginDemo,
-        OnlineModeActions.readLoginData
+  saveLogin$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          LocalModeActions.login,
+          OnlineModeActions.loginDemo,
+          AuthenticationActions.login.success
+        ),
+        tap(async (action) => {
+          this.sessStr.store('loggedIn', true);
+          await this.idbService.saveOption('usemode', action.mode);
+        })
       ),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.sessStr.store('loggedIn', true);
-        const promises: Promise<any>[] = [];
-        promises.push(this.idbService.saveOption('usemode', action.mode));
-        Promise.all(promises)
-          .then(() => {
-            subject.next(IDBActions.saveLoginSessionSuccess());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveLoginSessionFailed({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
+    { dispatch: false }
   );
 
   saveLogout$ = createEffect(() =>

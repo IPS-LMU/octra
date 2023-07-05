@@ -17,7 +17,7 @@
     "paths": {
       "@angular/*": ["node_modules/@angular/*"],
       "@octra/annotation": ["libs/annotation/src/index.ts"],
-      "@octra/api-types": ["../octra-backend/dist/libs/api-types"],
+      "@octra/api-types": ["../octra-backend/libs/api-types"],
       "@octra/assets": ["libs/assets/src/lib/index.ts"],
       "@octra/json-set-validator": ["libs/json-set-validator/src/index.ts"],
       "@octra/media": ["libs/media/src/index.ts"],

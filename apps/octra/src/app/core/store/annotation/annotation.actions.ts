@@ -1,10 +1,10 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { AnnotationStateLevel, LoginMode } from '../index';
+import { LoginMode } from '../index';
 import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TranscriptionState } from './index';
+import { AnnotationStateLevel, TranscriptionState } from './index';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({

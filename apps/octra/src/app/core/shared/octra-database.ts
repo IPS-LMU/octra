@@ -289,11 +289,6 @@ export class OctraDatabase extends Dexie {
       sessionfile: undefined,
       currentEditor: 'Dictaphone-Editor',
       logging: true,
-      user: {
-        name: '',
-        email: '',
-        webToken: '',
-      },
       project: {
         id: '-1',
         name: '',
@@ -448,11 +443,6 @@ export interface IIDBModeOptions {
   sessionfile: any;
   currentEditor: string;
   logging: boolean;
-  user: {
-    name: string;
-    email: string;
-    webToken: string;
-  };
   project: {
     id: string;
     name: string;
@@ -467,11 +457,6 @@ export const DefaultModeOptions: IIDBModeOptions = {
   sessionfile: undefined,
   currentEditor: '',
   logging: true,
-  user: {
-    name: '',
-    email: '',
-    webToken: '',
-  },
   project: {
     id: '-1',
     name: '',

@@ -1,4 +1,4 @@
-import { AccountLoginMethod } from '@octra/api-types';
+import { AccountLoginMethod, AuthDtoMe } from '@octra/api-types';
 
 export * from './authentication.actions';
 export * from './authentication.reducer';
@@ -9,6 +9,7 @@ export interface AuthenticationState {
   webToken?: string;
   authenticated: boolean;
   type?: AccountLoginMethod;
+  me?: AuthDtoMe;
   logoutMessage?: string;
   logoutMessageType?: string;
   loginErrorMessage?: string;

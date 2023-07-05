@@ -16,13 +16,7 @@ import { LoginMode } from '../../index';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
-  onlineSession: {
-    loginData: {
-      userName: '',
-      email: '',
-      webToken: '',
-    },
-  },
+  onlineSession: {},
 };
 
 // initialize ngrx-wieder with custom config
@@ -42,30 +36,27 @@ export class OnlineModeReducers {
       initialState,
       ...new AnnotationStateReducers(this.mode).create(),
       on(
-        OnlineModeActions.loginDemo,
-        (state: OnlineModeState, { onlineSession, mode }) => {
+        AuthenticationActions.login.success,
+        (state: OnlineModeState, {auth, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession,
+              onlineSession: {
+                ...state,
+                me: auth.me
+              }
             };
           }
           return state;
         }
       ),
       on(
-        OnlineModeActions.readLoginData,
-        (state: OnlineModeState, { loginData, removeData, mode }) => {
+        OnlineModeActions.loginDemo,
+        (state: OnlineModeState, { onlineSession, mode }) => {
           if (this.mode === mode) {
-            if (removeData) {
-              return initialState;
-            }
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                loginData,
-              },
+              onlineSession,
             };
           }
           return state;
@@ -90,8 +81,7 @@ export class OnlineModeReducers {
               ? {
                   ...initialState,
                   onlineSession: {
-                    ...initialState.onlineSession,
-                    loginData: state.onlineSession.loginData,
+                    ...initialState.onlineSession
                   },
                   guidelines: state.guidelines,
                   projectConfig: state.projectConfig,
@@ -314,13 +304,7 @@ export class OnlineModeReducers {
           }
         }
 
-        return {
-          ...state,
-          onlineSession: {
-            ...state.onlineSession,
-            loginData: onlineSessionData,
-          },
-        };
+        return state;
     }
 
     return state;

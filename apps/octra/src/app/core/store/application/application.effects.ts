@@ -27,6 +27,7 @@ import { SettingsService } from '../../shared/service';
 import { LoginMode, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
+import { Params } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -398,7 +399,7 @@ export class ApplicationEffects {
           }
 
           // if url mode, set it in options
-          if (SettingsService.queryParamsSet(queryParams)) {
+          if (this.queryParamsSet(queryParams)) {
             this.appStorage.setURLSession(
               queryParams.audio,
               transcriptURL,
@@ -619,5 +620,11 @@ export class ApplicationEffects {
       return '';
     }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
+  private queryParamsSet(queryParams: Params): boolean {
+    return (
+      queryParams.audio !== undefined && queryParams.embedded !== undefined
+    );
   }
 }

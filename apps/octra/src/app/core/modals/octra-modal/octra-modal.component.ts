@@ -73,8 +73,8 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
 
   ngOnInit() {
     this.bgemail =
-      this.appStorage.userProfile.email !== undefined
-        ? this.appStorage.userProfile.email
+      this.appStorage.snapshot.authentication.me.email !== undefined
+        ? this.appStorage.snapshot.authentication.me.email
         : '';
     this.subscrManager = new SubscriptionManager<Subscription>();
 

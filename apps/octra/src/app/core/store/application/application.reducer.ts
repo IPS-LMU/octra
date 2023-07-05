@@ -170,9 +170,9 @@ export const reducer = createReducer(
       loaded: true,
     },
   })),
-  on(OnlineModeActions.readLoginData, (state: ApplicationState) => ({
+  on(AuthenticationActions.login.success, (state: ApplicationState, {mode}) => ({
     ...state,
-    mode: LoginMode.ONLINE,
+    mode,
     loggedIn: true,
   })),
   on(LocalModeActions.login, (state: ApplicationState) => ({

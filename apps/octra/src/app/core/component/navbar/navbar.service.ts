@@ -8,14 +8,13 @@ import { FileSize } from '@octra/utilities';
 
 @Injectable()
 export class NavbarService {
-  public onexportbuttonclick = new EventEmitter<any>();
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();
-  public transcrService: TranscriptionService;
-  public uiService: UserInteractionsService;
+  public transcrService!: TranscriptionService;
+  public uiService!: UserInteractionsService;
   public dataloaded = false;
-  public ressource: AudioRessource;
-  public filesize: FileSize;
+  public ressource!: AudioRessource;
+  public filesize!: FileSize;
   public showNavbar = true;
 
   public toolApplied = new EventEmitter<string>();

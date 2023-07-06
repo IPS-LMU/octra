@@ -70,7 +70,7 @@ export class MultiThreadingService {
   }
 
   private getBestWorker(): TsWorker {
-    let foundWorker: TsWorker = undefined;
+    let foundWorker: TsWorker | undefined = undefined;
 
     for (const worker of this._workers) {
       if (foundWorker === undefined) {
@@ -80,6 +80,6 @@ export class MultiThreadingService {
       }
     }
 
-    return foundWorker;
+    return foundWorker!;
   }
 }

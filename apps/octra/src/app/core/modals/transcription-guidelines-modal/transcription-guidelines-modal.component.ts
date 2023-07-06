@@ -186,7 +186,7 @@ export class TranscriptionGuidelinesModalComponent
     }
   }
 
-  public getGuidelineHTML(text): SafeHtml {
+  public getGuidelineHTML(text: string): SafeHtml {
     let html = text;
     if (text.indexOf('{{') > -1) {
       html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
@@ -198,7 +198,7 @@ export class TranscriptionGuidelinesModalComponent
       html = `${html}`;
     }
 
-    return this.sanitizer.sanitize(SecurityContext.HTML, html);
+    return this.sanitizer.sanitize(SecurityContext.HTML, html)!;
   }
 
   public isPDFExportEnabled() {

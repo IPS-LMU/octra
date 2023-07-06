@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  SimpleChanges,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SettingsService } from '../../shared/service';
@@ -17,7 +18,7 @@ import { NavbarService } from '../../component/navbar/navbar.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsComponent implements OnInit, OnChanges {
-  @Input() url;
+  @Input() url = '';
 
   public loaded = false;
 
@@ -33,8 +34,8 @@ export class NewsComponent implements OnInit, OnChanges {
     this.navService.showExport = false;
   }
 
-  ngOnChanges(obj) {
-    if (!(obj.url === undefined || obj.url === undefined)) {
+  ngOnChanges(obj: SimpleChanges) {
+    if (!(obj['url'] === undefined)) {
       this.cd.markForCheck();
       this.cd.checkNoChanges();
     }

@@ -15,10 +15,10 @@
       class="shortcut-group"
       *ngFor="let shortcutGroup of keyMap.shortcutGroups"
     >
-      <h5>{{ 'modal.shortcuts.' + shortcutGroup.name | transloco }}</h5>
+      <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
       <table class="table table-striped table-bordered">
         <tbody>
-          <tr *ngFor="let entry of shortcutGroup.items">
+          <tr *ngFor="let entry of shortcutGroup!.items">
             <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
             <td>
               <octra-shortcut

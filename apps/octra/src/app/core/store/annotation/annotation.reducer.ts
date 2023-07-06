@@ -73,21 +73,18 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
-      on(
-        AnnotationActions.loadAudio.do,
-        (state: AnnotationState, { mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              audio: {
-                ...state.audio,
-                loaded: false
-              }
-            };
-          }
-          return state;
+      on(AnnotationActions.loadAudio.do, (state: AnnotationState, { mode }) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            audio: {
+              ...state.audio,
+              loaded: false,
+            },
+          };
         }
-      ),
+        return state;
+      }),
       on(
         AnnotationActions.loadAudio.success,
         (state: AnnotationState, { mode, audioFile }) => {
@@ -97,10 +94,10 @@ export class AnnotationStateReducers {
               audio: {
                 ...state.audio,
                 loaded: true,
-                sampleRate: audioFile?.metadata?.sampleRate,
-                fileName: audioFile?.filename,
-                file: audioFile
-              }
+                sampleRate: audioFile!.metadata?.sampleRate,
+                fileName: audioFile!.filename,
+                file: audioFile,
+              },
             };
           }
           return state;
@@ -186,7 +183,7 @@ export class AnnotationStateReducers {
           return {
             ...state,
             transcript: {
-              ...annotations[this.mode],
+              ...(annotations as any)[this.mode],
             },
           };
         }
@@ -247,7 +244,7 @@ export class AnnotationStateReducers {
       on(IDBActions.loadLogsSuccess, (state: AnnotationState, logs) => {
         return {
           ...state,
-          logs: logs[this.mode],
+          logs: (logs as any)[this.mode],
         };
       }),
       on(
@@ -281,7 +278,7 @@ export class AnnotationStateReducers {
             options = localOptions;
           }
 
-          for (const [name, value] of getProperties(options)) {
+          for (const [name, value] of getProperties(options!)) {
             result = this.writeOptionToStore(result, name, value);
           }
 
@@ -294,7 +291,7 @@ export class AnnotationStateReducers {
           ...state,
           methods,
         })
-      )
+      ),
     ];
   }
 

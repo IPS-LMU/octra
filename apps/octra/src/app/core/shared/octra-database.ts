@@ -240,7 +240,7 @@ export class OctraDatabase extends Dexie {
   }
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
-    let table: Dexie.Table<IIDBEntry, string> = undefined;
+    let table: Dexie.Table<IIDBEntry, string> = undefined as any;
 
     switch (mode) {
       case LoginMode.DEMO:
@@ -452,7 +452,7 @@ export interface IIDBModeOptions {
 
 export const DefaultModeOptions: IIDBModeOptions = {
   submitted: false,
-  transcriptID: "-1",
+  transcriptID: '-1',
   feedback: undefined,
   sessionfile: undefined,
   currentEditor: '',

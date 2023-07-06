@@ -30,7 +30,7 @@ export class ReloadFileGuard implements CanActivate {
     return new Promise<boolean>((resolve) => {
       if (!this.appStorage.loggedIn) {
         const params = AppInfo.queryParamsHandling;
-        params.fragment = route.fragment;
+        params.fragment = route.fragment!;
         params.queryParams = route.queryParams;
 
         navigateTo(this.router, ['/login'], params).catch((error) => {
@@ -39,7 +39,7 @@ export class ReloadFileGuard implements CanActivate {
         resolve(false);
       } else {
         afterDefined(
-          this.store.select(fromAnnotation.selectProjectConfig)
+          this.store.select(fromAnnotation.selectProjectConfig as any)
         ).then(() => {
           console.log(`reload file guard projectconfig set ok`);
           resolve(true);

@@ -19,7 +19,7 @@ export const MEMBER_AREA_GUARD: CanActivateFn = (
   if (appStorage.loggedIn !== true) {
     console.log(`members area logged in false`);
     const params = AppInfo.queryParamsHandling;
-    params.fragment = route.fragment;
+    params.fragment = route.fragment!;
     params.queryParams = route.queryParams;
 
     navigateTo(router, ['/login'], params).catch((error) => {

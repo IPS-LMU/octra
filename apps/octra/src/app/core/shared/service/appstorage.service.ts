@@ -46,7 +46,7 @@ export class AppStorageService {
   }
 
   get sessionfile(): SessionFile {
-    return this._snapshot.localMode.sessionFile;
+    return this._snapshot.localMode.sessionFile!;
   }
 
   get playonhover(): boolean {
@@ -63,7 +63,7 @@ export class AppStorageService {
     const subject = new Subject<AnnotationState>();
     this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
       console.log(`annotation changed`);
-      subject.next(state);
+      subject.next(state!);
     });
     return subject;
   }
@@ -103,7 +103,7 @@ export class AppStorageService {
     this.store.dispatch(
       OnlineModeActions.setSubmitted({
         submitted: value,
-        mode: this._snapshot.application.mode,
+        mode: this._snapshot.application.mode!,
       })
     );
   }
@@ -136,11 +136,11 @@ export class AppStorageService {
 
   /* Getter/Setter IDB Storage */
   get dbVersion(): number {
-    return this._snapshot.application.idb.version;
+    return this._snapshot.application.idb.version!;
   }
 
   get logging(): boolean {
-    return getModeState(this._snapshot)?.logging;
+    return getModeState(this._snapshot)!.logging!;
   }
 
   set logging(value: boolean) {
@@ -215,11 +215,11 @@ export class AppStorageService {
   }
 
   get annotationLevels(): AnnotationStateLevel[] {
-    return getModeState(this._snapshot)?.transcript?.levels;
+    return getModeState(this._snapshot)!.transcript!.levels;
   }
 
   get annotationLinks(): OIDBLink[] {
-    return getModeState(this._snapshot)?.transcript?.links;
+    return getModeState(this._snapshot)!.transcript?.links;
   }
 
   get secondsPerLine(): number {
@@ -276,10 +276,10 @@ export class AppStorageService {
 
   private _loaded = new EventEmitter();
 
-  private _snapshot: RootState;
+  private _snapshot!: RootState;
 
   get savingNeeded(): boolean {
-    return getModeState(this._snapshot).savingNeeded;
+    return getModeState(this._snapshot)!.savingNeeded;
   }
 
   set savingNeeded(value: boolean) {
@@ -321,7 +321,7 @@ export class AppStorageService {
   }
 
   get logs(): any[] {
-    return getModeState(this._snapshot)?.logs;
+    return getModeState(this._snapshot)!.logs;
   }
 
   get onlineSession(): OnlineSession {
@@ -329,7 +329,7 @@ export class AppStorageService {
   }
 
   get asrSelectedLanguage(): string {
-    return this._snapshot.asr.selectedLanguage;
+    return this._snapshot.asr.selectedLanguage!;
   }
 
   set asrSelectedLanguage(value: string) {
@@ -350,7 +350,7 @@ export class AppStorageService {
   }
 
   get asrSelectedService(): string {
-    return this._snapshot.asr.selectedService;
+    return this._snapshot.asr.selectedService!;
   }
 
   set asrSelectedService(value: string) {
@@ -389,7 +389,7 @@ export class AppStorageService {
   }
 
   get isSaving(): boolean {
-    return getModeState(this._snapshot).isSaving;
+    return getModeState(this._snapshot)!.isSaving;
   }
 
   set isSaving(value: boolean) {
@@ -405,7 +405,7 @@ export class AppStorageService {
   }
 
   get useMode(): LoginMode {
-    return this._snapshot.application.mode;
+    return this._snapshot.application.mode!;
   }
 
   get loggedIn(): boolean {
@@ -421,7 +421,7 @@ export class AppStorageService {
   }
 
   get interface(): string {
-    return getModeState(this._snapshot)?.currentEditor;
+    return getModeState(this._snapshot)!.currentEditor!;
   }
 
   set interface(newInterface: string) {
@@ -641,7 +641,7 @@ export class AppStorageService {
       const properties = getProperties(log);
       for (const [name, value] of properties) {
         if (value === undefined) {
-          delete log['' + name];
+          delete (log as any)['' + name];
         }
       }
 
@@ -716,7 +716,7 @@ export class AppStorageService {
   public addAnnotationLevel(level: OIDBLevel) {
     return new Promise<void>((resolve, reject) => {
       if (level !== undefined) {
-        level.id = getModeState(this._snapshot).transcript.levelCounter + 1;
+        level.id = getModeState(this._snapshot)!.transcript.levelCounter + 1;
 
         waitTillResultRetrieved<Actions, Action, void>(
           this.actions,

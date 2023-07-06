@@ -51,7 +51,7 @@ export interface ApplicationState {
     version?: number;
   };
   language: string;
-  appConfiguration: AppSettings;
+  appConfiguration?: AppSettings;
   consoleEntries: ConsoleEntry[];
   options: {
     playOnHover: boolean;

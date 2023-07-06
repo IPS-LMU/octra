@@ -23,8 +23,8 @@ import {
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
 
-declare let validateAnnotation: (string, any) => any;
-declare let tidyUpAnnotation: (string, any) => any;
+declare let validateAnnotation: (transcript: string, guidelines: any) => any;
+declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
 @Component({
   selector: 'octra-overview-modal',
@@ -32,15 +32,15 @@ declare let tidyUpAnnotation: (string, any) => any;
   styleUrls: ['./overview-modal.component.scss'],
 })
 export class OverviewModalComponent extends OctraModal {
-  @ViewChild('feedback', { static: false })
-  feedback: TranscriptionFeedbackComponent;
-  @Output() transcriptionSend = new EventEmitter<void>();
-
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: false,
     backdrop: true,
   };
+
+  @ViewChild('feedback', { static: false })
+  feedback!: TranscriptionFeedbackComponent;
+  @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = undefined;
   private shortcutID = -1;
@@ -320,7 +320,7 @@ export class OverviewModalComponent extends OctraModal {
       !this.settingsService.projectsettings.octra.validationEnabled
     ) {
       if (
-        !this.transcrService.currentlevel.segments ||
+        !this.transcrService.currentlevel!.segments ||
         !this.transcrService.guidelines
       ) {
         this.shownSegments = [];
@@ -331,10 +331,10 @@ export class OverviewModalComponent extends OctraModal {
 
       for (
         let i = 0;
-        i < this.transcrService.currentlevel.segments.length;
+        i < this.transcrService.currentlevel!.segments.length;
         i++
       ) {
-        const segment = this.transcrService.currentlevel.segments.segments[i];
+        const segment = this.transcrService.currentlevel!.segments.segments[i];
 
         const obj = this.getShownSegment(
           startTime,
@@ -352,7 +352,7 @@ export class OverviewModalComponent extends OctraModal {
     }
   }
 
-  switchToTRNEditor($event) {
+  switchToTRNEditor() {
     this.navbarService.interfacechange.emit('TRN-Editor');
     this.close(false);
   }

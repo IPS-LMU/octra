@@ -16,7 +16,7 @@ import { Subscription } from 'rxjs';
   selector: '[octraDynComponent]',
 })
 export class DynComponentDirective implements OnInit, OnDestroy {
-  @Input() component: {
+  @Input() component!: {
     id: number;
     class: any;
     instance: any;
@@ -35,7 +35,7 @@ export class DynComponentDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     const componentFactory =
       this._componentFactoryResolver.resolveComponentFactory(
-        this.component.class
+        this.component!.class
       );
 
     const viewContainerRef = this.viewContainerRef;

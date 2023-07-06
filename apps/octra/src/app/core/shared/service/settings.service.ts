@@ -45,11 +45,11 @@ export class SettingsService {
   }
 
   get projectsettings(): ProjectSettings {
-    return getModeState(this.appStorage.snapshot)?.projectConfig;
+    return getModeState(this.appStorage.snapshot)!.projectConfig!;
   }
 
   get appSettings(): AppSettings {
-    return this.appStorage.snapshot.application.appConfiguration;
+    return this.appStorage.snapshot.application.appConfiguration!;
   }
 
   get guidelines(): any {
@@ -66,7 +66,7 @@ export class SettingsService {
     this._log = value;
   }
 
-  private _filename: string;
+  private _filename!: string;
 
   get filename(): string {
     return this._filename;

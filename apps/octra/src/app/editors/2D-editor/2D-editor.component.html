@@ -22,7 +22,7 @@
   <div *ngIf="appStorage.showLoupe">
     <octra-audio-viewer
       #loupe
-      (mousemove)="onCircleLoupeMouseOver($event)"
+      (mousemove)="onCircleLoupeMouseOver()"
       [audioChunk]="audioChunkLoupe"
       [breakMarker]="{
         code: '<P>'

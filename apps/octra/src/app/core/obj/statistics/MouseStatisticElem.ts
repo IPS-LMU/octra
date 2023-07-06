@@ -1,6 +1,6 @@
-import { StatisticElem } from "./StatisticElement";
-import { ILog } from "../Settings/logging";
-import { getProperties, hasProperty } from "@octra/utilities";
+import { StatisticElem } from './StatisticElement';
+import { ILog } from '../Settings/logging';
+import { getProperties, hasProperty } from '@octra/utilities';
 
 /***
  * Statistic Element Class
@@ -60,22 +60,22 @@ export class MouseStatisticElem extends StatisticElem {
         hasProperty(elem, 'segment')
       ) {
         if (name === 'playerpos') {
-          result.playpos = elem[`${name}`];
+          result.playpos = (elem as any)[`${name}`];
         } else {
-          result[`${name}`] = elem[`${name}`];
+          (result as any)[`${name}`] = (elem as any)[`${name}`];
         }
       }
     }
 
     return new MouseStatisticElem(
-      result.type,
-      result.context,
-      result.value,
-      result.timestamp,
+      result.type!,
+      result.context!,
+      result.value!,
+      result.timestamp!,
       result.playpos,
       result.caretpos,
-      result.selection,
-      result.segment
+      result.selection!,
+      result.segment!
     );
   }
 }

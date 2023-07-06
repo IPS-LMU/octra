@@ -9,12 +9,12 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./supportedfiles-modal.component.scss'],
 })
 export class SupportedFilesModalComponent extends OctraModal {
-  AppInfo = AppInfo;
-
   public static options: NgbModalOptions = {
     backdrop: true,
     size: 'lg',
   };
+
+  AppInfo = AppInfo;
 
   constructor(protected override activeModal: NgbActiveModal) {
     super('supportedFilesModal', activeModal);

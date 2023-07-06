@@ -17,10 +17,10 @@ import { Subject, Subscription, timer } from 'rxjs';
 export class AsrService {
   public static authURL = '';
 
-  private _selectedLanguage: ASRLanguage = undefined;
+  private _selectedLanguage?: ASRLanguage;
 
   get selectedLanguage(): ASRLanguage {
-    return this._selectedLanguage;
+    return this._selectedLanguage!;
   }
 
   set selectedLanguage(value: ASRLanguage) {
@@ -28,13 +28,10 @@ export class AsrService {
     if (value !== undefined) {
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
-    } else {
-      this.appStorage.asrSelectedLanguage = undefined;
-      this.appStorage.asrSelectedService = undefined;
     }
   }
 
-  private _queue: ASRQueue;
+  private _queue!: ASRQueue;
 
   get queue(): ASRQueue {
     return this._queue;
@@ -70,7 +67,7 @@ export class AsrService {
     }
   }
 
-  public getLanguageByCode(code: string, asr: string): ASRLanguage {
+  public getLanguageByCode(code: string, asr: string): ASRLanguage | undefined {
     if (asr === undefined || code === undefined) {
       return undefined;
     }
@@ -81,12 +78,7 @@ export class AsrService {
   }
 
   public getServiceInformation(serviceProvider: string) {
-    if (
-      !(
-        this.asrSettings.services === undefined ||
-        this.asrSettings.services === undefined
-      )
-    ) {
+    if (!(this.asrSettings.services === undefined)) {
       return this.asrSettings.services.find((a) => {
         return a.provider === serviceProvider;
       });
@@ -112,7 +104,7 @@ export class AsrService {
       timeInterval,
       this.queue,
       this.selectedLanguage,
-      asrInfo,
+      asrInfo!,
       this.audioService.audiomanagers[0].sampleRate,
       type,
       transcript
@@ -138,13 +130,13 @@ export class AsrService {
         audioManager.sampleRate
       );
       const segNumber =
-        this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
           segmentBoundary
         );
 
       if (segNumber > -1) {
         const segment =
-          this.transcrService.currentlevel.segments.get(segNumber);
+          this.transcrService.currentlevel!.segments.get(segNumber);
 
         if (segment !== undefined) {
           segment.isBlockedBy = undefined;
@@ -494,7 +486,7 @@ export class ASRQueueItem {
     return this._status;
   }
 
-  private _result: string;
+  private _result!: string;
 
   get result(): string {
     return this._result;
@@ -610,7 +602,7 @@ export class ASRQueueItem {
     });
   }
 
-  private onMAUSRequestError = (error) => {
+  private onMAUSRequestError = (error: any) => {
     console.error(error);
 
     if (this.status !== ASRProcessStatus.NOAUTH) {
@@ -641,12 +633,12 @@ export class ASRQueueItem {
       const format = new WavFormat();
       format.init(
         audioManager.resource.info.fullname,
-        audioManager.resource.arraybuffer
+        audioManager.resource.arraybuffer!
       );
       format
         .cutAudioFile(
           `OCTRA_ASRqueueItem_${this._id}`,
-          audioManager.resource.arraybuffer,
+          audioManager.resource.arraybuffer!,
           {
             number: 1,
             sampleStart: this.time.sampleStart,
@@ -741,12 +733,12 @@ export class ASRQueueItem {
       const format = new WavFormat();
       format.init(
         audioManager.resource.info.fullname,
-        audioManager.resource.arraybuffer
+        audioManager.resource.arraybuffer!
       );
       format
         .cutAudioFile(
           `OCTRA_ASRqueueItem_${this._id}`,
-          audioManager.resource.arraybuffer,
+          audioManager.resource.arraybuffer!,
           {
             number: 1,
             sampleStart: this.time.sampleStart,
@@ -1014,7 +1006,7 @@ export class ASRQueueItem {
           .then(() => {
             // add messages to protocol
             resolve({
-              file: file.file,
+              file: file.file!,
               url: json.downloadLink,
             });
           })

@@ -21,7 +21,6 @@ export const initialState: ApplicationState = {
     version: 1,
   },
   language: 'en',
-  appConfiguration: undefined,
   loggedIn: false,
   consoleEntries: [],
   options: {
@@ -170,11 +169,14 @@ export const reducer = createReducer(
       loaded: true,
     },
   })),
-  on(AuthenticationActions.login.success, (state: ApplicationState, {mode}) => ({
-    ...state,
-    mode,
-    loggedIn: true,
-  })),
+  on(
+    AuthenticationActions.login.success,
+    (state: ApplicationState, { mode }) => ({
+      ...state,
+      mode,
+      loggedIn: true,
+    })
+  ),
   on(LocalModeActions.login, (state: ApplicationState) => ({
     ...state,
     mode: LoginMode.LOCAL,

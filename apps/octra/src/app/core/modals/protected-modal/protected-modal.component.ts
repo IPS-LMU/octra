@@ -9,7 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./protected-modal.component.scss'],
 })
 export class ProtectedModalComponent extends OctraModal {
-  public htmlMessage: string;
+  public htmlMessage = '';
 
   public get sanitizedHTMLMessage() {
     return this.sanitizer.sanitize(SecurityContext.HTML, this.htmlMessage);

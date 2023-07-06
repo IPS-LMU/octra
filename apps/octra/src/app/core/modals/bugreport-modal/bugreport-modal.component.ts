@@ -22,6 +22,12 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BugreportModalComponent extends OctraModal implements OnInit {
+  public static options: NgbModalOptions = {
+    size: 'xl',
+    keyboard: false,
+    backdrop: true,
+  };
+
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
@@ -32,12 +38,6 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
     previewURL: string;
   }[] = [];
   protected data = undefined;
-
-  public static options: NgbModalOptions = {
-    size: 'xl',
-    keyboard: false,
-    backdrop: true,
-  };
 
   profile = {
     email: '',
@@ -115,7 +115,7 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
     input.click();
   }
 
-  public onFileChange($event) {
+  public onFileChange($event: any) {
     if ($event.target.files.length > 0) {
       if (
         $event.target.files[0].name.indexOf('.jpg') > -1 ||

@@ -5,7 +5,7 @@ import { ILog, SampleInterval } from '../Settings/logging';
 import { getProperties, hasProperty } from '@octra/utilities';
 
 export class StatisticElem {
-  protected data: ILog = {
+  protected data: any = {
     timestamp: undefined,
     type: undefined,
     context: undefined,
@@ -100,19 +100,19 @@ export class StatisticElem {
         if (name === 'playerpos') {
           result.playpos = value;
         } else {
-          result[`${name}`] = elem[`${name}`];
+          (result as any)[`${name}`] = (elem as any)[`${name}`];
         }
       }
     }
 
     return new StatisticElem(
-      result.type,
-      result.context,
+      result.type!,
+      result.context!,
       result.value,
-      result.timestamp,
-      result.playpos,
-      result.selection,
-      result.segment
+      result.timestamp!,
+      result.playpos!,
+      result.selection!,
+      result.segment!
     );
   }
 

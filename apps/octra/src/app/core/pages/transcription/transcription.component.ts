@@ -60,6 +60,7 @@ import { PromptModalComponent } from '../../modals/prompt-modal/prompt-modal.com
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../component/default.component';
+import videojs from 'video.js';
 
 @Component({
   selector: 'octra-transcription',
@@ -80,20 +81,20 @@ export class TranscriptionComponent
   }
 
   public waitForSend = false;
-  modalShortcutsDialogue: NgbModalRef;
-  modalOverview: NgbModalRef;
-  transcrSendingModal: NgbModalRef;
-  modalGuidelines: NgbModalRef;
-  inactivityModal: NgbModalRef;
-  missingPermissionsModal: NgbModalRef;
+  modalShortcutsDialogue?: NgbModalRef;
+  modalOverview?: NgbModalRef;
+  transcrSendingModal?: NgbModalRef;
+  modalGuidelines?: NgbModalRef;
+  inactivityModal?: NgbModalRef;
+
   @ViewChild(LoadeditorDirective, { static: true })
-  appLoadeditor: LoadeditorDirective;
+  appLoadeditor!: LoadeditorDirective;
 
   public sendError = '';
   public saving = '';
   public interface = '';
   public editorloaded = false;
-  user: number;
+  user?: number;
   public platform = BrowserInfo.platform;
   private sendOk = false;
   private _useMode = '';
@@ -204,7 +205,7 @@ export class TranscriptionComponent
     return this.settingsService.responsive.enabled;
   }
 
-  private _currentEditor: ComponentRef<Component>;
+  private _currentEditor!: ComponentRef<Component>;
 
   get currentEditor(): ComponentRef<Component> {
     return this._currentEditor;
@@ -379,7 +380,7 @@ export class TranscriptionComponent
 
     this.subscrManager.add(
       this.modService.showmodal.subscribe(
-        (event: { type: string; data; emitter: any }) => {
+        (event: { type: string; data: any; emitter: any }) => {
           if (
             this.currentEditor !== undefined &&
             (this.currentEditor.instance as any).editor !== undefined
@@ -446,7 +447,7 @@ export class TranscriptionComponent
           TranscriptionStopModalComponent,
           TranscriptionStopModalComponent.options
         )
-        .then((answer: TranscriptionStopModalAnswer) => {
+        .then((answer: any) => {
           if (answer === TranscriptionStopModalAnswer.QUIT) {
             this.logout(false);
           }
@@ -455,11 +456,6 @@ export class TranscriptionComponent
           console.error(error);
         });
     }
-  };
-
-  onSendError = (error) => {
-    this.sendError = error.message;
-    return throwError(error);
   };
 
   ngOnInit() {
@@ -667,7 +663,7 @@ export class TranscriptionComponent
   }
 
   @HostListener('window:keydown', ['$event'])
-  onKeyDown($event) {
+  onKeyDown($event: KeyboardEvent) {
     const shortcutInfo = this.shortcutManager.checkKeyEvent($event, Date.now());
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
@@ -681,7 +677,7 @@ export class TranscriptionComponent
             );
             this.modalVisiblities.shortcuts = true;
           } else {
-            this.modalShortcutsDialogue.close();
+            this.modalShortcutsDialogue!.close();
             this.modalVisiblities.shortcuts = false;
           }
           break;
@@ -693,7 +689,7 @@ export class TranscriptionComponent
             );
             this.modalVisiblities.guidelines = true;
           } else {
-            this.modalGuidelines.close();
+            this.modalGuidelines!.close();
             this.modalVisiblities.guidelines = false;
           }
           break;
@@ -706,7 +702,7 @@ export class TranscriptionComponent
             );
             this.modalVisiblities.overview = true;
           } else {
-            this.modalOverview.close();
+            this.modalOverview!.close();
             this.modalVisiblities.overview = false;
           }
           break;
@@ -715,7 +711,7 @@ export class TranscriptionComponent
   }
 
   @HostListener('window:keyup', ['$event'])
-  onKeyUp($event) {
+  onKeyUp($event: KeyboardEvent) {
     this.shortcutManager.checkKeyEvent($event, Date.now());
   }
 
@@ -758,8 +754,9 @@ export class TranscriptionComponent
               const viewContainerRef = this.appLoadeditor.viewContainerRef;
               viewContainerRef.clear();
 
-              this._currentEditor =
-                viewContainerRef.createComponent(componentFactory);
+              this._currentEditor = viewContainerRef.createComponent(
+                componentFactory
+              ) as any;
 
               if (
                 hasProperty(this.currentEditor.instance as any, 'openModal')
@@ -869,7 +866,7 @@ export class TranscriptionComponent
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
-        this.modalOverview.close();
+        this.modalOverview!.close();
       }
 
       this.modService
@@ -877,7 +874,7 @@ export class TranscriptionComponent
           TranscriptionDemoEndModalComponent,
           TranscriptionDemoEndModalComponent.options
         )
-        .then((action: ModalEndAnswer) => {
+        .then((action: any) => {
           this.appStorage.savingNeeded = false;
           this.waitForSend = false;
 
@@ -895,7 +892,7 @@ export class TranscriptionComponent
               this.subscrManager.add(
                 timer(1000).subscribe(() => {
                   // simulate nextTranscription
-                  this.transcrSendingModal.close();
+                  this.transcrSendingModal!.close();
                   this.reloadDemo();
                 })
               );
@@ -1028,9 +1025,9 @@ export class TranscriptionComponent
     );
     const result: IFile = converter.export(
       oannotjson,
-      this.transcrService.audiofile,
+      this.transcrService.audiofile!,
       0
-    ).file;
+    )!.file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 
     // upload transcript

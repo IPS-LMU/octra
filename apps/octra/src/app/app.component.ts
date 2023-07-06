@@ -96,6 +96,6 @@ export class AppComponent
 
   queryParamsSet(): boolean {
     const params = this.route.snapshot.queryParams;
-    return params.audio && params.embedded;
+    return params['audio'] && params['embedded'];
   }
 }

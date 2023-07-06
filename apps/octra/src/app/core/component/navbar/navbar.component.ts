@@ -38,10 +38,11 @@ import { DefaultComponent } from '../default.component';
   styleUrls: ['./navbar.component.scss'],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {
-  modalexport: NgbModalRef;
-  modalTools: NgbModalRef;
-  modalStatistics: NgbModalRef;
-  @Input() version: string;
+  modalexport?: NgbModalRef;
+  modalTools?: NgbModalRef;
+  modalStatistics?: NgbModalRef;
+
+  @Input() version?: string;
 
   public test = 'ok';
   public secondsPerLine = 5;
@@ -146,7 +147,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   toggleSettings(option: string) {
-    this.appStorage[option] = !this.appStorage[option];
+    (this.appStorage as any)[option] = !(this.appStorage as any)[option];
     if (option === 'logging') {
       this.uiService.enabled = this.appStorage[option];
     }
@@ -164,11 +165,11 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       });
   }
 
-  onLevelNameClick(event) {
+  onLevelNameClick() {
     // jQuery(event.target).addClass('selected');
   }
 
-  onLevelNameLeave(event, tiernum: number) {
+  onLevelNameLeave(event: any, tiernum: number) {
     // jQuery(event.target).removeClass('selected');
     // save level name
     if (event.target.value !== undefined && event.target.value !== '') {
@@ -231,7 +232,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
           -1,
           newlevel.getObj(
             this.transcrServ.audioManager.resource.info.duration.clone()
-          ),
+          )!,
           this.transcrServ.annotation.levels.length
         )
       )
@@ -266,7 +267,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     );
     this.appStorage
       .addAnnotationLevel(
-        new OIDBLevel(-1, newlevel, this.transcrServ.annotation.levels.length)
+        new OIDBLevel(-1, newlevel!, this.transcrServ.annotation.levels.length)
       )
       .catch((error) => {
         console.error(error);

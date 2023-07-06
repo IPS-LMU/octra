@@ -5,7 +5,7 @@ import { DefaultComponent } from '../component/default.component';
 export class OctraModal extends DefaultComponent {
   public readonly name: string;
   protected activeModal: NgbActiveModal;
-  public action: Subject<unknown>;
+  public action: Subject<unknown> = new Subject<unknown>();
 
   protected constructor(name: string, activeModal: NgbActiveModal) {
     super();

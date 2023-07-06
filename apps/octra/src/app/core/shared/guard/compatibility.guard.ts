@@ -39,7 +39,9 @@ export class CompatibilityGuard implements CanActivate {
         ) {
           resolve2();
         } else {
-          afterDefined(this.store.select(fromApplication.selectAppSettings))
+          afterDefined(
+            this.store.select(fromApplication.selectAppSettings as any)
+          )
             .then(resolve2)
             .catch((error) => {
               console.error(error);
@@ -50,7 +52,7 @@ export class CompatibilityGuard implements CanActivate {
           if (result) {
             if (next.url[0].path === 'test') {
               const params = AppInfo.queryParamsHandling;
-              params.fragment = next.fragment;
+              params.fragment = next.fragment!;
               params.queryParams = next.queryParams;
 
               navigateTo(this.router, ['login'], params).catch((error) => {
@@ -61,7 +63,7 @@ export class CompatibilityGuard implements CanActivate {
           } else {
             if (next.url[0].path !== 'test') {
               const params = AppInfo.queryParamsHandling;
-              params.fragment = next.fragment;
+              params.fragment = next.fragment!;
               params.queryParams = next.queryParams;
 
               navigateTo(this.router, ['test'], params).catch((error) => {

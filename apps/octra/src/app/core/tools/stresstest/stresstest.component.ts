@@ -14,11 +14,11 @@ import { BrowserInfo, getFileSize } from '@octra/utilities';
   providers: [SessionStorageService],
 })
 export class StresstestComponent {
-  @SessionStorage('stresstest_js_result') lastResult;
+  @SessionStorage('stresstest_js_result') lastResult: any;
   public measured = 0;
   public status = 'init';
-  private sampleData: File;
-  private arrayBuffer: ArrayBuffer;
+  private sampleData!: File;
+  private arrayBuffer!: ArrayBuffer;
 
   public get measuredString() {
     const size = getFileSize(this.measured);
@@ -88,7 +88,7 @@ export class StresstestComponent {
 
         reader.onloadend = () => {
           this.sampleData = new File(
-            [this.arrayBuffer, reader.result],
+            [this.arrayBuffer, reader.result!],
             'test2'
           );
           resolve();

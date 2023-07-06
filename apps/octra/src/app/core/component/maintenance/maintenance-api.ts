@@ -4,7 +4,7 @@ export class MaintenanceAPI {
   constructor(private serverURL: string, private httpClient: HttpClient) {}
 
   public readMaintenanceNotifications(
-    hoursBefore = undefined
+    hoursBefore: number
   ): Promise<MaintenanceNotification> {
     return new Promise<MaintenanceNotification>((resolve, reject) => {
       const commandURL = hoursBefore
@@ -12,21 +12,21 @@ export class MaintenanceAPI {
         : this.serverURL;
 
       this.httpClient
-        .get(commandURL, {
+        .get<MaintenanceNotification>(commandURL, {
           responseType: 'json',
         })
-        .subscribe(
-          (json: MaintenanceNotification) => {
-            if (!(json === undefined || json === undefined)) {
+        .subscribe({
+          next: (json: MaintenanceNotification) => {
+            if (json) {
               resolve(json);
             } else {
               reject(new Error('response is undefined or undefined'));
             }
           },
-          (error) => {
+          error: (error) => {
             reject(error);
-          }
-        );
+          },
+        });
     });
   }
 }

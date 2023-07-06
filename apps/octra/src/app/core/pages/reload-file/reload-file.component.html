@@ -34,7 +34,7 @@
         !(
           !isN(dropzone.oaudiofile) &&
           sessionfile !== undefined &&
-          dropzone.oaudiofile.name === sessionfile.name &&
+          dropzone.oaudiofile?.name === sessionfile.name &&
           isN(dropzone.oannotation)
         )
       "

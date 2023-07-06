@@ -118,7 +118,7 @@ export class ApplicationEffects {
                   '#bas-asr-service-table'
                 );
                 const basASRInfoContainers = findElements(
-                  basTable,
+                  basTable!,
                   '.bas-asr-info-container'
                 );
 
@@ -269,7 +269,7 @@ export class ApplicationEffects {
         } else {
           return of(
             ApplicationActions.loadASRSettings.fail({
-              error: undefined,
+              error: undefined as any,
             })
           );
         }
@@ -336,7 +336,7 @@ export class ApplicationEffects {
             const lang: ASRLanguage = this.asrService.getLanguageByCode(
               selectedLanguage,
               selectedService
-            );
+            )!;
 
             if (lang !== undefined) {
               this.asrService.selectedLanguage = lang;
@@ -363,7 +363,7 @@ export class ApplicationEffects {
               ? queryParams.transcript
               : undefined;
           // define languages
-          const languages = store.application.appConfiguration.octra.languages;
+          const languages = store.application.appConfiguration!.octra.languages;
           const browserLang =
             navigator.language || (navigator as any).userLanguage;
 
@@ -373,7 +373,7 @@ export class ApplicationEffects {
             this.appStorage.language === ''
           ) {
             if (
-              store.application.appConfiguration.octra.languages.find(
+              store.application.appConfiguration!.octra.languages.find(
                 (value) => {
                   return value === browserLang;
                 }
@@ -386,7 +386,7 @@ export class ApplicationEffects {
             }
           } else {
             if (
-              store.application.appConfiguration.octra.languages.find(
+              store.application.appConfiguration!.octra.languages.find(
                 (value) => {
                   return value === this.appStorage.language;
                 }
@@ -401,10 +401,10 @@ export class ApplicationEffects {
           // if url mode, set it in options
           if (this.queryParamsSet(queryParams)) {
             this.appStorage.setURLSession(
-              queryParams.audio,
-              transcriptURL,
+              queryParams.audio!,
+              transcriptURL!,
               queryParams.embedded === '1',
-              queryParams.host
+              queryParams.host!
             );
           }
 
@@ -489,10 +489,10 @@ export class ApplicationEffects {
       const serv = this.bugService;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.log = function (message) {
-          serv.addEntry(ConsoleType.LOG, message);
+        console.log = function (...args) {
+          serv.addEntry(ConsoleType.LOG, args[0]);
           // eslint-disable-next-line prefer-rest-params
-          oldLog.apply(console, arguments);
+          oldLog.apply(console, args);
         };
       })();
 
@@ -500,7 +500,10 @@ export class ApplicationEffects {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function (error, context) {
+        console.error = function (...args) {
+          const error = args[0];
+          const context = args[1];
+
           let debug = '';
           let stack: string | undefined = '';
 
@@ -539,7 +542,7 @@ export class ApplicationEffects {
           }
 
           // eslint-disable-next-line prefer-rest-params
-          oldError.apply(console, arguments);
+          oldError.apply(console, args);
         };
       })();
 
@@ -547,10 +550,10 @@ export class ApplicationEffects {
       const oldWarn = console.warn;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.warn = function (message) {
-          serv.addEntry(ConsoleType.WARN, message);
+        console.warn = function (...args) {
+          serv.addEntry(ConsoleType.WARN, args[0]);
           // eslint-disable-next-line prefer-rest-params
-          oldWarn.apply(console, arguments);
+          oldWarn.apply(console, args);
         };
       })();
     }
@@ -624,7 +627,8 @@ export class ApplicationEffects {
 
   private queryParamsSet(queryParams: Params): boolean {
     return (
-      queryParams.audio !== undefined && queryParams.embedded !== undefined
+      queryParams['audio'] !== undefined &&
+      queryParams['embedded'] !== undefined
     );
   }
 }

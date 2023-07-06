@@ -37,14 +37,14 @@ export class OnlineModeReducers {
       ...new AnnotationStateReducers(this.mode).create(),
       on(
         AuthenticationActions.login.success,
-        (state: OnlineModeState, {auth, mode }) => {
+        (state: AnnotationState, { auth, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               onlineSession: {
-                ...state,
-                me: auth.me
-              }
+                ...state.onlineSession,
+                me: auth.me,
+              },
             };
           }
           return state;
@@ -52,7 +52,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.loginDemo,
-        (state: OnlineModeState, { onlineSession, mode }) => {
+        (state: AnnotationState, { onlineSession, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
@@ -64,7 +64,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.clearWholeSession.success,
-        (state: OnlineModeState, { mode }) => {
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...initialState,
@@ -75,13 +75,13 @@ export class OnlineModeReducers {
       ),
       on(
         AuthenticationActions.logout.success,
-        (state: OnlineModeState, { clearSession, mode }) => {
+        (state: AnnotationState, { clearSession, mode }) => {
           if (mode === this.mode) {
             return clearSession
               ? {
                   ...initialState,
                   onlineSession: {
-                    ...initialState.onlineSession
+                    ...initialState.onlineSession,
                   },
                   guidelines: state.guidelines,
                   projectConfig: state.projectConfig,
@@ -105,7 +105,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setAudioURL.do,
-        (state: OnlineModeState, { audioURL, mode }) => {
+        (state: AnnotationState, { audioURL, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
@@ -122,7 +122,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setFeedback,
-        (state: OnlineModeState, { feedback, mode }) => {
+        (state: AnnotationState, { feedback, mode }) => {
           if (mode === mode) {
             return {
               ...state,
@@ -140,14 +140,14 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setComment,
-        (state: OnlineModeState, { comment, mode }) => {
+        (state: AnnotationState, { comment, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               changedTask: {
-                ...state.changedTask,
-                comment
-              }
+                ...(state.changedTask as any),
+                comment,
+              },
             };
           }
           return state;
@@ -155,14 +155,14 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setPromptText,
-        (state: OnlineModeState, { promptText, mode }) => {
+        (state: AnnotationState, { promptText, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               changedTask: {
-                ...state.changedTask,
-                orgtext: promptText
-              }
+                ...(state.changedTask as any),
+                orgtext: promptText,
+              },
             };
           }
           return state;
@@ -170,14 +170,14 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setServerComment,
-        (state: OnlineModeState, { serverComment, mode }) => {
+        (state: AnnotationState, { serverComment, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               changedTask: {
-                ...state.changedTask,
-                comment: serverComment
-              }
+                ...(state.changedTask as any),
+                comment: serverComment,
+              },
             };
           }
           return state;
@@ -185,7 +185,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setJobsLeft,
-        (state: OnlineModeState, { jobsLeft, mode }) => {
+        (state: AnnotationState, { jobsLeft, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
@@ -203,7 +203,7 @@ export class OnlineModeReducers {
       ),
       on(
         IDBActions.loadOptionsSuccess,
-        (state: OnlineModeState, { onlineOptions, demoOptions }) => {
+        (state: AnnotationState, { onlineOptions, demoOptions }) => {
           let result = state;
 
           let options: IIDBModeOptions;
@@ -216,7 +216,7 @@ export class OnlineModeReducers {
           }
 
           for (const [name, value] of getProperties(options)) {
-            result = this.writeOptionToStore(result, name, value);
+            result = this.writeOptionToStore(result as any, name, value);
           }
 
           return result;
@@ -224,7 +224,7 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.setSubmitted,
-        (state: OnlineModeState, { submitted, mode }) => {
+        (state: AnnotationState, { submitted, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
@@ -241,20 +241,16 @@ export class OnlineModeReducers {
       ),
       on(
         OnlineModeActions.startOnlineAnnotation,
-        (
-          state: OnlineModeState,
-          { currentProject, mode, sessionData, transcript }
-        ) => {
+        (state: AnnotationState, { currentProject, mode, sessionData }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              audio: initialState.audio,
+              audio: initialState.audio!,
               onlineSession: {
-                ...state.onlineSession,
+                ...state.onlineSession!,
                 currentProject,
                 sessionData,
               },
-              transcript,
             };
           }
           return state;
@@ -262,16 +258,16 @@ export class OnlineModeReducers {
       ),
       on(
         AnnotationActions.startAnnotation.success,
-        (state: OnlineModeState, { task, project }) => {
+        (state: AnnotationState, { task, project }) => {
           return {
             ...state,
-            projectConfig: task.tool_configuration.value,
+            projectConfig: task.tool_configuration!.value,
             onlineSession: {
               ...state.onlineSession,
               currentProject: project,
-              task
+              task,
             },
-            changedTask: task
+            changedTask: task,
           };
         }
       )

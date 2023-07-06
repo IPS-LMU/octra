@@ -23,7 +23,7 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
   styleUrls: ['./reload-file.component.scss'],
 })
 export class ReloadFileComponent {
-  @ViewChild('dropzone', { static: true }) dropzone: OctraDropzoneComponent;
+  @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;
   private error = '';
 
   get sessionfile(): SessionFile {
@@ -82,7 +82,7 @@ export class ReloadFileComponent {
               resolve();
             }
           }).then(() => {
-            this.audioService.registerAudioManager(this.dropzone.audioManager);
+            this.audioService.registerAudioManager(this.dropzone.audioManager!);
             this.appStorage.clearLoggingDataPermanently();
             this.appStorage
               .beginLocalSession(this.dropzone.files, keepData)
@@ -108,7 +108,7 @@ export class ReloadFileComponent {
   };
 
   onOfflineSubmit = () => {
-    this.audioService.registerAudioManager(this.dropzone.audioManager);
+    this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.appStorage
       .beginLocalSession(this.dropzone.files, true)
       .then(this.navigate)
@@ -143,7 +143,7 @@ export class ReloadFileComponent {
         TranscriptionStopModalComponent,
         TranscriptionStopModalComponent.options
       )
-      .then((answer: TranscriptionStopModalAnswer) => {
+      .then((answer: any) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.abortTranscription();
         }

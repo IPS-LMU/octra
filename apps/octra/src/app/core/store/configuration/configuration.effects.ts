@@ -10,8 +10,8 @@ import { Subject } from 'rxjs';
 import { exhaustMap } from 'rxjs/operators';
 import '../../schemata/appconfig.schema';
 
-declare let validateAnnotation: (string, any) => any;
-declare let tidyUpAnnotation: (string, any) => any;
+declare let validateAnnotation: (transcript: any, guidelines: any) => any;
+declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
 @Injectable()
 export class ConfigurationEffects {

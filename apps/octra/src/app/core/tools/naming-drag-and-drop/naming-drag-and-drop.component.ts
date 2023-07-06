@@ -29,9 +29,9 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     '<secondsDur>',
   ];
 
-  @ViewChild('list', { static: true }) list: ElementRef;
+  @ViewChild('list', { static: true }) list!: ElementRef;
   @Input() fileName = '';
-  @Input() firstSegment: Segment;
+  @Input() firstSegment?: Segment;
 
   @Output() namingConventionchanged: Subject<string> = new Subject<string>();
 
@@ -131,7 +131,7 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     this.namingConventionchanged.next(this.namingConvention);
   }
 
-  onItemClick(event, i) {
+  onItemClick(event: MouseEvent, i: number) {
     if (this.resultConvention[i].type === 'text') {
       this.clicked = i;
     } else {
@@ -139,7 +139,7 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     }
   }
 
-  onKeyDown($event, text) {
+  onKeyDown($event: any, text: HTMLElement) {
     if ($event.code === 'Enter') {
       $event.preventDefault();
       this.deselect();
@@ -150,17 +150,17 @@ export class NamingDragAndDropComponent extends DefaultComponent {
 
   private deselect() {
     if (window.getSelection) {
-      if (window.getSelection().empty) {
+      if (window.getSelection()?.empty) {
         // Chrome
-        window.getSelection().empty();
-      } else if (window.getSelection().removeAllRanges) {
+        window.getSelection()!.empty();
+      } else if (window.getSelection()?.removeAllRanges) {
         // Firefox
-        window.getSelection().removeAllRanges();
+        window.getSelection()!.removeAllRanges();
       }
     }
   }
 
-  onDrop($event) {
+  onDrop($event: any) {
     moveItemInArray(
       this.resultConvention,
       $event.previousIndex,

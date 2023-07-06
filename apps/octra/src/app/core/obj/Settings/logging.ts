@@ -86,21 +86,21 @@ export class OLog implements ILog {
     this.value = value;
     this.playpos = playpos;
     this.caretpos = caretpos;
-    this.selection = selection;
-    this.segment = segment;
+    this.selection = selection!;
+    this.segment = segment!;
 
     if (selection === undefined) {
-      delete this.selection;
+      delete (this as any).selection;
     }
     if (segment === undefined) {
-      delete this.segment;
+      delete (this as any).segment;
     }
 
     if (caretpos < 0) {
-      delete this.caretpos;
+      delete (this as any).caretpos;
     }
     if (caretpos < 0) {
-      delete this.caretpos;
+      delete (this as any).caretpos;
     }
   }
 }

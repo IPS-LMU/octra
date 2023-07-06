@@ -21,7 +21,7 @@ import { DefaultComponent } from '../../component/default.component';
   styleUrls: ['./octra-modal.component.scss'],
 })
 export class OctraModalComponent extends DefaultComponent implements OnInit {
-  modals = {
+  modals: any = {
     error: {
       visible: false,
       type: ErrorModalComponent,
@@ -73,8 +73,8 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
 
   ngOnInit() {
     this.bgemail =
-      this.appStorage.snapshot.authentication.me.email !== undefined
-        ? this.appStorage.snapshot.authentication.me.email
+      this.appStorage.snapshot.authentication.me?.email !== undefined
+        ? this.appStorage.snapshot.authentication.me?.email
         : '';
     this.subscrManager = new SubscriptionManager<Subscription>();
 

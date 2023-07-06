@@ -7,7 +7,7 @@ abstract class CuttingFormat {
     audioInfo: AudioInfo,
     fileName: string,
     nameConvention: string
-  );
+  ): any;
 }
 
 export interface Segment {
@@ -40,7 +40,7 @@ export class JSONConverter extends CuttingFormat {
           bitRate: audioInfo.bitrate,
         },
       },
-      segments: [],
+      segments: [] as any[],
     };
 
     for (let i = 0; i < cutList.length; i++) {

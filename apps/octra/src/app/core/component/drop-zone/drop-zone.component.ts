@@ -21,18 +21,18 @@ export class DropZoneComponent implements OnInit {
   public clicklocked = false;
   @Output() public afterdrop: EventEmitter<FileList> =
     new EventEmitter<FileList>();
-  @ViewChild('fileinput', { static: true }) public fileinput: ElementRef;
+  @ViewChild('fileinput', { static: true }) fileinput!: ElementRef;
   private fileAPIsupported = false;
 
-  private _files: FileList = undefined;
+  private _files?: FileList;
 
-  get files(): FileList {
+  get files(): FileList | undefined {
     return this._files;
   }
 
-  private _sessionfile: SessionFile;
+  private _sessionfile?: SessionFile;
 
-  get sessionfile(): SessionFile {
+  get sessionfile(): SessionFile | undefined {
     return this._sessionfile;
   }
 
@@ -43,13 +43,13 @@ export class DropZoneComponent implements OnInit {
     }
   }
 
-  onDragOver($event) {
+  onDragOver($event: any) {
     $event.stopPropagation();
     $event.preventDefault();
     $event.dataTransfer.dropEffect = 'copy';
   }
 
-  onFileDrop($event) {
+  onFileDrop($event: any) {
     $event.stopPropagation();
     $event.preventDefault();
 
@@ -65,7 +65,7 @@ export class DropZoneComponent implements OnInit {
     }
   }
 
-  onFileChange($event) {
+  onFileChange($event: any) {
     this._files = $event.target.files;
     this.afterdrop.emit(this._files);
   }

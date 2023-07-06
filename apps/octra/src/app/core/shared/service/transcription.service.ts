@@ -21,6 +21,7 @@ import { SettingsService } from './settings.service';
 import { UserInteractionsService } from './userInteractions.service';
 import {
   Annotation,
+  AnnotationLevelType,
   Converter,
   IFile,
   ImportResult,
@@ -52,7 +53,7 @@ import { AnnotationStoreService } from '../../store/annotation/annotation.store.
 import { TaskDto } from '@octra/api-types';
 import { RoutingService } from './routing.service';
 
-declare let validateAnnotation: (string, any) => any;
+declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 
 @Injectable({
   providedIn: 'root',
@@ -70,9 +71,9 @@ export class TranscriptionService {
   public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
   public annotationChanged: EventEmitter<void> = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager<Subscription>;
-  private _segments: Segments;
+  private _segments!: Segments;
   private state = 'ANNOTATED';
-  private _audiomanager: AudioManager;
+  private _audiomanager!: AudioManager;
   private _currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
   public alertTriggered: Subject<{
     type: 'danger' | 'warning' | 'info' | 'success';
@@ -80,7 +81,7 @@ export class TranscriptionService {
     unique: boolean;
     duration?: number;
   }>;
-  private maintenanceChecker: Subscription;
+  private maintenanceChecker!: Subscription;
 
   get audioManager(): AudioManager {
     return this._audiomanager;
@@ -92,14 +93,14 @@ export class TranscriptionService {
    }
    */
 
-  public get currentlevel(): Level {
+  public get currentlevel(): Level | undefined {
     if (this._selectedlevel === undefined || this._selectedlevel < 0) {
       return this._annotation?.levels[0];
     }
     return this._annotation?.levels[this._selectedlevel];
   }
 
-  private _annotation: Annotation;
+  private _annotation!: Annotation;
 
   get annotation(): Annotation {
     return this._annotation;
@@ -109,7 +110,7 @@ export class TranscriptionService {
     return getModeState(this.appStorage.snapshot)?.guidelines;
   }
 
-  private _audiofile: OAudiofile;
+  private _audiofile!: OAudiofile;
 
   get audiofile(): OAudiofile {
     return this._audiofile;
@@ -122,7 +123,7 @@ export class TranscriptionService {
    }
    */
 
-  private _feedback: FeedBackForm;
+  private _feedback!: FeedBackForm;
 
   get feedback(): FeedBackForm {
     return this._feedback;
@@ -300,7 +301,7 @@ export class TranscriptionService {
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
         level: convertFromLevelObject(
-          level,
+          level!,
           this._audiomanager.resource.info.duration
         ),
       });
@@ -384,7 +385,7 @@ export class TranscriptionService {
       const modeState = getModeState(state);
       this._audiomanager = this.audio.audiomanagers[0];
 
-      this.filename = modeState.audio.fileName;
+      this.filename = modeState!.audio.fileName;
 
       this._audiofile = new OAudiofile();
       this._audiofile.name = this._audiomanager.resource.info.fullname;
@@ -396,7 +397,7 @@ export class TranscriptionService {
       this._audiofile.url =
         state.application.mode === LoginMode.DEMO
           ? `${this.appStorage.audioURL}`
-          : modeState.audio.file.url;
+          : modeState!.audio!.file!.url!;
       this._audiofile.type = this._audiomanager.resource.info.type;
 
       // overwrite logging option using projectconfig
@@ -409,11 +410,13 @@ export class TranscriptionService {
       }
       this.uiService.enabled = this.appStorage.logging;
 
-      await this.loadSegments(modeState, state);
+      await this.loadSegments(modeState!, state);
 
       this.selectedlevel = 0;
       this.navbarServ.ressource = this._audiomanager.resource;
-      this.navbarServ.filesize = getFileSize(this._audiomanager.resource.size);
+      this.navbarServ.filesize = getFileSize(
+        this._audiomanager.resource.size!
+      )!;
 
       this.subscrmanager.removeByTag('idbAnnotationChange');
       this.subscrmanager.add(
@@ -437,10 +440,10 @@ export class TranscriptionService {
 
     if (!(this.annotation === undefined)) {
       result = converter.export(
-        this.annotation.getObj(this.audioManager.resource.info.duration),
-        this.audiofile,
+        this.annotation.getObj(this.audioManager.resource.info.duration)!,
+        this.audiofile!,
         0
-      ).file;
+      )!.file!;
 
       return result.content;
     }
@@ -468,28 +471,34 @@ export class TranscriptionService {
         newLinks.push(new OIDBLink(i + 1, newAnnotJSON.links[i]));
       }
 
-      if (rootState.application.mode === LoginMode.ONLINE || rootState.application.mode === LoginMode.URL) {
+      if (
+        rootState.application.mode === LoginMode.ONLINE ||
+        rootState.application.mode === LoginMode.URL
+      ) {
         const task: TaskDto = modeState.onlineSession?.task;
 
         const serverTranscript =
           this.annotationStoreService.getTranscriptFromIO(task.inputs);
 
         // import logs
-        this.annotationStoreService.setLogs(task.log, rootState.application.mode);
+        this.annotationStoreService.setLogs(
+          task.log,
+          rootState.application.mode
+        );
         if (serverTranscript) {
           // check if it's AnnotJSON
-          const annotResult: ImportResult =
+          const annotResult: ImportResult | undefined =
             this.annotationStoreService.convertFromSupportedConverters(
               AppInfo.converters,
               {
                 name: `${this._audiomanager.resource.info.name}_annot.json`,
                 content: serverTranscript.content,
-                type: serverTranscript.fileType,
+                type: serverTranscript.fileType!,
                 encoding: 'utf-8',
               },
               {
                 name: this._audiomanager.resource.info.fullname,
-                arraybuffer: this._audiomanager.resource.arraybuffer,
+                arraybuffer: this._audiomanager.resource.arraybuffer!,
                 size: this._audiomanager.resource.info.size,
                 duration: this._audiomanager.resource.info.duration.samples,
                 sampleRate: this._audiomanager.resource.info.sampleRate,
@@ -522,7 +531,7 @@ export class TranscriptionService {
               // set prompt as new transcript
 
               // check if prompttext ist a transcription format like AnnotJSON
-              const converted: ImportResult =
+              const converted: ImportResult | undefined =
                 this.annotationStoreService.convertFromSupportedConverters(
                   AppInfo.converters,
                   {
@@ -655,7 +664,7 @@ export class TranscriptionService {
   private listenForSegmentChanges() {
     this.subscrmanager.removeByTag('segmentchange');
     this.subscrmanager.add(
-      this.currentlevel.segments.onsegmentchange.subscribe((event) => {
+      this.currentlevel!.segments.onsegmentchange.subscribe((event) => {
         this._currentLevelSegmentChange.emit(event);
       }),
       'segmentchange'
@@ -674,9 +683,9 @@ export class TranscriptionService {
             ? 'NOT AVAILABLE'
             : this.appStorage.onlineSession.currentProject?.name,
         annotator:
-          this.appStorage.snapshot.authentication.me.username === undefined
+          this.appStorage.snapshot.authentication.me!.username === undefined
             ? 'NOT AVAILABLE'
-            : this.appStorage.snapshot.authentication.me.username,
+            : this.appStorage.snapshot.authentication.me!.username,
         transcript: undefined,
         comment: this._feedback.comment,
         quality: this.settingsService.isTheme('shortAudioFiles')
@@ -699,23 +708,23 @@ export class TranscriptionService {
 
       const transcript: any[] = [];
 
-      for (let i = 0; i < this.currentlevel.segments.length; i++) {
-        const segment = this.currentlevel.segments.get(i);
+      for (let i = 0; i < this.currentlevel!.segments.length; i++) {
+        const segment = this.currentlevel!.segments.get(i);
 
         let lastBound = 0;
         if (i > 0) {
           lastBound = Math.round(
-            this.currentlevel.segments.get(i - 1).time.samples
+            this.currentlevel!.segments.get(i - 1)!.time.samples
           );
         }
 
         const segmentJSON: any = {
           start: lastBound,
-          length: segment.time.samples - lastBound,
-          text: segment.transcript,
+          length: segment!.time.samples - lastBound,
+          text: segment!.transcript,
         };
 
-        if (i === this.currentlevel.segments.length - 1) {
+        if (i === this.currentlevel!.segments.length - 1) {
           segmentJSON.length =
             this._audiomanager.resource.info.duration.samples - lastBound;
         }
@@ -745,10 +754,10 @@ export class TranscriptionService {
     this.subscrmanager.destroy();
 
     // set data to undefined
-    this._segments = undefined;
+    this._segments = undefined as any;
     this.filename = '';
 
-    this._feedback = undefined;
+    this._feedback = undefined as any;
 
     this._breakMarker = undefined;
 
@@ -844,10 +853,10 @@ export class TranscriptionService {
       const segment =
         this._annotation.levels[this._selectedlevel].segments.get(i);
 
-      if (segment.transcript !== '') {
+      if (segment!.transcript !== '') {
         if (
           this.breakMarker !== undefined &&
-          segment.transcript.indexOf(this.breakMarker.code) > -1
+          segment!.transcript.indexOf(this.breakMarker.code) > -1
         ) {
           this._statistic.pause++;
         } else {
@@ -1084,7 +1093,7 @@ export class TranscriptionService {
             if (newEntry.code === code) {
               newEntry.description = newEntry.description.replace(
                 /{{([^{}]+)}}/g,
-                (g0, g1) => {
+                (g0: string, g1: string) => {
                   return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
                 }
               );
@@ -1106,7 +1115,11 @@ export class TranscriptionService {
   }
 
   public createNewAnnotation(): OAnnotJSON {
-    const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
+    const level: OLevel = new OLevel(
+      'OCTRA_1',
+      AnnotationLevelType.SEGMENT,
+      []
+    );
     level.items.push(
       new OSegment(1, 0, this._audiomanager.resource.info.duration.samples, [
         new OLabel('OCTRA_1', ''),
@@ -1132,8 +1145,8 @@ export class TranscriptionService {
     ) {
       let invalid = false;
 
-      for (let i = 0; i < this.currentlevel.segments.length; i++) {
-        const segment = this.currentlevel.segments.segments[i];
+      for (let i = 0; i < this.currentlevel!.segments.length; i++) {
+        const segment = this.currentlevel!.segments.segments[i];
 
         let segmentValidation = [];
 

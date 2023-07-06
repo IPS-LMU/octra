@@ -10,7 +10,7 @@ import { BrowserInfo } from '@octra/utilities';
 })
 export class BrowserTestComponent {
   public get browserName(): string {
-    return BrowserInfo.browser;
+    return BrowserInfo.browser!;
   }
 
   constructor(

@@ -1,6 +1,6 @@
-import { StatisticElem } from "./StatisticElement";
-import { ILog } from "../Settings/logging";
-import { getProperties, hasProperty } from "@octra/utilities";
+import { StatisticElem } from './StatisticElement';
+import { ILog } from '../Settings/logging';
+import { getProperties, hasProperty } from '@octra/utilities';
 
 /***
  * Statistic Element Class
@@ -68,22 +68,22 @@ export class KeyStatisticElem extends StatisticElem {
         hasProperty(elem, 'control')
       ) {
         if (name === 'playerpos') {
-          result.playpos = elem[`${name}`];
+          result.playpos = (elem as any)[`${name}`];
         } else {
-          result[`${name}`] = elem[`${name}`];
+          (result as any)[`${name}`] = (elem as any)[`${name}`];
         }
       }
     }
 
     return new KeyStatisticElem(
-      result.type,
-      result.context,
+      result.type!,
+      result.context!,
       result.value,
-      result.timestamp,
+      result.timestamp!,
       result.playpos,
       result.caretpos,
-      result.selection,
-      result.segment
+      result.selection!,
+      result.segment!
     );
   }
 }

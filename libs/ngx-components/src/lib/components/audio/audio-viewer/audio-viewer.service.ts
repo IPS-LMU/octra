@@ -245,7 +245,7 @@ export class AudioViewerService {
               }
 
               resolve(lineNum);
-            }).catch((error) => {
+            }).catch((error: any) => {
               console.error(error);
             });
           }

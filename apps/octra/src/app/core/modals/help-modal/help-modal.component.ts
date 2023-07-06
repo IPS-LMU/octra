@@ -14,8 +14,8 @@ export class HelpModalComponent extends OctraModal {
   };
   public visible = false;
 
-  @ViewChild('modal', { static: true }) modal: any;
-  @ViewChild('content', { static: false }) contentElement: ElementRef;
+  @ViewChild('modal', { static: true }) modal!: any;
+  @ViewChild('content', { static: false }) contentElement!: ElementRef;
 
   constructor(protected override activeModal: NgbActiveModal) {
     super('HelpModalComponent', activeModal);

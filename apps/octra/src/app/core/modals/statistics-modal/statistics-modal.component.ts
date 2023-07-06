@@ -45,7 +45,7 @@ export class StatisticsModalComponent extends OctraModal {
     return this.sendProObj || this.bgdescr !== '';
   }
 
-  get UIElements(): StatisticElem[] {
+  get UIElements(): StatisticElem[] | undefined {
     return this.uiService !== undefined ? this.uiService.elements : undefined;
   }
 

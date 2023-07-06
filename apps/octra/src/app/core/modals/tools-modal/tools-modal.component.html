@@ -207,7 +207,7 @@
                   class="show-configurator-link"
                 >
                   <ng-container *ngIf="tools.audioCutting.showConfigurator">
-                    <i class="bi bi-chevron-up" style="gray"></i>
+                    <i class="bi bi-chevron-up" style="color: gray"></i>
                     {{ 'tools.cut audio.hide configurator' | transloco }}
                   </ng-container>
                   <ng-container *ngIf="!tools.audioCutting.showConfigurator">
@@ -222,10 +222,10 @@
                   <octra-naming-drag-and-drop
                     #namingConvention
                     [fileName]="
-                      navbarServ.transcrService.audioManager.resource.name
+                      navbarServ.transcrService.audioManager!.resource.name
                     "
                     [firstSegment]="
-                      navbarServ.transcrService.currentlevel.segments.get(0)
+                      navbarServ.transcrService.currentlevel!.segments.get(0)
                     "
                   ></octra-naming-drag-and-drop>
 

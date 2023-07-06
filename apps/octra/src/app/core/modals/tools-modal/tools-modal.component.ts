@@ -6,7 +6,11 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import {
+  DomSanitizer,
+  SafeResourceUrl,
+  SafeUrl,
+} from '@angular/platform-browser';
 import { TranslocoService } from '@ngneat/transloco';
 import {
   fadeInExpandOnEnterAnimation,
@@ -27,7 +31,7 @@ import {
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { Segment } from '@octra/annotation';
-import { WavFormat } from '@octra/media';
+import { IntArray, WavFormat } from '@octra/media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
 import { OctraModalService } from '../octra-modal.service';
@@ -64,13 +68,49 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   };
   public converters = AppInfo.converters;
 
-  public tools = {
+  public tools: {
+    audioCutting: {
+      opened: boolean;
+      selectedMethod: string;
+      progress: number;
+      result: {
+        url?: SafeResourceUrl;
+        filename: string;
+      };
+      status: string;
+      message: string;
+      progressbarType: string;
+      showConfigurator: boolean;
+      subscriptionIDs: number[];
+      exportFormats: {
+        label: string;
+        value: string;
+        selected: boolean;
+      }[];
+      clientStreamHelper?: any;
+      zippingSpeed: number;
+      archiveStructure?: any;
+      cuttingSpeed: number;
+      cuttingTimeLeft: number;
+      timeLeft: number;
+      wavFormat?: any;
+    };
+    combinePhrases: {
+      opened: boolean;
+      status: string;
+      message: string;
+      showOptions: boolean;
+      options: {
+        minSilenceLength: number;
+        maxWordsPerSegment: number;
+      };
+    };
+  } = {
     audioCutting: {
       opened: false,
       selectedMethod: 'client',
       progress: 0,
       result: {
-        url: undefined,
         filename: '',
       },
       status: 'idle',
@@ -111,11 +151,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   };
 
   @ViewChild('namingConvention', { static: false })
-  namingConvention: NamingDragAndDropComponent;
-  @ViewChild('content', { static: false }) contentElement: ElementRef;
+  namingConvention!: NamingDragAndDropComponent;
+  @ViewChild('content', { static: false }) contentElement!: ElementRef;
 
-  @Input() transcrService: TranscriptionService;
-  @Input() uiService: UserInteractionsService;
+  @Input() transcrService!: TranscriptionService;
+  @Input() uiService!: UserInteractionsService;
   protected data = undefined;
 
   public get manualURL(): string {
@@ -171,14 +211,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   }
 
   public splitAudioClient() {
-    const cutList = [];
+    const cutList: any[] = [];
     let startSample = 0;
     this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.result.url = undefined;
 
-    for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
-      const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+    for (let i = 0; i < this.transcrService.currentlevel!.segments.length; i++) {
+      const segment: Segment =
+        this.transcrService.currentlevel!.segments.get(i)!;
       let sampleDur = segment.time.samples - startSample;
 
       if (
@@ -217,15 +258,19 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
       this.transcrService.audioManager.resource.info.fullname,
-      this.transcrService.audioManager.resource.arraybuffer
+      this.transcrService.audioManager.resource.arraybuffer!
     );
 
     let totalSize = 0;
     let cuttingStarted = 0;
 
     this.tools.audioCutting.subscriptionIDs[1] = this.subscrManager.add(
-      this.tools.audioCutting.wavFormat.onaudiocut.subscribe(
-        (status) => {
+      this.tools.audioCutting.wavFormat.onaudiocut.subscribe({
+        next: (status: {
+          finishedSegments: number;
+          fileName: string;
+          intArray: IntArray;
+        }) => {
           this.tools.audioCutting.progress = Math.round(
             (status.finishedSegments / overallTasks) * 100
           );
@@ -242,15 +287,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               (now - cuttingStarted) / 1000 / status.intArray.length;
 
             const rest =
-              this.transcrService.audioManager.resource.arraybuffer.byteLength -
-              totalSize;
+              this.transcrService.audioManager.resource.arraybuffer!
+                .byteLength - totalSize;
             this.tools.audioCutting.cuttingTimeLeft =
               this.tools.audioCutting.cuttingSpeed * rest;
 
             const zippingSpeed = this.tools.audioCutting.zippingSpeed;
             this.tools.audioCutting.timeLeft = Math.ceil(
               (this.tools.audioCutting.cuttingTimeLeft +
-                this.transcrService.audioManager.resource.arraybuffer
+                this.transcrService.audioManager.resource.arraybuffer!
                   .byteLength *
                   zippingSpeed +
                 10) *
@@ -349,7 +394,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
                   if (this.tools.audioCutting.result.url !== undefined) {
                     window.URL.revokeObjectURL(
-                      this.tools.audioCutting.result.url
+                      this.tools.audioCutting.result.url.toString()
                     );
                   }
 
@@ -372,7 +417,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                       ErrorModalComponent,
                       ErrorModalComponent.options,
                       {
-                        text: e.message ?? e,
+                        text: (e as any).message ?? e,
                       }
                     );
                   }
@@ -384,26 +429,26 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
             );
 
             /*
-          this.tools.audioCutting.clientStreamHelper.accumulate().then((data) => {
-            this.tools.audioCutting.status = 'finished';
-            this.tools.audioCutting.progress = 100;
-            this.tools.audioCutting.progressbarType = 'success';
+            this.tools.audioCutting.clientStreamHelper.accumulate().then((data) => {
+              this.tools.audioCutting.status = 'finished';
+              this.tools.audioCutting.progress = 100;
+              this.tools.audioCutting.progressbarType = 'success';
 
-            if (this.tools.audioCutting.result.url !== undefined) {
-              window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
-            }
+              if (this.tools.audioCutting.result.url !== undefined) {
+                window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
+              }
 
-            this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
-            this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
-            // finished
-          });
+              this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
+              this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
+              // finished
+            });
 
-          this.tools.audioCutting.clientStreamHelper.resume();
+            this.tools.audioCutting.clientStreamHelper.resume();
 
-           */
+             */
           }
         },
-        (err) => {
+        error: (err: any) => {
           if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
             this.subscrManager.removeById(
               this.tools.audioCutting.subscriptionIDs[2]
@@ -415,8 +460,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
           console.error(`other error`);
           console.error(err);
-        }
-      )
+        },
+      })
     );
 
     this.tools.audioCutting.status = 'running';
@@ -473,7 +518,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   isSomethingBlocked(): boolean {
     return (
-      this.transcrService.currentlevel.segments.segments.find((a) => {
+      this.transcrService.currentlevel!.segments.segments.find((a) => {
         return a.isBlockedBy !== undefined;
       }) !== undefined
     );
@@ -513,15 +558,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
     for (
       let i = 0;
-      i < this.transcrService.currentlevel.segments.segments.length;
+      i < this.transcrService.currentlevel!.segments.segments.length;
       i++
     ) {
-      const segment = this.transcrService.currentlevel.segments.segments[i];
+      const segment = this.transcrService.currentlevel!.segments.segments[i];
 
       let startPos = 0;
       if (i > 0) {
         startPos =
-          this.transcrService.currentlevel.segments.segments[i - 1].time.unix;
+          this.transcrService.currentlevel!.segments.segments[i - 1].time.unix;
       }
       let duration = segment.time.unix - startPos;
       if (!isSilence(segment) || duration < minSilenceLength) {
@@ -530,11 +575,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         } else {
           if (i > 0) {
             const lastSegment =
-              this.transcrService.currentlevel.segments.segments[i - 1];
+              this.transcrService.currentlevel!.segments.segments[i - 1];
             startPos = 0;
             if (i > 1) {
               startPos =
-                this.transcrService.currentlevel.segments.segments[i - 2].time
+                this.transcrService.currentlevel!.segments.segments[i - 2].time
                   .unix;
             }
             duration = lastSegment.time.unix - startPos;
@@ -553,7 +598,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 segmentText = '';
                 segment.transcript = `${lastSegmentText}`;
               }
-              this.transcrService.currentlevel.segments.removeByIndex(
+              this.transcrService.currentlevel!.segments.removeByIndex(
                 i - 1,
                 '',
                 false

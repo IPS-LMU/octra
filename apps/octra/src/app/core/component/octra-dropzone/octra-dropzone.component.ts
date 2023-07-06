@@ -30,15 +30,15 @@ import { DefaultComponent } from '../default.component';
   styleUrls: ['./octra-dropzone.component.scss'],
 })
 export class OctraDropzoneComponent extends DefaultComponent {
-  @ViewChild('dropzone', { static: true }) dropzone: DropZoneComponent;
+  @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
   @Input() height = '250px';
-  private _audiomanager: AudioManager;
+  private _audiomanager?: AudioManager;
 
   get AppInfo(): AppInfo {
     return AppInfo;
   }
 
-  get audioManager(): AudioManager {
+  get audioManager(): AudioManager | undefined {
     return this._audiomanager;
   }
 
@@ -48,19 +48,19 @@ export class OctraDropzoneComponent extends DefaultComponent {
     return this._files;
   }
 
-  private _oaudiofile: OAudiofile;
+  private _oaudiofile?: OAudiofile;
 
-  get oaudiofile(): OAudiofile {
+  get oaudiofile(): OAudiofile | undefined {
     return this._oaudiofile;
   }
 
-  private _oannotation: OAnnotJSON;
+  private _oannotation?: OAnnotJSON;
 
-  get oannotation(): OAnnotJSON {
+  get oannotation(): OAnnotJSON | undefined {
     return this._oannotation;
   }
 
-  private _status: string;
+  private _status!: string;
 
   get status(): string {
     return this._status;
@@ -76,7 +76,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   public afterDrop = () => {
     this._oannotation = undefined;
-    const files = fileListToArray(this.dropzone.files);
+    const files = fileListToArray(this.dropzone.files!);
     for (const file of files) {
       const fileProcess: FileProgress = {
         status: 'progress',
@@ -174,9 +174,9 @@ export class OctraDropzoneComponent extends DefaultComponent {
                   encoding: converter.encoding,
                 };
 
-                const audioName = this._oaudiofile.name.substr(
+                const audioName = this._oaudiofile!.name.substr(
                   0,
-                  this._oaudiofile.name.lastIndexOf('.')
+                  this._oaudiofile!.name.lastIndexOf('.')
                 );
                 if (
                   file.file.name ===
@@ -184,14 +184,13 @@ export class OctraDropzoneComponent extends DefaultComponent {
                   file.file.name ===
                     audioName + AppInfo.converters[i].extension.toLowerCase()
                 ) {
-                  const importResult: ImportResult = converter.import(
-                    ofile,
-                    this._oaudiofile
-                  );
+                  const importResult: ImportResult | undefined =
+                    converter.import(ofile, this._oaudiofile!);
 
                   const setAnnotation = () => {
                     if (
                       this._oaudiofile !== undefined &&
+                      importResult !== undefined &&
                       importResult.annotjson !== undefined &&
                       importResult.error === ''
                     ) {
@@ -201,11 +200,21 @@ export class OctraDropzoneComponent extends DefaultComponent {
                           if (level.items[0].sampleStart !== 0) {
                             let temp = [];
                             temp.push(
-                              new OSegment(0, 0, level.items[0].sampleStart, [
+                              new OSegment(0, 0, level.items[0].sampleStart!, [
                                 new OLabel(level.name, ''),
                               ])
                             );
-                            temp = temp.concat(level.items);
+                            temp = temp.concat(
+                              level.items.map(
+                                (a) =>
+                                  new OSegment(
+                                    a.id,
+                                    a.sampleStart!,
+                                    a.sampleDur!,
+                                    a.labels
+                                  )
+                              )
+                            );
                             level.items = temp;
 
                             for (let j = 1; j < level.items.length + 1; j++) {
@@ -216,16 +225,16 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
                           const last = level.items[level.items.length - 1];
                           if (
-                            last.sampleStart + last.sampleDur !==
+                            last.sampleStart! + last.sampleDur! !==
                             this._oaudiofile.duration
                           ) {
                             level.items.push(
                               new OSegment(
                                 last.id + 1,
-                                last.sampleStart + last.sampleDur,
+                                last.sampleStart! + last.sampleDur!,
                                 this._oaudiofile.duration *
                                   this._oaudiofile.sampleRate -
-                                  (last.sampleStart + last.sampleDur),
+                                  (last.sampleStart! + last.sampleDur!),
                                 [new OLabel(level.name, '')]
                               )
                             );
@@ -245,7 +254,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                       ) {
                         // last converter to check
                         file.status = 'invalid';
-                        file.error = importResult.error;
+                        file.error = importResult!.error!;
                         this._oannotation = undefined;
                         this.checkState();
                       }
@@ -347,8 +356,8 @@ export class OctraDropzoneComponent extends DefaultComponent {
     }
   }
 
-  private loadImportFileData(extension: string = undefined) {
-    const files = fileListToArray(this.dropzone.files);
+  private loadImportFileData(extension?: string) {
+    const files = fileListToArray(this.dropzone.files!);
 
     for (const importfile of files) {
       if (extension === undefined) {
@@ -448,7 +457,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
                 if (checkimport) {
                   // load import data
-                  const files = fileListToArray(this.dropzone.files);
+                  const files = fileListToArray(this.dropzone.files!);
                   for (const importfile of files) {
                     if (
                       !AudioManager.isValidAudioFileName(

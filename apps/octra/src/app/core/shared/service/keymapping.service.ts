@@ -50,7 +50,7 @@ export class KeymappingService {
 
   public register(shortcutGroup: ShortcutGroup): ShortcutGroup {
     this._shortcutsManager.registerShortcutGroup(shortcutGroup);
-    return this._shortcutsManager.getShortcutGroup(shortcutGroup.name);
+    return this._shortcutsManager.getShortcutGroup(shortcutGroup.name)!;
   }
 
   public registerGeneralShortcutGroup(shortcutGroup: ShortcutGroup) {
@@ -81,10 +81,10 @@ export class KeymappingService {
   public getShortcut(identifier: string, key: string): string {
     const shortcuts = this.getShortcuts(identifier);
 
-    if (shortcuts && shortcuts[key] !== undefined) {
+    if (shortcuts && (shortcuts as any)[key] !== undefined) {
       const platform = BrowserInfo.platform;
-      if (shortcuts[key].keys[platform]) {
-        let shortc = '[' + shortcuts[key].keys[platform] + ']';
+      if ((shortcuts as any)[key].keys[platform]) {
+        let shortc = '[' + (shortcuts as any)[key].keys[platform] + ']';
         shortc = shortc.replace('BACKSPACE', 'DEL');
         return shortc;
       }
@@ -104,7 +104,7 @@ export class KeymappingService {
     }
   };
 
-  private onKeyUp = ($event) => {
+  private onKeyUp = ($event: KeyboardEvent) => {
     this._shortcutsManager.checkKeyEvent($event, Date.now());
   };
 
@@ -118,7 +118,7 @@ export class KeymappingService {
         const platform = BrowserInfo.platform;
         if (shortcutGroup !== undefined) {
           const foundShortcut = shortcutGroup.items.find(
-            (a) => a.keys['' + platform] === shortcut
+            (a) => (a.keys as any)['' + platform] === shortcut
           );
 
           if (foundShortcut !== undefined) {

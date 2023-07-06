@@ -82,15 +82,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   public lastResizing = 0;
 
   @ViewChild('transcrEditor', { static: false })
-  transcrEditor: TranscrEditorComponent;
-  @ViewChild('viewer', { static: false }) viewer: AudioViewerComponent;
+  transcrEditor!: TranscrEditorComponent;
+  @ViewChild('viewer', { static: false }) viewer!: AudioViewerComponent;
   @ViewChild('validationPopover', { static: true })
-  validationPopover: ValidationPopoverComponent;
+  validationPopover!: ValidationPopoverComponent;
   @ViewChild('contextMenu', { static: false })
-  contextMenu: ContextMenuComponent;
+  contextMenu!: ContextMenuComponent;
 
-  public audioChunk: AudioChunk;
-  audioViewerSettings: AudioviewerConfig;
+  public audioChunk!: AudioChunk;
+  audioViewerSettings!: AudioviewerConfig;
   public popovers = {
     validation: {
       location: {
@@ -249,8 +249,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     ],
   };
 
-  private audioManager: AudioManager;
-  private tempSegments: Segments;
+  private audioManager!: AudioManager;
+  private tempSegments!: Segments;
   private selectedCell = {
     labelText: '',
     row: 0,
@@ -261,7 +261,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     state: 'inactive',
     selectedSegment: -1,
     openingBlocked: false,
-    audiochunk: undefined,
+    audiochunk: undefined as any,
     transcript: '',
   };
 
@@ -290,12 +290,12 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
     for (
       let i = 1;
-      i < this.transcrService.currentlevel.segments.segments.length;
+      i < this.transcrService.currentlevel!.segments.segments.length;
       i++
     ) {
-      const segment = this.transcrService.currentlevel.segments.segments[i];
+      const segment = this.transcrService.currentlevel!.segments.segments[i];
       const previousSegment =
-        this.transcrService.currentlevel.segments.segments[i - 1];
+        this.transcrService.currentlevel!.segments.segments[i - 1];
 
       if (segment.speakerLabel === previousSegment.speakerLabel) {
         intervals[intervalCounter].length++;
@@ -312,7 +312,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     console.log(intervals);
     for (let j = intervals.length - 1; j > -1; j--) {
       const interval = intervals[j];
-      this.transcrService.currentlevel.segments.combineSegments(
+      this.transcrService.currentlevel!.segments.combineSegments(
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -450,7 +450,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     console.log(intervals);
     for (let j = intervals.length - 1; j > -1; j--) {
       const interval = intervals[j];
-      this.transcrService.currentlevel.segments.combineSegments(
+      this.transcrService.currentlevel!.segments.combineSegments(
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -498,17 +498,17 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         if (shownSegment.isSelected) {
           if (this.shownSegments.length > 1) {
             const oldSegmentEnd =
-              this.transcrService.currentlevel.segments.segments[
+              this.transcrService.currentlevel!.segments.segments[
                 i
               ].time.clone();
-            this.transcrService.currentlevel.segments.removeByIndex(
+            this.transcrService.currentlevel!.segments.removeByIndex(
               i,
               this.transcrService.breakMarker.code,
               false,
               false
             );
             if (i > 0) {
-              this.transcrService.currentlevel.segments.segments[i - 1].time =
+              this.transcrService.currentlevel!.segments.segments[i - 1].time =
                 oldSegmentEnd;
             }
             this.shownSegments.splice(i, 1);
@@ -531,7 +531,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
   getStartPoint(index: number) {
     return index > 0
-      ? this.transcrService.currentlevel.segments.get(index - 1).time.unix
+      ? this.transcrService.currentlevel!.segments.get(index - 1)!.time.unix
       : 0;
   }
 
@@ -559,7 +559,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   }
 
   onSpeakerLabelMouseDown(
-    $event,
+    $event: any,
     labelCol: HTMLTableCellElement,
     rowNumber: number
   ) {
@@ -575,7 +575,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
   }
 
-  onTimestampMouseDown($event, rowNumber: number) {
+  onTimestampMouseDown($event: any, rowNumber: number) {
     // de-/select row
     if (this._textEditor.state !== 'active') {
       this.onTableLineClick($event, rowNumber);
@@ -599,8 +599,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   }
 
   onTranscriptCellMouseOver(
-    $event,
-    rowNumber,
+    $event: any,
+    rowNumber: number,
     scrollContainer: HTMLDivElement
   ) {
     this.lastMouseOver = Date.now();
@@ -609,11 +609,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     if (this.textEditor.state === 'inactive') {
       if (
         getAttr(target, '.val-error') ||
-        getAttr(target.parentElement, '.val-error')
+        getAttr(target.parentElement!, '.val-error')
       ) {
         if (!this.popovers.validation.mouse.enter) {
           if (!getAttr(target, '.val-error')) {
-            target = target.parentElement;
+            target = target.parentElement!;
           }
 
           let marginTop = 0;
@@ -630,7 +630,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
           const errorcode = getAttr(target, 'data-errorcode');
 
-          this.selectedError = this.transcrService.getErrorDetails(errorcode);
+          this.selectedError = this.transcrService.getErrorDetails(errorcode!);
 
           if (this.selectedError !== undefined) {
             this.validationPopover.show();
@@ -664,7 +664,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
   }
 
-  onTranscriptCellMouseDown($event, i) {
+  onTranscriptCellMouseDown($event: any, i: number) {
     if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       this.onTableLineClick($event, i);
     } else {
@@ -677,7 +677,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   }
 
   focusOnNextSpeakerLabel(segmentNumber: number) {
-    const maxSegments = this.transcrService.currentlevel.segments.length;
+    const maxSegments = this.transcrService.currentlevel!.segments.length;
     segmentNumber = Math.max(-1, Math.min(maxSegments, segmentNumber));
     if (segmentNumber < maxSegments - 1) {
       console.log(`focus on ${segmentNumber}`);
@@ -712,7 +712,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
       isSelected: false,
       transcription: {
         text: segment.transcript,
-        safeHTML: undefined,
+        safeHTML: undefined as any,
       },
       validation: '',
     };
@@ -802,7 +802,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
           this.textEditor.selectedSegment = -1;
 
           this.audioManager.removeChunk(this.textEditor.audiochunk);
-          this.textEditor.audiochunk = undefined;
+          this.textEditor.audiochunk = undefined as any;
 
           started = Date.now();
           this.updateSegments();
@@ -824,15 +824,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
   updateTempSegments() {
     const segStart =
-      this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
         this._textEditor.audiochunk.time.start.add(
           new SampleUnit(20, this.audioManager.sampleRate)
         )
       );
     const currentSegment =
-      this.transcrService.currentlevel.segments.get(segStart);
+      this.transcrService.currentlevel!.segments.get(segStart);
 
-    this.tempSegments = this.transcrService.currentlevel.segments.clone();
+    this.tempSegments = this.transcrService.currentlevel!.segments.clone();
 
     const html = this.transcrEditor.getRawText();
     // split text at the position of every boundary marker
@@ -866,7 +866,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     for (let i = 0; i < segTexts.length - 1; i++) {
       this.tempSegments.add(
         this.audioManager.createSampleUnit(samplesArray[i]),
-        currentSegment.speakerLabel,
+        currentSegment!.speakerLabel,
         segTexts[i]
       );
     }
@@ -875,7 +875,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     const found = this.tempSegments.get(segStart + segTexts.length - 1);
 
     if (!(found === undefined || found === undefined)) {
-      this.tempSegments.get(segStart + segTexts.length - 1).transcript =
+      this.tempSegments.get(segStart + segTexts.length - 1)!.transcript =
         segTexts[segTexts.length - 1];
     }
   }
@@ -886,8 +886,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
     if (
       segmentIndex > -1 &&
-      this.transcrService.currentlevel.segments &&
-      segmentIndex < this.transcrService.currentlevel.segments.length
+      this.transcrService.currentlevel!.segments &&
+      segmentIndex < this.transcrService.currentlevel!.segments.length
     ) {
       if (
         this.transcrEditor.html.indexOf(
@@ -895,26 +895,26 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         ) > -1
       ) {
         // boundaries were inserted
-        this.transcrService.currentlevel.segments.segments =
+        this.transcrService.currentlevel!.segments.segments =
           this.tempSegments.segments;
         this.transcrService.currentLevelSegmentChange.emit(undefined);
       } else {
         // no boundaries inserted
-        const segment = this.transcrService.currentlevel.segments
-          .get(segmentIndex)
+        const segment = this.transcrService.currentlevel!.segments
+          .get(segmentIndex)!
           .clone();
         this.transcrEditor.updateRawText();
         segment.transcript = this.transcrEditor.rawText;
         segment.isBlockedBy =
-          this.transcrService.currentlevel.segments.get(
+          this.transcrService.currentlevel!.segments.get(
             segmentIndex
-          ).isBlockedBy;
-        this.transcrService.currentlevel.segments.change(segmentIndex, segment);
+          )!.isBlockedBy;
+        this.transcrService.currentlevel!.segments.change(segmentIndex, segment);
       }
     } else {
-      const isNull = this.transcrService.currentlevel.segments === undefined;
+      const isNull = this.transcrService.currentlevel!.segments === undefined;
       console.log(`could not save segment. segment index=${segmentIndex},
-segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
+segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
     }
   }
 
@@ -923,7 +923,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     const oldValue = this.showSignalDisplay;
     this.showSignalDisplay = true;
     if (oldValue !== this.showSignalDisplay) {
@@ -951,7 +951,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           this.textEditor.selectedSegment = -1;
 
           this.audioManager.removeChunk(this.textEditor.audiochunk);
-          this.textEditor.audiochunk = undefined;
+          this.textEditor.audiochunk = undefined as any;
           this.cd.markForCheck();
           this.cd.detectChanges();
           resolve();
@@ -966,7 +966,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     return new Promise<void>((resolve) => {
       if (this.playStateSegments[segmentNumber].state === 'stopped') {
         console.log(`play segment ${segmentNumber}`);
-        const segments = this.transcrService.currentlevel.segments.segments;
+        const segments = this.transcrService.currentlevel!.segments.segments;
         console.log(segments);
 
         const segment: Segment = segments[segmentNumber];
@@ -1032,7 +1032,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   playAll(nextSegment: number) {
-    const segments = this.transcrService.currentlevel.segments.segments;
+    const segments = this.transcrService.currentlevel!.segments.segments;
 
     const segment = segments[nextSegment];
 
@@ -1142,8 +1142,9 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
           const startSample =
             segmentNumber > 0
-              ? this.transcrService.currentlevel.segments.get(segmentNumber - 1)
-                  .time.samples
+              ? this.transcrService.currentlevel!.segments.get(
+                  segmentNumber - 1
+                )!.time.samples
               : 0;
           this.uiService.addElementFromEvent(
             'mouseclick',
@@ -1157,7 +1158,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
             {
               start: startSample,
               length:
-                this.transcrService.currentlevel.segments.get(segmentNumber)
+                this.transcrService.currentlevel!.segments.get(segmentNumber)!
                   .time.samples - startSample,
             },
             'overview'
@@ -1178,7 +1179,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     } else {
       const startSample =
         segmentNumber > 0
-          ? this.transcrService.currentlevel.segments.get(segmentNumber - 1)
+          ? this.transcrService.currentlevel!.segments.get(segmentNumber - 1)!
               .time.samples
           : 0;
       this.uiService.addElementFromEvent(
@@ -1193,7 +1194,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         {
           start: startSample,
           length:
-            this.transcrService.currentlevel.segments.get(segmentNumber).time
+            this.transcrService.currentlevel!.segments.get(segmentNumber)!.time
               .samples - startSample,
         },
         'overview'
@@ -1217,7 +1218,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   ) {
     if (!(direction === 'up' && segmentNumber === 0)) {
       this.saveAndCloseTranscrEditor().then(() => {
-        const segmentsLength = this.transcrService.currentlevel.segments.length;
+        const segmentsLength = this.transcrService.currentlevel!.segments.length;
 
         switch (direction) {
           case 'up':
@@ -1283,7 +1284,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
+    const triggerUIAction = (shortcutObj: any, caretPos: number = -1) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',
@@ -1316,7 +1317,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           this.navigateBetweenCells(
             'down',
             Math.min(
-              this.transcrService.currentlevel.segments.length,
+              this.transcrService.currentlevel!.segments.length,
               this.selectedCell.row
             )
           );
@@ -1393,11 +1394,11 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   };
 
   private saveNewLabel(index: number, newLabel: string) {
-    const segment = this.transcrService.currentlevel.segments
-      .get(index)
+    const segment = this.transcrService.currentlevel!.segments
+      .get(index)!
       .clone();
     segment.speakerLabel = newLabel;
-    this.transcrService.currentlevel.segments.change(index, segment);
+    this.transcrService.currentlevel!.segments.change(index, segment);
   }
 
   private openTranscrEditor(segmentIndex: number) {
@@ -1413,8 +1414,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
       let started = 0;
 
-      const segments = this.transcrService.currentlevel.segments.segments;
-      this.tempSegments = this.transcrService.currentlevel.segments.clone();
+      const segments = this.transcrService.currentlevel!.segments.segments;
+      this.tempSegments = this.transcrService.currentlevel!.segments.clone();
       const segment = segments[segmentIndex];
       const segmentStart =
         segmentIndex > 0
@@ -1479,7 +1480,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   private updateSegments() {
     this.playStateSegments = [];
-    const segments = this.transcrService.currentlevel.segments.segments;
+    const segments = this.transcrService.currentlevel!.segments.segments;
     const oldShownSegments = [...this.shownSegments];
     this.shownSegments = [];
 
@@ -1530,11 +1531,11 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   private changeTranscriptOfSegment(index: number, rawTranscript: string) {
-    const segment = this.transcrService.currentlevel.segments
-      .get(index)
+    const segment = this.transcrService.currentlevel!.segments
+      .get(index)!
       .clone();
     segment.transcript = rawTranscript;
-    this.transcrService.currentlevel.segments.change(index, segment);
+    this.transcrService.currentlevel!.segments.change(index, segment);
 
     const newSegment = this.getShownSegment(
       this.shownSegments[index].start,
@@ -1544,7 +1545,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     this.shownSegments[index].transcription = newSegment.transcription;
   }
 
-  onTableLineClick($event, rowNumber: number) {
+  onTableLineClick($event: any, rowNumber: number) {
     const selectedSegment = this.shownSegments[rowNumber];
     if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       // de- select line

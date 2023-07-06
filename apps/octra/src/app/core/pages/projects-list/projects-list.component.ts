@@ -14,7 +14,7 @@ import { RoutingService } from '../../shared/service/routing.service';
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects: ProjectDto[] = [];
-  selectedFile: File;
+  selectedFile?: File;
 
   constructor(
     private api: OctraAPIService,
@@ -34,7 +34,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             if (a.active && !b.active) {
               return 1;
             } else if (a.active && b.active) {
-              if (a.statistics.freeTasks > b.statistics.freeTasks) {
+              if (a.statistics!.freeTasks > b.statistics!.freeTasks) {
                 return 1;
               }
               return 0;
@@ -54,7 +54,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   onProjectClick(project: ProjectDto) {
-    if (project.statistics.freeTasks > 0) {
+    if (project.statistics!.freeTasks > 0) {
       this.appStorage.startOnlineAnnotation(project);
     }
   }
@@ -64,6 +64,4 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     const res = event.target.files[0];
     this.selectedFile = res;
   }
-
-  testUpload() {}
 }

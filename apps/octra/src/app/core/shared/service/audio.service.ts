@@ -49,7 +49,7 @@ export class AudioService {
             /((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/,
             'g'
           );
-          const matches: RegExpExecArray = regex.exec(url);
+          const matches: RegExpExecArray | null = regex.exec(url);
 
           let filename = '';
           if (matches !== null && matches.length > 0) {

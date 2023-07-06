@@ -104,7 +104,7 @@ export class TsWorker {
   /**
    * returns the first free job
    */
-  public getFirstFreeJob(): TsWorkerJob {
+  public getFirstFreeJob(): TsWorkerJob | undefined {
     const index = this._queue.findIndex((a) => {
       return a.status === TsWorkerStatus.INITIALIZED;
     });

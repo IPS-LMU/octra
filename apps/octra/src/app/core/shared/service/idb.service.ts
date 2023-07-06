@@ -16,7 +16,7 @@ export class IDBService {
   private _isReady = false;
   private _isOpened = false;
 
-  private database: OctraDatabase;
+  private database!: OctraDatabase;
 
   public get isReady(): boolean {
     return this._isReady;
@@ -117,7 +117,7 @@ export class IDBService {
       this.database.options
         .bulkGet(keys)
         .then((values) => {
-          resolve(values.filter((a) => a !== undefined));
+          resolve(values.filter((a) => a !== undefined) as any);
         })
         .catch((error) => {
           reject(error);
@@ -139,7 +139,7 @@ export class IDBService {
     return this.database.loadDataOfMode<IAnnotJSON>(
       mode,
       'annotation',
-      undefined
+      undefined as any
     );
   }
 
@@ -206,6 +206,7 @@ export class IDBService {
    * @param key
    */
   public remove(tableName: string, key: string | number) {
-    return this.database[tableName].delete(key);
+    (this.database as any)[tableName].delete(key);
+    return;
   }
 }

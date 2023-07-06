@@ -68,13 +68,13 @@ export class Segment {
     this._changed = value;
   }
 
-  private _isBlockedBy!: ASRQueueItemType;
+  private _isBlockedBy?: ASRQueueItemType;
 
-  get isBlockedBy(): ASRQueueItemType {
+  get isBlockedBy(): ASRQueueItemType | undefined{
     return this._isBlockedBy;
   }
 
-  set isBlockedBy(value: ASRQueueItemType) {
+  set isBlockedBy(value: ASRQueueItemType | undefined) {
     this._isBlockedBy = value;
   }
 

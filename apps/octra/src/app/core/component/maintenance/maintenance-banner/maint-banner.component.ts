@@ -18,11 +18,11 @@ import { DateTime } from 'luxon';
   styleUrls: ['./maint-banner.component.scss'],
 })
 export class MaintenanceBannerComponent implements OnChanges {
-  @Input() serverURL: string;
-  @Input() language: string = undefined;
+  @Input() serverURL!: string;
+  @Input() language?: string;
 
-  notification: MaintenanceNotification;
-  parsedNotification: MaintenanceNotification;
+  notification?: MaintenanceNotification;
+  parsedNotification?: MaintenanceNotification;
 
   constructor(
     private http: HttpClient,
@@ -33,14 +33,17 @@ export class MaintenanceBannerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     const isServerURL =
       hasProperty(changes, 'serverURL') &&
-      changes.serverURL.currentValue !== undefined;
+      changes['serverURL'].currentValue !== undefined;
 
     const isLanguage =
       hasProperty(changes, 'language') &&
-      changes.language.currentValue !== undefined;
+      changes['language'].currentValue !== undefined;
 
     if (isServerURL) {
-      const api = new MaintenanceAPI(changes.serverURL.currentValue, this.http);
+      const api = new MaintenanceAPI(
+        changes['serverURL'].currentValue,
+        this.http
+      );
       api
         .readMaintenanceNotifications(72)
         .then((notification) => {

@@ -39,7 +39,7 @@
   <octra-audio-viewer
     #signalDisplayTop
     (mousecursorchange)="onMouseOver($event)"
-    (mousedown)="onViewerMouseDown($event)"
+    (mousedown)="onViewerMouseDown()"
     (mouseenter)="
       miniloupe.isHidden = false; onAudioViewerMouseEnter('signaldisplay_top')
     "
@@ -63,8 +63,8 @@
   #signalDisplayDown
   (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
   (alert)="onAlertTriggered($event)"
-  (click)="onLoupeClick($event)"
-  (mousedown)="onViewerMouseDown($event)"
+  (click)="onLoupeClick()"
+  (mousedown)="onViewerMouseDown()"
   (segmententer)="onLoupeSegmentEnter($event)"
   (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
   (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
@@ -82,7 +82,8 @@
   <div
     *ngIf="
       !segmentselected &&
-      audioChunkDown !== undefined && audioChunkDown !== undefined
+      audioChunkDown !== undefined &&
+      audioChunkDown !== undefined
     "
     [innerHTML]="
       'signal-gui.segment enter text'

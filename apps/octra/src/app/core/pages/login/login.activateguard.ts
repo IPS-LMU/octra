@@ -21,7 +21,7 @@ export class ALoginGuard implements CanActivate {
     if (this.appStorage.loggedIn) {
       console.log(`IS LOGGED IN!`);
       const params = AppInfo.queryParamsHandling;
-      params.fragment = route.fragment;
+      params.fragment = route.fragment!;
       params.queryParams = route.queryParams;
 
       this.router.navigate(['/user/transcr'], params).catch((error) => {

@@ -31,7 +31,7 @@ export class TranscActivateGuard implements CanActivate {
           if (state.application.loading.status !== LoadingStatus.FINISHED) {
             console.error(`audio not loaded`);
             const params = AppInfo.queryParamsHandling;
-            params.fragment = route.fragment;
+            params.fragment = route.fragment!;
             params.queryParams = route.queryParams;
 
             if (state.application.mode !== LoginMode.LOCAL) {

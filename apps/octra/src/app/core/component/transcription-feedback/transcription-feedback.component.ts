@@ -13,10 +13,10 @@ import { getProperties } from '@octra/utilities';
 export class TranscriptionFeedbackComponent {
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
-  @ViewChild('fo', { static: true }) feedbackForm: NgForm;
+  @ViewChild('fo', { static: true }) feedbackForm!: NgForm;
 
   public get valid(): boolean {
-    return this.feedbackForm.valid;
+    return this.feedbackForm.valid!;
   }
 
   constructor(

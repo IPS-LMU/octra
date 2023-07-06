@@ -41,12 +41,14 @@ export class DictaphoneEditorComponent
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('nav', { static: true }) nav: AudioNavigationComponent;
-  @ViewChild('audioplayer', { static: true }) audioplayer: AudioplayerComponent;
-  @ViewChild('transcr', { static: true }) public editor: TranscrEditorComponent;
+  @ViewChild('nav', { static: true }) nav!: AudioNavigationComponent;
+  @ViewChild('audioplayer', { static: true })
+  audioplayer!: AudioplayerComponent;
+  @ViewChild('transcr', { static: true })
+  public editor!: TranscrEditorComponent;
 
-  public audiochunk: AudioChunk;
-  public audioManager: AudioManager;
+  public audiochunk!: AudioChunk;
+  public audioManager!: AudioManager;
   private subscrmanager: SubscriptionManager<Subscription>;
   private boundaryselected = false;
 
@@ -57,7 +59,7 @@ export class DictaphoneEditorComponent
     this.appStorage.highlightingEnabled = value;
   }
 
-  public segments: Segments = undefined;
+  public segments?: Segments = undefined;
 
   private oldRaw = '';
 
@@ -229,7 +231,7 @@ export class DictaphoneEditorComponent
     );
   }
 
-  afterTyping(status) {
+  afterTyping(status: string) {
     if (status === 'started') {
       this.oldRaw = this.editor.rawText;
     }
@@ -250,7 +252,7 @@ export class DictaphoneEditorComponent
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj) => {
+    const triggerUIAction = (shortcutObj: any) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',
@@ -316,7 +318,7 @@ export class DictaphoneEditorComponent
 
   onBoundaryClicked(samples: SampleUnit) {
     const i: number =
-      this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
         samples
       );
 
@@ -325,7 +327,7 @@ export class DictaphoneEditorComponent
     if (i > -1) {
       const start =
         i > 0
-          ? this.transcrService.currentlevel.segments.get(i - 1).time.samples
+          ? this.transcrService.currentlevel!.segments.get(i - 1)!.time.samples
           : 0;
 
       new Promise<void>((resolve) => {
@@ -337,7 +339,7 @@ export class DictaphoneEditorComponent
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
         this.audiochunk.selection.end =
-          this.transcrService.currentlevel.segments.get(i).time.clone();
+          this.transcrService.currentlevel!.segments.get(i)!.time.clone();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos to selected boundary
@@ -436,7 +438,7 @@ export class DictaphoneEditorComponent
       const segment = new Segment(time, '', segTexts[i]);
       segments.push(segment);
     }
-    this.transcrService.currentlevel.segments.overwriteAllWith(
+    this.transcrService.currentlevel!.segments.overwriteAllWith(
       segments,
       this.audioManager.resource.info.duration
     );
@@ -487,8 +489,8 @@ export class DictaphoneEditorComponent
   }
 
   private loadEditor() {
-    if (this.transcrService.currentlevel.segments.length > 0) {
-      this.segments = this.transcrService.currentlevel.segments;
+    if (this.transcrService.currentlevel!.segments.length > 0) {
+      this.segments = this.transcrService.currentlevel!.segments;
     }
     this.editor.Settings.height = 100;
     this.oldRaw = this.editor.rawText;

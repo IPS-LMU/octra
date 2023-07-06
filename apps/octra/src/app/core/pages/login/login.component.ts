@@ -41,11 +41,11 @@ export class LoginComponent
   extends DefaultComponent
   implements OnInit, ComponentCanDeactivate
 {
-  @ViewChild('f', { static: false }) loginform: NgForm;
-  @ViewChild('dropzone', { static: true }) dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement', { static: false }) agreement: ElementRef;
-  @ViewChild('localmode', { static: true }) localmode: ElementRef;
-  @ViewChild('onlinemode', { static: true }) onlinemode: ElementRef;
+  @ViewChild('f', { static: false }) loginform!: NgForm;
+  @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;
+  @ViewChild('agreement', { static: false }) agreement!: ElementRef;
+  @ViewChild('localmode', { static: true }) localmode!: ElementRef;
+  @ViewChild('onlinemode', { static: true }) onlinemode!: ElementRef;
 
   state: {
     online: {
@@ -123,7 +123,7 @@ export class LoginComponent
       });
       */
     } else {
-      this.audioService.registerAudioManager(this.dropzone.audioManager);
+      this.audioService.registerAudioManager(this.dropzone.audioManager!);
       this.appStorage
         .beginLocalSession(this.dropzone.files, true)
         .then(this.beforeNavigation)
@@ -155,7 +155,7 @@ export class LoginComponent
   };
 
   newTranscription = () => {
-    this.audioService.registerAudioManager(this.dropzone.audioManager);
+    this.audioService.registerAudioManager(this.dropzone.audioManager!);
 
     this.appStorage.clearAnnotationPermanently();
     this.appStorage.clearLoggingDataPermanently();
@@ -399,7 +399,7 @@ export class LoginComponent
         TranscriptionDeleteModalComponent,
         TranscriptionDeleteModalComponent.options
       )
-      .then((answer: ModalDeleteAnswer) => {
+      .then((answer: any) => {
         if (answer === ModalDeleteAnswer.DELETE) {
           this.newTranscription();
         }
@@ -425,7 +425,7 @@ export class LoginComponent
     }
   }
 
-  public isPasswordCorrect(selectedProject, password) {
+  public isPasswordCorrect() {
     /*
     if (this.settingsService.appSettings.octra.allowed_projects !== undefined) {
       const inputHash = sha256(password).toUpperCase();
@@ -453,7 +453,7 @@ export class LoginComponent
     );
   };
 
-  private createNewOnlineSession(form: NgForm) {
+  private createNewOnlineSession() {
     /*
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
       const data = json.data as IDataEntry;

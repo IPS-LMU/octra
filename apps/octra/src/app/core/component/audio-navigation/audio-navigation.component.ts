@@ -152,8 +152,8 @@ export class AudioNavigationComponent
    * this method is called only after a input changed (dirty check)
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.audioChunk !== undefined) {
-      const newAudioChunk: AudioChunk = changes.audioChunk.currentValue;
+    if (changes['audioChunk'] !== undefined) {
+      const newAudioChunk: AudioChunk = changes['audioChunk'].currentValue;
 
       if (newAudioChunk !== undefined) {
         this.subscrManager.destroy();

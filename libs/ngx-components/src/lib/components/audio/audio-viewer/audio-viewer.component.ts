@@ -38,6 +38,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this._transcriptionLevel = value;
   }
 
+  get transcriptionLevel(): Level | undefined {
+    return this._transcriptionLevel;
+  }
+
   // Ways to improve performance
   // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
 
@@ -108,10 +112,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   get AudioPxWidth(): number {
     return this.av.AudioPxWidth;
-  }
-
-  get transcriptionLevel(): Level | undefined {
-    return this._transcriptionLevel;
   }
 
   get focused(): boolean {
@@ -270,7 +270,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       this.subscrManager.add(this.audioChunk.statuschange.subscribe(
         this.onAudioChunkStatusChanged
-        , (error) => {
+        , (error: any) => {
           console.error(error);
         }), 'audioChunkStatusChange');
 
@@ -280,7 +280,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             this.audioChunk.audioManager.onChannelDataChange.subscribe(() => {
                 resolve();
               },
-              (error) => {
+              (error:any) => {
                 reject(error);
               })
             , 'audioChunkChannelFinished');
@@ -562,7 +562,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               this.updatePlayCursor();
 
               if (this.audioManager.isPlaying) {
-                this.audioManager.stopPlayback().catch((error) => {
+                this.audioManager.stopPlayback().catch((error:any) => {
                   console.error(error);
                 });
               }
@@ -591,7 +591,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         }
         afterAudioEnded();
       }
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error(error);
     });
   }

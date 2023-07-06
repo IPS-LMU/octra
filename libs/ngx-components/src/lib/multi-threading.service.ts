@@ -38,7 +38,7 @@ export class MultiThreadingService {
               // unsubscribe because not needed anymore
               this.subscrManager.removeById(id);
             }
-          }, (error) => {
+          }, (error: any) => {
             reject(error);
           }
         ));

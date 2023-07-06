@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./help-tools.component.scss'],
 })
 export class HelpToolsComponent {
-  @ViewChild('canvas', { static: false }) canvas: ElementRef;
+  @ViewChild('canvas', { static: false }) canvas!: ElementRef;
 
   constructor(
     private appStorage: AppStorageService,

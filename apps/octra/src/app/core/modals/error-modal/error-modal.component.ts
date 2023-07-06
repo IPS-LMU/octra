@@ -13,8 +13,8 @@ export class ErrorModalComponent extends OctraModal {
     backdrop: true,
   };
 
-  @ViewChild('modal', { static: true }) modal: TemplateRef<any>;
-  text: '';
+  @ViewChild('modal', { static: true }) modal!: TemplateRef<any>;
+  text = '';
 
   constructor(protected override activeModal: NgbActiveModal) {
     super('errorModal', activeModal);

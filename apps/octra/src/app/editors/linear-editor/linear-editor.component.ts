@@ -53,15 +53,16 @@ export class LinearEditorComponent
   public static editorname = 'Linear Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('signalDisplayTop', { static: true })
-  signalDisplayTop: AudioViewerComponent;
+  signalDisplayTop!: AudioViewerComponent;
   @ViewChild('miniloupeComponent', { static: false })
-  miniloupeComponent: AudioViewerComponent;
+  miniloupeComponent!: AudioViewerComponent;
   @ViewChild('signalDisplayDown', { static: false })
-  signalDisplayDown: AudioViewerComponent;
-  @ViewChild('nav', { static: true }) nav: AudioNavigationComponent;
-  @ViewChild('transcr', { static: true }) public editor: TranscrEditorComponent;
+  signalDisplayDown!: AudioViewerComponent;
+  @ViewChild('nav', { static: true }) nav!: AudioNavigationComponent;
+  @ViewChild('transcr', { static: true })
+  public editor!: TranscrEditorComponent;
   public segmentselected = false;
-  public loupeSettings: AudioviewerConfig;
+  public loupeSettings!: AudioviewerConfig;
   public miniloupe = {
     component: undefined,
     isHidden: true,
@@ -74,18 +75,18 @@ export class LinearEditorComponent
       y: 0,
     },
   };
-  public audioManager: AudioManager;
-  public audioChunkTop: AudioChunk;
-  public audioChunkDown: AudioChunk;
-  public audioChunkLoupe: AudioChunk;
+  public audioManager!: AudioManager;
+  public audioChunkTop!: AudioChunk;
+  public audioChunkDown?: AudioChunk;
+  public audioChunkLoupe!: AudioChunk;
 
-  public selectedAudioChunk: AudioChunk;
+  public selectedAudioChunk!: AudioChunk;
 
   private oldRaw = '';
   private saving = false;
   private factor = 6;
   private platform = BrowserInfo.platform;
-  private selectedIndex: number;
+  private selectedIndex!: number;
 
   private mousestate = 'initiliazied';
 
@@ -199,7 +200,7 @@ export class LinearEditorComponent
     return '';
   }
 
-  private _miniLoupeSettings: AudioviewerConfig;
+  private _miniLoupeSettings!: AudioviewerConfig;
 
   get miniLoupeSettings(): AudioviewerConfig {
     return this._miniLoupeSettings;
@@ -388,8 +389,8 @@ export class LinearEditorComponent
       this.audioManager.playPosition,
       caretpos,
       {
-        start: this.signalDisplayTop.av.drawnSelection.start.samples,
-        length: this.signalDisplayTop.av.drawnSelection.duration.samples,
+        start: this.signalDisplayTop.av.drawnSelection!.start.samples,
+        length: this.signalDisplayTop.av.drawnSelection!.duration.samples,
       },
       undefined,
       'audio_buttons'
@@ -433,7 +434,7 @@ export class LinearEditorComponent
     }
   }
 
-  onAlertTriggered(result) {
+  onAlertTriggered(result: any) {
     this.alertService.showAlert(result.type, result.message).catch((error) => {
       console.error(error);
     });
@@ -443,23 +444,26 @@ export class LinearEditorComponent
     this.saving = false;
   }
 
-  onMouseOver($event: { event: MouseEvent | undefined; time: SampleUnit }) {
+  onMouseOver($event: {
+    event: MouseEvent | undefined,
+    time: SampleUnit | undefined
+  }) {
     this.subscrManager.removeByTag('mouseTimer');
 
-    this.miniloupe.component = this.signalDisplayTop;
+    this.miniloupe.component = this.signalDisplayTop as any;
 
     this.doPlayOnHover(
       this.audioManager,
       this.appStorage.playonhover,
       this.audioChunkTop,
-      this.signalDisplayTop.av.mouseCursor
+      this.signalDisplayTop.av.mouseCursor!
     );
 
     if (this.appStorage.showLoupe) {
       this.miniloupe.isHidden = false;
       this.subscrManager.add(
         timer(20).subscribe(() => {
-          this.changeLoupePosition($event.event, $event.time);
+          this.changeLoupePosition($event.event!, $event.time!);
           this.mousestate = 'ended';
         }),
         'mouseTimer'
@@ -467,7 +471,7 @@ export class LinearEditorComponent
     }
   }
 
-  onSegmentEnter($event) {
+  onSegmentEnter($event: any) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown = new AudioChunk(selection, this.audioManager);
       this.editor.focus(true, true).catch((error) => {
@@ -478,8 +482,8 @@ export class LinearEditorComponent
     if (this.appStorage.logging) {
       const start =
         $event.index > 0
-          ? this.transcrService.currentlevel.segments.get($event.index - 1).time
-              .samples
+          ? this.transcrService.currentlevel!.segments.get($event.index - 1)!
+              .time.samples
           : 0;
       this.uiService.addElementFromEvent(
         'segment',
@@ -493,7 +497,7 @@ export class LinearEditorComponent
         {
           start,
           length:
-            this.transcrService.currentlevel.segments.get($event.index).time
+            this.transcrService.currentlevel!.segments.get($event.index)!.time
               .samples - start,
         },
         LinearEditorComponent.editorname
@@ -501,17 +505,17 @@ export class LinearEditorComponent
     }
   }
 
-  onLoupeSegmentEnter($event) {
+  onLoupeSegmentEnter($event: any) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
-      this.audioChunkDown.selection = selection.clone();
-      this.audioChunkDown.absolutePlayposition = selection.start.clone();
+      this.audioChunkDown!.selection = selection.clone();
+      this.audioChunkDown!.absolutePlayposition = selection.start.clone();
       this.editor.focus(true, true).catch((error) => {
         console.error(error);
       });
     });
   }
 
-  onTranscriptionChanged($event) {
+  onTranscriptionChanged() {
     this.save();
   }
 
@@ -627,7 +631,7 @@ export class LinearEditorComponent
                 this.signalDisplayTop,
                 this.audioManager,
                 this.audioChunkLoupe,
-                this.signalDisplayTop.av.mouseCursor,
+                this.signalDisplayTop.av.mouseCursor!,
                 this.factor
               ).then((newLoupeChunk) => {
                 if (newLoupeChunk !== undefined) {
@@ -642,7 +646,7 @@ export class LinearEditorComponent
   };
 
   private triggerUIActionAfterShortcut(
-    $event,
+    $event: any,
     control: string,
     timestamp: number
   ) {
@@ -669,19 +673,19 @@ export class LinearEditorComponent
         let segment = undefined;
 
         if (this.segmentselected && this.selectedIndex > -1) {
-          const annoSegment = this.transcrService.currentlevel.segments.get(
+          const annoSegment = this.transcrService.currentlevel!.segments.get(
             this.selectedIndex
           );
           segment = {
-            start: annoSegment.time.samples,
+            start: annoSegment!.time.samples,
             length:
               this.selectedIndex <
-              this.transcrService.currentlevel.segments.length - 1
-                ? this.transcrService.currentlevel.segments.get(
+              this.transcrService.currentlevel!.segments.length - 1
+                ? this.transcrService.currentlevel!.segments.get(
                     this.selectedIndex + 1
-                  ).time.samples - annoSegment.time.samples
+                  )!.time.samples - annoSegment!.time.samples
                 : this.audioManager.resource.info.duration.samples -
-                  annoSegment.time.samples,
+                  annoSegment!.time.samples,
           };
         }
 
@@ -690,14 +694,14 @@ export class LinearEditorComponent
           length: 0,
         };
 
-        let playPosition = component.audioChunk.absolutePlayposition;
+        let playPosition = component!.audioChunk!.absolutePlayposition;
 
-        selection.start = component.av.drawnSelection.start.samples;
-        selection.length = component.av.drawnSelection.duration.samples;
+        selection.start = component!.av.drawnSelection!.start.samples;
+        selection.length = component!.av.drawnSelection!.duration.samples;
 
-        if (!component.audioChunk.isPlaying) {
+        if (!component!.audioChunk!.isPlaying) {
           if ($event.type === 'boundary') {
-            playPosition = component.av.MouseClickPos;
+            playPosition = component.av.MouseClickPos!;
           }
         }
 
@@ -720,20 +724,20 @@ export class LinearEditorComponent
     }
   }
 
-  onLoupeClick(event) {
+  onLoupeClick() {
     if (this.selectedIndex > -1) {
-      const endSamples = this.transcrService.currentlevel.segments.get(
+      const endSamples = this.transcrService.currentlevel!.segments.get(
         this.selectedIndex
-      ).time.samples;
+      )!.time.samples;
       let startSamples = 0;
       if (this.selectedIndex > 0) {
-        startSamples = this.transcrService.currentlevel.segments.get(
+        startSamples = this.transcrService.currentlevel!.segments.get(
           this.selectedIndex - 1
-        ).time.samples;
+        )!.time.samples;
       }
       if (
-        this.signalDisplayDown.av.MouseClickPos.samples < startSamples ||
-        this.signalDisplayDown.av.MouseClickPos.samples > endSamples
+        this.signalDisplayDown.av.MouseClickPos!.samples < startSamples ||
+        this.signalDisplayDown.av.MouseClickPos!.samples > endSamples
       ) {
         this.segmentselected = false;
       }
@@ -748,18 +752,18 @@ export class LinearEditorComponent
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(
+        const annoSegment = this.transcrService.currentlevel!.segments.get(
           this.selectedIndex
         );
-        segment.start = annoSegment.time.samples;
+        segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel.segments.length - 1
-            ? this.transcrService.currentlevel.segments.get(
+          this.transcrService.currentlevel!.segments.length - 1
+            ? this.transcrService.currentlevel!.segments.get(
                 this.selectedIndex + 1
-              ).time.samples - annoSegment.time.samples
+              )!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
-              annoSegment.time.samples;
+              annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -776,7 +780,7 @@ export class LinearEditorComponent
   }
 
   onMarkerClick(markerCode: string) {
-    this.onTranscriptionChanged(undefined);
+    this.onTranscriptionChanged();
     if (this.appStorage.logging) {
       const segment = {
         start: -1,
@@ -784,18 +788,18 @@ export class LinearEditorComponent
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(
+        const annoSegment = this.transcrService.currentlevel!.segments.get(
           this.selectedIndex
         );
-        segment.start = annoSegment.time.samples;
+        segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel.segments.length - 1
-            ? this.transcrService.currentlevel.segments.get(
+          this.transcrService.currentlevel!.segments.length - 1
+            ? this.transcrService.currentlevel!.segments.get(
                 this.selectedIndex + 1
-              ).time.samples - annoSegment.time.samples
+              )!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
-              annoSegment.time.samples;
+              annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -833,7 +837,7 @@ export class LinearEditorComponent
     this.cd.detectChanges();
   }
 
-  onViewerMouseDown($event) {
+  onViewerMouseDown() {
     this.segmentselected = false;
   }
 
@@ -845,18 +849,18 @@ export class LinearEditorComponent
       };
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(
+        const annoSegment = this.transcrService.currentlevel!.segments.get(
           this.selectedIndex
         );
-        segment.start = annoSegment.time.samples;
+        segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel.segments.length - 1
-            ? this.transcrService.currentlevel.segments.get(
+          this.transcrService.currentlevel!.segments.length - 1
+            ? this.transcrService.currentlevel!.segments.get(
                 this.selectedIndex + 1
-              ).time.samples - annoSegment.time.samples
+              )!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
-              annoSegment.time.samples;
+              annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -877,19 +881,19 @@ export class LinearEditorComponent
       let segment = undefined;
 
       if (this.segmentselected && this.selectedIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel.segments.get(
+        const annoSegment = this.transcrService.currentlevel!.segments.get(
           this.selectedIndex
         );
         segment = {
-          start: annoSegment.time.samples,
+          start: annoSegment!.time.samples,
           length:
             this.selectedIndex <
-            this.transcrService.currentlevel.segments.length - 1
-              ? this.transcrService.currentlevel.segments.get(
+            this.transcrService.currentlevel!.segments.length - 1
+              ? this.transcrService.currentlevel!.segments.get(
                   this.selectedIndex + 1
-                ).time.samples - annoSegment.time.samples
+                )!.time.samples - annoSegment!.time.samples
               : this.audioManager.resource.info.duration.samples -
-                annoSegment.time.samples,
+                annoSegment!.time.samples,
         };
       }
 
@@ -913,13 +917,13 @@ export class LinearEditorComponent
   public update() {
     this.segmentselected = false;
     this.audioChunkTop.startpos = this.audioChunkTop.time.start.clone();
-    this.audioChunkDown.startpos = this.audioChunkDown.time.start.clone();
+    this.audioChunkDown!.startpos = this.audioChunkDown!.time.start.clone();
   }
 
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkTop,
-      this.transcrService.currentlevel
+      this.transcrService.currentlevel!
     );
   }
 
@@ -943,15 +947,15 @@ export class LinearEditorComponent
 
   private selectSegment(index: number): Promise<AudioSelection> {
     return new Promise<AudioSelection>((resolve) => {
-      const segment = this.transcrService.currentlevel.segments.get(index);
-      this.transcript = segment.transcript;
+      const segment = this.transcrService.currentlevel!.segments.get(index);
+      this.transcript = segment!.transcript;
       this.selectedIndex = index;
       this.segmentselected = true;
       let start = this.audioManager.createSampleUnit(0);
       if (index > 0) {
-        start = this.transcrService.currentlevel.segments.get(index - 1).time;
+        start = this.transcrService.currentlevel!.segments.get(index - 1)!.time;
       }
-      resolve(new AudioSelection(start, segment.time));
+      resolve(new AudioSelection(start, segment!.time));
     });
   }
 
@@ -959,16 +963,16 @@ export class LinearEditorComponent
     if (this.segmentselected) {
       if (
         this.selectedIndex > -1 &&
-        this.transcrService.currentlevel.segments &&
-        this.selectedIndex < this.transcrService.currentlevel.segments.length
+        this.transcrService.currentlevel!.segments &&
+        this.selectedIndex < this.transcrService.currentlevel!.segments.length
       ) {
-        const segment = this.transcrService.currentlevel.segments
-          .get(this.selectedIndex)
+        const segment = this.transcrService.currentlevel!.segments
+          .get(this.selectedIndex)!
           .clone();
         // this.viewer.focused = false;
         // this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        this.transcrService.currentlevel.segments.change(
+        this.transcrService.currentlevel!.segments.change(
           this.selectedIndex,
           segment
         );

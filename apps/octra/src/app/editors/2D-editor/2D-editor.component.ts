@@ -75,15 +75,15 @@ export class TwoDEditorComponent
   public static editorname = '2D-Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('viewer', { static: true }) viewer: AudioViewerComponent;
-  @ViewChild('window', { static: false }) window: TranscrWindowComponent;
-  @ViewChild('loupe', { static: false }) loupe: AudioViewerComponent;
-  @ViewChild('audionav', { static: true }) audionav: AudioNavigationComponent;
+  @ViewChild('viewer', { static: true }) viewer!: AudioViewerComponent;
+  @ViewChild('window', { static: false }) window!: TranscrWindowComponent;
+  @ViewChild('loupe', { static: false }) loupe!: AudioViewerComponent;
+  @ViewChild('audionav', { static: true }) audionav!: AudioNavigationComponent;
   @Output() public openModal = new EventEmitter();
 
   public showWindow = false;
   public loupeHidden = true;
-  public selectedIndex: number;
+  public selectedIndex!: number;
   public miniloupe = {
     size: {
       width: 160,
@@ -95,19 +95,17 @@ export class TwoDEditorComponent
     },
   };
 
-  public audioManager: AudioManager;
-  public audioChunkLines: AudioChunk;
-  public audioChunkWindow: AudioChunk;
-  public audioChunkLoupe: AudioChunk;
-  public miniLoupeSettings: AudioviewerConfig;
-  private;
-  public;
+  public audioManager!: AudioManager;
+  public audioChunkLines!: any;
+  public audioChunkWindow!: AudioChunk;
+  public audioChunkLoupe!: AudioChunk;
+  public miniLoupeSettings!: AudioviewerConfig;
   private mousestate = 'initiliazied';
   private intervalID = undefined;
   private factor = 8;
-  private scrolltimer: Subscription = undefined;
+  private scrolltimer?: Subscription;
   private shortcuts: any = {};
-  private authWindow: Window = undefined;
+  private authWindow?: Window;
   private windowShortcuts: ShortcutGroup = {
     name: 'transcription window',
     enabled: true,
@@ -187,8 +185,8 @@ export class TwoDEditorComponent
 
   private shortcutsEnabled = true;
 
-  public get editor(): TranscrEditorComponent {
-    if (this.window === undefined || this.window === undefined) {
+  public get editor(): TranscrEditorComponent | undefined {
+    if (!this.window) {
       return undefined;
     }
     return this.window.editor;
@@ -293,11 +291,11 @@ export class TwoDEditorComponent
             }
 
             this.scrolltimer = interval(1000).subscribe(() => {
-              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(
-                this.audioChunkLines.relativePlayposition
+              const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
+                this.audioChunkLines.relativePlayposition!
               );
 
-              const lines = Math.floor(absx / this.viewer.av.innerWidth);
+              const lines = Math.floor(absx / this.viewer.av.innerWidth!);
               const y =
                 lines *
                 (this.viewer.settings.lineheight +
@@ -340,14 +338,14 @@ export class TwoDEditorComponent
             this.audioManager.sampleRate
           );
           let segmentIndex =
-            this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+            this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
               segmentBoundary
             );
 
           if (segmentIndex > -1) {
             let segment =
-              this.transcrService.currentlevel.segments.get(segmentIndex);
-            segment.progressInfo = {
+              this.transcrService.currentlevel!.segments.get(segmentIndex);
+            segment!.progressInfo = {
               progress: item.progress,
               statusLabel: item.type,
             };
@@ -446,13 +444,13 @@ export class TwoDEditorComponent
                       segment.transcript = item.result.replace(/(<\/p>)/g, '');
 
                       const index =
-                        this.transcrService.currentlevel.segments.segments.findIndex(
+                        this.transcrService.currentlevel!.segments.segments.findIndex(
                           (a) => {
-                            return a.time.samples === segment.time.samples;
+                            return a.time.samples === segment!.time.samples;
                           }
                         );
                       if (index > -1) {
-                        this.transcrService.currentlevel.segments.change(
+                        this.transcrService.currentlevel!.segments.change(
                           index,
                           segment
                         );
@@ -481,7 +479,7 @@ export class TwoDEditorComponent
                         audiofile
                       );
 
-                      const wordsTier = convertedResult.annotjson.levels.find(
+                      const wordsTier = convertedResult.annotjson!.levels.find(
                         (a) => {
                           return a.name === 'ORT-MAU';
                         }
@@ -500,25 +498,25 @@ export class TwoDEditorComponent
                               item.time.sampleStart + item.time.sampleLength;
                             if (
                               item.time.sampleStart +
-                                wordItem.sampleStart +
-                                wordItem.sampleDur <=
+                                wordItem.sampleStart! +
+                                wordItem.sampleDur! <=
                               itemEnd
                             ) {
                               const readSegment = Segment.fromObj(
-                                this.transcrService.currentlevel.name,
+                                this.transcrService.currentlevel!.name,
                                 new OSegment(
                                   1,
-                                  wordItem.sampleStart,
-                                  wordItem.sampleDur,
+                                  wordItem.sampleStart!,
+                                  wordItem.sampleDur!,
                                   wordItem.labels
                                 ),
                                 this.audioManager.sampleRate
                               );
                               if (
-                                readSegment.transcript === '<p:>' ||
-                                readSegment.transcript === ''
+                                readSegment!.transcript === '<p:>' ||
+                                readSegment!.transcript === ''
                               ) {
-                                readSegment.transcript =
+                                readSegment!.transcript =
                                   this.transcrService.breakMarker.code;
                               }
 
@@ -526,26 +524,26 @@ export class TwoDEditorComponent
                                 // the processed segment is now the very right one. Replace its content with
                                 // the content of the last word item.
                                 segmentIndex =
-                                  this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+                                  this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
                                     segmentBoundary
                                   );
 
-                                this.transcrService.currentlevel.segments.segments[
+                                this.transcrService.currentlevel!.segments.segments[
                                   segmentIndex
-                                ].transcript = readSegment.transcript;
-                                this.transcrService.currentlevel.segments.segments[
+                                ].transcript = readSegment!.transcript;
+                                this.transcrService.currentlevel!.segments.segments[
                                   segmentIndex
                                 ].isBlockedBy = undefined;
                               } else {
                                 const origTime = new SampleUnit(
                                   item.time.sampleStart +
-                                    readSegment.time.samples,
+                                    readSegment!.time.samples,
                                   this.audioManager.sampleRate
                                 );
-                                this.transcrService.currentlevel.addSegment(
+                                this.transcrService.currentlevel!.addSegment(
                                   origTime,
                                   '',
-                                  readSegment.transcript,
+                                  readSegment!.transcript,
                                   false
                                 );
                               }
@@ -591,7 +589,7 @@ export class TwoDEditorComponent
                         });
                     }
                     console.error(item.result);
-                    this.transcrService.currentlevel.segments.segments[
+                    this.transcrService.currentlevel!.segments.segments[
                       segmentIndex
                     ].isBlockedBy = undefined;
                     this.transcrService.currentLevelSegmentChange.emit();
@@ -662,11 +660,11 @@ export class TwoDEditorComponent
 
   onSegmentEntered(selected: any) {
     if (
-      this.transcrService.currentlevel.segments &&
+      this.transcrService.currentlevel!.segments &&
       selected.index > -1 &&
-      selected.index < this.transcrService.currentlevel.segments.length
+      selected.index < this.transcrService.currentlevel!.segments.length
     ) {
-      const segment = this.transcrService.currentlevel.segments.get(
+      const segment = this.transcrService.currentlevel!.segments.get(
         selected.index
       );
 
@@ -677,8 +675,8 @@ export class TwoDEditorComponent
         ) {
           const start: SampleUnit =
             selected.index > 0
-              ? this.transcrService.currentlevel.segments
-                  .get(selected.index - 1)
+              ? this.transcrService.currentlevel!.segments
+                  .get(selected.index - 1)!
                   .time.clone()
               : this.audioManager.createSampleUnit(0);
           this.selectedIndex = selected.index;
@@ -703,7 +701,7 @@ export class TwoDEditorComponent
             {
               start: start.samples,
               length:
-                this.transcrService.currentlevel.segments.get(selected.index)
+                this.transcrService.currentlevel!.segments.get(selected.index)!
                   .time.samples - start.samples,
             },
             TwoDEditorComponent.editorname
@@ -727,7 +725,7 @@ export class TwoDEditorComponent
     }
   }
 
-  onWindowAction(state) {
+  onWindowAction(state: string) {
     if (state === 'close') {
       this.showWindow = false;
       this.viewer.enableShortcuts();
@@ -735,17 +733,19 @@ export class TwoDEditorComponent
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
 
-      const segment = this.transcrService.currentlevel.segments.get(
+      const segment = this.transcrService.currentlevel!.segments.get(
         this.selectedIndex
       );
-      const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time);
+      const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
+        segment!.time
+      );
 
       let y =
-        Math.floor(absx / this.viewer.av.innerWidth) *
+        Math.floor(absx / this.viewer.av.innerWidth!) *
         this.viewer.settings.lineheight;
       y +=
         10 +
-        Math.floor(absx / this.viewer.av.innerWidth) *
+        Math.floor(absx / this.viewer.av.innerWidth!) *
           this.viewer.settings.margin.bottom;
       scrollTo(y, '#special');
     } else if (state === 'overview') {
@@ -754,7 +754,10 @@ export class TwoDEditorComponent
     }
   }
 
-  onMouseOver($event: { event: MouseEvent | undefined; time: SampleUnit }) {
+  onMouseOver($event: {
+    event: MouseEvent | undefined,
+    time: SampleUnit | undefined
+  }) {
     this.subscrManager.removeByTag('mouseTimer');
     this.mousestate = 'moving';
 
@@ -762,18 +765,18 @@ export class TwoDEditorComponent
       this.audioManager,
       this.appStorage.playonhover,
       this.audioChunkLines,
-      this.viewer.av.mouseCursor
+      this.viewer.av.mouseCursor!
     );
 
     if (this.appStorage.showLoupe) {
       if (
-        this.viewer.audioChunk.time.duration.seconds !==
-        this.viewer.av.mouseCursor.seconds
+        this.viewer.audioChunk!.time.duration.seconds !==
+        this.viewer.av.mouseCursor!.seconds
       ) {
         this.loupeHidden = false;
         this.subscrManager.add(
           timer(20).subscribe(() => {
-            this.changeLoupePosition($event.event, $event.time);
+            this.changeLoupePosition($event.event!, $event.time!);
             this.mousestate = 'ended';
           }),
           'mouseTimer'
@@ -788,7 +791,7 @@ export class TwoDEditorComponent
     const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
     const x = mouseEvent.offsetX - (this.miniloupe.size.width - 10) / 2 - 2;
 
-    if (fullY < this.viewer.height) {
+    if (fullY < this.viewer.height!) {
       // loupe is fully visible
       this.miniloupe.location.y = mouseEvent.offsetY + 20;
     } else {
@@ -846,11 +849,11 @@ export class TwoDEditorComponent
               timestamp: $event.timestamp,
             });
             if (this.audioChunkLines.isPlaying) {
-              this.audioChunkLines.pausePlayback().catch((error) => {
+              this.audioChunkLines.pausePlayback().catch((error: any) => {
                 console.error(error);
               });
             } else {
-              this.audioChunkLines.startPlayback(false).catch((error) => {
+              this.audioChunkLines.startPlayback(false).catch((error: any) => {
                 console.error(error);
               });
             }
@@ -864,7 +867,7 @@ export class TwoDEditorComponent
               type: 'audio',
               timestamp: $event.timestamp,
             });
-            this.audioChunkLines.stopPlayback().catch((error) => {
+            this.audioChunkLines.stopPlayback().catch((error: any) => {
               console.error(error);
             });
             shortcutTriggered = true;
@@ -878,7 +881,7 @@ export class TwoDEditorComponent
               type: 'audio',
               timestamp: $event.timestamp,
             });
-            this.audioChunkLines.stepBackward().catch((error) => {
+            this.audioChunkLines.stepBackward().catch((error: any) => {
               console.error(error);
             });
             break;
@@ -891,7 +894,7 @@ export class TwoDEditorComponent
               type: 'audio',
               timestamp: $event.timestamp,
             });
-            this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+            this.audioChunkLines.stepBackwardTime(0.5).catch((error: any) => {
               console.error(error);
             });
             shortcutTriggered = true;
@@ -921,7 +924,7 @@ export class TwoDEditorComponent
             this.viewer,
             this.audioManager,
             this.audioChunkLoupe,
-            this.viewer.av.mouseCursor,
+            this.viewer.av.mouseCursor!,
             this.factor
           ).then((newLoupeChunk) => {
             if (newLoupeChunk !== undefined) {
@@ -948,25 +951,25 @@ export class TwoDEditorComponent
     ) {
       const timePosition: SampleUnit =
         $event.timePosition !== undefined
-          ? $event.timePosition
-          : this.viewer.av.mouseCursor;
+          ? $event.timePosition!
+          : this.viewer.av.mouseCursor!;
 
       const segmentNumber =
-        this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
           timePosition
         );
 
       if (segmentNumber > -1) {
         if (this.asrService.selectedLanguage !== undefined) {
           const segment =
-            this.transcrService.currentlevel.segments.get(segmentNumber);
+            this.transcrService.currentlevel!.segments.get(segmentNumber);
 
           if (segment !== undefined) {
             const sampleStart =
               segmentNumber > 0
-                ? this.transcrService.currentlevel.segments.get(
+                ? this.transcrService.currentlevel!.segments.get(
                     segmentNumber - 1
-                  ).time.samples
+                  )!.time.samples
                 : 0;
 
             this.uiService.addElementFromEvent(
@@ -1035,7 +1038,7 @@ export class TwoDEditorComponent
                 selection.sampleStart,
                 selection.sampleLength
               );
-              this.asrService.stopASROfItem(item);
+              this.asrService.stopASROfItem(item!);
               segment.isBlockedBy = undefined;
             }
           }
@@ -1068,7 +1071,12 @@ export class TwoDEditorComponent
     ) {
       $event.value = `${$event.type}:${$event.value}`;
 
-      let selection = {
+      let selection:
+        | {
+            start: number;
+            length: number;
+          }
+        | undefined = {
         start: -1,
         length: -1,
       };
@@ -1086,7 +1094,7 @@ export class TwoDEditorComponent
       let playPosition = this.audioManager.playPosition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
-          playPosition = this.viewer.av.MouseClickPos;
+          playPosition = this.viewer.av.MouseClickPos!;
         }
       }
 
@@ -1156,8 +1164,8 @@ export class TwoDEditorComponent
         : -1;
 
       const selection = {
-        start: this.viewer.av.drawnSelection.start.samples,
-        length: this.viewer.av.drawnSelection.duration.samples,
+        start: this.viewer.av.drawnSelection!.start.samples,
+        length: this.viewer.av.drawnSelection!.duration.samples,
       };
 
       this.uiService.addElementFromEvent(
@@ -1181,24 +1189,24 @@ export class TwoDEditorComponent
     this.audioChunkLines.startpos = this.audioChunkLines.time.start.clone();
   }
 
-  onScrollbarMouse(event) {
+  onScrollbarMouse(event: any) {
     if (event.state === 'mousemove') {
       this.loupeHidden = true;
     }
   }
 
-  onScrolling(event) {
+  onScrolling(event: any) {
     if (event.state === 'scrolling') {
       this.loupeHidden = true;
     }
   }
 
-  onCircleLoupeMouseOver($event) {
+  onCircleLoupeMouseOver() {
     // TODO important what about focus?
     // this.viewer.focus();
 
     const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
-    if (fullY < this.viewer.height) {
+    if (fullY < this.viewer.height!) {
       // loupe is fully visible
       this.miniloupe.location.y = this.miniloupe.location.y + 20;
     } else {
@@ -1211,7 +1219,7 @@ export class TwoDEditorComponent
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkLines,
-      this.transcrService.currentlevel
+      this.transcrService.currentlevel!
     );
     this.cd.detectChanges();
   }

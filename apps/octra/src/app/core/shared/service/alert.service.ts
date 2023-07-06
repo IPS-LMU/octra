@@ -97,7 +97,7 @@ export interface AlertEntry {
   animation: string;
   unique: boolean;
   id: number;
-  component: {
+  component?: {
     id: number;
     class: any;
     instance: any;

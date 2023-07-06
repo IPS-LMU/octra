@@ -10,11 +10,10 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./permutations-replace-modal.component.scss'],
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
-  modalRef: NgbModalRef;
   public visible = false;
 
   @ViewChild('modal', { static: true }) modal: any;
-  @ViewChild('content', { static: false }) contentElement: ElementRef;
+  @ViewChild('content', { static: false }) contentElement!: ElementRef;
 
   protected data = undefined;
   private actionperformed: Subject<string> = new Subject<string>();
@@ -29,7 +28,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
 
   private readListOfSpeakers() {
     const result = [];
-    for (const segment of this.transcrService.currentlevel.segments.segments) {
+    for (const segment of this.transcrService.currentlevel!.segments.segments) {
       if (result.findIndex((a) => a.name === segment.speakerLabel) < 0) {
         result.push({
           name: segment.speakerLabel,
@@ -94,7 +93,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
   }
 
   replaceSpeakers() {
-    for (const segment of this.transcrService.currentlevel.segments.segments) {
+    for (const segment of this.transcrService.currentlevel!.segments.segments) {
       for (const speakerObj of this.listOfSpeakers) {
         if (segment.speakerLabel === speakerObj.name) {
           segment.speakerLabel = speakerObj.replaceWith;

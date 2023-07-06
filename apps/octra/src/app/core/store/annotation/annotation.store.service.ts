@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RootState } from '../index';
+import { LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
 import { TaskInputOutputDto } from '@octra/api-types';
@@ -11,7 +11,7 @@ import { Converter, IFile, OAudiofile } from '@octra/annotation';
 export class AnnotationStoreService {
   constructor(private store: Store<RootState>) {}
 
-  setLogs(value: any[], mode) {
+  setLogs(value: any[], mode: LoginMode) {
     this.store.dispatch(
       AnnotationActions.saveLogs.do({
         logs: value ?? [],
@@ -23,10 +23,10 @@ export class AnnotationStoreService {
   public getTranscriptFromIO(io: TaskInputOutputDto[]): TaskInputOutputDto {
     return io.find(
       (a) =>
-        !a.fileType.includes('audio') &&
-        !a.fileType.includes('video') &&
-        !a.fileType.includes('image')
-    );
+        !a.fileType!.includes('audio') &&
+        !a.fileType!.includes('video') &&
+        !a.fileType!.includes('image')
+    )!;
   }
 
   public convertFromSupportedConverters(

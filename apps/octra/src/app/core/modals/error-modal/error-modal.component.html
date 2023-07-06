@@ -1,5 +1,10 @@
 <div class="modal-content border-0">
-  <div class="modal-header bg-danger text-light text-left justify-content-start"><i class="bi bi-exclamation-triangle me-1"></i> {{"general.error" | transloco}}</div>
+  <div
+    class="modal-header bg-danger text-light text-left justify-content-start"
+  >
+    <i class="bi bi-exclamation-triangle me-1"></i>
+    {{ 'general.error' | transloco }}
+  </div>
   <div class="modal-body">
     <p>{{ text ? text : '' }}</p>
   </div>

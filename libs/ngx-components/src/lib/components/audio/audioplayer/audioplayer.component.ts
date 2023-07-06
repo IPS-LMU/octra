@@ -125,7 +125,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
       this.audiochunkSubscription = this.audioChunk.statuschange.subscribe(
         this.onAudioChunkStatusChanged
-        , (error) => {
+        , (error: any) => {
           console.error(error);
         });
     }
@@ -373,13 +373,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
             this.setPlayPosition(xCoord);
             this.subscrmanager.add(timer(200).subscribe(() => {
               if (this.audioChunk !== undefined) {
-                this.audioChunk.startPlayback().catch((error) => {
+                this.audioChunk.startPlayback().catch((error: any) => {
                   console.error(error);
                 });
               }
             }));
           }
-        }).catch((error) => {
+        }).catch((error: any) => {
           console.error(error);
         });
       } else {

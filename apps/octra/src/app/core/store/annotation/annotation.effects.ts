@@ -14,6 +14,7 @@ import { AudioService, TranscriptionService } from '../../shared/service';
 import { withLatestFrom } from 'rxjs/operators';
 import { AppInfo } from '../../../app.info';
 import {
+  AnnotationLevelType,
   IFile,
   ImportResult,
   OAudiofile,
@@ -62,7 +63,7 @@ export class AnnotationEffects {
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
-                (a) => a.fileType.indexOf('audio') > -1
+                (a) => a.fileType!.indexOf('audio') > -1
               ),
               mode: a.mode,
             })
@@ -87,7 +88,7 @@ export class AnnotationEffects {
             );
           }
 
-          let filename = a.audioFile.filename;
+          let filename = a.audioFile!.filename;
           if (
             state.application.mode === LoginMode.ONLINE ||
             state.application.mode === LoginMode.URL ||
@@ -95,7 +96,7 @@ export class AnnotationEffects {
           ) {
             // online, url or demo
             if (a.audioFile) {
-              const src = this.apiService.prepareFileURL(a.audioFile.url);
+              const src = this.apiService.prepareFileURL(a.audioFile!.url!);
               // extract filename
 
               filename = filename.substring(0, filename.lastIndexOf('.'));
@@ -110,13 +111,13 @@ export class AnnotationEffects {
                     this.store.dispatch(
                       AnnotationActions.loadAudio.progress({
                         value: progress,
-                        mode: state.application.mode,
+                        mode: state.application.mode!,
                       })
                     );
                   } else {
                     this.store.dispatch(
                       AnnotationActions.loadAudio.success({
-                        mode: state.application.mode,
+                        mode: state.application.mode!,
                         audioFile: a.audioFile,
                       })
                     );
@@ -194,18 +195,18 @@ export class AnnotationEffects {
         tap(([a, state]) => {
           if (
             state.application.mode === LoginMode.URL &&
-            state.application.queryParams.transcript !== undefined
+            state.application.queryParams!.transcript !== undefined
           ) {
             this.transcrService.defaultFontSize = 16;
 
             // load transcript file via URL
             this.http
-              .get(state.application.queryParams.transcript, {
+              .get(state.application.queryParams!.transcript, {
                 responseType: 'text',
               })
               .subscribe({
                 next: (res) => {
-                  let filename = state.application.queryParams.transcript;
+                  let filename = state.application.queryParams!.transcript;
                   filename = filename.substring(filename.lastIndexOf('/') + 1);
 
                   const file: IFile = {
@@ -218,14 +219,14 @@ export class AnnotationEffects {
                   // convert par to annotJSON
                   const audioRessource = this.audio.audiomanagers[0].resource;
                   const oAudioFile = new OAudiofile();
-                  oAudioFile.arraybuffer = audioRessource.arraybuffer;
+                  oAudioFile.arraybuffer = audioRessource.arraybuffer!;
                   oAudioFile.duration = audioRessource.info.duration.samples;
                   oAudioFile.name = audioRessource.info.fullname;
                   oAudioFile.sampleRate =
                     audioRessource.info.duration.sampleRate;
-                  oAudioFile.size = audioRessource.size;
+                  oAudioFile.size = audioRessource.size!;
 
-                  let importResult: ImportResult;
+                  let importResult: ImportResult | undefined;
                   // find valid converter...
                   for (const converter of AppInfo.converters) {
                     if (filename.indexOf(converter.extension) > -1) {
@@ -242,13 +243,13 @@ export class AnnotationEffects {
                         importResult = tempImportResult;
                         break;
                       } else {
-                        console.error(tempImportResult.error);
+                        console.error(tempImportResult!.error);
                       }
                     }
                   }
 
                   if (
-                    !(importResult === undefined) &&
+                    importResult !== undefined &&
                     !(importResult.annotjson === undefined)
                   ) {
                     // conversion successfully finished
@@ -299,7 +300,11 @@ export class AnnotationEffects {
 
               const newLevels: OIDBLevel[] = [];
               newLevels.push(
-                new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1)
+                new OIDBLevel(
+                  1,
+                  new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT),
+                  1
+                )
               );
 
               this.appStorage.overwriteAnnotation(newLevels, [], false);

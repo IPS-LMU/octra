@@ -44,7 +44,7 @@ export class IDBEffects {
           const links = modeState.transcript.links.map((a) => a.link);
           this.idbService
             .saveAnnotation(
-              appState.application.mode,
+              appState.application.mode!,
               new OAnnotJSON(
                 modeState.audio.fileName,
                 modeState.audio.sampleRate,
@@ -89,7 +89,7 @@ export class IDBEffects {
           const links = modeState.transcript.links.map((a) => a.link);
           this.idbService
             .saveAnnotation(
-              appState.application.mode,
+              appState.application.mode!,
               new OAnnotJSON(
                 modeState.audio.fileName,
                 modeState.audio.sampleRate,
@@ -253,7 +253,7 @@ export class IDBEffects {
             console.log(`results:`);
             console.log(onlineAnnotation);
             let max = 0;
-            const convertToStateLevel = (level: ILevel, i) => {
+            const convertToStateLevel = (level: ILevel, i: number) => {
               const annotationStateLevel = convertFromOIDLevel(level, i + 1);
               if (!hasProperty(level, 'id')) {
                 annotationStateLevel.id = i + 1;
@@ -263,7 +263,7 @@ export class IDBEffects {
               return annotationStateLevel;
             };
 
-            const convertLink = (link: ILink, i) => {
+            const convertLink = (link: ILink, i: number) => {
               if (!hasProperty(link, 'id')) {
                 return new OIDBLink(i + 1, link);
               } else {
@@ -500,13 +500,13 @@ export class IDBEffects {
           this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile: localModeState?.sessionFile?.toAny(),
-              currentEditor: modeState.currentEditor,
+              currentEditor: modeState.currentEditor!,
               logging: modeState?.logging,
               project: {
-                id: onlineModeState?.onlineSession?.currentProject?.id,
-                name: onlineModeState?.onlineSession?.currentProject?.name,
+                id: onlineModeState!.onlineSession!.currentProject!.id!,
+                name: onlineModeState!.onlineSession!.currentProject!.name!,
                 description:
-                  onlineModeState?.onlineSession?.currentProject?.description,
+                  onlineModeState!.onlineSession!.currentProject!.description!,
               },
               submitted: false,
               transcriptID: '0',
@@ -810,7 +810,7 @@ export class IDBEffects {
           setTimeout(() => {
             subject.next(
               IDBActions.saveFollowPlayCursorFailed({
-                error,
+                error: error as any,
               })
             );
             subject.complete();
@@ -838,7 +838,7 @@ export class IDBEffects {
           setTimeout(() => {
             subject.next(
               IDBActions.saveFollowPlayCursorFailed({
-                error,
+                error: error as any,
               })
             );
             subject.complete();
@@ -866,7 +866,7 @@ export class IDBEffects {
           setTimeout(() => {
             subject.next(
               IDBActions.saveAppReloadedFailed({
-                error,
+                error: error as any,
               })
             );
             subject.complete();
@@ -894,7 +894,7 @@ export class IDBEffects {
           setTimeout(() => {
             subject.next(
               IDBActions.saveServerDataEntryFailed({
-                error,
+                error: error as any,
               })
             );
             subject.complete();
@@ -1159,7 +1159,7 @@ export class IDBEffects {
   }
 
   getModeStateFromString(appState: RootState, mode: LoginMode) {
-    let modeState: OnlineModeState | LocalModeState = undefined;
+    let modeState: OnlineModeState | LocalModeState | undefined = undefined;
     if (mode === 'online') {
       modeState = appState.onlineMode;
     } else if (mode === 'local') {

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { BugReporter } from '../../obj/BugAPI/BugReporter';
 import { AppStorageService } from './appstorage.service';
@@ -31,8 +31,8 @@ export interface BugReportCredentials {
 
 @Injectable()
 export class BugReportService {
-  private reporter: BugReporter;
-  private transcrService: TranscriptionService;
+  private reporter!: BugReporter;
+  private transcrService!: TranscriptionService;
   private fromDBLoaded = false;
 
   private _console: ConsoleEntry[] = [];
@@ -96,7 +96,7 @@ export class BugReportService {
   }
 
   public getPackage(): any {
-    const result = {
+    const result: any = {
       octra: {
         version: AppInfo.version,
         language: this.langService.getActiveLang(),
@@ -129,8 +129,9 @@ export class BugReportService {
     };
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      result.octra.project = this.appStorage.onlineSession.currentProject?.name;
-      result.octra.user = this.appStorage.snapshot.authentication.me.username;
+      result.octra.project =
+        this.appStorage.onlineSession!.currentProject!.name!;
+      result.octra.user = this.appStorage.snapshot.authentication.me!.username;
       result.octra.jobID = this.appStorage.transcriptID;
     }
 
@@ -149,7 +150,7 @@ export class BugReportService {
         this.transcrService.audioManager.resource.extension;
       result.octra.levels = this.transcrService.annotation.levels.length;
       result.octra.currentlevel = this.transcrService.selectedlevel;
-      result.octra.segments = this.transcrService.currentlevel.segments.length;
+      result.octra.segments = this.transcrService.currentlevel!.segments.length;
     }
 
     return result;
@@ -202,6 +203,6 @@ export class BugReportService {
       );
     }
 
-    return undefined;
+    return of(undefined);
   }
 }

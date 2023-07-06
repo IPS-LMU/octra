@@ -14,7 +14,7 @@ export const authenticationReducer = createReducer(
   on(
     AuthenticationActions.login.success,
     AuthenticationActions.reauthenticate.success,
-    (state: AuthenticationState, {auth, method}) => {
+    (state: AuthenticationState, { auth, method }) => {
       return {
         ...state,
         me: auth.me,
@@ -64,7 +64,7 @@ export const authenticationReducer = createReducer(
       };
     }
   ),
-  on(APIActions.init.success, (state: AuthenticationState, data) => {
+  on(APIActions.init.success, (state: AuthenticationState, data: any) => {
     return {
       ...state,
       webToken: data.webToken,
@@ -75,21 +75,21 @@ export const authenticationReducer = createReducer(
   on(OnlineModeActions.loginDemo, (state: AuthenticationState, data) => {
     return {
       ...state,
-      webToken: "8u8asu8dua8sda98dj8adam9d8amd7a",
+      webToken: '8u8asu8dua8sda98dj8adam9d8amd7a',
       type: AccountLoginMethod.local,
       authenticated: true,
       me: {
-        id: "23424",
+        id: '23424',
         username: 'demo_user',
-        email: "johndoe@example.com",
+        email: 'johndoe@example.com',
         email_verified: true,
         first_name: 'John',
         last_name: 'Doe',
         systemRole: AccountRole.user as any,
         timezone: 'Europe/Berlin',
         locale: 'en-EN',
-        projectRoles: []
-      }
+        projectRoles: [],
+      },
     };
   })
 );

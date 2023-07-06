@@ -17,7 +17,7 @@ import { DefaultComponent } from '../default.component';
 })
 export class AlertComponent extends DefaultComponent {
   @ViewChild(DynComponentDirective, { static: false })
-  appDynComponent: DynComponentDirective;
+  appDynComponent!: DynComponentDirective;
 
   public duration = 20;
   public animation = 'closed';
@@ -65,7 +65,7 @@ export class AlertComponent extends DefaultComponent {
   }
 
   public validate(message: string): SafeHtml {
-    return this.sanitizer.sanitize(SecurityContext.HTML, message);
+    return this.sanitizer.sanitize(SecurityContext.HTML, message)!;
   }
 
   public afterComponentInitialized(item: { id: number; instance: any }) {

@@ -39,12 +39,12 @@ export class TableConfiguratorComponent implements OnInit {
       }[];
     };
   }[] = [];
-  @Input() annotation: Annotation;
+  @Input() annotation!: Annotation;
   @Input() options = {};
-  @Input() currentLevelID;
+  @Input() currentLevelID!: number;
   @Input() view: 'expert' | 'easy' = 'easy';
   @Input() tableWidth = 300;
-  resultURL: SafeResourceUrl = undefined;
+  resultURL?: SafeResourceUrl;
 
   includeLineNumbers = false;
 
@@ -92,7 +92,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             let segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.seconds * 1000
+                ? level.segments.get(segmentNumber - 1)!.time.seconds * 1000
                 : 0;
             segmentStart = Math.round(segmentStart);
 
@@ -111,7 +111,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             return (
               (segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.samples + 1
+                ? level.segments.get(segmentNumber - 1)!.time.samples + 1
                 : 1) + ''
             );
           },
@@ -128,7 +128,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             return (
               (segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.seconds.toFixed(4)
+                ? level.segments.get(segmentNumber - 1)!.time.seconds.toFixed(4)
                 : '0') + ''
             );
           },
@@ -149,7 +149,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segment = level.segments.get(segmentNumber);
             return this.convertMilliSecondsIntoLegibleString(
-              Math.round(segment.time.seconds * 1000)
+              Math.round(segment!.time.seconds * 1000)
             );
           },
           formatString: 'HH:mm:ss.mss',
@@ -164,7 +164,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.samples + '';
+            return level.segments.get(segmentNumber)!.time.samples + '';
           },
         },
         {
@@ -178,7 +178,7 @@ export class TableConfiguratorComponent implements OnInit {
           ) => {
             // the value must be a unix timestamp
             return (
-              level.segments.get(segmentNumber).time.seconds.toFixed(4) + ''
+              level.segments.get(segmentNumber)!.time.seconds.toFixed(4) + ''
             );
           },
         },
@@ -198,11 +198,11 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.seconds
+                ? level.segments.get(segmentNumber - 1)!.time.seconds
                 : 0;
             const segment = level.segments.get(segmentNumber);
             return this.convertMilliSecondsIntoLegibleString(
-              Math.round((segment.time.seconds - segmentStart) * 1000)
+              Math.round((segment!.time.seconds - segmentStart) * 1000)
             );
           },
           formatString: 'HH:mm:ss.mss',
@@ -219,10 +219,12 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.samples + 1
+                ? level.segments.get(segmentNumber - 1)!.time.samples + 1
                 : 1;
             return (
-              level.segments.get(segmentNumber).time.samples - segmentStart + ''
+              level.segments.get(segmentNumber)!.time.samples -
+              segmentStart +
+              ''
             );
           },
         },
@@ -238,11 +240,11 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1).time.seconds
+                ? level.segments.get(segmentNumber - 1)!.time.seconds
                 : 0;
             return (
               (
-                level.segments.get(segmentNumber).time.seconds - segmentStart
+                level.segments.get(segmentNumber)!.time.seconds - segmentStart
               ).toFixed(4) + ''
             );
           },
@@ -262,7 +264,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).transcript;
+            return level.segments.get(segmentNumber)!.transcript;
           },
         },
       ],
@@ -298,7 +300,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return `${level.segments.get(0).time.sampleRate}`;
+            return `${level.segments.get(0)!.time.sampleRate}`;
           },
         },
         {
@@ -311,7 +313,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return `${level.segments.get(0).time.sampleRate / 1000}kHz`;
+            return `${level.segments.get(0)!.time.sampleRate / 1000}kHz`;
           },
         },
       ],
@@ -368,11 +370,11 @@ export class TableConfiguratorComponent implements OnInit {
     let colDef: ColumnDefinition;
 
     if (type === '') {
-      colDef = this.findNextUnusedColumnDefinition();
+      colDef = this.findNextUnusedColumnDefinition()!;
     } else {
       colDef = this.columnDefinitions.find((a) => {
         return a.type === type;
-      });
+      })!;
     }
     if (colDef !== undefined) {
       const item = {
@@ -394,7 +396,7 @@ export class TableConfiguratorComponent implements OnInit {
     }
   }
 
-  convertMilliSecondsIntoLegibleString(milliSecondsIn) {
+  convertMilliSecondsIntoLegibleString(milliSecondsIn: number) {
     const secsIn = milliSecondsIn / 1000;
     let milliSecs: any = milliSecondsIn % 1000;
 
@@ -426,7 +428,7 @@ export class TableConfiguratorComponent implements OnInit {
         });
         column.columnDefinition = {
           type: column.columnDefinition.type,
-          selectedFormat: selFormat,
+          selectedFormat: selFormat!,
           formats: column.columnDefinition.formats,
           cells: column.columnDefinition.cells,
         };
@@ -508,7 +510,7 @@ export class TableConfiguratorComponent implements OnInit {
 
         textLines.push({
           text,
-          samples: segment.time.samples,
+          samples: segment!.time.samples,
         });
         counter++;
       }
@@ -532,7 +534,7 @@ export class TableConfiguratorComponent implements OnInit {
     );
   }
 
-  onExtensionClick(extension) {
+  onExtensionClick(extension: string) {
     this.tableOptions.fileExtension = extension;
     this.onSomethingDone();
   }
@@ -542,11 +544,11 @@ export class TableConfiguratorComponent implements OnInit {
       (a) => {
         return a.value === dividerValue;
       }
-    );
+    )!;
     this.onSomethingDone();
   }
 
-  findNextUnusedColumnDefinition(): ColumnDefinition {
+  findNextUnusedColumnDefinition(): ColumnDefinition | undefined {
     for (const columnDefinition of this.columnDefinitions) {
       const alreadyUsed =
         this.columns.findIndex((a) => {
@@ -600,7 +602,7 @@ export class TableConfiguratorComponent implements OnInit {
           samples: start,
         });
         counter++;
-        start = segment.time.samples;
+        start = segment!.time.samples;
       }
 
       if (!hasTierColumn) {
@@ -628,7 +630,7 @@ export class TableConfiguratorComponent implements OnInit {
     }
   }
 
-  onDropChange(event) {
+  onDropChange(event: any) {
     moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
     this.updateAllTableCells();
   }

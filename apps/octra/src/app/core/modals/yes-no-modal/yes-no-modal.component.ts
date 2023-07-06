@@ -12,7 +12,7 @@ export class YesNoModalComponent extends OctraModal {
     keyboard: false,
     backdrop: false,
   };
-  public message: string;
+  public message = '';
 
   constructor(protected override activeModal: NgbActiveModal) {
     super('yesNoModal', activeModal);

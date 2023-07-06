@@ -142,7 +142,7 @@ export class CompatibilityService {
     return new Promise<boolean>((resolve) => {
       if (name !== 'browser') {
         if (name === 'indexeddb') {
-          Modernizr.on(name, (result) => {
+          Modernizr.on(name, (result: any) => {
             resolve(result);
           });
         } else {

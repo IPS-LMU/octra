@@ -62,7 +62,10 @@ export class Group {
   }
 
   public toAny(): any {
-    const result = {
+    const result: {
+      title: string;
+      controls: any[];
+    } = {
       title: this._title,
       controls: [],
     };

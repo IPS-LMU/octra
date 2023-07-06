@@ -25,7 +25,7 @@ import { ApplicationStoreService } from '../../store/application/application-sto
   styleUrls: ['./loading.component.scss'],
 })
 export class LoadingComponent extends DefaultComponent implements OnInit {
-  @Output() loaded: boolean;
+  @Output() loaded = false;
   public text = '';
   public state = '';
   public warning = '';
@@ -81,7 +81,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
       // url mode set, but no params => change mode
       console.warn(`use mode is url but no params found. Reset use mode.`);
       if (
-        this.appStorage.snapshot.authentication.me.username !== undefined &&
+        this.appStorage.snapshot.authentication.me?.username !== undefined &&
         this.appStorage.snapshot.authentication.me.username !== '' &&
         this.appStorage.sessionfile === undefined
       ) {

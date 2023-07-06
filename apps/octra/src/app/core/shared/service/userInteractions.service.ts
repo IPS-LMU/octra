@@ -30,7 +30,7 @@ export class UserInteractionsService {
   /**
    * timestamp of lastAction
    */
-  private _lastAction: number;
+  private _lastAction!: number;
 
   get lastAction(): number {
     return this._lastAction;
@@ -61,17 +61,21 @@ export class UserInteractionsService {
     type: string,
     event: any,
     timestamp: number,
-    playpos: SampleUnit,
-    caretpos: number,
-    selection: {
-      start: number;
-      length: number;
-    },
-    segment: {
-      start: number;
-      length: number;
-      // tslint:disable-next-line:align
-    },
+    playpos: SampleUnit | undefined,
+    caretpos: number | undefined,
+    selection:
+      | {
+          start: number;
+          length: number;
+        }
+      | undefined,
+    segment:
+      | {
+          start: number;
+          length: number;
+          // tslint:disable-next-line:align
+        }
+      | undefined,
     targetName?: string
   ) {
     this._lastAction = Date.now();
@@ -104,9 +108,9 @@ export class UserInteractionsService {
           event.value,
           timestamp,
           playpos !== undefined ? playpos.samples : -1,
-          caretpos,
-          selection,
-          segment
+          caretpos!,
+          selection!,
+          segment!
         );
       } else if (contains(type, 'mouse')) {
         elem = new MouseStatisticElem(
@@ -115,9 +119,9 @@ export class UserInteractionsService {
           event.value,
           timestamp,
           originalPlayerPos,
-          caretpos,
-          selection,
-          segment
+          caretpos!,
+          selection!,
+          segment!
         );
       } else if (contains(type, 'slider')) {
         elem = new MouseStatisticElem(
@@ -126,9 +130,9 @@ export class UserInteractionsService {
           event.new_value,
           timestamp,
           originalPlayerPos,
-          caretpos,
-          selection,
-          segment
+          caretpos!,
+          selection!,
+          segment!
         );
       } else {
         elem = new StatisticElem(
@@ -137,8 +141,8 @@ export class UserInteractionsService {
           event.value,
           timestamp,
           originalPlayerPos,
-          selection,
-          segment
+          selection!,
+          segment!
         );
       }
 
@@ -170,8 +174,8 @@ export class UserInteractionsService {
     state: PlayBackStatus,
     playposition: SampleUnit,
     caretpos: number,
-    selection: { start: number; length: number },
-    segment: { start: number; length: number }
+    selection: { start: number; length: number } | undefined,
+    segment: { start: number; length: number } | undefined
   ) {
     if (
       state !== PlayBackStatus.PLAYING &&

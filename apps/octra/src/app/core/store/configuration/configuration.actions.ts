@@ -29,8 +29,8 @@ export class ConfigurationActions {
   public static loadMethodsSuccess = createAction(
     `[${context}] Load Methods Success`,
     props<{
-      validate: (string, any) => any;
-      tidyUp: (string, any) => any;
+      validate: (transcript: string, guidelines: any) => any;
+      tidyUp: (transcript: string, guidelines: any) => any;
     }>()
   );
 

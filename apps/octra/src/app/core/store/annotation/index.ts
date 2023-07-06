@@ -78,8 +78,8 @@ export interface AnnotationStateLevel {
 }
 
 export class AnnotationStateSegment extends OSegment {
-  public isBlockedBy: ASRQueueItemType;
-  public progressInfo: { progress: number; statusLabel: string };
+  public isBlockedBy?: ASRQueueItemType;
+  public progressInfo?: { progress: number; statusLabel: string };
 }
 
 export function convertToLevelObject(
@@ -90,7 +90,7 @@ export function convertToLevelObject(
   const level = Level.fromObj(
     {
       id: stateLevel.id,
-      sortorder: undefined,
+      sortorder: undefined as any,
       level: new OLevel(stateLevel.name, stateLevel.type, stateLevel.items),
     },
     sampleRate,
@@ -163,13 +163,13 @@ export function convertFromLevelObject(
     id: level.id,
     name: level.name,
     type: level.type,
-    items: oLevel.items.map((a, i) => {
+    items: oLevel!.items.map((a, i) => {
       if (level.type === AnnotationLevelType.SEGMENT) {
         const segment = level.segments.get(i);
         return {
           ...a,
-          isBlockedBy: segment.isBlockedBy,
-          progressInfo: segment.progressInfo,
+          isBlockedBy: segment!.isBlockedBy,
+          progressInfo: segment!.progressInfo,
         };
       } else {
         return a;

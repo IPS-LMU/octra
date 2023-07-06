@@ -169,8 +169,8 @@ export class APIService implements API {
 
   public getAudioURL(dir: string, src: string): string {
     if (dir !== undefined && dir !== '' && src !== undefined && src !== '') {
-      dir = this.sanitizer.sanitize(SecurityContext.URL, dir);
-      src = this.sanitizer.sanitize(SecurityContext.URL, src);
+      dir = this.sanitizer.sanitize(SecurityContext.URL, dir)!;
+      src = this.sanitizer.sanitize(SecurityContext.URL, src)!;
 
       return this.serverURL + '?dir=' + dir + '&src=' + src;
     } else {
@@ -223,7 +223,7 @@ export class APIService implements API {
   }
 
   public init(serverURL: string) {
-    this.serverURL = this.sanitizer.sanitize(SecurityContext.URL, serverURL);
+    this.serverURL = this.sanitizer.sanitize(SecurityContext.URL, serverURL)!;
   }
 
   public sendBugReport(
@@ -257,7 +257,7 @@ export class APIService implements API {
                 json.data.status === 'BUSY'
               ) {
                 this.closeSession(
-                  appStorage.snapshot.authentication.me.username,
+                  appStorage.snapshot.authentication.me!.username,
                   appStorage.transcriptID,
                   ''
                 )

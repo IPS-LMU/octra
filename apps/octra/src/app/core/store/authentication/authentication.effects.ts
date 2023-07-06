@@ -50,7 +50,7 @@ export class AuthenticationEffects {
                 return AuthenticationActions.login.success({
                   auth: dto,
                   method: a.method,
-                  mode: state.application.mode,
+                  mode: state.application.mode!,
                 });
               } else {
                 // redirect to new tab
@@ -101,7 +101,7 @@ export class AuthenticationEffects {
                 return AuthenticationActions.login.success({
                   auth: dto,
                   method: a.method,
-                  mode: state.application.mode,
+                  mode: state.application.mode!,
                 });
               } else {
                 return AuthenticationActions.needReAuthentication.success({
@@ -112,7 +112,7 @@ export class AuthenticationEffects {
             return AuthenticationActions.login.success({
               auth: dto,
               method: a.method,
-              mode: state.application.mode,
+              mode: state.application.mode!,
             });
           }),
           catchError((err: HttpErrorResponse) => {

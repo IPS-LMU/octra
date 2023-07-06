@@ -26,7 +26,7 @@ export class PromptModalComponent extends OctraModal {
     size: 'lg',
   };
 
-  public formatConverter;
+  public formatConverter: any;
   protected data = undefined;
 
   constructor(

@@ -39,7 +39,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   };
 
   AppInfo = AppInfo;
-  public exportStates = [];
+  public exportStates: any[] = [];
   public preparing = {
     name: '',
     preparing: false,
@@ -98,13 +98,13 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   };
 
   @ViewChild('namingConvention', { static: false })
-  namingConvention: NamingDragAndDropComponent;
+  namingConvention!: NamingDragAndDropComponent;
   @ViewChild('tableConfigurator', { static: false })
-  tableConfigurator: TableConfiguratorComponent;
+  tableConfigurator!: TableConfiguratorComponent;
 
-  transcriptionService: TranscriptionService;
-  navbarService: NavbarService;
-  uiService: UserInteractionsService;
+  transcriptionService!: TranscriptionService;
+  navbarService!: NavbarService;
+  uiService!: UserInteractionsService;
 
   public selectedLevel = 0;
 
@@ -121,7 +121,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   ngOnInit() {
     for (const converter of AppInfo.converters) {
-      this.exportStates.push('inactive');
+      this.exportStates.push();
     }
   }
 
@@ -175,9 +175,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   private setParentFormatURI(url: string) {
     if (this.parentformat.uri !== undefined) {
-      window.URL.revokeObjectURL(
-        this.parentformat.uri['changingThisBreaksApplicationSecurity']
-      );
+      window.URL.revokeObjectURL(this.parentformat!.uri.toString());
     }
     this.parentformat.uri = this.sanitize(url);
   }
@@ -210,14 +208,14 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
           if (converter.name === 'Bundle') {
             // only this converter needs an array buffer
             this.transcriptionService.audiofile.arraybuffer =
-              this.transcriptionService.audioManager.resource.arraybuffer;
+              this.transcriptionService.audioManager.resource.arraybuffer!;
           }
 
           const result: IFile = converter.export(
             oannotjson,
             this.transcriptionService.audiofile,
             levelnum
-          ).file;
+          )!.file;
 
           this.parentformat.download = result.name;
 

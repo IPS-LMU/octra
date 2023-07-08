@@ -222,10 +222,10 @@
                   <octra-naming-drag-and-drop
                     #namingConvention
                     [fileName]="
-                      navbarServ.transcrService.audioManager!.resource.name
+                      navbarServ.transcrService!.audioManager!.resource!.name
                     "
                     [firstSegment]="
-                      navbarServ.transcrService.currentlevel!.segments.get(0)
+                      navbarServ.transcrService!.currentlevel!.segments!.get(0)
                     "
                   ></octra-naming-drag-and-drop>
 

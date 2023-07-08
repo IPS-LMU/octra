@@ -15,15 +15,15 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@octra/annotation": ["dist/libs/annotation"],
+      "@octra/annotation": ["libs/annotation/src/index"],
       "@octra/api-types": ["../octra-backend/dist/libs/api-types"],
-      "@octra/assets": ["dist/libs/assets"],
-      "@octra/json-sets": ["dist/libs/json-sets"],
-      "@octra/media": ["dist/libs/media"],
-      "@octra/ngx-components": ["dist/libs/ngx-components"],
+      "@octra/assets": ["libs/assets/src/index"],
+      "@octra/json-sets": ["libs/json-sets/src/index"],
+      "@octra/media": ["libs/media/src/index"],
+      "@octra/ngx-components": ["libs/ngx-components/src/index"],
       "@octra/ngx-octra-api": ["../octra-backend/dist/libs/ngx-octra-api"],
-      "@octra/ngx-utilities": ["dist/libs/ngx-utilities"],
-      "@octra/utilities": ["dist/libs/utilities"]
+      "@octra/ngx-utilities": ["libs/ngx-utilities/src/index"],
+      "@octra/utilities": ["libs/utilities/src/index"]
     }
   },
   "exclude": ["node_modules", "tmp", "doc"]

@@ -56,8 +56,8 @@ export class AsrOptionsComponent extends DefaultComponent {
     return code.substring(code.length - 2);
   }
 
-  onASRLangChanged(lang: ASRLanguage) {
-    this.asrService.selectedLanguage = lang;
+  onASRLangChanged(lang?: ASRLanguage) {
+    this.asrService.selectedLanguage = lang ?? this.asrService.selectedLanguage;
     this.dropdown.close();
   }
 
@@ -78,13 +78,13 @@ export class AsrOptionsComponent extends DefaultComponent {
           this.audioChunk!.time.duration
         );
         const segNumber =
-          this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+          this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
             time
           );
 
         if (segNumber > -1) {
           const segment =
-            this.transcrService.currentlevel.segments.get(segNumber);
+            this.transcrService.currentlevel!.segments.get(segNumber);
 
           if (segment !== undefined) {
             segment.isBlockedBy = ASRQueueItemType.ASR;
@@ -111,22 +111,22 @@ export class AsrOptionsComponent extends DefaultComponent {
 
   startASRForAllSegmentsNext() {
     const segNumber =
-      this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      this.transcrService!.currentlevel!.segments.getSegmentBySamplePosition(
         this.audioChunk!.time.start.add(this.audioChunk!.time.duration)
       );
 
     if (segNumber > -1) {
       for (
         let i = segNumber;
-        i < this.transcrService.currentlevel.segments.length;
+        i < this.transcrService!.currentlevel!.segments.length;
         i++
       ) {
-        const segment = this.transcrService.currentlevel.segments.get(i);
+        const segment = this.transcrService!.currentlevel!.segments.get(i);
 
         if (segment !== undefined) {
           const sampleStart =
             i > 0
-              ? this.transcrService.currentlevel.segments.get(i - 1)!.time
+              ? this.transcrService!.currentlevel!.segments.get(i - 1)!.time
                   .samples
               : 0;
           const sampleLength = segment.time.samples - sampleStart;

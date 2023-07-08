@@ -157,9 +157,9 @@
         >
           <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
             {{
-              transcrServ.currentlevel.name.length > 30
-                ? transcrServ.currentlevel.name.substr(0, 30) + '...'
-                : transcrServ.currentlevel.name
+              transcrServ.currentlevel!.name.length > 30
+                ? transcrServ.currentlevel!.name.substring(0, 30) + '...'
+                : transcrServ.currentlevel!.name
             }}
             <i class="bi bi-book-half navbar-icon"></i>
           </a>
@@ -198,7 +198,7 @@
                   >
                     <input
                       (blur)="onLevelNameLeave($event, i)"
-                      (click)="onLevelNameClick($event)"
+                      (click)="onLevelNameClick()"
                       maxlength="100"
                       type="text"
                       value="{{ level.name }}"
@@ -290,7 +290,7 @@
                   <span>{{ 'general.name' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ navbarServ.ressource?.info.fullname }}</span>
+                  <span>{{ navbarServ.ressource!.info!.fullname }}</span>
                 </td>
               </tr>
               <tr>
@@ -300,7 +300,7 @@
                 <td>
                   <span
                     >{{
-                      navbarServ.ressource?.info.duration.unix
+                      navbarServ.ressource!.info!.duration.unix
                         | timespan
                           : {
                               showHour: true
@@ -315,7 +315,7 @@
                   <span>{{ 'general.sampleRate' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ navbarServ.ressource?.info.sampleRate }}</span>
+                  <span>{{ navbarServ.ressource!.info!.sampleRate }}</span>
                 </td>
               </tr>
               <tr>
@@ -323,7 +323,7 @@
                   <span>{{ 'general.bitspersecond' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ navbarServ.ressource?.info.bitrate }} Bit/s</span>
+                  <span>{{ navbarServ.ressource!.info!.bitrate }} Bit/s</span>
                 </td>
               </tr>
               <tr>

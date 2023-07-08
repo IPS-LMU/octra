@@ -320,8 +320,8 @@ export class OverviewModalComponent extends OctraModal {
       !this.settingsService.projectsettings.octra.validationEnabled
     ) {
       if (
-        !this.transcrService.currentlevel!.segments ||
-        !this.transcrService.guidelines
+        !this.transcrService!.currentlevel!.segments ||
+        !this.transcrService!.guidelines
       ) {
         this.shownSegments = [];
       }

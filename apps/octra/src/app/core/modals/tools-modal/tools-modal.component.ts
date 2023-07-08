@@ -217,6 +217,10 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.result.url = undefined;
 
+    if(!this.transcrService?.currentlevel) {
+      return;
+    }
+
     for (let i = 0; i < this.transcrService.currentlevel!.segments.length; i++) {
       const segment: Segment =
         this.transcrService.currentlevel!.segments.get(i)!;
@@ -558,15 +562,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
     for (
       let i = 0;
-      i < this.transcrService.currentlevel!.segments.segments.length;
+      i < this.transcrService!.currentlevel!.segments.segments.length;
       i++
     ) {
-      const segment = this.transcrService.currentlevel!.segments.segments[i];
+      const segment = this.transcrService!.currentlevel!.segments.segments[i];
 
       let startPos = 0;
       if (i > 0) {
         startPos =
-          this.transcrService.currentlevel!.segments.segments[i - 1].time.unix;
+          this.transcrService!.currentlevel!.segments.segments[i - 1].time.unix;
       }
       let duration = segment.time.unix - startPos;
       if (!isSilence(segment) || duration < minSilenceLength) {
@@ -575,7 +579,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         } else {
           if (i > 0) {
             const lastSegment =
-              this.transcrService.currentlevel!.segments.segments[i - 1];
+              this.transcrService!.currentlevel!.segments.segments[i - 1];
             startPos = 0;
             if (i > 1) {
               startPos =

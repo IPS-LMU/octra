@@ -12,36 +12,34 @@ import { LoginComponent } from './core/pages/login';
 import { MEMBER_ROUTES } from './core/pages/members-area';
 import { CompatibilityGuard } from './core/shared/guard/compatibility.guard';
 import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
-import { CONFIG_LOADED_GUARD } from './core/shared/guard/appconfig-load.guard';
-import { IDB_LOADED_GUARD } from './core/shared/guard/idb.activateguard';
 
 const APP_ROUTES: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+    canActivate: [],
   },
   {
     path: 'test',
     component: BrowserTestComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD, CompatibilityGuard],
+    canActivate: [CompatibilityGuard],
   },
   { path: '404', component: Error404Component },
   {
     path: 'news',
     component: NewsComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+    canActivate: [],
   },
   {
     path: 'features',
     component: FeaturesComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+    canActivate: [],
   },
   {
     path: 'user',
     component: MembersAreaComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD, CompatibilityGuard],
+    canActivate: [CompatibilityGuard],
     children: MEMBER_ROUTES,
   },
   { path: 'help-tools', component: HelpToolsComponent },

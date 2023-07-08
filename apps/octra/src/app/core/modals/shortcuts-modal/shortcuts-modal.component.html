@@ -22,7 +22,7 @@
             <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
             <td>
               <octra-shortcut
-                [shortcut]="entry.keys[platform]"
+                [shortcut]="getShortcut(entry, platform)"
               ></octra-shortcut>
               <span *ngIf="entry.focusonly" class="focus-info"
                 >({{ 'general.on focus only' | transloco }} )</span
@@ -41,7 +41,7 @@
               <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
               <td>
                 <octra-shortcut
-                  [shortcut]="entry.keys[platform]"
+                  [shortcut]="getShortcut(entry, platform)"
                 ></octra-shortcut>
                 <span *ngIf="entry.focusonly" class="focus-info"
                   >({{ 'general.on focus only' | transloco }} )</span

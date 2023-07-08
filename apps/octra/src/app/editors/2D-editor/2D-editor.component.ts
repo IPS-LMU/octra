@@ -270,7 +270,7 @@ export class TwoDEditorComponent
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
     this.subscrManager.add(
-      this.viewer.alert.subscribe((result) => {
+      this.viewer.alert.subscribe((result: any) => {
         this.alertService
           .showAlert(result.type as AlertType, result.message)
           .catch((error) => {
@@ -445,7 +445,7 @@ export class TwoDEditorComponent
 
                       const index =
                         this.transcrService.currentlevel!.segments.segments.findIndex(
-                          (a) => {
+                          (a: any) => {
                             return a.time.samples === segment!.time.samples;
                           }
                         );
@@ -480,7 +480,7 @@ export class TwoDEditorComponent
                       );
 
                       const wordsTier = convertedResult.annotjson!.levels.find(
-                        (a) => {
+                        (a: any) => {
                           return a.name === 'ORT-MAU';
                         }
                       );

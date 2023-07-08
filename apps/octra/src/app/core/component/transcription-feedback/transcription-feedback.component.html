@@ -16,7 +16,7 @@
               <div *ngIf="control.type.type === 'radiobutton'" class="radio">
                 <label>
                   <input
-                    [(ngModel)]="feedbackData[group.name]"
+                    [(ngModel)]="control.value"
                     [checked]="control.custom.checked"
                     [required]="control.required"
                     name="{{ group.name }}"

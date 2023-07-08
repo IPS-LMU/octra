@@ -1,4 +1,10 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslocoService } from '@ngneat/transloco';
 import { SettingsService, TranscriptionService } from '../../shared/service';
@@ -10,7 +16,7 @@ import { getProperties } from '@octra/utilities';
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.scss'],
 })
-export class TranscriptionFeedbackComponent {
+export class TranscriptionFeedbackComponent implements OnChanges {
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
   @ViewChild('fo', { static: true }) feedbackForm!: NgForm;
@@ -18,6 +24,11 @@ export class TranscriptionFeedbackComponent {
   public get valid(): boolean {
     return this.feedbackForm.valid!;
   }
+
+  internFeedbackData: {
+    name: string;
+    value: any;
+  }[] = [];
 
   constructor(
     public transcrService: TranscriptionService,
@@ -60,6 +71,23 @@ export class TranscriptionFeedbackComponent {
       value.toString()
     );
     console.warn(result);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const feedbackData = changes['feedbackData'];
+
+    if (feedbackData) {
+      if (!feedbackData.currentValue) {
+        this.internFeedbackData = [];
+      } else {
+        for (const key of Object.keys(feedbackData.currentValue)) {
+          this.internFeedbackData.push({
+            name: key,
+            value: feedbackData.currentValue[key],
+          });
+        }
+      }
+    }
   }
 
   public checkBoxChanged(groupName: string, checkb: string) {

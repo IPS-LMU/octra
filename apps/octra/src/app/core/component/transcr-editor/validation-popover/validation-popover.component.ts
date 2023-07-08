@@ -15,15 +15,15 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class ValidationPopoverComponent {
   @ViewChild('validationContainer', { static: true })
-  validationContainer: ElementRef;
+  validationContainer?: ElementRef;
   public visible = false;
 
-  public get sanitizedDescription(): string {
+  public get sanitizedDescription(): string | null {
     return this.sanitizer.sanitize(SecurityContext.HTML, this._description);
   }
 
   get width(): number {
-    return this.validationContainer.nativeElement.offsetWidth;
+    return this.validationContainer?.nativeElement.offsetWidth;
   }
 
   private _title = '';
@@ -49,7 +49,7 @@ export class ValidationPopoverComponent {
   }
 
   public get height() {
-    return this.validationContainer.nativeElement.offsetHeight;
+    return this.validationContainer?.nativeElement.offsetHeight;
   }
 
   constructor(

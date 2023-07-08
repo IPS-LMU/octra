@@ -219,6 +219,7 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     TranslocoModule,
     OctraComponentsModule,
     NgxOctraApiModule,
+    OctraComponentsModule,
   ],
   bootstrap: [AppComponent],
   providers: [

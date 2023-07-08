@@ -31,7 +31,7 @@
           "node_modules/hammerjs/hammer.min.js"
         ],
         "extractLicenses": true,
-        "preserveSymlinks": false
+        "preserveSymlinks": true
       },
       "configurations": {
         "production": {
@@ -58,6 +58,12 @@
           "namedChunks": true
         }
       },
+      "dependsOn": [
+        {
+          "projects": "dependencies",
+          "target": "build"
+        }
+      ],
       "defaultConfiguration": "production"
     },
     "serve": {

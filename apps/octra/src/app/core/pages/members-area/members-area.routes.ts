@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { MEMBER_AREA_GUARD, TranscrEndGuard } from '../../shared/guard';
+import { TranscrEndGuard } from '../../shared/guard';
 import { TranscActivateGuard } from '../../shared/guard/transcr.activateguard';
 import { AuthComponent } from '../auth/auth.component';
 import { LoadingComponent } from '../loading';
@@ -14,12 +14,12 @@ export const MEMBER_ROUTES: Routes = [
   {
     path: 'projects',
     component: ProjectsListComponent,
-    canActivate: [MEMBER_AREA_GUARD],
+    canActivate: [],
   },
   {
     path: 'transcr',
     component: TranscriptionComponent,
-    canActivate: [MEMBER_AREA_GUARD, TranscActivateGuard],
+    canActivate: [TranscActivateGuard],
   },
   {
     path: 'transcr/end',

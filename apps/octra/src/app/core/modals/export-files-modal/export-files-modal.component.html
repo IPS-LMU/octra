@@ -247,7 +247,7 @@
               <octra-table-configurator
                 [columns]="tools.tableConfigurator.columns"
                 [annotation]="transcriptionService.annotation"
-                [currentLevelID]="transcriptionService?.currentlevel?.id"
+                [currentLevelID]="transcriptionService!.currentlevel!.id"
                 [tableWidth]="content.offsetWidth - 100"
                 #tableConfigurator
               ></octra-table-configurator>

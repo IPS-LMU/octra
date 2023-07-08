@@ -41,6 +41,8 @@ import { TimespanPipe } from '@octra/ngx-components';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { DefaultComponent } from '../default.component';
+import videojs from "video.js";
+import KeyboardEvent = videojs.KeyboardEvent;
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -237,14 +239,14 @@ export class TranscrEditorComponent
   /**
    * called when key pressed in editor
    */
-  onKeyDown = ($event: KeyboardEvent) => {
-    if ($event.which === 13) {
+  onKeyDown = ($event: Event) => {
+    if (($event as any).which === 13) {
       $event.preventDefault();
       return;
     }
 
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(
-      $event,
+      $event as any,
       Date.now()
     );
     if (shortcutInfo !== undefined) {
@@ -287,7 +289,7 @@ export class TranscrEditorComponent
       }
     } else {
       const externalShortcutInfo = this.externalShortcutManager!.checkKeyEvent(
-        $event,
+        $event as any,
         Date.now()
       );
       if (externalShortcutInfo !== undefined) {
@@ -301,16 +303,16 @@ export class TranscrEditorComponent
   /**
    * called after key up in editor
    */
-  onKeyUp = ($event: KeyboardEvent) => {
+  onKeyUp = ($event: Event) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(
-      $event,
+      ($event as any),
       Date.now()
     );
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
     } else if (this.externalShortcutManager !== undefined) {
       const externalShortcutCommand =
-        this.externalShortcutManager.checkKeyEvent($event, Date.now());
+        this.externalShortcutManager.checkKeyEvent($event as any, Date.now());
 
       if (externalShortcutCommand !== undefined) {
         $event.preventDefault();
@@ -1131,12 +1133,12 @@ export class TranscrEditorComponent
       if (item !== undefined) {
         this.asrService.stopASROfItem(item);
         const segIndex =
-          this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+          this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
             this.audioManager.createSampleUnit(item.time.sampleStart + 1)
           );
-        const segment = this.transcrService.currentlevel.segments.get(segIndex);
+        const segment = this.transcrService.currentlevel!.segments.get(segIndex);
         segment!.isBlockedBy = undefined;
-        this.transcrService.currentlevel.segments.change(segIndex, segment!);
+        this.transcrService.currentlevel!.segments.change(segIndex, segment!);
       }
     } else {
       console.error(`could not stop ASR because segment number was not found.`);

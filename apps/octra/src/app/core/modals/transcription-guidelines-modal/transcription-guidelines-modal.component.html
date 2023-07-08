@@ -31,7 +31,7 @@
           <a
             *ngIf="isPDFLinkOnly() && getPDFNameFromLink() !== ''"
             [download]="getPDFNameFromLink()"
-            [href]="settService.projectsettings.plugins.pdfexport.url"
+            [href]="settService.projectsettings!.plugins.pdfexport.url"
             class="btn btn-sm btn-danger"
             style="border: 1px solid red"
             target="_blank"
@@ -123,9 +123,9 @@
                     >
                       <div
                         *ngIf="
-                          settService.projectsettings.guidelines ===
+                          settService.projectsettings?.guidelines ===
                             undefined ||
-                          settService.projectsettings.guidelines
+                          settService.projectsettings?.guidelines
                             ?.showExampleHeader
                         "
                         class="card-header example"
@@ -133,9 +133,8 @@
                         {{ 'general.example' | transloco }}
                         <ng-container
                           *ngIf="
-                            settService.projectsettings.guidelines ===
-                              undefined ||
-                            settService.projectsettings.guidelines
+                            settService.projectsettings?.guidelines !== undefined &&
+                            settService.projectsettings?.guidelines
                               ?.showExampleNumbers
                           "
                         >

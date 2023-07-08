@@ -22,7 +22,7 @@ export interface ProjectSettings {
   interfaces: string[];
   plugins: {
     pdfexport: {
-      url: '';
+      url: string;
     };
   };
   feedback_form: Group[];

@@ -198,7 +198,7 @@ export class TranscriptionComponent
   }
 
   get projectsettings(): ProjectSettings {
-    return this.settingsService.projectsettings;
+    return this.settingsService.projectsettings!;
   }
 
   get responsive(): boolean {
@@ -422,8 +422,8 @@ export class TranscriptionComponent
     if (
       (this._useMode === LoginMode.ONLINE ||
         this._useMode === LoginMode.DEMO) &&
-      this.settingsService.projectsettings.octra !== undefined &&
-      this.settingsService.projectsettings.octra.theme !== undefined &&
+      this.projectsettings.octra !== undefined &&
+      this.projectsettings.octra.theme !== undefined &&
       this.settingsService.isTheme('shortAudioFiles')
     ) {
       // clear transcription
@@ -496,7 +496,7 @@ export class TranscriptionComponent
 
     // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
     this.navbarServ.showInterfaces =
-      this.settingsService.projectsettings.navigation.interfaces;
+      this.projectsettings.navigation.interfaces;
     this.checkCurrentEditor();
     this.interface = this.appStorage.interface;
 
@@ -545,7 +545,7 @@ export class TranscriptionComponent
     );
 
     this.navbarServ.showExport =
-      this.settingsService.projectsettings.navigation.export;
+      this.settingsService.projectsettings?.navigation?.export === true;
 
     if (this.transcrService.annotation !== undefined) {
       this.levelSubscriptionID = this.subscrManager.add(

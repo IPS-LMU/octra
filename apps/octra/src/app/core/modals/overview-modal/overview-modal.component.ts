@@ -51,7 +51,7 @@ export class OverviewModalComponent extends OctraModal {
 
   public get sendValidTranscriptOnly(): boolean {
     return (
-      !(this.settingsService.projectsettings.octra === undefined) &&
+      !(this.settingsService.projectsettings?.octra === undefined) &&
       !(
         this.settingsService.projectsettings.octra
           .sendValidatedTranscriptionOnly === undefined
@@ -317,7 +317,7 @@ export class OverviewModalComponent extends OctraModal {
     if (
       this.transcrService.validationArray.length > 0 ||
       this.appStorage.useMode === LoginMode.URL ||
-      !this.settingsService.projectsettings.octra.validationEnabled
+      !this.settingsService.projectsettings?.octra.validationEnabled
     ) {
       if (
         !this.transcrService!.currentlevel!.segments ||

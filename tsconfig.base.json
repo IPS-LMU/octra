@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@angular/*": ["node_modules/@angular/*"],
       "@octra/annotation": ["libs/annotation/src/index"],
       "@octra/api-types": ["../octra-backend/dist/libs/api-types"],
       "@octra/assets": ["libs/assets/src/index"],

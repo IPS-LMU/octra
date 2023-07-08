@@ -188,10 +188,6 @@ export class TranscriptionService {
     return this.settingsService.appSettings;
   }
 
-  private get projectsettings(): ProjectSettings {
-    return this.settingsService.projectsettings;
-  }
-
   constructor(
     private audio: AudioService,
     private appStorage: AppStorageService,
@@ -406,7 +402,7 @@ export class TranscriptionService {
         state.application.mode === LoginMode.DEMO
       ) {
         this.appStorage.logging =
-          this.settingsService.projectsettings.logging.forced;
+          this.settingsService.projectsettings?.logging.forced === true;
       }
       this.uiService.enabled = this.appStorage.logging;
 
@@ -598,10 +594,12 @@ export class TranscriptionService {
           this.appStorage.annotationLinks
         );
 
-        this._feedback = FeedBackForm.fromAny(
-          this.settingsService.projectsettings.feedback_form,
-          this.appStorage.comment
-        );
+        if(this.settingsService.projectsettings) {
+          this._feedback = FeedBackForm.fromAny(
+            this.settingsService.projectsettings.feedback_form,
+            this.appStorage.comment
+          );
+        }
         this._feedback.importData(this.appStorage.feedback);
 
         if (this.appStorage.comment === undefined) {
@@ -1141,7 +1139,7 @@ export class TranscriptionService {
     if (
       this.appStorage.useMode !== LoginMode.URL &&
       (this.appStorage.useMode === LoginMode.DEMO ||
-        this.settingsService.projectsettings.octra.validationEnabled)
+        this.settingsService?.projectsettings?.octra?.validationEnabled === true)
     ) {
       let invalid = false;
 

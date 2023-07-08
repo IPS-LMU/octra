@@ -435,7 +435,7 @@ export class TranscrWindowComponent
     this._validationEnabled =
       this.appStorage.useMode !== 'url' &&
       (this.appStorage.useMode === 'demo' ||
-        this.settingsService.projectsettings.octra.validationEnabled);
+        this.settingsService?.projectsettings?.octra?.validationEnabled === true);
   }
 
   ngOnChanges(obj: SimpleChanges) {

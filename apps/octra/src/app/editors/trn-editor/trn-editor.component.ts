@@ -1453,7 +1453,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       this.transcrEditor.validationEnabled =
         this.appStorage.useMode !== LoginMode.URL &&
         (this.appStorage.useMode === LoginMode.DEMO ||
-          this.settingsService.projectsettings.octra.validationEnabled);
+          this.settingsService?.projectsettings?.octra?.validationEnabled === true);
       started = Date.now();
       this.transcrEditor.initialize();
       console.log(`init transccrEditor ended: ${Date.now() - started}ms`);

@@ -44,8 +44,8 @@ export class SettingsService {
     }
   }
 
-  get projectsettings(): ProjectSettings {
-    return getModeState(this.appStorage.snapshot)!.projectConfig!;
+  get projectsettings(): ProjectSettings | undefined {
+    return getModeState(this.appStorage.snapshot)?.projectConfig;
   }
 
   get appSettings(): AppSettings {

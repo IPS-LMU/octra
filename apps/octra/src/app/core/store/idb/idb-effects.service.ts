@@ -503,10 +503,7 @@ export class IDBEffects {
               currentEditor: modeState.currentEditor!,
               logging: modeState?.logging,
               project: {
-                id: onlineModeState!.onlineSession!.currentProject!.id!,
-                name: onlineModeState!.onlineSession!.currentProject!.name!,
-                description:
-                  onlineModeState!.onlineSession!.currentProject!.description!,
+                id: onlineModeState?.onlineSession?.currentProject?.id
               },
               submitted: false,
               transcriptID: '0',

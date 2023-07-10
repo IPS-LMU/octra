@@ -115,7 +115,7 @@
   [validationEnabled]="
     appStorage.useMode !== 'url' &&
     (appStorage.useMode === 'demo' ||
-      settingsService.projectsettings.octra.validationEnabled)
+      settingsService.projectsettings!.octra.validationEnabled)
   "
   [externalShortcutManager]="keyMap.shortcutsManager"
 >

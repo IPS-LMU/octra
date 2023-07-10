@@ -11,9 +11,7 @@ import { FileInfo, SubscriptionManager } from '@octra/utilities';
 import { AudioManager, SampleUnit, WavFormat } from '@octra/media';
 import { Subject, Subscription, timer } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class AsrService {
   public static authURL = '';
 

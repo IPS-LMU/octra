@@ -9,7 +9,7 @@ import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
 import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RootState } from '../index';
+import { LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
@@ -101,7 +101,7 @@ export class AuthenticationEffects {
                 return AuthenticationActions.login.success({
                   auth: dto,
                   method: a.method,
-                  mode: state.application.mode!,
+                  mode: a.mode,
                 });
               } else {
                 return AuthenticationActions.needReAuthentication.success({
@@ -112,7 +112,7 @@ export class AuthenticationEffects {
             return AuthenticationActions.login.success({
               auth: dto,
               method: a.method,
-              mode: state.application.mode!,
+              mode: LoginMode.ONLINE,
             });
           }),
           catchError((err: HttpErrorResponse) => {

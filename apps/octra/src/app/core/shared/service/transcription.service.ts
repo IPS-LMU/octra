@@ -55,9 +55,7 @@ import { RoutingService } from './routing.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class TranscriptionService {
   get currentLevelSegmentChange(): EventEmitter<SegmentChangeEvent> {
     return this._currentLevelSegmentChange;
@@ -94,6 +92,10 @@ export class TranscriptionService {
    */
 
   public get currentlevel(): Level | undefined {
+    if(!this.annotation) {
+      console.error(new Error("t"));
+    }
+
     if (this._selectedlevel === undefined || this._selectedlevel < 0) {
       return this._annotation?.levels[0];
     }
@@ -106,8 +108,8 @@ export class TranscriptionService {
     return this._annotation;
   }
 
-  get guidelines(): any {
-    return getModeState(this.appStorage.snapshot)?.guidelines;
+  get guidelines(): any | undefined {
+    return getModeState(this.appStorage.snapshot)?.guidelines?.selected?.json;
   }
 
   private _audiofile!: OAudiofile;
@@ -199,6 +201,7 @@ export class TranscriptionService {
     private routingService: RoutingService,
     private http: HttpClient
   ) {
+    console.log("INIT TRANSCRIPTION SERVICE");
     this.alertTriggered = new Subject<{
       type: 'danger' | 'warning' | 'info' | 'success';
       data: string | any;
@@ -395,20 +398,11 @@ export class TranscriptionService {
           ? `${this.appStorage.audioURL}`
           : modeState!.audio!.file!.url!;
       this._audiofile.type = this._audiomanager.resource.info.type;
-
-      // overwrite logging option using projectconfig
-      if (
-        state.application.mode === LoginMode.ONLINE ||
-        state.application.mode === LoginMode.DEMO
-      ) {
-        this.appStorage.logging =
-          this.settingsService.projectsettings?.logging.forced === true;
-      }
       this.uiService.enabled = this.appStorage.logging;
 
       await this.loadSegments(modeState!, state);
 
-      this.selectedlevel = 0;
+      this._selectedlevel = 0;
       this.navbarServ.ressource = this._audiomanager.resource;
       this.navbarServ.filesize = getFileSize(
         this._audiomanager.resource.size!
@@ -567,6 +561,18 @@ export class TranscriptionService {
         }
       }
       this.appStorage.overwriteAnnotation(newLevels, newLinks, true);
+      console.log("SET ANNOATION IN loadSegments");
+      console.log(new Annotation(
+        this._audiofile.name,
+        this._audiofile,
+        newLevels.map((a) =>
+          Level.fromObj(
+            a,
+            this._audiofile.sampleRate,
+            this.audioManager.createSampleUnit(this._audiofile.duration)
+          )
+        )
+      ));
       this._annotation = new Annotation(
         this._audiofile.name,
         this._audiofile,
@@ -578,14 +584,12 @@ export class TranscriptionService {
           )
         )
       );
-      this.routingService.navigate(
-        ['/user/transcr'],
-        AppInfo.queryParamsHandling
-      );
     } else {
       const annotates =
         this._audiomanager.resource.name +
         this._audiomanager.resource.extension;
+      console.log("SET ANNOATION IN SET ANNOATION IN loadSegments2");
+      console.log(new Annotation(annotates, this._audiofile));
       this._annotation = new Annotation(annotates, this._audiofile);
 
       if (this.appStorage.annotationLevels !== undefined) {
@@ -654,6 +658,8 @@ export class TranscriptionService {
       annotation.links.push(annotationLink.link);
     }
 
+    console.log("SET ANNOATION IN updateAnnoation");
+    console.log(annotation);
     this._annotation = annotation;
     this.listenForSegmentChanges();
     this.annotationChanged.emit();

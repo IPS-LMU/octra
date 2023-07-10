@@ -12,7 +12,7 @@ import { DefaultComponent } from '../../component/default.component';
   selector: 'octra-members-area',
   templateUrl: './members-area.component.html',
   styleUrls: ['./members-area.component.scss'],
-  providers: [UserInteractionsService, TranscriptionService, AsrService],
+  providers: [UserInteractionsService, AsrService],
 })
 export class MembersAreaComponent extends DefaultComponent {
   constructor(private router: Router, private settService: SettingsService) {

@@ -4,7 +4,8 @@ import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AnnotationStateLevel, TranscriptionState } from './index';
+import { AnnotationStateLevel, GuidelinesItem, TranscriptionState } from "./index";
+import { ProjectSettings } from "../../obj";
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -201,6 +202,15 @@ export class AnnotationActions {
     },
   });
 
+  static initTranscriptionService = createActionGroup({
+    source: `annotation/ init transcription service`,
+    events: {
+      do: props<{
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
   static startAnnotation = createActionGroup({
     source: `annotation/ start`,
     events: {
@@ -211,6 +221,9 @@ export class AnnotationActions {
       success: props<{
         project: ProjectDto;
         task: TaskDto;
+        projectSettings: ProjectSettings,
+        guidelines: GuidelinesItem[],
+        selectedGuidelines?: GuidelinesItem,
         mode: LoginMode;
       }>(),
       fail: props<{

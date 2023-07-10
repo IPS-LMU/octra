@@ -17,7 +17,7 @@ import {
   ShortcutManager,
 } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
-import { interval, throwError, timer } from 'rxjs';
+import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
@@ -60,7 +60,6 @@ import { PromptModalComponent } from '../../modals/prompt-modal/prompt-modal.com
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../component/default.component';
-import videojs from 'video.js';
 
 @Component({
   selector: 'octra-transcription',
@@ -245,9 +244,6 @@ export class TranscriptionComponent
   ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
-
-    this.navbarServ.transcrService = this.transcrService;
-    this.navbarServ.uiService = this.uiService;
 
     this.shortcutManager = new ShortcutManager();
     this.shortcutManager.registerShortcutGroup(this.modalShortcuts);
@@ -487,16 +483,17 @@ export class TranscriptionComponent
 
     this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
 
-    for (const marker of this.transcrService.guidelines.markers) {
+    /**
+     for (const marker of this.transcrService.guidelines.markers) {
       if (marker.type === 'break') {
         this.transcrService.breakMarker = marker;
         break;
       }
     }
+     **/
 
     // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
-    this.navbarServ.showInterfaces =
-      this.projectsettings.navigation.interfaces;
+    this.navbarServ.showInterfaces = this.projectsettings.navigation.interfaces;
     this.checkCurrentEditor();
     this.interface = this.appStorage.interface;
 
@@ -716,6 +713,7 @@ export class TranscriptionComponent
   }
 
   changeEditor(name: string): Promise<void> {
+    console.log('CHANGE EDITOR TO ' + name);
     return new Promise<void>((resolve, reject) => {
       this.editorloaded = false;
       this.cd.detectChanges();
@@ -745,7 +743,7 @@ export class TranscriptionComponent
           })
         );
 
-        if (!(this.appLoadeditor === undefined)) {
+        if (this.appLoadeditor !== undefined) {
           const componentFactory =
             this._componentFactoryResolver.resolveComponentFactory(comp);
 

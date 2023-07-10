@@ -22,7 +22,6 @@ import {
 import { AppSettings, ASRLanguage } from '../../obj';
 import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { AsrService } from '../../shared/service/asr.service';
 import { SettingsService } from '../../shared/service';
 import { LoginMode, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
@@ -330,9 +329,11 @@ export class ApplicationEffects {
             this.appStorage.asrSelectedService !== undefined &&
             this.appStorage.asrSelectedLanguage !== undefined
           ) {
-            // set asr settings
+            // set asr settings TODO move to transcr init
             const selectedLanguage = this.appStorage.asrSelectedLanguage;
             const selectedService = this.appStorage.asrSelectedService;
+
+            /*
             const lang: ASRLanguage = this.asrService.getLanguageByCode(
               selectedLanguage,
               selectedService
@@ -343,6 +344,7 @@ export class ApplicationEffects {
             } else {
               console.error('Could not read ASR language from database');
             }
+             */
 
             if (!this.settingsService.responsive.enabled) {
               this.setFixedWidth();
@@ -477,7 +479,6 @@ export class ApplicationEffects {
     private configurationService: ConfigurationService,
     private bugService: BugReportService,
     private appStorage: AppStorageService,
-    private asrService: AsrService,
     private settingsService: SettingsService,
     private routerService: RoutingService
   ) {}

@@ -19,6 +19,12 @@ import {
 } from '@octra/annotation';
 import { SampleUnit } from '@octra/media';
 
+export interface GuidelinesItem {
+  name: string;
+  json: any;
+  type?: string;
+}
+
 export interface AnnotationState extends UndoRedoState {
   savingNeeded: boolean;
   isSaving: boolean;
@@ -29,7 +35,10 @@ export interface AnnotationState extends UndoRedoState {
     sampleRate: number;
     file?: TaskInputOutputDto; // TODO <- add audio file here
   };
-  guidelines?: any;
+  guidelines?: {
+    selected?: GuidelinesItem;
+    list: GuidelinesItem[]
+  };
   logs: ILog[];
   logging: boolean;
   projectConfig?: ProjectSettings;

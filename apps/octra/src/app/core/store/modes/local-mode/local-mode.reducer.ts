@@ -42,10 +42,7 @@ export const reducer = createUndoRedoReducer(
       if (mode === LoginMode.LOCAL) {
         return clearSession
           ? {
-              ...initialState,
-              guidelines: state.guidelines,
-              projectConfig: state.projectConfig,
-              methods: state.methods,
+              ...initialState
             }
           : {
               ...state,

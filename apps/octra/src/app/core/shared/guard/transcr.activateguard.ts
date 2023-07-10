@@ -27,7 +27,7 @@ export class TranscActivateGuard implements CanActivate {
   ): Observable<boolean> | boolean {
     return this.store.pipe(
       map((state) => {
-        if (state.application.loading) {
+        if (state.application.loading.status === "FINISHED" && state.onlineMode.transcript.levels.length > 0) {
           if (state.application.loading.status !== LoadingStatus.FINISHED) {
             console.error(`audio not loaded`);
             const params = AppInfo.queryParamsHandling;

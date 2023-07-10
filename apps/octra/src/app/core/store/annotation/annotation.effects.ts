@@ -10,7 +10,7 @@ import { LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationActions } from './annotation.actions';
-import { AudioService, TranscriptionService } from '../../shared/service';
+import { AudioService, TranscriptionService, UserInteractionsService } from "../../shared/service";
 import { withLatestFrom } from 'rxjs/operators';
 import { AppInfo } from '../../../app.info';
 import {
@@ -23,13 +23,18 @@ import {
   OLevel,
 } from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
+import { ToolConfigurationAssetDto } from '@octra/api-types';
+import { GuidelinesItem } from './index';
+import { NavbarService } from "../../component/navbar/navbar.service";
 
 @Injectable()
 export class AnnotationEffects {
   startAnnotation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.startAnnotation.do),
-      exhaustMap((a) => {
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        // TODO write for Local and URL and DEMP
         return this.apiService
           .startTask(a.project.id, {
             task_type: 'annotation',
@@ -38,10 +43,59 @@ export class AnnotationEffects {
             map((task) => {
               this.sessionStorageService.clear();
 
+              if (!task.tool_configuration) {
+                return AnnotationActions.startAnnotation.fail({
+                  error: new HttpErrorResponse({
+                    error: new Error('Missing tool configuration'),
+                    status: 500,
+                  }),
+                });
+              }
+
+              if (
+                !task.tool_configuration.assets ||
+                task.tool_configuration.assets.length === 0
+              ) {
+                return AnnotationActions.startAnnotation.fail({
+                  error: new HttpErrorResponse({
+                    error: new Error('Missing tool configuration assets'),
+                    status: 500,
+                  }),
+                });
+              }
+
+              const assets = task.tool_configuration.assets;
+              const guidelines: GuidelinesItem[] = this.readGuidelines(assets);
+
+              this.addFunctions(assets);
+
+              let selectedGuidelines: GuidelinesItem | undefined = undefined;
+
+              if(guidelines.length > 0) {
+                if (state.application.language) {
+                  if (guidelines.length === 1) {
+                    selectedGuidelines = guidelines[0];
+                  } else {
+                    const found = guidelines.find(
+                      (a) =>
+                        new RegExp(
+                          `_${state.application.language.toLowerCase()}.json`
+                        ).exec(a.name) !== null
+                    );
+                    selectedGuidelines = found ?? guidelines[0];
+                  }
+                } else {
+                  selectedGuidelines = guidelines[0];
+                }
+              }
+
               return AnnotationActions.startAnnotation.success({
                 task,
                 project: a.project,
                 mode: a.mode,
+                projectSettings: task.tool_configuration.value,
+                guidelines,
+                selectedGuidelines,
               });
             }),
             catchError((error: HttpErrorResponse) => {
@@ -59,7 +113,7 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
-          this.routingService.navigate(['user/transcr']);
+          this.routingService.navigate(['user/load']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
@@ -187,12 +241,13 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
-  onAudioLoadSuccess$ = createEffect(
+  initTranscriptionService$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.loadAudio.success),
+        ofType(AnnotationActions.initTranscriptionService.do),
         withLatestFrom(this.store),
         tap(([a, state]) => {
+
           if (
             state.application.mode === LoginMode.URL &&
             state.application.queryParams!.transcript !== undefined
@@ -283,8 +338,14 @@ export class AnnotationEffects {
                       newLinks,
                       false
                     );
-                    console.log('NAVIGATE TRANSCR');
-                    this.routingService.navigate(['/user/transcr']);
+                    this.navbarService.transcrService = this.transcrService;
+                    this.navbarService.uiService = this.uiService;
+
+                    console.log("INIT TRANSCR OKOKOKO");
+                    this.routingService.navigate(
+                      ['/user/transcr'],
+                      AppInfo.queryParamsHandling
+                    );
                   } else {
                     // TODO reject
                   }
@@ -295,7 +356,7 @@ export class AnnotationEffects {
               });
           } else {
             if (this.appStorage.useMode === LoginMode.URL) {
-              // overwrite
+              // overwrite with empty level
               this.transcrService.defaultFontSize = 16;
 
               const newLevels: OIDBLevel[] = [];
@@ -309,9 +370,15 @@ export class AnnotationEffects {
 
               this.appStorage.overwriteAnnotation(newLevels, [], false);
             } else {
+              // it's not URL mode
               this.transcrService
                 .load(state)
                 .then(() => {
+                  this.navbarService.transcrService = this.transcrService;
+                  this.navbarService.uiService = this.uiService;
+
+                  console.log("INIT TRANSCR OK:");
+                  console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
                     ['/user/transcr'],
                     AppInfo.queryParamsHandling
@@ -327,6 +394,59 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
+  onAudioLoadSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.loadAudio.success),
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          this.store.dispatch(AnnotationActions.initTranscriptionService.do({mode: state.application.mode!}));
+        })
+      ),
+    { dispatch: false }
+  );
+
+  private addFunctions(assets: ToolConfigurationAssetDto[]) {
+    const functionsObj = assets.find((a) => a.name === 'functions');
+
+    const script = document.createElement('script');
+    script.type = 'application/javascript';
+    script.id = 'octra_functions';
+    if (functionsObj) {
+      script.innerHTML = functionsObj.content;
+    } else {
+      script.innerHTML = `
+                  function validateAnnotation(annotation, guidelines) { return []; }
+                  function tidyUpAnnotation(annotation, guidelines) { return annotation; }
+                `;
+    }
+
+    document.head.querySelector('#octra_functions')?.remove();
+    document.head.appendChild(script);
+  }
+
+  private readGuidelines(
+    assets: ToolConfigurationAssetDto[]
+  ): GuidelinesItem[] {
+    return assets
+      .filter((a) => a.name === 'guidelines')
+      .map((a) => {
+        try {
+          return {
+            name: a.name,
+            json: JSON.parse(a.content),
+            type: a.mime_type,
+          };
+        } catch (e) {
+          return {
+            name: a.name,
+            json: undefined,
+            type: a.mime_type,
+          };
+        }
+      });
+  }
+
   constructor(
     private actions$: Actions,
     private store: Store<RootState>,
@@ -340,6 +460,8 @@ export class AnnotationEffects {
     private modalsService: OctraModalService,
     private audio: AudioService,
     private transcrService: TranscriptionService,
+    private navbarService: NavbarService,
+    private uiService: UserInteractionsService,
     private appStorage: AppStorageService
   ) {}
 }

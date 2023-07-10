@@ -82,10 +82,7 @@ export class OnlineModeReducers {
                   ...initialState,
                   onlineSession: {
                     ...initialState.onlineSession,
-                  },
-                  guidelines: state.guidelines,
-                  projectConfig: state.projectConfig,
-                  methods: state.methods,
+                  }
                 }
               : {
                   ...state,
@@ -258,17 +255,24 @@ export class OnlineModeReducers {
       ),
       on(
         AnnotationActions.startAnnotation.success,
-        (state: AnnotationState, { task, project }) => {
-          return {
-            ...state,
-            projectConfig: task.tool_configuration!.value,
-            onlineSession: {
-              ...state.onlineSession,
-              currentProject: project,
-              task,
-            },
-            changedTask: task,
-          };
+        (state: AnnotationState, { task, project, mode, projectSettings, guidelines, selectedGuidelines }) => {
+          if (mode === LoginMode.ONLINE) {
+            return {
+              ...state,
+              projectConfig: projectSettings,
+              onlineSession: {
+                ...state.onlineSession,
+                currentProject: project,
+                task,
+              },
+              guidelines: {
+                selected: selectedGuidelines,
+                list: guidelines
+              },
+              changedTask: task,
+            };
+          }
+          return state;
         }
       )
     );

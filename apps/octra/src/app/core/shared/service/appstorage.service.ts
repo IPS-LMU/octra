@@ -30,8 +30,9 @@ import { ILog } from '../../obj/Settings/logging';
 import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
 import { LocalModeActions } from '../../store/modes/local-mode/local-mode.actions';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { ProjectDto } from '@octra/api-types';
+import { ProjectDto, TaskDto } from "@octra/api-types";
 import { AuthenticationActions } from '../../store/authentication';
+import { get } from "jodit/types/core/helpers";
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,11 @@ export class AppStorageService {
     );
   }
 
+  public get currentTask(): TaskDto | undefined{
+    const mode = getModeState(this._snapshot);
+    return mode?.onlineSession?.task;
+  }
+
   public get annotationChanged(): Observable<AnnotationState> {
     const subject = new Subject<AnnotationState>();
     this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
@@ -80,11 +86,6 @@ export class AppStorageService {
     );
   }
 
-  get serverDataEntry(): any {
-    return getModeState(this._snapshot)?.onlineSession.sessionData
-      ?.serverDataEntry;
-  }
-
   set serverDataEntry(value: any) {
     this.store.dispatch(
       OnlineModeActions.setServerDataEntry({
@@ -92,11 +93,6 @@ export class AppStorageService {
         mode: this.useMode,
       })
     );
-  }
-
-  get submitted(): boolean {
-    console.log(`mode state for ${this.useMode}`);
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.submitted;
   }
 
   set submitted(value: boolean) {
@@ -108,10 +104,6 @@ export class AppStorageService {
     );
   }
 
-  get feedback(): any {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.feedback;
-  }
-
   set feedback(value: any) {
     this.store.dispatch(
       OnlineModeActions.setFeedback({
@@ -119,11 +111,6 @@ export class AppStorageService {
         mode: this.useMode,
       })
     );
-  }
-
-  get transcriptID(): number {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData
-      ?.transcriptID;
   }
 
   get language(): string {
@@ -176,10 +163,6 @@ export class AppStorageService {
     );
   }
 
-  get prompttext(): string {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.promptText;
-  }
-
   get urlParams(): any {
     return this._snapshot.application.queryParams;
   }
@@ -196,10 +179,6 @@ export class AppStorageService {
     );
   }
 
-  get comment(): string {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.comment;
-  }
-
   set comment(value: string) {
     this.store.dispatch(
       OnlineModeActions.setComment({
@@ -209,10 +188,6 @@ export class AppStorageService {
     );
   }
 
-  get servercomment(): string {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData
-      ?.serverComment;
-  }
 
   get annotationLevels(): AnnotationStateLevel[] {
     return getModeState(this._snapshot)!.transcript!.levels;
@@ -307,11 +282,6 @@ export class AppStorageService {
     return this._snapshot.application.idb.loaded;
   }
 
-  get jobsLeft(): number {
-    return getModeState(this._snapshot)?.onlineSession?.currentProject
-      ?.jobsLeft;
-  }
-
   set jobsLeft(jobsLeft: number) {
     this.store.dispatch(
       ApplicationActions.setJobsLeft({
@@ -324,7 +294,7 @@ export class AppStorageService {
     return getModeState(this._snapshot)!.logs;
   }
 
-  get onlineSession(): OnlineSession {
+  get onlineSession(): OnlineSession | undefined {
     return getModeState(this._snapshot)?.onlineSession;
   }
 
@@ -398,10 +368,6 @@ export class AppStorageService {
         isSaving: value,
       })
     );
-  }
-
-  get audioURL(): string {
-    return getModeState(this._snapshot)?.onlineSession?.sessionData?.audioURL;
   }
 
   get useMode(): LoginMode {

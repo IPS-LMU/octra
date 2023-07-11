@@ -22,6 +22,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -74,6 +75,7 @@ export class OverviewModalComponent extends OctraModal {
     public transcrService: TranscriptionService,
     public modalService: NgbModal,
     public settingsService: SettingsService,
+    public annotationStoreService: AnnotationStoreService,
     public appStorage: AppStorageService,
     private keyService: KeymappingService,
     private uiService: UserInteractionsService,
@@ -158,21 +160,14 @@ export class OverviewModalComponent extends OctraModal {
       );
 
     if (
-      this.appStorage.servercomment !== '' &&
+      this.appStorage.currentTask?.comment &&
       this.transcrService.feedback.comment === ''
     ) {
       this.transcrService.feedback.comment =
-        type + '; ' + this.appStorage.servercomment;
-    } else if (
-      (this.appStorage.servercomment === '' &&
-        this.transcrService.feedback.comment !== '') ||
-      (this.appStorage.servercomment !== '' &&
-        this.transcrService.feedback.comment !== '')
-    ) {
+        type + '; ' + this.appStorage.currentTask.comment;
+    } else {
       this.transcrService.feedback.comment =
         type + '; ' + this.transcrService.feedback.comment;
-    } else {
-      this.transcrService.feedback.comment = type;
     }
 
     if (

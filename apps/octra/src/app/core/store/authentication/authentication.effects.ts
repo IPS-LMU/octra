@@ -90,13 +90,13 @@ export class AuthenticationEffects {
 
               if (a.type === AuthenticationActions.login.do.type) {
                 if (!dto.me.last_login) {
-                  this.routingService.navigate(['/loading'], {
+                  this.routingService.navigate(['/load'], {
                     queryParams: {
                       first_login: true,
                     },
                   });
                 } else {
-                  this.routingService.navigate(['/loading']);
+                  this.routingService.navigate(['/load']);
                 }
                 return AuthenticationActions.login.success({
                   auth: dto,
@@ -175,7 +175,7 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.login.success),
         tap((a) => {
-          this.routingService.navigate(['/user/projects']);
+          this.routingService.navigate(['/intern/projects']);
 
           // TODO api
           // 1. Save loginData to store and IDB
@@ -229,7 +229,7 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.continueSessionAfterAgreement.success),
         tap((a) => {
           this.routingService.navigate(
-            ['/loading'],
+            ['/load'],
             { queryParams: a.params },
             null
           );

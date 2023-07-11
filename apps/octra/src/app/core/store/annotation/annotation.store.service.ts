@@ -1,14 +1,33 @@
 import { Injectable } from '@angular/core';
-import { LoginMode, RootState } from '../index';
+import { getModeState, LoginMode, RootState } from "../index";
 import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
 import { TaskInputOutputDto } from '@octra/api-types';
 import { Converter, IFile, OAudiofile } from '@octra/annotation';
+import { AnnotationState } from './index';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnnotationStoreService {
+  task$ = this.store.select((state: RootState) => getModeState(state)?.onlineSession?.task);
+
+  textInput$ = this.store.select((state: RootState) => {
+    if (
+      state.application.mode === undefined ||
+      state.application.mode === LoginMode.LOCAL ||
+      state.application.mode === LoginMode.URL
+    ) {
+      return undefined;
+    }
+
+    const mode = getModeState(state);
+    const result = this.getTranscriptFromIO(mode?.onlineSession?.task?.inputs ?? []);
+    console.log("RESULT");
+    console.log(result);
+    return result;
+  });
+
   constructor(private store: Store<RootState>) {}
 
   setLogs(value: any[], mode: LoginMode) {

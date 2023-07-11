@@ -7,32 +7,30 @@
     <div
       [ngClass]="{
         'col-12 col-sm-9':
-          appStorage.prompttext !== undefined &&
-          appStorage.prompttext !== undefined &&
-          appStorage.prompttext !== '',
+          (annotationStoreService.textInput$ | async) !== undefined &&
+          (annotationStoreService.textInput$ | async)?.content !== '',
         'col-12':
-          appStorage.prompttext !== undefined &&
-          appStorage.prompttext !== undefined &&
-          appStorage.prompttext === ''
+          (annotationStoreService.textInput$ | async) !== undefined &&
+          (annotationStoreService.textInput$ | async)?.content === ''
       }"
       class="col-12 col-sm-9"
       style="text-align: left; padding-left: 20px"
     >
       {{ navbarServ.ressource!.info!.fullname }}:
-      <i>{{ appStorage.servercomment }}</i>
+      <i>{{ (annotationStoreService.task$ | async)?.orgtext}}</i>
     </div>
     <div
       *ngIf="
-        appStorage.prompttext !== undefined &&
-        appStorage.prompttext !== undefined &&
-        appStorage.prompttext !== ''
+        (annotationStoreService.textInput$ | async) !== undefined
       "
       class="col-12 col-sm-3"
       style="text-align: right; padding-right: 20px"
     >
-      <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">{{
+      <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
+        {{
         'general.prompt' | transloco
-      }}</a>
+        }}
+      </a>
     </div>
   </div>
 </div>

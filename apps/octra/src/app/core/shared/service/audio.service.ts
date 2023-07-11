@@ -5,6 +5,7 @@ import { SubscriptionManager } from '@octra/utilities';
 import { downloadFile } from '@octra/ngx-utilities';
 import { AudioManager } from '@octra/media';
 import { Subject, Subscription } from 'rxjs';
+import { TaskInputOutputDto } from '@octra/api-types';
 
 @Injectable()
 export class AudioService {
@@ -36,42 +37,33 @@ export class AudioService {
    *
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
-  public loadAudio: (url: string) => Subject<any> = (url: string) => {
+  public loadAudio: (
+    url: string,
+    audioInput: TaskInputOutputDto
+  ) => Subject<any> = (url: string, audioInput: TaskInputOutputDto) => {
     this._loaded = false;
 
     const subj = new Subject<number>();
 
-    downloadFile(this.http, url).subscribe(
-      (event) => {
+    downloadFile(this.http, url).subscribe({
+      next: (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {
-          const regex = new RegExp(
-            /((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/,
-            'g'
-          );
-          const matches: RegExpExecArray | null = regex.exec(url);
-
-          let filename = '';
-          if (matches !== null && matches.length > 0) {
-            filename = matches[1] + '.' + matches[3];
-          } else {
-            filename = url;
-          }
-
           this.subscrmanager.add(
             AudioManager.decodeAudio(
-              filename,
-              'audio/wav',
+              audioInput.filename,
+              audioInput.type,
               event.result,
               AppInfo.audioformats
-            ).subscribe(
-              (result) => {
+            ).subscribe({
+              next: (result) => {
                 if (
                   result.audioManager !== undefined &&
                   result.audioManager !== null
                 ) {
                   // finished
                   console.log(`REGISTER AUDIOMANAGER`);
+                  result.audioManager.resource.info.url = url;
                   this.registerAudioManager(result.audioManager);
                   this.afterloaded.emit({ status: 'success' });
 
@@ -81,17 +73,17 @@ export class AudioService {
                   subj.next(0.5 + 0.5 * result.decodeProgress);
                 }
               },
-              (error) => {
+              error: (error) => {
                 subj.error(error);
-              }
-            )
+              },
+            })
           );
         }
       },
-      (error) => {
+      error: (error) => {
         subj.error(error);
-      }
-    );
+      },
+    });
 
     return subj;
   };

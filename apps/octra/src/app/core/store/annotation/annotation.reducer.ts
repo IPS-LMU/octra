@@ -5,7 +5,7 @@ import { IDBActions } from '../idb/idb.actions';
 import { ConfigurationActions } from '../configuration/configuration.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
-import { AnnotationState } from './index';
+import { AnnotationState, OnlineModeState } from "./index";
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -28,7 +28,7 @@ export const initialState: AnnotationState = {
 export class AnnotationStateReducers {
   constructor(private mode: LoginMode) {}
 
-  create(): ReducerTypes<AnnotationState, ActionCreator[]>[] {
+  create<T>(): ReducerTypes<AnnotationState, ActionCreator[]>[] {
     return [
       on(
         AnnotationActions.setLevelCounter.do,

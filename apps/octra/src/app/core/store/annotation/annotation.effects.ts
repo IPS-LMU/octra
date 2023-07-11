@@ -23,7 +23,7 @@ import {
   OLevel,
 } from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { ToolConfigurationAssetDto } from '@octra/api-types';
+import { TaskInputOutputDto, ToolConfigurationAssetDto } from "@octra/api-types";
 import { GuidelinesItem } from './index';
 import { NavbarService } from "../../component/navbar/navbar.service";
 
@@ -34,7 +34,7 @@ export class AnnotationEffects {
       ofType(AnnotationActions.startAnnotation.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        // TODO write for Local and URL and DEMP
+        // TODO write for Local and URL and DEMO
         return this.apiService
           .startTask(a.project.id, {
             task_type: 'annotation',
@@ -113,7 +113,8 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
-          this.routingService.navigate(['user/load']);
+          this.transcrService.init();
+          this.routingService.navigate(['/intern/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
@@ -159,7 +160,7 @@ export class AnnotationEffects {
                 filename = filename.substring(filename.indexOf('src=') + 4);
               }
 
-              this.audio.loadAudio(src).subscribe({
+              this.audio.loadAudio(src, a.audioFile).subscribe({
                 next: (progress) => {
                   if (progress < 1) {
                     this.store.dispatch(
@@ -229,7 +230,7 @@ export class AnnotationEffects {
           if (state.application.mode === LoginMode.LOCAL) {
             this.routingService
               .navigate(
-                ['/user/transcr/reload-file'],
+                ['/intern/transcr/reload-file'],
                 AppInfo.queryParamsHandling
               )
               .catch((error) => {
@@ -343,7 +344,7 @@ export class AnnotationEffects {
 
                     console.log("INIT TRANSCR OKOKOKO");
                     this.routingService.navigate(
-                      ['/user/transcr'],
+                      ['/intern/transcr'],
                       AppInfo.queryParamsHandling
                     );
                   } else {
@@ -380,7 +381,7 @@ export class AnnotationEffects {
                   console.log("INIT TRANSCR OK:");
                   console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
-                    ['/user/transcr'],
+                    ['/intern/transcr'],
                     AppInfo.queryParamsHandling
                   );
                 })

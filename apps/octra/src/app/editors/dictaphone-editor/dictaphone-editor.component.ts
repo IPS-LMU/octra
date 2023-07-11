@@ -489,8 +489,8 @@ export class DictaphoneEditorComponent
   }
 
   private loadEditor() {
-    if (this.transcrService.currentlevel!.segments.length > 0) {
-      this.segments = this.transcrService.currentlevel!.segments;
+    if (this.transcrService.currentlevel && this.transcrService.currentlevel.segments.length > 0) {
+      this.segments = this.transcrService.currentlevel.segments;
     }
     this.editor.Settings.height = 100;
     this.oldRaw = this.editor.rawText;

@@ -11,6 +11,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from "../../store/annotation/annotation.store.service";
 
 @Component({
   selector: 'octra-prompt-modal',
@@ -31,7 +32,7 @@ export class PromptModalComponent extends OctraModal {
 
   constructor(
     modalService: NgbModal,
-    public appStorage: AppStorageService,
+    public annotationStoreService: AnnotationStoreService,
     private settService: SettingsService,
     private cd: ChangeDetectorRef,
     protected override activeModal: NgbActiveModal

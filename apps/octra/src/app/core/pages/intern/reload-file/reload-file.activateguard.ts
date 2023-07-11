@@ -6,10 +6,10 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { AppInfo } from '../../../app.info';
-import { SettingsService } from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import * as fromAnnotation from '../../store/annotation';
+import { AppInfo } from '../../../../app.info';
+import { SettingsService } from '../../../shared/service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
+import * as fromAnnotation from '../../../store/annotation';
 import { Store } from '@ngrx/store';
 import { afterDefined } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';

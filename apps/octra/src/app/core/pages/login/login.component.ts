@@ -107,9 +107,7 @@ export class LoginComponent
 
   onOfflineSubmit = () => {
     if (
-      this.appStorage.useMode !== LoginMode.DEMO &&
-      this.appStorage.transcriptID !== undefined &&
-      typeof this.appStorage.transcriptID === 'number'
+      this.appStorage.useMode !== LoginMode.DEMO
     ) {
       // last was online mode
       /*
@@ -446,7 +444,7 @@ export class LoginComponent
   }
 
   private navigate = (): void => {
-    navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch(
+    navigateTo(this.router, ['/intern'], AppInfo.queryParamsHandling).catch(
       (error) => {
         console.error(error);
       }

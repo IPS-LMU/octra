@@ -5,10 +5,10 @@ import {
   SettingsService,
   TranscriptionService,
   UserInteractionsService,
-} from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { NavbarService } from '../../component/navbar/navbar.service';
-import { DefaultComponent } from '../../component/default.component';
+} from '../../../shared/service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { NavbarService } from '../../../component/navbar/navbar.service';
+import { DefaultComponent } from '../../../component/default.component';
 
 @Component({
   selector: 'octra-transcription-submitted',
@@ -45,6 +45,6 @@ export class TranscriptionEndComponent
   }
 
   backToProjectsList() {
-    navigateTo(this.router, ['user/projects']);
+    navigateTo(this.router, ['intern/projects']);
   }
 }

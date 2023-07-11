@@ -48,7 +48,7 @@ export interface AnnotationState extends UndoRedoState {
   };
   transcript: TranscriptionState;
   histories: Histories;
-  onlineSession?: any;
+  onlineSession?: OnlineSession;
   files?: any;
   sessionFile?: any;
   changedTask?: TaskDto;

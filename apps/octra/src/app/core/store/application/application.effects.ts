@@ -458,7 +458,7 @@ export class ApplicationEffects {
           subject.complete();
 
           this.routerService
-            .navigate(['login'], AppInfo.queryParamsHandling)
+            .navigate(['/login'], AppInfo.queryParamsHandling)
             .catch((error) => {
               console.error(error);
             });

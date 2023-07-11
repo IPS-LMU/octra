@@ -12,11 +12,13 @@ import { LoadingStatus, LoginMode, RootState } from '../../store';
 import { navigateTo } from '@octra/ngx-utilities';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { Store } from '@ngrx/store';
+import { TranscriptionService } from "../service";
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
   constructor(
     private appStoreService: ApplicationStoreService,
+    private transcrService: TranscriptionService,
     private router: Router,
     private store: Store<RootState>
   ) {}
@@ -27,35 +29,32 @@ export class TranscActivateGuard implements CanActivate {
   ): Observable<boolean> | boolean {
     return this.store.pipe(
       map((state) => {
-        if (state.application.loading.status === "FINISHED" && state.onlineMode.transcript.levels.length > 0) {
-          if (state.application.loading.status !== LoadingStatus.FINISHED) {
-            console.error(`audio not loaded`);
-            const params = AppInfo.queryParamsHandling;
-            params.fragment = route.fragment!;
-            params.queryParams = route.queryParams;
+        if (state.application.loading.status !== LoadingStatus.FINISHED) {
+          console.error(`audio not loaded`);
+          const params = AppInfo.queryParamsHandling;
+          params.fragment = route.fragment!;
+          params.queryParams = route.queryParams;
 
-            if (state.application.mode !== LoginMode.LOCAL) {
-              navigateTo(this.router, ['/user/load'], params).catch((error) => {
-                console.error(error);
-              });
-            } else {
-              navigateTo(
-                this.router,
-                ['/user/transcr/reload-file'],
-                params
-              ).catch((error) => {
-                console.error(error);
-              });
-            }
-            console.log('NAVIGATE LOAD');
-            navigateTo(this.router, ['/user/load'], params).catch((error) => {
+          if (state.application.mode !== LoginMode.LOCAL) {
+            navigateTo(this.router, ['/intern/load'], params).catch((error) => {
               console.error(error);
             });
-            return false;
+          } else {
+            navigateTo(
+              this.router,
+              ['/intern/transcr/reload-file'],
+              params
+            ).catch((error) => {
+              console.error(error);
+            });
           }
-          return true;
+          console.log('NAVIGATE LOAD');
+          navigateTo(this.router, ['/intern/load'], params).catch((error) => {
+            console.error(error);
+          });
+          return false;
         }
-        return false;
+        return true;
       })
     );
   }

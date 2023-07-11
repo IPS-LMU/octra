@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { interval } from 'rxjs';
-import { NavbarService } from '../../component/navbar/navbar.service';
-import { DefaultComponent } from '../../component/default.component';
+import { NavbarService } from '../../../component/navbar/navbar.service';
+import { DefaultComponent } from '../../../component/default.component';
 
 @Component({
   selector: 'octra-auth',

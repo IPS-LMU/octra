@@ -24,7 +24,7 @@ export class TranscrEndGuard implements CanActivate {
       console.log(`not submitted, to load`);
       navigateTo(
         this.router,
-        ['/user/load'],
+        ['/intern/load'],
         AppInfo.queryParamsHandling
       ).catch((error) => {
         console.error(error);

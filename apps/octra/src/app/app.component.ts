@@ -46,8 +46,7 @@ export class AppComponent
     private multiThreading: MultiThreadingService,
     private asrService: AsrService,
     private appStoreService: ApplicationStoreService,
-    private store: Store,
-    private transloco: TranslocoService
+    private store: Store
   ) {
     super();
 
@@ -55,10 +54,10 @@ export class AppComponent
 
     this.router.events.subscribe((event: any) => {
       if (event.url) {
-        console.log(`route to page: ${event?.url}`);
+        console.log(`route from ${event.url} to page: ${event?.url}`);
       } else if (event.snapshot) {
         console.log(
-          `route to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
+          `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
         );
       }
     });

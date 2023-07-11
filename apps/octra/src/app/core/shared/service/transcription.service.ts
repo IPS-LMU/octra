@@ -10,7 +10,7 @@ import {
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { FeedBackForm } from '../../obj/FeedbackForm/FeedBackForm';
-import { AppSettings, ProjectSettings } from '../../obj/Settings';
+import { AppSettings } from '../../obj/Settings';
 import { OLog, OLogging } from '../../obj/Settings/logging';
 import { KeyStatisticElem } from '../../obj/statistics/KeyStatisticElem';
 import { MouseStatisticElem } from '../../obj/statistics/MouseStatisticElem';
@@ -55,7 +55,9 @@ import { RoutingService } from './routing.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TranscriptionService {
   get currentLevelSegmentChange(): EventEmitter<SegmentChangeEvent> {
     return this._currentLevelSegmentChange;
@@ -92,10 +94,6 @@ export class TranscriptionService {
    */
 
   public get currentlevel(): Level | undefined {
-    if(!this.annotation) {
-      console.error(new Error("t"));
-    }
-
     if (this._selectedlevel === undefined || this._selectedlevel < 0) {
       return this._annotation?.levels[0];
     }
@@ -201,15 +199,19 @@ export class TranscriptionService {
     private routingService: RoutingService,
     private http: HttpClient
   ) {
-    console.log("INIT TRANSCRIPTION SERVICE");
+    this.subscrmanager = new SubscriptionManager<Subscription>();
     this.alertTriggered = new Subject<{
       type: 'danger' | 'warning' | 'info' | 'success';
       data: string | any;
       unique: boolean;
       duration?: number;
     }>();
-    this.subscrmanager = new SubscriptionManager<Subscription>();
+  }
 
+  /**
+   * init is called as soon as annotation is started
+   */
+  init() {
     this.subscrmanager.add(
       this.uiService.afteradd.subscribe((elem) => {
         if (this.appStorage.logging) {
@@ -387,7 +389,7 @@ export class TranscriptionService {
       this.filename = modeState!.audio.fileName;
 
       this._audiofile = new OAudiofile();
-      this._audiofile.name = this._audiomanager.resource.info.fullname;
+      this._audiofile.name = modeState!.audio.fileName;
       this._audiofile.sampleRate = this._audiomanager.resource.info.sampleRate;
       this._audiofile.duration =
         this._audiomanager.resource.info.duration.samples;
@@ -395,7 +397,7 @@ export class TranscriptionService {
 
       this._audiofile.url =
         state.application.mode === LoginMode.DEMO
-          ? `${this.appStorage.audioURL}`
+          ? `` // TODO DEMO ensure URL
           : modeState!.audio!.file!.url!;
       this._audiofile.type = this._audiomanager.resource.info.type;
       this.uiService.enabled = this.appStorage.logging;
@@ -465,19 +467,21 @@ export class TranscriptionService {
         rootState.application.mode === LoginMode.ONLINE ||
         rootState.application.mode === LoginMode.URL
       ) {
-        const task: TaskDto = modeState.onlineSession?.task;
+        let annotResult: ImportResult | undefined;
+        const task: TaskDto | undefined = modeState.onlineSession?.task;
 
-        const serverTranscript =
-          this.annotationStoreService.getTranscriptFromIO(task.inputs);
+        const serverTranscript = task
+          ? this.annotationStoreService.getTranscriptFromIO(task.inputs)
+          : '';
 
         // import logs
         this.annotationStoreService.setLogs(
-          task.log,
+          task?.log,
           rootState.application.mode
         );
         if (serverTranscript) {
           // check if it's AnnotJSON
-          const annotResult: ImportResult | undefined =
+          annotResult =
             this.annotationStoreService.convertFromSupportedConverters(
               AppInfo.converters,
               {
@@ -492,7 +496,7 @@ export class TranscriptionService {
                 size: this._audiomanager.resource.info.size,
                 duration: this._audiomanager.resource.info.duration.samples,
                 sampleRate: this._audiomanager.resource.info.sampleRate,
-                url: this.appStorage.audioURL,
+                url: this._audiomanager.resource.info.url!,
                 type: this._audiomanager.resource.info.type,
               }
             );
@@ -510,13 +514,16 @@ export class TranscriptionService {
               const link = annotResult.annotjson.links[i];
               newLinks.push(new OIDBLink(i + 1, link));
             }
-          } else {
-            // no transcript found
-            if (
-              task.orgtext !== undefined &&
-              task.orgtext !== '' &&
-              typeof task.orgtext === 'string'
-            ) {
+          }
+        }
+
+        if (!annotResult) {
+          // no transcript found
+          if (task) {
+            const textInput = this.annotationStoreService.getTranscriptFromIO(
+              task.inputs
+            );
+            if (textInput) {
               // prompt text available and server transcript is undefined
               // set prompt as new transcript
 
@@ -526,7 +533,7 @@ export class TranscriptionService {
                   AppInfo.converters,
                   {
                     name: this._audiofile.name,
-                    content: this.appStorage.prompttext,
+                    content: textInput.content,
                     type: 'text',
                     encoding: 'utf8',
                   },
@@ -537,7 +544,7 @@ export class TranscriptionService {
                 // prompttext is raw text
                 newLevels[0].level.items[0].labels[0] = new OLabel(
                   'OCTRA_1',
-                  this.appStorage.prompttext
+                  textInput.content
                 );
               } else if (converted.annotjson) {
                 // use imported annotJSON
@@ -560,19 +567,8 @@ export class TranscriptionService {
           }
         }
       }
+
       this.appStorage.overwriteAnnotation(newLevels, newLinks, true);
-      console.log("SET ANNOATION IN loadSegments");
-      console.log(new Annotation(
-        this._audiofile.name,
-        this._audiofile,
-        newLevels.map((a) =>
-          Level.fromObj(
-            a,
-            this._audiofile.sampleRate,
-            this.audioManager.createSampleUnit(this._audiofile.duration)
-          )
-        )
-      ));
       this._annotation = new Annotation(
         this._audiofile.name,
         this._audiofile,
@@ -588,8 +584,6 @@ export class TranscriptionService {
       const annotates =
         this._audiomanager.resource.name +
         this._audiomanager.resource.extension;
-      console.log("SET ANNOATION IN SET ANNOATION IN loadSegments2");
-      console.log(new Annotation(annotates, this._audiofile));
       this._annotation = new Annotation(annotates, this._audiofile);
 
       if (this.appStorage.annotationLevels !== undefined) {
@@ -598,7 +592,7 @@ export class TranscriptionService {
           this.appStorage.annotationLinks
         );
 
-        if(this.settingsService.projectsettings) {
+        if (this.settingsService.projectsettings) {
           this._feedback = FeedBackForm.fromAny(
             this.settingsService.projectsettings.feedback_form,
             this.appStorage.comment
@@ -658,8 +652,6 @@ export class TranscriptionService {
       annotation.links.push(annotationLink.link);
     }
 
-    console.log("SET ANNOATION IN updateAnnoation");
-    console.log(annotation);
     this._annotation = annotation;
     this.listenForSegmentChanges();
     this.annotationChanged.emit();
@@ -673,85 +665,6 @@ export class TranscriptionService {
       }),
       'segmentchange'
     );
-  }
-
-  public exportDataToJSON(): any {
-    let data: any = {};
-
-    if (!(this.annotation === undefined)) {
-      const logData: OLogging = this.extractUI(this.uiService.elements);
-
-      data = {
-        project:
-          this.appStorage.onlineSession.currentProject === undefined
-            ? 'NOT AVAILABLE'
-            : this.appStorage.onlineSession.currentProject?.name,
-        annotator:
-          this.appStorage.snapshot.authentication.me!.username === undefined
-            ? 'NOT AVAILABLE'
-            : this.appStorage.snapshot.authentication.me!.username,
-        transcript: undefined,
-        comment: this._feedback.comment,
-        quality: this.settingsService.isTheme('shortAudioFiles')
-          ? this.appStorage.feedback
-          : JSON.stringify(this._feedback.exportData()),
-        status: 'ANNOTATED',
-        id: this.appStorage.transcriptID,
-        log: logData.getObj(),
-      };
-
-      if (this.settingsService.isTheme('korbinian')) {
-        data.quality = '';
-      }
-
-      for (const logElement of data.log) {
-        if (logElement.type === 'transcription:segment_exited') {
-          logElement.value = JSON.stringify(logElement.value);
-        }
-      }
-
-      const transcript: any[] = [];
-
-      for (let i = 0; i < this.currentlevel!.segments.length; i++) {
-        const segment = this.currentlevel!.segments.get(i);
-
-        let lastBound = 0;
-        if (i > 0) {
-          lastBound = Math.round(
-            this.currentlevel!.segments.get(i - 1)!.time.samples
-          );
-        }
-
-        const segmentJSON: any = {
-          start: lastBound,
-          length: segment!.time.samples - lastBound,
-          text: segment!.transcript,
-        };
-
-        if (i === this.currentlevel!.segments.length - 1) {
-          segmentJSON.length =
-            this._audiomanager.resource.info.duration.samples - lastBound;
-        }
-
-        transcript.push(segmentJSON);
-      }
-
-      data.transcript = transcript;
-
-      // add number of errors as last element to the log
-      data.log.push({
-        timestamp: Date.now(),
-        type: 'errors',
-        context: 'transcript',
-        value: JSON.stringify(
-          this.validationArray.filter((a) => {
-            return a.validation.length > 0;
-          })
-        ),
-      });
-    }
-
-    return data;
   }
 
   public destroy() {
@@ -804,9 +717,9 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      this.appStorage.onlineSession.currentProject?.name === undefined
+      this.appStorage.onlineSession?.currentProject?.name === undefined
         ? 'local'
-        : this.appStorage.onlineSession.currentProject?.name,
+        : this.appStorage.onlineSession?.currentProject?.name,
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.sampleRate,
@@ -1145,7 +1058,8 @@ export class TranscriptionService {
     if (
       this.appStorage.useMode !== LoginMode.URL &&
       (this.appStorage.useMode === LoginMode.DEMO ||
-        this.settingsService?.projectsettings?.octra?.validationEnabled === true)
+        this.settingsService?.projectsettings?.octra?.validationEnabled ===
+          true)
     ) {
       let invalid = false;
 

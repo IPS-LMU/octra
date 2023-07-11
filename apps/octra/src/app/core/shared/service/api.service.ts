@@ -1,15 +1,15 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, SecurityContext } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { API } from '../../obj/API/api.interface';
-import { AppStorageService } from './appstorage.service';
-import { hasProperty } from '@octra/utilities';
+import { HttpClient } from "@angular/common/http";
+import { Injectable, SecurityContext } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { API } from "../../obj/API/api.interface";
+import { AppStorageService } from "./appstorage.service";
 
 @Injectable()
 export class APIService implements API {
-  private serverURL = '';
+  private serverURL = "";
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
+  }
 
   public beginSession(
     project: string,
@@ -18,17 +18,17 @@ export class APIService implements API {
     password?: string
   ): Promise<any> {
     // validation
-    if (project !== '' && annotator !== '') {
+    if (project !== "" && annotator !== "") {
       const cmdJSON = {
-        querytype: 'startannotation',
+        querytype: "startannotation",
         annotator,
         project,
-        jobno,
+        jobno
       };
 
       return this.post(cmdJSON);
     }
-    throw new Error('beginSession - validation false');
+    throw new Error("beginSession - validation false");
   }
 
   public continueSession(
@@ -38,26 +38,26 @@ export class APIService implements API {
   ): Promise<any> {
     if (
       project !== undefined &&
-      project !== '' &&
+      project !== "" &&
       annotator !== undefined &&
-      annotator !== ''
+      annotator !== ""
     ) {
       const cmdJSON = {
-        querytype: 'continueannotation',
+        querytype: "continueannotation",
         project,
         annotator,
-        jobno,
+        jobno
       };
       return this.post(cmdJSON);
     } else {
-      throw new Error('continueSession - validation false');
+      throw new Error("continueSession - validation false");
     }
   }
 
   public fetchAnnotation(id: number): Promise<any> {
     const cmdJSON = {
-      querytype: 'fetchannotation',
-      id,
+      querytype: "fetchannotation",
+      id
     };
     return this.post(cmdJSON);
   }
@@ -72,23 +72,23 @@ export class APIService implements API {
     quality: any,
     log: any[]
   ): Promise<any> {
-    if (project !== '' && transcript.length > 0 && quality !== undefined) {
+    if (project !== "" && transcript.length > 0 && quality !== undefined) {
       const cmdJSON = {
-        querytype: 'continueannotation',
+        querytype: "continueannotation",
         transcript: JSON.stringify(transcript),
         project,
         annotator,
         comment,
         jobno,
-        status: 'BUSY',
+        status: "BUSY",
         quality: JSON.stringify(quality),
         id: dataID,
-        log,
+        log
       };
 
       return this.post(cmdJSON);
     } else {
-      throw new Error('saveSession - validation false');
+      throw new Error("saveSession - validation false");
     }
   }
 
@@ -96,22 +96,22 @@ export class APIService implements API {
    * this method doesn't work! Do not use it.
    */
   public unlockSession(project: string, dataID: number): Promise<any> {
-    if (project !== '') {
+    if (project !== "") {
       const cmdJSON = {
-        querytype: 'continueannotation',
-        transcript: '',
+        querytype: "continueannotation",
+        transcript: "",
         project,
-        annotator: '',
-        comment: '',
-        status: 'FREE',
-        quality: '',
+        annotator: "",
+        comment: "",
+        status: "FREE",
+        quality: "",
         id: dataID,
-        log: [],
+        log: []
       };
 
       return this.post(cmdJSON);
     } else {
-      throw new Error('unlockSession - validation false');
+      throw new Error("unlockSession - validation false");
     }
   }
 
@@ -126,9 +126,9 @@ export class APIService implements API {
     quality: any,
     log: any[]
   ): Promise<any> {
-    if (project !== '' && transcript.length > 0 && quality !== undefined) {
+    if (project !== "" && transcript.length > 0 && quality !== undefined) {
       const cmdJSON = {
-        querytype: 'continueannotation',
+        querytype: "continueannotation",
         transcript: JSON.stringify(transcript),
         project,
         annotator,
@@ -137,12 +137,12 @@ export class APIService implements API {
         status,
         quality,
         id: dataID,
-        log,
+        log
       };
 
       return this.post(cmdJSON);
     } else {
-      throw new Error('saveSession - validation false');
+      throw new Error("saveSession - validation false");
     }
   }
 
@@ -151,36 +151,36 @@ export class APIService implements API {
     id: number,
     comment: string
   ): Promise<any> {
-    comment = comment ? comment : '';
+    comment = comment ? comment : "";
 
     if (annotator !== undefined && id !== undefined && id > -1) {
       const cmdJSON = {
-        querytype: 'endannotation',
+        querytype: "endannotation",
         annotator,
         comment,
-        id,
+        id
       };
 
       return this.post(cmdJSON);
     } else {
-      throw new Error('closeSession - validation false');
+      throw new Error("closeSession - validation false");
     }
   }
 
   public getAudioURL(dir: string, src: string): string {
-    if (dir !== undefined && dir !== '' && src !== undefined && src !== '') {
+    if (dir !== undefined && dir !== "" && src !== undefined && src !== "") {
       dir = this.sanitizer.sanitize(SecurityContext.URL, dir)!;
       src = this.sanitizer.sanitize(SecurityContext.URL, src)!;
 
-      return this.serverURL + '?dir=' + dir + '&src=' + src;
+      return this.serverURL + "?dir=" + dir + "&src=" + src;
     } else {
-      throw new Error('getAudioBuffer - validation false');
+      throw new Error("getAudioBuffer - validation false");
     }
   }
 
   public getProjects(): Promise<any> {
     const cmdJSON = {
-      querytype: 'listprojects',
+      querytype: "listprojects"
     };
 
     return new Promise<any>((resolve, reject) => {
@@ -188,7 +188,7 @@ export class APIService implements API {
 
       setTimeout(() => {
         checked = true;
-        reject(new Error('API timeout: server does not answer.'));
+        reject(new Error("API timeout: server does not answer."));
       }, 2000);
 
       this.post(cmdJSON)
@@ -209,7 +209,7 @@ export class APIService implements API {
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.serverURL, body, {
-          responseType: 'json',
+          responseType: "json"
         })
         .subscribe(
           (obj) => {
@@ -227,23 +227,24 @@ export class APIService implements API {
   }
 
   public sendBugReport(
-    email: string = '',
-    description: string = '',
+    email: string = "",
+    description: string = "",
     log: any
   ): Promise<any> {
     const json = JSON.stringify(log);
 
     const cmdJSON = {
-      querytype: 'reportbug',
+      querytype: "reportbug",
       email,
-      buglogtext: json,
+      buglogtext: json
     };
 
     return this.post(cmdJSON);
   }
 
-  public setOnlineSessionToFree = (appStorage: AppStorageService) => {
+  public async setOnlineSessionToFree(appStorage: AppStorageService) {
     // check if old annotation is already annotated
+    /*
     return new Promise<void>((resolve, reject) => {
       if (
         appStorage.transcriptID !== undefined &&
@@ -283,4 +284,6 @@ export class APIService implements API {
       }
     });
   };
+     */
+  }
 }

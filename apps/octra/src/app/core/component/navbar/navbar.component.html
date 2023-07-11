@@ -282,7 +282,7 @@
                   <span>{{ 'general.free jobs' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ appStorage.jobsLeft }}</span>
+                  <span>{{ appStorage.onlineSession?.currentProject?.statistics?.freeTasks }}</span>
                 </td>
               </tr>
               <tr>
@@ -347,7 +347,7 @@
                   <span>{{ 'general.id' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ appStorage.transcriptID }}</span>
+                  <span>{{ appStorage.currentTask?.id }}</span>
                 </td>
               </tr>
             </table>

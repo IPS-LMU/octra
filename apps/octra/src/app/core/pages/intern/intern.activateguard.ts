@@ -9,7 +9,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AppInfo } from '../../../app.info';
 import { navigateTo } from '@octra/ngx-utilities';
 
-export const MEMBER_AREA_GUARD: CanActivateFn = (
+export const AUTHENTICATED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {

@@ -4,12 +4,10 @@ import {
   BrowserTestComponent,
   Error404Component,
   FeaturesComponent,
-  HelpToolsComponent,
-  MembersAreaComponent,
-  NewsComponent,
-} from './core/pages';
+  HelpToolsComponent, InternModule,
+  NewsComponent
+} from "./core/pages";
 import { LoginComponent } from './core/pages/login';
-import { MEMBER_ROUTES } from './core/pages/members-area';
 import { CompatibilityGuard } from './core/shared/guard/compatibility.guard';
 import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
 import { CONFIG_LOADED_GUARD } from './core/shared/guard/appconfig-load.guard';
@@ -21,6 +19,11 @@ const APP_ROUTES: Routes = [
     path: 'login',
     component: LoginComponent,
     canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+  },
+  {
+    path: 'intern',
+    loadChildren: () => InternModule,
+    canActivate: [],
   },
   {
     path: 'test',
@@ -37,12 +40,6 @@ const APP_ROUTES: Routes = [
     path: 'features',
     component: FeaturesComponent,
     canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
-  },
-  {
-    path: 'user',
-    component: MembersAreaComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD, CompatibilityGuard],
-    children: MEMBER_ROUTES,
   },
   { path: 'help-tools', component: HelpToolsComponent },
   { path: 'stresstest', component: StresstestComponent },

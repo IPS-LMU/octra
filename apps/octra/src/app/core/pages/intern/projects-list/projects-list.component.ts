@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { AppStorageService } from '../../shared/service/appstorage.service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { ProjectDto } from '@octra/api-types';
-import { DefaultComponent } from '../../component/default.component';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { RoutingService } from '../../shared/service/routing.service';
+import { DefaultComponent } from '../../../component/default.component';
+import { OctraModalService } from '../../../modals/octra-modal.service';
+import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
+import { RoutingService } from '../../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-projects-list',

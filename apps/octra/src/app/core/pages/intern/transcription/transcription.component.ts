@@ -19,26 +19,26 @@ import {
 import { navigateTo } from '@octra/ngx-utilities';
 import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
-import { AppInfo } from '../../../app.info';
-import { editorComponents } from '../../../editors/components';
-import { OCTRAEditor } from '../../../editors/octra-editor';
-import { InactivityModalComponent } from '../../modals/inactivity-modal/inactivity-modal.component';
-import { MissingPermissionsModalComponent } from '../../modals/missing-permissions/missing-permissions.component';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { OverviewModalComponent } from '../../modals/overview-modal/overview-modal.component';
+import { AppInfo } from '../../../../app.info';
+import { editorComponents } from '../../../../editors/components';
+import { OCTRAEditor } from '../../../../editors/octra-editor';
+import { InactivityModalComponent } from '../../../modals/inactivity-modal/inactivity-modal.component';
+import { MissingPermissionsModalComponent } from '../../../modals/missing-permissions/missing-permissions.component';
+import { OctraModalService } from '../../../modals/octra-modal.service';
+import { OverviewModalComponent } from '../../../modals/overview-modal/overview-modal.component';
 import {
   ModalEndAnswer,
   TranscriptionDemoEndModalComponent,
-} from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
-import { TranscriptionGuidelinesModalComponent } from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
-import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+} from '../../../modals/transcription-demo-end/transcription-demo-end-modal.component';
+import { TranscriptionGuidelinesModalComponent } from '../../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   TranscriptionStopModalAnswer,
   TranscriptionStopModalComponent,
-} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import { ProjectSettings } from '../../obj/Settings';
+} from '../../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import { ProjectSettings } from '../../../obj/Settings';
 
-import { LoadeditorDirective } from '../../shared/directive/loadeditor.directive';
+import { LoadeditorDirective } from '../../../shared/directive/loadeditor.directive';
 
 import {
   AlertService,
@@ -47,19 +47,20 @@ import {
   SettingsService,
   TranscriptionService,
   UserInteractionsService,
-} from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { AsrService } from '../../shared/service/asr.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
-import { NavbarService } from '../../component/navbar/navbar.service';
+} from '../../../shared/service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { AsrService } from '../../../shared/service/asr.service';
+import { BugReportService } from '../../../shared/service/bug-report.service';
+import { NavbarService } from '../../../component/navbar/navbar.service';
 import { IFile, Level, PartiturConverter } from '@octra/annotation';
 import { AudioManager } from '@octra/media';
-import { LoginMode } from '../../store';
-import { ShortcutsModalComponent } from '../../modals/shortcuts-modal/shortcuts-modal.component';
-import { PromptModalComponent } from '../../modals/prompt-modal/prompt-modal.component';
+import { LoginMode } from '../../../store';
+import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
+import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { DefaultComponent } from '../../component/default.component';
+import { DefaultComponent } from '../../../component/default.component';
+import { AnnotationStoreService } from "../../../store/annotation/annotation.store.service";
 
 @Component({
   selector: 'octra-transcription',
@@ -240,7 +241,8 @@ export class TranscriptionComponent
     private bugService: BugReportService,
     private cd: ChangeDetectorRef,
     private asrService: AsrService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    public annotationStoreService: AnnotationStoreService
   ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
@@ -832,11 +834,11 @@ export class TranscriptionComponent
             console.log(`new annotation is `);
             console.log(newAnnotation);
             if (newAnnotation !== undefined) {
-              navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+              navigateTo(this.router, ['/intern/load'], AppInfo.queryParamsHandling).catch((error) => {
                 console.error(error);
               });
             } else {
-              navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
+              navigateTo(this.router, ['/intern/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
                 console.error(error);
               });
               this.appStorage.clearAnnotationPermanently();
@@ -976,7 +978,7 @@ export class TranscriptionComponent
 
       navigateTo(
         this.router,
-        ['/user/load'],
+        ['/intern/load'],
         AppInfo.queryParamsHandling
       ).catch((error) => {
         console.error(`navigation failed`);
@@ -992,7 +994,7 @@ export class TranscriptionComponent
         this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
         this.api.startAnnotation(this.appStorage.onlineSession.currentProject.id).then((result) => {
           this.transcrService.endTranscription(false);
-          navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+          navigateTo(this.router, ['/intern/load'], AppInfo.queryParamsHandling).catch((error) => {
             console.error(error);
           });
         }).catch((error) => {
@@ -1118,16 +1120,16 @@ export class TranscriptionComponent
         /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
         ''
       );
-    const servercomment = this.appStorage.servercomment.replace(
+    const servercomment = this.appStorage.onlineSession?.task?.comment?.replace(
       /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
       ''
     );
 
-    if (servercomment !== '' && this.transcrService.feedback.comment === '') {
+    if (servercomment && this.transcrService.feedback.comment === '') {
       this.transcrService.feedback.comment = type + '; ' + servercomment;
     } else if (
-      (servercomment === '' && this.transcrService.feedback.comment !== '') ||
-      (servercomment !== '' && this.transcrService.feedback.comment !== '')
+      (!servercomment && this.transcrService.feedback.comment !== '') ||
+      (servercomment && this.transcrService.feedback.comment !== '')
     ) {
       this.transcrService.feedback.comment =
         type + '; ' + this.transcrService.feedback.comment;

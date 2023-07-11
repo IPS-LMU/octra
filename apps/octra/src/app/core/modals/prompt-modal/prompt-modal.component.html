@@ -14,7 +14,7 @@
     <ng-container
       *ngIf="formatConverter === undefined || formatConverter === undefined"
     >
-      {{ appStorage.prompttext }}
+      {{ (annotationStoreService.textInput$ | async)?.content }}
     </ng-container>
     <ng-container
       *ngIf="formatConverter !== undefined && formatConverter !== undefined"

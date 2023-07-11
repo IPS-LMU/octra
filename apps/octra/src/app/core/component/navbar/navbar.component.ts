@@ -314,7 +314,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   backToProjectsList() {
-    navigateTo(this.router, ['user/projects']);
+    navigateTo(this.router, ['intern/projects']);
   }
 
   logout() {

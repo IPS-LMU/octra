@@ -55,7 +55,7 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment!;
               params.queryParams = next.queryParams;
 
-              navigateTo(this.router, ['login'], params).catch((error) => {
+              navigateTo(this.router, ['/login'], params).catch((error) => {
                 console.error(error);
               });
             }
@@ -66,7 +66,7 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment!;
               params.queryParams = next.queryParams;
 
-              navigateTo(this.router, ['test'], params).catch((error) => {
+              navigateTo(this.router, ['/test'], params).catch((error) => {
                 console.error(error);
               });
               resolve(result);

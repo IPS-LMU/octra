@@ -1,24 +1,26 @@
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+  ALoginGuard,
   BrowserTestComponent,
   Error404Component,
   FeaturesComponent,
-  HelpToolsComponent, InternModule,
+  HelpToolsComponent, InternModule, LoadingComponent,
   NewsComponent
 } from "./core/pages";
 import { LoginComponent } from './core/pages/login';
 import { CompatibilityGuard } from './core/shared/guard/compatibility.guard';
 import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
-import { CONFIG_LOADED_GUARD } from './core/shared/guard/appconfig-load.guard';
+import { APP_INITIALIZED_GUARD, CONFIG_LOADED_GUARD } from "./core/shared/guard/appconfig-load.guard";
 import { IDB_LOADED_GUARD } from './core/shared/guard/idb.activateguard';
 
 const APP_ROUTES: Routes = [
+  { path: 'load', component: LoadingComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [CONFIG_LOADED_GUARD, IDB_LOADED_GUARD],
+    canActivate: [APP_INITIALIZED_GUARD, ALoginGuard],
   },
   {
     path: 'intern',

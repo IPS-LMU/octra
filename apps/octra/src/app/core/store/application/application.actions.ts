@@ -22,6 +22,7 @@ export class ApplicationActions {
         loggedIn: boolean;
         reloaded: boolean;
       }>(),
+      finish: emptyProps(),
     },
   });
 

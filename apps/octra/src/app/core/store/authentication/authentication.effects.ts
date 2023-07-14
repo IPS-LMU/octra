@@ -137,6 +137,7 @@ export class AuthenticationEffects {
             return AuthenticationActions.logout.success(a);
           }),
           catchError((err: HttpErrorResponse) => {
+            // ignore
             this.sessionStorageService.clear();
             return of(AuthenticationActions.logout.success(a));
           })

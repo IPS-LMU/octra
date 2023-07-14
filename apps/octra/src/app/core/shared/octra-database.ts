@@ -2,6 +2,7 @@ import Dexie, { Transaction } from 'dexie';
 import { IAnnotJSON } from '@octra/annotation';
 import { LoginMode } from '../store';
 import { Subject } from 'rxjs';
+import { ProjectDto, TaskDto } from "@octra/api-types";
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -288,8 +289,7 @@ export class OctraDatabase extends Dexie {
       feedback: undefined,
       sessionfile: undefined,
       currentEditor: 'Dictaphone-Editor',
-      logging: true,
-      project: {},
+      logging: true
     };
 
     return table.add({
@@ -434,22 +434,15 @@ export interface IIDBLogs extends IIDBEntry {
 
 export interface IIDBModeOptions {
   submitted: boolean;
-  transcriptID: string;
-  feedback: any;
-  sessionfile: any;
-  currentEditor: string;
+  transcriptID?: string;
+  feedback?: any;
+  sessionfile?: any;
+  currentEditor?: string;
   logging: boolean;
-  project: {
-    id?: string;
-  };
+  project?: ProjectDto;
 }
 
 export const DefaultModeOptions: IIDBModeOptions = {
   submitted: false,
-  transcriptID: '-1',
-  feedback: undefined,
-  sessionfile: undefined,
-  currentEditor: '',
-  logging: true,
-  project: {},
+  logging: true
 };

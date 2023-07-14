@@ -19,7 +19,7 @@ import {
   BugReportService,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
-import { AppSettings, ASRLanguage } from '../../obj';
+import { AppSettings } from '../../obj';
 import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { SettingsService } from '../../shared/service';
@@ -27,6 +27,7 @@ import { LoginMode, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
 import { Params } from '@angular/router';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Injectable({
   providedIn: 'root',
@@ -284,7 +285,9 @@ export class ApplicationEffects {
         const authType = this.sessStr.retrieve('authType');
         const authenticated = this.sessStr.retrieve('authenticated');
 
-        this.store.dispatch(
+        this.transloco.setAvailableLangs(a.settings.octra.languages);
+
+        return of(
           APIActions.init.do({
             url: a.settings.api.url,
             appToken: a.settings.api.appToken,
@@ -293,36 +296,61 @@ export class ApplicationEffects {
             webToken,
           })
         );
-
-        this.transloco.setAvailableLangs(a.settings.octra.languages);
-
-        if (
-          a.settings.octra.tracking !== undefined &&
-          a.settings.octra.tracking.active !== undefined &&
-          a.settings.octra.tracking.active !== ''
-        ) {
-          this.appendTrackingCode(a.settings.octra.tracking.active, a.settings);
-        }
-
-        const loggedIn = this.sessStr.retrieve('loggedIn');
-
-        return of(
-          ApplicationActions.initApplication.success({
-            playOnHover: this.sessStr.retrieve('playonhover') ?? false,
-            followPlayCursor:
-              this.sessStr.retrieve('followplaycursor') ?? false,
-            loggedIn: this.sessStr.retrieve('loggedIn') ?? false,
-            reloaded: this.sessStr.retrieve('reloaded') ?? false,
-          })
-        );
       })
     )
+  );
+
+  afterAPIInit$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(APIActions.init.success),
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          if (
+            state.application.appConfiguration!.octra.tracking !== undefined &&
+            state.application.appConfiguration!.octra.tracking.active !==
+              undefined &&
+            state.application.appConfiguration!.octra.tracking.active !== ''
+          ) {
+            this.appendTrackingCode(
+              state.application.appConfiguration!.octra.tracking.active,
+              state.application.appConfiguration!
+            );
+          }
+
+          this.store.dispatch(
+            ApplicationActions.initApplication.success({
+              playOnHover: this.sessStr.retrieve('playonhover') ?? false,
+              followPlayCursor:
+                this.sessStr.retrieve('followplaycursor') ?? false,
+              loggedIn:
+                a.authenticated ?? this.sessStr.retrieve('logedIn') ?? false,
+              reloaded: this.sessStr.retrieve('reloaded') ?? false,
+            })
+          );
+        })
+      ),
+    { dispatch: false }
+  );
+
+  afterInitApplication$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.initApplication.finish),
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          if (!state.application.loggedIn) {
+            this.routerService.navigate(["/login"], AppInfo.queryParamsHandling);
+          }
+        })
+      ),
+    { dispatch: false }
   );
 
   afterIDBLoaded$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(IDBActions.loadAnnotationSuccess),
+        ofType(IDBActions.loadAnnotation.success),
         withLatestFrom(this.store),
         tap(([a, store]: [Action, RootState]) => {
           if (
@@ -480,7 +508,8 @@ export class ApplicationEffects {
     private bugService: BugReportService,
     private appStorage: AppStorageService,
     private settingsService: SettingsService,
-    private routerService: RoutingService
+    private routerService: RoutingService,
+    private api: OctraAPIService
   ) {}
 
   private initConsoleLogging() {

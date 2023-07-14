@@ -29,6 +29,19 @@ export class AnnotationActions {
     },
   });
 
+  static prepareTaskDataForAnnotation = createActionGroup({
+    source: `annotation/ prepare task data for annotation`,
+    events: {
+      do: props<{
+        mode: LoginMode,
+        currentProject: ProjectDto,
+        task: TaskDto
+      }>(),
+      success: emptyProps(),
+      fail: emptyProps(),
+    },
+  });
+
   static clearSessionStorage = createActionGroup({
     source: `annotation/ session storage/ clear`,
     events: {
@@ -224,6 +237,23 @@ export class AnnotationActions {
         projectSettings: ProjectSettings,
         guidelines: GuidelinesItem[],
         selectedGuidelines?: GuidelinesItem,
+        mode: LoginMode;
+      }>(),
+      fail: props<{
+        error: HttpErrorResponse;
+      }>(),
+    },
+  });
+
+  static sendAnnotation = createActionGroup({
+    source: `annotation/ send to server`,
+    events: {
+      do: emptyProps(),
+      start: props<{
+        mode: LoginMode
+      }>(),
+      success: props<{
+        task: TaskDto;
         mode: LoginMode;
       }>(),
       fail: props<{

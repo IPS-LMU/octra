@@ -57,6 +57,8 @@ export interface AnnotationState extends UndoRedoState {
 export interface OnlineSession {
   currentProject?: ProjectDto;
   task?: TaskDto;
+  assessment?: any;
+  comment?: string;
 }
 
 export interface SessionData {

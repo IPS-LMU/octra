@@ -13,7 +13,7 @@ export class TranscriptionSendingModalComponent extends OctraModal {
     backdrop: true,
   };
 
-  public content = '';
+  public error = '';
 
   constructor(protected override activeModal: NgbActiveModal) {
     super('transcriptionSendingModal', activeModal);

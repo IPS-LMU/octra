@@ -378,14 +378,6 @@ export class AppStorageService {
     return this._snapshot.application.loggedIn;
   }
 
-  set loggedIn(loggedIn: boolean) {
-    this.store.dispatch(
-      ApplicationActions.setLoggedIn({
-        loggedIn,
-      })
-    );
-  }
-
   get interface(): string {
     return getModeState(this._snapshot)!.currentEditor!;
   }
@@ -573,8 +565,8 @@ export class AppStorageService {
         case 'feedback':
           waitTillResultRetrieved<Actions, Action, void>(
             this.actions,
-            IDBActions.saveTranscriptionFeedbackSuccess,
-            IDBActions.saveTranscriptionFeedbackFailed
+            IDBActions.saveTranscriptionFeedback.success,
+            IDBActions.saveTranscriptionFeedback.fail
           )
             .then(() => {
               this.isSaving = false;
@@ -651,8 +643,8 @@ export class AppStorageService {
           if (this.annotationLevels.length > tiernum) {
             waitTillResultRetrieved<Actions, Action, void>(
               this.actions,
-              IDBActions.saveAnnotationSuccess,
-              IDBActions.saveAnnotationFailed
+              IDBActions.saveAnnotation.success,
+              IDBActions.saveAnnotation.fail
             )
               .then(() => {
                 resolve();
@@ -686,8 +678,8 @@ export class AppStorageService {
 
         waitTillResultRetrieved<Actions, Action, void>(
           this.actions,
-          IDBActions.addAnnotationLevelSuccess,
-          IDBActions.addAnnotationLevelFailed
+          IDBActions.addAnnotationLevel.success,
+          IDBActions.addAnnotationLevel.fail
         )
           .then(() => {
             resolve();
@@ -803,18 +795,18 @@ export class AppStorageService {
     promises.push(
       waitTillResultRetrieved<Actions, Action, void>(
         this.actions,
-        IDBActions.clearAllOptionsSuccess,
-        IDBActions.clearAllOptionsFailed
+        IDBActions.clearAllOptions.success,
+        IDBActions.clearAllOptions.fail
       ),
       waitTillResultRetrieved<Actions, Action, void>(
         this.actions,
-        IDBActions.clearLogsSuccess,
-        IDBActions.clearLogsFailed
+        IDBActions.clearLogs.success,
+        IDBActions.clearLogs.fail
       ),
       waitTillResultRetrieved<Actions, Action, void>(
         this.actions,
-        IDBActions.clearAnnotationSuccess,
-        IDBActions.clearAnnotationFailed
+        IDBActions.clearAnnotation.success,
+        IDBActions.clearAnnotation.fail
       )
     );
     this.store.dispatch(

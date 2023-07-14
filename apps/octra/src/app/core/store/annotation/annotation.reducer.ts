@@ -178,7 +178,7 @@ export class AnnotationStateReducers {
         }
       ),
       on(
-        IDBActions.loadAnnotationSuccess,
+        IDBActions.loadAnnotation.success,
         (state: AnnotationState, annotations) => {
           return {
             ...state,
@@ -241,7 +241,7 @@ export class AnnotationStateReducers {
         ...state,
         logs: [],
       })),
-      on(IDBActions.loadLogsSuccess, (state: AnnotationState, logs) => {
+      on(IDBActions.loadLogs.success, (state: AnnotationState, logs) => {
         return {
           ...state,
           logs: (logs as any)[this.mode],
@@ -262,7 +262,7 @@ export class AnnotationStateReducers {
         })
       ),
       on(
-        IDBActions.loadOptionsSuccess,
+        IDBActions.loadOptions.success,
         (
           state: AnnotationState,
           { demoOptions, localOptions, onlineOptions }

@@ -43,7 +43,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
           });
         },
         error: (error) => {
-          const ref = this.modalService.openModalRef(
+          const ref = this.modalService.openModalRef<ErrorModalComponent>(
             ErrorModalComponent,
             ErrorModalComponent.options
           );

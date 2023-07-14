@@ -12,9 +12,9 @@
   </div>
   <div class="modal-body">
     {{ 'modal.transcription.sending.text' | transloco }}<br /><br />
-    <div style="color: red">{{ content }}</div>
+    <div style="color: red">{{ error }}</div>
     <div
-      *ngIf="content === ''"
+      *ngIf="error === ''"
       class="text-success"
       style="text-align: center; display: block"
     >

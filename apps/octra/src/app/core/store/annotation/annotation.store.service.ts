@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
-import { getModeState, LoginMode, RootState } from "../index";
+import { getModeState, LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
 import { TaskInputOutputDto } from '@octra/api-types';
 import { Converter, IFile, OAudiofile } from '@octra/annotation';
-import { AnnotationState } from './index';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnnotationStoreService {
-  task$ = this.store.select((state: RootState) => getModeState(state)?.onlineSession?.task);
+  task$ = this.store.select(
+    (state: RootState) => getModeState(state)?.onlineSession?.task
+  );
 
   textInput$ = this.store.select((state: RootState) => {
     if (
@@ -22,9 +23,9 @@ export class AnnotationStoreService {
     }
 
     const mode = getModeState(state);
-    const result = this.getTranscriptFromIO(mode?.onlineSession?.task?.inputs ?? []);
-    console.log("RESULT");
-    console.log(result);
+    const result = this.getTranscriptFromIO(
+      mode?.onlineSession?.task?.inputs ?? []
+    );
     return result;
   });
 
@@ -65,5 +66,11 @@ export class AnnotationStoreService {
     }
 
     return undefined;
+  }
+
+  sendAnnotation() {
+    this.store.dispatch(
+      AnnotationActions.sendAnnotation.do()
+    );
   }
 }

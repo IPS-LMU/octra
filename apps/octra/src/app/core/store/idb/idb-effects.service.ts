@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Subject, tap, timer } from 'rxjs';
+import { forkJoin, of, Subject, tap, timer } from "rxjs";
 import { Action, Store } from '@ngrx/store';
 import { IDBService } from '../../shared/service/idb.service';
 import { getModeState, LoginMode, RootState } from '../index';
@@ -30,6 +30,225 @@ import {
   providedIn: 'root',
 })
 export class IDBEffects {
+  loadOptions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.loadSettings.success),
+      exhaustMap((action) => {
+        const subject = new Subject<Action>();
+
+        this.idbService
+          .initialize(action.settings.octra.database.name)
+          .then(() => {
+            console.log(`load options...`);
+            const loadApplicationOptions = this.idbService.loadOptions([
+              'version',
+              'easymode',
+              'language',
+              'usemode',
+              'user',
+              'showLoupe',
+              'secondsPerLine',
+              'audioSettings',
+              'highlightingEnabled',
+              'asr',
+            ]);
+
+            const loadModeOptionsLocal = this.idbService.loadModeOptions(
+              LoginMode.LOCAL
+            );
+            const loadModeOptionsDemo = this.idbService.loadModeOptions(
+              LoginMode.DEMO
+            );
+            const loadModeOptionsOnline = this.idbService.loadModeOptions(
+              LoginMode.ONLINE
+            );
+
+            Promise.all([
+              loadApplicationOptions,
+              loadModeOptionsLocal,
+              loadModeOptionsDemo,
+              loadModeOptionsOnline,
+            ])
+              .then(
+                ([
+                  applicationOptions,
+                  localOptions,
+                  demoOptions,
+                  onlineOptions,
+                ]: [
+                  any,
+                  IIDBModeOptions,
+                  IIDBModeOptions,
+                  IIDBModeOptions
+                ]) => {
+                  subject.next(
+                    IDBActions.loadOptions.success({
+                      applicationOptions,
+                      localOptions,
+                      onlineOptions,
+                      demoOptions,
+                    })
+                  );
+                  subject.complete();
+                }
+              )
+              .catch((error) => {
+                subject.next(
+                  IDBActions.loadOptions.fail({
+                    error,
+                  })
+                );
+                subject.complete();
+              });
+          })
+          .catch((error) => {
+            subject.next(
+              IDBActions.loadOptions.fail({
+                error,
+              })
+            );
+            subject.complete();
+          });
+
+        return subject;
+      })
+    )
+  );
+
+  loadLogs$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.loadOptions.success),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        if (
+          state.application.loggedIn &&
+          action.onlineOptions.project &&
+          action.onlineOptions.transcriptID
+        ) {
+          this.store.dispatch(
+            OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+              projectID: action.onlineOptions.project.id,
+              taskID: action.onlineOptions.transcriptID,
+            })
+          );
+        }
+        const subject = new Subject<Action>();
+        Promise.all([
+          this.idbService.loadLogs(LoginMode.ONLINE),
+          this.idbService.loadLogs(LoginMode.LOCAL),
+          this.idbService.loadLogs(LoginMode.DEMO),
+        ])
+          .then(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
+            subject.next(
+              IDBActions.loadLogs.success({
+                online: onlineModeLogs,
+                demo: localModeLogs,
+                local: demoModeLogs,
+              })
+            );
+            subject.complete();
+          })
+          .catch((error) => {
+            subject.next(
+              IDBActions.loadLogs.fail({
+                error,
+              })
+            );
+            subject.complete();
+          });
+
+        return subject;
+      })
+    )
+  );
+
+  loadAnnotation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.loadLogs.success),
+      exhaustMap((action) => {
+        const subject = new Subject<Action>();
+        Promise.all([
+          this.idbService.loadAnnotation(LoginMode.ONLINE),
+          this.idbService.loadAnnotation(LoginMode.LOCAL),
+          this.idbService.loadAnnotation(LoginMode.DEMO),
+        ])
+          .then(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
+            console.log(`results:`);
+            console.log(onlineAnnotation);
+            let max = 0;
+            const convertToStateLevel = (level: ILevel, i: number) => {
+              const annotationStateLevel = convertFromOIDLevel(level, i + 1);
+              if (!hasProperty(level, 'id')) {
+                annotationStateLevel.id = i + 1;
+              }
+
+              max = Math.max(annotationStateLevel.id, max);
+              return annotationStateLevel;
+            };
+
+            const convertLink = (link: ILink, i: number) => {
+              if (!hasProperty(link, 'id')) {
+                return new OIDBLink(i + 1, link);
+              } else {
+                return link;
+              }
+            };
+
+            const oidbOnlineAnnotation = {
+              levels: onlineAnnotation?.levels
+                ? onlineAnnotation?.levels.map(convertToStateLevel)
+                : [],
+              links: onlineAnnotation?.links
+                ? onlineAnnotation?.links.map(convertLink)
+                : [],
+              levelCounter: max,
+            };
+
+            max = 0;
+            const oidbLocalAnnotation = {
+              levels: localAnnotation?.levels
+                ? localAnnotation?.levels.map(convertToStateLevel)
+                : [],
+              links: localAnnotation?.links
+                ? localAnnotation?.links.map(convertLink)
+                : [],
+              levelCounter: max,
+            };
+
+            max = 0;
+            const oidbDemoAnnotation = {
+              levels: demoAnnotation?.levels
+                ? demoAnnotation?.levels.map(convertToStateLevel)
+                : [],
+              links: demoAnnotation?.links
+                ? demoAnnotation?.links.map(convertLink)
+                : [],
+              levelCounter: max,
+            };
+
+            subject.next(
+              IDBActions.loadAnnotation.success({
+                online: oidbOnlineAnnotation,
+                local: oidbLocalAnnotation,
+                demo: oidbDemoAnnotation,
+              })
+            );
+            subject.complete();
+          })
+          .catch((error) => {
+            subject.next(
+              IDBActions.loadAnnotation.fail({
+                error,
+              })
+            );
+            subject.complete();
+          });
+
+        return subject;
+      })
+    )
+  );
+
   saveAfterUndo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationActions.undo),
@@ -120,212 +339,6 @@ export class IDBEffects {
     )
   );
 
-  loadOptions$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.loadSettings.success),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .initialize(action.settings.octra.database.name)
-          .then(() => {
-            console.log(`load options...`);
-            const loadApplicationOptions = this.idbService.loadOptions([
-              'version',
-              'easymode',
-              'language',
-              'usemode',
-              'user',
-              'showLoupe',
-              'secondsPerLine',
-              'audioSettings',
-              'highlightingEnabled',
-              'asr',
-            ]);
-
-            const loadModeOptionsLocal = this.idbService.loadModeOptions(
-              LoginMode.LOCAL
-            );
-            const loadModeOptionsDemo = this.idbService.loadModeOptions(
-              LoginMode.DEMO
-            );
-            const loadModeOptionsOnline = this.idbService.loadModeOptions(
-              LoginMode.ONLINE
-            );
-
-            Promise.all([
-              loadApplicationOptions,
-              loadModeOptionsLocal,
-              loadModeOptionsDemo,
-              loadModeOptionsOnline,
-            ])
-              .then(
-                ([
-                  applicationOptions,
-                  localOptions,
-                  demoOptions,
-                  onlineOptions,
-                ]: [
-                  any,
-                  IIDBModeOptions,
-                  IIDBModeOptions,
-                  IIDBModeOptions
-                ]) => {
-                  subject.next(
-                    IDBActions.loadOptionsSuccess({
-                      applicationOptions,
-                      localOptions,
-                      onlineOptions,
-                      demoOptions,
-                    })
-                  );
-                  subject.complete();
-                }
-              )
-              .catch((error) => {
-                subject.next(
-                  IDBActions.loadOptionsFailed({
-                    error,
-                  })
-                );
-                subject.complete();
-              });
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.loadOptionsFailed({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
-  );
-
-  loadLogs$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(IDBActions.loadOptionsSuccess),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-        Promise.all([
-          this.idbService.loadLogs(LoginMode.ONLINE),
-          this.idbService.loadLogs(LoginMode.LOCAL),
-          this.idbService.loadLogs(LoginMode.DEMO),
-        ])
-          .then(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
-            subject.next(
-              IDBActions.loadLogsSuccess({
-                online: onlineModeLogs,
-                demo: localModeLogs,
-                local: demoModeLogs,
-              })
-            );
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.loadLogsFailed({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
-  );
-
-  loadAnnotation$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(IDBActions.loadLogsSuccess),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-        Promise.all([
-          this.idbService.loadAnnotation(LoginMode.ONLINE),
-          this.idbService.loadAnnotation(LoginMode.LOCAL),
-          this.idbService.loadAnnotation(LoginMode.DEMO),
-        ])
-          .then(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
-            console.log(`results:`);
-            console.log(onlineAnnotation);
-            let max = 0;
-            const convertToStateLevel = (level: ILevel, i: number) => {
-              const annotationStateLevel = convertFromOIDLevel(level, i + 1);
-              if (!hasProperty(level, 'id')) {
-                annotationStateLevel.id = i + 1;
-              }
-
-              max = Math.max(annotationStateLevel.id, max);
-              return annotationStateLevel;
-            };
-
-            const convertLink = (link: ILink, i: number) => {
-              if (!hasProperty(link, 'id')) {
-                return new OIDBLink(i + 1, link);
-              } else {
-                return link;
-              }
-            };
-
-            const oidbOnlineAnnotation = {
-              levels: onlineAnnotation?.levels
-                ? onlineAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: onlineAnnotation?.links
-                ? onlineAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            max = 0;
-            const oidbLocalAnnotation = {
-              levels: localAnnotation?.levels
-                ? localAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: localAnnotation?.links
-                ? localAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            max = 0;
-            const oidbDemoAnnotation = {
-              levels: demoAnnotation?.levels
-                ? demoAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: demoAnnotation?.links
-                ? demoAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            subject.next(
-              IDBActions.loadAnnotationSuccess({
-                online: oidbOnlineAnnotation,
-                local: oidbLocalAnnotation,
-                demo: oidbDemoAnnotation,
-              })
-            );
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.loadAnnotationFailed({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
-  );
-
   clearLogs$ = createEffect(() =>
     this.actions$.pipe(
       filter(
@@ -339,12 +352,12 @@ export class IDBEffects {
         this.idbService
           .clearLoggingData((action as any).mode)
           .then(() => {
-            subject.next(IDBActions.clearLogsSuccess((action as any).mode));
+            subject.next(IDBActions.clearLogs.success((action as any).mode));
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.clearLogsFailed({
+              IDBActions.clearLogs.fail({
                 error,
               })
             );
@@ -360,7 +373,7 @@ export class IDBEffects {
     this.actions$.pipe(
       filter(
         (a) =>
-          a.type === IDBActions.clearAllOptions.type ||
+          a.type === IDBActions.clearAllOptions.do.type ||
           a.type === OnlineModeActions.clearWholeSession.do.type
       ),
       exhaustMap((action) => {
@@ -369,12 +382,12 @@ export class IDBEffects {
         this.idbService
           .clearOptions((action as any).mode)
           .then(() => {
-            subject.next(IDBActions.clearAllOptionsSuccess());
+            subject.next(IDBActions.clearAllOptions.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.clearAllOptionsFailed({
+              IDBActions.clearAllOptions.fail({
                 error,
               })
             );
@@ -403,12 +416,12 @@ export class IDBEffects {
           this.idbService
             .clearAnnotationData((action as any).mode)
             .then(() => {
-              subject.next(IDBActions.clearAnnotationSuccess());
+              subject.next(IDBActions.clearAnnotation.success());
               subject.complete();
             })
             .catch((error) => {
               subject.next(
-                IDBActions.clearAnnotationFailed({
+                IDBActions.clearAnnotation.fail({
                   error,
                 })
               );
@@ -434,12 +447,12 @@ export class IDBEffects {
           this.idbService
             .clearAnnotationData((action as any).mode)
             .then(() => {
-              subject.next(IDBActions.overwriteTranscriptSuccess());
+              subject.next(IDBActions.overwriteTranscript.success());
               subject.complete();
             })
             .catch((error) => {
               subject.next(
-                IDBActions.overwriteTranscriptFailed({
+                IDBActions.overwriteTranscript.fail({
                   error,
                 })
               );
@@ -453,6 +466,19 @@ export class IDBEffects {
     )
   );
 
+  /*
+  onClearOnlineSession$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(OnlineModeActions.clearOnlineSession.do),
+        exhaustMap((a) => {
+          return forkJoin({
+            options: this.idbService.clearOptions()
+          })
+        })
+      )
+    );
+   */
+
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.success),
@@ -461,7 +487,7 @@ export class IDBEffects {
 
         this.sessStr.store('loggedIn', false);
         timer(0).subscribe(() => {
-          subject.next(IDBActions.logoutSessionSuccess());
+          subject.next(IDBActions.logoutSession.success());
           subject.complete();
         });
 
@@ -482,7 +508,7 @@ export class IDBEffects {
         LocalModeActions.login,
         AnnotationActions.setCurrentEditor.do,
         OnlineModeActions.loginDemo,
-        OnlineModeActions.startOnlineAnnotation,
+        OnlineModeActions.startAnnotation.do,
         LocalModeActions.login
       ),
       withLatestFrom(this.store),
@@ -494,24 +520,19 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
-          const onlineModeState = modeState as OnlineModeState;
-          const localModeState = modeState as LocalModeState;
-
           this.idbService
             .saveModeOptions((action as any).mode, {
-              sessionfile: localModeState?.sessionFile?.toAny(),
-              currentEditor: modeState.currentEditor!,
-              logging: modeState?.logging,
-              project: {
-                id: onlineModeState?.onlineSession?.currentProject?.id
-              },
-              submitted: false,
-              transcriptID: '0',
-              feedback: undefined, // TODO change
+              sessionfile: modeState?.sessionFile?.toAny(),
+              currentEditor: modeState.currentEditor,
+              logging: modeState.logging,
+              project: modeState.onlineSession?.currentProject,
+              submitted: false, //<- TODO ?
+              transcriptID: modeState.onlineSession?.task?.id,
+              feedback: modeState.changedTask?.assessment, // TODO changeTask must be initalized at startup
             })
             .then(() => {
               subject.next(
-                IDBActions.saveModeOptionsSuccess({
+                IDBActions.saveModeOptions.success({
                   mode: (action as any).mode,
                 })
               );
@@ -519,7 +540,7 @@ export class IDBEffects {
             })
             .catch((error) => {
               subject.next(
-                IDBActions.saveModeOptionsFailed({
+                IDBActions.saveModeOptions.fail({
                   error,
                 })
               );
@@ -541,12 +562,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('userProfile', { name: action.name, email: action.email })
           .then(() => {
-            subject.next(IDBActions.saveUserProfileSuccess());
+            subject.next(IDBActions.saveUserProfile.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveUserProfileFailed({
+              IDBActions.saveUserProfile.fail({
                 error,
               })
             );
@@ -567,12 +588,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('language', action.language)
           .then(() => {
-            subject.next(IDBActions.saveAppLanguageSuccess());
+            subject.next(IDBActions.saveAppLanguage.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveAppLanguageFailed({
+              IDBActions.saveAppLanguage.fail({
                 error,
               })
             );
@@ -593,12 +614,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('version', action.version)
           .then(() => {
-            subject.next(IDBActions.saveIDBVersionSuccess());
+            subject.next(IDBActions.saveIDBVersion.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveIDBVersionFailed({
+              IDBActions.saveIDBVersion.fail({
                 error,
               })
             );
@@ -619,12 +640,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('showLoupe', action.showLoupe)
           .then(() => {
-            subject.next(IDBActions.saveShowLoupeSuccess());
+            subject.next(IDBActions.saveShowLoupe.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveShowLoupeFailed({
+              IDBActions.saveShowLoupe.fail({
                 error,
               })
             );
@@ -645,12 +666,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('easymode', action.easyMode)
           .then(() => {
-            subject.next(IDBActions.saveEasyModeSucess());
+            subject.next(IDBActions.saveEasyMode.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveEasyModeFailed({
+              IDBActions.saveEasyMode.fail({
                 error,
               })
             );
@@ -672,12 +693,12 @@ export class IDBEffects {
           this.idbService
             .saveOption('secondsPerLine', action.secondsPerLine)
             .then(() => {
-              subject.next(IDBActions.saveSecondsPerLineSuccess());
+              subject.next(IDBActions.saveSecondsPerLine.success());
               subject.complete();
             })
             .catch((error) => {
               subject.next(
-                IDBActions.saveSecondsPerLineFailed({
+                IDBActions.saveSecondsPerLine.fail({
                   error,
                 })
               );
@@ -699,12 +720,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('highlightingEnabled', action.highlightingEnabled)
           .then(() => {
-            subject.next(IDBActions.saveHighlightingEnabledSuccess());
+            subject.next(IDBActions.saveHighlightingEnabled.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveHighlightingEnabledFailed({
+              IDBActions.saveHighlightingEnabled.fail({
                 error,
               })
             );
@@ -727,7 +748,7 @@ export class IDBEffects {
         timer(0)
           .toPromise()
           .then(() => {
-            subject.next(IDBActions.saveDemoSessionSuccess());
+            subject.next(IDBActions.saveDemoSession.success());
             subject.complete();
           });
 
@@ -774,12 +795,12 @@ export class IDBEffects {
         promises.push(this.idbService.saveOption('usemode', undefined));
         Promise.all(promises)
           .then(() => {
-            subject.next(IDBActions.saveLogoutSuccess());
+            subject.next(IDBActions.saveLogout.success);
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveLogoutFailed({
+              IDBActions.saveLogout.fail({
                 error,
               })
             );
@@ -800,13 +821,13 @@ export class IDBEffects {
         try {
           this.sessStr.store('playonhover', action.playOnHover);
           setTimeout(() => {
-            subject.next(IDBActions.saveFollowPlayCursorSuccess());
+            subject.next(IDBActions.saveFollowPlayCursor.success());
             subject.complete();
           }, 200);
         } catch (error) {
           setTimeout(() => {
             subject.next(
-              IDBActions.saveFollowPlayCursorFailed({
+              IDBActions.saveFollowPlayCursor.fail({
                 error: error as any,
               })
             );
@@ -828,13 +849,13 @@ export class IDBEffects {
         try {
           this.sessStr.store('followplaycursor', action.followPlayCursor);
           setTimeout(() => {
-            subject.next(IDBActions.saveFollowPlayCursorSuccess());
+            subject.next(IDBActions.saveFollowPlayCursor.success());
             subject.complete();
           }, 200);
         } catch (error) {
           setTimeout(() => {
             subject.next(
-              IDBActions.saveFollowPlayCursorFailed({
+              IDBActions.saveFollowPlayCursor.fail({
                 error: error as any,
               })
             );
@@ -856,13 +877,13 @@ export class IDBEffects {
         try {
           this.sessStr.store('reloaded', action.reloaded);
           setTimeout(() => {
-            subject.next(IDBActions.saveAppReloadedSuccess());
+            subject.next(IDBActions.saveAppReloaded.success());
             subject.complete();
           }, 200);
         } catch (error) {
           setTimeout(() => {
             subject.next(
-              IDBActions.saveAppReloadedFailed({
+              IDBActions.saveAppReloaded.fail({
                 error: error as any,
               })
             );
@@ -884,13 +905,13 @@ export class IDBEffects {
         try {
           this.sessStr.store('serverDataEntry', action.serverDataEntry);
           setTimeout(() => {
-            subject.next(IDBActions.saveServerDataEntrySuccess());
+            subject.next(IDBActions.saveServerDataEntry.success());
             subject.complete();
           }, 200);
         } catch (error) {
           setTimeout(() => {
             subject.next(
-              IDBActions.saveServerDataEntryFailed({
+              IDBActions.saveServerDataEntry.fail({
                 error: error as any,
               })
             );
@@ -915,12 +936,12 @@ export class IDBEffects {
             selectedService: action.selectedService,
           })
           .then(() => {
-            subject.next(IDBActions.saveASRSettingsSuccess());
+            subject.next(IDBActions.saveASRSettings.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveASRSettingsFailed({
+              IDBActions.saveASRSettings.fail({
                 error,
               })
             );
@@ -944,12 +965,12 @@ export class IDBEffects {
             speed: action.speed,
           })
           .then(() => {
-            subject.next(IDBActions.saveAudioSettingsSuccess());
+            subject.next(IDBActions.saveAudioSettings.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveAudioSettingsFailed({
+              IDBActions.saveAudioSettings.fail({
                 error,
               })
             );
@@ -970,12 +991,12 @@ export class IDBEffects {
         this.idbService
           .saveOption('interface', action.currentEditor)
           .then(() => {
-            subject.next(IDBActions.saveCurrentEditorSuccess());
+            subject.next(IDBActions.saveCurrentEditor.success());
             subject.complete();
           })
           .catch((error) => {
             subject.next(
-              IDBActions.saveCurrentEditorFailed({
+              IDBActions.saveCurrentEditor.fail({
                 error,
               })
             );
@@ -1003,12 +1024,12 @@ export class IDBEffects {
           this.idbService
             .saveLogs((action as any).mode, modeState.logs)
             .then(() => {
-              subject.next(IDBActions.saveLogsSuccess());
+              subject.next(IDBActions.saveLogs.success());
               subject.complete();
             })
             .catch((error) => {
               subject.next(
-                IDBActions.saveLogsFailed({
+                IDBActions.saveLogs.fail({
                   error,
                 })
               );
@@ -1016,7 +1037,7 @@ export class IDBEffects {
             });
         } else {
           subject.next(
-            IDBActions.saveLogsFailed({
+            IDBActions.saveLogs.fail({
               error: "Can't find modeState",
             })
           );
@@ -1055,12 +1076,12 @@ export class IDBEffects {
               )
             )
             .then(() => {
-              subject.next(IDBActions.saveAnnotationSuccess());
+              subject.next(IDBActions.saveAnnotation.success());
               subject.complete();
             })
             .catch((error) => {
               subject.next(
-                IDBActions.saveAnnotationFailed({
+                IDBActions.saveAnnotation.fail({
                   error,
                 })
               );
@@ -1068,7 +1089,7 @@ export class IDBEffects {
             });
         } else {
           subject.next(
-            IDBActions.saveAnnotationFailed({
+            IDBActions.saveAnnotation.fail({
               error: "Can't find modeState",
             })
           );
@@ -1082,7 +1103,7 @@ export class IDBEffects {
 
   loadConsoleEntries$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(IDBActions.loadAnnotationSuccess),
+      ofType(IDBActions.loadAnnotation.success),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 
@@ -1091,13 +1112,13 @@ export class IDBEffects {
           .then((dbEntries: ConsoleEntry[]) => {
             if (dbEntries !== undefined) {
               subject.next(
-                IDBActions.loadConsoleEntriesSuccess({
+                IDBActions.loadConsoleEntries.success({
                   consoleEntries: dbEntries,
                 })
               );
             } else {
               subject.next(
-                IDBActions.loadConsoleEntriesSuccess({
+                IDBActions.loadConsoleEntries.success({
                   consoleEntries: [],
                 })
               );
@@ -1105,13 +1126,22 @@ export class IDBEffects {
           })
           .catch(() => {
             subject.next(
-              IDBActions.loadConsoleEntriesSuccess({
+              IDBActions.loadConsoleEntries.success({
                 consoleEntries: [],
               })
             );
           });
 
         return subject;
+      })
+    )
+  );
+
+  afterIDBLoaded$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.saveConsoleEntries.success),
+      exhaustMap((action) => {
+        return of(ApplicationActions.initApplication.finish());
       })
     )
   );
@@ -1126,10 +1156,10 @@ export class IDBEffects {
           this.idbService
             .saveConsoleEntries(action.consoleEntries)
             .then(() => {
-              subject.next(IDBActions.saveConsoleEntriesSuccess());
+              subject.next(IDBActions.saveConsoleEntries.success());
             })
             .catch((error) => {
-              subject.next(IDBActions.saveConsoleEntriesSuccess());
+              subject.next(IDBActions.saveConsoleEntries.success());
             });
         }
 

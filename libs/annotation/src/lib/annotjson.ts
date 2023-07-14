@@ -66,15 +66,28 @@ export class OAnnotJSON implements IAnnotJSON {
     this.sampleRate = sampleRate;
 
     if (audioFile.lastIndexOf('.') > -1) {
-      this.name = audioFile.substr(0, audioFile.lastIndexOf('.'));
+      this.name = audioFile.substring(0, audioFile.lastIndexOf('.'));
     }
 
-    if (!(levels === undefined || levels === undefined)) {
-      this.levels = levels;
+    if (levels) {
+      this.levels = levels.map(a => ({
+        name: a.name,
+        type: a.type,
+        items: a.items.map(b => ({
+          id: b.id,
+          sampleStart: b.sampleStart,
+          sampleDur: b.sampleDur,
+          samplePoint: b.samplePoint,
+          labels: b.labels
+        }))
+      }));
     }
 
-    if (!(links === undefined || links === undefined)) {
-      this.links = links;
+    if (links) {
+      this.links = links.map(a => ({
+        fromID: a.fromID,
+        toID: a.toID
+      }));
     }
   }
 }

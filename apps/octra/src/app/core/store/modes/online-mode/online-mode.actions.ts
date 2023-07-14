@@ -1,13 +1,20 @@
 import { AnnotationActions } from '../../annotation/annotation.actions';
-import { createAction, props } from '@ngrx/store';
+import {
+  Action,
+  createAction,
+  createActionGroup,
+  emptyProps,
+  props
+} from "@ngrx/store";
 import { CurrentProject, LoginMode } from '../../index';
-import { TaskDto } from '@octra/api-types';
+import { ProjectDto, TaskDto } from "@octra/api-types";
 import {
   OnlineSession,
   SessionData,
   TranscriptionState,
 } from '../../annotation';
 import { URLParameters } from '../../application';
+import { HttpErrorResponse } from "@angular/common/http";
 
 export class OnlineModeActions extends AnnotationActions {
   public static loginDemo = createAction(
@@ -81,13 +88,35 @@ export class OnlineModeActions extends AnnotationActions {
     }>()
   );
 
-  public static startOnlineAnnotation = createAction(
-    `annotation Start Annotation`,
-    props<{
-      mode: LoginMode;
-      currentProject: CurrentProject;
-      sessionData: SessionData;
-      transcript?: TranscriptionState;
-    }>()
-  );
+  static clearOnlineSession = createActionGroup({
+    source: `annotation/ clear online session`,
+    events: {
+      do: props<{
+        mode: LoginMode;
+        actionAfterSuccess: Action;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        actionAfterSuccess: Action;
+      }>()
+    },
+  });
+
+  static loadOnlineInformationAfterIDBLoaded = createActionGroup({
+    source: `annotation/ load task information`,
+    events: {
+      do: props<{
+        projectID: string;
+        taskID: string;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        currentProject: ProjectDto;
+        task: TaskDto
+      }>(),
+      fail: props<{
+        error: HttpErrorResponse
+      }>(),
+    },
+  });
 }

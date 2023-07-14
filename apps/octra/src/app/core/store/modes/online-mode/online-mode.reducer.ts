@@ -1,4 +1,4 @@
-import { Action, ActionCreator, ActionReducer, on, ReducerTypes } from "@ngrx/store";
+import { Action, ActionReducer, on } from '@ngrx/store';
 import * as fromAnnotation from '../../annotation/annotation.reducer';
 import { AnnotationStateReducers } from '../../annotation/annotation.reducer';
 import { undoRedo } from 'ngrx-wieder';
@@ -11,7 +11,7 @@ import {
 } from '../../../shared/octra-database';
 import { getProperties, hasProperty } from '@octra/utilities';
 import { AuthenticationActions } from '../../authentication';
-import { AnnotationState, OnlineModeState } from "../../annotation";
+import { OnlineModeState } from '../../annotation';
 import { LoginMode } from '../../index';
 
 export const initialState: OnlineModeState = {
@@ -68,6 +68,20 @@ export class OnlineModeReducers {
           if (this.mode === mode) {
             return {
               ...initialState,
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        OnlineModeActions.clearOnlineSession.do,
+        (state: OnlineModeState, { mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...initialState,
+              onlineSession: {
+                currentProject: state.onlineSession.currentProject
+              }
             };
           }
           return state;
@@ -181,7 +195,7 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        IDBActions.loadOptionsSuccess,
+        IDBActions.loadOptions.success,
         (state: OnlineModeState, { onlineOptions, demoOptions }) => {
           let result = state;
 
@@ -219,6 +233,22 @@ export class OnlineModeReducers {
         }
       ),
       on(
+        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
+        (state: OnlineModeState, { currentProject, task, mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              onlineSession: {
+                ...state.onlineSession,
+                currentProject,
+                task,
+              },
+            };
+          }
+          return state;
+        }
+      ),
+      on(
         AnnotationActions.startAnnotation.success,
         (
           state: OnlineModeState,
@@ -241,8 +271,8 @@ export class OnlineModeReducers {
                   ...project,
                   statistics: {
                     ...project.statistics,
-                    freeTasks: project.statistics?.freeTasks! - 1
-                  }
+                    freeTasks: project.statistics?.freeTasks! - 1,
+                  },
                 },
                 task,
               },

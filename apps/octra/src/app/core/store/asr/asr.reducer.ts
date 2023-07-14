@@ -13,39 +13,11 @@ export const reducer = createReducer(
     ...data,
   })),
   on(
-    IDBActions.loadOptionsSuccess,
-    (state: ASRState, { applicationOptions }) => {
-      let result = state;
-
-      for (const option of applicationOptions) {
-        result = writeOptionToStore(result, option.name, option.value);
-      }
-
-      return result;
-    }
+    IDBActions.loadOptions.success,
+    (state: ASRState, { applicationOptions }) => ({
+      ...state,
+      selectedLanguage: applicationOptions.asr?.selectedLanguage,
+      selectedService: applicationOptions.asr?.selectedService
+    })
   )
 );
-
-function writeOptionToStore(
-  state: ASRState,
-  attribute: string,
-  value: any
-): ASRState {
-  switch (attribute) {
-    case 'asr':
-      return {
-        ...state,
-        selectedLanguage:
-          value !== undefined && hasProperty(value, 'selectedLanguage')
-            ? value.selectedLanguage
-            : undefined,
-        selectedService:
-          value !== undefined && hasProperty(value, 'selectedService')
-            ? value.selectedService
-            : undefined,
-      };
-
-    default:
-      return state;
-  }
-}

@@ -154,7 +154,7 @@ export class ReloadFileComponent {
   }
 
   private navigate = () => {
-    navigateTo(this.router, ['/intern/load'], AppInfo.queryParamsHandling).catch(
+    navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch(
       (error) => {
         console.error(error);
       }

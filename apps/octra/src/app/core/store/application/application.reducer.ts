@@ -10,6 +10,7 @@ import { ApplicationState } from './index';
 import { AuthenticationActions } from '../authentication';
 
 export const initialState: ApplicationState = {
+  initialized: false,
   loading: {
     status: LoadingStatus.INITIALIZE,
     progress: 0,
@@ -55,6 +56,10 @@ export const reducer = createReducer(
       loggedIn,
     })
   ),
+  on(ApplicationActions.initApplication.finish, (state: ApplicationState) => ({
+    ...state,
+    initialized: true
+  })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
@@ -115,16 +120,24 @@ export const reducer = createReducer(
     })
   ),
   on(
-    IDBActions.loadOptionsSuccess,
-    (state: ApplicationState, { applicationOptions }) => {
-      let result = state;
-
-      for (const option of applicationOptions) {
-        result = writeOptionToStore(result, option.name, option.value);
-      }
-
-      return result;
-    }
+    IDBActions.loadOptions.success,
+    (state: ApplicationState, { applicationOptions }) => ({
+      ...state,
+      mode: applicationOptions.usemode,
+      language: applicationOptions.language ?? 'en',
+      options: {
+        ...state.options,
+        showLoupe: applicationOptions.showLoupe ?? false,
+        secondsPerLine: applicationOptions.secondsPerLine ?? 5,
+        easyMode: applicationOptions.easymode ?? false,
+        playOnHover: applicationOptions.playOnHofer ?? false,
+        highlightingEnabled: applicationOptions.highlightingEnabled ?? false,
+        audioSettings: applicationOptions.audioSettings ?? {
+          volume: 1,
+          speed: 1,
+        },
+      },
+    })
   ),
   on(ConfigurationActions.loadGuidelinesSuccess, (state: ApplicationState) => ({
     ...state,
@@ -162,7 +175,7 @@ export const reducer = createReducer(
       progress: state.loading.progress + 25,
     },
   })),
-  on(IDBActions.loadAnnotationSuccess, (state: ApplicationState) => ({
+  on(IDBActions.loadAnnotation.success, (state: ApplicationState) => ({
     ...state,
     idb: {
       ...state.idb,

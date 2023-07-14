@@ -107,23 +107,34 @@ export class IDBService {
   /**
    * load options
    */
-  public loadOptions = (keys: string[]): Promise<IIDBEntry[]> => {
-    return new Promise<
-      {
-        value: any;
-        name: string;
-      }[]
-    >((resolve, reject) => {
-      this.database.options
-        .bulkGet(keys)
-        .then((values) => {
-          resolve(values.filter((a) => a !== undefined) as any);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  };
+  public async loadOptions(keys: string[]): Promise<{
+    version?: string,
+    easymode?: boolean,
+    language?: string,
+    usemode?: any,
+    user?: string,
+    showLoupe?: boolean,
+    secondsPerLine?: number,
+    audioSettings?: {
+      volume: number,
+      speed: number,
+    },
+    highlightingEnabled?: boolean,
+    playOnHofer?: boolean,
+    asr?: {
+      selectedLanguage?: string;
+      selectedService?: string;
+    }
+  }> {
+    const values = await this.database.options.bulkGet(keys);
+    const entries = values.filter((a) => a !== undefined);
+    const result: any = {};
+
+    for (const entry of entries) {
+      result[entry!.name] = entry!.value;
+    }
+    return result;
+  }
 
   /**
    * load all logs

@@ -69,7 +69,7 @@ export const reducer = createUndoRedoReducer(
     })
   ),
   on(
-    IDBActions.loadOptionsSuccess,
+    IDBActions.loadOptions.success,
     (state: LocalModeState, { localOptions }) => {
       let result = state;
 

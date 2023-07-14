@@ -5,30 +5,47 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
-import { catchError, exhaustMap, map, of, tap } from 'rxjs';
+import { catchError, exhaustMap, forkJoin, map, of, tap } from 'rxjs';
 import { LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationActions } from './annotation.actions';
-import { AudioService, TranscriptionService, UserInteractionsService } from "../../shared/service";
+import {
+  AudioService,
+  TranscriptionService,
+  UserInteractionsService,
+} from '../../shared/service';
 import { withLatestFrom } from 'rxjs/operators';
 import { AppInfo } from '../../../app.info';
 import {
   AnnotationLevelType,
+  AnnotJSONConverter,
   IFile,
+  ILink,
   ImportResult,
+  OAnnotJSON,
   OAudiofile,
   OIDBLevel,
   OIDBLink,
   OLevel,
 } from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { TaskInputOutputDto, ToolConfigurationAssetDto } from "@octra/api-types";
-import { GuidelinesItem } from './index';
-import { NavbarService } from "../../component/navbar/navbar.service";
+import {
+  ProjectDto,
+  TaskDto,
+  ToolConfigurationAssetDto,
+} from '@octra/api-types';
+import { convertFromOIDLevel, GuidelinesItem } from './index';
+import { NavbarService } from '../../component/navbar/navbar.service';
+import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { AuthenticationActions } from '../authentication';
+import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
 
 @Injectable()
 export class AnnotationEffects {
+  transcrSendingModal?: NgbModalWrapper<TranscriptionSendingModalComponent>;
+
   startAnnotation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.startAnnotation.do),
@@ -41,72 +58,82 @@ export class AnnotationEffects {
           })
           .pipe(
             map((task) => {
-              this.sessionStorageService.clear();
-
-              if (!task.tool_configuration) {
-                return AnnotationActions.startAnnotation.fail({
-                  error: new HttpErrorResponse({
-                    error: new Error('Missing tool configuration'),
-                    status: 500,
-                  }),
-                });
-              }
-
-              if (
-                !task.tool_configuration.assets ||
-                task.tool_configuration.assets.length === 0
-              ) {
-                return AnnotationActions.startAnnotation.fail({
-                  error: new HttpErrorResponse({
-                    error: new Error('Missing tool configuration assets'),
-                    status: 500,
-                  }),
-                });
-              }
-
-              const assets = task.tool_configuration.assets;
-              const guidelines: GuidelinesItem[] = this.readGuidelines(assets);
-
-              this.addFunctions(assets);
-
-              let selectedGuidelines: GuidelinesItem | undefined = undefined;
-
-              if(guidelines.length > 0) {
-                if (state.application.language) {
-                  if (guidelines.length === 1) {
-                    selectedGuidelines = guidelines[0];
-                  } else {
-                    const found = guidelines.find(
-                      (a) =>
-                        new RegExp(
-                          `_${state.application.language.toLowerCase()}.json`
-                        ).exec(a.name) !== null
-                    );
-                    selectedGuidelines = found ?? guidelines[0];
-                  }
-                } else {
-                  selectedGuidelines = guidelines[0];
-                }
-              }
-
-              return AnnotationActions.startAnnotation.success({
+              return AnnotationActions.prepareTaskDataForAnnotation.do({
+                currentProject: a.project,
                 task,
-                project: a.project,
                 mode: a.mode,
-                projectSettings: task.tool_configuration.value,
-                guidelines,
-                selectedGuidelines,
               });
             }),
             catchError((error: HttpErrorResponse) => {
-              this.sessionStorageService.clear();
               return of(AnnotationActions.startAnnotation.fail({ error }));
             })
           );
       })
     )
   );
-  //
+
+  onPrepareTaskForAnnotation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.prepareTaskDataForAnnotation.do),
+      withLatestFrom(this.store),
+      map(([{ task, currentProject, mode }, state]) => {
+        if (!task.tool_configuration) {
+          return AnnotationActions.startAnnotation.fail({
+            error: new HttpErrorResponse({
+              error: new Error('Missing tool configuration'),
+              status: 500,
+            }),
+          });
+        }
+
+        if (
+          !task.tool_configuration.assets ||
+          task.tool_configuration.assets.length === 0
+        ) {
+          return AnnotationActions.startAnnotation.fail({
+            error: new HttpErrorResponse({
+              error: new Error('Missing tool configuration assets'),
+              status: 500,
+            }),
+          });
+        }
+
+        const assets = task.tool_configuration.assets;
+        const guidelines: GuidelinesItem[] = this.readGuidelines(assets);
+
+        this.addFunctions(assets);
+
+        let selectedGuidelines: GuidelinesItem | undefined = undefined;
+
+        if (guidelines.length > 0) {
+          if (state.application.language) {
+            if (guidelines.length === 1) {
+              selectedGuidelines = guidelines[0];
+            } else {
+              const found = guidelines.find(
+                (a) =>
+                  new RegExp(
+                    `_${state.application.language.toLowerCase()}.json`
+                  ).exec(a.name) !== null
+              );
+              selectedGuidelines = found ?? guidelines[0];
+            }
+          } else {
+            selectedGuidelines = guidelines[0];
+          }
+        }
+
+        return AnnotationActions.startAnnotation.success({
+          task,
+          project: currentProject,
+          mode,
+          projectSettings: task.tool_configuration.value,
+          guidelines,
+          selectedGuidelines,
+        });
+      })
+    )
+  );
 
   onAnnotationStart$ = createEffect(
     () =>
@@ -114,7 +141,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
           this.transcrService.init();
-          this.routingService.navigate(['/intern/load/']);
+          this.routingService.navigate(['/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
@@ -248,7 +275,6 @@ export class AnnotationEffects {
         ofType(AnnotationActions.initTranscriptionService.do),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-
           if (
             state.application.mode === LoginMode.URL &&
             state.application.queryParams!.transcript !== undefined
@@ -342,7 +368,7 @@ export class AnnotationEffects {
                     this.navbarService.transcrService = this.transcrService;
                     this.navbarService.uiService = this.uiService;
 
-                    console.log("INIT TRANSCR OKOKOKO");
+                    console.log('INIT TRANSCR OKOKOKO');
                     this.routingService.navigate(
                       ['/intern/transcr'],
                       AppInfo.queryParamsHandling
@@ -378,7 +404,7 @@ export class AnnotationEffects {
                   this.navbarService.transcrService = this.transcrService;
                   this.navbarService.uiService = this.uiService;
 
-                  console.log("INIT TRANSCR OK:");
+                  console.log('INIT TRANSCR OK:');
                   console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
                     ['/intern/transcr'],
@@ -401,11 +427,209 @@ export class AnnotationEffects {
         ofType(AnnotationActions.loadAudio.success),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          this.store.dispatch(AnnotationActions.initTranscriptionService.do({mode: state.application.mode!}));
+          this.store.dispatch(
+            AnnotationActions.initTranscriptionService.do({
+              mode: state.application.mode!,
+            })
+          );
         })
       ),
     { dispatch: false }
   );
+
+  onLoadOnlineInfo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do),
+      exhaustMap((a) => {
+        return forkJoin<[ProjectDto, TaskDto]>(
+          this.apiService.getProject(a.projectID),
+          this.apiService.getTask(a.projectID, a.taskID)
+        ).pipe(
+          withLatestFrom(this.store),
+          map(([[currentProject, task], state]) => {
+            return OnlineModeActions.prepareTaskDataForAnnotation.do({
+              mode: LoginMode.ONLINE,
+              currentProject,
+              task,
+            });
+          }),
+          catchError((error: HttpErrorResponse) => {
+            return of(
+              OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail({
+                error,
+              })
+            );
+          })
+        );
+      })
+    )
+  );
+
+  onLoadOnlineFailed$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
+      exhaustMap((a) => {
+        return of(
+          AuthenticationActions.logout.do({
+            message: a.error.message,
+            clearSession: true,
+            messageType: '',
+            mode: LoginMode.ONLINE,
+          })
+        );
+      })
+    )
+  );
+
+  onAnnotationSend$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.sendAnnotation.do),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        if (state.application.mode === LoginMode.ONLINE) {
+          this.transcrSendingModal = this.modalsService.openModalRef(
+            TranscriptionSendingModalComponent,
+            TranscriptionSendingModalComponent.options
+          );
+          this.transcrSendingModal.componentInstance.error = '';
+
+          if (
+            !state.onlineMode.onlineSession.currentProject ||
+            !state.onlineMode.onlineSession.task?.id
+          ) {
+            return of(
+              AnnotationActions.sendAnnotation.fail({
+                error: new HttpErrorResponse({
+                  error: 'Current project or current task is undefined',
+                }),
+              })
+            );
+          }
+          const result = new AnnotJSONConverter().export(
+            new OAnnotJSON(
+              state.onlineMode.audio.fileName,
+              16000,
+              state.onlineMode.transcript.levels.map((a) =>
+                convertFromOIDLevel(a, a.id)
+              ),
+              state.onlineMode.transcript.links.map((a) => {
+                return {
+                  fromID: a.link.fromID,
+                  toID: a.link.toID,
+                } as ILink;
+              })
+            )
+          )?.file?.content;
+
+          const outputs = result
+            ? [
+                new File(
+                  [result],
+                  state.onlineMode.audio.fileName.substring(
+                    0,
+                    state.onlineMode.audio.fileName.lastIndexOf('.')
+                  ) + '_annot.json',
+                  {
+                    type: 'application/json',
+                  }
+                ),
+              ]
+            : [];
+
+          return this.apiService
+            .saveTask(
+              state.onlineMode.onlineSession.currentProject.id,
+              state.onlineMode.onlineSession.task.id,
+              {
+                assessment: state.onlineMode.onlineSession.assessment,
+                comment: state.onlineMode.onlineSession.comment,
+                log: state.onlineMode.logs,
+              },
+              outputs
+            )
+            .pipe(
+              map((a) => {
+                return AnnotationActions.sendAnnotation.success({
+                  mode: state.application.mode!,
+                  task: a,
+                });
+              }),
+              catchError((error: HttpErrorResponse) => {
+                if (this.transcrSendingModal) {
+                  this.transcrSendingModal.componentInstance.error =
+                    error.error?.message ?? error.message;
+                }
+                /* TODO if error is because of not busy
+                 => select new annotation?
+                 */
+                return of(
+                  AnnotationActions.sendAnnotation.fail({
+                    error,
+                  })
+                );
+              })
+            );
+        } else {
+          // TODO add other modes
+        }
+        return of(
+          AnnotationActions.sendAnnotation.fail({
+            error: new HttpErrorResponse({
+              error: 'Not implemented',
+            }),
+          })
+        );
+      })
+    )
+  );
+
+  afterAnnotationSent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.sendAnnotation.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        console.log('Load new annotation...');
+        this.transcrSendingModal?.close();
+        return of(
+          OnlineModeActions.clearOnlineSession.do({
+            mode: a.mode,
+            actionAfterSuccess: AnnotationActions.startAnnotation.do({
+              mode: a.mode,
+              project: state.onlineMode.onlineSession.currentProject!,
+            })
+          })
+        );
+      })
+    )
+  );
+
+  /**
+   exhaustMap((a) => {
+  return forkJoin<[void, string?]>([this.apiService.saveMyAccountFieldValues(a.data), this.appService.needsRedirectionTo$.pipe(take(1))]).pipe(
+    withLatestFrom(this.store),
+    map(([[api, redirection], state]) => {
+      if (redirection && redirection !== '') {
+        if (isURL(redirection)) {
+          document.location.href = redirection;
+        } else {
+          this.router.navigate([redirection]);
+        }
+      } else {
+        this.alertService.show(this.transloco.translate("g.saving success"), 'success', 3000);
+      }
+
+      return AccountsActions.saveCurrentAccountFieldValues.success({
+        me: state?.accounts?.me,
+      });
+    }),
+    catchError((err: HttpErrorResponse) => {
+      return checkAndThrowError(err, a, AccountsActions.saveCurrentAccountFieldValues.fail(err), this.store, () =>
+        this.alertService.show(this.transloco.translate("g.saving failed"), 'danger')
+      );
+    })
+  );
+})
+   **/
 
   private addFunctions(assets: ToolConfigurationAssetDto[]) {
     const functionsObj = assets.find((a) => a.name === 'functions');

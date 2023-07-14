@@ -815,6 +815,11 @@ export class TranscriptionComponent
     this.sendOk = true;
 
     if (this._useMode === LoginMode.ONLINE) {
+
+      if (this._useMode === LoginMode.ONLINE) {
+        console.log(`modal opened!`);
+        this.annotationStoreService.sendAnnotation()
+      }
       /* TODO
     const subscr = this.modalService.open.subscribe((modal) => {
       console.log(`modal opened!`);
@@ -834,7 +839,7 @@ export class TranscriptionComponent
             console.log(`new annotation is `);
             console.log(newAnnotation);
             if (newAnnotation !== undefined) {
-              navigateTo(this.router, ['/intern/load'], AppInfo.queryParamsHandling).catch((error) => {
+              navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch((error) => {
                 console.error(error);
               });
             } else {
@@ -859,10 +864,6 @@ export class TranscriptionComponent
         subscr.unsubscribe();
       });
       */
-      this.transcrSendingModal = this.modService.openModalRef(
-        TranscriptionSendingModalComponent,
-        TranscriptionSendingModalComponent.options
-      );
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
@@ -978,7 +979,7 @@ export class TranscriptionComponent
 
       navigateTo(
         this.router,
-        ['/intern/load'],
+        ['/load'],
         AppInfo.queryParamsHandling
       ).catch((error) => {
         console.error(`navigation failed`);
@@ -994,7 +995,7 @@ export class TranscriptionComponent
         this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
         this.api.startAnnotation(this.appStorage.onlineSession.currentProject.id).then((result) => {
           this.transcrService.endTranscription(false);
-          navigateTo(this.router, ['/intern/load'], AppInfo.queryParamsHandling).catch((error) => {
+          navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch((error) => {
             console.error(error);
           });
         }).catch((error) => {

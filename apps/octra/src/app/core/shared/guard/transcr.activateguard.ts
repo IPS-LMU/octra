@@ -36,7 +36,7 @@ export class TranscActivateGuard implements CanActivate {
           params.queryParams = route.queryParams;
 
           if (state.application.mode !== LoginMode.LOCAL) {
-            navigateTo(this.router, ['/intern/load'], params).catch((error) => {
+            navigateTo(this.router, ['/load'], params).catch((error) => {
               console.error(error);
             });
           } else {
@@ -49,7 +49,7 @@ export class TranscActivateGuard implements CanActivate {
             });
           }
           console.log('NAVIGATE LOAD');
-          navigateTo(this.router, ['/intern/load'], params).catch((error) => {
+          navigateTo(this.router, ['/load'], params).catch((error) => {
             console.error(error);
           });
           return false;

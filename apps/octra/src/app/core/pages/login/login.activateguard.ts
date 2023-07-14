@@ -6,31 +6,38 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
-import { AppStorageService } from '../../shared/service/appstorage.service';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
 
 @Injectable()
 export class ALoginGuard implements CanActivate {
-  constructor(private appStorage: AppStorageService, private router: Router) {}
+  constructor(
+    private appStoreService: ApplicationStoreService,
+    private router: Router
+  ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (this.appStorage.loggedIn) {
-      console.log(`IS LOGGED IN!`);
-      const params = AppInfo.queryParamsHandling;
-      params.fragment = route.fragment!;
-      params.queryParams = route.queryParams;
+    return this.appStoreService.loggedIn$.pipe(
+      map((a) => {
+        if (a) {
+          console.log(`IS LOGGED IN!`);
+          const params = AppInfo.queryParamsHandling;
+          params.fragment = route.fragment!;
+          params.queryParams = route.queryParams;
 
-      this.router.navigate(['/intern/transcr'], params).catch((error) => {
-        console.error(error);
-      });
-      return false;
-    } else {
-      console.log(`IS NOT LOGGED IN!`);
-    }
-    return true;
+          this.router.navigate(['/intern/transcr'], params).catch((error) => {
+            console.error(error);
+          });
+          return false;
+        } else {
+          console.log(`IS NOT LOGGED IN!`);
+        }
+        return true;
+      })
+    );
   }
 }

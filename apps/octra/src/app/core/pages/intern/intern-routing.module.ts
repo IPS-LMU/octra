@@ -1,6 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { LoadingComponent } from './loading';
+import { LoadingComponent } from '../loading';
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { AUTHENTICATED_GUARD } from './intern.activateguard';
 import { TranscriptionComponent } from './transcription';
@@ -12,7 +12,6 @@ import { ReloadFileGuard } from './reload-file/reload-file.activateguard';
 import { AuthComponent } from './auth';
 
 const MEMBER_ROUTES: Routes = [
-  { path: 'load', component: LoadingComponent },
   {
     path: 'projects',
     component: ProjectsListComponent,
@@ -34,7 +33,7 @@ const MEMBER_ROUTES: Routes = [
     canActivate: [ReloadFileGuard],
   },
   { path: 'auth', component: AuthComponent },
-  { path: '', redirectTo: 'load', pathMatch: 'full' },
+  { path: '', redirectTo: '/load', pathMatch: 'full' },
   //{ path: '**', redirectTo: '/404', pathMatch: 'full' },
 ];
 

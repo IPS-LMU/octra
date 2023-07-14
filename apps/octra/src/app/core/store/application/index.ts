@@ -37,6 +37,7 @@ export interface URLParameters {
 }
 
 export interface ApplicationState {
+  initialized: boolean;
   mode?: LoginMode;
   queryParams?: URLParameters;
   loggedIn: boolean;

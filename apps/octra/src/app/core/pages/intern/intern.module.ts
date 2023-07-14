@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { NgxJoditModule } from 'ngx-jodit';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { AuthComponent } from './auth';
-import { LoadingComponent } from './loading';
+import { LoadingComponent } from '../loading';
 import { ProjectsListComponent } from './projects-list';
 import { ReloadFileComponent } from './reload-file';
 import { TranscriptionComponent } from './transcription';

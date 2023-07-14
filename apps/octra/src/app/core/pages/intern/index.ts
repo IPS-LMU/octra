@@ -2,7 +2,7 @@ export * from './intern.component';
 export * from './intern.module';
 export * from './intern.activateguard';
 export * from "./auth";
-export * from "./loading";
+export * from "../loading";
 export * from "./projects-list";
 export * from "./reload-file";
 export * from "./transcription";

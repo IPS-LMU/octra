@@ -1,32 +1,31 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import { OIDBLink } from '@octra/annotation';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { AnnotationStateLevel } from '../annotation';
 
 export class IDBActions {
   static loadOptions = createActionGroup({
-    source: `[IDB]/Load options`,
+    source: `IDB/Load options`,
     events: {
       success: props<{
         applicationOptions: {
-          version?: string,
-          easymode?: boolean,
-          language?: string,
-          usemode?: any,
-          user?: string,
-          showLoupe?: boolean,
-          secondsPerLine?: number,
+          version?: string;
+          easymode?: boolean;
+          language?: string;
+          usemode?: any;
+          user?: string;
+          showLoupe?: boolean;
+          secondsPerLine?: number;
           audioSettings?: {
-            volume: number,
-            speed: number,
-          },
-          highlightingEnabled?: boolean,
-          playOnHofer?: boolean,
+            volume: number;
+            speed: number;
+          };
+          highlightingEnabled?: boolean;
+          playOnHofer?: boolean;
           asr?: {
             selectedLanguage?: string;
             selectedService?: string;
-          }
+          };
         };
         localOptions: IIDBModeOptions;
         onlineOptions: IIDBModeOptions;
@@ -39,7 +38,7 @@ export class IDBActions {
   });
 
   static loadLogs = createActionGroup({
-    source: `[IDB]/Load logs`,
+    source: `IDB/Load logs`,
     events: {
       success: props<{
         online: any[];
@@ -53,7 +52,7 @@ export class IDBActions {
   });
 
   static loadAnnotation = createActionGroup({
-    source: `[IDB]/Load annotation`,
+    source: `IDB/Load annotation`,
     events: {
       success: props<{
         online: {
@@ -76,7 +75,7 @@ export class IDBActions {
   });
 
   static loadConsoleEntries = createActionGroup({
-    source: `[IDB]/Load console entries`,
+    source: `IDB/Load console entries`,
     events: {
       success: props<{
         consoleEntries: ConsoleEntry[];
@@ -88,7 +87,7 @@ export class IDBActions {
   });
 
   static clearLogs = createActionGroup({
-    source: `[IDB]/Clear logs`,
+    source: `IDB/Clear logs`,
     events: {
       success: props<{
         mode: string;
@@ -100,7 +99,7 @@ export class IDBActions {
   });
 
   static clearAllOptions = createActionGroup({
-    source: `[IDB]/Clear all options`,
+    source: `IDB/Clear all options`,
     events: {
       do: emptyProps(),
       success: emptyProps(),
@@ -111,7 +110,7 @@ export class IDBActions {
   });
 
   static saveUserProfile = createActionGroup({
-    source: `[IDB]/save user profile`,
+    source: `IDB/save user profile`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -121,7 +120,7 @@ export class IDBActions {
   });
 
   static saveTranscriptionSubmitted = createActionGroup({
-    source: `[IDB]/save transcription submitted`,
+    source: `IDB/save transcription submitted`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -131,7 +130,7 @@ export class IDBActions {
   });
 
   static saveTranscriptionFeedback = createActionGroup({
-    source: `[IDB]/save transcription feedback`,
+    source: `IDB/save transcription feedback`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -141,7 +140,7 @@ export class IDBActions {
   });
 
   static saveAppLanguage = createActionGroup({
-    source: `[IDB]/save app language`,
+    source: `IDB/save app language`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -151,7 +150,7 @@ export class IDBActions {
   });
 
   static saveIDBVersion = createActionGroup({
-    source: `[IDB]/save IDB version`,
+    source: `IDB/save IDB version`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -161,7 +160,7 @@ export class IDBActions {
   });
 
   static saveTranscriptionLogging = createActionGroup({
-    source: `[IDB]/save transcription logging`,
+    source: `IDB/save transcription logging`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -171,7 +170,7 @@ export class IDBActions {
   });
 
   static saveShowLoupe = createActionGroup({
-    source: `[IDB]/save show loupe`,
+    source: `IDB/save show loupe`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -181,7 +180,7 @@ export class IDBActions {
   });
 
   static saveEasyMode = createActionGroup({
-    source: `[IDB]/save easy mode`,
+    source: `IDB/save easy mode`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -191,7 +190,7 @@ export class IDBActions {
   });
 
   static saveTranscriptionComment = createActionGroup({
-    source: `[IDB]/save easy mode`,
+    source: `IDB/save easy mode`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -201,7 +200,7 @@ export class IDBActions {
   });
 
   static saveSecondsPerLine = createActionGroup({
-    source: `[IDB]/save seconds per line`,
+    source: `IDB/save seconds per line`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -211,7 +210,7 @@ export class IDBActions {
   });
 
   static saveHighlightingEnabled = createActionGroup({
-    source: `[IDB]/save highlightingEnabled`,
+    source: `IDB/save highlightingEnabled`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -221,7 +220,7 @@ export class IDBActions {
   });
 
   static saveDemoSession = createActionGroup({
-    source: `[IDB]/save demoSession`,
+    source: `IDB/save demoSession`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -231,7 +230,7 @@ export class IDBActions {
   });
 
   static saveOnlineSession = createActionGroup({
-    source: `[IDB]/save OnlineSession`,
+    source: `IDB/save OnlineSession`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -241,7 +240,7 @@ export class IDBActions {
   });
 
   static saveLoggedIn = createActionGroup({
-    source: `[IDB]/save LoggedIn`,
+    source: `IDB/save LoggedIn`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -251,7 +250,7 @@ export class IDBActions {
   });
 
   static savePlayOnHover = createActionGroup({
-    source: `[IDB]/save PlayOnHover`,
+    source: `IDB/save PlayOnHover`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -261,7 +260,7 @@ export class IDBActions {
   });
 
   static saveFollowPlayCursor = createActionGroup({
-    source: `[IDB]/save FollowPlayCursor`,
+    source: `IDB/save FollowPlayCursor`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -271,7 +270,7 @@ export class IDBActions {
   });
 
   static saveAppReloaded = createActionGroup({
-    source: `[IDB]/save AppReloaded`,
+    source: `IDB/save AppReloaded`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -281,7 +280,7 @@ export class IDBActions {
   });
 
   static saveServerDataEntry = createActionGroup({
-    source: `[IDB]/save ServerDataEntry`,
+    source: `IDB/save ServerDataEntry`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -291,7 +290,7 @@ export class IDBActions {
   });
 
   static saveLoginSession = createActionGroup({
-    source: `[IDB]/save LoginSession`,
+    source: `IDB/save LoginSession`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -301,7 +300,7 @@ export class IDBActions {
   });
 
   static saveLogout = createActionGroup({
-    source: `[IDB]/save logout`,
+    source: `IDB/save logout`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -311,7 +310,7 @@ export class IDBActions {
   });
 
   static saveLogs = createActionGroup({
-    source: `[IDB]/save logs`,
+    source: `IDB/save logs`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -321,7 +320,7 @@ export class IDBActions {
   });
 
   static saveASRSettings = createActionGroup({
-    source: `[IDB]/save ASRSettings`,
+    source: `IDB/save ASRSettings`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -331,7 +330,7 @@ export class IDBActions {
   });
 
   static saveAudioSettings = createActionGroup({
-    source: `[IDB]/save saveAudioSettings`,
+    source: `IDB/save saveAudioSettings`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -341,7 +340,7 @@ export class IDBActions {
   });
 
   static saveCurrentEditor = createActionGroup({
-    source: `[IDB]/save saveCurrentEditor`,
+    source: `IDB/save saveCurrentEditor`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -351,7 +350,7 @@ export class IDBActions {
   });
 
   static clearAnnotation = createActionGroup({
-    source: `[IDB]/save clearAnnotation`,
+    source: `IDB/save clearAnnotation`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -361,7 +360,7 @@ export class IDBActions {
   });
 
   static overwriteTranscript = createActionGroup({
-    source: `[IDB]/save overwriteTranscript`,
+    source: `IDB/save overwriteTranscript`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -371,7 +370,7 @@ export class IDBActions {
   });
 
   static overwriteAnnotationLinks = createActionGroup({
-    source: `[IDB]/save overwriteAnnotationLinks`,
+    source: `IDB/save overwriteAnnotationLinks`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -381,7 +380,7 @@ export class IDBActions {
   });
 
   static saveModeOptions = createActionGroup({
-    source: `[IDB]/save saveModeOptions`,
+    source: `IDB/save saveModeOptions`,
     events: {
       success: props<{
         mode: string;
@@ -393,7 +392,7 @@ export class IDBActions {
   });
 
   static logoutSession = createActionGroup({
-    source: `[IDB]/Logout session`,
+    source: `IDB/Logout session`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -403,7 +402,7 @@ export class IDBActions {
   });
 
   static saveAnnotation = createActionGroup({
-    source: `[IDB]/save annotation`,
+    source: `IDB/save annotation`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -413,7 +412,7 @@ export class IDBActions {
   });
 
   static addAnnotationLevel = createActionGroup({
-    source: `[IDB]/add AnnotationLevel`,
+    source: `IDB/add AnnotationLevel`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -423,7 +422,7 @@ export class IDBActions {
   });
 
   static removeAnnotationLevel = createActionGroup({
-    source: `[IDB]/remove AnnotationLevel`,
+    source: `IDB/remove AnnotationLevel`,
     events: {
       success: emptyProps(),
       fail: props<{
@@ -433,7 +432,7 @@ export class IDBActions {
   });
 
   static saveConsoleEntries = createActionGroup({
-    source: `[IDB]/save ConsoleEntries`,
+    source: `IDB/save ConsoleEntries`,
     events: {
       success: emptyProps(),
       fail: props<{

@@ -240,15 +240,15 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.undo),
       withLatestFrom(this.store),
-      mergeMap(([actionData, appState]: [Action, RootState]) => {
-        const subject = new Subject<Action>();
+      exhaustMap(([actionData, appState]) => {
         // code for saving to the database
         console.log(`save after undo`);
         const modeState = getModeState(appState);
 
         if (modeState) {
           const links = modeState.transcript.links.map((a) => a.link);
-          this.idbService
+
+          return this.idbService
             .saveAnnotation(
               appState.application.mode!,
               new OAnnotJSON(
@@ -258,24 +258,23 @@ export class IDBEffects {
                 links
               )
             )
-            .then(() => {
-              subject.next(ApplicationActions.undoSuccess());
-            })
-            .catch((error) => {
-              subject.next(
-                ApplicationActions.undoFailed({
-                  error,
-                })
-              );
-            });
+            .pipe(
+              map(() => ApplicationActions.undoSuccess()),
+              catchError((error) => {
+                return of(
+                  ApplicationActions.undoFailed({
+                    error,
+                  })
+                );
+              })
+            );
         } else {
-          subject.next(
+          return of(
             ApplicationActions.undoFailed({
               error: "Can't find modeState",
             })
           );
         }
-        return subject;
       })
     )
   );
@@ -285,7 +284,6 @@ export class IDBEffects {
       ofType(ApplicationActions.redo),
       withLatestFrom(this.store),
       mergeMap(([actionData, appState]: [Action, RootState]) => {
-        const subject = new Subject<Action>();
         // code for saving to the database
         console.log(`save after redo`);
 
@@ -293,7 +291,7 @@ export class IDBEffects {
 
         if (modeState) {
           const links = modeState.transcript.links.map((a) => a.link);
-          this.idbService
+          return this.idbService
             .saveAnnotation(
               appState.application.mode!,
               new OAnnotJSON(
@@ -303,25 +301,23 @@ export class IDBEffects {
                 links
               )
             )
-            .then(() => {
-              subject.next(ApplicationActions.redoSuccess());
-            })
-            .catch((error) => {
-              subject.next(
-                ApplicationActions.redoFailed({
-                  error,
-                })
-              );
-            });
+            .pipe(
+              map(() => ApplicationActions.redoSuccess()),
+              catchError((error) => {
+                return of(
+                  ApplicationActions.redoFailed({
+                    error,
+                  })
+                );
+              })
+            );
         } else {
-          subject.next(
+          return of(
             ApplicationActions.undoFailed({
               error: "Can't find modeState",
             })
           );
         }
-
-        return subject;
       })
     )
   );
@@ -333,26 +329,18 @@ export class IDBEffects {
           a.type === AnnotationActions.clearLogs.do.type ||
           a.type === AnnotationActions.clearWholeSession.do.type
       ),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .clearLoggingData((action as any).mode)
-          .then(() => {
-            subject.next(IDBActions.clearLogs.success((action as any).mode));
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+      exhaustMap((action) =>
+        this.idbService.clearLoggingData((action as any).mode).pipe(
+          map(() => IDBActions.clearLogs.success((action as any).mode)),
+          catchError((error) => {
+            return of(
               IDBActions.clearLogs.fail({
                 error,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
-      })
+          })
+        )
+      )
     )
   );
 
@@ -395,31 +383,22 @@ export class IDBEffects {
           action.type === AuthenticationActions.logout.success.type
       ),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
         if (
           !hasProperty(action, 'clearSession') ||
           (action as any).clearSession
         ) {
-          this.idbService
-            .clearAnnotationData((action as any).mode)
-            .then(() => {
-              subject.next(IDBActions.clearAnnotation.success());
-              subject.complete();
-            })
-            .catch((error) => {
-              subject.next(
-                IDBActions.clearAnnotation.fail({
+          return this.idbService
+            .clearAnnotationData((action as any).mode).pipe(
+              map(()=> IDBActions.clearAnnotation.success()),
+              catchError((error) => {
+                return of(IDBActions.clearAnnotation.fail({
                   error,
-                })
-              );
-              subject.complete();
-            });
+                }))
+              })
+            )
         } else {
-          timer(10).subscribe(() => {
-            subject.complete();
-          });
+          return of(IDBActions.clearAnnotation.success())
         }
-        return subject;
       })
     )
   );
@@ -428,27 +407,19 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.overwriteTranscript.do),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
         if (action.saveToDB) {
-          this.idbService
-            .clearAnnotationData((action as any).mode)
-            .then(() => {
-              subject.next(IDBActions.overwriteTranscript.success());
-              subject.complete();
-            })
-            .catch((error) => {
-              subject.next(
-                IDBActions.overwriteTranscript.fail({
+          return this.idbService
+            .clearAnnotationData((action as any).mode).pipe(
+              map(()=> IDBActions.overwriteTranscript.success()),
+              catchError((error)=> {
+                return of(IDBActions.overwriteTranscript.fail({
                   error,
-                })
-              );
-              subject.complete();
-            });
+                }))
+              })
+            )
         } else {
-          subject.complete();
+          return of(IDBActions.overwriteTranscript.success());
         }
-        return subject;
       })
     )
   );
@@ -499,15 +470,13 @@ export class IDBEffects {
         LocalModeActions.login
       ),
       withLatestFrom(this.store),
-      mergeMap(([action, appState]: [Action, RootState]) => {
-        const subject = new Subject<Action>();
-
+      exhaustMap(([action, appState]) => {
         const modeState = this.getModeStateFromString(
           appState,
           (action as any).mode
         );
         if (modeState) {
-          this.idbService
+          return this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile: modeState?.sessionFile?.toAny(),
               currentEditor: modeState.currentEditor,
@@ -516,27 +485,29 @@ export class IDBEffects {
               submitted: false, //<- TODO ?
               transcriptID: modeState.onlineSession?.task?.id,
               feedback: modeState.onlineSession?.assessment, // TODO changeTask must be initalized at startup,
-              comment: modeState.onlineSession?.comment
+              comment: modeState.onlineSession?.comment,
             })
-            .then(() => {
-              subject.next(
-                IDBActions.saveModeOptions.success({
+            .pipe(
+              map(() => {
+                return IDBActions.saveModeOptions.success({
                   mode: (action as any).mode,
-                })
-              );
-              subject.complete();
+                });
+              }),
+              catchError((error) => {
+                return of(
+                  IDBActions.saveModeOptions.fail({
+                    error,
+                  })
+                );
+              })
+            );
+        } else {
+          return of(
+            IDBActions.saveModeOptions.success({
+              mode: (action as any).mode,
             })
-            .catch((error) => {
-              subject.next(
-                IDBActions.saveModeOptions.fail({
-                  error,
-                })
-              );
-              subject.complete();
-            });
+          );
         }
-
-        return subject;
       })
     )
   );
@@ -1000,7 +971,7 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.saveLogs.do, AnnotationActions.addLog.do),
       withLatestFrom(this.store),
-      mergeMap(([action, appState]: [Action, RootState]) => {
+      exhaustMap(([action, appState]: [Action, RootState]) => {
         const subject = new Subject<Action>();
 
         const modeState = this.getModeStateFromString(
@@ -1009,30 +980,25 @@ export class IDBEffects {
         );
 
         if (modeState) {
-          this.idbService
+          return this.idbService
             .saveLogs((action as any).mode, modeState.logs)
-            .then(() => {
-              subject.next(IDBActions.saveLogs.success());
-              subject.complete();
-            })
-            .catch((error) => {
-              subject.next(
-                IDBActions.saveLogs.fail({
-                  error,
-                })
-              );
-              subject.complete();
-            });
+            .pipe(
+              map(() => IDBActions.saveLogs.success()),
+              catchError((error) => {
+                return of(
+                  IDBActions.saveLogs.fail({
+                    error,
+                  })
+                );
+              })
+            );
         } else {
-          subject.next(
+          return of(
             IDBActions.saveLogs.fail({
               error: "Can't find modeState",
             })
           );
-          subject.complete();
         }
-
-        return subject;
       })
     )
   );
@@ -1045,7 +1011,7 @@ export class IDBEffects {
         AnnotationActions.removeAnnotationLevel.do
       ),
       withLatestFrom(this.store),
-      mergeMap(([action, appState]) => {
+      exhaustMap(([action, appState]) => {
         const subject = new Subject<Action>();
         const modeState = this.getModeStateFromString(
           appState,
@@ -1053,7 +1019,7 @@ export class IDBEffects {
         );
 
         if (modeState) {
-          this.idbService
+          return this.idbService
             .saveAnnotation(
               (action as any).mode,
               new OAnnotJSON(
@@ -1063,18 +1029,16 @@ export class IDBEffects {
                 modeState.transcript.links.map((a) => a.link)
               )
             )
-            .then(() => {
-              subject.next(IDBActions.saveAnnotation.success());
-              subject.complete();
-            })
-            .catch((error) => {
-              subject.next(
-                IDBActions.saveAnnotation.fail({
-                  error,
-                })
-              );
-              subject.complete();
-            });
+            .pipe(
+              map(() => IDBActions.saveAnnotation.success()),
+              catchError((error) => {
+                return of(
+                  IDBActions.saveAnnotation.fail({
+                    error,
+                  })
+                );
+              })
+            );
         } else {
           subject.next(
             IDBActions.saveAnnotation.fail({

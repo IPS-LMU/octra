@@ -177,67 +177,9 @@ export class OctraDatabase extends Dexie {
       });
   }
 
-  private upgradeToDatabaseV4(transaction: Transaction) {
+  private async upgradeToDatabaseV4(transaction: Transaction) {
     console.log(`UPGRADE to v4`);
-
-    return new Promise<void>((resolve, reject) => {
-      transaction
-        .table('options')
-        .get('usemode')
-        .then((usemode) => {
-          if (usemode === 'local') {
-            // TODO db: migrate old local data to localData, remove old tables
-            resolve();
-          }
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
-
-  loadModeOptionsFromDB(mode: LoginMode) {
-    return new Promise<IIDBModeOptions>((resolve, reject) => {
-      const table = this.getTableFromString(mode);
-
-      if (table) {
-        table
-          .get('options')
-          .then((options) => {
-            if (options !== undefined) {
-              resolve(options.value);
-            } else {
-              resolve(DefaultModeOptions);
-            }
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      } else {
-        resolve(DefaultModeOptions);
-      }
-    });
-  }
-
-  loadModeLogsFromDB(mode: LoginMode) {
-    return new Promise<any[]>((resolve, reject) => {
-      const table = this.getTableFromString(mode);
-
-      if (table !== undefined) {
-        table
-          .get('logs')
-          .then((logs) => {
-            if (logs !== undefined) {
-              resolve(logs.value);
-            } else {
-              resolve([]);
-            }
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      }
-    });
+    await transaction.table('options').get('usemode');
   }
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
@@ -299,45 +241,37 @@ export class OctraDatabase extends Dexie {
   }
 
   public saveModeData(mode: LoginMode, name: string, value: any) {
-    return new Promise<void>((resolve, reject) => {
-      const table = this.getTableFromString(mode);
-      if (table) {
-        table
-          .put({ name, value }, name)
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      } else {
-        resolve();
-      }
-    });
+    const table = this.getTableFromString(mode);
+    if (table) {
+      return from(table.put({ name, value }, name)).pipe(
+        map(() => {
+          return;
+        })
+      );
+    } else {
+      return of();
+    }
   }
 
   public clearDataOfMode(mode: LoginMode, name: string) {
-    return new Promise<void>((resolve, reject) => {
-      const table = this.getTableFromString(mode);
-      if (table) {
-        table
-          .put(
-            {
-              name: name,
-              value: {},
-            },
-            name
-          )
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      } else {
-        resolve();
-      }
-    });
+    const table = this.getTableFromString(mode);
+    if (table) {
+      return from(
+        table.put(
+          {
+            name: name,
+            value: {},
+          },
+          name
+        )
+      ).pipe(
+        map(() => {
+          return;
+        })
+      );
+    } else {
+      return of();
+    }
   }
 
   public loadDataOfMode<T>(mode: LoginMode, name: string, emptyValue: T) {

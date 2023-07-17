@@ -39,14 +39,14 @@ export class IDBService {
   /**
    * clears all annotaiton data
    */
-  public clearAnnotationData(mode: LoginMode): Promise<any> {
+  public clearAnnotationData(mode: LoginMode) {
     return this.database.clearDataOfMode(mode, 'annotation');
   }
 
   /**
    * clears all options
    */
-  public clearModeOptions(mode: LoginMode): Promise<any> {
+  public clearModeOptions(mode: LoginMode) {
     return this.database.clearDataOfMode(mode, 'options');
   }
 
@@ -194,7 +194,7 @@ export class IDBService {
   /**
    * clears logging data
    */
-  public clearLoggingData(mode: LoginMode): Promise<any> {
+  public clearLoggingData(mode: LoginMode) {
     return this.database.clearDataOfMode(mode, 'logs');
   }
 

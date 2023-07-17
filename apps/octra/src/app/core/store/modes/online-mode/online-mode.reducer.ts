@@ -13,6 +13,7 @@ import { getProperties, hasProperty } from '@octra/utilities';
 import { AuthenticationActions } from '../../authentication';
 import { OnlineModeState } from '../../annotation';
 import { LoginMode } from '../../index';
+import { ProjectSettings } from "../../../obj";
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -213,13 +214,14 @@ export class OnlineModeReducers {
                 currentProject,
                 task,
               },
+              logging: (task.tool_configuration!.value as ProjectSettings).logging.forced ?? false
             };
           }
           return state;
         }
       ),
       on(
-        AnnotationActions.startAnnotation.success,
+        OnlineModeActions.startAnnotation.success,
         (
           state: OnlineModeState,
           {

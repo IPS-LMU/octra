@@ -387,17 +387,18 @@ export class IDBEffects {
           !hasProperty(action, 'clearSession') ||
           (action as any).clearSession
         ) {
-          return this.idbService
-            .clearAnnotationData((action as any).mode).pipe(
-              map(()=> IDBActions.clearAnnotation.success()),
-              catchError((error) => {
-                return of(IDBActions.clearAnnotation.fail({
+          return this.idbService.clearAnnotationData((action as any).mode).pipe(
+            map(() => IDBActions.clearAnnotation.success()),
+            catchError((error) => {
+              return of(
+                IDBActions.clearAnnotation.fail({
                   error,
-                }))
-              })
-            )
+                })
+              );
+            })
+          );
         } else {
-          return of(IDBActions.clearAnnotation.success())
+          return of(IDBActions.clearAnnotation.success());
         }
       })
     )
@@ -408,15 +409,16 @@ export class IDBEffects {
       ofType(AnnotationActions.overwriteTranscript.do),
       exhaustMap((action) => {
         if (action.saveToDB) {
-          return this.idbService
-            .clearAnnotationData((action as any).mode).pipe(
-              map(()=> IDBActions.overwriteTranscript.success()),
-              catchError((error)=> {
-                return of(IDBActions.overwriteTranscript.fail({
+          return this.idbService.clearAnnotationData((action as any).mode).pipe(
+            map(() => IDBActions.overwriteTranscript.success()),
+            catchError((error) => {
+              return of(
+                IDBActions.overwriteTranscript.fail({
                   error,
-                }))
-              })
-            )
+                })
+              );
+            })
+          );
         } else {
           return of(IDBActions.overwriteTranscript.success());
         }
@@ -516,24 +518,18 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(UserActions.setUserProfile),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
+        return this.idbService
           .saveOption('userProfile', { name: action.name, email: action.email })
-          .then(() => {
-            subject.next(IDBActions.saveUserProfile.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveUserProfile.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+          .pipe(
+            map(() => IDBActions.saveUserProfile.success()),
+            catchError((error: Error) => {
+              return of(
+                IDBActions.saveUserProfile.fail({
+                  error: error.message,
+                })
+              );
+            })
+          );
       })
     )
   );
@@ -542,24 +538,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setAppLanguage),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .saveOption('language', action.language)
-          .then(() => {
-            subject.next(IDBActions.saveAppLanguage.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+        return this.idbService.saveOption('language', action.language).pipe(
+          map(() => IDBActions.saveAppLanguage.success()),
+          catchError((error: Error) => {
+            return of(
               IDBActions.saveAppLanguage.fail({
-                error,
+                error: error.message,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -568,24 +556,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setDBVersion),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .saveOption('version', action.version)
-          .then(() => {
-            subject.next(IDBActions.saveIDBVersion.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+        return this.idbService.saveOption('version', action.version).pipe(
+          map(() => IDBActions.saveIDBVersion.success()),
+          catchError((error: Error) => {
+            return of(
               IDBActions.saveIDBVersion.fail({
-                error,
+                error: error.message,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -594,24 +574,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setShowLoupe),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .saveOption('showLoupe', action.showLoupe)
-          .then(() => {
-            subject.next(IDBActions.saveShowLoupe.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+        return this.idbService.saveOption('showLoupe', action.showLoupe).pipe(
+          map(() => IDBActions.saveShowLoupe.success()),
+          catchError((error: Error) => {
+            return of(
               IDBActions.saveShowLoupe.fail({
-                error,
+                error: error.message,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -620,24 +592,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setEasyMode),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
-          .saveOption('easymode', action.easyMode)
-          .then(() => {
-            subject.next(IDBActions.saveEasyMode.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+        return this.idbService.saveOption('easymode', action.easyMode).pipe(
+          map(() => IDBActions.saveEasyMode.success()),
+          catchError((error: Error) => {
+            return of(
               IDBActions.saveEasyMode.fail({
-                error,
+                error: error.message,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -646,26 +610,21 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setSecondsPerLine),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
         if (this.idbService.isReady) {
-          this.idbService
+          return this.idbService
             .saveOption('secondsPerLine', action.secondsPerLine)
-            .then(() => {
-              subject.next(IDBActions.saveSecondsPerLine.success());
-              subject.complete();
-            })
-            .catch((error) => {
-              subject.next(
-                IDBActions.saveSecondsPerLine.fail({
-                  error,
-                })
-              );
-              subject.complete();
-            });
+            .pipe(
+              map(() => IDBActions.saveSecondsPerLine.success()),
+              catchError((error: Error) => {
+                return of(
+                  IDBActions.saveSecondsPerLine.fail({
+                    error: error.message,
+                  })
+                );
+              })
+            );
         }
-
-        return subject;
+        return of();
       })
     )
   );
@@ -674,24 +633,18 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setHighlightingEnabled),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
+        return this.idbService
           .saveOption('highlightingEnabled', action.highlightingEnabled)
-          .then(() => {
-            subject.next(IDBActions.saveHighlightingEnabled.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveHighlightingEnabled.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+          .pipe(
+            map(() => IDBActions.saveHighlightingEnabled.success()),
+            catchError((error: Error) => {
+              return of(
+                IDBActions.saveHighlightingEnabled.fail({
+                  error: error.message,
+                })
+              );
+            })
+          );
       })
     )
   );
@@ -747,26 +700,17 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.success),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
         this.sessStr.store('loggedIn', false);
-        const promises: Promise<any>[] = [];
-        promises.push(this.idbService.saveOption('usemode', undefined));
-        Promise.all(promises)
-          .then(() => {
-            subject.next(IDBActions.saveLogout.success);
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+        return this.idbService.saveOption('usemode', undefined).pipe(
+          map(() => IDBActions.saveLogout.success()),
+          catchError((error: Error) => {
+            return of(
               IDBActions.saveLogout.fail({
-                error,
+                error: error.message,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -889,25 +833,21 @@ export class IDBEffects {
       mergeMap((action) => {
         const subject = new Subject<Action>();
 
-        this.idbService
+        return this.idbService
           .saveOption('asr', {
             selectedLanguage: action.selectedLanguage,
             selectedService: action.selectedService,
           })
-          .then(() => {
-            subject.next(IDBActions.saveASRSettings.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveASRSettings.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+          .pipe(
+            map(() => IDBActions.saveASRSettings.success()),
+            catchError((error: Error) =>
+              of(
+                IDBActions.saveASRSettings.fail({
+                  error: error.message,
+                })
+              )
+            )
+          );
       })
     )
   );
@@ -916,27 +856,21 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setAudioSettings),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
+        return this.idbService
           .saveOption('audioSettings', {
             volume: action.volume,
             speed: action.speed,
           })
-          .then(() => {
-            subject.next(IDBActions.saveAudioSettings.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveAudioSettings.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+          .pipe(
+            map(() => IDBActions.saveAudioSettings.success()),
+            catchError((error: Error) => {
+              return of(
+                IDBActions.saveAudioSettings.fail({
+                  error: error.message,
+                })
+              );
+            })
+          );
       })
     )
   );
@@ -945,24 +879,18 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.setCurrentEditor.do),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
+        return this.idbService
           .saveOption('interface', action.currentEditor)
-          .then(() => {
-            subject.next(IDBActions.saveCurrentEditor.success());
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.saveCurrentEditor.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+          .pipe(
+            map(() => IDBActions.saveCurrentEditor.success()),
+            catchError((error: Error) => {
+              return of(
+                IDBActions.saveCurrentEditor.fail({
+                  error: error.message,
+                })
+              );
+            })
+          );
       })
     )
   );

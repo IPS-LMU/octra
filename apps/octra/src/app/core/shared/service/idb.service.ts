@@ -7,7 +7,7 @@ import {
 } from '../octra-database';
 import { LoginMode } from '../../store';
 import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
-import { from, map, Observable } from 'rxjs';
+import { from, map, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -146,23 +146,16 @@ export class IDBService {
    * @param key
    * @param value
    */
-  public saveOption(key: string, value: any) {
-    return new Promise<string>((resolve, reject) => {
-      if (this.isReady) {
-        this.database.options
-          .put({ name: key, value }, key)
-          .then((result) => {
-            resolve(result);
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      } else {
-        reject(
-          new Error(`can't save option ${key}, because idb is not ready.`)
-        );
-      }
-    });
+  public saveOption<T>(key: string, value: T) {
+    if (this.isReady) {
+      return from(this.database.options.put({ name: key, value }, key)).pipe(
+        map((result: string) => result)
+      );
+    } else {
+      return throwError(() => {
+        return new Error(`can't save option ${key}, because idb is not ready.`);
+      });
+    }
   }
 
   public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {

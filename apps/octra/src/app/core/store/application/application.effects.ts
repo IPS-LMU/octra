@@ -502,6 +502,17 @@ export class ApplicationEffects {
     )
   );
 
+  wait$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.waitForEffects.do),
+        tap((a) => {
+          this.routerService.navigate(['/load'], AppInfo.queryParamsHandling);
+        })
+      ),
+    { dispatch: false }
+  );
+
   constructor(
     private actions$: Actions,
     private transloco: TranslocoService,

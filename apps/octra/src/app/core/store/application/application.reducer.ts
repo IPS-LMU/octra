@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { LoadingStatus, LoginMode } from '../index';
 import { ApplicationActions } from './application.actions';
-import { ConfigurationActions } from '../configuration/configuration.actions';
 import { IDBActions } from '../idb/idb.actions';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { AnnotationActions } from '../annotation/annotation.actions';
@@ -139,42 +138,6 @@ export const reducer = createReducer(
       },
     })
   ),
-  on(ConfigurationActions.loadGuidelinesSuccess, (state: ApplicationState) => ({
-    ...state,
-    loading: {
-      ...state.loading,
-      status:
-        state.loading.progress === 75
-          ? LoadingStatus.FINISHED
-          : LoadingStatus.LOADING,
-      progress: state.loading.progress + 25,
-    },
-  })),
-  on(
-    ConfigurationActions.projectConfigurationLoaded,
-    (state: ApplicationState) => ({
-      ...state,
-      loading: {
-        ...state.loading,
-        status:
-          state.loading.progress === 75
-            ? LoadingStatus.FINISHED
-            : LoadingStatus.LOADING,
-        progress: state.loading.progress + 25,
-      },
-    })
-  ),
-  on(ConfigurationActions.loadMethodsSuccess, (state: ApplicationState) => ({
-    ...state,
-    loading: {
-      ...state.loading,
-      status:
-        state.loading.progress === 75
-          ? LoadingStatus.FINISHED
-          : LoadingStatus.LOADING,
-      progress: state.loading.progress + 25,
-    },
-  })),
   on(IDBActions.loadAnnotation.success, (state: ApplicationState) => ({
     ...state,
     idb: {
@@ -286,6 +249,15 @@ export const reducer = createReducer(
       },
     })
   ),
+  on(ApplicationActions.waitForEffects.do, (state: ApplicationState) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.WAITING,
+      progress: 50,
+      errors: [],
+    },
+  })),
   on(AnnotationActions.loadAudio.do, (state: ApplicationState, { mode }) => ({
     ...state,
     loading: {

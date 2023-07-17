@@ -13,9 +13,10 @@ export enum LoginMode {
 
 export enum LoadingStatus {
   INITIALIZE = 'INITIALIZE',
+  WAITING = "WAITING",
   LOADING = 'LOADING',
   FAILED = 'FAILED',
-  FINISHED = 'FINISHED',
+  FINISHED = 'FINISHED'
 }
 
 export interface LoginData {

@@ -48,7 +48,6 @@ import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromUser from './core/store/user/user.reducer';
 import { IDBEffects } from './core/store/idb/idb-effects.service';
 import { IDBService } from './core/shared/service/idb.service';
-import { ConfigurationEffects } from './core/store/configuration/configuration.effects';
 import { ApplicationEffects } from './core/store/application/application.effects';
 import { ModalsModule } from './core/modals/modals.module';
 import { AppSharedModule } from './app.shared.module';
@@ -109,7 +108,6 @@ import { PagesModule } from './core/pages/pages.module';
       logOnly: environment.production,
     }),
     EffectsModule.forRoot([
-      ConfigurationEffects,
       IDBEffects,
       ApplicationEffects,
       APIEffects,

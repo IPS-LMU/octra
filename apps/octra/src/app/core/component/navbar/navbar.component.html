@@ -3,6 +3,7 @@
   aria-label="Fourth navbar example"
   #navbar
   id="navbar"
+  *ngIf="appStorage.snapshot.application.loading.status !== 'WAITING'"
 >
   <div class="container-fluid">
     <a

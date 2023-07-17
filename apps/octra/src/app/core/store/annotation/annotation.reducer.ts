@@ -2,7 +2,6 @@ import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
 import { LoginMode } from '../index';
 import { AnnotationActions } from './annotation.actions';
 import { IDBActions } from '../idb/idb.actions';
-import { ConfigurationActions } from '../configuration/configuration.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
 import { AnnotationState, OnlineModeState } from "./index";
@@ -248,20 +247,6 @@ export class AnnotationStateReducers {
         };
       }),
       on(
-        ConfigurationActions.projectConfigurationLoaded,
-        (state: AnnotationState, { projectConfig }) => ({
-          ...state,
-          projectConfig,
-        })
-      ),
-      on(
-        ConfigurationActions.loadGuidelinesSuccess,
-        (state: AnnotationState, { guidelines }) => ({
-          ...state,
-          guidelines,
-        })
-      ),
-      on(
         IDBActions.loadOptions.success,
         (
           state: AnnotationState,
@@ -284,13 +269,6 @@ export class AnnotationStateReducers {
 
           return result;
         }
-      ),
-      on(
-        ConfigurationActions.loadMethodsSuccess,
-        (state: AnnotationState, methods) => ({
-          ...state,
-          methods,
-        })
       ),
     ];
   }

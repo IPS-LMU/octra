@@ -149,6 +149,22 @@ export class AnnotationActions {
     },
   });
 
+  static quit = createActionGroup({
+    source: `annotation/quit`,
+    events: {
+      do: props<{
+        clearSession: boolean;
+        freeTask: boolean;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static saveLogs = createActionGroup({
     source: `annotation/ save logs`,
     events: {

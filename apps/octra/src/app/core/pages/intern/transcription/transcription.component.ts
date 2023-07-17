@@ -426,19 +426,9 @@ export class TranscriptionComponent
       // clear transcription
 
       this.transcrService.endTranscription();
-
-      if (this._useMode !== LoginMode.DEMO) {
-        /* TODO
-        this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
-          this.logout(true);
-        }).catch((error) => {
-          console.error(error);
-        }); */
-      } else {
-        // is demo mode
-        this.logout(true);
-      }
+      this.annotationStoreService.quit(true, true);
     } else {
+      // TODO check other themes than shortAudioFiles
       this.modService
         .openModal(
           TranscriptionStopModalComponent,

@@ -127,7 +127,7 @@ export class AppStorageService {
   }
 
   get logging(): boolean {
-    return getModeState(this._snapshot)!.logging!;
+    return getModeState(this._snapshot)?.logging ?? false;
   }
 
   set logging(value: boolean) {

@@ -78,6 +78,13 @@ export class ApplicationActions {
     },
   });
 
+  static waitForEffects = createActionGroup({
+    source: 'app/wait',
+    events: {
+      do: emptyProps(),
+    },
+  });
+
   public static undo = createAction(`UNDO`);
 
   public static redo = createAction(`REDO`);

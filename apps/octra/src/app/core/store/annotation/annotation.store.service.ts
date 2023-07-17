@@ -41,6 +41,12 @@ export class AnnotationStoreService {
     );
   }
 
+  quit(clearSession: boolean, freeTask: boolean){
+    this.store.dispatch(AnnotationActions.quit.do({
+      clearSession, freeTask
+    }));
+  }
+
   public getTranscriptFromIO(io: TaskInputOutputDto[]): TaskInputOutputDto {
     return io.find(
       (a) =>

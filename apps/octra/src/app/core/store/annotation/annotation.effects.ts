@@ -5,7 +5,16 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
-import { catchError, exhaustMap, forkJoin, map, of, Subscription, tap, timer } from "rxjs";
+import {
+  catchError,
+  exhaustMap,
+  forkJoin,
+  map,
+  of,
+  Subscription,
+  tap,
+  timer,
+} from 'rxjs';
 import { LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
@@ -41,13 +50,14 @@ import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { AuthenticationActions } from '../authentication';
 import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
+import { ApplicationActions } from "../application/application.actions";
 
 @Injectable()
 export class AnnotationEffects {
   transcrSendingModal: {
-    ref?:NgbModalWrapper<TranscriptionSendingModalComponent>,
-    timeout?: Subscription,
-    error?: string
+    ref?: NgbModalWrapper<TranscriptionSendingModalComponent>;
+    timeout?: Subscription;
+    error?: string;
   } = {};
 
   startAnnotation$ = createEffect(() =>
@@ -271,6 +281,46 @@ export class AnnotationEffects {
         })
       ),
     { dispatch: false }
+  );
+
+  onQuit$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.quit.do),
+        withLatestFrom(this.store),
+        exhaustMap(([a, state]) => {
+          this.store.dispatch(ApplicationActions.waitForEffects.do());
+
+          if (state.application.mode === LoginMode.ONLINE) {
+            if(a.freeTask && state.onlineMode.onlineSession.currentProject && state.onlineMode.onlineSession.task) {
+              return this.apiService.freeTask(state.onlineMode.onlineSession.currentProject.id, state.onlineMode.onlineSession.task.id).pipe(
+                map((result) => AuthenticationActions.logout.do({
+                  clearSession: a.clearSession,
+                  mode: state.application.mode!
+                })),
+                catchError((error) => {
+                  // ignore
+                  return of(AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode!
+                  }));
+                })
+              )
+            } else {
+              return of(AuthenticationActions.logout.do({
+                clearSession: a.clearSession,
+                mode: state.application.mode
+              }));
+            }
+          } else {
+            return of(
+              AnnotationActions.quit.success({
+                mode: state.application.mode!,
+              })
+            );
+          }
+        })
+      )
   );
 
   initTranscriptionService$ = createEffect(
@@ -499,14 +549,15 @@ export class AnnotationEffects {
       exhaustMap(([a, state]) => {
         if (state.application.mode === LoginMode.ONLINE) {
           this.transcrSendingModal.timeout = timer(2000).subscribe({
-            next: ()=> {
+            next: () => {
               this.transcrSendingModal.ref = this.modalsService.openModalRef(
                 TranscriptionSendingModalComponent,
                 TranscriptionSendingModalComponent.options
               );
-              this.transcrSendingModal.ref.componentInstance.error = this.transcrSendingModal.error ?? '';
-            }
-          })
+              this.transcrSendingModal.ref.componentInstance.error =
+                this.transcrSendingModal.error ?? '';
+            },
+          });
 
           if (
             !state.onlineMode.onlineSession.currentProject ||

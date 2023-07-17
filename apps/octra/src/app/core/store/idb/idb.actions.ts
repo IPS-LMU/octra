@@ -52,15 +52,6 @@ export class IDBActions {
     },
   });
 
-  static loadAnnotationLinks = createActionGroup({
-    source: `[IDB]/Load annotation links`,
-    events: {
-      success: props<{
-        links: OIDBLink[];
-      }>(),
-    },
-  });
-
   static loadAnnotation = createActionGroup({
     source: `[IDB]/Load annotation`,
     events: {

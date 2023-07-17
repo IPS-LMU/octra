@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
 import { TaskInputOutputDto } from '@octra/api-types';
 import { Converter, IFile, OAudiofile } from '@octra/annotation';
+import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -69,8 +70,16 @@ export class AnnotationStoreService {
   }
 
   sendAnnotation() {
+    console.log('SEND ANNOTATION');
+    this.store.dispatch(AnnotationActions.sendAnnotation.do());
+  }
+
+  changeComment(comment: string) {
     this.store.dispatch(
-      AnnotationActions.sendAnnotation.do()
+      OnlineModeActions.changeComment.do({
+        mode: LoginMode.ONLINE,
+        comment
+      })
     );
   }
 }

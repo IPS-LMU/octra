@@ -51,7 +51,6 @@ export interface AnnotationState extends UndoRedoState {
   onlineSession?: OnlineSession;
   files?: any;
   sessionFile?: any;
-  changedTask?: TaskDto;
 }
 
 export interface OnlineSession {

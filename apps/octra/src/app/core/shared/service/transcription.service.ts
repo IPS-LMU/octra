@@ -106,6 +106,14 @@ export class TranscriptionService {
     return this._annotation;
   }
 
+  public set comment(value: string | undefined) {
+    this.annotationStoreService.changeComment(value ?? '');
+  }
+
+  public get comment(): string {
+    return getModeState(this.appStorage.snapshot)?.onlineSession?.comment ?? '';
+  }
+
   get guidelines(): any | undefined {
     return getModeState(this.appStorage.snapshot)?.guidelines?.selected?.json;
   }
@@ -595,15 +603,15 @@ export class TranscriptionService {
         if (this.settingsService.projectsettings) {
           this._feedback = FeedBackForm.fromAny(
             this.settingsService.projectsettings.feedback_form,
-            this.appStorage.comment
+            this.comment
           );
         }
         this._feedback.importData(this.appStorage.feedback);
 
-        if (this.appStorage.comment === undefined) {
-          this.appStorage.comment = '';
+        if (this.comment === undefined) {
+          this.comment = '';
         } else {
-          this._feedback.comment = this.appStorage.comment;
+          this._feedback.comment = this.comment;
         }
 
         if (this.appStorage.logs === undefined) {
@@ -659,12 +667,14 @@ export class TranscriptionService {
 
   private listenForSegmentChanges() {
     this.subscrmanager.removeByTag('segmentchange');
-    this.subscrmanager.add(
-      this.currentlevel!.segments.onsegmentchange.subscribe((event) => {
-        this._currentLevelSegmentChange.emit(event);
-      }),
-      'segmentchange'
-    );
+    if (this.currentlevel) {
+      this.subscrmanager.add(
+        this.currentlevel!.segments.onsegmentchange.subscribe((event) => {
+          this._currentLevelSegmentChange.emit(event);
+        }),
+        'segmentchange'
+      );
+    }
   }
 
   public destroy() {

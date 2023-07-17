@@ -52,7 +52,7 @@ export class TranscriptionFeedbackComponent implements OnChanges {
       this.transcrService.feedback.comment =
         this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, ' ');
     }
-    this.appStorage.comment = this.transcrService?.feedback?.comment;
+    this.transcrService.comment = this.transcrService?.feedback?.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
       for (const [name, value] of getProperties(this.feedbackData)) {

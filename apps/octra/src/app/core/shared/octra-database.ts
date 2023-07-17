@@ -1,8 +1,8 @@
 import Dexie, { Transaction } from 'dexie';
 import { IAnnotJSON } from '@octra/annotation';
 import { LoginMode } from '../store';
-import { Subject } from 'rxjs';
-import { ProjectDto, TaskDto } from "@octra/api-types";
+import { from, map, of, Subject } from 'rxjs';
+import { ProjectDto } from '@octra/api-types';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -289,7 +289,7 @@ export class OctraDatabase extends Dexie {
       feedback: undefined,
       sessionfile: undefined,
       currentEditor: 'Dictaphone-Editor',
-      logging: true
+      logging: true,
     };
 
     return table.add({
@@ -341,25 +341,19 @@ export class OctraDatabase extends Dexie {
   }
 
   public loadDataOfMode<T>(mode: LoginMode, name: string, emptyValue: T) {
-    return new Promise<T>((resolve, reject) => {
-      const table = this.getTableFromString(mode);
-      if (table) {
-        table
-          .get(name)
-          .then((result) => {
-            if (result && result.value) {
-              resolve(result.value as T);
-            } else {
-              resolve(emptyValue);
-            }
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      } else {
-        resolve(emptyValue);
-      }
-    });
+    const table = this.getTableFromString(mode);
+    if (table) {
+      return from(table.get(name)).pipe(
+        map((result) => {
+          if (result && result.value) {
+            return result.value as T;
+          } else {
+            return emptyValue;
+          }
+        })
+      );
+    }
+    return of(emptyValue);
   }
 
   private populateOptions() {
@@ -440,9 +434,10 @@ export interface IIDBModeOptions {
   currentEditor?: string;
   logging: boolean;
   project?: ProjectDto;
+  comment?: string;
 }
 
 export const DefaultModeOptions: IIDBModeOptions = {
   submitted: false,
-  logging: true
+  logging: true,
 };

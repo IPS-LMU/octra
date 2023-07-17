@@ -41,8 +41,7 @@ import { TimespanPipe } from '@octra/ngx-components';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { DefaultComponent } from '../default.component';
-import videojs from "video.js";
-import KeyboardEvent = videojs.KeyboardEvent;
+import videojs from 'video.js';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -69,7 +68,7 @@ export class TranscrEditorComponent
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
   @Input() visible = true;
-  @Input() markers: any = true;
+  @Input() markers: any[] = [];
   @Input() easymode = true;
   @Input() height = 0;
   @Input() playposition?: SampleUnit;
@@ -305,7 +304,7 @@ export class TranscrEditorComponent
    */
   onKeyUp = ($event: Event) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(
-      ($event as any),
+      $event as any,
       Date.now()
     );
     if (shortcutInfo !== undefined) {
@@ -665,6 +664,9 @@ export class TranscrEditorComponent
       obj['markers'].previousValue !== obj['markers'].currentValue &&
       !obj['markers'].firstChange
     ) {
+      if (obj['markers'].currentValue === undefined) {
+        this.markers = [];
+      }
       renew = true;
     }
     if (
@@ -1136,7 +1138,8 @@ export class TranscrEditorComponent
           this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
             this.audioManager.createSampleUnit(item.time.sampleStart + 1)
           );
-        const segment = this.transcrService.currentlevel!.segments.get(segIndex);
+        const segment =
+          this.transcrService.currentlevel!.segments.get(segIndex);
         segment!.isBlockedBy = undefined;
         this.transcrService.currentlevel!.segments.change(segIndex, segment!);
       }

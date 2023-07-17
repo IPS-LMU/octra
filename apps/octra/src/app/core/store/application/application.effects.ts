@@ -340,7 +340,12 @@ export class ApplicationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           if (!state.application.loggedIn) {
-            this.routerService.navigate(["/login"], AppInfo.queryParamsHandling);
+            this.routerService.navigate(
+              ['/login'],
+              AppInfo.queryParamsHandling
+            );
+          } else {
+            this.routerService.navigate(['/load']);
           }
         })
       ),

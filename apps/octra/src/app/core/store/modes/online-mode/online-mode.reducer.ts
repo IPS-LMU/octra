@@ -150,45 +150,15 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.setComment,
+        OnlineModeActions.changeComment.do,
         (state: OnlineModeState, { comment, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              changedTask: {
-                ...(state.changedTask as any),
-                comment,
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
-        OnlineModeActions.setPromptText,
-        (state: OnlineModeState, { promptText, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              changedTask: {
-                ...(state.changedTask as any),
-                orgtext: promptText,
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
-        OnlineModeActions.setServerComment,
-        (state: OnlineModeState, { serverComment, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              changedTask: {
-                ...(state.changedTask as any),
-                comment: serverComment,
-              },
+              onlineSession: {
+                ...state.onlineSession,
+                comment
+              }
             };
           }
           return state;
@@ -209,7 +179,7 @@ export class OnlineModeReducers {
           }
 
           for (const [name, value] of getProperties(options)) {
-            result = this.writeOptionToStore(result as any, name, value);
+            result = this.writeOptionToStore(result, name, value);
           }
 
           return result;
@@ -294,30 +264,22 @@ export class OnlineModeReducers {
     attribute: string,
     value: any
   ): OnlineModeState {
-    const onlineSessionData = {
-      userName: '',
-      email: '',
-      webToken: '',
-    };
+    const onlineSessionData: {
+      comment?: string;
+    } = {};
 
     switch (attribute) {
-      case 'user':
-        if (value !== undefined) {
-          if (hasProperty(value, 'name')) {
-            onlineSessionData.userName = value.name;
-          }
-          if (hasProperty(value, 'email')) {
-            onlineSessionData.email = value.email;
-          }
-
-          if (hasProperty(value, 'webToken')) {
-            onlineSessionData.webToken = value.webToken;
-          }
-        }
-
-        return state;
+      case 'comment':
+        onlineSessionData.comment = value;
+      break;
     }
 
-    return state;
+    return {
+      ...state,
+      onlineSession: {
+        ...state.onlineSession,
+        ...onlineSessionData
+      }
+    };
   }
 }

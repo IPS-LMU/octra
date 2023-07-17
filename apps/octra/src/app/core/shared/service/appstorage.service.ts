@@ -179,16 +179,6 @@ export class AppStorageService {
     );
   }
 
-  set comment(value: string) {
-    this.store.dispatch(
-      OnlineModeActions.setComment({
-        comment: value,
-        mode: this.useMode,
-      })
-    );
-  }
-
-
   get annotationLevels(): AnnotationStateLevel[] {
     return getModeState(this._snapshot)!.transcript!.levels;
   }

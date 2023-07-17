@@ -141,7 +141,7 @@
       <ul class="navbar-nav">
         <li
           class="nav-item dropdown"
-          *ngIf="transcrServ !== undefined"
+          *ngIf="transcrServ !== undefined && transcrServ.currentlevel !== undefined"
           [ngStyle]="{
             display:
               !appStorage.loggedIn ||
@@ -157,9 +157,9 @@
         >
           <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
             {{
-              transcrServ.currentlevel!.name.length > 30
-                ? transcrServ.currentlevel!.name.substring(0, 30) + '...'
-                : transcrServ.currentlevel!.name
+              transcrServ.currentlevel.name.length > 30
+                ? transcrServ.currentlevel.name.substring(0, 30) + '...'
+                : transcrServ.currentlevel.name
             }}
             <i class="bi bi-book-half navbar-icon"></i>
           </a>

@@ -1,7 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { forkJoin, of, Subject, tap, timer } from "rxjs";
+import {
+  catchError,
+  combineLatest,
+  forkJoin,
+  map,
+  mergeAll,
+  of,
+  Subject,
+  tap,
+  timer,
+} from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import { IDBService } from '../../shared/service/idb.service';
 import { getModeState, LoginMode, RootState } from '../index';
@@ -34,130 +44,113 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.loadSettings.success),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.idbService
+        return this.idbService
           .initialize(action.settings.octra.database.name)
-          .then(() => {
-            console.log(`load options...`);
-            const loadApplicationOptions = this.idbService.loadOptions([
-              'version',
-              'easymode',
-              'language',
-              'usemode',
-              'user',
-              'showLoupe',
-              'secondsPerLine',
-              'audioSettings',
-              'highlightingEnabled',
-              'asr',
-            ]);
-
-            const loadModeOptionsLocal = this.idbService.loadModeOptions(
-              LoginMode.LOCAL
-            );
-            const loadModeOptionsDemo = this.idbService.loadModeOptions(
-              LoginMode.DEMO
-            );
-            const loadModeOptionsOnline = this.idbService.loadModeOptions(
-              LoginMode.ONLINE
-            );
-
-            Promise.all([
-              loadApplicationOptions,
-              loadModeOptionsLocal,
-              loadModeOptionsDemo,
-              loadModeOptionsOnline,
-            ])
-              .then(
-                ([
-                  applicationOptions,
-                  localOptions,
-                  demoOptions,
-                  onlineOptions,
-                ]: [
-                  any,
+          .pipe(
+            map(() => {
+              return forkJoin<
+                [
+                  {
+                    version?: string;
+                    easymode?: boolean;
+                    language?: string;
+                    usemode?: any;
+                    user?: string;
+                    showLoupe?: boolean;
+                    secondsPerLine?: number;
+                    audioSettings?: {
+                      volume: number;
+                      speed: number;
+                    };
+                    highlightingEnabled?: boolean;
+                    playOnHofer?: boolean;
+                    asr?: {
+                      selectedLanguage?: string;
+                      selectedService?: string;
+                    };
+                  },
                   IIDBModeOptions,
                   IIDBModeOptions,
                   IIDBModeOptions
-                ]) => {
-                  subject.next(
-                    IDBActions.loadOptions.success({
-                      applicationOptions,
-                      localOptions,
-                      onlineOptions,
-                      demoOptions,
-                    })
-                  );
-                  subject.complete();
-                }
-              )
-              .catch((error) => {
-                subject.next(
-                  IDBActions.loadOptions.fail({
-                    error,
-                  })
-                );
-                subject.complete();
-              });
-          })
-          .catch((error) => {
-            subject.next(
-              IDBActions.loadOptions.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+                ]
+              >([
+                this.idbService.loadOptions([
+                  'version',
+                  'easymode',
+                  'language',
+                  'usemode',
+                  'user',
+                  'showLoupe',
+                  'secondsPerLine',
+                  'audioSettings',
+                  'highlightingEnabled',
+                  'asr',
+                ]),
+                this.idbService.loadModeOptions(LoginMode.LOCAL),
+                this.idbService.loadModeOptions(LoginMode.DEMO),
+                this.idbService.loadModeOptions(LoginMode.ONLINE),
+              ]);
+            }),
+            mergeAll()
+          )
+          .pipe(
+            map(
+              ([
+                applicationOptions,
+                localOptions,
+                demoOptions,
+                onlineOptions,
+              ]) => {
+                return IDBActions.loadOptions.success({
+                  applicationOptions,
+                  localOptions,
+                  onlineOptions,
+                  demoOptions,
+                });
+              }
+            ),
+            catchError((err: string) => {
+              return of(
+                IDBActions.loadOptions.fail({
+                  error: err,
+                })
+              );
+            })
+          );
       })
     )
   );
 
-  loadLogs$ = createEffect(() =>
+  afterOptionsSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(IDBActions.loadOptions.success),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
-        if (
-          state.application.loggedIn &&
-          action.onlineOptions.project &&
-          action.onlineOptions.transcriptID
-        ) {
-          this.store.dispatch(
-            OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
-              projectID: action.onlineOptions.project.id,
-              taskID: action.onlineOptions.transcriptID,
-            })
-          );
-        }
-        const subject = new Subject<Action>();
-        Promise.all([
+        return forkJoin([
           this.idbService.loadLogs(LoginMode.ONLINE),
           this.idbService.loadLogs(LoginMode.LOCAL),
           this.idbService.loadLogs(LoginMode.DEMO),
-        ])
-          .then(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
-            subject.next(
-              IDBActions.loadLogs.success({
-                online: onlineModeLogs,
-                demo: localModeLogs,
-                local: demoModeLogs,
-              })
-            );
-            subject.complete();
+        ]).pipe(
+          map(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
+            if (
+              state.application.loggedIn &&
+              action.onlineOptions.project &&
+              action.onlineOptions.transcriptID
+            ) {
+              this.store.dispatch(
+                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                  projectID: action.onlineOptions.project.id,
+                  taskID: action.onlineOptions.transcriptID,
+                })
+              );
+            }
+            return IDBActions.loadLogs.success({
+              online: onlineModeLogs,
+              demo: localModeLogs,
+              local: demoModeLogs,
+            });
           })
-          .catch((error) => {
-            subject.next(
-              IDBActions.loadLogs.fail({
-                error,
-              })
-            );
-            subject.complete();
-          });
-
-        return subject;
+        );
       })
     )
   );
@@ -166,13 +159,12 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(IDBActions.loadLogs.success),
       exhaustMap((action) => {
-        const subject = new Subject<Action>();
-        Promise.all([
+        return forkJoin([
           this.idbService.loadAnnotation(LoginMode.ONLINE),
           this.idbService.loadAnnotation(LoginMode.LOCAL),
           this.idbService.loadAnnotation(LoginMode.DEMO),
-        ])
-          .then(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
+        ]).pipe(
+          map(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
             console.log(`results:`);
             console.log(onlineAnnotation);
             let max = 0;
@@ -226,25 +218,20 @@ export class IDBEffects {
               levelCounter: max,
             };
 
-            subject.next(
-              IDBActions.loadAnnotation.success({
-                online: oidbOnlineAnnotation,
-                local: oidbLocalAnnotation,
-                demo: oidbDemoAnnotation,
-              })
-            );
-            subject.complete();
-          })
-          .catch((error) => {
-            subject.next(
+            return IDBActions.loadAnnotation.success({
+              online: oidbOnlineAnnotation,
+              local: oidbLocalAnnotation,
+              demo: oidbDemoAnnotation,
+            });
+          }),
+          catchError((error) => {
+            return of(
               IDBActions.loadAnnotation.fail({
                 error,
               })
             );
-            subject.complete();
-          });
-
-        return subject;
+          })
+        );
       })
     )
   );
@@ -502,7 +489,7 @@ export class IDBEffects {
         AuthenticationActions.login.success,
         AuthenticationActions.logout.success,
         OnlineModeActions.setSubmitted,
-        OnlineModeActions.setComment,
+        OnlineModeActions.changeComment.do,
         OnlineModeActions.setFeedback,
         AnnotationActions.setLogging.do,
         LocalModeActions.login,
@@ -528,7 +515,8 @@ export class IDBEffects {
               project: modeState.onlineSession?.currentProject,
               submitted: false, //<- TODO ?
               transcriptID: modeState.onlineSession?.task?.id,
-              feedback: modeState.changedTask?.assessment, // TODO changeTask must be initalized at startup
+              feedback: modeState.onlineSession?.assessment, // TODO changeTask must be initalized at startup,
+              comment: modeState.onlineSession?.comment
             })
             .then(() => {
               subject.next(
@@ -1138,9 +1126,35 @@ export class IDBEffects {
   );
 
   afterIDBLoaded$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(IDBActions.saveConsoleEntries.success),
-      exhaustMap((action) => {
+    combineLatest([
+      this.actions$.pipe(ofType(IDBActions.loadOptions.success)),
+      this.actions$.pipe(ofType(IDBActions.loadLogs.success)),
+      this.actions$.pipe(ofType(IDBActions.loadAnnotation.success)),
+      this.actions$.pipe(ofType(IDBActions.loadConsoleEntries.success)),
+    ]).pipe(
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        console.log('INIT OK');
+        // make sure online information is loaded
+        if (
+          state.application.mode === LoginMode.ONLINE &&
+          state.application.loggedIn
+        ) {
+          if (
+            state.onlineMode.onlineSession.currentProject !== undefined &&
+            state.onlineMode.onlineSession.task !== undefined
+          ) {
+            return of(ApplicationActions.initApplication.finish());
+          } else {
+            return this.actions$.pipe(
+              ofType(
+                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success
+              ),
+              map((a) => ApplicationActions.initApplication.finish())
+            );
+          }
+        }
+
         return of(ApplicationActions.initApplication.finish());
       })
     )

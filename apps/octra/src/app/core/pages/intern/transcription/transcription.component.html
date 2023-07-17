@@ -62,9 +62,8 @@
   ></octra-fastbar>
 
   <div class="flex">
-    <ng-template octraLoadeditor></ng-template>
     <div
-      *ngIf="!editorloaded || waitForSend"
+      *ngIf="!editorloaded || waitForSend || projectsettings === undefined; else showEditor"
       id="editor-loading"
       class="w-100 h-100 flex justify-content-center align-items-center"
     >
@@ -77,6 +76,7 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
+    <ng-template octraLoadeditor #showEditor></ng-template>
   </div>
 
   <div *ngIf="showCommentSection">

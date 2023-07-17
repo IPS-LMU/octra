@@ -1,20 +1,10 @@
 import { AnnotationActions } from '../../annotation/annotation.actions';
-import {
-  Action,
-  createAction,
-  createActionGroup,
-  emptyProps,
-  props
-} from "@ngrx/store";
-import { CurrentProject, LoginMode } from '../../index';
-import { ProjectDto, TaskDto } from "@octra/api-types";
-import {
-  OnlineSession,
-  SessionData,
-  TranscriptionState,
-} from '../../annotation';
+import { Action, createAction, createActionGroup, props } from '@ngrx/store';
+import { LoginMode } from '../../index';
+import { ProjectDto, TaskDto } from '@octra/api-types';
+import { OnlineSession } from '../../annotation';
 import { URLParameters } from '../../application';
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from '@angular/common/http';
 
 export class OnlineModeActions extends AnnotationActions {
   public static loginDemo = createAction(
@@ -29,38 +19,6 @@ export class OnlineModeActions extends AnnotationActions {
     `online mode Login URLParameters`,
     props<{
       urlParams: URLParameters;
-    }>()
-  );
-
-  public static setComment = createAction(
-    `online mode Set user comment`,
-    props<{
-      comment: string;
-      mode: string;
-    }>()
-  );
-
-  public static setPromptText = createAction(
-    `online mode Set promptText`,
-    props<{
-      promptText: string;
-      mode: string;
-    }>()
-  );
-
-  public static setServerComment = createAction(
-    `online mode Set serverComment`,
-    props<{
-      serverComment: string;
-      mode: LoginMode;
-    }>()
-  );
-
-  public static setJobsLeft = createAction(
-    `online mode Set jobsLeft`,
-    props<{
-      jobsLeft: number;
-      mode: LoginMode;
     }>()
   );
 
@@ -88,6 +46,19 @@ export class OnlineModeActions extends AnnotationActions {
     }>()
   );
 
+  static changeComment = createActionGroup({
+    source: `annotation/change comment`,
+    events: {
+      do: props<{
+        mode: LoginMode;
+        comment: string;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static clearOnlineSession = createActionGroup({
     source: `annotation/ clear online session`,
     events: {
@@ -98,7 +69,10 @@ export class OnlineModeActions extends AnnotationActions {
       success: props<{
         mode: LoginMode;
         actionAfterSuccess: Action;
-      }>()
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
     },
   });
 
@@ -112,10 +86,10 @@ export class OnlineModeActions extends AnnotationActions {
       success: props<{
         mode: LoginMode;
         currentProject: ProjectDto;
-        task: TaskDto
+        task: TaskDto;
       }>(),
       fail: props<{
-        error: HttpErrorResponse
+        error: HttpErrorResponse;
       }>(),
     },
   });

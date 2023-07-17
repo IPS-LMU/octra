@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { ConsoleEntry } from './bug-report.service';
 import {
   DefaultModeOptions,
-  IIDBEntry,
   IIDBModeOptions,
   OctraDatabase,
 } from '../octra-database';
 import { LoginMode } from '../../store';
 import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
+import { from, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -26,30 +26,14 @@ export class IDBService {
    * call this function after appSettings were loaded.
    * @param dbName
    */
-  public initialize(dbName: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.database = new OctraDatabase(dbName);
-      this.database.onReady.subscribe(() => {
+  public initialize(dbName: string): Observable<void> {
+    this.database = new OctraDatabase(dbName);
+    return from(this.database.open()).pipe(
+      map((a) => {
         this._isReady = true;
-
-        if (this._isOpened) {
-          resolve();
-        }
-      });
-
-      this.database
-        .open()
-        .then(() => {
-          this._isOpened = true;
-
-          if (this._isReady) {
-            resolve();
-          }
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+        this._isOpened = true;
+      })
+    );
   }
 
   /**
@@ -107,39 +91,42 @@ export class IDBService {
   /**
    * load options
    */
-  public async loadOptions(keys: string[]): Promise<{
-    version?: string,
-    easymode?: boolean,
-    language?: string,
-    usemode?: any,
-    user?: string,
-    showLoupe?: boolean,
-    secondsPerLine?: number,
+  public loadOptions(keys: string[]): Observable<{
+    version?: string;
+    easymode?: boolean;
+    language?: string;
+    usemode?: any;
+    user?: string;
+    showLoupe?: boolean;
+    secondsPerLine?: number;
     audioSettings?: {
-      volume: number,
-      speed: number,
-    },
-    highlightingEnabled?: boolean,
-    playOnHofer?: boolean,
+      volume: number;
+      speed: number;
+    };
+    highlightingEnabled?: boolean;
+    playOnHofer?: boolean;
     asr?: {
       selectedLanguage?: string;
       selectedService?: string;
-    }
+    };
   }> {
-    const values = await this.database.options.bulkGet(keys);
-    const entries = values.filter((a) => a !== undefined);
-    const result: any = {};
+    return from(this.database.options.bulkGet(keys)).pipe(
+      map((values) => {
+        const entries = values.filter((a) => a !== undefined);
+        const result: any = {};
 
-    for (const entry of entries) {
-      result[entry!.name] = entry!.value;
-    }
-    return result;
+        for (const entry of entries) {
+          result[entry!.name] = entry!.value;
+        }
+        return result;
+      })
+    );
   }
 
   /**
    * load all logs
    */
-  public loadLogs(mode: LoginMode): Promise<any[]> {
+  public loadLogs(mode: LoginMode) {
     return this.database.loadDataOfMode<any[]>(mode, 'logs', []);
   }
 
@@ -182,7 +169,7 @@ export class IDBService {
     return this.database.saveModeData(mode, 'options', options);
   }
 
-  public loadModeOptions(mode: LoginMode) {
+  public loadModeOptions(mode: LoginMode): Observable<IIDBModeOptions> {
     return this.database.loadDataOfMode<IIDBModeOptions>(
       mode,
       'options',

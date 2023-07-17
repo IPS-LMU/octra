@@ -216,12 +216,11 @@ export class TranscriptionComponent
   }
 
   set comment(value: string) {
-    this.transcrService.feedback.comment = value;
-    this.appStorage.comment = value;
+    this.transcrService.comment = value;
   }
 
   get comment(): string {
-    return this.transcrService?.feedback?.comment;
+    return this.transcrService?.comment;
   }
 
   constructor(
@@ -466,8 +465,7 @@ export class TranscriptionComponent
     this.showCommentSection =
       (this.settingsService.isTheme('shortAudioFiles') ||
         this.settingsService.isTheme('korbinian')) &&
-      (this._useMode === 'online' || this._useMode === 'demo') &&
-      this.transcrService.feedback !== undefined;
+      (this._useMode === 'online' || this._useMode === 'demo');
 
     this.subscrManager.add(
       this.transcrService.alertTriggered.subscribe((alertConfig) => {
@@ -817,7 +815,6 @@ export class TranscriptionComponent
     if (this._useMode === LoginMode.ONLINE) {
 
       if (this._useMode === LoginMode.ONLINE) {
-        console.log(`modal opened!`);
         this.annotationStoreService.sendAnnotation()
       }
       /* TODO
@@ -1014,7 +1011,7 @@ export class TranscriptionComponent
     this.appStorage.submitted = false; // ok
     this.appStorage.clearAnnotationPermanently(); // ok
     this.appStorage.feedback = {}; // ok
-    this.appStorage.comment = ''; // ok
+    this.transcrService.comment = ''; // ok
     this.appStorage.clearLoggingDataPermanently(); // ok
     this.uiService.elements = [];
   }

@@ -6,8 +6,8 @@ import {
   OItem,
   OLabel,
   OLevel,
-  OSegment
-} from "../annotjson";
+  OSegment,
+} from '../annotjson';
 
 export class PartiturConverter extends Converter {
   public constructor() {
@@ -181,13 +181,20 @@ LBD:\n`;
         }
         pointer++;
       }
-      result.levels.push(level!);
-
-      return {
-        annotjson: result,
-        audiofile: undefined,
-        error: '',
-      };
+      if (level) {
+        result.levels.push(level);
+        return {
+          annotjson: result,
+          audiofile: undefined,
+          error: '',
+        };
+      } else {
+        return {
+          annotjson: undefined,
+          audiofile: undefined,
+          error: `Input file not compatible with Praat Partitur.`,
+        };
+      }
     }
 
     return {

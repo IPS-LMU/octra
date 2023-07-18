@@ -95,15 +95,6 @@ export class AppStorageService {
     );
   }
 
-  set submitted(value: boolean) {
-    this.store.dispatch(
-      OnlineModeActions.setSubmitted({
-        submitted: value,
-        mode: this._snapshot.application.mode!,
-      })
-    );
-  }
-
   set feedback(value: any) {
     this.store.dispatch(
       OnlineModeActions.setFeedback({

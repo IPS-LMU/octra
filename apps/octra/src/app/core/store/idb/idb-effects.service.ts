@@ -461,7 +461,6 @@ export class IDBEffects {
       ofType(
         AuthenticationActions.login.success,
         AuthenticationActions.logout.success,
-        OnlineModeActions.setSubmitted,
         OnlineModeActions.changeComment.do,
         OnlineModeActions.setFeedback,
         AnnotationActions.setLogging.do,
@@ -484,9 +483,8 @@ export class IDBEffects {
               currentEditor: modeState.currentEditor,
               logging: modeState.logging,
               project: modeState.onlineSession?.currentProject,
-              submitted: false, //<- TODO ?
               transcriptID: modeState.onlineSession?.task?.id,
-              feedback: modeState.onlineSession?.assessment, // TODO changeTask must be initalized at startup,
+              feedback: modeState.onlineSession?.assessment,
               comment: modeState.onlineSession?.comment,
             })
             .pipe(

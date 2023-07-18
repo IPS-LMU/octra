@@ -103,7 +103,6 @@ export class OnlineModeReducers {
                   ...state,
                   savingNeeded: false,
                   isSaving: false,
-                  submitted: false,
                   audio: {
                     fileName: '',
                     sampleRate: 0,
@@ -116,16 +115,13 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.setAudioURL.do,
+        OnlineModeActions.setAudioURL.do, // TODO replace this function
         (state: OnlineModeState, { audioURL, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  audioURL,
-                },
+                ...state.onlineSession
               },
             };
           }
@@ -140,10 +136,7 @@ export class OnlineModeReducers {
               ...state,
               onlineSession: {
                 ...state.onlineSession,
-                sessionData: {
-                  ...state.onlineSession,
-                  feedback,
-                },
+                assessment: feedback
               },
             };
           }
@@ -187,23 +180,6 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.setSubmitted,
-        (state: OnlineModeState, { submitted, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                sessionData: {
-                  submitted,
-                },
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
         OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
         (state: OnlineModeState, { currentProject, task, mode }) => {
           if (this.mode === mode) {
@@ -213,6 +189,7 @@ export class OnlineModeReducers {
                 ...state.onlineSession,
                 currentProject,
                 task,
+                comment: state.onlineSession.comment ?? task.comment ?? ''
               },
               logging: (task.tool_configuration!.value as ProjectSettings).logging.forced ?? false
             };

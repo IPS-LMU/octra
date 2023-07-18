@@ -226,7 +226,6 @@ export class OctraDatabase extends Dexie {
 
   private populateModeOptions(table: Dexie.Table<IIDBEntry, string>) {
     const modeOptions: IIDBModeOptions = {
-      submitted: false,
       transcriptID: '-1',
       feedback: undefined,
       sessionfile: undefined,
@@ -361,7 +360,6 @@ export interface IIDBLogs extends IIDBEntry {
 }
 
 export interface IIDBModeOptions {
-  submitted: boolean;
   transcriptID?: string;
   feedback?: any;
   sessionfile?: any;
@@ -372,6 +370,5 @@ export interface IIDBModeOptions {
 }
 
 export const DefaultModeOptions: IIDBModeOptions = {
-  submitted: false,
   logging: true,
 };

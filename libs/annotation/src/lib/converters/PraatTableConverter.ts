@@ -170,11 +170,19 @@ export class PraatTableConverter extends Converter {
           }
           result.levels.push(olevel);
         }
-        return {
-          annotjson: result,
-          audiofile: undefined,
-          error: '',
-        };
+        if (tiers.length > 0) {
+          return {
+            annotjson: result,
+            audiofile: undefined,
+            error: '',
+          };
+        } else {
+          return {
+            annotjson: undefined,
+            audiofile: undefined,
+            error: `Invalid Praat table file.`,
+          };
+        }
       } else {
         return {
           annotjson: undefined,

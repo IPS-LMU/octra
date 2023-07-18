@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import {
   escapeRegex,
-  getFileSize,
+  getFileSize, getTranscriptFromIO,
   hasProperty,
   insertString,
-  SubscriptionManager,
-} from '@octra/utilities';
+  SubscriptionManager
+} from "@octra/utilities";
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { FeedBackForm } from '../../obj/FeedbackForm/FeedBackForm';
@@ -22,7 +22,7 @@ import { UserInteractionsService } from './userInteractions.service';
 import {
   Annotation,
   AnnotationLevelType,
-  Converter,
+  Converter, convertFromSupportedConverters,
   IFile,
   ImportResult,
   Level,
@@ -34,8 +34,8 @@ import {
   OLevel,
   OSegment,
   SegmentChangeEvent,
-  Segments,
-} from '@octra/annotation';
+  Segments
+} from "@octra/annotation";
 import { AudioManager } from '@octra/media';
 import { getModeState, LoginMode, RootState } from '../../store';
 import { TranslocoService } from '@ngneat/transloco';
@@ -421,10 +421,12 @@ export class TranscriptionService {
       this.subscrmanager.removeByTag('idbAnnotationChange');
       this.subscrmanager.add(
         this.appStorage.annotationChanged.subscribe((state) => {
-          this.updateAnnotation(
-            state.transcript.levels,
-            state.transcript.links
-          );
+          if(state?.transcript) {
+            this.updateAnnotation(
+              state.transcript.levels,
+              state.transcript.links
+            );
+          }
         }),
         'idbAnnotationChange'
       );
@@ -478,19 +480,20 @@ export class TranscriptionService {
         let annotResult: ImportResult | undefined;
         const task: TaskDto | undefined = modeState.onlineSession?.task;
 
-        const serverTranscript = task
-          ? this.annotationStoreService.getTranscriptFromIO(task.inputs)
-          : '';
-
         // import logs
         this.annotationStoreService.setLogs(
           task?.log,
           rootState.application.mode
         );
+
+        const serverTranscript = task
+          ? getTranscriptFromIO(task.outputs) ?? getTranscriptFromIO(task.inputs)
+          : '';
+
         if (serverTranscript) {
           // check if it's AnnotJSON
           annotResult =
-            this.annotationStoreService.convertFromSupportedConverters(
+            convertFromSupportedConverters(
               AppInfo.converters,
               {
                 name: `${this._audiomanager.resource.info.name}_annot.json`,
@@ -528,7 +531,7 @@ export class TranscriptionService {
         if (!annotResult) {
           // no transcript found
           if (task) {
-            const textInput = this.annotationStoreService.getTranscriptFromIO(
+            const textInput = getTranscriptFromIO(
               task.inputs
             );
             if (textInput) {
@@ -537,7 +540,7 @@ export class TranscriptionService {
 
               // check if prompttext ist a transcription format like AnnotJSON
               const converted: ImportResult | undefined =
-                this.annotationStoreService.convertFromSupportedConverters(
+                convertFromSupportedConverters(
                   AppInfo.converters,
                   {
                     name: this._audiofile.name,

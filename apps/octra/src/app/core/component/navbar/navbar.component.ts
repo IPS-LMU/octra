@@ -31,6 +31,8 @@ import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.comp
 import { Router } from '@angular/router';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
+import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
+import { LoginMode } from '../../store';
 
 @Component({
   selector: 'octra-navigation',
@@ -103,6 +105,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public modService: OctraModalService,
     public settService: SettingsService,
     public bugService: BugReportService,
+    public annotationStoreService: AnnotationStoreService,
     private router: Router
   ) {
     super();
@@ -318,6 +321,13 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   logout() {
-    this.appStorage.logout(true);
+    if (
+      this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
+      this.appStorage.snapshot.onlineMode.onlineSession.currentProject
+    ) {
+      this.annotationStoreService.quit(true, true); // TODO change
+    } else {
+      this.appStorage.logout(true);
+    }
   }
 }

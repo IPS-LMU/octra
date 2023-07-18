@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { TaskInputOutputDto } from "@octra/api-types";
 
 export interface FileSize {
   size: number;
@@ -437,4 +438,13 @@ export async function readFileContents<T>(
         break;
     }
   });
+}
+
+export function getTranscriptFromIO(io: TaskInputOutputDto[]): TaskInputOutputDto | undefined {
+  return io.find(
+    (a) =>
+      !a.fileType!.includes('audio') &&
+      !a.fileType!.includes('video') &&
+      !a.fileType!.includes('image')
+  )!;
 }

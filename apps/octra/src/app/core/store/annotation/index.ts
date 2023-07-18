@@ -60,17 +60,6 @@ export interface OnlineSession {
   comment?: string;
 }
 
-export interface SessionData {
-  transcriptID: number;
-  audioURL: string;
-  promptText: string;
-  serverComment: string;
-  serverDataEntry: TaskDto;
-  comment: string;
-  submitted: boolean;
-  feedback: any;
-}
-
 export interface OnlineModeState extends AnnotationState {
   onlineSession: OnlineSession;
 }

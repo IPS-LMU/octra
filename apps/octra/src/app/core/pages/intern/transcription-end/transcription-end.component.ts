@@ -34,7 +34,6 @@ export class TranscriptionEndComponent
   }
 
   ngOnInit() {
-    this.appStorage.submitted = true;
   }
 
   leave() {

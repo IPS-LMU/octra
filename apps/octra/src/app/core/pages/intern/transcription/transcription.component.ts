@@ -807,50 +807,6 @@ export class TranscriptionComponent
       if (this._useMode === LoginMode.ONLINE) {
         this.annotationStoreService.sendAnnotation()
       }
-      /* TODO
-    const subscr = this.modalService.open.subscribe((modal) => {
-      console.log(`modal opened!`);
-      this.api.saveAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID, {
-        transcript: JSON.stringify(this.transcrService.annotation.getObj(this.audio.audiomanagers[0].ressource.info.duration)),
-        comment: this.appStorage.comment,
-        assessment: this.appStorage.feedback,
-        log: JSON.stringify(this.appStorage.logs)
-      }).then(() => {
-        this.unsubscribeSubscriptionsForThisAnnotation();
-        this.appStorage.submitted = true;
-
-        this.waitForSend = false;
-        const subscr2 = this.modalService.closed.subscribe(() => {
-          console.log(`modal closed!`);
-          this.appStorage.startOnlineAnnotation(this.appStorage.onlineSession.currentProject).then((newAnnotation) => {
-            console.log(`new annotation is `);
-            console.log(newAnnotation);
-            if (newAnnotation !== undefined) {
-              navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch((error) => {
-                console.error(error);
-              });
-            } else {
-              navigateTo(this.router, ['/intern/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
-                console.error(error);
-              });
-              this.appStorage.clearAnnotationPermanently();
-            }
-          }).catch((error) => {
-            this.sendError = error;
-          });
-          subscr2.unsubscribe();
-        });
-        this.transcrService.endTranscription(false);
-
-        setTimeout(() => {
-          this.transcrSendingModal.close();
-        }, 500);
-      }).catch((error) => {
-        this.sendError = error;
-      });
-        subscr.unsubscribe();
-      });
-      */
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       if (this.modalVisiblities.overview) {
@@ -998,7 +954,6 @@ export class TranscriptionComponent
 
   clearDataPermanently() {
     // replace with store method
-    this.appStorage.submitted = false; // ok
     this.appStorage.clearAnnotationPermanently(); // ok
     this.appStorage.feedback = {}; // ok
     this.transcrService.comment = ''; // ok
@@ -1125,13 +1080,6 @@ export class TranscriptionComponent
       this.transcrService.feedback.comment = type;
     }
     this.onSendButtonClick();
-  }
-
-  private unsubscribeSubscriptionsForThisAnnotation() {
-    if (this.levelSubscriptionID > 0) {
-      this.subscrManager.removeById(this.levelSubscriptionID);
-      this.levelSubscriptionID = 0;
-    }
   }
 
   private logout(clearSession: boolean) {

@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { getModeState, LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
-import { TaskInputOutputDto } from '@octra/api-types';
-import { Converter, IFile, OAudiofile } from '@octra/annotation';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { getTranscriptFromIO } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
@@ -24,9 +23,7 @@ export class AnnotationStoreService {
     }
 
     const mode = getModeState(state);
-    const result = this.getTranscriptFromIO(
-      mode?.onlineSession?.task?.inputs ?? []
-    );
+    const result = getTranscriptFromIO(mode?.onlineSession?.task?.inputs ?? []);
     return result;
   });
 
@@ -41,42 +38,16 @@ export class AnnotationStoreService {
     );
   }
 
-  quit(clearSession: boolean, freeTask: boolean){
-    this.store.dispatch(AnnotationActions.quit.do({
-      clearSession, freeTask
-    }));
-  }
-
-  public getTranscriptFromIO(io: TaskInputOutputDto[]): TaskInputOutputDto {
-    return io.find(
-      (a) =>
-        !a.fileType!.includes('audio') &&
-        !a.fileType!.includes('video') &&
-        !a.fileType!.includes('image')
-    )!;
-  }
-
-  public convertFromSupportedConverters(
-    converters: Converter[],
-    file: IFile,
-    audioFile: OAudiofile
-  ) {
-    for (const converter of converters) {
-      try {
-        const result = converter.import(file, audioFile);
-        if (result && result.annotjson) {
-          return result;
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    return undefined;
+  quit(clearSession: boolean, freeTask: boolean) {
+    this.store.dispatch(
+      AnnotationActions.quit.do({
+        clearSession,
+        freeTask,
+      })
+    );
   }
 
   sendAnnotation() {
-    console.log('SEND ANNOTATION');
     this.store.dispatch(AnnotationActions.sendAnnotation.do());
   }
 
@@ -84,7 +55,7 @@ export class AnnotationStoreService {
     this.store.dispatch(
       OnlineModeActions.changeComment.do({
         mode: LoginMode.ONLINE,
-        comment
+        comment,
       })
     );
   }

@@ -136,14 +136,20 @@ export class SRTConverter extends Converter {
         // set last segment duration to fit last sample
         const lastItem = olevel.items[olevel.items.length - 1];
         olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(lastItem.sampleStart);
-      }
 
-      result.levels.push(olevel);
-      return {
-        annotjson: result,
-        audiofile: undefined,
-        error: ''
-      };
+        result.levels.push(olevel);
+        return {
+          annotjson: result,
+          audiofile: undefined,
+          error: ''
+        };
+      } else {
+        return {
+          annotjson: undefined,
+          audiofile: undefined,
+          error: "Input file is not comatible with SRT format."
+        }
+      }
     }
 
     return {

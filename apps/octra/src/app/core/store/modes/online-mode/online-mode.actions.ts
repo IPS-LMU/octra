@@ -30,14 +30,6 @@ export class OnlineModeActions extends AnnotationActions {
     }>()
   );
 
-  public static setSubmitted = createAction(
-    `annotation set submitted`,
-    props<{
-      submitted: boolean;
-      mode: LoginMode;
-    }>()
-  );
-
   public static setFeedback = createAction(
     `annotation Set feedback`,
     props<{

@@ -48,7 +48,6 @@ export const reducer = createUndoRedoReducer(
               ...state,
               savingNeeded: false,
               isSaving: false,
-              submitted: false,
               audio: {
                 loaded: false,
                 fileName: '',

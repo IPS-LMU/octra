@@ -1,7 +1,7 @@
 import { AnnotationActions } from '../../annotation/annotation.actions';
 import { Action, createAction, createActionGroup, props } from '@ngrx/store';
 import { LoginMode } from '../../index';
-import { ProjectDto, TaskDto } from '@octra/api-types';
+import { CurrentAccountDto, ProjectDto, TaskDto } from "@octra/api-types";
 import { OnlineSession } from '../../annotation';
 import { URLParameters } from '../../application';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -77,6 +77,7 @@ export class OnlineModeActions extends AnnotationActions {
       }>(),
       success: props<{
         mode: LoginMode;
+        me: CurrentAccountDto;
         currentProject: ProjectDto;
         task: TaskDto;
       }>(),

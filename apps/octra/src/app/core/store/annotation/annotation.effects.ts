@@ -40,10 +40,11 @@ import {
 } from "@octra/annotation";
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
+  CurrentAccountDto,
   ProjectDto,
   TaskDto,
-  ToolConfigurationAssetDto,
-} from '@octra/api-types';
+  ToolConfigurationAssetDto
+} from "@octra/api-types";
 import { convertFromOIDLevel, GuidelinesItem } from './index';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
@@ -303,11 +304,16 @@ export class AnnotationEffects {
                 state.onlineMode.onlineSession.task.id
               )
               .pipe(
-                map((result) =>
-                  AuthenticationActions.logout.do({
-                    clearSession: a.clearSession,
-                    mode: state.application.mode!,
-                  })
+                map((result) => {
+                  if(a.redirectToProjects) {
+                    return AnnotationActions.redirectToProjects.do();
+                  } else {
+                    return AuthenticationActions.logout.do({
+                      clearSession: a.clearSession,
+                      mode: state.application.mode!,
+                    })
+                  }
+                  }
                 ),
                 catchError((error) => {
                   // ignore
@@ -510,15 +516,17 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do),
       exhaustMap((a) => {
-        return forkJoin<[ProjectDto, TaskDto]>(
+        return forkJoin<[CurrentAccountDto, ProjectDto, TaskDto]>(
+          this.apiService.getMyAccountInformation(),
           this.apiService.getProject(a.projectID),
           this.apiService.getTask(a.projectID, a.taskID)
         ).pipe(
           withLatestFrom(this.store),
-          map(([[currentProject, task], state]) => {
+          map(([[currentAccount, currentProject, task], state]) => {
             this.store.dispatch(
               OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success({
                 mode: LoginMode.ONLINE,
+                me: currentAccount,
                 currentProject,
                 task,
               })
@@ -694,6 +702,16 @@ export class AnnotationEffects {
       })
     )
   );
+
+  redirectToProjects$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.redirectToProjects.do),
+        exhaustMap((a) => {
+          this.routingService.navigate(["/intern/projects"], AppInfo.queryParamsHandling);
+          return of(AnnotationActions.redirectToProjects.success());
+        })
+      )
+    );
 
   /**
    exhaustMap((a) => {

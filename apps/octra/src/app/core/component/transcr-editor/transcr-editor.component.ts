@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -8,6 +9,7 @@ import {
   Input,
   OnChanges,
   Output,
+  Renderer2,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
@@ -23,7 +25,6 @@ import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {
   BrowserInfo,
-  escapeHtml,
   escapeRegex,
   findElements,
   getAttr,
@@ -41,7 +42,9 @@ import { TimespanPipe } from '@octra/ngx-components';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { DefaultComponent } from '../default.component';
-import videojs from 'video.js';
+import { Config } from 'jodit/types/config';
+import { IControlType } from 'jodit/src/types';
+import { IJodit, IToolbarButton } from 'jodit/types/types';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -53,6 +56,7 @@ declare let document: any;
   styleUrls: ['./transcr-editor.component.scss'],
   providers: [TranscrEditorConfig],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranscrEditorComponent
   extends DefaultComponent
@@ -80,13 +84,13 @@ export class TranscrEditorComponent
 
   @ViewChild('validationPopover', { static: true })
   validationPopover!: ValidationPopoverComponent;
-  @ViewChild('transcrEditor', { static: true }) transcrEditor!: ElementRef;
-  @ViewChild('jodit', { static: true }) joditComponent!: NgxJoditComponent;
+  @ViewChild('transcrEditor', { static: true }) transcrEditor?: ElementRef;
+  @ViewChild('jodit', { static: false }) joditComponent?: NgxJoditComponent;
   public focused = false;
 
-  public joditOptions: any = {};
+  public joditOptions: Partial<Config> = {};
 
-  value = '';
+  private joditDefaultOptions: Partial<Config> = {};
 
   public asr = {
     status: 'inactive',
@@ -151,7 +155,8 @@ export class TranscrEditorComponent
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
     private transcrService: TranscriptionService,
-    private asrService: AsrService
+    private asrService: AsrService,
+    private renderer: Renderer2
   ) {
     super();
     this.shortcutsManager = new ShortcutManager();
@@ -161,10 +166,11 @@ export class TranscrEditorComponent
 
   private _highlightingEnabled = true;
 
-  @Input() get highlightingEnabled() {
+  get highlightingEnabled() {
     return this._highlightingEnabled;
   }
 
+  @Input()
   set highlightingEnabled(value: boolean) {
     this._highlightingEnabled = value !== undefined ? value : true;
     this.highlightingEnabledChange.emit(value);
@@ -201,17 +207,15 @@ export class TranscrEditorComponent
   }
 
   get workplace() {
-    return this.joditComponent.jodit!.currentPlace.workplace;
+    return this.joditComponent?.jodit?.currentPlace.workplace;
   }
 
-  public get wisiwyg() {
-    return this.workplace.getElementsByClassName(
-      'jodit-wysiwyg'
-    )[0] as HTMLElement;
+  public get wysiwyg(): HTMLElement | null {
+    return this.workplace?.querySelector('.jodit-wysiwyg') as HTMLElement;
   }
 
   get toolbar() {
-    return this.joditComponent.jodit!.toolbar.container;
+    return this.joditComponent?.jodit?.toolbar.container;
   }
 
   private _isTyping = false;
@@ -268,9 +272,9 @@ export class TranscrEditorComponent
           shortcutInfo.shortcutName === 'redo'
         ) {
           if (shortcutInfo.shortcutName === 'undo') {
-            this.joditComponent.jodit!.history.undo();
+            this.joditComponent?.jodit?.history.undo();
           } else {
-            this.joditComponent.jodit!.history.redo();
+            this.joditComponent?.jodit?.history.redo();
           }
           this.triggerTyping();
         } else {
@@ -327,7 +331,10 @@ export class TranscrEditorComponent
    * converts the editor's html text to raw text
    */
   getRawText = (replaceEmptySpaces = true) => {
-    let html = this.wisiwyg.innerHTML;
+    if (!this.wysiwyg) {
+      return '';
+    }
+    let html = this.wysiwyg.innerHTML;
 
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
     html = html.replace(/&nbsp;/g, ' ');
@@ -347,8 +354,6 @@ export class TranscrEditorComponent
         html = html.replace(new RegExp(marker.icon, 'g'), marker.code);
       }
     }
-
-    html = this.transcrService.replaceSingleTags(html);
 
     const dom: HTMLElement = document.createElement('p');
     dom.innerHTML = html;
@@ -380,10 +385,7 @@ export class TranscrEditorComponent
           for (const marker of this.markers) {
             if (markerCode === marker.code) {
               const parent = elem.parentNode;
-              parent.replaceChild(
-                document.createTextNode(escapeHtml(markerCode)),
-                elem
-              );
+              parent.replaceChild(document.createTextNode(markerCode), elem);
               charCounter += markerCode.length;
               break;
             }
@@ -441,29 +443,33 @@ export class TranscrEditorComponent
       rawText = rawText.replace(/[\s ]+/g, ' ');
     }
 
-    return rawText;
+    return rawText.replace(/\uFEFF/gm, '');
   };
   /**
    * initializes the editor and the containing jodit editor
    */
   public initialize = () => {
-    if (this.audiochunk !== undefined) {
+    if (
+      this.audiochunk !== undefined &&
+      this.transcrEditor &&
+      this.joditComponent
+    ) {
       this.initializeShortcuts();
       this.shortcutsManager.unregisterShortcutGroup('texteditor');
       this.shortcutsManager.registerShortcutGroup(this.shortcuts);
 
-      this.initToolbar();
-      this.joditOptions = this.joditOptions = {
-        showCharsCounter: false,
-        showWordsCounter: false,
+      this.joditOptions = {
+        ...this.joditDefaultOptions,
+        showCharsCounter: true,
+        showWordsCounter: true,
         showXPathInStatusbar: false,
         disablePlugins:
-          'image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
+          'add-new-line,image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
           'table-keyboard-navigation,table,preview,print,about,drag-and-drop,iframe,indent,inline-popup,' +
           'drag-and-drop-element,format-block,resizer,hr,hotkeys,fullsize,font,justify,limit,link,class-span,' +
-          'bold,delete,clean-html,wrap-text-nodes,copy-format,clipboard,paste,paste-storage,color,enter,' +
-          'error-messages,mobile,ordered-list,placeholder,redo-undo,search,select,size,resize-handler,' +
-          'source,stat,sticky,symbols,xpath,tooltip',
+          'bold,delelte,clean-html,wrap-text-nodes,copy-format,clipboard,paste,paste-storage,color,enter,' +
+          'error-messages,mobile,ordered-list,placeholder,redo-undo,search,select,size,resize-handler' +
+          'source,stat,sticky,symbols,xpath,debug,dtd',
         events: {
           blur: () => {
             this.focused = false;
@@ -474,30 +480,21 @@ export class TranscrEditorComponent
           afterInit: this.onAfterInit,
         },
         buttons: [],
+        extraButtons: [],
       };
+      this.initToolbar();
 
-      if (this.Settings.specialMarkers.boundary) {
-        this.joditOptions.buttons.push(this.createBoundaryButton());
+      if (
+        this.Settings.specialMarkers.boundary &&
+        this.joditOptions.extraButtons
+      ) {
+        this.joditOptions.extraButtons.push(this.createBoundaryButton() as any);
         if (this._settings.highlightingEnabled) {
-          this.joditOptions.buttons.push(this.createHighlightingButton());
+          this.joditOptions.extraButtons.push(
+            this.createHighlightingButton() as any
+          );
         }
       }
-
-      const jodit = this.joditComponent.jodit;
-      jodit!.registerButton({
-        group: 'image',
-        name: 'info',
-        position: 0,
-      });
-
-      const segmentBoundary = document.createElement('div');
-      segmentBoundary.setAttribute('class', 'panel seg-popover');
-      segmentBoundary.innerHTML = '00:00:000';
-      this.popovers.segmentBoundary = segmentBoundary;
-      this.workplace.parentNode!.insertBefore(
-        this.popovers.segmentBoundary!,
-        this.workplace
-      );
 
       const validationError = document.createElement('div');
       validationError.setAttribute('class', 'card error-card');
@@ -514,7 +511,7 @@ export class TranscrEditorComponent
         display: 'none',
       });
       this.popovers.validationError = validationError;
-      this.toolbar.parentNode!.insertBefore(
+      this.toolbar?.parentNode?.insertBefore(
         this.popovers.validationError!,
         this.toolbar
       );
@@ -570,7 +567,7 @@ export class TranscrEditorComponent
    * inserts a marker to the editors html
    */
   insertMarker = (markerCode: string, icon: string) => {
-    const editor = this.joditComponent.jodit;
+    const editor = this.joditComponent?.jodit;
 
     if (icon === undefined || icon === '') {
       // text only
@@ -591,13 +588,15 @@ export class TranscrEditorComponent
           }
         });
 
+        console.log(`markercode on insert is ${markerCode}`);
+
         const element = document.createElement('img');
         element.setAttribute('src', icon);
         element.setAttribute('class', 'btn-icon-text');
         element.setAttribute('data-marker-code', markerCode);
         element.setAttribute('alt', markerCode);
 
-        editor!.selection.insertNode(element);
+        editor!.selection.insertHTML(element.outerHTML);
       } else {
         editor!.selection.insertHTML(icon);
       }
@@ -612,11 +611,16 @@ export class TranscrEditorComponent
     return new Promise<void>((resolve, reject) => {
       const func = () => {
         try {
-          if (this.joditComponent.value !== '') {
-            if (this.wisiwyg.innerHTML.indexOf('<p>') === 0) {
-              this.placeAtEnd(this.wisiwyg.getElementsByTagName('p')[0]);
+          if (!this.wysiwyg) {
+            resolve();
+            return;
+          }
+
+          if (this.joditComponent?.value !== '') {
+            if (this.wysiwyg.innerHTML.indexOf('<p>') === 0) {
+              this.placeAtEnd(this.wysiwyg.getElementsByTagName('p')[0]);
             } else {
-              this.placeAtEnd(this.wisiwyg);
+              this.placeAtEnd(this.wysiwyg);
             }
           }
           resolve();
@@ -643,6 +647,7 @@ export class TranscrEditorComponent
     if (this.audiochunk !== undefined) {
       this._lastAudioChunkID = this.audiochunk.id;
     }
+    console.log('AFTER VIEW INIT');
     this.initialize();
 
     this.subscrManager.add(
@@ -659,10 +664,10 @@ export class TranscrEditorComponent
 
   ngOnChanges(obj: SimpleChanges) {
     let renew = false;
+    console.log(obj);
     if (
-      !(obj['markers'] === undefined) &&
-      obj['markers'].previousValue !== obj['markers'].currentValue &&
-      !obj['markers'].firstChange
+      Object.keys(obj).includes('markers') &&
+      obj['markers'].currentValue !== obj['markers'].previousValue
     ) {
       if (obj['markers'].currentValue === undefined) {
         this.markers = [];
@@ -701,6 +706,7 @@ export class TranscrEditorComponent
     }
 
     if (renew) {
+      console.log('RENEW TRANSR EDITOR');
       this.initialize();
       this.initPopover();
     }
@@ -717,11 +723,13 @@ export class TranscrEditorComponent
    * initializes the navbar bar of the editor
    */
   initToolbar() {
-    this.joditOptions.buttons = [];
+    this.joditOptions.extraButtons = [];
     if (this.markers !== undefined) {
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
-        this.joditOptions.buttons.push(this.createMarkerButton(marker));
+        this.joditOptions.extraButtons.push(
+          this.createMarkerButton(marker) as any
+        );
       }
     }
   }
@@ -732,20 +740,31 @@ export class TranscrEditorComponent
   createButton(
     name: string,
     tooltip: string,
-    content: string,
-    onClick: () => void
-  ): any {
+    getContent: () => string,
+    onClick: (event: MouseEvent, button: HTMLElement) => void,
+    hotkeys?: string
+  ): IControlType<IJodit, IToolbarButton> {
     return {
       name,
-      getContent: () => {
-        const newButton = document.createElement('span');
-        newButton.innerHTML = content;
-        newButton.setAttribute('class', 'marker-btn');
-        newButton.onmousedown = onClick;
-        newButton.setAttribute('title', tooltip);
-
-        return newButton;
+      data: {
+        active: false,
       },
+      getContent: (a, b, c) => {
+        const button = document.createElement('div');
+        button.innerHTML = getContent();
+        button.addEventListener('click', (event: MouseEvent) => {
+          onClick(event, button);
+        });
+        return button;
+      },
+      isActive: function (editor, btn) {
+        if (btn.data) {
+          return btn.data['active'];
+        }
+        return false;
+      },
+      tooltip,
+      hotkeys,
     };
   }
 
@@ -762,65 +781,75 @@ export class TranscrEditorComponent
     };
     name: string;
     description: string;
-  }): any {
-    let content = '';
-    const platform = BrowserInfo.platform;
-    if (
-      marker.icon === undefined ||
-      marker.icon === '' ||
-      (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0)
-    ) {
-      // text only or utf8 symbol
-      content =
-        marker.icon !== undefined &&
-        (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)
-          ? marker.icon
-          : '';
-
-      if (!this.easymode) {
-        content +=
-          `${marker.button_text}<span class="btn-shortcut"> ` +
-          `[${marker.shortcut[platform]}]</span>`;
-        if (this.Settings.responsive) {
+  }): IControlType<IJodit, IToolbarButton> {
+    return this.createButton(
+      marker.name,
+      marker.description,
+      () => {
+        let content = '';
+        const platform = BrowserInfo.platform;
+        if (
+          marker.icon === undefined ||
+          marker.icon === '' ||
+          (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0)
+        ) {
+          // text only or utf8 symbol
           content =
-            `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
-            `[${marker.shortcut[platform]}]</span>`;
-        }
-      } else {
-        content += ' ' + marker.button_text;
-      }
-    } else {
-      if (!this.easymode) {
-        content =
-          `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
-          `<span class="btn-description"> ${marker.button_text}</span><span class="btn-shortcut"> ` +
-          `[${marker.shortcut[platform]}]</span>`;
-        if (this.Settings.responsive) {
-          content =
-            `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
-            `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
-            `</span><span class="btn-shortcut d-none d-lg-inline"> [${marker.shortcut[platform]}]</span>`;
-        }
-      } else {
-        content = `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>`;
-      }
-    }
+            marker.icon !== undefined &&
+            (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)
+              ? marker.icon
+              : '';
 
-    return this.createButton(marker.name, marker.description, content, () => {
-      // invoke insertText method with 'hello' on editor module.
-      this.insertMarker(marker.code, marker.icon!);
-      this.markerClick.emit(marker.name);
-    });
+          if (!this.easymode) {
+            content +=
+              `${marker.button_text}<span class="btn-shortcut"> ` +
+              `[${marker.shortcut[platform]}]</span>`;
+            if (this.Settings.responsive) {
+              content =
+                `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
+                `[${marker.shortcut[platform]}]</span>`;
+            }
+          } else {
+            content += ' ' + marker.button_text;
+          }
+        } else {
+          if (!this.easymode) {
+            content =
+              `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
+              `<span class="btn-description"> ${marker.button_text}</span><span class="btn-shortcut"> ` +
+              `[${marker.shortcut[platform]}]</span>`;
+            if (this.Settings.responsive) {
+              content =
+                `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
+                `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
+                `</span><span class="btn-shortcut d-none d-lg-inline"> [${marker.shortcut[platform]}]</span>`;
+            }
+          } else {
+            content = `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>`;
+          }
+        }
+        return content;
+      },
+      () => {
+        // invoke insertText method with 'hello' on editor module.
+        this.insertMarker(marker.code, marker.icon!);
+        this.markerClick.emit(marker.name);
+      }
+    );
   }
 
-  initPopover() {
-    if (this.popovers.validationError !== undefined) {
+  async initPopover() {
+    if (!this.wysiwyg) {
+      return;
+    }
+
+    if (this.popovers.validationError && this.popovers.segmentBoundary) {
       this.popovers.validationError.style.display = 'none';
-      this.popovers.segmentBoundary!.style.display = 'none';
+      this.popovers.segmentBoundary.style.display = 'none';
     }
 
     const dataSampleDivs = findElements(
-      this.wisiwyg,
+      this.wysiwyg,
       '.btn-icon-text[data-samples]'
     );
     for (const dataSampleDiv of dataSampleDivs) {
@@ -836,7 +865,7 @@ export class TranscrEditorComponent
     }
 
     // set popover for errors
-    const valErrorDivs = findElements(this.wisiwyg, '.val-error');
+    const valErrorDivs = findElements(this.wysiwyg, '.val-error');
     for (const valErrorDiv of valErrorDivs) {
       valErrorDiv.removeEventListener(
         'mouseenter',
@@ -848,7 +877,7 @@ export class TranscrEditorComponent
       );
     }
 
-    const valErrorChildren = findElements(this.wisiwyg, '.val-error *');
+    const valErrorChildren = findElements(this.wysiwyg, '.val-error *');
     for (const valErrorChild of valErrorChildren) {
       valErrorChild.removeEventListener(
         'mouseenter',
@@ -860,84 +889,68 @@ export class TranscrEditorComponent
       );
     }
 
-    this.waitForValidationFinished().then(() => {
-      const dataSamples = findElements(
-        this.wisiwyg,
-        '.btn-icon-text[data-samples]'
+    await this.waitForValidationFinished();
+
+    const dataSamples = findElements(
+      this.wysiwyg,
+      '.btn-icon-text[data-samples]'
+    );
+    for (const dataSample of dataSamples) {
+      dataSample.addEventListener('click', this.onDataSampleClick);
+      dataSample.addEventListener('mouseover', this.onSegmentBoundaryMouseOver);
+      dataSample.addEventListener(
+        'mouseleave',
+        this.onSegmentBoundaryMouseLeave
       );
-      for (const dataSample of dataSamples) {
-        dataSample.addEventListener('click', this.onDataSampleClick);
-        dataSample.addEventListener(
-          'mouseover',
-          this.onSegmentBoundaryMouseOver
-        );
-        dataSample.addEventListener(
-          'mouseleave',
-          this.onSegmentBoundaryMouseLeave
-        );
-      }
+    }
 
-      const valErrors = findElements(this.wisiwyg, '.val-error');
-      for (const valError of valErrors) {
-        valError.addEventListener(
-          'mouseenter',
-          this.onValidationErrorMouseOver
-        );
-        valError.addEventListener(
-          'mouseleave',
-          this.onValidationErrorMouseLeave
-        );
-      }
+    const valErrors = findElements(this.wysiwyg, '.val-error');
+    for (const valError of valErrors) {
+      valError.addEventListener('mouseenter', this.onValidationErrorMouseOver);
+      valError.addEventListener('mouseleave', this.onValidationErrorMouseLeave);
+    }
 
-      const valErrorsChildren = findElements(this.wisiwyg, '.val-error *');
-      for (const valErrorsChild of valErrorsChildren) {
-        valErrorsChild.addEventListener(
-          'mouseenter',
-          this.onValidationErrorMouseOver
-        );
-        valErrorsChild.addEventListener(
-          'mouseleave',
-          this.onValidationErrorMouseLeave
-        );
-      }
-    });
+    const valErrorsChildren = findElements(this.wysiwyg, '.val-error *');
+    for (const valErrorsChild of valErrorsChildren) {
+      valErrorsChild.addEventListener(
+        'mouseenter',
+        this.onValidationErrorMouseOver
+      );
+      valErrorsChild.addEventListener(
+        'mouseleave',
+        this.onValidationErrorMouseLeave
+      );
+    }
   }
 
-  createHighlightingButton() {
-    let content = '';
+  createHighlightingButton(): IControlType<IJodit, IToolbarButton> {
+    const getContent = () => {
+      let content = '';
 
-    content = this.highlightingEnabled
-      ? `<img src="assets/img/components/transcr-editor/highlightingEnabled.jpg"
- class="btn-icon highlight-button" style="height:15px;"/>`
-      : `<img src="assets/img/components/transcr-editor/highlightingDisbled.jpg"
- class="btn-icon highlight-button" style="height:15px;"/>`;
-
+      content = this.highlightingEnabled
+        ? `<img src="assets/img/components/transcr-editor/highlightingEnabled.jpg"
+         class="btn-icon highlight-button" style="height:15px;"/>`
+        : `<img src="assets/img/components/transcr-editor/highlightingDisbled.jpg"
+         class="btn-icon highlight-button" style="height:15px;"/>`;
+      return content;
+    };
     return this.createButton(
       'highlight',
       'enable highlighting',
-      content,
-      () => {
-        if (this._highlightingEnabled) {
-          this.stopRecurringHighlight();
-          this.highlightingEnabled = false;
-          const boundaries = findElements(this.wisiwyg, '.highlight-button');
-          for (const boundary of boundaries) {
-            boundary.setAttribute(
-              'src',
-              'assets/img/components/transcr-editor/highlightingDisbled.jpg'
-            );
-          }
-        } else {
-          this.highlightingEnabled = true;
-          const boundaries = findElements(this.wisiwyg, '.highlight-button');
-          for (const boundary of boundaries) {
-            boundary.setAttribute(
-              'src',
-              'assets/img/components/transcr-editor/highlightingEnabled.jpg'
-            );
-          }
-          this.startRecurringHighlight();
+      getContent,
+      (event, button) => {
+        if (!this.wysiwyg || !this.toolbar) {
+          return;
         }
+        if (this._highlightingEnabled) {
+          this.highlightingEnabled = false;
+          this.stopRecurringHighlight();
+        } else {
+          this.startRecurringHighlight();
+          this.highlightingEnabled = true;
+        }
+
+        (event.target! as any).outerHTML = getContent();
       }
     );
   }
@@ -958,8 +971,7 @@ export class TranscrEditorComponent
     // timeout needed to fix summernote
     this.subscrManager.add(
       timer(100).subscribe(() => {
-        this.joditComponent.jodit!.selection.insertNode(element);
-        this.joditComponent.jodit!.selection.insertHTML(' ');
+        this.joditComponent?.jodit?.selection.insertHTML(element.outerHTML);
 
         this.subscrManager.add(
           timer(200).subscribe(() => {
@@ -977,14 +989,14 @@ export class TranscrEditorComponent
   }
 
   saveSelection() {
-    const cursorPositions = this.joditComponent.jodit!.selection.save();
-    if (cursorPositions.length > 0) {
+    const cursorPositions = this.joditComponent?.jodit?.selection.save();
+    if (cursorPositions && cursorPositions.length > 0) {
       this.lastCursorPosition = cursorPositions[0];
     }
   }
 
   restoreSelection() {
-    this.joditComponent.jodit!.selection.restore();
+    this.joditComponent?.jodit?.selection.restore();
   }
 
   /**
@@ -992,7 +1004,6 @@ export class TranscrEditorComponent
    */
   updateTextField() {
     this._rawText = this.tidyUpRaw(this.getRawText());
-    // jQuery(this.transcrEditor.nativeElement).find('.note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
   }
 
   public getSegmentByCaretPos(caretpos: number): number {
@@ -1043,6 +1054,9 @@ export class TranscrEditorComponent
   }
 
   public validate() {
+    if (!this.wysiwyg) {
+      return;
+    }
     if (this.validationEnabled) {
       if (!this.isValidating) {
         this.isValidating = true;
@@ -1058,7 +1072,8 @@ export class TranscrEditorComponent
             const startMarker = '[[[sel-start]]][[[/sel-start]]]';
             const endMarker = '[[[sel-end]]][[[/sel-end]]]';
             code =
-              this.lastCursorPosition!.endMarker !== undefined
+              this.lastCursorPosition!.endMarker !== undefined &&
+              this._textSelection.end >= this._textSelection.start
                 ? insertString(
                     this._rawText,
                     this._textSelection.end,
@@ -1092,9 +1107,9 @@ export class TranscrEditorComponent
           }
 
           this._rawText = this.tidyUpRaw(this._rawText);
-          this.wisiwyg.innerHTML = code;
+          this.wysiwyg.innerHTML = code;
           if (focusAtEnd) {
-            this.placeAtEnd(this.wisiwyg.firstChild as HTMLElement);
+            this.placeAtEnd(this.wysiwyg.firstChild as HTMLElement);
           } else {
             this.restoreSelection();
           }
@@ -1122,8 +1137,10 @@ export class TranscrEditorComponent
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.size.height = this.transcrEditor.nativeElement.offsetHeight;
-    this.size.width = this.transcrEditor.nativeElement.offsetWidth;
+    if (this.transcrEditor) {
+      this.size.height = this.transcrEditor.nativeElement.offsetHeight;
+      this.size.width = this.transcrEditor.nativeElement.offsetWidth;
+    }
   }
 
   public onASROverlayClick() {
@@ -1181,89 +1198,102 @@ export class TranscrEditorComponent
   }
 
   public highlightCurrentSegment(playPosition: SampleUnit) {
-    /* TODO not working, repair
+    // TODO change algorithm
+    if (!this.transcrService.currentlevel || !this.wysiwyg) {
+      return;
+    }
     if (playPosition.samples === 0) {
       playPosition = this.audioManager.createSampleUnit(1);
     }
-    const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(playPosition);
 
-    if (segIndex > -1 && segIndex !== this.lastHighlightedSegment) {
-      //this.saveSelection();
-      const segment = this.transcrService.currentlevel.segments.get(segIndex);
+    const segIndexPlayposition =
+      this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        playPosition
+      );
+
+    if (
+      segIndexPlayposition > -1 &&
+      segIndexPlayposition !== this.lastHighlightedSegment
+    ) {
+      this.saveSelection();
+      const currentlyPlayedSegment =
+        this.transcrService.currentlevel.segments.get(segIndexPlayposition)!;
 
       this.removeHighlight();
 
-      let dom = findElements(this.wisiwyg, 'p');
-      if (dom.length === 0) {
-        dom = [this.wisiwyg];
+      const dom = this.wysiwyg.querySelector('p')!;
+
+      if (!dom) {
+        return;
       }
 
       let currentSegIndex = 0;
       let puffer = document.createElement('span');
       puffer.setAttribute('class', 'highlighted');
 
-      const parentElement: HTMLElement = dom[0];
-      const domCopy = dom[0].cloneNode(true) as HTMLElement;
+      const parentElement: HTMLElement = dom;
+      let pointer: ChildNode | null | undefined = dom.childNodes?.item(0);
 
-      let j = 0;
-      domCopy.childNodes.forEach((elem: HTMLElement, i) => {
-        const domElement = parentElement.childNodes.item(j);
-        if (elem !== undefined) {
-          const tagName = elem.tagName;
-          const tagContent = (elem.tagName) ? elem.innerHTML : elem.nodeValue;
-          const addElemToPuffer = () => {
-            if (currentSegIndex === segIndex && elem !== undefined) {
-              domElement.remove();
-              puffer.appendChild(domElement);
-              j--;
-            }
-          };
+      while (pointer) {
+        const tagName = pointer.nodeName;
 
-          if (tagName !== undefined) {
-            if (tagName.toLowerCase() === 'img') {
-              const dataSamples = getAttr(elem, 'data-samples');
-              if (dataSamples !== undefined) {
-                const segSamples = Number(dataSamples);
-                const foundSegment = segment.time.samples;
+        const addElemToPuffer = () => {
+          if (currentSegIndex === segIndexPlayposition && pointer) {
+            const nextPointer = pointer?.nextSibling;
+            pointer.remove();
+            puffer.appendChild(pointer.cloneNode(true));
+            pointer = nextPointer;
+          } else {
+            pointer = pointer?.nextSibling;
+          }
+        };
 
-                if (segSamples === foundSegment) {
-                  if (puffer.childNodes.length > 0) {
-                    domElement.parentNode.insertBefore(puffer, domElement);
-                  }
-                  this.lastHighlightedSegment = currentSegIndex;
-                  puffer = document.createElement('span');
-                  return;
-                } else {
-                  puffer = document.createElement('span');
-                  puffer.setAttribute('class', 'highlighted');
-                  currentSegIndex++;
+
+        if (pointer.nodeType === 3) {
+          // text
+          addElemToPuffer();
+        } else if (tagName) {
+          if (tagName.toLowerCase() === 'img') {
+            const dataSamples = getAttr(pointer as HTMLElement, 'data-samples');
+            if (dataSamples !== undefined) {
+              const segSamples = Number(dataSamples);
+              const foundSegment = currentlyPlayedSegment.time.samples;
+              if (segSamples === foundSegment) {
+                if (puffer.childNodes.length > 0) {
+                  pointer.parentNode!.insertBefore(puffer, pointer);
                 }
+                this.lastHighlightedSegment = currentSegIndex;
+                puffer = document.createElement('span');
+                puffer.setAttribute('class', 'highlighted');
+
+                pointer = pointer.nextSibling;
+                currentSegIndex++;
               } else {
-                addElemToPuffer();
+                puffer = document.createElement('span');
+                puffer.setAttribute('class', 'highlighted');
+                currentSegIndex++;
+                pointer = pointer.nextSibling;
               }
             } else {
-              addElemToPuffer();
+              pointer = pointer.nextSibling;
             }
           } else {
-            addElemToPuffer();
+            pointer = pointer.nextSibling;
           }
         } else {
-          console.error(`elem is undefined! puffer: ${jQuery(puffer).text()}`);
+          pointer = pointer.nextSibling;
         }
-        j++;
-      });
+        //end of scan
+      }
 
-      const pufferText = puffer.outerHTML;
       if (puffer.childNodes.length > 0) {
         // puffer not added, last segment
         parentElement.appendChild(puffer);
-        const parentText = parentElement.outerHTML;
         this.lastHighlightedSegment = currentSegIndex;
-        // this.restoreSelection();
-        // this.initPopover();
       }
+      this.restoreSelection();
+      this.initPopover();
     }
-    */
   }
 
   public waitForValidationFinished(): Promise<void> {
@@ -1297,55 +1327,73 @@ export class TranscrEditorComponent
     return false;
   }
 
-  private createBoundaryButton() {
-    let content = '';
-    // create boudary button
-    const boundaryLabel = this.langService.translate(
-      'special_markers.boundary.insert',
-      { type: '' }
-    );
+  private createBoundaryButton(): IControlType<IJodit, IToolbarButton> {
     const boundaryDescr = this.langService.translate(
       'special_markers.boundary.description',
       { type: '' }
     );
 
-    if (!this.easymode) {
-      content =
-        `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
-        `<span class="btn-description">${boundaryLabel}</span><span class="btn-shortcut"> ` +
-        `[ALT + S]</span>`;
-      if (this.Settings.responsive) {
-        content =
-          `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
-          `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
-          `<span class="btn-shortcut d-none d-lg-inline"> ` +
-          `[ALT + S]</span>`;
+    return this.createButton(
+      'boundary',
+      boundaryDescr,
+      () => {
+        let content = '';
+        // create boudary button
+        const boundaryLabel = this.langService.translate(
+          'special_markers.boundary.insert',
+          { type: '' }
+        );
+        if (!this.easymode) {
+          content =
+            `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
+            `<span class="btn-description">${boundaryLabel}</span><span class="btn-shortcut"> ` +
+            `[ALT + S]</span>`;
+          if (this.Settings.responsive) {
+            content =
+              `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
+              `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
+              `<span class="btn-shortcut d-none d-lg-inline"> ` +
+              `[ALT + S]</span>`;
+          }
+        } else {
+          content = `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/>`;
+        }
+        return content;
+      },
+      () => {
+        this.markerClick.emit('boundary');
+        this.insertBoundary(
+          'assets/img/components/transcr-editor/boundary.png'
+        );
+        this.subscrManager.add(
+          timer(100).subscribe({
+            next: () => {
+              this.validate();
+              this.initPopover();
+            },
+          })
+        );
       }
-    } else {
-      content = `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/>`;
-    }
-
-    return this.createButton('boundary', boundaryDescr, content, () => {
-      this.markerClick.emit('boundary');
-      this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-    });
+    );
   }
 
   private setTranscript(rawText: string) {
-    this._rawText = this.tidyUpRaw(rawText);
+    if (this.joditComponent?.jodit) {
+      this._rawText = this.tidyUpRaw(rawText);
 
-    // set cursor at the end after focus
-    this.init = 0;
+      // set cursor at the end after focus
+      this.init = 0;
 
-    this.joditComponent.jodit!.value = this.transcrService.rawToHTML(rawText);
-    this.validate();
-    this.initPopover();
+      this.joditComponent.jodit.value = this.transcrService.rawToHTML(rawText);
+      this.validate();
+      this.initPopover();
 
-    this.asr = {
-      status: 'inactive',
-      result: '',
-      error: '',
-    };
+      this.asr = {
+        status: 'inactive',
+        result: '',
+        error: '',
+      };
+    }
   }
 
   private setSegments(segments: Segments) {
@@ -1415,35 +1463,34 @@ export class TranscrEditorComponent
     }
   };
 
-  private onSegmentBoundaryMouseOver(event: MouseEvent) {
+  private onSegmentBoundaryMouseOver = (event: MouseEvent) => {
+    if (!this.transcrEditor) {
+      return;
+    }
     const target = event.target as HTMLElement;
-    const segPopovers =
-      this.transcrEditor.nativeElement.querySelector('.seg-popover');
-    const segPopover = segPopovers[0];
+    const segPopover = this.transcrEditor.nativeElement.querySelector(
+      '.seg-popover'
+    ) as HTMLDivElement;
 
-    if (segPopover !== undefined) {
+    if (segPopover && this.workplace && this.wysiwyg) {
       const width = segPopover.offsetWidth;
-      const height = segPopover.offsetHeight;
-      const editorPos = this.workplace.offsetTop;
       const segSamples = getAttr(target, 'data-samples');
 
       if (segSamples !== undefined && isNumber(segSamples)) {
         const samples = Number(segSamples);
         const time = new SampleUnit(samples, this.audioManager.sampleRate);
         const marginLeft = target.offsetLeft - width / 2 + 'px';
-        const marginTop =
-          this.workplace.offsetTop - editorPos - height - 10 + 'px';
+        const marginTop = this.wysiwyg.offsetTop + target.offsetTop - 10 + 'px';
 
-        segPopover.css({
-          'margin-left': marginLeft,
-          'margin-top': marginTop,
-          'z-index': 30,
-          position: 'absolute',
-          'background-color': 'white',
-          display: 'inherit',
-        });
+        this.renderer.setStyle(segPopover, 'margin-left', marginLeft);
+        this.renderer.setStyle(segPopover, 'margin-top', marginTop);
+        this.renderer.setStyle(segPopover, 'z-index', 30);
+        this.renderer.setStyle(segPopover, 'position', 'absolute');
+        this.renderer.setStyle(segPopover, 'background-color', 'white');
+        this.renderer.setStyle(segPopover, 'display', 'inherit');
+        this.renderer.setStyle(segPopover, 'box-shadow', '0px 0px 10px gray');
 
-        target.style.cursor = 'pointer';
+        this.renderer.setStyle(target, 'cursor', 'pointer');
 
         const timespan = new TimespanPipe();
         const text = timespan.transform(time.unix, {
@@ -1451,12 +1498,12 @@ export class TranscrEditorComponent
           showMilliSeconds: true,
           maxDuration: this.audiochunk!.time.duration.unix,
         });
-        segPopover.text(text);
+        this.renderer.setProperty(segPopover, 'innerText', text);
       }
     }
-  }
+  };
 
-  private onDataSampleClick(event: MouseEvent) {
+  private onDataSampleClick = (event: MouseEvent) => {
     const samples = getAttr(event.target as any, 'data-samples')!;
 
     if (isNumber(samples)) {
@@ -1464,15 +1511,18 @@ export class TranscrEditorComponent
         new SampleUnit(Number(samples), this.audioManager.sampleRate)
       );
     }
-  }
+  };
 
-  private onSegmentBoundaryMouseLeave() {
-    const segPopovers = findElements(this.workplace, '.seg-popover');
-    for (const segPopover of segPopovers) {
-      segPopover.style.display = 'none';
+  private onSegmentBoundaryMouseLeave = () => {
+    if (this.transcrEditor) {
+      const segPopover =
+        this.transcrEditor.nativeElement.querySelector('.seg-popover');
+      if (segPopover) {
+        this.renderer.setStyle(segPopover, 'display', 'none');
+        this.triggerTyping();
+      }
     }
-    this.triggerTyping();
-  }
+  };
 
   private onValidationErrorMouseOver = (event: MouseEvent) => {
     let target: HTMLElement = event.target as HTMLElement;
@@ -1485,7 +1535,7 @@ export class TranscrEditorComponent
     if (errorCode !== undefined) {
       const errorDetails = this.transcrService.getErrorDetails(errorCode);
 
-      if (errorDetails !== undefined) {
+      if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
         this.cd.markForCheck();
@@ -1498,10 +1548,9 @@ export class TranscrEditorComponent
         let marginLeft = target.offsetLeft;
         const height = this.validationPopover.height;
 
-        console.dir();
         if (
           this.validationPopover.width + marginLeft >
-            this.wisiwyg.offsetWidth &&
+            this.wysiwyg.offsetWidth &&
           marginLeft - this.validationPopover.width > 0
         ) {
           marginLeft -= this.validationPopover.width;
@@ -1524,21 +1573,27 @@ export class TranscrEditorComponent
   };
 
   private removeHighlight() {
-    const highlights = findElements(
-      this.transcrEditor.nativeElement,
-      '.highlighted'
-    );
-    for (const highlight of highlights) {
-      if (highlight.parentNode !== null) {
-        const highlightChilds = findElements(highlight, '*');
-        for (const highlightChild of highlightChilds) {
-          highlightChild.remove();
-          highlight.parentNode.insertBefore(highlightChild, highlight);
-        }
-        highlight.remove();
-      } else {
-        console.error(`item parent is undefined!`);
+    if (!this.wysiwyg) {
+      return;
+    }
+
+    const highlight = this.wysiwyg.querySelector('.highlighted');
+    if (highlight?.parentNode) {
+      let pointer: ChildNode | null | undefined = highlight.childNodes?.item(0);
+
+      while (pointer) {
+        const nextSibling: ChildNode | null = pointer.nextSibling;
+        pointer.remove();
+        (highlight.parentNode as HTMLElement)?.insertBefore(
+          pointer.cloneNode(true),
+          highlight
+        );
+        pointer = nextSibling;
       }
+
+      highlight.remove();
+    } else {
+      console.error(`item parent is undefined!`);
     }
   }
 
@@ -1555,6 +1610,24 @@ export class TranscrEditorComponent
         pc: 'ALT + S',
       },
       title: 'add boundary',
+      focusonly: true,
+    });
+    this.shortcuts.items.push({
+      name: 'undo',
+      keys: {
+        mac: 'CMD + Z',
+        pc: 'CTR + Z',
+      },
+      title: 'redo',
+      focusonly: true,
+    });
+    this.shortcuts.items.push({
+      name: 'redo',
+      keys: {
+        mac: 'SHIFT + CMD + Z',
+        pc: 'CTRL + Y',
+      },
+      title: 'redo',
       focusonly: true,
     });
 
@@ -1595,8 +1668,8 @@ export class TranscrEditorComponent
     ).getData('Text');
     let html = bufferText
       .replace(/(<p>)|(<\/p>)/g, '')
-      .replace(new RegExp(/\\\[\\\|/, 'g'), '{')
-      .replace(new RegExp(/\\\|]/, 'g'), '}');
+      .replace(new RegExp(/\[\|/, 'g'), '{')
+      .replace(new RegExp(/\|]/, 'g'), '}');
     html = unEscapeHtml(html);
     html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
@@ -1604,12 +1677,9 @@ export class TranscrEditorComponent
     htmlObj.innerHTML = html;
 
     if (this.rawText !== undefined && this._rawText !== '') {
-      this.joditComponent.jodit!.editor.insertAdjacentHTML(
-        'beforebegin',
-        htmlObj[0]
-      );
-    } else {
-      this.joditComponent.value = html;
+      this.joditComponent!.jodit!.selection.insertHTML(htmlObj.innerHTML, true);
+    } else if (this.joditComponent) {
+      this.joditComponent.jodit!.value = html;
       this.focus(true, false).catch((error) => {
         console.error(error);
       });
@@ -1617,9 +1687,27 @@ export class TranscrEditorComponent
   }
 
   onAfterInit = () => {
-    // fix additional <p><br/></p>
+    // TODO fix additional <p><br/></p>
+    this.subscrManager.removeByTag('afterInit');
     this.subscrManager.add(
-      timer(100).subscribe(() => {
+      timer(50).subscribe(() => {
+        if (this.workplace?.parentNode && !this.popovers.segmentBoundary) {
+          const segmentBoundary = document.createElement('div');
+          segmentBoundary.setAttribute('class', 'panel seg-popover');
+          segmentBoundary.innerHTML = '00:00:000';
+          this.popovers.segmentBoundary = segmentBoundary;
+
+          console.log('inserted panel seg-popover');
+          this.workplace?.parentNode?.insertBefore(
+            this.popovers.segmentBoundary!,
+            this.workplace
+          );
+        } else {
+          console.error(
+            "Can't set segment boundary because workplace or parentNode is undefined"
+          );
+        }
+
         if (this.segments === undefined || this.segments.length === 0) {
           this.setTranscript(this.transcript);
         } else {
@@ -1632,11 +1720,12 @@ export class TranscrEditorComponent
           .catch((error) => {
             console.error(error);
           });
-      })
+      }),
+      'afterInit'
     );
   };
 
   placeAtEnd(element: HTMLElement) {
-    this.joditComponent.jodit!.selection.setCursorAfter(element.lastChild!);
+    this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild!);
   }
 }

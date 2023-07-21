@@ -33,6 +33,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
+import { AccountRole } from "@octra/api-types";
 
 @Component({
   selector: 'octra-navigation',
@@ -47,7 +48,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   @Input() version?: string;
 
   public test = 'ok';
-  public secondsPerLine = 5;
 
   isCollapsed = true;
 
@@ -57,6 +57,10 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
 
   public get converters(): any[] {
     return AppInfo.converters;
+  }
+
+  public get isAdministrator(){
+    return this.appStorage.snapshot.authentication.me?.systemRole.label === AccountRole.administrator;
   }
 
   public get AppInfo(): any {
@@ -129,8 +133,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
         }
       })
     );
-
-    this.secondsPerLine = this.appStorage.secondsPerLine;
   }
 
   setInterface(newInterface: string) {
@@ -283,7 +285,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   public changeSecondsPerLine(seconds: number) {
-    this.secondsPerLine = seconds;
     this.appStorage.secondsPerLine = seconds;
   }
 
@@ -317,15 +318,15 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   backToProjectsList() {
-    navigateTo(this.router, ['intern/projects']);
+    this.logout(true);
   }
 
-  logout() {
+  logout(redirectToProjects = false) {
     if (
       this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
       this.appStorage.snapshot.onlineMode.onlineSession.currentProject
     ) {
-      this.annotationStoreService.quit(true, true); // TODO change
+      this.annotationStoreService.quit(true, true, redirectToProjects); // TODO change
     } else {
       this.appStorage.logout(true);
     }

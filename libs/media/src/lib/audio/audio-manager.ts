@@ -289,6 +289,8 @@ export class AudioManager {
   public startPlayback(audioSelection: AudioSelection, volume: number, playbackRate: number, playOnHover = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      //make sur selection is not changed
+      audioSelection = audioSelection.clone();
       if (this._audioContext === undefined) {
         this.initAudioContext();
       }
@@ -327,6 +329,8 @@ export class AudioManager {
 
         this._audio.play()
           .then(() => {
+            console.log("duration is: " + audioSelection.duration.seconds);
+            const time = Math.round(audioSelection.duration.unix / playbackRate);
             this._playbackEndChecker = timer(Math.round(audioSelection.duration.unix / playbackRate)).subscribe(() => {
               this.endPlayBack();
               this.subscrManager.add(timer(100).subscribe(() => {

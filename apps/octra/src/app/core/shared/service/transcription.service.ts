@@ -2,11 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import {
   escapeRegex,
-  getFileSize, getTranscriptFromIO,
+  getFileSize,
+  getTranscriptFromIO,
   hasProperty,
   insertString,
-  SubscriptionManager
-} from "@octra/utilities";
+  SubscriptionManager,
+} from '@octra/utilities';
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { FeedBackForm } from '../../obj/FeedbackForm/FeedBackForm';
@@ -22,7 +23,8 @@ import { UserInteractionsService } from './userInteractions.service';
 import {
   Annotation,
   AnnotationLevelType,
-  Converter, convertFromSupportedConverters,
+  Converter,
+  convertFromSupportedConverters,
   IFile,
   ImportResult,
   Level,
@@ -34,8 +36,8 @@ import {
   OLevel,
   OSegment,
   SegmentChangeEvent,
-  Segments
-} from "@octra/annotation";
+  Segments,
+} from '@octra/annotation';
 import { AudioManager } from '@octra/media';
 import { getModeState, LoginMode, RootState } from '../../store';
 import { TranslocoService } from '@ngneat/transloco';
@@ -421,7 +423,7 @@ export class TranscriptionService {
       this.subscrmanager.removeByTag('idbAnnotationChange');
       this.subscrmanager.add(
         this.appStorage.annotationChanged.subscribe((state) => {
-          if(state?.transcript) {
+          if (state?.transcript) {
             this.updateAnnotation(
               state.transcript.levels,
               state.transcript.links
@@ -487,30 +489,30 @@ export class TranscriptionService {
         );
 
         const serverTranscript = task
-          ? getTranscriptFromIO(task.outputs) ?? getTranscriptFromIO(task.inputs)
+          ? getTranscriptFromIO(task.outputs) ??
+            getTranscriptFromIO(task.inputs)
           : '';
 
         if (serverTranscript) {
           // check if it's AnnotJSON
-          annotResult =
-            convertFromSupportedConverters(
-              AppInfo.converters,
-              {
-                name: `${this._audiomanager.resource.info.name}_annot.json`,
-                content: serverTranscript.content,
-                type: serverTranscript.fileType!,
-                encoding: 'utf-8',
-              },
-              {
-                name: this._audiomanager.resource.info.fullname,
-                arraybuffer: this._audiomanager.resource.arraybuffer!,
-                size: this._audiomanager.resource.info.size,
-                duration: this._audiomanager.resource.info.duration.samples,
-                sampleRate: this._audiomanager.resource.info.sampleRate,
-                url: this._audiomanager.resource.info.url!,
-                type: this._audiomanager.resource.info.type,
-              }
-            );
+          annotResult = convertFromSupportedConverters(
+            AppInfo.converters,
+            {
+              name: `${this._audiomanager.resource.info.name}_annot.json`,
+              content: serverTranscript.content,
+              type: serverTranscript.fileType!,
+              encoding: 'utf-8',
+            },
+            {
+              name: this._audiomanager.resource.info.fullname,
+              arraybuffer: this._audiomanager.resource.arraybuffer!,
+              size: this._audiomanager.resource.info.size,
+              duration: this._audiomanager.resource.info.duration.samples,
+              sampleRate: this._audiomanager.resource.info.sampleRate,
+              url: this._audiomanager.resource.info.url!,
+              type: this._audiomanager.resource.info.type,
+            }
+          );
 
           // import servertranscript
           if (annotResult && annotResult.annotjson) {
@@ -531,9 +533,7 @@ export class TranscriptionService {
         if (!annotResult) {
           // no transcript found
           if (task) {
-            const textInput = getTranscriptFromIO(
-              task.inputs
-            );
+            const textInput = getTranscriptFromIO(task.inputs);
             if (textInput) {
               // prompt text available and server transcript is undefined
               // set prompt as new transcript
@@ -802,6 +802,7 @@ export class TranscriptionService {
    * converts raw text of markers to html
    */
   public rawToHTML(rawtext: string): string {
+    console.log(`convert rawtext to html: ${rawtext}`);
     let result: string = rawtext;
 
     if (rawtext !== '') {
@@ -889,8 +890,10 @@ export class TranscriptionService {
               marker.icon.indexOf('.gif') > -1)
           ) {
             const markerCode = marker.code
-              .replace(/</g, '&amp;lt;')
-              .replace(/>/g, '&amp;gt;');
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+
+            console.log(`markercode on rawToHTML is ${markerCode}`);
             img =
               "<img src='" +
               marker.icon +
@@ -918,12 +921,9 @@ export class TranscriptionService {
     }
 
     // wrap result with <p>. Missing this would cause the editor fail on marker insertion
-    result =
-      result !== '' && result !== ' '
-        ? '<p>' + result + '</p>'
-        : '<p><br/></p>';
+    result = result !== '' && result !== ' ' ? '<p>' + result + '</p>' : '';
 
-    return result;
+    return result.replace(/\uFEFF/gm, '');
   }
 
   public underlineTextRed(rawtext: string, validation: any[]) {

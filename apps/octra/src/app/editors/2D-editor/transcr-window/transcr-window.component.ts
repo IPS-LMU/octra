@@ -1111,19 +1111,18 @@ export class TranscrWindowComponent
 
     let start = 0;
     for (let i = 0; i < samplesArray.length; i++) {
+      const boundary = this.editor.wysiwyg?.querySelector(
+        'img[data-samples]:eq(' + i + ')'
+      ) as HTMLDivElement;
       if (!(samplesArray[i] > start)) {
         // mark boundary red
-        (
-          this.editor.wisiwyg.querySelector(
-            'img[data-samples]:eq(' + i + ')'
-          ) as any
-        )[0].css.backgroundColor = 'red';
+        if(boundary) {
+          boundary.style.backgroundColor = 'red';
+        }
       } else {
-        (
-          this.editor.wisiwyg.querySelector(
-            'img[data-samples]:eq(' + i + ')'
-          ) as any
-        )[0].css.backgroundColor = 'transparent';
+        if(boundary) {
+          boundary.style.backgroundColor = 'transparent';
+        }
         start = samplesArray[i];
       }
     }

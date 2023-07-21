@@ -124,7 +124,7 @@
             *ngIf="
               appStorage.loggedIn &&
               navbarServ.showInterfaces &&
-              settService.appSettings.octra.showdetails
+              isAdministrator
             "
             class="nav-item"
           >
@@ -533,8 +533,8 @@
               >
                 <button
                   [ngClass]="{
-                    'btn-primary': secondsPerLine === 5,
-                    'btn-secondary': secondsPerLine !== 5
+                    'btn-primary': appStorage.secondsPerLine === 5,
+                    'btn-secondary': appStorage.secondsPerLine !== 5
                   }"
                   type="button"
                   class="btn btn-sm"
@@ -545,8 +545,8 @@
                 </button>
                 <button
                   [ngClass]="{
-                    'btn-primary': secondsPerLine === 10,
-                    'btn-secondary': secondsPerLine !== 10
+                    'btn-primary': appStorage.secondsPerLine === 10,
+                    'btn-secondary': appStorage.secondsPerLine !== 10
                   }"
                   type="button"
                   class="btn btn-sm"
@@ -557,8 +557,8 @@
                 </button>
                 <button
                   [ngClass]="{
-                    'btn-primary': secondsPerLine === 15,
-                    'btn-secondary': secondsPerLine !== 15
+                    'btn-primary': appStorage.secondsPerLine === 15,
+                    'btn-secondary': appStorage.secondsPerLine !== 15
                   }"
                   type="button"
                   class="btn btn-sm"
@@ -569,8 +569,8 @@
                 </button>
                 <button
                   [ngClass]="{
-                    'btn-primary': secondsPerLine === 20,
-                    'btn-secondary': secondsPerLine !== 20
+                    'btn-primary': appStorage.secondsPerLine === 20,
+                    'btn-secondary': appStorage.secondsPerLine !== 20
                   }"
                   type="button"
                   class="btn btn-sm"
@@ -581,8 +581,8 @@
                 </button>
                 <button
                   [ngClass]="{
-                    'btn-primary': secondsPerLine === 60,
-                    'btn-secondary': secondsPerLine !== 60
+                    'btn-primary': appStorage.secondsPerLine === 60,
+                    'btn-secondary': appStorage.secondsPerLine !== 60
                   }"
                   type="button"
                   class="btn btn-sm"

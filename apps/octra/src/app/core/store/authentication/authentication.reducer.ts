@@ -72,6 +72,10 @@ export const authenticationReducer = createReducer(
       authenticated: data.authenticated,
     };
   }),
+  on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success, (state: AuthenticationState, {me}) => ({
+    ...state,
+    me
+  })),
   on(OnlineModeActions.loginDemo, (state: AuthenticationState, data) => {
     return {
       ...state,

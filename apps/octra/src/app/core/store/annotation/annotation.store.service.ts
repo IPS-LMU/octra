@@ -38,11 +38,12 @@ export class AnnotationStoreService {
     );
   }
 
-  quit(clearSession: boolean, freeTask: boolean) {
+  quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
     this.store.dispatch(
       AnnotationActions.quit.do({
         clearSession,
         freeTask,
+        redirectToProjects
       })
     );
   }

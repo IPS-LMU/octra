@@ -179,8 +179,7 @@ export class OnlineModeReducers {
           return result;
         }
       ),
-      on(
-        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
+      on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
         (state: OnlineModeState, { currentProject, task, mode }) => {
           if (this.mode === mode) {
             return {

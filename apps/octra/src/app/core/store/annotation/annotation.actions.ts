@@ -155,6 +155,7 @@ export class AnnotationActions {
       do: props<{
         clearSession: boolean;
         freeTask: boolean;
+        redirectToProjects?: boolean;
       }>(),
       success: props<{
         mode: LoginMode;
@@ -275,6 +276,14 @@ export class AnnotationActions {
       fail: props<{
         error: HttpErrorResponse;
       }>(),
+    },
+  });
+
+  static redirectToProjects = createActionGroup({
+    source: `annotation/redirect to projects`,
+    events: {
+      do: emptyProps(),
+      success: emptyProps()
     },
   });
 }

@@ -750,7 +750,9 @@ export class TranscrEditorComponent
         active: false,
       },
       getContent: (a, b, c) => {
-        const button = document.createElement('div');
+        const button = document.createElement('span');
+        button.style.display = "flex";
+        button.setAttribute("class", "me-2 align-items-center px-1");
         button.innerHTML = getContent();
         button.addEventListener('click', (event: MouseEvent) => {
           onClick(event, button);

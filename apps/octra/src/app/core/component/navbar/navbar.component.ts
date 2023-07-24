@@ -33,7 +33,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
-import { AccountRole } from "@octra/api-types";
+import { AccountRole, ProjectDto } from "@octra/api-types";
 
 @Component({
   selector: 'octra-navigation',
@@ -330,5 +330,10 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     } else {
       this.appStorage.logout(true);
     }
+  }
+
+  getFreeAnnotationTasks(project: ProjectDto | undefined) {
+    return project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
+      .free ?? 0
   }
 }

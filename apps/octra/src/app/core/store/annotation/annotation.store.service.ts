@@ -60,4 +60,8 @@ export class AnnotationStoreService {
       })
     );
   }
+
+  resumeTaskManually() {
+    this.store.dispatch(AnnotationActions.resumeTaskManually.do());
+  }
 }

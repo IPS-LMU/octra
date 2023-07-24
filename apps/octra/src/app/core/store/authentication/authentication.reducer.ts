@@ -4,6 +4,7 @@ import { AuthenticationState } from './index';
 import { APIActions } from '../api';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { AccountLoginMethod, AccountRole } from '@octra/api-types';
+import { IDBActions } from "../idb/idb.actions";
 
 export const initialState: AuthenticationState = {
   authenticated: false,
@@ -21,6 +22,19 @@ export const authenticationReducer = createReducer(
         authenticated: auth.openURL === undefined,
         type: method,
         webToken: auth.accessToken,
+      };
+    }
+  ),
+  on(
+    IDBActions.loadOptions.success,
+    (state: AuthenticationState, { onlineOptions }) => {
+      return {
+        ...state,
+        previousUser:  onlineOptions.user ? {
+          id: onlineOptions.user.id,
+          username: onlineOptions.user.name,
+          email: onlineOptions.user.email
+        } : undefined
       };
     }
   ),

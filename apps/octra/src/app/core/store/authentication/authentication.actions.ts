@@ -46,6 +46,13 @@ export class AuthenticationActions {
     },
   });
 
+  static redirectToProjects = createActionGroup({
+    source: 'auth/redirect to projects',
+    events: {
+      do: emptyProps(),
+    },
+  });
+
   static continueSessionAfterAgreement = createActionGroup({
     source: 'auth/continue session after agreement',
     events: {

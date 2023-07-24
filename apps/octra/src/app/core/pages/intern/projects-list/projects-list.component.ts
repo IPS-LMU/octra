@@ -5,7 +5,8 @@ import { ProjectDto } from '@octra/api-types';
 import { DefaultComponent } from '../../../component/default.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { RoutingService } from '../../../shared/service/routing.service';
+import { AuthenticationStoreService } from '../../../store/authentication';
+import { AnnotationStoreService } from '../../../store/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-projects-list',
@@ -20,7 +21,8 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     private api: OctraAPIService,
     public appStorage: AppStorageService,
     private modalService: OctraModalService,
-    private routingService: RoutingService
+    public authStoreService: AuthenticationStoreService,
+    private annotationStoreService: AnnotationStoreService
   ) {
     super();
   }
@@ -29,13 +31,35 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.subscrManager.add(
       this.api.listProjects().subscribe({
         next: (projects) => {
-          this.projects = projects;
+          this.projects = projects.filter((a) => {
+            const annotationStatistics = a.statistics?.tasks.find(
+              (a) => a.type === 'annotation'
+            );
+
+            if (annotationStatistics) {
+              if (annotationStatistics.status.free > 0) {
+                return true;
+              }
+            }
+
+            return false;
+          });
+
           this.projects.sort((a, b) => {
             if (a.active && !b.active) {
               return 1;
             } else if (a.active && b.active) {
-              if (a.statistics!.freeTasks > b.statistics!.freeTasks) {
+              const annotationStatisticsA =
+                a.statistics!.tasks.find((c) => c.type === 'annotation')?.status
+                  .free ?? 0;
+              const annotationStatisticsB =
+                b.statistics!.tasks.find((c) => c.type === 'annotation')?.status
+                  .free ?? 0;
+
+              if (annotationStatisticsA > annotationStatisticsB) {
                 return 1;
+              } else if (annotationStatisticsA < annotationStatisticsB) {
+                return annotationStatisticsA === 0 ? -1 : 1;
               }
               return 0;
             }
@@ -54,14 +78,15 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   onProjectClick(project: ProjectDto) {
-    if (project.statistics!.freeTasks > 0) {
-      this.appStorage.startOnlineAnnotation(project);
-    }
+    this.appStorage.startOnlineAnnotation(project);
   }
 
-  onFileChange(event: any) {
-    const test = 'result';
-    const res = event.target.files[0];
-    this.selectedFile = res;
+  resumeTaskManually() {
+    this.annotationStoreService.resumeTaskManually();
+  }
+
+  getFreeAnnotationTasks(project: ProjectDto) {
+    return project.statistics?.tasks.find((a) => a.type === 'annotation')?.status
+        .free ?? 0
   }
 }

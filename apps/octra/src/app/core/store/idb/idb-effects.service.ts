@@ -141,6 +141,7 @@ export class IDBEffects {
                 OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
                   projectID: action.onlineOptions.project.id,
                   taskID: action.onlineOptions.transcriptID,
+                  mode: LoginMode.ONLINE,
                 })
               );
             }
@@ -459,7 +460,6 @@ export class IDBEffects {
   savemodeOptions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        AuthenticationActions.login.success,
         AuthenticationActions.logout.success,
         OnlineModeActions.changeComment.do,
         OnlineModeActions.setFeedback,
@@ -477,15 +477,29 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
+          console.log(`save for ${action.type}`);
+          console.log(appState.authentication);
+
           return this.idbService
             .saveModeOptions((action as any).mode, {
-              sessionfile: modeState?.sessionFile?.toAny(),
-              currentEditor: modeState.currentEditor,
-              logging: modeState.logging,
-              project: modeState.onlineSession?.currentProject,
-              transcriptID: modeState.onlineSession?.task?.id,
-              feedback: modeState.onlineSession?.assessment,
-              comment: modeState.onlineSession?.comment,
+              sessionfile: modeState?.sessionFile?.toAny() ?? null,
+              currentEditor: modeState.currentEditor ?? null,
+              logging: modeState.logging ?? null,
+              project: modeState.onlineSession?.loadFromServer
+                ? modeState.onlineSession?.currentProject ?? null
+                : undefined,
+              transcriptID: modeState.onlineSession?.loadFromServer
+                ? modeState.onlineSession?.task?.id ?? null
+                : undefined,
+              feedback: modeState.onlineSession?.assessment ?? null,
+              comment: modeState.onlineSession?.comment ?? null,
+              user: appState.authentication.me
+                ? {
+                    id: appState.authentication.me.id,
+                    name: appState.authentication.me.username,
+                    email: appState.authentication.me.email,
+                  }
+                : undefined,
             })
             .pipe(
               map(() => {
@@ -671,7 +685,7 @@ export class IDBEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthenticationActions.login.success),
-        tap(() => {
+        tap((a) => {
           this.sessStr.store('loggedIn', true);
         })
       ),
@@ -1030,18 +1044,22 @@ export class IDBEffects {
           state.application.mode === LoginMode.ONLINE &&
           state.application.loggedIn
         ) {
-          if (
-            state.onlineMode.onlineSession.currentProject !== undefined &&
-            state.onlineMode.onlineSession.task !== undefined
-          ) {
-            return of(ApplicationActions.initApplication.finish());
+          if (state.onlineMode.onlineSession?.loadFromServer) {
+            if (
+              state.onlineMode.onlineSession.currentProject !== undefined &&
+              state.onlineMode.onlineSession.task !== undefined
+            ) {
+              return of(ApplicationActions.initApplication.finish());
+            } else {
+              return this.actions$.pipe(
+                ofType(
+                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success
+                ),
+                map((a) => ApplicationActions.initApplication.finish())
+              );
+            }
           } else {
-            return this.actions$.pipe(
-              ofType(
-                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success
-              ),
-              map((a) => ApplicationActions.initApplication.finish())
-            );
+            return of(ApplicationActions.initApplication.finish());
           }
         }
 

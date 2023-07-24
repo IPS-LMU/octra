@@ -1,8 +1,9 @@
 import Dexie, { Transaction } from 'dexie';
 import { IAnnotJSON } from '@octra/annotation';
 import { LoginMode } from '../store';
-import { from, map, of, Subject } from 'rxjs';
+import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
 import { ProjectDto } from '@octra/api-types';
+import { removeEmptyProperties } from '@octra/utilities';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -145,12 +146,15 @@ export class OctraDatabase extends Dexie {
 
     this.on('ready', () => {
       this.checkAndFillPopulation()
-        .then(() => {
-          this.onReady.next();
-          this.onReady.complete();
-        })
-        .catch((error) => {
-          this.onReady.error(error);
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.onReady.next();
+            this.onReady.complete();
+          },
+          error: (error) => {
+            this.onReady.error(error);
+          },
         });
     });
   }
@@ -200,53 +204,100 @@ export class OctraDatabase extends Dexie {
     return table;
   }
 
-  private checkAndFillPopulation(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.options.count((count) => {
-        if (count === 0) {
-          Promise.all([
-            this.populateOptions(),
-            this.populateModeOptions(this.demoData),
-            this.populateModeOptions(this.onlineData),
-            this.populateModeOptions(this.localData),
-          ])
-            .then(() => {
-              console.log(`population of options finished!`);
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
+  private checkAndFillPopulation(): Observable<void> {
+    const subj = new Subject<void>();
+
+    this.countEntries(this.options)
+      .pipe(take(1))
+      .subscribe({
+        next: (count) => {
+          if (count === 0) {
+            forkJoin([
+              this.populateOptions(),
+              this.populateModeOptions(LoginMode.DEMO),
+              this.populateModeOptions(LoginMode.ONLINE),
+              this.populateModeOptions(LoginMode.LOCAL),
+            ]).subscribe(() => {
+              subj.next();
+              subj.complete();
             });
-        } else {
-          resolve();
-        }
+          } else {
+            subj.next();
+            subj.complete();
+          }
+        },
       });
-    });
+
+    return subj;
   }
 
-  private populateModeOptions(table: Dexie.Table<IIDBEntry, string>) {
+  private countEntries(
+    table: Dexie.Table<IIDBEntry, string>
+  ): Observable<number> {
+    return from(
+      new Promise<number>((resolve, reject) => {
+        table
+          .count()
+          .then((count) => {
+            resolve(count);
+          })
+          .catch(() => {
+            reject();
+          });
+      })
+    );
+  }
+
+  private populateModeOptions(mode: LoginMode) {
     const modeOptions: IIDBModeOptions = {
-      transcriptID: '-1',
-      feedback: undefined,
-      sessionfile: undefined,
-      currentEditor: 'Dictaphone-Editor',
+      currentEditor: '2D-Editor',
       logging: true,
     };
 
-    return table.add({
-      name: 'options',
-      value: modeOptions,
-    });
+    return this.saveModeData(mode, 'options', modeOptions, true);
   }
 
-  public saveModeData(mode: LoginMode, name: string, value: any) {
+  public saveModeData(
+    mode: LoginMode,
+    name: string,
+    value: any,
+    overwrite = false
+  ) {
     const table = this.getTableFromString(mode);
     if (table) {
-      return from(table.put({ name, value }, name)).pipe(
-        map(() => {
-          return;
-        })
-      );
+      let prepared =
+        typeof value === 'object' && value !== undefined && value !== null
+          ? JSON.parse(JSON.stringify(value))
+          : value;
+      prepared = removeEmptyProperties(prepared, {
+        removeNull: false,
+        removeEmptyStrings: false,
+        removeUndefined: true,
+      });
+      // write undefined or null
+      if (overwrite) {
+        return from(
+          table.put(
+            {
+              name,
+              value: prepared,
+            },
+            name
+          )
+        ).pipe(
+          map(() => {
+            return;
+          })
+        );
+      } else {
+        return from(table.update(name, {
+          value: prepared
+        })).pipe(
+          map(() => {
+            return;
+          })
+        );
+      }
     } else {
       return of();
     }
@@ -290,59 +341,61 @@ export class OctraDatabase extends Dexie {
   }
 
   private populateOptions() {
-    return this.options.bulkPut([
-      {
-        name: 'version',
-        value: 3,
-      },
-      {
-        name: 'easymode',
-        value: false,
-      },
-      {
-        name: 'language',
-        value: undefined,
-      },
-      {
-        name: 'usemode',
-        value: undefined,
-      },
-      {
-        name: 'user',
-        value: undefined,
-      },
-      {
-        name: 'interface',
-        value: undefined,
-      },
-      {
-        name: 'showLoupe',
-        value: false,
-      },
-      {
-        name: 'secondsPerLine',
-        value: 5,
-      },
-      {
-        name: 'audioSettings',
-        value: {
-          volume: 1,
-          speed: 1,
+    return from(
+      this.options.bulkPut([
+        {
+          name: 'version',
+          value: 3,
         },
-      },
-      {
-        name: 'asr',
-        value: undefined,
-      },
-      {
-        name: 'highlightingEnabled',
-        value: false,
-      },
-      {
-        name: 'console',
-        value: [],
-      },
-    ]);
+        {
+          name: 'easymode',
+          value: false,
+        },
+        {
+          name: 'language',
+          value: undefined,
+        },
+        {
+          name: 'usemode',
+          value: undefined,
+        },
+        {
+          name: 'user',
+          value: undefined,
+        },
+        {
+          name: 'interface',
+          value: undefined,
+        },
+        {
+          name: 'showLoupe',
+          value: false,
+        },
+        {
+          name: 'secondsPerLine',
+          value: 5,
+        },
+        {
+          name: 'audioSettings',
+          value: {
+            volume: 1,
+            speed: 1,
+          },
+        },
+        {
+          name: 'asr',
+          value: undefined,
+        },
+        {
+          name: 'highlightingEnabled',
+          value: false,
+        },
+        {
+          name: 'console',
+          value: [],
+        },
+      ])
+    );
   }
 }
 
@@ -360,13 +413,18 @@ export interface IIDBLogs extends IIDBEntry {
 }
 
 export interface IIDBModeOptions {
-  transcriptID?: string;
+  transcriptID?: string | null;
   feedback?: any;
   sessionfile?: any;
-  currentEditor?: string;
-  logging: boolean;
-  project?: ProjectDto;
-  comment?: string;
+  currentEditor?: string | null;
+  logging?: boolean | null;
+  project?: ProjectDto | null;
+  comment?: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
 }
 
 export const DefaultModeOptions: IIDBModeOptions = {

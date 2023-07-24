@@ -54,6 +54,7 @@ export interface AnnotationState extends UndoRedoState {
 }
 
 export interface OnlineSession {
+  loadFromServer?: boolean;
   currentProject?: ProjectDto;
   task?: TaskDto;
   assessment?: any;
@@ -62,6 +63,14 @@ export interface OnlineSession {
 
 export interface OnlineModeState extends AnnotationState {
   onlineSession: OnlineSession;
+  previousSession?: {
+    task: {
+      id: string;
+    },
+    project: {
+      id: string;
+    }
+  }
 }
 
 export interface LocalModeState extends AnnotationState {

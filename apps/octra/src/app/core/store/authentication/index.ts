@@ -10,6 +10,11 @@ export interface AuthenticationState {
   authenticated: boolean;
   type?: AccountLoginMethod;
   me?: AuthDtoMe;
+  previousUser?: {
+    id: string;
+    username: string;
+    email: string;
+  };
   logoutMessage?: string;
   logoutMessageType?: string;
   loginErrorMessage?: string;

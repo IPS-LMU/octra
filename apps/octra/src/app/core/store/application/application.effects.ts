@@ -28,6 +28,9 @@ import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
 import { Params } from '@angular/router';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { AnnotationActions } from '../annotation/annotation.actions';
+import { OctraModalService } from '../../modals/octra-modal.service';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 
 @Injectable({
   providedIn: 'root',
@@ -345,7 +348,12 @@ export class ApplicationEffects {
               AppInfo.queryParamsHandling
             );
           } else {
-            this.routerService.navigate(['/load']);
+            const lastPagePath = this.sessStr.retrieve('last_page_path');
+            if (lastPagePath) {
+              this.routerService.navigate([lastPagePath]);
+            } else {
+              this.routerService.navigate(['/load']);
+            }
           }
         })
       ),
@@ -513,6 +521,23 @@ export class ApplicationEffects {
     { dispatch: false }
   );
 
+  showErrorMessage$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.startAnnotation.fail),
+        tap((a) => {
+          const ref = this.modalService.openModalRef(
+            ErrorModalComponent,
+            ErrorModalComponent.options,
+            {
+              text: a.error,
+            }
+          );
+        })
+      ),
+    { dispatch: false }
+  );
+
   constructor(
     private actions$: Actions,
     private transloco: TranslocoService,
@@ -525,6 +550,7 @@ export class ApplicationEffects {
     private appStorage: AppStorageService,
     private settingsService: SettingsService,
     private routerService: RoutingService,
+    private modalService: OctraModalService,
     private api: OctraAPIService
   ) {}
 

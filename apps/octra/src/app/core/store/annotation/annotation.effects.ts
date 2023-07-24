@@ -15,7 +15,7 @@ import {
   tap,
   timer,
 } from 'rxjs';
-import { getModeState, LoginMode, RootState } from "../index";
+import { getModeState, LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationActions } from './annotation.actions';
@@ -28,7 +28,7 @@ import { withLatestFrom } from 'rxjs/operators';
 import { AppInfo } from '../../../app.info';
 import {
   AnnotationLevelType,
-  AnnotJSONConverter, convertFromSupportedConverters,
+  AnnotJSONConverter,
   IFile,
   ILink,
   ImportResult,
@@ -36,15 +36,15 @@ import {
   OAudiofile,
   OIDBLevel,
   OIDBLink,
-  OLevel
-} from "@octra/annotation";
+  OLevel,
+} from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
   CurrentAccountDto,
   ProjectDto,
   TaskDto,
-  ToolConfigurationAssetDto
-} from "@octra/api-types";
+  ToolConfigurationAssetDto,
+} from '@octra/api-types';
 import { convertFromOIDLevel, GuidelinesItem } from './index';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
@@ -52,7 +52,7 @@ import { AuthenticationActions } from '../authentication';
 import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../application/application.actions';
-import { getTranscriptFromIO } from "@octra/utilities";
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 
 @Injectable()
 export class AnnotationEffects {
@@ -74,14 +74,21 @@ export class AnnotationEffects {
           })
           .pipe(
             map((task) => {
-              return AnnotationActions.prepareTaskDataForAnnotation.do({
-                currentProject: a.project,
-                task,
-                mode: a.mode,
-              });
+              if (task) {
+                return AnnotationActions.prepareTaskDataForAnnotation.do({
+                  currentProject: a.project,
+                  task,
+                  mode: a.mode,
+                });
+              }
+              return AnnotationActions.showNoRemainingTasksModal.do();
             }),
             catchError((error: HttpErrorResponse) => {
-              return of(AnnotationActions.startAnnotation.fail({ error }));
+              return of(
+                AnnotationActions.startAnnotation.fail({
+                  error: error.error?.message ?? error.message,
+                })
+              );
             })
           );
       })
@@ -95,10 +102,7 @@ export class AnnotationEffects {
       map(([{ task, currentProject, mode }, state]) => {
         if (!task.tool_configuration) {
           return AnnotationActions.startAnnotation.fail({
-            error: new HttpErrorResponse({
-              error: new Error('Missing tool configuration'),
-              status: 500,
-            }),
+            error: 'Missing tool configuration',
           });
         }
 
@@ -107,10 +111,7 @@ export class AnnotationEffects {
           task.tool_configuration.assets.length === 0
         ) {
           return AnnotationActions.startAnnotation.fail({
-            error: new HttpErrorResponse({
-              error: new Error('Missing tool configuration assets'),
-              status: 500,
-            }),
+            error: 'Missing tool configuration assets',
           });
         }
 
@@ -305,16 +306,15 @@ export class AnnotationEffects {
               )
               .pipe(
                 map((result) => {
-                  if(a.redirectToProjects) {
+                  if (a.redirectToProjects) {
                     return AnnotationActions.redirectToProjects.do();
                   } else {
                     return AuthenticationActions.logout.do({
                       clearSession: a.clearSession,
                       mode: state.application.mode!,
-                    })
+                    });
                   }
-                  }
-                ),
+                }),
                 catchError((error) => {
                   // ignore
                   return of(
@@ -342,6 +342,22 @@ export class AnnotationEffects {
         }
       })
     )
+  );
+
+  showNoRemainingTasksModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.showNoRemainingTasksModal.do),
+        tap((a) => {
+          const ref = this.modalsService.openModalRef(
+            ErrorModalComponent,
+            ErrorModalComponent.options
+          );
+          (ref.componentInstance as ErrorModalComponent).text =
+            this.transloco.translate('projects-list.no remaining tasks');
+        })
+      ),
+    { dispatch: false }
   );
 
   initTranscriptionService$ = createEffect(
@@ -516,26 +532,59 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do),
       exhaustMap((a) => {
-        return forkJoin<[CurrentAccountDto, ProjectDto, TaskDto]>(
+        return forkJoin<
+          [CurrentAccountDto, ProjectDto | undefined, TaskDto | undefined]
+        >(
           this.apiService.getMyAccountInformation(),
-          this.apiService.getProject(a.projectID),
-          this.apiService.getTask(a.projectID, a.taskID)
+          this.apiService
+            .getProject(a.projectID)
+            .pipe(catchError((a) => of(undefined))),
+          this.apiService
+            .getTask(a.projectID, a.taskID)
+            .pipe(catchError((a) => of(undefined)))
         ).pipe(
           withLatestFrom(this.store),
           map(([[currentAccount, currentProject, task], state]) => {
-            this.store.dispatch(
-              OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success({
-                mode: LoginMode.ONLINE,
-                me: currentAccount,
-                currentProject,
-                task,
-              })
-            );
-            return OnlineModeActions.prepareTaskDataForAnnotation.do({
-              mode: LoginMode.ONLINE,
-              currentProject,
-              task,
-            });
+            if (currentProject && task) {
+              if (!a.actionAfterSuccess) {
+                // normal load after task start or resuming session
+                this.store.dispatch(
+                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                    {
+                      mode: LoginMode.ONLINE,
+                      me: currentAccount,
+                      currentProject,
+                      task,
+                    }
+                  )
+                );
+                return OnlineModeActions.prepareTaskDataForAnnotation.do({
+                  mode: LoginMode.ONLINE,
+                  currentProject,
+                  task,
+                });
+              }
+
+              return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                {
+                  mode: LoginMode.ONLINE,
+                  me: currentAccount,
+                  currentProject,
+                  task,
+                  actionAfterSuccess: a.actionAfterSuccess,
+                }
+              );
+            } else {
+              return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                {
+                  mode: LoginMode.ONLINE,
+                  me: currentAccount,
+                  currentProject,
+                  task,
+                  actionAfterSuccess: a.actionAfterSuccess,
+                }
+              );
+            }
           }),
           catchError((error: HttpErrorResponse) => {
             return of(
@@ -549,6 +598,8 @@ export class AnnotationEffects {
     )
   );
 
+  // TODO add effect if task and project can't not be loaded
+  /*
   onLoadOnlineFailed$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
@@ -564,6 +615,7 @@ export class AnnotationEffects {
       })
     )
   );
+ */
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
@@ -588,9 +640,7 @@ export class AnnotationEffects {
           ) {
             return of(
               AnnotationActions.sendAnnotation.fail({
-                error: new HttpErrorResponse({
-                  error: 'Current project or current task is undefined',
-                }),
+                error: 'Current project or current task is undefined',
               })
             );
           }
@@ -653,7 +703,7 @@ export class AnnotationEffects {
                  */
                 return of(
                   AnnotationActions.sendAnnotation.fail({
-                    error,
+                    error: error.error?.message ?? error.message,
                   })
                 );
               })
@@ -663,9 +713,7 @@ export class AnnotationEffects {
         }
         return of(
           AnnotationActions.sendAnnotation.fail({
-            error: new HttpErrorResponse({
-              error: 'Not implemented',
-            }),
+            error: 'Not implemented',
           })
         );
       })
@@ -704,14 +752,42 @@ export class AnnotationEffects {
   );
 
   redirectToProjects$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(AnnotationActions.redirectToProjects.do),
-        exhaustMap((a) => {
-          this.routingService.navigate(["/intern/projects"], AppInfo.queryParamsHandling);
-          return of(AnnotationActions.redirectToProjects.success());
-        })
-      )
-    );
+    this.actions$.pipe(
+      ofType(AnnotationActions.redirectToProjects.do),
+      exhaustMap((a) => {
+        this.routingService.navigate(
+          ['/intern/projects'],
+          AppInfo.queryParamsHandling
+        );
+        return of(AnnotationActions.redirectToProjects.success());
+      })
+    )
+  );
+
+  resumeTaskManually$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.resumeTaskManually.do),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        const modeState = getModeState(state);
+
+        if (
+          modeState?.onlineSession?.currentProject &&
+          modeState?.onlineSession?.task
+        ) {
+          return of(
+            AnnotationActions.prepareTaskDataForAnnotation.do({
+              mode: state.application.mode!,
+              currentProject: modeState.onlineSession.currentProject,
+              task: modeState.onlineSession.task,
+            })
+          );
+        }
+
+        return of();
+      })
+    )
+  );
 
   /**
    exhaustMap((a) => {

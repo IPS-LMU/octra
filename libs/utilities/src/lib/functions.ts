@@ -375,13 +375,13 @@ export function removeEmptyProperties<T>(
   } else {
     if (typeof obj === 'object') {
       const anyObj = obj as any;
-      const keys = Object.keys(anyObj);
+      const keys = Object.keys(anyObj ?? {});
 
       for (const key of keys) {
         if (
           (options.removeNull && anyObj[key] === null) ||
           (options.removeUndefined && anyObj[key] === undefined) ||
-          anyObj[key].toString() === 'NaN' ||
+          (anyObj[key] !== undefined && anyObj[key] !== null && anyObj[key].toString() === 'NaN') ||
           (options.removeEmptyStrings &&
             typeof anyObj[key] === 'string' &&
             anyObj[key].toString().trim() === '')

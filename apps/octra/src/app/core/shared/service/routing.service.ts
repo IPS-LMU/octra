@@ -46,7 +46,10 @@ export class RoutingService {
         },
         queryParamsHandling,
       });
-      this.sessionStorage.store("last_page_path", commands.join('/'));
+      const joined = commands.join('/');
+      if(joined !== "/load") {
+        this.sessionStorage.store("last_page_path", joined);
+      }
     } catch (e) {
       console.error(e);
     }

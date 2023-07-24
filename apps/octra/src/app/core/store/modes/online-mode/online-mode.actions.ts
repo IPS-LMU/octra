@@ -74,12 +74,15 @@ export class OnlineModeActions extends AnnotationActions {
       do: props<{
         projectID: string;
         taskID: string;
+        mode: LoginMode;
+        actionAfterSuccess?: Action;
       }>(),
       success: props<{
         mode: LoginMode;
         me: CurrentAccountDto;
-        currentProject: ProjectDto;
-        task: TaskDto;
+        currentProject?: ProjectDto;
+        task?: TaskDto;
+        actionAfterSuccess?: Action;
       }>(),
       fail: props<{
         error: HttpErrorResponse;

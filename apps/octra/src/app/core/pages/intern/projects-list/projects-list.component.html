@@ -1,25 +1,37 @@
 <div class="card container">
   <div class="card-body flex h-100">
-    <h1>Projects</h1>
+    <ng-container *ngIf="authStoreService.otherUserLoggedIn$ | async; else sameUser">
+      <div class="alert alert-warning text-center" [innerHTML]="'projects-list.other user logged in' | transloco:{username: (authStoreService.otherUserLoggedIn$ | async)?.username}">
+      </div>
+    </ng-container>
+    <ng-template #sameUser>
+      <div *ngIf="authStoreService.sameUserWithOpenTask$ | async" class="alert alert-warning text-center">
+        <span [innerHTML]="'projects-list.same user free task' | transloco: {
+        project: (authStoreService.sameUserWithOpenTask$ | async)?.currentProject?.name,
+        resumeTranscription: 'projects-list.resume transcription' | transloco
+      }"></span><p><a class="link" (click)="resumeTaskManually()">{{'projects-list.resume transcription' | transloco}}</a></p>
+      </div>
+    </ng-template>
+    <h1>{{"general.projects" | transloco}}</h1>
     <p class="text-center">
-      Please select a project that you want to transcribe and click on "START".
+      {{"projects-list.introduction" | transloco}}
     </p>
     <div class="table-wrapper flex overflow-y-scroll h-100">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
             <th></th>
-            <th>Name</th>
-            <th>Description</th>
-            <th class="text-center">Free Tasks</th>
-            <th class="text-center">Action</th>
+            <th>{{"general.name" | transloco}}</th>
+            <th>{{"general.description" | transloco}}</th>
+            <th class="text-center">{{"general.free tasks" | transloco}}</th>
+            <th class="text-center">{{"general.action" | transloco}}</th>
           </tr>
         </thead>
         <tbody>
           <tr
             *ngFor="let project of projects"
             [ngClass]="{
-              deactivated: project.statistics!.freeTasks < 1
+              deactivated: getFreeAnnotationTasks(project) < 1
             }"
           >
             <td>
@@ -36,15 +48,14 @@
             </td>
             <td>{{ project.name }}</td>
             <td class="description">{{ project.description }}</td>
-            <td class="text-center">{{ project.statistics?.freeTasks }}</td>
+            <td class="text-center">{{ getFreeAnnotationTasks(project) }}</td>
             <td class="text-center">
               <button
                 class="btn btn-primary btn-sm"
                 size="sm"
                 (click)="onProjectClick(project)"
-                [disabled]="project.statistics!.freeTasks < 1"
               >
-                Start
+                {{"general.start" | transloco}}
               </button>
             </td>
           </tr>

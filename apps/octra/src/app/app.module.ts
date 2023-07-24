@@ -104,8 +104,9 @@ import { PagesModule } from './core/pages/pages.module';
       }
     ),
     StoreDevtoolsModule.instrument({
+      trace: true,
       maxAge: 25,
-      logOnly: environment.production,
+      logOnly: !environment.production,
     }),
     EffectsModule.forRoot([
       IDBEffects,

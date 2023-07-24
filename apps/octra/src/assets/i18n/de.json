@@ -100,7 +100,11 @@
     "time": "Zeit",
     "speaker": "Sprecher",
     "actions": "Aktionen",
-    "error": "Fehler"
+    "error": "Fehler",
+    "projects": "Projekte",
+    "free tasks": "Freie Aufgaben",
+    "action": "Aktion",
+    "start": "Start"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -405,5 +409,12 @@
       "remove transcripts of selected lines": "Entferne Transkriptionen ausgewählter Segmente (behalte Segmentgrenzen bei)",
       "remove selected lines completely": "Entferne ausgewählte Segmente vollständig (entferne Transkripte & führe zusammen)"
     }
+  },
+  "projects-list": {
+    "other user logged in": "Es sind Daten von einer Sitzung eines anderen Nutzers vorhanden (<b>{{username}}</b>). Wenn Du eine neue Aufgabe beginnst, werden diese Daten entfernt.",
+    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>",
+    "resume transcription": "Transkription fortsetzen",
+    "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",
+    "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben."
   }
 }

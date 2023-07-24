@@ -26,6 +26,22 @@ export class AuthenticationStoreService {
     (store: RootState) => store.authentication.loginErrorMessage
   );
 
+  otherUserLoggedIn$ = this.store.select(
+    (store: RootState) => {
+      return this.getDifferentUserData(store);
+    }
+  );
+
+  sameUserWithOpenTask$ = this.store.select(
+    (store: RootState) => {
+      const differentUserData = this.getDifferentUserData(store);
+      if(!differentUserData && store.onlineMode.onlineSession.currentProject && store.onlineMode.onlineSession.task) {
+        return store.onlineMode.onlineSession;
+      }
+
+      return undefined;
+    }
+  )
   loginOnline(
     method: AccountLoginMethod,
     username?: string,
@@ -79,5 +95,18 @@ export class AuthenticationStoreService {
     this.store.dispatch(
       AuthenticationActions.needReAuthentication.success({ actionAfterSuccess })
     );
+  }
+
+  getDifferentUserData(store: RootState){
+    const previousUser = store.authentication.previousUser;
+    if(previousUser?.username && previousUser?.email) {
+      if(
+        previousUser.username !== store.authentication.me?.username ||
+        previousUser.email !== store.authentication.me?.email
+      ) {
+        return previousUser;
+      }
+    }
+    return undefined;
   }
 }

@@ -240,7 +240,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   onResize() {
     if (this.stage !== undefined && this.canvasElements?.panel !== undefined && this.canvasElements?.sliderBar !== undefined
-      && this.canvasElements?.playHead !== undefined && this.width !== undefined) {
+      && this.canvasElements?.playHead !== undefined && this.width !== undefined && this.width > 0) {
       this.stage.width(this.width);
       this.stage.height((this._settings.height + this._settings.border.width));
 

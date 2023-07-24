@@ -101,7 +101,11 @@
     "speaker": "Speaker",
     "switch to": "Switch to {{editor}}",
     "actions": "Actions",
-    "error": "Error"
+    "error": "Error",
+    "projects": "Projects",
+    "free tasks": "Free Tasks",
+    "action": "Action",
+    "start": "Start"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -405,5 +409,12 @@
       "remove transcripts of selected lines": "Remove transcripts of selected segments (keep boundaries)",
       "remove selected lines completely": "Remove selected segments completely (remove transcript & merge)"
     }
+  },
+  "projects-list": {
+    "other user logged in": "There is some data locally saved by another user (<b>{{username}}</b>) from a previous session. If you start a new task the data from that previous session is going to be removed.",
+    "same user free task": "There are remaining date from a previous unfinished session (project: {{project}}). Click on \"{{resumeTranscription}}\" in order to resume the previous transcription or start a new task. <b>Starting a new task removes data from that previous session</b>",
+    "resume transcription": "Continue transcription",
+    "introduction": "Please select a project that you want to transcribe and click on \"START\".",
+    "no remaining tasks": "This project does not have any free tasks."
   }
 }

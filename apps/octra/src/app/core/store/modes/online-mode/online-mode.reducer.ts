@@ -36,21 +36,10 @@ export class OnlineModeReducers {
     return createUndoRedoReducer(
       initialState,
       ...(new AnnotationStateReducers(this.mode).create() as any),
-      on(
-        AuthenticationActions.login.success,
-        (state: OnlineModeState, { auth, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              onlineSession: {
-                ...state.onlineSession,
-                me: auth.me,
-              },
-            };
-          }
-          return state;
-        }
-      ),
+      // TODO !!!
+      // falls letzter user = current user, lade Projekt & Aufgabendaten in projects list
+      // prüfe, ob Task busy, falls ja, zeige Warnmeldung an mit Fortsetzen Funktion
+      // falls letzter user != gleicher user, dann ignoriere letzte Aufgabe.
       on(
         OnlineModeActions.loginDemo,
         (state: OnlineModeState, { onlineSession, mode }) => {
@@ -188,9 +177,39 @@ export class OnlineModeReducers {
                 ...state.onlineSession,
                 currentProject,
                 task,
-                comment: state.onlineSession.comment ?? task.comment ?? ''
+                comment: state.onlineSession.comment ?? task?.comment ?? ''
               },
-              logging: (task.tool_configuration!.value as ProjectSettings).logging.forced ?? false
+              logging: (task?.tool_configuration?.value as ProjectSettings)?.logging?.forced ?? false
+            };
+          }
+          return state;
+        }
+      ),
+      on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do,
+        (state: OnlineModeState, {mode}) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              onlineSession: {
+                ...state.onlineSession,
+                loadFromServer: true
+              }
+            };
+          }
+          return state;
+        }
+      ),
+      on(OnlineModeActions.startAnnotation.do,
+        (state: OnlineModeState, {mode}) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              transcript: {
+                levels: [],
+                links: [],
+                levelCounter: 1
+              },
+              onlineSession: {}
             };
           }
           return state;
@@ -215,12 +234,24 @@ export class OnlineModeReducers {
               projectConfig: projectSettings,
               onlineSession: {
                 ...state.onlineSession,
+                loadFromServer: true,
                 currentProject: {
                   ...project,
-                  statistics: {
+                  statistics: project.statistics ? {
                     ...project.statistics,
-                    freeTasks: project.statistics?.freeTasks! - 1,
-                  },
+                    tasks: project.statistics?.tasks.map((a)=> {
+                      if(a.type === "annotation") {
+                        return {
+                          ...a,
+                          status: {
+                            ...a.status,
+                            free: a.status.free - 1
+                          }
+                        }
+                      }
+                      return a;
+                    }) ?? []
+                  } : undefined,
                 },
                 task,
               },
@@ -242,22 +273,37 @@ export class OnlineModeReducers {
     attribute: string,
     value: any
   ): OnlineModeState {
-    const onlineSessionData: {
-      comment?: string;
-    } = {};
-
     switch (attribute) {
       case 'comment':
-        onlineSessionData.comment = value;
+        state.onlineSession = {
+          ...state.onlineSession,
+          comment: value
+        };
       break;
+      case 'project':
+        state = {
+          ...state,
+          previousSession: {
+            ...state.previousSession,
+            project: {
+              id: value.id as string
+            }
+          } as any
+        };
+        break;
+      case 'transcriptID':
+        state = {
+          ...state,
+          previousSession: {
+            ...state.previousSession,
+            task: {
+              id: value
+            }
+          } as any
+        };
+        break;
     }
 
-    return {
-      ...state,
-      onlineSession: {
-        ...state.onlineSession,
-        ...onlineSessionData
-      }
-    };
+    return state
   }
 }

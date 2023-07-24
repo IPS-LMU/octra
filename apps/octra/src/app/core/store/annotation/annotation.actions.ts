@@ -3,9 +3,12 @@ import { LoginMode } from '../index';
 import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
-import { HttpErrorResponse } from '@angular/common/http';
-import { AnnotationStateLevel, GuidelinesItem, TranscriptionState } from "./index";
-import { ProjectSettings } from "../../obj";
+import {
+  AnnotationStateLevel,
+  GuidelinesItem,
+  TranscriptionState,
+} from './index';
+import { ProjectSettings } from '../../obj';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -29,13 +32,20 @@ export class AnnotationActions {
     },
   });
 
+  static showNoRemainingTasksModal = createActionGroup({
+    source: 'annotation/modal show no remaining tasks',
+    events: {
+      do: emptyProps(),
+    },
+  });
+
   static prepareTaskDataForAnnotation = createActionGroup({
     source: `annotation/ prepare task data for annotation`,
     events: {
       do: props<{
-        mode: LoginMode,
-        currentProject: ProjectDto,
-        task: TaskDto
+        mode: LoginMode;
+        currentProject: ProjectDto;
+        task: TaskDto;
       }>(),
       success: emptyProps(),
       fail: emptyProps(),
@@ -242,7 +252,7 @@ export class AnnotationActions {
   });
 
   static startAnnotation = createActionGroup({
-    source: `annotation/ start`,
+    source: `annotation/start`,
     events: {
       do: props<{
         project: ProjectDto;
@@ -251,13 +261,13 @@ export class AnnotationActions {
       success: props<{
         project: ProjectDto;
         task: TaskDto;
-        projectSettings: ProjectSettings,
-        guidelines: GuidelinesItem[],
-        selectedGuidelines?: GuidelinesItem,
+        projectSettings: ProjectSettings;
+        guidelines: GuidelinesItem[];
+        selectedGuidelines?: GuidelinesItem;
         mode: LoginMode;
       }>(),
       fail: props<{
-        error: HttpErrorResponse;
+        error: string;
       }>(),
     },
   });
@@ -267,14 +277,14 @@ export class AnnotationActions {
     events: {
       do: emptyProps(),
       start: props<{
-        mode: LoginMode
+        mode: LoginMode;
       }>(),
       success: props<{
         task: TaskDto;
         mode: LoginMode;
       }>(),
       fail: props<{
-        error: HttpErrorResponse;
+        error: string;
       }>(),
     },
   });
@@ -283,7 +293,14 @@ export class AnnotationActions {
     source: `annotation/redirect to projects`,
     events: {
       do: emptyProps(),
-      success: emptyProps()
+      success: emptyProps(),
+    },
+  });
+
+  static resumeTaskManually = createActionGroup({
+    source: 'annotation/resume task manually',
+    events: {
+      do: emptyProps(),
     },
   });
 }

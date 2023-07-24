@@ -14,6 +14,7 @@ import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { withLatestFrom } from 'rxjs/operators';
+import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -175,8 +176,36 @@ export class AuthenticationEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthenticationActions.login.success),
-        tap((a) => {
-          this.routingService.navigate(['/intern/projects']);
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          if (state.authentication.me && state.authentication.previousUser) {
+            if (
+              state.authentication.me.id ===
+              state.authentication.previousUser.id
+            ) {
+              if (state.application.mode === LoginMode.ONLINE) {
+                if (
+                  state.onlineMode.previousSession?.project.id &&
+                  state.onlineMode.previousSession?.task.id
+                ) {
+                  // load online data after login
+                  this.store.dispatch(
+                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                      projectID: state.onlineMode.previousSession.project.id,
+                      taskID: state.onlineMode.previousSession.task.id,
+                      mode: LoginMode.ONLINE,
+                      actionAfterSuccess:
+                        AuthenticationActions.redirectToProjects.do(),
+                    })
+                  );
+                }
+              }
+            } else {
+              this.store.dispatch(AuthenticationActions.redirectToProjects.do());
+            }
+          } else {
+            this.store.dispatch(AuthenticationActions.redirectToProjects.do());
+          }
 
           // TODO api
           // 1. Save loginData to store and IDB
@@ -189,6 +218,29 @@ export class AuthenticationEffects {
           // 9. Check logout/login
           // 10. Add person icon to navbar with menu for signout, etc.
           // 11. Add information about project to the navbar.
+        })
+      ),
+    { dispatch: false }
+  );
+
+  afterIDLoadedSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success),
+      exhaustMap((a) => {
+        if (a.actionAfterSuccess) {
+          return of(a.actionAfterSuccess);
+        }
+        return of();
+      })
+    )
+  );
+
+  redirectToProjects$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.redirectToProjects.do),
+        tap((a) => {
+          this.routingService.navigate(['/intern/projects']);
         })
       ),
     { dispatch: false }

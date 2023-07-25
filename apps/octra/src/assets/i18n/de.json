@@ -106,6 +106,9 @@
     "action": "Aktion",
     "start": "Start"
   },
+  "p": {
+    "back to projects": "Zurück zu den Projekten"
+  },
   "bug report": {
     "give feedback": "Feedback geben",
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",

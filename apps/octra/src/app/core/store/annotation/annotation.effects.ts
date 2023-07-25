@@ -81,6 +81,12 @@ export class AnnotationEffects {
                   mode: a.mode,
                 });
               }
+
+              if (!task && a.actionAfterFail) {
+                this.store.dispatch(ApplicationActions.waitForEffects.do());
+                // no remaining task
+                return a.actionAfterFail;
+              }
               return AnnotationActions.showNoRemainingTasksModal.do();
             }),
             catchError((error: HttpErrorResponse) => {
@@ -281,6 +287,21 @@ export class AnnotationEffects {
                 console.error(error);
               });
           }
+        })
+      ),
+    { dispatch: false }
+  );
+
+  onTranscriptionEnd$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(OnlineModeActions.endTranscription.do),
+        tap((a) => {
+          this.routingService.navigate(
+            ['/intern/transcr/end'],
+            AppInfo.queryParamsHandling
+          );
+          this.transcrService.endTranscription(true);
         })
       ),
     { dispatch: false }
@@ -735,6 +756,10 @@ export class AnnotationEffects {
             actionAfterSuccess: AnnotationActions.startAnnotation.do({
               mode: a.mode,
               project: state.onlineMode.onlineSession.currentProject!,
+              actionAfterFail: OnlineModeActions.endTranscription.do({
+                clearSession: true,
+                mode: LoginMode.ONLINE,
+              }),
             }),
           })
         );

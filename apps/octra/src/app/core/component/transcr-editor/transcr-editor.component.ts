@@ -55,7 +55,6 @@ declare let document: any;
   templateUrl: './transcr-editor.component.html',
   styleUrls: ['./transcr-editor.component.scss'],
   providers: [TranscrEditorConfig],
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranscrEditorComponent
@@ -752,7 +751,7 @@ export class TranscrEditorComponent
       getContent: (a, b, c) => {
         const button = document.createElement('span');
         button.style.display = "flex";
-        button.setAttribute("class", "me-2 align-items-center px-1");
+        button.setAttribute("class", "me-2 align-items-center px-1 h-100");
         button.innerHTML = getContent();
         button.addEventListener('click', (event: MouseEvent) => {
           onClick(event, button);
@@ -817,12 +816,12 @@ export class TranscrEditorComponent
         } else {
           if (!this.easymode) {
             content =
-              `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
+              `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
               `<span class="btn-description"> ${marker.button_text}</span><span class="btn-shortcut"> ` +
               `[${marker.shortcut[platform]}]</span>`;
             if (this.Settings.responsive) {
               content =
-                `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>` +
+                `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
                 `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
                 `</span><span class="btn-shortcut d-none d-lg-inline"> [${marker.shortcut[platform]}]</span>`;
             }
@@ -931,9 +930,9 @@ export class TranscrEditorComponent
 
       content = this.highlightingEnabled
         ? `<img src="assets/img/components/transcr-editor/highlightingEnabled.jpg"
-         class="btn-icon highlight-button" style="height:15px;"/>`
+         class="btn-icon highlight-button me-1" style="height:15px;"/>`
         : `<img src="assets/img/components/transcr-editor/highlightingDisbled.jpg"
-         class="btn-icon highlight-button" style="height:15px;"/>`;
+         class="btn-icon highlight-button me-1" style="height:15px;"/>`;
       return content;
     };
     return this.createButton(
@@ -1347,12 +1346,12 @@ export class TranscrEditorComponent
         );
         if (!this.easymode) {
           content =
-            `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
+            `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
             `<span class="btn-description">${boundaryLabel}</span><span class="btn-shortcut"> ` +
             `[ALT + S]</span>`;
           if (this.Settings.responsive) {
             content =
-              `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/> ` +
+              `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
               `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
               `<span class="btn-shortcut d-none d-lg-inline"> ` +
               `[ALT + S]</span>`;
@@ -1633,13 +1632,15 @@ export class TranscrEditorComponent
       focusonly: true,
     });
 
-    for (const marker of this.markers) {
-      this.shortcuts.items.push({
-        name: marker.name,
-        keys: marker.shortcut,
-        focusonly: true,
-        title: marker.button_text,
-      });
+    if(this.markers) {
+      for (const marker of this.markers) {
+        this.shortcuts.items.push({
+          name: marker.name,
+          keys: marker.shortcut,
+          focusonly: true,
+          title: marker.button_text,
+        });
+      }
     }
   }
 

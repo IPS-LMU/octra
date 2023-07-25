@@ -1,4 +1,4 @@
-import { createActionGroup, emptyProps, props } from '@ngrx/store';
+import { Action, createActionGroup, emptyProps, props } from "@ngrx/store";
 import { LoginMode } from '../index';
 import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
@@ -257,6 +257,7 @@ export class AnnotationActions {
       do: props<{
         project: ProjectDto;
         mode: LoginMode;
+        actionAfterFail?: Action;
       }>(),
       success: props<{
         project: ProjectDto;
@@ -269,6 +270,7 @@ export class AnnotationActions {
       fail: props<{
         error: string;
       }>(),
+      noTasks: emptyProps()
     },
   });
 

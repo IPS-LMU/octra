@@ -79,6 +79,7 @@ export class OnlineModeReducers {
       ),
       on(
         AuthenticationActions.logout.success,
+        OnlineModeActions.endTranscription.do,
         (state: OnlineModeState, { clearSession, mode }) => {
           if (mode === this.mode) {
             return clearSession

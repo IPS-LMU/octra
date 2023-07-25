@@ -9,11 +9,12 @@ import {
   DefaultModeOptions,
   IIDBModeOptions,
 } from '../../../shared/octra-database';
-import { getProperties, hasProperty } from '@octra/utilities';
+import { getProperties } from '@octra/utilities';
 import { AuthenticationActions } from '../../authentication';
 import { OnlineModeState } from '../../annotation';
 import { LoginMode } from '../../index';
-import { ProjectSettings } from "../../../obj";
+import { ProjectSettings } from '../../../obj';
+import { ApplicationActions } from '../../application/application.actions';
 
 export const initialState: OnlineModeState = {
   ...fromAnnotation.initialState,
@@ -37,21 +38,7 @@ export class OnlineModeReducers {
       initialState,
       ...(new AnnotationStateReducers(this.mode).create() as any),
       // TODO !!!
-      // falls letzter user = current user, lade Projekt & Aufgabendaten in projects list
       // prüfe, ob Task busy, falls ja, zeige Warnmeldung an mit Fortsetzen Funktion
-      // falls letzter user != gleicher user, dann ignoriere letzte Aufgabe.
-      on(
-        OnlineModeActions.loginDemo,
-        (state: OnlineModeState, { onlineSession, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              onlineSession,
-            };
-          }
-          return state;
-        }
-      ),
       on(
         OnlineModeActions.clearWholeSession.success,
         (state: OnlineModeState, { mode }) => {
@@ -70,8 +57,8 @@ export class OnlineModeReducers {
             return {
               ...initialState,
               onlineSession: {
-                currentProject: state.onlineSession.currentProject
-              }
+                currentProject: state.onlineSession.currentProject,
+              },
             };
           }
           return state;
@@ -111,7 +98,7 @@ export class OnlineModeReducers {
             return {
               ...state,
               onlineSession: {
-                ...state.onlineSession
+                ...state.onlineSession,
               },
             };
           }
@@ -126,7 +113,7 @@ export class OnlineModeReducers {
               ...state,
               onlineSession: {
                 ...state.onlineSession,
-                assessment: feedback
+                assessment: feedback,
               },
             };
           }
@@ -141,8 +128,8 @@ export class OnlineModeReducers {
               ...state,
               onlineSession: {
                 ...state.onlineSession,
-                comment
-              }
+                comment,
+              },
             };
           }
           return state;
@@ -169,7 +156,8 @@ export class OnlineModeReducers {
           return result;
         }
       ),
-      on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
+      on(
+        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
         (state: OnlineModeState, { currentProject, task, mode }) => {
           if (this.mode === mode) {
             return {
@@ -178,39 +166,43 @@ export class OnlineModeReducers {
                 ...state.onlineSession,
                 currentProject,
                 task,
-                comment: state.onlineSession.comment ?? task?.comment ?? ''
+                comment: state.onlineSession.comment ?? task?.comment ?? '',
               },
-              logging: (task?.tool_configuration?.value as ProjectSettings)?.logging?.forced ?? false
+              logging:
+                (task?.tool_configuration?.value as ProjectSettings)?.logging
+                  ?.forced ?? false,
             };
           }
           return state;
         }
       ),
-      on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do,
-        (state: OnlineModeState, {mode}) => {
+      on(
+        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do,
+        (state: OnlineModeState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               onlineSession: {
                 ...state.onlineSession,
-                loadFromServer: true
-              }
+                loadFromServer: true,
+              },
             };
           }
           return state;
         }
       ),
-      on(OnlineModeActions.startAnnotation.do,
-        (state: OnlineModeState, {mode}) => {
+      on(
+        OnlineModeActions.startAnnotation.do,
+        (state: OnlineModeState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
               transcript: {
                 levels: [],
                 links: [],
-                levelCounter: 1
+                levelCounter: 1,
               },
-              onlineSession: {}
+              onlineSession: {},
             };
           }
           return state;
@@ -229,7 +221,7 @@ export class OnlineModeReducers {
             selectedGuidelines,
           }
         ) => {
-          if (mode === LoginMode.ONLINE) {
+          if (mode === LoginMode.ONLINE || mode === LoginMode.DEMO) {
             return {
               ...state,
               projectConfig: projectSettings,
@@ -238,21 +230,24 @@ export class OnlineModeReducers {
                 loadFromServer: true,
                 currentProject: {
                   ...project,
-                  statistics: project.statistics ? {
-                    ...project.statistics,
-                    tasks: project.statistics?.tasks.map((a)=> {
-                      if(a.type === "annotation") {
-                        return {
-                          ...a,
-                          status: {
-                            ...a.status,
-                            free: a.status.free - 1
-                          }
-                        }
+                  statistics: project.statistics
+                    ? {
+                        ...project.statistics,
+                        tasks:
+                          project.statistics?.tasks.map((a) => {
+                            if (a.type === 'annotation') {
+                              return {
+                                ...a,
+                                status: {
+                                  ...a.status,
+                                  free: a.status.free - 1,
+                                },
+                              };
+                            }
+                            return a;
+                          }) ?? [],
                       }
-                      return a;
-                    }) ?? []
-                  } : undefined,
+                    : undefined,
                 },
                 task,
               },
@@ -261,6 +256,24 @@ export class OnlineModeReducers {
                 list: guidelines,
               },
               changedTask: task,
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        ApplicationActions.setAppLanguage,
+        (state: OnlineModeState, { language }) => {
+          const guideline = state.guidelines?.list.find(
+            (a) => a.filename === `guidelines_${language}.json`
+          );
+          if (state.guidelines && guideline) {
+            return {
+              ...state,
+              guidelines: {
+                ...state.guidelines,
+                selected: guideline,
+              },
             };
           }
           return state;
@@ -278,18 +291,18 @@ export class OnlineModeReducers {
       case 'comment':
         state.onlineSession = {
           ...state.onlineSession,
-          comment: value
+          comment: value,
         };
-      break;
+        break;
       case 'project':
         state = {
           ...state,
           previousSession: {
             ...state.previousSession,
             project: {
-              id: value.id as string
-            }
-          } as any
+              id: value.id as string,
+            },
+          } as any,
         };
         break;
       case 'transcriptID':
@@ -298,13 +311,13 @@ export class OnlineModeReducers {
           previousSession: {
             ...state.previousSession,
             task: {
-              id: value
-            }
-          } as any
+              id: value,
+            },
+          } as any,
         };
         break;
     }
 
-    return state
+    return state;
   }
 }

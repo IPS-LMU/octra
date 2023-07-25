@@ -20,6 +20,7 @@ import {
 import { SampleUnit } from '@octra/media';
 
 export interface GuidelinesItem {
+  filename: string;
   name: string;
   json: any;
   type?: string;

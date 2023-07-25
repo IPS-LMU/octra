@@ -10,6 +10,8 @@ import { LoginMode, RootState } from '../index';
 export class AuthenticationStoreService {
   constructor(private store: Store<RootState>) {}
 
+  me$ = this.store.select((store: RootState)=> store.authentication.me);
+
   authenticated$ = this.store.select(
     (store: RootState) => store.authentication.authenticated
   );
@@ -26,22 +28,22 @@ export class AuthenticationStoreService {
     (store: RootState) => store.authentication.loginErrorMessage
   );
 
-  otherUserLoggedIn$ = this.store.select(
-    (store: RootState) => {
-      return this.getDifferentUserData(store);
-    }
-  );
+  otherUserLoggedIn$ = this.store.select((store: RootState) => {
+    return this.getDifferentUserData(store);
+  });
 
-  sameUserWithOpenTask$ = this.store.select(
-    (store: RootState) => {
-      const differentUserData = this.getDifferentUserData(store);
-      if(!differentUserData && store.onlineMode.onlineSession.currentProject && store.onlineMode.onlineSession.task) {
-        return store.onlineMode.onlineSession;
-      }
-
-      return undefined;
+  sameUserWithOpenTask$ = this.store.select((store: RootState) => {
+    const differentUserData = this.getDifferentUserData(store);
+    if (
+      !differentUserData &&
+      store.onlineMode.onlineSession.currentProject &&
+      store.onlineMode.onlineSession.task
+    ) {
+      return store.onlineMode.onlineSession;
     }
-  )
+
+    return undefined;
+  });
   loginOnline(
     method: AccountLoginMethod,
     username?: string,
@@ -53,6 +55,14 @@ export class AuthenticationStoreService {
         username,
         password,
         mode: LoginMode.ONLINE,
+      })
+    );
+  }
+
+  loginDemo() {
+    this.store.dispatch(
+      AuthenticationActions.loginDemo.do({
+        mode: LoginMode.DEMO,
       })
     );
   }
@@ -97,10 +107,10 @@ export class AuthenticationStoreService {
     );
   }
 
-  getDifferentUserData(store: RootState){
+  getDifferentUserData(store: RootState) {
     const previousUser = store.authentication.previousUser;
-    if(previousUser?.username && previousUser?.email) {
-      if(
+    if (previousUser?.username && previousUser?.email) {
+      if (
         previousUser.username !== store.authentication.me?.username ||
         previousUser.email !== store.authentication.me?.email
       ) {

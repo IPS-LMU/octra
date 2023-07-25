@@ -30,6 +30,7 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AccountLoginMethod } from '../../../../../../../../octra-backend/dist/libs/api-types';
+import { AnnotationStoreService } from "../../store/annotation/annotation.store.service";
 
 @Component({
   selector: 'octra-login',
@@ -99,7 +100,8 @@ export class LoginComponent
     public modService: OctraModalService,
     private langService: TranslocoService,
     private audioService: AudioService,
-    private authStoreService: AuthenticationStoreService
+    private authStoreService: AuthenticationStoreService,
+    private annotationStoreService: AnnotationStoreService
   ) {
     super();
     console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
@@ -408,6 +410,7 @@ export class LoginComponent
   }
 
   public startDemo() {
+    /*
     const audioExample = this.settingsService.getAudioExample(
       this.langService.getActiveLang()
     );
@@ -421,6 +424,8 @@ export class LoginComponent
       );
       this.navigate();
     }
+     */
+    this.authStoreService.loginDemo();
   }
 
   public isPasswordCorrect() {

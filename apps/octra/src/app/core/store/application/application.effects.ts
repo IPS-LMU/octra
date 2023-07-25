@@ -327,7 +327,7 @@ export class ApplicationEffects {
               followPlayCursor:
                 this.sessStr.retrieve('followplaycursor') ?? false,
               loggedIn:
-                a.authenticated ?? this.sessStr.retrieve('logedIn') ?? false,
+                a.authenticated ?? this.sessStr.retrieve('loggedIn') ?? false,
               reloaded: this.sessStr.retrieve('reloaded') ?? false,
             })
           );

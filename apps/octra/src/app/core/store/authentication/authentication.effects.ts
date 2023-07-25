@@ -128,6 +128,18 @@ export class AuthenticationEffects {
     )
   );
 
+  onLoginDemo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthenticationActions.loginDemo.do),
+      exhaustMap((a) =>
+        of(
+          AuthenticationActions.loginDemo.success({
+            mode: LoginMode.DEMO,
+          })
+        )
+      )
+    )
+  );
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.do),
@@ -175,49 +187,54 @@ export class AuthenticationEffects {
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthenticationActions.login.success),
+        ofType(
+          AuthenticationActions.login.success,
+          AuthenticationActions.loginDemo.success
+        ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          if (state.authentication.me && state.authentication.previousUser) {
-            if (
-              state.authentication.me.id ===
-              state.authentication.previousUser.id
-            ) {
-              if (state.application.mode === LoginMode.ONLINE) {
-                if (
-                  state.onlineMode.previousSession?.project.id &&
-                  state.onlineMode.previousSession?.task.id
-                ) {
-                  // load online data after login
-                  this.store.dispatch(
-                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
-                      projectID: state.onlineMode.previousSession.project.id,
-                      taskID: state.onlineMode.previousSession.task.id,
-                      mode: LoginMode.ONLINE,
-                      actionAfterSuccess:
-                        AuthenticationActions.redirectToProjects.do(),
-                    })
-                  );
+          if (a.mode === LoginMode.ONLINE) {
+            if (state.authentication.me && state.authentication.previousUser) {
+              if (
+                state.authentication.me.id ===
+                state.authentication.previousUser.id
+              ) {
+                if (state.application.mode === LoginMode.ONLINE) {
+                  if (
+                    state.onlineMode.previousSession?.project.id &&
+                    state.onlineMode.previousSession?.task.id
+                  ) {
+                    // load online data after login
+                    this.store.dispatch(
+                      OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                        projectID: state.onlineMode.previousSession.project.id,
+                        taskID: state.onlineMode.previousSession.task.id,
+                        mode: a.mode,
+                        actionAfterSuccess:
+                          AuthenticationActions.redirectToProjects.do(),
+                      })
+                    );
+                  }
                 }
+              } else {
+                this.store.dispatch(
+                  AuthenticationActions.redirectToProjects.do()
+                );
               }
             } else {
-              this.store.dispatch(AuthenticationActions.redirectToProjects.do());
+              this.store.dispatch(
+                AuthenticationActions.redirectToProjects.do()
+              );
             }
-          } else {
-            this.store.dispatch(AuthenticationActions.redirectToProjects.do());
+          } else if (a.mode === LoginMode.DEMO) {
+            this.store.dispatch(
+              OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                projectID: '7234892',
+                taskID: '73482',
+                mode: a.mode,
+              })
+            );
           }
-
-          // TODO api
-          // 1. Save loginData to store and IDB
-          // 2. Create Actions and Reducers for startOnlineAnnotation
-          // 4. After project selected, dispatch startOnlineAnnotation with retrieved transcript, save data to store and IDB
-          // 5. Redirect to transcr section
-          // 6. Make sure that all data persists, even after reload
-          // 7. Send transcription to server and retrieve next one (it's AnnotJSON). Make sure it's saved.
-          // 8. Load new transcript and redirect to transcr
-          // 9. Check logout/login
-          // 10. Add person icon to navbar with menu for signout, etc.
-          // 11. Add information about project to the navbar.
         })
       ),
     { dispatch: false }

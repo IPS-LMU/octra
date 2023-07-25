@@ -132,19 +132,31 @@ export class IDBEffects {
           this.idbService.loadLogs(LoginMode.DEMO),
         ]).pipe(
           map(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
-            if (
-              state.application.loggedIn &&
-              action.onlineOptions.project &&
-              action.onlineOptions.transcriptID
-            ) {
-              this.store.dispatch(
-                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
-                  projectID: action.onlineOptions.project.id,
-                  taskID: action.onlineOptions.transcriptID,
-                  mode: LoginMode.ONLINE,
-                })
-              );
+            if (state.application.loggedIn) {
+              if (state.application.mode === LoginMode.ONLINE) {
+                if (
+                  action.onlineOptions.project &&
+                  action.onlineOptions.transcriptID
+                ) {
+                  this.store.dispatch(
+                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                      projectID: action.onlineOptions.project.id,
+                      taskID: action.onlineOptions.transcriptID,
+                      mode: LoginMode.ONLINE,
+                    })
+                  );
+                }
+              } else if (state.application.mode === LoginMode.DEMO) {
+                this.store.dispatch(
+                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                    projectID: action.demoOptions?.project?.id ?? '1234',
+                    taskID: action.demoOptions?.transcriptID ?? '38295',
+                    mode: LoginMode.DEMO,
+                  })
+                );
+              }
             }
+
             return IDBActions.loadLogs.success({
               online: onlineModeLogs,
               demo: localModeLogs,
@@ -466,7 +478,7 @@ export class IDBEffects {
         AnnotationActions.setLogging.do,
         LocalModeActions.login,
         AnnotationActions.setCurrentEditor.do,
-        OnlineModeActions.loginDemo,
+        AuthenticationActions.loginDemo.success,
         OnlineModeActions.startAnnotation.do,
         LocalModeActions.login
       ),
@@ -663,7 +675,7 @@ export class IDBEffects {
 
   saveLoginDemo$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.loginDemo),
+      ofType(AuthenticationActions.loginDemo.success),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 
@@ -684,7 +696,10 @@ export class IDBEffects {
   saveLoggedIn$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthenticationActions.login.success),
+        ofType(
+          AuthenticationActions.login.success,
+          AuthenticationActions.loginDemo.success
+        ),
         tap((a) => {
           this.sessStr.store('loggedIn', true);
         })
@@ -697,8 +712,9 @@ export class IDBEffects {
       this.actions$.pipe(
         ofType(
           LocalModeActions.login,
-          OnlineModeActions.loginDemo,
-          AuthenticationActions.login.success
+          AuthenticationActions.loginDemo.success,
+          AuthenticationActions.login.success,
+          AuthenticationActions.loginDemo.success
         ),
         tap(async (action) => {
           this.sessStr.store('loggedIn', true);

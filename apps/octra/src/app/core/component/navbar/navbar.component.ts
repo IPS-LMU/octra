@@ -6,7 +6,6 @@ import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
-import { navigateTo } from '@octra/ngx-utilities';
 import {
   SettingsService,
   TranscriptionService,
@@ -33,7 +32,8 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
-import { AccountRole, ProjectDto } from "@octra/api-types";
+import { AccountRole, ProjectDto } from '@octra/api-types';
+import { AuthenticationStoreService } from "../../store/authentication";
 
 @Component({
   selector: 'octra-navigation',
@@ -59,8 +59,11 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     return AppInfo.converters;
   }
 
-  public get isAdministrator(){
-    return this.appStorage.snapshot.authentication.me?.systemRole.label === AccountRole.administrator;
+  public get isAdministrator() {
+    return (
+      this.appStorage.snapshot.authentication.me?.systemRole.label ===
+      AccountRole.administrator
+    );
   }
 
   public get AppInfo(): any {
@@ -110,6 +113,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public settService: SettingsService,
     public bugService: BugReportService,
     public annotationStoreService: AnnotationStoreService,
+    public authStoreService: AuthenticationStoreService,
     private router: Router
   ) {
     super();
@@ -333,7 +337,9 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   getFreeAnnotationTasks(project: ProjectDto | undefined) {
-    return project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
-      .free ?? 0
+    return (
+      project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
+        .free ?? 0
+    );
   }
 }

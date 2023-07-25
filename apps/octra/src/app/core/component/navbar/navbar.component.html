@@ -519,7 +519,7 @@
                 </td>
               </tr>
             </table>
-            <ng-container *ngIf="appStorage.interface === '2D-Editor'">
+            <ng-container *ngIf="appStorage?.interface === '2D-Editor'">
               <hr style="border: 1px solid lightgray" />
               <br />
               <label style="font-size: 1.2em"
@@ -618,11 +618,11 @@
           >
             <a class="dropdown-item">
               <i class="bi bi-person-circle"></i>
-              Account
+              {{(authStoreService.me$ | async)?.username}}
             </a>
-            <a class="dropdown-item" (click)="backToProjectsList()">
+            <a *ngIf="appStorage.useMode === 'online'" class="dropdown-item" (click)="backToProjectsList()">
               <i class="bi bi-arrow-left"></i>
-              Back to the list of projects
+              {{"p.back to projects" | transloco}}
             </a>
             <a class="dropdown-item" (click)="logout()">
               <i class="bi bi-door-open-fill"></i>

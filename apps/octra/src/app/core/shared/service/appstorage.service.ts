@@ -359,14 +359,14 @@ export class AppStorageService {
     return this._snapshot.application.loggedIn;
   }
 
-  get interface(): string {
-    return getModeState(this._snapshot)!.currentEditor!;
+  get interface(): string | undefined {
+    return getModeState(this._snapshot)?.currentEditor;
   }
 
-  set interface(newInterface: string) {
+  set interface(newInterface: string | undefined) {
     this.store.dispatch(
       AnnotationActions.setCurrentEditor.do({
-        currentEditor: newInterface,
+        currentEditor: newInterface!,
         mode: this.useMode,
       })
     );
@@ -461,34 +461,6 @@ export class AppStorageService {
         sessionFile,
         removeData: false,
         mode: LoginMode.LOCAL,
-      })
-    );
-  }
-
-  setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
-    if (this.easymode === undefined) {
-      this.easymode = false;
-    }
-
-    if (this.interface === undefined) {
-      this.interface = '2D-Editor';
-    }
-
-    this.store.dispatch(
-      OnlineModeActions.loginDemo({
-        mode: LoginMode.DEMO,
-        onlineSession: {
-          currentProject: {
-            id: '234267',
-            name: 'DemoProject',
-            description: 'This is a demo project.',
-            creationdate: new Date().toISOString(),
-            updatedate: new Date().toISOString(),
-            active: true,
-            visibility: 'public',
-            roles: [],
-          },
-        },
       })
     );
   }

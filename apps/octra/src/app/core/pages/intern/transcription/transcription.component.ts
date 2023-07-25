@@ -60,7 +60,7 @@ import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
-import { AnnotationStoreService } from "../../../store/annotation/annotation.store.service";
+import { AnnotationStoreService } from '../../../store/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription',
@@ -92,7 +92,7 @@ export class TranscriptionComponent
 
   public sendError = '';
   public saving = '';
-  public interface = '';
+  public interface?: string;
   public editorloaded = false;
   user?: number;
   public platform = BrowserInfo.platform;
@@ -185,10 +185,6 @@ export class TranscriptionComponent
   showCommentSection = false;
   isInactivityModalVisible = false;
 
-  public get Interface(): string {
-    return this.interface;
-  }
-
   get loaded(): boolean {
     return this.audio.loaded && this.transcrService.guidelines !== undefined;
   }
@@ -262,16 +258,18 @@ export class TranscriptionComponent
               caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
 
-            // make sure that events from playonhover are not logged
-            const currentEditorName = this.appStorage.interface;
-            this.uiService.logAudioEvent(
-              currentEditorName,
-              state,
-              this.audioManager.playPosition,
-              caretpos,
-              undefined,
-              undefined
-            );
+            if(this.appStorage.interface) {
+              // make sure that events from playonhover are not logged
+              const currentEditorName = this.appStorage.interface;
+              this.uiService.logAudioEvent(
+                currentEditorName,
+                state,
+                this.audioManager.playPosition,
+                caretpos,
+                undefined,
+                undefined
+              );
+            }
           }
         },
         (error) => {
@@ -504,13 +502,15 @@ export class TranscriptionComponent
     this.asrService.init();
 
     // first change
-    this.changeEditor(this.interface)
-      .then(() => {
-        (this._currentEditor.instance as any).afterFirstInitialization();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (this.interface) {
+      this.changeEditor(this.interface)
+        .then(() => {
+          (this._currentEditor.instance as any).afterFirstInitialization();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
@@ -803,9 +803,8 @@ export class TranscriptionComponent
     this.sendOk = true;
 
     if (this._useMode === LoginMode.ONLINE) {
-
       if (this._useMode === LoginMode.ONLINE) {
-        this.annotationStoreService.sendAnnotation()
+        this.annotationStoreService.sendAnnotation();
       }
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
@@ -914,20 +913,20 @@ export class TranscriptionComponent
 
     if (audioExample !== undefined) {
       // transcription available
+      /*
       this.appStorage.setDemoSession(
         audioExample.url,
         audioExample.description,
         this.appStorage.jobsLeft - 1
       );
+       */
 
-      navigateTo(
-        this.router,
-        ['/load'],
-        AppInfo.queryParamsHandling
-      ).catch((error) => {
-        console.error(`navigation failed`);
-        console.error(error);
-      });
+      navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch(
+        (error) => {
+          console.error(`navigation failed`);
+          console.error(error);
+        }
+      );
     }
   }
 

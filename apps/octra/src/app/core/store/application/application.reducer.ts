@@ -147,6 +147,7 @@ export const reducer = createReducer(
   })),
   on(
     AuthenticationActions.login.success,
+    AuthenticationActions.loginDemo.success,
     (state: ApplicationState, { mode }) => ({
       ...state,
       mode,
@@ -167,11 +168,6 @@ export const reducer = createReducer(
       queryParams: urlParams,
     })
   ),
-  on(OnlineModeActions.loginDemo, (state: ApplicationState, { mode }) => ({
-    ...state,
-    mode: LoginMode.DEMO,
-    loggedIn: true,
-  })),
   on(ApplicationActions.setMode, (state: ApplicationState, { mode }) => ({
     ...state,
     mode,
@@ -186,6 +182,7 @@ export const reducer = createReducer(
   on(AuthenticationActions.logout.success, (state: ApplicationState) => {
     return {
       ...state,
+      loading: initialState.loading,
       mode: undefined,
       queryParams: undefined,
       loggedIn: false,

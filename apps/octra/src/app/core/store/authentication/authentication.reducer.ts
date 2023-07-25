@@ -4,7 +4,7 @@ import { AuthenticationState } from './index';
 import { APIActions } from '../api';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
 import { AccountLoginMethod, AccountRole } from '@octra/api-types';
-import { IDBActions } from "../idb/idb.actions";
+import { IDBActions } from '../idb/idb.actions';
 
 export const initialState: AuthenticationState = {
   authenticated: false,
@@ -25,16 +25,43 @@ export const authenticationReducer = createReducer(
       };
     }
   ),
+  on(AuthenticationActions.loginDemo.success, (state: AuthenticationState) => {
+    return {
+      ...state,
+      me: {
+        id: '12345',
+        username: 'demoUser',
+        projectRoles: [],
+        systemRole: {
+          label: AccountRole.user,
+          i18n: {},
+          badge: 'orange',
+        },
+        email: 'demo-user@example.com',
+        email_verified: true,
+        first_name: 'John',
+        last_name: 'Doe',
+        last_login: new Date().toISOString(),
+        locale: 'en-EN',
+        timezone: 'Europe/Berlin',
+      },
+      authenticated: true,
+      type: AccountLoginMethod.local,
+      webToken: 'faketoken',
+    };
+  }),
   on(
     IDBActions.loadOptions.success,
     (state: AuthenticationState, { onlineOptions }) => {
       return {
         ...state,
-        previousUser:  onlineOptions.user ? {
-          id: onlineOptions.user.id,
-          username: onlineOptions.user.name,
-          email: onlineOptions.user.email
-        } : undefined
+        previousUser: onlineOptions.user
+          ? {
+              id: onlineOptions.user.id,
+              username: onlineOptions.user.name,
+              email: onlineOptions.user.email,
+            }
+          : undefined,
       };
     }
   ),
@@ -86,28 +113,11 @@ export const authenticationReducer = createReducer(
       authenticated: data.authenticated,
     };
   }),
-  on(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success, (state: AuthenticationState, {me}) => ({
-    ...state,
-    me
-  })),
-  on(OnlineModeActions.loginDemo, (state: AuthenticationState, data) => {
-    return {
+  on(
+    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
+    (state: AuthenticationState, { me }) => ({
       ...state,
-      webToken: '8u8asu8dua8sda98dj8adam9d8amd7a',
-      type: AccountLoginMethod.local,
-      authenticated: true,
-      me: {
-        id: '23424',
-        username: 'demo_user',
-        email: 'johndoe@example.com',
-        email_verified: true,
-        first_name: 'John',
-        last_name: 'Doe',
-        systemRole: AccountRole.user as any,
-        timezone: 'Europe/Berlin',
-        locale: 'en-EN',
-        projectRoles: [],
-      },
-    };
-  })
+      me,
+    })
+  )
 );

@@ -40,11 +40,14 @@ import {
 } from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
+  AccountRole,
   CurrentAccountDto,
   ProjectDto,
-  TaskDto,
-  ToolConfigurationAssetDto,
-} from '@octra/api-types';
+  ProjectVisibility,
+  TaskDto, TaskInputOutputCreatorType,
+  TaskStatus,
+  ToolConfigurationAssetDto
+} from "@octra/api-types";
 import { convertFromOIDLevel, GuidelinesItem } from './index';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
@@ -53,6 +56,7 @@ import { TranscriptionSendingModalComponent } from '../../modals/transcription-s
 import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../application/application.actions';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { FileInfo } from "@octra/utilities";
 
 @Injectable()
 export class AnnotationEffects {
@@ -137,7 +141,7 @@ export class AnnotationEffects {
                 (a) =>
                   new RegExp(
                     `_${state.application.language.toLowerCase()}.json`
-                  ).exec(a.name) !== null
+                  ).exec(a.filename) !== null
               );
               selectedGuidelines = found ?? guidelines[0];
             }
@@ -185,12 +189,13 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           console.log('Load audio file...');
-          if (state.application.mode === undefined) {
+          if (state.application.mode === undefined || !a.audioFile) {
             this.store.dispatch(
               AnnotationActions.loadAudio.fail({
                 error: `An error occured. Please click on "Back" and try it again.`,
               })
             );
+            return;
           }
 
           let filename = a.audioFile!.filename;
@@ -355,11 +360,10 @@ export class AnnotationEffects {
             );
           }
         } else {
-          return of(
-            AnnotationActions.quit.success({
-              mode: state.application.mode!,
-            })
-          );
+          return of(AuthenticationActions.logout.do({
+            clearSession: a.clearSession,
+            mode: state.application.mode!,
+          }));
         }
       })
     )
@@ -552,69 +556,207 @@ export class AnnotationEffects {
   onLoadOnlineInfo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do),
-      exhaustMap((a) => {
-        return forkJoin<
-          [CurrentAccountDto, ProjectDto | undefined, TaskDto | undefined]
-        >(
-          this.apiService.getMyAccountInformation(),
-          this.apiService
-            .getProject(a.projectID)
-            .pipe(catchError((a) => of(undefined))),
-          this.apiService
-            .getTask(a.projectID, a.taskID)
-            .pipe(catchError((a) => of(undefined)))
-        ).pipe(
-          withLatestFrom(this.store),
-          map(([[currentAccount, currentProject, task], state]) => {
-            if (currentProject && task) {
-              if (!a.actionAfterSuccess) {
-                // normal load after task start or resuming session
-                this.store.dispatch(
-                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                    {
-                      mode: LoginMode.ONLINE,
-                      me: currentAccount,
-                      currentProject,
-                      task,
-                    }
-                  )
-                );
-                return OnlineModeActions.prepareTaskDataForAnnotation.do({
-                  mode: LoginMode.ONLINE,
-                  currentProject,
-                  task,
-                });
-              }
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        if (a.mode === LoginMode.ONLINE) {
+          return forkJoin<
+            [CurrentAccountDto, ProjectDto | undefined, TaskDto | undefined]
+          >(
+            this.apiService.getMyAccountInformation(),
+            this.apiService
+              .getProject(a.projectID)
+              .pipe(catchError((a) => of(undefined))),
+            this.apiService
+              .getTask(a.projectID, a.taskID)
+              .pipe(catchError((a) => of(undefined)))
+          ).pipe(
+            map(([currentAccount, currentProject, task]) => {
+              if (currentProject && task) {
+                if (!a.actionAfterSuccess) {
+                  // normal load after task start or resuming session
+                  this.store.dispatch(
+                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                      {
+                        mode: LoginMode.ONLINE,
+                        me: currentAccount,
+                        currentProject,
+                        task,
+                      }
+                    )
+                  );
+                  return OnlineModeActions.prepareTaskDataForAnnotation.do({
+                    mode: LoginMode.ONLINE,
+                    currentProject,
+                    task,
+                  });
+                }
 
-              return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                {
-                  mode: LoginMode.ONLINE,
-                  me: currentAccount,
+                return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                  {
+                    mode: LoginMode.ONLINE,
+                    me: currentAccount,
+                    currentProject,
+                    task,
+                    actionAfterSuccess: a.actionAfterSuccess,
+                  }
+                );
+              } else {
+                return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                  {
+                    mode: LoginMode.ONLINE,
+                    me: currentAccount,
+                    currentProject,
+                    task,
+                    actionAfterSuccess: a.actionAfterSuccess,
+                  }
+                );
+              }
+            }),
+            catchError((error: HttpErrorResponse) => {
+              return of(
+                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail({
+                  error,
+                })
+              );
+            })
+          );
+        } else if (a.mode === LoginMode.DEMO) {
+          return forkJoin<[any,
+            ({
+              language: string;
+              json: any;
+            } | undefined)[], any]>(
+            [
+              this.http.get('config/localmode/projectconfig.json', {
+              responseType: 'json',
+            }),
+            forkJoin(state.application.appConfiguration!.octra.languages.map((b: string) => this.http.get(`config/localmode/guidelines/guidelines_${b}.json`, {
+              responseType: 'json',
+            }).pipe(map((c) => ({
+              language: b,
+              json: c
+            })), catchError(() => of(undefined))))),
+            this.http.get('config/localmode/functions.js', {
+              responseType: 'text',
+            })]
+          ).pipe(
+            map(([projectConfig, guidelines, functions]) => {
+              const currentProject = {
+                id: a.projectID,
+                name: 'demo project',
+                shortname: 'demo',
+                roles: [],
+                statistics: {
+                  status: {
+                    free: 1234567,
+                    paused: 34,
+                    busy: 12,
+                    finished: 30,
+                    postponed: 23,
+                    failed: 15,
+                  },
+                  tasks: [
+                    {
+                      type: 'annotation',
+                      status: {
+                        free: 1234567,
+                        paused: 34,
+                        busy: 12,
+                        finished: 30,
+                        postponed: 23,
+                        failed: 15,
+                      },
+                    },
+                  ],
+                },
+                description: 'This project shows you how octra works',
+                active: true,
+                visibility: ProjectVisibility.public,
+                startdate: new Date().toISOString(),
+                enddate: new Date().toISOString(),
+                creationdate: new Date().toISOString(),
+                updatedate: new Date().toISOString(),
+              };
+              const task: TaskDto = {
+                id: a.taskID,
+                inputs: state.application.appConfiguration!.octra.audioExamples.map(a => ({
+                  filename: FileInfo.fromURL(a.url).fullname,
+                  fileType: "audio/wave",
+                  type: "input",
+                  url: a.url,
+                  creator_type: TaskInputOutputCreatorType.user,
+                  content: "",
+                  content_type: ""
+                })),
+                outputs: [],
+                status: TaskStatus.free,
+                orgtext: state.application.appConfiguration!.octra.audioExamples[0].description,
+                creationdate: new Date().toISOString(),
+                updatedate: new Date().toISOString(),
+                tool_configuration: {
+                  id: '345',
+                  tool_id: '565',
+                  name: 'localConfig',
+                  task_type: {
+                    name: 'annotation',
+                    style: {},
+                  },
+                  value: projectConfig,
+                  assets: [
+                    {
+                      id: '1',
+                      name: 'functions',
+                      filename: 'functions.js',
+                      mime_type: 'application/javascript',
+                      content: functions,
+                    },
+                    ...guidelines.filter(c => c !== undefined).map((c, i) => ({
+                      id: (i + 2).toString(),
+                      name: `guidelines`,
+                      filename: `guidelines_${c?.language}.json`,
+                      mime_type: 'application/json',
+                      content: c?.json,
+                    }))
+                  ],
+                },
+              };
+              this.store.dispatch(
+                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success({
+                  mode: LoginMode.DEMO,
+                  me: {
+                    id: '12345',
+                    username: 'demoUser',
+                    projectRoles: [],
+                    systemRole: {
+                      label: AccountRole.user,
+                      i18n: {},
+                      badge: 'orange',
+                    },
+                    email: 'demo-user@example.com',
+                    email_verified: true,
+                    first_name: 'John',
+                    last_name: 'Doe',
+                    last_login: new Date().toISOString(),
+                    locale: 'en-EN',
+                    timezone: 'Europe/Berlin',
+                  },
                   currentProject,
                   task,
-                  actionAfterSuccess: a.actionAfterSuccess,
-                }
+                  actionAfterSuccess:
+                    AnnotationActions.redirectToTranscription.do(),
+                })
               );
-            } else {
-              return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                {
-                  mode: LoginMode.ONLINE,
-                  me: currentAccount,
-                  currentProject,
-                  task,
-                  actionAfterSuccess: a.actionAfterSuccess,
-                }
-              );
-            }
-          }),
-          catchError((error: HttpErrorResponse) => {
-            return of(
-              OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail({
-                error,
-              })
-            );
-          })
-        );
+
+              return OnlineModeActions.prepareTaskDataForAnnotation.do({
+                mode: LoginMode.DEMO,
+                currentProject,
+                task,
+              });
+            })
+          );
+        }
+        // TODO add load online for URL mode and local mode
+        return of();
       })
     )
   );
@@ -814,33 +956,19 @@ export class AnnotationEffects {
     )
   );
 
-  /**
-   exhaustMap((a) => {
-  return forkJoin<[void, string?]>([this.apiService.saveMyAccountFieldValues(a.data), this.appService.needsRedirectionTo$.pipe(take(1))]).pipe(
-    withLatestFrom(this.store),
-    map(([[api, redirection], state]) => {
-      if (redirection && redirection !== '') {
-        if (isURL(redirection)) {
-          document.location.href = redirection;
-        } else {
-          this.router.navigate([redirection]);
-        }
-      } else {
-        this.alertService.show(this.transloco.translate("g.saving success"), 'success', 3000);
-      }
-
-      return AccountsActions.saveCurrentAccountFieldValues.success({
-        me: state?.accounts?.me,
-      });
-    }),
-    catchError((err: HttpErrorResponse) => {
-      return checkAndThrowError(err, a, AccountsActions.saveCurrentAccountFieldValues.fail(err), this.store, () =>
-        this.alertService.show(this.transloco.translate("g.saving failed"), 'danger')
-      );
-    })
+  redirectToTranscription$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.redirectToTranscription.do),
+        tap((a) => {
+          this.routingService.navigate(
+            ['/intern/transcr'],
+            AppInfo.queryParamsHandling
+          );
+        })
+      ),
+    { dispatch: false }
   );
-})
-   **/
 
   private addFunctions(assets: ToolConfigurationAssetDto[]) {
     const functionsObj = assets.find((a) => a.name === 'functions');
@@ -869,12 +997,14 @@ export class AnnotationEffects {
       .map((a) => {
         try {
           return {
+            filename: a.filename!,
             name: a.name,
-            json: JSON.parse(a.content),
+            json: typeof a.content === "string" ? JSON.parse(a.content): a.content,
             type: a.mime_type,
           };
         } catch (e) {
           return {
+            filename: a.filename!,
             name: a.name,
             json: undefined,
             type: a.mime_type,

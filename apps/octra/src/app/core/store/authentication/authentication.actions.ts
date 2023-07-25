@@ -2,8 +2,8 @@ import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import {
   AccountLoginMethod,
   AuthDto,
-  CurrentAccountDto,
-} from '@octra/api-types';
+  CurrentAccountDto, TaskDto
+} from "@octra/api-types";
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoginMode } from '../index';
 
@@ -31,6 +31,20 @@ export class AuthenticationActions {
       }>(),
     },
   });
+
+  static loginDemo = createActionGroup({
+      source: 'auth/login demo',
+      events: {
+        do: props<{
+          mode: LoginMode
+        }>(),
+        success: props<{
+          mode: LoginMode;
+        }>(),
+        fail: props<Error>(),
+      },
+    });
+
 
   static loginAuto = createActionGroup({
     source: 'auth/login automatically',

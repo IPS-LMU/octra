@@ -1,20 +1,11 @@
 import { AnnotationActions } from '../../annotation/annotation.actions';
-import { Action, createAction, createActionGroup, emptyProps, props } from "@ngrx/store";
+import { Action, createAction, createActionGroup, props } from '@ngrx/store';
 import { LoginMode } from '../../index';
-import { CurrentAccountDto, ProjectDto, TaskDto } from "@octra/api-types";
-import { OnlineSession } from '../../annotation';
+import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
 import { URLParameters } from '../../application';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export class OnlineModeActions extends AnnotationActions {
-  public static loginDemo = createAction(
-    `online mode Login Demo`,
-    props<{
-      onlineSession: OnlineSession;
-      mode: LoginMode.DEMO;
-    }>()
-  );
-
   public static loginURLParameters = createAction(
     `online mode Login URLParameters`,
     props<{
@@ -91,10 +82,9 @@ export class OnlineModeActions extends AnnotationActions {
   });
 
   static endTranscription = createActionGroup({
-      source: 'annotation/ redirect to transcription end',
-      events: {
-        do: props<{clearSession:boolean, mode: LoginMode}>()
-      },
-    });
-
+    source: 'annotation/ redirect to transcription end',
+    events: {
+      do: props<{ clearSession: boolean; mode: LoginMode }>(),
+    },
+  });
 }

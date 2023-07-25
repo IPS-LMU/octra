@@ -1,4 +1,4 @@
-import { Action, createActionGroup, emptyProps, props } from "@ngrx/store";
+import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import { LoginMode } from '../index';
 import { OIDBLink } from '@octra/annotation';
 import { ILog } from '../../obj/Settings/logging';
@@ -270,7 +270,7 @@ export class AnnotationActions {
       fail: props<{
         error: string;
       }>(),
-      noTasks: emptyProps()
+      noTasks: emptyProps(),
     },
   });
 
@@ -296,6 +296,13 @@ export class AnnotationActions {
     events: {
       do: emptyProps(),
       success: emptyProps(),
+    },
+  });
+
+  static redirectToTranscription = createActionGroup({
+    source: 'annotation/redirect to transcription',
+    events: {
+      do: emptyProps(),
     },
   });
 

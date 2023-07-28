@@ -61,6 +61,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/annotation/annotation.store.service';
+import { AuthenticationStoreService } from "../../../store/authentication";
 
 @Component({
   selector: 'octra-transcription',
@@ -237,7 +238,8 @@ export class TranscriptionComponent
     private cd: ChangeDetectorRef,
     private asrService: AsrService,
     private alertService: AlertService,
-    public annotationStoreService: AnnotationStoreService
+    public annotationStoreService: AnnotationStoreService,
+    private authService: AuthenticationStoreService
   ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
@@ -905,29 +907,9 @@ export class TranscriptionComponent
   }
 
   reloadDemo() {
-    this.transcrService.endTranscription(false);
+    this.transcrService.endTranscription(true);
     this.clearDataPermanently();
-    const audioExample = this.settingsService.getAudioExample(
-      this.langService.getActiveLang()
-    );
-
-    if (audioExample !== undefined) {
-      // transcription available
-      /*
-      this.appStorage.setDemoSession(
-        audioExample.url,
-        audioExample.description,
-        this.appStorage.jobsLeft - 1
-      );
-       */
-
-      navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch(
-        (error) => {
-          console.error(`navigation failed`);
-          console.error(error);
-        }
-      );
-    }
+    this.authService.loginDemo();
   }
 
   closeTranscriptionAndGetNew() {

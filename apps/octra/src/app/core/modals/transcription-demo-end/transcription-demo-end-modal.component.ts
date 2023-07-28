@@ -22,7 +22,7 @@ export enum ModalEndAnswer {
 export class TranscriptionDemoEndModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false,
+    backdrop: true,
   };
 
   constructor(

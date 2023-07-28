@@ -1729,6 +1729,8 @@ export class TranscrEditorComponent
   };
 
   placeAtEnd(element: HTMLElement) {
-    this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild!);
+    if(element?.lastChild) {
+      this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild);
+    }
   }
 }

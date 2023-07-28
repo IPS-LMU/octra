@@ -12,7 +12,7 @@
     "build:dev": "node runner.js build:dev",
     "build:prod": "node runner.js build:prod",
     "build:extern": "node runner.js build:extern",
-    "build:json-set-validator": "node runner.js build:json-set-validator",
+    "build:json-sets": "node runner.js build:json-sets",
     "build:assets": "node build_assets.js && nx build assets",
     "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",

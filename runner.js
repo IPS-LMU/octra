@@ -32,7 +32,7 @@ const OCTRA = {
     await run("nx build annotation");
     await run("nx build ngx-components");
     await run("npm run build:assets");
-    await run("npm run build:json-set-validator");
+    await run("npm run build:json-sets");
     await OCTRA.prepareExtern();
   }
 };
@@ -40,7 +40,7 @@ const OCTRA = {
 
 const JSONValidator = {
   build: async function() {
-    await run("nx build json-set-validator");
+    await run("nx build json-sets");
     await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
     await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
   }
@@ -63,7 +63,7 @@ yargs.version("1.0.0").help().alias("help", "h")
     "build:extern", "Builds extern libraries.",
     OCTRA.buildExtern)
   .command(
-    "build:json-set-validator", "Builds json-set-validator library.",
+    "build:json-sets", "Builds json-sets library.",
     JSONValidator.build)
   .argv;
 

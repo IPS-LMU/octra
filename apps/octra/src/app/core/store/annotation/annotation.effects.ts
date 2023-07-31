@@ -40,14 +40,12 @@ import {
 } from '@octra/annotation';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
-  AccountRole,
   CurrentAccountDto,
   ProjectDto,
-  ProjectVisibility,
-  TaskDto, TaskInputOutputCreatorType,
-  TaskStatus,
-  ToolConfigurationAssetDto
-} from "@octra/api-types";
+  TaskDto,
+  TaskInputOutputCreatorType,
+  ToolConfigurationAssetDto,
+} from '@octra/api-types';
 import { convertFromOIDLevel, GuidelinesItem } from './index';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
@@ -56,7 +54,12 @@ import { TranscriptionSendingModalComponent } from '../../modals/transcription-s
 import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../application/application.actions';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { FileInfo } from "@octra/utilities";
+import { FileInfo } from '@octra/utilities';
+import {
+  createSampleProjectDto,
+  createSampleTask,
+  createSampleUser,
+} from '../../shared';
 
 @Injectable()
 export class AnnotationEffects {
@@ -252,14 +255,10 @@ export class AnnotationEffects {
             }
           } else if (state.application.mode === LoginMode.LOCAL) {
             // local mode
-            if (state.onlineMode.sessionFile !== undefined) {
-              filename = state.onlineMode.sessionFile.name;
-              filename = filename.substring(0, filename.lastIndexOf('.'));
-
-              console.log('Audio loaded.');
+            if (state.localMode.sessionFile !== undefined) {
               this.store.dispatch(
                 AnnotationActions.loadAudio.success({
-                  mode: state.application.mode,
+                  mode: LoginMode.LOCAL,
                   audioFile: a.audioFile,
                 })
               );
@@ -360,10 +359,12 @@ export class AnnotationEffects {
             );
           }
         } else {
-          return of(AuthenticationActions.logout.do({
-            clearSession: a.clearSession,
-            mode: state.application.mode!,
-          }));
+          return of(
+            AuthenticationActions.logout.do({
+              clearSession: a.clearSession,
+              mode: state.application.mode!,
+            })
+          );
         }
       })
     )
@@ -620,126 +621,76 @@ export class AnnotationEffects {
               );
             })
           );
-        } else if (a.mode === LoginMode.DEMO) {
-          return forkJoin<[any,
-            ({
-              language: string;
-              json: any;
-            } | undefined)[], any]>(
+        } else if (
+          [LoginMode.DEMO, LoginMode.ONLINE, LoginMode.LOCAL].includes(a.mode)
+        ) {
+          // mode is not online => load configuration for local environment
+          return forkJoin<
             [
-              this.http.get('config/localmode/projectconfig.json', {
+              any,
+              (
+                | {
+                    language: string;
+                    json: any;
+                  }
+                | undefined
+              )[],
+              any
+            ]
+          >([
+            this.http.get('config/localmode/projectconfig.json', {
               responseType: 'json',
             }),
-            forkJoin(state.application.appConfiguration!.octra.languages.map((b: string) => this.http.get(`config/localmode/guidelines/guidelines_${b}.json`, {
-              responseType: 'json',
-            }).pipe(map((c) => ({
-              language: b,
-              json: c
-            })), catchError(() => of(undefined))))),
+            forkJoin(
+              state.application.appConfiguration!.octra.languages.map(
+                (b: string) =>
+                  this.http
+                    .get(`config/localmode/guidelines/guidelines_${b}.json`, {
+                      responseType: 'json',
+                    })
+                    .pipe(
+                      map((c) => ({
+                        language: b,
+                        json: c,
+                      })),
+                      catchError(() => of(undefined))
+                    )
+              )
+            ),
             this.http.get('config/localmode/functions.js', {
               responseType: 'text',
-            })]
-          ).pipe(
+            }),
+          ]).pipe(
             map(([projectConfig, guidelines, functions]) => {
-              const currentProject = {
-                id: a.projectID,
-                name: 'demo project',
-                shortname: 'demo',
-                roles: [],
-                statistics: {
-                  status: {
-                    free: 1234567,
-                    paused: 34,
-                    busy: 12,
-                    finished: 30,
-                    postponed: 23,
-                    failed: 15,
-                  },
-                  tasks: [
-                    {
-                      type: 'annotation',
-                      status: {
-                        free: 1234567,
-                        paused: 34,
-                        busy: 12,
-                        finished: 30,
-                        postponed: 23,
-                        failed: 15,
-                      },
-                    },
-                  ],
-                },
-                description: 'This project shows you how octra works',
-                active: true,
-                visibility: ProjectVisibility.public,
-                startdate: new Date().toISOString(),
-                enddate: new Date().toISOString(),
-                creationdate: new Date().toISOString(),
-                updatedate: new Date().toISOString(),
-              };
-              const task: TaskDto = {
-                id: a.taskID,
-                inputs: state.application.appConfiguration!.octra.audioExamples.map(a => ({
-                  filename: FileInfo.fromURL(a.url).fullname,
-                  fileType: "audio/wave",
-                  type: "input",
-                  url: a.url,
-                  creator_type: TaskInputOutputCreatorType.user,
-                  content: "",
-                  content_type: ""
-                })),
-                outputs: [],
-                status: TaskStatus.free,
-                orgtext: state.application.appConfiguration!.octra.audioExamples[0].description,
-                creationdate: new Date().toISOString(),
-                updatedate: new Date().toISOString(),
-                tool_configuration: {
-                  id: '345',
-                  tool_id: '565',
-                  name: 'localConfig',
-                  task_type: {
-                    name: 'annotation',
-                    style: {},
-                  },
-                  value: projectConfig,
-                  assets: [
-                    {
-                      id: '1',
-                      name: 'functions',
-                      filename: 'functions.js',
-                      mime_type: 'application/javascript',
-                      content: functions,
-                    },
-                    ...guidelines.filter(c => c !== undefined).map((c, i) => ({
-                      id: (i + 2).toString(),
-                      name: `guidelines`,
-                      filename: `guidelines_${c?.language}.json`,
-                      mime_type: 'application/json',
-                      content: c?.json,
-                    }))
-                  ],
-                },
-              };
+              const currentProject = createSampleProjectDto(a.projectID);
+              const task = createSampleTask(
+                a.taskID,
+                state.application.appConfiguration!.octra.audioExamples.map(
+                  (a) => ({
+                    filename: FileInfo.fromURL(a.url).fullname,
+                    fileType: 'audio/wave',
+                    type: 'input',
+                    url: a.url,
+                    creator_type: TaskInputOutputCreatorType.user,
+                    content: '',
+                    content_type: '',
+                  })
+                ),
+                [],
+                projectConfig,
+                functions,
+                guidelines,
+                {
+                  orgtext:
+                    state.application.appConfiguration!.octra.audioExamples[0]
+                      .description,
+                }
+              );
+
               this.store.dispatch(
                 OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success({
-                  mode: LoginMode.DEMO,
-                  me: {
-                    id: '12345',
-                    username: 'demoUser',
-                    projectRoles: [],
-                    systemRole: {
-                      label: AccountRole.user,
-                      i18n: {},
-                      badge: 'orange',
-                    },
-                    email: 'demo-user@example.com',
-                    email_verified: true,
-                    first_name: 'John',
-                    last_name: 'Doe',
-                    last_login: new Date().toISOString(),
-                    locale: 'en-EN',
-                    timezone: 'Europe/Berlin',
-                  },
+                  mode: a.mode,
+                  me: createSampleUser(),
                   currentProject,
                   task,
                   actionAfterSuccess:
@@ -748,7 +699,7 @@ export class AnnotationEffects {
               );
 
               return OnlineModeActions.prepareTaskDataForAnnotation.do({
-                mode: LoginMode.DEMO,
+                mode: a.mode,
                 currentProject,
                 task,
               });
@@ -779,6 +730,26 @@ export class AnnotationEffects {
     )
   );
  */
+
+  /*
+  onLocalOrURLModeLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LocalModeActions.login),
+      exhaustMap((a) => {
+        return AnnotationActions.prepareTaskDataForAnnotation.do({
+          mode: LoginMode.LOCAL,
+          currentProject: createSampleProjectDto("-1"),
+          task: createSampleTask("-1", a.files.map((a, i) => ({
+            id: "" + i,
+            filename: a.name,
+            fileType: a.type,
+            size: a.size
+          })), [])
+        });
+      })
+    )
+  );
+   */
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
@@ -999,7 +970,8 @@ export class AnnotationEffects {
           return {
             filename: a.filename!,
             name: a.name,
-            json: typeof a.content === "string" ? JSON.parse(a.content): a.content,
+            json:
+              typeof a.content === 'string' ? JSON.parse(a.content) : a.content,
             type: a.mime_type,
           };
         } catch (e) {

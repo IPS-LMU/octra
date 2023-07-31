@@ -29,7 +29,7 @@ export const reducer = createUndoRedoReducer(
   initialState,
   ...new AnnotationStateReducers(LoginMode.LOCAL).create(),
   on(
-    LocalModeActions.login,
+    AuthenticationActions.loginLocal.success,
     (state: LocalModeState, { files, sessionFile }) => ({
       ...state,
       files,

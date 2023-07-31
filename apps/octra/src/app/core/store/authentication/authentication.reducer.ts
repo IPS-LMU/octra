@@ -13,7 +13,7 @@ export const initialState: AuthenticationState = {
 export const authenticationReducer = createReducer(
   initialState,
   on(
-    AuthenticationActions.login.success,
+    AuthenticationActions.loginOnline.success,
     AuthenticationActions.reauthenticate.success,
     (state: AuthenticationState, { auth, method }) => {
       return {
@@ -25,7 +25,7 @@ export const authenticationReducer = createReducer(
       };
     }
   ),
-  on(AuthenticationActions.loginDemo.success, (state: AuthenticationState) => {
+  on(AuthenticationActions.loginDemo.success, AuthenticationActions.loginLocal.success, (state: AuthenticationState) => {
     return {
       ...state,
       me: {
@@ -66,7 +66,7 @@ export const authenticationReducer = createReducer(
     }
   ),
   on(
-    AuthenticationActions.login.fail,
+    AuthenticationActions.loginOnline.fail,
     AuthenticationActions.reauthenticate.fail,
     AuthenticationActions.continueSessionAfterAgreement.fail,
     (state: AuthenticationState, { error }) => {

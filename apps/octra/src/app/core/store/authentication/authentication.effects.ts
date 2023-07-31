@@ -5,7 +5,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
-import { catchError, exhaustMap, map, of, tap } from 'rxjs';
+import { catchError, exhaustMap, from, map, of, tap } from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
 import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,13 +15,20 @@ import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { withLatestFrom } from 'rxjs/operators';
 import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import {
+  ModalDeleteAnswer,
+  TranscriptionDeleteModalComponent,
+} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import { AudioManager } from "@octra/media";
+import { AppInfo } from "../../../app.info";
+import { SessionFile } from "../../obj/SessionFile";
 
 @Injectable()
 export class AuthenticationEffects {
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        AuthenticationActions.login.do,
+        AuthenticationActions.loginOnline.do,
         AuthenticationActions.reauthenticate.do
       ),
       withLatestFrom(this.store),
@@ -34,7 +41,7 @@ export class AuthenticationEffects {
               let url = `${dto.openURL}`;
               localStorage.setItem('cid', cid.toString());
 
-              if (a.type === AuthenticationActions.login.do.type) {
+              if (a.type === AuthenticationActions.loginOnline.do.type) {
                 // redirect directly
                 url = `${url}?cid=${cid}&r=${encodeURIComponent(
                   document.location.href
@@ -48,7 +55,7 @@ export class AuthenticationEffects {
 
                 document.location.href = url;
 
-                return AuthenticationActions.login.success({
+                return AuthenticationActions.loginOnline.success({
                   auth: dto,
                   method: a.method,
                   mode: state.application.mode!,
@@ -89,7 +96,7 @@ export class AuthenticationEffects {
               this.sessionStorageService.store('authType', a.method);
               this.sessionStorageService.store('authenticated', true);
 
-              if (a.type === AuthenticationActions.login.do.type) {
+              if (a.type === AuthenticationActions.loginOnline.do.type) {
                 if (!dto.me.last_login) {
                   this.routingService.navigate(['/load'], {
                     queryParams: {
@@ -99,7 +106,7 @@ export class AuthenticationEffects {
                 } else {
                   this.routingService.navigate(['/load']);
                 }
-                return AuthenticationActions.login.success({
+                return AuthenticationActions.loginOnline.success({
                   auth: dto,
                   method: a.method,
                   mode: a.mode,
@@ -110,17 +117,17 @@ export class AuthenticationEffects {
                 });
               }
             }
-            return AuthenticationActions.login.success({
+            return AuthenticationActions.loginOnline.success({
               auth: dto,
               method: a.method,
               mode: LoginMode.ONLINE,
             });
           }),
           catchError((err: HttpErrorResponse) => {
-            if (a.type === AuthenticationActions.login.do.type) {
-              return of(AuthenticationActions.login.fail({ error: err }));
+            if (a.type === AuthenticationActions.loginOnline.do.type) {
+              return of(AuthenticationActions.loginOnline.fail({ error: err }));
             } else {
-              return of(AuthenticationActions.login.fail({ error: err }));
+              return of(AuthenticationActions.loginOnline.fail({ error: err }));
             }
           })
         );
@@ -131,7 +138,7 @@ export class AuthenticationEffects {
   onLoginDemo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.loginDemo.do),
-      exhaustMap((a) =>
+      exhaustMap(() =>
         of(
           AuthenticationActions.loginDemo.success({
             mode: LoginMode.DEMO,
@@ -140,6 +147,61 @@ export class AuthenticationEffects {
       )
     )
   );
+
+  onLoginLocal$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthenticationActions.loginLocal.do),
+      exhaustMap((a) => {
+        const checkInputs = ()=> {
+          if (a.files !== undefined) {
+            // get audio file
+            let audiofile: File | undefined;
+            for (const file of a.files) {
+              if (
+                AudioManager.isValidAudioFileName(file.name, AppInfo.audioformats)
+              ) {
+                audiofile = file;
+                break;
+              }
+            }
+
+            if (audiofile !== undefined) {
+              return of(AuthenticationActions.loginLocal.success({
+                ...a,
+                sessionFile: this.getSessionFile(audiofile)
+              }));
+            } else {
+              return of(AuthenticationActions.loginLocal.fail(new Error('file not supported')))
+            }
+          } else {
+            return of(AuthenticationActions.loginLocal.fail(new Error('files are undefined')))
+          }
+        };
+
+        if (!a.removeData) {
+          // continue with old transcript
+          return checkInputs();
+        } else {
+          // ask for deletion of old transcript
+          return from(
+            this.modalsService.openModal(
+              TranscriptionDeleteModalComponent,
+              TranscriptionDeleteModalComponent.options
+            )
+          ).pipe(
+            exhaustMap((value) => {
+              if (value === ModalDeleteAnswer.DELETE) {
+                return checkInputs();
+              } else {
+                return of();
+              }
+            })
+          );
+        }
+      })
+    )
+  );
+
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.do),
@@ -188,8 +250,9 @@ export class AuthenticationEffects {
     () =>
       this.actions$.pipe(
         ofType(
-          AuthenticationActions.login.success,
-          AuthenticationActions.loginDemo.success
+          AuthenticationActions.loginOnline.success,
+          AuthenticationActions.loginDemo.success,
+          AuthenticationActions.loginLocal.success
         ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
@@ -226,7 +289,8 @@ export class AuthenticationEffects {
                 AuthenticationActions.redirectToProjects.do()
               );
             }
-          } else if (a.mode === LoginMode.DEMO) {
+          } else {
+            // is not online => load local configuration
             this.store.dispatch(
               OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
                 projectID: '7234892',
@@ -338,7 +402,7 @@ export class AuthenticationEffects {
   showErrorModal$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthenticationActions.login.fail),
+        ofType(AuthenticationActions.loginOnline.fail),
         tap((a) => {
           this.modalsService.openModal(
             ErrorModalComponent,
@@ -356,6 +420,15 @@ export class AuthenticationEffects {
   );
 
   private reauthenticationRef?: NgbModalRef;
+
+  getSessionFile = (file: File) => {
+    return new SessionFile(
+      file.name,
+      file.size,
+      new Date(file.lastModified),
+      file.type
+    );
+  };
 
   constructor(
     private actions$: Actions,

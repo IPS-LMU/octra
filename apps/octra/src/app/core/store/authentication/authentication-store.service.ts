@@ -3,6 +3,9 @@ import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from './authentication.actions';
 import { LoginMode, RootState } from '../index';
+import { SessionFile } from '../../obj/SessionFile';
+import { AudioManager } from '@octra/media';
+import { AppInfo } from '../../../app.info';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +13,7 @@ import { LoginMode, RootState } from '../index';
 export class AuthenticationStoreService {
   constructor(private store: Store<RootState>) {}
 
-  me$ = this.store.select((store: RootState)=> store.authentication.me);
+  me$ = this.store.select((store: RootState) => store.authentication.me);
 
   authenticated$ = this.store.select(
     (store: RootState) => store.authentication.authenticated
@@ -44,13 +47,14 @@ export class AuthenticationStoreService {
 
     return undefined;
   });
+
   loginOnline(
     method: AccountLoginMethod,
     username?: string,
     password?: string
   ) {
     this.store.dispatch(
-      AuthenticationActions.login.do({
+      AuthenticationActions.loginOnline.do({
         method,
         username,
         password,
@@ -63,6 +67,16 @@ export class AuthenticationStoreService {
     this.store.dispatch(
       AuthenticationActions.loginDemo.do({
         mode: LoginMode.DEMO,
+      })
+    );
+  }
+
+  async loginLocal(files: File[], removeData: boolean) {
+    this.store.dispatch(
+      AuthenticationActions.loginLocal.do({
+        files,
+        removeData,
+        mode: LoginMode.LOCAL,
       })
     );
   }

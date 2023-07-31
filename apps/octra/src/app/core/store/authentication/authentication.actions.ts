@@ -2,18 +2,19 @@ import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import {
   AccountLoginMethod,
   AuthDto,
-  CurrentAccountDto, TaskDto
-} from "@octra/api-types";
+  CurrentAccountDto,
+} from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoginMode } from '../index';
+import { SessionFile } from '../../obj/SessionFile';
 
 export class AdaptedAuthDto extends AuthDto {
   method!: AccountLoginMethod;
 }
 
 export class AuthenticationActions {
-  static login = createActionGroup({
-    source: 'auth/login',
+  static loginOnline = createActionGroup({
+    source: 'auth/login online',
     events: {
       do: props<{
         mode: LoginMode;
@@ -33,21 +34,38 @@ export class AuthenticationActions {
   });
 
   static loginDemo = createActionGroup({
-      source: 'auth/login demo',
-      events: {
-        do: props<{
-          mode: LoginMode
-        }>(),
-        success: props<{
-          mode: LoginMode;
-        }>(),
-        fail: props<Error>(),
-      },
-    });
+    source: 'auth/login demo',
+    events: {
+      do: props<{
+        mode: LoginMode;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+      }>(),
+      fail: props<Error>(),
+    },
+  });
 
+  static loginLocal = createActionGroup({
+    source: 'auth/login local',
+    events: {
+      do: props<{
+        files: File[];
+        removeData: boolean;
+        mode: LoginMode.LOCAL;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        files: File[];
+        sessionFile: SessionFile;
+        removeData: boolean;
+      }>(),
+      fail: props<Error>(),
+    },
+  });
 
   static loginAuto = createActionGroup({
-    source: 'auth/login automatically',
+    source: 'auth/login online automatically',
     events: {
       do: props<{
         method: AccountLoginMethod;

@@ -33,7 +33,7 @@ export class SessionFile {
   ) {}
 
   public static fromAny(element: any) {
-    if (element === undefined || element === undefined) {
+    if (!element) {
       return undefined;
     }
 

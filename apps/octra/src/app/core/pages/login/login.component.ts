@@ -107,75 +107,9 @@ export class LoginComponent
     console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
   }
 
-  onOfflineSubmit = () => {
-    if (
-      this.appStorage.useMode !== LoginMode.DEMO
-    ) {
-      // last was online mode
-      /*
-      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-        this.audioService.registerAudioManager(this.dropzone.audioManager);
-        this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
-          alert(error);
-        });
-      }).catch((error) => {
-        console.error(error);
-      });
-      */
-    } else {
-      this.audioService.registerAudioManager(this.dropzone.audioManager!);
-      this.appStorage
-        .beginLocalSession(this.dropzone.files, true)
-        .then(this.beforeNavigation)
-        .catch((error) => {
-          alert(error);
-        });
-    }
-  };
-
-  private beforeNavigation = () => {
-    if (!(this.dropzone.oannotation === undefined)) {
-      const newLevels: OIDBLevel[] = [];
-      for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-        newLevels.push(
-          new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i)
-        );
-      }
-
-      const newLinks: OIDBLink[] = [];
-      for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-        newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-      }
-
-      this.appStorage.overwriteAnnotation(newLevels, newLinks);
-      this.navigate();
-    } else {
-      this.navigate();
-    }
-  };
-
-  newTranscription = () => {
+  onOfflineSubmit = (removeData: boolean) => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
-
-    this.appStorage.clearAnnotationPermanently();
-    this.appStorage.clearLoggingDataPermanently();
-    this.appStorage
-      .beginLocalSession(this.dropzone.files, false)
-      .then(this.beforeNavigation)
-      .catch((error) => {
-        if (error === 'file not supported') {
-          this.modService
-            .openModal(ErrorModalComponent, ErrorModalComponent.options, {
-              text: this.langService.translate(
-                'reload-file.file not supported',
-                { type: '' }
-              ),
-            })
-            .catch((error2) => {
-              console.error(error2);
-            });
-        }
-      });
+    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), removeData);
   };
 
   ngOnInit() {
@@ -354,7 +288,7 @@ export class LoginComponent
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-    if (this.settingsService.responsive.enabled === false) {
+    if (!this.settingsService.responsive.enabled) {
       this.state.local.validSize =
         window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
@@ -393,59 +327,8 @@ export class LoginComponent
     return 'unknown';
   }
 
-  onTranscriptionDelete() {
-    this.modService
-      .openModal(
-        TranscriptionDeleteModalComponent,
-        TranscriptionDeleteModalComponent.options
-      )
-      .then((answer: any) => {
-        if (answer === ModalDeleteAnswer.DELETE) {
-          this.newTranscription();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
   public startDemo() {
-    /*
-    const audioExample = this.settingsService.getAudioExample(
-      this.langService.getActiveLang()
-    );
-
-    if (audioExample !== undefined) {
-      // delete old data for fresh new session
-      this.appStorage.setDemoSession(
-        audioExample.url,
-        audioExample.description,
-        1000
-      );
-      this.navigate();
-    }
-     */
     this.authStoreService.loginDemo();
-  }
-
-  public isPasswordCorrect() {
-    /*
-    if (this.settingsService.appSettings.octra.allowed_projects !== undefined) {
-      const inputHash = sha256(password).toUpperCase();
-      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
-        return a.name === selectedProject;
-      });
-
-      if (projectData !== undefined) {
-        if (hasProperty(projectData, 'password') && projectData.password !== '') {
-          return projectData.password.toUpperCase() === inputHash;
-        }
-      }
-    }
-
-    return true;
-
-     */
   }
 
   private navigate = (): void => {
@@ -455,67 +338,4 @@ export class LoginComponent
       }
     );
   };
-
-  private createNewOnlineSession() {
-    /*
-    this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
-      const data = json.data as IDataEntry;
-      if (form.valid && json.message !== '0') {
-        // delete old data for fresh new session
-        this.appStorage.clearAnnotationPermanently();
-
-        let prompt = '';
-        let serverComment = '';
-        let jobsLeft = -1;
-
-        // get transcript data that already exists
-        const jsonStr = JSON.stringify(data);
-        let serverDataEntry = parseServerDataEntry(jsonStr);
-
-        if (hasPropertyTree(serverDataEntry, 'prompttext')) {
-          // get transcript data that already exists
-          prompt = serverDataEntry.prompttext;
-          prompt = (prompt) ? prompt : '';
-        }
-        if (hasPropertyTree(serverDataEntry, 'comment')) {
-          // get transcript data that already exists
-          serverComment = serverDataEntry.comment;
-          serverComment = (serverComment) ? serverComment : '';
-        }
-        if (hasProperty(json, 'message')) {
-          const counter = (json.message === '') ? '0' : json.message;
-          jobsLeft = Number(counter);
-        }
-
-        if (!hasPropertyTree(serverDataEntry, 'transcript') ||
-          !Array.isArray(serverDataEntry.transcript)) {
-          serverDataEntry = {
-            ...serverDataEntry,
-            transcript: []
-          };
-        }
-
-        if (!hasPropertyTree(serverDataEntry, 'logtext') ||
-          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-          serverDataEntry = {
-            ...serverDataEntry,
-            logtext: []
-          };
-        }
-        // beware, this.appStorage.serverDataEntry is aync!
-        this.appStorage.serverDataEntry = serverDataEntry;
-
-        this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft, true);
-        this.navigate();
-      } else {
-        this.modService.openModal(LoginInvalidModalComponent, {}).catch((error) => {
-          console.error(error);
-        });
-      }
-    }).catch((error) => {
-      alert('Server cannot be requested. Please check if you are online.');
-      console.error(error);
-    });
-     */
-  }
 }

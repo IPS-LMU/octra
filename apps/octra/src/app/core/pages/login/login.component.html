@@ -136,7 +136,7 @@
                 <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
               </div>
               <button
-                (click)="onOfflineSubmit()"
+                (click)="onOfflineSubmit(false)"
                 *ngIf="getFileStatus() !== 'new'"
                 [disabled]="getFileStatus() !== 'start'"
                 class="btn btn-raised btn-primary"
@@ -146,8 +146,8 @@
                 {{ 'transcription.start' | transloco }}
               </button>
               <button
-                (click)="onTranscriptionDelete()"
-                *ngIf="getFileStatus() === 'new' || getFileStatus() === 'start'"
+                (click)="onOfflineSubmit(true)"
+                *ngIf="getFileStatus() === 'new'"
                 class="btn btn-raised btn-danger offline-delete-btn"
               >
                 {{ 'transcription.new' | transloco }}

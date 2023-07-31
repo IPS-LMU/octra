@@ -35,20 +35,6 @@ export class TranscActivateGuard implements CanActivate {
           params.fragment = route.fragment!;
           params.queryParams = route.queryParams;
 
-          if (state.application.mode !== LoginMode.LOCAL) {
-            navigateTo(this.router, ['/load'], params).catch((error) => {
-              console.error(error);
-            });
-          } else {
-            navigateTo(
-              this.router,
-              ['/intern/transcr/reload-file'],
-              params
-            ).catch((error) => {
-              console.error(error);
-            });
-          }
-          console.log('NAVIGATE LOAD');
           navigateTo(this.router, ['/load'], params).catch((error) => {
             console.error(error);
           });

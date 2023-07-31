@@ -16,6 +16,7 @@ import { navigateTo } from '@octra/ngx-utilities';
 import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { TranscriptionDeleteModalComponent } from '../../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
+import { AuthenticationStoreService } from "../../../store/authentication";
 
 @Component({
   selector: 'octra-reload-file',
@@ -36,7 +37,8 @@ export class ReloadFileComponent {
     public transcrServ: TranscriptionService,
     public modService: OctraModalService,
     public langService: TranslocoService,
-    private audioService: AudioService
+    private audioService: AudioService,
+    private authStoreService: AuthenticationStoreService
   ) {}
 
   abortTranscription = () => {
@@ -83,20 +85,7 @@ export class ReloadFileComponent {
             }
           }).then(() => {
             this.audioService.registerAudioManager(this.dropzone.audioManager!);
-            this.appStorage.clearLoggingDataPermanently();
-            this.appStorage
-              .beginLocalSession(this.dropzone.files, keepData)
-              .then(this.navigate)
-              .catch((error) => {
-                if (error === 'file not supported') {
-                  this.showErrorMessage(
-                    this.langService.translate(
-                      'reload-file.file not supported',
-                      { type: '' }
-                    )
-                  );
-                }
-              });
+            this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), !keepData);
           });
         } else {
           // do nothing because abort
@@ -109,18 +98,7 @@ export class ReloadFileComponent {
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
-    this.appStorage
-      .beginLocalSession(this.dropzone.files, true)
-      .then(this.navigate)
-      .catch((error) => {
-        if (error === 'file not supported') {
-          this.showErrorMessage(
-            this.langService.translate('reload-file.file not supported', {
-              type: '',
-            })
-          );
-        }
-      });
+    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), true);
   };
 
   public isN(obj: any): boolean {

@@ -372,46 +372,6 @@ export class AppStorageService {
     );
   }
 
-  public beginLocalSession = async (
-    files: FileProgress[],
-    keepData: boolean
-  ) => {
-    return new Promise<void>((resolve, reject) => {
-      if (files !== undefined) {
-        // get audio file
-        let audiofile;
-        for (const file of files) {
-          if (
-            AudioManager.isValidAudioFileName(
-              file.file.name,
-              AppInfo.audioformats
-            )
-          ) {
-            audiofile = file.file;
-            break;
-          }
-        }
-
-        if (audiofile !== undefined) {
-          const storeFiles = files.map((a) => a.file);
-          this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
-          resolve();
-        } else {
-          reject('file not supported');
-        }
-      }
-    });
-  };
-
-  public getSessionFile = (file: File) => {
-    return new SessionFile(
-      file.name,
-      file.size,
-      new Date(file.lastModified),
-      file.type
-    );
-  };
-
   public overwriteAnnotation = (
     levels: OIDBLevel[],
     links: OIDBLink[],
@@ -445,25 +405,6 @@ export class AppStorageService {
       })
     );
   };
-
-  setLocalSession(files: File[], sessionFile: SessionFile) {
-    if (this.easymode === undefined) {
-      this.easymode = false;
-    }
-
-    if (this.interface === undefined) {
-      this.interface = '2D-Editor';
-    }
-
-    this.store.dispatch(
-      LocalModeActions.login({
-        files,
-        sessionFile,
-        removeData: false,
-        mode: LoginMode.LOCAL,
-      })
-    );
-  }
 
   setURLSession(
     audio: string,

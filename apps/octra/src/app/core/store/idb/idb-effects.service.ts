@@ -476,11 +476,10 @@ export class IDBEffects {
         OnlineModeActions.changeComment.do,
         OnlineModeActions.setFeedback,
         AnnotationActions.setLogging.do,
-        LocalModeActions.login,
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
+        AuthenticationActions.loginLocal.success,
         OnlineModeActions.startAnnotation.do,
-        LocalModeActions.login
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]) => {
@@ -697,7 +696,7 @@ export class IDBEffects {
     () =>
       this.actions$.pipe(
         ofType(
-          AuthenticationActions.login.success,
+          AuthenticationActions.loginOnline.success,
           AuthenticationActions.loginDemo.success
         ),
         tap((a) => {
@@ -711,10 +710,9 @@ export class IDBEffects {
     () =>
       this.actions$.pipe(
         ofType(
-          LocalModeActions.login,
+          AuthenticationActions.loginLocal.success,
           AuthenticationActions.loginDemo.success,
-          AuthenticationActions.login.success,
-          AuthenticationActions.loginDemo.success
+          AuthenticationActions.loginOnline.success
         ),
         tap(async (action) => {
           this.sessStr.store('loggedIn', true);

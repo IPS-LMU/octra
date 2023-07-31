@@ -146,19 +146,15 @@ export const reducer = createReducer(
     },
   })),
   on(
-    AuthenticationActions.login.success,
+    AuthenticationActions.loginOnline.success,
     AuthenticationActions.loginDemo.success,
+    AuthenticationActions.loginLocal.success,
     (state: ApplicationState, { mode }) => ({
       ...state,
       mode,
       loggedIn: true,
     })
   ),
-  on(LocalModeActions.login, (state: ApplicationState) => ({
-    ...state,
-    mode: LoginMode.LOCAL,
-    loggedIn: true,
-  })),
   on(
     OnlineModeActions.loginURLParameters,
     (state: ApplicationState, { urlParams }) => ({

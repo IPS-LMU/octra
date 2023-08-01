@@ -11,7 +11,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from "../../store/annotation/annotation.store.service";
+import { AnnotationStoreService } from "../../store/login-mode/annotation/annotation.store.service";
 
 @Component({
   selector: 'octra-prompt-modal',

@@ -18,23 +18,21 @@ import { getModeState, LoginMode, RootState } from '../index';
 import { ILevel, ILink, OAnnotJSON, OIDBLink } from '@octra/annotation';
 import { SessionStorageService } from 'ngx-webstorage';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import { AnnotationActions } from '../annotation/annotation.actions';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { IDBActions } from './idb.actions';
 import { ApplicationActions } from '../application/application.actions';
 import { ASRActions } from '../asr/asr.actions';
 import { UserActions } from '../user/user.actions';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
-import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
 import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
 import {
-  convertFromOIDLevel,
-  LocalModeState,
-  OnlineModeState,
-} from '../annotation';
+  AnnotationState,
+  convertFromOIDLevel
+} from "../login-mode/annotation";
 
 @Injectable({
   providedIn: 'root',
@@ -139,16 +137,17 @@ export class IDBEffects {
                   action.onlineOptions.transcriptID
                 ) {
                   this.store.dispatch(
-                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                    LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
                       projectID: action.onlineOptions.project.id,
                       taskID: action.onlineOptions.transcriptID,
                       mode: LoginMode.ONLINE,
                     })
                   );
                 }
-              } else if (state.application.mode === LoginMode.DEMO) {
+              } else {
+                // other modes
                 this.store.dispatch(
-                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                  LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
                     mode: LoginMode.DEMO,
@@ -362,7 +361,7 @@ export class IDBEffects {
       filter(
         (a) =>
           a.type === IDBActions.clearAllOptions.do.type ||
-          a.type === OnlineModeActions.clearWholeSession.do.type
+          a.type === LoginModeActions.clearWholeSession.do.type
       ),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
@@ -392,7 +391,7 @@ export class IDBEffects {
       filter(
         (action) =>
           action.type === AnnotationActions.clearAnnotation.do.type ||
-          action.type === OnlineModeActions.clearWholeSession.do.type ||
+          action.type === LoginModeActions.clearWholeSession.do.type ||
           action.type === AuthenticationActions.logout.success.type
       ),
       exhaustMap((action) => {
@@ -473,13 +472,13 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(
         AuthenticationActions.logout.success,
-        OnlineModeActions.changeComment.do,
-        OnlineModeActions.setFeedback,
+        LoginModeActions.changeComment.do,
+        LoginModeActions.setFeedback,
         AnnotationActions.setLogging.do,
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
         AuthenticationActions.loginLocal.success,
-        OnlineModeActions.startAnnotation.do,
+        LoginModeActions.startAnnotation.do
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]) => {
@@ -488,22 +487,19 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
-          console.log(`save for ${action.type}`);
-          console.log(appState.authentication);
-
           return this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile: modeState?.sessionFile?.toAny() ?? null,
               currentEditor: modeState.currentEditor ?? null,
               logging: modeState.logging ?? null,
-              project: modeState.onlineSession?.loadFromServer
-                ? modeState.onlineSession?.currentProject ?? null
+              project: modeState.currentSession?.loadFromServer
+                ? modeState.currentSession?.currentProject ?? null
                 : undefined,
-              transcriptID: modeState.onlineSession?.loadFromServer
-                ? modeState.onlineSession?.task?.id ?? null
+              transcriptID: modeState.currentSession?.loadFromServer
+                ? modeState.currentSession?.task?.id ?? null
                 : undefined,
-              feedback: modeState.onlineSession?.assessment ?? null,
-              comment: modeState.onlineSession?.comment ?? null,
+              feedback: modeState.currentSession?.assessment ?? null,
+              comment: modeState.currentSession?.comment ?? null,
               user: appState.authentication.me
                 ? {
                     id: appState.authentication.me.id,
@@ -827,7 +823,7 @@ export class IDBEffects {
 
   saveServerDataEntry$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.setServerDataEntry),
+      ofType(LoginModeActions.setServerDataEntry),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 
@@ -1058,16 +1054,16 @@ export class IDBEffects {
           state.application.mode === LoginMode.ONLINE &&
           state.application.loggedIn
         ) {
-          if (state.onlineMode.onlineSession?.loadFromServer) {
+          if (state.onlineMode.currentSession?.loadFromServer) {
             if (
-              state.onlineMode.onlineSession.currentProject !== undefined &&
-              state.onlineMode.onlineSession.task !== undefined
+              state.onlineMode.currentSession.currentProject !== undefined &&
+              state.onlineMode.currentSession.task !== undefined
             ) {
               return of(ApplicationActions.initApplication.finish());
             } else {
               return this.actions$.pipe(
                 ofType(
-                  OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success
+                  LoginModeActions.loadOnlineInformationAfterIDBLoaded.success
                 ),
                 map((a) => ApplicationActions.initApplication.finish())
               );
@@ -1122,7 +1118,7 @@ export class IDBEffects {
   }
 
   getModeStateFromString(appState: RootState, mode: LoginMode) {
-    let modeState: OnlineModeState | LocalModeState | undefined = undefined;
+    let modeState: AnnotationState | undefined = undefined;
     if (mode === 'online') {
       modeState = appState.onlineMode;
     } else if (mode === 'local') {

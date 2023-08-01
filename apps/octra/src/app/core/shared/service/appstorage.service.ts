@@ -1,8 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SessionStorageService } from 'ngx-webstorage';
-import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import { FileProgress } from '../../obj/objects';
 import {
   getProperties,
   SubscriptionManager,
@@ -11,28 +9,25 @@ import {
 import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { getModeState, LoadingStatus, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
-import { AudioManager } from '@octra/media';
 import { Actions } from '@ngrx/effects';
 import { ConsoleEntry } from './bug-report.service';
 import { Router } from '@angular/router';
-import { AnnotationActions } from '../../store/annotation/annotation.actions';
+import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
-import * as fromAnnotation from '../../store/annotation';
+import * as fromAnnotation from '../../store/login-mode/annotation';
 import {
+  AnnotationSessionState,
   AnnotationState,
   AnnotationStateLevel,
   convertFromOIDLevel,
-  OnlineSession,
-} from '../../store/annotation';
+} from '../../store/login-mode/annotation';
 import { ASRActions } from '../../store/asr/asr.actions';
 import { ILog } from '../../obj/Settings/logging';
-import { OnlineModeActions } from '../../store/modes/online-mode/online-mode.actions';
-import { LocalModeActions } from '../../store/modes/local-mode/local-mode.actions';
+import { LoginModeActions } from '../../store/login-mode';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { ProjectDto, TaskDto } from "@octra/api-types";
+import { ProjectDto, TaskDto } from '@octra/api-types';
 import { AuthenticationActions } from '../../store/authentication';
-import { get } from "jodit/types/core/helpers";
 
 @Injectable({
   providedIn: 'root',
@@ -60,9 +55,9 @@ export class AppStorageService {
     );
   }
 
-  public get currentTask(): TaskDto | undefined{
+  public get currentTask(): TaskDto | undefined {
     const mode = getModeState(this._snapshot);
-    return mode?.onlineSession?.task;
+    return mode?.currentSession.task;
   }
 
   public get annotationChanged(): Observable<AnnotationState> {
@@ -88,7 +83,7 @@ export class AppStorageService {
 
   set serverDataEntry(value: any) {
     this.store.dispatch(
-      OnlineModeActions.setServerDataEntry({
+      LoginModeActions.setServerDataEntry({
         serverDataEntry: value,
         mode: this.useMode,
       })
@@ -97,7 +92,7 @@ export class AppStorageService {
 
   set feedback(value: any) {
     this.store.dispatch(
-      OnlineModeActions.setFeedback({
+      LoginModeActions.setFeedback({
         feedback: value,
         mode: this.useMode,
       })
@@ -275,8 +270,8 @@ export class AppStorageService {
     return getModeState(this._snapshot)!.logs;
   }
 
-  get onlineSession(): OnlineSession | undefined {
-    return getModeState(this._snapshot)?.onlineSession;
+  get onlineSession(): AnnotationSessionState | undefined {
+    return getModeState(this._snapshot)?.currentSession;
   }
 
   get asrSelectedLanguage(): string {
@@ -421,7 +416,7 @@ export class AppStorageService {
     }
 
     this.store.dispatch(
-      OnlineModeActions.loginURLParameters({
+      LoginModeActions.loginURLParameters({
         urlParams: {
           audio,
           transcript,
@@ -474,7 +469,7 @@ export class AppStorageService {
               this.saving.emit('success');
             });
           this.store.dispatch(
-            OnlineModeActions.setFeedback({
+            LoginModeActions.setFeedback({
               mode: LoginMode.ONLINE,
               feedback: value,
             })

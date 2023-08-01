@@ -15,17 +15,17 @@ import {
   tap,
   timer,
 } from 'rxjs';
-import { getModeState, LoginMode, RootState } from '../index';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { RoutingService } from '../../shared/service/routing.service';
+import { getModeState, LoginMode, RootState } from '../../index';
+import { OctraModalService } from '../../../modals/octra-modal.service';
+import { RoutingService } from '../../../shared/service/routing.service';
 import { AnnotationActions } from './annotation.actions';
 import {
   AudioService,
   TranscriptionService,
   UserInteractionsService,
-} from '../../shared/service';
+} from '../../../shared/service';
 import { withLatestFrom } from 'rxjs/operators';
-import { AppInfo } from '../../../app.info';
+import { AppInfo } from '../../../../app.info';
 import {
   AnnotationLevelType,
   AnnotJSONConverter,
@@ -38,7 +38,7 @@ import {
   OIDBLink,
   OLevel,
 } from '@octra/annotation';
-import { AppStorageService } from '../../shared/service/appstorage.service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
 import {
   CurrentAccountDto,
   ProjectDto,
@@ -47,19 +47,19 @@ import {
   ToolConfigurationAssetDto,
 } from '@octra/api-types';
 import { convertFromOIDLevel, GuidelinesItem } from './index';
-import { NavbarService } from '../../component/navbar/navbar.service';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
-import { AuthenticationActions } from '../authentication';
-import { TranscriptionSendingModalComponent } from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
-import { NgbModalWrapper } from '../../modals/ng-modal-wrapper';
-import { ApplicationActions } from '../application/application.actions';
-import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { NavbarService } from '../../../component/navbar/navbar.service';
+import { LoginModeActions } from '../login-mode.actions';
+import { AuthenticationActions } from '../../authentication';
+import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
+import { ApplicationActions } from '../../application/application.actions';
+import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { FileInfo } from '@octra/utilities';
 import {
   createSampleProjectDto,
   createSampleTask,
   createSampleUser,
-} from '../../shared';
+} from '../../../shared';
 
 @Injectable()
 export class AnnotationEffects {
@@ -256,12 +256,20 @@ export class AnnotationEffects {
           } else if (state.application.mode === LoginMode.LOCAL) {
             // local mode
             if (state.localMode.sessionFile !== undefined) {
-              this.store.dispatch(
-                AnnotationActions.loadAudio.success({
-                  mode: LoginMode.LOCAL,
-                  audioFile: a.audioFile,
-                })
-              );
+              if(this.audio.audiomanagers.length > 0) {
+                this.store.dispatch(
+                  AnnotationActions.loadAudio.success({
+                    mode: LoginMode.LOCAL,
+                    audioFile: a.audioFile,
+                  })
+                );
+              } else {
+                this.store.dispatch(
+                  AnnotationActions.loadAudio.fail({
+                    error: 'audio from sessionfile not loaded. Reload needed.',
+                  })
+                );
+              }
             } else {
               this.store.dispatch(
                 AnnotationActions.loadAudio.fail({
@@ -299,7 +307,7 @@ export class AnnotationEffects {
   onTranscriptionEnd$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(OnlineModeActions.endTranscription.do),
+        ofType(LoginModeActions.endTranscription.do),
         tap((a) => {
           this.routingService.navigate(
             ['/intern/transcr/end'],
@@ -321,13 +329,13 @@ export class AnnotationEffects {
         if (state.application.mode === LoginMode.ONLINE) {
           if (
             a.freeTask &&
-            state.onlineMode.onlineSession.currentProject &&
-            state.onlineMode.onlineSession.task
+            state.onlineMode.currentSession.currentProject &&
+            state.onlineMode.currentSession.task
           ) {
             return this.apiService
               .freeTask(
-                state.onlineMode.onlineSession.currentProject.id,
-                state.onlineMode.onlineSession.task.id
+                state.onlineMode.currentSession.currentProject.id,
+                state.onlineMode.currentSession.task.id
               )
               .pipe(
                 map((result) => {
@@ -556,7 +564,7 @@ export class AnnotationEffects {
 
   onLoadOnlineInfo$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do),
+      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (a.mode === LoginMode.ONLINE) {
@@ -576,7 +584,7 @@ export class AnnotationEffects {
                 if (!a.actionAfterSuccess) {
                   // normal load after task start or resuming session
                   this.store.dispatch(
-                    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                    LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
                       {
                         mode: LoginMode.ONLINE,
                         me: currentAccount,
@@ -585,14 +593,14 @@ export class AnnotationEffects {
                       }
                     )
                   );
-                  return OnlineModeActions.prepareTaskDataForAnnotation.do({
+                  return LoginModeActions.prepareTaskDataForAnnotation.do({
                     mode: LoginMode.ONLINE,
                     currentProject,
                     task,
                   });
                 }
 
-                return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
                   {
                     mode: LoginMode.ONLINE,
                     me: currentAccount,
@@ -602,7 +610,7 @@ export class AnnotationEffects {
                   }
                 );
               } else {
-                return OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
                   {
                     mode: LoginMode.ONLINE,
                     me: currentAccount,
@@ -615,7 +623,7 @@ export class AnnotationEffects {
             }),
             catchError((error: HttpErrorResponse) => {
               return of(
-                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail({
+                LoginModeActions.loadOnlineInformationAfterIDBLoaded.fail({
                   error,
                 })
               );
@@ -665,8 +673,8 @@ export class AnnotationEffects {
               const currentProject = createSampleProjectDto(a.projectID);
               const task = createSampleTask(
                 a.taskID,
-                state.application.appConfiguration!.octra.audioExamples.map(
-                  (a) => ({
+                state.application
+                  .appConfiguration!.octra.audioExamples.map((a) => ({
                     filename: FileInfo.fromURL(a.url).fullname,
                     fileType: 'audio/wave',
                     type: 'input',
@@ -674,8 +682,8 @@ export class AnnotationEffects {
                     creator_type: TaskInputOutputCreatorType.user,
                     content: '',
                     content_type: '',
-                  })
-                ),
+                  }))
+                  .slice(0, 1),
                 [],
                 projectConfig,
                 functions,
@@ -688,7 +696,7 @@ export class AnnotationEffects {
               );
 
               this.store.dispatch(
-                OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success({
+                LoginModeActions.loadOnlineInformationAfterIDBLoaded.success({
                   mode: a.mode,
                   me: createSampleUser(),
                   currentProject,
@@ -698,7 +706,7 @@ export class AnnotationEffects {
                 })
               );
 
-              return OnlineModeActions.prepareTaskDataForAnnotation.do({
+              return LoginModeActions.prepareTaskDataForAnnotation.do({
                 mode: a.mode,
                 currentProject,
                 task,
@@ -769,8 +777,8 @@ export class AnnotationEffects {
           });
 
           if (
-            !state.onlineMode.onlineSession.currentProject ||
-            !state.onlineMode.onlineSession.task?.id
+            !state.onlineMode.currentSession.currentProject ||
+            !state.onlineMode.currentSession.task?.id
           ) {
             return of(
               AnnotationActions.sendAnnotation.fail({
@@ -811,11 +819,11 @@ export class AnnotationEffects {
 
           return this.apiService
             .saveTask(
-              state.onlineMode.onlineSession.currentProject.id,
-              state.onlineMode.onlineSession.task.id,
+              state.onlineMode.currentSession.currentProject.id,
+              state.onlineMode.currentSession.task.id,
               {
-                assessment: state.onlineMode.onlineSession.assessment,
-                comment: state.onlineMode.onlineSession.comment,
+                assessment: state.onlineMode.currentSession.assessment,
+                comment: state.onlineMode.currentSession.comment,
                 log: state.onlineMode.logs,
               },
               outputs
@@ -864,12 +872,12 @@ export class AnnotationEffects {
         this.transcrSendingModal.ref?.close();
 
         return of(
-          OnlineModeActions.clearOnlineSession.do({
+          LoginModeActions.clearOnlineSession.do({
             mode: a.mode,
             actionAfterSuccess: AnnotationActions.startAnnotation.do({
               mode: a.mode,
-              project: state.onlineMode.onlineSession.currentProject!,
-              actionAfterFail: OnlineModeActions.endTranscription.do({
+              project: state.onlineMode.currentSession.currentProject!,
+              actionAfterFail: LoginModeActions.endTranscription.do({
                 clearSession: true,
                 mode: LoginMode.ONLINE,
               }),
@@ -882,7 +890,7 @@ export class AnnotationEffects {
 
   afterClearOnlineSession$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.clearOnlineSession.do),
+      ofType(LoginModeActions.clearOnlineSession.do),
       exhaustMap((a) => {
         return of(a.actionAfterSuccess);
       })
@@ -910,14 +918,14 @@ export class AnnotationEffects {
         const modeState = getModeState(state);
 
         if (
-          modeState?.onlineSession?.currentProject &&
-          modeState?.onlineSession?.task
+          modeState?.currentSession?.currentProject &&
+          modeState?.currentSession?.task
         ) {
           return of(
             AnnotationActions.prepareTaskDataForAnnotation.do({
               mode: state.application.mode!,
-              currentProject: modeState.onlineSession.currentProject,
-              task: modeState.onlineSession.task,
+              currentProject: modeState.currentSession.currentProject,
+              task: modeState.currentSession.task,
             })
           );
         }

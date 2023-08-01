@@ -98,7 +98,7 @@ export class ReloadFileComponent {
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
-    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), true);
+    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), false);
   };
 
   public isN(obj: any): boolean {

@@ -45,13 +45,12 @@ import { MaintenanceAPI } from '../../component/maintenance/maintenance-api';
 import { interval, Subject, Subscription, timer } from 'rxjs';
 import { DateTime } from 'luxon';
 import {
+  AnnotationState,
   AnnotationStateLevel,
   convertFromLevelObject,
-  convertToLevelObject,
-  LocalModeState,
-  OnlineModeState,
-} from '../../store/annotation';
-import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
+  convertToLevelObject
+} from "../../store/login-mode/annotation";
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TaskDto } from '@octra/api-types';
 import { RoutingService } from './routing.service';
 
@@ -113,7 +112,7 @@ export class TranscriptionService {
   }
 
   public get comment(): string {
-    return getModeState(this.appStorage.snapshot)?.onlineSession?.comment ?? '';
+    return getModeState(this.appStorage.snapshot)?.currentSession.comment ?? '';
   }
 
   get guidelines(): any | undefined {
@@ -456,7 +455,7 @@ export class TranscriptionService {
   }
 
   public async loadSegments(
-    modeState: OnlineModeState | LocalModeState,
+    modeState: AnnotationState,
     rootState: RootState
   ): Promise<void> {
     if (
@@ -480,7 +479,7 @@ export class TranscriptionService {
         rootState.application.mode === LoginMode.URL
       ) {
         let annotResult: ImportResult | undefined;
-        const task: TaskDto | undefined = modeState.onlineSession?.task;
+        const task: TaskDto | undefined = modeState.currentSession?.task;
 
         // import logs
         this.annotationStoreService.setLogs(

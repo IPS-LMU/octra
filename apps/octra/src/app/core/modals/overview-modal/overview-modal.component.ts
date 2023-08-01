@@ -22,7 +22,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;

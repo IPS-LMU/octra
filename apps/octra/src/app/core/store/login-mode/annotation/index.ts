@@ -1,10 +1,10 @@
 import { pipe } from 'rxjs';
-import { getModeState, RootState } from '../index';
+import { getModeState, RootState } from '../../index';
 import { Histories, UndoRedoState } from 'ngrx-wieder';
-import { ILog } from '../../obj/Settings/logging';
-import { ProjectSettings } from '../../obj';
+import { ILog } from '../../../obj/Settings/logging';
+import { ProjectSettings } from '../../../obj';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
-import { SessionFile } from '../../obj/SessionFile';
+import { SessionFile } from '../../../obj/SessionFile';
 import {
   AnnotationLevelType,
   ASRQueueItemType,
@@ -49,21 +49,7 @@ export interface AnnotationState extends UndoRedoState {
   };
   transcript: TranscriptionState;
   histories: Histories;
-  onlineSession?: OnlineSession;
-  files?: any;
-  sessionFile?: any;
-}
-
-export interface OnlineSession {
-  loadFromServer?: boolean;
-  currentProject?: ProjectDto;
-  task?: TaskDto;
-  assessment?: any;
-  comment?: string;
-}
-
-export interface OnlineModeState extends AnnotationState {
-  onlineSession: OnlineSession;
+  currentSession: AnnotationSessionState;
   previousSession?: {
     task: {
       id: string;
@@ -72,11 +58,15 @@ export interface OnlineModeState extends AnnotationState {
       id: string;
     }
   }
+  sessionFile?: any;
 }
 
-export interface LocalModeState extends AnnotationState {
-  files?: any[];
-  sessionFile?: SessionFile;
+export interface AnnotationSessionState {
+  loadFromServer?: boolean;
+  currentProject?: ProjectDto;
+  task?: TaskDto;
+  assessment?: any;
+  comment?: string;
 }
 
 export interface AnnotationStateLevel {

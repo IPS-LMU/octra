@@ -6,7 +6,7 @@ import { DefaultComponent } from '../../../component/default.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { AuthenticationStoreService } from '../../../store/authentication';
-import { AnnotationStoreService } from '../../../store/annotation/annotation.store.service';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-projects-list',

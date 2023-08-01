@@ -39,10 +39,10 @@ export class AuthenticationStoreService {
     const differentUserData = this.getDifferentUserData(store);
     if (
       !differentUserData &&
-      store.onlineMode.onlineSession.currentProject &&
-      store.onlineMode.onlineSession.task
+      store.onlineMode.currentSession.currentProject &&
+      store.onlineMode.currentSession.task
     ) {
-      return store.onlineMode.onlineSession;
+      return store.onlineMode.currentSession;
     }
 
     return undefined;

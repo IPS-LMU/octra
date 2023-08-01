@@ -10,7 +10,7 @@ import { AppStorageService } from "../../shared/service/appstorage.service";
 import { LoadingStatus, LoginMode } from "../../store";
 import { Store } from "@ngrx/store";
 import { Actions } from "@ngrx/effects";
-import { OnlineModeActions } from "../../store/modes/online-mode/online-mode.actions";
+import { LoginModeActions } from "../../store/login-mode/login-mode.actions";
 import { ApplicationActions } from "../../store/application/application.actions";
 import { DefaultComponent } from "../../component/default.component";
 import { ApplicationStoreService } from "../../store/application/application-store.service";

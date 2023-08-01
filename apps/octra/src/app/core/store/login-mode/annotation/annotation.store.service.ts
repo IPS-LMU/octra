@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { getModeState, LoginMode, RootState } from '../index';
+import { getModeState, LoginMode, RootState } from '../../index';
 import { Store } from '@ngrx/store';
 import { AnnotationActions } from './annotation.actions';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { LoginModeActions } from '../login-mode.actions';
 import { getTranscriptFromIO } from '@octra/utilities';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { getTranscriptFromIO } from '@octra/utilities';
 })
 export class AnnotationStoreService {
   task$ = this.store.select(
-    (state: RootState) => getModeState(state)?.onlineSession?.task
+    (state: RootState) => getModeState(state)?.currentSession?.task
   );
 
   textInput$ = this.store.select((state: RootState) => {
@@ -23,7 +23,7 @@ export class AnnotationStoreService {
     }
 
     const mode = getModeState(state);
-    const result = getTranscriptFromIO(mode?.onlineSession?.task?.inputs ?? []);
+    const result = getTranscriptFromIO(mode?.currentSession?.task?.inputs ?? []);
     return result;
   });
 
@@ -54,7 +54,7 @@ export class AnnotationStoreService {
 
   changeComment(comment: string) {
     this.store.dispatch(
-      OnlineModeActions.changeComment.do({
+      LoginModeActions.changeComment.do({
         mode: LoginMode.ONLINE,
         comment,
       })

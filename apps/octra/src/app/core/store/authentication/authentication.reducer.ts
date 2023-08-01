@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { AuthenticationActions } from './authentication.actions';
 import { AuthenticationState } from './index';
 import { APIActions } from '../api';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { AccountLoginMethod, AccountRole } from '@octra/api-types';
 import { IDBActions } from '../idb/idb.actions';
 
@@ -114,7 +114,7 @@ export const authenticationReducer = createReducer(
     };
   }),
   on(
-    OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
+    LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
     (state: AuthenticationState, { me }) => ({
       ...state,
       me,

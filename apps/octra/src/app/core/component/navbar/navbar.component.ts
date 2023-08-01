@@ -30,7 +30,7 @@ import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.comp
 import { Router } from '@angular/router';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
-import { AnnotationStoreService } from '../../store/annotation/annotation.store.service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import { AuthenticationStoreService } from "../../store/authentication";
@@ -328,7 +328,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   logout(redirectToProjects = false) {
     if (
       this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
-      this.appStorage.snapshot.onlineMode.onlineSession.currentProject
+      this.appStorage.snapshot.onlineMode.currentSession.currentProject
     ) {
       this.annotationStoreService.quit(true, true, redirectToProjects); // TODO change
     } else {

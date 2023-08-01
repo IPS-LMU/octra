@@ -30,7 +30,7 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AccountLoginMethod } from '../../../../../../../../octra-backend/dist/libs/api-types';
-import { AnnotationStoreService } from "../../store/annotation/annotation.store.service";
+import { AnnotationStoreService } from "../../store/login-mode/annotation/annotation.store.service";
 
 @Component({
   selector: 'octra-login',

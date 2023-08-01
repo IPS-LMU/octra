@@ -1,7 +1,7 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { IIDBModeOptions } from '../../shared/octra-database';
-import { AnnotationStateLevel } from '../annotation';
+import { AnnotationStateLevel } from '../login-mode/annotation';
 
 export class IDBActions {
   static loadOptions = createActionGroup({

@@ -1,13 +1,10 @@
 import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
-import { LoginMode } from '../index';
+import { LoginMode } from '../../index';
 import { AnnotationActions } from './annotation.actions';
-import { IDBActions } from '../idb/idb.actions';
-import { IIDBModeOptions } from '../../shared/octra-database';
+import { IDBActions } from '../../idb/idb.actions';
+import { IIDBModeOptions } from '../../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
-import { AnnotationState, OnlineModeState } from "./index";
-import { Annotation } from "@octra/annotation";
-import { OnlineModeReducers } from "../modes/online-mode/online-mode.reducer";
-import { OnlineModeActions } from "../modes/online-mode/online-mode.actions";
+import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -24,6 +21,7 @@ export const initialState: AnnotationState = {
   },
   logs: [],
   logging: false,
+  currentSession: {},
   histories: {},
 };
 

@@ -2,9 +2,8 @@ import { createReducer, on } from '@ngrx/store';
 import { LoadingStatus, LoginMode } from '../index';
 import { ApplicationActions } from './application.actions';
 import { IDBActions } from '../idb/idb.actions';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
-import { AnnotationActions } from '../annotation/annotation.actions';
-import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ApplicationState } from './index';
 import { AuthenticationActions } from '../authentication';
 
@@ -57,7 +56,7 @@ export const reducer = createReducer(
   ),
   on(ApplicationActions.initApplication.finish, (state: ApplicationState) => ({
     ...state,
-    initialized: true
+    initialized: true,
   })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
@@ -156,7 +155,7 @@ export const reducer = createReducer(
     })
   ),
   on(
-    OnlineModeActions.loginURLParameters,
+    LoginModeActions.loginURLParameters,
     (state: ApplicationState, { urlParams }) => ({
       ...state,
       mode: LoginMode.URL,

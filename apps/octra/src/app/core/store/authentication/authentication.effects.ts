@@ -14,7 +14,7 @@ import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { withLatestFrom } from 'rxjs/operators';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
 import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent,
@@ -269,7 +269,7 @@ export class AuthenticationEffects {
                   ) {
                     // load online data after login
                     this.store.dispatch(
-                      OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                      LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
                         projectID: state.onlineMode.previousSession.project.id,
                         taskID: state.onlineMode.previousSession.task.id,
                         mode: a.mode,
@@ -292,7 +292,7 @@ export class AuthenticationEffects {
           } else {
             // is not online => load local configuration
             this.store.dispatch(
-              OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do({
+              LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
                 projectID: '7234892',
                 taskID: '73482',
                 mode: a.mode,
@@ -306,7 +306,7 @@ export class AuthenticationEffects {
 
   afterIDLoadedSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success),
+      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.success),
       exhaustMap((a) => {
         if (a.actionAfterSuccess) {
           return of(a.actionAfterSuccess);

@@ -16,7 +16,7 @@ export enum ModalDeleteAnswer {
 export class TranscriptionDeleteModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false,
+    backdrop: true,
   };
 
   AppInfo = AppInfo;

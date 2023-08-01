@@ -60,7 +60,7 @@ import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
-import { AnnotationStoreService } from '../../../store/annotation/annotation.store.service';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from "../../../store/authentication";
 
 @Component({

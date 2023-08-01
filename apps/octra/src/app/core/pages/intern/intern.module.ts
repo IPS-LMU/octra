@@ -31,12 +31,10 @@ import { InternRoutingModule } from './intern-routing.module';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@ngneat/transloco';
 import { StoreModule } from '@ngrx/store';
-import { OnlineModeReducers } from '../../store/modes/online-mode/online-mode.reducer';
+import { LoginModeReducers } from '../../store/login-mode/login-mode.reducer';
 import { LoginMode } from '../../store';
-import * as fromLocalMode from '../../store/modes/local-mode/local-mode.reducer';
 import { EffectsModule } from '@ngrx/effects';
-import { AnnotationEffects } from '../../store/annotation/annotation.effects';
-import { TranscriptionService } from '../../shared/service';
+import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
 import { AsrService } from '../../shared/service/asr.service';
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];
@@ -85,13 +83,16 @@ export const EDITORS: any[] = [
     TranslocoModule,
     StoreModule.forFeature(
       'onlineMode',
-      new OnlineModeReducers(LoginMode.ONLINE).create()
+      new LoginModeReducers(LoginMode.ONLINE).create()
     ),
     StoreModule.forFeature(
       'demoMode',
-      new OnlineModeReducers(LoginMode.DEMO).create()
+      new LoginModeReducers(LoginMode.DEMO).create()
     ),
-    StoreModule.forFeature('localMode', fromLocalMode.reducer),
+    StoreModule.forFeature(
+      'localMode',
+      new LoginModeReducers(LoginMode.LOCAL).create()
+    ),
     EffectsModule.forFeature([AnnotationEffects]),
   ],
   exports: [

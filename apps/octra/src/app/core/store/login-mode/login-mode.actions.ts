@@ -1,20 +1,20 @@
-import { AnnotationActions } from '../../annotation/annotation.actions';
+import { AnnotationActions } from './annotation/annotation.actions';
 import { Action, createAction, createActionGroup, props } from '@ngrx/store';
-import { LoginMode } from '../../index';
+import { LoginMode } from '../index';
 import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
-import { URLParameters } from '../../application';
+import { URLParameters } from '../application';
 import { HttpErrorResponse } from '@angular/common/http';
 
-export class OnlineModeActions extends AnnotationActions {
+export class LoginModeActions extends AnnotationActions {
   public static loginURLParameters = createAction(
-    `online mode Login URLParameters`,
+    `login mode Login URLParameters`,
     props<{
       urlParams: URLParameters;
     }>()
   );
 
   public static setServerDataEntry = createAction(
-    `online mode Set serverDataEntry`,
+    `login mode Set serverDataEntry`,
     props<{
       serverDataEntry: TaskDto;
       mode: LoginMode;

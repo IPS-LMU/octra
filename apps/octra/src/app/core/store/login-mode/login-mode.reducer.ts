@@ -1,24 +1,24 @@
 import { Action, ActionReducer, on } from '@ngrx/store';
-import * as fromAnnotation from '../../annotation/annotation.reducer';
-import { AnnotationStateReducers } from '../../annotation/annotation.reducer';
+import * as fromAnnotation from './annotation/annotation.reducer';
+import { AnnotationStateReducers } from './annotation/annotation.reducer';
 import { undoRedo } from 'ngrx-wieder';
-import { AnnotationActions } from '../../annotation/annotation.actions';
-import { OnlineModeActions } from './online-mode.actions';
-import { IDBActions } from '../../idb/idb.actions';
+import { AnnotationActions } from './annotation/annotation.actions';
+import { LoginModeActions } from './login-mode.actions';
+import { IDBActions } from '../idb/idb.actions';
 import {
   DefaultModeOptions,
   IIDBModeOptions,
-} from '../../../shared/octra-database';
+} from '../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
-import { AuthenticationActions } from '../../authentication';
-import { OnlineModeState } from '../../annotation';
-import { LoginMode } from '../../index';
-import { ProjectSettings } from '../../../obj';
-import { ApplicationActions } from '../../application/application.actions';
+import { AuthenticationActions } from '../authentication';
+import { LoginMode } from '../index';
+import { ProjectSettings } from '../../obj';
+import { ApplicationActions } from '../application/application.actions';
+import { AnnotationState } from './annotation';
 
-export const initialState: OnlineModeState = {
+export const initialState: AnnotationState = {
   ...fromAnnotation.initialState,
-  onlineSession: {},
+  currentSession: {},
 };
 
 // initialize ngrx-wieder with custom config
@@ -30,18 +30,18 @@ const { createUndoRedoReducer } = undoRedo({
   ],
 });
 
-export class OnlineModeReducers {
+export class LoginModeReducers {
   constructor(private mode: LoginMode) {}
 
-  public create(): ActionReducer<OnlineModeState, Action> {
+  public create(): ActionReducer<AnnotationState, Action> {
     return createUndoRedoReducer(
       initialState,
       ...(new AnnotationStateReducers(this.mode).create() as any),
       // TODO !!!
       // prüfe, ob Task busy, falls ja, zeige Warnmeldung an mit Fortsetzen Funktion
       on(
-        OnlineModeActions.clearWholeSession.success,
-        (state: OnlineModeState, { mode }) => {
+        LoginModeActions.clearWholeSession.success,
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...initialState,
@@ -51,13 +51,13 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.clearOnlineSession.do,
-        (state: OnlineModeState, { mode }) => {
+        LoginModeActions.clearOnlineSession.do,
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...initialState,
-              onlineSession: {
-                currentProject: state.onlineSession.currentProject,
+              currentSession: {
+                currentProject: state.currentSession.currentProject,
               },
             };
           }
@@ -66,14 +66,14 @@ export class OnlineModeReducers {
       ),
       on(
         AuthenticationActions.logout.success,
-        OnlineModeActions.endTranscription.do,
-        (state: OnlineModeState, { clearSession, mode }) => {
+        LoginModeActions.endTranscription.do,
+        (state: AnnotationState, { clearSession, mode }) => {
           if (mode === this.mode) {
             return clearSession
               ? {
                   ...initialState,
-                  onlineSession: {
-                    ...initialState.onlineSession,
+                  currentSession: {
+                    ...initialState.currentSession,
                   },
                 }
               : {
@@ -92,27 +92,13 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.setAudioURL.do, // TODO replace this function
-        (state: OnlineModeState, { audioURL, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              onlineSession: {
-                ...state.onlineSession,
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
-        OnlineModeActions.setFeedback,
-        (state: OnlineModeState, { feedback, mode }) => {
+        LoginModeActions.setFeedback,
+        (state: AnnotationState, { feedback, mode }) => {
           if (mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
+              currentSession: {
+                ...state.currentSession,
                 assessment: feedback,
               },
             };
@@ -121,13 +107,13 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.changeComment.do,
-        (state: OnlineModeState, { comment, mode }) => {
+        LoginModeActions.changeComment.do,
+        (state: AnnotationState, { comment, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
+              currentSession: {
+                ...state.currentSession,
                 comment,
               },
             };
@@ -137,7 +123,10 @@ export class OnlineModeReducers {
       ),
       on(
         IDBActions.loadOptions.success,
-        (state: OnlineModeState, { onlineOptions, demoOptions }) => {
+        (
+          state: AnnotationState,
+          { onlineOptions, demoOptions, localOptions }
+        ) => {
           let result = state;
 
           let options: IIDBModeOptions;
@@ -145,6 +134,8 @@ export class OnlineModeReducers {
             options = onlineOptions;
           } else if (this.mode === LoginMode.DEMO) {
             options = demoOptions;
+          } else if (this.mode === LoginMode.LOCAL) {
+            options = localOptions;
           } else {
             options = DefaultModeOptions;
           }
@@ -157,16 +148,16 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.success,
-        (state: OnlineModeState, { currentProject, task, mode }) => {
+        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
+        (state: AnnotationState, { currentProject, task, mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
+              currentSession: {
+                ...state.currentSession,
                 currentProject,
                 task,
-                comment: state.onlineSession.comment ?? task?.comment ?? '',
+                comment: state.currentSession.comment ?? task?.comment ?? '',
               },
               logging:
                 (task?.tool_configuration?.value as ProjectSettings)?.logging
@@ -177,13 +168,13 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.loadOnlineInformationAfterIDBLoaded.do,
-        (state: OnlineModeState, { mode }) => {
+        LoginModeActions.loadOnlineInformationAfterIDBLoaded.do,
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              onlineSession: {
-                ...state.onlineSession,
+              currentSession: {
+                ...state.currentSession,
                 loadFromServer: true,
               },
             };
@@ -192,8 +183,8 @@ export class OnlineModeReducers {
         }
       ),
       on(
-        OnlineModeActions.startAnnotation.do,
-        (state: OnlineModeState, { mode }) => {
+        LoginModeActions.startAnnotation.do,
+        (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
@@ -202,16 +193,42 @@ export class OnlineModeReducers {
                 links: [],
                 levelCounter: 1,
               },
-              onlineSession: {},
+              currentSession: {},
             };
           }
           return state;
         }
       ),
       on(
-        OnlineModeActions.startAnnotation.success,
+        AuthenticationActions.loginLocal.success,
+        (state: AnnotationState, { mode, sessionFile, removeData }) => {
+          if (this.mode === mode) {
+            if (removeData) {
+              return {
+                ...state,
+                transcript: {
+                  levels: [],
+                  links: [],
+                  levelCounter: 1,
+                },
+                currentSession: {},
+                sessionFile,
+              };
+            } else {
+              return {
+                ...state,
+                currentSession: {},
+                sessionFile,
+              };
+            }
+          }
+          return state;
+        }
+      ),
+      on(
+        LoginModeActions.startAnnotation.success,
         (
-          state: OnlineModeState,
+          state: AnnotationState,
           {
             task,
             project,
@@ -221,12 +238,12 @@ export class OnlineModeReducers {
             selectedGuidelines,
           }
         ) => {
-          if (mode === LoginMode.ONLINE || mode === LoginMode.DEMO) {
+          if (this.mode === mode) {
             return {
               ...state,
               projectConfig: projectSettings,
-              onlineSession: {
-                ...state.onlineSession,
+              currentSession: {
+                ...state.currentSession,
                 loadFromServer: true,
                 currentProject: {
                   ...project,
@@ -263,7 +280,7 @@ export class OnlineModeReducers {
       ),
       on(
         ApplicationActions.setAppLanguage,
-        (state: OnlineModeState, { language }) => {
+        (state: AnnotationState, { language }) => {
           const guideline = state.guidelines?.list.find(
             (a) => a.filename === `guidelines_${language}.json`
           );
@@ -283,14 +300,14 @@ export class OnlineModeReducers {
   }
 
   writeOptionToStore(
-    state: OnlineModeState,
+    state: AnnotationState,
     attribute: string,
     value: any
-  ): OnlineModeState {
+  ): AnnotationState {
     switch (attribute) {
       case 'comment':
-        state.onlineSession = {
-          ...state.onlineSession,
+        state.currentSession = {
+          ...state.currentSession,
           comment: value,
         };
         break;
@@ -314,6 +331,15 @@ export class OnlineModeReducers {
               id: value,
             },
           } as any,
+        };
+        break;
+      case 'sessionfile':
+        state = {
+          ...state,
+          sessionFile: {
+            ...state.sessionFile,
+            ...value,
+          },
         };
         break;
     }

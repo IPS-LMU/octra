@@ -2,7 +2,7 @@ import { AuthenticationState } from './authentication';
 import { ApplicationState } from './application';
 import { ASRState } from './asr';
 import { UserState } from './user';
-import { LocalModeState, OnlineModeState } from './annotation';
+import { AnnotationState } from "./login-mode/annotation";
 
 export enum LoginMode {
   URL = 'url',
@@ -36,9 +36,9 @@ export interface RootState {
   authentication: AuthenticationState;
   application: ApplicationState;
   asr: ASRState;
-  onlineMode: OnlineModeState;
-  demoMode: OnlineModeState;
-  localMode: LocalModeState;
+  onlineMode: AnnotationState;
+  demoMode: AnnotationState;
+  localMode: AnnotationState;
   // TODO missing URL Mode state
   user: UserState;
 }

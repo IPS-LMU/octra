@@ -3,8 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { ApplicationActions } from '../application/application.actions';
-import { OnlineModeActions } from '../modes/online-mode/online-mode.actions';
-import { LocalModeActions } from '../modes/local-mode/local-mode.actions';
+import { LoginModeActions } from '../login-mode';
 import { catchError, forkJoin, map, of, Subject, tap, timer } from 'rxjs';
 import { exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -28,7 +27,7 @@ import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
 import { Params } from '@angular/router';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { AnnotationActions } from '../annotation/annotation.actions';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 
@@ -492,9 +491,9 @@ export class ApplicationEffects {
 
         timer(10).subscribe(() => {
           if (action.type === AuthenticationActions.logout.success.type) {
-            subject.next(OnlineModeActions.clearSessionStorage.success());
+            subject.next(LoginModeActions.clearSessionStorage.success());
           } else {
-            subject.next(LocalModeActions.clearSessionStorage.success());
+            subject.next(LoginModeActions.clearSessionStorage.success());
           }
           subject.complete();
 

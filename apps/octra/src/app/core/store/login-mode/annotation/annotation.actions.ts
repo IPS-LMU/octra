@@ -1,14 +1,14 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
-import { LoginMode } from '../index';
+import { LoginMode } from '../../index';
 import { OIDBLink } from '@octra/annotation';
-import { ILog } from '../../obj/Settings/logging';
+import { ILog } from '../../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import {
   AnnotationStateLevel,
   GuidelinesItem,
   TranscriptionState,
 } from './index';
-import { ProjectSettings } from '../../obj';
+import { ProjectSettings } from '../../../obj';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -227,16 +227,6 @@ export class AnnotationActions {
     events: {
       do: props<{
         log: ILog;
-        mode: LoginMode;
-      }>(),
-    },
-  });
-
-  static setAudioURL = createActionGroup({
-    source: `annotation/ set audio url`,
-    events: {
-      do: props<{
-        audioURL: string;
         mode: LoginMode;
       }>(),
     },

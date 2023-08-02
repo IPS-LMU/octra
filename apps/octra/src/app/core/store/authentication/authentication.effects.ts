@@ -5,23 +5,29 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
-import { catchError, exhaustMap, from, map, of, tap } from 'rxjs';
+import {
+  catchError,
+  exhaustMap,
+  from,
+  map,
+  of,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { AuthenticationActions } from './authentication.actions';
-import { joinURL } from '@octra/api-types';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { LoginMode, RootState } from '../index';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { withLatestFrom } from 'rxjs/operators';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
 import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent,
 } from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import { AudioManager } from "@octra/media";
-import { AppInfo } from "../../../app.info";
-import { SessionFile } from "../../obj/SessionFile";
+import { AudioManager } from '@octra/media';
+import { AppInfo } from '../../../app.info';
+import { SessionFile } from '../../obj/SessionFile';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -35,92 +41,9 @@ export class AuthenticationEffects {
       exhaustMap(([a, state]) => {
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((dto) => {
-            if (dto.openURL !== undefined) {
-              // need to open windowURL
-              const cid = Date.now();
-              let url = `${dto.openURL}`;
-              localStorage.setItem('cid', cid.toString());
-
-              if (a.type === AuthenticationActions.loginOnline.do.type) {
-                // redirect directly
-                url = `${url}?cid=${cid}&r=${encodeURIComponent(
-                  document.location.href
-                )}`;
-
-                if (dto.agreementToken) {
-                  url = `${url}&t=${dto.agreementToken}`;
-                  this.sessionStorageService.store('authType', a.method);
-                  this.sessionStorageService.store('authenticated', false);
-                }
-
-                document.location.href = url;
-
-                return AuthenticationActions.loginOnline.success({
-                  auth: dto,
-                  method: a.method,
-                  mode: state.application.mode!,
-                });
-              } else {
-                // redirect to new tab
-                const match = /(.+\/intern\/)/g.exec(document.location.href);
-                const baseURL =
-                  match && match.length === 2
-                    ? match[1]
-                    : document.location.href;
-                console.log('OPEN WINDOW');
-                console.log(joinURL(baseURL, 're-authentication'));
-
-                const bc = new BroadcastChannel('ocb_authentication');
-                bc.addEventListener('message', (e) => {
-                  if (e.data === true) {
-                    this.store.dispatch(
-                      AuthenticationActions.needReAuthentication.success({
-                        actionAfterSuccess: a.actionAfterSuccess,
-                      })
-                    );
-                    bc.close();
-                  }
-                });
-
-                window.open(
-                  `${url}?cid=${cid}&r=${encodeURIComponent(
-                    joinURL(baseURL, 're-authentication')
-                  )}`,
-                  '_blank'
-                );
-
-                return AuthenticationActions.reauthenticate.wait();
-              }
-            } else if (dto.me) {
-              this.sessionStorageService.store('webToken', dto.accessToken);
-              this.sessionStorageService.store('authType', a.method);
-              this.sessionStorageService.store('authenticated', true);
-
-              if (a.type === AuthenticationActions.loginOnline.do.type) {
-                if (!dto.me.last_login) {
-                  this.routingService.navigate(['/load'], {
-                    queryParams: {
-                      first_login: true,
-                    },
-                  });
-                } else {
-                  this.routingService.navigate(['/load']);
-                }
-                return AuthenticationActions.loginOnline.success({
-                  auth: dto,
-                  method: a.method,
-                  mode: a.mode,
-                });
-              } else {
-                return AuthenticationActions.needReAuthentication.success({
-                  actionAfterSuccess: a.actionAfterSuccess,
-                });
-              }
-            }
-            return AuthenticationActions.loginOnline.success({
-              auth: dto,
-              method: a.method,
-              mode: LoginMode.ONLINE,
+            return AuthenticationActions.logout.success({
+              clearSession: true,
+              mode: LoginMode.LOCAL,
             });
           }),
           catchError((err: HttpErrorResponse) => {
@@ -152,13 +75,16 @@ export class AuthenticationEffects {
     this.actions$.pipe(
       ofType(AuthenticationActions.loginLocal.do),
       exhaustMap((a) => {
-        const checkInputs = ()=> {
+        const checkInputs = () => {
           if (a.files !== undefined) {
             // get audio file
             let audiofile: File | undefined;
             for (const file of a.files) {
               if (
-                AudioManager.isValidAudioFileName(file.name, AppInfo.audioformats)
+                AudioManager.isValidAudioFileName(
+                  file.name,
+                  AppInfo.audioformats
+                )
               ) {
                 audiofile = file;
                 break;
@@ -166,15 +92,25 @@ export class AuthenticationEffects {
             }
 
             if (audiofile !== undefined) {
-              return of(AuthenticationActions.loginLocal.success({
-                ...a,
-                sessionFile: this.getSessionFile(audiofile)
-              }));
+              return of(
+                AuthenticationActions.loginLocal.success({
+                  ...a,
+                  sessionFile: this.getSessionFile(audiofile),
+                })
+              );
             } else {
-              return of(AuthenticationActions.loginLocal.fail(new Error('file not supported')))
+              return of(
+                AuthenticationActions.loginLocal.fail(
+                  new Error('file not supported')
+                )
+              );
             }
           } else {
-            return of(AuthenticationActions.loginLocal.fail(new Error('files are undefined')))
+            return of(
+              AuthenticationActions.loginLocal.fail(
+                new Error('files are undefined')
+              )
+            );
           }
         };
 

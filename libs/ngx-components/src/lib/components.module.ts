@@ -1,10 +1,10 @@
-import {CommonModule} from '@angular/common';
-import {HttpClientModule} from '@angular/common/http';
-import {NgModule} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {AudioplayerComponent} from './components/audio/audioplayer';
-import {LeadingNullPipe, ProcentPipe, TimespanPipe} from './pipe';
-import {AudioViewerComponent} from './components/audio/audio-viewer';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AudioplayerComponent } from './components/audio/audioplayer';
+import { LeadingNullPipe, ProcentPipe, TimespanPipe } from './pipe';
+import { AudioViewerComponent } from './components/audio/audio-viewer';
 
 @NgModule({
   declarations: [
@@ -12,21 +12,15 @@ import {AudioViewerComponent} from './components/audio/audio-viewer';
     ProcentPipe,
     AudioViewerComponent,
     LeadingNullPipe,
-    TimespanPipe
+    TimespanPipe,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, FormsModule, HttpClientModule, ReactiveFormsModule],
   exports: [
     AudioplayerComponent,
     AudioViewerComponent,
     ProcentPipe,
     TimespanPipe,
-    LeadingNullPipe
-  ]
+    LeadingNullPipe,
+  ],
 })
-export class OctraComponentsModule {
-}
+export class OctraComponentsModule {}

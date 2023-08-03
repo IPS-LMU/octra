@@ -13,7 +13,7 @@ import { TranslocoModule } from '@ngneat/transloco';
 import { AppSharedModule } from '../../app.shared.module';
 import { MaintenanceModule } from '../component/maintenance/maintenance.module';
 import { RouterModule } from '@angular/router';
-import { BrowserTestComponent } from "./browser-test";
+import { BrowserTestComponent } from './browser-test';
 
 @NgModule({
   declarations: [
@@ -23,7 +23,7 @@ import { BrowserTestComponent } from "./browser-test";
     LoginComponent,
     NewsComponent,
     StresstestComponent,
-    BrowserTestComponent
+    BrowserTestComponent,
   ],
   imports: [
     CommonModule,
@@ -44,7 +44,7 @@ import { BrowserTestComponent } from "./browser-test";
     LoginComponent,
     NewsComponent,
     StresstestComponent,
-    BrowserTestComponent
+    BrowserTestComponent,
   ],
 })
 export class PagesModule {}

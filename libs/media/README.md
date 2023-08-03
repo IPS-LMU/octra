@@ -1,5 +1,7 @@
-# @octra/media
+# media
 
-Library for media playback and decoding.
+This library was generated with [Nx](https://nx.dev).
 
-- [audio](src/lib/audio) : all functions and classes in regard to audio playback and decoding.
+## Building
+
+Run `nx build media` to build the library.

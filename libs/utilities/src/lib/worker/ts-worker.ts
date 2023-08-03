@@ -1,5 +1,5 @@
-import { Subject } from "rxjs";
-import { TsWorkerJob, TsWorkerStatus } from "./ts-worker-job";
+import { Subject } from 'rxjs';
+import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
 
 export class TsWorker {
   private static workerID = 1;
@@ -30,13 +30,11 @@ export class TsWorker {
   constructor() {
     this._id = TsWorker.workerID++;
     // creates an worker that runs a job
-    this.blobURL = URL.createObjectURL(new Blob([
-        TsWorker.getWorkerScript()
-      ],
-      {
-        type: "application/javascript"
-      }
-    ));
+    this.blobURL = URL.createObjectURL(
+      new Blob([TsWorker.getWorkerScript()], {
+        type: 'application/javascript',
+      })
+    );
     this.worker = new Worker(this.blobURL);
   }
 
@@ -44,11 +42,14 @@ export class TsWorker {
    * converts a job to an JSON object
    */
   private static convertJobToObj(job: TsWorkerJob) {
-    let scriptString = (typeof job.doFunction === "string") ? job.doFunction : job.doFunction.toString();
+    let scriptString =
+      typeof job.doFunction === 'string'
+        ? job.doFunction
+        : job.doFunction.toString();
     scriptString = scriptString
       // remove comments
-      .replace(/(\/\*+[^**/]+\*+\/)|(\/\/.*)\n*/g, "")
-      .replace(/(function)([^(]*)([^{\n]+)/g, "$3 => ");
+      .replace(/(\/\*+[^**/]+\*+\/)|(\/\/.*)\n*/g, '')
+      .replace(/(function)([^(]*)([^{\n]+)/g, '$3 => ');
 
     if (eval(`${scriptString}`) === undefined) {
       throw new Error("Can't eval function.");
@@ -57,7 +58,7 @@ export class TsWorker {
     return {
       userName: job.id,
       args: job.args,
-      doFunction: scriptString
+      doFunction: scriptString,
     };
   }
 
@@ -127,7 +128,9 @@ onmessage = (msg) => {
       this._queue.push(job);
       this.checkBeforeStart();
     } else {
-      console.error(`job ${job.id} is already in job list of worker ${this._id}`);
+      console.error(
+        `job ${job.id} is already in job list of worker ${this._id}`
+      );
     }
   }
 
@@ -158,21 +161,23 @@ onmessage = (msg) => {
       const job = this.getFirstFreeJob();
       if (job !== undefined) {
         job.changeStatus(TsWorkerStatus.RUNNING);
-        this.run(this._queue[0]).then((result: any) => {
-          // remove job from job list
-          this.removeJobByID(job.id);
+        this.run(this._queue[0])
+          .then((result: any) => {
+            // remove job from job list
+            this.removeJobByID(job.id);
 
-          job.result = result;
-          job.changeStatus(TsWorkerStatus.FINISHED);
-          this._jobstatuschange.next(job);
+            job.result = result;
+            job.changeStatus(TsWorkerStatus.FINISHED);
+            this._jobstatuschange.next(job);
 
-          this.checkBeforeStart();
-        }).catch((error) => {
-          job.changeStatus(TsWorkerStatus.FAILED);
-          this._jobstatuschange.error(error);
-          this._jobstatuschange = new Subject();
-          this.checkBeforeStart();
-        });
+            this.checkBeforeStart();
+          })
+          .catch((error) => {
+            job.changeStatus(TsWorkerStatus.FAILED);
+            this._jobstatuschange.error(error);
+            this._jobstatuschange = new Subject();
+            this.checkBeforeStart();
+          });
       }
     }
   }
@@ -205,9 +210,11 @@ onmessage = (msg) => {
    * @param job job to check
    */
   public hasJob(job: TsWorkerJob) {
-    return this._queue.findIndex((a) => {
-      return a !== undefined && a.id === job.id;
-    }) > -1;
+    return (
+      this._queue.findIndex((a) => {
+        return a !== undefined && a.id === job.id;
+      }) > -1
+    );
   }
 
   /**
@@ -222,33 +229,31 @@ onmessage = (msg) => {
    * @param job the job to run
    */
   private run = (job: TsWorkerJob): Promise<any> => {
-    return new Promise<any>(
-      (resolve, reject) => {
-        this.worker.onmessage = (ev: MessageEvent) => {
-          job.statistics.ended = Date.now();
-          this.status = ev.data.status;
+    return new Promise<any>((resolve, reject) => {
+      this.worker.onmessage = (ev: MessageEvent) => {
+        job.statistics.ended = Date.now();
+        this.status = ev.data.status;
 
-          if (ev.data.status === "finished") {
-            this.removeJobByID(job.id);
-            resolve(ev.data.result);
-          } else if (ev.data.status === "failed") {
-            this.removeJobByID(job.id);
-            reject(ev.data.message);
-          }
-        };
-
-        this.worker.onerror = (err) => {
-          this.status = TsWorkerStatus.FAILED;
+        if (ev.data.status === 'finished') {
           this.removeJobByID(job.id);
-          reject(err);
-        };
+          resolve(ev.data.result);
+        } else if (ev.data.status === 'failed') {
+          this.removeJobByID(job.id);
+          reject(ev.data.message);
+        }
+      };
 
-        job.statistics.started = Date.now();
-        this.worker.postMessage({
-          command: "run",
-          args: [TsWorker.convertJobToObj(job)]
-        });
-      }
-    );
+      this.worker.onerror = (err) => {
+        this.status = TsWorkerStatus.FAILED;
+        this.removeJobByID(job.id);
+        reject(err);
+      };
+
+      job.statistics.started = Date.now();
+      this.worker.postMessage({
+        command: 'run',
+        args: [TsWorker.convertJobToObj(job)],
+      });
+    });
   };
 }

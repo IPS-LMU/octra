@@ -1,8 +1,7 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile} from '../annotjson';
+import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import { OAnnotJSON, OAudiofile } from '../annotjson';
 
 export class AnnotJSONConverter extends Converter {
-
   public constructor() {
     super();
     this._application = 'Emu-WebApp';
@@ -21,8 +20,8 @@ export class AnnotJSONConverter extends Converter {
           name: annotation.name + this._extension,
           content: JSON.stringify(annotation, undefined, 2),
           encoding: 'UTF-8',
-          type: 'application/json'
-        }
+          type: 'application/json',
+        },
       };
     }
 
@@ -38,31 +37,35 @@ export class AnnotJSONConverter extends Converter {
         try {
           result = JSON.parse(content);
 
-          if (result.annotates === audiofile.name && result.sampleRate === audiofile.sampleRate) {
+          if (
+            result.annotates === audiofile.name &&
+            result.sampleRate === audiofile.sampleRate
+          ) {
             return {
               annotjson: result,
               audiofile: undefined,
-              error: ''
+              error: '',
             };
           } else {
             return {
               annotjson: undefined,
               audiofile: undefined,
-              error: 'Either the "annotates" field or the sample rate are not equal to the audio file.'
+              error:
+                'Either the "annotates" field or the sample rate are not equal to the audio file.',
             };
           }
         } catch (e) {
           return {
             annotjson: undefined,
             audiofile: undefined,
-            error: 'Could not read AnnotJSON (parse error).'
+            error: 'Could not read AnnotJSON (parse error).',
           };
         }
       } else {
         return {
           annotjson: undefined,
           audiofile: undefined,
-          error: `Could not read AnnotJSON. (empty content)`
+          error: `Could not read AnnotJSON. (empty content)`,
         };
       }
     }
@@ -70,7 +73,7 @@ export class AnnotJSONConverter extends Converter {
     return {
       annotjson: undefined,
       audiofile: undefined,
-      error: `This AnnotJSON is not compatible.`
+      error: `This AnnotJSON is not compatible.`,
     };
   }
 }

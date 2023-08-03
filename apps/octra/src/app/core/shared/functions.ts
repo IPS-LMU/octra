@@ -8,7 +8,10 @@ import {
   TaskStatus,
 } from '@octra/api-types';
 
-export function createSampleProjectDto(projectID: string, dto?: Partial<ProjectDto>): ProjectDto {
+export function createSampleProjectDto(
+  projectID: string,
+  dto?: Partial<ProjectDto>
+): ProjectDto {
   return {
     id: projectID,
     name: 'demo project',
@@ -44,7 +47,7 @@ export function createSampleProjectDto(projectID: string, dto?: Partial<ProjectD
     enddate: new Date().toISOString(),
     creationdate: new Date().toISOString(),
     updatedate: new Date().toISOString(),
-    ...dto
+    ...dto,
   };
 }
 

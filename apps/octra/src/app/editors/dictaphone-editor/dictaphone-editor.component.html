@@ -25,7 +25,9 @@
   [validationEnabled]="
     appStorage.useMode !== 'url' &&
     (appStorage.useMode === 'demo' ||
-      (settingsService.projectsettings !== undefined && settingsService.projectsettings!.octra !== undefined && settingsService.projectsettings.octra.validationEnabled === true))
+      (settingsService.projectsettings !== undefined &&
+        settingsService.projectsettings!.octra !== undefined &&
+        settingsService.projectsettings.octra.validationEnabled === true))
   "
   [(highlightingEnabled)]="highlighting"
   [externalShortcutManager]="keyMap.shortcutsManager"

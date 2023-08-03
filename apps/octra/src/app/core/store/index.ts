@@ -2,7 +2,7 @@ import { AuthenticationState } from './authentication';
 import { ApplicationState } from './application';
 import { ASRState } from './asr';
 import { UserState } from './user';
-import { AnnotationState } from "./login-mode/annotation";
+import { AnnotationState } from './login-mode/annotation';
 
 export enum LoginMode {
   URL = 'url',
@@ -13,10 +13,10 @@ export enum LoginMode {
 
 export enum LoadingStatus {
   INITIALIZE = 'INITIALIZE',
-  WAITING = "WAITING",
+  WAITING = 'WAITING',
   LOADING = 'LOADING',
   FAILED = 'FAILED',
-  FINISHED = 'FINISHED'
+  FINISHED = 'FINISHED',
 }
 
 export interface LoginData {

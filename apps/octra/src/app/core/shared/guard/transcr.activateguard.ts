@@ -8,11 +8,11 @@ import {
 } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
-import { LoadingStatus, LoginMode, RootState } from '../../store';
+import { LoadingStatus, RootState } from '../../store';
 import { navigateTo } from '@octra/ngx-utilities';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { Store } from '@ngrx/store';
-import { TranscriptionService } from "../service";
+import { TranscriptionService } from '../service';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {

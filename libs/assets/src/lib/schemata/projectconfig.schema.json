@@ -1,9 +1,7 @@
 {
   "$id": "v0.0.1",
   "type": "object",
-  "required": [
-    "version"
-  ],
+  "required": ["version"],
   "properties": {
     "version": {
       "type": "string",

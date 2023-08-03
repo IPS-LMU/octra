@@ -1,6 +1,8 @@
 <div id="transcr-end">
   <div class="container" style="width: 900px">
-    <div class="text-center"><i class="bi bi-check-circle" style="color:green; font-size: 100px;"></i></div>
+    <div class="text-center">
+      <i class="bi bi-check-circle" style="color: green; font-size: 100px"></i>
+    </div>
     <div class="well well-large">
       <p>{{ 'transcription submitted.no jobs left' | transloco }}</p>
     </div>
@@ -10,13 +12,13 @@
           (click)="backToProjectsList()"
           class="btn btn-primary"
           style="width: 100%"
-        >{{"p.back to projects" | transloco}}</a
+          >{{ 'p.back to projects' | transloco }}</a
         >
       </div>
       <div class="col-md-6">
         <a (click)="leave()" class="btn btn-secondary" style="width: 100%">{{
           'transcription submitted.quit' | transloco
-          }}</a>
+        }}</a>
       </div>
     </div>
   </div>

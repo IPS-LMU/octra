@@ -1,10 +1,13 @@
-import {AudioInfo} from '../audio-info';
+import { AudioInfo } from '../audio-info';
 
 export type IntArray = Uint8Array | Int16Array | Int32Array;
 
 export abstract class AudioFormat {
   protected _extension!: string;
-  public formatConstructor!: Uint8ArrayConstructor | Int16ArrayConstructor | Int32ArrayConstructor;
+  public formatConstructor!:
+    | Uint8ArrayConstructor
+    | Int16ArrayConstructor
+    | Int32ArrayConstructor;
 
   get extension(): string {
     return this._extension;
@@ -63,9 +66,21 @@ export abstract class AudioFormat {
     }
   }
 
-  public getAudioInfo(filename: string, type: string, buffer: ArrayBuffer): AudioInfo {
+  public getAudioInfo(
+    filename: string,
+    type: string,
+    buffer: ArrayBuffer
+  ): AudioInfo {
     if (this.isValid(buffer)) {
-      return new AudioInfo(filename, type, buffer.byteLength, this.sampleRate, this._duration, this._channels, this._bitsPerSample);
+      return new AudioInfo(
+        filename,
+        type,
+        buffer.byteLength,
+        this.sampleRate,
+        this._duration,
+        this._channels,
+        this._bitsPerSample
+      );
     } else {
       throw new Error(`Audio file is not a valid ${this._extension} file.`);
     }

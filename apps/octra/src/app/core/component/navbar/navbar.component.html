@@ -142,7 +142,9 @@
       <ul class="navbar-nav">
         <li
           class="nav-item dropdown"
-          *ngIf="transcrServ !== undefined && transcrServ.currentlevel !== undefined"
+          *ngIf="
+            transcrServ !== undefined && transcrServ.currentlevel !== undefined
+          "
           [ngStyle]="{
             display:
               !appStorage.loggedIn ||
@@ -283,7 +285,11 @@
                   <span>{{ 'general.free jobs' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ getFreeAnnotationTasks(appStorage.onlineSession?.currentProject) }}</span>
+                  <span>{{
+                    getFreeAnnotationTasks(
+                      appStorage.onlineSession?.currentProject
+                    )
+                  }}</span>
                 </td>
               </tr>
               <tr>
@@ -618,11 +624,15 @@
           >
             <a class="dropdown-item">
               <i class="bi bi-person-circle"></i>
-              {{(authStoreService.me$ | async)?.username}}
+              {{ (authStoreService.me$ | async)?.username }}
             </a>
-            <a *ngIf="appStorage.useMode === 'online'" class="dropdown-item" (click)="backToProjectsList()">
+            <a
+              *ngIf="appStorage.useMode === 'online'"
+              class="dropdown-item"
+              (click)="backToProjectsList()"
+            >
               <i class="bi bi-arrow-left"></i>
-              {{"p.back to projects" | transloco}}
+              {{ 'p.back to projects' | transloco }}
             </a>
             <a class="dropdown-item" (click)="logout()">
               <i class="bi bi-door-open-fill"></i>

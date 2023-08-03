@@ -1,8 +1,14 @@
-import {AnnotationLevelType, ISegment, OEvent, OItem, OLevel} from './annotjson';
-import {Segments} from './segments';
-import {SampleUnit} from '@octra/media';
-import {OIDBLevel} from './db-objects';
-import {Segment} from './segment';
+import {
+  AnnotationLevelType,
+  ISegment,
+  OEvent,
+  OItem,
+  OLevel,
+} from './annotjson';
+import { Segments } from './segments';
+import { SampleUnit } from '@octra/media';
+import { OIDBLevel } from './db-objects';
+import { Segment } from './segment';
 
 export class Level {
   public counter = 1;
@@ -34,13 +40,13 @@ export class Level {
     this._name = name;
     this._id = id;
     switch (type) {
-      case('EVENT'):
+      case 'EVENT':
         this._type = AnnotationLevelType.EVENT;
         break;
-      case('ITEM'):
+      case 'ITEM':
         this._type = AnnotationLevelType.ITEM;
         break;
-      case('SEGMENT'):
+      case 'SEGMENT':
         this._type = AnnotationLevelType.SEGMENT;
         break;
     }
@@ -50,21 +56,35 @@ export class Level {
     }
   }
 
-  public static fromObj(entry: OIDBLevel, sampleRate: number, lastSample: SampleUnit): Level {
+  public static fromObj(
+    entry: OIDBLevel,
+    sampleRate: number,
+    lastSample: SampleUnit
+  ): Level {
     let segments: Segments | undefined = undefined;
     let events: any[] = [];
     let items: any[] = [];
 
     if (entry.level.type === 'SEGMENT') {
       const segmentEntries: ISegment[] = entry.level.items as ISegment[];
-      segments = new Segments(sampleRate, entry.level.name, segmentEntries, lastSample);
+      segments = new Segments(
+        sampleRate,
+        entry.level.name,
+        segmentEntries,
+        lastSample
+      );
     } else if (entry.level.type === 'ITEM') {
       items = entry.level.items;
     } else if (entry.level.type === 'EVENT') {
       events = entry.level.items;
     }
 
-    const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
+    const result = new Level(
+      entry.id,
+      entry.level.name,
+      entry.level.type,
+      segments
+    );
     result.items = items;
     result.events = events;
 
@@ -74,7 +94,11 @@ export class Level {
   public getObj(lastOriginalBoundary: SampleUnit): OLevel | undefined {
     let result: OLevel | undefined = undefined;
     if (this._type === AnnotationLevelType.SEGMENT) {
-      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.samples));
+      result = new OLevel(
+        this._name,
+        this.getTypeString(),
+        this.segments.getObj(this._name, lastOriginalBoundary.samples)
+      );
     } else if (this._type === AnnotationLevelType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
     } else if (this._type === AnnotationLevelType.EVENT) {
@@ -88,8 +112,13 @@ export class Level {
     return this._type;
   }
 
-  public addSegment(time: SampleUnit, label = '', transcript: string | undefined = undefined, triggerChange = true) {
-    const newLabel = (label !== '') ? label : this._name;
+  public addSegment(
+    time: SampleUnit,
+    label = '',
+    transcript: string | undefined = undefined,
+    triggerChange = true
+  ) {
+    const newLabel = label !== '' ? label : this._name;
     this.segments.add(time, newLabel, transcript, triggerChange);
   }
 
@@ -98,6 +127,11 @@ export class Level {
   }
 
   public clone(): Level {
-    return new Level(++this.counter, this.name + '_2', this.getTypeString(), this.segments.clone());
+    return new Level(
+      ++this.counter,
+      this.name + '_2',
+      this.getTypeString(),
+      this.segments.clone()
+    );
   }
 }

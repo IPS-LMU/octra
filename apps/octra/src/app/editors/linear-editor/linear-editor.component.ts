@@ -445,8 +445,8 @@ export class LinearEditorComponent
   }
 
   onMouseOver($event: {
-    event: MouseEvent | undefined,
-    time: SampleUnit | undefined
+    event: MouseEvent | undefined;
+    time: SampleUnit | undefined;
   }) {
     this.subscrManager.removeByTag('mouseTimer');
 
@@ -966,8 +966,8 @@ export class LinearEditorComponent
         this.transcrService.currentlevel!.segments &&
         this.selectedIndex < this.transcrService.currentlevel!.segments.length
       ) {
-        const segment = this.transcrService.currentlevel!.segments
-          .get(this.selectedIndex)!
+        const segment = this.transcrService
+          .currentlevel!.segments.get(this.selectedIndex)!
           .clone();
         // this.viewer.focused = false;
         // this.loupe.viewer.focused = false;

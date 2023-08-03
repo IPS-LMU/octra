@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { TaskInputOutputDto } from "@octra/api-types";
+import { TaskInputOutputDto } from '@octra/api-types';
 
 export interface FileSize {
   size: number;
@@ -381,7 +381,9 @@ export function removeEmptyProperties<T>(
         if (
           (options.removeNull && anyObj[key] === null) ||
           (options.removeUndefined && anyObj[key] === undefined) ||
-          (anyObj[key] !== undefined && anyObj[key] !== null && anyObj[key].toString() === 'NaN') ||
+          (anyObj[key] !== undefined &&
+            anyObj[key] !== null &&
+            anyObj[key].toString() === 'NaN') ||
           (options.removeEmptyStrings &&
             typeof anyObj[key] === 'string' &&
             anyObj[key].toString().trim() === '')
@@ -440,7 +442,9 @@ export async function readFileContents<T>(
   });
 }
 
-export function getTranscriptFromIO(io: TaskInputOutputDto[]): TaskInputOutputDto | undefined {
+export function getTranscriptFromIO(
+  io: TaskInputOutputDto[]
+): TaskInputOutputDto | undefined {
   return io.find(
     (a) =>
       !a.fileType!.includes('audio') &&

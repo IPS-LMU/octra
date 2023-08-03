@@ -13,8 +13,12 @@ export class ApplicationStoreService {
     (state: RootState) => state.application.appConfiguration
   );
   idb$ = this.store.select((state: RootState) => state.application.idb);
-  loggedIn$ = this.store.select((state: RootState) => state.application.loggedIn);
-  appInitialized = this.store.select((state: RootState) => state.application.initialized);
+  loggedIn$ = this.store.select(
+    (state: RootState) => state.application.loggedIn
+  );
+  appInitialized = this.store.select(
+    (state: RootState) => state.application.initialized
+  );
 
   public initApplication() {
     this.store.dispatch(ApplicationActions.initApplication.do());

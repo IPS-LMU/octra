@@ -40,11 +40,23 @@ export class MediaResource {
    * @param buffer arrayBuffer
    * @param fileSize file size
    */
-  constructor(fullName: string, sourceType: SourceType, buffer?: ArrayBuffer, fileSize?: number) {
-    if (sourceType !== SourceType.URL && (buffer === undefined || buffer === null)) {
-      throw new Error('MediaResource of type File or ArrayBuffer must have content');
+  constructor(
+    fullName: string,
+    sourceType: SourceType,
+    buffer?: ArrayBuffer,
+    fileSize?: number
+  ) {
+    if (
+      sourceType !== SourceType.URL &&
+      (buffer === undefined || buffer === null)
+    ) {
+      throw new Error(
+        'MediaResource of type File or ArrayBuffer must have content'
+      );
     } else if (fullName.lastIndexOf('.') === -1) {
-      throw new Error('fullName parameter needs to consist of an file extension');
+      throw new Error(
+        'fullName parameter needs to consist of an file extension'
+      );
     } else {
       const extensionStart = fullName.lastIndexOf('.');
       this._name = fullName.substring(0, extensionStart);

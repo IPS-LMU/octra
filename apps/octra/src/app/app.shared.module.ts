@@ -10,11 +10,14 @@ import { TranscriptionFeedbackComponent } from './core/component/transcription-f
 import { ClipTextPipe } from './core/shared/clip-text.pipe';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { NgbDropdownModule, NgbPopoverModule } from "@ng-bootstrap/ng-bootstrap";
+import {
+  NgbDropdownModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
 import { DropZoneComponent } from './core/component';
-import { OctraComponentsModule } from "@octra/ngx-components";
+import { OctraComponentsModule } from '@octra/ngx-components';
 
 @NgModule({
   declarations: [
@@ -32,7 +35,7 @@ import { OctraComponentsModule } from "@octra/ngx-components";
     DragDropModule,
     NgbDropdownModule,
     NgbPopoverModule,
-    OctraComponentsModule
+    OctraComponentsModule,
   ],
   providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [

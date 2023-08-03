@@ -10,11 +10,11 @@ export class BrowserInfo {
   }
 
   public static get browser(): string | undefined {
-    return (platform) ? platform.name : '';
+    return platform ? platform.name : '';
   }
 
   public static get version(): string | undefined {
-    return (platform) ? platform.version : '';
+    return platform ? platform.version : '';
   }
 
   public static get os(): any {

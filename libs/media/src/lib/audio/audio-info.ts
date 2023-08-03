@@ -1,5 +1,5 @@
-import {SampleUnit} from './audio-time';
-import {FileInfo} from '@octra/utilities';
+import { SampleUnit } from './audio-time';
+import { FileInfo } from '@octra/utilities';
 
 export class AudioInfo extends FileInfo {
   private readonly _bitrate: number = -1;
@@ -30,8 +30,15 @@ export class AudioInfo extends FileInfo {
     return this._sampleRate;
   }
 
-  constructor(filename: string, type: string, size: number, sampleRate: number, durationSamples: number,
-              channels: number, bitrate: number) {
+  constructor(
+    filename: string,
+    type: string,
+    size: number,
+    sampleRate: number,
+    durationSamples: number,
+    channels: number,
+    bitrate: number
+  ) {
     super(filename, type, size);
     this._sampleRate = sampleRate;
     this._duration = new SampleUnit(durationSamples, sampleRate);
@@ -39,4 +46,3 @@ export class AudioInfo extends FileInfo {
     this._bitrate = bitrate;
   }
 }
-

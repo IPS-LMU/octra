@@ -1,4 +1,4 @@
-import {OLevel, OLink} from './annotjson';
+import { OLevel, OLink } from './annotjson';
 
 export interface IIDBLevel {
   id: number;

@@ -1,11 +1,10 @@
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'timespan',
-  pure: false
+  pure: false,
 })
 export class TimespanPipe implements PipeTransform {
-
   private timespan = 0;
 
   private get MilliSeconds(): number {
@@ -29,11 +28,14 @@ export class TimespanPipe implements PipeTransform {
    * @param value number or milliseconds
    * @param args [showHour, showMilliSeconds]
    */
-  transform(value: number | undefined, args?: {
-    showHour?: boolean,
-    showMilliSeconds?: boolean,
-    maxDuration?: number
-  }): any {
+  transform(
+    value: number | undefined,
+    args?: {
+      showHour?: boolean;
+      showMilliSeconds?: boolean;
+      maxDuration?: number;
+    }
+  ): any {
     if (value !== undefined) {
       this.timespan = Number(value);
       if (this.timespan < 0) {
@@ -43,19 +45,23 @@ export class TimespanPipe implements PipeTransform {
       const defaultArgs = {
         showHour: false,
         showMilliSeconds: false,
-        maxDuration: 0
+        maxDuration: 0,
       };
 
-      args = {...defaultArgs, ...args};
+      args = { ...defaultArgs, ...args };
 
-      const forceHours = (Math.floor((args as any).maxDuration / 1000 / 60 / 60)) > 0;
+      const forceHours =
+        Math.floor((args as any).maxDuration / 1000 / 60 / 60) > 0;
 
       let result = '';
 
       const milliSeconds: string = this.formatNumber(this.MilliSeconds, 3);
       const minutes: string = this.formatNumber(this.Minutes, 2);
       const seconds: string = this.formatNumber(this.Seconds, 2);
-      const hours: string = (args.showHour && (forceHours || this.Hours > 0)) ? this.formatNumber(this.Hours, 2) + ':' : '';
+      const hours: string =
+        args.showHour && (forceHours || this.Hours > 0)
+          ? this.formatNumber(this.Hours, 2) + ':'
+          : '';
 
       result += hours + minutes + ':' + seconds;
       if (args.showMilliSeconds) {
@@ -72,6 +78,5 @@ export class TimespanPipe implements PipeTransform {
       result = '0' + result;
     }
     return result;
-  }
-
+  };
 }

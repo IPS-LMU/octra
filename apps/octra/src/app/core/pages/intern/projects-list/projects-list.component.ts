@@ -86,7 +86,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   getFreeAnnotationTasks(project: ProjectDto) {
-    return project.statistics?.tasks.find((a) => a.type === 'annotation')?.status
+    return (
+      project.statistics?.tasks.find((a) => a.type === 'annotation')?.status
         .free ?? 0
+    );
   }
 }

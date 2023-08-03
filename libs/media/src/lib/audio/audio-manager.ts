@@ -1,13 +1,13 @@
-import {EventEmitter} from '@angular/core';
-import {AudioDecoder} from './audio-decoder';
-import {AudioInfo} from './audio-info';
-import {AudioRessource} from './audio-ressource';
-import {AudioFormat, WavFormat} from './AudioFormats';
-import {SubscriptionManager} from '@octra/utilities';
-import {SampleUnit} from './audio-time';
-import {PlayBackStatus, SourceType} from '../types';
-import {AudioSelection} from './audio-selection';
-import {Subject, Subscription, timer} from 'rxjs';
+import { EventEmitter } from '@angular/core';
+import { AudioDecoder } from './audio-decoder';
+import { AudioInfo } from './audio-info';
+import { AudioRessource } from './audio-ressource';
+import { AudioFormat, WavFormat } from './AudioFormats';
+import { SubscriptionManager } from '@octra/utilities';
+import { SampleUnit } from './audio-time';
+import { PlayBackStatus, SourceType } from '../types';
+import { AudioSelection } from './audio-selection';
+import { Subject, Subscription, timer } from 'rxjs';
 
 declare let window: any;
 
@@ -18,18 +18,20 @@ export class AudioManager {
   public static decoder: AudioDecoder;
   public time = {
     start: 0,
-    end: 0
+    end: 0,
   };
   public onChannelDataChange = new Subject<void>();
   public audioBuffered = new Subject<{
-    sampleStart: SampleUnit,
-    sampleDur: SampleUnit
+    sampleStart: SampleUnit;
+    sampleDur: SampleUnit;
   }>();
 
   // events
-  public afterDecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
+  public afterDecoded: EventEmitter<AudioRessource> =
+    new EventEmitter<AudioRessource>();
   public afterLoaded: EventEmitter<any> = new EventEmitter<any>();
-  public statechange: EventEmitter<PlayBackStatus> = new EventEmitter<PlayBackStatus>();
+  public statechange: EventEmitter<PlayBackStatus> =
+    new EventEmitter<PlayBackStatus>();
   public missingPermission = new EventEmitter<void>();
 
   get audio(): HTMLAudioElement {
@@ -41,7 +43,7 @@ export class AudioManager {
   }
 
   get isPlaying(): boolean {
-    return (this._state === PlayBackStatus.PLAYING);
+    return this._state === PlayBackStatus.PLAYING;
   }
 
   get resource(): AudioRessource {
@@ -149,7 +151,10 @@ export class AudioManager {
    * @param extension file extension
    * @param audioformats list of supported audio formats
    */
-  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat | undefined {
+  public static getFileFormat(
+    extension: string,
+    audioformats: AudioFormat[]
+  ): AudioFormat | undefined {
     return audioformats.find((a) => {
       return a.extension === extension;
     });
@@ -162,17 +167,24 @@ export class AudioManager {
    * @param buffer
    * @param audioFormats
    */
-  public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
-                               audioFormats: AudioFormat[]): Subject<{
-    audioManager?: AudioManager,
-    decodeProgress: number
+  public static decodeAudio = (
+    filename: string,
+    type: string,
+    buffer: ArrayBuffer,
+    audioFormats: AudioFormat[]
+  ): Subject<{
+    audioManager?: AudioManager;
+    decodeProgress: number;
   }> => {
     const subj = new Subject<{
-      audioManager?: AudioManager,
-      decodeProgress: number
+      audioManager?: AudioManager;
+      decodeProgress: number;
     }>();
 
-    const audioformat: AudioFormat | undefined = AudioManager.getFileFormat(filename.substring(filename.lastIndexOf('.')), audioFormats);
+    const audioformat: AudioFormat | undefined = AudioManager.getFileFormat(
+      filename.substring(filename.lastIndexOf('.')),
+      audioFormats
+    );
 
     if (audioformat !== undefined) {
       audioformat.init(filename, buffer);
@@ -181,7 +193,6 @@ export class AudioManager {
 
       try {
         audioinfo = audioformat.getAudioInfo(filename, type, buffer);
-
       } catch (err: any) {
         subj.error(err!.message);
       }
@@ -189,17 +200,35 @@ export class AudioManager {
       if (audioinfo) {
         const bufferLength = buffer.byteLength;
         // decode first 10 seconds
-        const sampleDur = new SampleUnit(Math.min(audioformat.sampleRate * 30, audioformat.duration), audioformat.sampleRate);
+        const sampleDur = new SampleUnit(
+          Math.min(audioformat.sampleRate * 30, audioformat.duration),
+          audioformat.sampleRate
+        );
 
         // get result;
         const result = new AudioManager(audioinfo, audioformat.sampleRate);
 
-        audioinfo = new AudioInfo(filename, type, bufferLength, audioformat.sampleRate,
-          audioformat.sampleRate * audioformat.duration / audioformat.sampleRate, audioformat.channels, audioinfo.bitrate);
+        audioinfo = new AudioInfo(
+          filename,
+          type,
+          bufferLength,
+          audioformat.sampleRate,
+          (audioformat.sampleRate * audioformat.duration) /
+            audioformat.sampleRate,
+          audioformat.channels,
+          audioinfo.bitrate
+        );
 
-        audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
-        result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-          audioinfo, buffer, bufferLength));
+        audioinfo.file = new File([buffer], filename, { type: 'audio/wav' });
+        result.setRessource(
+          new AudioRessource(
+            filename,
+            SourceType.ArrayBuffer,
+            audioinfo,
+            buffer,
+            bufferLength
+          )
+        );
 
         // set duration is very important
 
@@ -214,44 +243,56 @@ export class AudioManager {
         result.prepareAudioPlayBack();
 
         result.time.start = Date.now();
-        const subscr = result.updateChannelData(result.createSampleUnit(0), sampleDur).subscribe((statusItem) => {
-            if (statusItem.progress === 1) {
-              setTimeout(() => {
+        const subscr = result
+          .updateChannelData(result.createSampleUnit(0), sampleDur)
+          .subscribe(
+            (statusItem) => {
+              if (statusItem.progress === 1) {
+                setTimeout(() => {
+                  subj.next({
+                    audioManager: result,
+                    decodeProgress: 1,
+                  });
+                  subj.complete();
+                }, 0);
+              } else {
                 subj.next({
-                  audioManager: result,
-                  decodeProgress: 1
+                  audioManager: undefined,
+                  decodeProgress: statusItem.progress,
                 });
-                subj.complete();
-              }, 0);
-            } else {
-              subj.next({
-                audioManager: undefined,
-                decodeProgress: statusItem.progress
-              });
+              }
+            },
+            (error) => {
+              console.error(error);
+              subscr.unsubscribe();
+            },
+            () => {
+              subscr.unsubscribe();
             }
-          },
-          (error) => {
-            console.error(error);
-            subscr.unsubscribe();
-          },
-          () => {
-            subscr.unsubscribe();
-          });
+          );
       }
     } else {
       subj.error(`audio format not supported`);
     }
 
     return subj;
-  }
+  };
 
   /**
    * checks if there is an audio format that matches with the extension of the audio file.
    * @param filename
    * @param audioFormats
    */
-  public static isValidAudioFileName(filename: string, audioFormats: AudioFormat[]): boolean {
-    return AudioManager.getFileFormat(filename.substring(filename.lastIndexOf('.')), audioFormats) !== undefined;
+  public static isValidAudioFileName(
+    filename: string,
+    audioFormats: AudioFormat[]
+  ): boolean {
+    return (
+      AudioManager.getFileFormat(
+        filename.substring(filename.lastIndexOf('.')),
+        audioFormats
+      ) !== undefined
+    );
   }
 
   /**
@@ -262,7 +303,6 @@ export class AudioManager {
     const mb = fileSize / 1024 / 1024;
 
     if (mb > 50) {
-
       // make chunks of 50 mb
       return Math.ceil(mb / 50);
     }
@@ -274,7 +314,9 @@ export class AudioManager {
    * stops the decoding process.
    */
   public static stopDecoding() {
-    if (!(AudioManager.decoder === undefined || AudioManager.decoder === null)) {
+    if (
+      !(AudioManager.decoder === undefined || AudioManager.decoder === null)
+    ) {
       AudioManager.decoder.requeststopDecoding();
     }
   }
@@ -286,7 +328,11 @@ export class AudioManager {
    * @param playbackRate
    * @param playOnHover
    */
-  public startPlayback(audioSelection: AudioSelection, volume: number, playbackRate: number, playOnHover = false
+  public startPlayback(
+    audioSelection: AudioSelection,
+    volume: number,
+    playbackRate: number,
+    playOnHover = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       //make sur selection is not changed
@@ -295,68 +341,80 @@ export class AudioManager {
         this.initAudioContext();
       }
 
-      this._audioContext?.resume().then(() => {
-        if (this._gainNode === undefined) {
-          this._gainNode = this.audioContext!.createGain();
-        }
-        // create an audio context and hook up the video element as the source
-        if (this._source === undefined) {
-          this._source = this._audioContext!.createMediaElementSource(this._audio);
-        }
-        this.changeState(PlayBackStatus.STARTED);
+      this._audioContext
+        ?.resume()
+        .then(() => {
+          if (this._gainNode === undefined) {
+            this._gainNode = this.audioContext!.createGain();
+          }
+          // create an audio context and hook up the video element as the source
+          if (this._source === undefined) {
+            this._source = this._audioContext!.createMediaElementSource(
+              this._audio
+            );
+          }
+          this.changeState(PlayBackStatus.STARTED);
 
-        // Firefox issue causes playBackRate working only for volume up to 1
+          // Firefox issue causes playBackRate working only for volume up to 1
 
-        // create a gain node
-        this._gainNode.gain.value = volume;
-        this._source.connect(this._gainNode);
+          // create a gain node
+          this._gainNode.gain.value = volume;
+          this._source.connect(this._gainNode);
 
-        // connect the gain node to an output destination
-        this._gainNode.connect(this._audioContext!.destination);
+          // connect the gain node to an output destination
+          this._gainNode.connect(this._audioContext!.destination);
 
-        this._audio.playbackRate = playbackRate;
-        this._audio.onerror = reject;
+          this._audio.playbackRate = playbackRate;
+          this._audio.onerror = reject;
 
-        this._playOnHover = playOnHover;
-        this._stepBackward = false;
-        this.playPosition = audioSelection.start!.clone();
-        this._statusRequest = PlayBackStatus.PLAYING;
-        this.changeState(PlayBackStatus.PLAYING);
+          this._playOnHover = playOnHover;
+          this._stepBackward = false;
+          this.playPosition = audioSelection.start!.clone();
+          this._statusRequest = PlayBackStatus.PLAYING;
+          this.changeState(PlayBackStatus.PLAYING);
 
-        this._audio.addEventListener('pause', this.onPlayBackChanged);
-        this._audio.addEventListener('ended', this.onPlayBackChanged);
-        this._audio.addEventListener('error', this.onPlaybackFailed);
+          this._audio.addEventListener('pause', this.onPlayBackChanged);
+          this._audio.addEventListener('ended', this.onPlayBackChanged);
+          this._audio.addEventListener('error', this.onPlaybackFailed);
 
-        this._audio.play()
-          .then(() => {
-            console.log("duration is: " + audioSelection.duration.seconds);
-            const time = Math.round(audioSelection.duration.unix / playbackRate);
-            this._playbackEndChecker = timer(Math.round(audioSelection.duration.unix / playbackRate)).subscribe(() => {
-              this.endPlayBack();
-              this.subscrManager.add(timer(100).subscribe(() => {
+          this._audio
+            .play()
+            .then(() => {
+              console.log('duration is: ' + audioSelection.duration.seconds);
+              const time = Math.round(
+                audioSelection.duration.unix / playbackRate
+              );
+              this._playbackEndChecker = timer(
+                Math.round(audioSelection.duration.unix / playbackRate)
+              ).subscribe(() => {
+                this.endPlayBack();
+                this.subscrManager.add(
+                  timer(100).subscribe(() => {
+                    resolve();
+                  })
+                );
+              });
+            })
+            .catch((error) => {
+              this._playbackEndChecker!.unsubscribe();
+              if (!this.playOnHover) {
+                if (error.name && error.name === 'NotAllowedError') {
+                  // no permission
+                  this.missingPermission.emit();
+                }
+
+                this.statechange.error(new Error(error));
+                reject(error);
+              } else {
                 resolve();
-              }));
-            });
-          })
-          .catch((error) => {
-            this._playbackEndChecker!.unsubscribe();
-            if (!this.playOnHover) {
-              if (error.name && error.name === 'NotAllowedError') {
-                // no permission
-                this.missingPermission.emit();
               }
-
-              this.statechange.error(new Error(error));
-              reject(error);
-            } else {
-              resolve();
-            }
-          });
-      }).catch((error) => {
-        this._playbackEndChecker!.unsubscribe();
-        this.statechange.error(new Error(error));
-        reject(error);
-      });
+            });
+        })
+        .catch((error) => {
+          this._playbackEndChecker!.unsubscribe();
+          this.statechange.error(new Error(error));
+          reject(error);
+        });
     });
   }
 
@@ -399,11 +457,13 @@ export class AudioManager {
    * prepares the audio manager for play back
    */
   public prepareAudioPlayBack() {
-    this._audio.src = URL.createObjectURL(new File([this._resource.arraybuffer!], this._resource.info.fullname));
+    this._audio.src = URL.createObjectURL(
+      new File([this._resource.arraybuffer!], this._resource.info.fullname)
+    );
 
     this._channel = undefined;
     this._state = PlayBackStatus.INITIALIZED;
-    this.afterLoaded.emit({status: 'success', error: ''});
+    this.afterLoaded.emit({ status: 'success', error: '' });
   }
 
   /**
@@ -416,15 +476,18 @@ export class AudioManager {
     }
   }
 
-
   /**
    * creates a new audio chunk entry from a given selection and adds it to the list of chunks.
    * @param time
    * @param selection
    */
-  public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk | undefined {
+  public createNewAudioChunk(
+    time: AudioSelection,
+    selection?: AudioSelection
+  ): AudioChunk | undefined {
     if (
-      time.start!.samples + time.duration.samples <= this.resource.info.duration.samples
+      time.start!.samples + time.duration.samples <=
+      this.resource.info.duration.samples
     ) {
       const chunk = new AudioChunk(time, this, selection);
       this.addChunk(chunk);
@@ -444,13 +507,10 @@ export class AudioManager {
   }
 
   public removeChunk(chunk: AudioChunk) {
-
     // remove by id
-    this.chunks = this.chunks.filter(
-      (a) => {
-        return a.id !== chunk.id;
-      }
-    );
+    this.chunks = this.chunks.filter((a) => {
+      return a.id !== chunk.id;
+    });
   }
 
   /**
@@ -480,15 +540,23 @@ export class AudioManager {
    * @param sampleStart
    * @param sampleDur
    */
-  public updateChannelData(sampleStart: SampleUnit, sampleDur: SampleUnit): Subject<{
-    progress: number
+  public updateChannelData(
+    sampleStart: SampleUnit,
+    sampleDur: SampleUnit
+  ): Subject<{
+    progress: number;
   }> {
     const result = new Subject<{ progress: number }>();
 
     const format = new WavFormat();
     format.init(this._resource.info.name, this._resource.arraybuffer!);
-    AudioManager.decoder = new AudioDecoder(format, this._resource.info, this._resource.arraybuffer!);
-    const subj = AudioManager.decoder.onChannelDataCalculate.subscribe((status) => {
+    AudioManager.decoder = new AudioDecoder(
+      format,
+      this._resource.info,
+      this._resource.arraybuffer!
+    );
+    const subj = AudioManager.decoder.onChannelDataCalculate.subscribe(
+      (status) => {
         if (status.progress === 1 && status.result !== undefined) {
           AudioManager.decoder.destroy();
           this._channel = status.result;
@@ -499,7 +567,7 @@ export class AudioManager {
           subj.unsubscribe();
         }
 
-        result.next({progress: status.progress});
+        result.next({ progress: status.progress });
         if (status.progress === 1 && status.result !== undefined) {
           result.complete();
         }
@@ -507,11 +575,14 @@ export class AudioManager {
       (error) => {
         this.onChannelDataChange.error(error);
         result.error(error);
-      });
+      }
+    );
     AudioManager.decoder.started = Date.now();
-    AudioManager.decoder.getChunkedChannelData(sampleStart, sampleDur).catch((error) => {
-      console.error(error);
-    });
+    AudioManager.decoder
+      .getChunkedChannelData(sampleStart, sampleDur)
+      .catch((error) => {
+        console.error(error);
+      });
 
     return result;
   }
@@ -521,12 +592,13 @@ export class AudioManager {
    * @private
    */
   private initAudioContext() {
-    const audioContext = window.AudioContext // Default
-      || window.webkitAudioContext // Safari and old versions of Chrome
-      || window.mozAudioContext
-      || false;
+    const audioContext =
+      window.AudioContext || // Default
+      window.webkitAudioContext || // Safari and old versions of Chrome
+      window.mozAudioContext ||
+      false;
     if (audioContext) {
-      if ((this._audioContext === undefined || this._audioContext === null)) {
+      if (this._audioContext === undefined || this._audioContext === null) {
         // reuse old audiocontext
         this._audioContext = new audioContext();
       }
@@ -564,19 +636,19 @@ export class AudioManager {
       callback();
     }
     this.callBacksAfterEnded = [];
-  }
+  };
 
   private onPlaybackFailed = (error: any) => {
     console.error(error);
-  }
+  };
 
   private onPause = () => {
     this.changeState(PlayBackStatus.PAUSED);
-  }
+  };
 
   private onStop = () => {
     this.changeState(PlayBackStatus.STOPPED);
-  }
+  };
 
   private onEnded = () => {
     if (this._state === PlayBackStatus.PLAYING) {
@@ -585,7 +657,7 @@ export class AudioManager {
     }
 
     this.gainNode.disconnect();
-  }
+  };
 
   private endPlayBack() {
     this._statusRequest = PlayBackStatus.ENDED;
@@ -599,7 +671,8 @@ export class AudioManager {
 
 export class AudioChunk {
   private static _counter = 0;
-  public statuschange: EventEmitter<PlayBackStatus> = new EventEmitter<PlayBackStatus>();
+  public statuschange: EventEmitter<PlayBackStatus> =
+    new EventEmitter<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
   private subscrManager = new SubscriptionManager<Subscription>();
   private _playposition: SampleUnit;
@@ -621,11 +694,14 @@ export class AudioChunk {
    * end position to the last sample every time it's called
    */
   public set startpos(value: SampleUnit) {
-    if ((value === undefined || value === null)) {
+    if (value === undefined || value === null) {
       throw new Error('start pos is undefined!');
     }
-    if ((this.selection === undefined || this.selection === null)) {
-      this.selection = new AudioSelection(value.clone(), this.time.end!.clone());
+    if (this.selection === undefined || this.selection === null) {
+      this.selection = new AudioSelection(
+        value.clone(),
+        this.time.end!.clone()
+      );
     } else {
       this.selection.start = value.clone();
       this.selection.end = this.time.end!.clone();
@@ -650,7 +726,11 @@ export class AudioChunk {
   }
 
   set relativePlayposition(value: SampleUnit | undefined) {
-    if (value !== undefined && this._time.end.samples >= value.samples && value.samples > -1) {
+    if (
+      value !== undefined &&
+      this._time.end.samples >= value.samples &&
+      value.samples > -1
+    ) {
       this._playposition = this._time.start.add(value);
     } else {
       console.error(`invalid value for relative sample unit!`);
@@ -665,7 +745,11 @@ export class AudioChunk {
   }
 
   set absolutePlayposition(value: SampleUnit) {
-    if (value !== undefined && value.samples >= this._time.start.samples && value.samples <= this._time.end.samples) {
+    if (
+      value !== undefined &&
+      value.samples >= this._time.start.samples &&
+      value.samples <= this._time.end.samples
+    ) {
       this._playposition = value;
     } else {
       console.error(`incorrect value for absolute playback position!`);
@@ -758,11 +842,17 @@ export class AudioChunk {
     return this._replay;
   }
 
-  constructor(time: AudioSelection, audioManager: AudioManager, selection?: AudioSelection) {
+  constructor(
+    time: AudioSelection,
+    audioManager: AudioManager,
+    selection?: AudioSelection
+  ) {
     if (time && time.start && time.end) {
       this.time = time.clone();
     } else {
-      throw new Error('AudioChunk constructor needs two correct AudioTime objects');
+      throw new Error(
+        'AudioChunk constructor needs two correct AudioTime objects'
+      );
     }
 
     if (!(audioManager === undefined || audioManager === null)) {
@@ -784,7 +874,10 @@ export class AudioChunk {
 
   public getChannelBuffer(selection: AudioSelection): Float32Array | undefined {
     if (selection) {
-      return this.audioManager!.channel?.subarray(selection.start.samples, selection.end.samples);
+      return this.audioManager!.channel?.subarray(
+        selection.start.samples,
+        selection.end.samples
+      );
     }
 
     return undefined;
@@ -796,76 +889,101 @@ export class AudioChunk {
         if (!this._audioManger.isPlaying) {
           resolve2();
         } else {
-          this._audioManger.pausePlayback().then(() => {
-            this.subscrManager.add(timer(500).subscribe(() => {
-              resolve2();
-            }));
-          }).catch((error) => {
-            reject2(error);
-          });
+          this._audioManger
+            .pausePlayback()
+            .then(() => {
+              this.subscrManager.add(
+                timer(500).subscribe(() => {
+                  resolve2();
+                })
+              );
+            })
+            .catch((error) => {
+              reject2(error);
+            });
         }
-      }).then(() => {
-        if (this._selection === undefined) {
-          this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
-        }
-
-        if (this._selection.start.equals(this._selection.end)) {
-          this.startpos = this._selection.start.clone() as SampleUnit;
-        }
-
-        this._lastplayedpos = this._playposition.clone();
-
-        const id = this.subscrManager.add(this.audioManager.statechange.subscribe(
-          (state: PlayBackStatus) => {
-            if (state === PlayBackStatus.STOPPED || state === PlayBackStatus.PAUSED || state === PlayBackStatus.ENDED) {
-              this.subscrManager.removeById(id);
-            }
-
-            if (state === PlayBackStatus.STOPPED) {
-              this._playposition = this.time.start.clone();
-            }
-
-            if (state === PlayBackStatus.ENDED) {
-              this.absolutePlayposition = this.selection.end.clone();
-              // reset to beginning of selection
-
-              if (this._playposition.seconds >= this.time.end.seconds) {
-                this.startpos = this.time.start.clone();
-              } else {
-                this._playposition = this.selection.start.clone();
-              }
-              if (this._replay) {
-                this.setState(state);
-                new Promise<void>((resolve2, reject2) => {
-                  this.subscrManager.add(timer(200).subscribe(() => {
-                    this.startPlayback(playOnHover).then(() => {
-                      resolve2();
-                    })
-                      .catch((error) => {
-                        console.error(error);
-                        reject2(error);
-                      });
-                  }));
-                });
-              } else {
-                this.setState(state);
-                resolve();
-              }
-            } else {
-              this.setState(state);
-              resolve();
-            }
-          },
-          (error) => {
-            console.error(error);
+      })
+        .then(() => {
+          if (this._selection === undefined) {
+            this.selection = new AudioSelection(
+              this.time.start.clone(),
+              this.time.end.clone()
+            );
           }
-        ));
 
-        this._audioManger.startPlayback(this.selection, this._volume, this._playbackRate, playOnHover
-        ).catch(reject);
-      }).catch((error) => {
-        console.error(error);
-      });
+          if (this._selection.start.equals(this._selection.end)) {
+            this.startpos = this._selection.start.clone() as SampleUnit;
+          }
+
+          this._lastplayedpos = this._playposition.clone();
+
+          const id = this.subscrManager.add(
+            this.audioManager.statechange.subscribe(
+              (state: PlayBackStatus) => {
+                if (
+                  state === PlayBackStatus.STOPPED ||
+                  state === PlayBackStatus.PAUSED ||
+                  state === PlayBackStatus.ENDED
+                ) {
+                  this.subscrManager.removeById(id);
+                }
+
+                if (state === PlayBackStatus.STOPPED) {
+                  this._playposition = this.time.start.clone();
+                }
+
+                if (state === PlayBackStatus.ENDED) {
+                  this.absolutePlayposition = this.selection.end.clone();
+                  // reset to beginning of selection
+
+                  if (this._playposition.seconds >= this.time.end.seconds) {
+                    this.startpos = this.time.start.clone();
+                  } else {
+                    this._playposition = this.selection.start.clone();
+                  }
+                  if (this._replay) {
+                    this.setState(state);
+                    new Promise<void>((resolve2, reject2) => {
+                      this.subscrManager.add(
+                        timer(200).subscribe(() => {
+                          this.startPlayback(playOnHover)
+                            .then(() => {
+                              resolve2();
+                            })
+                            .catch((error) => {
+                              console.error(error);
+                              reject2(error);
+                            });
+                        })
+                      );
+                    });
+                  } else {
+                    this.setState(state);
+                    resolve();
+                  }
+                } else {
+                  this.setState(state);
+                  resolve();
+                }
+              },
+              (error) => {
+                console.error(error);
+              }
+            )
+          );
+
+          this._audioManger
+            .startPlayback(
+              this.selection,
+              this._volume,
+              this._playbackRate,
+              playOnHover
+            )
+            .catch(reject);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     });
   }
 
@@ -884,19 +1002,29 @@ export class AudioChunk {
         resolve();
       }
     });
-  }
+  };
 
   public pausePlayback() {
     return new Promise<void>((resolve, reject) => {
-      this._audioManger.pausePlayback().then(() => {
-        if (this.audioManager.state !== this.status && this.status === PlayBackStatus.PLAYING) {
-          reject(new Error(`audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`));
-        }
-        this.afterPlaybackPaused();
-        resolve();
-      }).catch((error) => {
-        reject(error);
-      });
+      this._audioManger
+        .pausePlayback()
+        .then(() => {
+          if (
+            this.audioManager.state !== this.status &&
+            this.status === PlayBackStatus.PLAYING
+          ) {
+            reject(
+              new Error(
+                `audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`
+              )
+            );
+          }
+          this.afterPlaybackPaused();
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -905,7 +1033,8 @@ export class AudioChunk {
       if (!(this.lastplayedpos === undefined || this.lastplayedpos === null)) {
         new Promise<void>((resolve2) => {
           if (this._status === PlayBackStatus.PLAYING) {
-            const subscr = this.statuschange.subscribe((status) => {
+            const subscr = this.statuschange.subscribe(
+              (status) => {
                 if (status === PlayBackStatus.PAUSED) {
                   resolve2();
                 }
@@ -913,7 +1042,8 @@ export class AudioChunk {
               },
               () => {
                 resolve2();
-              });
+              }
+            );
             this.audioManager.pausePlayback().catch((error) => {
               console.error(error);
             });
@@ -932,18 +1062,26 @@ export class AudioChunk {
 
   public stepBackwardTime(backSec: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const backSamples = Math.max(0, (this.absolutePlayposition.samples
-        - (Math.round(backSec * this._audioManger.sampleRate))));
-      const backSample = new SampleUnit(backSamples, this._audioManger.sampleRate);
+      const backSamples = Math.max(
+        0,
+        this.absolutePlayposition.samples -
+          Math.round(backSec * this._audioManger.sampleRate)
+      );
+      const backSample = new SampleUnit(
+        backSamples,
+        this._audioManger.sampleRate
+      );
 
       new Promise<void>((resolve2) => {
         if (this._status === PlayBackStatus.PLAYING) {
-          this.pausePlayback().then(() => {
-            resolve2();
-          }).catch((error) => {
-            console.error(error);
-            resolve2();
-          });
+          this.pausePlayback()
+            .then(() => {
+              resolve2();
+            })
+            .catch((error) => {
+              console.error(error);
+              resolve2();
+            });
         } else {
           resolve2();
         }
@@ -976,10 +1114,10 @@ export class AudioChunk {
   private afterPlaybackStopped = () => {
     this.startpos = this.time.start!.clone() as SampleUnit;
     this._audioManger.playPosition = this.time.start!.clone();
-  }
+  };
 
   private afterPlaybackPaused = () => {
     this.absolutePlayposition = this.audioManager.playPosition.clone();
     this.startpos = this.absolutePlayposition.clone();
-  }
+  };
 }

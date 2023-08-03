@@ -1,22 +1,21 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {base64ToArrayBuffer, contains} from '@octra/utilities';
-import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../annotjson';
+import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import { base64ToArrayBuffer, contains } from '@octra/utilities';
+import { IAnnotJSON, OAnnotJSON, OAudiofile } from '../annotjson';
 
 export interface Bundle {
   ssffFiles: {
-    fileExtension: string,
-    encoding: string,
-    data: string
+    fileExtension: string;
+    encoding: string;
+    data: string;
   }[];
   mediaFile: {
-    encoding: string,
-    data: string
+    encoding: string;
+    data: string;
   };
   annotation: IAnnotJSON;
 }
 
 export class BundleJSONConverter extends Converter {
-
   public constructor() {
     super();
     this._application = '';
@@ -30,7 +29,10 @@ export class BundleJSONConverter extends Converter {
     this._notice = 'Export to Bundle is currenty not possible';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult | undefined {
+  public export(
+    annotation: OAnnotJSON,
+    audiofile: OAudiofile
+  ): ExportResult | undefined {
     let result = '';
     let filename = '';
 
@@ -40,10 +42,13 @@ export class BundleJSONConverter extends Converter {
         mediaFile: {
           encoding: 'BASE654',
           data: btoa(
-            new Uint8Array(audiofile.arraybuffer)
-              .reduce((data, byte) => data + String.fromCharCode(byte), '')
-          )
-        }, annotation
+            new Uint8Array(audiofile.arraybuffer).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              ''
+            )
+          ),
+        },
+        annotation,
       };
       result = JSON.stringify(bundle, undefined, 2);
       filename = annotation.name + this._extension;
@@ -53,8 +58,8 @@ export class BundleJSONConverter extends Converter {
           name: filename,
           content: result,
           encoding: 'UTF-8',
-          type: 'application/json'
-        }
+          type: 'application/json',
+        },
       };
     }
 
@@ -70,34 +75,48 @@ export class BundleJSONConverter extends Converter {
       return {
         annotjson: undefined,
         audiofile: undefined,
-        error: `This BundleJSON file is not compatible with this audio file.`
+        error: `This BundleJSON file is not compatible with this audio file.`,
       };
     }
 
-    if (json && json['mediaFile'] && json.mediaFile['data']
-      && json['annotation']) {
+    if (
+      json &&
+      json['mediaFile'] &&
+      json.mediaFile['data'] &&
+      json['annotation']
+    ) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;
       const buffer = base64ToArrayBuffer(data);
 
       const audioResult: OAudiofile = new OAudiofile();
-      audioResult.name = annotation.name + annotation.annotates.substr(annotation.annotates.lastIndexOf('.'));
+      audioResult.name =
+        annotation.name +
+        annotation.annotates.substr(annotation.annotates.lastIndexOf('.'));
 
-      if (contains(audioResult.name, '.wav') || contains(audioResult.name, '.ogg')) {
+      if (
+        contains(audioResult.name, '.wav') ||
+        contains(audioResult.name, '.ogg')
+      ) {
         audioResult.size = buffer.byteLength;
         audioResult.sampleRate = annotation.sampleRate;
         audioResult.arraybuffer = buffer;
 
         return {
-          annotjson: new OAnnotJSON(annotation.name, annotation.sampleRate, annotation.levels, annotation.links),
+          annotjson: new OAnnotJSON(
+            annotation.name,
+            annotation.sampleRate,
+            annotation.levels,
+            annotation.links
+          ),
           audiofile: audioResult,
-          error: ''
+          error: '',
         };
       } else {
         return {
           annotjson: undefined,
           audiofile: undefined,
-          error: `Could not read mediaFile attribute.`
+          error: `Could not read mediaFile attribute.`,
         };
       }
     }
@@ -105,7 +124,7 @@ export class BundleJSONConverter extends Converter {
     return {
       annotjson: undefined,
       audiofile: undefined,
-      error: `This BundleJSON file is not compatible with this audio file.`
+      error: `This BundleJSON file is not compatible with this audio file.`,
     };
   }
 }

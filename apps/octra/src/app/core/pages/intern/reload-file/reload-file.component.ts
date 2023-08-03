@@ -16,7 +16,7 @@ import { navigateTo } from '@octra/ngx-utilities';
 import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { TranscriptionDeleteModalComponent } from '../../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { AuthenticationStoreService } from "../../../store/authentication";
+import { AuthenticationStoreService } from '../../../store/authentication';
 
 @Component({
   selector: 'octra-reload-file',
@@ -85,7 +85,10 @@ export class ReloadFileComponent {
             }
           }).then(() => {
             this.audioService.registerAudioManager(this.dropzone.audioManager!);
-            this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), !keepData);
+            this.authStoreService.loginLocal(
+              this.dropzone.files.map((a) => a.file),
+              !keepData
+            );
           });
         } else {
           // do nothing because abort
@@ -98,7 +101,10 @@ export class ReloadFileComponent {
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
-    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), false);
+    this.authStoreService.loginLocal(
+      this.dropzone.files.map((a) => a.file),
+      false
+    );
   };
 
   public isN(obj: any): boolean {

@@ -2,7 +2,7 @@
 export const enum SourceType {
   URL,
   FILE,
-  ArrayBuffer
+  ArrayBuffer,
 }
 
 export const enum PlayBackStatus {
@@ -12,7 +12,7 @@ export const enum PlayBackStatus {
   PLAYING = 'PLAYING',
   PAUSED = 'PAUSED',
   STOPPED = 'STOPPED',
-  ENDED = 'ENDED'
+  ENDED = 'ENDED',
 }
 
 export interface NumeratedSegment {

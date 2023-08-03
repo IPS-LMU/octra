@@ -290,9 +290,11 @@ export class OctraDatabase extends Dexie {
           })
         );
       } else {
-        return from(table.update(name, {
-          value: prepared
-        })).pipe(
+        return from(
+          table.update(name, {
+            value: prepared,
+          })
+        ).pipe(
           map(() => {
             return;
           })

@@ -23,7 +23,9 @@ export class AnnotationStoreService {
     }
 
     const mode = getModeState(state);
-    const result = getTranscriptFromIO(mode?.currentSession?.task?.inputs ?? []);
+    const result = getTranscriptFromIO(
+      mode?.currentSession?.task?.inputs ?? []
+    );
     return result;
   });
 
@@ -43,7 +45,7 @@ export class AnnotationStoreService {
       AnnotationActions.quit.do({
         clearSession,
         freeTask,
-        redirectToProjects
+        redirectToProjects,
       })
     );
   }

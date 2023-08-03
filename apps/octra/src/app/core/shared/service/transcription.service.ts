@@ -48,8 +48,8 @@ import {
   AnnotationState,
   AnnotationStateLevel,
   convertFromLevelObject,
-  convertToLevelObject
-} from "../../store/login-mode/annotation";
+  convertToLevelObject,
+} from '../../store/login-mode/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TaskDto } from '@octra/api-types';
 import { RoutingService } from './routing.service';

@@ -121,9 +121,5 @@
     }
   },
   "type": "object",
-  "required": [
-    "meta",
-    "instructions",
-    "markers"
-  ]
+  "required": ["meta", "instructions", "markers"]
 }

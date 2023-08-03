@@ -60,7 +60,12 @@ export class OAnnotJSON implements IAnnotJSON {
   levels: OLevel[] = [];
   links: OLink[] = [];
 
-  constructor(audioFile: string, sampleRate: number, levels?: ILevel[], links?: ILink[]) {
+  constructor(
+    audioFile: string,
+    sampleRate: number,
+    levels?: ILevel[],
+    links?: ILink[]
+  ) {
     this.annotates = audioFile;
     this.name = audioFile;
     this.sampleRate = sampleRate;
@@ -70,23 +75,23 @@ export class OAnnotJSON implements IAnnotJSON {
     }
 
     if (levels) {
-      this.levels = levels.map(a => ({
+      this.levels = levels.map((a) => ({
         name: a.name,
         type: a.type,
-        items: a.items.map(b => ({
+        items: a.items.map((b) => ({
           id: b.id,
           sampleStart: b.sampleStart,
           sampleDur: b.sampleDur,
           samplePoint: b.samplePoint,
-          labels: b.labels
-        }))
+          labels: b.labels,
+        })),
       }));
     }
 
     if (links) {
-      this.links = links.map(a => ({
+      this.links = links.map((a) => ({
         fromID: a.fromID,
-        toID: a.toID
+        toID: a.toID,
       }));
     }
   }
@@ -137,7 +142,12 @@ export class OSegment extends OItem {
   sampleStart = 0;
   sampleDur = 0;
 
-  constructor(id: number, sampleStart: number, sampleDur: number, labels?: ILabel[]) {
+  constructor(
+    id: number,
+    sampleStart: number,
+    sampleDur: number,
+    labels?: ILabel[]
+  ) {
     super(id, labels);
     this.sampleStart = sampleStart;
     this.sampleDur = sampleDur;
@@ -176,5 +186,5 @@ export class OLink implements ILink {
 export enum AnnotationLevelType {
   ITEM = 'ITEM',
   EVENT = 'EVENT',
-  SEGMENT = 'SEGMENT'
+  SEGMENT = 'SEGMENT',
 }

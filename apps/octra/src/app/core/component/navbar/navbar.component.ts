@@ -33,7 +33,7 @@ import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
 import { AccountRole, ProjectDto } from '@octra/api-types';
-import { AuthenticationStoreService } from "../../store/authentication";
+import { AuthenticationStoreService } from '../../store/authentication';
 
 @Component({
   selector: 'octra-navigation',

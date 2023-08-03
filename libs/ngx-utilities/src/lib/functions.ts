@@ -1,13 +1,27 @@
-import { HttpClient, HttpEventType, HttpRequest, HttpResponse } from "@angular/common/http";
-import { NavigationExtras, Router } from "@angular/router";
-import { Observable, Subject } from "rxjs";
+import {
+  HttpClient,
+  HttpEventType,
+  HttpRequest,
+  HttpResponse,
+} from '@angular/common/http';
+import { NavigationExtras, Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
 
-export function uniqueHTTPRequest(http: HttpClient, post = false, requestOptions: any,
-                                  url: string, body: any): Observable<any> {
+export function uniqueHTTPRequest(
+  http: HttpClient,
+  post = false,
+  requestOptions: any,
+  url: string,
+  body: any
+): Observable<any> {
   if (!post) {
-    const options = (!(requestOptions === undefined || requestOptions === undefined)) ? requestOptions : {};
+    const options = !(
+      requestOptions === undefined || requestOptions === undefined
+    )
+      ? requestOptions
+      : {};
 
-    if (!options["params"]) {
+    if (!options['params']) {
       options.params = {};
     }
 
@@ -19,39 +33,48 @@ export function uniqueHTTPRequest(http: HttpClient, post = false, requestOptions
   }
 }
 
-export function downloadFile(http: HttpClient, url: string): Subject<{
-  progress: number,
-  result: any
+export function downloadFile(
+  http: HttpClient,
+  url: string
+): Subject<{
+  progress: number;
+  result: any;
 }> {
   const subj: Subject<any> = new Subject<any>();
 
-  const req = new HttpRequest("GET", url, {
+  const req = new HttpRequest('GET', url, {
     reportProgress: true,
-    responseType: "arraybuffer"
+    responseType: 'arraybuffer',
   });
 
-  http.request(req).subscribe(event => {
+  http.request(req).subscribe(
+    (event) => {
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
-          progress: (event.total) ? event.loaded / event.total : 0,
-          result: undefined
+          progress: event.total ? event.loaded / event.total : 0,
+          result: undefined,
         });
       } else if (event instanceof HttpResponse) {
         subj.next({
           progress: 1,
-          result: event.body
+          result: event.body,
         });
         subj.complete();
       }
     },
-    error => {
+    (error) => {
       subj.error(error);
-    });
+    }
+  );
 
   return subj;
 }
 
-export function navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {
+export function navigateTo(
+  router: Router,
+  commands: any[],
+  navigationExtras?: NavigationExtras
+): Promise<boolean> {
   console.log(`navigate to ${commands[0]}`);
   return new Promise<boolean>((resolve) => {
     setTimeout(() => {

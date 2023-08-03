@@ -131,7 +131,8 @@
           class="col-md-4"
           *ngIf="
             !hasSegmentBoundaries &&
-            (segmentIndex === transcrService.currentlevel!.segments.length - 1 ||
+            (segmentIndex ===
+              transcrService.currentlevel!.segments.length - 1 ||
               isNextSegmentLastAndBreak(segmentIndex))
           "
         >

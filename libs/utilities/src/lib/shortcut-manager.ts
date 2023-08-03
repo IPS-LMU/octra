@@ -1,4 +1,4 @@
-import {BrowserInfo} from './browser-info';
+import { BrowserInfo } from './browser-info';
 
 export interface ShortcutEvent {
   shortcut: string;
@@ -20,7 +20,7 @@ export interface Shortcut {
   keys: {
     mac: string;
     pc: string;
-  },
+  };
   title: string;
   focusonly: boolean;
 }
@@ -32,7 +32,13 @@ export interface ShortcutGroup {
 }
 
 export class ShortcutManager {
-  get pressedKeys(): { other: number; ctrl: boolean; shift: boolean; alt: boolean; cmd: boolean } {
+  get pressedKeys(): {
+    other: number;
+    ctrl: boolean;
+    shift: boolean;
+    alt: boolean;
+    cmd: boolean;
+  } {
     return this._pressedKeys;
   }
 
@@ -44,85 +50,85 @@ export class ShortcutManager {
   public generalShortcuts: ShortcutGroup = {
     name: 'general shortcuts',
     enabled: true,
-    items: []
-  }
+    items: [],
+  };
 
   private _pressedKeys = {
     alt: false,
     cmd: false,
     ctrl: false,
     shift: false,
-    other: -1
-  }
+    other: -1,
+  };
 
   private keyMappingTable: KeyMappingEntry[] = [
     {
       name: 'CMD',
-      keyCode: 91
+      keyCode: 91,
     },
     {
       name: 'CMD',
-      keyCode: 93
+      keyCode: 93,
     },
     {
       name: 'ALT',
-      keyCode: 18
+      keyCode: 18,
     },
     {
       name: 'META',
-      keyCode: -1
+      keyCode: -1,
     },
     {
       name: 'CTRL',
-      keyCode: 17
+      keyCode: 17,
     },
     {
       name: 'TAB',
-      keyCode: 9
+      keyCode: 9,
     },
     {
       name: 'BACKSPACE',
-      keyCode: 8
+      keyCode: 8,
     },
     {
       name: 'ENTER',
-      keyCode: 13
+      keyCode: 13,
     },
     {
       name: 'ESC',
-      keyCode: 27
+      keyCode: 27,
     },
     {
       name: 'SPACE',
-      keyCode: 32
+      keyCode: 32,
     },
     {
       name: 'SHIFT',
-      keyCode: 16
+      keyCode: 16,
     },
     {
       name: 'ARROWLEFT',
-      keyCode: 37
+      keyCode: 37,
     },
     {
       name: 'ARROWUP',
-      keyCode: 38
+      keyCode: 38,
     },
     {
       name: 'ARROWRIGHT',
-      keyCode: 39
+      keyCode: 39,
     },
     {
       name: 'ARROWDOWN',
-      keyCode: 40
-    }
+      keyCode: 40,
+    },
   ];
 
   private protectedShortcuts: string[] = [
     'CMD + S', // Save dialogue
     'STRG + S',
     'CMD + P', // Print dialogue
-    'STRG + P'
+    'STRG + P',
   ];
 
   constructor() {
@@ -132,24 +138,28 @@ export class ShortcutManager {
   public shortcutsEnabled = true;
 
   public getShortcutGroup(name: string) {
-    return this._shortcuts.find(a => a.name === name);
+    return this._shortcuts.find((a) => a.name === name);
   }
 
   public registerShortcutGroup(shortcutGroup: ShortcutGroup) {
-    if (this._shortcuts.findIndex(a => a.name === shortcutGroup.name) < 0) {
+    if (this._shortcuts.findIndex((a) => a.name === shortcutGroup.name) < 0) {
       this._shortcuts.push(shortcutGroup);
     }
   }
 
   public unregisterShortcutGroup(groupName: string) {
-    this._shortcuts = this._shortcuts.filter(a => a.name !== groupName);
+    this._shortcuts = this._shortcuts.filter((a) => a.name !== groupName);
   }
 
   public clearShortcuts() {
     this._shortcuts = [];
   }
 
-  public checkKeyEvent(event: KeyboardEvent, timestamp: number, checkPressKey = true): ShortcutEvent | undefined {
+  public checkKeyEvent(
+    event: KeyboardEvent,
+    timestamp: number,
+    checkPressKey = true
+  ): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
       if (event.type === 'keydown') {
         // run shortcut check
@@ -174,9 +184,8 @@ export class ShortcutManager {
             onFocusOnly: commandObj.shortcut.focusonly,
             shortcut,
             event,
-            timestamp
+            timestamp,
           };
-
         } else {
           return undefined;
         }
@@ -201,17 +210,24 @@ export class ShortcutManager {
     return this.getCommand(shortcut, BrowserInfo.platform);
   }
 
-  private getCommand(shortcut: string, platform: 'mac' | 'pc'): {
-    shortcut: Shortcut,
-    groupName: string
-  } | undefined {
+  private getCommand(
+    shortcut: string,
+    platform: 'mac' | 'pc'
+  ):
+    | {
+        shortcut: Shortcut;
+        groupName: string;
+      }
+    | undefined {
     for (const shortcutGroup of this._shortcuts) {
-      const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
+      const elem = shortcutGroup.items.find(
+        (a) => a.keys[platform] === shortcut
+      );
       if (elem !== undefined) {
         if (shortcutGroup.enabled) {
           return {
             shortcut: elem,
-            groupName: shortcutGroup.name
+            groupName: shortcutGroup.name,
           };
         } else {
           return undefined;
@@ -220,12 +236,14 @@ export class ShortcutManager {
     }
 
     // look for general shortcut
-    const generalShortcutElem = this.generalShortcuts.items.find(a => a.keys[platform] === shortcut);
+    const generalShortcutElem = this.generalShortcuts.items.find(
+      (a) => a.keys[platform] === shortcut
+    );
 
     if (generalShortcutElem !== undefined) {
       return {
         shortcut: generalShortcutElem,
-        groupName: this.generalShortcuts.name
+        groupName: this.generalShortcuts.name,
       };
     }
 
@@ -243,7 +261,10 @@ export class ShortcutManager {
       if (BrowserInfo.platform === 'mac') {
         if (BrowserInfo.browser!.toLowerCase().indexOf('firefox') > -1) {
           // Firefox
-          if (code === 224 && (event.code === 'OSLeft' || event.code === 'OSRight')) {
+          if (
+            code === 224 &&
+            (event.code === 'OSLeft' || event.code === 'OSRight')
+          ) {
             return 'CMD';
           }
         }
@@ -311,8 +332,10 @@ export class ShortcutManager {
     }
 
     // if name == comboKey, only one special Key pressed
-    const keys = comboKey.split(' + ').filter(a => a !== undefined && a !== '');
-    if (keys.find(a => a === name) === undefined) {
+    const keys = comboKey
+      .split(' + ')
+      .filter((a) => a !== undefined && a !== '');
+    if (keys.find((a) => a === name) === undefined) {
       if (name === 'A') {
         const ok = 2;
       }
@@ -347,21 +370,21 @@ export class ShortcutManager {
     const valueToSet = event.type === 'keydown';
 
     switch (keyName) {
-      case ('ALT'):
+      case 'ALT':
         this._pressedKeys.alt = valueToSet;
         break;
-      case ('SHIFT'):
+      case 'SHIFT':
         this._pressedKeys.shift = valueToSet;
         break;
-      case ('CTRL'):
+      case 'CTRL':
         this._pressedKeys.ctrl = valueToSet;
         break;
-      case ('CMD'):
+      case 'CMD':
         this._pressedKeys.cmd = valueToSet;
         break;
     }
 
-    this._pressedKeys.other = (valueToSet) ? this.getKeyCode(event) : -1;
+    this._pressedKeys.other = valueToSet ? this.getKeyCode(event) : -1;
   }
 
   private resetPressedKeys() {
@@ -370,12 +393,12 @@ export class ShortcutManager {
       shift: false,
       cmd: false,
       ctrl: false,
-      other: -1
+      other: -1,
     };
   }
 
   public enableShortcutGroup(name: string) {
-    const group = this.shortcuts.find(a => a.name === name);
+    const group = this.shortcuts.find((a) => a.name === name);
 
     if (group !== undefined) {
       group.enabled = true;
@@ -383,11 +406,13 @@ export class ShortcutManager {
   }
 
   private isProtectedShortcut(shortcutCombination: string) {
-    return this.protectedShortcuts.findIndex(a => a === shortcutCombination) > -1;
+    return (
+      this.protectedShortcuts.findIndex((a) => a === shortcutCombination) > -1
+    );
   }
 
   public disableShortcutGroup(name: string) {
-    const group = this.shortcuts.find(a => a.name === name);
+    const group = this.shortcuts.find((a) => a.name === name);
 
     if (group !== undefined) {
       group.enabled = false;

@@ -494,7 +494,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         }
       };
 
-      if (this.settings.multiLine && this.audioChunk!.time!.duration.seconds > this.secondsPerLine) {
+      if (
+        this.settings.multiLine &&
+        this.audioChunk!.time!.duration.seconds > this.secondsPerLine
+      ) {
         let lineWidth = this.av.innerWidth;
 
         if (lineWidth !== undefined) {

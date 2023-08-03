@@ -1,6 +1,6 @@
-import {OLabel, OSegment} from './annotjson';
-import {ASRQueueItemType} from './asr';
-import {SampleUnit} from '@octra/media';
+import { OLabel, OSegment } from './annotjson';
+import { ASRQueueItemType } from './asr';
+import { SampleUnit } from '@octra/media';
 
 export class Segment {
   get time(): SampleUnit {
@@ -22,12 +22,17 @@ export class Segment {
   private static counter = 1;
   private readonly _id: number;
 
-  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id?: number) {
+  constructor(
+    time: SampleUnit,
+    speakerLabel: string,
+    transcript = '',
+    id?: number
+  ) {
     this._time = time;
     this._speakerLabel = speakerLabel;
     this._transcript = transcript;
 
-    if (id === undefined || id === undefined && id > 0) {
+    if (id === undefined || (id === undefined && id > 0)) {
       this._id = Segment.counter++;
     } else {
       this._id = id;
@@ -70,7 +75,7 @@ export class Segment {
 
   private _isBlockedBy?: ASRQueueItemType;
 
-  get isBlockedBy(): ASRQueueItemType | undefined{
+  get isBlockedBy(): ASRQueueItemType | undefined {
     return this._isBlockedBy;
   }
 
@@ -80,7 +85,7 @@ export class Segment {
 
   private _progressInfo = {
     statusLabel: 'ASR',
-    progress: 0
+    progress: 0,
   };
 
   get progressInfo(): { progress: number; statusLabel: string } {
@@ -94,26 +99,36 @@ export class Segment {
   /**
    * converts an object to a Segment. The conversion goes from original -> browser samples.
    */
-  public static fromObj(levelName: string, oSegment: OSegment, sampleRate: number): Segment | undefined {
+  public static fromObj(
+    levelName: string,
+    oSegment: OSegment,
+    sampleRate: number
+  ): Segment | undefined {
     if (oSegment !== undefined) {
       let speakerLabel = '';
 
       let transcriptLabel: OLabel | undefined;
       if (oSegment.labels !== undefined) {
         if (oSegment.labels.length > 1) {
-          const foundLabel = oSegment.labels.find(a => a.name.toLowerCase() === 'speaker');
-          speakerLabel = (foundLabel !== undefined ? foundLabel.value : '')
-          transcriptLabel = oSegment.labels.find(a => a.name === levelName);
+          const foundLabel = oSegment.labels.find(
+            (a) => a.name.toLowerCase() === 'speaker'
+          );
+          speakerLabel = foundLabel !== undefined ? foundLabel.value : '';
+          transcriptLabel = oSegment.labels.find((a) => a.name === levelName);
         } else if (oSegment.labels.length === 1) {
           transcriptLabel = oSegment.labels[0];
         }
       }
 
-      const transcript = transcriptLabel !== undefined ? transcriptLabel.value : '';
+      const transcript =
+        transcriptLabel !== undefined ? transcriptLabel.value : '';
 
       return new Segment(
         new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate),
-        speakerLabel, transcript, oSegment.id);
+        speakerLabel,
+        transcript,
+        oSegment.id
+      );
     }
 
     return undefined;

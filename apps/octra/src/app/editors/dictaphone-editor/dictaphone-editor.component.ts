@@ -338,8 +338,9 @@ export class DictaphoneEditorComponent
         }
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
-        this.audiochunk.selection.end =
-          this.transcrService.currentlevel!.segments.get(i)!.time.clone();
+        this.audiochunk.selection.end = this.transcrService
+          .currentlevel!.segments.get(i)!
+          .time.clone();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos to selected boundary
@@ -489,7 +490,10 @@ export class DictaphoneEditorComponent
   }
 
   private loadEditor() {
-    if (this.transcrService.currentlevel && this.transcrService.currentlevel.segments.length > 0) {
+    if (
+      this.transcrService.currentlevel &&
+      this.transcrService.currentlevel.segments.length > 0
+    ) {
       this.segments = this.transcrService.currentlevel.segments;
     }
     this.editor.Settings.height = 100;

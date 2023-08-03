@@ -1,7 +1,7 @@
-import {EventEmitter} from '@angular/core';
-import {ISegment, OLabel, OSegment} from './annotjson';
-import {Segment} from './segment';
-import {SampleUnit} from '@octra/media';
+import { EventEmitter } from '@angular/core';
+import { ISegment, OLabel, OSegment } from './annotjson';
+import { Segment } from './segment';
+import { SampleUnit } from '@octra/media';
 
 export interface SegmentChangeEvent {
   type: 'remove' | 'change' | 'add';
@@ -26,7 +26,12 @@ export class Segments {
     this._segments = value;
   }
 
-  constructor(private sampleRate: number, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
+  constructor(
+    private sampleRate: number,
+    private levelName: string,
+    segments: ISegment[],
+    lastSampleUnit: SampleUnit
+  ) {
     this._segments = [];
     this.onsegmentchange = new EventEmitter<SegmentChangeEvent>();
 
@@ -38,11 +43,15 @@ export class Segments {
       for (const segment of segments) {
         // divide samples through sampleRateFactor in order to get decodedValue
 
-        const newSegment = Segment.fromObj(levelName, {
-          ...segment,
-          sampleDur: Math.round(segment.sampleDur),
-          sampleStart: Math.round(segment.sampleStart)
-        }, sampleRate);
+        const newSegment = Segment.fromObj(
+          levelName,
+          {
+            ...segment,
+            sampleDur: Math.round(segment.sampleDur),
+            sampleStart: Math.round(segment.sampleStart),
+          },
+          sampleRate
+        );
 
         this._segments.push(newSegment!);
       }
@@ -52,19 +61,28 @@ export class Segments {
   /**
    * adds new Segment
    */
-  public add(time: SampleUnit, label: string, transcript: string | undefined = undefined, triggerChange = true): boolean {
+  public add(
+    time: SampleUnit,
+    label: string,
+    transcript: string | undefined = undefined,
+    triggerChange = true
+  ): boolean {
     const newSegment: Segment = new Segment(time, label);
 
     if (transcript !== undefined) {
       newSegment.transcript = transcript;
     }
 
-    if (this.segments.find((a) => {
-      return a.time!.seconds === time.seconds;
-    }) === undefined) {
+    if (
+      this.segments.find((a) => {
+        return a.time!.seconds === time.seconds;
+      }) === undefined
+    ) {
       this.segments.push(newSegment);
     } else {
-      console.error(`segment with this timestamp ${time.seconds} already exists and can not be added.`);
+      console.error(
+        `segment with this timestamp ${time.seconds} already exists and can not be added.`
+      );
     }
     this.sort();
     this.cleanup();
@@ -73,7 +91,7 @@ export class Segments {
       this.onsegmentchange.emit({
         type: 'add',
         oldNum: -1,
-        oldID: newSegment.id
+        oldID: newSegment.id,
       });
     }
     return true;
@@ -92,7 +110,7 @@ export class Segments {
         this.onsegmentchange.emit({
           type: 'remove',
           oldNum: i,
-          oldID: segment.id
+          oldID: segment.id,
         });
       }
     }
@@ -104,16 +122,30 @@ export class Segments {
    * @param breakMarker the break marker
    * @param triggerChange shall the change event be triggered?
    */
-  public removeByIndex(index: number, breakMarker: string, triggerChange = true, mergeTranscripts = true) {
+  public removeByIndex(
+    index: number,
+    breakMarker: string,
+    triggerChange = true,
+    mergeTranscripts = true
+  ) {
     if (index > -1 && index < this.segments.length) {
       const segment = this.segments[index];
-      if (index < this.segments.length - 1 && breakMarker !== undefined && breakMarker !== '') {
+      if (
+        index < this.segments.length - 1 &&
+        breakMarker !== undefined &&
+        breakMarker !== ''
+      ) {
         const nextSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        if (nextSegment.transcript !== breakMarker && transcription !== breakMarker && mergeTranscripts) {
+        if (
+          nextSegment.transcript !== breakMarker &&
+          transcription !== breakMarker &&
+          mergeTranscripts
+        ) {
           // concat transcripts
           if (nextSegment.transcript !== '' && transcription !== '') {
-            nextSegment.transcript = transcription + ' ' + nextSegment.transcript;
+            nextSegment.transcript =
+              transcription + ' ' + nextSegment.transcript;
           } else if (nextSegment.transcript === '' && transcription !== '') {
             nextSegment.transcript = transcription;
           }
@@ -127,13 +159,11 @@ export class Segments {
       this.segments.splice(index, 1);
 
       if (triggerChange) {
-        this.onsegmentchange.emit(
-          {
-            type: 'remove',
-            oldNum: index,
-            oldID: segment.id
-          }
-        );
+        this.onsegmentchange.emit({
+          type: 'remove',
+          oldNum: index,
+          oldID: segment.id,
+        });
       }
     }
   }
@@ -146,7 +176,7 @@ export class Segments {
       const old = {
         samples: this._segments[i].time!.samples,
         transcript: this._segments[i].transcript,
-        label: this._segments[i].speakerLabel
+        label: this._segments[i].speakerLabel,
       };
 
       this._segments[i].time = segment.time!.clone();
@@ -154,12 +184,15 @@ export class Segments {
       this._segments[i].transcript = segment.transcript;
       this._segments[i].isBlockedBy = segment.isBlockedBy;
 
-      if (old.samples !== segment.time!.samples || old.transcript !== segment.transcript
-        || old.label !== segment.speakerLabel) {
+      if (
+        old.samples !== segment.time!.samples ||
+        old.transcript !== segment.transcript ||
+        old.label !== segment.speakerLabel
+      ) {
         this.onsegmentchange.emit({
           type: 'change',
           oldNum: i,
-          oldID: this._segments[i].id
+          oldID: this._segments[i].id,
         });
         return true;
       }
@@ -179,7 +212,7 @@ export class Segments {
     this.onsegmentchange.emit({
       type: 'change',
       oldNum: -1,
-      oldID: -1
+      oldID: -1,
     });
   }
 
@@ -212,14 +245,14 @@ export class Segments {
    * gets Segment by ID
    */
   public getByID(id: number): Segment | undefined {
-    return this.segments.find(a => a.id === id);
+    return this.segments.find((a) => a.id === id);
   }
 
   /**
    * gets Segment by ID
    */
   public getNumberByID(id: number): number {
-    return this.segments.findIndex(a => a.id === id);
+    return this.segments.findIndex((a) => a.id === id);
   }
 
   public getFullTranscription(): string {
@@ -241,22 +274,31 @@ export class Segments {
       if (i > 0) {
         begin = this._segments[i - 1].time!.samples;
       }
-      if (samples.samples > begin.valueOf() && samples.samples <= this._segments[i].time!.samples) {
+      if (
+        samples.samples > begin.valueOf() &&
+        samples.samples <= this._segments[i].time!.samples
+      ) {
         return i;
       }
     }
     return -1;
   }
 
-  public getSegmentsOfRange(startSamples: SampleUnit, endSamples: SampleUnit): Segment[] {
+  public getSegmentsOfRange(
+    startSamples: SampleUnit,
+    endSamples: SampleUnit
+  ): Segment[] {
     const result: Segment[] = [];
     let start = new SampleUnit(0, this.sampleRate);
 
     for (const segment of this.segments) {
       if (
-        (segment.time!.samples >= startSamples.samples && segment.time!.samples <= endSamples.samples) ||
-        (start.samples >= startSamples.samples && start.samples <= endSamples.samples) ||
-        (start.samples <= startSamples.samples && segment.time!.samples >= endSamples.samples)
+        (segment.time!.samples >= startSamples.samples &&
+          segment.time!.samples <= endSamples.samples) ||
+        (start.samples >= startSamples.samples &&
+          start.samples <= endSamples.samples) ||
+        (start.samples <= startSamples.samples &&
+          segment.time!.samples >= endSamples.samples)
       ) {
         result.push(segment);
       }
@@ -282,7 +324,7 @@ export class Segments {
     return undefined;
   }
 
-  public BetweenWhichSegment(samples: number): Segment | undefined{
+  public BetweenWhichSegment(samples: number): Segment | undefined {
     let start = 0;
 
     for (const segment of this.segments) {
@@ -315,9 +357,19 @@ export class Segments {
 
       let annotSegment = undefined;
       if (i < this._segments.length - 1) {
-        annotSegment = new OSegment((i + 1), start, (segment.time.samples - start), labels);
+        annotSegment = new OSegment(
+          i + 1,
+          start,
+          segment.time.samples - start,
+          labels
+        );
       } else {
-        annotSegment = new OSegment((i + 1), start, lastOriginalSample - start, labels);
+        annotSegment = new OSegment(
+          i + 1,
+          start,
+          lastOriginalSample - start,
+          labels
+        );
       }
       result.push(annotSegment);
 
@@ -328,7 +380,12 @@ export class Segments {
   }
 
   public clone(): Segments {
-    const result = new Segments(this.sampleRate, this.levelName, [], this.segments[this.length - 1].time!);
+    const result = new Segments(
+      this.sampleRate,
+      this.levelName,
+      [],
+      this.segments[this.length - 1].time!
+    );
     for (const segment of this.segments) {
       result.add(segment.time!, segment.speakerLabel, segment.transcript);
     }
@@ -355,7 +412,11 @@ export class Segments {
     }
   }
 
-  public combineSegments(segmentIndexStart: number, segmentIndexEnd: number, breakMarker: string) {
+  public combineSegments(
+    segmentIndexStart: number,
+    segmentIndexEnd: number,
+    breakMarker: string
+  ) {
     for (let i = segmentIndexStart; i < segmentIndexEnd; i++) {
       this.removeByIndex(i, breakMarker, false);
       i--;

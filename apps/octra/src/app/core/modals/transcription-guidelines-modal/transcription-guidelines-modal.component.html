@@ -133,7 +133,8 @@
                         {{ 'general.example' | transloco }}
                         <ng-container
                           *ngIf="
-                            settService.projectsettings?.guidelines !== undefined &&
+                            settService.projectsettings?.guidelines !==
+                              undefined &&
                             settService.projectsettings?.guidelines
                               ?.showExampleNumbers
                           "

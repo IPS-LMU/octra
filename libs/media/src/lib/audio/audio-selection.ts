@@ -1,4 +1,4 @@
-import {SampleUnit} from './audio-time';
+import { SampleUnit } from './audio-time';
 
 export class AudioSelection {
   get length(): number {
@@ -34,16 +34,13 @@ export class AudioSelection {
     this._end = value;
   }
 
-  constructor(start: SampleUnit,
-              end: SampleUnit) {
+  constructor(start: SampleUnit, end: SampleUnit) {
     this.start = start.clone();
     this.end = end?.clone();
   }
 
   public clone() {
-    return new AudioSelection(
-      this._start!, this._end
-    );
+    return new AudioSelection(this._start!, this._end);
   }
 
   public checkSelection() {

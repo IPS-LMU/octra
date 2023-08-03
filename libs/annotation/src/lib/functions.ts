@@ -1,5 +1,5 @@
-import { OAudiofile } from "./annotjson";
-import { Converter, IFile } from "./converters";
+import { OAudiofile } from './annotjson';
+import { Converter, IFile } from './converters';
 
 export function convertFromSupportedConverters(
   converters: Converter[],

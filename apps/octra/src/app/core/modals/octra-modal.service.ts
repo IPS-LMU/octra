@@ -4,7 +4,7 @@ import {
   NgbModalOptions,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalWrapper } from "./ng-modal-wrapper";
+import { NgbModalWrapper } from './ng-modal-wrapper';
 
 @Injectable()
 export class OctraModalService {
@@ -28,7 +28,11 @@ export class OctraModalService {
     return modalRef.result as Promise<R>;
   }
 
-  public openModalRef<T>(modal: any, config: NgbModalOptions, data?: any): NgbModalWrapper<T> {
+  public openModalRef<T>(
+    modal: any,
+    config: NgbModalOptions,
+    data?: any
+  ): NgbModalWrapper<T> {
     const ref = this.modalService.open(modal, {
       ...config,
     }) as NgbModalWrapper<T>;

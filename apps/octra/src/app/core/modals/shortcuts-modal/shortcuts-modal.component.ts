@@ -34,7 +34,7 @@ export class ShortcutsModalComponent extends OctraModal {
     super('ShortcutsModalComponent', activeModal);
   }
 
-  getShortcut(entry: any, platform: string){
+  getShortcut(entry: any, platform: string) {
     return entry.keys[platform];
   }
 }

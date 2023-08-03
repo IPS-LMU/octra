@@ -5,13 +5,32 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nrwl/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/utilities",
         "main": "libs/utilities/src/index.ts",
         "tsConfig": "libs/utilities/tsconfig.lib.json",
-        "assets": ["libs/utilities/*.md"]
+        "assets": [],
+        "project": "libs/utilities/package.json",
+        "compiler": "tsc"
+      }
+    },
+    "package": {
+      "executor": "@nrwl/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "project": "libs/utilities/package.json",
+        "outputPath": "dist/libs/utilities",
+        "entryFile": "libs/utilities/src/index.ts",
+        "tsConfig": "libs/utilities/tsconfig.lib.json",
+        "compiler": "babel",
+        "external": ["typescript"],
+        "format": ["cjs", "esm"],
+        "assets": [
+          "libs/utilities/src/README.md",
+          "libs/utilities/src/LICENSE.txt"
+        ]
       }
     },
     "publish": {
@@ -34,6 +53,12 @@
       "options": {
         "jestConfig": "libs/utilities/jest.config.ts",
         "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
     }
   },

@@ -13,24 +13,17 @@ import { BrowserInfo, FileSize, getFileSize } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
 import { AppInfo } from '../../../app.info';
 import { OctraModalService } from '../../modals/octra-modal.service';
-import {
-  ModalDeleteAnswer,
-  TranscriptionDeleteModalComponent,
-} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
-import { LoginMode } from '../../store';
-import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { Observable } from 'rxjs';
-import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AccountLoginMethod } from '../../../../../../../../octra-backend/dist/libs/api-types';
-import { AnnotationStoreService } from "../../store/login-mode/annotation/annotation.store.service";
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-login',
@@ -109,7 +102,10 @@ export class LoginComponent
 
   onOfflineSubmit = (removeData: boolean) => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
-    this.authStoreService.loginLocal(this.dropzone.files.map(a => a.file), removeData);
+    this.authStoreService.loginLocal(
+      this.dropzone.files.map((a) => a.file),
+      removeData
+    );
   };
 
   ngOnInit() {

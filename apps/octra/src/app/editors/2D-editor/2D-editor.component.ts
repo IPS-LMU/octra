@@ -675,8 +675,8 @@ export class TwoDEditorComponent
         ) {
           const start: SampleUnit =
             selected.index > 0
-              ? this.transcrService.currentlevel!.segments
-                  .get(selected.index - 1)!
+              ? this.transcrService
+                  .currentlevel!.segments.get(selected.index - 1)!
                   .time.clone()
               : this.audioManager.createSampleUnit(0);
           this.selectedIndex = selected.index;
@@ -755,8 +755,8 @@ export class TwoDEditorComponent
   }
 
   onMouseOver($event: {
-    event: MouseEvent | undefined,
-    time: SampleUnit | undefined
+    event: MouseEvent | undefined;
+    time: SampleUnit | undefined;
   }) {
     this.subscrManager.removeByTag('mouseTimer');
     this.mousestate = 'moving';

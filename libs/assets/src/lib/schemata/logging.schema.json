@@ -23,11 +23,7 @@
             "type": "string"
           },
           "value": {
-            "type": [
-              "string",
-              "integer",
-              "object"
-            ]
+            "type": ["string", "integer", "object"]
           },
           "playpos": {
             "type": "integer"

@@ -25,31 +25,35 @@ export const authenticationReducer = createReducer(
       };
     }
   ),
-  on(AuthenticationActions.loginDemo.success, AuthenticationActions.loginLocal.success, (state: AuthenticationState) => {
-    return {
-      ...state,
-      me: {
-        id: '12345',
-        username: 'demoUser',
-        projectRoles: [],
-        systemRole: {
-          label: AccountRole.user,
-          i18n: {},
-          badge: 'orange',
+  on(
+    AuthenticationActions.loginDemo.success,
+    AuthenticationActions.loginLocal.success,
+    (state: AuthenticationState) => {
+      return {
+        ...state,
+        me: {
+          id: '12345',
+          username: 'demoUser',
+          projectRoles: [],
+          systemRole: {
+            label: AccountRole.user,
+            i18n: {},
+            badge: 'orange',
+          },
+          email: 'demo-user@example.com',
+          email_verified: true,
+          first_name: 'John',
+          last_name: 'Doe',
+          last_login: new Date().toISOString(),
+          locale: 'en-EN',
+          timezone: 'Europe/Berlin',
         },
-        email: 'demo-user@example.com',
-        email_verified: true,
-        first_name: 'John',
-        last_name: 'Doe',
-        last_login: new Date().toISOString(),
-        locale: 'en-EN',
-        timezone: 'Europe/Berlin',
-      },
-      authenticated: true,
-      type: AccountLoginMethod.local,
-      webToken: 'faketoken',
-    };
-  }),
+        authenticated: true,
+        type: AccountLoginMethod.local,
+        webToken: 'faketoken',
+      };
+    }
+  ),
   on(
     IDBActions.loadOptions.success,
     (state: AuthenticationState, { onlineOptions }) => {

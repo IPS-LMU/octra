@@ -1,4 +1,10 @@
 {
   "name": "@octra/annotation",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "type": "module",
+  "peerDependencies": {
+    "x2js": "^3.4.4",
+    "@octra/utilties": "^0.0.0",
+    "@octra/media": "^0.0.0"
+  }
 }

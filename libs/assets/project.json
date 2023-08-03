@@ -5,13 +5,36 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nrwl/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/assets",
         "main": "libs/assets/src/index.ts",
         "tsConfig": "libs/assets/tsconfig.lib.json",
-        "assets": ["libs/assets/*.md", "libs/assets/src/lib/schemata/*.json"]
+        "assets": ["libs/assets/src/README.md", "libs/assets/src/lib/schemata"],
+        "project": "libs/assets/package.json",
+        "compiler": "tsc"
+      }
+    },
+    "package": {
+      "executor": "@nrwl/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "project": "libs/assets/package.json",
+        "outputPath": "dist/libs/assets",
+        "entryFile": "libs/assets/src/index.ts",
+        "tsConfig": "libs/assets/tsconfig.lib.json",
+        "compiler": "babel",
+        "external": ["typescript"],
+        "format": ["cjs", "esm"],
+        "assets": [
+          "libs/assets/src/README.md",
+          {
+            "input": "libs/assets/src/lib/schemata",
+            "glob": "**.json",
+            "output": "./src/lib/schemata"
+          }
+        ]
       }
     },
     "publish": {
@@ -34,6 +57,12 @@
       "options": {
         "jestConfig": "libs/assets/jest.config.ts",
         "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
     }
   },

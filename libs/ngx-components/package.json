@@ -2,10 +2,17 @@
   "name": "@octra/ngx-components",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^14.2.0",
-    "@angular/core": "^14.2.0"
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@angular/forms": "^15.2.0",
+    "@octra/utilties": "^0.0.1",
+    "@octra/annotation": "^0.0.1",
+    "@octra/media": "^0.0.1",
+    "konva": "^9.0.0",
+    "rxjs": ">=7.5.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
-  }
+  },
+  "sideEffects": false
 }

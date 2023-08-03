@@ -12,7 +12,6 @@ import {
   Renderer2,
   SimpleChanges,
   ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
 import { TranscriptionService } from '../../shared/service';
@@ -750,8 +749,8 @@ export class TranscrEditorComponent
       },
       getContent: (a, b, c) => {
         const button = document.createElement('span');
-        button.style.display = "flex";
-        button.setAttribute("class", "me-2 align-items-center px-1 h-100");
+        button.style.display = 'flex';
+        button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
         button.innerHTML = getContent();
         button.addEventListener('click', (event: MouseEvent) => {
           onClick(event, button);
@@ -1249,7 +1248,6 @@ export class TranscrEditorComponent
           }
         };
 
-
         if (pointer.nodeType === 3) {
           // text
           addElemToPuffer();
@@ -1632,7 +1630,7 @@ export class TranscrEditorComponent
       focusonly: true,
     });
 
-    if(this.markers) {
+    if (this.markers) {
       for (const marker of this.markers) {
         this.shortcuts.items.push({
           name: marker.name,
@@ -1729,7 +1727,7 @@ export class TranscrEditorComponent
   };
 
   placeAtEnd(element: HTMLElement) {
-    if(element?.lastChild) {
+    if (element?.lastChild) {
       this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild);
     }
   }

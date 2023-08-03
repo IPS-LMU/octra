@@ -1,4 +1,4 @@
-import {DataInfo} from './dataInfo';
+import { DataInfo } from './dataInfo';
 
 export class FileInfo extends DataInfo {
   /**
@@ -54,7 +54,7 @@ export class FileInfo extends DataInfo {
   }
 
   public set fullname(value: string) {
-    const {name, extension} = FileInfo.extractFileName(value);
+    const { name, extension } = FileInfo.extractFileName(value);
     this._name = name;
     this._extension = extension;
   }
@@ -283,7 +283,7 @@ export class FileInfo extends DataInfo {
   public updateContentFromURL(httpClient: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this._url !== undefined && this._url !== undefined) {
-        httpClient.get(this._url, {responseType: 'text'}).subscribe({
+        httpClient.get(this._url, { responseType: 'text' }).subscribe({
           next: (result: any) => {
             this._file = FileInfo.getFileFromContent(
               result,

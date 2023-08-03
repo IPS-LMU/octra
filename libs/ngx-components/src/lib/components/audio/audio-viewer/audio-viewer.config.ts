@@ -1,4 +1,4 @@
-import {ShortcutGroup} from '@octra/utilities';
+import { ShortcutGroup } from '@octra/utilities';
 
 export class AudioviewerConfig {
   public multiLine = false;
@@ -8,22 +8,22 @@ export class AudioviewerConfig {
   public lineheight = 60;
   public backgroundcolor = 'rgb(255, 248, 248)';
   public margin: {
-    top: number,
-    right: number,
-    bottom: number,
-    left: number
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
   } = {
     top: 0,
     right: 0,
     bottom: 0,
-    left: 0
+    left: 0,
   };
   public cursor: {
-    color: string,
-    fixed: boolean
+    color: string;
+    fixed: boolean;
   } = {
     fixed: false,
-    color: 'rgb(255, 0, 0)'
+    color: 'rgb(255, 0, 0)',
   };
 
   public scrollbar = {
@@ -32,66 +32,65 @@ export class AudioviewerConfig {
     background: {
       color: 'white',
       stroke: 'gray',
-      strokeWidth: 1
+      strokeWidth: 1,
     },
     selector: {
       color: 'green',
       stroke: 'gray',
       strokeWidth: 1,
-      width: 20
-    }
+      width: 20,
+    },
   };
 
   public playcursor: {
-    height: number
+    height: number;
     width: number;
-    color: string
+    color: string;
   } = {
     height: 20,
     width: 10,
-    color: 'purple'
+    color: 'purple',
   };
   public boundaries: {
-    enabled: boolean,
-    readonly: boolean,
+    enabled: boolean;
+    readonly: boolean;
     width: number;
-    color: string
+    color: string;
   } = {
     enabled: true,
     readonly: false,
     width: 3,
-    color: '#ebaf4c'
+    color: '#ebaf4c',
   };
   public grid: {
     enabled: true;
-    color: string
+    color: string;
   } = {
     enabled: true,
-    color: 'rgb(224, 224, 224)'
+    color: 'rgb(224, 224, 224)',
   };
   public data: {
-    color: string
+    color: string;
   } = {
-    color: 'rgb(0, 127, 0)'
+    color: 'rgb(0, 127, 0)',
   };
 
   public selection: {
-    enabled: boolean,
-    color: string
+    enabled: boolean;
+    color: string;
   } = {
     enabled: true,
-    color: 'gray'
+    color: 'gray',
   };
   public frame: {
-    color: string
+    color: string;
   } = {
-    color: '#b5b5b5'
+    color: '#b5b5b5',
   };
 
   public asr = {
-    enabled: false
+    enabled: false,
   };
-
 
   // SHORTCUTS
   // SHORTCUTS sheme= KeyMapping [+ <char or charCode>]
@@ -104,137 +103,137 @@ export class AudioviewerConfig {
         name: 'undo',
         keys: {
           mac: 'CMD + Z',
-          pc: 'CTRL + Z'
+          pc: 'CTRL + Z',
         },
         focusonly: true,
-        title: 'undo'
+        title: 'undo',
       },
       {
         name: 'redo',
         keys: {
           mac: 'SHIFT + CMD + Z',
-          pc: 'CTRL + Y'
+          pc: 'CTRL + Y',
         },
         focusonly: true,
-        title: 'redo'
+        title: 'redo',
       },
       {
         name: 'set_boundary',
         keys: {
           mac: 'S',
-          pc: 'S'
+          pc: 'S',
         },
         focusonly: true,
-        title: 'set segment'
+        title: 'set segment',
       },
       {
         name: 'set_break',
         keys: {
           mac: 'A',
-          pc: 'A'
+          pc: 'A',
         },
         focusonly: true,
-        title: 'set break'
+        title: 'set break',
       },
       {
         name: 'play_selection',
         keys: {
           mac: 'C',
-          pc: 'C'
+          pc: 'C',
         },
         focusonly: true,
-        title: 'play selection'
+        title: 'play selection',
       },
       {
         name: 'segment_enter',
         keys: {
           mac: 'ENTER',
-          pc: 'ENTER'
+          pc: 'ENTER',
         },
         focusonly: true,
-        title: 'transcribe segment'
+        title: 'transcribe segment',
       },
       {
         name: 'cursor_left',
         keys: {
           mac: 'ARROWLEFT',
-          pc: 'ARROWLEFT'
+          pc: 'ARROWLEFT',
         },
         focusonly: true,
-        title: 'move cursor left'
+        title: 'move cursor left',
       },
       {
         name: 'cursor_right',
         keys: {
           mac: 'ARROWRIGHT',
-          pc: 'ARROWRIGHT'
+          pc: 'ARROWRIGHT',
         },
         focusonly: true,
-        title: 'move cursor right'
+        title: 'move cursor right',
       },
       {
         name: 'playonhover',
         keys: {
           mac: 'H',
-          pc: 'H'
+          pc: 'H',
         },
         focusonly: true,
-        title: 'play audio on hover'
+        title: 'play audio on hover',
       },
       {
         name: 'delete_boundaries',
         keys: {
           mac: 'D',
-          pc: 'D'
+          pc: 'D',
         },
         focusonly: true,
-        title: 'delete boundaries'
+        title: 'delete boundaries',
       },
       {
         name: 'do_asr',
         keys: {
           mac: 'R',
-          pc: 'R'
+          pc: 'R',
         },
         focusonly: true,
-        title: 'do asr'
+        title: 'do asr',
       },
       {
         name: 'do_asr_maus',
         keys: {
           mac: 'M',
-          pc: 'M'
+          pc: 'M',
         },
         focusonly: true,
-        title: 'do asr maus'
+        title: 'do asr maus',
       },
       {
         name: 'do_maus',
         keys: {
           mac: 'W',
-          pc: 'W'
+          pc: 'W',
         },
         focusonly: true,
-        title: 'do maus only'
-      }
-    ]
+        title: 'do maus only',
+      },
+    ],
   };
 
   public disabledKeys = ['SHIFT + SPACE'];
   public timeline: {
-    enabled: boolean,
-    height: number,
-    fontSize: number,
-    fontWeight: string,
-    font: string,
-    foreColor: string
+    enabled: boolean;
+    height: number;
+    fontSize: number;
+    fontWeight: string;
+    font: string;
+    foreColor: string;
   } = {
     enabled: false,
     height: 15,
     fontSize: 9,
     fontWeight: 'light',
     font: 'Arial',
-    foreColor: 'black'
+    foreColor: 'black',
   };
 
   public stepWidthRatio = 0.0226;

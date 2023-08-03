@@ -16,15 +16,15 @@
     "baseUrl": ".",
     "paths": {
       "@angular/*": ["node_modules/@angular/*"],
-      "@octra/annotation": ["libs/annotation/src/index"],
-      "@octra/api-types": ["../octra-backend/dist/libs/api-types"],
-      "@octra/assets": ["libs/assets/src/index"],
-      "@octra/json-sets": ["libs/json-sets/src/index"],
-      "@octra/media": ["libs/media/src/index"],
-      "@octra/ngx-components": ["libs/ngx-components/src/index"],
-      "@octra/ngx-octra-api": ["../octra-backend/dist/libs/ngx-octra-api"],
-      "@octra/ngx-utilities": ["libs/ngx-utilities/src/index"],
-      "@octra/utilities": ["libs/utilities/src/index"]
+      "@octra/annotation": ["libs/annotation/src/index.ts"],
+      "@octra/api-types": ["../octra-backend/libs/api-types"],
+      "@octra/assets": ["libs/assets/src/index.ts"],
+      "@octra/json-sets": ["libs/json-sets"],
+      "@octra/media": ["libs/media/src/index.ts"],
+      "@octra/ngx-components": ["libs/ngx-components/src/index.ts"],
+      "@octra/ngx-octra-api": ["../octra-backend/libs/ngx-octra-api"],
+      "@octra/ngx-utilities": ["libs/ngx-utilities/src/index.ts"],
+      "@octra/utilities": ["libs/utilities/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "doc"]

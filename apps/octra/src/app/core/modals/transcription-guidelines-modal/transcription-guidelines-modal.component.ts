@@ -211,7 +211,8 @@ export class TranscriptionGuidelinesModalComponent
   public isPDFLinkOnly() {
     return (
       this.isPDFExportEnabled() &&
-      this.settService.projectsettings?.plugins?.pdfexport?.url && this.settService.projectsettings!.plugins.pdfexport.url.indexOf(
+      this.settService.projectsettings?.plugins?.pdfexport?.url &&
+      this.settService.projectsettings!.plugins.pdfexport.url.indexOf(
         'pdfconverter'
       ) < 0
     );

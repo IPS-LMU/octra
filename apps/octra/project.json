@@ -2,8 +2,9 @@
   "name": "octra",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/octra/src",
   "prefix": "octra",
+  "sourceRoot": "apps/octra/src",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -14,8 +15,13 @@
         "main": "apps/octra/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/octra/tsconfig.app.json",
-        "allowedCommonJsDependencies": ["jodit-angular", "ajv"],
-        "inlineStyleLanguage": "scss",
+        "allowedCommonJsDependencies": [
+          "jodit-angular",
+          "ajv",
+          "x2js",
+          "konva",
+          "platform"
+        ],
         "assets": [
           "apps/octra/src/assets",
           "apps/octra/src/config",
@@ -58,12 +64,6 @@
           "namedChunks": true
         }
       },
-      "dependsOn": [
-        {
-          "projects": "dependencies",
-          "target": "build"
-        }
-      ],
       "defaultConfiguration": "production"
     },
     "serve": {
@@ -88,6 +88,7 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/octra/**/*.ts", "apps/octra/**/*.html"]
       }
@@ -98,8 +99,19 @@
       "options": {
         "jestConfig": "apps/octra/jest.config.ts",
         "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "serve-static": {
+      "executor": "@nrwl/web:file-server",
+      "options": {
+        "buildTarget": "octra:build"
       }
     }
-  },
-  "tags": []
+  }
 }

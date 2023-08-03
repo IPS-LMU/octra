@@ -7,8 +7,8 @@ import {
   OAudiofile,
   OLabel,
   OLevel,
-  OSegment
-} from "../annotjson";
+  OSegment,
+} from '../annotjson';
 
 export class PraatTableConverter extends Converter {
   public constructor() {

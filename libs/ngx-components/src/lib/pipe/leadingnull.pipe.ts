@@ -1,8 +1,8 @@
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'leadingnull',
-  pure: false
+  pure: false,
 })
 export class LeadingNullPipe implements PipeTransform {
   transform(value: any, maxnum: number): any {
@@ -19,7 +19,7 @@ export class LeadingNullPipe implements PipeTransform {
     }
 
     if (maxNull - maxNullValue > 0) {
-      for (let i = 0; i < (maxNull - maxNullValue); i++) {
+      for (let i = 0; i < maxNull - maxNullValue; i++) {
         result += '0';
       }
     }

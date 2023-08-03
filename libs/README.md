@@ -25,15 +25,15 @@ want to use the libraries in your project you have to manually install these.
 1. Clone the OCTRA repository next to the project folder you want to use the libraries for.
 2. In Terminal go to Octra directory and run
 
-  ````shell
-  npm install --legacy-peer-deps && npm run build
-  ````
+```shell
+npm install --legacy-peer-deps && npm run build
+```
 
 3. Now go to you project folder and run
 
-  ````shell
-  npm install --legacy-peer-deps "../octra/dist/libs/<library_name>"
-  ````
+```shell
+npm install --legacy-peer-deps "../octra/dist/libs/<library_name>"
+```
 
 If you change something in the libraries and run `npm run build` again, the changes are automatically available in your project.
 

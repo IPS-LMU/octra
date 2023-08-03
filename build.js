@@ -20,7 +20,7 @@ const json = JSON.parse(packageText);
 version = json.version;
 
 if (process.argv[2] === "dev=true") {
-  dev = "-c development";
+  dev = "--configuration development";
 }
 
 if (process.argv[3] === "isUpdate=true") {
@@ -34,7 +34,7 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
-const command = ["--max-old-space-size=12000", "./node_modules/@nrwl/cli/bin/nx", "build", "--prod", "--configuration=public-dev", `--base-href=${baseHref}`];
+const command = ["--max-old-space-size=12000", "./node_modules/@nrwl/cli/bin/nx", "build",  "octra", "--prod", "--configuration=public-dev", `--base-href=${baseHref}`];
 
 if (dev === "") {
   command.splice(4, 1);

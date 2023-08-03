@@ -256,7 +256,7 @@ export class AnnotationEffects {
           } else if (state.application.mode === LoginMode.LOCAL) {
             // local mode
             if (state.localMode.sessionFile !== undefined) {
-              if(this.audio.audiomanagers.length > 0) {
+              if (this.audio.audiomanagers.length > 0) {
                 this.store.dispatch(
                   AnnotationActions.loadAudio.success({
                     mode: LoginMode.LOCAL,

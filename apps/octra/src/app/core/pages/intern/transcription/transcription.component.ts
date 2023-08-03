@@ -16,10 +16,8 @@ import {
   ShortcutGroup,
   ShortcutManager,
 } from '@octra/utilities';
-import { navigateTo } from '@octra/ngx-utilities';
 import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
-import { AppInfo } from '../../../../app.info';
 import { editorComponents } from '../../../../editors/components';
 import { OCTRAEditor } from '../../../../editors/octra-editor';
 import { InactivityModalComponent } from '../../../modals/inactivity-modal/inactivity-modal.component';
@@ -61,7 +59,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
-import { AuthenticationStoreService } from "../../../store/authentication";
+import { AuthenticationStoreService } from '../../../store/authentication';
 
 @Component({
   selector: 'octra-transcription',
@@ -260,7 +258,7 @@ export class TranscriptionComponent
               caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
 
-            if(this.appStorage.interface) {
+            if (this.appStorage.interface) {
               // make sure that events from playonhover are not logged
               const currentEditorName = this.appStorage.interface;
               this.uiService.logAudioEvent(

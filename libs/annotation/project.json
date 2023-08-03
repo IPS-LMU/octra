@@ -5,13 +5,27 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nrwl/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/annotation",
         "main": "libs/annotation/src/index.ts",
         "tsConfig": "libs/annotation/tsconfig.lib.json",
-        "assets": ["libs/annotation/*.md"]
+        "project": "libs/annotation/package.json",
+        "compiler": "tsc"
+      }
+    },
+    "package": {
+      "executor": "@nrwl/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "project": "libs/annotation/package.json",
+        "outputPath": "dist/libs/annotation",
+        "entryFile": "libs/annotation/src/index.ts",
+        "tsConfig": "libs/annotation/tsconfig.lib.json",
+        "compiler": "babel",
+        "external": ["typescript"],
+        "format": ["cjs", "esm"]
       }
     },
     "publish": {
@@ -26,14 +40,6 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/annotation/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/annotation/jest.config.ts",
-        "passWithNoTests": true
       }
     }
   },

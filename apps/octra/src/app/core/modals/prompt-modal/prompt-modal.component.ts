@@ -4,14 +4,13 @@ import {
   Component,
 } from '@angular/core';
 import { SettingsService } from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
 import { OctraModal } from '../types';
 import {
   NgbActiveModal,
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from "../../store/login-mode/annotation/annotation.store.service";
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-prompt-modal',

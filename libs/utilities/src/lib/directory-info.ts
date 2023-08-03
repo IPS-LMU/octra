@@ -1,5 +1,5 @@
-import {DataInfo} from './dataInfo';
-import {FileInfo} from './fileInfo';
+import { DataInfo } from './dataInfo';
+import { FileInfo } from './fileInfo';
 
 export class DirectoryInfo extends DataInfo {
   private readonly _path: string;
@@ -23,11 +23,13 @@ export class DirectoryInfo extends DataInfo {
     this._entries = value;
   }
 
-  public static async fromFolderObject(folder: FileSystemEntry | null): Promise<DirectoryInfo> {
+  public static async fromFolderObject(
+    folder: FileSystemEntry | null
+  ): Promise<DirectoryInfo> {
     if (folder) {
       const result = await this.traverseFileTree(folder, '');
       if (result && result[0] instanceof DirectoryInfo) {
-        return (result[0] as DirectoryInfo);
+        return result[0] as DirectoryInfo;
       } else {
         throw new Error('could not parse directory');
       }
@@ -56,18 +58,26 @@ export class DirectoryInfo extends DataInfo {
     return undefined;
   }
 
-  private static async traverseFileTree(item: FileSystemEntry, path?: string): Promise<(FileInfo | DirectoryInfo)[]> {
+  private static async traverseFileTree(
+    item: FileSystemEntry,
+    path?: string
+  ): Promise<(FileInfo | DirectoryInfo)[]> {
     const getFile = async (webKitEntry: FileSystemFileEntry) => {
       return new Promise<FileInfo[]>((resolve) => {
         webKitEntry.file((file: File) => {
           if (file.name.indexOf('.') > -1) {
-            const fileInfo = new FileInfo(file.name, file.type, file.size, file);
+            const fileInfo = new FileInfo(
+              file.name,
+              file.type,
+              file.size,
+              file
+            );
             resolve([fileInfo]);
           } else {
             resolve([]);
           }
         });
-      })
+      });
     };
 
     path = path || '';
@@ -81,11 +91,14 @@ export class DirectoryInfo extends DataInfo {
 
         const readEntries = async (dirReader: FileSystemDirectoryReader) => {
           return new Promise<FileSystemEntry[]>((resolve, reject) => {
-            dirReader.readEntries((entries: FileSystemEntry[]) => {
-              resolve(entries);
-            }, (error: DOMException) => {
-              reject(error);
-            });
+            dirReader.readEntries(
+              (entries: FileSystemEntry[]) => {
+                resolve(entries);
+              },
+              (error: DOMException) => {
+                reject(error);
+              }
+            );
           });
         };
 
@@ -101,7 +114,9 @@ export class DirectoryInfo extends DataInfo {
         const values: (FileInfo | DirectoryInfo)[][] = [];
 
         for (const entry of entries) {
-          values.push(await this.traverseFileTree(entry, path + dirEntry.name + '/'));
+          values.push(
+            await this.traverseFileTree(entry, path + dirEntry.name + '/')
+          );
         }
 
         const dir = new DirectoryInfo(path + dirEntry.name + '/');

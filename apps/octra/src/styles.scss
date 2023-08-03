@@ -446,28 +446,28 @@ a {
   cursor: pointer;
 }
 
-.jodit-container .jodit-workplace{
-  height:100% !important;
+.jodit-container .jodit-workplace {
+  height: 100% !important;
 }
 
-.jodit-container.jodit.jodit_theme_default.jodit-wysiwyg_mode{
-  display:flex;
+.jodit-container.jodit.jodit_theme_default.jodit-wysiwyg_mode {
+  display: flex;
   flex-direction: column;
-  flex:auto;
+  flex: auto;
 }
 
-.jodit-toolbar-editor-collection .jodit-toolbar-content{
+.jodit-toolbar-editor-collection .jodit-toolbar-content {
   display: table-cell;
   vertical-align: middle;
 }
 
 .jodit-toolbar__box:not(:empty):not(:empty),
-.jodit-toolbar-editor-collection_size_middle.jodit-toolbar-editor-collection_mode_horizontal{
-  background:whitesmoke !important;
+.jodit-toolbar-editor-collection_size_middle.jodit-toolbar-editor-collection_mode_horizontal {
+  background: whitesmoke !important;
 }
 
 .jodit-toolbar__box .btn-shortcut {
   font-size: 0.7em;
   margin: auto 0;
-  margin-left:3px;
+  margin-left: 3px;
 }

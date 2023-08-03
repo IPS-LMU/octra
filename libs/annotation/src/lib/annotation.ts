@@ -1,7 +1,7 @@
-import {OAnnotJSON, OAudiofile} from './annotjson';
-import {Level} from './level';
-import {Link} from './link';
-import {SampleUnit} from '@octra/media';
+import { OAnnotJSON, OAudiofile } from './annotjson';
+import { Level } from './level';
+import { Link } from './link';
+import { SampleUnit } from '@octra/media';
 
 export class Annotation {
   private readonly _annotates: string;
@@ -35,7 +35,12 @@ export class Annotation {
     this._links = value;
   }
 
-  constructor(annotates: string, audiofile: OAudiofile, levels?: Level[], links?: Link[]) {
+  constructor(
+    annotates: string,
+    audiofile: OAudiofile,
+    levels?: Level[],
+    links?: Link[]
+  ) {
     this._annotates = annotates;
     this._audiofile = audiofile;
     this._levels = [];
@@ -50,7 +55,12 @@ export class Annotation {
   }
 
   public getObj(lastOriginalBoundary: SampleUnit): OAnnotJSON {
-    const result = new OAnnotJSON(this._audiofile.name, this._audiofile.sampleRate, [], this._links);
+    const result = new OAnnotJSON(
+      this._audiofile.name,
+      this._audiofile.sampleRate,
+      [],
+      this._links
+    );
     result.annotates = this._annotates;
 
     let startID = 1;

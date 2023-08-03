@@ -435,7 +435,8 @@ export class TranscrWindowComponent
     this._validationEnabled =
       this.appStorage.useMode !== 'url' &&
       (this.appStorage.useMode === 'demo' ||
-        this.settingsService?.projectsettings?.octra?.validationEnabled === true);
+        this.settingsService?.projectsettings?.octra?.validationEnabled ===
+          true);
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -508,8 +509,8 @@ export class TranscrWindowComponent
       {
         start: startSample,
         length:
-          this.transcrService.currentlevel!.segments.get(this.segmentIndex)!.time
-            .samples - startSample,
+          this.transcrService.currentlevel!.segments.get(this.segmentIndex)!
+            .time.samples - startSample,
       },
       'transcription window'
     );
@@ -544,8 +545,8 @@ export class TranscrWindowComponent
         this.transcrService.currentLevelSegmentChange.emit(undefined);
       } else {
         // no boundaries inserted
-        const segment = this.transcrService.currentlevel!.segments
-          .get(this.segmentIndex)!
+        const segment = this.transcrService
+          .currentlevel!.segments.get(this.segmentIndex)!
           .clone();
         this.editor.updateRawText();
         segment.transcript = this.editor.rawText;
@@ -626,7 +627,8 @@ export class TranscrWindowComponent
         this.transcrService.currentlevel!.segments &&
         this.segmentIndex < this.transcrService.currentlevel!.segments.length
       ) {
-        const segmentsLength = this.transcrService.currentlevel!.segments.length;
+        const segmentsLength =
+          this.transcrService.currentlevel!.segments.length;
 
         let segment: Segment | undefined = undefined;
 
@@ -692,8 +694,8 @@ export class TranscrWindowComponent
 
         let begin;
         if (this.segmentIndex > 0) {
-          begin = this.transcrService.currentlevel!.segments
-            .get(this.segmentIndex - 1)!
+          begin = this.transcrService
+            .currentlevel!.segments.get(this.segmentIndex - 1)!
             .time.clone();
         } else {
           begin = new SampleUnit(0, this.audioManager.sampleRate);
@@ -1116,11 +1118,11 @@ export class TranscrWindowComponent
       ) as HTMLDivElement;
       if (!(samplesArray[i] > start)) {
         // mark boundary red
-        if(boundary) {
+        if (boundary) {
           boundary.style.backgroundColor = 'red';
         }
       } else {
-        if(boundary) {
+        if (boundary) {
           boundary.style.backgroundColor = 'transparent';
         }
         start = samplesArray[i];

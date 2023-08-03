@@ -33,8 +33,7 @@ export class TranscriptionEndComponent
     this.navService.dataloaded = false;
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   leave() {
     this.tranService.endTranscription();

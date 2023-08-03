@@ -4,7 +4,6 @@ import { Histories, UndoRedoState } from 'ngrx-wieder';
 import { ILog } from '../../../obj/Settings/logging';
 import { ProjectSettings } from '../../../obj';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
-import { SessionFile } from '../../../obj/SessionFile';
 import {
   AnnotationLevelType,
   ASRQueueItemType,
@@ -38,7 +37,7 @@ export interface AnnotationState extends UndoRedoState {
   };
   guidelines?: {
     selected?: GuidelinesItem;
-    list: GuidelinesItem[]
+    list: GuidelinesItem[];
   };
   logs: ILog[];
   logging: boolean;
@@ -53,11 +52,11 @@ export interface AnnotationState extends UndoRedoState {
   previousSession?: {
     task: {
       id: string;
-    },
+    };
     project: {
       id: string;
-    }
-  }
+    };
+  };
   sessionFile?: any;
 }
 

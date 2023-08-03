@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SubscriptionManager } from '@octra/utilities';
-import { SessionStorageService } from "ngx-webstorage";
+import { SessionStorageService } from 'ngx-webstorage';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,10 @@ export class RoutingService {
 
   private readonly subscrManager = new SubscriptionManager<Subscription>();
   // Observable exposing the breadcrumb hierarchy
-  constructor(private router: Router, private sessionStorage: SessionStorageService) {}
+  constructor(
+    private router: Router,
+    private sessionStorage: SessionStorageService
+  ) {}
 
   public removeStaticParam(name: string) {
     if (Object.keys(this._staticQueryParams).includes(name)) {
@@ -37,7 +40,7 @@ export class RoutingService {
     queryParamsHandling: QueryParamsHandling | null | undefined = 'merge'
   ) {
     console.error(`RS navigate to ${commands.join('/')}`);
-    try{
+    try {
       await this.router.navigate(commands, {
         ...extras,
         queryParams: {
@@ -47,8 +50,8 @@ export class RoutingService {
         queryParamsHandling,
       });
       const joined = commands.join('/');
-      if(joined !== "/load") {
-        this.sessionStorage.store("last_page_path", joined);
+      if (joined !== '/load') {
+        this.sessionStorage.store('last_page_path', joined);
       }
     } catch (e) {
       console.error(e);

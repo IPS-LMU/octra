@@ -1,9 +1,16 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains} from '@octra/utilities';
-import { AnnotationLevelType, OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment } from "../annotjson";
+import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import { contains } from '@octra/utilities';
+import {
+  AnnotationLevelType,
+  OAnnotJSON,
+  OAudiofile,
+  OEvent,
+  OLabel,
+  OLevel,
+  OSegment,
+} from '../annotjson';
 
 export class PraatTextgridConverter extends Converter {
-
   public constructor() {
     super();
     this._application = 'Praat';
@@ -16,10 +23,13 @@ export class PraatTextgridConverter extends Converter {
     this._encoding = 'UTF-8';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult | undefined {
+  public export(
+    annotation: OAnnotJSON,
+    audiofile: OAudiofile
+  ): ExportResult | undefined {
     if (annotation) {
       let result = '';
-      const durSeconds = (audiofile.duration / audiofile.sampleRate);
+      const durSeconds = audiofile.duration / audiofile.sampleRate;
 
       let segLevels = 0;
 
@@ -30,13 +40,16 @@ export class PraatTextgridConverter extends Converter {
       }
 
       const addHeader = (res: string) => {
-        return res + `File type = "ooTextFile"\n` +
+        return (
+          res +
+          `File type = "ooTextFile"\n` +
           `Object class = "TextGrid"\n` +
           `\n` +
           `xmin = 0\n` +
           `xmax = ${durSeconds}\n` +
           `tiers? <exists>\n` +
-          `size = ${segLevels}\n`;
+          `size = ${segLevels}\n`
+        );
       };
 
       result = addHeader(result);
@@ -47,7 +60,8 @@ export class PraatTextgridConverter extends Converter {
         const level = annotation.levels[i];
 
         if (level.type === 'SEGMENT') {
-          result += `    item [${i + 1}]:\n` +
+          result +=
+            `    item [${i + 1}]:\n` +
             `        class = "IntervalTier" \n` +
             `        name = "${level.name}" \n` +
             `        xmin = 0 \n` +
@@ -58,9 +72,12 @@ export class PraatTextgridConverter extends Converter {
             const segment = level.items[j];
 
             const secondsStart = segment.sampleStart! / audiofile.sampleRate;
-            const secondsEnd = (segment.sampleStart! + segment.sampleDur!) / audiofile.sampleRate;
+            const secondsEnd =
+              (segment.sampleStart! + segment.sampleDur!) /
+              audiofile.sampleRate;
 
-            result += `        intervals [${j + 1}]:\n` +
+            result +=
+              `        intervals [${j + 1}]:\n` +
               `            xmin = ${secondsStart} \n` +
               `            xmax = ${secondsEnd} \n` +
               `            text = "${segment.labels[0].value}" \n`;
@@ -75,8 +92,8 @@ export class PraatTextgridConverter extends Converter {
           name: filename,
           content: result,
           encoding: 'UTF-16',
-          type: 'text/plain'
-        }
+          type: 'text/plain',
+        },
       };
     }
     return undefined;
@@ -85,7 +102,10 @@ export class PraatTextgridConverter extends Converter {
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== undefined) {
       const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
-      const fileName = (file.name.indexOf('.') > -1) ? file.name.substr(0, file.name.lastIndexOf('.')) : file.name
+      const fileName =
+        file.name.indexOf('.') > -1
+          ? file.name.substr(0, file.name.lastIndexOf('.'))
+          : file.name;
       if (name === fileName) {
         const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
@@ -99,8 +119,9 @@ export class PraatTextgridConverter extends Converter {
         // check if header is first
         if (lines.length > 14) {
           if (
-            contains(lines[0], 'File type = "ooTextFile"')
-            && contains(lines[1], 'Object class = "TextGrid"')) {
+            contains(lines[0], 'File type = "ooTextFile"') &&
+            contains(lines[1], 'Object class = "TextGrid"')
+          ) {
             // is TextGrid
 
             let lvlNum = 0;
@@ -122,7 +143,7 @@ export class PraatTextgridConverter extends Converter {
                       return {
                         annotjson: undefined,
                         audiofile: undefined,
-                        error: `PraatTextGrid could not read line ${i}.`
+                        error: `PraatTextGrid could not read line ${i}.`,
                       };
                     }
                     classStr = test[1];
@@ -135,11 +156,14 @@ export class PraatTextgridConverter extends Converter {
                       return {
                         annotjson: undefined,
                         audiofile: undefined,
-                        error: `PraatTextGrid could not read line ${i}.`
+                        error: `PraatTextGrid could not read line ${i}.`,
                       };
                     }
                     lvlName = test[1];
-                    const olevel = (classStr === 'IntervalTier') ? new OLevel(lvlName, AnnotationLevelType.SEGMENT) : new OLevel(lvlName, AnnotationLevelType.EVENT);
+                    const olevel =
+                      classStr === 'IntervalTier'
+                        ? new OLevel(lvlName, AnnotationLevelType.SEGMENT)
+                        : new OLevel(lvlName, AnnotationLevelType.EVENT);
                     i++;
 
                     // ignore xmin and xmax, interval size
@@ -150,7 +174,11 @@ export class PraatTextgridConverter extends Converter {
                     // read items
                     let match = lines[i].match(/item \[([0-9]+)]:/);
 
-                    while (lines[i] !== '' && match === null && i < lines.length) {
+                    while (
+                      lines[i] !== '' &&
+                      match === null &&
+                      i < lines.length
+                    ) {
                       let isActive = true;
                       test = lines[i].match(/intervals \[[0-9]+]:/);
                       if (!test) {
@@ -159,7 +187,7 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         } else {
                           isActive = false;
@@ -173,7 +201,7 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         }
                         i++;
@@ -184,7 +212,7 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         }
                         i++;
@@ -195,16 +223,16 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         }
                         i++;
                         const text = test[1];
 
                         const olabels: OLabel[] = [];
-                        olabels.push((new OLabel(lvlName, text)));
+                        olabels.push(new OLabel(lvlName, text));
                         const osegment = new OSegment(
-                          (segNum),
+                          segNum,
                           Math.round(xmin * audiofile.sampleRate),
                           Math.round((xmax - xmin) * audiofile.sampleRate),
                           olabels
@@ -216,7 +244,7 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         }
                         i++;
@@ -228,15 +256,19 @@ export class PraatTextgridConverter extends Converter {
                           return {
                             annotjson: undefined,
                             audiofile: undefined,
-                            error: `PraatTextGrid could not read line ${i}.`
+                            error: `PraatTextGrid could not read line ${i}.`,
                           };
                         }
                         i++;
                         const mark = test[1];
 
                         const olabels: OLabel[] = [];
-                        olabels.push((new OLabel(lvlName, mark)));
-                        const oevent = new OEvent(segNum, Math.round(numberStr * audiofile.sampleRate), olabels);
+                        olabels.push(new OLabel(lvlName, mark));
+                        const oevent = new OEvent(
+                          segNum,
+                          Math.round(numberStr * audiofile.sampleRate),
+                          olabels
+                        );
                         olevel.items.push(oevent);
                       }
 
@@ -255,48 +287,48 @@ export class PraatTextgridConverter extends Converter {
               return {
                 annotjson: undefined,
                 audiofile: undefined,
-                error: `Could not import any level.`
+                error: `Could not import any level.`,
               };
             }
 
             return {
               annotjson: result,
               audiofile: undefined,
-              error: ''
+              error: '',
             };
           } else {
             return {
               annotjson: undefined,
               audiofile: undefined,
-              error: 'invalid Textgrid Header'
+              error: 'invalid Textgrid Header',
             };
           }
         } else {
           return {
             annotjson: undefined,
             audiofile: undefined,
-            error: 'Textgrid has less than 14 lines.'
+            error: 'Textgrid has less than 14 lines.',
           };
         }
       } else {
         return {
           annotjson: undefined,
           audiofile: undefined,
-          error: `names of audio file and TextGrid file do not match.`
+          error: `names of audio file and TextGrid file do not match.`,
         };
       }
     } else {
       return {
         annotjson: undefined,
         audiofile: undefined,
-        error: 'audiofile is undefined.'
+        error: 'audiofile is undefined.',
       };
     }
 
     return {
       annotjson: undefined,
       audiofile: undefined,
-      error: `This PraatTextgrid file is not compatible.`
+      error: `This PraatTextgrid file is not compatible.`,
     };
   }
 }

@@ -900,8 +900,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         this.transcrService.currentLevelSegmentChange.emit(undefined);
       } else {
         // no boundaries inserted
-        const segment = this.transcrService.currentlevel!.segments
-          .get(segmentIndex)!
+        const segment = this.transcrService
+          .currentlevel!.segments.get(segmentIndex)!
           .clone();
         this.transcrEditor.updateRawText();
         segment.transcript = this.transcrEditor.rawText;
@@ -909,7 +909,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
           this.transcrService.currentlevel!.segments.get(
             segmentIndex
           )!.isBlockedBy;
-        this.transcrService.currentlevel!.segments.change(segmentIndex, segment);
+        this.transcrService.currentlevel!.segments.change(
+          segmentIndex,
+          segment
+        );
       }
     } else {
       const isNull = this.transcrService.currentlevel!.segments === undefined;
@@ -1218,7 +1221,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   ) {
     if (!(direction === 'up' && segmentNumber === 0)) {
       this.saveAndCloseTranscrEditor().then(() => {
-        const segmentsLength = this.transcrService.currentlevel!.segments.length;
+        const segmentsLength =
+          this.transcrService.currentlevel!.segments.length;
 
         switch (direction) {
           case 'up':
@@ -1394,8 +1398,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   };
 
   private saveNewLabel(index: number, newLabel: string) {
-    const segment = this.transcrService.currentlevel!.segments
-      .get(index)!
+    const segment = this.transcrService
+      .currentlevel!.segments.get(index)!
       .clone();
     segment.speakerLabel = newLabel;
     this.transcrService.currentlevel!.segments.change(index, segment);
@@ -1453,7 +1457,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       this.transcrEditor.validationEnabled =
         this.appStorage.useMode !== LoginMode.URL &&
         (this.appStorage.useMode === LoginMode.DEMO ||
-          this.settingsService?.projectsettings?.octra?.validationEnabled === true);
+          this.settingsService?.projectsettings?.octra?.validationEnabled ===
+            true);
       started = Date.now();
       this.transcrEditor.initialize();
       console.log(`init transccrEditor ended: ${Date.now() - started}ms`);
@@ -1531,8 +1536,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   private changeTranscriptOfSegment(index: number, rawTranscript: string) {
-    const segment = this.transcrService.currentlevel!.segments
-      .get(index)!
+    const segment = this.transcrService
+      .currentlevel!.segments.get(index)!
       .clone();
     segment.transcript = rawTranscript;
     this.transcrService.currentlevel!.segments.change(index, segment);

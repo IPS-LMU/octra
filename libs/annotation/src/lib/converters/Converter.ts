@@ -1,4 +1,4 @@
-import {OAnnotJSON, OAudiofile} from '../annotjson';
+import { OAnnotJSON, OAudiofile } from '../annotjson';
 
 export interface IFile {
   name: string;
@@ -20,7 +20,7 @@ export interface ExportResult {
 export abstract class Converter {
   protected _conversion = {
     import: false,
-    export: false
+    export: false,
   };
 
   get conversion(): { import: boolean; export: boolean } {
@@ -52,16 +52,16 @@ export abstract class Converter {
   }
 
   protected _website: {
-    title: string,
-    url: string
+    title: string;
+    url: string;
   } = {
     title: '',
-    url: ''
+    url: '',
   };
 
   get website(): {
-    title: string,
-    url: string
+    title: string;
+    url: string;
   } {
     return this._website;
   }
@@ -79,7 +79,14 @@ export abstract class Converter {
     return this._multitiers;
   }
 
-  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult | undefined;
+  public abstract export(
+    annotation: OAnnotJSON,
+    audiofile: OAudiofile,
+    levelnum?: number
+  ): ExportResult | undefined;
 
-  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult | undefined;
+  public abstract import(
+    file: IFile,
+    audiofile: OAudiofile
+  ): ImportResult | undefined;
 }

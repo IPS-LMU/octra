@@ -29,10 +29,7 @@ import { hasProperty } from '@octra/utilities';
 import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
-import {
-  AnnotationState,
-  convertFromOIDLevel
-} from "../login-mode/annotation";
+import { AnnotationState, convertFromOIDLevel } from '../login-mode/annotation';
 
 @Injectable({
   providedIn: 'root',

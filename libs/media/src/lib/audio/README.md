@@ -6,7 +6,7 @@ The AudioManager is a class that controls an audio file and all of its chunks (a
 
 ## Example
 
-````Typescript
+```Typescript
 import { AudioManager, AudioSelection, SampleUnit, WavFormat } from "@octra/media";
 
 const xhr = new XMLHttpRequest();
@@ -32,7 +32,7 @@ xhr.onloadend = () => {
         // starts the audio playback (user needs to interact with the website before)
         await audioManager.startPlayback(selection, 1, 1);
         console.log("Finished playback!");
-        
+
         audioManager.destroy();
       }
     }
@@ -40,7 +40,7 @@ xhr.onloadend = () => {
 };
 
 xhr.send();
-````
+```
 
 ### Functions
 

@@ -1,20 +1,21 @@
-import { HttpClient } from "@angular/common/http";
-import { Component, OnInit, Output } from "@angular/core";
-import { Router } from "@angular/router";
-import { TranslocoService } from "@ngneat/transloco";
-import { AppInfo } from "../../../app.info";
-import { hasProperty } from "@octra/utilities";
-import { navigateTo } from "@octra/ngx-utilities";
-import { AudioService, SettingsService, TranscriptionService } from "../../shared/service";
-import { AppStorageService } from "../../shared/service/appstorage.service";
-import { LoadingStatus, LoginMode } from "../../store";
-import { Store } from "@ngrx/store";
-import { Actions } from "@ngrx/effects";
-import { LoginModeActions } from "../../store/login-mode/login-mode.actions";
-import { ApplicationActions } from "../../store/application/application.actions";
-import { DefaultComponent } from "../../component/default.component";
-import { ApplicationStoreService } from "../../store/application/application-store.service";
-import { RoutingService } from "../../shared/service/routing.service";
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
+import { AppInfo } from '../../../app.info';
+import { navigateTo } from '@octra/ngx-utilities';
+import {
+  AudioService,
+  SettingsService,
+  TranscriptionService,
+} from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { LoadingStatus } from '../../store';
+import { Store } from '@ngrx/store';
+import { Actions } from '@ngrx/effects';
+import { DefaultComponent } from '../../component/default.component';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-loading',

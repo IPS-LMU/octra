@@ -217,11 +217,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.result.url = undefined;
 
-    if(!this.transcrService?.currentlevel) {
+    if (!this.transcrService?.currentlevel) {
       return;
     }
 
-    for (let i = 0; i < this.transcrService.currentlevel!.segments.length; i++) {
+    for (
+      let i = 0;
+      i < this.transcrService.currentlevel!.segments.length;
+      i++
+    ) {
       const segment: Segment =
         this.transcrService.currentlevel!.segments.get(i)!;
       let sampleDur = segment.time.samples - startSample;

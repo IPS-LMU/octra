@@ -1,8 +1,8 @@
 export class SubscriptionManager<T> {
   private subscriptions: {
-    id: number,
-    tag?: string,
-    subscription: T
+    id: number;
+    tag?: string;
+    subscription: T;
   }[];
 
   private counter: number;
@@ -20,13 +20,11 @@ export class SubscriptionManager<T> {
    */
   public add(subscription: T | undefined, tag?: string): number {
     if (subscription !== undefined) {
-      this.subscriptions.push(
-        {
-          id: ++this.counter,
-          tag,
-          subscription
-        }
-      );
+      this.subscriptions.push({
+        id: ++this.counter,
+        tag,
+        subscription,
+      });
       return this.counter;
     }
     return -1;
@@ -36,7 +34,7 @@ export class SubscriptionManager<T> {
    * unsubscribes all subscriptions
    */
   public destroy() {
-    if (this.subscriptions !== undefined){
+    if (this.subscriptions !== undefined) {
       for (const elem of this.subscriptions) {
         (elem.subscription as any).unsubscribe();
       }

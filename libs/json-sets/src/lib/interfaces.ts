@@ -1,5 +1,4 @@
-export interface FileMetaData {
-}
+export interface FileMetaData {}
 
 export interface AudioFileMetaData extends FileMetaData {
   bitRate?: number;
@@ -34,7 +33,7 @@ export interface JSONFileSetDefinition {
   description?: string;
   name?: string;
   unique?: boolean;
-  uniqueSelector?: "object";
+  uniqueSelector?: 'object';
 
   statements: JSONFileSetStatement[];
 }
@@ -43,7 +42,7 @@ export interface JSONSetDefinition {
   description?: string;
   name?: string;
   unique?: boolean;
-  uniqueSelector?: "object";
+  uniqueSelector?: 'object';
 
   statements: JSONSetStatement[];
 }
@@ -62,7 +61,7 @@ export interface JSONFileSetValidationError {
 }
 
 export interface JSONSetStatement {
-  combination: JSONSetCombination,
+  combination: JSONSetCombination;
   name?: string;
   description?: string;
   optional?: boolean;
@@ -72,8 +71,7 @@ export interface JSONSetStatement {
   constraints: JSONSetConstraints[];
 }
 
-
 export enum JSONSetCombination {
-  "union" = "union",
-  "difference" = "difference"
+  'union' = 'union',
+  'difference' = 'difference',
 }

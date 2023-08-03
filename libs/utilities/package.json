@@ -2,6 +2,8 @@
   "name": "@octra/utilities",
   "version": "0.0.1",
   "peerDependencies": {
-    "platform": "^1.3.6"
+    "platform": "^1.3.6",
+    "rxjs": ">=7.5.0",
+    "@octra/api-types": "^0.0.1"
   }
 }

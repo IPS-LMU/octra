@@ -1,4 +1,4 @@
-import {ILink} from './annotjson';
+import { ILink } from './annotjson';
 
 export class Link implements ILink {
   fromID: number;

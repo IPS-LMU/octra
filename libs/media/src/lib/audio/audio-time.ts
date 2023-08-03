@@ -13,7 +13,7 @@ export class SampleUnit {
   }
 
   public set unix(value: number) {
-    this._samples = value * this._sampleRate / 1000;
+    this._samples = (value * this._sampleRate) / 1000;
   }
 
   public get seconds(): number {
@@ -30,9 +30,7 @@ export class SampleUnit {
 
   private _samples: number;
 
-  private static readonly validSampleRates = [
-    8000, 16000, 22050, 44100, 48000
-  ]
+  private static readonly validSampleRates = [8000, 16000, 22050, 44100, 48000];
 
   get samples(): number {
     return this._samples;
@@ -69,8 +67,11 @@ export class SampleUnit {
     return new SampleUnit(seconds * sampleRate, sampleRate);
   }
 
-  public static fromMiliSeconds(miliseconds: number, sampleRate: number): SampleUnit {
-    return new SampleUnit(miliseconds / 1000 * sampleRate, sampleRate);
+  public static fromMiliSeconds(
+    miliseconds: number,
+    sampleRate: number
+  ): SampleUnit {
+    return new SampleUnit((miliseconds / 1000) * sampleRate, sampleRate);
   }
 
   public clone(): SampleUnit {
@@ -81,18 +82,21 @@ export class SampleUnit {
     if (this.hasEqualSampleRate(sample2)) {
       return new SampleUnit(this._samples - sample2._samples, this._sampleRate);
     }
-    throw Error('can\'t sub Sample because the sample rates are different.');
+    throw Error("can't sub Sample because the sample rates are different.");
   }
 
   public add(sample2: SampleUnit): SampleUnit {
     if (this.hasEqualSampleRate(sample2)) {
       return new SampleUnit(this._samples + sample2._samples, this._sampleRate);
     }
-    throw Error('can\'t add Sample because the sample rates are different.');
+    throw Error("can't add Sample because the sample rates are different.");
   }
 
   public equals(sample: SampleUnit): boolean {
-    return (this._samples === sample._samples && this._sampleRate === sample.sampleRate);
+    return (
+      this._samples === sample._samples &&
+      this._sampleRate === sample.sampleRate
+    );
   }
 
   public hasEqualSampleRate(sample2: SampleUnit) {

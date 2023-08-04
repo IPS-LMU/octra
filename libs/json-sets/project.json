@@ -5,36 +5,19 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/json-sets",
         "main": "libs/json-sets/src/index.ts",
         "tsConfig": "libs/json-sets/tsconfig.lib.json",
-        "assets": [],
-        "project": "libs/json-sets/package.json",
-        "compiler": "tsc"
-      }
-    },
-    "package": {
-      "executor": "@nrwl/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "project": "libs/json-sets/package.json",
-        "outputPath": "dist/libs/json-sets",
+        "assets": ["libs/json-sets/*.md"],
         "entryFile": "libs/json-sets/src/index.ts",
-        "tsConfig": "libs/json-sets/tsconfig.lib.json",
+        "project": "libs/json-sets/package.json",
         "compiler": "babel",
         "external": ["typescript"],
-        "format": ["cjs", "esm"],
-        "assets": [
-          {
-            "input": "libs/json-sets/src/lib/schema",
-            "glob": "**.json",
-            "output": "./src/lib/schema"
-          }
-        ]
-      }
+        "format": ["cjs", "esm"]
+      },
     },
     "publish": {
       "executor": "nx:run-commands",
@@ -48,6 +31,20 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/json-sets/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/json-sets/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
     }
   },

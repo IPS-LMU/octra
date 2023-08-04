@@ -10,20 +10,10 @@
       "options": {
         "outputPath": "dist/libs/media",
         "main": "libs/media/src/index.ts",
+        "entryFile": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
         "assets": [],
         "project": "libs/media/package.json",
-        "compiler": "tsc"
-      }
-    },
-    "package": {
-      "executor": "@nrwl/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "project": "libs/media/package.json",
-        "outputPath": "dist/libs/media",
-        "entryFile": "libs/media/src/index.ts",
-        "tsConfig": "libs/media/tsconfig.lib.json",
         "compiler": "babel",
         "external": ["typescript"],
         "format": ["cjs", "esm"]

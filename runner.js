@@ -27,10 +27,10 @@ const OCTRA = {
     fs.copySync("dist/libs", "extern/libs", { recursive: true });
   },
   buildExtern: async function() {
-    await run("nx package utilities");
-    await run("nx package media");
-    await run("nx package annotation");
-    await run("nx package ngx-components");
+    await run("nx build utilities");
+    await run("node_modules/nx/bin/nx.js package media");
+    await run("nx build annotation");
+    await run("nx build ngx-components");
     await run("npm run build:assets");
     await run("npm run build:json-sets");
     await OCTRA.prepareExtern();
@@ -40,7 +40,7 @@ const OCTRA = {
 
 const JSONValidator = {
   build: async function() {
-    await run("nx package json-sets");
+    await run("nx build json-sets");
     // await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
     //await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
   }

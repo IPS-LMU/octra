@@ -1,4 +1,5 @@
 import {AudioManager, WavFormat} from "@octra/media";
+import {downloadFile} from "@octra/utilities";
 
 async function main() {
     console.log("loaded");

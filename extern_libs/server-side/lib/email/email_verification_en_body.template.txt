@@ -1,0 +1,8 @@
+Hello {{firstname}},
+
+please click on the following link to verify your e-mail address registered to octra-backend.
+
+{{verify_link}}
+
+Kind regards,
+Your OCTRA team

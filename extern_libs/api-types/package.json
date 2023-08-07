@@ -1,0 +1,15 @@
+{
+  "name": "@octra/api-types",
+  "version": "0.7.8",
+  "type": "module",
+  "files": [
+    "**/*"
+  ],
+  "module": "./index.js",
+  "main": "./index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "@octra/json-sets": "file:../octra/extern/libs/json-sets"
+  }
+}

@@ -10,3 +10,4 @@ export * from './lib/fileInfo';
 export * from './lib/directory-info';
 export * from './lib/browser-info';
 export * from './lib/shortcut-manager';
+export * from "./lib/octra-event";

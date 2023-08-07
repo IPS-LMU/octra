@@ -4,8 +4,17 @@ import { Action, Store } from '@ngrx/store';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { ApplicationActions } from '../application/application.actions';
 import { LoginModeActions } from '../login-mode';
-import { catchError, forkJoin, map, of, Subject, tap, timer } from 'rxjs';
-import { exhaustMap, withLatestFrom } from 'rxjs/operators';
+import {
+  catchError,
+  exhaustMap,
+  forkJoin,
+  map,
+  of,
+  Subject,
+  tap,
+  timer,
+  withLatestFrom,
+} from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { APIActions } from '../api';
 import { getBrowserLang, TranslocoService } from '@ngneat/transloco';
@@ -374,17 +383,17 @@ export class ApplicationEffects {
             const selectedService = this.appStorage.asrSelectedService;
 
             /*
-            const lang: ASRLanguage = this.asrService.getLanguageByCode(
-              selectedLanguage,
-              selectedService
-            )!;
+                        const lang: ASRLanguage = this.asrService.getLanguageByCode(
+                          selectedLanguage,
+                          selectedService
+                        )!;
 
-            if (lang !== undefined) {
-              this.asrService.selectedLanguage = lang;
-            } else {
-              console.error('Could not read ASR language from database');
-            }
-             */
+                        if (lang !== undefined) {
+                          this.asrService.selectedLanguage = lang;
+                        } else {
+                          console.error('Could not read ASR language from database');
+                        }
+                         */
 
             if (!this.settingsService.responsive.enabled) {
               this.setFixedWidth();

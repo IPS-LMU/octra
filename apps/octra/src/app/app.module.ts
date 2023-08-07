@@ -71,6 +71,7 @@ import {
 } from './core/store/authentication';
 import { APIEffects } from './core/store/api';
 import { PagesModule } from './core/pages/pages.module';
+import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
 
 @NgModule({
   declarations: [AlertComponent, AppComponent, NavigationComponent],
@@ -126,6 +127,7 @@ import { PagesModule } from './core/pages/pages.module';
     TranslocoModule,
     NgxOctraApiModule,
     OctraComponentsModule,
+    NgxUtilitiesPipesModule,
   ],
   bootstrap: [AppComponent],
   providers: [

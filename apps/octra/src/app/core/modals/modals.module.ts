@@ -44,6 +44,7 @@ import {
   NgbModalModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
+import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -93,6 +94,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     DragDropModule,
     NgbDropdownModule,
     NgbModalModule,
+    NgxUtilitiesPipesModule,
   ],
   providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [

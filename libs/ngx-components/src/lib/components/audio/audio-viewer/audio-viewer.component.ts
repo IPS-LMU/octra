@@ -15,11 +15,7 @@ import Konva from 'konva';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioviewerConfig } from './audio-viewer.config';
 import { AudioViewerService } from './audio-viewer.service';
-import {
-  ShortcutGroup,
-  ShortcutManager,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { OctraEvent, ShortcutGroup, ShortcutManager } from '@octra/utilities';
 import { ASRQueueItemType, Level, Segment } from '@octra/annotation';
 import {
   AudioChunk,
@@ -29,8 +25,7 @@ import {
   SampleUnit,
 } from '@octra/media';
 import { Position, Size } from '../../../obj';
-import { TimespanPipe } from '../../../pipe/timespan.pipe';
-import { Subject, Subscription } from 'rxjs';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
@@ -56,8 +51,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(public av: AudioViewerService, private renderer: Renderer2) {
     this.shortcutsManager = new ShortcutManager();
-    this.subscrManager = new SubscriptionManager<Subscription>();
-
+    /*
     this.subscrManager.add(
       this.av.boundaryDragging.subscribe((status) => {
         if (status === 'stopped') {
@@ -69,6 +63,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         }
       })
     );
+
+ */
   }
 
   @Input() set isMultiLine(value: boolean) {
@@ -151,7 +147,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   @Output() alert = new EventEmitter<{ type: string; message: string }>();
 
   @Output()
-  public get boundaryDragging(): Subject<'started' | 'stopped'> {
+  public get boundaryDragging(): OctraEvent<'started' | 'stopped'> {
     return this.av.boundaryDragging;
   }
 
@@ -161,7 +157,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   private shortcutsManager: ShortcutManager;
   public updating = false;
   // EVENTS
-  public onInitialized = new Subject<void>();
+  public onInitialized = new OctraEvent<void>();
   public secondsPerLine = 5;
   private stage: Konva.Stage | undefined;
   private hoveredLine = -1;
@@ -211,7 +207,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         scrollBars: Konva.Layer;
       }
     | undefined;
-  private subscrManager: SubscriptionManager<Subscription>;
   private animation: {
     playHead: Konva.Animation | undefined;
   } = {
@@ -291,7 +286,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscrManager.destroy();
+    // this.subscrManager.destroy();
     this.stage?.destroy();
 
     this.konvaContainer?.nativeElement.removeEventListener(
@@ -326,6 +321,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   afterChunkUpdated() {
     if (this.audioChunk) {
+      /*
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
 
@@ -338,12 +334,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         ),
         'audioChunkStatusChange'
       );
-
+       */
       new Promise<void>((resolve, reject) => {
         if (
           this.audioChunk !== undefined &&
           this.audioChunk.audioManager.channel === undefined
         ) {
+          /*
           this.subscrManager.add(
             this.audioChunk.audioManager.onChannelDataChange.subscribe(
               () => {
@@ -355,6 +352,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             ),
             'audioChunkChannelFinished'
           );
+
+           */
         } else {
           resolve();
         }
@@ -464,7 +463,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       this.stage.height(this.height);
 
-      this.onInitialized.next();
+      // this.onInitialized.next();
       for (const [, value] of Object.entries(this.layers)) {
         value.removeChildren();
       }
@@ -792,7 +791,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.widthOnInit = this.width;
       this.styles.height = this.height;
       this.drawnSegmentIDs = [];
-      this.subscrManager.removeByTag('resize');
+      // this.subscrManager.removeByTag('resize');
 
       if (!this.settings.multiLine) {
         this.settings.lineheight =

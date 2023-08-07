@@ -1,13 +1,12 @@
 import { AudioInfo } from './audio-info';
 import { SampleUnit } from './audio-time';
 import {
-  SubscriptionManager,
+  OctraEvent,
   TsWorker,
   TsWorkerJob,
   TsWorkerStatus,
 } from '@octra/utilities';
 import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
-import { Subject, timer } from 'rxjs';
 
 declare let window: unknown;
 
@@ -18,10 +17,10 @@ export class AudioDecoder {
   /**
    * triggers as soon as new channel data was read. Last event has progress 1.
    */
-  public onChannelDataCalculate: Subject<{
+  public onChannelDataCalculate: OctraEvent<{
     progress: number;
     result?: Float32Array;
-  }> = new Subject<{
+  }> = new OctraEvent<{
     progress: number;
     result?: Float32Array;
   }>();
@@ -47,12 +46,11 @@ export class AudioDecoder {
     start: number;
     duration: number;
   }[] = [];
-  private subscriptionManager = new SubscriptionManager();
 
   private stopDecoding = false;
   private uint8Array?: Uint8Array;
   private writtenChannel = 0;
-  private afterChannelDataFinished?: Subject<void>;
+  private afterChannelDataFinished?: OctraEvent<void>;
 
   get channelDataFactor() {
     let factor: number;
@@ -83,59 +81,65 @@ export class AudioDecoder {
 
       for (let i = 0; i < this.parallelJobs; i++) {
         const worker = new TsWorker();
-        worker.jobstatuschange.subscribe(async (job: TsWorkerJob) => {
-          const jobItem = this.joblist.findIndex((a) => {
-            return a.jobId === job.id;
-          });
+        worker.jobstatuschange.subscribe({
+          next: async (event: any) => {
+            const job: TsWorkerJob = event.detail;
+            const jobItem = this.joblist.findIndex((a) => {
+              return a.jobId === job.id;
+            });
 
-          if (
-            job.status === TsWorkerStatus.FINISHED &&
-            job.result !== undefined
-          ) {
-            if (jobItem > -1) {
-              const j = this.joblist[jobItem];
-              this.writtenChannel += j.duration;
-              this.joblist.splice(jobItem, 1);
+            if (
+              job.status === TsWorkerStatus.FINISHED &&
+              job.result !== undefined
+            ) {
+              if (jobItem > -1) {
+                const j = this.joblist[jobItem];
+                this.writtenChannel += j.duration;
+                this.joblist.splice(jobItem, 1);
 
-              if (this.channelData === undefined || this.channelData === null) {
-                this.channelData = new Float32Array(
-                  Math.round(
-                    this.audioInfo.duration.samples / this.channelDataFactor
-                  )
-                );
-              }
+                if (
+                  this.channelData === undefined ||
+                  this.channelData === null
+                ) {
+                  this.channelData = new Float32Array(
+                    Math.round(
+                      this.audioInfo.duration.samples / this.channelDataFactor
+                    )
+                  );
+                }
 
-              try {
-                const result = await this.minimizeChannelData(
-                  job.result,
-                  this.channelDataFactor
-                );
-                this.insertChannelBuffer(
-                  Math.floor(j.start / this.channelDataFactor),
-                  result
-                );
-              } catch (e) {
-                console.error(e);
+                try {
+                  const result = await this.minimizeChannelData(
+                    job.result,
+                    this.channelDataFactor
+                  );
+                  this.insertChannelBuffer(
+                    Math.floor(j.start / this.channelDataFactor),
+                    result
+                  );
+                } catch (e) {
+                  console.error(e);
+                }
               }
             }
-          }
 
-          if (this.writtenChannel >= this.audioInfo.duration.samples - 1) {
-            // send complete audiobuffer
-            this.onChannelDataCalculate.next({
-              progress: 1,
-              result: this.channelData,
-            });
+            if (this.writtenChannel >= this.audioInfo.duration.samples - 1) {
+              // send complete audiobuffer
+              this.onChannelDataCalculate.next({
+                progress: 1,
+                result: this.channelData,
+              });
 
-            this.afterChannelDataFinished!.next();
-          } else {
-            const progress =
-              this.writtenChannel / this.audioInfo.duration.samples;
-            this.onChannelDataCalculate.next({
-              progress,
-              result: undefined,
-            });
-          }
+              this.afterChannelDataFinished!.next(undefined);
+            } else {
+              const progress =
+                this.writtenChannel / this.audioInfo.duration.samples;
+              this.onChannelDataCalculate.next({
+                progress,
+                result: undefined,
+              });
+            }
+          },
         });
 
         this.tsWorkers.push(worker);
@@ -158,11 +162,20 @@ export class AudioDecoder {
         sampleStart.samples >= 0
       ) {
         if (this.afterChannelDataFinished === undefined) {
-          this.afterChannelDataFinished = new Subject<void>();
-          this.afterChannelDataFinished.subscribe(() => {
-            this.afterChannelDataFinished!.unsubscribe();
-            this.afterChannelDataFinished = undefined;
-            this.onChannelDataCalculate.complete();
+          this.afterChannelDataFinished = new OctraEvent<void>();
+          this.afterChannelDataFinished.subscribe({
+            next: () => {
+              this.afterChannelDataFinished?.unsubscribe();
+              this.afterChannelDataFinished = undefined;
+              this.onChannelDataCalculate.complete();
+            },
+          });
+          this.afterChannelDataFinished.subscribe({
+            next: () => {
+              this.afterChannelDataFinished!.unsubscribe();
+              this.afterChannelDataFinished = undefined;
+              this.onChannelDataCalculate.complete();
+            },
           });
         }
 
@@ -202,38 +215,36 @@ export class AudioDecoder {
             this.audioInfo.duration.samples
           ) {
             if (!this.stopDecoding) {
-              this.subscriptionManager.add(
-                timer(10).subscribe(() => {
-                  let sampleDur2 = Math.min(
-                    sampleDur.samples,
-                    this.audioInfo.duration.samples -
-                      sampleStart.samples -
-                      sampleDur.samples
-                  );
+              setTimeout(() => {
+                let sampleDur2 = Math.min(
+                  sampleDur.samples,
+                  this.audioInfo.duration.samples -
+                    sampleStart.samples -
+                    sampleDur.samples
+                );
 
-                  if (
+                if (
+                  this.audioInfo.duration.samples -
+                    sampleStart.samples -
+                    sampleDur.samples <
+                  2 * sampleDur.samples
+                ) {
+                  sampleDur2 =
                     this.audioInfo.duration.samples -
-                      sampleStart.samples -
-                      sampleDur.samples <
-                    2 * sampleDur.samples
-                  ) {
-                    sampleDur2 =
-                      this.audioInfo.duration.samples -
-                      sampleStart.samples -
-                      sampleDur.samples;
-                  }
-                  const durationUnit = new SampleUnit(
-                    sampleDur2,
-                    this.audioInfo.sampleRate
-                  );
-                  this.getChunkedChannelData(
-                    sampleStart.add(sampleDur),
-                    durationUnit
-                  ).catch((error) => {
-                    console.error(error);
-                  });
-                })
-              );
+                    sampleStart.samples -
+                    sampleDur.samples;
+                }
+                const durationUnit = new SampleUnit(
+                  sampleDur2,
+                  this.audioInfo.sampleRate
+                );
+                this.getChunkedChannelData(
+                  sampleStart.add(sampleDur),
+                  durationUnit
+                ).catch((error) => {
+                  console.error(error);
+                });
+              }, 10);
             } else {
               this.onChannelDataCalculate.complete();
             }
@@ -252,7 +263,6 @@ export class AudioDecoder {
   }
 
   public destroy() {
-    this.subscriptionManager.destroy();
     this.uint8Array = undefined;
     for (let i = 0; i < this.parallelJobs; i++) {
       this.tsWorkers[i].destroy();

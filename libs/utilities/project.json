@@ -14,7 +14,7 @@
         "tsConfig": "libs/utilities/tsconfig.lib.json",
         "assets": [],
         "project": "libs/utilities/package.json",
-        "compiler": "babel",
+        "compiler": "tsc",
         "external": ["typescript"],
         "format": ["cjs", "esm"]
       }

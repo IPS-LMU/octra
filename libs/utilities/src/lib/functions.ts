@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { TaskInputOutputDto } from '@octra/api-types';
 
 export interface FileSize {
@@ -198,50 +197,6 @@ export function fileListToArray(fileList: FileList): File[] {
   return result;
 }
 
-export function afterTrue(observable: Observable<boolean>): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const subscription = observable.subscribe(
-      (value) => {
-        if (value === true) {
-          try {
-            subscription.unsubscribe();
-          } catch (e) {
-            // ignore
-          }
-          resolve();
-        }
-      },
-      (error) => {
-        reject(error);
-      },
-      () => {
-        reject('comnpleted!');
-      }
-    );
-  });
-}
-
-export function afterDefined(observable: Observable<any>): Promise<any> {
-  return new Promise<any>((resolve, reject) => {
-    const subscription = observable.subscribe(
-      (value) => {
-        if (value !== undefined) {
-          console.log(`is defined`);
-          try {
-            subscription.unsubscribe();
-          } catch (e) {
-            // ignore
-          }
-          resolve(value);
-        }
-      },
-      (error) => {
-        reject(error);
-      }
-    );
-  });
-}
-
 export function waitTillResultRetrieved<
   A1 extends { subscribe: any },
   A2 extends {
@@ -412,6 +367,20 @@ export function mapFnOnObject(
     obj[key] = fn(key, obj[key]);
   });
   return obj;
+}
+
+export async function downloadFile(url: string): Promise<File> {
+  return new Promise<File>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', url);
+    xhr.addEventListener('load', (result) => {
+      resolve(xhr.response);
+    });
+    xhr.addEventListener('error', (error) => {
+      reject(error);
+    });
+    xhr.send();
+  });
 }
 
 export async function readFileContents<T>(

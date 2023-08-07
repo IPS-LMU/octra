@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'timespan',
-  pure: false,
 })
 export class TimespanPipe implements PipeTransform {
   private timespan = 0;

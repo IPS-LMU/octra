@@ -9,17 +9,15 @@ import {
   PlayBackStatus,
   SampleUnit,
 } from '@octra/media';
-import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
+import { OctraEvent, TsWorkerJob } from '@octra/utilities';
 import { ASRQueueItemType, Level, Segment } from '@octra/annotation';
-import { Subject } from 'rxjs';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { MultiThreadingService } from '../../../multi-threading.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioViewerService {
-  get boundaryDragging(): Subject<'started' | 'stopped'> {
+  get boundaryDragging(): OctraEvent<'started' | 'stopped'> {
     return this._boundaryDragging;
   }
 
@@ -27,18 +25,16 @@ export class AudioViewerService {
   public overboundary = false;
   public shiftPressed = false;
   public breakMarker: any;
-  public channelInitialized = new Subject<void>();
+  public channelInitialized = new OctraEvent<void>();
   protected mouseClickPos: SampleUnit | undefined;
   protected playcursor: PlayCursor | undefined;
 
-  private _boundaryDragging: Subject<'started' | 'stopped'>;
+  private _boundaryDragging: OctraEvent<'started' | 'stopped'>;
 
   // AUDIO
   protected audioPxW = 0;
   protected hZoom = 0;
   protected audioChunk: AudioChunk | undefined;
-  private subscrManager: SubscriptionManager<Subscription> =
-    new SubscriptionManager<Subscription>();
 
   private _currentTranscriptionLevel: Level | undefined;
 
@@ -150,7 +146,7 @@ export class AudioViewerService {
   }
 
   constructor(private multiThreadingService: MultiThreadingService) {
-    this._boundaryDragging = new Subject<'started' | 'stopped'>();
+    this._boundaryDragging = new OctraEvent<'started' | 'stopped'>();
   }
 
   public initialize(
@@ -328,7 +324,7 @@ export class AudioViewerService {
    * destroy this audioviewer object
    */
   public destroy() {
-    this.subscrManager.destroy();
+    // this.subscrManager.destroy();
   }
 
   /**
@@ -1045,7 +1041,7 @@ export class AudioViewerService {
             this.audioChunk.absolutePlayposition =
               this.audioChunk.time.start.clone();
           }
-          this.channelInitialized.next();
+          this.channelInitialized.next(undefined);
           this.channelInitialized.complete();
           resolve();
         })

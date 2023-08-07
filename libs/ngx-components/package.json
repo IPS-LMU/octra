@@ -8,8 +8,7 @@
     "@octra/utilties": "^0.0.1",
     "@octra/annotation": "^0.0.1",
     "@octra/media": "^0.0.1",
-    "konva": "^9.0.0",
-    "rxjs": ">=7.5.0"
+    "konva": "^9.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

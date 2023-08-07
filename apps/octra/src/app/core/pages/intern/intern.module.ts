@@ -36,6 +36,8 @@ import { LoginMode } from '../../store';
 import { EffectsModule } from '@ngrx/effects';
 import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
 import { AsrService } from '../../shared/service/asr.service';
+import { AppModule } from '../../../../../../web-components/src/app/app.module';
+import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];
 
@@ -94,6 +96,8 @@ export const EDITORS: any[] = [
       new LoginModeReducers(LoginMode.LOCAL).create()
     ),
     EffectsModule.forFeature([AnnotationEffects]),
+    AppModule,
+    NgxUtilitiesPipesModule,
   ],
   exports: [
     AuthComponent,

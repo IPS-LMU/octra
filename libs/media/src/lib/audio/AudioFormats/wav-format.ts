@@ -1,14 +1,14 @@
 import {AudioFormat, IntArray} from './audio-format';
-import {NumeratedSegment} from '../../types';
-import {Subject} from 'rxjs';
+import {NumeratedSegment} from '../../types'
+import {OctraEvent} from '@octra/utilities';
 
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {
-  public onaudiocut: Subject<{
+  public onaudiocut: OctraEvent<{
     finishedSegments: number;
     fileName: string;
     intArray: IntArray;
-  }> = new Subject<{
+  }> = new OctraEvent<{
     finishedSegments: number;
     fileName: string;
     intArray: IntArray;

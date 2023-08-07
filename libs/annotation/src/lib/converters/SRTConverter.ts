@@ -129,11 +129,8 @@ export class SRTConverter extends Converter {
       let lastEnd = 0;
 
       if (content !== '') {
-        const regex = new RegExp(
-          '([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\n' +
-            '((?:(?:(?![0-9]).+)?\n?)+)',
-          'g'
-        );
+        const regex =
+          /([0-9]+)[\n\r]*([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})[\n\r]*((?:(?:(?![0-9]).+)?[\n\r]*)+)/g;
 
         let matches = regex.exec(content);
         while (matches !== null) {

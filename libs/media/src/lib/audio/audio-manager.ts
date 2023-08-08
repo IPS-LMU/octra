@@ -3,10 +3,11 @@ import { AudioDecoder } from './audio-decoder';
 import { AudioInfo } from './audio-info';
 import { AudioRessource } from './audio-ressource';
 import { AudioFormat, WavFormat } from './AudioFormats';
+import { SubscriptionManager } from '@octra/utilities';
 import { SampleUnit } from './audio-time';
 import { PlayBackStatus, SourceType } from '../types';
 import { AudioSelection } from './audio-selection';
-import { OctraEvent } from '@octra/utilities';
+import { Subject, Subscription, timer } from 'rxjs';
 
 declare let window: any;
 
@@ -19,8 +20,8 @@ export class AudioManager {
     start: 0,
     end: 0,
   };
-  public onChannelDataChange = new OctraEvent<void>();
-  public audioBuffered = new OctraEvent<{
+  public onChannelDataChange = new Subject<void>();
+  public audioBuffered = new Subject<{
     sampleStart: SampleUnit;
     sampleDur: SampleUnit;
   }>();
@@ -82,11 +83,12 @@ export class AudioManager {
   }
 
   private static counter = 0;
+  private subscrManager: SubscriptionManager<Subscription>;
 
   private _id: number;
   private _stepBackward = false;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
-  private _playbackEndChecker?: OctraEvent<any>;
+  private _playbackEndChecker?: Subscription;
   private readonly _audio: HTMLAudioElement;
 
   // variables needed for initializing audio
@@ -125,6 +127,7 @@ export class AudioManager {
   constructor(audioInfo: AudioInfo, sampleRate: number) {
     this._id = ++AudioManager.counter;
     this._audio = new Audio();
+    this.subscrManager = new SubscriptionManager();
     this._audio.autoplay = false;
     this._audio.defaultPlaybackRate = 1;
     this._audio.defaultMuted = false;
@@ -169,11 +172,11 @@ export class AudioManager {
     type: string,
     buffer: ArrayBuffer,
     audioFormats: AudioFormat[]
-  ): OctraEvent<{
+  ): Subject<{
     audioManager?: AudioManager;
     decodeProgress: number;
   }> => {
-    const subj = new OctraEvent<{
+    const subj = new Subject<{
       audioManager?: AudioManager;
       decodeProgress: number;
     }>();
@@ -240,11 +243,10 @@ export class AudioManager {
         result.prepareAudioPlayBack();
 
         result.time.start = Date.now();
-        result
+        const subscr = result
           .updateChannelData(result.createSampleUnit(0), sampleDur)
-          .subscribe({
-            next: (event: any) => {
-              const statusItem = event.detail;
+          .subscribe(
+            (statusItem) => {
               if (statusItem.progress === 1) {
                 setTimeout(() => {
                   subj.next({
@@ -260,14 +262,14 @@ export class AudioManager {
                 });
               }
             },
-            error: (error: any) => {
+            (error) => {
               console.error(error);
-              // subscr.unsubscribe();
+              subscr.unsubscribe();
             },
-            complete: () => {
-              // subscr.unsubscribe();
-            },
-          });
+            () => {
+              subscr.unsubscribe();
+            }
+          );
       }
     } else {
       subj.error(`audio format not supported`);
@@ -382,12 +384,16 @@ export class AudioManager {
               const time = Math.round(
                 audioSelection.duration.unix / playbackRate
               );
-              setTimeout(() => {
+              this._playbackEndChecker = timer(
+                Math.round(audioSelection.duration.unix / playbackRate)
+              ).subscribe(() => {
                 this.endPlayBack();
-                setTimeout(() => {
-                  resolve();
-                }, 100);
-              }, Math.round(audioSelection.duration.unix / playbackRate));
+                this.subscrManager.add(
+                  timer(100).subscribe(() => {
+                    resolve();
+                  })
+                );
+              });
             })
             .catch((error) => {
               this._playbackEndChecker!.unsubscribe();
@@ -517,7 +523,7 @@ export class AudioManager {
         await this._audioContext.close();
       }
     }
-    // this.subscrManager.destroy();
+    this.subscrManager.destroy();
     return;
   }
 
@@ -537,10 +543,10 @@ export class AudioManager {
   public updateChannelData(
     sampleStart: SampleUnit,
     sampleDur: SampleUnit
-  ): OctraEvent<{
+  ): Subject<{
     progress: number;
   }> {
-    const result = new OctraEvent<{ progress: number }>();
+    const result = new Subject<{ progress: number }>();
 
     const format = new WavFormat();
     format.init(this._resource.info.name, this._resource.arraybuffer!);
@@ -549,15 +555,16 @@ export class AudioManager {
       this._resource.info,
       this._resource.arraybuffer!
     );
-    AudioManager.decoder.onChannelDataCalculate.subscribe({
-      next: (event: any) => {
-        const status = event.detail;
+    const subj = AudioManager.decoder.onChannelDataCalculate.subscribe(
+      (status) => {
         if (status.progress === 1 && status.result !== undefined) {
           AudioManager.decoder.destroy();
           this._channel = status.result;
           this._channelDataFactor = AudioManager.decoder.channelDataFactor;
-          this.onChannelDataChange.next(undefined);
+          this.onChannelDataChange.next();
           this.onChannelDataChange.complete();
+
+          subj.unsubscribe();
         }
 
         result.next({ progress: status.progress });
@@ -565,11 +572,11 @@ export class AudioManager {
           result.complete();
         }
       },
-      error: (error: any) => {
+      (error) => {
         this.onChannelDataChange.error(error);
         result.error(error);
-      },
-    });
+      }
+    );
     AudioManager.decoder.started = Date.now();
     AudioManager.decoder
       .getChunkedChannelData(sampleStart, sampleDur)
@@ -667,6 +674,7 @@ export class AudioChunk {
   public statuschange: EventEmitter<PlayBackStatus> =
     new EventEmitter<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
+  private subscrManager = new SubscriptionManager<Subscription>();
   private _playposition: SampleUnit;
 
   get audioManager(): AudioManager {
@@ -834,8 +842,6 @@ export class AudioChunk {
     return this._replay;
   }
 
-  private subscriptions: OctraEvent<any>[] = [];
-
   constructor(
     time: AudioSelection,
     audioManager: AudioManager,
@@ -886,9 +892,11 @@ export class AudioChunk {
           this._audioManger
             .pausePlayback()
             .then(() => {
-              setTimeout(() => {
-                resolve2();
-              }, 500);
+              this.subscrManager.add(
+                timer(500).subscribe(() => {
+                  resolve2();
+                })
+              );
             })
             .catch((error) => {
               reject2(error);
@@ -908,63 +916,61 @@ export class AudioChunk {
           }
 
           this._lastplayedpos = this._playposition.clone();
-          /*
-                    const id = this.subscrManager.add(
-                      this.audioManager.statechange.subscribe(
-                        (state: PlayBackStatus) => {
-                          if (
-                            state === PlayBackStatus.STOPPED ||
-                            state === PlayBackStatus.PAUSED ||
-                            state === PlayBackStatus.ENDED
-                          ) {
-                            this.subscrManager.removeById(id);
-                          }
 
-                          if (state === PlayBackStatus.STOPPED) {
-                            this._playposition = this.time.start.clone();
-                          }
+          const id = this.subscrManager.add(
+            this.audioManager.statechange.subscribe(
+              (state: PlayBackStatus) => {
+                if (
+                  state === PlayBackStatus.STOPPED ||
+                  state === PlayBackStatus.PAUSED ||
+                  state === PlayBackStatus.ENDED
+                ) {
+                  this.subscrManager.removeById(id);
+                }
 
-                          if (state === PlayBackStatus.ENDED) {
-                            this.absolutePlayposition = this.selection.end.clone();
-                            // reset to beginning of selection
+                if (state === PlayBackStatus.STOPPED) {
+                  this._playposition = this.time.start.clone();
+                }
 
-                            if (this._playposition.seconds >= this.time.end.seconds) {
-                              this.startpos = this.time.start.clone();
-                            } else {
-                              this._playposition = this.selection.start.clone();
-                            }
-                            if (this._replay) {
-                              this.setState(state);
-                              new Promise<void>((resolve2, reject2) => {
-                                this.subscrManager.add(
-                                  timer(200).subscribe(() => {
-                                    this.startPlayback(playOnHover)
-                                      .then(() => {
-                                        resolve2();
-                                      })
-                                      .catch((error) => {
-                                        console.error(error);
-                                        reject2(error);
-                                      });
-                                  })
-                                );
-                              });
-                            } else {
-                              this.setState(state);
-                              resolve();
-                            }
-                          } else {
-                            this.setState(state);
-                            resolve();
-                          }
-                        },
-                        (error) => {
-                          console.error(error);
-                        }
-                      )
-                    );
+                if (state === PlayBackStatus.ENDED) {
+                  this.absolutePlayposition = this.selection.end.clone();
+                  // reset to beginning of selection
 
-                     */
+                  if (this._playposition.seconds >= this.time.end.seconds) {
+                    this.startpos = this.time.start.clone();
+                  } else {
+                    this._playposition = this.selection.start.clone();
+                  }
+                  if (this._replay) {
+                    this.setState(state);
+                    new Promise<void>((resolve2, reject2) => {
+                      this.subscrManager.add(
+                        timer(200).subscribe(() => {
+                          this.startPlayback(playOnHover)
+                            .then(() => {
+                              resolve2();
+                            })
+                            .catch((error) => {
+                              console.error(error);
+                              reject2(error);
+                            });
+                        })
+                      );
+                    });
+                  } else {
+                    this.setState(state);
+                    resolve();
+                  }
+                } else {
+                  this.setState(state);
+                  resolve();
+                }
+              },
+              (error) => {
+                console.error(error);
+              }
+            )
+          );
 
           this._audioManger
             .startPlayback(
@@ -1091,7 +1097,7 @@ export class AudioChunk {
   }
 
   public destroy() {
-    // this.subscrManager.destroy();
+    this.subscrManager.destroy();
   }
 
   public toggleReplay() {

@@ -1,13 +1,12 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -15,22 +14,32 @@ import Konva from 'konva';
 import { AudioplayerSettings } from './audioplayer-settings';
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioChunk, PlayBackStatus, SampleUnit } from '@octra/media';
+import {interval, Subscription, timer} from 'rxjs';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({
   selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
   styleUrls: ['./audioplayer.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
+
+  constructor(private cd: ChangeDetectorRef) {
+    interval(100).subscribe( {
+      next: ()=>{
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      }
+    })
+  }
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:
     | ElementRef
     | undefined;
 
-  @Output() loadComp = new EventEmitter<void>();
   private stage: Konva.Stage | undefined;
   private animation: {
     playHead: Konva.Animation | undefined;
@@ -49,7 +58,7 @@ export class AudioplayerComponent
     sliderBar: undefined,
     playHead: undefined,
   };
-  private audiochunkSubscription: EventEmitter<any> | undefined;
+  private audiochunkSubscription: Subscription | undefined;
 
   private _settings: AudioplayerSettings = {
     slider: {
@@ -127,7 +136,6 @@ export class AudioplayerComponent
   ngOnInit() {
     this.afterChunkUpdated();
     this.subscrmanager = new SubscriptionManager();
-    this.loadComp.emit();
     // this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
   }
 
@@ -150,15 +158,12 @@ export class AudioplayerComponent
         this.audiochunkSubscription.unsubscribe();
       }
 
-      /*
       this.audiochunkSubscription = this.audioChunk.statuschange.subscribe(
         this.onAudioChunkStatusChanged,
         (error: any) => {
           console.error(error);
         }
       );
-
-       */
     }
   }
 
@@ -465,7 +470,6 @@ export class AudioplayerComponent
           .then(() => {
             if (this.audioChunk !== undefined) {
               this.setPlayPosition(xCoord);
-              /*
               this.subscrmanager.add(
                 timer(200).subscribe(() => {
                   if (this.audioChunk !== undefined) {
@@ -475,7 +479,6 @@ export class AudioplayerComponent
                   }
                 })
               );
-               */
             }
           })
           .catch((error: any) => {

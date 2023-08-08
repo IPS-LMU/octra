@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
-import { TsWorker, TsWorkerJob } from '@octra/utilities';
+import { Subscription } from 'rxjs/internal/Subscription';
+import {
+  SubscriptionManager,
+  TsWorker,
+  TsWorkerJob,
+  TsWorkerStatus,
+} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MultiThreadingService {
   private numberOfThreads = 2;
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   private _workers: TsWorker[] = [];
 
@@ -24,7 +31,6 @@ export class MultiThreadingService {
       const bestWorker = this.getBestWorker();
 
       if (bestWorker !== undefined) {
-        /*
         const id = this.subscrManager.add(
           bestWorker.jobstatuschange.subscribe(
             (changedJob: TsWorkerJob) => {
@@ -45,8 +51,6 @@ export class MultiThreadingService {
           )
         );
 
-         */
-
         bestWorker.addJob(job);
       } else {
         console.error(new Error(`found no worker to run job ${job.id}`));
@@ -66,7 +70,7 @@ export class MultiThreadingService {
   }
 
   public destroy() {
-    // this.subscrManager.destroy();
+    this.subscrManager.destroy();
   }
 
   private getBestWorker(): TsWorker | undefined {

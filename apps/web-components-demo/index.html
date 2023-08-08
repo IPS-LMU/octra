@@ -1,24 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Web Components DEMO</title>
-    <script type="importmap">
-        {
-            "imports": {
-              "rxjs": "../../node_modules/rxjs/_esm2015/index.js",
-              "@angular/core": "../../node_modules/@angular/core/fesm2015/core.mjs",
-              "platform": "../../node_modules/platform/platform.js",
-              "@octra/utilities": "../../dist/libs/utilities/index.js",
-              "@octra/media": "../../dist/libs/media/index.js"
-            }
-        }
-
-    </script>
+  <meta charset="UTF-8">
+  <title>Web Components DEMO</title>
+  <script type="module" src="../../dist/libs/utilities/bundles/OctraUtilities.umd.js"></script>
+  <script type="module" src="../../dist/libs/media/bundles/OctraMedia.umd.js"></script>
+  <script type="module" src="../../dist/build/web-components/web-components.js"></script>
 </head>
 <body>
 <div id="wrapper"></div>
-<script type="text/javascript" src="../../dist/build/web-components/web-components.js"></script>
+<button onclick="play()">PLAY</button>
+<button onclick="pause()">PAUSE</button>
 <script type="module" src="./index.mjs"></script>
 </body>
 </html>

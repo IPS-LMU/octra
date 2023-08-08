@@ -1,5 +1,5 @@
+import { Subject } from 'rxjs';
 import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
-import { OctraEvent } from '../octra-event';
 
 export class TsWorker {
   private static workerID = 1;
@@ -21,9 +21,9 @@ export class TsWorker {
   /**
    * triggers whenever a job changed its status
    */
-  private _jobstatuschange = new OctraEvent<TsWorkerJob>();
+  private _jobstatuschange = new Subject<TsWorkerJob>();
 
-  get jobstatuschange(): OctraEvent<TsWorkerJob> {
+  get jobstatuschange(): Subject<TsWorkerJob> {
     return this._jobstatuschange;
   }
 
@@ -175,7 +175,7 @@ onmessage = (msg) => {
           .catch((error) => {
             job.changeStatus(TsWorkerStatus.FAILED);
             this._jobstatuschange.error(error);
-            this._jobstatuschange = new OctraEvent();
+            this._jobstatuschange = new Subject();
             this.checkBeforeStart();
           });
       }

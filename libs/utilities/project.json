@@ -5,8 +5,10 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nrwl/web:rollup",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/utilities",
         "main": "libs/utilities/src/index.ts",
@@ -14,9 +16,44 @@
         "tsConfig": "libs/utilities/tsconfig.lib.json",
         "assets": [],
         "project": "libs/utilities/package.json",
-        "compiler": "tsc",
-        "external": ["typescript"],
-        "format": ["cjs", "esm"]
+        "compiler": "babel",
+        "external": [
+          "typescript"
+        ],
+        "format": [
+          "cjs",
+          "esm",
+          "umd"
+        ]
+      }
+    },
+    "bundle": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "babelUpwardRootMode": true,
+        "libraryName": "OctraUtilities",
+        "libraryTargets": [
+          "global",
+          "commonjs",
+          "amd",
+          "umd"
+        ],
+        "index": "",
+        "tsConfig": "libs/utilities/tsconfig.lib.json",
+        "main": "libs/utilities/src/index.ts",
+        "outputPath": "dist/libs/utilities/bundles",
+        "compiler": "babel",
+        "optimization": true,
+        "extractLicenses": true,
+        "runtimeChunk": false,
+        "vendorChunk": false,
+        "generateIndexHtml": false,
+        "commonChunk": false,
+        "namedChunks": false,
+        "webpackConfig": "webpack.config.js"
       }
     },
     "publish": {
@@ -24,18 +61,26 @@
       "options": {
         "command": "node tools/scripts/publish.mjs utilities {args.ver} {args.tag}"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/utilities/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/utilities/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "libs/utilities/jest.config.ts",
         "passWithNoTests": true

@@ -12,7 +12,10 @@
         "main": "libs/media/src/index.ts",
         "entryFile": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": [],
+        "assets": [
+          "libs/media/src/LICENSE.txt",
+          "libs/media/src/README.md"
+        ],
         "project": "libs/media/package.json",
         "compiler": "babel",
         "external": ["typescript"],
@@ -46,7 +49,8 @@
         "commonChunk": false,
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
-      }
+      },
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",

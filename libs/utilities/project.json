@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/web:rollup",
+      "executor": "@nrwl/rollup:rollup",
       "outputs": [
         "{options.outputPath}"
       ],
@@ -14,7 +14,10 @@
         "main": "libs/utilities/src/index.ts",
         "entryFile": "libs/utilities/src/index.ts",
         "tsConfig": "libs/utilities/tsconfig.lib.json",
-        "assets": [],
+        "assets": [
+          "libs/utilities/src/LICENSE.txt",
+          "libs/utilities/src/README.md"
+        ],
         "project": "libs/utilities/package.json",
         "compiler": "babel",
         "external": [
@@ -22,8 +25,7 @@
         ],
         "format": [
           "cjs",
-          "esm",
-          "umd"
+          "esm"
         ]
       }
     },
@@ -54,7 +56,10 @@
         "commonChunk": false,
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
-      }
+      },
+      "dependsOn": [
+        "build"
+      ]
     },
     "publish": {
       "executor": "nx:run-commands",

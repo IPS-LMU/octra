@@ -9,6 +9,7 @@
     "build:release": "node runner.js build:release",
     "build:dev": "node runner.js build:dev",
     "build:prod": "node runner.js build:prod",
+    "build:libs": "node runner.js build:libs",
     "build:extern": "node runner.js build:extern",
     "build:json-sets": "node runner.js build:json-sets",
     "build:assets": "nx build assets",

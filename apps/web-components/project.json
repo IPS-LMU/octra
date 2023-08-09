@@ -11,7 +11,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "aot": true,
-        "outputPath": "dist/apps/web-components",
+        "outputPath": "dist/libs/web-components",
         "index": "apps/web-components/src/index.html",
         "main": "apps/web-components/src/main.ts",
         "polyfills": ["zone.js"],

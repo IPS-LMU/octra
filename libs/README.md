@@ -17,6 +17,7 @@ This sections shows an overview of all custom libraries used by OCTRA. All Angul
   signal displays.
 - [ngx-utilities](./ngx-utilities/): library with custom functions used in
   angular projects
+- [web-components](./web-components/): library with web-components containing components from ngx-components. These components can be used in other frameworks or Vanilla JS. [See demo](../apps/web-components-demo/).
 
 # Installation
 
@@ -27,7 +28,7 @@ want to use the libraries in your project you have to manually install these.
 2. In Terminal go to Octra directory and run
 
 ```shell
-npm install --legacy-peer-deps && npm run build
+npm install --legacy-peer-deps && npm run build:libs
 ```
 
 3. Now go to you project folder and run

@@ -1,0 +1,9 @@
+{
+  "entryPoints": [
+    "libs/*"
+  ],
+  "name": "Octra libraries",
+  "entryPointStrategy": "packages",
+  "includeVersion": true,
+  "out": "docs"
+}

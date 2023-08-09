@@ -17,7 +17,7 @@ This sections shows an overview of all custom libraries used by OCTRA. All Angul
   signal displays.
 - [ngx-utilities](./ngx-utilities/): library with custom functions used in
   angular projects
-- [web-components](./web-components/): library with web-components containing components from ngx-components. These components can be used in other frameworks or Vanilla JS. [See demo](../apps/web-components-demo/).
+- [web-components](../apps/web-components/): library with web-components containing components from ngx-components. These components can be used in other frameworks or Vanilla JS. [See demo](../apps/web-components-demo/).
 
 # Installation
 

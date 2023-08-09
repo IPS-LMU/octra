@@ -118,7 +118,9 @@ export class LoginComponent
   }
 
   onOnlineShibbolethSubmit(form: NgForm) {
-    /* TODO
+    this.authStoreService.loginOnline(AccountLoginMethod.shibboleth);
+
+    /*
     this.api.loginUser('shibboleth').then((result) => {
       if (result.openWindowURL !== undefined) {
         // need to open windowURL

@@ -338,6 +338,23 @@ export function last<T>(array: T[] | undefined) {
 }
 
 /**
+ * this method is like path.join() just for URL
+ * @param args
+ */
+export function joinURL(...args: string[]) {
+  return args
+      .map((a) => {
+        const httpsArr = /(https?:\/\/)/g.exec(a);
+        const https = httpsArr ? httpsArr[1] : '';
+
+        const result = https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
+        return result;
+      })
+      .filter((a) => a !== null && a !== undefined && a !== '')
+      .join('/');
+}
+
+/**
  * creates a range with start and end number.
  * @param start
  * @param end

@@ -27,10 +27,12 @@ export const editorComponents: {
     translate: 'interfaces.2D editor',
     icon: 'bi bi-justify',
   },
+    /* TODO fix TRN editor
   {
     name: TrnEditorComponent.editorname,
     editor: TrnEditorComponent,
     translate: 'interfaces.TRN editor',
     icon: 'bi bi-table',
   },
+     */
 ];

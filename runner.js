@@ -37,7 +37,7 @@ const OCTRA = {
     await run("node ./build.js dev=false isUpdate=false url=/");
   },
   buildDev: async function() {
-    await run("node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/");
+    await run("node ./build.js dev=false isUpdate=true url=/apps/octra/octra-dev/");
   },
   prepareExtern: async function() {
     if (fs.pathExistsSync("extern")) {

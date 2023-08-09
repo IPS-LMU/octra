@@ -35,6 +35,7 @@ function initAudioViewer(audioManager) {
         sortorder:0
     }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration.samples)
     console.log(level);
+
     audioViewer = document.createElement("oc-audioviewer");
     audioViewer.isMultiLine = true;
     audioViewer.breakMarker = {

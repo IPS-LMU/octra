@@ -53,6 +53,12 @@
               "maximumError": "10kb"
             }
           ],
+          "fileReplacements": [
+            {
+              "replace": "apps/octra/src/environments/environment.ts",
+              "with": "apps/octra/src/environments/environment.prod.ts"
+            }
+          ],
           "outputHashing": "all"
         },
         "development": {

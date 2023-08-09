@@ -1,325 +1,324 @@
 <div class="modal-content">
-  <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">
-      {{ 'general.export data' | transloco }}
-    </h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      aria-describedby="modal-title"
-      (click)="close()"
-    ></button>
-  </div>
-  <div class="modal-body" id="export-table" #content>
-    <table class="table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>{{ 'general.download' | transloco }}</th>
-          <th>{{ 'general.application' | transloco }}</th>
-          <th>{{ 'general.website' | transloco }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let converter of converters; let i = index">
-          <tr *ngIf="converter.conversion.export" class="top-tr">
-            <td (click)="onLineClick(converter, i)">
-              <i
-                class="bi"
-                style="color: gray"
-                [ngClass]="{
+    <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">
+            {{ 'general.export data' | transloco }}
+        </h5>
+        <button
+                type="button"
+                class="btn-close"
+                aria-label="Close"
+                aria-describedby="modal-title"
+                (click)="close()"
+        ></button>
+    </div>
+    <div class="modal-body" id="export-table" #content>
+        <table class="table">
+            <thead>
+            <tr>
+                <th></th>
+                <th>{{ 'general.download' | transloco }}</th>
+                <th>{{ 'general.application' | transloco }}</th>
+                <th>{{ 'general.website' | transloco }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <ng-container *ngFor="let converter of converters; let i = index">
+                <tr *ngIf="converter.conversion.export" class="top-tr">
+                    <td (click)="onLineClick(converter, i)">
+                        <i
+                                class="bi"
+                                style="color: gray"
+                                [ngClass]="{
                   'bi-chevron-up': exportStates[i] === 'active',
                   'bi-chevron-down': exportStates[i] !== 'active'
                 }"
-              ></i>
-            </td>
-            <td (click)="onLineClick(converter, i)">
-              <a #a> {{ converter.name }} (*{{ converter.extension }}) </a>
-              <div
-                *ngIf="preparing.name === converter.name && preparing.preparing"
-                class="spinner-border"
-                role="status"
-              >
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </td>
-            <td (click)="onLineClick(converter, i)">
-              {{ converter.application }}
-            </td>
-            <td (click)="onLineClick(converter, i)">
-              <a href="{{ converter.website.url }}" target="_blank">
-                {{ converter.website.title }}
-              </a>
-            </td>
-            <td (click)="onLineClick(converter, i)">
-              <i
-                class="bi bi-info-circle"
-                *ngIf="converter.notice !== ''"
-                [ngbTooltip]="converter.notice"
-              ></i>
-            </td>
-          </tr>
-          <ng-container *ngIf="converter.conversion.export">
-            <tr
-              [@fadeInExpandOnEnter]
-              [@fadeOutCollapseOnLeave]
-              *ngIf="exportStates[i] === 'active'"
-            >
-              <td></td>
-              <td colspan="4" style="padding-left: 20px">
-                <div
-                  class="tier-selection"
-                  style="margin-bottom: 10px"
-                  *ngIf="
+                        ></i>
+                    </td>
+                    <td (click)="onLineClick(converter, i)">
+                        <a #a> {{ converter.name }} (*{{ converter.extension }})</a>
+                        <div *ngIf="preparing.name === converter.name && preparing.preparing"
+                             class="spinner-border"
+                             style="margin-left: 5px; height:16px; width:16px;border-width:1px;"
+                             role="status"
+                        >
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </td>
+                    <td (click)="onLineClick(converter, i)">
+                        {{ converter.application }}
+                    </td>
+                    <td (click)="onLineClick(converter, i)">
+                        <a href="{{ converter.website.url }}" target="_blank">
+                            {{ converter.website.title }}
+                        </a>
+                    </td>
+                    <td (click)="onLineClick(converter, i)">
+                        <i
+                                class="bi bi-info-circle"
+                                *ngIf="converter.notice !== ''"
+                                [ngbTooltip]="converter.notice"
+                        ></i>
+                    </td>
+                </tr>
+                <ng-container *ngIf="converter.conversion.export">
+                    <tr
+                            [@fadeInExpandOnEnter]
+                            [@fadeOutCollapseOnLeave]
+                            *ngIf="exportStates[i] === 'active'"
+                    >
+                        <td></td>
+                        <td colspan="4" style="padding-left: 20px">
+                            <div
+                                    class="tier-selection"
+                                    style="margin-bottom: 10px"
+                                    *ngIf="
                     transcriptionService !== undefined &&
                     !converter.multitiers &&
                     transcriptionService.annotation.levels.length > 1
                   "
-                >
+                            >
                   <span style="margin-left: 10px"
-                    >{{ 'general.select one tier' | transloco }}:
+                  >{{ 'general.select one tier' | transloco }}:
                   </span>
-                  <select
-                    #val
-                    [(ngModel)]="selectedLevel"
-                    (change)="onSelectionChange(converter, val.value)"
-                    style="padding: 5px 10px"
-                  >
-                    <option
-                      *ngFor="
+                                <select
+                                    #val
+                                    [(ngModel)]="selectedLevel"
+                                    (change)="onSelectionChange(converter, val.value)"
+                                    style="padding: 5px 10px"
+                                >
+                                    <option
+                                            *ngFor="
                         let level of transcriptionService.annotation.levels;
                         let l = index
                       "
-                      value="{{ l }}"
-                    >
-                      {{ level.name }}
-                    </option>
-                  </select>
-                </div>
+                                            value="{{ l }}"
+                                    >
+                                        {{ level.name }}
+                                    </option>
+                                </select>
+                            </div>
 
-                <div class="options" *ngIf="converter.options !== undefined">
+                            <div class="options" *ngIf="converter.options !== undefined">
                   <span style="font-weight: bold"
-                    >{{ 'general.Options' | transloco }}:</span
+                  >{{ 'general.Options' | transloco }}:</span
                   >
-                  <div
-                    *ngIf="converter.name === 'Plain text'"
-                    class="timestamp-options"
-                  >
-                    <table>
-                      <tbody>
-                        <tr class="option">
-                          <td style="vertical-align: top">
-                            <input
-                              type="checkbox"
-                              id="timestamp-option-string"
-                              name="showTimestampString"
-                              (ngModelChange)="
+                                <div
+                                        *ngIf="converter.name === 'Plain text'"
+                                        class="timestamp-options"
+                                >
+                                    <table>
+                                        <tbody>
+                                        <tr class="option">
+                                            <td style="vertical-align: top">
+                                                <input
+                                                        type="checkbox"
+                                                        id="timestamp-option-string"
+                                                        name="showTimestampString"
+                                                        (ngModelChange)="
                                 onPlaintextTimestampOptionChanged(converter)
                               "
-                              [(ngModel)]="
+                                                        [(ngModel)]="
                                 converter.options.showTimestampString
                               "
-                            />
-                          </td>
-                          <td style="line-height: 0.9">
-                            <label for="timestamp-option-string">
-                              {{
-                                'export.options.add timestamps' | transloco
-                              }}</label
-                            ><br />
-                            <code>
-                              This is an example &lt;ts="00:00:03.222"/> of a
-                              transcript with timestamps.
-                            </code>
-                          </td>
-                        </tr>
-                        <tr class="option">
-                          <td style="vertical-align: top">
-                            <input
-                              type="checkbox"
-                              id="timestamp-option-samples"
-                              name="showTimestampString"
-                              [(ngModel)]="
+                                                />
+                                            </td>
+                                            <td style="line-height: 0.9">
+                                                <label for="timestamp-option-string">
+                                                    {{
+                                                    'export.options.add timestamps' | transloco
+                                                    }}</label
+                                                ><br/>
+                                                <code>
+                                                    This is an example &lt;ts="00:00:03.222"/> of a
+                                                    transcript with timestamps.
+                                                </code>
+                                            </td>
+                                        </tr>
+                                        <tr class="option">
+                                            <td style="vertical-align: top">
+                                                <input
+                                                        type="checkbox"
+                                                        id="timestamp-option-samples"
+                                                        name="showTimestampString"
+                                                        [(ngModel)]="
                                 converter.options.showTimestampSamples
                               "
-                              (ngModelChange)="
+                                                        (ngModelChange)="
                                 onPlaintextTimestampOptionChanged(converter)
                               "
-                            />
-                          </td>
-                          <td style="line-height: 0.9">
-                            <label for="timestamp-option-samples">
-                              {{
-                                'export.options.add samplepoints' | transloco
-                              }}</label
-                            ><br />
-                            <code>
-                              This is an example &lt;sp="379736"/> of a
-                              transcript with timestamps.
-                            </code>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <p style="margin-top: 20px; font-size: 0.9em">
-                      {{ 'export.options.timestamp notice' | transloco }}<br />
-                      <code>
-                        This is an example &lt;ts="00:00:03.222" sp="379736"/>
-                        of a transcript with timestamps.
-                      </code>
-                    </p>
-                  </div>
-                </div>
+                                                />
+                                            </td>
+                                            <td style="line-height: 0.9">
+                                                <label for="timestamp-option-samples">
+                                                    {{
+                                                    'export.options.add samplepoints' | transloco
+                                                    }}</label
+                                                ><br/>
+                                                <code>
+                                                    This is an example &lt;sp="379736"/> of a
+                                                    transcript with timestamps.
+                                                </code>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="margin-top: 20px; font-size: 0.9em">
+                                        {{ 'export.options.timestamp notice' | transloco }}<br/>
+                                        <code>
+                                            This is an example &lt;ts="00:00:03.222" sp="379736"/>
+                                            of a transcript with timestamps.
+                                        </code>
+                                    </p>
+                                </div>
+                            </div>
 
-                <a
-                  style="margin-left: 10px"
-                  *ngIf="
+                            <a
+                                    style="margin-left: 10px"
+                                    *ngIf="
                     preparing.name === converter.name && !preparing.preparing
                   "
-                  download="{{ parentformat.download }}"
-                  [href]="parentformat.uri"
-                  class="link"
-                  (click)="onDownloadClick(i)"
-                >
-                  <i class="bi bi-save-fill"></i>
-                  Download
-                </a>
-              </td>
-            </tr>
-          </ng-container>
-        </ng-container>
-      </tbody>
-    </table>
+                                    download="{{ parentformat.download }}"
+                                    [href]="parentformat.uri"
+                                    class="link"
+                                    (click)="onDownloadClick(i)"
+                            >
+                                <i class="bi bi-save-fill"></i>
+                                Download
+                            </a>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+            </tbody>
+        </table>
 
-    <div contenteditable="true">test test</div>
-    <h5>{{ 'general.custom formats' | transloco }}</h5>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th></th>
-          <th>{{ 'general.name' | transloco }}</th>
-          <th>{{ 'general.description' | transloco }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td
-            (click)="
+        <h5>{{ 'general.custom formats' | transloco }}</h5>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th></th>
+                <th>{{ 'general.name' | transloco }}</th>
+                <th>{{ 'general.description' | transloco }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td
+                        (click)="
               tools.tableConfigurator.opened = !tools.tableConfigurator.opened
             "
-          >
-            <i
-              class="bi"
-              style="color: gray"
-              [ngClass]="{
+                >
+                    <i
+                            class="bi"
+                            style="color: gray"
+                            [ngClass]="{
                 'bi-chevron-up': tools.tableConfigurator.opened,
                 'bi-chevron-down': !tools.tableConfigurator.opened
               }"
-            ></i>
-          </td>
-          <td
-            (click)="
+                    ></i>
+                </td>
+                <td
+                        (click)="
               tools.tableConfigurator.opened = !tools.tableConfigurator.opened
             "
-          >
-            <a #a>
-              {{ 'custom.table configurator.name' | transloco }}
-            </a>
-          </td>
-          <td colspan="3">
-            {{ 'custom.table configurator.description' | transloco }}
-          </td>
-        </tr>
-        <tr
-          [@fadeInExpandOnEnter]
-          [@fadeOutCollapseOnLeave]
-          *ngIf="tools.tableConfigurator.opened"
-        >
-          <td></td>
-          <td colspan="4" style="padding-left: 20px">
-            <div
-              class="card"
-              style="padding: 10px"
-              *ngIf="transcriptionService !== undefined"
+                >
+                    <a #a>
+                        {{ 'custom.table configurator.name' | transloco }}
+                    </a>
+                </td>
+                <td colspan="3">
+                    {{ 'custom.table configurator.description' | transloco }}
+                </td>
+            </tr>
+            <tr
+                    [@fadeInExpandOnEnter]
+                    [@fadeOutCollapseOnLeave]
+                    *ngIf="tools.tableConfigurator.opened"
             >
-              <octra-table-configurator
-                [columns]="tools.tableConfigurator.columns"
-                [annotation]="transcriptionService.annotation"
-                [currentLevelID]="transcriptionService!.currentlevel!.id"
-                [tableWidth]="content.offsetWidth - 100"
-                #tableConfigurator
-              ></octra-table-configurator>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                <td></td>
+                <td colspan="4" style="padding-left: 20px">
+                    <div
+                            class="card"
+                            style="padding: 10px"
+                            *ngIf="transcriptionService !== undefined"
+                    >
+                        <octra-table-configurator
+                                [columns]="tools.tableConfigurator.columns"
+                                [annotation]="transcriptionService.annotation"
+                                [currentLevelID]="transcriptionService!.currentlevel!.id"
+                                [tableWidth]="content.offsetWidth - 100"
+                                #tableConfigurator
+                        ></octra-table-configurator>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    <h5>{{ 'general.meta data' | transloco }}</h5>
+        <h5>{{ 'general.meta data' | transloco }}</h5>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th style="width: 25px"></th>
-          <th>{{ 'general.name' | transloco }}</th>
-          <th>{{ 'general.description' | transloco }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td (click)="getProtocol()">
-            <i
-              class="bi"
-              style="color: gray"
-              [ngClass]="{
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th style="width: 25px"></th>
+                <th>{{ 'general.name' | transloco }}</th>
+                <th>{{ 'general.description' | transloco }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td (click)="getProtocol()">
+                    <i
+                            class="bi"
+                            style="color: gray"
+                            [ngClass]="{
                 'bi-chevron-up': preparing.name === 'Protocol',
                 'bi-chevron-down': preparing.name !== 'Protocol'
               }"
-            ></i>
-          </td>
-          <td (click)="getProtocol()">
-            <a #a>
-              {{ 'general.protocol' | transloco }}
-            </a>
-          </td>
-          <td colspan="3">{{ 'export.meta data.description' | transloco }}</td>
-        </tr>
-        <tr
-          [@fadeInExpandOnEnter]
-          [@fadeOutCollapseOnLeave]
-          *ngIf="preparing.name === 'Protocol'"
-        >
-          <td></td>
-          <td colspan="4">
-            <i
-              class="fa fa-spinner fa-spin"
-              *ngIf="preparing.name === 'Protocol' && preparing.preparing"
-            ></i>
-            <a
-              *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
-              download="{{ parentformat.download }}"
-              [href]="parentformat.uri"
-              class="link"
+                    ></i>
+                </td>
+                <td (click)="getProtocol()">
+                    <a #a>
+                        {{ 'general.protocol' | transloco }}
+                    </a>
+                </td>
+                <td colspan="3">{{ 'export.meta data.description' | transloco }}</td>
+            </tr>
+            <tr
+                    [@fadeInExpandOnEnter]
+                    [@fadeOutCollapseOnLeave]
+                    *ngIf="preparing.name === 'Protocol'"
             >
-              <i class="bi bi-save-fill"></i>
-              Download
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-dismiss="modal"
-      (click)="close()"
-    >
-      {{ 'general.close' | transloco }}
-    </button>
-  </div>
+                <td></td>
+                <td colspan="4">
+                    <div class="spinner-border text-primary" role="status"
+                         *ngIf="preparing.name === 'Protocol' && preparing.preparing">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <a
+                            *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
+                            download="{{ parentformat.download }}"
+                            [href]="parentformat.uri"
+                            class="link"
+                    >
+                        <i class="bi bi-save-fill"></i>
+                        Download
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-primary"
+                data-dismiss="modal"
+                (click)="close()"
+        >
+            {{ 'general.close' | transloco }}
+        </button>
+    </div>
 </div>

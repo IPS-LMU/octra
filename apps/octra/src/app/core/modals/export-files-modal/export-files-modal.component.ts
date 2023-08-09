@@ -39,7 +39,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   };
 
   AppInfo = AppInfo;
-  public exportStates: any[] = [];
+  public exportStates: string[] = [];
   public preparing = {
     name: '',
     preparing: false,
@@ -121,7 +121,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   ngOnInit() {
     for (const converter of AppInfo.converters) {
-      this.exportStates.push();
+      this.exportStates.push("close");
     }
   }
 

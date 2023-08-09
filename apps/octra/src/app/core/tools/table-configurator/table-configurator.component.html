@@ -1,219 +1,209 @@
 <div style="margin-bottom: 10px">
-  <div class="btn-group" ngbDropdown>
-    <button
-      ngbDropdownToggle
-      size="sm"
-      type="button"
-      class="btn btn-primary dropdown-toggle"
-      style="width: 100%; margin-left: 5px"
-    >
-      <i class="bi bi-plus-lg"></i>
-      {{ 'custom.table configurator.add column' | transloco }}
-    </button>
-
-    <div class="dropdown-menu dropdown-primary" style="cursor: pointer">
-      <a
-        (click)="tableConfiguratorAddColumn(-1, colDef.type)"
-        *ngFor="let colDef of remainingColDefs"
-        class="dropdown-item"
-      >
-        {{ colDef.type }}
-      </a>
+    <div ngbDropdown class="d-inline-block">
+        <button type="button" class="btn btn-secondary btn-sm" id="add-col-button" ngbDropdownToggle
+                style="width: 100%; margin-left: 5px">
+            <i class="bi bi-plus-lg"></i>
+            {{ 'custom.table configurator.add column' | transloco }}
+        </button>
+        <div ngbDropdownMenu style="cursor: pointer">
+            <a (click)="tableConfiguratorAddColumn(-1, colDef.type)"
+                *ngFor="let colDef of remainingColDefs"
+                    class="dropdown-item"
+            >
+                {{ colDef.type }}
+            </a>
+        </div>
     </div>
-  </div>
-
-  <div class="settings">
+<div class="settings justify-content-center align-middle align-items-center">
     <input
-      type="checkbox"
-      id="includeLineNumbers"
-      [(ngModel)]="includeLineNumbers"
-      (ngModelChange)="onCheckboxChange()"
+            type="checkbox"
+            id="includeLineNumbers"
+            [(ngModel)]="includeLineNumbers"
+            (ngModelChange)="onCheckboxChange()"
     />
     <label for="includeLineNumbers">{{
-      'custom.table configurator.include line numbers' | transloco
-    }}</label>
-  </div>
-  <div class="settings">
+        'custom.table configurator.include line numbers' | transloco
+        }}</label>
+</div>
+<div class="settings justify-content-center align-middle justify-content-center">
     <label>{{ 'custom.table configurator.time format' | transloco }}: </label>
     <div class="btn-group" ngbDropdown>
-      <button
-        ngbDropdownToggle
-        size="sm"
-        type="button"
-        class="btn btn-primary dropdown-toggle"
-        style="width: 150px; margin-left: 5px"
-      >
-        {{ tableOptions.timeFormat }}
-      </button>
-
-      <div class="dropdown-menu dropdown-primary" style="cursor: pointer">
-        <a
-          (click)="onTimeFormatChange(timeFormat)"
-          *ngFor="let timeFormat of tableOptions.timeFormats"
-          class="dropdown-item"
-          role="menuitem"
+        <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-secondary btn-sm dropdown-toggle"
+                style="width: 150px; margin-left: 5px"
         >
-          {{ timeFormat }}
-        </a>
-      </div>
+            {{ tableOptions.timeFormat }}
+        </button>
+
+        <div ngbDropdownMenu style="cursor: pointer">
+            <a
+                    (click)="onTimeFormatChange(timeFormat)"
+                    *ngFor="let timeFormat of tableOptions.timeFormats"
+                    class="dropdown-item"
+                    role="menuitem"
+            >
+                {{ timeFormat }}
+            </a>
+        </div>
     </div>
-  </div>
+</div>
 </div>
 
 <div
-  [ngStyle]="{
+        [ngStyle]="{
     width: tableWidth + 'px'
   }"
-  class="easy-table"
+        class="easy-table"
 >
-  <div
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    (cdkDropListDropped)="onDropChange($event)"
-    class="inner"
-  >
-    <div *ngFor="let column of columns; let i = index" class="column" cdkDrag>
-      <div class="grip">
-        <i class="bi bi-grip-vertical"></i>
-      </div>
-      <div (click)="onDeleteColumnClick(i)" class="delete-column">
-        <i class="bi bi-x-lg"></i>
-      </div>
-      <div class="header">
-        <div
-          #title
-          (keydown)="onTitleKeyDown($event)"
-          (keyup)="onTitleKeyUp($event, title, i)"
-          (mouseleave)="onTitleLeave(title, i)"
-          class="title"
-          contenteditable="true"
-          (mousedown)="$event.stopPropagation()"
-        >
-          {{ column.title }}
+    <div
+            cdkDropList
+            cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="onDropChange($event)"
+            class="inner"
+    >
+        <div *ngFor="let column of columns; let i = index" class="column" cdkDrag>
+            <div class="grip">
+                <i class="bi bi-grip-vertical"></i>
+            </div>
+            <div (click)="onDeleteColumnClick(i)" class="delete-column">
+                <i class="bi bi-x-lg"></i>
+            </div>
+            <div class="header">
+                <div
+                    #title
+                    (keydown)="onTitleKeyDown($event)"
+                    (keyup)="onTitleKeyUp($event, title, i)"
+                    (mouseleave)="onTitleLeave(title, i)"
+                    class="title"
+                    contenteditable="true"
+                    (mousedown)="$event.stopPropagation()"
+                >
+                    {{ column.title }}
+                </div>
+            </div>
+            <div *ngFor="let cell of columns[i].columnDefinition.cells" class="cell">
+                {{ cell.text | cliptext }}
+            </div>
         </div>
-      </div>
-      <div *ngFor="let cell of columns[i].columnDefinition.cells" class="cell">
-        {{ cell.text | cliptext }}
-      </div>
+        <div class="clearfix"></div>
     </div>
-    <div class="clearfix"></div>
-  </div>
 </div>
 
 <div class="table-options">
-  <form>
-    <fieldset class="form-group">
-      <div class="row">
-        <legend class="col-form-label col-sm-2 pt-0">
-          {{ 'custom.table configurator.divider' | transloco }}:
-        </legend>
-        <div class="col-sm-10">
-          <div class="btn-group" dropdown>
-            <button
-              aria-controls="dropdown-basic"
-              class="btn btn-info btn-raised btn-sm"
-              dropdownToggle
-              style="width: 100%"
-              type="button"
-            >
-              {{ tableOptions.divider.name }} ({{ tableOptions.divider.value }})
-            </button>
-            <ul
-              *dropdownMenu
-              aria-labelledby="button-basic"
-              class="dropdown-menu"
-              id="dropdown-basic3"
-              role="menu"
-              style="cursor: pointer"
-            >
-              <li
-                (click)="onDividerClick(divider.value)"
-                *ngFor="let divider of tableOptions.selection.dividers"
-                class="dropdown-item"
-                role="menuitem"
-              >
-                {{ divider.name }} ({{ divider.value }})
-              </li>
-            </ul>
-          </div>
+    <form>
+        <fieldset class="form-group">
+            <div class="row">
+                <legend class="col-form-label col-sm-2 pt-0">
+                    {{ 'custom.table configurator.divider' | transloco }}:
+                </legend>
+                <div class="col-sm-10">
+                    <div class="btn-group" ngbDropdown>
+                        <button
+                                aria-controls="dropdown-basic"
+                                class="btn btn-info btn-raised btn-sm"
+                                ngbDropdownToggle
+                                style="width: 100%"
+                                type="button"
+                        >
+                            {{ tableOptions.divider.name }} ({{ tableOptions.divider.value }})
+                        </button>
+                        <ul
+                                ngbDropdownMenu
+                                aria-labelledby="button-basic"
+                                id="dropdown-basic3"
+                                role="menu"
+                                style="cursor: pointer"
+                        >
+                            <li
+                                    (click)="onDividerClick(divider.value)"
+                                    *ngFor="let divider of tableOptions.selection.dividers"
+                                    class="dropdown-item"
+                                    role="menuitem"
+                            >
+                                {{ divider.name }} ({{ divider.value }})
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="form-group">
+            <div class="row">
+                <legend class="col-form-label col-sm-2 pt-0">
+                    {{ 'general.File extension' | transloco }}:
+                </legend>
+                <div class="col-sm-10">
+                    <div class="btn-group" ngbDropdown>
+                        <button
+                                aria-controls="dropdown-basic"
+                                class="btn btn-info btn-raised btn-sm"
+                                ngbDropdownToggle
+                                style="width: 100%"
+                                type="button"
+                        >
+                            {{ tableOptions.fileExtension }}
+                        </button>
+                        <ul
+                                ngbDropdownMenu
+                                aria-labelledby="button-basic"
+                                class="dropdown-menu"
+                                role="menu"
+                                style="cursor: pointer"
+                        >
+                            <li
+                                    (click)="onExtensionClick(extension)"
+                                    *ngFor="let extension of tableOptions.selection.extension"
+                                    class="dropdown-item"
+                                    role="menuitem"
+                            >
+                                {{ extension }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <div class="form-check">
+                    <input
+                            (ngModelChange)="onSomethingDone()"
+                            [(ngModel)]="tableOptions.addHeader"
+                            class="form-check-input"
+                            id="gridCheck1"
+                            name="addHeader"
+                            type="checkbox"
+                    />
+                    <label
+                            class="form-check-label"
+                            for="gridCheck1"
+                            style="font-size: 14px"
+                    >
+                        {{ 'custom.table configurator.add header' | transloco }}
+                    </label>
+                </div>
+            </div>
         </div>
-      </div>
-    </fieldset>
-    <fieldset class="form-group">
-      <div class="row">
-        <legend class="col-form-label col-sm-2 pt-0">
-          {{ 'general.File extension' | transloco }}:
-        </legend>
-        <div class="col-sm-10">
-          <div class="btn-group" dropdown>
-            <button
-              aria-controls="dropdown-basic"
-              class="btn btn-info btn-raised btn-sm"
-              dropdownToggle
-              style="width: 100%"
-              type="button"
-            >
-              {{ tableOptions.fileExtension }}
-            </button>
-            <ul
-              *dropdownMenu
-              aria-labelledby="button-basic"
-              class="dropdown-menu"
-              role="menu"
-              style="cursor: pointer"
-            >
-              <li
-                (click)="onExtensionClick(extension)"
-                *ngFor="let extension of tableOptions.selection.extension"
-                class="dropdown-item"
-                role="menuitem"
-              >
-                {{ extension }}
-              </li>
-            </ul>
-          </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button
+                        (click)="generateFile()"
+                        [disabled]="this.columns.length < 1"
+                        class="btn btn-primary btn-raised"
+                        type="submit"
+                >
+                    {{ 'custom.table configurator.generate table' | transloco }}
+                </button>
+                <a
+                        *ngIf="this.resultURL !== undefined"
+                        [download]="'test' + tableOptions.fileExtension"
+                        [href]="this.resultURL"
+                        style="margin-left: 10px"
+                >{{ 'general.download' | transloco }}</a
+                >
+            </div>
         </div>
-      </div>
-    </fieldset>
-    <div class="form-group row">
-      <div class="col-sm-12">
-        <div class="form-check">
-          <input
-            (ngModelChange)="onSomethingDone()"
-            [(ngModel)]="tableOptions.addHeader"
-            class="form-check-input"
-            id="gridCheck1"
-            name="addHeader"
-            type="checkbox"
-          />
-          <label
-            class="form-check-label"
-            for="gridCheck1"
-            style="font-size: 14px"
-          >
-            {{ 'custom.table configurator.add header' | transloco }}
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="form-group row">
-      <div class="col-sm-10">
-        <button
-          (click)="generateFile()"
-          [disabled]="this.columns.length < 1"
-          class="btn btn-primary btn-raised"
-          type="submit"
-        >
-          {{ 'custom.table configurator.generate table' | transloco }}
-        </button>
-        <a
-          *ngIf="this.resultURL !== undefined"
-          [download]="'test' + tableOptions.fileExtension"
-          [href]="this.resultURL"
-          style="margin-left: 10px"
-          >{{ 'general.download' | transloco }}</a
-        >
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

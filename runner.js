@@ -18,6 +18,7 @@ const Project = {
     await fs.copyFile(`./LICENSE.txt`, `./libs/assets/src/LICENSE.txt`);
     await fs.copyFile(`./LICENSE.txt`, `./libs/media/src/LICENSE.txt`);
     await fs.copyFile(`./LICENSE.txt`, `./libs/utilities/src/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./apps/web-components/src/LICENSE.txt`);
     await fs.copyFile(`./LICENSE.txt`, `./libs/json-sets/LICENSE.txt`);
     await fs.copyFile(`./LICENSE.txt`, `./libs/ngx-components/LICENSE.txt`);
     await fs.copyFile(`./LICENSE.txt`, `./libs/ngx-utilities/LICENSE.txt`);

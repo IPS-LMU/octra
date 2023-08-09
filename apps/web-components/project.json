@@ -10,12 +10,13 @@
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/web-components",
+        "outputPath": "tmp/web-components",
         "index": "apps/web-components/src/index.html",
         "main": "apps/web-components/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/web-components/tsconfig.app.json",
         "assets": [
+          "apps/web-components/src/LICENSE.txt"
         ],
         "styles": [],
         "scripts": []

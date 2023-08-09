@@ -4,18 +4,19 @@
 
 This sections shows an overview of all custom libraries used by OCTRA. All Angular-specific libraries start with "ngx".
 
-- [ngx-components](https://github.com/IPS-LMU/octra/tree/main/libs/ngx-components): Angular components e.g. for the
-  signal displays.
-- [annotation](https://github.com/IPS-LMU/octra/tree/main/libs/annotation): Objects and other classes used to handle
-  annotation tasks
-- [media](https://github.com/IPS-LMU/octra/tree/main/libs/media): all media related classes (for now audio only: audio
-  playback a.s.o)
-- [ngx-utilities](https://github.com/IPS-LMU/octra/tree/main/libs/ngx-utilities): library with custom functions used in
-  angular projects
-- [utilities](https://github.com/IPS-LMU/octra/tree/main/libs/utilities): library with custom functions used in the
+
+- [utilities](./utilities/src/): library with custom functions used in the
   other libraries or apps like OCTRA
-- [assets](https://github.com/IPS-LMU/octra/tree/main/libs/assets): library with shared assets in octra applications
+- [media](./media/src/): all media related classes (for now audio only: audio
+  playback a.s.o)
+- [assets](./assets/src/): library with shared assets in octra applications
   e.g. JSON schemata
+- [annotation](./annotation/src/): Objects and other classes used to handle
+  annotation tasks
+- [ngx-components](./ngx-components/): Angular components e.g. for the
+  signal displays.
+- [ngx-utilities](./ngx-utilities/): library with custom functions used in
+  angular projects
 
 # Installation
 

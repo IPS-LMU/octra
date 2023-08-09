@@ -31,9 +31,6 @@
         "babelUpwardRootMode": true,
         "libraryName": "OctraJSONSets",
         "libraryTargets": [
-          "global",
-          "commonjs",
-          "amd",
           "umd"
         ],
         "index": "",

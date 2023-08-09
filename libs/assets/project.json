@@ -36,9 +36,6 @@
         "babelUpwardRootMode": true,
         "libraryName": "OctraAssets",
         "libraryTargets": [
-          "global",
-          "commonjs",
-          "amd",
           "umd"
         ],
         "index": "",

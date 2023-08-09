@@ -20,20 +20,13 @@ import KonvaEventObject = Konva.KonvaEventObject;
 @Component({
   selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
-  styleUrls: ['./audioplayer.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./audioplayer.component.css']
 })
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
 
-  constructor(private cd: ChangeDetectorRef) {
-    interval(100).subscribe( {
-      next: ()=>{
-        this.cd.markForCheck();
-        this.cd.detectChanges();
-      }
-    })
+  constructor() {
   }
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:

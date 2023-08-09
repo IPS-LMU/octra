@@ -38,9 +38,6 @@
         "babelUpwardRootMode": true,
         "libraryName": "OctraAnnotation",
         "libraryTargets": [
-          "global",
-          "commonjs",
-          "amd",
           "umd"
         ],
         "index": "",

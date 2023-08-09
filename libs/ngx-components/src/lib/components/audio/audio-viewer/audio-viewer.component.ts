@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -40,10 +41,12 @@ import Shape = Konva.Shape;
   selector: 'octra-audio-viewer',
   templateUrl: './audio-viewer.component.html',
   styleUrls: ['./audio-viewer.component.css'],
-  providers: [AudioViewerService],
+  providers: [AudioViewerService]
 })
 export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   @Input() set transcriptionLevel(value: Level | undefined) {
+    console.log(`set transcription level to `);
+    console.log(value);
     this._transcriptionLevel = value;
   }
 
@@ -54,7 +57,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   // Ways to improve performance
   // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
 
-  constructor(public av: AudioViewerService, private renderer: Renderer2) {
+  constructor(public av: AudioViewerService, private renderer: Renderer2, private cd: ChangeDetectorRef) {
     this.shortcutsManager = new ShortcutManager();
     this.subscrManager = new SubscriptionManager<Subscription>();
 
@@ -387,16 +390,31 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               });
           } else {
             console.error(`width is undefined`);
+            console.log('width:');
+            console.log(this.width);
+            console.log('audiochunk:');
+            console.log(this.audioChunk);
+            console.log('_transcriptionLevel:');
+            console.log(this._transcriptionLevel);
           }
         })
         .catch((error) => {
           console.error(error);
         });
+    } else {
+      console.error(`AudioViewer: chunk is undefined.`);
     }
   }
 
   afterLevelUpdated() {
     if (this._transcriptionLevel !== undefined) {
+      // subscribe to levelChanges for extern changes
+      this.subscrManager.removeByTag("externLevelChanges");
+      this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe({
+        next: () => {
+          this.refreshLevel();
+        }
+      }), "externLevelChanges");
       this.refreshLevel();
     }
   }
@@ -2404,6 +2422,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 }
                 break;
               case 'set_boundary':
+                console.log(`{
+                  audioManager: ${this.audioManager},
+                  currentLevel: ${this.av.currentTranscriptionLevel}
+                }`);
                 if (
                   this.settings.boundaries.enabled &&
                   !this.settings.boundaries.readonly &&
@@ -2412,6 +2434,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   this.av.currentTranscriptionLevel !== undefined
                 ) {
                   const result = this.av.addSegment();
+                  console.log('NEW SEGMENT:');
+                  console.log(result);
                   if (result !== undefined && result.msg !== undefined) {
                     if (result.msg.text && result.msg.text !== '') {
                       this.alert.emit({
@@ -3031,7 +3055,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     return group;
   }
 
-  public refreshLevel() {
+  public refreshLevel  = () => {
     if (
       this.audioChunk !== undefined &&
       this.av.audioTCalculator !== undefined &&
@@ -3045,8 +3069,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers.overlay.batchDraw();
       this.layers.boundaries.batchDraw();
       this.refreshRunning = false;
-    } else {
-      // console.error(new Error('can\'t refresh level'));
     }
   }
 

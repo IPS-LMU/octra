@@ -10,7 +10,6 @@
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "aot": true,
         "outputPath": "dist/libs/web-components",
         "index": "apps/web-components/src/index.html",
         "main": "apps/web-components/src/main.ts",
@@ -18,7 +17,7 @@
         "tsConfig": "apps/web-components/tsconfig.app.json",
         "assets": [
         ],
-        "styles": ["apps/web-components/src/styles.scss"],
+        "styles": [],
         "scripts": []
       },
       "configurations": {

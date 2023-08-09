@@ -414,6 +414,24 @@ export function mapFnOnObject(
   return obj;
 }
 
+export async function downloadFile(
+  url: string,
+  type: XMLHttpRequestResponseType = 'text'
+): Promise<File> {
+  return new Promise<File>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = type;
+    xhr.open('get', url, true);
+    xhr.addEventListener('load', (result) => {
+      resolve(xhr.response);
+    });
+    xhr.addEventListener('error', (error) => {
+      reject(error);
+    });
+    xhr.send();
+  });
+}
+
 export async function readFileContents<T>(
   file: File,
   method: 'text' | 'binary' | 'arraybuffer',

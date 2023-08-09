@@ -4,6 +4,26 @@ const fs = require("fs-extra");
 const process = require("node:child_process");
 const { exec } = require("node:child_process");
 
+const JSONValidator = {
+  build: async function() {
+    await run("nx bundle json-sets");
+    // await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
+    //await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
+  }
+};
+
+const Project = {
+  updateLicenses: async function() {
+    await fs.copyFile(`./LICENSE.txt`, `./libs/annotation/src/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/assets/src/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/media/src/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/utilities/src/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/json-sets/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/ngx-components/LICENSE.txt`);
+    await fs.copyFile(`./LICENSE.txt`, `./libs/ngx-utilities/LICENSE.txt`);
+  }
+};
+
 const OCTRA = {
   start: async function() {
     await run("npm run modernizr", true, true);
@@ -27,22 +47,18 @@ const OCTRA = {
     fs.copySync("dist/libs", "extern/libs", { recursive: true });
   },
   buildExtern: async function() {
-    await run("nx build utilities");
-    await run("node_modules/nx/bin/nx.js package media");
-    await run("nx build annotation");
-    await run("nx build ngx-components");
-    await run("npm run build:assets");
-    await run("npm run build:json-sets");
+    await OCTRA.buildLibs();
     await OCTRA.prepareExtern();
-  }
-};
-
-
-const JSONValidator = {
-  build: async function() {
-    await run("nx build json-sets");
-    // await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
-    //await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
+  },
+  buildLibs: async function() {
+    await run("nx build ngx-components");
+    await run("nx build ngx-utilities");
+    await run(`npm run build:web-components`);
+    await JSONValidator.build();
+    await run("nx bundle annotation");
+    await run("nx bundle assets");
+    await run("nx bundle media");
+    await run("nx bundle utilities");
   }
 };
 
@@ -60,11 +76,17 @@ yargs.version("1.0.0").help().alias("help", "h")
     "build:dev", "Builds development version of OCTRA.",
     OCTRA.buildDev)
   .command(
+    "build:libs", "Builds all libraries.",
+    OCTRA.buildLibs)
+  .command(
     "build:extern", "Builds extern libraries.",
     OCTRA.buildExtern)
   .command(
     "build:json-sets", "Builds json-sets library.",
     JSONValidator.build)
+  .command(
+    "update:licenses", "Updates licenses with current version from root.",
+    Project.updateLicenses)
   .argv;
 
 async function run(scriptPath, showOutput = true, returnAfterExit = true) {

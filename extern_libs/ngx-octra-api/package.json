@@ -1,0 +1,38 @@
+{
+  "name": "@octra/ngx-octra-api",
+  "version": "0.7.8",
+  "license": "MIT",
+  "type": "module",
+  "peerDependencies": {
+    "@angular/common": "^12.0.4",
+    "@angular/core": "^12.0.4",
+    "@octra/api-types": "0.7.8",
+    "rxjs": "7.8.1"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  },
+  "module": "fesm2015/octra-ngx-octra-api.mjs",
+  "es2020": "fesm2020/octra-ngx-octra-api.mjs",
+  "esm2020": "esm2020/octra-ngx-octra-api.mjs",
+  "fesm2020": "fesm2020/octra-ngx-octra-api.mjs",
+  "fesm2015": "fesm2015/octra-ngx-octra-api.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2020": "./esm2020/octra-ngx-octra-api.mjs",
+      "es2020": "./fesm2020/octra-ngx-octra-api.mjs",
+      "es2015": "./fesm2015/octra-ngx-octra-api.mjs",
+      "node": "./fesm2015/octra-ngx-octra-api.mjs",
+      "default": "./fesm2020/octra-ngx-octra-api.mjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled by Ivy in full compilation mode. This is not allowed.\\nPlease delete and rebuild the package with Ivy partial compilation mode, before attempting to publish.\\n')\" && exit 1"
+  }
+}

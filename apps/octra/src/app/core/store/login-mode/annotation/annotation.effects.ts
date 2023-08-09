@@ -14,6 +14,7 @@ import {
   Subscription,
   tap,
   timer,
+  withLatestFrom,
 } from 'rxjs';
 import { getModeState, LoginMode, RootState } from '../../index';
 import { OctraModalService } from '../../../modals/octra-modal.service';
@@ -24,7 +25,6 @@ import {
   TranscriptionService,
   UserInteractionsService,
 } from '../../../shared/service';
-import { withLatestFrom } from 'rxjs/operators';
 import { AppInfo } from '../../../../app.info';
 import {
   AnnotationLevelType,
@@ -722,42 +722,42 @@ export class AnnotationEffects {
 
   // TODO add effect if task and project can't not be loaded
   /*
-  onLoadOnlineFailed$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
-      exhaustMap((a) => {
-        return of(
-          AuthenticationActions.logout.do({
-            message: a.error.message,
-            clearSession: true,
-            messageType: '',
-            mode: LoginMode.ONLINE,
-          })
-        );
-      })
-    )
-  );
- */
+    onLoadOnlineFailed$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
+        exhaustMap((a) => {
+          return of(
+            AuthenticationActions.logout.do({
+              message: a.error.message,
+              clearSession: true,
+              messageType: '',
+              mode: LoginMode.ONLINE,
+            })
+          );
+        })
+      )
+    );
+   */
 
   /*
-  onLocalOrURLModeLogin$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LocalModeActions.login),
-      exhaustMap((a) => {
-        return AnnotationActions.prepareTaskDataForAnnotation.do({
-          mode: LoginMode.LOCAL,
-          currentProject: createSampleProjectDto("-1"),
-          task: createSampleTask("-1", a.files.map((a, i) => ({
-            id: "" + i,
-            filename: a.name,
-            fileType: a.type,
-            size: a.size
-          })), [])
-        });
-      })
-    )
-  );
-   */
+    onLocalOrURLModeLogin$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(LocalModeActions.login),
+        exhaustMap((a) => {
+          return AnnotationActions.prepareTaskDataForAnnotation.do({
+            mode: LoginMode.LOCAL,
+            currentProject: createSampleProjectDto("-1"),
+            task: createSampleTask("-1", a.files.map((a, i) => ({
+              id: "" + i,
+              filename: a.name,
+              fileType: a.type,
+              size: a.size
+            })), [])
+          });
+        })
+      )
+    );
+     */
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
@@ -841,8 +841,8 @@ export class AnnotationEffects {
                     error.error?.message ?? error.message;
                 }
                 /* TODO if error is because of not busy
-                 => select new annotation?
-                 */
+                                 => select new annotation?
+                                 */
                 return of(
                   AnnotationActions.sendAnnotation.fail({
                     error: error.error?.message ?? error.message,

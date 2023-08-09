@@ -4,13 +4,17 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
   catchError,
   combineLatest,
+  exhaustMap,
+  filter,
   forkJoin,
   map,
   mergeAll,
+  mergeMap,
   of,
   Subject,
   tap,
   timer,
+  withLatestFrom,
 } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import { IDBService } from '../../shared/service/idb.service';
@@ -26,7 +30,6 @@ import { UserActions } from '../user/user.actions';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { IIDBModeOptions } from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
-import { exhaustMap, filter, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
 import { AnnotationState, convertFromOIDLevel } from '../login-mode/annotation';
@@ -436,17 +439,17 @@ export class IDBEffects {
   );
 
   /*
-  onClearOnlineSession$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(OnlineModeActions.clearOnlineSession.do),
-        exhaustMap((a) => {
-          return forkJoin({
-            options: this.idbService.clearOptions()
+    onClearOnlineSession$ = createEffect(() =>
+        this.actions$.pipe(
+          ofType(OnlineModeActions.clearOnlineSession.do),
+          exhaustMap((a) => {
+            return forkJoin({
+              options: this.idbService.clearOptions()
+            })
           })
-        })
-      )
-    );
-   */
+        )
+      );
+     */
 
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(

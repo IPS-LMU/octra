@@ -18,6 +18,7 @@
         "format": ["cjs", "esm"],
         "assets": [
           "libs/assets/src/README.md",
+          "libs/assets/src/LICENSE.txt",
           {
             "input": "libs/assets/src/lib/schemata",
             "glob": "**.json",
@@ -25,6 +26,33 @@
           }
         ]
       }
+    },
+    "bundle": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "babelUpwardRootMode": true,
+        "libraryName": "OctraAssets",
+        "libraryTargets": [
+          "umd"
+        ],
+        "index": "",
+        "tsConfig": "libs/assets/tsconfig.lib.json",
+        "main": "libs/assets/src/index.ts",
+        "outputPath": "dist/libs/assets/bundles",
+        "compiler": "babel",
+        "optimization": true,
+        "extractLicenses": true,
+        "runtimeChunk": false,
+        "vendorChunk": false,
+        "generateIndexHtml": false,
+        "commonChunk": false,
+        "namedChunks": false,
+        "webpackConfig": "webpack.config.js"
+      },
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",

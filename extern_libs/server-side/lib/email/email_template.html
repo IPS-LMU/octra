@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{email_subject}}</title>
+    <style>
+      * {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      #header {
+        background-color: whitesmoke;
+      }
+
+      #footer {
+        margin-top: 30px;
+        font-size: 11px;
+      }
+
+      #header,
+      #footer,
+      #body {
+        padding: 5px;
+      }
+
+      #body {
+        margin-top: 20px;
+      }
+
+      hr {
+        color: whitesmoke;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">{{HEADER}}</div>
+    <div id="body">{{BODY}}</div>
+    <div id="footer">{{FOOTER}}</div>
+  </body>
+</html>

@@ -6,7 +6,9 @@
   "targets": {
     "build": {
       "executor": "@nrwl/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/annotation",
         "main": "libs/annotation/src/index.ts",
@@ -14,22 +16,66 @@
         "project": "libs/annotation/package.json",
         "entryFile": "libs/annotation/src/index.ts",
         "compiler": "babel",
-        "external": ["typescript"],
-        "format": ["cjs", "esm"]
+        "external": [
+          "typescript"
+        ],
+        "format": [
+          "cjs",
+          "esm"
+        ],
+        "assets": [
+          "libs/annotation/src/LICENSE.txt",
+          "libs/annotation/src/README.md"
+        ]
       }
+    },
+    "bundle": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "babelUpwardRootMode": true,
+        "libraryName": "OctraAnnotation",
+        "libraryTargets": [
+          "umd"
+        ],
+        "index": "",
+        "tsConfig": "libs/annotation/tsconfig.lib.json",
+        "main": "libs/annotation/src/index.ts",
+        "outputPath": "dist/libs/annotation/bundles",
+        "compiler": "babel",
+        "optimization": true,
+        "extractLicenses": true,
+        "runtimeChunk": false,
+        "vendorChunk": false,
+        "generateIndexHtml": false,
+        "commonChunk": false,
+        "namedChunks": false,
+        "webpackConfig": "webpack.config.js"
+      },
+      "dependsOn": [
+        "build"
+      ]
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs annotation {args.ver} {args.tag}"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/annotation/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/annotation/**/*.ts"
+        ]
       }
     }
   },

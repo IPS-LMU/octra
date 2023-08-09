@@ -11,13 +11,43 @@
         "outputPath": "dist/libs/json-sets",
         "main": "libs/json-sets/src/index.ts",
         "tsConfig": "libs/json-sets/tsconfig.lib.json",
-        "assets": ["libs/json-sets/*.md"],
         "entryFile": "libs/json-sets/src/index.ts",
         "project": "libs/json-sets/package.json",
         "compiler": "babel",
         "external": ["typescript"],
-        "format": ["cjs", "esm"]
+        "format": ["cjs", "esm"],
+        "assets": [
+          "libs/json-sets/LICENSE.txt",
+          "libs/json-sets/README.md"
+        ]
+      }
+    },
+    "bundle": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "babelUpwardRootMode": true,
+        "libraryName": "OctraJSONSets",
+        "libraryTargets": [
+          "umd"
+        ],
+        "index": "",
+        "tsConfig": "libs/json-sets/tsconfig.lib.json",
+        "main": "libs/json-sets/src/index.ts",
+        "outputPath": "dist/libs/json-sets/bundles",
+        "compiler": "babel",
+        "optimization": true,
+        "extractLicenses": true,
+        "runtimeChunk": false,
+        "vendorChunk": false,
+        "generateIndexHtml": false,
+        "commonChunk": false,
+        "namedChunks": false,
+        "webpackConfig": "webpack.config.js"
       },
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",

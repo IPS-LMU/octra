@@ -1,0 +1,6 @@
+{
+  "name": "@octra/web-components",
+  "version": "0.0.1",
+  "main": "./web-components.js",
+  "type": "module"
+}

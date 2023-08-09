@@ -12,12 +12,42 @@
         "main": "libs/media/src/index.ts",
         "entryFile": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": [],
+        "assets": [
+          "libs/media/src/LICENSE.txt",
+          "libs/media/src/README.md"
+        ],
         "project": "libs/media/package.json",
         "compiler": "babel",
         "external": ["typescript"],
         "format": ["cjs", "esm"]
       }
+    },
+    "bundle": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "babelUpwardRootMode": true,
+        "libraryName": "OctraMedia",
+        "libraryTargets": [
+          "umd"
+        ],
+        "index": "",
+        "tsConfig": "libs/media/tsconfig.lib.json",
+        "main": "libs/media/src/index.ts",
+        "outputPath": "dist/libs/media/bundles",
+        "compiler": "babel",
+        "optimization": true,
+        "extractLicenses": true,
+        "runtimeChunk": false,
+        "vendorChunk": false,
+        "generateIndexHtml": false,
+        "commonChunk": false,
+        "namedChunks": false,
+        "webpackConfig": "webpack.config.js"
+      },
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",

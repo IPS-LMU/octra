@@ -18,6 +18,7 @@ import { RouterModule } from '@angular/router';
 import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
 import { DropZoneComponent } from './core/component';
 import { OctraComponentsModule } from '@octra/ngx-components';
+import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { OctraComponentsModule } from '@octra/ngx-components';
     NgbDropdownModule,
     NgbPopoverModule,
     OctraComponentsModule,
+    NgxUtilitiesPipesModule,
   ],
   providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [

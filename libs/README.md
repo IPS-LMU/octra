@@ -31,13 +31,13 @@ want to use the libraries in your project you have to manually install these.
 npm install --legacy-peer-deps && npm run build:libs
 ```
 
-3. Now go to you project folder and run
+3. Now go to your project folder and run
 
 ```shell
 npm install --legacy-peer-deps "../octra/dist/libs/<library_name>"
 ```
 
-If you change something in the libraries and run `npm run build` again, the changes are automatically available in your project.
+If you change something in the libraries and run `npm run build:libs` again, the changes are automatically available in your project.
 
 # Dependency graph
 

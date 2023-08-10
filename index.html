@@ -12,105 +12,39 @@
 <div class="col-content">
 <div class="tsd-page-title">
 <h2>Octra libraries - v2.0.0</h2></div>
-<div class="tsd-panel tsd-typography"><p align="center">
-This is the frontpage of the OCTRA app. If you are looking for OCTRA's custom libraries, click <a href="https://github.com/IPS-LMU/octra/tree/master/libs">here</a>
-</p>
-<h1 align="center">OCTRA v2.x (still in development)</h1>
-
-<p align="center">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor1.png" alt="Dictaphone Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
-</p>
-<p align="center">
-<a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/features">
-  More information
-</a>
-</p>
-
-<p>This is a web-application for the orthographic transcription of audiofiles. For now, it uses three editors for the orthographic transcription:</p>
+<div class="tsd-panel tsd-typography"><a id="md:octra-libraries" class="tsd-anchor"></a><h1><a href="#md:octra-libraries">OCTRA libraries</a></h1><p><strong>OCTRA 2.0 and its libraries are still in development.</strong></p>
+<p>This sections shows an overview of all custom libraries used by OCTRA. All Angular-specific libraries start with &quot;ngx&quot;.</p>
 <ul>
-<li>Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.</li>
-<li>Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.</li>
-<li>2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.</li>
+<li><a href="./utilities/src/">utilities</a>: library with custom functions used in the
+other libraries or apps like OCTRA</li>
+<li><a href="./media/src/">media</a>: all media related classes (for now audio only: audio
+playback a.s.o)</li>
+<li><a href="./assets/src/">assets</a>: library with shared assets in octra applications
+e.g. JSON schemata</li>
+<li><a href="./annotation/src/">annotation</a>: Objects and other classes used to handle
+annotation tasks</li>
+<li><a href="./ngx-components/">ngx-components</a>: Angular components e.g. for the
+signal displays.</li>
+<li><a href="./ngx-utilities/">ngx-utilities</a>: library with custom functions used in
+angular projects</li>
+<li><a href="../apps/web-components/">web-components</a>: library with web-components containing components from ngx-components. These components can be used in other frameworks or Vanilla JS. <a href="../apps/web-components-demo/">See demo</a>.</li>
 </ul>
-<a id="md:user-manual" class="tsd-anchor"></a><h2><a href="#md:user-manual">User Manual</a></h2><p>You can find the manual for users here: <a href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/">OCTRA Manual</a></p>
-<a id="md:features" class="tsd-anchor"></a><h2><a href="#md:features">Features</a></h2><ul>
-<li>Three different editors</li>
-<li>Noise markers (placeholders) in the form of icons in text. Icons can be UTF-8 symbols, too.  </li>
-<li>Auto-saving of the transcription progress to prevent data loss</li>
-<li>Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.</li>
-<li>Validation using project specific guidelines. **New: text editor supports inline validation **</li>
-<li>Shortcuts for faster transcriptions</li>
-<li>Multi-Tiers support in local mode</li>
-<li>Logging of user activities for further studies</li>
-<li>Localization of the GUI</li>
-<li>Customization with configuration files for the app, project, guidelines and validation methods.</li>
-<li>Segment boundaries as markers in text</li>
-<li>Overview window to see the whole transcript</li>
-<li>Cutting audio files up to 300 MB</li>
-<li>Visible transcripts in 2D-Editor</li>
-<li><strong>New:</strong> Costum table generator</li>
-<li><strong>New:</strong> ASR support for transcription and segmentation</li>
-</ul>
-<a id="md:remarks" class="tsd-anchor"></a><h2><a href="#md:remarks">Remarks</a></h2><p>At the moment, OCTRA&#39;s online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers (project &quot;octra-backend&quot; is in development).</p>
-<a id="md:production-use" class="tsd-anchor"></a><h2><a href="#md:production-use">Production Use</a></h2><a id="md:octra-website" class="tsd-anchor"></a><h3><a href="#md:octra-website">OCTRA website</a></h3><p>If you don&#39;t want to install OCTRA, you can use the latest release <a href="https://www.phonetik.uni-muenchen.de/apps/octra/octra/">here</a>.</p>
-<a id="md:installation" class="tsd-anchor"></a><h3><a href="#md:installation">Installation</a></h3><p>In a production environment you don&#39;t need to compile OCTRA again.</p>
+<a id="md:installation" class="tsd-anchor"></a><h1><a href="#md:installation">Installation</a></h1><p>Currently, the libraries are not published to npm because Octra 2.0 and the libraries are still in development. If you
+want to use the libraries in your project you have to manually install these.</p>
 <ol>
-<li><p>Download the latest release from the releases page.``</p>
-</li>
-<li><p>Extract and Copy its content to your http-server. If you have already installed an older version of OCTRA, please notice to not override the old config folder. More information about upgrading can be found in the next section.</p>
-</li>
-<li><p>Before you can use OCTRA, duplicate and rename the <code>appconfig_sample.json</code> to <code>appconfig.json</code> in the config folder. Please make sure, that you offer all translation files for any language you defined in config.json.</p>
-</li>
-<li><p>To make OCTRA work please change the &#39;database:name&#39; entry in your appconfig.json. After the first launch a new local database with this name will be created.</p>
-</li>
-<li><p>Please have a look on the projectconfig.json in the localmode folder. In this file you can change the settings of the local mode.</p>
-</li>
-<li><p>Change the baseref attribute in the index.html according to the url where your OCTRA installation is hosted.</p>
-</li>
-<li><p>Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.</p>
-</li>
+<li>Clone the OCTRA repository next to the project folder you want to use the libraries for.</li>
+<li>In Terminal go to Octra directory and run</li>
 </ol>
-<a id="md:upgrade" class="tsd-anchor"></a><h3><a href="#md:upgrade">Upgrade</a></h3><ol>
-<li><p>Duplicate and rename your octra directory (e.g. to &#39;octra_backup&#39;) on your server.</p>
-</li>
-<li><p>Download the new OCTRA release and upload the &#39;dist&#39; folder to your server next to the backup and rename it to the same name like before (e.g. &#39;octra&#39;).</p>
-</li>
-<li><p>Copy your old appconfig.json and localmode folder to the new config directory.</p>
-</li>
-<li><p>Compare your appconfig.json with the new appconfig_samples.json file. If there are new entries, just copy and paste them to your appconfig.</p>
-</li>
-<li><p>Compare your projectconfig.json file with the new projectconfig.json file in the localmode folder.</p>
-</li>
-<li><p>Change the baseref attribute in the index.html according to the url where your OCTRA installation is hosted.</p>
-</li>
-<li><p>Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.</p>
-</li>
+<pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--legacy-peer-deps</span><span class="hl-1"> &amp;&amp; </span><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">build:libs</span>
+</code><button>Copy</button></pre>
+<ol start="3">
+<li>Now go to your project folder and run</li>
 </ol>
-<a id="md:development-use" class="tsd-anchor"></a><h2><a href="#md:development-use">Development Use</a></h2><p>On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 3 or higher.</p>
-<p>Then you can install OCTRA:</p>
-<ol>
-<li>Clone the octra repository.</li>
-<li>Go to the octra directory via Terminal (or GitBash on Windows).</li>
-<li>Call <code>npm install</code>.</li>
-<li>Wait.</li>
-<li>Duplicate the file <code>src/config/appconfig_sample.json</code> and rename it to <code>scr/config/appconfig.json</code>. In appconfig.json you can change the settings of your instance of OCTRA.</li>
-<li>After the installation you can call <code>npm start</code> to start the node server.</li>
-<li>After that please read the notice about the config files in the production use section</li>
-</ol>
-<a id="md:documentation" class="tsd-anchor"></a><h2><a href="#md:documentation">Documentation</a></h2><ul>
-<li>For users: <a href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/">OCTRA manual</a></li>
-<li>For project leaders/administrators: <a href="https://github.com/IPS-LMU/octra/wiki">Github Wiki</a>.</li>
-</ul>
-<a id="md:contribution" class="tsd-anchor"></a><h2><a href="#md:contribution">Contribution</a></h2><a id="md:commit-template" class="tsd-anchor"></a><h3><a href="#md:commit-template">Commit template</a></h3><p>For this project <a href="https://github.com/commitizen/cz-cli">commitizen</a> is used. If you want to contribute to this project you should make use of this tool to create commit messages important for the changelog (other commit messages will be ignored otherwise). For WebStorm or PHPStorm there is a <a href="https://plugins.jetbrains.com/plugin/9861-git-commit-template">Commit Template Plugin</a> to create these templates.</p>
-<p>For creating changelog automatically, <a href="https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-cli">conventional-changelog-cli</a> is used. To create changelogs you need to install conventional-changelog-cli globally as described on its github page. After installation you just need to run <code>npm run changelog</code> to create the changelog automatically.</p>
-<a id="md:translation" class="tsd-anchor"></a><h3><a href="#md:translation">Translation</a></h3><p>To translate OCTRA to a new language please visit <a href="https://www.phonetik.uni-muenchen.de/apps/octra/translation/start.php">https://www.phonetik.uni-muenchen.de/apps/octra/translation/start.php</a></p>
-<p>If the language you would like translate to does not exist please send us an email to <a href="mailto:octra@phonetik.uni-muenchen.de">octra@phonetik.uni-muenchen.de</a></p>
-<a id="md:affiliations" class="tsd-anchor"></a><h3><a href="#md:affiliations">Affiliations</a></h3><p><a href="http://www.en.phonetik.uni-muenchen.de/">INSTITUTE OF PHONETICS AND SPEECH PROCESSING</a></p>
+<pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--legacy-peer-deps</span><span class="hl-1"> </span><span class="hl-2">&quot;../octra/dist/libs/&lt;library_name&gt;&quot;</span>
+</code><button>Copy</button></pre>
+<p>If you change something in the libraries and run <code>npm run build:libs</code> again, the changes are automatically available in your project.</p>
+<a id="md:dependency-graph" class="tsd-anchor"></a><h1><a href="#md:dependency-graph">Dependency graph</a></h1><p>Run <code>npm run dep-graph</code> to view the interactive dependency graph:</p>
+<p><img src="../images/octra_dependency_graph.png" alt="octra_dependency_graph.png"></p>
 </div></div>
 <div class="col-sidebar">
 <div class="page-menu">
@@ -133,31 +67,15 @@ This is the frontpage of the OCTRA app. If you are looking for OCTRA's custom li
 <ul>
 <li>
 <ul>
-<li><a href="#md:user-manual"><span>User <wbr/>Manual</span></a></li>
-<li>
-<ul>
-<li><a href="#md:features"><span>Features</span></a></li>
-<li><a href="#md:remarks"><span>Remarks</span></a></li>
-<li><a href="#md:production-use"><span>Production <wbr/>Use</span></a></li>
-<li>
-<ul>
-<li><a href="#md:octra-website"><span>OCTRA website</span></a></li>
+<li><a href="#md:octra-libraries"><span>OCTRA libraries</span></a></li>
 <li><a href="#md:installation"><span>Installation</span></a></li>
-<li><a href="#md:upgrade"><span>Upgrade</span></a></li></ul></li>
-<li><a href="#md:development-use"><span>Development <wbr/>Use</span></a></li>
-<li><a href="#md:documentation"><span>Documentation</span></a></li>
-<li><a href="#md:contribution"><span>Contribution</span></a></li>
-<li>
-<ul>
-<li><a href="#md:commit-template"><span>Commit template</span></a></li>
-<li><a href="#md:translation"><span>Translation</span></a></li>
-<li><a href="#md:affiliations"><span>Affiliations</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<li><a href="#md:dependency-graph"><span>Dependency graph</span></a></li></ul></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>Octra libraries -<wbr/> v2.0.0</span></a>
 <ul class="tsd-small-nested-navigation">
 <li><a href="modules/_octra_annotation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/annotation -<wbr/> v0.0.1</span></a></li>
 <li><a href="modules/_octra_assets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/assets -<wbr/> v0.0.1</span></a></li>
-<li><a href="modules/_octra_json_sets2.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets2 -<wbr/> v0.0.1</span></a></li>
+<li><a href="modules/_octra_json_sets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets -<wbr/> v0.0.1</span></a></li>
 <li><a href="modules/_octra_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/media -<wbr/> v0.0.1</span></a></li>
 <li><a href="modules/_octra_ngx_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>components -<wbr/> v0.0.1</span></a></li>
 <li><a href="modules/_octra_ngx_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>utilities -<wbr/> v0.0.1</span></a></li>

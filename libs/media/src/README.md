@@ -28,7 +28,7 @@ Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([se
 ````html
     <head>
         <!-- ... -->
-        <script type="module" src="../octra/libs/media/bundles/OctraMedia.umd.js"></script>
+        <script type="application/javascript" src="../octra/libs/media/bundles/OctraMedia.umd.js"></script>
         <!-- ... -->
     </head>
 ````

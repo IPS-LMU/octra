@@ -22,6 +22,33 @@ const build = async () => {
     'tmp/web-components/LICENSE.txt',
     'dist/libs/web-components/LICENSE.txt'
   );
+
+  const license = await fs.readFile(
+      'dist/libs/web-components/LICENSE.txt',
+      'utf-8'
+  );
+
+  const thirdPartyLicenses = await fs.readFile(
+    'tmp/web-components/3rdpartylicenses.txt',
+    'utf-8'
+  );
+  let jsCode = await fs.readFile(
+    'dist/libs/web-components/web-components.js',
+    'utf-8'
+  );
+  jsCode = `/*
+  ${license}
+  */
+  ${jsCode}
+
+/* Third party licenses:
+${thirdPartyLicenses}
+*/
+`;
+  await fs.writeFile('dist/libs/web-components/web-components.js', jsCode, {
+    encoding: 'utf-8',
+  });
+
   console.log('Web-Components Build OK');
 };
 

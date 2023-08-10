@@ -31,7 +31,7 @@ file ([see full example here](../../apps/web-components-demo/index.html)).
 
 <head>
     <!-- ... -->
-    <script type="module" src="../octra/libs/json-sets/bundles/OctraJSONSets.umd.js"></script>
+    <script type="application/javascript" src="../octra/libs/json-sets/bundles/OctraJSONSets.umd.js"></script>
     <!-- ... -->
 </head>
 ````

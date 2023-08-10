@@ -31,7 +31,7 @@ file ([see full example here](../../../apps/web-components-demo/index.html)).
 ````html
 <head>
     <!-- ... -->
-    <script type="module" src="../octra/libs/annotation/bundles/OctraAnnotation.umd.js"></script>
+    <script type="application/javascript" src="../octra/libs/annotation/bundles/OctraAnnotation.umd.js"></script>
     <!-- ... -->
 </head>
 ````

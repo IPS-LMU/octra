@@ -10,6 +10,7 @@
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "extractLicenses": true,
         "outputPath": "tmp/web-components",
         "index": "apps/web-components/src/index.html",
         "main": "apps/web-components/src/main.ts",

@@ -20,7 +20,7 @@ git checkout static
 ````html
     <head>
         <!-- ... -->
-        <script type="module" src="../octra/libs/web-components/web-components.js"></script>
+        <script type="application/javascript" src="../octra/libs/web-components/web-components.js"></script>
         <!-- ... -->
     </head>
 ````

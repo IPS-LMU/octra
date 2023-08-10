@@ -15,8 +15,29 @@
 <li><a href="../index.html">Octra libraries</a></li>
 <li><a href="_octra_media.html">@octra/media</a></li></ul>
 <h1>Module @octra/media - v0.0.1</h1></div>
-<section class="tsd-panel tsd-typography"><a id="md:media" class="tsd-anchor"></a><h1><a href="#md:media">media</a></h1><p>This library was generated with <a href="https://nx.dev">Nx</a>.</p>
-<a id="md:building" class="tsd-anchor"></a><h2><a href="#md:building">Building</a></h2><p>Run <code>nx build media</code> to build the library.</p>
+<section class="tsd-panel tsd-typography"><a id="md:media" class="tsd-anchor"></a><h1><a href="#md:media">media</a></h1><p>This library offers classes and functions for handling audio files in web browsers (e.g. chunked decoding etc.).</p>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><a id="md:esm-cjs-amp-ts-definitions" class="tsd-anchor"></a><h3><a href="#md:esm-cjs-amp-ts-definitions">ESM, CJS &amp; TS definitions</a></h3><p>Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
+want to use the libraries in your project you have to manually install.</p>
+<ol>
+<li>Clone the OCTRA repository next to the project folder you want to use the libraries for.</li>
+<li>Switch tu branch &quot;static&quot;.</li>
+</ol>
+<pre><code class="language-shell"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">checkout</span><span class="hl-1"> </span><span class="hl-2">static</span>
+</code><button>Copy</button></pre>
+<ol start="3">
+<li>Now go to your project folder and run</li>
+</ol>
+<pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--legacy-peer-deps</span><span class="hl-1"> </span><span class="hl-2">&quot;../octra/libs/media&quot;</span>
+</code><button>Copy</button></pre>
+<a id="md:umd-bundle-vanilla-js" class="tsd-anchor"></a><h3><a href="#md:umd-bundle-vanilla-js">UMD Bundle (Vanilla JS)</a></h3><p>Do steps 1 and 2 from the previous chapter and reference it in an HTML file (<a href="../../../apps/web-components-demo/index.html">see full example here</a>).</p>
+<pre><code class="language-html"><span class="hl-1">    </span><span class="hl-4">&lt;</span><span class="hl-5">head</span><span class="hl-4">&gt;</span><br/><span class="hl-1">        </span><span class="hl-6">&lt;!-- ... --&gt;</span><br/><span class="hl-1">        </span><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-7"> </span><span class="hl-8">type</span><span class="hl-7">=</span><span class="hl-9">&quot;module&quot;</span><span class="hl-7"> </span><span class="hl-8">src</span><span class="hl-7">=</span><span class="hl-9">&quot;../octra/libs/media/bundles/OctraMedia.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span><br/><span class="hl-1">        </span><span class="hl-6">&lt;!-- ... --&gt;</span><br/><span class="hl-1">    </span><span class="hl-4">&lt;/</span><span class="hl-5">head</span><span class="hl-4">&gt;</span>
+</code><button>Copy</button></pre>
+<a id="md:update" class="tsd-anchor"></a><h2><a href="#md:update">Update</a></h2><ol>
+<li>Go to the cloned octra repository. Make sure you are in branch <code>static</code>.</li>
+<li>Update directory:</li>
+</ol>
+<pre><code class="language-shell"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">pull</span>
+</code><button>Copy</button></pre>
 </section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
@@ -73,7 +94,12 @@
 <li><a href="#md:media"><span>media</span></a></li>
 <li>
 <ul>
-<li><a href="#md:building"><span>Building</span></a></li></ul></li></ul></li></ul></div></details></div>
+<li><a href="#md:installation"><span>Installation</span></a></li>
+<li>
+<ul>
+<li><a href="#md:esm-cjs-amp-ts-definitions"><span>ESM, CJS &amp; TS definitions</span></a></li>
+<li><a href="#md:umd-bundle-vanilla-js"><span>UMD <wbr/>Bundle (<wbr/>Vanilla JS)</span></a></li></ul></li>
+<li><a href="#md:update"><span>Update</span></a></li></ul></li></ul></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>Octra libraries -<wbr/> v2.0.0</span></a>
 <ul class="tsd-small-nested-navigation">
@@ -102,7 +128,8 @@
 <li><a href="../types/_octra_media.IntArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Int<wbr/>Array</span></a></li></ul></div></details></li>
 <li><a href="_octra_ngx_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>components -<wbr/> v0.0.1</span></a></li>
 <li><a href="_octra_ngx_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>utilities -<wbr/> v0.0.1</span></a></li>
-<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.1</span></a></li></ul></nav></div></div></div>
+<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.1</span></a></li>
+<li><a href="_octra_web_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>components -<wbr/> v0.0.1</span></a></li></ul></nav></div></div></div>
 <div class="tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div></body></html>

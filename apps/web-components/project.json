@@ -16,7 +16,8 @@
         "polyfills": ["zone.js"],
         "tsConfig": "apps/web-components/tsconfig.app.json",
         "assets": [
-          "apps/web-components/src/LICENSE.txt"
+          "apps/web-components/src/LICENSE.txt",
+          "apps/web-components/src/README.md"
         ],
         "styles": [],
         "scripts": []

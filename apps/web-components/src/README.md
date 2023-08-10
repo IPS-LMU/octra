@@ -1,10 +1,10 @@
-# ngx-components
+# @octra/web-components
 
-This library contains audio components for Angular used in Octra.
+This library offers the same components from @octra/ngx-components without the limitation of using it in Angular projects.
 
 ## Installation
 
-### ESM, CJS & TS definitions
+### Vanilla JS (plain Javascript)
 Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
 want to use the libraries in your project you have to manually install.
 
@@ -15,15 +15,15 @@ want to use the libraries in your project you have to manually install.
 git checkout static
 ```
 
-3. Now go to your project folder and run
+3. Add to HTML file ([see full example here](../../../apps/web-components-demo/index.html)).
 
-```shell
-npm install --legacy-peer-deps "../octra/libs/ngx-components"
-```
-
-### UMD Bundle (Vanilla JS)
-
-See web-components library.
+````html
+    <head>
+        <!-- ... -->
+        <script type="module" src="../octra/libs/web-components/web-components.js"></script>
+        <!-- ... -->
+    </head>
+````
 
 ## Update
 

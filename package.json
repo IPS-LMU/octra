@@ -6,6 +6,7 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
+    "build:docs": "typedoc && node runner.js prepare:docs",
     "build:release": "node runner.js build:release",
     "build:dev": "node runner.js build:dev",
     "build:prod": "node runner.js build:prod",
@@ -147,6 +148,7 @@
     "ts-jest": "^29.0.5",
     "ts-node": "10.9.1",
     "typedoc": "^0.24.8",
+    "typedoc-plugin-replace-text": "^3.1.0",
     "typescript": "~4.9.5",
     "yargs": "^17.7.2"
   }

@@ -380,7 +380,6 @@ export class AudioManager {
           this._audio
             .play()
             .then(() => {
-              console.log('duration is: ' + audioSelection.duration.seconds);
               const time = Math.round(
                 audioSelection.duration.unix / playbackRate
               );

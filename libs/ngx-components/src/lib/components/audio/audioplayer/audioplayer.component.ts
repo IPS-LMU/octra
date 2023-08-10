@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -14,20 +13,18 @@ import Konva from 'konva';
 import { AudioplayerSettings } from './audioplayer-settings';
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioChunk, PlayBackStatus, SampleUnit } from '@octra/media';
-import {interval, Subscription, timer} from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({
   selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
-  styleUrls: ['./audioplayer.component.css']
+  styleUrls: ['./audioplayer.component.css'],
 })
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
-
-  constructor() {
-  }
+  constructor() {}
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:
     | ElementRef

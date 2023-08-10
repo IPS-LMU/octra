@@ -1,47 +1,63 @@
 let audioplayer = undefined;
 let audioViewer = undefined;
+let annotation = undefined;
 
 function initAudioPlayer(audioManager) {
+    // <oc-audioplayer> is a web component from web-components library
     audioplayer = document.createElement("oc-audioplayer");
-    audioplayer.addEventListener("loadComp", (event) => {
-        console.log("COMPONENT LOADED");
-    });
+    // connect audiochunk with audioplayer
     audioplayer.audioChunk = audioManager.mainchunk;
 
+    // add audio player to DOM
     const wrapper = document.getElementById("audioplayer-wrapper");
     wrapper.appendChild(audioplayer);
 }
 
 function initAudioViewer(audioManager) {
-    const importResult = new OctraAnnotation.AnnotJSONConverter().import({
-        name: "Bahnauskunft_annot.json",
-        content: annotationSample,
-        type: "application/json",
-        encoding: "utf-8"
-    }, {
+    // import AnnotJSON data from sample ( see at the end of this file)
+
+    const oAudioFile = {
         name: audioManager.resource.info.fullname,
         arrayBuffer: audioManager.resource.arraybuffer,
         size: audioManager.resource.info.size,
         sampleRate: audioManager.resource.info.sampleRate,
         duration: audioManager.resource.info.duration.samples,
         type: audioManager.resource.info.type
+    };
+
+    const importResult = new OctraAnnotation.AnnotJSONConverter().import({
+        name: "Bahnauskunft_annot.json",
+        content: annotationSample,
+        type: "application/json",
+        encoding: "utf-8"
+    }, oAudioFile);
+
+    // retrieve first level object from importResult
+    const annotation = new OctraAnnotation.Annotation(
+        "Bahnauskunft.wav", oAudioFile,
+        importResult.annotjson.levels.map((level, i) => OctraAnnotation.Level.fromObj({
+            id: level.id,
+            level,
+            sortorder: i
+        }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration.samples))
+    );
+
+    // onsegmentchange is an Observabke from rxjs
+    annotation.levels[0].segments.onsegmentchange.subscribe({
+        next: (e) => {
+            console.log(`Segment changed!`);
+            console.log(e);
+        }
     });
 
-    console.log(importResult);
-    const annotation = importResult.annotjson;
-    const level = OctraAnnotation.Level.fromObj({
-        id: annotation.levels[0].id,
-        level: annotation.levels[0],
-        sortorder:0
-    }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration.samples)
-    console.log(level);
-
+    // <oc-audioplayer> is a web component from web-components library
     audioViewer = document.createElement("oc-audioviewer");
     audioViewer.isMultiLine = true;
     audioViewer.breakMarker = {
         code: "<P>"
     };
-    audioViewer.transcriptionLevel = level;
+    audioViewer.transcriptionLevel = annotation.levels[0];
+
     const wrapper = document.getElementById("audioviewer-wrapper");
     wrapper.appendChild(audioViewer);
     audioViewer.audioChunk = audioManager.mainchunk;
@@ -51,22 +67,34 @@ function initAudioViewer(audioManager) {
 }
 
 async function main() {
+    // download audio file
+    const downloadedBlob = await OctraUtilities.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
     const file = new File(
-        [await OctraUtilities.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob")],
+        [downloadedBlob],
         "Bahnauskunft.wav",
         {
             type: "audio/wave"
         }
     );
 
+    // read arraybuffer
     const arrayBuffer = await OctraUtilities.readFileContents(file, "arraybuffer");
     OctraMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraMedia.WavFormat()]).subscribe({
         next: (status) => {
             console.log(status)
 
             if (status.decodeProgress === 1) {
+                // audio was decoded, init audioplayer and audioviewer
                 initAudioPlayer(status.audioManager);
                 initAudioViewer(status.audioManager);
+
+                // subscribe to audio events
+                status.audioManager.statechange.subscribe({
+                    next: (event) => {
+                        console.log(`Audio status change!`);
+                        console.log(event);
+                    }
+                })
             }
         }
     });

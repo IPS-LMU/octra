@@ -342,15 +342,16 @@ export function last<T>(array: T[] | undefined) {
  */
 export function joinURL(...args: string[]) {
   return args
-      .map((a) => {
-        const httpsArr = /(https?:\/\/)/g.exec(a);
-        const https = httpsArr ? httpsArr[1] : '';
+    .map((a) => {
+      const httpsArr = /(https?:\/\/)/g.exec(a);
+      const https = httpsArr ? httpsArr[1] : '';
 
-        const result = https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
-        return result;
-      })
-      .filter((a) => a !== null && a !== undefined && a !== '')
-      .join('/');
+      const result =
+        https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
+      return result;
+    })
+    .filter((a) => a !== null && a !== undefined && a !== '')
+    .join('/');
 }
 
 /**
@@ -476,9 +477,7 @@ export async function readFileContents<T>(
   });
 }
 
-export function getTranscriptFromIO(
-  io: any[]
-): any | undefined {
+export function getTranscriptFromIO(io: any[]): any | undefined {
   return io.find(
     (a) =>
       !a.fileType!.includes('audio') &&

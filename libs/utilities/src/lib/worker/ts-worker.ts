@@ -1,31 +1,15 @@
 import { Subject } from 'rxjs';
 import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
 
+/**
+ * Inline web worker that runs jobs asynchronously.
+ */
 export class TsWorker {
   private static workerID = 1;
   private readonly blobURL: string;
   private worker: Worker;
   private status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
   private readonly _id: number;
-
-  get id(): number {
-    return this._id;
-  }
-
-  private _queue: TsWorkerJob[] = [];
-
-  get queue(): TsWorkerJob[] {
-    return this._queue;
-  }
-
-  /**
-   * triggers whenever a job changed its status
-   */
-  private _jobstatuschange = new Subject<TsWorkerJob>();
-
-  get jobstatuschange(): Subject<TsWorkerJob> {
-    return this._jobstatuschange;
-  }
 
   constructor() {
     this._id = TsWorker.workerID++;
@@ -36,6 +20,25 @@ export class TsWorker {
       })
     );
     this.worker = new Worker(this.blobURL);
+  }
+
+  private _jobstatuschange = new Subject<TsWorkerJob>();
+
+  /**
+   * triggers whenever a job changed its status
+   */
+  get jobstatuschange(): Subject<TsWorkerJob> {
+    return this._jobstatuschange;
+  }
+
+  private _queue: TsWorkerJob[] = [];
+
+  get queue(): TsWorkerJob[] {
+    return this._queue;
+  }
+
+  get id(): number {
+    return this._id;
   }
 
   /**

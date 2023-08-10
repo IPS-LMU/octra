@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@nrwl/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/utilities",
         "main": "libs/utilities/src/index.ts",
@@ -20,26 +18,17 @@
         ],
         "project": "libs/utilities/package.json",
         "compiler": "babel",
-        "external": [
-          "typescript"
-        ],
-        "format": [
-          "cjs",
-          "esm"
-        ]
+        "external": ["typescript"],
+        "format": ["cjs", "esm"]
       }
     },
     "bundle": {
       "executor": "@nrwl/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraUtilities",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/utilities/tsconfig.lib.json",
         "main": "libs/utilities/src/index.ts",
@@ -54,35 +43,25 @@
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs utilities {args.ver} {args.tag}"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/utilities/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/utilities/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/utilities/jest.config.ts",
         "passWithNoTests": true

@@ -1,4 +1,4 @@
-import { DataInfo } from './dataInfo';
+import { DataInfo } from './data-info';
 
 export class FileInfo extends DataInfo {
   /**

@@ -5,6 +5,7 @@ This library offers JS functions and classes to make some parts of app developme
 ## Installation
 
 ### ESM, CJS & TS definitions
+
 Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
 want to use the libraries in your project you have to manually install.
 
@@ -25,13 +26,13 @@ npm install --legacy-peer-deps "../octra/libs/utilities"
 
 Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([see full example here](../../../apps/web-components-demo/index.html)).
 
-````html
-    <head>
-        <!-- ... -->
-        <script type="application/javascript" src="../octra/libs/utilities/bundles/OctraUtilities.umd.js"></script>
-        <!-- ... -->
-    </head>
-````
+```html
+<head>
+  <!-- ... -->
+  <script type="application/javascript" src="../octra/libs/utilities/bundles/OctraUtilities.umd.js"></script>
+  <!-- ... -->
+</head>
+```
 
 ## Update
 

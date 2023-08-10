@@ -6,11 +6,17 @@ export enum TsWorkerStatus {
   STOPPED = 'stopped',
 }
 
+/**
+ * This class defines a task with given function and parameters.
+ */
 export class TsWorkerJob {
   private static jobIDCounter = 0;
   args: any[] = [];
   private readonly _id: number;
 
+  /**
+   * returns id of the job
+   */
   get id(): number {
     return this._id;
   }
@@ -20,16 +26,26 @@ export class TsWorkerJob {
     ended: -1,
   };
 
+  /**
+   * returns timing statistics
+   */
   get statistics(): { ended: number; started: number } {
     return this._statistics;
   }
 
+  /**
+   * sets timing statistics
+   * @param value start and end time
+   */
   set statistics(value: { ended: number; started: number }) {
     this._statistics = value;
   }
 
   private _result: any;
 
+  /**
+   * result of the ran function
+   */
   get result(): any {
     return this._result;
   }
@@ -40,6 +56,9 @@ export class TsWorkerJob {
 
   private _status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
 
+  /**
+   * current status
+   */
   get status(): TsWorkerStatus {
     return this._status;
   }

@@ -1,5 +1,5 @@
-import { DataInfo } from './dataInfo';
-import { FileInfo } from './fileInfo';
+import { DataInfo } from './data-info';
+import { FileInfo } from './file-info';
 
 export class DirectoryInfo extends DataInfo {
   private readonly _path: string;

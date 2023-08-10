@@ -1,5 +1,8 @@
 import { BrowserInfo } from './browser-info';
 
+/**
+ * wrapper containing KeyboardEvent information with additional data
+ */
 export interface ShortcutEvent {
   shortcut: string;
   platform: string;
@@ -10,11 +13,17 @@ export interface ShortcutEvent {
   timestamp: number;
 }
 
+/**
+ * entry that maps a key name to a code
+ */
 export interface KeyMappingEntry {
   name: string;
   keyCode: number;
 }
 
+/**
+ * shortcut definition
+ */
 export interface Shortcut {
   name: string;
   keys: {
@@ -25,12 +34,18 @@ export interface Shortcut {
   focusonly: boolean;
 }
 
+/**
+ * defines a group of shortcuts
+ */
 export interface ShortcutGroup {
   enabled: boolean;
   name: string;
   items: Shortcut[];
 }
 
+/**
+ * manages all supported shortcuts
+ */
 export class ShortcutManager {
   get pressedKeys(): {
     other: number;

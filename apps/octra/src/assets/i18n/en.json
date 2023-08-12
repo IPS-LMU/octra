@@ -108,7 +108,8 @@
     "start": "Start"
   },
   "p": {
-    "back to projects": "Go back to list of projects"
+    "back to projects": "Go back to list of projects",
+    "manage account": "Manage account"
   },
   "bug report": {
     "give feedback": "Give feedback",

@@ -6,9 +6,9 @@
     {{ 'general.error' | transloco }}
   </div>
   <div class="modal-body">
-    <p>{{ text ? text : '' }}</p>
+    <p [innerHTML]="text ? text : ''"></p>
   </div>
-  <div class="modal-footer">
+  <div class="modal-footer" *ngIf="showOKButton">
     <button
       (click)="close()"
       class="btn btn-default"

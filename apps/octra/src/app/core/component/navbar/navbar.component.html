@@ -627,6 +627,16 @@
               {{ (authStoreService.me$ | async)?.username }}
             </a>
             <a
+                    *ngIf="appStorage.useMode === 'online' && appStorage.snapshot.application.appConfiguration?.octraBackend?.enabled && appStorage.snapshot.application.appConfiguration?.octraBackend?.url"
+                    class="dropdown-item"
+                    [href]="appStorage.snapshot.application.appConfiguration?.octraBackend?.url"
+                    target="_blank"
+            >
+              <i class="bi bi-tools"></i>
+              {{ 'p.manage account' | transloco }}
+            </a>
+            <div class="dropdown-divider"></div>
+            <a
               *ngIf="appStorage.useMode === 'online'"
               class="dropdown-item"
               (click)="backToProjectsList()"

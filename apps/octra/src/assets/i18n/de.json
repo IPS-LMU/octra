@@ -107,7 +107,8 @@
     "start": "Start"
   },
   "p": {
-    "back to projects": "Zurück zu den Projekten"
+    "back to projects": "Zurück zu den Projekten",
+    "manage account": "Account verwalten"
   },
   "bug report": {
     "give feedback": "Feedback geben",

@@ -55,7 +55,11 @@ export interface AppSettings {
       active: string;
       apiURL: string;
     };
-  };
+  },
+  octraBackend?: {
+    enabled: boolean;
+    url: string;
+  }
 }
 
 export interface ASRLanguage {

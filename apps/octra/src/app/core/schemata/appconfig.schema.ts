@@ -4,6 +4,7 @@ export const AppConfigSchema = {
       type: 'string',
     },
     api: {
+      required: ['url', 'appToken'],
       properties: {
         url: {
           type: 'string',
@@ -100,8 +101,19 @@ export const AppConfigSchema = {
       type: 'object',
       required: ['database'],
     },
+    octraBackend: {
+      required: ['enabled', 'url'],
+      type: 'object',
+      properties: {
+        enabled: {
+          type: 'boolean',
+        },
+        url: {
+          type: 'string',
+        },
+      },
+    },
   },
   type: 'object',
-  required: ['version', 'api', 'octra'],
-  additionalProperties: true,
+  required: ['version', 'api', 'octra']
 };

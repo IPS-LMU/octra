@@ -26,7 +26,8 @@
           "apps/octra/src/assets",
           "apps/octra/src/config",
           "apps/octra/src/media",
-          "apps/octra/src/LICENSE.txt"
+          "apps/octra/src/LICENSE.txt",
+          "apps/octra/src/.htaccess"
         ],
         "styles": [
           "node_modules/video.js/dist/video-js.min.css",
@@ -62,12 +63,19 @@
           "outputHashing": "all"
         },
         "development": {
+          "outputHashing": "all",
           "buildOptimizer": false,
           "optimization": false,
           "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
-          "namedChunks": true
+          "namedChunks": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/octra/src/environments/environment.ts",
+              "with": "apps/octra/src/environments/environment.dev.ts"
+            }
+          ]
         }
       },
       "defaultConfiguration": "production"

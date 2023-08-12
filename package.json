@@ -65,7 +65,7 @@
     "@octra/ngx-octra-api": "file:../octra-backend/extern/libs/ngx-octra-api",
     "@popperjs/core": "^2.11.6",
     "@swc/helpers": "~0.5.0",
-    "ajv": "^8.11.0",
+    "ajv": "^8.12.0",
     "angular-animations": "^0.11.0",
     "animate.css": "^4.1.1",
     "bootstrap": "^5.2.3",

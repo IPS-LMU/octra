@@ -1,3 +1,0 @@
-export * from './lib/ngx-octra-api.module';
-export * from './lib/octra-api.service';
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi9saWJzL25neC1vY3RyYS1hcGkvc3JjL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLGNBQWMsNEJBQTRCLENBQUM7QUFDM0MsY0FBYyx5QkFBeUIsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCAqIGZyb20gJy4vbGliL25neC1vY3RyYS1hcGkubW9kdWxlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL29jdHJhLWFwaS5zZXJ2aWNlJztcbiJdfQ==

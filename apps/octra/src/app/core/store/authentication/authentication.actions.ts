@@ -116,13 +116,13 @@ export class AuthenticationActions {
         message?: string;
         messageType?: string;
         clearSession: boolean;
-        mode: LoginMode;
+        mode?: LoginMode;
       }>(),
       success: props<{
         message?: string;
         messageType?: string;
         clearSession: boolean;
-        mode: LoginMode;
+        mode?: LoginMode;
       }>(),
     },
   });

@@ -1,7 +1,7 @@
 <div class="modal-content">
     <div class="modal-header">
         <h5 class="modal-title" id="modal-title">
-            {{ 'general.export data' | transloco }}
+            {{ 'g.export data' | transloco }}
         </h5>
         <button
                 type="button"
@@ -16,9 +16,9 @@
             <thead>
             <tr>
                 <th></th>
-                <th>{{ 'general.download' | transloco }}</th>
-                <th>{{ 'general.application' | transloco }}</th>
-                <th>{{ 'general.website' | transloco }}</th>
+                <th>{{ 'g.download' | transloco }}</th>
+                <th>{{ 'g.application' | transloco }}</th>
+                <th>{{ 'g.website' | transloco }}</th>
             </tr>
             </thead>
             <tbody>
@@ -78,7 +78,7 @@
                   "
                             >
                   <span style="margin-left: 10px"
-                  >{{ 'general.select one tier' | transloco }}:
+                  >{{ 'g.select one tier' | transloco }}:
                   </span>
                                 <select
                                     #val
@@ -100,7 +100,7 @@
 
                             <div class="options" *ngIf="converter.options !== undefined">
                   <span style="font-weight: bold"
-                  >{{ 'general.Options' | transloco }}:</span
+                  >{{ 'g.Options' | transloco }}:</span
                   >
                                 <div
                                         *ngIf="converter.name === 'Plain text'"
@@ -192,13 +192,13 @@
             </tbody>
         </table>
 
-        <h5>{{ 'general.custom formats' | transloco }}</h5>
+        <h5>{{ 'g.custom formats' | transloco }}</h5>
         <table class="table table-striped">
             <thead>
             <tr>
                 <th></th>
-                <th>{{ 'general.name' | transloco }}</th>
-                <th>{{ 'general.description' | transloco }}</th>
+                <th>{{ 'g.name' | transloco }}</th>
+                <th>{{ 'g.description' | transloco }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -256,14 +256,14 @@
             </tbody>
         </table>
 
-        <h5>{{ 'general.meta data' | transloco }}</h5>
+        <h5>{{ 'g.meta data' | transloco }}</h5>
 
         <table class="table table-striped">
             <thead>
             <tr>
                 <th style="width: 25px"></th>
-                <th>{{ 'general.name' | transloco }}</th>
-                <th>{{ 'general.description' | transloco }}</th>
+                <th>{{ 'g.name' | transloco }}</th>
+                <th>{{ 'g.description' | transloco }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -281,7 +281,7 @@
                 </td>
                 <td (click)="getProtocol()">
                     <a #a>
-                        {{ 'general.protocol' | transloco }}
+                        {{ 'g.protocol' | transloco }}
                     </a>
                 </td>
                 <td colspan="3">{{ 'export.meta data.description' | transloco }}</td>
@@ -318,7 +318,7 @@
                 data-dismiss="modal"
                 (click)="close()"
         >
-            {{ 'general.close' | transloco }}
+            {{ 'g.close' | transloco }}
         </button>
     </div>
 </div>

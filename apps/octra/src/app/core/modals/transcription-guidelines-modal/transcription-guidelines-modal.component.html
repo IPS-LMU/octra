@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      {{ 'general.guidelines' | transloco
+      {{ 'g.guidelines' | transloco
       }}<span class="version"> v {{ guidelines.meta.version }}</span>
     </h5>
     <button
@@ -15,7 +15,7 @@
     <div class="row" style="width: 100%">
       <div class="col-md-7">
         <h3 style="display: inline">
-          {{ 'general.guidelines' | transloco
+          {{ 'g.guidelines' | transloco
           }}<span class="version"> v {{ guidelines.meta.version }} </span>
         </h3>
         <button
@@ -41,10 +41,10 @@
           </a>
         </ng-template>
         <span class="project">
-          {{ 'general.project' | transloco }}: {{ guidelines.meta.project }}
+          {{ 'g.project' | transloco }}: {{ guidelines.meta.project }}
         </span>
         <span class="authors">
-          {{ 'general.authors' | transloco }}: {{ guidelines.meta.authors }}
+          {{ 'g.authors' | transloco }}: {{ guidelines.meta.authors }}
         </span>
       </div>
       <div class="col-md-5">
@@ -58,7 +58,7 @@
               (keyup)="search(input.value)"
               class="form-control"
               id="addon1"
-              placeholder="{{ 'general.search' | transloco }}"
+              placeholder="{{ 'g.search' | transloco }}"
               type="text"
             />
           </div>
@@ -72,7 +72,7 @@
       "
       class="bg-warning"
     >
-      {{ 'general.no guidelines found' | transloco }}
+      {{ 'g.no guidelines found' | transloco }}
     </div>
     <div
       *ngFor="let instructions of shownGuidelines.instructions; let j = index"
@@ -130,7 +130,7 @@
                         "
                         class="card-header example"
                       >
-                        {{ 'general.example' | transloco }}
+                        {{ 'g.example' | transloco }}
                         <ng-container
                           *ngIf="
                             settService.projectsettings?.guidelines !==
@@ -213,7 +213,7 @@
       data-dismiss="modal"
       type="button"
     >
-      {{ 'general.close' | transloco }}
+      {{ 'g.close' | transloco }}
     </button>
   </div>
 </div>

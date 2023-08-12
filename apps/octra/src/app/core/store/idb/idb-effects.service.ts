@@ -144,7 +144,7 @@ export class IDBEffects {
                     })
                   );
                 }
-              } else {
+              } else if(state.application.mode) {
                 // other modes
                 this.store.dispatch(
                   LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
@@ -153,6 +153,8 @@ export class IDBEffects {
                     mode: LoginMode.DEMO,
                   })
                 );
+              } else {
+                  // do nothing
               }
             }
 

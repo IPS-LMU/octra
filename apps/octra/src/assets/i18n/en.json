@@ -1,5 +1,5 @@
 {
-  "general": {
+  "g": {
     "name": "Name",
     "abort": "Abort",
     "continue": "Continue",
@@ -51,7 +51,7 @@
     "segment": "Segment",
     "job number": "Job number",
     "free jobs": "Free Jobs",
-    "email": "Email",
+    "e-mail": "Email",
     "description": "Description",
     "bug report": "Bug Report",
     "protocol": "Protocol",
@@ -105,11 +105,15 @@
     "projects": "Projects",
     "free tasks": "Free Tasks",
     "action": "Action",
-    "start": "Start"
+    "start": "Start",
+    "or": "oder"
   },
   "p": {
+    "username or email": "Username or E-Mail",
+    "forgot password": "Forgot password",
     "back to projects": "Go back to list of projects",
-    "manage account": "Manage account"
+    "manage account": "Manage account",
+    "reset password": "Reset password"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -381,7 +385,11 @@
   "authentication": {
     "you are authenticated": "You are authenticated!",
     "window closed": "This window will be automatically closed in {{seconds}} seconds.",
-    "description": "Close this window and click in OCTRA on the \"I'm authenticated!\" button in order to confirm authentication. After that the automated processing continues."
+    "description": "Close this window and click in OCTRA on the \"I'm authenticated!\" button in order to confirm authentication. After that the automated processing continues.",
+    "signin": "Please signin",
+    "signin university": "Signin with university account",
+    "signin credentials": "Signin with credentials",
+    "password reset success": "If an account with the given e-mail is registered, you will receive an e-mail for password reset. Please have a look on your spam/junk folder, too."
   },
   "export": {
     "meta data": {

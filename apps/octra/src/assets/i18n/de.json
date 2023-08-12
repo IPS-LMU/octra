@@ -1,5 +1,5 @@
 {
-  "general": {
+  "g": {
     "name": "Name",
     "abort": "Abbrechen",
     "continue": "Weiter",
@@ -51,7 +51,7 @@
     "segment": "Segment",
     "job number": "Aufgabennummer",
     "free jobs": "Freie Aufgaben",
-    "email": "Email",
+    "e-mail": "Email",
     "description": "Beschreibung",
     "bug report": "Fehlerbericht",
     "protocol": "Protokoll",
@@ -104,11 +104,15 @@
     "projects": "Projekte",
     "free tasks": "Freie Aufgaben",
     "action": "Aktion",
-    "start": "Start"
+    "start": "Start",
+    "or": "oder"
   },
   "p": {
+    "username or email": "Nutzername oder E-Mail",
+    "forgot password": "Passwort vergessen",
     "back to projects": "Zurück zu den Projekten",
-    "manage account": "Account verwalten"
+    "manage account": "Account verwalten",
+    "reset password": "Passwort zurücksetzen"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -381,7 +385,11 @@
   "authentication": {
     "you are authenticated": "Du bist authentifiziert!",
     "window closed": "Dieses Fenster wird in {{seconds}} Sekunden automatisch geschlossen.",
-    "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt."
+    "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt.",
+    "signin": "Bitte anmelden",
+    "signin university": "Über Universitätsnetzwerk anmelden",
+    "signin credentials": "Mit Zugangsdaten anmelden",
+    "password reset success": "Wenn ein Benutzerkonto mit deiner E-Mail Adresse existiert, erhältst Du eine E-Mail für die Passwort-Zurücksetzung. Prüfe auch bitte auch deinen Spam/Junk Ordner. Please have a look on your spam/junk folder, too."
   },
   "export": {
     "meta data": {

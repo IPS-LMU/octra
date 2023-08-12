@@ -3,7 +3,6 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
 import {
   catchError,
@@ -21,6 +20,7 @@ import { OctraModalService } from '../../../modals/octra-modal.service';
 import { RoutingService } from '../../../shared/service/routing.service';
 import { AnnotationActions } from './annotation.actions';
 import {
+  AlertService,
   AudioService,
   TranscriptionService,
   UserInteractionsService,
@@ -60,6 +60,7 @@ import {
   createSampleTask,
   createSampleUser,
 } from '../../../shared';
+import { checkAndThrowError } from '../../error.handlers';
 
 @Injectable()
 export class AnnotationEffects {
@@ -96,13 +97,25 @@ export class AnnotationEffects {
               }
               return AnnotationActions.showNoRemainingTasksModal.do();
             }),
-            catchError((error: HttpErrorResponse) => {
-              return of(
+            catchError((error: HttpErrorResponse) =>
+              checkAndThrowError(
+                {
+                  statusCode: error.status,
+                  message: error.error?.message ?? error.message,
+                },
+                a,
                 AnnotationActions.startAnnotation.fail({
                   error: error.error?.message ?? error.message,
-                })
-              );
-            })
+                }),
+                this.store,
+                () => {
+                  this.alertService.showAlert(
+                    'danger',
+                    error.error?.message ?? error.message
+                  );
+                }
+              )
+            )
           );
       })
     )
@@ -171,7 +184,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
           this.transcrService.init();
-          this.routingService.navigate("start annotation", ['/load/']);
+          this.routingService.navigate('start annotation', ['/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
@@ -292,7 +305,7 @@ export class AnnotationEffects {
           if (state.application.mode === LoginMode.LOCAL) {
             this.routingService
               .navigate(
-                  "reload aufio local",
+                'reload aufio local',
                 ['/intern/transcr/reload-file'],
                 AppInfo.queryParamsHandling
               )
@@ -311,7 +324,7 @@ export class AnnotationEffects {
         ofType(LoginModeActions.endTranscription.do),
         tap((a) => {
           this.routingService.navigate(
-            "end transcription",
+            'end transcription',
             ['/intern/transcr/end'],
             AppInfo.queryParamsHandling
           );
@@ -350,15 +363,26 @@ export class AnnotationEffects {
                     });
                   }
                 }),
-                catchError((error) => {
-                  // ignore
-                  return of(
+                catchError((error) =>
+                  checkAndThrowError(
+                    {
+                      statusCode: error.status,
+                      message: error.error?.message ?? error.message,
+                    },
+                    a,
                     AuthenticationActions.logout.do({
                       clearSession: a.clearSession,
                       mode: state.application.mode!,
-                    })
-                  );
-                })
+                    }),
+                    this.store,
+                    () => {
+                      this.alertService.showAlert(
+                        'danger',
+                        error.error?.message ?? error.message
+                      );
+                    }
+                  )
+                )
               );
           } else {
             return of(
@@ -498,7 +522,7 @@ export class AnnotationEffects {
 
                     console.log('INIT TRANSCR OKOKOKO');
                     this.routingService.navigate(
-                      "transcript initialized URL",
+                      'transcript initialized URL',
                       ['/intern/transcr'],
                       AppInfo.queryParamsHandling
                     );
@@ -536,7 +560,7 @@ export class AnnotationEffects {
                   console.log('INIT TRANSCR OK:');
                   console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
-                    "transcription initialized",
+                    'transcription initialized',
                     ['/intern/transcr'],
                     AppInfo.queryParamsHandling
                   );
@@ -627,10 +651,22 @@ export class AnnotationEffects {
               }
             }),
             catchError((error: HttpErrorResponse) => {
-              return of(
+              return checkAndThrowError(
+                {
+                  statusCode: error.status,
+                  message: error.error?.message ?? error.message,
+                },
+                a,
                 LoginModeActions.loadOnlineInformationAfterIDBLoaded.fail({
                   error,
-                })
+                }),
+                this.store,
+                () => {
+                  this.alertService.showAlert(
+                    'danger',
+                    error.error?.message ?? error.message
+                  );
+                }
               );
             })
           );
@@ -727,42 +763,42 @@ export class AnnotationEffects {
 
   // TODO add effect if task and project can't not be loaded
   /*
-    onLoadOnlineFailed$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
-        exhaustMap((a) => {
-          return of(
-            AuthenticationActions.logout.do({
-              message: a.error.message,
-              clearSession: true,
-              messageType: '',
-              mode: LoginMode.ONLINE,
-            })
-          );
-        })
-      )
-    );
-   */
+                  onLoadOnlineFailed$ = createEffect(() =>
+                    this.actions$.pipe(
+                      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
+                      exhaustMap((a) => {
+                        return of(
+                          AuthenticationActions.logout.do({
+                            message: a.error.message,
+                            clearSession: true,
+                            messageType: '',
+                            mode: LoginMode.ONLINE,
+                          })
+                        );
+                      })
+                    )
+                  );
+                 */
 
   /*
-    onLocalOrURLModeLogin$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(LocalModeActions.login),
-        exhaustMap((a) => {
-          return AnnotationActions.prepareTaskDataForAnnotation.do({
-            mode: LoginMode.LOCAL,
-            currentProject: createSampleProjectDto("-1"),
-            task: createSampleTask("-1", a.files.map((a, i) => ({
-              id: "" + i,
-              filename: a.name,
-              fileType: a.type,
-              size: a.size
-            })), [])
-          });
-        })
-      )
-    );
-     */
+                  onLocalOrURLModeLogin$ = createEffect(() =>
+                    this.actions$.pipe(
+                      ofType(LocalModeActions.login),
+                      exhaustMap((a) => {
+                        return AnnotationActions.prepareTaskDataForAnnotation.do({
+                          mode: LoginMode.LOCAL,
+                          currentProject: createSampleProjectDto("-1"),
+                          task: createSampleTask("-1", a.files.map((a, i) => ({
+                            id: "" + i,
+                            filename: a.name,
+                            fileType: a.type,
+                            size: a.size
+                          })), [])
+                        });
+                      })
+                    )
+                  );
+                   */
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
@@ -841,17 +877,27 @@ export class AnnotationEffects {
                 });
               }),
               catchError((error: HttpErrorResponse) => {
-                if (this.transcrSendingModal.ref) {
-                  this.transcrSendingModal.ref.componentInstance.error =
-                    error.error?.message ?? error.message;
+                if (error.status === 401) {
+                  this.transcrSendingModal.timeout?.unsubscribe();
                 }
-                /* TODO if error is because of not busy
-                                 => select new annotation?
-                                 */
-                return of(
+
+                return checkAndThrowError(
+                  {
+                    statusCode: error.status,
+                    message: error.error?.message ?? error.message,
+                  },
+                  a,
                   AnnotationActions.sendAnnotation.fail({
                     error: error.error?.message ?? error.message,
-                  })
+                  }),
+                  this.store,
+                  () => {
+                    if (this.transcrSendingModal.ref) {
+                      this.transcrSendingModal.ref.componentInstance.error =
+                        error.error?.message ?? error.message;
+                      /* TODO if error is because of not busy => select new annotation? */
+                    }
+                  }
                 );
               })
             );
@@ -907,7 +953,7 @@ export class AnnotationEffects {
       ofType(AnnotationActions.redirectToProjects.do),
       exhaustMap((a) => {
         this.routingService.navigate(
-          "redirect to projects after quit",
+          'redirect to projects after quit',
           ['/intern/projects'],
           AppInfo.queryParamsHandling
         );
@@ -1006,8 +1052,7 @@ export class AnnotationEffects {
     private apiService: OctraAPIService,
     // private settingsService: AppSettingsService,
     private http: HttpClient,
-    private localStorageService: LocalStorageService,
-    private sessionStorageService: SessionStorageService,
+    private alertService: AlertService,
     private transloco: TranslocoService,
     private routingService: RoutingService,
     private modalsService: OctraModalService,

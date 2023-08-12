@@ -25,7 +25,7 @@
       style="text-align: right; padding-right: 20px"
     >
       <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
-        {{ 'general.prompt' | transloco }}
+        {{ 'g.prompt' | transloco }}
       </a>
     </div>
   </div>
@@ -49,10 +49,10 @@
     (overviewbtnclicked)="openOverview()"
     (shortcutbtnclicked)="openShortcutsModal()"
     [buttonLabels]="{
-      shortcuts: 'general.shortcuts' | transloco,
-      guidelines: 'general.guidelines' | transloco,
-      overview: 'general.overview' | transloco,
-      help: 'general.help' | transloco
+      shortcuts: 'g.shortcuts' | transloco,
+      guidelines: 'g.guidelines' | transloco,
+      overview: 'g.overview' | transloco,
+      help: 'g.help' | transloco
     }"
     [responsive]="responsive"
   ></octra-fastbar>
@@ -86,7 +86,7 @@
             [(ngModel)]="comment"
             class="w-100"
             name="comment"
-            placeholder="{{ 'general.insert comment' | transloco }}"
+            placeholder="{{ 'g.insert comment' | transloco }}"
             style="height: 40px; resize: none"
           ></textarea>
         </div>
@@ -109,7 +109,7 @@
         >
           <i class="bi bi-x-circle"></i>
           <span>
-            {{ 'general.quit' | transloco }}
+            {{ 'g.quit' | transloco }}
           </span>
         </button>
         <button
@@ -154,7 +154,7 @@
         >
           <i class="bi bi-x-circle"></i>
           <span>
-            {{ 'general.quit' | transloco }}
+            {{ 'g.quit' | transloco }}
           </span>
         </button>
         <button
@@ -196,7 +196,7 @@
           *ngIf="!appStorage.easymode"
           [ngClass]="{ ' d-none d-md-inline': appc.octra.responsive.enabled }"
         >
-          {{ 'general.quit' | transloco }}
+          {{ 'g.quit' | transloco }}
         </span>
       </button>
       <button
@@ -210,7 +210,7 @@
           *ngIf="!appStorage.easymode"
           [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
         >
-          {{ 'general.export data' | transloco }}</span
+          {{ 'g.export data' | transloco }}</span
         >
       </button>
       <button

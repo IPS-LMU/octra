@@ -42,11 +42,11 @@
               id="inputName"
               name="name"
               aria-describedby="name"
-              [placeholder]="'general.name' | transloco"
+              [placeholder]="'g.name' | transloco"
               [(ngModel)]="profile.username"
             />
             <label for="inputName" class="form-label">{{
-              'general.name' | transloco
+              'g.name' | transloco
             }}</label>
           </div>
         </div>
@@ -62,7 +62,7 @@
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{
-              'general.email' | transloco
+              'g.email' | transloco
             }}</label>
           </div>
         </div>
@@ -74,14 +74,14 @@
               [(ngModel)]="bgdescr"
               class="form-control"
               aria-describedby="bgDescr"
-              [placeholder]="'general.description' | transloco"
+              [placeholder]="'g.description' | transloco"
               id="bgDescr"
               maxlength="1000"
               rows="3"
               name="bgdescr"
               style="height: 100px"
             ></textarea>
-            <label for="bgDescr">{{ 'general.description' | transloco }}</label>
+            <label for="bgDescr">{{ 'g.description' | transloco }}</label>
             <div id="emailHelp" class="form-text">German or English</div>
           </div>
         </div>
@@ -90,7 +90,7 @@
       <div class="form-row">
         <div class="col-12">
           <div class="form-group" style="margin-bottom: 20px">
-            <label>{{ 'general.screenshots' | transloco }} (optional):</label
+            <label>{{ 'g.screenshots' | transloco }} (optional):</label
             ><br />
             <div class="preview-images">
               <div
@@ -156,7 +156,7 @@
             class="form-group"
             style="padding-top: 0; margin-top: 0"
           >
-            <span>{{ 'general.protocol' | transloco }}:</span>
+            <span>{{ 'g.protocol' | transloco }}:</span>
             <textarea
               #bgProtocol
               [innerHTML]="visible ? bugService.getText() : ''"
@@ -172,7 +172,7 @@
   </div>
   <div class="modal-footer">
     <button (click)="close()" class="btn btn-secondary" type="button">
-      {{ 'general.abort' | transloco }}
+      {{ 'g.abort' | transloco }}
     </button>
     <button
       (click)="sendBugReport()"

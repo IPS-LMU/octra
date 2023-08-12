@@ -3,7 +3,9 @@ import { hasProperty } from '@octra/utilities';
 
 export type AlertType = 'danger' | 'warning' | 'info' | 'success';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AlertService {
   public alertInitialized = new EventEmitter<{
     id: number;

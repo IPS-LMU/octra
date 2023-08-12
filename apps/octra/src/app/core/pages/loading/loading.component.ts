@@ -56,7 +56,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
 
   ngOnInit() {
     this.langService
-      .selectTranslate('general.please wait')
+      .selectTranslate('g.please wait')
       .subscribe((translation) => {
         this.text = translation + '... ';
       });

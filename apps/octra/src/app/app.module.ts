@@ -72,6 +72,9 @@ import {
 import { APIEffects } from './core/store/api';
 import { PagesModule } from './core/pages/pages.module';
 import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import {
+  AuthenticationComponent
+} from './core/component/authentication-component/authentication-component.component';
 
 @NgModule({
   declarations: [AlertComponent, AppComponent, NavigationComponent],

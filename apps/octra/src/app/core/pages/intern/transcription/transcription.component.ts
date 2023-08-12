@@ -64,8 +64,7 @@ import { AuthenticationStoreService } from '../../../store/authentication';
 @Component({
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
-  styleUrls: ['./transcription.component.scss'],
-  providers: [AlertService],
+  styleUrls: ['./transcription.component.scss']
 })
 export class TranscriptionComponent
   extends DefaultComponent

@@ -50,7 +50,7 @@
             [routerLink]="['/login']"
             class="nav-link"
             (click)="isCollapsed = true"
-            >{{ 'general.login' | transloco }}</a
+            >{{ 'g.login' | transloco }}</a
           >
         </li>
         <li [routerLinkActive]="['active']" class="nav-item">
@@ -59,7 +59,7 @@
             [routerLink]="['/features']"
             class="nav-link"
             (click)="isCollapsed = true"
-            >{{ 'general.features' | transloco }}</a
+            >{{ 'g.features' | transloco }}</a
           >
         </li>
         <li [routerLinkActive]="['active']" class="nav-item">
@@ -68,7 +68,7 @@
             [routerLink]="['/news']"
             class="nav-link"
             (click)="isCollapsed = true"
-            >{{ 'general.news' | transloco }}</a
+            >{{ 'g.news' | transloco }}</a
           >
         </li>
         <li class="nav-item">
@@ -77,7 +77,7 @@
             href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/"
             target="_blank"
           >
-            {{ 'general.manual' | transloco }}
+            {{ 'g.manual' | transloco }}
           </a>
         </li>
         <li class="nav-item">
@@ -267,7 +267,7 @@
                 "
               >
                 <td>
-                  <span>{{ 'general.project' | transloco }}:</span>
+                  <span>{{ 'g.project' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{
@@ -282,7 +282,7 @@
                 "
               >
                 <td>
-                  <span>{{ 'general.free jobs' | transloco }}:</span>
+                  <span>{{ 'g.free jobs' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{
@@ -294,7 +294,7 @@
               </tr>
               <tr>
                 <td>
-                  <span>{{ 'general.name' | transloco }}:</span>
+                  <span>{{ 'g.name' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{ navbarServ.ressource!.info!.fullname }}</span>
@@ -302,7 +302,7 @@
               </tr>
               <tr>
                 <td>
-                  <span>{{ 'general.duration' | transloco }}:</span>
+                  <span>{{ 'g.duration' | transloco }}:</span>
                 </td>
                 <td>
                   <span
@@ -319,7 +319,7 @@
               </tr>
               <tr>
                 <td>
-                  <span>{{ 'general.sampleRate' | transloco }}:</span>
+                  <span>{{ 'g.sampleRate' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{ navbarServ.ressource!.info!.sampleRate }}</span>
@@ -327,7 +327,7 @@
               </tr>
               <tr>
                 <td>
-                  <span>{{ 'general.bitspersecond' | transloco }}:</span>
+                  <span>{{ 'g.bitspersecond' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{ navbarServ.ressource!.info!.bitrate }} Bit/s</span>
@@ -335,7 +335,7 @@
               </tr>
               <tr>
                 <td>
-                  <span>{{ 'general.filesize' | transloco }}:</span>
+                  <span>{{ 'g.filesize' | transloco }}:</span>
                 </td>
                 <td>
                   <span
@@ -351,7 +351,7 @@
                 "
               >
                 <td>
-                  <span>{{ 'general.id' | transloco }}:</span>
+                  <span>{{ 'g.id' | transloco }}:</span>
                 </td>
                 <td>
                   <span>{{ appStorage.currentTask?.id }}</span>
@@ -371,7 +371,7 @@
           <a (mouseup)="openToolsModal()" class="nav-link">
             <i class="bi bi-tools navbar-icon"></i>
             <span class="d-md-none d-lg-inline">
-              {{ 'general.tools' | transloco }}</span
+              {{ 'g.tools' | transloco }}</span
             >
           </a>
         </li>
@@ -386,7 +386,7 @@
           <a (mouseup)="openExportModal()" class="nav-link">
             <i class="bi bi-download navbar-icon"></i>
             <span class="d-md-none d-lg-inline">
-              {{ 'general.export' | transloco }}</span
+              {{ 'g.export' | transloco }}</span
             >
           </a>
         </li>
@@ -672,7 +672,7 @@
             >
             </i>
             <ng-container *ngIf="!appStorage.loggedIn">
-              {{ 'general.feedback' | transloco }}
+              {{ 'g.feedback' | transloco }}
             </ng-container>
           </a>
         </li>

@@ -3,9 +3,6 @@ import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from './authentication.actions';
 import { LoginMode, RootState } from '../index';
-import { SessionFile } from '../../obj/SessionFile';
-import { AudioManager } from '@octra/media';
-import { AppInfo } from '../../../app.info';
 
 @Injectable({
   providedIn: 'root',

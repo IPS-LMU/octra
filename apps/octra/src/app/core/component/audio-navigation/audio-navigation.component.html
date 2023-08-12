@@ -7,7 +7,7 @@
         *ngIf="!isAudioPlaying"
         [disabled]="!isReady"
         name="play"
-        [title]="'general.play' | transloco"
+        [title]="'g.play' | transloco"
       >
         <i class="bi bi-play-fill"></i>
       </button>
@@ -16,7 +16,7 @@
         *ngIf="isAudioPlaying"
         class="btn btn-info"
         name="pause"
-        [title]="'general.pause' | transloco"
+        [title]="'g.pause' | transloco"
       >
         <i class="bi bi-pause-fill"></i>
       </button>
@@ -24,7 +24,7 @@
         (mousedown)="onButtonClick('stop')"
         class="btn btn-info"
         name="stop"
-        [title]="'general.stop' | transloco"
+        [title]="'g.stop' | transloco"
       >
         <i class="bi bi-stop-fill"></i>
       </button>
@@ -33,7 +33,7 @@
         [ngClass]="{ active: replay }"
         class="btn btn-info"
         name="replay"
-        [title]="'general.replay' | transloco"
+        [title]="'g.replay' | transloco"
       >
         <i class="bi bi-rewind-fill"></i>
       </button>
@@ -41,7 +41,7 @@
         class="btn btn-info"
         (mousedown)="onButtonClick('backward')"
         name="step_back"
-        [title]="'general.backward' | transloco"
+        [title]="'g.backward' | transloco"
       >
         <i class="bi bi-reply-fill"></i>
       </button>
@@ -49,7 +49,7 @@
         class="btn btn-info"
         (mousedown)="onButtonClick('backward time')"
         name="step_back"
-        [title]="'general.backwardtime' | transloco"
+        [title]="'g.backwardtime' | transloco"
       >
         <i class="bi bi-arrow-counterclockwise"></i> - 2s
       </button>

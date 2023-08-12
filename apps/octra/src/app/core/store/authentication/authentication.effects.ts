@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
+import { HttpErrorResponse } from '@angular/common/http';
+import { SessionStorageService } from 'ngx-webstorage';
 import { TranslocoService } from '@ngneat/transloco';
 import {
   catchError,
@@ -29,6 +29,8 @@ import { AudioManager } from '@octra/media';
 import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
 import { joinURL } from '@octra/utilities';
+import { checkAndThrowError } from '../error.handlers';
+import { AlertService } from '../../shared/service';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -106,13 +108,13 @@ export class AuthenticationEffects {
 
               if (a.type === AuthenticationActions.loginOnline.do.type) {
                 if (!auth.me.last_login) {
-                  this.routingService.navigate("first login", ['/load'], {
+                  this.routingService.navigate('first login', ['/load'], {
                     queryParams: {
                       first_login: true,
                     },
                   });
                 } else {
-                  this.routingService.navigate("normal login", ['/load']);
+                  this.routingService.navigate('normal login', ['/load']);
                 }
                 return AuthenticationActions.loginOnline.success({
                   mode: LoginMode.ONLINE,
@@ -264,7 +266,7 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.logout.success),
         tap((a) => {
-          this.routingService.navigate("logout", ['/login']);
+          this.routingService.navigate('logout', ['/login']);
         })
       ),
     { dispatch: false }
@@ -313,7 +315,8 @@ export class AuthenticationEffects {
                 AuthenticationActions.redirectToProjects.do()
               );
             }
-          } else {
+          } else if (state.application.mode) {
+            console.log(`MODE IS ${state.application.mode}`);
             // is not online => load local configuration
             this.store.dispatch(
               LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
@@ -322,6 +325,12 @@ export class AuthenticationEffects {
                 mode: a.mode,
               })
             );
+          } else {
+            console.log(`MODE IS UNDEFINED`);
+            // mode is undefined
+            this.routingService.navigate('redirect because mode is undefined', [
+              '/login',
+            ]);
           }
         })
       ),
@@ -345,7 +354,10 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.redirectToProjects.do),
         tap((a) => {
-          this.routingService.navigate("redirect to projects after authentication", ['/intern/projects']);
+          this.routingService.navigate(
+            'redirect to projects after authentication',
+            ['/intern/projects']
+          );
         })
       ),
     { dispatch: false }
@@ -366,10 +378,22 @@ export class AuthenticationEffects {
             )
           ),
           catchError((error: HttpErrorResponse) =>
-            of(
+            checkAndThrowError(
+              {
+                statusCode: error.status,
+                message: error.error?.message ?? error.message,
+              },
+              a,
               LoginModeActions.loadCurrentAccountInformation.fail({
                 error: error.error.message ?? error.message,
-              })
+              }),
+              this.store,
+              () => {
+                this.alertService.showAlert(
+                  'danger',
+                  error.error?.message ?? error.message
+                );
+              }
             )
           )
         );
@@ -426,7 +450,7 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.continueSessionAfterAgreement.success),
         tap((a) => {
           this.routingService.navigate(
-              "continue after agreement",
+            'continue after agreement',
             ['/load'],
             { queryParams: a.params },
             null
@@ -442,8 +466,11 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.needReAuthentication.do),
         tap((a) => {
           if (!this.reauthenticationRef) {
-            // TODO change
-            // this.reauthenticationRef = this.modalsService.openReAuthenticationModal(this.apiService.authType, a.actionAfterSuccess);
+            this.reauthenticationRef =
+              this.modalsService.openReAuthenticationModal(
+                this.apiService.authType,
+                a.actionAfterSuccess
+              );
           }
         })
       ),
@@ -489,7 +516,7 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.loginOnline.redirecttourl),
         tap((a) => {
-          setTimeout(()=> {
+          setTimeout(() => {
             document.location.href = a.url;
           }, 1000);
         })
@@ -513,8 +540,7 @@ export class AuthenticationEffects {
     private store: Store<RootState>,
     private apiService: OctraAPIService,
     // private settingsService: AppSettingsService,
-    private http: HttpClient,
-    private localStorageService: LocalStorageService,
+    private alertService: AlertService,
     private sessionStorageService: SessionStorageService,
     private transloco: TranslocoService,
     private routingService: RoutingService,

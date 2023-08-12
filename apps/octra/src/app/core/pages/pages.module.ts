@@ -14,6 +14,7 @@ import { AppSharedModule } from '../../app.shared.module';
 import { MaintenanceModule } from '../component/maintenance/maintenance.module';
 import { RouterModule } from '@angular/router';
 import { BrowserTestComponent } from './browser-test';
+import {ModalsModule} from '../modals/modals.module';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { BrowserTestComponent } from './browser-test';
     AppSharedModule,
     RouterModule,
     TranslocoModule,
+    ModalsModule,
   ],
   bootstrap: [],
   providers: [],

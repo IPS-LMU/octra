@@ -3,7 +3,7 @@
     class="modal-header bg-danger text-light text-left justify-content-start"
   >
     <i class="bi bi-exclamation-triangle me-1"></i>
-    {{ 'general.error' | transloco }}
+    {{ 'g.error' | transloco }}
   </div>
   <div class="modal-body">
     <p [innerHTML]="text ? text : ''"></p>
@@ -15,7 +15,7 @@
       data-dismiss="modal"
       type="button"
     >
-      {{ 'general.OK' | transloco }}
+      {{ 'g.OK' | transloco }}
     </button>
   </div>
 </div>

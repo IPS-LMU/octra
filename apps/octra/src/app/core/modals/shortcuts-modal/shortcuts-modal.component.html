@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      {{ 'general.shortcuts' | transloco }} {{ appStorage.interface }}
+      {{ 'g.shortcuts' | transloco }} {{ appStorage.interface }}
     </h5>
     <button
       type="button"
@@ -25,7 +25,7 @@
                 [shortcut]="getShortcut(entry, platform)"
               ></octra-shortcut>
               <span *ngIf="entry.focusonly" class="focus-info"
-                >({{ 'general.on focus only' | transloco }} )</span
+                >({{ 'g.on focus only' | transloco }} )</span
               >
             </td>
           </tr>
@@ -44,7 +44,7 @@
                   [shortcut]="getShortcut(entry, platform)"
                 ></octra-shortcut>
                 <span *ngIf="entry.focusonly" class="focus-info"
-                  >({{ 'general.on focus only' | transloco }} )</span
+                  >({{ 'g.on focus only' | transloco }} )</span
                 >
               </td>
             </tr>
@@ -55,7 +55,7 @@
   </div>
   <div class="modal-footer">
     <button (click)="close()" class="btn btn-primary" type="button">
-      {{ 'general.close' | transloco }}
+      {{ 'g.close' | transloco }}
     </button>
   </div>
 </div>

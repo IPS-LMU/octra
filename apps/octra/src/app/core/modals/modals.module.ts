@@ -45,6 +45,8 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
+import { AuthenticationComponent } from '../component/authentication-component/authentication-component.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -82,6 +84,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NamingDragAndDropComponent,
     ShortcutComponent,
     TableConfiguratorComponent,
+    ReAuthenticationModalComponent,
+    AuthenticationComponent,
   ],
   imports: [
     CommonModule,
@@ -119,6 +123,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     TranscriptionStopModalComponent,
     YesNoModalComponent,
     ProtectedModalComponent,
+    AuthenticationComponent,
   ],
 })
 export class ModalsModule {}

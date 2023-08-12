@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      {{ 'general.overview' | transloco }}
+      {{ 'g.overview' | transloco }}
     </h5>
     <button
       type="button"
@@ -28,7 +28,7 @@
           border-right: 1px solid lightgray;
         "
       >
-        <h4>{{ 'general.statistics' | transloco }}</h4>
+        <h4>{{ 'g.statistics' | transloco }}</h4>
 
         <table class="table table-bordered" id="statistics">
           <thead>
@@ -55,14 +55,14 @@
         <p [hidden]="shownSegments.length === 0" style="text-align: center">
           <ng-container *ngIf="validationFound">
             <span *ngIf="foundErrors === 0" class="text-success found-errors">{{
-              'general.no errors found' | transloco
+              'g.no errors found' | transloco
             }}</span>
           </ng-container>
         </p>
         <div *ngIf="foundErrors > 0">
           <div class="text-danger found-errors">
             {{
-              'general.errors found' | transloco : { errors: foundErrors + '' }
+              'g.errors found' | transloco : { errors: foundErrors + '' }
             }}<br />
             {{ 'modal.overview.check transcription' | transloco }}
           </div>
@@ -71,7 +71,7 @@
             (click)="switchToTRNEditor()"
           >
             {{
-              'general.switch to'
+              'g.switch to'
                 | transloco
                   : {
                       editor: 'interfaces.TRN editor' | transloco
@@ -191,7 +191,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary" (click)="close(true)" type="button">
-      {{ 'general.close' | transloco }}
+      {{ 'g.close' | transloco }}
     </button>
   </div>
 </div>

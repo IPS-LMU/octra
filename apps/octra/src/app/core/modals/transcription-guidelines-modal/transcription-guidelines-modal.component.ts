@@ -130,7 +130,7 @@ export class TranscriptionGuidelinesModalComponent
       document.body.appendChild(form);
 
       const jsonObj = {
-        translation: this.lang.translate('general'),
+        translation: this.lang.translate('g'),
         guidelines: this.guidelines,
       };
 

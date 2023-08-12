@@ -1,24 +1,26 @@
-const fs = require("fs");
+const fs = require('fs-extra');
 
 const path = require('path');
-const {NodeSSH} = require('node-ssh');
+const { NodeSSH } = require('node-ssh');
 const process = require('process');
 const ssh = new NodeSSH();
 
-const configText = fs.readFileSync("./deploy.config.json", {
-  encoding: "utf8"
+const configText = fs.readFileSync('./deploy.config.json', {
+  encoding: 'utf8',
 });
 const config = JSON.parse(configText);
 
 console.log(`connect via ssh...`);
 const timeStamp = getDateTimeString();
 
-start().then(() => {
-  console.log(`finished`);
-  process.exit();
-}).catch((error) => {
-  console.log(error);
-});
+start()
+  .then(() => {
+    console.log(`finished`);
+    process.exit();
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 async function start() {
   try {
@@ -29,38 +31,54 @@ async function start() {
       username: config.server.userName,
       password: config.server.password,
       tryKeyboard: true,
-      port: config.server.port
+      port: config.server.port,
     });
     console.log(`connected!`);
     try {
-      fs.unlinkSync(`${config.distPath}.DS_Store`);
-    } catch (e) {
-    }
+      await fs.unlink(`${config.distPath}.DS_Store`);
+    } catch (e) {}
 
-    if (config.hasOwnProperty("groups") && Array.isArray(config.groups)) {
+    if (config.hasOwnProperty('groups') && Array.isArray(config.groups)) {
       for (const group of config.groups) {
         // replace base-href
 
-        let indexHTMLOriginal = fs.readFileSync(`${config.distPath}index.html`, {
-          encoding: "utf8"
-        });
+        let indexHTMLOriginal = fs.readFileSync(
+          `${config.distPath}index.html`,
+          {
+            encoding: 'utf8',
+          }
+        );
 
         for (const listElement of group.list) {
           let indexHTML = indexHTMLOriginal;
-          indexHTML = indexHTML.replace(/(<base href=")[^"]+(">)/g, `$1${listElement.baseHref}$2`);
+          indexHTML = indexHTML.replace(
+            /(<base href=")[^"]+(">)/g,
+            `$1${listElement.baseHref}$2`
+          );
 
-          if (listElement.hasOwnProperty("robots") && listElement.robots === true) {
-            indexHTML = indexHTML.replace(/(<meta name="robots" content="noindex">)/g, "");
+          if (
+            listElement.hasOwnProperty('robots') &&
+            listElement.robots === true
+          ) {
+            indexHTML = indexHTML.replace(
+              /(<meta name="robots" content="noindex">)/g,
+              ''
+            );
           }
 
           fs.writeFileSync(`${config.distPath}index.html`, indexHTML, {
-            encoding: "utf8"
+            encoding: 'utf8',
           });
           console.log(`indexed html changed for ${listElement.baseHref}`);
 
           try {
             console.log(`backup ${listElement.path} ...`);
-            await backupDir(ssh, listElement.path, "/raid/r29/WWW/htdocs/apps/octra/backups/");
+            await backupDir(
+              ssh,
+              listElement.path,
+              '/raid/r29/WWW/htdocs/apps/octra/backups/'
+            );
+            console.log('backup ok');
 
             try {
               console.log(`remove folders from ssh...`);
@@ -71,25 +89,32 @@ async function start() {
               const successful = [];
 
               try {
-                const status = await ssh.putDirectory(`${config.distPath}`, listElement.path, {
-                  recursive: true,
-                  concurrency: 1,
-                  validate: function (itemPath) {
-                    const baseName = path.basename(itemPath);
-                    return baseName !== ".DS_Store";
-                  },
-                  tick: function (localPath, remotePath, error) {
-                    if (error) {
-                      failed.push(localPath)
-                      console.log(`failed: ${localPath}`);
-                    } else {
-                      successful.push(localPath)
-                    }
+                const status = await ssh.putDirectory(
+                  `${config.distPath}`,
+                  listElement.path,
+                  {
+                    recursive: true,
+                    concurrency: 1,
+                    validate: function (itemPath) {
+                      const baseName = path.basename(itemPath);
+                      return baseName !== '.DS_Store';
+                    },
+                    tick: function (localPath, remotePath, error) {
+                      if (error) {
+                        failed.push(localPath);
+                        console.log(`failed: ${localPath}`);
+                      } else {
+                        successful.push(localPath);
+                      }
+                    },
                   }
-                });
+                );
 
                 success = success && failed.length === 0;
-                console.log('the directory transfer was', status ? 'successful' : 'unsuccessful');
+                console.log(
+                  'the directory transfer was',
+                  status ? 'successful' : 'unsuccessful'
+                );
                 console.log('failed transfers:', failed.length);
                 console.log('successful transfers:', successful.length);
                 console.log(`---------`);
@@ -114,17 +139,18 @@ async function start() {
   }
 }
 
-ssh.connect({
-  host: config.server.host,
-  username: config.server.userName,
-  password: config.server.password,
-  tryKeyboard: true,
-  port: config.server.port
-}).then(() => {
-}).catch((error) => {
-  console.log(error);
-});
-
+ssh
+  .connect({
+    host: config.server.host,
+    username: config.server.userName,
+    password: config.server.password,
+    tryKeyboard: true,
+    port: config.server.port,
+  })
+  .then(() => {})
+  .catch((error) => {
+    console.log(error);
+  });
 
 function clearRemote(distPath, remotePath) {
   const files = fs.readdirSync(distPath);
@@ -136,18 +162,28 @@ function clearRemote(distPath, remotePath) {
   return Promise.all(promises);
 }
 
-function backupDir(ssh, remotePath, backupDir) {
+async function backupDir(ssh, remotePath, backupDir) {
   return new Promise((resolve, reject) => {
     let tmpPath = remotePath.substr(0, remotePath.length - 1);
-    const dirName = tmpPath.substr(tmpPath.lastIndexOf("/") + 1);
+    const dirName = tmpPath.substring(tmpPath.lastIndexOf('/') + 1);
 
-    ssh.execCommand(`cp -rf ${remotePath} ${backupDir}${timeStamp}_${dirName}`).then(function (result) {
-      if (result.stderr) {
-        reject();
-      } else {
-        resolve();
-      }
-    });
+    console.log(`cp -rf ${remotePath} ${backupDir}${timeStamp}_${dirName}`);
+    ssh
+      .execCommand(`cp -rf ${remotePath} ${backupDir}${timeStamp}_${dirName}`)
+      .then(function (result) {
+        console.log('copy result');
+        console.log(result);
+
+        if (result.stderr) {
+          reject(result.stderr);
+        } else {
+          resolve();
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        reject(e);
+      });
   });
 }
 

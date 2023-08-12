@@ -20,7 +20,7 @@ const json = JSON.parse(packageText);
 version = json.version;
 
 if (process.argv[2] === "dev=true") {
-  dev = "--configuration development";
+  dev = "--configuration=development";
 }
 
 if (process.argv[3] === "isUpdate=true") {
@@ -34,11 +34,14 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
-const command = ["--max-old-space-size=12000", "./node_modules/@nrwl/cli/bin/nx", "build",  "octra", "--prod", "--configuration=public-dev", `--base-href=${baseHref}`];
+const command = ["./node_modules/@nrwl/cli/bin/nx", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`, '--skip-nx-cache'];
 
-if (dev === "") {
+if (dev !== "") {
+  command.splice(3, 1);
+} else {
   command.splice(4, 1);
 }
+console.log(command.join(" "));
 
 const node = spawn("node", command);
 node.stdout.on("data", function(data) {
@@ -73,6 +76,7 @@ node.on("exit", function(code) {
   indexHTML = indexHTML.replace(/(runtime-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(runtime\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(styles\.[0-9a-z]*\.css)/g, `${targetFolder}/$1`);
+  indexHTML = indexHTML.replace(/(vendor\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(const octraLastUpdated = ").*(";)/g, `$1${timeNow}$2`);
   indexHTML = indexHTML.replace(/(const octraVersion = ").*(";)/g, `$1${version}$2`);
 

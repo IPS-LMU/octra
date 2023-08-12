@@ -334,13 +334,15 @@ export class LoginModeReducers {
         };
         break;
       case 'sessionfile':
-        state = {
-          ...state,
-          sessionFile: {
-            ...state.sessionFile,
-            ...value,
-          },
-        };
+        if(state.sessionFile) {
+          state = {
+            ...state,
+            sessionFile: {
+              ...state.sessionFile,
+              ...value,
+            },
+          };
+        }
         break;
     }
 

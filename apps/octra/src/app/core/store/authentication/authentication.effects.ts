@@ -1,26 +1,34 @@
-import {Injectable} from '@angular/core';
-import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {Store} from '@ngrx/store';
-import {OctraAPIService} from '@octra/ngx-octra-api';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
-import {TranslocoService} from '@ngneat/transloco';
-import {catchError, exhaustMap, from, map, of, tap, withLatestFrom,} from 'rxjs';
-import {AuthenticationActions} from './authentication.actions';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {LoginMode, RootState} from '../index';
-import {OctraModalService} from '../../modals/octra-modal.service';
-import {RoutingService} from '../../shared/service/routing.service';
-import {ErrorModalComponent} from '../../modals/error-modal/error-modal.component';
-import {LoginModeActions} from '../login-mode/login-mode.actions';
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { OctraAPIService } from '@octra/ngx-octra-api';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
+import { TranslocoService } from '@ngneat/transloco';
 import {
-    ModalDeleteAnswer,
-    TranscriptionDeleteModalComponent,
+  catchError,
+  exhaustMap,
+  from,
+  map,
+  of,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
+import { AuthenticationActions } from './authentication.actions';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { LoginMode, RootState } from '../index';
+import { OctraModalService } from '../../modals/octra-modal.service';
+import { RoutingService } from '../../shared/service/routing.service';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
+import {
+  ModalDeleteAnswer,
+  TranscriptionDeleteModalComponent,
 } from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import {AudioManager} from '@octra/media';
-import {AppInfo} from '../../../app.info';
-import {SessionFile} from '../../obj/SessionFile';
-import {joinURL} from '@octra/utilities';
+import { AudioManager } from '@octra/media';
+import { AppInfo } from '../../../app.info';
+import { SessionFile } from '../../obj/SessionFile';
+import { joinURL } from '@octra/utilities';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -34,78 +42,89 @@ export class AuthenticationEffects {
       exhaustMap(([a, state]) => {
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((auth) => {
-              if (auth.openURL !== undefined) {
-                  // need to open windowURL
-                  const cid = Date.now();
-                  let url = `${auth.openURL}`;
-                  localStorage.setItem('cid', cid.toString());
+            if (auth.openURL !== undefined) {
+              // need to open windowURL
+              const cid = Date.now();
+              let url = `${auth.openURL}`;
+              localStorage.setItem('cid', cid.toString());
 
-                  if (a.type === AuthenticationActions.loginOnline.do.type) {
-                      // redirect directly
-                      url = `${url}?cid=${cid}&r=${encodeURIComponent(document.location.href)}`;
+              if (a.type === AuthenticationActions.loginOnline.do.type) {
+                // redirect directly
+                url = `${url}?cid=${cid}&r=${encodeURIComponent(
+                  joinURL(
+                    document.location.href.replace(/login\/?/g, ''),
+                    'intern',
+                    'projects'
+                  )
+                )}`;
 
-                      if (auth.agreementToken) {
-                          url = `${url}&t=${auth.agreementToken}`;
-                          this.sessionStorageService.store('authType', a.method);
-                          this.sessionStorageService.store('authenticated', false);
-                      }
-
-                      document.location.href = url;
-
-                      return AuthenticationActions.loginOnline.success({
-                          mode: LoginMode.ONLINE,
-                          auth,
-                          method: a.method,
-                      });
-                  } else {
-                      // redirect to new tab
-                      const match = /(.+\/intern\/)/g.exec(document.location.href);
-                      const baseURL = match && match.length === 2 ? match[1] : document.location.href;
-                      console.log('OPEN WINDOW');
-                      console.log(joinURL(baseURL, 're-authentication'));
-
-                      const bc = new BroadcastChannel('ocb_authentication');
-                      bc.addEventListener('message', (e) => {
-                          if (e.data === true) {
-                              this.store.dispatch(
-                                  AuthenticationActions.needReAuthentication.success({
-                                      actionAfterSuccess: a.actionAfterSuccess,
-                                  })
-                              );
-                              bc.close();
-                          }
-                      });
-
-                      window.open(`${url}?cid=${cid}&r=${encodeURIComponent(joinURL(baseURL, 're-authentication'))}`, '_blank');
-
-                      return AuthenticationActions.reauthenticate.wait();
-                  }
-              } else if (auth.me) {
-                  this.sessionStorageService.store('webToken', auth.accessToken);
+                if (auth.agreementToken) {
+                  url = `${url}&t=${auth.agreementToken}`;
                   this.sessionStorageService.store('authType', a.method);
-                  this.sessionStorageService.store('authenticated', true);
+                  this.sessionStorageService.store('authenticated', false);
+                }
 
-                  if (a.type === AuthenticationActions.loginOnline.do.type) {
-                      if (!auth.me.last_login) {
-                          this.routingService.navigate(['/loading'], {
-                              queryParams: {
-                                  first_login: true,
-                              },
-                          });
-                      } else {
-                          this.routingService.navigate(['/loading']);
-                      }
-                      return AuthenticationActions.loginOnline.success({
-                          mode: LoginMode.ONLINE,
-                          auth,
-                          method: a.method,
-                      });
-                  } else {
-                      return AuthenticationActions.needReAuthentication.success({
-                          actionAfterSuccess: a.actionAfterSuccess,
-                      });
+                return AuthenticationActions.loginOnline.redirecttourl({
+                  mode: LoginMode.ONLINE,
+                  url,
+                });
+              } else {
+                // redirect to new tab
+                const match = /(.+\/intern\/)/g.exec(document.location.href);
+                const baseURL =
+                  match && match.length === 2
+                    ? match[1]
+                    : document.location.href;
+                console.log('OPEN WINDOW');
+                console.log(joinURL(baseURL, 're-authentication'));
+
+                const bc = new BroadcastChannel('ocb_authentication');
+                bc.addEventListener('message', (e) => {
+                  if (e.data === true) {
+                    this.store.dispatch(
+                      AuthenticationActions.needReAuthentication.success({
+                        actionAfterSuccess: a.actionAfterSuccess,
+                      })
+                    );
+                    bc.close();
                   }
+                });
+
+                window.open(
+                  `${url}?cid=${cid}&r=${encodeURIComponent(
+                    joinURL(baseURL, 're-authentication')
+                  )}`,
+                  '_blank'
+                );
+
+                return AuthenticationActions.reauthenticate.wait();
               }
+            } else if (auth.me) {
+              this.sessionStorageService.store('webToken', auth.accessToken);
+              this.sessionStorageService.store('authType', a.method);
+              this.sessionStorageService.store('authenticated', true);
+
+              if (a.type === AuthenticationActions.loginOnline.do.type) {
+                if (!auth.me.last_login) {
+                  this.routingService.navigate("first login", ['/load'], {
+                    queryParams: {
+                      first_login: true,
+                    },
+                  });
+                } else {
+                  this.routingService.navigate("normal login", ['/load']);
+                }
+                return AuthenticationActions.loginOnline.success({
+                  mode: LoginMode.ONLINE,
+                  auth,
+                  method: a.method,
+                });
+              } else {
+                return AuthenticationActions.needReAuthentication.success({
+                  actionAfterSuccess: a.actionAfterSuccess,
+                });
+              }
+            }
 
             return AuthenticationActions.loginOnline.success({
               mode: LoginMode.LOCAL,
@@ -117,7 +136,9 @@ export class AuthenticationEffects {
             if (a.type === AuthenticationActions.loginOnline.do.type) {
               return of(AuthenticationActions.loginOnline.fail({ error: err }));
             } else {
-              return of(AuthenticationActions.reauthenticate.fail({ error: err }));
+              return of(
+                AuthenticationActions.reauthenticate.fail({ error: err })
+              );
             }
           })
         );
@@ -243,7 +264,7 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.logout.success),
         tap((a) => {
-          this.routingService.navigate(['/login']);
+          this.routingService.navigate("logout", ['/login']);
         })
       ),
     { dispatch: false }
@@ -324,7 +345,46 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.redirectToProjects.do),
         tap((a) => {
-          this.routingService.navigate(['/intern/projects']);
+          this.routingService.navigate("redirect to projects after authentication", ['/intern/projects']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  loadCurrentAccountInformation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LoginModeActions.loadCurrentAccountInformation.do),
+      exhaustMap((a) => {
+        return this.apiService.getMyAccountInformation().pipe(
+          exhaustMap((me) =>
+            of(
+              LoginModeActions.loadCurrentAccountInformation.success({
+                mode: a.mode,
+                actionAfterSuccess: a.actionAfterSuccess,
+                me,
+              })
+            )
+          ),
+          catchError((error: HttpErrorResponse) =>
+            of(
+              LoginModeActions.loadCurrentAccountInformation.fail({
+                error: error.error.message ?? error.message,
+              })
+            )
+          )
+        );
+      })
+    )
+  );
+
+  loadCurrentAccountInformationSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(LoginModeActions.loadCurrentAccountInformation.success),
+        tap((a) => {
+          if (a.actionAfterSuccess) {
+            return this.store.dispatch(a.actionAfterSuccess);
+          }
         })
       ),
     { dispatch: false }
@@ -366,6 +426,7 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.continueSessionAfterAgreement.success),
         tap((a) => {
           this.routingService.navigate(
+              "continue after agreement",
             ['/load'],
             { queryParams: a.params },
             null
@@ -407,6 +468,7 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.loginOnline.fail),
         tap((a) => {
+          console.log('show error on login fail');
           this.modalsService.openModal(
             ErrorModalComponent,
             ErrorModalComponent.options,
@@ -417,6 +479,19 @@ export class AuthenticationEffects {
                   : a.error?.message ?? a.error.error?.message,
             }
           );
+        })
+      ),
+    { dispatch: false }
+  );
+
+  redirectToURL$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.loginOnline.redirecttourl),
+        tap((a) => {
+          setTimeout(()=> {
+            document.location.href = a.url;
+          }, 1000);
         })
       ),
     { dispatch: false }

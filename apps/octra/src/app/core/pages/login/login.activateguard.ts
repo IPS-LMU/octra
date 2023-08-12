@@ -9,12 +9,13 @@ import {
 import { map, Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
+import {RoutingService} from '../../shared/service/routing.service';
 
 @Injectable()
 export class ALoginGuard implements CanActivate {
   constructor(
     private appStoreService: ApplicationStoreService,
-    private router: Router
+    private routingService: RoutingService
   ) {}
 
   canActivate(
@@ -29,7 +30,7 @@ export class ALoginGuard implements CanActivate {
           params.fragment = route.fragment!;
           params.queryParams = route.queryParams;
 
-          this.router.navigate(['/intern/transcr'], params).catch((error) => {
+          this.routingService.navigate("login guard", ['/intern/transcr'], params).catch((error) => {
             console.error(error);
           });
           return false;

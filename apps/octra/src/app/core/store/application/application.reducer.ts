@@ -58,6 +58,10 @@ export const reducer = createReducer(
     ...state,
     initialized: true,
   })),
+  on(AuthenticationActions.loginOnline.redirecttourl, (state: ApplicationState) => ({
+    ...state,
+    mode: LoginMode.ONLINE
+  })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {

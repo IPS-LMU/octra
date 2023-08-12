@@ -29,7 +29,7 @@ export const APP_INITIALIZED_GUARD: CanActivateFn = (
   return inject(ApplicationStoreService).appInitialized.pipe(
     map((a) => {
       if (!a) {
-        routingService.navigate(['/load'], AppInfo.queryParamsHandling);
+        routingService.navigate("guard app init, to load", ['/load'], AppInfo.queryParamsHandling);
       }
       return a;
     })

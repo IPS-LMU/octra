@@ -171,7 +171,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
           this.transcrService.init();
-          this.routingService.navigate(['/load/']);
+          this.routingService.navigate("start annotation", ['/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
               audioFile: a.task.inputs.find(
@@ -292,6 +292,7 @@ export class AnnotationEffects {
           if (state.application.mode === LoginMode.LOCAL) {
             this.routingService
               .navigate(
+                  "reload aufio local",
                 ['/intern/transcr/reload-file'],
                 AppInfo.queryParamsHandling
               )
@@ -310,6 +311,7 @@ export class AnnotationEffects {
         ofType(LoginModeActions.endTranscription.do),
         tap((a) => {
           this.routingService.navigate(
+            "end transcription",
             ['/intern/transcr/end'],
             AppInfo.queryParamsHandling
           );
@@ -383,6 +385,7 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.showNoRemainingTasksModal.do),
         tap((a) => {
+          console.log('show error modal on no remaining tasks');
           const ref = this.modalsService.openModalRef(
             ErrorModalComponent,
             ErrorModalComponent.options
@@ -495,6 +498,7 @@ export class AnnotationEffects {
 
                     console.log('INIT TRANSCR OKOKOKO');
                     this.routingService.navigate(
+                      "transcript initialized URL",
                       ['/intern/transcr'],
                       AppInfo.queryParamsHandling
                     );
@@ -532,6 +536,7 @@ export class AnnotationEffects {
                   console.log('INIT TRANSCR OK:');
                   console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
+                    "transcription initialized",
                     ['/intern/transcr'],
                     AppInfo.queryParamsHandling
                   );
@@ -902,6 +907,7 @@ export class AnnotationEffects {
       ofType(AnnotationActions.redirectToProjects.do),
       exhaustMap((a) => {
         this.routingService.navigate(
+          "redirect to projects after quit",
           ['/intern/projects'],
           AppInfo.queryParamsHandling
         );
@@ -941,6 +947,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.redirectToTranscription.do),
         tap((a) => {
           this.routingService.navigate(
+            'redirect to transcription loadOnlineInformationAfterIDBLoaded',
             ['/intern/transcr'],
             AppInfo.queryParamsHandling
           );

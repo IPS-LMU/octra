@@ -17,13 +17,13 @@ export class APIEffects {
           a.url,
           a.appToken,
           a.webToken,
-          environment.production
+          environment.useCookies
         );
         return of(
           APIActions.init.success({
-            authenticated: a.authenticated,
-            webToken: a.webToken,
-            authType: a.authType,
+            authenticated: this.apiService.authenticated,
+            webToken: this.apiService.webToken,
+            authType: a.authType || this.apiService.authType,
             url: a.url,
           })
         );

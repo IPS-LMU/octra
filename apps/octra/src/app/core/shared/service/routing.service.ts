@@ -3,6 +3,7 @@ import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SubscriptionManager } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class RoutingService {
   private _staticQueryParams: any = {};
 
   private readonly subscrManager = new SubscriptionManager<Subscription>();
+
   // Observable exposing the breadcrumb hierarchy
   constructor(
     private router: Router,
@@ -35,12 +37,18 @@ export class RoutingService {
   }
 
   public async navigate(
+    label: string,
     commands: any[],
     extras?: NavigationExtras,
     queryParamsHandling: QueryParamsHandling | null | undefined = 'merge'
   ) {
-    console.error(`RS navigate to ${commands.join('/')}`);
     try {
+      if (
+        environment.debugging.enabled &&
+        environment.debugging.logging.routes
+      ) {
+        console.log(`[RS/${label}] navigate to ${commands.join('/')}`);
+      }
       await this.router.navigate(commands, {
         ...extras,
         queryParams: {

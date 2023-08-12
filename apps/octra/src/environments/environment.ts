@@ -6,4 +6,12 @@
 export const environment = {
   production: false,
   dev_version: true,
+  useCookies: false,
+  debugging: {
+    enabled: true,
+    logging: {
+      actions: true,
+      routes: true
+    }
+  }
 };

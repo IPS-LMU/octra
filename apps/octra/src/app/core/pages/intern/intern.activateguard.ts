@@ -16,7 +16,7 @@ export const AUTHENTICATED_GUARD: CanActivateFn = (
   const appStorage = inject(AppStorageService);
   const router = inject(Router);
 
-  if (appStorage.loggedIn !== true) {
+  if (!appStorage.loggedIn) {
     console.log(`members area logged in false`);
     const params = AppInfo.queryParamsHandling;
     params.fragment = route.fragment!;

@@ -1,5 +1,6 @@
 import { createActionGroup, props } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
+import {LoginMode} from '../index';
 
 export class APIActions {
   static init = createActionGroup({

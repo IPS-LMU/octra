@@ -13,7 +13,7 @@ export class ConfigurationService {
     schema: any
   ): ErrorObject<string, Record<string, any>, unknown>[] {
     if (!(json === undefined) && !(schema === undefined)) {
-      const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
+      const ajv = new Ajv({allErrors:true, strict: "log"}); // options can be passed, e.g. {allErrors: true}
       const validate = ajv.compile(schema);
       validate(json);
       return validate.errors ?? [];

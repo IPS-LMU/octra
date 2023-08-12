@@ -478,7 +478,7 @@ export class IDBEffects {
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
         AuthenticationActions.loginLocal.success,
-        LoginModeActions.startAnnotation.do
+        LoginModeActions.startAnnotation.success
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]) => {
@@ -487,9 +487,13 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
+            console.log("SAVE MODE STATE");
+            console.log(`mode is ${action.mode}`)
+            console.log(`current project is`);
+            console.log(modeState.currentSession?.currentProject)
           return this.idbService
             .saveModeOptions((action as any).mode, {
-              sessionfile: modeState?.sessionFile?.toAny() ?? null,
+              sessionfile: modeState && modeState.sessionFile && Object.keys(modeState.sessionFile).length > 0 ? modeState.sessionFile.toAny() : null,
               currentEditor: modeState.currentEditor ?? null,
               logging: modeState.logging ?? null,
               project: modeState.currentSession?.loadFromServer
@@ -1098,6 +1102,18 @@ export class IDBEffects {
         return subject;
       })
     )
+  );
+
+  saveModeBeforeURLRedirection$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.loginOnline.redirecttourl),
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          this.idbService.saveOption('usemode', LoginMode.ONLINE);
+        })
+      ),
+    { dispatch: false }
   );
 
   constructor(

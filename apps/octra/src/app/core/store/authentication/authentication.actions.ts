@@ -22,6 +22,10 @@ export class AuthenticationActions {
         username?: string;
         password?: string;
       }>(),
+      redirectToURL: props<{
+        mode: LoginMode;
+        url: string;
+      }>(),
       success: props<{
         mode: LoginMode;
         method: AccountLoginMethod;

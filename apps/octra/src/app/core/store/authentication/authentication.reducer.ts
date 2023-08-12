@@ -26,6 +26,15 @@ export const authenticationReducer = createReducer(
     }
   ),
   on(
+    LoginModeActions.loadCurrentAccountInformation.success,
+    (state: AuthenticationState, { me }) => {
+      return {
+        ...state,
+        me,
+      };
+    }
+  ),
+  on(
     AuthenticationActions.loginDemo.success,
     AuthenticationActions.loginLocal.success,
     (state: AuthenticationState) => {

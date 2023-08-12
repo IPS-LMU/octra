@@ -1,6 +1,5 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { LoadingComponent } from '../loading';
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { AUTHENTICATED_GUARD } from './intern.activateguard';
 import { TranscriptionComponent } from './transcription';

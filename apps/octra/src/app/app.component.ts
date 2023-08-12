@@ -52,15 +52,19 @@ export class AppComponent
 
     this.appStoreService.initApplication();
 
-    this.router.events.subscribe((event: any) => {
-      if (event.url) {
-        console.log(`route from ${event.url} to page: ${event?.url}`);
-      } else if (event.snapshot) {
-        console.log(
-          `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
-        );
-      }
-    });
+    if (environment.debugging.enabled && environment.debugging.logging.routes) {
+      this.subscrManager.add(
+        this.router.events.subscribe((event: any) => {
+          if (event.url) {
+            console.log(`route from ${event.url} to page: ${event?.url}`);
+          } else if (event.snapshot) {
+            console.log(
+              `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
+            );
+          }
+        })
+      );
+    }
   }
 
   ngOnInit() {

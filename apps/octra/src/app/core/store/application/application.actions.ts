@@ -26,6 +26,14 @@ export class ApplicationActions {
     },
   });
 
+  static redirectToLastPage = createActionGroup({
+    source: 'app/redirect to last page',
+    events: {
+      do: emptyProps()
+    }
+  });
+
+
   static loadASRSettings = createActionGroup({
     source: 'app/load asr settings',
     events: {
@@ -49,7 +57,7 @@ export class ApplicationActions {
         settings: AppSettings;
       }>(),
       fail: props<{
-        error: HttpErrorResponse;
+        error: string;
       }>(),
     },
   });

@@ -39,6 +39,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -85,18 +86,27 @@ export class ApplicationEffects {
                 settings: appconfig,
               });
             } else {
+              console.log(validation);
               return ApplicationActions.loadSettings.fail({
-                error: new HttpErrorResponse({
-                  error: new Error('Appconfig is invalid.'),
-                }),
+                error: `<br/><ul>${validation
+                  .map(
+                    (v) =>
+                      '<li><b>' +
+                      v.instancePath +
+                      '</b>:<br/>' +
+                      v.message +
+                      '</li>'
+                  )
+                  .join('<br/>')}</ul>`,
               });
             }
+
             return ApplicationActions.changeLanguage.success();
           }),
           catchError((err: HttpErrorResponse) => {
             return of(
               ApplicationActions.loadSettings.fail({
-                error: err,
+                error: err.error?.message ?? err.message,
               })
             );
           })
@@ -292,6 +302,14 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.loadSettings.success),
       exhaustMap((a) => {
+        // set language
+        const language = this.localStorage.retrieve('language');
+        this.transloco.setAvailableLangs(a.settings.octra.languages);
+
+        this.transloco.setActiveLang(
+          language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en'
+        );
+
         const webToken = this.sessStr.retrieve('webToken');
         const authType = this.sessStr.retrieve('authType');
         const authenticated = this.sessStr.retrieve('authenticated');
@@ -318,17 +336,14 @@ export class ApplicationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           if (
-            state.application.appConfiguration!.octra.tracking !== undefined &&
-            state.application.appConfiguration!.octra.tracking.active !==
-              undefined &&
-            state.application.appConfiguration!.octra.tracking.active !== ''
+            state.application.appConfiguration?.octra?.tracking?.active &&
+            state.application.appConfiguration.octra.tracking.active !== ''
           ) {
             this.appendTrackingCode(
-              state.application.appConfiguration!.octra.tracking.active,
-              state.application.appConfiguration!
+              state.application.appConfiguration.octra.tracking.active,
+              state.application.appConfiguration
             );
           }
-
           this.store.dispatch(
             ApplicationActions.initApplication.success({
               playOnHover: this.sessStr.retrieve('playonhover') ?? false,
@@ -352,16 +367,44 @@ export class ApplicationEffects {
         tap(([a, state]) => {
           if (!state.application.loggedIn) {
             this.routerService.navigate(
+              'not logged in, back to login',
               ['/login'],
               AppInfo.queryParamsHandling
             );
           } else {
-            const lastPagePath = this.sessStr.retrieve('last_page_path');
-            if (lastPagePath) {
-              this.routerService.navigate([lastPagePath]);
+            if (
+              state.application.mode === LoginMode.ONLINE &&
+              state.authentication.authenticated &&
+              environment.useCookies
+            ) {
+              this.store.dispatch(
+                LoginModeActions.loadCurrentAccountInformation.do({
+                  mode: state.application.mode,
+                  actionAfterSuccess: state.onlineMode.currentSession
+                    ?.currentProject
+                    ? ApplicationActions.redirectToLastPage.do()
+                    : AuthenticationActions.redirectToProjects.do(),
+                })
+              );
             } else {
-              this.routerService.navigate(['/load']);
+              this.store.dispatch(ApplicationActions.redirectToLastPage.do());
             }
+          }
+        })
+      ),
+    { dispatch: false }
+  );
+
+  redirectToLastPage$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.redirectToLastPage.do),
+        tap((a) => {
+          const lastPagePath = this.sessStr.retrieve('last_page_path');
+          if (lastPagePath) {
+            this.routerService.navigate('last page', [lastPagePath]);
+          } else {
+            this.routerService.navigate('no last page', ['/load']);
           }
         })
       ),
@@ -383,17 +426,17 @@ export class ApplicationEffects {
             const selectedService = this.appStorage.asrSelectedService;
 
             /*
-                        const lang: ASRLanguage = this.asrService.getLanguageByCode(
-                          selectedLanguage,
-                          selectedService
-                        )!;
+                                                                                                                                                                                    const lang: ASRLanguage = this.asrService.getLanguageByCode(
+                                                                                                                                                                                      selectedLanguage,
+                                                                                                                                                                                      selectedService
+                                                                                                                                                                                    )!;
 
-                        if (lang !== undefined) {
-                          this.asrService.selectedLanguage = lang;
-                        } else {
-                          console.error('Could not read ASR language from database');
-                        }
-                         */
+                                                                                                                                                                                    if (lang !== undefined) {
+                                                                                                                                                                                      this.asrService.selectedLanguage = lang;
+                                                                                                                                                                                    } else {
+                                                                                                                                                                                      console.error('Could not read ASR language from database');
+                                                                                                                                                                                    }
+                                                                                                                                                                                     */
 
             if (!this.settingsService.responsive.enabled) {
               this.setFixedWidth();
@@ -466,6 +509,7 @@ export class ApplicationEffects {
             this.appStorage.useMode !== LoginMode.URL
           ) {
             this.routerService.navigate(
+              'annotation loaded, not logged in',
               ['/login'],
               AppInfo.queryParamsHandling
             );
@@ -479,10 +523,8 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.loadLanguage.do),
       exhaustMap((a) => {
-        const language = this.localStorage.retrieve('language');
-        this.transloco.setActiveLang(
-          language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en'
-        );
+        this.transloco.setAvailableLangs(['en']);
+        this.transloco.setActiveLang('en');
         return of(ApplicationActions.loadLanguage.success());
       })
     )
@@ -507,7 +549,11 @@ export class ApplicationEffects {
           subject.complete();
 
           this.routerService
-            .navigate(['/login'], AppInfo.queryParamsHandling)
+            .navigate(
+              'after logout success',
+              ['/login'],
+              AppInfo.queryParamsHandling
+            )
             .catch((error) => {
               console.error(error);
             });
@@ -523,7 +569,11 @@ export class ApplicationEffects {
       this.actions$.pipe(
         ofType(ApplicationActions.waitForEffects.do),
         tap((a) => {
-          this.routerService.navigate(['/load'], AppInfo.queryParamsHandling);
+          this.routerService.navigate(
+            'wait for effects',
+            ['/load'],
+            AppInfo.queryParamsHandling
+          );
         })
       ),
     { dispatch: false }
@@ -534,6 +584,7 @@ export class ApplicationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.startAnnotation.fail),
         tap((a) => {
+          console.log('show errror on start annotation fail');
           const ref = this.modalService.openModalRef(
             ErrorModalComponent,
             ErrorModalComponent.options,
@@ -541,6 +592,47 @@ export class ApplicationEffects {
               text: a.error,
             }
           );
+        })
+      ),
+    { dispatch: false }
+  );
+
+  logActionsToConsole$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        tap((action) => {
+          if (
+            environment.debugging.enabled &&
+            environment.debugging.logging.actions
+          ) {
+            console.groupCollapsed(`--- ACTION ${action.type} ---`);
+            console.log(action);
+            console.groupEnd();
+          }
+        })
+      ),
+    {
+      dispatch: false,
+    }
+  );
+
+  appLoadingFail$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.loadSettings.fail),
+        tap((a) => {
+          const ref = this.modalService.openModalRef<ErrorModalComponent>(
+            ErrorModalComponent,
+            {
+              ...ErrorModalComponent.options,
+              backdrop: 'static',
+            },
+            {
+              text: `Can't load application settings: ${a.error}`,
+            }
+          );
+
+          ref.componentInstance.showOKButton = false;
         })
       ),
     { dispatch: false }

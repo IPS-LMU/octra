@@ -4,7 +4,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoginMode } from '../../store';
 import { Store } from '@ngrx/store';
 import { OctraModalService } from '../../modals/octra-modal.service';
-import { Router } from '@angular/router';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-help-tools',
@@ -19,7 +19,7 @@ export class HelpToolsComponent {
     private api: APIService,
     private store: Store,
     private modalService: OctraModalService,
-    private router: Router
+    private routingService: RoutingService
   ) {}
 
   refreshApp() {
@@ -52,7 +52,7 @@ export class HelpToolsComponent {
           console.error(error);
         });
     } else {
-      this.router.navigate(['/login']);
+      this.routingService.navigate('navigate before forced reload', ['/login']);
       document.location.reload();
     }
   }

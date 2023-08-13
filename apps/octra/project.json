@@ -76,6 +76,21 @@
               "with": "apps/octra/src/environments/environment.dev.ts"
             }
           ]
+        },
+        "public-development": {
+          "outputHashing": "all",
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/octra/src/environments/environment.ts",
+              "with": "apps/octra/src/environments/environment.public.dev.ts"
+            }
+          ]
         }
       },
       "defaultConfiguration": "production"

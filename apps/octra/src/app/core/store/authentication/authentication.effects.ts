@@ -28,7 +28,7 @@ import {
 import { AudioManager } from '@octra/media';
 import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import { joinURL } from '@octra/utilities';
+import {joinURL, popupCenter} from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
 
@@ -72,13 +72,13 @@ export class AuthenticationEffects {
                 });
               } else {
                 // redirect to new tab
-                const match = /(.+\/intern\/)/g.exec(document.location.href);
+                const match = /(.+)\/load\/?/g.exec(document.location.href);
                 const baseURL =
                   match && match.length === 2
                     ? match[1]
                     : document.location.href;
                 console.log('OPEN WINDOW');
-                console.log(joinURL(baseURL, 're-authentication'));
+                console.log(joinURL(baseURL, 'auth-success'));
 
                 const bc = new BroadcastChannel('ocb_authentication');
                 bc.addEventListener('message', (e) => {
@@ -92,11 +92,13 @@ export class AuthenticationEffects {
                   }
                 });
 
-                window.open(
+                popupCenter(
                   `${url}?cid=${cid}&r=${encodeURIComponent(
-                    joinURL(baseURL, 're-authentication')
+                    joinURL(baseURL, 'auth-success')
                   )}`,
-                  '_blank'
+                  'Octra-Backend - Authenticate via Shibboleth',
+                  760,
+                  760
                 );
 
                 return AuthenticationActions.reauthenticate.wait();
@@ -534,6 +536,8 @@ export class AuthenticationEffects {
       file.type
     );
   };
+
+
 
   constructor(
     private actions$: Actions,

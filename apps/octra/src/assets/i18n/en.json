@@ -106,14 +106,19 @@
     "free tasks": "Free Tasks",
     "action": "Action",
     "start": "Start",
-    "or": "oder"
+    "or": "oder",
+    "account": "Account",
+    "settings": "Preferences",
+    "information": "Information"
   },
   "p": {
     "username or email": "Username or E-Mail",
     "forgot password": "Forgot password",
     "back to projects": "Go back to list of projects",
     "manage account": "Manage account",
-    "reset password": "Reset password"
+    "reset password": "Reset password",
+    "authenticated": "I'm authenticated.",
+    "selected level": "Selected level"
   },
   "bug report": {
     "give feedback": "Give feedback",

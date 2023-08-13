@@ -9,6 +9,7 @@ import { TranscrEndGuard } from '../../shared/guard';
 import { ReloadFileComponent } from './reload-file';
 import { ReloadFileGuard } from './reload-file/reload-file.activateguard';
 import { AuthComponent } from './auth';
+import {AuthSuccessPageComponent} from './auth-success/auth-success.page.component';
 
 const MEMBER_ROUTES: Routes = [
   {
@@ -32,6 +33,7 @@ const MEMBER_ROUTES: Routes = [
     canActivate: [ReloadFileGuard],
   },
   { path: 'auth', component: AuthComponent },
+  { path: 'auth-success', component: AuthSuccessPageComponent },
   { path: '', redirectTo: '/load', pathMatch: 'full' },
   //{ path: '**', redirectTo: '/404', pathMatch: 'full' },
 ];

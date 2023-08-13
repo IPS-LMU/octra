@@ -58,10 +58,13 @@ export const reducer = createReducer(
     ...state,
     initialized: true,
   })),
-  on(AuthenticationActions.loginOnline.redirecttourl, (state: ApplicationState) => ({
-    ...state,
-    mode: LoginMode.ONLINE
-  })),
+  on(
+    AuthenticationActions.loginOnline.redirecttourl,
+    (state: ApplicationState) => ({
+      ...state,
+      mode: LoginMode.ONLINE,
+    })
+  ),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
@@ -78,11 +81,8 @@ export const reducer = createReducer(
       appConfiguration: settings,
       loading: {
         ...state.loading,
-        status:
-          state.loading.progress === 75
-            ? LoadingStatus.FINISHED
-            : LoadingStatus.LOADING,
-        progress: state.loading.progress + 25,
+        status: LoadingStatus.LOADING,
+        progress: 50,
       },
     })
   ),
@@ -259,7 +259,7 @@ export const reducer = createReducer(
     loading: {
       ...state.loading,
       status: LoadingStatus.INITIALIZE,
-      progress: 0,
+      progress: 50,
       errors: [],
     },
   })),
@@ -270,7 +270,7 @@ export const reducer = createReducer(
       loading: {
         ...state.loading,
         status: LoadingStatus.LOADING,
-        progress: Math.round(value * 100),
+        progress: 50 + Math.round(value * 50 * 100),
         errors: [],
       },
     })

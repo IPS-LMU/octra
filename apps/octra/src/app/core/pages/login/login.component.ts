@@ -22,8 +22,8 @@ import { LoginService } from './login.service';
 import { Observable } from 'rxjs';
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
-import { AccountLoginMethod } from '../../../../../../../../octra-backend/dist/libs/api-types';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import {AccountLoginMethod} from '@octra/api-types';
 
 @Component({
   selector: 'octra-login',

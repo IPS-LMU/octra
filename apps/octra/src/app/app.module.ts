@@ -71,7 +71,7 @@ import {
 } from './core/store/authentication';
 import { APIEffects } from './core/store/api';
 import { PagesModule } from './core/pages/pages.module';
-import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import {
   AuthenticationComponent
 } from './core/component/authentication-component/authentication-component.component';
@@ -130,7 +130,7 @@ import {
     TranslocoModule,
     NgxOctraApiModule,
     OctraComponentsModule,
-    NgxUtilitiesPipesModule,
+    OctraUtilitiesModule,
   ],
   bootstrap: [AppComponent],
   providers: [

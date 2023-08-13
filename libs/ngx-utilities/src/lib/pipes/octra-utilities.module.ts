@@ -9,4 +9,4 @@ import { ProcentPipe } from './procent.pipe';
   imports: [CommonModule],
   exports: [TimespanPipe, LeadingNullPipe, ProcentPipe],
 })
-export class NgxUtilitiesPipesModule {}
+export class OctraUtilitiesModule {}

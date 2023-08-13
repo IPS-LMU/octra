@@ -6,11 +6,11 @@ import {
   OctraComponentsModule,
 } from '@octra/ngx-components';
 import { createCustomElement } from '@angular/elements';
-import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 
 @NgModule({
   declarations: [],
-  imports: [BrowserModule, NgxUtilitiesPipesModule, OctraComponentsModule],
+  imports: [BrowserModule, OctraUtilitiesModule, OctraComponentsModule],
   providers: [],
   exports: [],
 })

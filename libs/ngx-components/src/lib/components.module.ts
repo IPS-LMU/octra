@@ -3,7 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AudioplayerComponent } from './components/audio/audioplayer';
-import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioViewerComponent } from './components/audio/audio-viewer';
 
 @NgModule({
@@ -13,7 +13,7 @@ import { AudioViewerComponent } from './components/audio/audio-viewer';
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NgxUtilitiesPipesModule,
+    OctraUtilitiesModule,
   ],
   exports: [AudioplayerComponent, AudioViewerComponent],
 })

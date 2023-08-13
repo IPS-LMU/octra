@@ -44,7 +44,7 @@ import {
   NgbModalModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { NgxUtilitiesPipesModule } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 import { AuthenticationComponent } from '../component/authentication-component/authentication-component.component';
 
@@ -98,7 +98,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     DragDropModule,
     NgbDropdownModule,
     NgbModalModule,
-    NgxUtilitiesPipesModule,
+    OctraUtilitiesModule,
   ],
   providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [

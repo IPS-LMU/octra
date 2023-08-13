@@ -63,7 +63,7 @@
           "outputHashing": "all"
         },
         "development": {
-          "outputHashing": "all",
+          "outputHashing": "none",
           "buildOptimizer": false,
           "optimization": false,
           "vendorChunk": true,

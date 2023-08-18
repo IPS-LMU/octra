@@ -22,7 +22,6 @@ import {
   AnnotationStateLevel,
   convertFromOIDLevel,
 } from '../../store/login-mode/annotation';
-import { ASRActions } from '../../store/asr/asr.actions';
 import { ILog } from '../../obj/Settings/logging';
 import { LoginModeActions } from '../../store/login-mode';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -274,38 +273,12 @@ export class AppStorageService {
     return getModeState(this._snapshot)?.currentSession;
   }
 
-  get asrSelectedLanguage(): string {
-    return this._snapshot.asr.selectedLanguage!;
-  }
-
-  set asrSelectedLanguage(value: string) {
-    this.store.dispatch(
-      ASRActions.setASRSettings({
-        selectedLanguage: value,
-        selectedService: this.asrSelectedService,
-      })
-    );
-  }
-
   get audioLoaded() {
     const modeState = getModeState(this._snapshot);
     if (modeState) {
       return modeState.audio.loaded;
     }
     return undefined;
-  }
-
-  get asrSelectedService(): string {
-    return this._snapshot.asr.selectedService!;
-  }
-
-  set asrSelectedService(value: string) {
-    this.store.dispatch(
-      ASRActions.setASRSettings({
-        selectedLanguage: this.asrSelectedLanguage,
-        selectedService: value,
-      })
-    );
   }
 
   public get audioVolume(): number {

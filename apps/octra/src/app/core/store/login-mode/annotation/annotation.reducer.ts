@@ -1,10 +1,12 @@
-import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
-import { LoginMode } from '../../index';
-import { AnnotationActions } from './annotation.actions';
-import { IDBActions } from '../../idb/idb.actions';
-import { IIDBModeOptions } from '../../../shared/octra-database';
-import { getProperties } from '@octra/utilities';
-import { AnnotationState } from './index';
+import {ActionCreator, on, ReducerTypes} from '@ngrx/store';
+import {LoginMode} from '../../index';
+import {AnnotationActions} from './annotation.actions';
+import {IDBActions} from '../../idb/idb.actions';
+import {IIDBModeOptions} from '../../../shared/octra-database';
+import {getProperties} from '@octra/utilities';
+import {AnnotationState, AnnotationStateSegment} from './index';
+import {ASRActions} from '../../asr/asr.actions';
+import {SampleUnit} from '@octra/media';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -248,6 +250,61 @@ export class AnnotationStateReducers {
         };
       }),
       on(
+        AnnotationActions.updateASRSegmentInformation.do,
+        (state: AnnotationState, { mode, timeInterval, progress, isBlockedBy, itemType, result }) => {
+          if(this.mode === mode) {
+
+            const segmentBoundary = new SampleUnit(
+              timeInterval.sampleStart + (timeInterval.sampleLength / 2),
+              state.audio.sampleRate
+            );
+            console.log(`select segment on boundary ${segmentBoundary.seconds}, sampleRate ${state.audio.sampleRate}`);
+            // todo add current level
+            let currentLevel = state.transcript.levels[0];
+            const segmentIndex = this.getSegmentBySamplePosition(
+              segmentBoundary,
+              currentLevel.items as AnnotationStateSegment[]
+            );
+
+            if (segmentIndex > -1) {
+              const segment = currentLevel.items[segmentIndex]!;
+
+              currentLevel = {
+                ...currentLevel,
+                items: [
+                  ...currentLevel.items.slice(0, segmentIndex),
+                  {
+                    ...segment,
+                    labels: result ? segment.labels.map((a) => a.name !== "Speaker" ? {
+                      ...a,
+                      value: result
+                    } : a) : segment.labels,
+                    progressInfo: {
+                      progress,
+                      statusLabel: itemType
+                    },
+                    isBlockedBy
+                  },
+                  ...currentLevel.items.slice(segmentIndex + 1),
+                ],
+              };
+
+              return {
+                ...state,
+                transcript: {
+                  ...state.transcript,
+                  levels: [currentLevel, ...state.transcript.levels.slice(1)],
+                },
+              };
+            } else {
+              console.error(`item not found`);
+            }
+            return state;
+          }
+          return state;
+        }
+      ),
+      on(
         IDBActions.loadOptions.success,
         (
           state: AnnotationState,
@@ -293,5 +350,24 @@ export class AnnotationStateReducers {
     }
 
     return state;
+  }
+
+  getSegmentBySamplePosition(
+    samples: SampleUnit,
+    segments: AnnotationStateSegment[]
+  ): number {
+    let begin = 0;
+    for (let i = 0; i < segments.length; i++) {
+      if (i > 0) {
+        begin = segments[i - 1].sampleStart + segments[i - 1].sampleDur;
+      }
+      if (
+        samples.samples > begin &&
+        samples.samples <= segments[i].sampleStart + segments[i].sampleDur
+      ) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

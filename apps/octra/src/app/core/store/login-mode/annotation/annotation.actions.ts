@@ -9,6 +9,9 @@ import {
   TranscriptionState,
 } from './index';
 import { ProjectSettings } from '../../../obj';
+import {ASRQueueItemType, ASRTimeInterval} from "../../asr";
+import videojs from "video.js";
+import Log = videojs.Log;
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -259,6 +262,7 @@ export class AnnotationActions {
       }>(),
       fail: props<{
         error: string;
+        showOKButton: true;
       }>(),
       noTasks: emptyProps(),
     },
@@ -302,4 +306,22 @@ export class AnnotationActions {
       do: emptyProps(),
     },
   });
+
+  static updateASRSegmentInformation = createActionGroup({
+      source: 'annotation/update asr information',
+      events: {
+        do: props<{
+          mode: LoginMode,
+          itemType: ASRQueueItemType,
+          timeInterval: ASRTimeInterval;
+          progress: number;
+          result?: string;
+          isBlockedBy?: ASRQueueItemType;
+        }>(),
+        fail: props<{
+          error: string
+        }>()
+      }
+  });
+
 }

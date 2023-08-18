@@ -25,11 +25,6 @@ import {
 } from '../../../core/shared/service';
 import { AppStorageService } from '../../../core/shared/service/appstorage.service';
 import {
-  ASRProcessStatus,
-  ASRQueueItem,
-  AsrService,
-} from '../../../core/shared/service/asr.service';
-import {
   AudioChunk,
   AudioManager,
   AudioRessource,
@@ -190,8 +185,7 @@ export class TranscrWindowComponent
     public uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
-    public cd: ChangeDetectorRef,
-    private asrService: AsrService
+    public cd: ChangeDetectorRef
   ) {
     super();
 
@@ -225,6 +219,7 @@ export class TranscrWindowComponent
       );
     }
 
+    /* TODO implement
     this.subscrManager.add(
       this.asrService.queue.itemChange.subscribe(
         (item: ASRQueueItem) => {
@@ -251,6 +246,8 @@ export class TranscrWindowComponent
         }
       )
     );
+
+     */
   }
 
   public doDirectionAction = (direction: string) => {
@@ -395,6 +392,7 @@ export class TranscrWindowComponent
     this.loupe.name = 'transcr-window viewer';
     this.loupe.settings.margin.top = 5;
     this.loupe.settings.margin.bottom = 0;
+    this.loupe.settings.lineheight = 200;
     this.loupe.settings.justifySignalHeight = true;
     this.loupe.settings.boundaries.enabled = false;
     this.loupe.settings.boundaries.readonly = true;

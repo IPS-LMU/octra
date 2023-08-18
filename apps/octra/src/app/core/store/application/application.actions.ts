@@ -93,6 +93,17 @@ export class ApplicationActions {
     },
   });
 
+  static showErrorModal = createActionGroup({
+      source: 'app/show error modal',
+      events: {
+        do: props<{
+          error: string;
+          showOKButton: boolean;
+        }>()
+      }
+  });
+
+
   public static undo = createAction(`UNDO`);
 
   public static redo = createAction(`REDO`);

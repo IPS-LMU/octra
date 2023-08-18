@@ -280,18 +280,18 @@ export class FileInfo extends DataInfo {
     });
   }
 
-  public updateContentFromURL(httpClient: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (this._url !== undefined && this._url !== undefined) {
+  public updateContentFromURL(httpClient: any): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if (this._url) {
         httpClient.get(this._url, { responseType: 'text' }).subscribe({
-          next: (result: any) => {
+          next: (result: string) => {
             this._file = FileInfo.getFileFromContent(
               result,
               this.fullname,
               this._type
             );
             this._size = this._file.size;
-            resolve();
+            resolve(result);
           },
           error: (error: any) => reject(error),
         });

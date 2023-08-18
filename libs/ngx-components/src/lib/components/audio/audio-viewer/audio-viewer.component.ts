@@ -1897,6 +1897,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             }
 
             if (sceneSegment.isBlockedBy === undefined) {
+              // not blocked
               if (sceneSegment.transcript === '') {
                 context.fillStyle = 'rgba(255,0,0,0.2)';
               } else if (
@@ -1909,6 +1910,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               }
               context.fillRect(x, localY, w, h);
             } else {
+              // something running
               let progressBarFillColor = '';
               let progressBarForeColor = '';
               if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
@@ -1943,17 +1945,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 }
 
                 const progressWidth = w - timeStampsWidth - 20;
+                console.log(`progresswidth = ${w} - ${timeStampsWidth} - 20`);
 
                 if (
                   progressWidth > 10 &&
                   sceneSegment.progressInfo !== undefined
                 ) {
                   const progressStart = x + 10 + (x === 0 ? timestampWidth : 0);
-                  const textPosition = Math.round(
-                    progressStart + progressWidth / 2
-                  );
                   const loadedPixels = Math.round(
-                    progressWidth * sceneSegment.progressInfo.progress
+                    progressWidth * (sceneSegment.progressInfo.progress/100)
                   );
 
                   this.drawRoundedRect(
@@ -1979,7 +1979,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   if (progressWidth > 100) {
                     const progressString = `${
                       sceneSegment.progressInfo.statusLabel
-                    } ${sceneSegment.progressInfo.progress * 100}%`;
+                    } ${sceneSegment.progressInfo.progress}%`;
+                    const textLength = context.measureText(progressString).width;
+                    const textPosition = Math.round(
+                      progressStart + ((progressWidth - textLength) / 2)
+                    );
                     context.fillStyle =
                       progressStart + loadedPixels > textPosition &&
                       progressBarForeColor === 'white'

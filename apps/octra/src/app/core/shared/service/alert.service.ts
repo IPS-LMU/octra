@@ -55,6 +55,7 @@ export class AlertService {
         const entry: AlertEntry = {
           type,
           animation: 'opened',
+          autohide: true,
           duration: duration ? duration : 5,
           message: typeof data === 'string' ? data : '',
           unique,
@@ -70,6 +71,7 @@ export class AlertService {
         };
 
         this.queue.push(entry);
+        console.log(this.queue);
       }
     });
   }
@@ -99,6 +101,7 @@ export interface AlertEntry {
   animation: string;
   unique: boolean;
   id: number;
+  autohide: boolean;
   component?: {
     id: number;
     class: any;

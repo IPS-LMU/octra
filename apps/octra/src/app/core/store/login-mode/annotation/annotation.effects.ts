@@ -61,6 +61,7 @@ import {
   createSampleUser,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
+import { ASRActions } from '../../asr/asr.actions';
 
 @Injectable()
 export class AnnotationEffects {
@@ -106,6 +107,7 @@ export class AnnotationEffects {
                 a,
                 AnnotationActions.startAnnotation.fail({
                   error: error.error?.message ?? error.message,
+                  showOKButton: true,
                 }),
                 this.store,
                 () => {
@@ -129,6 +131,7 @@ export class AnnotationEffects {
         if (!task.tool_configuration) {
           return AnnotationActions.startAnnotation.fail({
             error: 'Missing tool configuration',
+            showOKButton: true,
           });
         }
 
@@ -138,6 +141,7 @@ export class AnnotationEffects {
         ) {
           return AnnotationActions.startAnnotation.fail({
             error: 'Missing tool configuration assets',
+            showOKButton: true,
           });
         }
 
@@ -763,42 +767,42 @@ export class AnnotationEffects {
 
   // TODO add effect if task and project can't not be loaded
   /*
-                  onLoadOnlineFailed$ = createEffect(() =>
-                    this.actions$.pipe(
-                      ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
-                      exhaustMap((a) => {
-                        return of(
-                          AuthenticationActions.logout.do({
-                            message: a.error.message,
-                            clearSession: true,
-                            messageType: '',
-                            mode: LoginMode.ONLINE,
-                          })
-                        );
-                      })
-                    )
-                  );
-                 */
+                    onLoadOnlineFailed$ = createEffect(() =>
+                      this.actions$.pipe(
+                        ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
+                        exhaustMap((a) => {
+                          return of(
+                            AuthenticationActions.logout.do({
+                              message: a.error.message,
+                              clearSession: true,
+                              messageType: '',
+                              mode: LoginMode.ONLINE,
+                            })
+                          );
+                        })
+                      )
+                    );
+                   */
 
   /*
-                  onLocalOrURLModeLogin$ = createEffect(() =>
-                    this.actions$.pipe(
-                      ofType(LocalModeActions.login),
-                      exhaustMap((a) => {
-                        return AnnotationActions.prepareTaskDataForAnnotation.do({
-                          mode: LoginMode.LOCAL,
-                          currentProject: createSampleProjectDto("-1"),
-                          task: createSampleTask("-1", a.files.map((a, i) => ({
-                            id: "" + i,
-                            filename: a.name,
-                            fileType: a.type,
-                            size: a.size
-                          })), [])
-                        });
-                      })
-                    )
-                  );
-                   */
+                    onLocalOrURLModeLogin$ = createEffect(() =>
+                      this.actions$.pipe(
+                        ofType(LocalModeActions.login),
+                        exhaustMap((a) => {
+                          return AnnotationActions.prepareTaskDataForAnnotation.do({
+                            mode: LoginMode.LOCAL,
+                            currentProject: createSampleProjectDto("-1"),
+                            task: createSampleTask("-1", a.files.map((a, i) => ({
+                              id: "" + i,
+                              filename: a.name,
+                              fileType: a.type,
+                              size: a.size
+                            })), [])
+                          });
+                        })
+                      )
+                    );
+                     */
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(

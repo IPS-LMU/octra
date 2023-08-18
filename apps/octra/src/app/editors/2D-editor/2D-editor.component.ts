@@ -17,8 +17,6 @@ import {
   ShortcutGroup,
   SubscriptionManager,
 } from '@octra/utilities';
-import { AuthenticationNeededComponent } from '../../core/alerts/authentication-needed/authentication-needed.component';
-import { ErrorOccurredComponent } from '../../core/alerts/error-occurred/error-occurred.component';
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
@@ -31,12 +29,6 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import {
-  ASRProcessStatus,
-  ASRQueueItem,
-  AsrService,
-  ASRTimeInterval,
-} from '../../core/shared/service/asr.service';
 import { OCTRAEditor } from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
 import {
@@ -51,17 +43,11 @@ import {
   PlayBackStatus,
   SampleUnit,
 } from '@octra/media';
-import {
-  ASRQueueItemType,
-  OAudiofile,
-  OSegment,
-  PraatTextgridConverter,
-  Segment,
-} from '@octra/annotation';
-import { Store } from '@ngrx/store';
+import { ASRQueueItemType } from '@octra/annotation';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { ApplicationState } from '../../core/store/application';
+import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
+import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -212,10 +198,9 @@ export class TwoDEditorComponent
     public alertService: AlertService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
-    private asrService: AsrService,
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
-    private store: Store<ApplicationState>
+    private asrStoreService: AsrStoreService
   ) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
@@ -323,309 +308,326 @@ export class TwoDEditorComponent
     );
 
     this.subscrManager.add(
-      this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        const checkUndoRedo = () => {
-          if (this.asrService.queue.statistics.running === 0) {
-            this.appStorage.enableUndoRedo();
-          } else {
-            this.appStorage.disableUndoRedo();
-          }
-        };
-
-        if (item.status !== ASRProcessStatus.IDLE) {
-          const segmentBoundary = new SampleUnit(
-            item.time.sampleStart + item.time.sampleLength,
-            this.audioManager.sampleRate
-          );
-          let segmentIndex =
-            this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-              segmentBoundary
-            );
-
-          if (segmentIndex > -1) {
-            let segment =
-              this.transcrService.currentlevel!.segments.get(segmentIndex);
-            segment!.progressInfo = {
-              progress: item.progress,
-              statusLabel: item.type,
-            };
-            this.viewer.redraw();
-
-            if (
-              item.status !== ASRProcessStatus.STARTED &&
-              item.status !== ASRProcessStatus.RUNNING
-            ) {
-              if (segment !== undefined) {
-                segment = segment.clone();
-                segment.isBlockedBy = undefined;
-
-                if (item.status === ASRProcessStatus.NOQUOTA) {
-                  this.alertService
-                    .showAlert(
-                      'danger',
-                      this.langService.translate('asr.no quota')
-                    )
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                  this.uiService.addElementFromEvent(
-                    item.type.toLowerCase(),
-                    {
-                      value: 'failed',
-                    },
-                    Date.now(),
-                    undefined,
-                    undefined,
-                    undefined,
-                    {
-                      start: item.time.sampleStart,
-                      length: item.time.sampleLength,
-                    },
-                    'automation'
-                  );
-                } else if (item.status === ASRProcessStatus.NOAUTH) {
-                  console.log(`NO AUTH`);
-                  this.uiService.addElementFromEvent(
-                    item.type.toLowerCase(),
-                    {
-                      value: 'no_auth',
-                    },
-                    Date.now(),
-                    undefined,
-                    undefined,
-                    undefined,
-                    {
-                      start: item.time.sampleStart,
-                      length: item.time.sampleLength,
-                    },
-                    'automation'
-                  );
-
-                  this.alertService
-                    .showAlert(
-                      'warning',
-                      AuthenticationNeededComponent,
-                      true,
-                      -1
-                    )
-                    .then((alertItem) => {
-                      const auth =
-                        alertItem.component as AuthenticationNeededComponent;
-                      this.subscrManager.add(
-                        auth.authenticateClick.subscribe(() => {
-                          this.openAuthWindow();
-                        })
-                      );
-                      this.subscrManager.add(
-                        auth.confirmationClick.subscribe(() => {
-                          this.resetQueueItemsWithNoAuth();
-                          this.alertService.closeAlert(alertItem.id);
-                        })
-                      );
-                    });
-                } else {
-                  if (item.status === ASRProcessStatus.FINISHED) {
-                    this.uiService.addElementFromEvent(
-                      item.type.toLowerCase(),
-                      {
-                        value: 'finished',
-                      },
-                      Date.now(),
-                      undefined,
-                      undefined,
-                      undefined,
-                      {
-                        start: item.time.sampleStart,
-                        length: item.time.sampleLength,
-                      },
-                      'automation'
-                    );
-                    if (item.type === ASRQueueItemType.ASR) {
-                      segment.transcript = item.result.replace(/(<\/p>)/g, '');
-
-                      const index =
-                        this.transcrService.currentlevel!.segments.segments.findIndex(
-                          (a: any) => {
-                            return a.time.samples === segment!.time.samples;
-                          }
-                        );
-                      if (index > -1) {
-                        this.transcrService.currentlevel!.segments.change(
-                          index,
-                          segment
-                        );
-                      }
-                    } else if (
-                      item.type === ASRQueueItemType.ASRMAUS ||
-                      item.type === ASRQueueItemType.MAUS
-                    ) {
-                      const converter = new PraatTextgridConverter();
-
-                      const audiofile = new OAudiofile();
-                      const audioInfo = this.audioManager.resource.info;
-                      audiofile.duration = audioInfo.duration.samples;
-                      audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-                      audiofile.sampleRate = this.audioManager.sampleRate;
-                      audiofile.size = this.audioManager.resource.info.size;
-                      audiofile.type = this.audioManager.resource.info.type;
-
-                      const convertedResult = converter.import(
-                        {
-                          name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-                          content: item.result,
-                          type: 'text',
-                          encoding: 'utf-8',
-                        },
-                        audiofile
-                      );
-
-                      const wordsTier = convertedResult.annotjson!.levels.find(
-                        (a: any) => {
-                          return a.name === 'ORT-MAU';
-                        }
-                      );
-
-                      if (wordsTier !== undefined) {
-                        let counter = 0;
-
-                        if (segmentIndex < 0) {
-                          console.error(
-                            `could not find segment to be precessed by ASRMAUS!`
-                          );
-                        } else {
-                          for (const wordItem of wordsTier.items) {
-                            const itemEnd =
-                              item.time.sampleStart + item.time.sampleLength;
-                            if (
-                              item.time.sampleStart +
-                                wordItem.sampleStart! +
-                                wordItem.sampleDur! <=
-                              itemEnd
-                            ) {
-                              const readSegment = Segment.fromObj(
-                                this.transcrService.currentlevel!.name,
-                                new OSegment(
-                                  1,
-                                  wordItem.sampleStart!,
-                                  wordItem.sampleDur!,
-                                  wordItem.labels
-                                ),
-                                this.audioManager.sampleRate
-                              );
-                              if (
-                                readSegment!.transcript === '<p:>' ||
-                                readSegment!.transcript === ''
-                              ) {
-                                readSegment!.transcript =
-                                  this.transcrService.breakMarker.code;
-                              }
-
-                              if (counter === wordsTier.items.length - 1) {
-                                // the processed segment is now the very right one. Replace its content with
-                                // the content of the last word item.
-                                segmentIndex =
-                                  this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-                                    segmentBoundary
-                                  );
-
-                                this.transcrService.currentlevel!.segments.segments[
-                                  segmentIndex
-                                ].transcript = readSegment!.transcript;
-                                this.transcrService.currentlevel!.segments.segments[
-                                  segmentIndex
-                                ].isBlockedBy = undefined;
-                              } else {
-                                const origTime = new SampleUnit(
-                                  item.time.sampleStart +
-                                    readSegment!.time.samples,
-                                  this.audioManager.sampleRate
-                                );
-                                this.transcrService.currentlevel!.addSegment(
-                                  origTime,
-                                  '',
-                                  readSegment!.transcript,
-                                  false
-                                );
-                              }
-                            } else {
-                              console.error(
-                                `wordItem samples are out of the correct boundaries.`
-                              );
-                              // tslint:disable-next-line:max-line-length
-                              console.error(
-                                `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`
-                              );
-                            }
-                            counter++;
-                          }
-
-                          this.transcrService.currentLevelSegmentChange.emit();
-                        }
-                      } else {
-                        console.error(`word tier not found!`);
-                      }
-                    }
-                  } else if (item.status === ASRProcessStatus.FAILED) {
-                    if (item.result.indexOf('[Error]') === 0) {
-                      const errorMessage = item.result.replace('[Error] ', '');
-                      const translatedError = this.langService.translate(
-                        `asr.${errorMessage}`,
-                        {
-                          asrProvider: item.selectedLanguage.asr,
-                          maxDuration: item.selectedASRInfo.maxSignalDuration,
-                          maxSignalSize: item.selectedASRInfo.maxSignalSize,
-                        }
-                      );
-                      this.alertService
-                        .showAlert('danger', translatedError, true, 30)
-                        .catch((error) => {
-                          console.error(error);
-                        });
-                    } else {
-                      this.alertService
-                        .showAlert('danger', ErrorOccurredComponent, true, -1)
-                        .catch((error) => {
-                          console.error(error);
-                        });
-                    }
-                    console.error(item.result);
-                    this.transcrService.currentlevel!.segments.segments[
-                      segmentIndex
-                    ].isBlockedBy = undefined;
-                    this.transcrService.currentLevelSegmentChange.emit();
-                    this.cd.markForCheck();
-                  } else if (item.status === ASRProcessStatus.STOPPED) {
-                    this.cd.markForCheck();
-                  }
-                }
+      this.asrStoreService.queue$.subscribe({
+        next: (queue) => {
+          const checkUndoRedo = () => {
+            if (queue) {
+              if (queue.statistics.running === 0) {
+                this.appStorage.enableUndoRedo();
               } else {
-                console.error(`can't start ASR because segment not found!`);
+                this.appStorage.disableUndoRedo();
               }
-            } else if (item.status === ASRProcessStatus.STARTED) {
-              // item started
-              this.uiService.addElementFromEvent(
-                item.type.toLowerCase(),
-                {
-                  value: 'started',
-                },
-                Date.now(),
-                undefined,
-                undefined,
-                undefined,
-                {
-                  start: item.time.sampleStart,
-                  length: item.time.sampleLength,
-                },
-                'automation'
-              );
             }
-          } else {
-            console.error(new Error(`couldn't find segment number`));
+          };
+
+          if (queue) {
+            console.log('QUEUE CHANGED:');
+            console.log(queue);
+
+            // this.viewer.redraw();
           }
-        }
-        checkUndoRedo();
+        },
       })
     );
+
+    /* TODO implemenet
+        this.subscrManager.add(
+          this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+
+            if (item.status !== ASRProcessStatus.IDLE) {
+              const segmentBoundary = new SampleUnit(
+                item.time.sampleStart + item.time.sampleLength,
+                this.audioManager.sampleRate
+              );
+              let segmentIndex =
+                this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
+                  segmentBoundary
+                );
+
+              if (segmentIndex > -1) {
+                let segment =
+                  this.transcrService.currentlevel!.segments.get(segmentIndex);
+                segment!.progressInfo = {
+                  progress: item.progress,
+                  statusLabel: item.type,
+                };
+                this.viewer.redraw();
+
+                if (
+                  item.status !== ASRProcessStatus.STARTED &&
+                  item.status !== ASRProcessStatus.RUNNING
+                ) {
+                  if (segment !== undefined) {
+                    segment = segment.clone();
+                    segment.isBlockedBy = undefined;
+
+                    if (item.status === ASRProcessStatus.NOQUOTA) {
+                      this.alertService
+                        .showAlert(
+                          'danger',
+                          this.langService.translate('asr.no quota')
+                        )
+                        .catch((error) => {
+                          console.error(error);
+                        });
+                      this.uiService.addElementFromEvent(
+                        item.type.toLowerCase(),
+                        {
+                          value: 'failed',
+                        },
+                        Date.now(),
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                          start: item.time.sampleStart,
+                          length: item.time.sampleLength,
+                        },
+                        'automation'
+                      );
+                    } else if (item.status === ASRProcessStatus.NOAUTH) {
+                      console.log(`NO AUTH`);
+                      this.uiService.addElementFromEvent(
+                        item.type.toLowerCase(),
+                        {
+                          value: 'no_auth',
+                        },
+                        Date.now(),
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                          start: item.time.sampleStart,
+                          length: item.time.sampleLength,
+                        },
+                        'automation'
+                      );
+
+                      this.alertService
+                        .showAlert(
+                          'warning',
+                          AuthenticationNeededComponent,
+                          true,
+                          -1
+                        )
+                        .then((alertItem) => {
+                          const auth =
+                            alertItem.component as AuthenticationNeededComponent;
+                          this.subscrManager.add(
+                            auth.authenticateClick.subscribe(() => {
+                              this.openAuthWindow();
+                            })
+                          );
+                          this.subscrManager.add(
+                            auth.confirmationClick.subscribe(() => {
+                              this.resetQueueItemsWithNoAuth();
+                              this.alertService.closeAlert(alertItem.id);
+                            })
+                          );
+                        });
+                    } else {
+                      if (item.status === ASRProcessStatus.FINISHED) {
+                        this.uiService.addElementFromEvent(
+                          item.type.toLowerCase(),
+                          {
+                            value: 'finished',
+                          },
+                          Date.now(),
+                          undefined,
+                          undefined,
+                          undefined,
+                          {
+                            start: item.time.sampleStart,
+                            length: item.time.sampleLength,
+                          },
+                          'automation'
+                        );
+                        if (item.type === ASRQueueItemType.ASR) {
+                          segment.transcript = item.result.replace(/(<\/p>)/g, '');
+
+                          const index =
+                            this.transcrService.currentlevel!.segments.segments.findIndex(
+                              (a: any) => {
+                                return a.time.samples === segment!.time.samples;
+                              }
+                            );
+                          if (index > -1) {
+                            this.transcrService.currentlevel!.segments.change(
+                              index,
+                              segment
+                            );
+                          }
+                        } else if (
+                          item.type === ASRQueueItemType.ASRMAUS ||
+                          item.type === ASRQueueItemType.MAUS
+                        ) {
+                          const converter = new PraatTextgridConverter();
+
+                          const audiofile = new OAudiofile();
+                          const audioInfo = this.audioManager.resource.info;
+                          audiofile.duration = audioInfo.duration.samples;
+                          audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
+                          audiofile.sampleRate = this.audioManager.sampleRate;
+                          audiofile.size = this.audioManager.resource.info.size;
+                          audiofile.type = this.audioManager.resource.info.type;
+
+                          const convertedResult = converter.import(
+                            {
+                              name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
+                              content: item.result,
+                              type: 'text',
+                              encoding: 'utf-8',
+                            },
+                            audiofile
+                          );
+
+                          const wordsTier = convertedResult.annotjson!.levels.find(
+                            (a: any) => {
+                              return a.name === 'ORT-MAU';
+                            }
+                          );
+
+                          if (wordsTier !== undefined) {
+                            let counter = 0;
+
+                            if (segmentIndex < 0) {
+                              console.error(
+                                `could not find segment to be precessed by ASRMAUS!`
+                              );
+                            } else {
+                              for (const wordItem of wordsTier.items) {
+                                const itemEnd =
+                                  item.time.sampleStart + item.time.sampleLength;
+                                if (
+                                  item.time.sampleStart +
+                                    wordItem.sampleStart! +
+                                    wordItem.sampleDur! <=
+                                  itemEnd
+                                ) {
+                                  const readSegment = Segment.fromObj(
+                                    this.transcrService.currentlevel!.name,
+                                    new OSegment(
+                                      1,
+                                      wordItem.sampleStart!,
+                                      wordItem.sampleDur!,
+                                      wordItem.labels
+                                    ),
+                                    this.audioManager.sampleRate
+                                  );
+                                  if (
+                                    readSegment!.transcript === '<p:>' ||
+                                    readSegment!.transcript === ''
+                                  ) {
+                                    readSegment!.transcript =
+                                      this.transcrService.breakMarker.code;
+                                  }
+
+                                  if (counter === wordsTier.items.length - 1) {
+                                    // the processed segment is now the very right one. Replace its content with
+                                    // the content of the last word item.
+                                    segmentIndex =
+                                      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
+                                        segmentBoundary
+                                      );
+
+                                    this.transcrService.currentlevel!.segments.segments[
+                                      segmentIndex
+                                    ].transcript = readSegment!.transcript;
+                                    this.transcrService.currentlevel!.segments.segments[
+                                      segmentIndex
+                                    ].isBlockedBy = undefined;
+                                  } else {
+                                    const origTime = new SampleUnit(
+                                      item.time.sampleStart +
+                                        readSegment!.time.samples,
+                                      this.audioManager.sampleRate
+                                    );
+                                    this.transcrService.currentlevel!.addSegment(
+                                      origTime,
+                                      '',
+                                      readSegment!.transcript,
+                                      false
+                                    );
+                                  }
+                                } else {
+                                  console.error(
+                                    `wordItem samples are out of the correct boundaries.`
+                                  );
+                                  // tslint:disable-next-line:max-line-length
+                                  console.error(
+                                    `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`
+                                  );
+                                }
+                                counter++;
+                              }
+
+                              this.transcrService.currentLevelSegmentChange.emit();
+                            }
+                          } else {
+                            console.error(`word tier not found!`);
+                          }
+                        }
+                      } else if (item.status === ASRProcessStatus.FAILED) {
+                        if (item.result.indexOf('[Error]') === 0) {
+                          const errorMessage = item.result.replace('[Error] ', '');
+                          const translatedError = this.langService.translate(
+                            `asr.${errorMessage}`,
+                            {
+                              asrProvider: item.selectedLanguage.asr,
+                              maxDuration: item.selectedASRInfo.maxSignalDuration,
+                              maxSignalSize: item.selectedASRInfo.maxSignalSize,
+                            }
+                          );
+                          this.alertService
+                            .showAlert('danger', translatedError, true, 30)
+                            .catch((error) => {
+                              console.error(error);
+                            });
+                        } else {
+                          this.alertService
+                            .showAlert('danger', ErrorOccurredComponent, true, -1)
+                            .catch((error) => {
+                              console.error(error);
+                            });
+                        }
+                        console.error(item.result);
+                        this.transcrService.currentlevel!.segments.segments[
+                          segmentIndex
+                        ].isBlockedBy = undefined;
+                        this.transcrService.currentLevelSegmentChange.emit();
+                        this.cd.markForCheck();
+                      } else if (item.status === ASRProcessStatus.STOPPED) {
+                        this.cd.markForCheck();
+                      }
+                    }
+                  } else {
+                    console.error(`can't start ASR because segment not found!`);
+                  }
+                } else if (item.status === ASRProcessStatus.STARTED) {
+                  // item started
+                  this.uiService.addElementFromEvent(
+                    item.type.toLowerCase(),
+                    {
+                      value: 'started',
+                    },
+                    Date.now(),
+                    undefined,
+                    undefined,
+                    undefined,
+                    {
+                      start: item.time.sampleStart,
+                      length: item.time.sampleLength,
+                    },
+                    'automation'
+                  );
+                }
+              } else {
+                console.error(new Error(`couldn't find segment number`));
+              }
+            }
+            checkUndoRedo();
+          })
+        ); */
   }
 
   override ngOnDestroy() {
@@ -960,7 +962,7 @@ export class TwoDEditorComponent
         );
 
       if (segmentNumber > -1) {
-        if (this.asrService.selectedLanguage !== undefined) {
+        if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
           const segment =
             this.transcrService.currentlevel!.segments.get(segmentNumber);
 
@@ -1000,10 +1002,13 @@ export class TwoDEditorComponent
                 this.viewer.selectSegment(segmentNumber);
 
                 if ($event.value === 'do_asr') {
-                  this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
+                  this.asrStoreService.addToQueue(
+                    selection,
+                    ASRQueueItemType.ASR
+                  );
                   segment.isBlockedBy = ASRQueueItemType.ASR;
                 } else if ($event.value === 'do_asr_maus') {
-                  this.asrService.addToQueue(
+                  this.asrStoreService.addToQueue(
                     selection,
                     ASRQueueItemType.ASRMAUS
                   );
@@ -1023,7 +1028,7 @@ export class TwoDEditorComponent
                         console.error(error);
                       });
                   } else {
-                    this.asrService.addToQueue(
+                    this.asrStoreService.addToQueue(
                       selection,
                       ASRQueueItemType.MAUS,
                       segment.transcript
@@ -1032,13 +1037,12 @@ export class TwoDEditorComponent
                   }
                 }
               }
-              this.asrService.startASR();
+              this.asrStoreService.startProcessing();
             } else {
-              const item = this.asrService.queue.getItemByTime(
-                selection.sampleStart,
-                selection.sampleLength
-              );
-              this.asrService.stopASROfItem(item!);
+              this.asrStoreService.stopItemProcessing({
+                sampleStart: selection.sampleStart,
+                sampleLength: selection.sampleLength,
+              });
               segment.isBlockedBy = undefined;
             }
           }
@@ -1247,6 +1251,7 @@ export class TwoDEditorComponent
   };
 
   resetQueueItemsWithNoAuth = () => {
+    /*
     for (const asrQueueItem of this.asrService.queue.queue) {
       if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
         // reset
@@ -1254,6 +1259,8 @@ export class TwoDEditorComponent
       }
     }
     this.asrService.queue.start();
+
+     */
   };
 
   public enableAllShortcuts() {

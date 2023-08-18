@@ -7,7 +7,6 @@ import { NavigationComponent } from './core/component';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { APIService, SettingsService } from './core/shared/service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
-import { AsrService } from './core/shared/service/asr.service';
 import { BugReportService } from './core/shared/service/bug-report.service';
 import * as fromApplication from './core/store/application';
 import { Store } from '@ngrx/store';
@@ -36,15 +35,10 @@ export class AppComponent
   }
 
   constructor(
-    private api: APIService,
-    private langService: TranslocoService,
     public appStorage: AppStorageService,
-    private settingsService: SettingsService,
-    private bugService: BugReportService,
     private router: Router,
     private route: ActivatedRoute,
     private multiThreading: MultiThreadingService,
-    private asrService: AsrService,
     private appStoreService: ApplicationStoreService,
     private store: Store
   ) {
@@ -68,6 +62,7 @@ export class AppComponent
   }
 
   ngOnInit() {
+    /* TODO implement
     this.subscrManager.add(
       this.store
         .select(fromApplication.selectIDBLoaded as any)
@@ -82,6 +77,8 @@ export class AppComponent
           }
         })
     );
+
+     */
 
     this.route.fragment.subscribe((fragment) => {
       switch (fragment) {

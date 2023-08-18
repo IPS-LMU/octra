@@ -33,6 +33,7 @@ import { hasProperty } from '@octra/utilities';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
 import { AnnotationState, convertFromOIDLevel } from '../login-mode/annotation';
+import {ASRStateSettings} from "../asr";
 
 @Injectable({
   providedIn: 'root',
@@ -62,10 +63,7 @@ export class IDBEffects {
                     };
                     highlightingEnabled?: boolean;
                     playOnHofer?: boolean;
-                    asr?: {
-                      selectedLanguage?: string;
-                      selectedService?: string;
-                    };
+                    asr?: ASRStateSettings;
                   },
                   IIDBModeOptions,
                   IIDBModeOptions,
@@ -144,7 +142,7 @@ export class IDBEffects {
                     })
                   );
                 }
-              } else if(state.application.mode) {
+              } else if (state.application.mode) {
                 // other modes
                 this.store.dispatch(
                   LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
@@ -154,7 +152,7 @@ export class IDBEffects {
                   })
                 );
               } else {
-                  // do nothing
+                // do nothing
               }
             }
 
@@ -441,17 +439,17 @@ export class IDBEffects {
   );
 
   /*
-    onClearOnlineSession$ = createEffect(() =>
-        this.actions$.pipe(
-          ofType(OnlineModeActions.clearOnlineSession.do),
-          exhaustMap((a) => {
-            return forkJoin({
-              options: this.idbService.clearOptions()
+      onClearOnlineSession$ = createEffect(() =>
+          this.actions$.pipe(
+            ofType(OnlineModeActions.clearOnlineSession.do),
+            exhaustMap((a) => {
+              return forkJoin({
+                options: this.idbService.clearOptions()
+              })
             })
-          })
-        )
-      );
-     */
+          )
+        );
+       */
 
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(
@@ -489,13 +487,18 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
-            console.log("SAVE MODE STATE");
-            console.log(`mode is ${action.mode}`)
-            console.log(`current project is`);
-            console.log(modeState.currentSession?.currentProject)
+          console.log('SAVE MODE STATE');
+          console.log(`mode is ${action.mode}`);
+          console.log(`current project is`);
+          console.log(modeState.currentSession?.currentProject);
           return this.idbService
             .saveModeOptions((action as any).mode, {
-              sessionfile: modeState && modeState.sessionFile && Object.keys(modeState.sessionFile).length > 0 ? modeState.sessionFile.toAny() : null,
+              sessionfile:
+                modeState &&
+                modeState.sessionFile &&
+                Object.keys(modeState.sessionFile).length > 0
+                  ? modeState.sessionFile.toAny()
+                  : null,
               currentEditor: modeState.currentEditor ?? null,
               logging: modeState.logging ?? null,
               project: modeState.currentSession?.loadFromServer
@@ -855,28 +858,25 @@ export class IDBEffects {
     )
   );
 
-  saveASRLanguage$ = createEffect(() =>
+  saveASRSettings$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ASRActions.setASRSettings),
-      mergeMap((action) => {
-        const subject = new Subject<Action>();
-
-        return this.idbService
-          .saveOption('asr', {
-            selectedLanguage: action.selectedLanguage,
-            selectedService: action.selectedService,
-          })
-          .pipe(
-            map(() => IDBActions.saveASRSettings.success()),
-            catchError((error: Error) =>
-              of(
-                IDBActions.saveASRSettings.fail({
-                  error: error.message,
-                })
-              )
+      ofType(
+        ASRActions.setSelectedASRInformation.do,
+        ASRActions.setASRMausLanguage.do
+      ),
+      withLatestFrom(this.store),
+      mergeMap(([, state]) =>
+        this.idbService.saveOption('asr', state.asr.settings).pipe(
+          map(() => IDBActions.saveASRSettings.success()),
+          catchError((error: Error) =>
+            of(
+              IDBActions.saveASRSettings.fail({
+                error: error.message,
+              })
             )
-          );
-      })
+          )
+        )
+      )
     )
   );
 

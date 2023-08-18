@@ -1,56 +1,14 @@
-<div *ngIf="queue.length > 0" id="alert">
-  <button
-    (click)="clear()"
-    *ngIf="queue.length > 1"
-    [@fadeInOnEnter]
-    [@fadeOutOnLeave]
-    class="btn btn-sm btn-secondary clear-all-button"
-  >
-    <i class="bi bi-trash3"></i>
-    Clear all
-  </button>
-  <div class="queue">
-    <ng-container *ngFor="let entry of queue">
-      <div
-        [@fadeInOnEnter]
-        [@fadeOutOnLeave]
-        class="alert alert-{{ entry.type }} alert-dismissible"
-        role="alert"
-      >
-        <p
-          *ngIf="entry.component === undefined"
-          [innerHTML]="validate(entry.message)"
-          style="margin-right: 10px"
-        ></p>
-        <div style="margin-right: 10px">
-          <ng-template
-            (destroyed)="afterComponentDestroyed($event)"
-            (initialized)="afterComponentInitialized($event)"
-            *ngIf="entry.component !== undefined"
-            [component]="entry.component"
-            octraDynComponent
-          ></ng-template>
-          <p *ngIf="entry.duration > -1">
-            ({{
-              'g.dismissed'
-                | transloco
-                  : {
-                      value: entry.duration
-                    }
-            }})
-          </p>
-        </div>
-
-        <button
-          (click)="onClose(entry)"
-          aria-label="Close"
-          class="close"
-          data-dismiss="alert"
-          type="button"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    </ng-container>
-  </div>
-</div>
+<ngb-toast
+        *ngFor="let toast of alertService.queue"
+        [ngClass]="{
+         'bg-danger text-light': toast.type === 'danger'
+        }"
+        (mouseenter)="toast.autohide = false"
+        (mouseleave)="toast.autohide = true"
+        (hide)="toast.autohide = true"
+        [autohide]="toast.autohide"
+        [delay]="5000"
+        (hidden)="alertService.closeAlert(toast.id)"
+>
+  {{ toast.message }}
+</ngb-toast>

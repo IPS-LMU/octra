@@ -4,24 +4,19 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// icons
-import { TranslocoModule } from '@ngneat/transloco';
-// third-party
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // icons
+import { TranslocoModule } from '@ngneat/transloco'; // third-party
 import { environment } from '../environments/environment';
 
 import { NgxWebstorageModule } from 'ngx-webstorage';
 import { AppComponent } from './app.component';
-import { routing } from './app.routes';
-// other
-import { AlertComponent, NavigationComponent } from './core/component';
+import { routing } from './app.routes'; // other
+import { NavigationComponent } from './core/component';
 import { NavbarService } from './core/component/navbar/navbar.service';
 
 import { ReloadFileGuard } from './core/pages/intern/reload-file/reload-file.activateguard';
 
-import { OctraModalService } from './core/modals/octra-modal.service';
-
-// modules
+import { OctraModalService } from './core/modals/octra-modal.service'; // modules
 import {
   ALoginGuard,
   DeALoginGuard,
@@ -72,12 +67,10 @@ import {
 import { APIEffects } from './core/store/api';
 import { PagesModule } from './core/pages/pages.module';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import {
-  AuthenticationComponent
-} from './core/component/authentication-component/authentication-component.component';
+import { AsrEffects } from './core/store/asr/asr.effects.service';
 
 @NgModule({
-  declarations: [AlertComponent, AppComponent, NavigationComponent],
+  declarations: [AppComponent, NavigationComponent],
   imports: [
     BrowserModule,
     AppSharedModule,
@@ -115,6 +108,7 @@ import {
     EffectsModule.forRoot([
       IDBEffects,
       ApplicationEffects,
+      AsrEffects,
       APIEffects,
       AuthenticationEffects,
     ]),

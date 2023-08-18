@@ -12,11 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
   NgbDropdownModule,
-  NgbPopoverModule,
+  NgbPopoverModule, NgbToast,
 } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
-import { DropZoneComponent } from './core/component';
+import {AlertComponent, DropZoneComponent} from './core/component';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 
@@ -27,6 +27,7 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
     ClipTextPipe,
     OctraDropzoneComponent,
     DropZoneComponent,
+    AlertComponent,
   ],
   imports: [
     CommonModule,
@@ -38,6 +39,8 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
     NgbPopoverModule,
     OctraComponentsModule,
     OctraUtilitiesModule,
+    TranslocoModule,
+    NgbToast,
   ],
   providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [
@@ -46,6 +49,7 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
     ClipTextPipe,
     OctraDropzoneComponent,
     DropZoneComponent,
+    AlertComponent,
   ],
 })
 export class AppSharedModule {}

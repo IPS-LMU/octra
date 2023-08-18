@@ -108,6 +108,7 @@ export class IDBService {
     asr?: {
       selectedLanguage?: string;
       selectedService?: string;
+      selectedMausLanguage?: string;
     };
   }> {
     return from(this.database.options.bulkGet(keys)).pipe(

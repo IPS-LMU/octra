@@ -15,11 +15,6 @@ import {
 } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
 import { TranscriptionService } from '../../shared/service';
-import {
-  ASRProcessStatus,
-  ASRQueueItem,
-  AsrService,
-} from '../../shared/service/asr.service';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {
@@ -88,7 +83,9 @@ export class TranscrEditorComponent
 
   public joditOptions: Partial<Config> = {};
 
-  private joditDefaultOptions: Partial<Config> = {};
+  private joditDefaultOptions: Partial<Config> = {
+    statusbar: false
+  };
 
   public asr = {
     status: 'inactive',
@@ -153,7 +150,6 @@ export class TranscrEditorComponent
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
     private transcrService: TranscriptionService,
-    private asrService: AsrService,
     private renderer: Renderer2
   ) {
     super();
@@ -458,8 +454,8 @@ export class TranscrEditorComponent
 
       this.joditOptions = {
         ...this.joditDefaultOptions,
-        showCharsCounter: true,
-        showWordsCounter: true,
+        showCharsCounter: false,
+        showWordsCounter: false,
         showXPathInStatusbar: false,
         disablePlugins:
           'add-new-line,image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
@@ -518,22 +514,27 @@ export class TranscrEditorComponent
       this.asr.error = '';
       this.asr.result = '';
 
+      /* TODO implement
       const item = this.asrService.queue.getItemByTime(
         this.audiochunk.time.start.samples,
         this.audiochunk.time.duration.samples
       );
 
+
       this.onASRItemChange(item as any);
+
+       */
+
       this.size.height = this.transcrEditor.nativeElement.offsetHeight;
       this.size.width = this.transcrEditor.nativeElement.offsetWidth;
-
       if (this._settings.highlightingEnabled) {
         this.startRecurringHighlight();
       }
     }
   };
 
-  onASRItemChange(item: ASRQueueItem) {
+  onASRItemChange(item: any) {
+    /* TODO implement
     if (item !== undefined) {
       if (
         item.time.sampleStart === (this.audiochunk as any).time.start.samples &&
@@ -556,6 +557,8 @@ export class TranscrEditorComponent
         }
       }
     }
+
+     */
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -648,6 +651,7 @@ export class TranscrEditorComponent
     console.log('AFTER VIEW INIT');
     this.initialize();
 
+    /* TODO implement
     this.subscrManager.add(
       this.asrService.queue.itemChange.subscribe(
         (item: ASRQueueItem) => {
@@ -658,6 +662,8 @@ export class TranscrEditorComponent
         }
       )
     );
+
+     */
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -730,6 +736,8 @@ export class TranscrEditorComponent
         );
       }
     }
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   /**
@@ -1144,6 +1152,7 @@ export class TranscrEditorComponent
   }
 
   public onASROverlayClick() {
+    /* TODO implement
     if (this.asrService.selectedLanguage !== undefined) {
       const item = this.asrService.queue.getItemByTime(
         this.audiochunk!.time.start.samples,
@@ -1163,6 +1172,8 @@ export class TranscrEditorComponent
     } else {
       console.error(`could not stop ASR because segment number was not found.`);
     }
+
+     */
   }
 
   public startRecurringHighlight() {

@@ -35,7 +35,6 @@ import { LoginModeReducers } from '../../store/login-mode/login-mode.reducer';
 import { LoginMode } from '../../store';
 import { EffectsModule } from '@ngrx/effects';
 import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
-import { AsrService } from '../../shared/service/asr.service';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import {AuthSuccessPageComponent} from './auth-success/auth-success.page.component';
 
@@ -125,6 +124,6 @@ export const EDITORS: any[] = [
     ALERTS,
   ],
   bootstrap: [],
-  providers: [AsrService],
+  providers: [],
 })
 export class InternModule {}

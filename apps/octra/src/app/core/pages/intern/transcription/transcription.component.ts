@@ -47,7 +47,6 @@ import {
   UserInteractionsService,
 } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { AsrService } from '../../../shared/service/asr.service';
 import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { IFile, Level, PartiturConverter } from '@octra/annotation';
@@ -233,7 +232,6 @@ export class TranscriptionComponent
     private api: OctraAPIService,
     private bugService: BugReportService,
     private cd: ChangeDetectorRef,
-    private asrService: AsrService,
     private alertService: AlertService,
     public annotationStoreService: AnnotationStoreService,
     private authService: AuthenticationStoreService
@@ -497,8 +495,6 @@ export class TranscriptionComponent
     if (this._useMode === LoginMode.ONLINE) {
       // console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
     }
-
-    this.asrService.init();
 
     // first change
     if (this.interface) {

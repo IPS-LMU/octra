@@ -1,12 +1,9 @@
-#alert {
+:host {
   position: absolute;
-  width: 400px;
+  margin-top:60px;
   top: 0;
   right: 0;
-  z-index: 1000;
-  max-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  z-index: 10000;
 }
 
 .queue {

@@ -8,10 +8,11 @@ import {
   TranscriptionService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { ASRQueueItemType, AsrService } from '../../shared/service/asr.service';
 import { AudioChunk } from '@octra/media';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
+import {AsrStoreService} from '../../store/asr/asr-store-service.service';
+import {ASRQueueItemType} from '../../store/asr';
 
 @Component({
   selector: 'octra-asr-options',
@@ -28,6 +29,7 @@ export class AsrOptionsComponent extends DefaultComponent {
   @Input() audioChunk?: AudioChunk;
   @Input() enabled = true;
   @ViewChild('dropdown', { static: true }) dropdown!: NgbDropdown;
+  @ViewChild('dropdown2', { static: true }) dropdown2!: NgbDropdown;
   @ViewChild('pop', { static: true }) pop!: NgbPopover;
 
   public get appSettings(): AppSettings {
@@ -41,7 +43,7 @@ export class AsrOptionsComponent extends DefaultComponent {
   constructor(
     public appStorage: AppStorageService,
     public settingsService: SettingsService,
-    public asrService: AsrService,
+    public asrStoreService: AsrStoreService,
     private transcrService: TranscriptionService,
     private alertService: AlertService,
     private langService: TranslocoService
@@ -50,18 +52,29 @@ export class AsrOptionsComponent extends DefaultComponent {
     for (const provider of this.appSettings.octra.plugins.asr.services) {
       this.serviceProviders['' + provider.provider] = provider;
     }
+    console.log(this.settingsService.appSettings.octra.plugins.asr);
   }
 
   getShortCode(code: string) {
     return code.substring(code.length - 2);
   }
 
+  onMouseMove() {
+
+  }
+
+  onMouseOut() {
+
+  }
+
   onASRLangChanged(lang?: ASRLanguage) {
-    this.asrService.selectedLanguage = lang ?? this.asrService.selectedLanguage;
+    console.log("CHANGE!");
+    this.asrStoreService.changeASRService(lang);
     this.dropdown.close();
   }
 
   startASRForThisSegment() {
+    /* TODO implement
     if (this.asrService.selectedLanguage !== undefined) {
       if (this.audioChunk!.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
@@ -107,6 +120,7 @@ export class AsrOptionsComponent extends DefaultComponent {
         }
       }
     }
+     */
   }
 
   startASRForAllSegmentsNext() {
@@ -152,6 +166,7 @@ export class AsrOptionsComponent extends DefaultComponent {
             ) {
               // segment is empty and contains not a break
               segment.isBlockedBy = ASRQueueItemType.ASR;
+              /* TODO implement
               this.asrService.addToQueue(
                 {
                   sampleStart,
@@ -159,6 +174,7 @@ export class AsrOptionsComponent extends DefaultComponent {
                 },
                 ASRQueueItemType.ASR
               );
+               */
             }
           }
         } else {
@@ -167,7 +183,7 @@ export class AsrOptionsComponent extends DefaultComponent {
           );
         }
       }
-      this.asrService.startASR();
+      // this.asrService.startASR();
     } else {
       console.error(
         `could not start ASR for all next because segment number was not found.`
@@ -176,11 +192,13 @@ export class AsrOptionsComponent extends DefaultComponent {
   }
 
   stopASRForAll() {
-    this.asrService.stopASR();
-    this.asrService.queue.clear();
+    // TODO implement
+    // this.asrService.stopASR();
+   // this.asrService.queue.clear();
   }
 
   stopASRForThisSegment() {
+    /* TODO implement
     if (this.asrService.selectedLanguage !== undefined) {
       const item = this.asrService.queue.getItemByTime(
         this.audioChunk!.time.start.samples,
@@ -193,5 +211,52 @@ export class AsrOptionsComponent extends DefaultComponent {
     } else {
       console.error(`could not stop ASR because segment number was not found.`);
     }
+
+     */
+  }
+
+
+  onMAUSLangChanged(language: string, code: string) {
+    /* TODO implement
+    this.asrService.selectedMAUSLanguage = {
+      language, code
+    };
+
+    this.dropdown2.hide();
+
+     */
+  }
+
+  getQuotaPercentage(langAsr: string) {
+    /* TODO implement
+    if (this.serviceProviders[langAsr]) {
+      const ohService: OHService = this.serviceProviders[langAsr];
+      if (ohService.usedQuota && ohService.quotaPerMonth) {
+        return Math.round(ohService.usedQuota / ohService.quotaPerMonth * 100);
+      }
+    }
+
+     */
+    return 0;
+  }
+
+  getQuotaLabel(langAsr: string) {
+    if (this.serviceProviders[langAsr]) {
+      const ohService = this.serviceProviders[langAsr];
+      if (ohService.usedQuota && ohService.quotaPerMonth) {
+        const remainingQuota = (ohService.quotaPerMonth - ohService.usedQuota) / 60;
+        let label = '';
+        if (remainingQuota > 60) {
+          label = `${Math.round(remainingQuota / 60)} hours`;
+        } else {
+          label = `${Math.round(remainingQuota)} minutes`;
+        }
+
+        return `Free quota: Approx.<br/><b>${label}</b><br/>of recording time shared among all BAS users.`;
+      } else {
+        return `Unlimited quota`;
+      }
+    }
+    return '';
   }
 }

@@ -33,8 +33,13 @@
   width: 350px;
 }
 
+.ngb-tooltip-window {
+  opacity: 1;
+}
+
 #dropdown-button,
-#dropdown-button2 {
+#dropdown-button2,
+#dropdown-button3 {
   float: left;
   display: block;
   margin: 0 1px;
@@ -46,13 +51,8 @@
   flex: auto;
   flex-direction: column;
   display: flex;
-  padding: 10px 10px 5px;
+  padding: 5px;
   margin-bottom: 5px;
-}
-
-#asr-bar {
-  float: right;
-  margin-left: 50px;
 }
 
 .asr-label {

@@ -31,7 +31,12 @@ import {
   AudioSelection,
   SampleUnit,
 } from '@octra/media';
-import { ASRQueueItemType, Segment, Segments } from '@octra/annotation';
+import {
+  addSegment,
+  ASRQueueItemType,
+  getSegmentBySamplePosition,
+  Segment,
+} from '@octra/annotation';
 import {
   AudioViewerComponent,
   AudioViewerShortcutEvent,
@@ -62,7 +67,7 @@ export class TranscrWindowComponent
   @Input() segmentIndex!: number;
 
   private showWindow = false;
-  private tempSegments!: Segments;
+  private tempSegments!: Segment[];
   private oldRaw = '';
 
   @Output()
@@ -277,9 +282,8 @@ export class TranscrWindowComponent
       if (direction !== 'down') {
         this.goToSegment(direction)
           .then(() => {
-            const segment = this.transcrService.currentlevel!.segments.get(
-              this.segmentIndex
-            );
+            const segment =
+              this.transcrService.currentlevel!.segments[this.segmentIndex];
 
             if (segment?.isBlockedBy === undefined) {
               this.audiochunk.startPlayback().catch((error) => {
@@ -333,7 +337,6 @@ export class TranscrWindowComponent
           });
           break;
         case 'step_backward':
-          console.log(`step backward`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
@@ -346,7 +349,6 @@ export class TranscrWindowComponent
           });
           break;
         case 'step_backwardtime':
-          console.log(`step backward time`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
             shortcutName: $event.shortcutName,
@@ -386,9 +388,9 @@ export class TranscrWindowComponent
     this._loading = false;
     this.setValidationEnabledToDefault();
 
-    this.editor.Settings.markers = this.transcrService.guidelines.markers;
-    this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-    this.editor.Settings.specialMarkers.boundary = true;
+    this.editor.settings.markers = this.transcrService.guidelines.markers;
+    this.editor.settings.responsive = this.settingsService.responsive.enabled;
+    this.editor.settings.specialMarkers.boundary = true;
     this.loupe.name = 'transcr-window viewer';
     this.loupe.settings.margin.top = 5;
     this.loupe.settings.margin.bottom = 0;
@@ -404,17 +406,15 @@ export class TranscrWindowComponent
     this.loupe.settings.multiLine = false;
     this.loupe.av.drawnSelection = undefined;
 
-    const segments = this.transcrService.currentlevel!.segments;
-    this.tempSegments = segments.clone();
+    this.tempSegments = [...this.transcrService.currentlevel!.segments];
     this.subscrManager.removeByTag('editor');
     if (
       this.segmentIndex > -1 &&
       this.transcrService.currentlevel!.segments &&
       this.segmentIndex < this.transcrService.currentlevel!.segments.length
     ) {
-      this.transcript = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      )!.transcript;
+      this.transcript =
+        this.transcrService.currentlevel!.segments[this.segmentIndex].value;
     }
 
     const shortcutGroup =
@@ -465,9 +465,8 @@ export class TranscrWindowComponent
 
     this.subscrManager.add(
       timer(500).subscribe(() => {
-        const segment = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex
-        );
+        const segment =
+          this.transcrService.currentlevel!.segments[this.segmentIndex];
 
         if (segment!.isBlockedBy === undefined) {
           this.audiochunk.startPlayback().catch((error) => {
@@ -476,6 +475,7 @@ export class TranscrWindowComponent
         }
       })
     );
+    this.editor.focus(true, true);
   }
 
   ngAfterContentInit() {
@@ -491,8 +491,8 @@ export class TranscrWindowComponent
 
     const startSample =
       this.segmentIndex > 0
-        ? this.transcrService.currentlevel!.segments.get(this.segmentIndex - 1)!
-            .time.samples
+        ? this.transcrService.currentlevel!.segments[this.segmentIndex - 1].time
+            .samples
         : 0;
 
     this.uiService.addElementFromEvent(
@@ -507,8 +507,8 @@ export class TranscrWindowComponent
       {
         start: startSample,
         length:
-          this.transcrService.currentlevel!.segments.get(this.segmentIndex)!
-            .time.samples - startSample,
+          this.transcrService.currentlevel!.segments[this.segmentIndex]!.time
+            .samples - startSample,
       },
       'transcription window'
     );
@@ -538,23 +538,21 @@ export class TranscrWindowComponent
         ) > -1
       ) {
         // boundaries were inserted
-        this.transcrService.currentlevel!.segments.segments =
-          this.tempSegments.segments;
-        this.transcrService.currentLevelSegmentChange.emit(undefined);
+        this.transcrService.currentlevel!.segments = this.tempSegments;
       } else {
         // no boundaries inserted
-        const segment = this.transcrService
-          .currentlevel!.segments.get(this.segmentIndex)!
-          .clone();
+        const segment =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex
+          ]!.clone();
         this.editor.updateRawText();
-        segment.transcript = this.editor.rawText;
-        segment.isBlockedBy = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex
-        )!.isBlockedBy;
-        this.transcrService.currentlevel!.segments.change(
-          this.segmentIndex,
-          segment
-        );
+        segment.value = this.editor.rawText;
+        segment.isBlockedBy =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex
+          ].isBlockedBy;
+        this.transcrService.currentlevel!.segments[this.segmentIndex] = segment;
+        this.transcrService.saveSegments();
       }
     } else {
       const isNull = this.transcrService.currentlevel!.segments === undefined;
@@ -569,14 +567,14 @@ export class TranscrWindowComponent
       };
 
       if (this.segmentIndex > -1) {
-        const annoSegment = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex
-        );
+        const annoSegment =
+          this.transcrService.currentlevel!.segments[this.segmentIndex];
         segment.start = 0;
         if (this.segmentIndex > 0) {
-          segment.start = this.transcrService.currentlevel!.segments.get(
-            this.segmentIndex - 1
-          )!.time.samples;
+          segment.start =
+            this.transcrService.currentlevel!.segments[
+              this.segmentIndex - 1
+            ].time.samples;
         }
 
         segment.length = annoSegment!.time.samples - segment.start;
@@ -649,12 +647,10 @@ export class TranscrWindowComponent
 
         if (appliedDirection !== '') {
           for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
-            const tempSegment =
-              this.transcrService.currentlevel!.segments.get(i);
+            const tempSegment = this.transcrService.currentlevel!.segments[i];
 
             if (
-              tempSegment!.transcript !==
-                this.transcrService.breakMarker.code &&
+              tempSegment!.value !== this.transcrService.breakMarker.code &&
               tempSegment!.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
               tempSegment!.isBlockedBy !== ASRQueueItemType.MAUS
             ) {
@@ -666,9 +662,9 @@ export class TranscrWindowComponent
 
           const start =
             this.segmentIndex > 0
-              ? this.transcrService.currentlevel!.segments.get(
+              ? this.transcrService.currentlevel!.segments[
                   this.segmentIndex - 1
-                )!.time.samples
+                ].time.samples
               : 0;
           const valueString =
             appliedDirection === 'right' ? 'entered next' : 'entered previous';
@@ -682,9 +678,8 @@ export class TranscrWindowComponent
             {
               start,
               length:
-                this.transcrService.currentlevel!.segments.get(
-                  this.segmentIndex
-                )!.time.samples - start,
+                this.transcrService.currentlevel!.segments[this.segmentIndex]
+                  .time.samples - start,
             },
             'transcription window'
           );
@@ -692,17 +687,19 @@ export class TranscrWindowComponent
 
         let begin;
         if (this.segmentIndex > 0) {
-          begin = this.transcrService
-            .currentlevel!.segments.get(this.segmentIndex - 1)!
-            .time.clone();
+          begin =
+            this.transcrService.currentlevel!.segments[
+              this.segmentIndex - 1
+            ]!.time.clone();
         } else {
           begin = new SampleUnit(0, this.audioManager.sampleRate);
         }
 
         if (segment !== undefined) {
-          this.transcript = this.transcrService.currentlevel!.segments.get(
-            this.segmentIndex
-          )!.transcript;
+          this.transcript =
+            this.transcrService.currentlevel!.segments[
+              this.segmentIndex
+            ]!.value;
           // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(
             new AudioSelection(begin, segment.time.clone())
@@ -729,14 +726,14 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      );
+      const annoSegment =
+        this.transcrService.currentlevel!.segments[this.segmentIndex];
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex - 1
-        )!.time.samples;
+        segment.start =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex - 1
+          ].time.samples;
       }
 
       segment.length = annoSegment!.time.samples - segment.start;
@@ -776,14 +773,14 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      );
+      const annoSegment =
+        this.transcrService.currentlevel!.segments[this.segmentIndex];
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex - 1
-        )!.time.samples;
+        segment.start =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex - 1
+          ].time.samples;
       }
 
       segment.length = annoSegment!.time.samples - segment.start;
@@ -823,14 +820,14 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      );
+      const annoSegment =
+        this.transcrService.currentlevel!.segments[this.segmentIndex];
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex - 1
-        )!.time.samples;
+        segment.start =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex - 1
+          ].time.samples;
       }
 
       segment.length = annoSegment!.time.samples - segment.start;
@@ -899,14 +896,14 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      );
+      const annoSegment =
+        this.transcrService.currentlevel!.segments[this.segmentIndex];
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex - 1
-        )!.time.samples;
+        segment.start =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex - 1
+          ].time.samples;
       }
 
       segment.length = annoSegment!.time.samples - segment.start;
@@ -954,14 +951,14 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.transcrService.currentlevel!.segments.get(
-        this.segmentIndex
-      );
+      const annoSegment =
+        this.transcrService.currentlevel!.segments[this.segmentIndex];
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel!.segments.get(
-          this.segmentIndex - 1
-        )!.time.samples;
+        segment.start =
+          this.transcrService.currentlevel!.segments[
+            this.segmentIndex - 1
+          ].time.samples;
       }
 
       segment.length = annoSegment!.time.samples - segment.start;
@@ -995,14 +992,17 @@ export class TranscrWindowComponent
   }
 
   onBoundaryClicked(sample: SampleUnit) {
-    const i: number = this.tempSegments.getSegmentBySamplePosition(sample);
+    const i: number = getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments,
+      sample
+    );
 
     if (i > -1) {
       this.audiochunk.startpos =
         i > 0
-          ? this.tempSegments.get(i - 1)!.time.clone()
+          ? this.tempSegments[i - 1].time.clone()
           : this.audioManager.createSampleUnit(0);
-      this.audiochunk.selection.end = this.tempSegments.get(i)!.time.clone();
+      this.audiochunk.selection.end = this.tempSegments[i]!.time.clone();
       this.loupe.av.drawnSelection = this.audiochunk.selection;
       this.audiochunk.startPlayback().catch((error) => {
         console.error(error);
@@ -1038,16 +1038,16 @@ export class TranscrWindowComponent
   }
 
   saveTranscript() {
-    const segStart =
-      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-        this.audiochunk.time.start.add(
-          new SampleUnit(20, this.audioManager.sampleRate)
-        )
-      );
+    const segStart = getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments,
+      this.audiochunk.time.start.add(
+        new SampleUnit(20, this.audioManager.sampleRate)
+      )
+    );
     const currentSegment =
-      this.transcrService.currentlevel!.segments.get(segStart);
+      this.transcrService.currentlevel!.segments[this.segmentIndex];
 
-    this.tempSegments = this.transcrService.currentlevel!.segments.clone();
+    this.tempSegments = [...this.transcrService.currentlevel!.segments];
     const html = this.editor.getRawText();
     // split text at the position of every boundary marker
     const segTexts: string[] = html.split(/\s?{[0-9]+}\s?/g);
@@ -1078,7 +1078,8 @@ export class TranscrWindowComponent
     }
 
     for (let i = 0; i < segTexts.length - 1; i++) {
-      this.tempSegments.add(
+      addSegment(
+        this.tempSegments,
         this.audioManager.createSampleUnit(samplesArray[i]),
         currentSegment!.speakerLabel,
         segTexts[i]
@@ -1086,10 +1087,8 @@ export class TranscrWindowComponent
     }
 
     // shift rest of text to next segment
-    const found = this.tempSegments.get(segStart + segTexts.length - 1);
-
-    if (!(found === undefined || found === undefined)) {
-      this.tempSegments.get(segStart + segTexts.length - 1)!.transcript =
+    if (this.tempSegments[segStart + segTexts.length - 1]) {
+      this.tempSegments[segStart + segTexts.length - 1]!.value =
         segTexts[segTexts.length - 1];
     }
   }
@@ -1133,10 +1132,10 @@ export class TranscrWindowComponent
    */
   public isNextSegmentLastAndBreak(segmentIndex: number) {
     const currentLevel = this.transcrService.currentlevel;
-    const nextSegment = currentLevel!.segments.get(segmentIndex + 1);
+    const nextSegment = currentLevel!.segments[segmentIndex + 1];
     return (
       segmentIndex === currentLevel!.segments.length - 2 &&
-      (nextSegment!.transcript === this.transcrService.breakMarker.code ||
+      (nextSegment!.value === this.transcrService.breakMarker.code ||
         nextSegment!.isBlockedBy === ASRQueueItemType.ASRMAUS ||
         nextSegment!.isBlockedBy === ASRQueueItemType.MAUS)
     );
@@ -1145,4 +1144,6 @@ export class TranscrWindowComponent
   public onKeyUp() {
     this.appStorage.savingNeeded = true;
   }
+
+  somethingChanged($event: any) {}
 }

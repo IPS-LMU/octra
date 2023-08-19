@@ -28,7 +28,7 @@ import {
 import { AudioManager } from '@octra/media';
 import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import {joinURL, popupCenter} from '@octra/utilities';
+import { joinURL, popupCenter } from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
 
@@ -77,9 +77,6 @@ export class AuthenticationEffects {
                   match && match.length === 2
                     ? match[1]
                     : document.location.href;
-                console.log('OPEN WINDOW');
-                console.log(joinURL(baseURL, 'auth-success'));
-
                 const bc = new BroadcastChannel('ocb_authentication');
                 bc.addEventListener('message', (e) => {
                   if (e.data === true) {
@@ -318,7 +315,6 @@ export class AuthenticationEffects {
               );
             }
           } else if (state.application.mode) {
-            console.log(`MODE IS ${state.application.mode}`);
             // is not online => load local configuration
             this.store.dispatch(
               LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
@@ -328,7 +324,6 @@ export class AuthenticationEffects {
               })
             );
           } else {
-            console.log(`MODE IS UNDEFINED`);
             // mode is undefined
             this.routingService.navigate('redirect because mode is undefined', [
               '/login',
@@ -497,7 +492,6 @@ export class AuthenticationEffects {
       this.actions$.pipe(
         ofType(AuthenticationActions.loginOnline.fail),
         tap((a) => {
-          console.log('show error on login fail');
           this.modalsService.openModal(
             ErrorModalComponent,
             ErrorModalComponent.options,
@@ -536,8 +530,6 @@ export class AuthenticationEffects {
       file.type
     );
   };
-
-
 
   constructor(
     private actions$: Actions,

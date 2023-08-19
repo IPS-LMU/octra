@@ -30,7 +30,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Segment } from '@octra/annotation';
+import { removeSegmentByIndex, Segment } from '@octra/annotation';
 import { IntArray, WavFormat } from '@octra/media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
@@ -226,8 +226,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       i < this.transcrService.currentlevel!.segments.length;
       i++
     ) {
-      const segment: Segment =
-        this.transcrService.currentlevel!.segments.get(i)!;
+      const segment: Segment = this.transcrService.currentlevel!.segments[i]!;
       let sampleDur = segment.time.samples - startSample;
 
       if (
@@ -244,7 +243,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         number: i,
         sampleStart: startSample,
         sampleDur,
-        transcript: segment.transcript,
+        transcript: segment.value,
       });
       startSample = segment.time.samples;
     }
@@ -526,7 +525,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   isSomethingBlocked(): boolean {
     return (
-      this.transcrService.currentlevel!.segments.segments.find((a) => {
+      this.transcrService.currentlevel!.segments.find((a) => {
         return a.isBlockedBy !== undefined;
       }) !== undefined
     );
@@ -551,10 +550,10 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
     const isSilence = (segment: Segment) => {
       return (
-        segment.transcript.trim() === '' ||
-        segment.transcript.trim() === this.transcrService.breakMarker.code ||
-        segment.transcript.trim() === '<p:>' ||
-        segment.transcript.trim() === this.transcrService.breakMarker.code
+        segment.value.trim() === '' ||
+        segment.value.trim() === this.transcrService.breakMarker.code ||
+        segment.value.trim() === '<p:>' ||
+        segment.value.trim() === this.transcrService.breakMarker.code
       );
     };
 
@@ -566,47 +565,46 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
     for (
       let i = 0;
-      i < this.transcrService!.currentlevel!.segments.segments.length;
+      i < this.transcrService!.currentlevel!.segments.length;
       i++
     ) {
-      const segment = this.transcrService!.currentlevel!.segments.segments[i];
+      const segment = this.transcrService!.currentlevel!.segments[i];
 
       let startPos = 0;
       if (i > 0) {
-        startPos =
-          this.transcrService!.currentlevel!.segments.segments[i - 1].time.unix;
+        startPos = this.transcrService!.currentlevel!.segments[i - 1].time.unix;
       }
       let duration = segment.time.unix - startPos;
       if (!isSilence(segment) || duration < minSilenceLength) {
         if (maxWords > 0 && wordCounter >= maxWords) {
-          wordCounter = isSilence(segment) ? 0 : countWords(segment.transcript);
+          wordCounter = isSilence(segment) ? 0 : countWords(segment.value);
         } else {
           if (i > 0) {
             const lastSegment =
-              this.transcrService!.currentlevel!.segments.segments[i - 1];
+              this.transcrService!.currentlevel!.segments[i - 1];
             startPos = 0;
             if (i > 1) {
               startPos =
-                this.transcrService.currentlevel!.segments.segments[i - 2].time
-                  .unix;
+                this.transcrService.currentlevel!.segments[i - 2].time.unix;
             }
             duration = lastSegment.time.unix - startPos;
             if (!isSilence(lastSegment) || duration < minSilenceLength) {
-              let lastSegmentText = lastSegment.transcript;
-              let segmentText = segment.transcript;
+              let lastSegmentText = lastSegment.value;
+              let segmentText = segment.value;
 
               if (isSilence(lastSegment)) {
                 lastSegmentText = '';
               }
 
               if (!isSilence(segment)) {
-                segment.transcript = `${lastSegmentText} ${segment.transcript}`;
-                wordCounter = countWords(segment.transcript);
+                segment.value = `${lastSegmentText} ${segment.value}`;
+                wordCounter = countWords(segment.value);
               } else {
                 segmentText = '';
-                segment.transcript = `${lastSegmentText}`;
+                segment.value = `${lastSegmentText}`;
               }
-              this.transcrService.currentlevel!.segments.removeByIndex(
+              this.transcrService.currentlevel!.segments = removeSegmentByIndex(
+                this.transcrService.currentlevel!.segments,
                 i - 1,
                 '',
                 false
@@ -619,7 +617,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
 
     this.close();
-    this.transcrService.currentLevelSegmentChange.emit();
 
     this.subscrManager.add(
       timer(1000).subscribe(() => {

@@ -21,9 +21,9 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor } from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
-import { Segment, Segments } from '@octra/annotation';
+import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
 import { AudioplayerComponent } from '@octra/ngx-components';
 import { Subscription } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
@@ -35,11 +35,9 @@ import { AudioNavigationComponent } from '../../core/component/audio-navigation'
 })
 export class DictaphoneEditorComponent
   extends OCTRAEditor
-  implements OnInit, OnDestroy, AfterViewInit
+  implements OnInit, OnDestroy, AfterViewInit, OctraEditorRequirements
 {
   public static editorname = 'Dictaphone Editor';
-
-  public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('nav', { static: true }) nav!: AudioNavigationComponent;
   @ViewChild('audioplayer', { static: true })
@@ -52,6 +50,7 @@ export class DictaphoneEditorComponent
   private subscrmanager: SubscriptionManager<Subscription>;
   private boundaryselected = false;
 
+  public initialized: EventEmitter<void> = new EventEmitter<void>();
   public get highlighting(): boolean {
     return this.appStorage.highlightingEnabled;
   }
@@ -59,7 +58,7 @@ export class DictaphoneEditorComponent
     this.appStorage.highlightingEnabled = value;
   }
 
-  public segments?: Segments = undefined;
+  public segments?: Segment[] = [];
 
   private oldRaw = '';
 
@@ -164,10 +163,10 @@ export class DictaphoneEditorComponent
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
     this.audiochunk = this.audioManager.mainchunk.clone();
-    this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
-    this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-    this.editor.Settings.specialMarkers.boundary = true;
-    this.editor.Settings.highlightingEnabled = true;
+    this.editor.settings.markers = this.transcrService.guidelines.markers.items;
+    this.editor.settings.responsive = this.settingsService.responsive.enabled;
+    this.editor.settings.specialMarkers.boundary = true;
+    this.editor.settings.highlightingEnabled = true;
 
     this.subscrmanager.add(
       this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered),
@@ -175,7 +174,7 @@ export class DictaphoneEditorComponent
     );
     this.keyMap.register(this.shortcuts);
 
-    DictaphoneEditorComponent.initialized.emit();
+    this.initialized.emit();
   }
 
   ngAfterViewInit() {
@@ -293,7 +292,6 @@ export class DictaphoneEditorComponent
           });
           break;
         case 'step_backward':
-          console.log(`step backward`);
           triggerUIAction({
             shortcut: $event.shortcutName,
             value: $event.shortcut,
@@ -303,7 +301,6 @@ export class DictaphoneEditorComponent
           });
           break;
         case 'step_backwardtime':
-          console.log(`step backward time`);
           triggerUIAction({
             shortcut: $event.shortcutName,
             value: $event.shortcut,
@@ -317,17 +314,17 @@ export class DictaphoneEditorComponent
   };
 
   onBoundaryClicked(samples: SampleUnit) {
-    const i: number =
-      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-        samples
-      );
+    const i: number = getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments,
+      samples
+    );
 
     this.boundaryselected = true;
 
     if (i > -1) {
       const start =
         i > 0
-          ? this.transcrService.currentlevel!.segments.get(i - 1)!.time.samples
+          ? this.transcrService.currentlevel!.segments[i - 1]!.time.samples
           : 0;
 
       new Promise<void>((resolve) => {
@@ -338,9 +335,8 @@ export class DictaphoneEditorComponent
         }
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
-        this.audiochunk.selection.end = this.transcrService
-          .currentlevel!.segments.get(i)!
-          .time.clone();
+        this.audiochunk.selection.end =
+          this.transcrService.currentlevel!.segments[i]!.time.clone();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos to selected boundary
@@ -439,10 +435,8 @@ export class DictaphoneEditorComponent
       const segment = new Segment(time, '', segTexts[i]);
       segments.push(segment);
     }
-    this.transcrService.currentlevel!.segments.overwriteAllWith(
-      segments,
-      this.audioManager.resource.info.duration
-    );
+    this.transcrService.currentlevel!.segments = [...segments];
+    this.transcrService.saveSegments();
   }
 
   public update() {
@@ -455,12 +449,10 @@ export class DictaphoneEditorComponent
   }
 
   public enableAllShortcuts() {
-    console.log(`enable all shortcuts!`);
     this.shortcutsEnabled = true;
   }
 
   public disableAllShortcuts() {
-    console.log(`disable all shortcuts!`);
     this.shortcutsEnabled = false;
   }
 
@@ -496,7 +488,8 @@ export class DictaphoneEditorComponent
     ) {
       this.segments = this.transcrService.currentlevel.segments;
     }
-    this.editor.Settings.height = 100;
+    this.editor.settings.height = 100;
     this.oldRaw = this.editor.rawText;
+    this.editor.focus(true);
   }
 }

@@ -23,7 +23,6 @@ export const checkAndThrowError: (
 ) => {
   console.error(error);
   if (Object.keys(error).includes('statusCode') && error.statusCode === 0) {
-    console.log('SHOW ERROR');
     return of(
       ApplicationActions.showErrorModal.do({
         error: 'server is offline',

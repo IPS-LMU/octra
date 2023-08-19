@@ -19,9 +19,10 @@ import {
 import { NavbarService } from './navbar.service';
 import {
   AnnotationLevelType,
+  convertOSegmentsToSegments,
+  convertSegmentsToOSegments,
   Level,
   OIDBLevel,
-  Segments,
 } from '@octra/annotation';
 import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
@@ -163,7 +164,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   public openBugReport() {
-    console.log(`open bugreport`);
     this.modService
       .openModal(BugreportModalComponent, BugreportModalComponent.options)
       .then(() => {
@@ -189,8 +189,9 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
           id: level.id,
           name: level.name,
           type: level.type,
-          items: level.segments.getObj(
+          items: convertSegmentsToOSegments(
             level.name,
+            level.segments,
             this.transcrServ.audioManager.resource.info.duration.samples
           ),
         })
@@ -228,8 +229,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       -1,
       levelname,
       'SEGMENT',
-      new Segments(
-        this.transcrServ.audioManager.resource.info.sampleRate,
+      convertOSegmentsToSegments(
         levelname,
         [],
         this.transcrServ.audioManager.resource.info.duration

@@ -11,8 +11,9 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AudioChunk } from '@octra/media';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
-import {AsrStoreService} from '../../store/asr/asr-store-service.service';
-import {ASRQueueItemType} from '../../store/asr';
+import { AsrStoreService } from '../../store/asr/asr-store-service.service';
+import { ASRQueueItemType } from '../../store/asr';
+import { getSegmentBySamplePosition } from '@octra/annotation';
 
 @Component({
   selector: 'octra-asr-options',
@@ -52,23 +53,17 @@ export class AsrOptionsComponent extends DefaultComponent {
     for (const provider of this.appSettings.octra.plugins.asr.services) {
       this.serviceProviders['' + provider.provider] = provider;
     }
-    console.log(this.settingsService.appSettings.octra.plugins.asr);
   }
 
   getShortCode(code: string) {
     return code.substring(code.length - 2);
   }
 
-  onMouseMove() {
+  onMouseMove() {}
 
-  }
-
-  onMouseOut() {
-
-  }
+  onMouseOut() {}
 
   onASRLangChanged(lang?: ASRLanguage) {
-    console.log("CHANGE!");
     this.asrStoreService.changeASRService(lang);
     this.dropdown.close();
   }
@@ -97,7 +92,7 @@ export class AsrOptionsComponent extends DefaultComponent {
 
         if (segNumber > -1) {
           const segment =
-            this.transcrService.currentlevel!.segments.get(segNumber);
+            this.transcrService.currentlevel!.segments[segNumber];
 
           if (segment !== undefined) {
             segment.isBlockedBy = ASRQueueItemType.ASR;
@@ -124,10 +119,10 @@ export class AsrOptionsComponent extends DefaultComponent {
   }
 
   startASRForAllSegmentsNext() {
-    const segNumber =
-      this.transcrService!.currentlevel!.segments.getSegmentBySamplePosition(
-        this.audioChunk!.time.start.add(this.audioChunk!.time.duration)
-      );
+    const segNumber = getSegmentBySamplePosition(
+      this.transcrService!.currentlevel!.segments,
+      this.audioChunk!.time.start.add(this.audioChunk!.time.duration)
+    );
 
     if (segNumber > -1) {
       for (
@@ -135,13 +130,12 @@ export class AsrOptionsComponent extends DefaultComponent {
         i < this.transcrService!.currentlevel!.segments.length;
         i++
       ) {
-        const segment = this.transcrService!.currentlevel!.segments.get(i);
+        const segment = this.transcrService!.currentlevel!.segments[i];
 
         if (segment !== undefined) {
           const sampleStart =
             i > 0
-              ? this.transcrService!.currentlevel!.segments.get(i - 1)!.time
-                  .samples
+              ? this.transcrService!.currentlevel!.segments[i - 1]!.time.samples
               : 0;
           const sampleLength = segment.time.samples - sampleStart;
 
@@ -160,9 +154,8 @@ export class AsrOptionsComponent extends DefaultComponent {
             segment.isBlockedBy = undefined;
           } else {
             if (
-              segment.transcript.trim() === '' &&
-              segment.transcript.indexOf(this.transcrService.breakMarker.code) <
-                0
+              segment.value.trim() === '' &&
+              segment.value.indexOf(this.transcrService.breakMarker.code) < 0
             ) {
               // segment is empty and contains not a break
               segment.isBlockedBy = ASRQueueItemType.ASR;
@@ -194,7 +187,7 @@ export class AsrOptionsComponent extends DefaultComponent {
   stopASRForAll() {
     // TODO implement
     // this.asrService.stopASR();
-   // this.asrService.queue.clear();
+    // this.asrService.queue.clear();
   }
 
   stopASRForThisSegment() {
@@ -214,7 +207,6 @@ export class AsrOptionsComponent extends DefaultComponent {
 
      */
   }
-
 
   onMAUSLangChanged(language: string, code: string) {
     /* TODO implement
@@ -244,7 +236,8 @@ export class AsrOptionsComponent extends DefaultComponent {
     if (this.serviceProviders[langAsr]) {
       const ohService = this.serviceProviders[langAsr];
       if (ohService.usedQuota && ohService.quotaPerMonth) {
-        const remainingQuota = (ohService.quotaPerMonth - ohService.usedQuota) / 60;
+        const remainingQuota =
+          (ohService.quotaPerMonth - ohService.usedQuota) / 60;
         let label = '';
         if (remainingQuota > 60) {
           label = `${Math.round(remainingQuota / 60)} hours`;

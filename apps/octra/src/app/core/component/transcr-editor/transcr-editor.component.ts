@@ -31,7 +31,6 @@ import {
   unEscapeHtml,
 } from '@octra/utilities';
 import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
-import { Segments } from '@octra/annotation';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
@@ -39,6 +38,7 @@ import { DefaultComponent } from '../default.component';
 import { Config } from 'jodit/types/config';
 import { IControlType } from 'jodit/src/types';
 import { IJodit, IToolbarButton } from 'jodit/types/types';
+import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -64,6 +64,7 @@ export class TranscrEditorComponent
     new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
+
   @Input() visible = true;
   @Input() markers: any[] = [];
   @Input() easymode = true;
@@ -117,7 +118,7 @@ export class TranscrEditorComponent
     },
   };
   @Output() highlightingEnabledChange = new EventEmitter();
-  @Input() segments?: Segments = undefined;
+  @Input() segments?: Segment[] = undefined;
   @Input() public transcript = '';
   private internalTyping: EventEmitter<string> = new EventEmitter<string>();
   private shortcutsManager: ShortcutManager;
@@ -145,6 +146,7 @@ export class TranscrEditorComponent
   };
 
   public htmlValue = '';
+  private initialized: boolean = false;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -182,11 +184,12 @@ export class TranscrEditorComponent
     return this.audiochunk!.audioManager;
   }
 
-  get Settings(): TranscrEditorConfig {
+  get settings(): TranscrEditorConfig {
     return this._settings;
   }
 
-  set Settings(value: TranscrEditorConfig) {
+  @Input()
+  set settings(value: TranscrEditorConfig) {
     this._settings = value;
   }
 
@@ -250,7 +253,7 @@ export class TranscrEditorComponent
       $event.preventDefault();
       if (
         shortcutInfo.shortcut === 'ALT + S' &&
-        this.Settings.specialMarkers.boundary
+        this.settings.specialMarkers.boundary
       ) {
         // add boundary
         this.insertBoundary(
@@ -476,10 +479,11 @@ export class TranscrEditorComponent
         buttons: [],
         extraButtons: [],
       };
+      this.initialized = false;
       this.initToolbar();
 
       if (
-        this.Settings.specialMarkers.boundary &&
+        this.settings.specialMarkers.boundary &&
         this.joditOptions.extraButtons
       ) {
         this.joditOptions.extraButtons.push(this.createBoundaryButton() as any);
@@ -530,6 +534,7 @@ export class TranscrEditorComponent
       if (this._settings.highlightingEnabled) {
         this.startRecurringHighlight();
       }
+      this.initialized = true;
     }
   };
 
@@ -589,8 +594,6 @@ export class TranscrEditorComponent
           }
         });
 
-        console.log(`markercode on insert is ${markerCode}`);
-
         const element = document.createElement('img');
         element.setAttribute('src', icon);
         element.setAttribute('class', 'btn-icon-text');
@@ -644,11 +647,10 @@ export class TranscrEditorComponent
   };
 
   ngAfterViewInit() {
-    this.Settings.height = this.height;
+    this.settings.height = this.height;
     if (this.audiochunk !== undefined) {
       this._lastAudioChunkID = this.audiochunk.id;
     }
-    console.log('AFTER VIEW INIT');
     this.initialize();
 
     /* TODO implement
@@ -668,11 +670,11 @@ export class TranscrEditorComponent
 
   ngOnChanges(obj: SimpleChanges) {
     let renew = false;
-    console.log(obj);
     if (
       Object.keys(obj).includes('markers') &&
       obj['markers'].currentValue !== obj['markers'].previousValue
     ) {
+      console.log("markers changed")
       if (obj['markers'].currentValue === undefined) {
         this.markers = [];
       }
@@ -683,6 +685,7 @@ export class TranscrEditorComponent
       obj['easymode'].previousValue !== obj['easymode'].currentValue &&
       !obj['easymode'].firstChange
     ) {
+      console.log("easy mode changed")
       renew = true;
     }
     if (
@@ -710,7 +713,7 @@ export class TranscrEditorComponent
     }
 
     if (renew) {
-      console.log('RENEW TRANSR EDITOR');
+      console.log("RENEW TRANSCR EDITOR");
       this.initialize();
       this.initPopover();
     }
@@ -756,14 +759,17 @@ export class TranscrEditorComponent
         active: false,
       },
       getContent: (a, b, c) => {
-        const button = document.createElement('span');
-        button.style.display = 'flex';
-        button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
-        button.innerHTML = getContent();
-        button.addEventListener('click', (event: MouseEvent) => {
-          onClick(event, button);
-        });
-        return button;
+        if(!this.initialized) {
+          const button = document.createElement('span');
+          button.style.display = 'flex';
+          button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
+          button.innerHTML = getContent();
+          button.addEventListener('click', (event: MouseEvent) => {
+            onClick(event, button);
+          });
+          return button;
+        }
+        return c.container.children[0];
       },
       isActive: function (editor, btn) {
         if (btn.data) {
@@ -812,7 +818,7 @@ export class TranscrEditorComponent
             content +=
               `${marker.button_text}<span class="btn-shortcut"> ` +
               `[${marker.shortcut[platform]}]</span>`;
-            if (this.Settings.responsive) {
+            if (this.settings.responsive) {
               content =
                 `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
                 `[${marker.shortcut[platform]}]</span>`;
@@ -826,7 +832,7 @@ export class TranscrEditorComponent
               `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
               `<span class="btn-description"> ${marker.button_text}</span><span class="btn-shortcut"> ` +
               `[${marker.shortcut[platform]}]</span>`;
-            if (this.Settings.responsive) {
+            if (this.settings.responsive) {
               content =
                 `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
                 `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
@@ -1165,7 +1171,7 @@ export class TranscrEditorComponent
             this.audioManager.createSampleUnit(item.time.sampleStart + 1)
           );
         const segment =
-          this.transcrService.currentlevel!.segments.get(segIndex);
+          this.transcrService.currentlevel!.segments[segIndex];
         segment!.isBlockedBy = undefined;
         this.transcrService.currentlevel!.segments.change(segIndex, segment!);
       }
@@ -1218,7 +1224,8 @@ export class TranscrEditorComponent
     }
 
     const segIndexPlayposition =
-      this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      getSegmentBySamplePosition(
+        this.segments!,
         playPosition
       );
 
@@ -1228,7 +1235,7 @@ export class TranscrEditorComponent
     ) {
       this.saveSelection();
       const currentlyPlayedSegment =
-        this.transcrService.currentlevel.segments.get(segIndexPlayposition)!;
+        this.transcrService.currentlevel.segments[segIndexPlayposition]!;
 
       this.removeHighlight();
 
@@ -1330,7 +1337,7 @@ export class TranscrEditorComponent
       return (
         this.markers.findIndex((a: any) => a.shortcut[platform] === shortcut) >
           -1 ||
-        (shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary)
+        (shortcut === 'ALT + S' && this.settings.specialMarkers.boundary)
       );
     }
 
@@ -1358,7 +1365,7 @@ export class TranscrEditorComponent
             `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
             `<span class="btn-description">${boundaryLabel}</span><span class="btn-shortcut"> ` +
             `[ALT + S]</span>`;
-          if (this.Settings.responsive) {
+          if (this.settings.responsive) {
             content =
               `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
               `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
@@ -1406,15 +1413,15 @@ export class TranscrEditorComponent
     }
   }
 
-  private setSegments(segments: Segments) {
+  private setSegments(segments: Segment[]) {
     let result = '';
 
     for (let i = 0; i < segments.length; i++) {
-      const seg = segments.get(i);
-      result += seg!.transcript;
+      const seg = segments[i];
+      result += seg!.value;
 
       if (i < segments.length - 1) {
-        result += `{${segments.get(i)!.time.samples}}`;
+        result += `{${segments[i]!.time.samples}}`;
       }
     }
 
@@ -1548,12 +1555,8 @@ export class TranscrEditorComponent
       if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
-        this.cd.markForCheck();
-        this.cd.detectChanges();
         this.validationPopover.description = errorDetails.description;
         this.validationPopover.title = errorDetails.title;
-        this.cd.markForCheck();
-        this.cd.detectChanges();
 
         let marginLeft = target.offsetLeft;
         const height = this.validationPopover.height;
@@ -1699,7 +1702,6 @@ export class TranscrEditorComponent
   }
 
   onAfterInit = () => {
-    // TODO fix additional <p><br/></p>
     this.subscrManager.removeByTag('afterInit');
     this.subscrManager.add(
       timer(50).subscribe(() => {
@@ -1709,7 +1711,6 @@ export class TranscrEditorComponent
           segmentBoundary.innerHTML = '00:00:000';
           this.popovers.segmentBoundary = segmentBoundary;
 
-          console.log('inserted panel seg-popover');
           this.workplace?.parentNode?.insertBefore(
             this.popovers.segmentBoundary!,
             this.workplace
@@ -1740,6 +1741,10 @@ export class TranscrEditorComponent
   placeAtEnd(element: HTMLElement) {
     if (element?.lastChild) {
       this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild);
+    } else {
+      this.joditComponent?.jodit?.selection.focus();
+      element.innerHTML = element.innerHTML.replace(/(<p>).*(<span[^>]+>[^<]+<\/span>)/g, "$1$2");
+      element.innerHTML = element.innerHTML.replace(/(<br\/?>)/g, "");
     }
   }
 }

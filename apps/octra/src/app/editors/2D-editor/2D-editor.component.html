@@ -28,6 +28,7 @@
         code: '<P>'
       }"
       [isMultiLine]="false"
+      [refreshOnInternChanges]="false"
       [name]="'loupe'"
       [ngStyle]="{
         width: miniloupe.size.width + 'px',
@@ -42,7 +43,8 @@
         'flex-direction': 'column'
       }"
       [settings]="miniLoupeSettings"
-      [transcriptionLevel]="transcrService.currentlevel"
+      [(entries)]="transcrService.currentlevel.segments"
+      [levelName]="transcrService.currentlevel.name"
     ></octra-audio-viewer>
   </div>
   <octra-audio-viewer
@@ -55,7 +57,10 @@
       code: '<P>'
     }"
     [isMultiLine]="true"
-    [transcriptionLevel]="transcrService.currentlevel"
+    [refreshOnInternChanges]="false"
+    [(entries)]="transcrService.currentlevel.segments"
+    (entriesChange)="onEntriesChange($event)"
+    [levelName]="transcrService.currentlevel.name"
     id="special"
     style="height: 400px; display: flex; flex: auto; flex-direction: column"
   >

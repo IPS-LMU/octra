@@ -180,7 +180,8 @@
               [settings]="audioViewerSettings"
               [audioChunk]="textEditor.audiochunk"
               [isMultiLine]="false"
-              [transcriptionLevel]="transcrService.currentlevel"
+              [refreshOnInternChanges]="false"
+              [(entries)]="transcrService.currentlevel.segments"
               style="height: 50px"
             >
             </octra-audio-viewer>

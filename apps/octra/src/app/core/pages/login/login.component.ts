@@ -9,7 +9,7 @@ import {
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import { BrowserInfo, FileSize, getFileSize } from '@octra/utilities';
+import { FileSize, getFileSize } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
 import { AppInfo } from '../../../app.info';
 import { OctraModalService } from '../../modals/octra-modal.service';
@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import {AccountLoginMethod} from '@octra/api-types';
+import { AccountLoginMethod } from '@octra/api-types';
 
 @Component({
   selector: 'octra-login',
@@ -97,7 +97,6 @@ export class LoginComponent
     private annotationStoreService: AnnotationStoreService
   ) {
     super();
-    console.log(BrowserInfo.platform + ' ' + BrowserInfo.browser);
   }
 
   onOfflineSubmit = (removeData: boolean) => {
@@ -124,7 +123,11 @@ export class LoginComponent
       password: string;
     };
   }) {
-    this.authStoreService.loginOnline($event.type, $event.credentials?.usernameEmail, $event.credentials?.password);
+    this.authStoreService.loginOnline(
+      $event.type,
+      $event.credentials?.usernameEmail,
+      $event.credentials?.password
+    );
   }
 
   onOnlineCredentialsSubmit() {

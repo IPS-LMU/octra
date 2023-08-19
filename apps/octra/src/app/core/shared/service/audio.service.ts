@@ -62,7 +62,6 @@ export class AudioService {
                   result.audioManager !== null
                 ) {
                   // finished
-                  console.log(`REGISTER AUDIOMANAGER`);
                   result.audioManager.resource.info.url = url;
                   this.registerAudioManager(result.audioManager);
                   this.afterloaded.emit({ status: 'success' });
@@ -90,7 +89,6 @@ export class AudioService {
 
   public registerAudioManager(manager: AudioManager) {
     if (manager !== undefined) {
-      console.log(`register new audio manager`);
       const found = this._audiomanagers.find((a: AudioManager) => {
         return a.resource.name === manager.resource.name;
       });
@@ -109,7 +107,6 @@ export class AudioService {
   }
 
   public destroy(disconnect: boolean = true) {
-    console.log(`destroy all!`);
     for (const audiomanager of this._audiomanagers) {
       audiomanager.destroy(disconnect);
     }

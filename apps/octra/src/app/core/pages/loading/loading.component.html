@@ -1,6 +1,6 @@
 <div id="loading">
   <span id="logo">OCTRA</span>
-  <div class="progress progress-bar-animated">
+  <div class="progress" role="progressbar" aria-label="Overall progress" [attr.aria-valuenow]="loading!.progress" aria-valuemin="0" aria-valuemax="100">
     <div
       *ngIf="settService.log === ''"
       [ngStyle]="{

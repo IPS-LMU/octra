@@ -85,7 +85,6 @@ export class ApplicationEffects {
                 settings: appconfig,
               });
             } else {
-              console.log(validation);
               return ApplicationActions.loadSettings.fail({
                 error: `<br/><ul>${validation
                   .map(
@@ -466,7 +465,6 @@ export class ApplicationEffects {
             embedded: this.getParameterByName('embedded'),
           };
 
-          console.log(`then!`);
           const transcriptURL =
             queryParams.transcript !== undefined
               ? queryParams.transcript
@@ -602,7 +600,6 @@ export class ApplicationEffects {
           ApplicationActions.showErrorModal.do
         ),
         tap((a) => {
-          console.log('show errror on start annotation fail');
           const ref = this.modalService.openModalRef<ErrorModalComponent>(
             ErrorModalComponent,
             {
@@ -628,7 +625,6 @@ export class ApplicationEffects {
             environment.debugging.logging.actions
           ) {
             console.groupCollapsed(`--- ACTION ${action.type} ---`);
-            console.log(action);
             console.groupEnd();
           }
         })

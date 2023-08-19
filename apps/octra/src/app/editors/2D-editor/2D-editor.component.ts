@@ -29,7 +29,7 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor } from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
 import {
   AudioViewerComponent,
@@ -43,10 +43,13 @@ import {
   PlayBackStatus,
   SampleUnit,
 } from '@octra/media';
-import { ASRQueueItemType } from '@octra/annotation';
+import {
+  ASRQueueItemType,
+  getSegmentBySamplePosition,
+} from '@octra/annotation';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
+import { ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
 
 @Component({
@@ -56,10 +59,10 @@ import { AsrStoreService } from '../../core/store/asr/asr-store-service.service'
 })
 export class TwoDEditorComponent
   extends OCTRAEditor
-  implements OnInit, AfterViewInit
+  implements OnInit, AfterViewInit, OctraEditorRequirements
 {
   public static editorname = '2D-Editor';
-  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+  public initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer', { static: true }) viewer!: AudioViewerComponent;
   @ViewChild('window', { static: false }) window!: TranscrWindowComponent;
@@ -203,12 +206,12 @@ export class TwoDEditorComponent
     private asrStoreService: AsrStoreService
   ) {
     super();
+    this.initialized = new EventEmitter<void>();
     this.miniLoupeSettings = new AudioviewerConfig();
     this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   ngOnInit() {
-    console.log(`2D-EDITOR INIT!`);
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
@@ -321,9 +324,6 @@ export class TwoDEditorComponent
           };
 
           if (queue) {
-            console.log('QUEUE CHANGED:');
-            console.log(queue);
-
             // this.viewer.redraw();
           }
         },
@@ -656,19 +656,19 @@ export class TwoDEditorComponent
     }
     const subscr = this.viewer.onInitialized.subscribe(() => {
       subscr.unsubscribe();
-      TwoDEditorComponent.initialized.emit();
+      this.initialized.emit();
     });
   }
 
   onSegmentEntered(selected: any) {
+    console.log('SEGMENT ENTRER');
     if (
       this.transcrService.currentlevel!.segments &&
       selected.index > -1 &&
       selected.index < this.transcrService.currentlevel!.segments.length
     ) {
-      const segment = this.transcrService.currentlevel!.segments.get(
-        selected.index
-      );
+      const segment =
+        this.transcrService.currentlevel!.segments[selected.index];
 
       if (segment !== undefined) {
         if (
@@ -677,9 +677,9 @@ export class TwoDEditorComponent
         ) {
           const start: SampleUnit =
             selected.index > 0
-              ? this.transcrService
-                  .currentlevel!.segments.get(selected.index - 1)!
-                  .time.clone()
+              ? this.transcrService.currentlevel!.segments[
+                  selected.index - 1
+                ].time.clone()
               : this.audioManager.createSampleUnit(0);
           this.selectedIndex = selected.index;
           this.audioChunkWindow = new AudioChunk(
@@ -703,8 +703,8 @@ export class TwoDEditorComponent
             {
               start: start.samples,
               length:
-                this.transcrService.currentlevel!.segments.get(selected.index)!
-                  .time.samples - start.samples,
+                this.transcrService.currentlevel!.segments[selected.index].time
+                  .samples - start.samples,
             },
             TwoDEditorComponent.editorname
           );
@@ -735,9 +735,8 @@ export class TwoDEditorComponent
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
 
-      const segment = this.transcrService.currentlevel!.segments.get(
-        this.selectedIndex
-      );
+      const segment =
+        this.transcrService.currentlevel!.segments[this.selectedIndex];
       const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
         segment!.time
       );
@@ -875,7 +874,6 @@ export class TwoDEditorComponent
             shortcutTriggered = true;
             break;
           case 'step_backward':
-            console.log(`step backward`);
             this.triggerUIAction({
               shortcut: $event.shortcut,
               shortcutName: $event.shortcutName,
@@ -888,7 +886,6 @@ export class TwoDEditorComponent
             });
             break;
           case 'step_backwardtime':
-            console.log(`step backward time`);
             this.triggerUIAction({
               shortcut: $event.shortcut,
               shortcutName: $event.shortcutName,
@@ -956,22 +953,21 @@ export class TwoDEditorComponent
           ? $event.timePosition!
           : this.viewer.av.mouseCursor!;
 
-      const segmentNumber =
-        this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-          timePosition
-        );
+      const segmentNumber = getSegmentBySamplePosition(
+        this.transcrService.currentlevel?.segments!,
+        timePosition
+      );
 
       if (segmentNumber > -1) {
         if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
           const segment =
-            this.transcrService.currentlevel!.segments.get(segmentNumber);
+            this.transcrService.currentlevel!.segments[segmentNumber];
 
           if (segment !== undefined) {
             const sampleStart =
               segmentNumber > 0
-                ? this.transcrService.currentlevel!.segments.get(
-                    segmentNumber - 1
-                  )!.time.samples
+                ? this.transcrService.currentlevel!.segments[segmentNumber - 1]
+                    .time.samples
                 : 0;
 
             this.uiService.addElementFromEvent(
@@ -1015,8 +1011,8 @@ export class TwoDEditorComponent
                   segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
                 } else if ($event.value === 'do_maus') {
                   if (
-                    segment.transcript.trim() === '' ||
-                    segment.transcript.split(' ').length < 2
+                    segment.value.trim() === '' ||
+                    segment.value.split(' ').length < 2
                   ) {
                     this.alertService
                       .showAlert(
@@ -1031,7 +1027,7 @@ export class TwoDEditorComponent
                     this.asrStoreService.addToQueue(
                       selection,
                       ASRQueueItemType.MAUS,
-                      segment.transcript
+                      segment.value
                     );
                     segment.isBlockedBy = ASRQueueItemType.MAUS;
                   }
@@ -1092,9 +1088,7 @@ export class TwoDEditorComponent
         selection = undefined;
       }
 
-      const caretpos = !(this.editor === undefined || this.editor === undefined)
-        ? this.editor.caretpos
-        : -1;
+      const caretpos = this.editor ? this.editor.caretpos : -1;
       let playPosition = this.audioManager.playPosition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
@@ -1243,10 +1237,8 @@ export class TwoDEditorComponent
     );
 
     if (tempWindow !== undefined) {
-      console.log('window opened');
       this.authWindow = tempWindow as any;
     } else {
-      console.log("window can't be opened!");
     }
   };
 
@@ -1282,5 +1274,9 @@ export class TwoDEditorComponent
   @HostListener('window:resize', ['$event'])
   onResize() {
     // this.viewer.height = this.linesViewHeight;
+  }
+
+  onEntriesChange($events: any) {
+    this.transcrService.saveSegments();
   }
 }

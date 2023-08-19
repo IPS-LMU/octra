@@ -71,8 +71,7 @@ export class AlertService {
         };
 
         this.queue.push(entry);
-        console.log(this.queue);
-      }
+        }
     });
   }
 

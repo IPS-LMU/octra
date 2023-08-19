@@ -93,8 +93,6 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
             this.sendStatus = 'success';
             this.bugsent = true;
             this.update();
-            console.log('Bugreport sent');
-
             this.subscrManager.add(
               timer(2000).subscribe(() => {
                 this.bgdescr = '';
@@ -166,7 +164,6 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
   }
 
   update() {
-    console.log(`update!`);
     this.cd.markForCheck();
     this.cd.detectChanges();
   }

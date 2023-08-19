@@ -2,7 +2,6 @@ import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { SubscriptionManager } from '@octra/utilities';
 import { TranscriptionService } from '../../../../core/shared/service';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-permutations-replace',
@@ -28,7 +27,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
 
   private readListOfSpeakers() {
     const result = [];
-    for (const segment of this.transcrService.currentlevel!.segments.segments) {
+    for (const segment of this.transcrService.currentlevel!.segments) {
       if (result.findIndex((a) => a.name === segment.speakerLabel) < 0) {
         result.push({
           name: segment.speakerLabel,
@@ -93,7 +92,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
   }
 
   replaceSpeakers() {
-    for (const segment of this.transcrService.currentlevel!.segments.segments) {
+    for (const segment of this.transcrService.currentlevel!.segments) {
       for (const speakerObj of this.listOfSpeakers) {
         if (segment.speakerLabel === speakerObj.name) {
           segment.speakerLabel = speakerObj.replaceWith;
@@ -103,7 +102,6 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
     }
 
     // trigger saving
-    this.transcrService.currentLevelSegmentChange.emit(undefined);
     this.modal.hide();
     this.actionperformed.next('replaced');
   }

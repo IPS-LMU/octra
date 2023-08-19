@@ -80,7 +80,7 @@ export class AnnotationStateSegment extends OSegment {
   public progressInfo?: { progress: number; statusLabel: string };
 }
 
-export function convertToLevelObject(
+export function convertStateLevelToLevelObject(
   stateLevel: AnnotationStateLevel,
   sampleRate: number,
   lastSample: SampleUnit
@@ -99,7 +99,7 @@ export function convertToLevelObject(
   for (const item of stateLevel.items) {
     if (stateLevel.type === AnnotationLevelType.SEGMENT) {
       const segment = item as AnnotationStateSegment;
-      const annoSegment = level.segments.getByID(segment.id);
+      const annoSegment = level.segments.find(a => a.id === segment.id);
 
       if (annoSegment !== undefined) {
         annoSegment.isBlockedBy = segment.isBlockedBy;
@@ -112,9 +112,7 @@ export function convertToLevelObject(
           };
         }
       } else {
-        console.error(`annoSegment with id ${segment.id} is undefined!`);
-        console.log(level);
-        console.log(stateLevel.items);
+        console.error(`can't find segment id ${segment.id}`)
       }
     }
   }
@@ -163,7 +161,7 @@ export function convertFromLevelObject(
     type: level.type,
     items: oLevel!.items.map((a, i) => {
       if (level.type === AnnotationLevelType.SEGMENT) {
-        const segment = level.segments.get(i);
+        const segment = level.segments[i];
         return {
           ...a,
           isBlockedBy: segment!.isBlockedBy,

@@ -24,7 +24,6 @@ export class Logger {
     for (const entry of this.entries) {
       switch (entry.type) {
         case 'log':
-          console.log(entry.message);
           break;
         case 'err':
           console.error(entry.message);

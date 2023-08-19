@@ -265,15 +265,17 @@ export const reducer = createReducer(
   })),
   on(
     AnnotationActions.loadAudio.progress,
-    (state: ApplicationState, { mode, value }) => ({
-      ...state,
-      loading: {
-        ...state.loading,
-        status: LoadingStatus.LOADING,
-        progress: 50 + Math.round(value * 50 * 100),
-        errors: [],
-      },
-    })
+    (state: ApplicationState, { mode, value }) => {
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          status: LoadingStatus.LOADING,
+          progress: 50 + Math.round(value * 50),
+          errors: [],
+        },
+      };
+    }
   ),
   on(
     AnnotationActions.loadAudio.success,

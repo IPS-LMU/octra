@@ -33,7 +33,7 @@ import { hasProperty } from '@octra/utilities';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
 import { AnnotationState, convertFromOIDLevel } from '../login-mode/annotation';
-import {ASRStateSettings} from "../asr";
+import { ASRStateSettings } from '../asr';
 
 @Injectable({
   providedIn: 'root',
@@ -177,8 +177,6 @@ export class IDBEffects {
           this.idbService.loadAnnotation(LoginMode.DEMO),
         ]).pipe(
           map(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
-            console.log(`results:`);
-            console.log(onlineAnnotation);
             let max = 0;
             const convertToStateLevel = (level: ILevel, i: number) => {
               const annotationStateLevel = convertFromOIDLevel(level, i + 1);
@@ -254,7 +252,6 @@ export class IDBEffects {
       withLatestFrom(this.store),
       exhaustMap(([actionData, appState]) => {
         // code for saving to the database
-        console.log(`save after undo`);
         const modeState = getModeState(appState);
 
         if (modeState) {
@@ -297,8 +294,6 @@ export class IDBEffects {
       withLatestFrom(this.store),
       mergeMap(([actionData, appState]: [Action, RootState]) => {
         // code for saving to the database
-        console.log(`save after redo`);
-
         const modeState = getModeState(appState);
 
         if (modeState) {
@@ -487,10 +482,6 @@ export class IDBEffects {
           (action as any).mode
         );
         if (modeState) {
-          console.log('SAVE MODE STATE');
-          console.log(`mode is ${action.mode}`);
-          console.log(`current project is`);
-          console.log(modeState.currentSession?.currentProject);
           return this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile:
@@ -1054,7 +1045,6 @@ export class IDBEffects {
     ]).pipe(
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        console.log('INIT OK');
         // make sure online information is loaded
         if (
           state.application.mode === LoginMode.ONLINE &&

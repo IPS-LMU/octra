@@ -211,7 +211,6 @@ export class UserInteractionsService {
 
       newElem = MouseStatisticElem.fromAny(elem);
       if (newElem !== undefined) {
-        console.log(`is not mouse StatisticElem`);
         newElem = StatisticElem.fromAny(elem);
       }
 

@@ -432,8 +432,6 @@ export class OctraDropzoneComponent extends DefaultComponent {
           ).subscribe(
             (result) => {
               fileProcess.progress = result.decodeProgress / 2 + 0.5;
-              // console.log((window.performance as any).memory.jsHeapSizeLimit - (window.performance as any).memory.usedJSHeapSize);
-
               if (result.audioManager === undefined) {
                 // not finished
               } else {

@@ -6,6 +6,7 @@
     code: '<P>'
   }"
   [isMultiLine]="false"
+  [refreshOnInternChanges]="false"
   [name]="'loupe'"
   [ngStyle]="{
     position: 'absolute',
@@ -20,7 +21,8 @@
     'flex-direction': 'column'
   }"
   [settings]="miniLoupeSettings"
-  [transcriptionLevel]="transcrService.currentlevel"
+  [entries]="transcrService.currentlevel.segments"
+  [levelName]="transcrService.currentlevel.name"
 >
 </octra-audio-viewer>
 <octra-audio-navigation
@@ -38,6 +40,7 @@
 <div id="viewer">
   <octra-audio-viewer
     #signalDisplayTop
+    [name]="'top loupe'"
     (mousecursorchange)="onMouseOver($event)"
     (mousedown)="onViewerMouseDown()"
     (mouseenter)="
@@ -50,10 +53,13 @@
     (selchange)="onSelectionChanged($event)"
     (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
     [audioChunk]="audioChunkTop"
+    [refreshOnInternChanges]="false"
     [breakMarker]="{
       code: '<P>'
     }"
-    [transcriptionLevel]="transcrService.currentlevel"
+    [entries]="transcrService.currentlevel.segments"
+    (entriesChange)="onEntriesChange($event)"
+    [levelName]="transcrService.currentlevel.name"
     style="height: 80px"
   >
   </octra-audio-viewer>
@@ -61,6 +67,7 @@
 
 <octra-audio-viewer
   #signalDisplayDown
+  [refreshOnInternChanges]="false"
   (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
   (alert)="onAlertTriggered($event)"
   (click)="onLoupeClick()"
@@ -68,21 +75,22 @@
   (segmententer)="onLoupeSegmentEnter($event)"
   (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
   (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
-  *ngIf="audioChunkDown !== undefined && audioChunkDown !== undefined"
+  *ngIf="audioChunkDown !== undefined"
   [audioChunk]="audioChunkDown"
   [breakMarker]="{
     code: '<P>'
   }"
   [name]="'downLoupe'"
   [settings]="loupeSettings"
-  [transcriptionLevel]="transcrService.currentlevel"
+  [entries]="transcrService.currentlevel.segments"
+  (entriesChange)="onEntriesChange($event)"
+  [levelName]="transcrService.currentlevel.name"
 >
 </octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
   <div
     *ngIf="
       !segmentselected &&
-      audioChunkDown !== undefined &&
       audioChunkDown !== undefined
     "
     [innerHTML]="
@@ -92,13 +100,16 @@
     class="inner"
   ></div>
   <div
-    *ngIf="!(audioChunkDown !== undefined && audioChunkDown !== undefined)"
+    *ngIf="audioChunkDown === undefined"
     [innerHTML]="'signal-gui.selection text' | transloco"
     class="inner"
   ></div>
 </div>
 <octra-transcr-editor
-  *ngIf="segmentselected"
+  [ngClass]="{
+  'd-none': !segmentselected,
+  'd-grid': segmentselected
+  }"
   #transcr
   (keyup)="onKeyUp()"
   (markerClick)="onMarkerClick($event)"
@@ -118,5 +129,6 @@
       settingsService.projectsettings!.octra.validationEnabled)
   "
   [externalShortcutManager]="keyMap.shortcutsManager"
+  [settings]="editorSettings"
 >
 </octra-transcr-editor>

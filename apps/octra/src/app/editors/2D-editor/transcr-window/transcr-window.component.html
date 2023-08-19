@@ -42,7 +42,10 @@
     <octra-audio-viewer
       #loupe
       [audioChunk]="audiochunk"
-      [transcriptionLevel]="transcrService.currentlevel"
+      [refreshOnInternChanges]="false"
+      [levelName]="transcrService.currentlevel.name"
+      [(entries)]="transcrService.annotation.levels[0].segments"
+      (entriesChange)="somethingChanged($event)"
       (shortcutTrigger)="triggerUIAction($event)"
       id="loupe"
     ></octra-audio-viewer>

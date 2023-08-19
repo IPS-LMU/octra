@@ -19,7 +19,10 @@ import {
 import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
 import { editorComponents } from '../../../../editors/components';
-import { OCTRAEditor } from '../../../../editors/octra-editor';
+import {
+  OCTRAEditor,
+  OctraEditorRequirements,
+} from '../../../../editors/octra-editor';
 import { InactivityModalComponent } from '../../../modals/inactivity-modal/inactivity-modal.component';
 import { MissingPermissionsModalComponent } from '../../../modals/missing-permissions/missing-permissions.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
@@ -63,7 +66,7 @@ import { AuthenticationStoreService } from '../../../store/authentication';
 @Component({
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
-  styleUrls: ['./transcription.component.scss']
+  styleUrls: ['./transcription.component.scss'],
 })
 export class TranscriptionComponent
   extends DefaultComponent
@@ -198,9 +201,9 @@ export class TranscriptionComponent
     return this.settingsService.responsive.enabled;
   }
 
-  private _currentEditor!: ComponentRef<Component>;
+  private _currentEditor!: ComponentRef<any>;
 
-  get currentEditor(): ComponentRef<Component> {
+  get currentEditor(): ComponentRef<any> {
     return this._currentEditor;
   }
 
@@ -377,11 +380,10 @@ export class TranscriptionComponent
             this.currentEditor !== undefined &&
             (this.currentEditor.instance as any).editor !== undefined
           ) {
-            const editor = this._currentEditor.instance as OCTRAEditor;
-            console.log(`CALL disable all shortcuts!`);
+            const editor = this._currentEditor
+              .instance as OctraEditorRequirements;
             editor.disableAllShortcuts();
           } else {
-            console.log(``);
           }
         }
       )
@@ -393,8 +395,8 @@ export class TranscriptionComponent
           this.currentEditor !== undefined &&
           (this.currentEditor.instance as any).editor !== undefined
         ) {
-          const editor = this._currentEditor.instance as OCTRAEditor;
-          console.log(`CALL enable all shortcuts!`);
+          const editor = this._currentEditor
+            .instance as OctraEditorRequirements;
           editor.enableAllShortcuts();
         }
       })
@@ -463,7 +465,6 @@ export class TranscriptionComponent
       })
     );
 
-    console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 
     this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
@@ -529,6 +530,9 @@ export class TranscriptionComponent
     this.navbarServ.showExport =
       this.settingsService.projectsettings?.navigation?.export === true;
 
+    // TODO replace with new code
+    /*
+
     if (this.transcrService.annotation !== undefined) {
       this.levelSubscriptionID = this.subscrManager.add(
         this.transcrService.currentLevelSegmentChange.subscribe(
@@ -546,6 +550,7 @@ export class TranscriptionComponent
         })
       );
     }
+     */
 
     this.subscrManager.add(
       this.transcrService.levelchanged.subscribe((level: Level) => {
@@ -553,11 +558,6 @@ export class TranscriptionComponent
 
         // important: subscribe to level changes in order to save proceedings
         this.subscrManager.removeById(this.levelSubscriptionID);
-        this.levelSubscriptionID = this.subscrManager.add(
-          this.transcrService.currentLevelSegmentChange.subscribe(
-            this.transcrService.saveSegments
-          )
-        );
         this.uiService.addElementFromEvent(
           'level',
           { value: 'changed' },
@@ -698,11 +698,10 @@ export class TranscriptionComponent
   }
 
   changeEditor(name: string): Promise<void> {
-    console.log('CHANGE EDITOR TO ' + name);
     return new Promise<void>((resolve, reject) => {
       this.editorloaded = false;
       this.cd.detectChanges();
-      let comp: any = undefined;
+      let comp: any;
 
       if (name === undefined || name === '') {
         // fallback to last editor
@@ -718,29 +717,24 @@ export class TranscriptionComponent
       }
 
       if (!(comp === undefined)) {
-        const id = this.subscrManager.add(
-          comp.initialized.subscribe(() => {
-            this.editorloaded = true;
-            this.subscrManager.removeById(id);
-            this.cd.detectChanges();
-
-            resolve();
-          })
-        );
-
         if (this.appLoadeditor !== undefined) {
-          const componentFactory =
-            this._componentFactoryResolver.resolveComponentFactory(comp);
-
           this.subscrManager.add(
             timer(20).subscribe(() => {
               const viewContainerRef = this.appLoadeditor.viewContainerRef;
               viewContainerRef.clear();
 
-              this._currentEditor = viewContainerRef.createComponent(
-                componentFactory
-              ) as any;
+              this._currentEditor =
+                viewContainerRef.createComponent<OCTRAEditor>(comp);
 
+              const id = this.subscrManager.add(
+                this._currentEditor.instance.initialized.subscribe(() => {
+                  this.editorloaded = true;
+                  this.subscrManager.removeById(id);
+                  this.cd.detectChanges();
+
+                  resolve();
+                })
+              );
               if (
                 hasProperty(this.currentEditor.instance as any, 'openModal')
               ) {
@@ -778,8 +772,6 @@ export class TranscriptionComponent
                 undefined,
                 'editors'
               );
-              console.log(`opened ${name}`);
-
               this.cd.detectChanges();
             })
           );
@@ -966,9 +958,7 @@ export class TranscriptionComponent
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    xhr.onloadstart = () => {
-      console.log('start');
-    };
+    xhr.onloadstart = () => {};
 
     xhr.onerror = (e) => {
       console.error(e);

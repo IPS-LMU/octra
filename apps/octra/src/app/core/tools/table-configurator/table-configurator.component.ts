@@ -92,7 +92,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             let segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.seconds * 1000
+                ? level.segments[segmentNumber - 1]!.time.seconds * 1000
                 : 0;
             segmentStart = Math.round(segmentStart);
 
@@ -111,7 +111,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             return (
               (segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.samples + 1
+                ? level.segments[segmentNumber - 1]!.time.samples + 1
                 : 1) + ''
             );
           },
@@ -128,7 +128,7 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             return (
               (segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.seconds.toFixed(4)
+                ? level.segments[segmentNumber - 1]!.time.seconds.toFixed(4)
                 : '0') + ''
             );
           },
@@ -147,7 +147,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            const segment = level.segments.get(segmentNumber);
+            const segment = level.segments[segmentNumber];
             return this.convertMilliSecondsIntoLegibleString(
               Math.round(segment!.time.seconds * 1000)
             );
@@ -164,7 +164,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber)!.time.samples + '';
+            return level.segments[segmentNumber]!.time.samples + '';
           },
         },
         {
@@ -178,7 +178,7 @@ export class TableConfiguratorComponent implements OnInit {
           ) => {
             // the value must be a unix timestamp
             return (
-              level.segments.get(segmentNumber)!.time.seconds.toFixed(4) + ''
+              level.segments[segmentNumber]!.time.seconds.toFixed(4) + ''
             );
           },
         },
@@ -198,9 +198,9 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.seconds
+                ? level.segments[segmentNumber - 1]!.time.seconds
                 : 0;
-            const segment = level.segments.get(segmentNumber);
+            const segment = level.segments[segmentNumber];
             return this.convertMilliSecondsIntoLegibleString(
               Math.round((segment!.time.seconds - segmentStart) * 1000)
             );
@@ -219,10 +219,10 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.samples + 1
+                ? level.segments[segmentNumber - 1]!.time.samples + 1
                 : 1;
             return (
-              level.segments.get(segmentNumber)!.time.samples -
+              level.segments[segmentNumber]!.time.samples -
               segmentStart +
               ''
             );
@@ -240,11 +240,11 @@ export class TableConfiguratorComponent implements OnInit {
             // the value must be a unix timestamp
             const segmentStart =
               segmentNumber > 0
-                ? level.segments.get(segmentNumber - 1)!.time.seconds
+                ? level.segments[segmentNumber - 1]!.time.seconds
                 : 0;
             return (
               (
-                level.segments.get(segmentNumber)!.time.seconds - segmentStart
+                level.segments[segmentNumber]!.time.seconds - segmentStart
               ).toFixed(4) + ''
             );
           },
@@ -264,7 +264,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber)!.transcript;
+            return level.segments[segmentNumber]!.value;
           },
         },
       ],
@@ -300,7 +300,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return `${level.segments.get(0)!.time.sampleRate}`;
+            return `${level.segments[0]!.time.sampleRate}`;
           },
         },
         {
@@ -313,7 +313,7 @@ export class TableConfiguratorComponent implements OnInit {
             counter: number
           ) => {
             // the value must be a unix timestamp
-            return `${level.segments.get(0)!.time.sampleRate / 1000}kHz`;
+            return `${level.segments[0]!.time.sampleRate / 1000}kHz`;
           },
         },
       ],
@@ -497,7 +497,7 @@ export class TableConfiguratorComponent implements OnInit {
       const level = this.annotation.levels[i];
 
       for (let j = 0; j < level.segments.length; j++) {
-        const segment = level.segments.get(j);
+        const segment = level.segments[j];
 
         let text = '';
 
@@ -593,7 +593,7 @@ export class TableConfiguratorComponent implements OnInit {
       let start = 0;
 
       for (let j = 0; j < level.segments.length; j++) {
-        const segment = level.segments.get(j);
+        const segment = level.segments[j];
         const text = def.formatFunction(level, j, counter);
 
         this.columns[index].columnDefinition.cells.push({

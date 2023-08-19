@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {getModeState, RootState} from '../index';
+import { getModeState, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
@@ -344,7 +344,6 @@ export class AsrEffects {
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
         if (action.options?.asr) {
-          console.log('ASR OK; RUN ASR!');
           return of(
             ASRActions.runASROnItem.do({
               item: action.item,
@@ -379,7 +378,6 @@ export class AsrEffects {
       ofType(ASRActions.runASROnItem.do),
       withLatestFrom(this.store),
       mergeMap(([{ outFormat, item, options, audioURL }, state]) => {
-        console.log(`RUN ASR ON ITEM ${audioURL}`);
         return this.transcribeSignalWithASR(
           outFormat,
           item,
@@ -571,10 +569,11 @@ export class AsrEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           const modState = getModeState(state);
-          console.log('SHOW ALERT');
           this.alertService.showAlert(
             'danger',
-            `ASR Error (item at ${(action.item.time.sampleStart / modState!.audio.sampleRate).toFixed(2)}s ${action.item.id} with error: ${action.error}`
+            `ASR Error (item at ${(
+              action.item.time.sampleStart / modState!.audio.sampleRate
+            ).toFixed(2)}s ${action.item.id} with error: ${action.error}`
           );
         })
       ),
@@ -670,8 +669,6 @@ export class AsrEffects {
       .pipe(
         take(1),
         exhaustMap((result) => {
-          console.log(`RUN ASR result of ${audioURL} is:`);
-          console.log(result);
           return from(this.extractResultData(result, info.fullname));
         })
       );
@@ -789,9 +786,7 @@ export class AsrEffects {
 
   extractErrorMessage(error: string) {
     const lines = error.split('<br/>');
-    console.log(lines);
-    const found = lines
-      .find((a) => /^StdErr: /g.exec(a) !== null);
+    const found = lines.find((a) => /^StdErr: /g.exec(a) !== null);
     let result = found?.replace(/StdErr: /g, '');
     result = result?.replace(/ - exiting/g, '') ?? error;
     return result;

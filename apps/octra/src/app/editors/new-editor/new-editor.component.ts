@@ -7,17 +7,19 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { LinearEditorComponent } from '../linear-editor';
-import { OCTRAEditor } from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 
 @Component({
   selector: 'octra-new-editor',
   templateUrl: './new-editor.component.html',
   styleUrls: ['./new-editor.component.scss'],
 })
-export class NewEditorComponent extends OCTRAEditor implements OnInit {
+export class NewEditorComponent
+  extends OCTRAEditor
+  implements OnInit, OctraEditorRequirements
+{
   public static editorname = 'New Editor';
-  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+  public initialized: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     public audio: AudioService,
@@ -30,9 +32,7 @@ export class NewEditorComponent extends OCTRAEditor implements OnInit {
     super();
   }
 
-  ngOnInit() {
-    LinearEditorComponent.initialized.emit();
-  }
+  ngOnInit() {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   afterFirstInitialization() {}

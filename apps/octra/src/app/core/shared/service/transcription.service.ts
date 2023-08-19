@@ -35,8 +35,7 @@ import {
   OLabel,
   OLevel,
   OSegment,
-  SegmentChangeEvent,
-  Segments,
+  Segment,
 } from '@octra/annotation';
 import { AudioManager } from '@octra/media';
 import { getModeState, LoginMode, RootState } from '../../store';
@@ -48,7 +47,7 @@ import {
   AnnotationState,
   AnnotationStateLevel,
   convertFromLevelObject,
-  convertToLevelObject,
+  convertStateLevelToLevelObject,
 } from '../../store/login-mode/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TaskDto } from '@octra/api-types';
@@ -60,22 +59,16 @@ declare let validateAnnotation: (transcript: string, guidelines: any) => any;
   providedIn: 'root',
 })
 export class TranscriptionService {
-  get currentLevelSegmentChange(): EventEmitter<SegmentChangeEvent> {
-    return this._currentLevelSegmentChange;
-  }
-
   public tasksBeforeSend: Promise<any>[] = [];
   public defaultFontSize = 14;
   public dataloaded = new EventEmitter<any>();
   public segmentrequested = new EventEmitter<number>();
   public filename = '';
   public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
-  public annotationChanged: EventEmitter<void> = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager<Subscription>;
-  private _segments!: Segments;
+  private _segments!: Segment[];
   private state = 'ANNOTATED';
   private _audiomanager!: AudioManager;
-  private _currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
   public alertTriggered: Subject<{
     type: 'danger' | 'warning' | 'info' | 'success';
     data: string | any;
@@ -94,11 +87,11 @@ export class TranscriptionService {
    }
    */
 
-  public get currentlevel(): Level | undefined {
+  public get currentlevel(): Level {
     if (this._selectedlevel === undefined || this._selectedlevel < 0) {
-      return this._annotation?.levels[0];
+      return this._annotation!.levels[0];
     }
-    return this._annotation?.levels[this._selectedlevel];
+    return this._annotation!.levels[this._selectedlevel];
   }
 
   private _annotation!: Annotation;
@@ -165,7 +158,6 @@ export class TranscriptionService {
       this._selectedlevel = this.getSegmentFirstLevel();
     }
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
-    this.listenForSegmentChanges();
   }
 
   private _statistic: any = {
@@ -229,7 +221,6 @@ export class TranscriptionService {
       })
     );
 
-    this._currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
     if (
       this.settingsService.appSettings !== undefined &&
       hasProperty(
@@ -300,7 +291,6 @@ export class TranscriptionService {
   }
 
   public saveSegments = () => {
-    console.log("SAVE SEGMENTS");
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (
       this._annotation !== undefined &&
@@ -424,6 +414,7 @@ export class TranscriptionService {
       this.subscrmanager.add(
         this.appStorage.annotationChanged.subscribe((state) => {
           if (state?.transcript) {
+            console.log("UPDATE ANNOTATION FROM STORE!!!")
             this.updateAnnotation(
               state.transcript.levels,
               state.transcript.links
@@ -651,7 +642,7 @@ export class TranscriptionService {
     );
 
     for (const annotationStateLevel of levels) {
-      const level = convertToLevelObject(
+      const level = convertStateLevelToLevelObject(
         annotationStateLevel,
         this.audioManager.sampleRate,
         this.audioManager.resource.info.duration.clone()
@@ -664,20 +655,6 @@ export class TranscriptionService {
     }
 
     this._annotation = annotation;
-    this.listenForSegmentChanges();
-    this.annotationChanged.emit();
-  }
-
-  private listenForSegmentChanges() {
-    this.subscrmanager.removeByTag('segmentchange');
-    if (this.currentlevel) {
-      this.subscrmanager.add(
-        this.currentlevel!.segments.onsegmentchange.subscribe((event) => {
-          this._currentLevelSegmentChange.emit(event);
-        }),
-        'segmentchange'
-      );
-    }
   }
 
   public destroy() {
@@ -781,12 +758,12 @@ export class TranscriptionService {
       i++
     ) {
       const segment =
-        this._annotation.levels[this._selectedlevel].segments.get(i);
+        this._annotation.levels[this._selectedlevel].segments[i];
 
-      if (segment!.transcript !== '') {
+      if (segment!.value !== '') {
         if (
           this.breakMarker !== undefined &&
-          segment!.transcript.indexOf(this.breakMarker.code) > -1
+          segment!.value.indexOf(this.breakMarker.code) > -1
         ) {
           this._statistic.pause++;
         } else {
@@ -802,7 +779,6 @@ export class TranscriptionService {
    * converts raw text of markers to html
    */
   public rawToHTML(rawtext: string): string {
-    console.log(`convert rawtext to html: ${rawtext}`);
     let result: string = rawtext;
 
     if (rawtext !== '') {
@@ -893,7 +869,6 @@ export class TranscriptionService {
               .replace(/</g, '&lt;')
               .replace(/>/g, '&gt;');
 
-            console.log(`markercode on rawToHTML is ${markerCode}`);
             img =
               "<img src='" +
               marker.icon +
@@ -1077,12 +1052,12 @@ export class TranscriptionService {
       let invalid = false;
 
       for (let i = 0; i < this.currentlevel!.segments.length; i++) {
-        const segment = this.currentlevel!.segments.segments[i];
+        const segment = this.currentlevel!.segments[i];
 
         let segmentValidation = [];
 
-        if (segment.transcript.length > 0) {
-          segmentValidation = this.validate(segment.transcript);
+        if (segment.value.length > 0) {
+          segmentValidation = this.validate(segment.value);
         }
 
         this._validationArray.push({

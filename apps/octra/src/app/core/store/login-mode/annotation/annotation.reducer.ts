@@ -1,12 +1,11 @@
-import {ActionCreator, on, ReducerTypes} from '@ngrx/store';
-import {LoginMode} from '../../index';
-import {AnnotationActions} from './annotation.actions';
-import {IDBActions} from '../../idb/idb.actions';
-import {IIDBModeOptions} from '../../../shared/octra-database';
-import {getProperties} from '@octra/utilities';
-import {AnnotationState, AnnotationStateSegment} from './index';
-import {ASRActions} from '../../asr/asr.actions';
-import {SampleUnit} from '@octra/media';
+import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
+import { LoginMode } from '../../index';
+import { AnnotationActions } from './annotation.actions';
+import { IDBActions } from '../../idb/idb.actions';
+import { IIDBModeOptions } from '../../../shared/octra-database';
+import { getProperties } from '@octra/utilities';
+import { AnnotationState, AnnotationStateSegment } from './index';
+import { SampleUnit } from '@octra/media';
 
 export const initialState: AnnotationState = {
   transcript: {
@@ -258,7 +257,6 @@ export class AnnotationStateReducers {
               timeInterval.sampleStart + (timeInterval.sampleLength / 2),
               state.audio.sampleRate
             );
-            console.log(`select segment on boundary ${segmentBoundary.seconds}, sampleRate ${state.audio.sampleRate}`);
             // todo add current level
             let currentLevel = state.transcript.levels[0];
             const segmentIndex = this.getSegmentBySamplePosition(

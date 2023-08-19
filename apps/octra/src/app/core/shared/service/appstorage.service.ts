@@ -62,7 +62,6 @@ export class AppStorageService {
   public get annotationChanged(): Observable<AnnotationState> {
     const subject = new Subject<AnnotationState>();
     this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
-      console.log(`annotation changed`);
       subject.next(state!);
     });
     return subject;

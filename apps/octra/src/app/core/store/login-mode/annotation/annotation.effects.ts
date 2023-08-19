@@ -61,7 +61,6 @@ import {
   createSampleUser,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
-import { ASRActions } from '../../asr/asr.actions';
 
 @Injectable()
 export class AnnotationEffects {
@@ -208,7 +207,6 @@ export class AnnotationEffects {
         ofType(AnnotationActions.loadAudio.do),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          console.log('Load audio file...');
           if (state.application.mode === undefined || !a.audioFile) {
             this.store.dispatch(
               AnnotationActions.loadAudio.fail({
@@ -413,7 +411,6 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.showNoRemainingTasksModal.do),
         tap((a) => {
-          console.log('show error modal on no remaining tasks');
           const ref = this.modalsService.openModalRef(
             ErrorModalComponent,
             ErrorModalComponent.options
@@ -524,7 +521,6 @@ export class AnnotationEffects {
                     this.navbarService.transcrService = this.transcrService;
                     this.navbarService.uiService = this.uiService;
 
-                    console.log('INIT TRANSCR OKOKOKO');
                     this.routingService.navigate(
                       'transcript initialized URL',
                       ['/intern/transcr'],
@@ -561,8 +557,6 @@ export class AnnotationEffects {
                   this.navbarService.transcrService = this.transcrService;
                   this.navbarService.uiService = this.uiService;
 
-                  console.log('INIT TRANSCR OK:');
-                  console.log(this.transcrService.currentlevel);
                   this.routingService.navigate(
                     'transcription initialized',
                     ['/intern/transcr'],
@@ -922,7 +916,6 @@ export class AnnotationEffects {
       ofType(AnnotationActions.sendAnnotation.success),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        console.log('Load new annotation...');
         this.transcrSendingModal.timeout?.unsubscribe();
         this.transcrSendingModal.ref?.close();
 

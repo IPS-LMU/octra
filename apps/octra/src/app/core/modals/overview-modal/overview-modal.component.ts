@@ -329,12 +329,12 @@ export class OverviewModalComponent extends OctraModal {
         i < this.transcrService.currentlevel!.segments.length;
         i++
       ) {
-        const segment = this.transcrService.currentlevel!.segments.segments[i];
+        const segment = this.transcrService.currentlevel!.segments[i];
 
         const obj = this.getShownSegment(
           startTime,
           segment.time.samples,
-          segment.transcript,
+          segment.value,
           i
         );
 

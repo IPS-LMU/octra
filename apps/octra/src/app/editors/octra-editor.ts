@@ -7,13 +7,16 @@ import {
 import { AudioViewerComponent } from '@octra/ngx-components';
 import { Level } from '@octra/annotation';
 import { DefaultComponent } from '../core/component/default.component';
+import { EventEmitter } from '@angular/core';
+
+export interface OctraEditorRequirements {
+  afterFirstInitialization(): void;
+  disableAllShortcuts(): void;
+  enableAllShortcuts(): void;
+  initialized: EventEmitter<void>;
+}
 
 export abstract class OCTRAEditor extends DefaultComponent {
-  public abstract afterFirstInitialization(): void;
-
-  public abstract disableAllShortcuts(): void;
-
-  public abstract enableAllShortcuts(): void;
 
   protected doPlayOnHover(
     audioManager: AudioManager,
@@ -80,8 +83,8 @@ export abstract class OCTRAEditor extends DefaultComponent {
     audioChunk: AudioChunk,
     currentLevel: Level
   ) {
-    const emptySegmentIndex = currentLevel.segments.segments.findIndex((a) => {
-      return a.transcript === '';
+    const emptySegmentIndex = currentLevel.segments.findIndex((a) => {
+      return a.value === '';
     });
 
     if (audioChunk.time.duration.seconds <= 35) {

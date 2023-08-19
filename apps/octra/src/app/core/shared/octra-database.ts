@@ -160,12 +160,10 @@ export class OctraDatabase extends Dexie {
   }
 
   private upgradeToDatabaseV2(transaction: Transaction) {
-    console.log(`UPGRADE to v2`);
     return transaction.table('options').bulkPut(this.defaultOptions);
   }
 
   private upgradeToDatabaseV3(transaction: Transaction) {
-    console.log(`UPGRADE to v3`);
     return transaction
       .table('options')
       .toCollection()
@@ -182,7 +180,6 @@ export class OctraDatabase extends Dexie {
   }
 
   private async upgradeToDatabaseV4(transaction: Transaction) {
-    console.log(`UPGRADE to v4`);
     await transaction.table('options').get('usemode');
   }
 

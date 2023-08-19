@@ -16,7 +16,7 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor } from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import {
   AudioChunk,
   AudioManager,
@@ -36,7 +36,13 @@ import {
   SubscriptionManager,
 } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
-import { Segment, Segments } from '@octra/annotation';
+import {
+  addSegment,
+  combineSegments,
+  getSegmentBySamplePosition,
+  removeSegmentByIndex,
+  Segment,
+} from '@octra/annotation';
 import {
   ContextMenuAction,
   ContextMenuComponent,
@@ -54,7 +60,7 @@ declare let validateAnnotation: any;
   styleUrls: ['./trn-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit {
+export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
   get textEditor(): Texteditor {
     return this._textEditor;
   }
@@ -77,7 +83,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   }
 
   public static editorname = 'TRN-Editor';
-  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+  public initialized: EventEmitter<void> = new EventEmitter<void>();
   public showSignalDisplay = false;
   public lastResizing = 0;
 
@@ -250,7 +256,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   };
 
   private audioManager!: AudioManager;
-  private tempSegments!: Segments;
+  private tempSegments!: Segment[];
   private selectedCell = {
     labelText: '',
     row: 0,
@@ -290,12 +296,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
     for (
       let i = 1;
-      i < this.transcrService.currentlevel!.segments.segments.length;
+      i < this.transcrService.currentlevel!.segments.length;
       i++
     ) {
-      const segment = this.transcrService.currentlevel!.segments.segments[i];
-      const previousSegment =
-        this.transcrService.currentlevel!.segments.segments[i - 1];
+      const segment = this.transcrService.currentlevel!.segments[i];
+      const previousSegment = this.transcrService.currentlevel!.segments[i - 1];
 
       if (segment.speakerLabel === previousSegment.speakerLabel) {
         intervals[intervalCounter].length++;
@@ -309,10 +314,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
 
     intervals = intervals.filter((a) => a.length > 0);
-    console.log(intervals);
     for (let j = intervals.length - 1; j > -1; j--) {
       const interval = intervals[j];
-      this.transcrService.currentlevel!.segments.combineSegments(
+      combineSegments(
+        this.transcrService.currentlevel!.segments,
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -368,7 +373,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
-    TrnEditorComponent.initialized.emit();
+    this.initialized.emit();
     this.subscrManager.add(
       this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered)
     );
@@ -447,10 +452,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
 
     intervals = intervals.filter((a) => a.length > 0);
-    console.log(intervals);
     for (let j = intervals.length - 1; j > -1; j--) {
       const interval = intervals[j];
-      this.transcrService.currentlevel!.segments.combineSegments(
+      combineSegments(
+        this.transcrService.currentlevel!.segments,
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -498,17 +503,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         if (shownSegment.isSelected) {
           if (this.shownSegments.length > 1) {
             const oldSegmentEnd =
-              this.transcrService.currentlevel!.segments.segments[
-                i
-              ].time.clone();
-            this.transcrService.currentlevel!.segments.removeByIndex(
+              this.transcrService.currentlevel!.segments[i].time.clone();
+            this.transcrService.currentlevel!.segments = removeSegmentByIndex(
+              this.transcrService.currentlevel!.segments,
               i,
               this.transcrService.breakMarker.code,
-              false,
               false
             );
             if (i > 0) {
-              this.transcrService.currentlevel!.segments.segments[i - 1].time =
+              this.transcrService.currentlevel!.segments[i - 1].time =
                 oldSegmentEnd;
             }
             this.shownSegments.splice(i, 1);
@@ -516,7 +519,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
           }
         }
       }
-      this.transcrService.currentLevelSegmentChange.emit(undefined);
     }
   };
 
@@ -531,7 +533,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
   getStartPoint(index: number) {
     return index > 0
-      ? this.transcrService.currentlevel!.segments.get(index - 1)!.time.unix
+      ? this.transcrService.currentlevel!.segments[index - 1].time.unix
       : 0;
   }
 
@@ -680,7 +682,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     const maxSegments = this.transcrService.currentlevel!.segments.length;
     segmentNumber = Math.max(-1, Math.min(maxSegments, segmentNumber));
     if (segmentNumber < maxSegments - 1) {
-      console.log(`focus on ${segmentNumber}`);
       const segmentLabel = findElements(document.body, '.label-column')[
         segmentNumber + 1
       ];
@@ -711,13 +712,13 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
       id: segment.id,
       isSelected: false,
       transcription: {
-        text: segment.transcript,
+        text: segment.value,
         safeHTML: undefined as any,
       },
       validation: '',
     };
 
-    let html = segment.transcript;
+    let html = segment.value;
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (
         typeof validateAnnotation !== 'undefined' &&
@@ -787,17 +788,12 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         const overallTime = started;
 
         this.waitForTranscrEditor().then(() => {
-          console.log(`waiting ended: ${Date.now() - started}ms`);
           started = Date.now();
           this.save();
-          console.log(`saving ended: ${Date.now() - started}ms`);
           started = Date.now();
           this.transcrService.validateAll();
-          console.log(`validated ended: ${Date.now() - started}ms`);
           started = Date.now();
           this.transcrService.saveSegments();
-          console.log(`saveSegments ended: ${Date.now() - started}ms`);
-
           this.textEditor.state = 'inactive';
           this.textEditor.selectedSegment = -1;
 
@@ -806,7 +802,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
 
           started = Date.now();
           this.updateSegments();
-          console.log(`updateSegments ended: ${Date.now() - started}ms`);
           started = Date.now();
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -823,16 +818,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
   }
 
   updateTempSegments() {
-    const segStart =
-      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-        this._textEditor.audiochunk.time.start.add(
-          new SampleUnit(20, this.audioManager.sampleRate)
-        )
-      );
-    const currentSegment =
-      this.transcrService.currentlevel!.segments.get(segStart);
+    const segStart = getSegmentBySamplePosition(
+      this.transcrService.currentlevel!.segments,
+      this._textEditor.audiochunk.time.start.add(
+        new SampleUnit(20, this.audioManager.sampleRate)
+      )
+    );
+    const currentSegment = this.transcrService.currentlevel!.segments[segStart];
 
-    this.tempSegments = this.transcrService.currentlevel!.segments.clone();
+    this.tempSegments = [...this.transcrService.currentlevel!.segments];
 
     const html = this.transcrEditor.getRawText();
     // split text at the position of every boundary marker
@@ -864,7 +858,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
 
     for (let i = 0; i < segTexts.length - 1; i++) {
-      this.tempSegments.add(
+      addSegment(
+        this.tempSegments,
         this.audioManager.createSampleUnit(samplesArray[i]),
         currentSegment!.speakerLabel,
         segTexts[i]
@@ -872,10 +867,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
     }
 
     // shift rest of text to next segment
-    const found = this.tempSegments.get(segStart + segTexts.length - 1);
 
-    if (!(found === undefined || found === undefined)) {
-      this.tempSegments.get(segStart + segTexts.length - 1)!.transcript =
+    if (this.tempSegments[segStart + segTexts.length - 1]) {
+      this.tempSegments[segStart + segTexts.length - 1]!.value =
         segTexts[segTexts.length - 1];
     }
   }
@@ -895,24 +889,17 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit {
         ) > -1
       ) {
         // boundaries were inserted
-        this.transcrService.currentlevel!.segments.segments =
-          this.tempSegments.segments;
-        this.transcrService.currentLevelSegmentChange.emit(undefined);
+        this.transcrService.currentlevel!.segments =
+          this.tempSegments;
       } else {
         // no boundaries inserted
-        const segment = this.transcrService
-          .currentlevel!.segments.get(segmentIndex)!
-          .clone();
+        const segment =
+          this.transcrService.currentlevel!.segments[segmentIndex]!.clone();
         this.transcrEditor.updateRawText();
-        segment.transcript = this.transcrEditor.rawText;
+        segment.value = this.transcrEditor.rawText;
         segment.isBlockedBy =
-          this.transcrService.currentlevel!.segments.get(
-            segmentIndex
-          )!.isBlockedBy;
-        this.transcrService.currentlevel!.segments.change(
-          segmentIndex,
-          segment
-        );
+          this.transcrService.currentlevel!.segments[segmentIndex].isBlockedBy;
+        this.transcrService.currentlevel!.segments[segmentIndex] = segment;
       }
     } else {
       const isNull = this.transcrService.currentlevel!.segments === undefined;
@@ -968,10 +955,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   playSegement(segmentNumber: number): Promise<void> {
     return new Promise<void>((resolve) => {
       if (this.playStateSegments[segmentNumber].state === 'stopped') {
-        console.log(`play segment ${segmentNumber}`);
-        const segments = this.transcrService.currentlevel!.segments.segments;
-        console.log(segments);
-
+        const segments = this.transcrService.currentlevel!.segments;
         const segment: Segment = segments[segmentNumber];
 
         this.playStateSegments[segmentNumber].state = 'started';
@@ -1035,7 +1019,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   playAll(nextSegment: number) {
-    const segments = this.transcrService.currentlevel!.segments.segments;
+    const segments = this.transcrService.currentlevel!.segments;
 
     const segment = segments[nextSegment];
 
@@ -1046,8 +1030,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       if (
         !this.playAllState.skipSilence ||
         (this.playAllState.skipSilence &&
-          segment.transcript !== '' &&
-          segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0)
+          segment.value !== '' &&
+          segment.value.indexOf(this.transcrService.breakMarker.code) < 0)
       ) {
         this.playAllState.currentSegment = nextSegment;
         this.playSegement(nextSegment).then(() => {
@@ -1065,8 +1049,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       this.cd.markForCheck();
       this.cd.detectChanges();
     } else {
-      console.log(`playAll failed`);
-    }
+      }
   }
 
   togglePlayAll() {
@@ -1145,9 +1128,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
           const startSample =
             segmentNumber > 0
-              ? this.transcrService.currentlevel!.segments.get(
-                  segmentNumber - 1
-                )!.time.samples
+              ? this.transcrService.currentlevel!.segments[segmentNumber - 1]
+                  .time.samples
               : 0;
           this.uiService.addElementFromEvent(
             'mouseclick',
@@ -1161,8 +1143,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
             {
               start: startSample,
               length:
-                this.transcrService.currentlevel!.segments.get(segmentNumber)!
-                  .time.samples - startSample,
+                this.transcrService.currentlevel!.segments[segmentNumber]!.time
+                  .samples - startSample,
             },
             'overview'
           );
@@ -1182,8 +1164,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
     } else {
       const startSample =
         segmentNumber > 0
-          ? this.transcrService.currentlevel!.segments.get(segmentNumber - 1)!
-              .time.samples
+          ? this.transcrService.currentlevel!.segments[segmentNumber - 1]!.time
+              .samples
           : 0;
       this.uiService.addElementFromEvent(
         'mouseclick',
@@ -1197,7 +1179,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
         {
           start: startSample,
           length:
-            this.transcrService.currentlevel!.segments.get(segmentNumber)!.time
+            this.transcrService.currentlevel!.segments[segmentNumber].time
               .samples - startSample,
         },
         'overview'
@@ -1398,11 +1380,9 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   };
 
   private saveNewLabel(index: number, newLabel: string) {
-    const segment = this.transcrService
-      .currentlevel!.segments.get(index)!
-      .clone();
+    const segment = this.transcrService.currentlevel!.segments[index].clone();
     segment.speakerLabel = newLabel;
-    this.transcrService.currentlevel!.segments.change(index, segment);
+    this.transcrService.currentlevel!.segments[index] = segment;
   }
 
   private openTranscrEditor(segmentIndex: number) {
@@ -1418,8 +1398,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
       let started = 0;
 
-      const segments = this.transcrService.currentlevel!.segments.segments;
-      this.tempSegments = this.transcrService.currentlevel!.segments.clone();
+      const segments = this.transcrService.currentlevel!.segments;
+      this.tempSegments = [...this.transcrService.currentlevel!.segments];
       const segment = segments[segmentIndex];
       const segmentStart =
         segmentIndex > 0
@@ -1436,8 +1416,6 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       started = Date.now();
       this.cd.markForCheck();
       this.cd.detectChanges();
-      console.log(`detected Changes ended: ${Date.now() - started}ms`);
-
       this.subscrManager.add(
         this.transcrEditor.loaded.subscribe(() => {
           this.subscrManager.removeByTag('openingBlocked');
@@ -1449,9 +1427,9 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
         'openingBlocked'
       );
 
-      this.transcrEditor.Settings.btnPopover = false;
-      this.transcrEditor.Settings.specialMarkers.boundary = true;
-      this.transcrEditor.Settings.markers =
+      this.transcrEditor.settings.btnPopover = false;
+      this.transcrEditor.settings.specialMarkers.boundary = true;
+      this.transcrEditor.settings.markers =
         this.transcrService.guidelines.markers.items;
 
       this.transcrEditor.validationEnabled =
@@ -1461,31 +1439,24 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
             true);
       started = Date.now();
       this.transcrEditor.initialize();
-      console.log(`init transccrEditor ended: ${Date.now() - started}ms`);
-
       started = Date.now();
       this.cd.markForCheck();
       this.cd.detectChanges();
-      console.log(`detected Changes ended: ${Date.now() - started}ms`);
-
       started = Date.now();
-      this._textEditor.transcript = segment.transcript;
-      console.log(`set rawtext ended: ${Date.now() - started}ms`);
-
+      this._textEditor.transcript = segment.value;
       this.selectedCell = {
         labelText: '',
         row: segmentIndex,
         column: 2,
       };
-      console.log(`openTranscrEditor ended: ${Date.now() - overallTime}ms`);
-    } else {
+      } else {
       console.error(`can't open texteditor because it's blocked!`);
     }
   }
 
   private updateSegments() {
     this.playStateSegments = [];
-    const segments = this.transcrService.currentlevel!.segments.segments;
+    const segments = this.transcrService.currentlevel!.segments;
     const oldShownSegments = [...this.shownSegments];
     this.shownSegments = [];
 
@@ -1536,11 +1507,9 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   private changeTranscriptOfSegment(index: number, rawTranscript: string) {
-    const segment = this.transcrService
-      .currentlevel!.segments.get(index)!
-      .clone();
-    segment.transcript = rawTranscript;
-    this.transcrService.currentlevel!.segments.change(index, segment);
+    const segment = this.transcrService.currentlevel!.segments[index].clone();
+    segment.value = rawTranscript;
+    this.transcrService.currentlevel!.segments[index] = segment;
 
     const newSegment = this.getShownSegment(
       this.shownSegments[index].start,

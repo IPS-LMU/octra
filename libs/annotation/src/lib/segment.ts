@@ -3,45 +3,32 @@ import { ASRQueueItemType } from './asr';
 import { SampleUnit } from '@octra/media';
 
 export class Segment {
-  get time(): SampleUnit {
-    return this._time;
-  }
-
-  set time(value: SampleUnit) {
-    this._time = value;
-  }
-
-  get speakerLabel(): string {
-    return this._speakerLabel;
-  }
-
-  set speakerLabel(value: string) {
-    this._speakerLabel = value;
-  }
-
   private static counter = 1;
+
+  speakerLabel = 'NOLABEL';
+  time!: SampleUnit;
+  changed = false;
+  isBlockedBy?: ASRQueueItemType;
+  progressInfo?: {
+    statusLabel: string;
+    progress: number;
+  };
+
+  private _value = '';
   private readonly _id: number;
 
-  constructor(
-    time: SampleUnit,
-    speakerLabel: string,
-    transcript = '',
-    id?: number
-  ) {
-    this._time = time;
-    this._speakerLabel = speakerLabel;
-    this._transcript = transcript;
+  constructor(time: SampleUnit, speakerLabel: string, value = '', id?: number) {
+    this.time = time;
+    this.speakerLabel = speakerLabel;
+    this._value = value;
 
-    if (id === undefined || (id === undefined && id > 0)) {
+    if (id === undefined || id === null || id < 1) {
       this._id = Segment.counter++;
     } else {
       this._id = id;
       Segment.counter = Math.max(id + 1, Segment.counter);
     }
   }
-
-  private _speakerLabel = 'NOLABEL';
-  private _time!: SampleUnit;
 
   /**
    * this id is for internal use only!
@@ -50,50 +37,15 @@ export class Segment {
     return this._id;
   }
 
-  private _transcript = '';
-
-  get transcript(): string {
-    return this._transcript;
+  get value(): string {
+    return this._value;
   }
 
-  set transcript(value: string) {
-    if (value !== this._transcript) {
+  set value(value: string) {
+    if (value !== this._value) {
       this.changed = true;
     }
-    this._transcript = value;
-  }
-
-  private _changed = false;
-
-  get changed(): boolean {
-    return this._changed;
-  }
-
-  set changed(value: boolean) {
-    this._changed = value;
-  }
-
-  private _isBlockedBy?: ASRQueueItemType;
-
-  get isBlockedBy(): ASRQueueItemType | undefined {
-    return this._isBlockedBy;
-  }
-
-  set isBlockedBy(value: ASRQueueItemType | undefined) {
-    this._isBlockedBy = value;
-  }
-
-  private _progressInfo = {
-    statusLabel: 'ASR',
-    progress: 0,
-  };
-
-  get progressInfo(): { progress: number; statusLabel: string } {
-    return this._progressInfo;
-  }
-
-  set progressInfo(value: { progress: number; statusLabel: string }) {
-    this._progressInfo = value;
+    this._value = value;
   }
 
   /**
@@ -135,6 +87,6 @@ export class Segment {
   }
 
   public clone(): Segment {
-    return new Segment(this.time.clone(), this.speakerLabel, this.transcript);
+    return new Segment(this.time.clone(), this.speakerLabel, this.value);
   }
 }

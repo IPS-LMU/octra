@@ -48,7 +48,7 @@ export function downloadFile(
   });
 
   http.request(req).subscribe(
-    (event) => {
+    (event: any) => {
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
           progress: event.total ? event.loaded / event.total : 0,
@@ -75,7 +75,6 @@ export function navigateTo(
   commands: any[],
   navigationExtras?: NavigationExtras
 ): Promise<boolean> {
-  console.log(`navigate to ${commands[0]}`);
   return new Promise<boolean>((resolve) => {
     setTimeout(() => {
       router.navigate(commands, navigationExtras).then(resolve);

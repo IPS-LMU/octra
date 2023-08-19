@@ -225,7 +225,6 @@ export function afterDefined(observable: Observable<any>): Promise<any> {
     const subscription = observable.subscribe(
       (value) => {
         if (value !== undefined) {
-          console.log(`is defined`);
           try {
             subscription.unsubscribe();
           } catch (e) {
@@ -256,9 +255,6 @@ export function waitTillResultRetrieved<
           ...action,
         } as any;
         delete props['type'];
-        console.log('props are');
-        console.log(props);
-
         if (Object.keys(props).length === 0) {
           props = undefined;
         }

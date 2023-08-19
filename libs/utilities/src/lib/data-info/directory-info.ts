@@ -144,9 +144,7 @@ export class DirectoryInfo extends DataInfo {
           }
         });
 
-        console.log(result);
         dir.addEntries(result);
-        console.log(`dir with ${result.length} found`);
         return [dir];
       }
     } else {

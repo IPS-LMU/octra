@@ -97,7 +97,6 @@ export class FileInfo extends DataInfo {
     } else {
       fullname = url.substr(url.lastIndexOf('/') + 1);
     }
-    console.log(type ?? this.getMimeTypeByExtension(extension), extension);
     const result = new FileInfo(
       fullname,
       type ?? this.getMimeTypeByExtension(extension),

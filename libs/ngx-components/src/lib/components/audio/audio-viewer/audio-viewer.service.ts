@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioviewerConfig } from './audio-viewer.config';
 import {
@@ -10,7 +10,13 @@ import {
   SampleUnit,
 } from '@octra/media';
 import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
-import { ASRQueueItemType, Level, Segment } from '@octra/annotation';
+import {
+  addSegment,
+  ASRQueueItemType,
+  betweenWhichSegment,
+  removeSegmentByIndex,
+  Segment,
+} from '@octra/annotation';
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MultiThreadingService } from '../../../multi-threading.service';
@@ -23,6 +29,7 @@ export class AudioViewerService {
     return this._boundaryDragging;
   }
 
+  public entriesChange = new EventEmitter<Segment[]>();
   public audioTCalculator: AudioTimeCalculator | undefined;
   public overboundary = false;
   public shiftPressed = false;
@@ -32,6 +39,7 @@ export class AudioViewerService {
   protected playcursor: PlayCursor | undefined;
 
   private _boundaryDragging: Subject<'started' | 'stopped'>;
+  private _levelName!: string;
 
   // AUDIO
   protected audioPxW = 0;
@@ -40,11 +48,7 @@ export class AudioViewerService {
   private subscrManager: SubscriptionManager<Subscription> =
     new SubscriptionManager<Subscription>();
 
-  private _currentTranscriptionLevel: Level | undefined;
-
-  get currentTranscriptionLevel(): Level | undefined {
-    return this._currentTranscriptionLevel;
-  }
+  public entries: Segment[] = [];
 
   private _drawnSelection: AudioSelection | undefined;
 
@@ -109,6 +113,7 @@ export class AudioViewerService {
     if (value > -1 && this._dragableBoundaryNumber === -1) {
       // started
       this._boundaryDragging.next('started');
+      this.entriesChange.emit(this.entries);
     }
     this._dragableBoundaryNumber = value;
   }
@@ -154,17 +159,23 @@ export class AudioViewerService {
   }
 
   public initialize(
+    levelName: string | undefined,
     innerWidth: number,
-    audioChunk: AudioChunk,
-    currentTranscriptionLevel: Level
+    audioChunk: AudioChunk
   ) {
+    if (!levelName) {
+      throw new Error(
+        'Level name is undefined. Set attribute levelName to audioviewer'
+      );
+    }
+
     const optionalScrollbarWidth = this.settings.scrollbar.enabled
       ? this.settings.scrollbar.width
       : 0;
 
     this.audioChunk = audioChunk;
     this._innerWidth = innerWidth - optionalScrollbarWidth;
-    this._currentTranscriptionLevel = currentTranscriptionLevel;
+    this._levelName = levelName;
   }
 
   /**
@@ -186,7 +197,7 @@ export class AudioViewerService {
           absXInTime !== undefined &&
           this.audioManager !== undefined &&
           this.audioChunk !== undefined &&
-          this._currentTranscriptionLevel !== undefined &&
+          this.entries.length > 0 &&
           this.audioTCalculator !== undefined &&
           this.PlayCursor !== undefined
         ) {
@@ -207,24 +218,13 @@ export class AudioViewerService {
               if (this._dragableBoundaryNumber > -1) {
                 const segmentBefore =
                   this._dragableBoundaryNumber > 0
-                    ? this._currentTranscriptionLevel.segments.get(
-                        this._dragableBoundaryNumber - 1
-                      )
-                    : this._currentTranscriptionLevel.segments.get(
-                        this._dragableBoundaryNumber
-                      );
-                const segment = this._currentTranscriptionLevel.segments.get(
-                  this._dragableBoundaryNumber
-                );
+                    ? this.entries[this._dragableBoundaryNumber - 1]
+                    : this.entries[this._dragableBoundaryNumber];
+                const segment = this.entries[this._dragableBoundaryNumber];
                 const segmentAfter =
-                  this._dragableBoundaryNumber <
-                  this._currentTranscriptionLevel.segments.length - 1
-                    ? this._currentTranscriptionLevel.segments.get(
-                        this._dragableBoundaryNumber + 1
-                      )
-                    : this._currentTranscriptionLevel.segments.get(
-                        this._dragableBoundaryNumber
-                      );
+                  this._dragableBoundaryNumber < this.entries.length - 1
+                    ? this.entries[this._dragableBoundaryNumber + 1]
+                    : this.entries[this._dragableBoundaryNumber];
 
                 if (
                   segment?.isBlockedBy === ASRQueueItemType.ASR ||
@@ -241,14 +241,11 @@ export class AudioViewerService {
                 this.settings.boundaries.enabled &&
                 !this.settings.boundaries.readonly &&
                 this._dragableBoundaryNumber > -1 &&
-                this._dragableBoundaryNumber <
-                  this._currentTranscriptionLevel.segments.length
+                this._dragableBoundaryNumber < this.entries.length
               ) {
                 // some boundary dragged
                 const segment: Segment | undefined =
-                  this?._currentTranscriptionLevel.segments
-                    .get(this._dragableBoundaryNumber)
-                    ?.clone();
+                  this?.entries[this._dragableBoundaryNumber]?.clone();
                 // TODO check this
                 if (segment) {
                   segment.time = this.audioTCalculator.absXChunktoSampleUnit(
@@ -257,10 +254,8 @@ export class AudioViewerService {
                   ) as any;
                 }
 
-                // trigger segment change because it wasn't triggered while dragging
-                this._currentTranscriptionLevel.segments.onsegmentchange.emit();
-
                 this._boundaryDragging.next('stopped');
+                this.entriesChange.emit(this.entries);
               } else {
                 // set selection
                 this.audioChunk.selection.end = absXInTime.clone();
@@ -319,10 +314,6 @@ export class AudioViewerService {
   onKeyUp = () => {
     this.shiftPressed = false;
   };
-
-  public updateLevel(level: Level) {
-    this._currentTranscriptionLevel = level;
-  }
 
   /**
    * destroy this audioviewer object
@@ -568,7 +559,7 @@ export class AudioViewerService {
     if (
       this.audioTCalculator !== undefined &&
       this.audioChunk !== undefined &&
-      this._currentTranscriptionLevel !== undefined
+      this.entries.length > 0
     ) {
       let absXTime = this.audioTCalculator.absXChunktoSampleUnit(
         absX,
@@ -589,25 +580,18 @@ export class AudioViewerService {
         ) {
           // mouse down something dragged
           const segment = (
-            this._currentTranscriptionLevel.segments.get(
-              this._dragableBoundaryNumber
-            ) as any
+            this.entries[this._dragableBoundaryNumber] as any
           ).clone();
           const absXSeconds = absXTime.seconds;
 
           // prevent overwriting another boundary
           const segmentBefore =
             this._dragableBoundaryNumber > 0
-              ? this._currentTranscriptionLevel.segments.get(
-                  this._dragableBoundaryNumber - 1
-                )
+              ? this.entries[this._dragableBoundaryNumber - 1]
               : undefined;
           const segmentAfter =
-            this._dragableBoundaryNumber <
-            this._currentTranscriptionLevel.segments.length - 1
-              ? this._currentTranscriptionLevel.segments.get(
-                  this._dragableBoundaryNumber + 1
-                )
+            this._dragableBoundaryNumber < this.entries.length - 1
+              ? this.entries[this._dragableBoundaryNumber + 1]
               : undefined;
           if (
             segmentBefore?.time !== undefined &&
@@ -635,9 +619,7 @@ export class AudioViewerService {
           }
 
           segment.time = absXTime.clone();
-          this._currentTranscriptionLevel.segments.segments[
-            this._dragableBoundaryNumber
-          ] = segment;
+          this.entries[this._dragableBoundaryNumber] = segment;
         } else {
           this._mouseDown = false;
         }
@@ -651,7 +633,7 @@ export class AudioViewerService {
   /**
    * addSegment() adds a boundary to the list of segments or removes the segment
    */
-  public addSegment():
+  public addOrRemoveSegment():
     | {
         type: string;
         seg_samples: number;
@@ -667,7 +649,7 @@ export class AudioViewerService {
       this.audioTCalculator !== undefined &&
       this.audioChunk !== undefined &&
       this._mouseCursor !== undefined &&
-      this._currentTranscriptionLevel !== undefined
+      this.entries.length > 0
     ) {
       this.audioTCalculator.audioPxWidth = this.audioPxW;
       const absXTime = !this.audioChunk.isPlaying
@@ -679,12 +661,9 @@ export class AudioViewerService {
       );
       bWidthTime = Math.round(bWidthTime);
 
-      if (
-        this._currentTranscriptionLevel.segments.length > 0 &&
-        !this.audioChunk.isPlaying
-      ) {
-        for (i = 0; i < this._currentTranscriptionLevel.segments.length; i++) {
-          const segment = this._currentTranscriptionLevel.segments.get(i);
+      if (this.entries.length > 0 && !this.audioChunk.isPlaying) {
+        for (i = 0; i < this.entries.length; i++) {
+          const segment = this.entries[i];
           if (
             segment?.time !== undefined &&
             this.audioManager !== undefined &&
@@ -694,10 +673,7 @@ export class AudioViewerService {
               this.audioManager.resource.info.duration.samples
           ) {
             const segSamples = segment.time.samples;
-            this._currentTranscriptionLevel.segments.removeByIndex(
-              i,
-              this.breakMarker.code
-            );
+            this.removeSegmentByIndex(i, this.breakMarker.code, true, false);
 
             return {
               type: 'remove',
@@ -722,14 +698,14 @@ export class AudioViewerService {
         absXTime <= this._drawnSelection.end.samples
       ) {
         // some part selected
-        const segm1 =
-          this._currentTranscriptionLevel.segments.BetweenWhichSegment(
-            this._drawnSelection.start.samples
-          );
-        const segm2 =
-          this._currentTranscriptionLevel.segments.BetweenWhichSegment(
-            this._drawnSelection.end.samples
-          );
+        const segm1 = betweenWhichSegment(
+          this.entries,
+          this._drawnSelection.start.samples
+        );
+        const segm2 = betweenWhichSegment(
+          this.entries,
+          this._drawnSelection.end.samples
+        );
 
         if (
           this.drawnSelection !== undefined &&
@@ -737,16 +713,16 @@ export class AudioViewerService {
             segm1 === segm2 ||
             (segm1 !== undefined &&
               segm2 !== undefined &&
-              segm1.transcript === '' &&
-              segm2.transcript === ''))
+              segm1.value === '' &&
+              segm2.value === ''))
         ) {
           if (this.drawnSelection.start.samples > 0) {
             // prevent setting boundary if first sample selected
-            this._currentTranscriptionLevel.addSegment(
-              this._drawnSelection.start
-            );
+            this.addSegment(this._drawnSelection.start);
           }
-          this._currentTranscriptionLevel.addSegment(this.drawnSelection.end);
+
+          this.addSegment(this._drawnSelection.end);
+
           return {
             type: 'add',
             seg_samples: this.drawnSelection.start.samples,
@@ -769,25 +745,21 @@ export class AudioViewerService {
         }
       } else {
         // no selection
-        const segment =
-          this._currentTranscriptionLevel.segments.BetweenWhichSegment(
-            absXTime
-          );
+        const segment = betweenWhichSegment(this.entries, absXTime);
         if (segment !== undefined && this.audioManager !== undefined) {
           let transcript = '';
           if (segment) {
-            if (this._currentTranscriptionLevel.segments.length > 1) {
+            if (this.entries.length > 1) {
               // clear right
-              transcript = segment.transcript;
-              segment.transcript = '';
+              transcript = segment.value;
+              segment.value = '';
             } else {
               // clear left
               transcript = '';
             }
           }
-          this._currentTranscriptionLevel.addSegment(
+          this.addSegment(
             this.audioManager.createSampleUnit(Math.round(absXTime)),
-            '',
             transcript
           );
 
@@ -815,22 +787,19 @@ export class AudioViewerService {
   ): AudioSelection | undefined {
     // complex decision needed because there are no segments at position 0 and the end of the file
     let result = undefined;
-    if (this._currentTranscriptionLevel !== undefined) {
-      const segments = this._currentTranscriptionLevel.segments;
-      const length = this._currentTranscriptionLevel.segments.length;
+    if (this.entries.length > 0) {
+      const segments = this.entries;
+      const length = this.entries.length;
 
       if (
         length > 0 &&
         segments !== undefined &&
         this.audioManager !== undefined
       ) {
-        const firstSegment = segments.get(0);
-        const lastSegment = segments.get(segments.length - 1);
+        const firstSegment = segments[0];
+        const lastSegment = segments[segments.length - 1];
 
-        if (
-          firstSegment?.time !== undefined &&
-          lastSegment?.time !== undefined
-        ) {
+        if (firstSegment.time.samples !== lastSegment.time.samples) {
           if (positionSamples < firstSegment.time.samples) {
             // select in first Boundary
             result = new AudioSelection(
@@ -846,8 +815,8 @@ export class AudioViewerService {
             );
           } else {
             for (let i = 1; i < length; i++) {
-              const currentSegment = segments.get(i);
-              const previousSegment = segments.get(i - 1);
+              const currentSegment = segments[i];
+              const previousSegment = segments[i - 1];
 
               if (
                 previousSegment?.time !== undefined &&
@@ -1055,5 +1024,27 @@ export class AudioViewerService {
           reject(err);
         });
     });
+  }
+
+  public removeSegmentByIndex(
+    index: number,
+    silenceCode: string,
+    mergeTranscripts: boolean,
+    triggerChange = true
+  ) {
+    this.entries = removeSegmentByIndex(
+      this.entries,
+      index,
+      silenceCode,
+      mergeTranscripts
+    );
+    if (triggerChange) {
+      this.entriesChange.emit(this.entries);
+    }
+  }
+
+  public addSegment(start: SampleUnit, value?: string) {
+    this.entries = addSegment(this.entries, start, this._levelName, value);
+    this.entriesChange.emit(this.entries);
   }
 }

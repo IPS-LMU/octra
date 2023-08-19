@@ -1028,7 +1028,7 @@ export class AudioViewerService {
 
   public removeSegmentByIndex(
     index: number,
-    silenceCode: string,
+    silenceCode: string | undefined,
     mergeTranscripts: boolean,
     triggerChange = true
   ) {

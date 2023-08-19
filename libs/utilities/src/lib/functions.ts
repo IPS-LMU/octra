@@ -1,22 +1,35 @@
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
+/**
+ * represents a file size definition giving size and label.
+ */
 export interface FileSize {
   size: number;
   label: string;
 }
 
-export function obj() {
-  return obj === undefined || typeof obj === 'undefined';
-}
-
+/**
+ * checks if value is an function
+ * @param value
+ */
 export function isFunction(value: any) {
   return typeof value === 'function';
 }
 
+/**
+ * checks if a given string contains a given substring
+ * @param haystack string that should be searched
+ * @param needle substring that is searched for
+ */
 export function contains(haystack: string, needle: string): boolean {
   return haystack.indexOf(needle) !== -1;
 }
 
+/**
+ * checks if a object has a value at given property path
+ * @param obj
+ * @param treeString
+ */
 export function hasPropertyTree(obj: any, treeString: string): boolean {
   if (obj !== undefined) {
     const properties = treeString
@@ -38,6 +51,10 @@ export function hasPropertyTree(obj: any, treeString: string): boolean {
   }
 }
 
+/**
+ * converts base64 to ArrayBuffer
+ * @param base64
+ */
 export function base64ToArrayBuffer(base64: any): ArrayBuffer {
   const binaryString = window.atob(base64);
   const len = binaryString.length;
@@ -48,26 +65,16 @@ export function base64ToArrayBuffer(base64: any): ArrayBuffer {
   return bytes.buffer as ArrayBuffer;
 }
 
-export function selectAllTextOfNode(el: any) {
+/**
+ * selects all text of a given element.
+ * @param el
+ */
+export function selectAllTextOfNode(element: any) {
   const range = document.createRange();
-  range.selectNodeContents(el);
+  range.selectNodeContents(element);
   const sel = window.getSelection();
   sel?.removeAllRanges();
   sel?.addRange(range);
-}
-
-export function checkArray(array: any[]) {
-  return array.findIndex((a) => a === undefined) < 0;
-}
-
-export function scrollTo(y: number, target?: string) {
-  setTimeout(() => {
-    if (target === undefined) {
-      // TODO jquery jQuery('html, body').scrollTop(y);
-    } else {
-      // TODO jquery jQuery(target).scrollTop(y);
-    }
-  }, 200);
 }
 
 export function isNumber(str: string): boolean {

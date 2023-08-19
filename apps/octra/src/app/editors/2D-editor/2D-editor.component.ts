@@ -12,7 +12,6 @@ import { TranslocoService } from '@ngneat/transloco';
 import {
   contains,
   hasProperty,
-  scrollTo,
   ShortcutEvent,
   ShortcutGroup,
   SubscriptionManager,
@@ -734,21 +733,6 @@ export class TwoDEditorComponent
       this.shortcutsEnabled = true;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
-
-      const segment =
-        this.transcrService.currentlevel!.segments[this.selectedIndex];
-      const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
-        segment!.time
-      );
-
-      let y =
-        Math.floor(absx / this.viewer.av.innerWidth!) *
-        this.viewer.settings.lineheight;
-      y +=
-        10 +
-        Math.floor(absx / this.viewer.av.innerWidth!) *
-          this.viewer.settings.margin.bottom;
-      scrollTo(y, '#special');
     } else if (state === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');

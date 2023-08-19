@@ -24,9 +24,7 @@
       #loupe
       (mousemove)="onCircleLoupeMouseOver()"
       [audioChunk]="audioChunkLoupe"
-      [breakMarker]="{
-        code: '<P>'
-      }"
+      [silencePlaceholder]="'<P>'"
       [isMultiLine]="false"
       [refreshOnInternChanges]="false"
       [name]="'loupe'"
@@ -51,11 +49,9 @@
     #viewer
     (mousecursorchange)="onMouseOver($event)"
     (segmententer)="onSegmentEntered($event)"
-    (shortcutTrigger)="onShortCutViewerTriggered($event)"
+    (shortcut)="onShortCutViewerTriggered($event)"
     [audioChunk]="audioChunkLines"
-    [breakMarker]="{
-      code: '<P>'
-    }"
+    [silencePlaceholder]="'<P>'"
     [isMultiLine]="true"
     [refreshOnInternChanges]="false"
     [(entries)]="transcrService.currentlevel.segments"

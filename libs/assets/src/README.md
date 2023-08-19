@@ -41,3 +41,30 @@ Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([se
 ```shell
 git pull
 ```
+
+## Use
+
+### Import
+
+#### ESM, Typescript
+
+Import the classes and functions from `@octra/assets`. For example
+
+````typescript
+import {OctraGuidelinesJSONSchema} from "@octra/assets";
+````
+
+#### UMD Bundle
+
+All functions and classes are available via global scope `OctraAssets`. For example:
+
+```javascript
+/*
+make sure that you have injected the umd bundle as described before.
+ */
+const guidelinesJSONSchema = OctraAssets.OctraGuidelinesJSONSchema;
+```
+
+### API
+
+You can find more information about classes and functions of `@octra/assets` [here](https://ips-lmu.github.io/octra/modules/_octra_assets.html).

@@ -44,3 +44,30 @@ file ([see full example here](../../../apps/web-components-demo/index.html)).
 ```shell
 git pull
 ```
+
+## Use
+
+### Import
+
+#### ESM, Typescript
+
+Import the classes and functions from `@octra/annotation`. For example
+
+````typescript
+import {Level} from "@octra/annotation";
+````
+
+#### UMD Bundle
+
+All functions and classes are available via global scope `OctraAnnotation`. For example:
+
+```javascript
+/*
+make sure that you have injected the umd bundle as described before.
+ */
+const annotation = new OctraAnnotation.Level(1, "OCTRA_1", "SEGMENT", []);
+```
+
+### API
+
+You can find more information about classes and functions of `@octra/annotation` [here](https://ips-lmu.github.io/octra/modules/_octra_annotation.html).

@@ -13,11 +13,15 @@ This sections shows an overview of all custom libraries used by OCTRA. All Angul
   e.g. JSON schemata
 - [annotation](./annotation/src/): Objects and other classes used to handle
   annotation tasks
-- [ngx-components](./ngx-components/src/): Angular components e.g. for the
+- [ngx-components](./ngx-components/): Angular components e.g. for the
   signal displays.
-- [ngx-utilities](./ngx-utilities/src/): library with custom functions used in
+- [ngx-utilities](./ngx-utilities/): library with custom functions used in
   angular projects
 - [web-components](../apps/web-components/src/): library with web-components containing components from ngx-components. These components can be used in other frameworks or Vanilla JS. [See demo](../apps/web-components-demo/).
+
+## API reference
+
+You find more information about all classes and functions of each library [here](https://ips-lmu.github.io/octra).
 
 ## Installation
 

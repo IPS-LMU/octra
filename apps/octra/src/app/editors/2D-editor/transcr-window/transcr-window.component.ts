@@ -72,7 +72,7 @@ export class TranscrWindowComponent
 
   @Output()
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
-    return this.loupe.shortcutTrigger;
+    return this.loupe.shortcut;
   }
 
   @Output()

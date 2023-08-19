@@ -1,6 +1,3 @@
-<p align="center">
-This is the frontpage of the OCTRA app. If you are looking for OCTRA's custom libraries, click <a href="https://github.com/IPS-LMU/octra/tree/master/libs">here</a>
-</p>
 <h1 align="center">OCTRA v2.x (still in development)</h1>
 
 <p align="center">
@@ -47,6 +44,9 @@ You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-
 
 ## Remarks
 At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers (project "octra-backend" is in development).
+
+## Libraries
+The libraries are still in development. If you want to use them you find more information [here](libs/README.md).
 
 ## Production Use
 

@@ -42,3 +42,31 @@ Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([se
 ```shell
 git pull
 ```
+
+## Use
+
+### Import
+
+#### ESM, Typescript
+
+Import the classes and functions from `@octra/utilties`. For example
+
+````typescript
+import {getFileSize} from "@octra/utilities";
+````
+
+#### UMD Bundle
+
+All functions and classes are available via global scope `OctraUtilities`. For example:
+
+```javascript
+/*
+make sure that you have injected the umd bundle as described before.
+ */
+const bytes = 738246364782
+const sizeInMb = OctraUtilities.getFileSize(bytes);
+```
+
+### API
+
+You can find more information about classes and functions of `@octra/utilities` [here](https://ips-lmu.github.io/octra/modules/_octra_utilities.html).

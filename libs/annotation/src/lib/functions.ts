@@ -83,7 +83,7 @@ export function getSegmentsOfRange(
 export function removeSegmentByIndex(
   entries: Segment[],
   index: number,
-  silenceValue: string,
+  silenceValue: string | undefined,
   mergeTranscripts = true
 ) {
   if (index > -1 && index < entries.length) {

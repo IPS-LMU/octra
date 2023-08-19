@@ -45,3 +45,30 @@ file ([see full example here](../../apps/web-components-demo/index.html)).
 git pull
 ```
 
+## Use
+
+### Import
+
+#### ESM, Typescript
+
+Import the classes and functions from `@octra/json-sets`. For example
+
+````typescript
+import {JsonSetValidator} from "@octra/json-sets";
+````
+
+#### UMD Bundle
+
+All functions and classes are available via global scope `OctraJSONSets`. For example:
+
+```javascript
+/*
+make sure that you have injected the umd bundle as described before.
+ */
+const validator = new OctraJSONSets.JSONSetValidator();
+```
+
+### API
+
+You can find more information about classes and functions of `@octra/json-sets` [here](https://ips-lmu.github.io/octra/modules/_octra_json_sets.html).
+

@@ -2,9 +2,7 @@
   #miniloupeComponent
   *ngIf="appStorage.showLoupe"
   [audioChunk]="audioChunkLoupe"
-  [breakMarker]="{
-    code: '<P>'
-  }"
+  [silencePlaceholder]="'<P>'"
   [isMultiLine]="false"
   [refreshOnInternChanges]="false"
   [name]="'loupe'"
@@ -51,12 +49,10 @@
     "
     (segmententer)="onSegmentEnter($event)"
     (selchange)="onSelectionChanged($event)"
-    (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
+    (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
     [audioChunk]="audioChunkTop"
     [refreshOnInternChanges]="false"
-    [breakMarker]="{
-      code: '<P>'
-    }"
+    [silencePlaceholder]="'<P>'"
     [entries]="transcrService.currentlevel.segments"
     (entriesChange)="onEntriesChange($event)"
     [levelName]="transcrService.currentlevel.name"
@@ -68,7 +64,7 @@
 <octra-audio-viewer
   #signalDisplayDown
   [refreshOnInternChanges]="false"
-  (shortcutTrigger)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+  (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
   (alert)="onAlertTriggered($event)"
   (click)="onLoupeClick()"
   (mousedown)="onViewerMouseDown()"
@@ -77,9 +73,7 @@
   (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
   *ngIf="audioChunkDown !== undefined"
   [audioChunk]="audioChunkDown"
-  [breakMarker]="{
-    code: '<P>'
-  }"
+  [silencePlaceholder]="'<P>'"
   [name]="'downLoupe'"
   [settings]="loupeSettings"
   [entries]="transcrService.currentlevel.segments"

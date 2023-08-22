@@ -436,6 +436,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           if (
             this.width !== undefined &&
             this.audioChunk !== undefined &&
+            this.av.entries &&
             this.av.entries.length > 0
           ) {
             const innerWidth =

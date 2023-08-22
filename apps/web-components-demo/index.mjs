@@ -3,133 +3,131 @@ let audioViewer = undefined;
 let annotation = undefined;
 
 function initAudioPlayer(audioManager) {
-    // <oc-audioplayer> is a web component from web-components library
-    audioplayer = document.createElement("oc-audioplayer");
-    // connect audiochunk with audioplayer
-    audioplayer.audioChunk = audioManager.mainchunk;
+  // <oc-audioplayer> is a web component from web-components library
+  audioplayer = document.createElement("oc-audioplayer");
+  // connect audiochunk with audioplayer
+  audioplayer.audioChunk = audioManager.mainchunk;
 
-    // add audio player to DOM
-    const wrapper = document.getElementById("audioplayer-wrapper");
-    wrapper.appendChild(audioplayer);
+  // add audio player to DOM
+  const wrapper = document.getElementById("audioplayer-wrapper");
+  wrapper.appendChild(audioplayer);
 }
 
 function initAudioViewer(audioManager) {
-    // import AnnotJSON data from sample ( see at the end of this file)
+  // import AnnotJSON data from sample ( see at the end of this file)
 
-    const oAudioFile = {
-        name: audioManager.resource.info.fullname,
-        arrayBuffer: audioManager.resource.arraybuffer,
-        size: audioManager.resource.info.size,
-        sampleRate: audioManager.resource.info.sampleRate,
-        duration: audioManager.resource.info.duration.samples,
-        type: audioManager.resource.info.type
-    };
+  const oAudioFile = {
+    name: audioManager.resource.info.fullname,
+    arrayBuffer: audioManager.resource.arraybuffer,
+    size: audioManager.resource.info.size,
+    sampleRate: audioManager.resource.info.sampleRate,
+    duration: audioManager.resource.info.duration.samples,
+    type: audioManager.resource.info.type
+  };
 
-    const importResult = new OctraAnnotation.AnnotJSONConverter().import({
-        name: "Bahnauskunft_annot.json",
-        content: annotationSample,
-        type: "application/json",
-        encoding: "utf-8"
-    }, oAudioFile);
+  const importResult = new OctraAnnotation.AnnotJSONConverter().import({
+    name: "Bahnauskunft_annot.json",
+    content: annotationSample,
+    type: "application/json",
+    encoding: "utf-8"
+  }, oAudioFile);
 
-    // retrieve first level object from importResult
-    const annotation = new OctraAnnotation.Annotation(
-        "Bahnauskunft.wav", oAudioFile,
-        importResult.annotjson.levels.map((level, i) => OctraAnnotation.Level.fromObj({
-            id: level.id,
-            level,
-            sortorder: i
-        }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration.samples))
-    );
+  // retrieve first level object from importResult
+  const annotation = new OctraAnnotation.Annotation(
+    "Bahnauskunft.wav", oAudioFile,
+    importResult.annotjson.levels.map((level, i) => OctraAnnotation.Level.fromObj({
+      id: level.id,
+      level,
+      sortorder: i
+    }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration))
+  );
 
-    // onsegmentchange is an Observabke from rxjs
-    annotation.levels[0].segments.onsegmentchange.subscribe({
-        next: (e) => {
-            console.log(`Segment changed!`);
-            console.log(e);
-        }
-    });
+  // <oc-audioplayer> is a web component from web-components library
+  audioViewer = document.createElement("oc-audioviewer");
+  audioViewer.audioChunk = audioManager.mainchunk;
+  audioViewer.entries = annotation.levels[0].segments;
+  audioViewer.isMultiLine = true;
+  audioViewer.breakMarker = "<P>"
+  audioViewer.levelName = annotation.levels[0].name;
 
-    // <oc-audioplayer> is a web component from web-components library
-    audioViewer = document.createElement("oc-audioviewer");
-    audioViewer.isMultiLine = true;
-    audioViewer.breakMarker = {
-        code: "<P>"
-    };
-    audioViewer.transcriptionLevel = annotation.levels[0];
+  const wrapper = document.getElementById("audioviewer-wrapper");
+  wrapper.appendChild(audioViewer);
 
-    const wrapper = document.getElementById("audioviewer-wrapper");
-    wrapper.appendChild(audioViewer);
-    audioViewer.audioChunk = audioManager.mainchunk;
-    audioViewer.settings.showTranscripts = true;
-    audioViewer.style.height = "600px";
-    audioViewer.settings.scrollbar.enabled = true;
+  audioViewer.settings.showTranscripts = true;
+  audioViewer.style.height = "600px";
+  audioViewer.settings.scrollbar.enabled = true;
+
+  audioViewer.addEventListener("entriesChange", (event) => {
+    const segments = event.detail;
+    // annotation.levels[0] is referenced in audioviewer, so it the changes are automatically available.
+  });
+
 }
 
 async function main() {
-    // download audio file
-    const downloadedBlob = await OctraUtilities.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
-    const file = new File(
-        [downloadedBlob],
-        "Bahnauskunft.wav",
-        {
-            type: "audio/wave"
-        }
-    );
-
-    // read arraybuffer
-    const arrayBuffer = await OctraUtilities.readFileContents(file, "arraybuffer");
-    OctraMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraMedia.WavFormat()]).subscribe({
-        next: (status) => {
-            console.log(status)
-
-            if (status.decodeProgress === 1) {
-                // audio was decoded, init audioplayer and audioviewer
-                initAudioPlayer(status.audioManager);
-                initAudioViewer(status.audioManager);
-
-                // subscribe to audio events
-                status.audioManager.statechange.subscribe({
-                    next: (event) => {
-                        console.log(`Audio status change!`);
-                        console.log(event);
-                    }
-                })
-            }
-        }
-    });
-
-    window.playAudioPlayer = function play() {
-        if (!audioplayer) {
-            alert("Audio noch nicht geladen!");
-        } else {
-            audioplayer.audioChunk.startPlayback();
-        }
+  // download audio file
+  const downloadedBlob = await OctraUtilities.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
+  const file = new File(
+    [downloadedBlob],
+    "Bahnauskunft.wav",
+    {
+      type: "audio/wave"
     }
+  );
 
-    window.pauseAudioPlayer = function pause() {
-        if (!audioplayer) {
-            alert("Audio noch nicht geladen!");
-        } else {
-            audioplayer.audioChunk.pausePlayback();
-        }
-    }
+  // read arraybuffer
+  const arrayBuffer = await OctraUtilities.readFileContents(file, "arraybuffer");
+  OctraMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraMedia.WavFormat()]).subscribe({
+    next: (status) => {
+      console.log(status)
 
-    window.playAudioViewer = function play() {
-        if (!audioViewer) {
-            alert("Audio noch nicht geladen!");
-        } else {
-            audioViewer.audioChunk.startPlayback();
-        }
-    }
+      if (status.decodeProgress === 1) {
+        // audio was decoded, init audioplayer and audioviewer
+        initAudioPlayer(status.audioManager);
+        initAudioViewer(status.audioManager);
 
-    window.pauseAudioViewer = function pause() {
-        if (!audioViewer) {
-            alert("Audio noch nicht geladen!");
-        } else {
-            audioViewer.audioChunk.pausePlayback();
-        }
+        // subscribe to audio events
+        status.audioManager.statechange.subscribe({
+          next: (event) => {
+            console.log(`Audio status change!`);
+            console.log(event);
+          }
+        })
+      }
     }
+  });
+
+  window.playAudioPlayer = function play() {
+    if (!audioplayer) {
+      alert("Audio noch nicht geladen!");
+    } else {
+      audioplayer.audioChunk.startPlayback();
+    }
+  }
+
+  window.pauseAudioPlayer = function pause() {
+    if (!audioplayer) {
+      alert("Audio noch nicht geladen!");
+    } else {
+      audioplayer.audioChunk.pausePlayback();
+    }
+  }
+
+  window.playAudioViewer = function play() {
+    if (!audioViewer) {
+      alert("Audio noch nicht geladen!");
+    } else {
+      audioViewer.audioChunk.startPlayback();
+    }
+  }
+
+  window.pauseAudioViewer = function pause() {
+    if (!audioViewer) {
+      alert("Audio noch nicht geladen!");
+    } else {
+      audioViewer.audioChunk.pausePlayback();
+    }
+  }
 }
 
 window.addEventListener("load", main);

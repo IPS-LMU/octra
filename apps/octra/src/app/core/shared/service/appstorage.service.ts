@@ -678,4 +678,8 @@ export class AppStorageService {
 
     return Promise.all(promises);
   }
+
+  public abortReauthentication() {
+    this.store.dispatch(AuthenticationActions.needReAuthentication.abort());
+  }
 }

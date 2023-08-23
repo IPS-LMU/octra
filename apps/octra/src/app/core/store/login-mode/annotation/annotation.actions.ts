@@ -1,6 +1,6 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import { LoginMode } from '../../index';
-import { OIDBLink } from '@octra/annotation';
+import { OIDBLink, Segment } from '@octra/annotation';
 import { ILog } from '../../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import {
@@ -9,9 +9,8 @@ import {
   TranscriptionState,
 } from './index';
 import { ProjectSettings } from '../../../obj';
-import {ASRQueueItemType, ASRTimeInterval} from "../../asr";
-import videojs from "video.js";
-import Log = videojs.Log;
+import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
+import videojs from 'video.js';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -308,20 +307,33 @@ export class AnnotationActions {
   });
 
   static updateASRSegmentInformation = createActionGroup({
-      source: 'annotation/update asr information',
-      events: {
-        do: props<{
-          mode: LoginMode,
-          itemType: ASRQueueItemType,
-          timeInterval: ASRTimeInterval;
-          progress: number;
-          result?: string;
-          isBlockedBy?: ASRQueueItemType;
-        }>(),
-        fail: props<{
-          error: string
-        }>()
-      }
+    source: 'annotation/update asr information',
+    events: {
+      do: props<{
+        mode: LoginMode;
+        itemType: ASRQueueItemType;
+        timeInterval: ASRTimeInterval;
+        progress: number;
+        result?: string;
+        isBlockedBy?: ASRQueueItemType;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
   });
 
+  static addMultipleASRSegments = createActionGroup({
+    source: 'asr/add multiple segments',
+    events: {
+      success: props<{
+        mode: LoginMode;
+        segmentID: number;
+        newSegments: Segment[];
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
 }

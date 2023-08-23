@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import {DefaultComponent} from '../default.component';
+import { DefaultComponent } from '../default.component';
 
 @Component({
   selector: 'octra-authentication-component',
@@ -17,6 +17,10 @@ export class AuthenticationComponent extends DefaultComponent {
     };
   }>();
 
+  @Input() authentications?: AccountLoginMethod[] = [
+    AccountLoginMethod.local,
+    AccountLoginMethod.shibboleth,
+  ];
   @Input() type?: AccountLoginMethod;
   @Input()
   showTitle = true;
@@ -42,5 +46,9 @@ export class AuthenticationComponent extends DefaultComponent {
 
   constructor(private api: OctraAPIService) {
     super();
+  }
+
+  isAuthAllowed(type: AccountLoginMethod) {
+    return this.authentications?.includes(type) ?? true;
   }
 }

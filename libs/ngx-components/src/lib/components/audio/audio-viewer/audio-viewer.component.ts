@@ -441,6 +441,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         .then(() => {
           if (
             this.width !== undefined &&
+            this.width > 0 &&
             this.audioChunk !== undefined &&
             this.av.entries &&
             this.av.entries.length > 0
@@ -462,7 +463,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 console.error(error);
               });
           } else {
-            console.error(`width is undefined`);
+            // ignore
           }
         })
         .catch((error) => {

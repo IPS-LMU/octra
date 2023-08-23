@@ -13,18 +13,6 @@ import { Subscription } from 'rxjs';
 export class SettingsService {
   private subscrmanager: SubscriptionManager<Subscription>;
 
-  public get isASREnabled(): boolean {
-    return (
-      this.appSettings.octra.plugins.asr !== undefined &&
-      this.appSettings.octra.plugins.asr.enabled !== undefined &&
-      this.appSettings.octra.plugins.asr.enabled === true &&
-      this.appSettings.octra.plugins.asr.calls !== undefined &&
-      this.appSettings.octra.plugins.asr.calls.length === 2 &&
-      this.appSettings.octra.plugins.asr.calls[0] !== '' &&
-      this.appSettings.octra.plugins.asr.calls[1] !== ''
-    );
-  }
-
   get responsive(): {
     enabled: boolean;
     fixedwidth: number;

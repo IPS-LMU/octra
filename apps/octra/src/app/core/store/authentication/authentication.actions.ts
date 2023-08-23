@@ -142,7 +142,7 @@ export class AuthenticationActions {
         mode: LoginMode;
       }>(),
       fail: props<{
-        error: HttpErrorResponse;
+        error: string;
       }>(),
       wait: emptyProps(),
     },
@@ -157,6 +157,7 @@ export class AuthenticationActions {
       success: props<{
         actionAfterSuccess: Action;
       }>(),
+      abort: emptyProps(),
       fail: props<{
         error: HttpErrorResponse;
       }>(),

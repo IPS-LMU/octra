@@ -38,7 +38,7 @@
     <h1 class="h3 mb-4 fw-normal" style="text-align: center" *ngIf="showTitle">
         {{ 'authentication.signin' | transloco }}
     </h1>
-    <form *ngIf="type === undefined || type === 'shibboleth'">
+    <form *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && type === undefined || type === 'shibboleth'">
         <button
                 class="w-100 btn btn-secondary"
                 (click)="
@@ -51,8 +51,8 @@
             {{ 'authentication.signin university' | transloco }}
         </button>
     </form>
-    <div class="separator my-4" *ngIf="type === undefined">{{ 'g.or' | transloco }}</div>
-    <form *ngIf="type === undefined || type === 'local'" #form="ngForm">
+    <div class="separator my-4" *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined">{{ 'g.or' | transloco }}</div>
+    <form *ngIf="isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')" #form="ngForm">
         <div class="form-floating mb-3">
             <input type="text" id="inputName" class="form-control" [placeholder]="'p.username or email' | transloco"
                    name="name" #name required autofocus/>

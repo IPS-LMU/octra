@@ -7,6 +7,7 @@ import {
   ASRStateQueueStatistics,
 } from './index';
 import { IDBActions } from '../idb/idb.actions';
+import { AuthenticationActions } from '../authentication';
 
 export const initialState: ASRState = {
   queue: {
@@ -58,6 +59,10 @@ function calculateStatistics(queue: ASRStateQueue) {
 
 export const reducer = createReducer(
   initialState,
+  on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
+    ...state,
+    isEnabled,
+  })),
   on(
     ASRActions.setASRMausLanguage.do,
     (state: ASRState, { selectedMausLanguage }) => ({
@@ -102,25 +107,29 @@ export const reducer = createReducer(
       : undefined,
   })),
   on(ASRActions.stopItemProcessing.do, (state: ASRState, { time }) => {
-    if(state.queue) {
-      const index = getItemIndexByTime(time.sampleStart, time.sampleLength, state.queue);
+    if (state.queue) {
+      const index = getItemIndexByTime(
+        time.sampleStart,
+        time.sampleLength,
+        state.queue
+      );
 
-      if(index > -1) {
+      if (index > -1) {
         return {
           ...state,
           queue: state.queue
             ? {
-              ...state.queue,
-              idCounter: state.queue.idCounter + 1,
-              items: [
-                ...state.queue.items.slice(0, index),
-                {
-                  ...state.queue.items[index],
-                  status: ASRProcessStatus.STOPPED
-                },
-                ...state.queue.items.slice(index + 1)
-              ],
-            }
+                ...state.queue,
+                idCounter: state.queue.idCounter + 1,
+                items: [
+                  ...state.queue.items.slice(0, index),
+                  {
+                    ...state.queue.items[index],
+                    status: ASRProcessStatus.STOPPED,
+                  },
+                  ...state.queue.items.slice(index + 1),
+                ],
+              }
             : undefined,
         };
       }
@@ -143,15 +152,53 @@ export const reducer = createReducer(
     ...state,
     queue: initialState.queue,
   })),
-  on(ASRActions.startProcessing.do, (state: ASRState) => ({
-    ...state,
-    queue: state.queue
+  on(ASRActions.startProcessing.do, (state: ASRState) => {
+    const queue = state.queue
       ? {
           ...state.queue,
           status: ASRProcessStatus.STARTED,
+          items: state.queue.items.map((a) => {
+            console.log('________');
+            console.log(a);
+            if (a.status === ASRProcessStatus.NOAUTH) {
+              return {
+                ...a,
+                status: ASRProcessStatus.IDLE,
+              };
+            }
+            return a;
+          }),
+          statistics: calculateStatistics(state.queue),
         }
-      : undefined,
+      : undefined;
+
+    queue!.statistics = calculateStatistics(queue!);
+
+    return {
+      ...state,
+      queue,
+    };
+  }),
+  on(AuthenticationActions.needReAuthentication.do, (state) => ({
+    ...state,
+    queue: {
+      ...state.queue!,
+      status: ASRProcessStatus.NOAUTH,
+    },
   })),
+  on(AuthenticationActions.needReAuthentication.abort, (state) => {
+    const queue = {
+      ...state.queue!,
+      status: ASRProcessStatus.STOPPED,
+    };
+    return {
+      ...state,
+      queue: {
+        ...queue,
+        statistics: calculateStatistics(queue),
+      },
+    };
+  }),
   on(ASRActions.processQueueItem.do, (state: ASRState, { item }) => {
     if (state.queue) {
       const index = state.queue.items.findIndex((a) => a.id === item.id);
@@ -276,7 +323,8 @@ export const reducer = createReducer(
     ASRActions.cutAndUploadQueueItem.fail,
     ASRActions.runASROnItem.fail,
     ASRActions.runWordAlignmentOnItem.fail,
-    (state: ASRState, { item }) => {
+    ASRActions.processQueueItem.fail,
+    (state: ASRState, { item, newStatus }) => {
       if (state.queue && item) {
         const index = state.queue.items.findIndex((a) => a.id === item.id);
         if (index > -1) {
@@ -286,7 +334,7 @@ export const reducer = createReducer(
               ...state.queue.items.slice(0, index),
               {
                 ...state.queue.items[index],
-                status: ASRProcessStatus.FAILED,
+                status: newStatus,
               },
               ...state.queue.items.slice(index + 1),
             ],
@@ -313,11 +361,10 @@ function getItemIndexByTime(
   sampleStart: number,
   sampleLength: number,
   queue: ASRStateQueue
-): number{
+): number {
   return queue.items.findIndex((a) => {
     return (
-      a.time.sampleStart === sampleStart &&
-      a.time.sampleLength === sampleLength
+      a.time.sampleStart === sampleStart && a.time.sampleLength === sampleLength
     );
   });
 }

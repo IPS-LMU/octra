@@ -74,6 +74,59 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
+      on(
+        AnnotationActions.addMultipleASRSegments.success,
+        (state, { mode, newSegments, segmentID }) => {
+          if (this.mode === mode) {
+            const segmentIndex = state.transcript.levels[0].items.findIndex(
+              (a) => a.id === segmentID
+            );
+            // 1. unblock current segment
+            /** TODO implement
+            state = {
+              ...state,
+              transcript: {
+                ...state.transcript,
+                levels: [
+                  {
+                    ...state.transcript.levels[0],
+                    items: [
+                      ...state.transcript.levels[0].items.slice(
+                        0,
+                        segmentIndex
+                      ),
+                      ...newSegments.filter((a, i) => i < newSegments.length - 1).map(a => new OSegment(
+                        a.id, (i === 0) ? (state.transcript.levels[0].items[segmentIndex]  as AnnotationStateSegment).sampleStart + (state.transcript.levels[0].items[segmentIndex] as AnnotationStateSegment).sampleDur : a.time.clone())
+                      )
+                      {
+                        ...state.transcript.levels[0].items[segmentIndex],
+                        labels: [
+                          {
+                            name: state.transcript.levels[0].name,
+                            value: last(newSegments)!.value,
+                          },
+                          {
+                            name: 'Speaker',
+                            value: last(newSegments)!.speakerLabel,
+                          },
+                        ],
+                        progressInfo: undefined,
+                        isBlockedBy: undefined,
+                      },
+                      ...state.transcript.levels[0].items.slice(
+                        segmentIndex + 1
+                      ),
+                    ],
+                  },
+                  ...state.transcript.levels.slice(1),
+                ],
+              },
+            };
+            **/
+          }
+          return state;
+        }
+      ),
       on(AnnotationActions.loadAudio.do, (state: AnnotationState, { mode }) => {
         if (this.mode === mode) {
           return {
@@ -250,11 +303,13 @@ export class AnnotationStateReducers {
       }),
       on(
         AnnotationActions.updateASRSegmentInformation.do,
-        (state: AnnotationState, { mode, timeInterval, progress, isBlockedBy, itemType, result }) => {
-          if(this.mode === mode) {
-
+        (
+          state: AnnotationState,
+          { mode, timeInterval, progress, isBlockedBy, itemType, result }
+        ) => {
+          if (this.mode === mode) {
             const segmentBoundary = new SampleUnit(
-              timeInterval.sampleStart + (timeInterval.sampleLength / 2),
+              timeInterval.sampleStart + timeInterval.sampleLength / 2,
               state.audio.sampleRate
             );
             // todo add current level
@@ -273,15 +328,21 @@ export class AnnotationStateReducers {
                   ...currentLevel.items.slice(0, segmentIndex),
                   {
                     ...segment,
-                    labels: result ? segment.labels.map((a) => a.name !== "Speaker" ? {
-                      ...a,
-                      value: result
-                    } : a) : segment.labels,
+                    labels: result
+                      ? segment.labels.map((a) =>
+                          a.name !== 'Speaker'
+                            ? {
+                                ...a,
+                                value: result,
+                              }
+                            : a
+                        )
+                      : segment.labels,
                     progressInfo: {
                       progress,
-                      statusLabel: itemType
+                      statusLabel: itemType,
                     },
-                    isBlockedBy
+                    isBlockedBy,
                   },
                   ...currentLevel.items.slice(segmentIndex + 1),
                 ],

@@ -65,6 +65,7 @@
                                 <octra-authentication-component
                                         [showTitle]="false"
                                         (submitClick)="onOnlineShibbolethSubmit($event)"
+                                        [authentications]="settingsService.appSettings.api.authentications"
                                 ></octra-authentication-component>
                             </div>
                         </div>

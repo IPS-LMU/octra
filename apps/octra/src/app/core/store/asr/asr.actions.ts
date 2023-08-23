@@ -1,8 +1,10 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import {
-  ASRProcessStatus, ASRQueueItemType,
+  ASRProcessStatus,
+  ASRQueueItemType,
   ASRStateProcessOptions,
-  ASRStateQueueItem, ASRTimeInterval,
+  ASRStateQueueItem,
+  ASRTimeInterval,
 } from './index';
 import { ASRLanguage } from '../../obj';
 
@@ -50,7 +52,7 @@ export class ASRActions {
           timeInterval: ASRTimeInterval;
           type: ASRQueueItemType;
           transcript?: string;
-        }
+        };
       }>(),
       success: props<{
         item: ASRStateQueueItem;
@@ -105,6 +107,8 @@ export class ASRActions {
         result: string;
       }>(),
       fail: props<{
+        item: ASRStateQueueItem;
+        newStatus: ASRProcessStatus;
         error: string;
       }>(),
     },
@@ -126,6 +130,7 @@ export class ASRActions {
       }>(),
       fail: props<{
         item?: ASRStateQueueItem;
+        newStatus: ASRProcessStatus;
         error: string;
       }>(),
     },
@@ -151,6 +156,7 @@ export class ASRActions {
       }>(),
       fail: props<{
         item: ASRStateQueueItem;
+        newStatus: ASRProcessStatus;
         error: string;
       }>(),
     },
@@ -173,6 +179,7 @@ export class ASRActions {
       }>(),
       fail: props<{
         item: ASRStateQueueItem;
+        newStatus: ASRProcessStatus;
         error: string;
       }>(),
     },
@@ -192,18 +199,27 @@ export class ASRActions {
   });
 
   static stopItemProcessing = createActionGroup({
-      source: 'asr/stop item processing',
-      events: {
-        do: props<{
-          time: ASRTimeInterval
-        }>(),
-        success: props<{
-          id: number
-        }>(),
-        fail: props<{
-          error: string;
-        }>(),
-      }
+    source: 'asr/stop item processing',
+    events: {
+      do: props<{
+        time: ASRTimeInterval;
+      }>(),
+      success: props<{
+        id: number;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
   });
 
+  static enableASR = createActionGroup({
+    source: 'asr/set enable',
+    events: {
+      do: props<{
+        isEnabled: boolean;
+      }>(),
+      success: emptyProps(),
+    },
+  });
 }

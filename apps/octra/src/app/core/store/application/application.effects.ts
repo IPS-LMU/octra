@@ -119,7 +119,7 @@ export class ApplicationEffects {
       exhaustMap(({ settings }) => {
         // load information from BASWebservices ASR page
         if (
-          settings.octra.plugins.asr.asrInfoURL !== undefined &&
+          settings.octra.plugins?.asr?.asrInfoURL !== undefined &&
           typeof settings.octra.plugins.asr.asrInfoURL === 'string' &&
           settings.octra.plugins.asr.asrInfoURL
         ) {
@@ -129,6 +129,13 @@ export class ApplicationEffects {
             })
             .pipe(
               map((result) => {
+                if (!settings.octra.plugins?.asr?.services) {
+                  return ApplicationActions.loadSettings.fail({
+                    error:
+                      'Missing asr.services property in application settings.',
+                  });
+                }
+
                 const document = new DOMParser().parseFromString(
                   result,
                   'text/html'

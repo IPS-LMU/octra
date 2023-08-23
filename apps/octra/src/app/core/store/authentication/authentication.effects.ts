@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SessionStorageService } from 'ngx-webstorage';
@@ -28,9 +28,10 @@ import {
 import { AudioManager } from '@octra/media';
 import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import { joinURL, popupCenter } from '@octra/utilities';
+import { getBaseHrefURL, joinURL, popupCenter } from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
+import { AccountLoginMethod } from '@octra/api-types';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -42,6 +43,70 @@ export class AuthenticationEffects {
       ),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
+        const waitForWindowResponse = (
+          actionAfterSuccess: Action,
+          url: string,
+          cid: number,
+          appendings = ''
+        ) => {
+          const baseURL = getBaseHrefURL();
+
+          const bc = new BroadcastChannel('ocb_authentication');
+          bc.addEventListener('message', (e) => {
+            if (e.data === true) {
+              this.store.dispatch(
+                AuthenticationActions.needReAuthentication.success({
+                  actionAfterSuccess,
+                })
+              );
+              bc.close();
+            }
+          });
+
+          console.log(
+            `Redirect to: ${url}?cid=${cid}&r=${encodeURIComponent(
+              joinURL(baseURL, 'auth-success')
+            )}${appendings}`
+          );
+
+          popupCenter(
+            `${url}?cid=${cid}&r=${encodeURIComponent(
+              joinURL(baseURL, 'auth-success')
+            )}${appendings}`,
+            'Octra-Backend - Authenticate via Shibboleth',
+            760,
+            760
+          );
+
+          return AuthenticationActions.reauthenticate.wait();
+        };
+
+        if (
+          a.type === AuthenticationActions.reauthenticate.do.type &&
+          state.application.mode !== LoginMode.ONLINE
+        ) {
+          // local reauthentication
+          if (
+            state.application.appConfiguration?.octra.plugins?.asr
+              ?.shibbolethURL
+          ) {
+            return of(
+              waitForWindowResponse(
+                a.actionAfterSuccess,
+                state.application.appConfiguration?.octra.plugins.asr
+                  .shibbolethURL,
+                Date.now(),
+                '&nc=true'
+              )
+            );
+          } else {
+            return of(
+              AuthenticationActions.reauthenticate.fail({
+                error: 'Missing Shibboleth URL in application settings.',
+              })
+            );
+          }
+        }
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((auth) => {
             if (auth.openURL !== undefined) {
@@ -71,34 +136,8 @@ export class AuthenticationEffects {
                   url,
                 });
               } else {
-                // redirect to new tab
-                const match = /(.+)\/load\/?/g.exec(document.location.href);
-                const baseURL =
-                  match && match.length === 2
-                    ? match[1]
-                    : document.location.href;
-                const bc = new BroadcastChannel('ocb_authentication');
-                bc.addEventListener('message', (e) => {
-                  if (e.data === true) {
-                    this.store.dispatch(
-                      AuthenticationActions.needReAuthentication.success({
-                        actionAfterSuccess: a.actionAfterSuccess,
-                      })
-                    );
-                    bc.close();
-                  }
-                });
-
-                popupCenter(
-                  `${url}?cid=${cid}&r=${encodeURIComponent(
-                    joinURL(baseURL, 'auth-success')
-                  )}`,
-                  'Octra-Backend - Authenticate via Shibboleth',
-                  760,
-                  760
-                );
-
-                return AuthenticationActions.reauthenticate.wait();
+                // redirect to new window
+                return waitForWindowResponse(a.actionAfterSuccess, url, cid);
               }
             } else if (auth.me) {
               this.sessionStorageService.store('webToken', auth.accessToken);
@@ -138,7 +177,9 @@ export class AuthenticationEffects {
               return of(AuthenticationActions.loginOnline.fail({ error: err }));
             } else {
               return of(
-                AuthenticationActions.reauthenticate.fail({ error: err })
+                AuthenticationActions.reauthenticate.fail({
+                  error: err?.error?.message ?? err?.message,
+                })
               );
             }
           })
@@ -461,13 +502,32 @@ export class AuthenticationEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthenticationActions.needReAuthentication.do),
-        tap((a) => {
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
           if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
                 this.apiService.authType,
                 a.actionAfterSuccess
               );
+            const subscr = this.reauthenticationRef.closed.subscribe({
+              next: () => {
+                subscr.unsubscribe();
+                this.reauthenticationRef = undefined;
+              },
+            });
+            if (
+              state.application.mode === LoginMode.ONLINE &&
+              state.authentication.type === AccountLoginMethod.shibboleth
+            ) {
+              // auth via shibboleth account
+              this.reauthenticationRef.componentInstance.authentications =
+                state.application.appConfiguration?.api.authentications ?? [];
+            } else {
+              this.reauthenticationRef.componentInstance.authentications = [
+                AccountLoginMethod.shibboleth,
+              ];
+            }
           }
         })
       ),

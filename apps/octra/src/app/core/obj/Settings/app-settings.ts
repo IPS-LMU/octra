@@ -1,8 +1,11 @@
+import { AccountLoginMethod } from '@octra/api-types';
+
 export interface AppSettings {
   version: string;
   api: {
     url: string;
     appToken: string;
+    authentications?: AccountLoginMethod[];
   };
   octra: {
     database: {
@@ -22,13 +25,11 @@ export interface AppSettings {
       auth_token: string;
       url: string;
     };
-    plugins: {
-      audioCutter: {
+    plugins?: {
+      audioCutter?: {
         enabled: boolean;
-        authToken: string;
-        url: string;
       };
-      asr: ASRSettings;
+      asr?: ASRSettings;
     };
     allowed_browsers: any[];
     allowed_projects: {
@@ -55,11 +56,11 @@ export interface AppSettings {
       active: string;
       apiURL: string;
     };
-  },
+  };
   octraBackend?: {
     enabled: boolean;
     url: string;
-  }
+  };
 }
 
 export interface ASRLanguage {
@@ -86,6 +87,7 @@ export interface ASRService {
 
 export interface ASRSettings {
   enabled: boolean;
+  shibbolethURL: string;
   calls: string[];
   services: ASRService[];
   languages: ASRLanguage[];

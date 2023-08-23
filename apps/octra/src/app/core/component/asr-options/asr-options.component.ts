@@ -1,12 +1,8 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppInfo } from '../../../app.info';
-import { AppSettings, ASRLanguage } from '../../obj/Settings';
-import {
-  AlertService,
-  SettingsService,
-  TranscriptionService,
-} from '../../shared/service';
+import { ASRLanguage, ASRSettings } from '../../obj/Settings';
+import { AlertService, TranscriptionService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AudioChunk } from '@octra/media';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -20,22 +16,19 @@ import { getSegmentBySamplePosition } from '@octra/annotation';
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss'],
 })
-export class AsrOptionsComponent extends DefaultComponent {
+export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   public serviceProviders: any = {};
   public settings = {
     onlyForThisOne: false,
     allSegmentsNext: false,
   };
 
+  @Input() asrSettings!: ASRSettings;
   @Input() audioChunk?: AudioChunk;
   @Input() enabled = true;
   @ViewChild('dropdown', { static: true }) dropdown!: NgbDropdown;
   @ViewChild('dropdown2', { static: true }) dropdown2!: NgbDropdown;
   @ViewChild('pop', { static: true }) pop!: NgbPopover;
-
-  public get appSettings(): AppSettings {
-    return this.settingsService.appSettings;
-  }
 
   public get manualURL(): string {
     return AppInfo.manualURL;
@@ -43,14 +36,16 @@ export class AsrOptionsComponent extends DefaultComponent {
 
   constructor(
     public appStorage: AppStorageService,
-    public settingsService: SettingsService,
     public asrStoreService: AsrStoreService,
     private transcrService: TranscriptionService,
     private alertService: AlertService,
     private langService: TranslocoService
   ) {
     super();
-    for (const provider of this.appSettings.octra.plugins.asr.services) {
+  }
+
+  ngOnInit() {
+    for (const provider of this.asrSettings.services) {
       this.serviceProviders['' + provider.provider] = provider;
     }
   }

@@ -26,11 +26,12 @@ export interface ProjectSettings {
     };
   };
   feedback_form: Group[];
-  octra: {
-    validationEnabled: boolean;
-    sendValidatedTranscriptionOnly: boolean;
-    showOverviewIfTranscriptNotValid: boolean;
-    theme: string;
+  octra?: {
+    asrEnabled?: boolean;
+    validationEnabled?: boolean;
+    sendValidatedTranscriptionOnly?: boolean;
+    showOverviewIfTranscriptNotValid?: boolean;
+    theme?: string;
   };
   guidelines: any;
 }

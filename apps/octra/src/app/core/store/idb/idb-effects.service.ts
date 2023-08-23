@@ -955,20 +955,20 @@ export class IDBEffects {
       ofType(
         AnnotationActions.changeAnnotationLevel.do,
         AnnotationActions.addAnnotationLevel.do,
-        AnnotationActions.removeAnnotationLevel.do
+        AnnotationActions.removeAnnotationLevel.do,
+        AnnotationActions.updateASRSegmentInformation.do
       ),
       withLatestFrom(this.store),
-      exhaustMap(([action, appState]) => {
+      mergeMap(([action, appState]) => {
         const subject = new Subject<Action>();
-        const modeState = this.getModeStateFromString(
-          appState,
-          (action as any).mode
-        );
+        const modeState = this.getModeStateFromString(appState, action.mode);
 
         if (modeState) {
+          console.log(`save levels`);
+          console.log(modeState.transcript.levels[0]);
           return this.idbService
             .saveAnnotation(
-              (action as any).mode,
+              action.mode,
               new OAnnotJSON(
                 modeState.audio.fileName,
                 modeState.audio.sampleRate,

@@ -6,6 +6,9 @@ import { timer } from 'rxjs';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { Action } from '@ngrx/store';
 import { DefaultComponent } from '../../component/default.component';
+import { SettingsService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { LoginMode } from '../../store';
 
 @Component({
   selector: 'octra-re-authentication-modal',
@@ -25,12 +28,15 @@ export class ReAuthenticationModalComponent
 
   initialized = false;
   type?: AccountLoginMethod;
+  authentications: AccountLoginMethod[] = [];
   authenticationRunning = false;
 
   actionAfterSuccess!: Action;
 
   constructor(
-    public bsModalRef: NgbActiveModal,
+    public activeModal: NgbActiveModal,
+    public settingsService: SettingsService,
+    public appStorage: AppStorageService,
     private authService: AuthenticationStoreService,
     private apiService: OctraAPIService
   ) {
@@ -82,4 +88,16 @@ export class ReAuthenticationModalComponent
       })
     );
   }
+
+  abort() {
+    if (this.appStorage.snapshot.application.mode === LoginMode.ONLINE) {
+      this.appStorage.logout();
+      this.activeModal.close();
+    } else {
+      this.appStorage.abortReauthentication();
+      this.activeModal.close();
+    }
+  }
+
+  protected readonly LoginMode = LoginMode;
 }

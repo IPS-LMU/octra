@@ -89,7 +89,10 @@ export const authenticationReducer = createReducer(
         authenticated: false,
         webToken: undefined,
         type: undefined,
-        loginErrorMessage: error?.message,
+        loginErrorMessage:
+          typeof error === 'string'
+            ? error
+            : error?.error?.message ?? error?.message,
       };
     }
   ),

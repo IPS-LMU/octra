@@ -29,14 +29,19 @@ import { AppInfo } from '../../../../app.info';
 import {
   AnnotationLevelType,
   AnnotJSONConverter,
+  getSegmentBySamplePosition,
   IFile,
   ILink,
   ImportResult,
+  ISegment,
   OAnnotJSON,
   OAudiofile,
   OIDBLevel,
   OIDBLink,
   OLevel,
+  OSegment,
+  PraatTextgridConverter,
+  Segment,
 } from '@octra/annotation';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import {
@@ -61,6 +66,8 @@ import {
   createSampleUser,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
+import { ASRActions } from '../../asr/asr.actions';
+import { SampleUnit } from '@octra/media';
 
 @Injectable()
 export class AnnotationEffects {
@@ -997,6 +1004,143 @@ export class AnnotationEffects {
         })
       ),
     { dispatch: false }
+  );
+
+  asrRunWordAlignmentSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ASRActions.runWordAlignmentOnItem.success),
+      withLatestFrom(this.store),
+      exhaustMap(([{ item }, state]) => {
+        const converter = new PraatTextgridConverter();
+        const audioManager = this.audio.audiomanagers[0];
+        const audiofile = new OAudiofile();
+        const audioInfo = audioManager.resource.info;
+        audiofile.duration = audioInfo.duration.samples;
+        audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
+        audiofile.sampleRate = audioManager.sampleRate;
+        audiofile.size = audioManager.resource.info.size;
+        audiofile.type = audioManager.resource.info.type;
+
+        if (item.result) {
+          const convertedResult = converter.import(
+            {
+              name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
+              content: item.result!,
+              type: 'text',
+              encoding: 'utf-8',
+            },
+            audiofile
+          );
+
+          if (convertedResult?.annotjson) {
+            const wordsTier = convertedResult.annotjson.levels.find(
+              (a: any) => {
+                return a.name === 'ORT-MAU';
+              }
+            );
+
+            if (wordsTier !== undefined) {
+              let counter = 0;
+
+              const segmentBoundary = new SampleUnit(
+                item.time.sampleStart + item.time.sampleLength,
+                audioManager.sampleRate
+              );
+              let segmentIndex = getSegmentBySamplePosition(
+                this.transcrService.currentlevel?.segments!,
+                segmentBoundary
+              );
+
+              if (segmentIndex < 0) {
+                return of(
+                  AnnotationActions.addMultipleASRSegments.fail({
+                    error: `could not find segment to be precessed by ASRMAUS!`,
+                  })
+                );
+              } else {
+                const segmentID =
+                  this.transcrService.currentlevel!.segments[segmentIndex].id;
+                const newSegments: Segment[] = [];
+
+                for (const wordItem of wordsTier.items as ISegment[]) {
+                  const itemEnd =
+                    item.time.sampleStart + item.time.sampleLength;
+                  if (
+                    item.time.sampleStart +
+                      wordItem.sampleStart +
+                      wordItem.sampleDur <=
+                    itemEnd
+                  ) {
+                    const readSegment = Segment.fromObj(
+                      this.transcrService.currentlevel!.name,
+                      new OSegment(
+                        1,
+                        wordItem.sampleStart,
+                        wordItem.sampleDur,
+                        wordItem.labels
+                      ),
+                      audioManager.sampleRate
+                    )!;
+
+                    if (
+                      readSegment.value === '<p:>' ||
+                      readSegment.value === ''
+                    ) {
+                      readSegment.value = this.transcrService.breakMarker.code;
+                    }
+
+                    const origTime = new SampleUnit(
+                      item.time.sampleStart + readSegment.time.samples,
+                      audioManager.sampleRate
+                    );
+                    newSegments.push(
+                      new Segment(origTime, '', readSegment.value)
+                    );
+                    // the last segment is the original segment
+                  } else {
+                    // tslint:disable-next-line:max-line-length
+                    console.error(
+                      `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`
+                    );
+                    return of(
+                      AnnotationActions.addMultipleASRSegments.fail({
+                        error: `wordItem samples are out of the correct boundaries.`,
+                      })
+                    );
+                  }
+                  counter++;
+                }
+                return of(
+                  AnnotationActions.addMultipleASRSegments.success({
+                    mode: state.application.mode!,
+                    segmentID,
+                    newSegments,
+                  })
+                );
+              }
+            } else {
+              return of(
+                AnnotationActions.addMultipleASRSegments.fail({
+                  error: 'word tier not found!',
+                })
+              );
+            }
+          } else {
+            return of(
+              AnnotationActions.addMultipleASRSegments.fail({
+                error: 'importresult ist undefined',
+              })
+            );
+          }
+        } else {
+          return of(
+            AnnotationActions.addMultipleASRSegments.fail({
+              error: 'Result is undefined',
+            })
+          );
+        }
+      })
+    )
   );
 
   private addFunctions(assets: ToolConfigurationAssetDto[]) {

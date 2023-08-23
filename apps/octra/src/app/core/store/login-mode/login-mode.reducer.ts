@@ -68,27 +68,24 @@ export class LoginModeReducers {
         AuthenticationActions.logout.success,
         LoginModeActions.endTranscription.do,
         (state: AnnotationState, { clearSession, mode }) => {
-          if (mode === this.mode) {
-            return clearSession
-              ? {
-                  ...initialState,
-                  currentSession: {
-                    ...initialState.currentSession,
-                  },
-                }
-              : {
-                  ...state,
-                  savingNeeded: false,
-                  isSaving: false,
-                  audio: {
-                    fileName: '',
-                    sampleRate: 0,
-                    loaded: false,
-                  },
-                  histories: {},
-                };
-          }
-          return state;
+          return mode === this.mode && clearSession
+            ? {
+              ...initialState,
+              currentSession: {
+                ...initialState.currentSession,
+              },
+            }
+            : {
+              ...state,
+              savingNeeded: false,
+              isSaving: false,
+              audio: {
+                fileName: '',
+                sampleRate: 0,
+                loaded: false,
+              },
+              histories: {},
+            };
         }
       ),
       on(

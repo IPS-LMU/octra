@@ -45,6 +45,7 @@ import { LoginMode } from '../../../core/store';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
 import { DefaultComponent } from '../../../core/component/default.component';
+import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -188,6 +189,7 @@ export class TranscrWindowComponent
     public transcrService: TranscriptionService,
     public audio: AudioService,
     public uiService: UserInteractionsService,
+    public asrStoreService: AsrStoreService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
     public cd: ChangeDetectorRef

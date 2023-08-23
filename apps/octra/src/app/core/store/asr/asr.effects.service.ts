@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { getModeState, RootState } from '../index';
-import { Store } from '@ngrx/store';
+import { LoginMode, RootState } from '../index';
+import { Action, Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   catchError,
@@ -22,12 +22,19 @@ import {
   ASRStateQueueItem,
 } from './index';
 import { WavFormat } from '@octra/media';
-import { AlertService, AudioService } from '../../shared/service';
+import {
+  AlertService,
+  AudioService,
+  UserInteractionsService,
+} from '../../shared/service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import * as X2JS from 'x2js';
-import { ASRLanguage, ASRSettings } from '../../obj';
+import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
 import { FileInfo, readFileContents } from '@octra/utilities';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
+import { AccountLoginMethod } from '@octra/api-types';
+import { AuthenticationActions } from '../authentication';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +56,7 @@ export class AsrEffects {
         }
 
         const asrSettings =
-          state.application.appConfiguration?.octra.plugins.asr;
+          state.application.appConfiguration?.octra.plugins!.asr!;
 
         if (!asrSettings) {
           return of(
@@ -214,7 +221,9 @@ export class AsrEffects {
         }
         return of(
           ASRActions.processQueueItem.fail({
+            item,
             error: `item already started`,
+            newStatus: ASRProcessStatus.FAILED,
           })
         );
       })
@@ -259,6 +268,7 @@ export class AsrEffects {
               return of(
                 ASRActions.cutAndUploadQueueItem.fail({
                   error: 'item is undefined',
+                  newStatus: ASRProcessStatus.FAILED,
                 })
               );
             }
@@ -313,6 +323,7 @@ export class AsrEffects {
                   ASRActions.cutAndUploadQueueItem.fail({
                     error: serviceRequirementsError,
                     item: action.item,
+                    newStatus: ASRProcessStatus.FAILED,
                   })
                 );
               }
@@ -330,6 +341,7 @@ export class AsrEffects {
               ASRActions.cutAndUploadQueueItem.fail({
                 item: action.item,
                 error,
+                newStatus: ASRProcessStatus.FAILED,
               })
             )
           )
@@ -367,6 +379,7 @@ export class AsrEffects {
           ASRActions.cutAndUploadQueueItem.fail({
             item: action.item,
             error: `missing options`,
+            newStatus: ASRProcessStatus.FAILED,
           })
         );
       })
@@ -382,7 +395,7 @@ export class AsrEffects {
           outFormat,
           item,
           audioURL,
-          state.application.appConfiguration!.octra.plugins.asr
+          state.application.appConfiguration!.octra.plugins!.asr!
         ).pipe(
           exhaustMap((result) =>
             of(
@@ -398,7 +411,9 @@ export class AsrEffects {
             )
           ),
           catchError((error) => {
-            return of(
+            return this.handleShibbolethError(
+              item,
+              error,
               ASRActions.runASROnItem.fail({
                 item,
                 error:
@@ -407,6 +422,7 @@ export class AsrEffects {
                     : error instanceof HttpErrorResponse
                     ? error.error?.message ?? error.message
                     : error,
+                newStatus: ASRProcessStatus.FAILED,
               })
             );
           })
@@ -423,7 +439,9 @@ export class AsrEffects {
         if (!result) {
           return of(
             ASRActions.processQueueItem.fail({
+              item,
               error: `asr result is undefined`,
+              newStatus: ASRProcessStatus.FAILED,
             })
           );
         }
@@ -460,7 +478,7 @@ export class AsrEffects {
           item.selectedLanguage,
           audioURL,
           transcriptURL,
-          state.application.appConfiguration!.octra.plugins.asr
+          state.application.appConfiguration!.octra!.plugins!.asr!
         ).pipe(
           exhaustMap((result) => {
             if (item.status !== ASRProcessStatus.STOPPED) {
@@ -486,10 +504,18 @@ export class AsrEffects {
             );
           }),
           catchError((error) =>
-            of(
+            this.handleShibbolethError(
+              item,
+              error,
               ASRActions.runWordAlignmentOnItem.fail({
                 item,
-                error,
+                error:
+                  error instanceof Error
+                    ? error.message
+                    : error instanceof HttpErrorResponse
+                    ? error.error?.message ?? error.message
+                    : error,
+                newStatus: ASRProcessStatus.FAILED,
               })
             )
           )
@@ -521,9 +547,9 @@ export class AsrEffects {
         ASRActions.cutAndUploadQueueItem.success,
         ASRActions.runASROnItem.success,
         ASRActions.runASROnItem.fail,
-        ASRActions.runWordAlignmentOnItem.success,
         ASRActions.runWordAlignmentOnItem.fail,
-        ASRActions.processQueueItem.success
+        ASRActions.processQueueItem.success,
+        ASRActions.processQueueItem.fail
       ),
       withLatestFrom(this.store),
       mergeMap(([action, state]) => {
@@ -532,6 +558,8 @@ export class AsrEffects {
         )!;
 
         if (item) {
+          console.log('ABORT ITEM');
+          console.log(item);
           return of(
             AnnotationActions.updateASRSegmentInformation.do({
               mode: state.application.mode!,
@@ -565,16 +593,78 @@ export class AsrEffects {
   onProcessingFail$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(ASRActions.runASROnItem.fail),
+        ofType(
+          ASRActions.runASROnItem.fail,
+          ASRActions.runWordAlignmentOnItem.fail
+        ),
         withLatestFrom(this.store),
         tap(([action, state]) => {
-          const modState = getModeState(state);
-          this.alertService.showAlert(
-            'danger',
-            `ASR Error (item at ${(
-              action.item.time.sampleStart / modState!.audio.sampleRate
-            ).toFixed(2)}s ${action.item.id} with error: ${action.error}`
-          );
+          if (
+            action.newStatus === ASRProcessStatus.NOAUTH &&
+            state.asr.queue!.status !== ASRProcessStatus.NOQUOTA
+          ) {
+            if (
+              state.application.mode === LoginMode.ONLINE &&
+              state.authentication.type === AccountLoginMethod.shibboleth
+            ) {
+              this.store.dispatch(
+                AuthenticationActions.needReAuthentication.do({
+                  actionAfterSuccess: ASRActions.startProcessing.do(),
+                })
+              );
+              this.alertService.showAlert(
+                'danger',
+                this.langService.translate('asr.no auth'),
+                true
+              );
+            } else {
+              this.store.dispatch(
+                AuthenticationActions.needReAuthentication.do({
+                  actionAfterSuccess: ASRActions.startProcessing.do(),
+                })
+              );
+            }
+            this.uiService.addElementFromEvent(
+              action.item.type.toLowerCase(),
+              {
+                value: 'no_auth',
+              },
+              Date.now(),
+              undefined,
+              undefined,
+              undefined,
+              {
+                start: action.item.time.sampleStart,
+                length: action.item.time.sampleLength,
+              },
+              'automation'
+            );
+          } else if (
+            action.newStatus === ASRProcessStatus.NOQUOTA &&
+            state.asr.queue!.status !== ASRProcessStatus.NOQUOTA
+          ) {
+            this.alertService.showAlert(
+              'danger',
+              this.langService.translate('asr.no quota'),
+              true
+            );
+
+            this.uiService.addElementFromEvent(
+              action.item.type.toLowerCase(),
+              {
+                value: 'failed',
+              },
+              Date.now(),
+              undefined,
+              undefined,
+              undefined,
+              {
+                start: action.item.time.sampleStart,
+                length: action.item.time.sampleLength,
+              },
+              'automation'
+            );
+          }
         })
       ),
     {
@@ -582,12 +672,78 @@ export class AsrEffects {
     }
   );
 
+  reAuthenticationAborted$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.needReAuthentication.abort),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          if (state.asr.queue) {
+            for (const item of state.asr.queue.items) {
+              if (
+                item.status === ASRProcessStatus.FAILED ||
+                item.status === ASRProcessStatus.NOAUTH ||
+                item.status === ASRProcessStatus.NOQUOTA
+              ) {
+                this.store.dispatch(
+                  ASRActions.processQueueItem.fail({
+                    item,
+                    error: '',
+                    newStatus: ASRProcessStatus.FAILED,
+                  })
+                );
+              }
+            }
+          }
+        })
+      ),
+    { dispatch: false }
+  );
+
+  enableASR$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.prepareTaskDataForAnnotation.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        const settings = state.application.appConfiguration;
+        const isShibbolethUser =
+          state.application.mode === LoginMode.ONLINE &&
+          state.authentication.type === AccountLoginMethod.shibboleth;
+        const localASRSettingsComplete =
+          settings?.octra.plugins?.asr?.shibbolethURL !== undefined &&
+          settings.octra.plugins?.asr?.shibbolethURL !== '';
+        const asrSettingsComplete =
+          settings?.octra.plugins?.asr?.enabled === true &&
+          settings.octra.plugins.asr.calls.length === 2 &&
+          settings.octra.plugins.asr.calls[0] !== '' &&
+          settings.octra.plugins.asr.calls[1] !== '';
+
+        console.log(
+          `ASR ENABLED: ${action.task.tool_configuration?.value?.octra?.asrEnabled}`
+        );
+
+        return of(
+          ASRActions.enableASR.do({
+            isEnabled:
+              asrSettingsComplete &&
+              (((action.task.tool_configuration?.value as ProjectSettings)
+                ?.octra?.asrEnabled &&
+                isShibbolethUser) ||
+                localASRSettingsComplete),
+          })
+        );
+      })
+    )
+  );
+
   constructor(
     private store: Store<RootState>,
     private actions$: Actions,
     private audio: AudioService,
     private http: HttpClient,
-    private alertService: AlertService
+    private langService: TranslocoService,
+    private alertService: AlertService,
+    private uiService: UserInteractionsService
   ) {}
 
   private getFirstFreeItem(
@@ -782,6 +938,34 @@ export class AsrEffects {
           return from(this.extractResultData(result, info.fullname));
         })
       );
+  }
+
+  handleShibbolethError(
+    item: ASRStateQueueItem,
+    error: HttpErrorResponse,
+    errorAction: Action
+  ): Observable<Action> {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : error instanceof HttpErrorResponse
+        ? error.error?.message ?? error.message
+        : error;
+    console.log('GOT ERROR');
+    console.error(errorMessage);
+
+    if (errorMessage.indexOf('quota') > -1) {
+      return of({
+        ...errorAction,
+        newStatus: ASRProcessStatus.NOQUOTA,
+      });
+    } else if (errorMessage.indexOf('0 Unknown Error') > -1) {
+      return of({
+        ...errorAction,
+        newStatus: ASRProcessStatus.NOAUTH,
+      });
+    }
+    return of(errorAction);
   }
 
   extractErrorMessage(error: string) {

@@ -11,6 +11,7 @@ import { ASRQueueItemType, ASRTimeInterval } from './index';
 export class AsrStoreService {
   asrOptions$ = this.store.select((state) => state.asr.settings);
   queue$ = this.store.select((state) => state.asr.queue);
+  asrEnabled$ = this.store.select((state) => state.asr.isEnabled);
 
   changeASRService(asrInfo?: ASRLanguage) {
     this.store.dispatch(
@@ -25,9 +26,11 @@ export class AsrStoreService {
   }
 
   stopItemProcessing(time: ASRTimeInterval) {
-    this.store.dispatch(ASRActions.stopItemProcessing.do({
-      time
-    }));
+    this.store.dispatch(
+      ASRActions.stopItemProcessing.do({
+        time,
+      })
+    );
   }
 
   changeASRSelectedMausLanguage(value: string) {
@@ -43,13 +46,15 @@ export class AsrStoreService {
     type: ASRQueueItemType,
     transcript?: string
   ) {
-    this.store.dispatch(ASRActions.addToQueue.do({
-      item: {
-        timeInterval,
-        type,
-        transcript
-      }
-    }));
+    this.store.dispatch(
+      ASRActions.addToQueue.do({
+        item: {
+          timeInterval,
+          type,
+          transcript,
+        },
+      })
+    );
   }
 
   constructor(private store: Store<RootState>) {}

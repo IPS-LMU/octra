@@ -58,6 +58,7 @@ export interface ASRStateQueue {
 
 export interface ASRState {
   settings?: ASRStateSettings;
+  isEnabled?: boolean;
   queue?: ASRStateQueue;
 }
 

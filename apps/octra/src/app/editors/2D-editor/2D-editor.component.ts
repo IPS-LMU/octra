@@ -240,7 +240,6 @@ export class TwoDEditorComponent
       this.audioManager.resource.info.sampleRate;
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
-    this.viewer.settings.asr.enabled = this.settingsService.isASREnabled;
     this.viewer.settings.showProgressBars = true;
     this.viewer.name = 'multiline viewer';
 
@@ -257,6 +256,13 @@ export class TwoDEditorComponent
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
     this.subscrManager.add(
+      this.asrStoreService.asrEnabled$.subscribe({
+        next: (enabled) => {
+          this.viewer.settings.asr.enabled = enabled === true;
+        },
+      })
+    );
+    this.subscrManager.add(
       this.viewer.alert.subscribe((result: any) => {
         this.alertService
           .showAlert(result.type as AlertType, result.message)
@@ -269,10 +275,7 @@ export class TwoDEditorComponent
     this.subscrManager.add(
       this.audioChunkLines.statuschange.subscribe((state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
-          if (
-            this.appStorage.followPlayCursor !== undefined &&
-            this.appStorage.followPlayCursor === true
-          ) {
+          if (this.appStorage.followPlayCursor) {
             if (this.scrolltimer !== undefined) {
               this.scrolltimer.unsubscribe();
             }
@@ -369,21 +372,6 @@ export class TwoDEditorComponent
                         .catch((error) => {
                           console.error(error);
                         });
-                      this.uiService.addElementFromEvent(
-                        item.type.toLowerCase(),
-                        {
-                          value: 'failed',
-                        },
-                        Date.now(),
-                        undefined,
-                        undefined,
-                        undefined,
-                        {
-                          start: item.time.sampleStart,
-                          length: item.time.sampleLength,
-                        },
-                        'automation'
-                      );
                     } else if (item.status === ASRProcessStatus.NOAUTH) {
                       console.log(`NO AUTH`);
                       this.uiService.addElementFromEvent(

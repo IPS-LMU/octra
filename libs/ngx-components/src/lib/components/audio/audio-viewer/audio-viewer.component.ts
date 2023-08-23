@@ -36,7 +36,7 @@ import {
 } from '@octra/media';
 import { Position, Size } from '../../../obj';
 import { TimespanPipe } from '@octra/ngx-utilities';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
@@ -82,7 +82,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
    */
   @Input() levelName?: string;
 
-  constructor(public av: AudioViewerService, private renderer: Renderer2) {
+  constructor(
+    public av: AudioViewerService,
+    private renderer: Renderer2,
+    private elementRef: ElementRef
+  ) {
     this.shortcutsManager = new ShortcutManager();
     this.subscrManager = new SubscriptionManager<Subscription>();
 
@@ -157,7 +161,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public get width(): number | undefined {
-    return this.konvaContainer?.nativeElement.offsetWidth;
+    return this.elementRef.nativeElement.clientWidth;
   }
 
   public get height(): number | undefined {
@@ -244,6 +248,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   private stage: Konva.Stage | undefined;
   private hoveredLine = -1;
   private refreshRunning = false;
+
+  private lastResize = 0;
 
   private croppingData:
     | {
@@ -488,45 +494,39 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  onResize() {
-    return new Promise<void>((resolve, reject) => {
-      if (
-        this.audioChunk !== undefined &&
-        this.stage !== undefined &&
-        this.width !== undefined &&
-        this.height !== undefined &&
-        this.entries.length > 0
-      ) {
-        const playpos = this.audioChunk?.absolutePlayposition.clone();
-        const drawnSelection = this.av.drawnSelection?.clone();
-        this.stage.width(this.width);
-        this.stage.height(this.height);
-        this.av.initialize(
-          this.levelName,
-          this.width - (this.settings.margin.left + this.settings.margin.right),
-          this.audioChunk
-        );
-        this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
-        this.av
-          .initializeSettings()
-          .then(() => {
-            if (this.audioChunk !== undefined) {
-              if (!this.audioChunk.isPlaying) {
-                this.audioChunk.absolutePlayposition = playpos.clone();
-              }
-              this.av.drawnSelection = drawnSelection;
-              this.updateLines();
-              this.createSegmentsForCanvas();
-              this.updatePlayCursor();
-            }
-            if (this.stage !== undefined) {
-              this.stage.batchDraw();
-            }
-            resolve();
-          })
-          .catch(reject);
+  async onResize() {
+    if (
+      this.audioChunk !== undefined &&
+      this.stage !== undefined &&
+      this.width !== undefined &&
+      this.height !== undefined &&
+      this.entries.length > 0
+    ) {
+      const playpos = this.audioChunk?.absolutePlayposition.clone();
+      const drawnSelection = this.av.drawnSelection?.clone();
+      this.stage.width(this.width);
+      this.stage.height(this.height);
+      this.av.initialize(
+        this.levelName,
+        this.width - (this.settings.margin.left + this.settings.margin.right),
+        this.audioChunk
+      );
+      this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+      await this.av.initializeSettings();
+
+      if (this.audioChunk !== undefined) {
+        if (!this.audioChunk.isPlaying) {
+          this.audioChunk.absolutePlayposition = playpos.clone();
+        }
+        this.av.drawnSelection = drawnSelection;
+        this.updateLines();
+        this.createSegmentsForCanvas();
+        this.updatePlayCursor();
       }
-    });
+      if (this.stage !== undefined) {
+        this.stage.batchDraw();
+      }
+    }
   }
 
   public initializeView() {
@@ -868,7 +868,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.widthOnInit = this.width;
       this.styles.height = this.height;
       this.drawnSegmentIDs = [];
-      this.subscrManager.removeByTag('resize');
 
       if (!this.settings.multiLine) {
         this.settings.lineheight =
@@ -950,16 +949,28 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       let resizing = false;
       window.onresize = () => {
-        if (!resizing) {
-          resizing = true;
-          this.onResize()
-            .then(() => {
-              resizing = false;
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
+        const wait = 50;
+        this.lastResize = Date.now();
+        this.subscrManager.removeByTag('resize');
+        this.subscrManager.add(
+          timer(wait).subscribe({
+            next: () => {
+              if (Date.now() - this.lastResize >= wait && !resizing) {
+                resizing = true;
+                this.onResize()
+                  .then(() => {
+                    this.lastResize = Date.now();
+                    resizing = false;
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                    resizing = false;
+                  });
+              }
+            },
+          }),
+          'resize'
+        );
       };
 
       this.shortcutsManager.clearShortcuts();
@@ -2003,8 +2014,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 }
 
                 const progressWidth = w - timeStampsWidth - 20;
-                console.log(`progresswidth = ${w} - ${timeStampsWidth} - 20`);
-
                 if (
                   progressWidth > 10 &&
                   sceneSegment.progressInfo !== undefined
@@ -2482,10 +2491,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 }
                 break;
               case 'set_boundary':
-                console.log(`{
-                  audioManager: ${this.audioManager},
-                  currentLevel: ${this.av.entries}
-                }`);
                 if (
                   this.settings.boundaries.enabled &&
                   !this.settings.boundaries.readonly &&

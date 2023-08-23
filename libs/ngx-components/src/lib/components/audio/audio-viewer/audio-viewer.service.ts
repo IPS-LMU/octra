@@ -325,52 +325,46 @@ export class AudioViewerService {
   /**
    * initialize settings
    */
-  public initializeSettings() {
-    if (
-      this.audioPxW !== undefined &&
-      this.audioManager !== undefined &&
-      this._innerWidth !== undefined
-    ) {
-      if (this._settings.multiLine) {
-        this.audioPxW =
-          this.audioManager.resource.info.duration.seconds *
-          this._settings.pixelPerSec;
-        this.audioPxW =
-          this.audioPxW < this._innerWidth
-            ? this._innerWidth
-            : this.AudioPxWidth;
-      } else {
-        this.audioPxW = this._innerWidth;
-      }
+  public async initializeSettings() {
+    if (!this.audioManager) {
+      throw new Error('Audiomanager is undefined');
+    }
+    if (!this.audioChunk) {
+      throw new Error('AudioChunk is undefined');
+    }
+    if (!this._innerWidth) {
+      throw new Error('Inner width is undefined');
+    }
+
+    if (this._settings.multiLine) {
+      this.audioPxW =
+        this.audioManager.resource.info.duration.seconds *
+        this._settings.pixelPerSec;
+      this.audioPxW =
+        this.audioPxW < this._innerWidth ? this._innerWidth : this.AudioPxWidth;
+    } else {
+      this.audioPxW = this._innerWidth;
     }
     this.audioPxW = Math.round(this.audioPxW);
 
-    if (
-      this.AudioPxWidth > 0 &&
-      this.audioManager !== undefined &&
-      this.audioChunk !== undefined &&
-      this._innerWidth !== undefined
-    ) {
-      // initialize the default values
-      this.audioTCalculator = new AudioTimeCalculator(
-        this.audioChunk.time.duration,
-        this.AudioPxWidth
-      );
-      this.MouseClickPos = this.audioManager.createSampleUnit(0);
-      this._mouseCursor = this.audioManager.createSampleUnit(0);
-      this.PlayCursor = new PlayCursor(
-        0,
-        new SampleUnit(0, this.audioChunk.sampleRate),
-        this._innerWidth
-      );
-      this._drawnSelection = this.audioChunk.selection.clone();
-      this._drawnSelection.end = this._drawnSelection.start.clone();
-    } else {
-      return new Promise<void>((resolve) => {
-        console.error('audio px is 0.');
-        resolve();
-      });
+    if (this.audioPxW <= 0) {
+      throw new Error(`Audio px is ${this.AudioPxWidth}`);
     }
+
+    // initialize the default values
+    this.audioTCalculator = new AudioTimeCalculator(
+      this.audioChunk.time.duration,
+      this.AudioPxWidth
+    );
+    this.MouseClickPos = this.audioManager.createSampleUnit(0);
+    this._mouseCursor = this.audioManager.createSampleUnit(0);
+    this.PlayCursor = new PlayCursor(
+      0,
+      new SampleUnit(0, this.audioChunk.sampleRate),
+      this._innerWidth
+    );
+    this._drawnSelection = this.audioChunk.selection.clone();
+    this._drawnSelection.end = this._drawnSelection.start.clone();
 
     return this.afterChannelInititialized();
   }

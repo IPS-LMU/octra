@@ -527,3 +527,10 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
     newWindow.focus();
   }
 }
+
+/**
+ * returns the base URL path to the application
+ */
+export function getBaseHrefURL() {
+  return location.origin + document.querySelector('head base')?.getAttribute('href');
+}

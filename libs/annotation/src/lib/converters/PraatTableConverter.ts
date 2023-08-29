@@ -1,14 +1,14 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import { contains } from '@octra/utilities';
 import {
-  AnnotationLevelType,
   ISegment,
   OAnnotJSON,
-  OAudiofile,
+  OAnyLevel,
   OLabel,
-  OLevel,
   OSegment,
+  OSegmentLevel,
 } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class PraatTableConverter extends Converter {
   public constructor() {
@@ -34,7 +34,11 @@ export class PraatTableConverter extends Converter {
       return res + 'tmin\ttier\ttext\ttmax\n';
     };
 
-    const addEntry = (res: string, level: OLevel, segment: ISegment) => {
+    const addEntry = (
+      res: string,
+      level: OAnyLevel<OSegment>,
+      segment: ISegment
+    ) => {
       const tmin = segment.sampleStart / annotation.sampleRate;
       const tmax =
         (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
@@ -72,7 +76,11 @@ export class PraatTableConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
     if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
 
       const content = file.content;
       const lines: string[] = content.split('\n');
@@ -95,7 +103,7 @@ export class PraatTableConverter extends Converter {
         }
 
         for (const tierElement of tiers) {
-          const olevel = new OLevel(tierElement, AnnotationLevelType.SEGMENT);
+          const olevel = new OSegmentLevel(tierElement);
           let start = 0;
           let puffer = 0;
           let id = 1;
@@ -121,17 +129,18 @@ export class PraatTableConverter extends Converter {
                 if (isNaN(tmin)) {
                   return undefined;
                 } else {
-                  const last =
+                  const last = (
                     olevel.items.length > 0 &&
                     !(
                       olevel.items[olevel.items.length - 1] === undefined ||
                       olevel.items[olevel.items.length - 1] === undefined
                     )
                       ? olevel.items[olevel.items.length - 1]
-                      : undefined;
+                      : undefined
+                  ) as OSegment;
                   if (
                     last !== undefined &&
-                    last.sampleStart! + last.sampleDur! ===
+                    last.sampleStart + last.sampleDur ===
                       Math.round(Number(tmin))
                   ) {
                     start = tmin;

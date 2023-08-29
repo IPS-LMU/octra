@@ -22,6 +22,17 @@ export class ASRActions {
     },
   });
 
+  static stopProcessing = createActionGroup({
+    source: 'asr/stop processing',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static setASRMausLanguage = createActionGroup({
     source: 'asr/set maus language',
     events: {

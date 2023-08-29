@@ -5,24 +5,42 @@ import { ILog } from '../../../obj/Settings/logging';
 import { ProjectSettings } from '../../../obj';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import {
-  AnnotationLevelType,
-  ASRQueueItemType,
-  ILevel,
-  Level,
-  OEvent,
-  OIDBLevel,
-  OIDBLink,
-  OItem,
-  OLevel,
+  ASRContext,
+  OctraAnnotation,
   OSegment,
+  Segment,
+  SegmentWithContext,
 } from '@octra/annotation';
-import { SampleUnit } from '@octra/media';
+import { OctraGuidelines } from '@octra/assets';
+import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 
 export interface GuidelinesItem {
   filename: string;
   name: string;
-  json: any;
+  json: OctraGuidelines;
   type?: string;
+}
+
+export class AnnotationStateSegment<T extends ASRContext> extends Segment<T> {
+  static override deserialize<T extends ASRContext>(
+    jsonObject: SegmentWithContext<T>
+  ): AnnotationStateSegment<T> {
+    return new AnnotationStateSegment(
+      jsonObject.id,
+      jsonObject.time,
+      jsonObject.labels,
+      jsonObject.context!
+    );
+  }
+
+  override serializeToOSegment(sampleStart: number): OSegment {
+    return new OSegment(
+      this.id,
+      sampleStart,
+      this.time.samples - sampleStart,
+      this.labels
+    );
+  }
 }
 
 export interface AnnotationState extends UndoRedoState {
@@ -46,7 +64,7 @@ export interface AnnotationState extends UndoRedoState {
     validate: (transcript: string, guidelines: any) => any;
     tidyUp: (transcript: string, guidelines: any) => any;
   };
-  transcript: TranscriptionState;
+  transcript: OctraAnnotation<ASRContext, Segment<ASRContext>>;
   histories: Histories;
   currentSession: AnnotationSessionState;
   previousSession?: {
@@ -64,136 +82,9 @@ export interface AnnotationSessionState {
   loadFromServer?: boolean;
   currentProject?: ProjectDto;
   task?: TaskDto;
+  feedback?: FeedBackForm;
   assessment?: any;
   comment?: string;
-}
-
-export interface AnnotationStateLevel {
-  id: number;
-  name: string;
-  type: AnnotationLevelType;
-  items: (OItem | AnnotationStateSegment | OEvent)[];
-}
-
-export class AnnotationStateSegment extends OSegment {
-  public isBlockedBy?: ASRQueueItemType;
-  public progressInfo?: { progress: number; statusLabel: string };
-}
-
-export function convertStateLevelToLevelObject(
-  stateLevel: AnnotationStateLevel,
-  sampleRate: number,
-  lastSample: SampleUnit
-): Level {
-  const level = Level.fromObj(
-    {
-      id: stateLevel.id,
-      sortorder: undefined as any,
-      level: new OLevel(stateLevel.name, stateLevel.type, stateLevel.items),
-    },
-    sampleRate,
-    lastSample
-  );
-
-  // change further attributes
-  for (const item of stateLevel.items) {
-    if (stateLevel.type === AnnotationLevelType.SEGMENT) {
-      const segment = item as AnnotationStateSegment;
-      const annoSegment = level.segments.find(a => a.id === segment.id);
-
-      if (annoSegment !== undefined) {
-        annoSegment.isBlockedBy = segment.isBlockedBy;
-        if (segment.progressInfo !== undefined) {
-          annoSegment.progressInfo = segment.progressInfo;
-        } else {
-          annoSegment.progressInfo = {
-            statusLabel: 'ASR',
-            progress: 0,
-          };
-        }
-      } else {
-        console.error(`can't find segment id ${segment.id}`)
-      }
-    }
-  }
-
-  return level;
-}
-
-export function convertToOIDBLevel(
-  stateLevel: AnnotationStateLevel,
-  sortorder: number
-): OIDBLevel {
-  const result = {
-    id: stateLevel.id,
-    sortorder,
-    level: new OLevel(
-      stateLevel.name,
-      stateLevel.type,
-      stateLevel.items.map((a) => {
-        if (stateLevel.type === AnnotationLevelType.SEGMENT) {
-          const segment = a as AnnotationStateSegment;
-          return new OSegment(
-            segment.id,
-            segment.sampleStart,
-            segment.sampleDur,
-            segment.labels
-          );
-        } else {
-          return a;
-        }
-      })
-    ),
-  };
-
-  return result;
-}
-
-export function convertFromLevelObject(
-  level: Level,
-  lastOriginalBoundary: SampleUnit
-): AnnotationStateLevel {
-  const oLevel = level.getObj(lastOriginalBoundary);
-
-  const result = {
-    id: level.id,
-    name: level.name,
-    type: level.type,
-    items: oLevel!.items.map((a, i) => {
-      if (level.type === AnnotationLevelType.SEGMENT) {
-        const segment = level.segments[i];
-        return {
-          ...a,
-          isBlockedBy: segment!.isBlockedBy,
-          progressInfo: segment!.progressInfo,
-        };
-      } else {
-        return a;
-      }
-    }),
-  };
-
-  return result;
-}
-
-export function convertFromOIDLevel(
-  level: ILevel,
-  id: number
-): AnnotationStateLevel {
-  const result = {
-    id,
-    name: level.name,
-    type: level.type,
-    items: level.items,
-  };
-
-  return result;
-}
-
-export interface TranscriptionState {
-  levels: AnnotationStateLevel[];
-  links: OIDBLink[];
-  levelCounter: number;
 }
 
 export const selectAnnotation = (state: RootState) => {

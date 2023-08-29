@@ -44,9 +44,7 @@
       #loupe
       [audioChunk]="audiochunk"
       [refreshOnInternChanges]="false"
-      [levelName]="transcrService.currentlevel.name"
-      [(entries)]="transcrService.annotation.levels[0].segments"
-      (entriesChange)="somethingChanged($event)"
+      [annotation]="annotationStoreService.transcript!"
       (shortcut)="triggerUIAction($event)"
       id="loupe"
     ></octra-audio-viewer>
@@ -61,7 +59,7 @@
       [audiochunk]="audiochunk"
       [easymode]="easymode"
       [height]="100"
-      [markers]="transcrService.guidelines?.markers"
+      [markers]="annotationStoreService.guidelines?.markers!"
       [validationEnabled]="validationEnabled"
       [externalShortcutManager]="keyMap.shortcutsManager"
       id="trancr"
@@ -112,7 +110,7 @@
             *ngIf="
               hasSegmentBoundaries ||
               (!isNextSegmentLastAndBreak(segmentIndex) &&
-                segmentIndex < transcrService.currentlevel!.segments.length - 1)
+                segmentIndex < annotationStoreService.currentLevel!.items.length - 1)
             "
           >
             <span
@@ -136,7 +134,7 @@
           *ngIf="
             !hasSegmentBoundaries &&
             (segmentIndex ===
-              transcrService.currentlevel!.segments.length - 1 ||
+              annotationStoreService.currentLevel!.items.length - 1 ||
               isNextSegmentLastAndBreak(segmentIndex))
           "
         >

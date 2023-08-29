@@ -12,19 +12,12 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  SampleUnit,
-} from '@octra/media';
+import { AudioChunk, AudioManager } from '@octra/media';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
-import { LoginMode } from '../../core/store';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
 import {
@@ -37,10 +30,8 @@ import {
 } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
-  addSegment,
-  combineSegments,
-  getSegmentBySamplePosition,
-  removeSegmentByIndex,
+  ASRContext,
+  OctraAnnotationAnyLevel,
   Segment,
 } from '@octra/annotation';
 import {
@@ -51,6 +42,8 @@ import { TranslocoService } from '@ngneat/transloco';
 import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
 import { Subscription, timer } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { OctraGuidelines } from '@octra/assets';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 
 declare let validateAnnotation: any;
 
@@ -60,15 +53,22 @@ declare let validateAnnotation: any;
   styleUrls: ['./trn-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
+export class TrnEditorComponent
+  extends OCTRAEditor
+  implements OnInit, OctraEditorRequirements
+{
   get textEditor(): Texteditor {
     return this._textEditor;
   }
 
+  private currentLevel!: OctraAnnotationAnyLevel<Segment<ASRContext>>;
+  private guidelines!: OctraGuidelines;
+  private breakMarkerCode?: string;
+  private idCounter = 1;
+
   constructor(
     public audio: AudioService,
     public keyMap: KeymappingService,
-    public transcrService: TranscriptionService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
@@ -76,7 +76,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     private cd: ChangeDetectorRef,
     private alertService: AlertService,
     private translocoService: TranslocoService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    public annotationStoreService: AnnotationStoreService
   ) {
     super();
     this.subscrManager = new SubscriptionManager<Subscription>();
@@ -294,15 +295,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
 
     let intervalCounter = 0;
 
-    for (
-      let i = 1;
-      i < this.transcrService.currentlevel!.segments.length;
-      i++
-    ) {
-      const segment = this.transcrService.currentlevel!.segments[i];
-      const previousSegment = this.transcrService.currentlevel!.segments[i - 1];
+    for (let i = 1; i < this.currentLevel.items.length; i++) {
+      const segment = this.currentLevel.items[i] as Segment;
+      const previousSegment = this.currentLevel.items[i - 1] as Segment;
 
-      if (segment.speakerLabel === previousSegment.speakerLabel) {
+      if (segment.getLabel('Speaker') === previousSegment.getLabel('Speaker')) {
         intervals[intervalCounter].length++;
       } else {
         intervals.push({
@@ -314,10 +311,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     }
 
     intervals = intervals.filter((a) => a.length > 0);
+    /* TODO
     for (let j = intervals.length - 1; j > -1; j--) {
       const interval = intervals[j];
       combineSegments(
-        this.transcrService.currentlevel!.segments,
+        this.currentLevel.items,
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -336,6 +334,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
       }
     }
     this.transcrService.validateAll();
+     */
     this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -347,6 +346,27 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   };
 
   ngOnInit() {
+    this.subscrManager.add(
+      this.annotationStoreService.transcript$.subscribe({
+        next: (trasncriptState) => {
+          this.currentLevel =
+            trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
+          this.tempSegments = [...(this.currentLevel.items as Segment[])];
+          this.idCounter = trasncriptState?.idCounters.item ?? 1;
+        },
+      })
+    );
+    this.subscrManager.add(
+      this.annotationStoreService.guidelines$.subscribe({
+        next: (guidelines) => {
+          this.guidelines = guidelines!.selected!.json;
+          this.breakMarkerCode = guidelines?.selected?.json.markers.find(
+            (a) => a.type === 'break'
+          )?.code;
+        },
+      })
+    );
+
     this.keyMap.register(this.shortcuts);
     this.keyMap.register(this.tableShortcuts);
     this.keyMap.register(this.audioShortcuts);
@@ -369,7 +389,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunk = this.audioManager.mainchunk.clone();
 
-    this.transcrService.validateAll();
+    // TODO this.transcrService.validateAll();
     this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -453,9 +473,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
 
     intervals = intervals.filter((a) => a.length > 0);
     for (let j = intervals.length - 1; j > -1; j--) {
+      /* TODO implement
       const interval = intervals[j];
       combineSegments(
-        this.transcrService.currentlevel!.segments,
+        this.currentLevel.items,
         interval.start,
         interval.start + interval.length,
         this.transcrService.breakMarker.code
@@ -472,8 +493,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
           })`
         );
       }
+       */
     }
-    this.transcrService.validateAll();
+    // TODO this.transcrService.validateAll();
     this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -497,22 +519,21 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   };
 
   removeSelectedLines = () => {
+    /* TODO
     if (this.shownSegments.length > 1) {
       for (let i = 0; i < this.shownSegments.length; i++) {
         const shownSegment = this.shownSegments[i];
         if (shownSegment.isSelected) {
           if (this.shownSegments.length > 1) {
-            const oldSegmentEnd =
-              this.transcrService.currentlevel!.segments[i].time.clone();
-            this.transcrService.currentlevel!.segments = removeSegmentByIndex(
-              this.transcrService.currentlevel!.segments,
+            const oldSegmentEnd = this.currentLevel.items[i].time.clone();
+            this.currentLevel.items = removeSegmentByIndex(
+              this.currentLevel.items,
               i,
               this.transcrService.breakMarker.code,
               false
             );
             if (i > 0) {
-              this.transcrService.currentlevel!.segments[i - 1].time =
-                oldSegmentEnd;
+              this.currentLevel.items[i - 1].time = oldSegmentEnd;
             }
             this.shownSegments.splice(i, 1);
             i--;
@@ -520,6 +541,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
         }
       }
     }
+
+     */
   };
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -532,9 +555,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   disableAllShortcuts() {}
 
   getStartPoint(index: number) {
-    return index > 0
-      ? this.transcrService.currentlevel!.segments[index - 1].time.unix
-      : 0;
+    return index > 0 && this.currentLevel.items[index - 1] instanceof Segment<ASRContext> ? (this.currentLevel.items[index - 1] as Segment<ASRContext>).time.unix : 0;
   }
 
   openSegment() {
@@ -632,7 +653,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
 
           const errorcode = getAttr(target, 'data-errorcode');
 
-          this.selectedError = this.transcrService.getErrorDetails(errorcode!);
+          // TODO this.selectedError = this.transcrService.getErrorDetails(errorcode!);
 
           if (this.selectedError !== undefined) {
             this.validationPopover.show();
@@ -679,7 +700,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   }
 
   focusOnNextSpeakerLabel(segmentNumber: number) {
-    const maxSegments = this.transcrService.currentlevel!.segments.length;
+    const maxSegments = this.currentLevel.items.length;
     segmentNumber = Math.max(-1, Math.min(maxSegments, segmentNumber));
     if (segmentNumber < maxSegments - 1) {
       const segmentLabel = findElements(document.body, '.label-column')[
@@ -704,21 +725,22 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     startSamples: number,
     segment: Segment,
     i: number
-  ): ShownSegment {
+  ) {
+    /* TODO implement
     const obj: ShownSegment = {
       start: startSamples,
       end: segment.time.samples,
-      label: segment.speakerLabel,
+      label: segment.getLabel('Speaker')!.value,
       id: segment.id,
       isSelected: false,
       transcription: {
-        text: segment.value,
+        text: segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
         safeHTML: undefined as any,
       },
       validation: '',
     };
 
-    let html = segment.value;
+    let html = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (
         typeof validateAnnotation !== 'undefined' &&
@@ -754,6 +776,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     obj.transcription.safeHTML = this.sanitizeHTML(html);
 
     return obj;
+     */
   }
 
   onKeyUp($event: KeyboardEvent, i: number) {
@@ -791,9 +814,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
           started = Date.now();
           this.save();
           started = Date.now();
-          this.transcrService.validateAll();
+          // TODO this.transcrService.validateAll();
           started = Date.now();
-          this.transcrService.saveSegments();
+          // TODO this.transcrService.saveSegments();
           this.textEditor.state = 'inactive';
           this.textEditor.selectedSegment = -1;
 
@@ -818,15 +841,16 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   }
 
   updateTempSegments() {
+    /* TODO
     const segStart = getSegmentBySamplePosition(
-      this.transcrService.currentlevel!.segments,
+      this.currentLevel.items,
       this._textEditor.audiochunk.time.start.add(
         new SampleUnit(20, this.audioManager.sampleRate)
       )
     );
-    const currentSegment = this.transcrService.currentlevel!.segments[segStart];
+    const currentSegment = this.currentLevel.items[segStart];
 
-    this.tempSegments = [...this.transcrService.currentlevel!.segments];
+    this.tempSegments = [...this.currentLevel.items];
 
     const html = this.transcrEditor.getRawText();
     // split text at the position of every boundary marker
@@ -858,20 +882,26 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
     }
 
     for (let i = 0; i < segTexts.length - 1; i++) {
-      addSegment(
+      const result = addSegment(
+        this.idCounter,
         this.tempSegments,
         this.audioManager.createSampleUnit(samplesArray[i]),
         currentSegment!.speakerLabel,
         segTexts[i]
       );
+      this.idCounter = result.itemIDCounter;
+      this.tempSegments = result.entries;
     }
 
     // shift rest of text to next segment
 
     if (this.tempSegments[segStart + segTexts.length - 1]) {
-      this.tempSegments[segStart + segTexts.length - 1]!.value =
-        segTexts[segTexts.length - 1];
+      (
+        this.tempSegments[segStart + segTexts.length - 1] as Segment
+      ).changeFirstLabelWithoutName('Speaker', segTexts[segTexts.length - 1]);
     }
+
+     */
   }
 
   save() {
@@ -880,8 +910,8 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
 
     if (
       segmentIndex > -1 &&
-      this.transcrService.currentlevel!.segments &&
-      segmentIndex < this.transcrService.currentlevel!.segments.length
+      this.currentLevel.items &&
+      segmentIndex < this.currentLevel.items.length
     ) {
       if (
         this.transcrEditor.html.indexOf(
@@ -889,22 +919,21 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
         ) > -1
       ) {
         // boundaries were inserted
-        this.transcrService.currentlevel!.segments =
-          this.tempSegments;
+        // TODO this.currentLevel.items = this.tempSegments;
       } else {
         // no boundaries inserted
-        const segment =
-          this.transcrService.currentlevel!.segments[segmentIndex]!.clone();
+        /* TODO
+        const segment = this.currentLevel.items[segmentIndex]!.clone();
         this.transcrEditor.updateRawText();
         segment.value = this.transcrEditor.rawText;
-        segment.isBlockedBy =
-          this.transcrService.currentlevel!.segments[segmentIndex].isBlockedBy;
-        this.transcrService.currentlevel!.segments[segmentIndex] = segment;
+        segment.isBlockedBy = this.currentLevel.items[segmentIndex].isBlockedBy;
+        this.currentLevel.items[segmentIndex] = segment;
+         */
       }
     } else {
-      const isNull = this.transcrService.currentlevel!.segments === undefined;
+      const isNull = this.currentLevel.items === undefined;
       console.log(`could not save segment. segment index=${segmentIndex},
-segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
+segments=${isNull}, ${this.currentLevel.items.length}`);
     }
   }
 
@@ -955,7 +984,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   playSegement(segmentNumber: number): Promise<void> {
     return new Promise<void>((resolve) => {
       if (this.playStateSegments[segmentNumber].state === 'stopped') {
-        const segments = this.transcrService.currentlevel!.segments;
+        /* TODO
+        const segments = this.currentLevel.items;
         const segment: Segment = segments[segmentNumber];
 
         this.playStateSegments[segmentNumber].state = 'started';
@@ -998,6 +1028,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
           .catch((error) => {
             console.error(error);
           });
+
+         */
       } else {
         // stop playback
         this.audio.audiomanagers[0]
@@ -1019,7 +1051,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   playAll(nextSegment: number) {
-    const segments = this.transcrService.currentlevel!.segments;
+    /* TODO
+    const segments = this.currentLevel.items;
 
     const segment = segments[nextSegment];
 
@@ -1049,7 +1082,9 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       this.cd.markForCheck();
       this.cd.detectChanges();
     } else {
-      }
+    }
+
+     */
   }
 
   togglePlayAll() {
@@ -1115,6 +1150,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   playSelectedSegment(segmentNumber: number) {
+    /* TODO
     // make sure that audio is not playing
     if (
       (this.playAllState.state === 'started' &&
@@ -1128,8 +1164,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
           const startSample =
             segmentNumber > 0
-              ? this.transcrService.currentlevel!.segments[segmentNumber - 1]
-                  .time.samples
+              ? this.currentLevel.items[segmentNumber - 1].time.samples
               : 0;
           this.uiService.addElementFromEvent(
             'mouseclick',
@@ -1143,8 +1178,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
             {
               start: startSample,
               length:
-                this.transcrService.currentlevel!.segments[segmentNumber]!.time
-                  .samples - startSample,
+                this.currentLevel.items[segmentNumber]!.time.samples -
+                startSample,
             },
             'overview'
           );
@@ -1164,8 +1199,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
     } else {
       const startSample =
         segmentNumber > 0
-          ? this.transcrService.currentlevel!.segments[segmentNumber - 1]!.time
-              .samples
+          ? this.currentLevel.items[segmentNumber - 1]!.time.samples
           : 0;
       this.uiService.addElementFromEvent(
         'mouseclick',
@@ -1179,8 +1213,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
         {
           start: startSample,
           length:
-            this.transcrService.currentlevel!.segments[segmentNumber].time
-              .samples - startSample,
+            this.currentLevel.items[segmentNumber].time.samples - startSample,
         },
         'overview'
       );
@@ -1195,6 +1228,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
           console.error(error);
         });
     }
+     */
   }
 
   navigateBetweenCells(
@@ -1203,8 +1237,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   ) {
     if (!(direction === 'up' && segmentNumber === 0)) {
       this.saveAndCloseTranscrEditor().then(() => {
-        const segmentsLength =
-          this.transcrService.currentlevel!.segments.length;
+        const segmentsLength = this.currentLevel.items.length;
 
         switch (direction) {
           case 'up':
@@ -1302,10 +1335,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
           $event.event.preventDefault();
           this.navigateBetweenCells(
             'down',
-            Math.min(
-              this.transcrService.currentlevel!.segments.length,
-              this.selectedCell.row
-            )
+            Math.min(this.currentLevel.items.length, this.selectedCell.row)
           );
           break;
         case 'left':
@@ -1380,12 +1410,15 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   };
 
   private saveNewLabel(index: number, newLabel: string) {
-    const segment = this.transcrService.currentlevel!.segments[index].clone();
+    /* TODO
+    const segment = this.currentLevel.items[index].clone();
     segment.speakerLabel = newLabel;
-    this.transcrService.currentlevel!.segments[index] = segment;
+    this.currentLevel.items[index] = segment;
+     */
   }
 
   private openTranscrEditor(segmentIndex: number) {
+    /* TODO
     if (!this._textEditor.openingBlocked) {
       this._textEditor.openingBlocked = true;
 
@@ -1398,8 +1431,8 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
       let started = 0;
 
-      const segments = this.transcrService.currentlevel!.segments;
-      this.tempSegments = [...this.transcrService.currentlevel!.segments];
+      const segments = this.currentLevel.items;
+      // TODO this.tempSegments = [...this.currentLevel.items];
       const segment = segments[segmentIndex];
       const segmentStart =
         segmentIndex > 0
@@ -1449,14 +1482,17 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
         row: segmentIndex,
         column: 2,
       };
-      } else {
+    } else {
       console.error(`can't open texteditor because it's blocked!`);
     }
+
+     */
   }
 
   private updateSegments() {
+    /*
     this.playStateSegments = [];
-    const segments = this.transcrService.currentlevel!.segments;
+    const segments = this.currentLevel.items;
     const oldShownSegments = [...this.shownSegments];
     this.shownSegments = [];
 
@@ -1486,6 +1522,9 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
     }
 
     this.shownSegments = result;
+
+
+     */
   }
 
   private waitForTranscrEditor() {
@@ -1507,9 +1546,10 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
   }
 
   private changeTranscriptOfSegment(index: number, rawTranscript: string) {
-    const segment = this.transcrService.currentlevel!.segments[index].clone();
+    /* TODO implement
+    const segment = (this.currentLevel.items[index] as Segment<ASRContext>).clone();
     segment.value = rawTranscript;
-    this.transcrService.currentlevel!.segments[index] = segment;
+    this.currentLevel.items[index] = segment;
 
     const newSegment = this.getShownSegment(
       this.shownSegments[index].start,
@@ -1517,6 +1557,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
       index
     );
     this.shownSegments[index].transcription = newSegment.transcription;
+     */
   }
 
   onTableLineClick($event: any, rowNumber: number) {

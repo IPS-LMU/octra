@@ -7,9 +7,10 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslocoService } from '@ngneat/transloco';
-import { SettingsService, TranscriptionService } from '../../shared/service';
+import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { getProperties } from '@octra/utilities';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription-feedback',
@@ -31,7 +32,7 @@ export class TranscriptionFeedbackComponent implements OnChanges {
   }[] = [];
 
   constructor(
-    public transcrService: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     public langService: TranslocoService,
     private appStorage: AppStorageService,
     private settingsService: SettingsService
@@ -46,13 +47,19 @@ export class TranscriptionFeedbackComponent implements OnChanges {
 
   public saveFeedbackform() {
     if (
-      !(this.transcrService?.feedback?.comment === undefined) &&
-      this.transcrService.feedback.comment !== ''
+      !(this.annotationStoreService?.feedback?.comment === undefined) &&
+      this.annotationStoreService.feedback.comment !== ''
     ) {
-      this.transcrService.feedback.comment =
-        this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, ' ');
+      this.annotationStoreService.changeFeedback({
+        ...this.annotationStoreService.feedback,
+        comment: this.annotationStoreService.feedback.comment.replace(
+          /(<)|(\/>)|(>)/g,
+          ' '
+        ),
+      });
     }
-    this.transcrService.comment = this.transcrService?.feedback?.comment;
+    this.annotationStoreService.comment =
+      this.annotationStoreService?.feedback?.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
       for (const [name, value] of getProperties(this.feedbackData)) {
@@ -60,15 +67,18 @@ export class TranscriptionFeedbackComponent implements OnChanges {
       }
       this.appStorage.save(
         'feedback',
-        this.transcrService?.feedback?.exportData()
+        this.annotationStoreService?.feedback?.exportData()
       );
     }
   }
 
   changeValue(control: string, value: any) {
-    const result = this.transcrService.feedback.setValueForControl(
+    const result = this.annotationStoreService.feedback.setValueForControl(
       control,
       value.toString()
+    );
+    this.annotationStoreService.changeFeedback(
+      this.annotationStoreService.feedback
     );
     console.warn(result);
   }
@@ -91,7 +101,7 @@ export class TranscriptionFeedbackComponent implements OnChanges {
   }
 
   public checkBoxChanged(groupName: string, checkb: string) {
-    for (const group of this.transcrService.feedback.groups) {
+    for (const group of this.annotationStoreService.feedback.groups) {
       if (group.name === groupName) {
         for (const control of group.controls) {
           if (control.value === checkb) {

@@ -1,7 +1,7 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { IIDBModeOptions } from '../../shared/octra-database';
-import { AnnotationStateLevel } from '../login-mode/annotation';
+import { OctraAnnotationAnyLevel, Segment } from '@octra/annotation';
 
 export class IDBActions {
   static loadOptions = createActionGroup({
@@ -56,16 +56,25 @@ export class IDBActions {
     events: {
       success: props<{
         online: {
-          levels: AnnotationStateLevel[];
-          levelCounter: number;
+          levels: OctraAnnotationAnyLevel<Segment>[];
+          idCounters: {
+            level: number;
+            item: number;
+          };
         };
         demo: {
-          levels: AnnotationStateLevel[];
-          levelCounter: number;
+          levels: OctraAnnotationAnyLevel<Segment>[];
+          idCounters: {
+            level: number;
+            item: number;
+          };
         };
         local: {
-          levels: AnnotationStateLevel[];
-          levelCounter: number;
+          levels: OctraAnnotationAnyLevel<Segment>[];
+          idCounters: {
+            level: number;
+            item: number;
+          };
         };
       }>(),
       fail: props<{

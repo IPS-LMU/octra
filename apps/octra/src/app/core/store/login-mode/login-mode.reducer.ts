@@ -15,6 +15,7 @@ import { LoginMode } from '../index';
 import { ProjectSettings } from '../../obj';
 import { ApplicationActions } from '../application/application.actions';
 import { AnnotationState } from './annotation';
+import { ASRContext, OctraAnnotation, Segment } from '@octra/annotation';
 
 export const initialState: AnnotationState = {
   ...fromAnnotation.initialState,
@@ -185,11 +186,7 @@ export class LoginModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              transcript: {
-                levels: [],
-                links: [],
-                levelCounter: 1,
-              },
+              transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
               currentSession: {},
             };
           }
@@ -203,11 +200,7 @@ export class LoginModeReducers {
             if (removeData) {
               return {
                 ...state,
-                transcript: {
-                  levels: [],
-                  links: [],
-                  levelCounter: 1,
-                },
+                transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
                 currentSession: {},
                 sessionFile,
               };

@@ -24,7 +24,6 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
@@ -43,7 +42,13 @@ import {
 import { LoginMode } from '../../core/store';
 import { Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { Segment } from '@octra/annotation';
+import {
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationSegmentLevel,
+  Segment,
+} from '@octra/annotation';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -217,7 +222,7 @@ export class LinearEditorComponent
     public audio: AudioService,
     public alertService: AlertService,
     public keyMap: KeymappingService,
-    public transcrService: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     public cd: ChangeDetectorRef,
     public uiService: UserInteractionsService,
     public settingsService: SettingsService,
@@ -238,6 +243,7 @@ export class LinearEditorComponent
               event.shortcut === 'SHIFT + ALT + 2' ||
               event.shortcut === 'SHIFT + ALT + 3'
             ) {
+              /* TODO:later
               this.transcrService.tasksBeforeSend.push(
                 new Promise<void>((resolve) => {
                   if (
@@ -253,6 +259,8 @@ export class LinearEditorComponent
                   }
                 })
               );
+
+               */
             }
           }
         )
@@ -343,14 +351,13 @@ export class LinearEditorComponent
     this._miniLoupeSettings.cursor.fixed = true;
     this._miniLoupeSettings.lineheight = 160;
 
-    this.editorSettings.markers = this.transcrService.guidelines.markers;
+    this.editorSettings.markers =
+      this.annotationStoreService.guidelines?.markers ?? [];
     this.editorSettings.responsive = this.settingsService.responsive.enabled;
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
-    // TODO replace with new code
-    /*
     this.subscrManager.add(
-      this.transcrService.currentLevelSegmentChange.subscribe(($event) => {
+      this.annotationStoreService.currentLevel$.subscribe(($event) => {
         if (!this.saving) {
           this.subscrManager.add(
             timer(1000).subscribe(() => {
@@ -361,7 +368,6 @@ export class LinearEditorComponent
         }
       })
     );
-     */
 
     this.subscrManager.add(
       this.signalDisplayTop.alert.subscribe((result) => {
@@ -415,9 +421,11 @@ export class LinearEditorComponent
     }
 
     this.subscrManager.add(
-      this.transcrService.segmentrequested.subscribe((segnumber: number) => {
-        this.openSegment(segnumber);
-      })
+      this.annotationStoreService.segmentrequested.subscribe(
+        (segnumber: number) => {
+          this.openSegment(segnumber);
+        }
+      )
     );
 
     this.subscrManager.add(
@@ -493,11 +501,15 @@ export class LinearEditorComponent
       });
     });
 
-    if (this.appStorage.logging) {
+    if (
+      this.appStorage.logging &&
+      this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel
+    ) {
       const start =
         $event.index > 0
-          ? this.transcrService.currentlevel!.segments[$event.index - 1]!.time
-              .samples
+          ? this.annotationStoreService.currentLevel!.items[$event.index - 1]!
+              .time.samples
           : 0;
       this.uiService.addElementFromEvent(
         'segment',
@@ -511,7 +523,7 @@ export class LinearEditorComponent
         {
           start,
           length:
-            this.transcrService.currentlevel!.segments[$event.index]!.time
+            this.annotationStoreService.currentLevel!.items[$event.index]!.time
               .samples - start,
         },
         LinearEditorComponent.editorname
@@ -543,7 +555,7 @@ export class LinearEditorComponent
     }
   }
 
-  // TODO Redo undo not working in linear editor?
+  // TODO:later Redo undo not working in linear editor?
   onShortcutTriggered = ($event: ShortcutEvent) => {
     if (this.shortcutsEnabled) {
       const comboKey = $event.shortcut;
@@ -684,15 +696,20 @@ export class LinearEditorComponent
 
         let segment = undefined;
 
-        if (this.segmentselected && this.selectedIndex > -1) {
+        if (
+          this.segmentselected &&
+          this.selectedIndex > -1 &&
+          this.annotationStoreService.currentLevel instanceof
+            OctraAnnotationSegmentLevel
+        ) {
           const annoSegment =
-            this.transcrService.currentlevel!.segments[this.selectedIndex];
+            this.annotationStoreService.currentLevel!.items[this.selectedIndex];
           segment = {
             start: annoSegment!.time.samples,
             length:
               this.selectedIndex <
-              this.transcrService.currentlevel!.segments.length - 1
-                ? this.transcrService.currentlevel!.segments[
+              this.annotationStoreService.currentLevel!.items.length - 1
+                ? this.annotationStoreService.currentLevel!.items[
                     this.selectedIndex + 1
                   ]!.time.samples - annoSegment!.time.samples
                 : this.audioManager.resource.info.duration.samples -
@@ -736,15 +753,21 @@ export class LinearEditorComponent
   }
 
   onLoupeClick() {
-    if (this.selectedIndex > -1) {
+    if (
+      this.selectedIndex > -1 &&
+      this.annotationStoreService.currentLevel?.items &&
+      this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel
+    ) {
       const endSamples =
-        this.transcrService.currentlevel!.segments[this.selectedIndex]!.time
+        this.annotationStoreService.currentLevel.items[this.selectedIndex]!.time
           .samples;
       let startSamples = 0;
       if (this.selectedIndex > 0) {
         startSamples =
-          this.transcrService.currentlevel!.segments[this.selectedIndex - 1]!
-            .time.samples;
+          this.annotationStoreService.currentLevel.items[
+            this.selectedIndex - 1
+          ]!.time.samples;
       }
       if (
         this.signalDisplayDown.av.MouseClickPos!.samples < startSamples ||
@@ -762,14 +785,20 @@ export class LinearEditorComponent
         length: -1,
       };
 
-      if (this.segmentselected && this.selectedIndex > -1) {
+      if (
+        this.segmentselected &&
+        this.selectedIndex > -1 &&
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+      ) {
         const annoSegment =
-          this.transcrService.currentlevel!.segments[this.selectedIndex];
+          this.annotationStoreService.currentLevel?.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel!.segments.length - 1
-            ? this.transcrService.currentlevel!.segments[
+          this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[
                 this.selectedIndex + 1
               ]!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
@@ -796,15 +825,20 @@ export class LinearEditorComponent
         start: -1,
         length: -1,
       };
-
-      if (this.segmentselected && this.selectedIndex > -1) {
+      if (
+        this.segmentselected &&
+        this.selectedIndex > -1 &&
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+      ) {
         const annoSegment =
-          this.transcrService.currentlevel!.segments[this.selectedIndex];
+          this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel!.segments.length - 1
-            ? this.transcrService.currentlevel!.segments[
+          this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[
                 this.selectedIndex + 1
               ]!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
@@ -857,14 +891,20 @@ export class LinearEditorComponent
         length: -1,
       };
 
-      if (this.segmentselected && this.selectedIndex > -1) {
+      if (
+        this.segmentselected &&
+        this.selectedIndex > -1 &&
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+      ) {
         const annoSegment =
-          this.transcrService.currentlevel!.segments[this.selectedIndex];
+          this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
           this.selectedIndex <
-          this.transcrService.currentlevel!.segments.length - 1
-            ? this.transcrService.currentlevel!.segments[
+          this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[
                 this.selectedIndex + 1
               ]!.time.samples - annoSegment!.time.samples
             : this.audioManager.resource.info.duration.samples -
@@ -888,15 +928,21 @@ export class LinearEditorComponent
     if (this.appStorage.logging) {
       let segment = undefined;
 
-      if (this.segmentselected && this.selectedIndex > -1) {
+      if (
+        this.segmentselected &&
+        this.selectedIndex > -1 &&
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+      ) {
         const annoSegment =
-          this.transcrService.currentlevel!.segments[this.selectedIndex];
+          this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment = {
           start: annoSegment!.time.samples,
           length:
             this.selectedIndex <
-            this.transcrService.currentlevel!.segments.length - 1
-              ? this.transcrService.currentlevel!.segments[
+            this.annotationStoreService.currentLevel.items.length - 1
+              ? this.annotationStoreService.currentLevel.items[
                   this.selectedIndex + 1
                 ]!.time.samples - annoSegment!.time.samples
               : this.audioManager.resource.info.duration.samples -
@@ -930,7 +976,7 @@ export class LinearEditorComponent
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkTop,
-      this.transcrService.currentlevel!
+      this.annotationStoreService.currentLevel!
     );
   }
 
@@ -954,15 +1000,23 @@ export class LinearEditorComponent
 
   private selectSegment(index: number): Promise<AudioSelection> {
     return new Promise<AudioSelection>((resolve) => {
-      const segment = this.transcrService.currentlevel!.segments[index];
-      this.transcript = segment!.value;
-      this.selectedIndex = index;
-      this.segmentselected = true;
-      let start = this.audioManager.createSampleUnit(0);
-      if (index > 0) {
-        start = this.transcrService.currentlevel!.segments[index - 1]!.time;
+      if (
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+      ) {
+        const segment = this.annotationStoreService.currentLevel.items[index];
+        this.transcript =
+          segment!.getFirstLabelWithoutName('Speaker')?.value ?? '';
+        this.selectedIndex = index;
+        this.segmentselected = true;
+        let start = this.audioManager.createSampleUnit(0);
+        if (index > 0) {
+          start =
+            this.annotationStoreService.currentLevel.items[index - 1]!.time;
+        }
+        resolve(new AudioSelection(start, segment!.time));
       }
-      resolve(new AudioSelection(start, segment!.time));
     });
   }
 
@@ -970,21 +1024,23 @@ export class LinearEditorComponent
     if (this.segmentselected) {
       if (
         this.selectedIndex > -1 &&
-        this.transcrService.currentlevel!.segments &&
-        this.selectedIndex < this.transcrService.currentlevel!.segments.length
+        this.annotationStoreService.currentLevel?.items &&
+        this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel &&
+        this.selectedIndex <
+          this.annotationStoreService.currentLevel.items.length
       ) {
-        const segment =
-          this.transcrService.currentlevel!.segments[
-            this.selectedIndex
-          ]!.clone();
-        // this.viewer.focused = false;
-        // this.loupe.viewer.focused = false;
-        segment.value = this.editor.rawText;
-        this.transcrService.currentlevel!.segments[this.selectedIndex] =
-          segment;
-        this.transcrService.saveSegments();
-        this.cd.markForCheck();
-        this.cd.detectChanges();
+        const segment = this.annotationStoreService.currentLevel.items[
+          this.selectedIndex
+        ].clone(
+          this.annotationStoreService.currentLevel.items[this.selectedIndex].id
+        );
+        segment.changeFirstLabelWithoutName('Speaker', this.editor.rawText);
+
+        this.annotationStoreService.changeCurrentItemById(
+          this.annotationStoreService.currentLevel.items[this.selectedIndex].id,
+          segment
+        );
       }
     }
   }
@@ -1001,7 +1057,7 @@ export class LinearEditorComponent
     this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 
-  onEntriesChange($event: Segment[]) {
-    this.transcrService.saveSegments();
+  onEntriesChange(annotation: OctraAnnotation<ASRContext, Segment>) {
+    this.annotationStoreService.overwriteTranscript(annotation);
   }
 }

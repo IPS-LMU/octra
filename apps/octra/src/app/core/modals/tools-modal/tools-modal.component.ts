@@ -24,13 +24,8 @@ import {
   JSONConverter,
   TextTableConverter,
 } from '../../obj/tools/audio-cutting/cutting-format';
-import {
-  AudioService,
-  TranscriptionService,
-  UserInteractionsService,
-} from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { removeSegmentByIndex, Segment } from '@octra/annotation';
+import { AudioService, UserInteractionsService } from '../../shared/service';
+import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
 import { IntArray, WavFormat } from '@octra/media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
@@ -41,6 +36,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-tools-modal',
@@ -154,7 +150,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   namingConvention!: NamingDragAndDropComponent;
   @ViewChild('content', { static: false }) contentElement!: ElementRef;
 
-  @Input() transcrService!: TranscriptionService;
   @Input() uiService!: UserInteractionsService;
   protected data = undefined;
 
@@ -177,8 +172,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     modalService: NgbModal,
     private modalsService: OctraModalService,
     private httpClient: HttpClient,
-    private appStorage: AppStorageService,
-    private audio: AudioService,
+    public annotationStoreService: AnnotationStoreService,
+    public audio: AudioService,
     public transloco: TranslocoService,
     protected override activeModal: NgbActiveModal
   ) {
@@ -217,35 +212,41 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.result.url = undefined;
 
-    if (!this.transcrService?.currentlevel) {
+    if (!this.annotationStoreService.transcript?.currentLevel) {
       return;
     }
-
-    for (
-      let i = 0;
-      i < this.transcrService.currentlevel!.segments.length;
-      i++
+    if (
+      this.annotationStoreService.transcript.currentLevel instanceof
+      OctraAnnotationSegmentLevel
     ) {
-      const segment: Segment = this.transcrService.currentlevel!.segments[i]!;
-      let sampleDur = segment.time.samples - startSample;
-
-      if (
-        startSample + sampleDur >
-        this.audio.audiomanagers[0].resource.info.duration.samples
+      for (
+        let i = 0;
+        i < this.annotationStoreService.transcript.currentLevel.items.length;
+        i++
       ) {
-        console.error(`invalid sampleDur!!`);
-        sampleDur =
-          this.audio.audiomanagers[0].resource.info.duration.samples -
-          startSample;
-      }
+        const segment =
+          this.annotationStoreService.transcript.currentLevel.items[i]!;
 
-      cutList.push({
-        number: i,
-        sampleStart: startSample,
-        sampleDur,
-        transcript: segment.value,
-      });
-      startSample = segment.time.samples;
+        let sampleDur = segment.time.samples - startSample;
+
+        if (
+          startSample + sampleDur >
+          this.audio.audiomanagers[0].resource.info.duration.samples
+        ) {
+          console.error(`invalid sampleDur!!`);
+          sampleDur =
+            this.audio.audiomanagers[0].resource.info.duration.samples -
+            startSample;
+        }
+
+        cutList.push({
+          number: i,
+          sampleStart: startSample,
+          sampleDur,
+          transcript: segment.getFirstLabelWithoutName('Speaker')?.value,
+        });
+        startSample = segment.time.samples;
+      }
     }
 
     // tasks = segments to cut + one for zipping
@@ -264,8 +265,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     // TODO arraybuffer is c
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
-      this.transcrService.audioManager.resource.info.fullname,
-      this.transcrService.audioManager.resource.arraybuffer!
+      this.audio.audioManager.resource.info.fullname,
+      this.audio.audioManager.resource.arraybuffer!
     );
 
     let totalSize = 0;
@@ -294,16 +295,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               (now - cuttingStarted) / 1000 / status.intArray.length;
 
             const rest =
-              this.transcrService.audioManager.resource.arraybuffer!
-                .byteLength - totalSize;
+              this.audio.audioManager.resource.arraybuffer!.byteLength -
+              totalSize;
             this.tools.audioCutting.cuttingTimeLeft =
               this.tools.audioCutting.cuttingSpeed * rest;
 
             const zippingSpeed = this.tools.audioCutting.zippingSpeed;
             this.tools.audioCutting.timeLeft = Math.ceil(
               (this.tools.audioCutting.cuttingTimeLeft +
-                this.transcrService.audioManager.resource.arraybuffer!
-                  .byteLength *
+                this.audio.audioManager.resource.arraybuffer!.byteLength *
                   zippingSpeed +
                 10) *
                 1000
@@ -326,14 +326,13 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               const converter = new TextTableConverter();
               const content = converter.exportList(
                 cutList,
-                this.transcrService.audioManager.resource.info,
-                this.transcrService.audioManager.resource.info.fullname,
+                this.audio.audioManager.resource.info,
+                this.audio.audioManager.resource.info.fullname,
                 this.namingConvention.namingConvention
               );
 
               this.tools.audioCutting.archiveStructure[
-                this.transcrService.audioManager.resource.info.name +
-                  '_meta.txt'
+                this.audio.audioManager.resource.info.name + '_meta.txt'
               ] = strToU8(content);
               finished++;
             }
@@ -343,14 +342,13 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               const converter = new JSONConverter();
               const content = converter.exportList(
                 cutList,
-                this.transcrService.audioManager.resource.info,
-                this.transcrService.audioManager.resource.info.fullname,
+                this.audio.audioManager.resource.info,
+                this.audio.audioManager.resource.info.fullname,
                 this.namingConvention.namingConvention
               );
 
               this.tools.audioCutting.archiveStructure[
-                this.transcrService.audioManager.resource.info.name +
-                  '_meta.json'
+                this.audio.audioManager.resource.info.name + '_meta.json'
               ] = strToU8(JSON.stringify(content, undefined, 2));
               finished++;
             }
@@ -411,14 +409,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                         URL.createObjectURL(
                           new File(
                             [data],
-                            this.transcrService.audioManager.resource.info
-                              .name + '.zip'
+                            this.audio.audioManager.resource.info.name + '.zip'
                           )
                         )
                       );
                     this.tools.audioCutting.result.filename =
-                      this.transcrService.audioManager.resource.info.name +
-                      '.zip';
+                      this.audio.audioManager.resource.info.name + '.zip';
                   } catch (e) {
                     this.modalsService.openModal(
                       ErrorModalComponent,
@@ -446,7 +442,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
               }
 
               this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
-              this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
+              this.tools.audioCutting.result.filename = this.audio.audioManager.ressource.info.name + '.zip';
               // finished
             });
 
@@ -482,7 +478,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         cuttingStarted = Date.now();
         this.tools.audioCutting.wavFormat.cutAudioFileSequentially(
           this.namingConvention.namingConvention,
-          this.transcrService.audioManager.resource.arraybuffer,
+          this.audio.audioManager.resource.arraybuffer,
           cutList
         );
       })
@@ -525,8 +521,10 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   isSomethingBlocked(): boolean {
     return (
-      this.transcrService.currentlevel!.segments.find((a) => {
-        return a.isBlockedBy !== undefined;
+      this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel &&
+      this.annotationStoreService.currentLevel!.items.find((a) => {
+        return a.context?.asr?.isBlockedBy !== undefined;
       }) !== undefined
     );
   }
@@ -546,14 +544,31 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   }
 
   private combinePhrases() {
+    if (
+      !(
+        this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel
+      )
+    ) {
+      return;
+    }
+
+    let transcript = this.annotationStoreService.transcript;
+    const currentLevel: OctraAnnotationSegmentLevel<Segment> = transcript!
+      .levels[
+      this.annotationStoreService.currentLevelIndex
+    ] as OctraAnnotationSegmentLevel<Segment>;
+
     const maxWords = this.tools.combinePhrases.options.maxWordsPerSegment;
     const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
     const isSilence = (segment: Segment) => {
       return (
-        segment.value.trim() === '' ||
-        segment.value.trim() === this.transcrService.breakMarker.code ||
-        segment.value.trim() === '<p:>' ||
-        segment.value.trim() === this.transcrService.breakMarker.code
+        segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '' ||
+        segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
+          this.annotationStoreService.breakMarker?.code ||
+        segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '<p:>' ||
+        segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
+          this.annotationStoreService.breakMarker?.code
       );
     };
 
@@ -563,52 +578,53 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
     let wordCounter = 0;
 
-    for (
-      let i = 0;
-      i < this.transcrService!.currentlevel!.segments.length;
-      i++
-    ) {
-      const segment = this.transcrService!.currentlevel!.segments[i];
+    for (let i = 0; i < currentLevel.items.length; i++) {
+      const segment = currentLevel.items[i];
 
       let startPos = 0;
       if (i > 0) {
-        startPos = this.transcrService!.currentlevel!.segments[i - 1].time.unix;
+        startPos = currentLevel.items[i - 1].time.unix;
       }
       let duration = segment.time.unix - startPos;
       if (!isSilence(segment) || duration < minSilenceLength) {
         if (maxWords > 0 && wordCounter >= maxWords) {
-          wordCounter = isSilence(segment) ? 0 : countWords(segment.value);
+          wordCounter = isSilence(segment)
+            ? 0
+            : countWords(
+                segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
+              );
         } else {
           if (i > 0) {
-            const lastSegment =
-              this.transcrService!.currentlevel!.segments[i - 1];
+            const lastSegment = currentLevel.items[i - 1];
             startPos = 0;
             if (i > 1) {
-              startPos =
-                this.transcrService.currentlevel!.segments[i - 2].time.unix;
+              startPos = currentLevel.items[i - 2].time.unix;
             }
             duration = lastSegment.time.unix - startPos;
             if (!isSilence(lastSegment) || duration < minSilenceLength) {
-              let lastSegmentText = lastSegment.value;
-              let segmentText = segment.value;
+              let lastSegmentText =
+                lastSegment.getFirstLabelWithoutName('Speaker')?.value;
+              let segmentText =
+                segment.getFirstLabelWithoutName('Speaker')?.value;
 
               if (isSilence(lastSegment)) {
                 lastSegmentText = '';
               }
 
               if (!isSilence(segment)) {
-                segment.value = `${lastSegmentText} ${segment.value}`;
-                wordCounter = countWords(segment.value);
+                segment.changeFirstLabelWithoutName(
+                  'Speaker',
+                  `${lastSegmentText} ${segmentText}`
+                );
+                wordCounter = countWords(`${lastSegmentText} ${segmentText}`);
               } else {
                 segmentText = '';
-                segment.value = `${lastSegmentText}`;
+                segment.changeFirstLabelWithoutName(
+                  'Speaker',
+                  `${lastSegmentText}`
+                );
               }
-              this.transcrService.currentlevel!.segments = removeSegmentByIndex(
-                this.transcrService.currentlevel!.segments,
-                i - 1,
-                '',
-                false
-              );
+              transcript = transcript!.removeItemByIndex(i - 1, '', false);
               i--;
             }
           }

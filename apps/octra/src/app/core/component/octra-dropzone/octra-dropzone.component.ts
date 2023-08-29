@@ -15,11 +15,12 @@ import {
   IFile,
   ImportResult,
   OAnnotJSON,
-  OAudiofile,
+  OctraAnnotationSegmentLevel,
   OLabel,
   OSegment,
+  Segment,
 } from '@octra/annotation';
-import { AudioManager } from '@octra/media';
+import { AudioManager, OAudiofile } from '@octra/media';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
@@ -196,7 +197,9 @@ export class OctraDropzoneComponent extends DefaultComponent {
                     ) {
                       file.status = 'valid';
                       for (const level of importResult.annotjson.levels) {
-                        if (level.type === 'SEGMENT') {
+                        if (
+                          level instanceof OctraAnnotationSegmentLevel<Segment>
+                        ) {
                           if (level.items[0].sampleStart !== 0) {
                             let temp = [];
                             temp.push(
@@ -270,7 +273,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                     const audioProcess: FileProgress = {
                       status: 'progress',
                       file: new File(
-                        [importResult.audiofile.arraybuffer],
+                        [importResult.audiofile.arraybuffer!],
                         importResult.audiofile.name
                       ),
                       checked_converters: 0,

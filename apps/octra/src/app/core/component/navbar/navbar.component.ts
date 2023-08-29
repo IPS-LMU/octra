@@ -7,8 +7,8 @@ import { editorComponents } from '../../../editors/components';
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import {
+  AudioService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -17,18 +17,11 @@ import {
   ConsoleType,
 } from '../../shared/service/bug-report.service';
 import { NavbarService } from './navbar.service';
-import {
-  AnnotationLevelType,
-  convertOSegmentsToSegments,
-  convertSegmentsToOSegments,
-  Level,
-  OIDBLevel,
-} from '@octra/annotation';
+import { AnnotationLevelType } from '@octra/annotation';
 import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { BugreportModalComponent } from '../../modals/bugreport-modal/bugreport-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
-import { Router } from '@angular/router';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
@@ -71,10 +64,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     return AppInfo;
   }
 
-  public get transcrServ(): TranscriptionService {
-    return this.navbarServ.transcrService;
-  }
-
   public get uiService(): UserInteractionsService {
     return this.navbarServ.uiService;
   }
@@ -115,7 +104,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public bugService: BugReportService,
     public annotationStoreService: AnnotationStoreService,
     public authStoreService: AuthenticationStoreService,
-    private router: Router
+    public audio: AudioService
   ) {
     super();
   }
@@ -130,7 +119,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
               ExportFilesModalComponent.options,
               {
                 navbarService: this,
-                transcriptionService: this.transcrServ,
                 uiService: this.uiService,
               }
             );
@@ -174,80 +162,12 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       });
   }
 
-  onLevelNameClick() {
-    // jQuery(event.target).addClass('selected');
-  }
-
   onLevelNameLeave(event: any, tiernum: number) {
-    // jQuery(event.target).removeClass('selected');
-    // save level name
-    if (event.target.value !== undefined && event.target.value !== '') {
-      const level = this.transcrServ.annotation.levels[tiernum];
-      level.name = event.target.value.replace(' ', '_');
-      this.appStorage
-        .changeAnnotationLevel(tiernum, {
-          id: level.id,
-          name: level.name,
-          type: level.type,
-          items: convertSegmentsToOSegments(
-            level.name,
-            level.segments,
-            this.transcrServ.audioManager.resource.info.duration.samples
-          ),
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-      // update value for annoation object in transcr service
-      this.transcrServ.annotation.levels[tiernum].name =
-        event.target.value.replace(' ', '_');
-    } else {
-      event.target.value = this.transcrServ.annotation.levels[tiernum].name;
-    }
+    this.annotationStoreService.changeLevelName(tiernum, event.target.value);
   }
 
   onLevelAddClick() {
-    const levelNums = this.transcrServ.annotation.levels.length;
-    let levelname = `OCTRA_${levelNums + 1}`;
-    let index = levelNums;
-
-    const nameexists = (newname: string) => {
-      for (const level of this.transcrServ.annotation.levels) {
-        if (level.name === newname) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    while (nameexists(levelname)) {
-      index++;
-      levelname = `OCTRA_${index + 1}`;
-    }
-
-    const newlevel = new Level(
-      -1,
-      levelname,
-      'SEGMENT',
-      convertOSegmentsToSegments(
-        levelname,
-        [],
-        this.transcrServ.audioManager.resource.info.duration
-      )
-    );
-    this.appStorage
-      .addAnnotationLevel(
-        new OIDBLevel(
-          -1,
-          newlevel.getObj(
-            this.transcrServ.audioManager.resource.info.duration.clone()
-          )!,
-          this.transcrServ.annotation.levels.length
-        )
-      )
-      .catch((error) => {
-        console.error(error);
-      });
+    this.annotationStoreService.addAnnotationLevel(AnnotationLevelType.SEGMENT);
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
@@ -258,11 +178,9 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       })
       .then((answer) => {
         if (answer === 'yes') {
-          if (this.transcrServ.annotation.levels.length > 1) {
-            this.appStorage.removeAnnotationLevel(id).catch((err) => {
-              console.error(err);
-            });
-          }
+          this.appStorage.removeAnnotationLevel(id).catch((err) => {
+            console.error(err);
+          });
         }
       })
       .catch((error) => {
@@ -270,22 +188,12 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       });
   }
 
-  onLevelDuplicateClick(tiernum: number, id: number) {
-    const newlevel = this.transcrServ.annotation.levels[tiernum].getObj(
-      this.transcrServ.audioManager.resource.info.duration.clone()
-    );
-    this.appStorage
-      .addAnnotationLevel(
-        new OIDBLevel(-1, newlevel!, this.transcrServ.annotation.levels.length)
-      )
-      .catch((error) => {
-        console.error(error);
-      });
-    // jQuery(this.tiersDropdown.nativeElement).addClass('show');
+  onLevelDuplicateClick(tiernum: number) {
+    this.annotationStoreService.duplicateLevel(tiernum);
   }
 
   public selectLevel(tiernum: number) {
-    this.transcrServ.selectedlevel = tiernum;
+    this.annotationStoreService.setLevelIndex(tiernum);
   }
 
   public changeSecondsPerLine(seconds: number) {
@@ -298,7 +206,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       ExportFilesModalComponent.options,
       {
         navbarService: this,
-        transcriptionService: this.transcrServ,
         uiService: this.uiService,
       }
     );
@@ -307,10 +214,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   openToolsModal() {
     this.modalTools = this.modService.openModalRef(
       ToolsModalComponent,
-      ToolsModalComponent.options,
-      {
-        transcrService: this.transcrServ,
-      }
+      ToolsModalComponent.options
     );
   }
 

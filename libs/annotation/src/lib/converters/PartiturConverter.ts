@@ -1,13 +1,13 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import {
-  AnnotationLevelType,
   OAnnotJSON,
-  OAudiofile,
   OItem,
+  OItemLevel,
   OLabel,
-  OLevel,
   OSegment,
+  OSegmentLevel,
 } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class PartiturConverter extends Converter {
   public constructor() {
@@ -55,7 +55,7 @@ LBD:\n`;
 
       let ortCounter = 0;
 
-      for (const item of annotation.levels[levelnum].items) {
+      for (const item of annotation.levels[levelnum].items as OSegment[]) {
         const words = item.labels
           .filter((a) => a.name !== 'Speaker')[0]
           .value.split(' ');
@@ -98,12 +98,16 @@ LBD:\n`;
       const lines = file.content.split(/\r?\n/g);
       let pointer = 0;
 
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
       const tiers: any = {};
 
       // skip not needed information and read needed information
       let previousTier = '';
-      let level = undefined;
+      let level: OSegmentLevel<OSegment> | OItemLevel | undefined = undefined;
       let counter = 1;
       while (pointer < lines.length) {
         const search = lines[pointer].match(
@@ -133,8 +137,8 @@ LBD:\n`;
               }
               level =
                 search[0] !== 'TRN'
-                  ? new OLevel(search[0], AnnotationLevelType.ITEM, [])
-                  : new OLevel(search[0], AnnotationLevelType.SEGMENT, []);
+                  ? new OItemLevel(search[0])
+                  : new OSegmentLevel(search[0]);
               previousTier = search[0];
               tiers[`${previousTier}`] = [];
             }
@@ -146,7 +150,7 @@ LBD:\n`;
                   error: 'A level is missing.',
                 };
               }
-              level.items.push(
+              (level.items as OItem[]).push(
                 new OItem(counter, [new OLabel(previousTier, columns[2])])
               );
               tiers[`${previousTier}`].push(columns[2]);

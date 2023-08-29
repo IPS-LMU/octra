@@ -24,7 +24,6 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
@@ -43,13 +42,17 @@ import {
   SampleUnit,
 } from '@octra/media';
 import {
+  ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
+  OctraAnnotation,
+  Segment,
 } from '@octra/annotation';
-import { interval, Subscription, timer } from 'rxjs';
+import { interval, map, Subscription, take, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -193,7 +196,7 @@ export class TwoDEditorComponent
   }
 
   constructor(
-    public transcrService: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     public keyMap: KeymappingService,
     public audio: AudioService,
     public uiService: UserInteractionsService,
@@ -629,9 +632,11 @@ export class TwoDEditorComponent
     }
 
     this.subscrManager.add(
-      this.transcrService.segmentrequested.subscribe((segnumber: number) => {
-        this.openSegment(segnumber);
-      })
+      this.annotationStoreService.segmentrequested.subscribe(
+        (segnumber: number) => {
+          this.openSegment(segnumber);
+        }
+      )
     );
 
     this.keyMap.unregisterAll();
@@ -648,70 +653,74 @@ export class TwoDEditorComponent
   }
 
   onSegmentEntered(selected: any) {
-    console.log('SEGMENT ENTRER');
-    if (
-      this.transcrService.currentlevel!.segments &&
-      selected.index > -1 &&
-      selected.index < this.transcrService.currentlevel!.segments.length
-    ) {
-      const segment =
-        this.transcrService.currentlevel!.segments[selected.index];
-
-      if (segment !== undefined) {
+    this.annotationStoreService.currentLevel$.pipe(
+      take(1),
+      map((currentLevel) => {
         if (
-          segment.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
-          segment.isBlockedBy !== ASRQueueItemType.MAUS
+          currentLevel &&
+          currentLevel.items &&
+          selected.index > -1 &&
+          selected.index < currentLevel.items.length
         ) {
-          const start: SampleUnit =
-            selected.index > 0
-              ? this.transcrService.currentlevel!.segments[
-                  selected.index - 1
-                ].time.clone()
-              : this.audioManager.createSampleUnit(0);
-          this.selectedIndex = selected.index;
-          this.audioChunkWindow = new AudioChunk(
-            new AudioSelection(start, segment.time.clone()),
-            this.audioManager
-          );
-          this.shortcutsEnabled = false;
+          const segment = currentLevel.items[selected.index];
 
-          this.viewer.disableShortcuts();
-          this.showWindow = true;
+          if (segment !== undefined && segment instanceof Segment) {
+            if (
+              segment.context?.asr?.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
+              segment.context?.asr?.isBlockedBy !== ASRQueueItemType.MAUS
+            ) {
+              const start: SampleUnit =
+                selected.index > 0
+                  ? (
+                      currentLevel.items[selected.index - 1] as Segment
+                    ).time.clone()
+                  : this.audioManager.createSampleUnit(0);
+              this.selectedIndex = selected.index;
+              this.audioChunkWindow = new AudioChunk(
+                new AudioSelection(start, segment.time.clone()),
+                this.audioManager
+              );
+              this.shortcutsEnabled = false;
 
-          this.uiService.addElementFromEvent(
-            'segment',
-            {
-              value: 'entered',
-            },
-            Date.now(),
-            this.audioManager.playPosition,
-            -1,
-            undefined,
-            {
-              start: start.samples,
-              length:
-                this.transcrService.currentlevel!.segments[selected.index].time
-                  .samples - start.samples,
-            },
-            TwoDEditorComponent.editorname
-          );
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-        } else {
-          // tslint:disable-next-line:max-line-length
-          this.alertService
-            .showAlert(
-              'danger',
-              "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first."
-            )
-            .catch((error) => {
-              console.error(error);
-            });
+              this.viewer.disableShortcuts();
+              this.showWindow = true;
+
+              this.uiService.addElementFromEvent(
+                'segment',
+                {
+                  value: 'entered',
+                },
+                Date.now(),
+                this.audioManager.playPosition,
+                -1,
+                undefined,
+                {
+                  start: start.samples,
+                  length:
+                    (currentLevel.items[selected.index] as Segment).time
+                      .samples - start.samples,
+                },
+                TwoDEditorComponent.editorname
+              );
+              this.cd.markForCheck();
+              this.cd.detectChanges();
+            } else {
+              // tslint:disable-next-line:max-line-length
+              this.alertService
+                .showAlert(
+                  'danger',
+                  "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first."
+                )
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+          } else {
+            console.error(`couldn't find segment with index ${selected.index}`);
+          }
         }
-      } else {
-        console.error(`couldn't find segment with index ${selected.index}`);
-      }
-    }
+      })
+    );
   }
 
   onWindowAction(state: string) {
@@ -925,108 +934,137 @@ export class TwoDEditorComponent
           ? $event.timePosition!
           : this.viewer.av.mouseCursor!;
 
-      const segmentNumber = getSegmentBySamplePosition(
-        this.transcrService.currentlevel?.segments!,
-        timePosition
-      );
+      this.annotationStoreService.currentLevel$.pipe(
+        take(1),
+        map((currentLevel) => {
+          const segmentNumber = getSegmentBySamplePosition(
+            currentLevel!.items as Segment[],
+            timePosition
+          );
 
-      if (segmentNumber > -1) {
-        if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
-          const segment =
-            this.transcrService.currentlevel!.segments[segmentNumber];
+          if (segmentNumber > -1) {
+            if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
+              const segment = currentLevel!.items[segmentNumber] as Segment;
 
-          if (segment !== undefined) {
-            const sampleStart =
-              segmentNumber > 0
-                ? this.transcrService.currentlevel!.segments[segmentNumber - 1]
-                    .time.samples
-                : 0;
+              if (segment !== undefined) {
+                const sampleStart =
+                  segmentNumber > 0
+                    ? (currentLevel!.items[segmentNumber - 1] as Segment).time
+                        .samples
+                    : 0;
 
-            this.uiService.addElementFromEvent(
-              'shortcut',
-              $event,
-              $event.timestamp,
-              this.audioManager.playPosition,
-              -1,
-              undefined,
-              {
-                start: sampleStart,
-                length: segment.time.samples - sampleStart,
-              },
-              'multi-lines-viewer'
-            );
+                this.uiService.addElementFromEvent(
+                  'shortcut',
+                  $event,
+                  $event.timestamp,
+                  this.audioManager.playPosition,
+                  -1,
+                  undefined,
+                  {
+                    start: sampleStart,
+                    length: segment.time.samples - sampleStart,
+                  },
+                  'multi-lines-viewer'
+                );
 
-            const selection: ASRTimeInterval = {
-              sampleStart,
-              sampleLength: segment.time.samples - sampleStart,
-            };
+                const selection: ASRTimeInterval = {
+                  sampleStart,
+                  sampleLength: segment.time.samples - sampleStart,
+                };
 
-            if (segment.isBlockedBy === undefined) {
-              if (
-                $event.value === 'do_asr' ||
-                $event.value === 'do_asr_maus' ||
-                $event.value === 'do_maus'
-              ) {
-                this.viewer.selectSegment(segmentNumber);
-
-                if ($event.value === 'do_asr') {
-                  this.asrStoreService.addToQueue(
-                    selection,
-                    ASRQueueItemType.ASR
-                  );
-                  segment.isBlockedBy = ASRQueueItemType.ASR;
-                } else if ($event.value === 'do_asr_maus') {
-                  this.asrStoreService.addToQueue(
-                    selection,
-                    ASRQueueItemType.ASRMAUS
-                  );
-                  segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
-                } else if ($event.value === 'do_maus') {
+                if (segment.context?.asr?.isBlockedBy === undefined) {
                   if (
-                    segment.value.trim() === '' ||
-                    segment.value.split(' ').length < 2
+                    $event.value === 'do_asr' ||
+                    $event.value === 'do_asr_maus' ||
+                    $event.value === 'do_maus'
                   ) {
-                    this.alertService
-                      .showAlert(
-                        'danger',
-                        this.langService.translate('asr.maus empty text'),
-                        false
-                      )
-                      .catch((error) => {
-                        console.error(error);
-                      });
-                  } else {
-                    this.asrStoreService.addToQueue(
-                      selection,
-                      ASRQueueItemType.MAUS,
-                      segment.value
-                    );
-                    segment.isBlockedBy = ASRQueueItemType.MAUS;
+                    this.viewer.selectSegment(segmentNumber);
+
+                    if ($event.value === 'do_asr') {
+                      this.asrStoreService.addToQueue(
+                        selection,
+                        ASRQueueItemType.ASR
+                      );
+                      segment.context = {
+                        ...segment.context,
+                        asr: {
+                          isBlockedBy: ASRQueueItemType.ASR,
+                        },
+                      };
+                    } else if ($event.value === 'do_asr_maus') {
+                      this.asrStoreService.addToQueue(
+                        selection,
+                        ASRQueueItemType.ASRMAUS
+                      );
+                      segment.context = {
+                        ...segment.context,
+                        asr: {
+                          isBlockedBy: ASRQueueItemType.ASRMAUS,
+                        },
+                      };
+                    } else if ($event.value === 'do_maus') {
+                      if (
+                        (segment.getFirstLabelWithoutName('Speaker') &&
+                          segment
+                            .getFirstLabelWithoutName('Speaker')!
+                            .value.trim() === '') ||
+                        segment
+                          .getFirstLabelWithoutName('Speaker')!
+                          .value.split(' ').length < 2
+                      ) {
+                        this.alertService
+                          .showAlert(
+                            'danger',
+                            this.langService.translate('asr.maus empty text'),
+                            false
+                          )
+                          .catch((error) => {
+                            console.error(error);
+                          });
+                      } else {
+                        this.asrStoreService.addToQueue(
+                          selection,
+                          ASRQueueItemType.MAUS,
+                          segment.getFirstLabelWithoutName('Speaker')?.value
+                        );
+                        segment.context = {
+                          ...segment.context,
+                          asr: {
+                            isBlockedBy: ASRQueueItemType.MAUS,
+                          },
+                        };
+                      }
+                    }
                   }
+                  this.asrStoreService.startProcessing();
+                } else {
+                  this.asrStoreService.stopItemProcessing({
+                    sampleStart: selection.sampleStart,
+                    sampleLength: selection.sampleLength,
+                  });
+                  segment.context = {
+                    ...segment.context,
+                    asr: {
+                      isBlockedBy: undefined,
+                    },
+                  };
                 }
               }
-              this.asrStoreService.startProcessing();
             } else {
-              this.asrStoreService.stopItemProcessing({
-                sampleStart: selection.sampleStart,
-                sampleLength: selection.sampleLength,
-              });
-              segment.isBlockedBy = undefined;
+              // open transcr window
+              this.openSegment(segmentNumber);
+              this.alertService
+                .showAlert(
+                  'warning',
+                  this.langService.translate('asr.no asr selected').toString()
+                )
+                .catch((error) => {
+                  console.error(error);
+                });
             }
           }
-        } else {
-          // open transcr window
-          this.openSegment(segmentNumber);
-          this.alertService
-            .showAlert(
-              'warning',
-              this.langService.translate('asr.no asr selected').toString()
-            )
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      }
+        })
+      );
     }
 
     if (
@@ -1090,9 +1128,7 @@ export class TwoDEditorComponent
     this.appStorage.audioSpeed = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = !(this.editor === undefined || this.editor === undefined)
-        ? this.editor.caretpos
-        : -1;
+      const caretpos = this.editor ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent(
         'slider',
         event,
@@ -1110,9 +1146,7 @@ export class TwoDEditorComponent
     this.appStorage.audioVolume = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = !(this.editor === undefined || this.editor === undefined)
-        ? this.editor.caretpos
-        : -1;
+      const caretpos = this.editor ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent(
         'slider',
         event,
@@ -1129,9 +1163,7 @@ export class TwoDEditorComponent
   onButtonClick(event: { type: string; timestamp: number }) {
     this.selectedIndex = -1;
     if (this.appStorage.logging) {
-      const caretpos = !(this.editor === undefined || this.editor === undefined)
-        ? this.editor.caretpos
-        : -1;
+      const caretpos = this.editor ? this.editor.caretpos : -1;
 
       const selection = {
         start: this.viewer.av.drawnSelection!.start.samples,
@@ -1172,9 +1204,6 @@ export class TwoDEditorComponent
   }
 
   onCircleLoupeMouseOver() {
-    // TODO important what about focus?
-    // this.viewer.focus();
-
     const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
     if (fullY < this.viewer.height!) {
       // loupe is fully visible
@@ -1189,7 +1218,7 @@ export class TwoDEditorComponent
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkLines,
-      this.transcrService.currentlevel!
+      this.annotationStoreService.currentLevel!
     );
     this.cd.detectChanges();
   }
@@ -1210,7 +1239,6 @@ export class TwoDEditorComponent
 
     if (tempWindow !== undefined) {
       this.authWindow = tempWindow as any;
-    } else {
     }
   };
 
@@ -1248,7 +1276,7 @@ export class TwoDEditorComponent
     // this.viewer.height = this.linesViewHeight;
   }
 
-  onEntriesChange($events: any) {
-    this.transcrService.saveSegments();
+  onEntriesChange($events: OctraAnnotation<ASRContext, Segment>) {
+    // TODO this.annotationStoreService.saveSegments();
   }
 }

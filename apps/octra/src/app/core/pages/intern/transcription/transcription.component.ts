@@ -46,13 +46,12 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
-import { IFile, Level, PartiturConverter } from '@octra/annotation';
+import { IFile, PartiturConverter } from '@octra/annotation';
 import { AudioManager } from '@octra/media';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
@@ -186,7 +185,9 @@ export class TranscriptionComponent
   isInactivityModalVisible = false;
 
   get loaded(): boolean {
-    return this.audio.loaded && this.transcrService.guidelines !== undefined;
+    return (
+      this.audio.loaded && this.annotationStoreService.guidelines !== undefined
+    );
   }
 
   get appc(): any {
@@ -211,12 +212,8 @@ export class TranscriptionComponent
     return this.settingsService.appSettings;
   }
 
-  set comment(value: string) {
-    this.transcrService.comment = value;
-  }
-
   get comment(): string {
-    return this.transcrService?.comment;
+    return this.annotationStoreService.comment;
   }
 
   constructor(
@@ -224,7 +221,6 @@ export class TranscriptionComponent
     private _componentFactoryResolver: ComponentFactoryResolver,
     public audio: AudioService,
     public uiService: UserInteractionsService,
-    public transcrService: TranscriptionService,
     public appStorage: AppStorageService,
     public keyMap: KeymappingService,
     public navbarServ: NavbarService,
@@ -383,7 +379,6 @@ export class TranscriptionComponent
             const editor = this._currentEditor
               .instance as OctraEditorRequirements;
             editor.disableAllShortcuts();
-          } else {
           }
         }
       )
@@ -422,7 +417,7 @@ export class TranscriptionComponent
     ) {
       // clear transcription
 
-      this.transcrService.endTranscription();
+      this.annotationStoreService.endTranscription();
       this.annotationStoreService.quit(true, true);
     } else {
       // TODO check other themes than shortAudioFiles
@@ -454,6 +449,7 @@ export class TranscriptionComponent
         this.settingsService.isTheme('korbinian')) &&
       (this._useMode === 'online' || this._useMode === 'demo');
 
+    /*
     this.subscrManager.add(
       this.transcrService.alertTriggered.subscribe((alertConfig) => {
         this.alertService.showAlert(
@@ -465,17 +461,19 @@ export class TranscriptionComponent
       })
     );
 
+     */
+
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 
     this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
 
     /**
      for (const marker of this.transcrService.guidelines.markers) {
-      if (marker.type === 'break') {
-        this.transcrService.breakMarker = marker;
-        break;
-      }
-    }
+     if (marker.type === 'break') {
+     this.transcrService.breakMarker = marker;
+     break;
+     }
+     }
      **/
 
     // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
@@ -490,8 +488,6 @@ export class TranscriptionComponent
         });
       })
     );
-
-    this.bugService.init(this.transcrService);
 
     if (this._useMode === LoginMode.ONLINE) {
       // console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
@@ -530,28 +526,7 @@ export class TranscriptionComponent
     this.navbarServ.showExport =
       this.settingsService.projectsettings?.navigation?.export === true;
 
-    // TODO replace with new code
     /*
-
-    if (this.transcrService.annotation !== undefined) {
-      this.levelSubscriptionID = this.subscrManager.add(
-        this.transcrService.currentLevelSegmentChange.subscribe(
-          this.transcrService.saveSegments
-        )
-      );
-    } else {
-      this.subscrManager.add(
-        this.transcrService.dataloaded.subscribe(() => {
-          this.levelSubscriptionID = this.subscrManager.add(
-            this.transcrService.currentLevelSegmentChange.subscribe(
-              this.transcrService.saveSegments
-            )
-          );
-        })
-      );
-    }
-     */
-
     this.subscrManager.add(
       this.transcrService.levelchanged.subscribe((level: Level) => {
         (this.currentEditor.instance as any).update();
@@ -569,7 +544,7 @@ export class TranscriptionComponent
           level.name
         );
       })
-    );
+    );*/
 
     if (
       this._useMode === LoginMode.ONLINE ||
@@ -677,7 +652,7 @@ export class TranscriptionComponent
           break;
         case 'overview':
           if (!this.modalVisiblities.overview) {
-            this.transcrService.analyse();
+            this.annotationStoreService.analyse();
             this.modalOverview = this.modService.openModalRef(
               OverviewModalComponent,
               OverviewModalComponent.options
@@ -840,6 +815,7 @@ export class TranscriptionComponent
     this.appStorage.afterSaving().then(() => {
       // after saving
       // make sure no tasks are pending
+      /* TODO add
       new Promise<void>((resolve) => {
         if (this.transcrService.tasksBeforeSend.length === 0) {
           resolve();
@@ -876,7 +852,7 @@ export class TranscriptionComponent
 
         if (
           (!validTranscript &&
-            showOverview) /*||  !this.modalOverview.feedBackComponent.valid*/ ||
+            showOverview) /*||  !this.modalOverview.feedBackComponent.valid||
           (validTranscriptOnly && !validTranscript)
         ) {
           this.waitForSend = false;
@@ -887,12 +863,12 @@ export class TranscriptionComponent
         } else {
           this.onSendNowClick();
         }
-      });
+      });*/
     });
   }
 
   reloadDemo() {
-    this.transcrService.endTranscription(true);
+    this.annotationStoreService.endTranscription(true);
     this.clearDataPermanently();
     this.authService.loginDemo();
   }
@@ -922,19 +898,20 @@ export class TranscriptionComponent
     // replace with store method
     this.appStorage.clearAnnotationPermanently(); // ok
     this.appStorage.feedback = {}; // ok
-    this.transcrService.comment = ''; // ok
+    this.annotationStoreService.changeComment(''); // ok
     this.appStorage.clearLoggingDataPermanently(); // ok
     this.uiService.elements = [];
   }
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(
-      this.transcrService.audioManager.resource.info.duration
+    const oannotjson = this.annotationStoreService.transcript!.serialize(
+      this.audio.audioManager.resource.name,
+      this.audio.audioManager.resource.info.sampleRate
     );
     const result: IFile = converter.export(
       oannotjson,
-      this.transcrService.audiofile!,
+      this.audio.audioManager.resource.getOAudioFile(),
       0
     )!.file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
@@ -1021,33 +998,8 @@ export class TranscriptionComponent
     this.onSendButtonClick();
   }
 
-  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
-    this.transcrService.feedback.comment =
-      this.transcrService.feedback.comment.replace(
-        /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
-        ''
-      );
-    const servercomment = this.appStorage.onlineSession?.task?.comment?.replace(
-      /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
-      ''
-    );
-
-    if (servercomment && this.transcrService.feedback.comment === '') {
-      this.transcrService.feedback.comment = type + '; ' + servercomment;
-    } else if (
-      (!servercomment && this.transcrService.feedback.comment !== '') ||
-      (servercomment && this.transcrService.feedback.comment !== '')
-    ) {
-      this.transcrService.feedback.comment =
-        type + '; ' + this.transcrService.feedback.comment;
-    } else {
-      this.transcrService.feedback.comment = type;
-    }
-    this.onSendButtonClick();
-  }
-
   private logout(clearSession: boolean) {
-    this.transcrService.endTranscription(true);
+    this.annotationStoreService.endTranscription(true);
     if (clearSession) {
       this.uiService.elements = [];
     }
@@ -1079,7 +1031,6 @@ export class TranscriptionComponent
   }
 
   openPromptModal() {
-    // TODO mdb: preserve this.transcrServ.audiofile
     this.modService.openModalRef(
       PromptModalComponent,
       PromptModalComponent.options

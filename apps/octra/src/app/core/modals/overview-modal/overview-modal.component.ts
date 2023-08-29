@@ -10,7 +10,6 @@ import { isFunction } from '@octra/utilities';
 import {
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -23,6 +22,7 @@ import {
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -72,7 +72,6 @@ export class OverviewModalComponent extends OctraModal {
   public trnEditorswitch = new EventEmitter<void>();
 
   constructor(
-    public transcrService: TranscriptionService,
     public modalService: NgbModal,
     public settingsService: SettingsService,
     public annotationStoreService: AnnotationStoreService,
@@ -116,7 +115,7 @@ export class OverviewModalComponent extends OctraModal {
   }
 
   onSegmentInOverviewClicked(segnumber: number) {
-    this.transcrService.requestSegment(segnumber);
+    this.annotationStoreService.requestSegment(segnumber);
     this.close();
   }
 
@@ -145,33 +144,8 @@ export class OverviewModalComponent extends OctraModal {
     }
 
     if (
-      (this.sendValidTranscriptOnly && this.transcrService.transcriptValid) ||
-      !this.sendValidTranscriptOnly
-    ) {
-      this.sendTranscription();
-    }
-  }
-
-  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
-    this.transcrService.feedback.comment =
-      this.transcrService.feedback.comment.replace(
-        /(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g,
-        ''
-      );
-
-    if (
-      this.appStorage.currentTask?.comment &&
-      this.transcrService.feedback.comment === ''
-    ) {
-      this.transcrService.feedback.comment =
-        type + '; ' + this.appStorage.currentTask.comment;
-    } else {
-      this.transcrService.feedback.comment =
-        type + '; ' + this.transcrService.feedback.comment;
-    }
-
-    if (
-      (this.sendValidTranscriptOnly && this.transcrService.transcriptValid) ||
+      (this.sendValidTranscriptOnly &&
+        this.annotationStoreService.transcriptValid) ||
       !this.sendValidTranscriptOnly
     ) {
       this.sendTranscription();
@@ -179,30 +153,30 @@ export class OverviewModalComponent extends OctraModal {
   }
 
   public get numberOfSegments(): number {
-    return this.transcrService.currentlevel !== undefined &&
-      this.transcrService.currentlevel.segments
-      ? this.transcrService.currentlevel.segments.length
+    return this.annotationStoreService.currentLevel !== undefined &&
+      this.annotationStoreService.currentLevel.items
+      ? this.annotationStoreService.currentLevel.items.length
       : 0;
   }
 
   public get transcrSegments(): number {
-    return this.transcrService.currentlevel !== undefined &&
-      this.transcrService.currentlevel.segments
-      ? this.transcrService.statistic.transcribed
+    return this.annotationStoreService.currentLevel !== undefined &&
+      this.annotationStoreService.currentLevel.items
+      ? this.annotationStoreService.statistics.transcribed
       : 0;
   }
 
   public get pauseSegments(): number {
-    return this.transcrService.currentlevel !== undefined &&
-      this.transcrService.currentlevel.segments
-      ? this.transcrService.statistic.pause
+    return this.annotationStoreService.currentLevel !== undefined &&
+      this.annotationStoreService.currentLevel.items
+      ? this.annotationStoreService.statistics.pause
       : 0;
   }
 
   public get emptySegments(): number {
-    return this.transcrService.currentlevel !== undefined &&
-      this.transcrService.currentlevel.segments
-      ? this.transcrService.statistic.empty
+    return this.annotationStoreService.currentLevel !== undefined &&
+      this.annotationStoreService.currentLevel.items
+      ? this.annotationStoreService.statistics.empty
       : 0;
   }
 
@@ -232,7 +206,7 @@ export class OverviewModalComponent extends OctraModal {
 
   updateView() {
     this.updateSegments();
-    this.transcrService.analyse();
+    this.annotationStoreService.analyse();
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -266,15 +240,15 @@ export class OverviewModalComponent extends OctraModal {
       if (
         typeof validateAnnotation !== 'undefined' &&
         typeof validateAnnotation === 'function' &&
-        this.transcrService.validationArray[i] !== undefined
+        this.annotationStoreService.validationArray[i] !== undefined
       ) {
-        obj.transcription.html = this.transcrService.underlineTextRed(
+        obj.transcription.html = this.annotationStoreService.underlineTextRed(
           obj.transcription.text,
-          this.transcrService.validationArray[i].validation
+          this.annotationStoreService.validationArray[i].validation
         );
       }
 
-      obj.transcription.html = this.transcrService.rawToHTML(
+      obj.transcription.html = this.annotationStoreService.rawToHTML(
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
@@ -287,7 +261,7 @@ export class OverviewModalComponent extends OctraModal {
         }
       );
     } else {
-      obj.transcription.html = this.transcrService.rawToHTML(
+      obj.transcription.html = this.annotationStoreService.rawToHTML(
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
@@ -310,13 +284,13 @@ export class OverviewModalComponent extends OctraModal {
 
   private updateSegments() {
     if (
-      this.transcrService.validationArray.length > 0 ||
+      this.annotationStoreService.validationArray.length > 0 ||
       this.appStorage.useMode === LoginMode.URL ||
       !this.settingsService.projectsettings?.octra?.validationEnabled
     ) {
       if (
-        !this.transcrService!.currentlevel!.segments ||
-        !this.transcrService!.guidelines
+        !this.annotationStoreService!.currentLevel!.items ||
+        !this.annotationStoreService!.guidelines
       ) {
         this.shownSegments = [];
       }
@@ -324,23 +298,28 @@ export class OverviewModalComponent extends OctraModal {
       let startTime = 0;
       const result = [];
 
-      for (
-        let i = 0;
-        i < this.transcrService.currentlevel!.segments.length;
-        i++
+      if (
+        this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel
       ) {
-        const segment = this.transcrService.currentlevel!.segments[i];
+        for (
+          let i = 0;
+          i < this.annotationStoreService.currentLevel!.items.length;
+          i++
+        ) {
+          const segment = this.annotationStoreService.currentLevel!.items[i];
 
-        const obj = this.getShownSegment(
-          startTime,
-          segment.time.samples,
-          segment.value,
-          i
-        );
+          const obj = this.getShownSegment(
+            startTime,
+            segment.time.samples,
+            segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
+            i
+          );
 
-        result.push(obj);
+          result.push(obj);
 
-        startTime = segment.time.samples;
+          startTime = segment.time.samples;
+        }
       }
 
       this.shownSegments = result;

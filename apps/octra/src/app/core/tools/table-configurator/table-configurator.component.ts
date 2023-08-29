@@ -1,7 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Annotation, Level } from '@octra/annotation';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationSegmentLevel,
+  Segment,
+} from '@octra/annotation';
 
 export interface ColumnDefinition {
   type: string;
@@ -13,7 +19,7 @@ export interface ColumnFormat {
   defaultValue: string;
   formatString: string;
   formatFunction: (
-    level: Level,
+    level: OctraAnnotationAnyLevel<Segment<ASRContext>>,
     segmentNumber: number,
     counter: number
   ) => string;
@@ -39,7 +45,7 @@ export class TableConfiguratorComponent implements OnInit {
       }[];
     };
   }[] = [];
-  @Input() annotation!: Annotation;
+  @Input() annotation!: OctraAnnotation<ASRContext, Segment<ASRContext>>;
   @Input() options = {};
   @Input() currentLevelID!: number;
   @Input() view: 'expert' | 'easy' = 'easy';
@@ -85,18 +91,21 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '01:30:02.234',
           formatString: 'HH:mm:ss.mss',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            let segmentStart =
-              segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.seconds * 1000
-                : 0;
-            segmentStart = Math.round(segmentStart);
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              let segmentStart =
+                segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.seconds * 1000
+                  : 0;
+              segmentStart = Math.round(segmentStart);
 
-            return this.convertMilliSecondsIntoLegibleString(segmentStart);
+              return this.convertMilliSecondsIntoLegibleString(segmentStart);
+            }
+            return '-1';
           },
         },
         {
@@ -104,16 +113,19 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatString: '120345',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return (
-              (segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.samples + 1
-                : 1) + ''
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return (
+                (segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.samples + 1
+                  : 1) + ''
+              );
+            }
+            return '-1';
           },
         },
         {
@@ -121,16 +133,19 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return (
-              (segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.seconds.toFixed(4)
-                : '0') + ''
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return (
+                (segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.seconds.toFixed(4)
+                  : '0') + ''
+              );
+            }
+            return '-1';
           },
         },
       ],
@@ -142,15 +157,18 @@ export class TableConfiguratorComponent implements OnInit {
           name: 'Timestamp',
           defaultValue: '01:30:02.234',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            const segment = level.segments[segmentNumber];
-            return this.convertMilliSecondsIntoLegibleString(
-              Math.round(segment!.time.seconds * 1000)
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              const segment = level.items[segmentNumber];
+              return this.convertMilliSecondsIntoLegibleString(
+                Math.round(segment!.time.seconds * 1000)
+              );
+            }
+            return '-1';
           },
           formatString: 'HH:mm:ss.mss',
         },
@@ -159,12 +177,15 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '120345',
           defaultValue: '120345',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return level.segments[segmentNumber]!.time.samples + '';
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return level.items[segmentNumber]!.time.samples + '';
+            }
+            return '-1';
           },
         },
         {
@@ -172,14 +193,15 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return (
-              level.segments[segmentNumber]!.time.seconds.toFixed(4) + ''
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return level.items[segmentNumber]!.time.seconds.toFixed(4) + '';
+            }
+            return '-1';
           },
         },
       ],
@@ -191,19 +213,22 @@ export class TableConfiguratorComponent implements OnInit {
           name: 'Timestamp',
           defaultValue: '01:30:02.234',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            const segmentStart =
-              segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.seconds
-                : 0;
-            const segment = level.segments[segmentNumber];
-            return this.convertMilliSecondsIntoLegibleString(
-              Math.round((segment!.time.seconds - segmentStart) * 1000)
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              const segmentStart =
+                segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.seconds
+                  : 0;
+              const segment = level.items[segmentNumber];
+              return this.convertMilliSecondsIntoLegibleString(
+                Math.round((segment!.time.seconds - segmentStart) * 1000)
+              );
+            }
+            return '-1';
           },
           formatString: 'HH:mm:ss.mss',
         },
@@ -212,20 +237,22 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '120345',
           defaultValue: '120345',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            const segmentStart =
-              segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.samples + 1
-                : 1;
-            return (
-              level.segments[segmentNumber]!.time.samples -
-              segmentStart +
-              ''
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              const segmentStart =
+                segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.samples + 1
+                  : 1;
+              return (
+                level.items[segmentNumber]!.time.samples - segmentStart + ''
+              );
+            }
+
+            return '-1';
           },
         },
         {
@@ -233,20 +260,23 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            const segmentStart =
-              segmentNumber > 0
-                ? level.segments[segmentNumber - 1]!.time.seconds
-                : 0;
-            return (
-              (
-                level.segments[segmentNumber]!.time.seconds - segmentStart
-              ).toFixed(4) + ''
-            );
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              const segmentStart =
+                segmentNumber > 0
+                  ? level.items[segmentNumber - 1]!.time.seconds
+                  : 0;
+              return (
+                (
+                  level.items[segmentNumber]!.time.seconds - segmentStart
+                ).toFixed(4) + ''
+              );
+            }
+            return '-1';
           },
         },
       ],
@@ -259,12 +289,17 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: 'Some transcript...',
           formatString: '',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return level.segments[segmentNumber]!.value;
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return level.items[segmentNumber]!.getFirstLabelWithoutName(
+                'Speaker'
+              )?.value ?? '';
+            }
+            return '-1';
           },
         },
       ],
@@ -277,12 +312,16 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: 'OCTRA_1',
           formatString: '',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return level.name;
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return level.name;
+            }
+
+            return '-1';
           },
         },
       ],
@@ -295,12 +334,15 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '44100',
           formatString: '44100',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return `${level.segments[0]!.time.sampleRate}`;
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return `${level.items[0]!.time.sampleRate}`;
+            }
+            return '-1';
           },
         },
         {
@@ -308,12 +350,15 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '44,1kHz',
           formatString: '44,1kHz',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return `${level.segments[0]!.time.sampleRate / 1000}kHz`;
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return `${level.items[0]!.time.sampleRate / 1000}kHz`;
+            }
+            return '-1';
           },
         },
       ],
@@ -326,12 +371,15 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '1',
           formatString: '1',
           formatFunction: (
-            level: Level,
+            level: OctraAnnotationAnyLevel<Segment>,
             segmentNumber: number,
             counter: number
           ) => {
-            // the value must be a unix timestamp
-            return `${counter}`;
+            if (level instanceof OctraAnnotationSegmentLevel) {
+              // the value must be a unix timestamp
+              return `${counter}`;
+            }
+            return '-1';
           },
         },
       ],
@@ -496,23 +544,25 @@ export class TableConfiguratorComponent implements OnInit {
     for (let i = startAt; i < this.annotation.levels.length; i++) {
       const level = this.annotation.levels[i];
 
-      for (let j = 0; j < level.segments.length; j++) {
-        const segment = level.segments[j];
+      if (level instanceof OctraAnnotationSegmentLevel) {
+        for (let j = 0; j < level.items.length; j++) {
+          const segment = level.items[j];
 
-        let text = '';
+          let text = '';
 
-        for (let k = 0; k < this.columns.length; k++) {
-          text += this.columns[k].columnDefinition.cells[counter].text;
-          if (k < this.columns.length - 1) {
-            text += divider;
+          for (let k = 0; k < this.columns.length; k++) {
+            text += this.columns[k].columnDefinition.cells[counter].text;
+            if (k < this.columns.length - 1) {
+              text += divider;
+            }
           }
-        }
 
-        textLines.push({
-          text,
-          samples: segment!.time.samples,
-        });
-        counter++;
+          textLines.push({
+            text,
+            samples: segment!.time.samples,
+          });
+          counter++;
+        }
       }
 
       if (!hasTierColumn) {
@@ -592,22 +642,24 @@ export class TableConfiguratorComponent implements OnInit {
       const level = this.annotation.levels[i];
       let start = 0;
 
-      for (let j = 0; j < level.segments.length; j++) {
-        const segment = level.segments[j];
-        const text = def.formatFunction(level, j, counter);
+      if (level instanceof OctraAnnotationSegmentLevel) {
+        for (let j = 0; j < level.items.length; j++) {
+          const segment = level.items[j];
+          const text = def.formatFunction(level, j, counter);
 
-        this.columns[index].columnDefinition.cells.push({
-          level: i,
-          text,
-          samples: start,
-        });
-        counter++;
-        start = segment!.time.samples;
-      }
+          this.columns[index].columnDefinition.cells.push({
+            level: i,
+            text,
+            samples: start,
+          });
+          counter++;
+          start = segment!.time.samples;
+        }
 
-      if (!hasTierColumn) {
-        // stop after actual level
-        break;
+        if (!hasTierColumn) {
+          // stop after actual level
+          break;
+        }
       }
     }
 

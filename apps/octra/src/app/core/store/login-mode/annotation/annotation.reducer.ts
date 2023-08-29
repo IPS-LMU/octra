@@ -4,15 +4,20 @@ import { AnnotationActions } from './annotation.actions';
 import { IDBActions } from '../../idb/idb.actions';
 import { IIDBModeOptions } from '../../../shared/octra-database';
 import { getProperties } from '@octra/utilities';
-import { AnnotationState, AnnotationStateSegment } from './index';
 import { SampleUnit } from '@octra/media';
+import {
+  AnnotationLevelType,
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationSegmentLevel,
+  OLabel,
+  Segment,
+} from '@octra/annotation';
+import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
-  transcript: {
-    levels: [],
-    links: [],
-    levelCounter: 0,
-  },
+  transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
   savingNeeded: false,
   isSaving: false,
   audio: {
@@ -32,31 +37,12 @@ export class AnnotationStateReducers {
   create<T>(): ReducerTypes<AnnotationState, ActionCreator[]>[] {
     return [
       on(
-        AnnotationActions.setLevelCounter.do,
-        (state: AnnotationState, { levelCounter, mode }) => {
-          if (this.mode === mode) {
-            return {
-              ...state,
-              transcript: {
-                ...state.transcript,
-                levelCounter: levelCounter,
-              },
-            };
-          }
-          return state;
-        }
-      ),
-      on(
         AnnotationActions.clearAnnotation.do,
         (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
               ...state,
-              transcript: {
-                levels: [],
-                links: [],
-                levelCounter: 0,
-              },
+              transcript: initialState.transcript,
             };
           }
           return state;
@@ -75,54 +61,49 @@ export class AnnotationStateReducers {
         }
       ),
       on(
+        AnnotationActions.loadSegments.success,
+        (state: AnnotationState, { transcript, mode, feedback }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              currentSession: {
+                ...state.currentSession,
+                feedback,
+              },
+              transcript,
+            };
+          }
+          return state;
+        }
+      ),
+      on(
         AnnotationActions.addMultipleASRSegments.success,
         (state, { mode, newSegments, segmentID }) => {
           if (this.mode === mode) {
-            const segmentIndex = state.transcript.levels[0].items.findIndex(
-              (a) => a.id === segmentID
-            );
             // 1. unblock current segment
-            /** TODO implement
+            let transcript = state.transcript;
+
+            const segments = newSegments.filter(
+              (a, i) => i < newSegments.length - 1
+            );
+
+            for (const segment of segments) {
+              transcript = transcript.addItemToCurrentLevel(
+                segment.time,
+                segment.labels,
+                {
+                  asr: {
+                    progressInfo: undefined,
+                    isBlockedBy: undefined,
+                  },
+                }
+              );
+            }
+
             state = {
               ...state,
-              transcript: {
-                ...state.transcript,
-                levels: [
-                  {
-                    ...state.transcript.levels[0],
-                    items: [
-                      ...state.transcript.levels[0].items.slice(
-                        0,
-                        segmentIndex
-                      ),
-                      ...newSegments.filter((a, i) => i < newSegments.length - 1).map(a => new OSegment(
-                        a.id, (i === 0) ? (state.transcript.levels[0].items[segmentIndex]  as AnnotationStateSegment).sampleStart + (state.transcript.levels[0].items[segmentIndex] as AnnotationStateSegment).sampleDur : a.time.clone())
-                      )
-                      {
-                        ...state.transcript.levels[0].items[segmentIndex],
-                        labels: [
-                          {
-                            name: state.transcript.levels[0].name,
-                            value: last(newSegments)!.value,
-                          },
-                          {
-                            name: 'Speaker',
-                            value: last(newSegments)!.speakerLabel,
-                          },
-                        ],
-                        progressInfo: undefined,
-                        isBlockedBy: undefined,
-                      },
-                      ...state.transcript.levels[0].items.slice(
-                        segmentIndex + 1
-                      ),
-                    ],
-                  },
-                  ...state.transcript.levels.slice(1),
-                ],
-              },
+              transcript,
             };
-            **/
           }
           return state;
         }
@@ -167,16 +148,7 @@ export class AnnotationStateReducers {
             if (index > -1 && index < annotationLevels.length) {
               return {
                 ...state,
-                transcript: {
-                  ...state.transcript,
-                  levels: [
-                    ...state.transcript.levels.slice(0, index),
-                    {
-                      ...level,
-                    },
-                    ...state.transcript.levels.slice(index + 1),
-                  ],
-                },
+                transcript: state.transcript.changeLevelByIndex(index, level),
               };
             } else {
               console.error(`can't change level because index not valid.`);
@@ -188,15 +160,34 @@ export class AnnotationStateReducers {
       ),
       on(
         AnnotationActions.addAnnotationLevel.do,
-        (state: AnnotationState, { level, mode }) => {
+        (state: AnnotationState, { levelType, mode, audioDuration }) => {
           if (this.mode === mode) {
-            return {
-              ...state,
-              transcript: {
-                ...state.transcript,
-                levels: [...state.transcript.levels, level],
-              },
-            };
+            let level:
+              | OctraAnnotationAnyLevel<Segment<ASRContext>>
+              | undefined = undefined;
+            if (levelType === AnnotationLevelType.SEGMENT) {
+              level = state.transcript.createSegmentLevel(
+                `OCTRA_${state.transcript.idCounters.level + 1}`,
+                [
+                  state.transcript.createSegment(audioDuration.clone(), [
+                    new OLabel(
+                      `OCTRA_${state.transcript.idCounters.level + 1}`,
+                      ''
+                    ),
+                    new OLabel(`Speaker`, ''),
+                  ]),
+                ]
+              );
+            } else {
+              console.error(`Can't add other level types. not supported.`);
+            }
+
+            if (level) {
+              return {
+                ...state,
+                transcript: state.transcript.addLevel(level),
+              };
+            }
           }
           return state;
         }
@@ -206,23 +197,10 @@ export class AnnotationStateReducers {
         (state: AnnotationState, { id, mode }) => {
           if (this.mode === mode) {
             if (id > -1) {
-              const index = state.transcript.levels.findIndex(
-                (a) => a.id === id
-              );
-              if (index > -1) {
-                return {
-                  ...state,
-                  transcript: {
-                    ...state.transcript,
-                    levels: [
-                      ...state.transcript.levels.slice(0, index),
-                      ...state.transcript.levels.slice(index + 1),
-                    ],
-                  },
-                };
-              } else {
-                console.error(`can't remove level because index not valid.`);
-              }
+              return {
+                ...state,
+                transcript: state.transcript.removeLevel(id),
+              };
             } else {
               console.error(`can't remove level because id not valid.`);
             }
@@ -248,6 +226,19 @@ export class AnnotationStateReducers {
           ...state,
           savingNeeded,
         })
+      ),
+      on(
+        AnnotationActions.changeCurrentItemById.do,
+        (state: AnnotationState, { id, item, mode }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              transcript: state.transcript.changeCurrentItemById(id, item),
+            };
+          }
+
+          return state;
+        }
       ),
       on(
         AnnotationActions.setIsSaving.do,
@@ -288,8 +279,16 @@ export class AnnotationStateReducers {
         })
       ),
       on(
-        AnnotationActions.setTranscriptionState.do,
-        (state: AnnotationState, newState) => ({ ...state, ...newState })
+        AnnotationActions.setLevelIndex.do,
+        (state: AnnotationState, { currentLevelIndex, mode }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              transcript: state.transcript.changeLevelIndex(currentLevelIndex),
+            };
+          }
+          return state;
+        }
       ),
       on(AnnotationActions.clearLogs.do, (state) => ({
         ...state,
@@ -307,53 +306,48 @@ export class AnnotationStateReducers {
           state: AnnotationState,
           { mode, timeInterval, progress, isBlockedBy, itemType, result }
         ) => {
-          if (this.mode === mode) {
+          const currentLevel = state.transcript.currentLevel;
+          if (
+            this.mode === mode &&
+            currentLevel instanceof OctraAnnotationSegmentLevel
+          ) {
             const segmentBoundary = new SampleUnit(
               timeInterval.sampleStart + timeInterval.sampleLength / 2,
               state.audio.sampleRate
             );
-            // todo add current level
-            let currentLevel = state.transcript.levels[0];
-            const segmentIndex = this.getSegmentBySamplePosition(
-              segmentBoundary,
-              currentLevel.items as AnnotationStateSegment[]
-            );
+            const segmentIndex =
+              state.transcript.getCurrentSegmentIndexBySamplePosition(
+                segmentBoundary
+              );
 
             if (segmentIndex > -1) {
-              const segment = currentLevel.items[segmentIndex]!;
-
-              currentLevel = {
-                ...currentLevel,
-                items: [
-                  ...currentLevel.items.slice(0, segmentIndex),
-                  {
-                    ...segment,
-                    labels: result
-                      ? segment.labels.map((a) =>
-                          a.name !== 'Speaker'
-                            ? {
-                                ...a,
-                                value: result,
-                              }
-                            : a
-                        )
-                      : segment.labels,
-                    progressInfo: {
-                      progress,
-                      statusLabel: itemType,
-                    },
-                    isBlockedBy,
-                  },
-                  ...currentLevel.items.slice(segmentIndex + 1),
-                ],
-              };
+              const segment = (
+                currentLevel as OctraAnnotationSegmentLevel<Segment>
+              ).level.items[segmentIndex];
 
               return {
                 ...state,
-                transcript: {
-                  ...state.transcript,
-                  levels: [currentLevel, ...state.transcript.levels.slice(1)],
-                },
+                transcript: state.transcript.changeCurrentItemByIndex(
+                  segmentIndex,
+                  Segment.deserialize<ASRContext>({
+                    ...segment,
+                    id: segment.id,
+                    labels: result
+                      ? segment.labels.map((a: OLabel) =>
+                          a.name !== 'Speaker' ? new OLabel(a.name, result) : a
+                        )
+                      : segment.labels,
+                    context: {
+                      asr: {
+                        progressInfo: {
+                          progress,
+                          statusLabel: itemType,
+                        },
+                        isBlockedBy,
+                      },
+                    },
+                  })
+                ),
               };
             } else {
               console.error(`item not found`);
@@ -387,6 +381,18 @@ export class AnnotationStateReducers {
           return result;
         }
       ),
+      on(
+        AnnotationActions.duplicateLevel.do,
+        (state: AnnotationState, { mode, index }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              transcript: state.transcript.duplicateLevel(index),
+            };
+          }
+          return state;
+        }
+      ),
     ];
   }
 
@@ -409,24 +415,5 @@ export class AnnotationStateReducers {
     }
 
     return state;
-  }
-
-  getSegmentBySamplePosition(
-    samples: SampleUnit,
-    segments: AnnotationStateSegment[]
-  ): number {
-    let begin = 0;
-    for (let i = 0; i < segments.length; i++) {
-      if (i > 0) {
-        begin = segments[i - 1].sampleStart + segments[i - 1].sampleDur;
-      }
-      if (
-        samples.samples > begin &&
-        samples.samples <= segments[i].sampleStart + segments[i].sampleDur
-      ) {
-        return i;
-      }
-    }
-    return -1;
   }
 }

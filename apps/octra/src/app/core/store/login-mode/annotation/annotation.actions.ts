@@ -1,16 +1,22 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import { LoginMode } from '../../index';
-import { OIDBLink, Segment } from '@octra/annotation';
+import {
+  AnnotationLevelType,
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationLink,
+  OEvent,
+  OItem,
+  Segment,
+} from '@octra/annotation';
 import { ILog } from '../../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
-import {
-  AnnotationStateLevel,
-  GuidelinesItem,
-  TranscriptionState,
-} from './index';
 import { ProjectSettings } from '../../../obj';
 import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
-import videojs from 'video.js';
+import { SampleUnit } from '@octra/media';
+import { GuidelinesItem } from './index';
+import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -86,7 +92,7 @@ export class AnnotationActions {
     source: `annotation/ overwrite transcript`,
     events: {
       do: props<{
-        transcript: TranscriptionState;
+        transcript: OctraAnnotation<ASRContext, Segment>;
         mode: LoginMode;
         saveToDB: boolean;
       }>(),
@@ -97,7 +103,7 @@ export class AnnotationActions {
     source: `annotation/ overwrite links`,
     events: {
       do: props<{
-        links: OIDBLink[];
+        links: OctraAnnotationLink[];
       }>(),
     },
   });
@@ -106,7 +112,7 @@ export class AnnotationActions {
     source: `annotation/ change level`,
     events: {
       do: props<{
-        level: AnnotationStateLevel;
+        level: OctraAnnotationAnyLevel<Segment<ASRContext>>;
         mode: LoginMode;
       }>(),
     },
@@ -116,7 +122,8 @@ export class AnnotationActions {
     source: `annotation/ add level`,
     events: {
       do: props<{
-        level: AnnotationStateLevel;
+        levelType: AnnotationLevelType;
+        audioDuration: SampleUnit;
         mode: LoginMode;
       }>(),
     },
@@ -127,16 +134,6 @@ export class AnnotationActions {
     events: {
       do: props<{
         id: number;
-        mode: LoginMode;
-      }>(),
-    },
-  });
-
-  static setLevelCounter = createActionGroup({
-    source: `annotation/ set level counter`,
-    events: {
-      do: props<{
-        levelCounter: number;
         mode: LoginMode;
       }>(),
     },
@@ -188,13 +185,6 @@ export class AnnotationActions {
     },
   });
 
-  static setTranscriptionState = createActionGroup({
-    source: `annotation/ set transcription state`,
-    events: {
-      do: props<TranscriptionState>(),
-    },
-  });
-
   static setCurrentEditor = createActionGroup({
     source: `annotation/ set current editor`,
     events: {
@@ -234,11 +224,20 @@ export class AnnotationActions {
     },
   });
 
-  static initTranscriptionService = createActionGroup({
+  static loadSegments = createActionGroup({
     source: `annotation/ init transcription service`,
     events: {
       do: props<{
         mode: LoginMode;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        transcript: OctraAnnotation<ASRContext, Segment<ASRContext>>;
+        feedback?: FeedBackForm;
+        saveToDB: boolean;
+      }>(),
+      fail: props<{
+        error: string;
       }>(),
     },
   });
@@ -324,13 +323,75 @@ export class AnnotationActions {
   });
 
   static addMultipleASRSegments = createActionGroup({
-    source: 'asr/add multiple segments',
+    source: 'annotation/add multiple segments',
     events: {
       success: props<{
         mode: LoginMode;
         segmentID: number;
-        newSegments: Segment[];
+        newSegments: Segment<ASRContext>[];
       }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static duplicateLevel = createActionGroup({
+    source: 'annotation/duplicate level',
+    events: {
+      do: props<{
+        index: number;
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static changeLevelName = createActionGroup({
+    source: 'annotation/change level name',
+    events: {
+      do: props<{
+        index: number;
+        name: string;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static setLevelIndex = createActionGroup({
+    source: 'annotation/set level index',
+    events: {
+      do: props<{
+        currentLevelIndex: number;
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static changeFeedback = createActionGroup({
+    source: 'annotation/change feedback',
+    events: {
+      do: props<{
+        feedback: any;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static changeCurrentItemById = createActionGroup({
+    source: 'annotation/change current level item by id',
+    events: {
+      do: props<{
+        id: number;
+        item: OItem | OEvent | Segment<ASRContext>;
+        mode: LoginMode;
+      }>(),
+      success: emptyProps(),
       fail: props<{
         error: string;
       }>(),

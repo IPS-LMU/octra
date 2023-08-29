@@ -63,7 +63,6 @@
           <td></td>
           <td colspan="4" style="padding-left: 20px">
             <div
-              *ngIf="navbarServ.transcrService !== undefined"
               class="card"
               style="padding: 10px"
             >
@@ -150,8 +149,7 @@
         <!-- cut audio files -->
         <tr
           *ngIf="
-            navbarServ.transcrService !== undefined &&
-            navbarServ.transcrService.audioManager.resource.info.extension ===
+            audio.audioManager.resource.info.extension ===
               '.wav'
           "
         >
@@ -182,8 +180,7 @@
         </tr>
         <ng-container
           *ngIf="
-            navbarServ.transcrService !== undefined &&
-            navbarServ.transcrService.audioManager.resource.info.extension ===
+            audio.audioManager.resource.info.extension ===
               '.wav'
           "
         >
@@ -195,7 +192,6 @@
             <td></td>
             <td colspan="4" style="padding-left: 20px">
               <div
-                *ngIf="navbarServ.transcrService !== undefined"
                 class="card"
                 style="padding: 10px"
               >
@@ -222,12 +218,11 @@
                   <octra-naming-drag-and-drop
                     #namingConvention
                     [fileName]="
-                      navbarServ.transcrService!.audioManager!.resource!.name
+                      audio.audioManager!.resource!.name
                     "
-                    [firstSegment]="
-                      navbarServ.transcrService!.currentlevel!.segments[0]
-                    "
+                    [firstSegment]="annotationStoreService.currentLevel!.items[0]"
                   ></octra-naming-drag-and-drop>
+
 
                   <div class="form-control">
                     <span

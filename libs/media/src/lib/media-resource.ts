@@ -33,18 +33,26 @@ export class MediaResource {
     return this._size;
   }
 
+  private _url?: string;
+
+  get url(): string | undefined {
+    return this._url;
+  }
+
   /***
    * initializes an MediaResource object
    * @param fullName file name including extension
    * @param sourceType type of media source
    * @param buffer arrayBuffer
    * @param fileSize file size
+   * @param url
    */
   constructor(
     fullName: string,
     sourceType: SourceType,
     buffer?: ArrayBuffer,
-    fileSize?: number
+    fileSize?: number,
+    url?: string
   ) {
     if (
       sourceType !== SourceType.URL &&
@@ -64,6 +72,7 @@ export class MediaResource {
       this._size = fileSize;
       this.source = sourceType;
       this._arraybuffer = buffer;
+      this._url = url;
     }
   }
 }

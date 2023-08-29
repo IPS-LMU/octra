@@ -1,5 +1,6 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
-import { OAnnotJSON, OAudiofile } from '../annotjson';
+import { OAnnotJSON } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class AnnotJSONConverter extends Converter {
   public constructor() {
@@ -30,7 +31,11 @@ export class AnnotJSONConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
-      let result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      let result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
       const content = file.content;
 
       if (content !== '') {

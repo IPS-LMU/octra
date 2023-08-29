@@ -2,13 +2,13 @@
   <fieldset>
     <ng-container
       *ngIf="
-        transcrService.feedback !== undefined && feedbackData !== undefined
+        (annotationStoreService.feedback$ |async) !== undefined && feedbackData !== undefined
       "
     >
       <ng-container *ngIf="!showCommentFieldOnly">
-        <ng-container *ngFor="let group of transcrService.feedback.groups">
+        <ng-container *ngFor="let group of (annotationStoreService.feedback$ | async).groups">
           <span>{{ translate(group.title, langService.getActiveLang()) }}</span>
-          <span *ngIf="group.controls[0].required" class="required_marker">
+          <span *ngIf="group?.controls[0].required" class="required_marker">
             *</span
           ><br />
           <div class="form-group" style="padding-top: 0">
@@ -78,7 +78,7 @@
           'transcription-submit.comment description' | transloco
         }}</label>
         <textarea
-          [(ngModel)]="transcrService.feedback.comment"
+          [(ngModel)]="annotationStoreService.comment"
           class="form-control"
           name="comment"
         ></textarea>

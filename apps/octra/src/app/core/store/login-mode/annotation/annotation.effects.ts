@@ -8,6 +8,7 @@ import {
   catchError,
   exhaustMap,
   forkJoin,
+  interval,
   map,
   of,
   Subscription,
@@ -22,24 +23,26 @@ import { AnnotationActions } from './annotation.actions';
 import {
   AlertService,
   AudioService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../../shared/service';
 import { AppInfo } from '../../../../app.info';
 import {
-  AnnotationLevelType,
   AnnotJSONConverter,
-  getSegmentBySamplePosition,
+  ASRContext,
+  convertFromSupportedConverters,
   IFile,
-  ILink,
   ImportResult,
   ISegment,
   OAnnotJSON,
-  OAudiofile,
-  OIDBLevel,
-  OIDBLink,
-  OLevel,
-  OSegment,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationEventLevel,
+  OctraAnnotationItemLevel,
+  OctraAnnotationLink,
+  OctraAnnotationSegmentLevel,
+  OEventLevel,
+  OLabel,
+  OSegmentLevel,
   PraatTextgridConverter,
   Segment,
 } from '@octra/annotation';
@@ -51,15 +54,14 @@ import {
   TaskInputOutputCreatorType,
   ToolConfigurationAssetDto,
 } from '@octra/api-types';
-import { convertFromOIDLevel, GuidelinesItem } from './index';
-import { NavbarService } from '../../../component/navbar/navbar.service';
+import { AnnotationState, GuidelinesItem } from './index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AuthenticationActions } from '../../authentication';
 import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../../application/application.actions';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { FileInfo } from '@octra/utilities';
+import { FileInfo, getTranscriptFromIO, hasProperty } from '@octra/utilities';
 import {
   createSampleProjectDto,
   createSampleTask,
@@ -68,6 +70,9 @@ import {
 import { checkAndThrowError } from '../../error.handlers';
 import { ASRActions } from '../../asr/asr.actions';
 import { SampleUnit } from '@octra/media';
+import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
+import { DateTime } from 'luxon';
+import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 
 @Injectable()
 export class AnnotationEffects {
@@ -193,7 +198,6 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.startAnnotation.success),
         tap((a) => {
-          this.transcrService.init();
           this.routingService.navigate('start annotation', ['/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
@@ -337,7 +341,7 @@ export class AnnotationEffects {
             ['/intern/transcr/end'],
             AppInfo.queryParamsHandling
           );
-          this.transcrService.endTranscription(true);
+          this.audio.destroy(true);
         })
       ),
     { dispatch: false }
@@ -429,152 +433,105 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
-  initTranscriptionService$ = createEffect(
+  loadSegments$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.loadSegments.do),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        this.initMaintenance(state);
+        if (
+          state.application.mode === LoginMode.URL &&
+          state.application.queryParams!.transcript !== undefined
+        ) {
+          // load transcript file via URL
+          return this.http
+            .get(state.application.queryParams!.transcript, {
+              responseType: 'text',
+            })
+            .pipe(
+              map((content) => {
+                let filename = state.application.queryParams!.transcript;
+                filename = filename.substring(filename.lastIndexOf('/') + 1);
+
+                const file: IFile = {
+                  name: filename,
+                  content,
+                  type: 'text',
+                  encoding: 'utf-8',
+                };
+
+                // convert par to annotJSON
+                const oAudioFile =
+                  this.audio.audioManager.resource.getOAudioFile();
+
+                let importResult: ImportResult | undefined;
+                // find valid converter...
+                for (const converter of AppInfo.converters) {
+                  if (filename.indexOf(converter.extension) > -1) {
+                    // test converter
+                    const tempImportResult = converter.import(file, oAudioFile);
+
+                    if (
+                      tempImportResult !== undefined &&
+                      tempImportResult.error === ''
+                    ) {
+                      importResult = tempImportResult;
+                      break;
+                    } else {
+                      console.error(tempImportResult!.error);
+                    }
+                  }
+                }
+
+                if (
+                  importResult !== undefined &&
+                  !(importResult.annotjson === undefined)
+                ) {
+                  return AnnotationActions.loadSegments.success({
+                    mode: state.application.mode!,
+                    transcript: OctraAnnotation.deserialize(
+                      importResult.annotjson
+                    ),
+                    saveToDB: false,
+                  });
+                } else {
+                  return AnnotationActions.loadSegments.fail({
+                    error: "Can't import transcript",
+                  });
+                }
+              })
+            );
+        } else {
+          if (this.appStorage.useMode === LoginMode.URL) {
+            // overwrite with empty level
+            const newAnnotation = new OctraAnnotation();
+            return of(
+              AnnotationActions.loadSegments.success({
+                mode: state.application.mode!,
+                transcript: newAnnotation,
+                saveToDB: false,
+              })
+            );
+          } else {
+            // it's not URL mode
+            return this.loadSegments(getModeState(state)!, state);
+          }
+        }
+      })
+    )
+  );
+
+  loadSegmentsSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.initTranscriptionService.do),
+        ofType(AnnotationActions.loadSegments.success),
         withLatestFrom(this.store),
-        tap(([a, state]) => {
-          if (
-            state.application.mode === LoginMode.URL &&
-            state.application.queryParams!.transcript !== undefined
-          ) {
-            this.transcrService.defaultFontSize = 16;
-
-            // load transcript file via URL
-            this.http
-              .get(state.application.queryParams!.transcript, {
-                responseType: 'text',
-              })
-              .subscribe({
-                next: (res) => {
-                  let filename = state.application.queryParams!.transcript;
-                  filename = filename.substring(filename.lastIndexOf('/') + 1);
-
-                  const file: IFile = {
-                    name: filename,
-                    content: res,
-                    type: 'text',
-                    encoding: 'utf-8',
-                  };
-
-                  // convert par to annotJSON
-                  const audioRessource = this.audio.audiomanagers[0].resource;
-                  const oAudioFile = new OAudiofile();
-                  oAudioFile.arraybuffer = audioRessource.arraybuffer!;
-                  oAudioFile.duration = audioRessource.info.duration.samples;
-                  oAudioFile.name = audioRessource.info.fullname;
-                  oAudioFile.sampleRate =
-                    audioRessource.info.duration.sampleRate;
-                  oAudioFile.size = audioRessource.size!;
-
-                  let importResult: ImportResult | undefined;
-                  // find valid converter...
-                  for (const converter of AppInfo.converters) {
-                    if (filename.indexOf(converter.extension) > -1) {
-                      // test converter
-                      const tempImportResult = converter.import(
-                        file,
-                        oAudioFile
-                      );
-
-                      if (
-                        tempImportResult !== undefined &&
-                        tempImportResult.error === ''
-                      ) {
-                        importResult = tempImportResult;
-                        break;
-                      } else {
-                        console.error(tempImportResult!.error);
-                      }
-                    }
-                  }
-
-                  if (
-                    importResult !== undefined &&
-                    !(importResult.annotjson === undefined)
-                  ) {
-                    // conversion successfully finished
-                    const newLevels: OIDBLevel[] = [];
-                    const newLinks: OIDBLink[] = [];
-                    for (
-                      let i = 0;
-                      i < importResult.annotjson.levels.length;
-                      i++
-                    ) {
-                      newLevels.push(
-                        new OIDBLevel(
-                          i + 1,
-                          importResult.annotjson.levels[i],
-                          i
-                        )
-                      );
-                    }
-                    for (
-                      let i = 0;
-                      i < importResult.annotjson.links.length;
-                      i++
-                    ) {
-                      newLinks.push(
-                        new OIDBLink(i + 1, importResult.annotjson.links[i])
-                      );
-                    }
-
-                    this.appStorage.overwriteAnnotation(
-                      newLevels,
-                      newLinks,
-                      false
-                    );
-                    this.navbarService.transcrService = this.transcrService;
-                    this.navbarService.uiService = this.uiService;
-
-                    this.routingService.navigate(
-                      'transcript initialized URL',
-                      ['/intern/transcr'],
-                      AppInfo.queryParamsHandling
-                    );
-                  } else {
-                    // TODO reject
-                  }
-                },
-                error: (err) => {
-                  // TODO reject
-                },
-              });
-          } else {
-            if (this.appStorage.useMode === LoginMode.URL) {
-              // overwrite with empty level
-              this.transcrService.defaultFontSize = 16;
-
-              const newLevels: OIDBLevel[] = [];
-              newLevels.push(
-                new OIDBLevel(
-                  1,
-                  new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT),
-                  1
-                )
-              );
-
-              this.appStorage.overwriteAnnotation(newLevels, [], false);
-            } else {
-              // it's not URL mode
-              this.transcrService
-                .load(state)
-                .then(() => {
-                  this.navbarService.transcrService = this.transcrService;
-                  this.navbarService.uiService = this.uiService;
-
-                  this.routingService.navigate(
-                    'transcription initialized',
-                    ['/intern/transcr'],
-                    AppInfo.queryParamsHandling
-                  );
-                })
-                .catch((err) => {
-                  console.error(err);
-                });
-            }
-          }
+        tap(([action, state]) => {
+          this.routingService.navigate(
+            'transcription initialized',
+            ['/intern/transcr'],
+            AppInfo.queryParamsHandling
+          );
         })
       ),
     { dispatch: false }
@@ -587,7 +544,7 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           this.store.dispatch(
-            AnnotationActions.initTranscriptionService.do({
+            AnnotationActions.loadSegments.do({
               mode: state.application.mode!,
             })
           );
@@ -760,50 +717,26 @@ export class AnnotationEffects {
             })
           );
         }
-        // TODO add load online for URL mode and local mode
         return of();
       })
     )
   );
 
-  // TODO add effect if task and project can't not be loaded
-  /*
-                    onLoadOnlineFailed$ = createEffect(() =>
-                      this.actions$.pipe(
-                        ofType(OnlineModeActions.loadOnlineInformationAfterIDBLoaded.fail),
-                        exhaustMap((a) => {
-                          return of(
-                            AuthenticationActions.logout.do({
-                              message: a.error.message,
-                              clearSession: true,
-                              messageType: '',
-                              mode: LoginMode.ONLINE,
-                            })
-                          );
-                        })
-                      )
-                    );
-                   */
-
-  /*
-                    onLocalOrURLModeLogin$ = createEffect(() =>
-                      this.actions$.pipe(
-                        ofType(LocalModeActions.login),
-                        exhaustMap((a) => {
-                          return AnnotationActions.prepareTaskDataForAnnotation.do({
-                            mode: LoginMode.LOCAL,
-                            currentProject: createSampleProjectDto("-1"),
-                            task: createSampleTask("-1", a.files.map((a, i) => ({
-                              id: "" + i,
-                              filename: a.name,
-                              fileType: a.type,
-                              size: a.size
-                            })), [])
-                          });
-                        })
-                      )
-                    );
-                     */
+  onLoadOnlineFailed$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.fail),
+      exhaustMap((a) => {
+        return of(
+          AuthenticationActions.logout.do({
+            message: a.error.message,
+            clearSession: true,
+            messageType: '',
+            mode: LoginMode.ONLINE,
+          })
+        );
+      })
+    )
+  );
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
@@ -835,16 +768,10 @@ export class AnnotationEffects {
           const result = new AnnotJSONConverter().export(
             new OAnnotJSON(
               state.onlineMode.audio.fileName,
+              state.onlineMode.audio.fileName.replace(/\.[^.]+$/g, ''),
               state.onlineMode.audio.sampleRate,
-              state.onlineMode.transcript.levels.map((a) =>
-                convertFromOIDLevel(a, a.id)
-              ),
-              state.onlineMode.transcript.links.map((a) => {
-                return {
-                  fromID: a.link.fromID,
-                  toID: a.link.toID,
-                } as ILink;
-              })
+              state.onlineMode.transcript.levels.map((a) => a.serialize()),
+              state.onlineMode.transcript.links.map((a) => a.link)
             )
           )?.file?.content;
 
@@ -1012,14 +939,9 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([{ item }, state]) => {
         const converter = new PraatTextgridConverter();
-        const audioManager = this.audio.audiomanagers[0];
-        const audiofile = new OAudiofile();
-        const audioInfo = audioManager.resource.info;
-        audiofile.duration = audioInfo.duration.samples;
+        const audioManager = this.audio.audioManager;
+        const audiofile = audioManager.resource.getOAudioFile();
         audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-        audiofile.sampleRate = audioManager.sampleRate;
-        audiofile.size = audioManager.resource.info.size;
-        audiofile.type = audioManager.resource.info.type;
 
         if (item.result) {
           const convertedResult = converter.import(
@@ -1046,10 +968,12 @@ export class AnnotationEffects {
                 item.time.sampleStart + item.time.sampleLength,
                 audioManager.sampleRate
               );
-              let segmentIndex = getSegmentBySamplePosition(
-                this.transcrService.currentlevel?.segments!,
-                segmentBoundary
-              );
+              const segmentIndex =
+                getModeState(
+                  state
+                )!.transcript.getCurrentSegmentIndexBySamplePosition(
+                  segmentBoundary
+                );
 
               if (segmentIndex < 0) {
                 return of(
@@ -1059,9 +983,13 @@ export class AnnotationEffects {
                 );
               } else {
                 const segmentID =
-                  this.transcrService.currentlevel!.segments[segmentIndex].id;
+                  getModeState(state)!.transcript.levels[segmentIndex].items[
+                    segmentIndex
+                  ].id;
                 const newSegments: Segment[] = [];
 
+                let itemCounter =
+                  getModeState(state)?.transcript.idCounters.item ?? 1;
                 for (const wordItem of wordsTier.items as ISegment[]) {
                   const itemEnd =
                     item.time.sampleStart + item.time.sampleLength;
@@ -1071,31 +999,31 @@ export class AnnotationEffects {
                       wordItem.sampleDur <=
                     itemEnd
                   ) {
-                    const readSegment = Segment.fromObj(
-                      this.transcrService.currentlevel!.name,
-                      new OSegment(
-                        1,
-                        wordItem.sampleStart,
-                        wordItem.sampleDur,
-                        wordItem.labels
+                    const readSegment = new Segment(
+                      itemCounter++,
+                      new SampleUnit(
+                        item.time.sampleStart +
+                          wordItem.sampleStart +
+                          wordItem.sampleDur,
+                        this.audio.audioManager.resource.info.sampleRate
                       ),
-                      audioManager.sampleRate
-                    )!;
+                      wordItem.labels.map((a) => OLabel.deserialize(a))
+                    );
 
-                    if (
-                      readSegment.value === '<p:>' ||
-                      readSegment.value === ''
-                    ) {
-                      readSegment.value = this.transcrService.breakMarker.code;
+                    const labelIndex = readSegment.labels.findIndex(
+                      (a) => a.value === '<p:>' || a.value === ''
+                    );
+
+                    if (labelIndex > -1) {
+                      readSegment.labels[labelIndex].value =
+                        getModeState(
+                          state
+                        )!.guidelines?.selected?.json.markers.find(
+                          (a) => a.type === 'break'
+                        )?.code ?? '';
                     }
 
-                    const origTime = new SampleUnit(
-                      item.time.sampleStart + readSegment.time.samples,
-                      audioManager.sampleRate
-                    );
-                    newSegments.push(
-                      new Segment(origTime, '', readSegment.value)
-                    );
+                    newSegments.push(readSegment);
                     // the last segment is the original segment
                   } else {
                     // tslint:disable-next-line:max-line-length
@@ -1187,20 +1115,265 @@ export class AnnotationEffects {
       });
   }
 
+  private loadSegments(modeState: AnnotationState, rootState: RootState) {
+    let feedback: FeedBackForm | undefined = undefined;
+
+    if (
+      modeState.transcript.levels === undefined ||
+      modeState.transcript.levels.length === 0
+    ) {
+      let newAnnotation = new OctraAnnotation();
+
+      if (
+        rootState.application.mode === LoginMode.ONLINE ||
+        rootState.application.mode === LoginMode.URL
+      ) {
+        let annotResult: ImportResult | undefined;
+        const task: TaskDto | undefined = modeState.currentSession?.task;
+
+        // import logs
+        this.store.dispatch(
+          AnnotationActions.saveLogs.do({
+            logs: task?.log ?? [],
+            mode: rootState.application.mode,
+          })
+        );
+
+        const serverTranscript = task
+          ? getTranscriptFromIO(task.outputs) ??
+            getTranscriptFromIO(task.inputs)
+          : '';
+
+        if (serverTranscript) {
+          // check if it's AnnotJSON
+          annotResult = convertFromSupportedConverters(
+            AppInfo.converters,
+            {
+              name: `${this.audio.audioManager.resource.info.name}_annot.json`,
+              content: serverTranscript.content,
+              type: serverTranscript.fileType!,
+              encoding: 'utf-8',
+            },
+            this.audio.audioManager.resource.getOAudioFile()
+          );
+
+          // import servertranscript
+          if (annotResult && annotResult.annotjson) {
+            newAnnotation = OctraAnnotation.deserialize(annotResult.annotjson);
+          }
+        }
+
+        if (!annotResult) {
+          // no transcript found
+          if (task) {
+            const textInput = getTranscriptFromIO(task.inputs);
+            if (textInput) {
+              // prompt text available and server transcript is undefined
+              // set prompt as new transcript
+
+              // check if prompttext ist a transcription format like AnnotJSON
+              const converted: ImportResult | undefined =
+                convertFromSupportedConverters(
+                  AppInfo.converters,
+                  {
+                    name: this.audio.audioManager.resource.name,
+                    content: textInput.content,
+                    type: 'text',
+                    encoding: 'utf8',
+                  },
+                  this.audio.audioManager.resource.getOAudioFile()
+                );
+
+              if (converted === undefined) {
+                // prompttext is raw text
+                newAnnotation.levels[0].items[0].labels[0] = new OLabel(
+                  'OCTRA_1',
+                  textInput.content
+                );
+              } else if (converted.annotjson) {
+                // use imported annotJSON
+                newAnnotation = OctraAnnotation.deserialize(
+                  converted.annotjson
+                );
+              }
+            }
+          }
+        }
+
+        return of(
+          AnnotationActions.loadSegments.success({
+            mode: rootState.application.mode,
+            transcript: newAnnotation,
+            feedback,
+            saveToDB: true,
+          })
+        );
+      } else {
+        const projectSettings =
+          getModeState(rootState)!.currentSession.task!.tool_configuration!
+            .value;
+        if (projectSettings) {
+          feedback = FeedBackForm.fromAny(
+            projectSettings.feedback_form,
+            modeState.currentSession.comment ?? ''
+          );
+        }
+        if (feedback) {
+          feedback?.importData(feedback);
+
+          if (modeState.currentSession.comment !== undefined) {
+            feedback.comment = modeState.currentSession.comment;
+          }
+        }
+
+        if (this.appStorage.logs === undefined) {
+          this.appStorage.clearLoggingDataPermanently();
+          this.uiService.elements = [];
+        } else if (Array.isArray(this.appStorage.logs)) {
+          this.uiService.fromAnyArray(this.appStorage.logs);
+        }
+
+        this.uiService.addElementFromEvent(
+          'octra',
+          { value: AppInfo.version },
+          Date.now(),
+          undefined,
+          -1,
+          undefined,
+          undefined,
+          'version'
+        );
+      }
+    }
+    return of(
+      AnnotationActions.loadSegments.success({
+        mode: rootState.application.mode!,
+        feedback,
+        transcript: modeState.transcript,
+        saveToDB: false,
+      })
+    );
+  }
+
+  private createNewAnnotation: () => {
+    levels: OctraAnnotationAnyLevel<Segment<ASRContext>>[];
+    links: OctraAnnotationLink[];
+  } = () => ({
+    levels: [
+      new OctraAnnotationSegmentLevel(1, 'OCTRA_1', [
+        new Segment(
+          1,
+          new SampleUnit(
+            this.audio.audioManager.resource.info.duration.samples,
+            this.audio.audioManager.resource.info.sampleRate
+          ),
+          [new OLabel('OCTRA_1', '')]
+        ),
+      ]),
+    ],
+    links: [],
+  });
+
+  private convertAnnotJSONToStateObject: (annotJSON: OAnnotJSON) => {
+    levels: OctraAnnotationAnyLevel<Segment<ASRContext>>[];
+    links: OctraAnnotationLink[];
+  } = (annotJSON: OAnnotJSON) => ({
+    levels: annotJSON.levels.map((a, i) => {
+      if (a instanceof OSegmentLevel) {
+        return new OctraAnnotationSegmentLevel(
+          i + 1,
+          a.name,
+          a.items.map((b) =>
+            Segment.deserializeFromOSegment(
+              b,
+              this.audio.audioManager.resource.info.sampleRate
+            )
+          )
+        );
+      } else if (a instanceof OEventLevel) {
+        return new OctraAnnotationEventLevel(i + 1, a.name, a.items);
+      }
+      return new OctraAnnotationItemLevel(i + 1, a.name, a.items);
+    }),
+    links: annotJSON.links.map((b, i) => new OctraAnnotationLink(i + 1, b)),
+  });
+
+  public initMaintenance(state: RootState) {
+    if (
+      state.application.appConfiguration !== undefined &&
+      hasProperty(
+        state.application.appConfiguration.octra,
+        'maintenanceNotification'
+      ) &&
+      state.application.appConfiguration.octra.maintenanceNotification
+        .active === 'active'
+    ) {
+      const maintenanceAPI = new MaintenanceAPI(
+        state.application.appConfiguration.octra.maintenanceNotification.apiURL,
+        this.http
+      );
+
+      maintenanceAPI
+        .readMaintenanceNotifications(24)
+        .then((notification) => {
+          // only check in interval if there is a pending maintenance in the next 24 hours
+          if (notification !== undefined) {
+            const readNotification = () => {
+              // notify after 15 minutes one hour before the maintenance begins
+              maintenanceAPI
+                .readMaintenanceNotifications(1)
+                .then((notification2) => {
+                  if (notification2 !== undefined) {
+                    this.alertService.showAlert(
+                      'warning',
+                      '⚠️ ' +
+                        this.transloco.translate('maintenance.in app', {
+                          start: DateTime.fromISO(notification.begin)
+                            .setLocale(this.appStorage.language)
+                            .toLocaleString(DateTime.DATETIME_SHORT),
+                          end: DateTime.fromISO(notification.end)
+                            .setLocale(this.appStorage.language)
+                            .toLocaleString(DateTime.DATETIME_SHORT),
+                        }),
+                      true,
+                      60
+                    );
+                  }
+                })
+                .catch(() => {
+                  // ignore
+                });
+            };
+
+            if (this.maintenanceChecker !== undefined) {
+              this.maintenanceChecker.unsubscribe();
+            }
+
+            // run each 15 minutes
+            this.maintenanceChecker = interval(15 * 60000).subscribe(
+              readNotification
+            );
+          }
+        })
+        .catch(() => {
+          // ignore
+        });
+    }
+  }
+
+  private maintenanceChecker?: Subscription;
+
   constructor(
     private actions$: Actions,
     private store: Store<RootState>,
     private apiService: OctraAPIService,
-    // private settingsService: AppSettingsService,
     private http: HttpClient,
     private alertService: AlertService,
-    private transloco: TranslocoService,
     private routingService: RoutingService,
     private modalsService: OctraModalService,
     private audio: AudioService,
-    private transcrService: TranscriptionService,
-    private navbarService: NavbarService,
     private uiService: UserInteractionsService,
-    private appStorage: AppStorageService
+    private appStorage: AppStorageService,
+    private transloco: TranslocoService
   ) {}
 }

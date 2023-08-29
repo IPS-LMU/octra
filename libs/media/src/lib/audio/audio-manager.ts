@@ -1,7 +1,7 @@
 import { EventEmitter } from '@angular/core';
 import { AudioDecoder } from './audio-decoder';
 import { AudioInfo } from './audio-info';
-import { AudioRessource } from './audio-ressource';
+import { AudioResource } from './audio-resource';
 import { AudioFormat, WavFormat } from './AudioFormats';
 import { SubscriptionManager } from '@octra/utilities';
 import { SampleUnit } from './audio-time';
@@ -27,8 +27,8 @@ export class AudioManager {
   }>();
 
   // events
-  public afterDecoded: EventEmitter<AudioRessource> =
-    new EventEmitter<AudioRessource>();
+  public afterDecoded: EventEmitter<AudioResource> =
+    new EventEmitter<AudioResource>();
   public afterLoaded: EventEmitter<any> = new EventEmitter<any>();
   public statechange: EventEmitter<PlayBackStatus> =
     new EventEmitter<PlayBackStatus>();
@@ -46,7 +46,7 @@ export class AudioManager {
     return this._state === PlayBackStatus.PLAYING;
   }
 
-  get resource(): AudioRessource {
+  get resource(): AudioResource {
     return this._resource;
   }
 
@@ -95,7 +95,7 @@ export class AudioManager {
   private _source?: AudioBufferSourceNode | MediaElementAudioSourceNode;
   private chunks: AudioChunk[] = [];
 
-  private _resource!: AudioRessource;
+  private _resource!: AudioResource;
   private _state!: PlayBackStatus;
   private _mainchunk!: AudioChunk;
   private _playPosition!: SampleUnit;
@@ -166,12 +166,14 @@ export class AudioManager {
    * @param type
    * @param buffer
    * @param audioFormats
+   * @param url
    */
   public static decodeAudio = (
     filename: string,
     type: string,
     buffer: ArrayBuffer,
-    audioFormats: AudioFormat[]
+    audioFormats: AudioFormat[],
+    url?: string
   ): Subject<{
     audioManager?: AudioManager;
     decodeProgress: number;
@@ -221,12 +223,13 @@ export class AudioManager {
 
         audioinfo.file = new File([buffer], filename, { type: 'audio/wav' });
         result.setRessource(
-          new AudioRessource(
+          new AudioResource(
             filename,
             SourceType.ArrayBuffer,
             audioinfo,
             buffer,
-            bufferLength
+            bufferLength,
+            url
           )
         );
 
@@ -469,7 +472,7 @@ export class AudioManager {
    * sets the ressource. Can be set only once.
    * @param ressource the audio ressource
    */
-  public setRessource(ressource: AudioRessource) {
+  public setRessource(ressource: AudioResource) {
     if (this._resource === undefined) {
       this._resource = ressource;
     }

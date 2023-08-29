@@ -16,7 +16,7 @@
       class="col-12 col-sm-9"
       style="text-align: left; padding-left: 20px"
     >
-      {{ navbarServ.ressource!.info!.fullname }}:
+      {{ audio.audioManager.resource.info!.fullname }}:
       <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
     </div>
     <div
@@ -83,7 +83,8 @@
       <fieldset class="w-100">
         <div class="form-group" style="padding-top: 0">
           <textarea
-            [(ngModel)]="comment"
+            [ngModel]="annotationStoreService.comment"
+            (ngModelChange)="annotationStoreService.changeComment($event)"
             class="w-100"
             name="comment"
             placeholder="{{ 'g.insert comment' | transloco }}"
@@ -99,7 +100,6 @@
         *ngIf="
           selectedTheme === 'shortAudioFiles' &&
             (useMode === 'online' || useMode === 'demo');
-          else defaultBottom2
         "
       >
         <button
@@ -139,50 +139,6 @@
         </button>
       </ng-container>
     </div>
-
-    <ng-template #defaultBottom2>
-      <ng-container
-        *ngIf="
-          selectedTheme === 'korbinian' &&
-            (useMode === 'online' || useMode === 'demo');
-          else defaultBottom
-        "
-      >
-        <button
-          (click)="abortTranscription()"
-          class="btn btn-secondary btn-raised col-md-4"
-        >
-          <i class="bi bi-x-circle"></i>
-          <span>
-            {{ 'g.quit' | transloco }}
-          </span>
-        </button>
-        <button
-          (click)="sendTranscriptionForKorbinian('NO')"
-          class="btn btn-raised btn-info col-md-2"
-        >
-          NO
-        </button>
-        <button
-          (click)="sendTranscriptionForKorbinian('VE')"
-          class="btn btn-raised btn-danger col-md-2"
-        >
-          VE
-        </button>
-        <button
-          (click)="sendTranscriptionForKorbinian('EE')"
-          class="btn btn-raised btn-secondary col-md-2"
-        >
-          EE
-        </button>
-        <button
-          (click)="sendTranscriptionForKorbinian('AN')"
-          class="btn btn-raised btn-primary col-md-2"
-        >
-          AN
-        </button>
-      </ng-container>
-    </ng-template>
 
     <ng-template #defaultBottom>
       <button

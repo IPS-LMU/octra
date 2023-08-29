@@ -5,9 +5,9 @@ import { AppInfo } from './app.info';
 import { NavigationComponent } from './core/component';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
-import { Store } from '@ngrx/store';
 import { DefaultComponent } from './core/component/default.component';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
+import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-app',
@@ -36,7 +36,7 @@ export class AppComponent
     private route: ActivatedRoute,
     private multiThreading: MultiThreadingService,
     private appStoreService: ApplicationStoreService,
-    private store: Store
+    private annotationStoreService: AnnotationStoreService
   ) {
     super();
 
@@ -57,24 +57,6 @@ export class AppComponent
   }
 
   ngOnInit() {
-    /* TODO implement
-    this.subscrManager.add(
-      this.store
-        .select(fromApplication.selectIDBLoaded as any)
-        .subscribe(() => {
-          if (
-            this.appStorage.asrSelectedService !== undefined &&
-            this.appStorage.asrSelectedLanguage !== undefined
-          ) {
-            this.navigation?.changeSecondsPerLine(
-              this.appStorage.secondsPerLine
-            );
-          }
-        })
-    );
-
-     */
-
     this.route.fragment.subscribe((fragment) => {
       switch (fragment) {
         case 'feedback':
@@ -87,6 +69,8 @@ export class AppComponent
   override ngOnDestroy() {
     super.ngOnDestroy();
     this.multiThreading.destroy();
+    this.annotationStoreService.destroy();
+    this.appStoreService.destroy();
   }
 
   queryParamsSet(): boolean {

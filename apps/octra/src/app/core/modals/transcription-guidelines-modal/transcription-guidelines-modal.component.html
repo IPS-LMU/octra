@@ -2,7 +2,7 @@
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
       {{ 'g.guidelines' | transloco
-      }}<span class="version"> v {{ guidelines.meta.version }}</span>
+      }}<span class="version"> v {{ guidelines?.meta?.version }}</span>
     </h5>
     <button
       type="button"
@@ -16,7 +16,7 @@
       <div class="col-md-7">
         <h3 style="display: inline">
           {{ 'g.guidelines' | transloco
-          }}<span class="version"> v {{ guidelines.meta.version }} </span>
+          }}<span class="version"> v {{ guidelines?.meta?.version }} </span>
         </h3>
         <button
           (click)="exportPDF()"
@@ -41,10 +41,10 @@
           </a>
         </ng-template>
         <span class="project">
-          {{ 'g.project' | transloco }}: {{ guidelines.meta.project }}
+          {{ 'g.project' | transloco }}: {{ guidelines?.meta?.project }}
         </span>
         <span class="authors">
-          {{ 'g.authors' | transloco }}: {{ guidelines.meta.authors }}
+          {{ 'g.authors' | transloco }}: {{ guidelines?.meta?.authors }}
         </span>
       </div>
       <div class="col-md-5">

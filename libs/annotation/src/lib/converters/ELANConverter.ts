@@ -1,14 +1,8 @@
 import * as X2JS from 'x2js';
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
-import {
-  AnnotationLevelType,
-  OAnnotJSON,
-  OAudiofile,
-  OLabel,
-  OLevel,
-  OSegment,
-} from '../annotjson';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { DateTime } from 'luxon';
+import { OAudiofile } from '@octra/media';
 
 export class ELANConverter extends Converter {
   public constructor() {
@@ -91,9 +85,9 @@ export class ELANConverter extends Converter {
           });
 
           // read annotation
-          for (const segment of level.items) {
+          for (const segment of level.items as OSegment[]) {
             const miliseconds = Math.round(
-              ((segment.sampleStart! + segment.sampleDur!) /
+              ((segment.sampleStart + segment.sampleDur) /
                 annotation.sampleRate) *
                 1000
             );
@@ -141,7 +135,11 @@ export class ELANConverter extends Converter {
       error: '',
     };
 
-    result.annotjson = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+    result.annotjson = new OAnnotJSON(
+      audiofile.name,
+      file.name,
+      audiofile.sampleRate
+    );
 
     const x2js = new X2JS();
     const jsonXML = x2js.xml2js<ELAN30Object>(file.content);
@@ -154,10 +152,8 @@ export class ELANConverter extends Converter {
       if (timeUnit !== undefined && timeUnit === 'milliseconds') {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
-          const level = new OLevel(
-            tier._TIER_ID,
-            AnnotationLevelType.SEGMENT,
-            []
+          const level: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
+            tier._TIER_ID
           );
           const readTier = (annotationElement: any) => {
             const t1 = this.getSamplesFromTimeSlot(
@@ -176,7 +172,7 @@ export class ELANConverter extends Converter {
             } else {
               if (t1 > lastSample) {
                 // empty segment space before
-                level.items.push(
+                (level.items as OSegment[]).push(
                   new OSegment(counter++, lastSample, t1 - lastSample, [
                     new OLabel(tier._TIER_ID, ''),
                   ])
@@ -184,7 +180,7 @@ export class ELANConverter extends Converter {
               }
 
               // correct segment
-              level.items.push(
+              (level.items as OSegment[]).push(
                 new OSegment(counter++, t1, t2 - t1, [
                   new OLabel(
                     tier._TIER_ID,

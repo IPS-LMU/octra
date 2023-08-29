@@ -8,13 +8,13 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnInit,
   Output,
   Renderer2,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
-import { TranscriptionService } from '../../shared/service';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {
@@ -38,7 +38,11 @@ import { DefaultComponent } from '../default.component';
 import { Config } from 'jodit/types/config';
 import { IControlType } from 'jodit/src/types';
 import { IJodit, IToolbarButton } from 'jodit/types/types';
-import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
+import { Segment } from '@octra/annotation';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraGuidelines } from '@octra/assets';
+import { AsrStoreService } from '../../store/asr/asr-store-service.service';
+import { ASRProcessStatus, ASRStateQueue } from '../../store/asr';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -53,7 +57,7 @@ declare let document: any;
 })
 export class TranscrEditorComponent
   extends DefaultComponent
-  implements OnChanges, AfterViewInit
+  implements OnChanges, AfterViewInit, OnInit
 {
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
@@ -83,9 +87,10 @@ export class TranscrEditorComponent
   public focused = false;
 
   public joditOptions: Partial<Config> = {};
+  private guidelines?: OctraGuidelines;
 
   private joditDefaultOptions: Partial<Config> = {
-    statusbar: false
+    statusbar: false,
   };
 
   public asr = {
@@ -151,8 +156,9 @@ export class TranscrEditorComponent
   constructor(
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
-    private transcrService: TranscriptionService,
-    private renderer: Renderer2
+    private annotationStoreService: AnnotationStoreService,
+    private renderer: Renderer2,
+    private asrStoreService: AsrStoreService
   ) {
     super();
     this.shortcutsManager = new ShortcutManager();
@@ -472,7 +478,7 @@ export class TranscrEditorComponent
             this.focused = false;
           },
           mouseup: () => {
-            // TODO this.selectionchanged.emit(this.caretpos);
+            this.selectionchanged.emit(this.caretpos);
           },
           afterInit: this.onAfterInit,
         },
@@ -518,16 +524,10 @@ export class TranscrEditorComponent
       this.asr.error = '';
       this.asr.result = '';
 
-      /* TODO implement
-      const item = this.asrService.queue.getItemByTime(
-        this.audiochunk.time.start.samples,
-        this.audiochunk.time.duration.samples
-      );
-
-
-      this.onASRItemChange(item as any);
-
-       */
+      this.asrStoreService.stopItemProcessing({
+        sampleStart: this.audiochunk.time.start.samples,
+        sampleLength: this.audiochunk.time.duration.samples,
+      });
 
       this.size.height = this.transcrEditor.nativeElement.offsetHeight;
       this.size.width = this.transcrEditor.nativeElement.offsetWidth;
@@ -538,16 +538,18 @@ export class TranscrEditorComponent
     }
   };
 
-  onASRItemChange(item: any) {
-    /* TODO implement
-    if (item !== undefined) {
-      if (
-        item.time.sampleStart === (this.audiochunk as any).time.start.samples &&
-        item.time.sampleLength === this.audiochunk!.time.duration.samples
-      ) {
+  onASRQueueChange(queue?: ASRStateQueue) {
+    if (queue !== undefined) {
+      const item = queue.items.find(
+        (a) =>
+          a.time.sampleStart === (this.audiochunk as any).time.start.samples &&
+          a.time.sampleLength === this.audiochunk!.time.duration.samples
+      );
+
+      if (item) {
         if (item.status === ASRProcessStatus.FINISHED) {
           this.asr.status = 'finished';
-          this.asr.result = item.result;
+          this.asr.result = item.result ?? '';
         } else if (item.status === ASRProcessStatus.FAILED) {
           this.asr.status = 'failed';
           this.asr.error = this.asr.result;
@@ -562,11 +564,6 @@ export class TranscrEditorComponent
         }
       }
     }
-
-     */
-
-    this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   /**
@@ -653,19 +650,24 @@ export class TranscrEditorComponent
     }
     this.initialize();
 
-    /* TODO implement
     this.subscrManager.add(
-      this.asrService.queue.itemChange.subscribe(
-        (item: ASRQueueItem) => {
-          this.onASRItemChange(item);
-        },
-        (error) => {
+      this.asrStoreService.queue$.subscribe({
+        next: this.onASRQueueChange,
+        error: (error) => {
           console.error(error);
-        }
-      )
+        },
+      })
     );
+  }
 
-     */
+  ngOnInit() {
+    this.subscrManager.add(
+      this.annotationStoreService.guidelines$.subscribe({
+        next: (guidelines) => {
+          this.guidelines = guidelines?.selected?.json;
+        },
+      })
+    );
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -674,7 +676,7 @@ export class TranscrEditorComponent
       Object.keys(obj).includes('markers') &&
       obj['markers'].currentValue !== obj['markers'].previousValue
     ) {
-      console.log("markers changed")
+      console.log('markers changed');
       if (obj['markers'].currentValue === undefined) {
         this.markers = [];
       }
@@ -685,7 +687,7 @@ export class TranscrEditorComponent
       obj['easymode'].previousValue !== obj['easymode'].currentValue &&
       !obj['easymode'].firstChange
     ) {
-      console.log("easy mode changed")
+      console.log('easy mode changed');
       renew = true;
     }
     if (
@@ -713,7 +715,7 @@ export class TranscrEditorComponent
     }
 
     if (renew) {
-      console.log("RENEW TRANSCR EDITOR");
+      console.log('RENEW TRANSCR EDITOR');
       this.initialize();
       this.initPopover();
     }
@@ -759,7 +761,7 @@ export class TranscrEditorComponent
         active: false,
       },
       getContent: (a, b, c) => {
-        if(!this.initialized) {
+        if (!this.initialized) {
           const button = document.createElement('span');
           button.style.display = 'flex';
           button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
@@ -1097,11 +1099,11 @@ export class TranscrEditorComponent
             code = insertString(code, this._textSelection.start, startMarker);
           }
 
-          code = this.transcrService.underlineTextRed(
+          code = this.annotationStoreService.underlineTextRed(
             code,
-            this.transcrService.validate(code)
+            this.annotationStoreService.validate(code)
           );
-          code = this.transcrService.rawToHTML(code);
+          code = this.annotationStoreService.rawToHTML(code);
 
           if (!focusAtEnd) {
             code = code.replace(
@@ -1158,28 +1160,14 @@ export class TranscrEditorComponent
   }
 
   public onASROverlayClick() {
-    /* TODO implement
-    if (this.asrService.selectedLanguage !== undefined) {
-      const item = this.asrService.queue.getItemByTime(
-        this.audiochunk!.time.start.samples,
-        this.audiochunk!.time.duration.samples
-      );
-      if (item !== undefined) {
-        this.asrService.stopASROfItem(item);
-        const segIndex =
-          this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-            this.audioManager.createSampleUnit(item.time.sampleStart + 1)
-          );
-        const segment =
-          this.transcrService.currentlevel!.segments[segIndex];
-        segment!.isBlockedBy = undefined;
-        this.transcrService.currentlevel!.segments.change(segIndex, segment!);
-      }
+    if (this.asrStoreService.asrOptions?.selectedLanguage !== undefined) {
+      this.asrStoreService.stopItemProcessing({
+        sampleStart: this.audiochunk!.time.start.samples,
+        sampleLength: this.audiochunk!.time.duration.samples,
+      });
     } else {
       console.error(`could not stop ASR because segment number was not found.`);
     }
-
-     */
   }
 
   public startRecurringHighlight() {
@@ -1216,7 +1204,7 @@ export class TranscrEditorComponent
 
   public highlightCurrentSegment(playPosition: SampleUnit) {
     // TODO change algorithm
-    if (!this.transcrService.currentlevel || !this.wysiwyg) {
+    if (!this.annotationStoreService.currentLevel || !this.wysiwyg) {
       return;
     }
     if (playPosition.samples === 0) {
@@ -1224,10 +1212,9 @@ export class TranscrEditorComponent
     }
 
     const segIndexPlayposition =
-      getSegmentBySamplePosition(
-        this.segments!,
+      this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
         playPosition
-      );
+      ) ?? -1;
 
     if (
       segIndexPlayposition > -1 &&
@@ -1235,7 +1222,7 @@ export class TranscrEditorComponent
     ) {
       this.saveSelection();
       const currentlyPlayedSegment =
-        this.transcrService.currentlevel.segments[segIndexPlayposition]!;
+        this.annotationStoreService.currentLevel.items[segIndexPlayposition]! as Segment;
 
       this.removeHighlight();
 
@@ -1401,7 +1388,7 @@ export class TranscrEditorComponent
       // set cursor at the end after focus
       this.init = 0;
 
-      this.joditComponent.jodit.value = this.transcrService.rawToHTML(rawText);
+      this.joditComponent.jodit.value = this.annotationStoreService.rawToHTML(rawText);
       this.validate();
       this.initPopover();
 
@@ -1418,7 +1405,7 @@ export class TranscrEditorComponent
 
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
-      result += seg!.value;
+      result += seg!.getFirstLabelWithoutName('Speaker')?.value;
 
       if (i < segments.length - 1) {
         result += `{${segments[i]!.time.samples}}`;
@@ -1459,7 +1446,7 @@ export class TranscrEditorComponent
    * tidy up the raw text, remove white spaces etc.
    */
   private tidyUpRaw(raw: string): string {
-    return tidyUpAnnotation(raw, this.transcrService.guidelines);
+    return tidyUpAnnotation(raw, this.guidelines);
   }
 
   private onSegmentBoundaryOver = (event: MouseEvent) => {
@@ -1550,8 +1537,7 @@ export class TranscrEditorComponent
     const errorCode = getAttr(target, 'data-errorcode');
 
     if (errorCode !== undefined) {
-      const errorDetails = this.transcrService.getErrorDetails(errorCode);
-
+      const errorDetails = this.annotationStoreService.getErrorDetails(errorCode);
       if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
@@ -1686,7 +1672,7 @@ export class TranscrEditorComponent
       .replace(new RegExp(/\[\|/, 'g'), '{')
       .replace(new RegExp(/\|]/, 'g'), '}');
     html = unEscapeHtml(html);
-    html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
+    html = '<span>' + this.annotationStoreService.rawToHTML(html) + '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
     const htmlObj = document.createElement('span');
     htmlObj.innerHTML = html;
@@ -1743,8 +1729,11 @@ export class TranscrEditorComponent
       this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild);
     } else {
       this.joditComponent?.jodit?.selection.focus();
-      element.innerHTML = element.innerHTML.replace(/(<p>).*(<span[^>]+>[^<]+<\/span>)/g, "$1$2");
-      element.innerHTML = element.innerHTML.replace(/(<br\/?>)/g, "");
+      element.innerHTML = element.innerHTML.replace(
+        /(<p>).*(<span[^>]+>[^<]+<\/span>)/g,
+        '$1$2'
+      );
+      element.innerHTML = element.innerHTML.replace(/(<br\/?>)/g, '');
     }
   }
 }

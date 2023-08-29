@@ -2,14 +2,15 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppInfo } from '../../../app.info';
 import { ASRLanguage, ASRSettings } from '../../obj/Settings';
-import { AlertService, TranscriptionService } from '../../shared/service';
+import { AlertService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AudioChunk } from '@octra/media';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { ASRQueueItemType } from '../../store/asr';
-import { getSegmentBySamplePosition } from '@octra/annotation';
+import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-asr-options',
@@ -37,7 +38,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   constructor(
     public appStorage: AppStorageService,
     public asrStoreService: AsrStoreService,
-    private transcrService: TranscriptionService,
+    private annotationStoreService: AnnotationStoreService,
     private alertService: AlertService,
     private langService: TranslocoService
   ) {
@@ -64,8 +65,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   }
 
   startASRForThisSegment() {
-    /* TODO implement
-    if (this.asrService.selectedLanguage !== undefined) {
+    if (this.asrStoreService.asrOptions?.selectedLanguage !== undefined) {
       if (this.audioChunk!.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
         this.alertService
@@ -77,65 +77,77 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
             console.error(error);
           });
       } else {
-        const time = this.audioChunk!.time.start.add(
-          this.audioChunk!.time.duration
-        );
-        const segNumber =
-          this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-            time
+        if (
+          this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+        ) {
+          const time = this.audioChunk!.time.start.add(
+            this.audioChunk!.time.duration
           );
-
-        if (segNumber > -1) {
-          const segment =
-            this.transcrService.currentlevel!.segments[segNumber];
-
-          if (segment !== undefined) {
-            segment.isBlockedBy = ASRQueueItemType.ASR;
-
-            this.asrService.addToQueue(
-              {
-                sampleStart: this.audioChunk!.time.start.samples,
-                sampleLength: this.audioChunk!.time.duration.samples,
-              },
-              ASRQueueItemType.ASR
+          const segNumber =
+            this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
+              time
             );
-            this.asrService.startASR();
+
+          if (segNumber > -1) {
+            const segment = this.annotationStoreService.currentLevel!.items[
+              segNumber
+            ] as Segment;
+
+            if (segment !== undefined) {
+              this.asrStoreService.addToQueue(
+                {
+                  sampleStart: this.audioChunk!.time.start.samples,
+                  sampleLength: this.audioChunk!.time.duration.samples,
+                },
+                ASRQueueItemType.ASR
+              );
+              this.asrStoreService.startProcessing();
+            } else {
+              console.error(`could not find segment for doing ASR.`);
+            }
           } else {
-            console.error(`could not find segment for doing ASR.`);
+            console.error(
+              `could not start ASR because segment number was not found.`
+            );
           }
-        } else {
-          console.error(
-            `could not start ASR because segment number was not found.`
-          );
         }
       }
     }
-     */
   }
 
   startASRForAllSegmentsNext() {
-    const segNumber = getSegmentBySamplePosition(
-      this.transcrService!.currentlevel!.segments,
-      this.audioChunk!.time.start.add(this.audioChunk!.time.duration)
-    );
+    const segNumber =
+      this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
+        this.audioChunk!.time.start.add(this.audioChunk!.time.duration)
+      );
 
-    if (segNumber > -1) {
+    if (
+      segNumber > -1 &&
+      this.annotationStoreService.transcript?.currentLevel &&
+      this.annotationStoreService.transcript?.currentLevel instanceof
+        OctraAnnotationSegmentLevel
+    ) {
       for (
         let i = segNumber;
-        i < this.transcrService!.currentlevel!.segments.length;
+        i < this.annotationStoreService.transcript.currentLevel.items.length;
         i++
       ) {
-        const segment = this.transcrService!.currentlevel!.segments[i];
+        const segment =
+          this.annotationStoreService.transcript.currentLevel.items[i];
 
         if (segment !== undefined) {
           const sampleStart =
             i > 0
-              ? this.transcrService!.currentlevel!.segments[i - 1]!.time.samples
+              ? this.annotationStoreService.transcript.currentLevel.items[
+                  i - 1
+                ]!.time.samples
               : 0;
           const sampleLength = segment.time.samples - sampleStart;
 
           if (
-            sampleLength / this.transcrService.audioManager.sampleRate >
+            sampleLength /
+              this.audioChunk?.audioManager!.resource!.info!.sampleRate! >
             600
           ) {
             this.alertService
@@ -146,23 +158,28 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
               .catch((error) => {
                 console.error(error);
               });
-            segment.isBlockedBy = undefined;
+            this.asrStoreService.stopItemProcessing({
+              sampleStart,
+              sampleLength,
+            });
           } else {
             if (
-              segment.value.trim() === '' &&
-              segment.value.indexOf(this.transcrService.breakMarker.code) < 0
+              segment.getFirstLabelWithoutName('Speaker')?.value &&
+              segment.getFirstLabelWithoutName('Speaker')!.value.trim() ===
+                '' &&
+              this.annotationStoreService.breakMarker?.code !== undefined &&
+              segment
+                .getFirstLabelWithoutName('Speaker')!
+                .value.indexOf(this.annotationStoreService.breakMarker.code) < 0
             ) {
               // segment is empty and contains not a break
-              segment.isBlockedBy = ASRQueueItemType.ASR;
-              /* TODO implement
-              this.asrService.addToQueue(
+              this.asrStoreService.addToQueue(
                 {
                   sampleStart,
                   sampleLength,
                 },
                 ASRQueueItemType.ASR
               );
-               */
             }
           }
         } else {
@@ -180,50 +197,30 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   }
 
   stopASRForAll() {
-    // TODO implement
-    // this.asrService.stopASR();
-    // this.asrService.queue.clear();
+    this.asrStoreService.stopProcessing();
   }
 
   stopASRForThisSegment() {
-    /* TODO implement
-    if (this.asrService.selectedLanguage !== undefined) {
-      const item = this.asrService.queue.getItemByTime(
-        this.audioChunk!.time.start.samples,
-        this.audioChunk!.time.duration.samples
-      );
-
-      if (item !== undefined) {
-        this.asrService.stopASROfItem(item);
-      }
-    } else {
-      console.error(`could not stop ASR because segment number was not found.`);
-    }
-
-     */
+    this.asrStoreService.stopItemProcessing({
+      sampleStart: this.audioChunk!.time.start.samples,
+      sampleLength: this.audioChunk!.time.duration.samples,
+    });
   }
 
   onMAUSLangChanged(language: string, code: string) {
-    /* TODO implement
-    this.asrService.selectedMAUSLanguage = {
-      language, code
-    };
-
-    this.dropdown2.hide();
-
-     */
+    this.asrStoreService.changeASRSelectedMausLanguage(code);
+    this.dropdown2.close();
   }
 
   getQuotaPercentage(langAsr: string) {
-    /* TODO implement
     if (this.serviceProviders[langAsr]) {
-      const ohService: OHService = this.serviceProviders[langAsr];
+      const ohService: any = this.serviceProviders[langAsr];
       if (ohService.usedQuota && ohService.quotaPerMonth) {
-        return Math.round(ohService.usedQuota / ohService.quotaPerMonth * 100);
+        return Math.round(
+          (ohService.usedQuota / ohService.quotaPerMonth) * 100
+        );
       }
     }
-
-     */
     return 0;
   }
 

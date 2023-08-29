@@ -9,7 +9,7 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoService } from '@ngneat/transloco';
 import { timer } from 'rxjs';
-import { SettingsService, TranscriptionService } from '../../shared/service';
+import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModal } from '../types';
@@ -19,6 +19,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
@@ -39,7 +40,7 @@ export class TranscriptionGuidelinesModalComponent
   };
 
   public get guidelines() {
-    return this.transcrService.guidelines;
+    return this.annotationStoreService.guidelines;
   }
 
   public shownGuidelines: any;
@@ -52,7 +53,7 @@ export class TranscriptionGuidelinesModalComponent
   constructor(
     modalService: NgbModal,
     private lang: TranslocoService,
-    public transcrService: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     private appStorage: AppStorageService,
     private bugService: BugReportService,
     public settService: SettingsService,
@@ -83,27 +84,33 @@ export class TranscriptionGuidelinesModalComponent
   }
 
   initVideoPlayers() {
-    for (let g = 0; g < this.guidelines.instructions.length; g++) {
-      for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
+    if (this.guidelines) {
+      for (let g = 0; g < this.guidelines.instructions.length; g++) {
         for (
-          let e = 0;
-          e < this.guidelines.instructions[g].entries[i].examples.length;
-          e++
+          let i = 0;
+          i < this.guidelines.instructions[g].entries.length;
+          i++
         ) {
-          const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
-          if (document.getElementById(idV)) {
-            const oldPlayer = this.videoplayerExists(idV);
+          for (
+            let e = 0;
+            e < this.guidelines.instructions[g].entries[i].examples.length;
+            e++
+          ) {
+            const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
+            if (document.getElementById(idV)) {
+              const oldPlayer = this.videoplayerExists(idV);
 
-            if (oldPlayer > -1) {
-              // videojs(document.getElementById(id_v)).dispose();
-            } else {
-              const player = videojs(idV, {
-                fluid: true,
-                autoplay: false,
-                preload: 'auto',
-              });
+              if (oldPlayer > -1) {
+                // videojs(document.getElementById(id_v)).dispose();
+              } else {
+                const player = videojs(idV, {
+                  fluid: true,
+                  autoplay: false,
+                  preload: 'auto',
+                });
 
-              this.videoPlayers.push(player);
+                this.videoPlayers.push(player);
+              }
             }
           }
         }
@@ -159,25 +166,26 @@ export class TranscriptionGuidelinesModalComponent
   search(text: string) {
     if (text !== '') {
       this.shownGuidelines.instructions = [];
+      if (this.guidelines) {
+        for (const instruction of this.guidelines.instructions) {
+          if (instruction.group.indexOf(text) > -1) {
+            this.shownGuidelines.instructions.push(instruction);
+          } else {
+            const instr = JSON.parse(JSON.stringify(instruction));
+            instr.entries = [];
 
-      for (const instruction of this.guidelines.instructions) {
-        if (instruction.group.indexOf(text) > -1) {
-          this.shownGuidelines.instructions.push(instruction);
-        } else {
-          const instr = JSON.parse(JSON.stringify(instruction));
-          instr.entries = [];
-
-          for (const entry of instruction.entries) {
-            if (
-              entry.title.indexOf(text) > -1 ||
-              entry.description.indexOf(text) > -1
-            ) {
-              instr.entries.push(entry);
+            for (const entry of instruction.entries) {
+              if (
+                entry.title.indexOf(text) > -1 ||
+                entry.description.indexOf(text) > -1
+              ) {
+                instr.entries.push(entry);
+              }
             }
-          }
 
-          if (instr.entries.length > 0) {
-            this.shownGuidelines.instructions.push(instr);
+            if (instr.entries.length > 0) {
+              this.shownGuidelines.instructions.push(instr);
+            }
           }
         }
       }
@@ -190,7 +198,7 @@ export class TranscriptionGuidelinesModalComponent
     let html = text;
     if (text.indexOf('{{') > -1) {
       html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
-        return this.transcrService
+        return this.annotationStoreService
           .rawToHTML(g1)
           .replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
       });
@@ -230,12 +238,14 @@ export class TranscriptionGuidelinesModalComponent
   private unCollapseAll() {
     this.collapsed = [];
 
-    for (const instruction of this.guidelines.instructions) {
-      const elem = [];
-      for (const entry of instruction.entries) {
-        elem.push(true);
+    if (this.guidelines) {
+      for (const instruction of this.guidelines.instructions) {
+        const elem = [];
+        for (const entry of instruction.entries) {
+          elem.push(true);
+        }
+        this.collapsed.push(elem);
       }
-      this.collapsed.push(elem);
     }
   }
 }

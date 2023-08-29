@@ -106,6 +106,13 @@ export const reducer = createReducer(
         }
       : undefined,
   })),
+  on(ASRActions.stopProcessing.do, (state: ASRState) => ({
+    ...state,
+    queue: {
+      ...initialState.queue!,
+      status: ASRProcessStatus.STOPPED
+    },
+  })),
   on(ASRActions.stopItemProcessing.do, (state: ASRState, { time }) => {
     if (state.queue) {
       const index = getItemIndexByTime(

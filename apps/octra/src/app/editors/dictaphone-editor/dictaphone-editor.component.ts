@@ -17,16 +17,20 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
-import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
+import {
+  OctraAnnotationSegmentLevel,
+  OLabel,
+  Segment,
+} from '@octra/annotation';
 import { AudioplayerComponent } from '@octra/ngx-components';
 import { Subscription } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-audioplayer-gui',
@@ -51,9 +55,11 @@ export class DictaphoneEditorComponent
   private boundaryselected = false;
 
   public initialized: EventEmitter<void> = new EventEmitter<void>();
+
   public get highlighting(): boolean {
     return this.appStorage.highlightingEnabled;
   }
+
   public set highlighting(value: boolean) {
     this.appStorage.highlightingEnabled = value;
   }
@@ -126,7 +132,7 @@ export class DictaphoneEditorComponent
   constructor(
     public audio: AudioService,
     public keyMap: KeymappingService,
-    public transcrService: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService
@@ -146,6 +152,7 @@ export class DictaphoneEditorComponent
               event.shortcut === 'SHIFT + ALT + 2' ||
               event.shortcut === 'SHIFT + ALT + 3'
             ) {
+              /* TODO:later
               this.transcrService.tasksBeforeSend.push(
                 new Promise<void>((resolve) => {
                   this.appStorage.afterSaving().then(() => {
@@ -153,6 +160,7 @@ export class DictaphoneEditorComponent
                   });
                 })
               );
+              */
             }
           }
         )
@@ -163,7 +171,8 @@ export class DictaphoneEditorComponent
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
     this.audiochunk = this.audioManager.mainchunk.clone();
-    this.editor.settings.markers = this.transcrService.guidelines.markers.items;
+    this.editor.settings.markers =
+      this.annotationStoreService.guidelines?.markers ?? [];
     this.editor.settings.responsive = this.settingsService.responsive.enabled;
     this.editor.settings.specialMarkers.boundary = true;
     this.editor.settings.highlightingEnabled = true;
@@ -314,6 +323,7 @@ export class DictaphoneEditorComponent
   };
 
   onBoundaryClicked(samples: SampleUnit) {
+    /*
     const i: number = getSegmentBySamplePosition(
       this.transcrService.currentlevel!.segments,
       samples
@@ -348,6 +358,7 @@ export class DictaphoneEditorComponent
     } else {
       this.boundaryselected = false;
     }
+    */
   }
 
   onBoundaryInserted() {
@@ -392,51 +403,60 @@ export class DictaphoneEditorComponent
   }
 
   saveTranscript() {
-    const rawText = this.editor.rawText;
-    // split text at the position of every boundary marker
-    let segTexts: string[] = rawText.split(/\s*{[0-9]+}\s*/g);
+    let transcript = this.annotationStoreService.transcript!;
+    transcript = transcript.clearAllItemsFromCurrentLevel();
 
-    const samplesArray: number[] = [];
-    rawText.replace(new RegExp(/\s*{([0-9]+)}\s*/, 'g'), (match, g1) => {
-      samplesArray.push(Number(g1));
-      return '';
-    });
+    if (
+      transcript.currentLevel &&
+      transcript.currentLevel instanceof OctraAnnotationSegmentLevel
+    ) {
+      const rawText = this.editor.rawText;
+      // split text at the position of every boundary marker
+      let segTexts: string[] = rawText.split(/\s*{[0-9]+}\s*/g);
 
-    // remove invalid boundaries
-    if (segTexts.length > 1) {
-      let start = 0;
-      for (let i = 0; i < samplesArray.length; i++) {
-        if (!(samplesArray[i] > start)) {
-          // remove boundary
-          samplesArray.splice(i, 1);
+      const samplesArray: number[] = [];
+      rawText.replace(new RegExp(/\s*{([0-9]+)}\s*/, 'g'), (match, g1) => {
+        samplesArray.push(Number(g1));
+        return '';
+      });
 
-          // concat
-          segTexts[i + 1] = segTexts[i] + segTexts[i + 1];
-          segTexts.splice(i, 1);
+      // remove invalid boundaries
+      if (segTexts.length > 1) {
+        let start = 0;
+        for (let i = 0; i < samplesArray.length; i++) {
+          if (!(samplesArray[i] > start)) {
+            // remove boundary
+            samplesArray.splice(i, 1);
 
-          --i;
-        } else {
-          start = samplesArray[i];
+            // concat
+            segTexts[i + 1] = segTexts[i] + segTexts[i + 1];
+            segTexts.splice(i, 1);
+
+            --i;
+          } else {
+            start = samplesArray[i];
+          }
         }
       }
+
+      segTexts = segTexts.map((a: string) => {
+        return a.replace(/(^\s+)|(\s+$)/g, '');
+      });
+
+      const segments: Segment[] = [];
+
+      for (let i = 0; i < segTexts.length; i++) {
+        const time =
+          i < samplesArray.length
+            ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
+            : this.audioManager.resource.info.duration;
+
+        transcript = transcript.addItemToCurrentLevel(time, [
+          new OLabel(transcript.currentLevel!.name, segTexts[i]),
+        ]);
+      }
+      this.annotationStoreService.overwriteTranscript(transcript);
     }
-
-    segTexts = segTexts.map((a: string) => {
-      return a.replace(/(^\s+)|(\s+$)/g, '');
-    });
-
-    const segments: Segment[] = [];
-    for (let i = 0; i < segTexts.length; i++) {
-      const time =
-        i < samplesArray.length
-          ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
-          : this.audioManager.resource.info.duration;
-
-      const segment = new Segment(time, '', segTexts[i]);
-      segments.push(segment);
-    }
-    this.transcrService.currentlevel!.segments = [...segments];
-    this.transcrService.saveSegments();
   }
 
   public update() {
@@ -483,13 +503,14 @@ export class DictaphoneEditorComponent
 
   private loadEditor() {
     if (
-      this.transcrService.currentlevel &&
-      this.transcrService.currentlevel.segments.length > 0
+      this.annotationStoreService.currentLevel &&
+      this.annotationStoreService.currentLevel instanceof
+        OctraAnnotationSegmentLevel &&
+      this.annotationStoreService.currentLevel.items.length > 0
     ) {
-      this.segments = this.transcrService.currentlevel.segments;
+      this.segments = this.annotationStoreService.currentLevel.items;
     }
     this.editor.settings.height = 100;
     this.oldRaw = this.editor.rawText;
-    this.editor.focus(true);
   }
 }

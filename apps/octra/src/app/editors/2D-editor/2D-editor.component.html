@@ -41,8 +41,7 @@
         'flex-direction': 'column'
       }"
       [settings]="miniLoupeSettings"
-      [(entries)]="transcrService.currentlevel.segments"
-      [levelName]="transcrService.currentlevel.name"
+      [annotation]="annotationStoreService.transcript!"
     ></octra-audio-viewer>
   </div>
   <octra-audio-viewer
@@ -54,9 +53,8 @@
     [silencePlaceholder]="'<P>'"
     [isMultiLine]="true"
     [refreshOnInternChanges]="false"
-    [(entries)]="transcrService.currentlevel.segments"
-    (entriesChange)="onEntriesChange($event)"
-    [levelName]="transcrService.currentlevel.name"
+    [annotation]="annotationStoreService.transcript!"
+    (annotationChange)="onEntriesChange($event)"
     id="special"
     style="height: 400px; display: flex; flex: auto; flex-direction: column"
   >

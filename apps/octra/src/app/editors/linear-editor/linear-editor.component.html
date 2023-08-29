@@ -19,8 +19,7 @@
     'flex-direction': 'column'
   }"
   [settings]="miniLoupeSettings"
-  [entries]="transcrService.currentlevel.segments"
-  [levelName]="transcrService.currentlevel.name"
+  [annotation]="annotationStoreService.transcript!"
 >
 </octra-audio-viewer>
 <octra-audio-navigation
@@ -53,9 +52,8 @@
     [audioChunk]="audioChunkTop"
     [refreshOnInternChanges]="false"
     [silencePlaceholder]="'<P>'"
-    [entries]="transcrService.currentlevel.segments"
-    (entriesChange)="onEntriesChange($event)"
-    [levelName]="transcrService.currentlevel.name"
+    [annotation]="annotationStoreService.transcript!"
+    (annotationChange)="onEntriesChange($event)"
     style="height: 80px"
   >
   </octra-audio-viewer>
@@ -76,9 +74,8 @@
   [silencePlaceholder]="'<P>'"
   [name]="'downLoupe'"
   [settings]="loupeSettings"
-  [entries]="transcrService.currentlevel.segments"
-  (entriesChange)="onEntriesChange($event)"
-  [levelName]="transcrService.currentlevel.name"
+  [annotation]="annotationStoreService.transcript!"
+  (annotationChange)="onEntriesChange($event)"
 >
 </octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
@@ -112,11 +109,7 @@
   [audiochunk]="audioChunkDown"
   [transcript]="transcript"
   [easymode]="appStorage.easymode"
-  [markers]="
-    transcrService.guidelines !== undefined
-      ? transcrService.guidelines.markers
-      : undefined
-  "
+  [markers]="annotationStoreService.guidelines?.markers!"
   [validationEnabled]="
     appStorage.useMode !== 'url' &&
     (appStorage.useMode === 'demo' ||

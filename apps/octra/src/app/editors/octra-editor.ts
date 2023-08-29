@@ -5,19 +5,25 @@ import {
   SampleUnit,
 } from '@octra/media';
 import { AudioViewerComponent } from '@octra/ngx-components';
-import { Level } from '@octra/annotation';
 import { DefaultComponent } from '../core/component/default.component';
 import { EventEmitter } from '@angular/core';
+import {
+  ASRContext,
+  OctraAnnotationAnyLevel,
+  Segment,
+} from '@octra/annotation';
 
 export interface OctraEditorRequirements {
   afterFirstInitialization(): void;
+
   disableAllShortcuts(): void;
+
   enableAllShortcuts(): void;
+
   initialized: EventEmitter<void>;
 }
 
 export abstract class OCTRAEditor extends DefaultComponent {
-
   protected doPlayOnHover(
     audioManager: AudioManager,
     isPlayingOnhover: boolean,
@@ -81,16 +87,19 @@ export abstract class OCTRAEditor extends DefaultComponent {
 
   protected checkIfSmallAudioChunk(
     audioChunk: AudioChunk,
-    currentLevel: Level
+    currentLevel: OctraAnnotationAnyLevel<Segment<ASRContext>>
   ) {
-    const emptySegmentIndex = currentLevel.segments.findIndex((a) => {
-      return a.value === '';
+    const emptySegmentIndex = currentLevel.items.findIndex((a) => {
+      return a instanceof Segment
+        ? a.getFirstLabelWithoutName('Speaker')?.value === undefined ||
+            a.getFirstLabelWithoutName('Speaker')?.value === ''
+        : false;
     });
 
     if (audioChunk.time.duration.seconds <= 35) {
       if (emptySegmentIndex > -1) {
         this.openSegment(emptySegmentIndex);
-      } else if (currentLevel.segments.length === 1) {
+      } else if (currentLevel.items.length === 1) {
         this.openSegment(0);
       }
     }

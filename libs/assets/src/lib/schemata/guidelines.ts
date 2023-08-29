@@ -127,3 +127,41 @@ export const OctraGuidelinesJSONSchema = {
   type: 'object',
   required: ['meta', 'instructions', 'markers'],
 };
+
+export interface OctraGuidelines {
+  meta: {
+    object_language: string;
+    project: string;
+    authors: string;
+    version: string;
+    date: string;
+    encoding: string;
+    validation_url: string;
+  },
+  instructions: {
+    group: string;
+    entries: {
+      code: string;
+      priority: string;
+      title: string;
+      description: string;
+      examples: {
+        annotation: string;
+        url: string;
+      }[]
+    }[]
+  }[],
+  markers: {
+    id: number;
+    name: string;
+    code: string;
+    type: string;
+    icon: string;
+    button_text: string;
+    description: string;
+    shortcuts: {
+      mac: string,
+      pc: string;
+    }[]
+  }[]
+}

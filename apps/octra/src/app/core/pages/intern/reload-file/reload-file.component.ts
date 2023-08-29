@@ -8,15 +8,16 @@ import {
   TranscriptionStopModalComponent,
 } from '../../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import { SessionFile } from '../../../obj/SessionFile';
-import { AudioService, TranscriptionService } from '../../../shared/service';
+import { AudioService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { OctraDropzoneComponent } from '../../../component/octra-dropzone/octra-dropzone.component';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
-import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { TranscriptionDeleteModalComponent } from '../../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { AuthenticationStoreService } from '../../../store/authentication';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
+import { OctraAnnotation } from '@octra/annotation';
 
 @Component({
   selector: 'octra-reload-file',
@@ -34,7 +35,7 @@ export class ReloadFileComponent {
   constructor(
     public router: Router,
     public appStorage: AppStorageService,
-    public transcrServ: TranscriptionService,
+    public annotationStoreService: AnnotationStoreService,
     public modService: OctraModalService,
     public langService: TranslocoService,
     private audioService: AudioService,
@@ -42,7 +43,7 @@ export class ReloadFileComponent {
   ) {}
 
   abortTranscription = () => {
-    this.transcrServ.endTranscription();
+    this.annotationStoreService.endTranscription();
     this.appStorage.logout();
   };
 
@@ -58,24 +59,10 @@ export class ReloadFileComponent {
 
           new Promise<void>((resolve) => {
             if (!(this.dropzone.oannotation === undefined)) {
-              const newLevels: OIDBLevel[] = [];
-              for (
-                let i = 0;
-                i < this.dropzone.oannotation.levels.length;
-                i++
-              ) {
-                newLevels.push(
-                  new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i)
-                );
-              }
-
-              const newLinks: OIDBLink[] = [];
-              for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-                newLinks.push(
-                  new OIDBLink(i + 1, this.dropzone.oannotation.links[i])
-                );
-              }
-              this.appStorage.overwriteAnnotation(newLevels, newLinks);
+              const transcript = OctraAnnotation.deserialize(
+                this.dropzone.oannotation
+              );
+              this.appStorage.overwriteAnnotation(transcript);
 
               keepData = true;
               resolve();

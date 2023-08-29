@@ -1,12 +1,6 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
-import {
-  AnnotationLevelType,
-  OAnnotJSON,
-  OAudiofile,
-  OLabel,
-  OLevel,
-  OSegment,
-} from '../annotjson';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class SRTConverter extends Converter {
   public constructor() {
@@ -74,18 +68,18 @@ export class SRTConverter extends Converter {
       }
 
       if (levelnum < annotation.levels.length) {
-        const level: OLevel = annotation.levels[levelnum];
+        const level = annotation.levels[levelnum];
 
         let counter = 1;
         if (level.type === 'SEGMENT') {
-          for (const item of level.items) {
+          for (const item of level.items as OSegment[]) {
             const transcript = item.labels[0].value;
             const start = this.getTimeStringFromSamples(
-              item.sampleStart!,
+              item.sampleStart,
               annotation.sampleRate
             );
             const end = this.getTimeStringFromSamples(
-              item.sampleStart! + item.sampleDur!,
+              item.sampleStart + item.sampleDur,
               annotation.sampleRate
             );
 
@@ -120,10 +114,14 @@ export class SRTConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
 
       const content = file.content;
-      const olevel = new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT);
+      const olevel = new OSegmentLevel('OCTRA_1');
 
       let counterID = 1;
       let lastEnd = 0;
@@ -167,8 +165,8 @@ export class SRTConverter extends Converter {
 
       if (olevel.items.length > 0) {
         // set last segment duration to fit last sample
-        const lastItem = olevel.items[olevel.items.length - 1];
-        olevel.items[olevel.items.length - 1].sampleDur =
+        const lastItem = olevel.items[olevel.items.length - 1] as OSegment;
+        lastItem.sampleDur =
           Number(audiofile.duration) - Number(lastItem.sampleStart);
 
         result.levels.push(olevel);

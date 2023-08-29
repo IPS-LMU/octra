@@ -103,9 +103,9 @@
           'segment-selected': segment.isSelected,
           'table-success':
             segment.transcription.text !== '' &&
-            segment.transcription.text !== transcrService.breakMarker.code,
+            segment.transcription.text !== annotationStoreService.breakMarker?.code,
           'table-info':
-            segment.transcription.text === transcrService.breakMarker.code,
+            segment.transcription.text === annotationStoreService.breakMarker?.code,
           'table-danger': segment.transcription.text === '',
           'active-playback': i === playAllState.currentSegment
         }"
@@ -181,7 +181,7 @@
               [audioChunk]="textEditor.audiochunk"
               [isMultiLine]="false"
               [refreshOnInternChanges]="false"
-              [(entries)]="transcrService.currentlevel.segments"
+              [annotation]="annotationStoreService.transcript!"
               style="height: 50px"
             >
             </octra-audio-viewer>
@@ -191,11 +191,7 @@
               [transcript]="textEditor.transcript"
               [audiochunk]="textEditor.audiochunk"
               [height]="60"
-              [markers]="
-                transcrService.guidelines !== undefined
-                  ? transcrService.guidelines.markers
-                  : undefined
-              "
+              [markers]="annotationStoreService.guidelines!.markers!"
             ></octra-transcr-editor>
             <button
               class="btn btn-sm btn-primary btn-info btn-raised w-50"

@@ -6,6 +6,7 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {
@@ -36,7 +37,8 @@
       "env": {
         "jest": true
       },
-      "rules": {}
+      "rules": {
+      }
     }
   ]
 }

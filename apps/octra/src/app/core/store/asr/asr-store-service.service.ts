@@ -3,13 +3,21 @@ import { ASRActions } from './asr.actions';
 import { RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { ASRLanguage } from '../../obj';
-import { ASRQueueItemType, ASRTimeInterval } from './index';
+import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
+import { SubscriptionManager } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AsrStoreService {
   asrOptions$ = this.store.select((state) => state.asr.settings);
+  private _asrOptions?: ASRStateSettings;
+  private subscrManager = new SubscriptionManager();
+
+  get asrOptions(): ASRStateSettings | undefined {
+    return this._asrOptions;
+  }
+
   queue$ = this.store.select((state) => state.asr.queue);
   asrEnabled$ = this.store.select((state) => state.asr.isEnabled);
 
@@ -57,5 +65,17 @@ export class AsrStoreService {
     );
   }
 
-  constructor(private store: Store<RootState>) {}
+  stopProcessing() {
+    this.store.dispatch(ASRActions.stopProcessing.do());
+  }
+
+  constructor(private store: Store<RootState>) {
+    this.subscrManager.add(
+      this.asrOptions$.subscribe({
+        next: (asrOptions) => {
+          this._asrOptions = asrOptions;
+        },
+      })
+    );
+  }
 }

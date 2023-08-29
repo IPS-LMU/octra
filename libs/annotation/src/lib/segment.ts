@@ -1,92 +1,120 @@
-import { OLabel, OSegment } from './annotjson';
-import { ASRQueueItemType } from './asr';
+import { ISegment, OEvent, OItem, OLabel, OSegment } from './annotjson';
 import { SampleUnit } from '@octra/media';
+import { Serializable } from '@octra/utilities';
+import { ASRQueueItemType } from './asr';
 
-export class Segment {
-  private static counter = 1;
+export interface SegmentWithContext<T extends ASRContext> {
+  id: number;
+  labels: OLabel[];
+  time: SampleUnit;
+  context?: T;
+}
 
-  speakerLabel = 'NOLABEL';
-  time!: SampleUnit;
-  changed = false;
-  isBlockedBy?: ASRQueueItemType;
-  progressInfo?: {
-    statusLabel: string;
-    progress: number;
+export interface ASRContext {
+  asr?: {
+    isBlockedBy?: ASRQueueItemType;
+    progressInfo?: { progress: number; statusLabel: string };
   };
+}
 
-  private _value = '';
-  private readonly _id: number;
-
-  constructor(time: SampleUnit, speakerLabel: string, value = '', id?: number) {
-    this.time = time;
-    this.speakerLabel = speakerLabel;
-    this._value = value;
-
-    if (id === undefined || id === null || id < 1) {
-      this._id = Segment.counter++;
-    } else {
-      this._id = id;
-      Segment.counter = Math.max(id + 1, Segment.counter);
-    }
-  }
-
-  /**
-   * this id is for internal use only!
-   */
+export class Segment<T extends ASRContext = ASRContext>
+  implements
+    SegmentWithContext<T>,
+    Serializable<SegmentWithContext<T>, Segment<T>>
+{
   get id(): number {
     return this._id;
   }
 
-  get value(): string {
-    return this._value;
+  public context?: T;
+  public time: SampleUnit;
+
+  private _id: number;
+  public labels: OLabel[];
+
+  constructor(id: number, time: SampleUnit, labels?: OLabel[], context?: T) {
+    this.time = time;
+    this._id = id;
+    this.labels = labels ?? [];
+    this.context = context;
   }
 
-  set value(value: string) {
-    if (value !== this._value) {
-      this.changed = true;
+  serialize(): SegmentWithContext<T> {
+    return {
+      id: this.id,
+      time: this.time,
+      labels: this.labels,
+      context: this.context,
+    };
+  }
+
+  serializeToOSegment(sampleStart: number): OSegment {
+    return new OSegment(
+      this.id,
+      sampleStart,
+      this.time.samples - sampleStart,
+      this.labels
+    );
+  }
+
+  deserialize(jsonObject: SegmentWithContext<T>): Segment<T> {
+    return Segment.deserialize(jsonObject);
+  }
+
+  getLabel(name: string) {
+    return this.labels?.find((a) => a.name === name);
+  }
+
+  getFirstLabelWithoutName(notName: string) {
+    return this.labels?.find((a) => a.name !== notName);
+  }
+
+  changeLabel(name: string, value: string) {
+    const index = this.labels.findIndex((a) => a.name === name);
+    if (index > -1) {
+      this.labels[index].value = value;
+      return true;
     }
-    this._value = value;
+    return false;
   }
 
-  /**
-   * converts an object to a Segment. The conversion goes from original -> browser samples.
-   */
-  public static fromObj(
-    levelName: string,
-    oSegment: OSegment,
-    sampleRate: number
-  ): Segment | undefined {
-    if (oSegment !== undefined) {
-      let speakerLabel = '';
-
-      let transcriptLabel: OLabel | undefined;
-      if (oSegment.labels !== undefined) {
-        if (oSegment.labels.length > 1) {
-          const foundLabel = oSegment.labels.find(
-            (a) => a.name.toLowerCase() === 'speaker'
-          );
-          speakerLabel = foundLabel !== undefined ? foundLabel.value : '';
-          transcriptLabel = oSegment.labels.find((a) => a.name === levelName);
-        } else if (oSegment.labels.length === 1) {
-          transcriptLabel = oSegment.labels[0];
-        }
-      }
-
-      const transcript =
-        transcriptLabel !== undefined ? transcriptLabel.value : '';
-
-      return new Segment(
-        new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate),
-        speakerLabel,
-        transcript,
-        oSegment.id
-      );
+  changeFirstLabelWithoutName(notName: string, value: string) {
+    const index = this.labels.findIndex((a) => a.name !== notName);
+    if (index > -1) {
+      this.labels[index].value = value;
+      return true;
     }
-
-    return undefined;
+    return false;
   }
 
-  public clone(): Segment {
-    return new Segment(this.time.clone(), this.speakerLabel, this.value);
+  static deserialize<T extends ASRContext>(
+    jsonObject: SegmentWithContext<T>
+  ): Segment<T> {
+    const result = new Segment<T>(
+      jsonObject.id,
+      jsonObject.time,
+      jsonObject.labels.map((a) => OLabel.deserialize(a)),
+      jsonObject.context
+    );
+    return result;
+  }
+
+  static deserializeFromOSegment<T extends ASRContext>(
+    jsonObject: ISegment,
+    sampleRate: number,
+    context?: T
+  ): Segment<T> {
+    return new Segment<T>(
+      jsonObject.id,
+      new SampleUnit(jsonObject.sampleStart + jsonObject.sampleDur, sampleRate),
+      jsonObject.labels.map((a) => OLabel.deserialize(a)),
+      context
+    );
+  }
+
+  clone(id: number): Segment<T> {
+    return new Segment<T>(id, this.time, this.labels, this.context);
   }
 }
+
+export type AnnotationAnySegment = Segment<ASRContext> | OItem | OEvent;

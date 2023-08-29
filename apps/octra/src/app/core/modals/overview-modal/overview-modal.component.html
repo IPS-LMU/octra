@@ -91,7 +91,7 @@
         <h4>Feedback</h4>
         <octra-transcription-feedback
           #feedback
-          [feedbackData]="appStorage.feedback"
+          [feedbackData]="annotationStoreService.feedback$ | async"
           [showCommentFieldOnly]="
             settingsService.isTheme('shortAudioFiles') ||
             settingsService.isTheme('korbinian')
@@ -100,7 +100,7 @@
         </octra-transcription-feedback>
 
         <p
-          *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid"
+          *ngIf="sendValidTranscriptOnly && !annotationStoreService.transcriptValid"
           style="color: red; text-align: center"
         >
           {{ 'transcription.invalid' | transloco }}
@@ -115,7 +115,7 @@
             (click)="sendTranscription()"
             [disabled]="
               !feedback.valid ||
-              (sendValidTranscriptOnly && !transcrService.transcriptValid)
+              (sendValidTranscriptOnly && !annotationStoreService.transcriptValid)
             "
             class="btn btn-primary btn-outline btn-success"
             id="transcr-send-btn"
@@ -128,7 +128,6 @@
           <div
             *ngIf="
               settingsService.isTheme('shortAudioFiles');
-              else isKorbinianTheme
             "
             class="row"
             id="bottom-navigation1"
@@ -155,34 +154,6 @@
               class="btn btn-raised btn-danger w-100"
             >
               <i class="bi bi-star-fill"></i>
-            </button>
-          </div>
-        </ng-template>
-        <ng-template #isKorbinianTheme>
-          <div class="row" id="bottom-navigation" role="group">
-            <button
-              (click)="sendTranscriptionForKorbinian('NO')"
-              class="btn btn-raised btn-info w-100"
-            >
-              NO
-            </button>
-            <button
-              (click)="sendTranscriptionForKorbinian('VE')"
-              class="btn btn-raised btn-danger w-100"
-            >
-              VE
-            </button>
-            <button
-              (click)="sendTranscriptionForKorbinian('EE')"
-              class="btn btn-raised btn-secondary w-100"
-            >
-              EE
-            </button>
-            <button
-              (click)="sendTranscriptionForKorbinian('AN')"
-              class="btn btn-raised btn-primary w-100"
-            >
-              AN
             </button>
           </div>
         </ng-template>

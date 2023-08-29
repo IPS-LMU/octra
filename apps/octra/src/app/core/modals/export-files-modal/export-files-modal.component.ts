@@ -1,10 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {
-  AudioService,
-  SettingsService,
-  TranscriptionService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { AudioService, UserInteractionsService } from '../../shared/service';
 import { AppInfo } from '../../../app.info';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
@@ -17,9 +12,10 @@ import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/nam
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Converter, IFile } from '@octra/annotation';
+import { Converter } from '@octra/annotation';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -102,7 +98,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   @ViewChild('tableConfigurator', { static: false })
   tableConfigurator!: TableConfiguratorComponent;
 
-  transcriptionService!: TranscriptionService;
   navbarService!: NavbarService;
   uiService!: UserInteractionsService;
 
@@ -113,7 +108,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     private httpClient: HttpClient,
     private appStorage: AppStorageService,
     private audio: AudioService,
-    private settService: SettingsService,
+    public annotationStoreService: AnnotationStoreService,
     protected override activeModal: NgbActiveModal
   ) {
     super('ExportFilesModalComponent', activeModal);
@@ -121,7 +116,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   ngOnInit() {
     for (const converter of AppInfo.converters) {
-      this.exportStates.push("close");
+      this.exportStates.push('close');
     }
   }
 
@@ -146,7 +141,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     if (
       converter.multitiers ||
       (!converter.multitiers &&
-        this.transcriptionService.annotation.levels.length === 1)
+        this.annotationStoreService.transcript!.levels.length === 1)
     ) {
       this.updateParentFormat(converter);
     }
@@ -187,16 +182,17 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   updateParentFormat(converter: Converter, levelnum?: number) {
+    /*
     if (levelnum === undefined && !converter.multitiers) {
       levelnum = 0;
     }
 
     if (!this.preparing.preparing) {
-      if (this.transcriptionService.annotation === undefined) {
+      if (this.transcriptionService.annotationLevels === undefined) {
         console.error(`annotation is undefined!`);
         return;
       }
-      const oannotjson = this.transcriptionService.annotation.getObj(
+      const oannotjson = this.transcriptionService.annotationLevels.getObj(
         this.transcriptionService.audioManager.resource.info.duration
       );
       this.preparing = {
@@ -231,38 +227,36 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         })
       );
     }
+
+     */
   }
 
   getProtocol() {
-    if (!(this.transcriptionService === undefined)) {
-      this.preparing = {
-        name: 'Protocol',
-        preparing: true,
-      };
-      this.parentformat.download =
-        this.transcriptionService.audiofile.name + '.json';
+    this.preparing = {
+      name: 'Protocol',
+      preparing: true,
+    };
+    this.parentformat.download =
+      this.audio.audioManager.resource.info.name + '.json';
 
-      if (this.parentformat.uri !== undefined) {
-        window.URL.revokeObjectURL(this.parentformat.uri.toString());
-      }
-      const json = new File(
-        [
-          JSON.stringify(
-            this.transcriptionService.extractUI(this.uiService.elements),
-            undefined,
-            2
-          ),
-        ],
-        this.parentformat.download
-      );
-      this.setParentFormatURI(window.URL.createObjectURL(json));
-      this.preparing = {
-        name: 'Protocol',
-        preparing: false,
-      };
-    } else {
-      console.error("can't get protocol file");
+    if (this.parentformat.uri !== undefined) {
+      window.URL.revokeObjectURL(this.parentformat.uri.toString());
     }
+    const json = new File(
+      [
+        JSON.stringify(
+          this.annotationStoreService.extractUI(this.uiService.elements),
+          undefined,
+          2
+        ),
+      ],
+      this.parentformat.download
+    );
+    this.setParentFormatURI(window.URL.createObjectURL(json));
+    this.preparing = {
+      name: 'Protocol',
+      preparing: false,
+    };
   }
 
   onDownloadClick(i: number) {

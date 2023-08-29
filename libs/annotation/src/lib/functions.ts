@@ -1,6 +1,6 @@
-import { OAudiofile, OLabel, OSegment } from './annotjson';
+import { OLabel, OSegment } from './annotjson';
 import { Converter, IFile } from './converters';
-import { SampleUnit } from '@octra/media';
+import { OAudiofile, SampleUnit } from '@octra/media';
 import { Segment } from './segment';
 
 export function convertFromSupportedConverters(
@@ -35,7 +35,7 @@ export function getSegmentBySamplePosition(
       begin = segments[i - 1].time.samples;
     }
     if (
-      samples.samples > begin.valueOf() &&
+      samples.samples > begin &&
       samples.samples <= segments[i].time.samples
     ) {
       return i;
@@ -94,22 +94,32 @@ export function removeSegmentByIndex(
       silenceValue !== ''
     ) {
       const nextSegment = entries[index + 1];
-      const transcription: string = entries[index].value;
+      const transcription = entries[index].getFirstLabelWithoutName('Spealer')?.value;
+
       if (
-        nextSegment.value !== silenceValue &&
+        silenceValue !== undefined &&
+        nextSegment.getFirstLabelWithoutName('Speaker')?.value !== silenceValue &&
         transcription !== silenceValue &&
         mergeTranscripts
       ) {
         // concat transcripts
-        if (nextSegment.value !== '' && transcription !== '') {
-          nextSegment.value = transcription + ' ' + nextSegment.value;
-        } else if (nextSegment.value === '' && transcription !== '') {
-          nextSegment.value = transcription;
+        if (
+          nextSegment.getFirstLabelWithoutName('Speaker')?.value !== '' &&
+          transcription !== ''
+        ) {
+          nextSegment.changeFirstLabelWithoutName(
+            'Speaker',
+            transcription + ' ' + nextSegment.getFirstLabelWithoutName('Speaker')?.value
+          );
+        } else if (
+          nextSegment.getFirstLabelWithoutName('Speaker')?.value === '' &&
+          transcription !== ''
+        ) {
+          nextSegment.changeFirstLabelWithoutName('Speaker', transcription ?? '');
         }
-        nextSegment.speakerLabel = segment.speakerLabel;
-      } else if (nextSegment.value === silenceValue) {
+      } else if (nextSegment.getFirstLabelWithoutName('Speaker')?.value === silenceValue) {
         // delete pause
-        nextSegment.value = transcription;
+        nextSegment.changeFirstLabelWithoutName('Speaker', transcription ?? '');
       }
     }
 
@@ -138,16 +148,18 @@ export function betweenWhichSegment(
  * adds new Segment
  */
 export function addSegment(
+  itemIDCounter: number,
   entries: Segment[],
   time: SampleUnit,
   label: string,
   value: string | undefined = undefined
-): Segment[] {
-  const newSegment: Segment = new Segment(time, label);
-
-  if (value !== undefined) {
-    newSegment.value = value;
-  }
+): {
+  entries: Segment[];
+  itemIDCounter: number;
+} {
+  const newSegment: Segment = new Segment(itemIDCounter, time, [
+    new OLabel(label, value ?? ''),
+  ]);
 
   if (
     entries.find((a) => {
@@ -155,14 +167,15 @@ export function addSegment(
     }) === undefined
   ) {
     entries.push(newSegment);
+    entries = sort(entries);
+    entries = cleanup(entries);
+    return { entries, itemIDCounter: itemIDCounter + 1 };
   } else {
     console.error(
       `segment with this timestamp ${time.seconds} already exists and can not be added.`
     );
   }
-  entries = sort(entries);
-  entries = cleanup(entries);
-  return entries;
+  return { entries, itemIDCounter: itemIDCounter };
 }
 
 /**
@@ -234,69 +247,19 @@ export function combineSegments(
 /**
  * returns an array of normal segment objects with original values.
  */
-export function convertSegmentsToOSegments(
-  levelName: string,
-  entries: Segment[],
-  lastOriginalSample: number
-): OSegment[] {
-  const result: OSegment[] = [];
-
-  let start = 0;
-  for (let i = 0; i < entries.length; i++) {
-    const segment = entries[i];
-    const labels: OLabel[] = [];
-
-    labels.push(new OLabel('Speaker', segment.speakerLabel));
-    labels.push(new OLabel(levelName, segment.value));
-
-    let annotSegment = undefined;
-    if (i < entries.length - 1) {
-      annotSegment = new OSegment(
-        i + 1,
-        start,
-        segment.time.samples - start,
-        labels
-      );
-    } else {
-      annotSegment = new OSegment(
-        i + 1,
-        start,
-        lastOriginalSample - start,
-        labels
-      );
-    }
-    result.push(annotSegment);
-
-    start = Math.round(segment.time.samples);
-  }
-
-  return result;
+export function convertSegmentsToOSegments(entries: Segment[]): OSegment[] {
+  return entries.map((a, i) =>
+    a.serializeToOSegment(i > 0 ? entries[i - 1].time.samples : 0)
+  );
 }
 
 export function convertOSegmentsToSegments(
-  levelName: string,
   entries: OSegment[],
-  lastOriginalSample: SampleUnit
+  sampleRate: number
 ): Segment[] {
-  const result = entries.map(
-    (a) =>
-      new Segment(
-        new SampleUnit(
-          a.sampleStart + a.sampleDur,
-          lastOriginalSample.sampleRate
-        ),
-        levelName,
-        a.labels.find((a) => a.name === levelName)?.value,
-        a.id
-      )
+  return entries.map((a) =>
+    Segment.deserializeFromOSegment(a, sampleRate)
   );
-
-  if (result[result.length - 1].time.samples !== lastOriginalSample.samples) {
-    // add last segment
-    result.push(new Segment(lastOriginalSample.clone(), '', ''));
-  }
-
-  return result;
 }
 
 /**

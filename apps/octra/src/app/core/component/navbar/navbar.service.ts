@@ -1,25 +1,25 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import {
-  TranscriptionService,
-  UserInteractionsService,
-} from '../../shared/service';
-import { AudioRessource } from '@octra/media';
-import { FileSize } from '@octra/utilities';
+import { AudioService, UserInteractionsService } from '../../shared/service';
+import { FileSize, getFileSize } from '@octra/utilities';
 
 @Injectable()
 export class NavbarService {
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();
-  public transcrService!: TranscriptionService;
-  public uiService!: UserInteractionsService;
+
   public dataloaded = false;
-  public ressource!: AudioRessource;
-  public filesize!: FileSize;
   public showNavbar = true;
 
   public toolApplied = new EventEmitter<string>();
 
   private _showExport = false;
+
+  public get fileSize(): FileSize | undefined {
+    if (this.audio.audioManager?.resource?.size !== undefined) {
+      return getFileSize(this.audio.audioManager.resource.size);
+    }
+    return undefined;
+  }
 
   get showExport(): boolean {
     return this._showExport;
@@ -52,4 +52,9 @@ export class NavbarService {
   public doclick(name: string) {
     this.onclick.emit(name);
   }
+
+  constructor(
+    public uiService: UserInteractionsService,
+    private audio: AudioService
+  ) {}
 }

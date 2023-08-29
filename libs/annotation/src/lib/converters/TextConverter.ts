@@ -1,12 +1,6 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
-import {
-  AnnotationLevelType,
-  OAnnotJSON,
-  OAudiofile,
-  OLabel,
-  OLevel,
-  OSegment,
-} from '../annotjson';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class TextConverter extends Converter {
   public override options = {
@@ -47,16 +41,16 @@ export class TextConverter extends Converter {
       }
 
       if (levelnum < annotation.levels.length) {
-        const level: OLevel = annotation.levels[levelnum];
+        const level = annotation.levels[levelnum];
 
         if (level.type === 'SEGMENT') {
           for (let j = 0; j < level.items.length; j++) {
-            const transcript = level.items[j].labels[0].value;
+            const item = level.items[j] as OSegment;
+            const transcript = item.labels[0].value;
 
             result += transcript;
             if (j < level.items.length - 1) {
-              const sampleEnd =
-                level.items[j].sampleStart! + level.items[j].sampleDur!;
+              const sampleEnd = item.sampleStart + item.sampleDur;
               const unixTimestamp = Math.ceil(
                 (sampleEnd * 1000) / audiofile.sampleRate
               );
@@ -109,10 +103,13 @@ export class TextConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
 
-      const olevel = new OLevel('OCTRA_1', AnnotationLevelType.SEGMENT);
-      const samplerate = audiofile.sampleRate;
+      const olevel = new OSegmentLevel('OCTRA_1');
 
       if (
         file.content.indexOf('<ts') > -1 ||

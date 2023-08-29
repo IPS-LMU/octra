@@ -1,6 +1,7 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import { base64ToArrayBuffer, contains } from '@octra/utilities';
-import { IAnnotJSON, OAnnotJSON, OAudiofile } from '../annotjson';
+import { IAnnotJSON, OAnnotJSON } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export interface Bundle {
   ssffFiles: {
@@ -42,7 +43,7 @@ export class BundleJSONConverter extends Converter {
         mediaFile: {
           encoding: 'BASE654',
           data: btoa(
-            new Uint8Array(audiofile.arraybuffer).reduce(
+            new Uint8Array(audiofile.arraybuffer!).reduce(
               (data, byte) => data + String.fromCharCode(byte),
               ''
             )
@@ -105,6 +106,7 @@ export class BundleJSONConverter extends Converter {
         return {
           annotjson: new OAnnotJSON(
             annotation.name,
+            file.name,
             annotation.sampleRate,
             annotation.levels,
             annotation.links

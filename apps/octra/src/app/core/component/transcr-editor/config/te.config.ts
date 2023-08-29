@@ -1,5 +1,5 @@
 export class TranscrEditorConfig {
-  public markers = [];
+  public markers: any[] = [];
   // disabled shortcuts
   public disabledKeys = [
     'ENTER',

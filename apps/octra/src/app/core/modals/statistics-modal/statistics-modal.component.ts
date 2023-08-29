@@ -1,18 +1,11 @@
 import { Component } from '@angular/core';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { StatisticElem } from '../../obj/statistics/StatisticElement';
-import {
-  TranscriptionService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { TextConverter } from '@octra/annotation';
 import { OctraModal } from '../types';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalOptions,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-statistics-modal',
@@ -29,13 +22,8 @@ export class StatisticsModalComponent extends OctraModal {
 
   public bgdescr = '';
   public sendProObj = true;
-  public bugsent = false;
   public transcrObjStr = '';
   protected data = undefined;
-
-  public get transcrServ(): TranscriptionService {
-    return this.navbarService.transcrService;
-  }
 
   public get uiService(): UserInteractionsService {
     return this.navbarService.uiService;
@@ -50,7 +38,7 @@ export class StatisticsModalComponent extends OctraModal {
   }
 
   constructor(
-    modalService: NgbModal,
+    public annotationStore: AnnotationStoreService,
     private navbarService: NavbarService,
     private appStorage: AppStorageService,
     protected override activeModal: NgbActiveModal
@@ -61,16 +49,6 @@ export class StatisticsModalComponent extends OctraModal {
   clearElements() {
     this.uiService.clear();
     this.appStorage.clearLoggingDataPermanently();
-  }
-
-  getText() {
-    if (this.transcrServ !== undefined) {
-      return this.navbarService.transcrService.getTranscriptString(
-        new TextConverter()
-      );
-    }
-
-    return '';
   }
 
   public stringify(value: string) {

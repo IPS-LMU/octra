@@ -1,14 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { navigateTo } from '@octra/ngx-utilities';
-import {
-  SettingsService,
-  TranscriptionService,
-  UserInteractionsService,
-} from '../../../shared/service';
+import { UserInteractionsService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { DefaultComponent } from '../../../component/default.component';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription-submitted',
@@ -22,9 +19,8 @@ export class TranscriptionEndComponent
   constructor(
     private router: Router,
     private appStorage: AppStorageService,
-    private tranService: TranscriptionService,
+    private annotationStoreService: AnnotationStoreService,
     private uiService: UserInteractionsService,
-    private settService: SettingsService,
     private navService: NavbarService
   ) {
     super();
@@ -36,7 +32,7 @@ export class TranscriptionEndComponent
   ngOnInit() {}
 
   leave() {
-    this.tranService.endTranscription();
+    this.annotationStoreService.endTranscription();
 
     this.uiService.elements = [];
     this.appStorage.logout(true);

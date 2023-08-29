@@ -3,7 +3,6 @@ import {
   AudioService,
   KeymappingService,
   SettingsService,
-  TranscriptionService,
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
@@ -24,7 +23,6 @@ export class NewEditorComponent
   constructor(
     public audio: AudioService,
     public keyMap: KeymappingService,
-    public transcrService: TranscriptionService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService

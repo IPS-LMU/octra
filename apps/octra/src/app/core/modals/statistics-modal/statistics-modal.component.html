@@ -11,7 +11,7 @@
   <div class="modal-body">
     <h3>Transkriptionstext:</h3>
     <p>
-      {{ getText() }}
+      {{ annotationStore.transcriptString$ | async }}
     </p>
     <table class="table">
       <thead>
@@ -23,7 +23,7 @@
       <tbody>
         <tr>
           <td>Anzahl Segmente:</td>
-          <td>{{ transcrServ.currentlevel!.segments!.length }}</td>
+          <td>{{ (annotationStore.currentLevel$ | async)!.items!.length }}</td>
         </tr>
         <tr>
           <td>Anzahl Logeinträge:</td>

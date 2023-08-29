@@ -12,13 +12,11 @@ import { LoadingStatus, RootState } from '../../store';
 import { navigateTo } from '@octra/ngx-utilities';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { Store } from '@ngrx/store';
-import { TranscriptionService } from '../service';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
   constructor(
     private appStoreService: ApplicationStoreService,
-    private transcrService: TranscriptionService,
     private router: Router,
     private store: Store<RootState>
   ) {}

@@ -6,10 +6,15 @@ import { AppInfo } from '../../../app.info';
 import { BugReporter } from '../../obj/BugAPI/BugReporter';
 import { AppStorageService } from './appstorage.service';
 import { SettingsService } from './settings.service';
-import { TranscriptionService } from './transcription.service';
-import { BrowserInfo, getFileSize } from '@octra/utilities';
+import {
+  BrowserInfo,
+  getFileSize,
+  SubscriptionManager,
+} from '@octra/utilities';
 import { LoginMode } from '../../store';
 import { DateTime } from 'luxon';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AudioService } from './audio.service';
 
 export enum ConsoleType {
   LOG,
@@ -32,9 +37,8 @@ export interface BugReportCredentials {
 @Injectable()
 export class BugReportService {
   private reporter!: BugReporter;
-  private transcrService!: TranscriptionService;
   private fromDBLoaded = false;
-
+  private subscrManager = new SubscriptionManager();
   private _console: ConsoleEntry[] = [];
 
   get console(): ConsoleEntry[] {
@@ -45,12 +49,10 @@ export class BugReportService {
     private langService: TranslocoService,
     private appStorage: AppStorageService,
     private settService: SettingsService,
+    private annotationStoreService: AnnotationStoreService,
+    private audio: AudioService,
     private http: HttpClient
   ) {}
-
-  public init(transcrService: TranscriptionService) {
-    this.transcrService = transcrService;
-  }
 
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {
@@ -135,23 +137,27 @@ export class BugReportService {
       result.octra.jobID = this.appStorage.onlineSession?.task?.id;
     }
 
-    if (!(this.transcrService === undefined)) {
-      const file = getFileSize(this.transcrService.audiofile.size);
-      result.octra.audiofile_size = file.size + ' ' + file.label;
-      result.octra.audiofile_duration =
-        this.transcrService.audioManager.resource.info.duration.seconds;
-      result.octra.audiofile_samplerate =
-        this.transcrService.audiofile.sampleRate;
-      result.octra.audiofile_bitrate =
-        this.transcrService.audioManager.resource.info.bitrate;
-      result.octra.audiofile_channels =
-        this.transcrService.audioManager.resource.info.channels;
-      result.octra.audiofile_type =
-        this.transcrService.audioManager.resource.extension;
-      result.octra.levels = this.transcrService.annotation.levels.length;
-      result.octra.currentlevel = this.transcrService.selectedlevel;
-      result.octra.segments = this.transcrService.currentlevel!.segments.length;
-    }
+    this.subscrManager.add(
+      this.annotationStoreService.transcript$.subscribe({
+        next: (transcript) => {
+          const file = getFileSize(this.audio.audioManager.resource.size!);
+          result.octra.audiofile_size = file.size + ' ' + file.label;
+          result.octra.audiofile_duration =
+            this.audio.audioManager.resource.info.duration.seconds;
+          result.octra.audiofile_samplerate =
+            this.audio.audioManager.resource.info.sampleRate;
+          result.octra.audiofile_bitrate =
+            this.audio.audioManager.resource.info.bitrate;
+          result.octra.audiofile_channels =
+            this.audio.audioManager.resource.info.channels;
+          result.octra.audiofile_type =
+            this.audio.audioManager.resource.extension;
+          result.octra.levels = transcript!.levels.length;
+          result.octra.currentlevel = transcript!.selectedLevelIndex;
+          result.octra.segments = transcript!.currentLevel!.items.length;
+        },
+      })
+    );
 
     return result;
   }

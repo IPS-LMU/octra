@@ -134,8 +134,6 @@ export function getFileSize(bytes: number): FileSize {
 }
 
 export function escapeHtml(text: string): string {
-  // TODO improve code!
-
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -145,8 +143,6 @@ export function escapeHtml(text: string): string {
 }
 
 export function unEscapeHtml(text: string): string {
-  // TODO improve code!
-
   return text
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -491,28 +487,28 @@ export function getTranscriptFromIO(io: any[]): any | undefined {
 
 export function popupCenter(url: string, title: string, w: number, h: number) {
   const dualScreenLeft =
-      window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop =
-      window.screenTop !== undefined ? window.screenTop : window.screenY;
+    window.screenTop !== undefined ? window.screenTop : window.screenY;
 
   const width = window.innerWidth
-      ? window.innerWidth
-      : document.documentElement.clientWidth
-          ? document.documentElement.clientWidth
-          : screen.width;
+    ? window.innerWidth
+    : document.documentElement.clientWidth
+    ? document.documentElement.clientWidth
+    : screen.width;
   const height = window.innerHeight
-      ? window.innerHeight
-      : document.documentElement.clientHeight
-          ? document.documentElement.clientHeight
-          : screen.height;
+    ? window.innerHeight
+    : document.documentElement.clientHeight
+    ? document.documentElement.clientHeight
+    : screen.height;
 
   const systemZoom = width / window.screen.availWidth;
   const left = (width - w) / 2 / systemZoom + dualScreenLeft;
   const top = (height - h) / 2 / systemZoom + dualScreenTop;
   const newWindow = window.open(
-      url,
-      title,
-      `
+    url,
+    title,
+    `
       toolbar=no,
       menubar=no,
       scrollbars=yes,
@@ -532,5 +528,7 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
  * returns the base URL path to the application
  */
 export function getBaseHrefURL() {
-  return location.origin + document.querySelector('head base')?.getAttribute('href');
+  return (
+    location.origin + document.querySelector('head base')?.getAttribute('href')
+  );
 }

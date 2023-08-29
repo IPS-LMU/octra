@@ -26,6 +26,10 @@ export class AudioService {
     return this._loaded;
   }
 
+  get audioManager(): AudioManager {
+    return this._audiomanagers[0];
+  }
+
   /***
    * Constructor
    */
@@ -54,7 +58,8 @@ export class AudioService {
               audioInput.filename,
               audioInput.type,
               event.result,
-              AppInfo.audioformats
+              AppInfo.audioformats,
+              url
             ).subscribe({
               next: (result) => {
                 if (

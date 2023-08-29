@@ -21,13 +21,13 @@
   [audiochunk]="audiochunk"
   [segments]="segments"
   [easymode]="appStorage.easymode"
-  [markers]="transcrService.guidelines?.markers"
+  [markers]="annotationStoreService.guidelines!.markers"
   [validationEnabled]="
     appStorage.useMode !== 'url' &&
     (appStorage.useMode === 'demo' ||
       (settingsService.projectsettings !== undefined &&
         settingsService.projectsettings!.octra !== undefined &&
-        settingsService.projectsettings.octra.validationEnabled === true))
+        settingsService.projectsettings!.octra!.validationEnabled === true))
   "
   [(highlightingEnabled)]="highlighting"
   [externalShortcutManager]="keyMap.shortcutsManager"

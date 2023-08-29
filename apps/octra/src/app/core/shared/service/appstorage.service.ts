@@ -6,7 +6,6 @@ import {
   SubscriptionManager,
   waitTillResultRetrieved,
 } from '@octra/utilities';
-import { OIDBLevel, OIDBLink } from '@octra/annotation';
 import { getModeState, LoadingStatus, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
@@ -19,14 +18,19 @@ import * as fromAnnotation from '../../store/login-mode/annotation';
 import {
   AnnotationSessionState,
   AnnotationState,
-  AnnotationStateLevel,
-  convertFromOIDLevel,
 } from '../../store/login-mode/annotation';
 import { ILog } from '../../obj/Settings/logging';
 import { LoginModeActions } from '../../store/login-mode';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { AuthenticationActions } from '../../store/authentication';
+import {
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationLink,
+  Segment,
+} from '@octra/annotation';
 
 @Injectable({
   providedIn: 'root',
@@ -163,11 +167,11 @@ export class AppStorageService {
     );
   }
 
-  get annotationLevels(): AnnotationStateLevel[] {
+  get annotationLevels(): OctraAnnotationAnyLevel<Segment>[] {
     return getModeState(this._snapshot)!.transcript!.levels;
   }
 
-  get annotationLinks(): OIDBLink[] {
+  get annotationLinks(): OctraAnnotationLink[] {
     return getModeState(this._snapshot)!.transcript?.links;
   }
 
@@ -340,32 +344,19 @@ export class AppStorageService {
   }
 
   public overwriteAnnotation = (
-    levels: OIDBLevel[],
-    links: OIDBLink[],
+    transcript: OctraAnnotation<ASRContext, Segment>,
     saveToDB = true
   ) => {
-    let max = 0;
-
-    for (const valueElem of levels) {
-      max = Math.max(max, valueElem.id);
-    }
-
     this.store.dispatch(
       AnnotationActions.overwriteTranscript.do({
         mode: this.useMode,
-        transcript: {
-          levels: levels.map((a) => {
-            return convertFromOIDLevel(a.level, a.id);
-          }),
-          links,
-          levelCounter: max,
-        },
+        transcript,
         saveToDB,
       })
     );
   };
 
-  public overwriteLinks = (value: OIDBLink[]) => {
+  public overwriteLinks = (value: OctraAnnotationLink[]) => {
     this.store.dispatch(
       AnnotationActions.overwriteLinks.do({
         links: value,
@@ -455,6 +446,8 @@ export class AppStorageService {
     return true;
   }
 
+  private maintenanceChecker!: Subscription;
+
   public saveLogItem(log: ILog) {
     if (log !== undefined) {
       const properties = getProperties(log);
@@ -496,7 +489,7 @@ export class AppStorageService {
 
   public changeAnnotationLevel(
     tiernum: number,
-    level: AnnotationStateLevel
+    level: OctraAnnotationAnyLevel<Segment>
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.annotationLevels !== undefined) {
@@ -528,35 +521,6 @@ export class AppStorageService {
         }
       } else {
         reject('annotation object is undefined or undefined');
-      }
-    });
-  }
-
-  public addAnnotationLevel(level: OIDBLevel) {
-    return new Promise<void>((resolve, reject) => {
-      if (level !== undefined) {
-        level.id = getModeState(this._snapshot)!.transcript.levelCounter + 1;
-
-        waitTillResultRetrieved<Actions, Action, void>(
-          this.actions,
-          IDBActions.addAnnotationLevel.success,
-          IDBActions.addAnnotationLevel.fail
-        )
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
-
-        this.store.dispatch(
-          AnnotationActions.addAnnotationLevel.do({
-            level: convertFromOIDLevel(level.level, level.id),
-            mode: this.useMode,
-          })
-        );
-      } else {
-        console.error('level is undefined or undefined');
       }
     });
   }

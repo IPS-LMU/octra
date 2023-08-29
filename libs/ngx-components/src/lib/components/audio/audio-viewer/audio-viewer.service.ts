@@ -11,9 +11,13 @@ import {
 } from '@octra/media';
 import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
 import {
-  addSegment,
+  AnnotationAnySegment,
+  ASRContext,
   ASRQueueItemType,
   betweenWhichSegment,
+  OctraAnnotation,
+  OctraAnnotationAnyLevel,
+  OLabel,
   removeSegmentByIndex,
   Segment,
 } from '@octra/annotation';
@@ -29,7 +33,22 @@ export class AudioViewerService {
     return this._boundaryDragging;
   }
 
-  public entriesChange = new EventEmitter<Segment[]>();
+  get currentLevel(): OctraAnnotationAnyLevel<Segment> | undefined {
+    if (this.currentLevelID && this.annotation) {
+      const index = this.annotation.levels.findIndex(
+        (a) => a.id === this.currentLevelID
+      );
+      if (index > -1) {
+        return this.annotation.levels[index];
+      }
+    }
+    return undefined;
+  }
+
+  public itemsChange = new EventEmitter<AnnotationAnySegment[]>();
+  public annotationChange = new EventEmitter<
+    OctraAnnotation<ASRContext, Segment>
+  >();
   public audioTCalculator: AudioTimeCalculator | undefined;
   public overboundary = false;
   public shiftPressed = false;
@@ -40,6 +59,9 @@ export class AudioViewerService {
 
   private _boundaryDragging: Subject<'started' | 'stopped'>;
   private _levelName!: string;
+  currentLevelID?: number;
+
+  annotation?: OctraAnnotation<ASRContext, Segment>;
 
   // AUDIO
   protected audioPxW = 0;
@@ -48,7 +70,7 @@ export class AudioViewerService {
   private subscrManager: SubscriptionManager<Subscription> =
     new SubscriptionManager<Subscription>();
 
-  public entries: Segment[] = [];
+  public items: AnnotationAnySegment[] = [];
 
   private _drawnSelection: AudioSelection | undefined;
 
@@ -113,7 +135,7 @@ export class AudioViewerService {
     if (value > -1 && this._dragableBoundaryNumber === -1) {
       // started
       this._boundaryDragging.next('started');
-      this.entriesChange.emit(this.entries);
+      this.itemsChange.emit(this.items);
     }
     this._dragableBoundaryNumber = value;
   }
@@ -152,6 +174,15 @@ export class AudioViewerService {
 
   protected get audioManager(): AudioManager | undefined {
     return this.audioChunk?.audioManager;
+  }
+
+  public itemIDCounter = 1;
+  public itemIDCounterChange = new EventEmitter<number>();
+
+  public getNextItemID() {
+    this.itemIDCounter++;
+    this.itemIDCounterChange.emit(this.itemIDCounter);
+    return this.itemIDCounter - 1;
   }
 
   constructor(private multiThreadingService: MultiThreadingService) {
@@ -197,7 +228,7 @@ export class AudioViewerService {
           absXInTime !== undefined &&
           this.audioManager !== undefined &&
           this.audioChunk !== undefined &&
-          this.entries.length > 0 &&
+          this.items.length > 0 &&
           this.audioTCalculator !== undefined &&
           this.PlayCursor !== undefined
         ) {
@@ -216,20 +247,25 @@ export class AudioViewerService {
               this._drawnSelection = this.audioChunk.selection.clone();
 
               if (this._dragableBoundaryNumber > -1) {
-                const segmentBefore =
+                const segmentBefore = (
                   this._dragableBoundaryNumber > 0
-                    ? this.entries[this._dragableBoundaryNumber - 1]
-                    : this.entries[this._dragableBoundaryNumber];
-                const segment = this.entries[this._dragableBoundaryNumber];
-                const segmentAfter =
-                  this._dragableBoundaryNumber < this.entries.length - 1
-                    ? this.entries[this._dragableBoundaryNumber + 1]
-                    : this.entries[this._dragableBoundaryNumber];
-
+                    ? this.items[this._dragableBoundaryNumber - 1]
+                    : this.items[this._dragableBoundaryNumber]
+                ) as Segment<ASRContext>;
+                const segment = this.items[
+                  this._dragableBoundaryNumber
+                ] as Segment<ASRContext>;
+                const segmentAfter = (
+                  this._dragableBoundaryNumber < this.items.length - 1
+                    ? this.items[this._dragableBoundaryNumber + 1]
+                    : this.items[this._dragableBoundaryNumber]
+                ) as Segment<ASRContext>;
                 if (
-                  segment?.isBlockedBy === ASRQueueItemType.ASR ||
-                  segmentBefore?.isBlockedBy === ASRQueueItemType.ASR ||
-                  segmentAfter?.isBlockedBy === ASRQueueItemType.ASR
+                  segment?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR ||
+                  segmentBefore?.context?.asr?.isBlockedBy ===
+                    ASRQueueItemType.ASR ||
+                  segmentAfter?.context?.asr?.isBlockedBy ===
+                    ASRQueueItemType.ASR
                 ) {
                   // prevent dragging boundary of blocked segment
                   this._dragableBoundaryNumber = -1;
@@ -241,21 +277,24 @@ export class AudioViewerService {
                 this.settings.boundaries.enabled &&
                 !this.settings.boundaries.readonly &&
                 this._dragableBoundaryNumber > -1 &&
-                this._dragableBoundaryNumber < this.entries.length
+                this._dragableBoundaryNumber < this.items.length
               ) {
                 // some boundary dragged
-                const segment: Segment | undefined =
-                  this?.entries[this._dragableBoundaryNumber]?.clone();
+                const segment: Segment | undefined = (
+                  this.items[
+                    this._dragableBoundaryNumber
+                  ] as Segment<ASRContext>
+                )?.clone(this.getNextItemID());
                 // TODO check this
                 if (segment) {
                   segment.time = this.audioTCalculator.absXChunktoSampleUnit(
                     absX,
                     this.audioChunk
-                  ) as any;
+                  )!;
                 }
 
                 this._boundaryDragging.next('stopped');
-                this.entriesChange.emit(this.entries);
+                this.itemsChange.emit(this.items);
               } else {
                 // set selection
                 this.audioChunk.selection.end = absXInTime.clone();
@@ -553,7 +592,7 @@ export class AudioViewerService {
     if (
       this.audioTCalculator !== undefined &&
       this.audioChunk !== undefined &&
-      this.entries.length > 0
+      this.items.length > 0
     ) {
       let absXTime = this.audioTCalculator.absXChunktoSampleUnit(
         absX,
@@ -574,19 +613,21 @@ export class AudioViewerService {
         ) {
           // mouse down something dragged
           const segment = (
-            this.entries[this._dragableBoundaryNumber] as any
+            this.items[this._dragableBoundaryNumber] as any
           ).clone();
           const absXSeconds = absXTime.seconds;
 
           // prevent overwriting another boundary
-          const segmentBefore =
+          const segmentBefore = (
             this._dragableBoundaryNumber > 0
-              ? this.entries[this._dragableBoundaryNumber - 1]
-              : undefined;
-          const segmentAfter =
-            this._dragableBoundaryNumber < this.entries.length - 1
-              ? this.entries[this._dragableBoundaryNumber + 1]
-              : undefined;
+              ? this.items[this._dragableBoundaryNumber - 1]
+              : undefined
+          ) as Segment<ASRContext>;
+          const segmentAfter = (
+            this._dragableBoundaryNumber < this.items.length - 1
+              ? this.items[this._dragableBoundaryNumber + 1]
+              : undefined
+          ) as Segment<ASRContext>;
           if (
             segmentBefore?.time !== undefined &&
             this.audioManager !== undefined
@@ -613,7 +654,7 @@ export class AudioViewerService {
           }
 
           segment.time = absXTime.clone();
-          this.entries[this._dragableBoundaryNumber] = segment;
+          this.items[this._dragableBoundaryNumber] = segment;
         } else {
           this._mouseDown = false;
         }
@@ -643,7 +684,7 @@ export class AudioViewerService {
       this.audioTCalculator !== undefined &&
       this.audioChunk !== undefined &&
       this._mouseCursor !== undefined &&
-      this.entries.length > 0
+      this.items.length > 0
     ) {
       this.audioTCalculator.audioPxWidth = this.audioPxW;
       const absXTime = !this.audioChunk.isPlaying
@@ -655,9 +696,9 @@ export class AudioViewerService {
       );
       bWidthTime = Math.round(bWidthTime);
 
-      if (this.entries.length > 0 && !this.audioChunk.isPlaying) {
-        for (i = 0; i < this.entries.length; i++) {
-          const segment = this.entries[i];
+      if (this.items.length > 0 && !this.audioChunk.isPlaying) {
+        for (i = 0; i < this.items.length; i++) {
+          const segment = this.items[i] as Segment<ASRContext>;
           if (
             segment?.time !== undefined &&
             this.audioManager !== undefined &&
@@ -693,11 +734,11 @@ export class AudioViewerService {
       ) {
         // some part selected
         const segm1 = betweenWhichSegment(
-          this.entries,
+          this.items as Segment<ASRContext>[],
           this._drawnSelection.start.samples
         );
         const segm2 = betweenWhichSegment(
-          this.entries,
+          this.items as Segment<ASRContext>[],
           this._drawnSelection.end.samples
         );
 
@@ -707,8 +748,8 @@ export class AudioViewerService {
             segm1 === segm2 ||
             (segm1 !== undefined &&
               segm2 !== undefined &&
-              segm1.value === '' &&
-              segm2.value === ''))
+              segm1.getFirstLabelWithoutName('Speaker')?.value === '' &&
+              segm2.getFirstLabelWithoutName('Speaker')?.value === ''))
         ) {
           if (this.drawnSelection.start.samples > 0) {
             // prevent setting boundary if first sample selected
@@ -739,14 +780,18 @@ export class AudioViewerService {
         }
       } else {
         // no selection
-        const segment = betweenWhichSegment(this.entries, absXTime);
+        const segment = betweenWhichSegment(
+          this.items as Segment<ASRContext>[],
+          absXTime
+        );
         if (segment !== undefined && this.audioManager !== undefined) {
           let transcript = '';
           if (segment) {
-            if (this.entries.length > 1) {
+            if (this.items.length > 1) {
               // clear right
-              transcript = segment.value;
-              segment.value = '';
+              transcript =
+                segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+              segment.changeFirstLabelWithoutName('Speaker', '');
             } else {
               // clear left
               transcript = '';
@@ -781,17 +826,19 @@ export class AudioViewerService {
   ): AudioSelection | undefined {
     // complex decision needed because there are no segments at position 0 and the end of the file
     let result = undefined;
-    if (this.entries.length > 0) {
-      const segments = this.entries;
-      const length = this.entries.length;
+    if (this.items.length > 0) {
+      const segments = this.items;
+      const length = this.items.length;
 
       if (
         length > 0 &&
         segments !== undefined &&
         this.audioManager !== undefined
       ) {
-        const firstSegment = segments[0];
-        const lastSegment = segments[segments.length - 1];
+        const firstSegment = segments[0] as Segment<ASRContext>;
+        const lastSegment = segments[
+          segments.length - 1
+        ] as Segment<ASRContext>;
 
         if (firstSegment.time.samples !== lastSegment.time.samples) {
           if (positionSamples < firstSegment.time.samples) {
@@ -809,8 +856,8 @@ export class AudioViewerService {
             );
           } else {
             for (let i = 1; i < length; i++) {
-              const currentSegment = segments[i];
-              const previousSegment = segments[i - 1];
+              const currentSegment = segments[i] as Segment<ASRContext>;
+              const previousSegment = segments[i - 1] as Segment<ASRContext>;
 
               if (
                 previousSegment?.time !== undefined &&
@@ -1026,19 +1073,21 @@ export class AudioViewerService {
     mergeTranscripts: boolean,
     triggerChange = true
   ) {
-    this.entries = removeSegmentByIndex(
-      this.entries,
+    this.items = removeSegmentByIndex(
+      this.items as Segment<ASRContext>[],
       index,
       silenceCode,
       mergeTranscripts
     );
     if (triggerChange) {
-      this.entriesChange.emit(this.entries);
+      this.itemsChange.emit(this.items);
     }
   }
 
   public addSegment(start: SampleUnit, value?: string) {
-    this.entries = addSegment(this.entries, start, this._levelName, value);
-    this.entriesChange.emit(this.entries);
+    const result = this.annotation!.addItemToCurrentLevel(start, [
+      new OLabel(this.currentLevel!.name, value ?? ''),
+    ]);
+    this.annotationChange.emit(result);
   }
 }

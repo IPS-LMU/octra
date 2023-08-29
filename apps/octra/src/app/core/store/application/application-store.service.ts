@@ -1,13 +1,33 @@
 import { Injectable } from '@angular/core';
-import { RootState } from '../index';
+import { LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { ApplicationActions } from './application.actions';
+import { SubscriptionManager } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApplicationStoreService {
-  constructor(private store: Store<RootState>) {}
+  private _useMode?: LoginMode;
+
+  get useMode(): LoginMode | undefined {
+    return this._useMode;
+  }
+
+  private subscrManager = new SubscriptionManager();
+
+  constructor(private store: Store<RootState>) {
+    this.subscrManager.add(
+      this.store
+        .select((state: RootState) => state.application.mode)
+        .subscribe({
+          next: (mode) => {
+            this._useMode = mode;
+          },
+        })
+    );
+  }
+
   loading$ = this.store.select((state: RootState) => state.application.loading);
   appconfig$ = this.store.select(
     (state: RootState) => state.application.appConfiguration
@@ -22,5 +42,9 @@ export class ApplicationStoreService {
 
   public initApplication() {
     this.store.dispatch(ApplicationActions.initApplication.do());
+  }
+
+  public destroy() {
+    this.subscrManager.destroy();
   }
 }

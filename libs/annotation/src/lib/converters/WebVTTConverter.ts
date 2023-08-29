@@ -1,12 +1,12 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import {
-  AnnotationLevelType,
   OAnnotJSON,
-  OAudiofile,
+  OAnyLevel,
   OLabel,
-  OLevel,
   OSegment,
+  OSegmentLevel,
 } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class WebVTTConverter extends Converter {
   public constructor() {
@@ -44,20 +44,21 @@ export class WebVTTConverter extends Converter {
       }
 
       if (levelnum < annotation.levels.length) {
-        const level: OLevel = annotation.levels[levelnum];
+        const level: OAnyLevel<OSegment> = annotation.levels[levelnum];
 
         let counter = 1;
         if (level.type === 'SEGMENT') {
           for (let j = 0; j < level.items.length; j++) {
-            const transcript = level.items[j].labels[0].value
+            const item = level.items[j] as OSegment;
+            const transcript = item.labels[0].value
               .replace(/</g, '&lt;')
               .replace(/>/g, '&gt;');
             const start = this.getTimeStringFromSamples(
-              level.items[j].sampleStart!,
+              item.sampleStart!,
               annotation.sampleRate
             );
             const end = this.getTimeStringFromSamples(
-              level.items[j].sampleStart! + level.items[j].sampleDur!,
+              item.sampleStart! + item.sampleDur!,
               annotation.sampleRate
             );
 
@@ -91,8 +92,12 @@ export class WebVTTConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
-      result.levels.push(new OLevel(`OCTRA_1`, AnnotationLevelType.SEGMENT));
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
+      result.levels.push(new OSegmentLevel(`OCTRA_1`));
 
       const content = file.content;
 
@@ -172,7 +177,7 @@ export class WebVTTConverter extends Converter {
 
                   if (escapedTranscript.trim() !== '') {
                     if (timeStart > lastEnd) {
-                      result.levels[0].items.push(
+                      (result.levels[0].items as OSegment[]).push(
                         new OSegment(
                           counterID++,
                           lastEnd,
@@ -182,7 +187,7 @@ export class WebVTTConverter extends Converter {
                       );
                     }
 
-                    result.levels[0].items.push(
+                    (result.levels[0].items as OSegment[]).push(
                       new OSegment(
                         counterID++,
                         timeStart,
@@ -207,19 +212,19 @@ export class WebVTTConverter extends Converter {
             }
 
             for (let i = 0; i < result.levels.length; i++) {
-              const level = result.levels[i];
+              const level = result.levels[i] as OSegmentLevel<OSegment>;
               if (level.items.length > 0) {
                 const lastItem = level.items[level.items.length - 1];
                 const restSamples =
                   audiofile.duration -
-                  (lastItem.sampleStart! + lastItem.sampleDur!);
+                  (lastItem.sampleStart + lastItem.sampleDur);
 
                 if (restSamples > 300) {
                   // add empty segment
                   level.items.push(
                     new OSegment(
                       counterID++,
-                      lastItem.sampleStart! + lastItem.sampleDur!,
+                      lastItem.sampleStart + lastItem.sampleDur,
                       restSamples,
                       [new OLabel(`OCTRA_${i + 1}`, '')]
                     )

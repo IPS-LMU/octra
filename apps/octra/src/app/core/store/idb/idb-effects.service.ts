@@ -19,7 +19,18 @@ import {
 import { Action, Store } from '@ngrx/store';
 import { IDBService } from '../../shared/service/idb.service';
 import { getModeState, LoginMode, RootState } from '../index';
-import { ILevel, ILink, OAnnotJSON, OIDBLink } from '@octra/annotation';
+import {
+  OAnnotJSON,
+  OAnyLevel,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationEventLevel,
+  OctraAnnotationItemLevel,
+  OctraAnnotationSegmentLevel,
+  OEventLevel,
+  OItemLevel,
+  OSegment,
+  Segment,
+} from '@octra/annotation';
 import { SessionStorageService } from 'ngx-webstorage';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
@@ -32,8 +43,8 @@ import { IIDBModeOptions } from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AuthenticationActions } from '../authentication';
-import { AnnotationState, convertFromOIDLevel } from '../login-mode/annotation';
 import { ASRStateSettings } from '../asr';
+import { AnnotationState } from '../login-mode/annotation';
 
 @Injectable({
   providedIn: 'root',
@@ -176,64 +187,78 @@ export class IDBEffects {
           this.idbService.loadAnnotation(LoginMode.LOCAL),
           this.idbService.loadAnnotation(LoginMode.DEMO),
         ]).pipe(
-          map(([onlineAnnotation, localAnnotation, demoAnnotation]) => {
-            let max = 0;
-            const convertToStateLevel = (level: ILevel, i: number) => {
-              const annotationStateLevel = convertFromOIDLevel(level, i + 1);
-              if (!hasProperty(level, 'id')) {
-                annotationStateLevel.id = i + 1;
-              }
+          withLatestFrom(this.store),
+          map(
+            ([[onlineAnnotation, localAnnotation, demoAnnotation], state]) => {
+              const oAnnotation = OAnnotJSON.deserialize(onlineAnnotation);
+              const lAnnotation = OAnnotJSON.deserialize(localAnnotation);
+              const dAnnotation = OAnnotJSON.deserialize(demoAnnotation);
 
-              max = Math.max(annotationStateLevel.id, max);
-              return annotationStateLevel;
-            };
+              const convertLevel: (
+                modState: AnnotationState,
+                level: OAnyLevel<OSegment>,
+                i: number
+              ) => OctraAnnotationAnyLevel<Segment> = (
+                modState: AnnotationState,
+                level,
+                i
+              ) => {
+                if (level instanceof OItemLevel) {
+                  return new OctraAnnotationItemLevel(
+                    i + 1,
+                    level.name,
+                    level.items
+                  );
+                } else if (level instanceof OEventLevel) {
+                  return new OctraAnnotationEventLevel(
+                    i + 1,
+                    level.name,
+                    level.items
+                  );
+                }
+                return new OctraAnnotationSegmentLevel(
+                  i + 1,
+                  level.name,
+                  level.items.map((a) =>
+                    Segment.deserializeFromOSegment(
+                      a,
+                      modState.audio.sampleRate
+                    )
+                  )
+                );
+              };
 
-            const convertLink = (link: ILink, i: number) => {
-              if (!hasProperty(link, 'id')) {
-                return new OIDBLink(i + 1, link);
-              } else {
-                return link;
-              }
-            };
-
-            const oidbOnlineAnnotation = {
-              levels: onlineAnnotation?.levels
-                ? onlineAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: onlineAnnotation?.links
-                ? onlineAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            max = 0;
-            const oidbLocalAnnotation = {
-              levels: localAnnotation?.levels
-                ? localAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: localAnnotation?.links
-                ? localAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            max = 0;
-            const oidbDemoAnnotation = {
-              levels: demoAnnotation?.levels
-                ? demoAnnotation?.levels.map(convertToStateLevel)
-                : [],
-              links: demoAnnotation?.links
-                ? demoAnnotation?.links.map(convertLink)
-                : [],
-              levelCounter: max,
-            };
-
-            return IDBActions.loadAnnotation.success({
-              online: oidbOnlineAnnotation,
-              local: oidbLocalAnnotation,
-              demo: oidbDemoAnnotation,
-            });
-          }),
+              return IDBActions.loadAnnotation.success({
+                online: {
+                  levels: oAnnotation.levels.map((a, i) =>
+                    convertLevel(state.onlineMode, a, i)
+                  ),
+                  idCounters: {
+                    level: oAnnotation.maxLevelID,
+                    item: oAnnotation.maxItemID,
+                  },
+                },
+                local: {
+                  levels: lAnnotation.levels.map((a, i) =>
+                    convertLevel(state.localMode, a, i)
+                  ),
+                  idCounters: {
+                    level: lAnnotation.maxLevelID,
+                    item: oAnnotation.maxItemID,
+                  },
+                },
+                demo: {
+                  levels: dAnnotation.levels.map((a, i) =>
+                    convertLevel(state.demoMode, a, i)
+                  ),
+                  idCounters: {
+                    level: dAnnotation.maxLevelID,
+                    item: dAnnotation.maxItemID,
+                  },
+                },
+              });
+            }
+          ),
           catchError((error) => {
             return of(
               IDBActions.loadAnnotation.fail({
@@ -262,8 +287,9 @@ export class IDBEffects {
               appState.application.mode!,
               new OAnnotJSON(
                 modeState.audio.fileName,
+                modeState.audio.fileName.replace(/\.[^.]+$/g, ''),
                 modeState.audio.sampleRate,
-                modeState.transcript.levels,
+                modeState.transcript.levels.map((a) => a.serialize()),
                 links
               )
             )
@@ -303,8 +329,9 @@ export class IDBEffects {
               appState.application.mode!,
               new OAnnotJSON(
                 modeState.audio.fileName,
+                modeState.audio.fileName.replace(/\.[^.]+/g, ''),
                 modeState.audio.sampleRate,
-                modeState.transcript.levels,
+                modeState.transcript.levels.map((a) => a.serialize()),
                 links
               )
             )
@@ -414,6 +441,7 @@ export class IDBEffects {
   overwriteAnnotation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.overwriteTranscript.do),
+      ofType(AnnotationActions.loadSegments.success),
       exhaustMap((action) => {
         if (action.saveToDB) {
           return this.idbService.clearAnnotationData((action as any).mode).pipe(
@@ -971,8 +999,9 @@ export class IDBEffects {
               action.mode,
               new OAnnotJSON(
                 modeState.audio.fileName,
+                modeState.audio.fileName.replace(/\.[^.]+/g, ''),
                 modeState.audio.sampleRate,
-                modeState.transcript.levels,
+                modeState.transcript.levels.map((a) => a.serialize()),
                 modeState.transcript.links.map((a) => a.link)
               )
             )

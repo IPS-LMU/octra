@@ -1,14 +1,14 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import { contains } from '@octra/utilities';
 import {
-  AnnotationLevelType,
   OAnnotJSON,
-  OAudiofile,
   OEvent,
+  OEventLevel,
   OLabel,
-  OLevel,
   OSegment,
+  OSegmentLevel,
 } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class PraatTextgridConverter extends Converter {
   public constructor() {
@@ -69,7 +69,7 @@ export class PraatTextgridConverter extends Converter {
             `        intervals: size = ${level.items.length} \n`;
 
           for (let j = 0; j < level.items.length; j++) {
-            const segment = level.items[j];
+            const segment = level.items[j] as OSegment;
 
             const secondsStart = segment.sampleStart! / audiofile.sampleRate;
             const secondsEnd =
@@ -107,7 +107,11 @@ export class PraatTextgridConverter extends Converter {
           ? file.name.substr(0, file.name.lastIndexOf('.'))
           : file.name;
       if (name === fileName) {
-        const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+        const result = new OAnnotJSON(
+          audiofile.name,
+          file.name,
+          audiofile.sampleRate
+        );
 
         let content = file.content;
         // replace
@@ -162,8 +166,8 @@ export class PraatTextgridConverter extends Converter {
                     lvlName = test[1];
                     const olevel =
                       classStr === 'IntervalTier'
-                        ? new OLevel(lvlName, AnnotationLevelType.SEGMENT)
-                        : new OLevel(lvlName, AnnotationLevelType.EVENT);
+                        ? new OSegmentLevel(lvlName)
+                        : new OEventLevel(lvlName);
                     i++;
 
                     // ignore xmin and xmax, interval size
@@ -236,8 +240,8 @@ export class PraatTextgridConverter extends Converter {
                           Math.round(xmin * audiofile.sampleRate),
                           Math.round((xmax - xmin) * audiofile.sampleRate),
                           olabels
-                        );
-                        olevel.items.push(osegment);
+                        ) as OSegment;
+                        (olevel.items as OSegment[]).push(osegment);
                       } else {
                         test = lines[i].match(/number = (.*)/);
                         if (!test) {
@@ -269,7 +273,7 @@ export class PraatTextgridConverter extends Converter {
                           Math.round(numberStr * audiofile.sampleRate),
                           olabels
                         );
-                        olevel.items.push(oevent);
+                        (olevel.items as OEvent[]).push(oevent);
                       }
 
                       segNum++;
@@ -324,11 +328,5 @@ export class PraatTextgridConverter extends Converter {
         error: 'audiofile is undefined.',
       };
     }
-
-    return {
-      annotjson: undefined,
-      audiofile: undefined,
-      error: `This PraatTextgrid file is not compatible.`,
-    };
   }
 }

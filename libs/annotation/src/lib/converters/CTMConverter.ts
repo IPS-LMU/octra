@@ -1,13 +1,7 @@
 import { Converter, ExportResult, IFile, ImportResult } from './Converter';
 import { contains } from '@octra/utilities';
-import {
-  AnnotationLevelType,
-  OAnnotJSON,
-  OAudiofile,
-  OLabel,
-  OLevel,
-  OSegment,
-} from '../annotjson';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
+import { OAudiofile } from '@octra/media';
 
 export class CTMConverter extends Converter {
   // http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#ctm_fmt_name_0
@@ -48,7 +42,7 @@ export class CTMConverter extends Converter {
     if (annotation) {
       const level = annotation.levels[levelnum];
 
-      for (const levelItem of level.items) {
+      for (const levelItem of level.items as OSegment[]) {
         const transcript = levelItem.labels[0].value;
         const start =
           Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) /
@@ -75,7 +69,11 @@ export class CTMConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
     if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
 
       const content = file.content;
       const lines: string[] = content.split('\n');
@@ -84,7 +82,7 @@ export class CTMConverter extends Converter {
       const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
       if (contains(file.name, filename) && contains(audiofile.name, filename)) {
-        const olevel = new OLevel('Tier_1', AnnotationLevelType.SEGMENT);
+        const olevel = new OSegmentLevel('Tier_1');
 
         let start = 0;
         for (let i = 0; i < lines.length; i++) {

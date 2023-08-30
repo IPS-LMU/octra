@@ -18,6 +18,12 @@ export const AppConfigSchema = {
             type: "string",
             enum: ["shibboleth", "local"]
           }
+        },
+        registrationsEnabled: {
+          type: "boolean"
+        },
+        passwordResetEnabled: {
+          type: "boolean"
         }
       },
       type: 'object',

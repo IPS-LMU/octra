@@ -556,10 +556,7 @@ export class AuthenticationEffects {
             ErrorModalComponent,
             ErrorModalComponent.options,
             {
-              text:
-                typeof a.error === 'string'
-                  ? a.error
-                  : a.error?.message ?? a.error.error?.message,
+              text: a.error.error?.message ?? a.error?.message ?? a.error,
             }
           );
         })

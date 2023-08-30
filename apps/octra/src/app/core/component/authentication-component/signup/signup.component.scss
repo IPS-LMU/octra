@@ -1,0 +1,20 @@
+* {
+  font-size: 0.92rem;
+}
+
+#signup-form {
+  margin-top: 20px;
+}
+
+#signup-form .text-danger {
+  margin-top: 20px;
+  font-size: 0.92rem;
+}
+
+#signup-form label {
+  margin-bottom: 0.25rem;
+}
+
+#signup-form .ng-touched.ng-invalid {
+  border-bottom: 2px solid red;
+}

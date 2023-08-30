@@ -6,6 +6,8 @@ export interface AppSettings {
     url: string;
     appToken: string;
     authentications?: AccountLoginMethod[];
+    passwordResetEnabled?: boolean;
+    registrationsEnabled?: boolean;
   };
   octra: {
     database: {

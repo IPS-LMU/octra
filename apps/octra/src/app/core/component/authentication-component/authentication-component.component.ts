@@ -1,7 +1,22 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AccountLoginMethod } from '@octra/api-types';
+import {
+  AccountLoginMethod,
+  LANGUAGES,
+  PolicyListItemDto,
+  TIMEZONE_NAMES,
+} from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../default.component';
+import { TranslocoService } from '@ngneat/transloco';
+
+export class PreparedPolicyListItemDto extends PolicyListItemDto {
+  checked = false;
+
+  constructor(obj: PolicyListItemDto) {
+    super();
+    Object.assign(this, obj);
+  }
+}
 
 @Component({
   selector: 'octra-authentication-component',
@@ -22,10 +37,13 @@ export class AuthenticationComponent extends DefaultComponent {
     AccountLoginMethod.shibboleth,
   ];
   @Input() type?: AccountLoginMethod;
-  @Input()
-  showTitle = true;
+  @Input() showTitle = true;
+  @Input() registrations?: boolean = false;
+  @Input() passwordReset?: boolean = false;
 
   showForgetPassword = false;
+  showSignup = false;
+  signUpLoading = false;
   passwordResetRequested = false;
   email?: string;
 
@@ -44,11 +62,27 @@ export class AuthenticationComponent extends DefaultComponent {
       });
   }
 
-  constructor(private api: OctraAPIService) {
+  constructor(
+    private api: OctraAPIService,
+    private transloco: TranslocoService
+  ) {
     super();
   }
 
   isAuthAllowed(type: AccountLoginMethod) {
     return this.authentications?.includes(type) ?? true;
   }
+
+  goBack() {
+    this.showSignup = false;
+    this.showForgetPassword = false;
+    this.passwordResetRequested = false;
+  }
+
+  showSignUpForm(){
+    this.showSignup =true;
+  }
+
+  protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;
+  protected readonly LANGUAGES = LANGUAGES;
 }

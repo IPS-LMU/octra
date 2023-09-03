@@ -507,7 +507,7 @@ export class AuthenticationEffects {
           if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
-                this.apiService.authType,
+                this.apiService.authType!,
                 a.actionAfterSuccess
               );
             const subscr = this.reauthenticationRef.closed.subscribe({

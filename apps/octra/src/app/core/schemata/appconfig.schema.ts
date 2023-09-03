@@ -11,19 +11,6 @@ export const AppConfigSchema = {
         },
         appToken: {
           type: 'string',
-        },
-        authentications: {
-          type: "array",
-          items: {
-            type: "string",
-            enum: ["shibboleth", "local"]
-          }
-        },
-        registrationsEnabled: {
-          type: "boolean"
-        },
-        passwordResetEnabled: {
-          type: "boolean"
         }
       },
       type: 'object',

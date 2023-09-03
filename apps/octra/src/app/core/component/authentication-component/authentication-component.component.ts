@@ -1,22 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   AccountLoginMethod,
+  AppFeatureDtoAuthenticationsEnum,
   LANGUAGES,
-  PolicyListItemDto,
   TIMEZONE_NAMES,
 } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../default.component';
 import { TranslocoService } from '@ngneat/transloco';
-
-export class PreparedPolicyListItemDto extends PolicyListItemDto {
-  checked = false;
-
-  constructor(obj: PolicyListItemDto) {
-    super();
-    Object.assign(this, obj);
-  }
-}
 
 @Component({
   selector: 'octra-authentication-component',
@@ -32,7 +23,7 @@ export class AuthenticationComponent extends DefaultComponent {
     };
   }>();
 
-  @Input() authentications?: AccountLoginMethod[] = [
+  @Input() authentications?: AppFeatureDtoAuthenticationsEnum[] = [
     AccountLoginMethod.local,
     AccountLoginMethod.shibboleth,
   ];
@@ -79,8 +70,8 @@ export class AuthenticationComponent extends DefaultComponent {
     this.passwordResetRequested = false;
   }
 
-  showSignUpForm(){
-    this.showSignup =true;
+  showSignUpForm() {
+    this.showSignup = true;
   }
 
   protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;

@@ -1,10 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { LANGUAGES, PolicyListItemDto, TIMEZONE_NAMES } from '@octra/api-types';
-import { PreparedPolicyListItemDto } from '../authentication-component.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../default.component';
 import { TranslocoService } from '@ngneat/transloco';
+
+export class PreparedPolicyListItemDto extends PolicyListItemDto {
+  checked = false;
+
+  constructor(obj: PolicyListItemDto) {
+    super();
+    Object.assign(this, obj);
+  }
+}
 
 @Component({
   selector: 'octra-signup',

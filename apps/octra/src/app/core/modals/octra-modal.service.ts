@@ -5,9 +5,9 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalWrapper } from './ng-modal-wrapper';
-import {AccountLoginMethod} from '@octra/api-types';
-import {Action} from '@ngrx/store';
-import {ReAuthenticationModalComponent} from './re-authentication-modal/re-authentication-modal.component';
+import { AccountLoginMethod } from '@octra/api-types';
+import { Action } from '@ngrx/store';
+import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 
 @Injectable()
 export class OctraModalService {
@@ -52,9 +52,16 @@ export class OctraModalService {
     }
   }
 
-  public openReAuthenticationModal(type: AccountLoginMethod | undefined, actionAfterSuccess: Action) {
-    const ref = this.openModalRef<ReAuthenticationModalComponent>(ReAuthenticationModalComponent, ReAuthenticationModalComponent.options);
+  public openReAuthenticationModal(
+    type: AccountLoginMethod,
+    actionAfterSuccess: Action
+  ) {
+    const ref = this.openModalRef<ReAuthenticationModalComponent>(
+      ReAuthenticationModalComponent,
+      ReAuthenticationModalComponent.options
+    );
     ref.componentInstance.type = type;
+    ref.componentInstance.authentications = [type];
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
     return ref;
   }

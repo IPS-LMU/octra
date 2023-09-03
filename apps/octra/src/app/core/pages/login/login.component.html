@@ -65,9 +65,9 @@
                                 <octra-authentication-component
                                         [showTitle]="false"
                                         (submitClick)="onOnlineSubmit($event)"
-                                        [authentications]="settingsService.appSettings.api.authentications"
-                                        [passwordReset]="settingsService.appSettings.api.passwordResetEnabled"
-                                        [registrations]="settingsService.appSettings.api.registrationsEnabled"
+                                        [authentications]="api.appFeatures?.authentications"
+                                        [passwordReset]="api.appFeatures?.reset_password"
+                                        [registrations]="api.appFeatures?.registrations"
                                 ></octra-authentication-component>
                             </div>
                         </div>

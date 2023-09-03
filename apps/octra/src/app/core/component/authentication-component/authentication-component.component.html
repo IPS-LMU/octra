@@ -43,7 +43,7 @@
   <h1 class="h3 mb-4 fw-normal" style="text-align: center" *ngIf="showTitle">
     {{ 'authentication.signin' | transloco }}
   </h1>
-  <form *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && type === undefined || type === 'shibboleth'"
+  <form *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && (type === undefined || type === 'shibboleth')"
         id="signin-form">
     <button
       class="w-100 btn btn-secondary"

@@ -88,7 +88,7 @@ export class LoginComponent
   constructor(
     private router: Router,
     public appStorage: AppStorageService,
-    private api: OctraAPIService,
+    public api: OctraAPIService,
     public settingsService: SettingsService,
     public modService: OctraModalService,
     private langService: TranslocoService,

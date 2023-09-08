@@ -18,19 +18,13 @@ import { TranscriptionService } from '../../shared/service';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {
-  BrowserInfo,
   escapeRegex,
-  findElements,
-  getAttr,
   insertString,
   isNumber,
-  setStyle,
-  ShortcutGroup,
-  ShortcutManager,
   SubscriptionManager,
   unEscapeHtml,
 } from '@octra/utilities';
-import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
+import { SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
@@ -39,6 +33,16 @@ import { Config } from 'jodit/types/config';
 import { IControlType } from 'jodit/src/types';
 import { IJodit, IToolbarButton } from 'jodit/types/types';
 import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
+import {
+  AudioChunk,
+  AudioManager,
+  BrowserInfo,
+  findElements,
+  getAttr,
+  setStyle,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 

@@ -13,7 +13,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { getProperties, ShortcutEvent, ShortcutGroup } from '@octra/utilities';
+import { getProperties } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../../core/component/transcr-editor';
 
 import {
@@ -24,13 +24,7 @@ import {
   UserInteractionsService,
 } from '../../../core/shared/service';
 import { AppStorageService } from '../../../core/shared/service/appstorage.service';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioRessource,
-  AudioSelection,
-  SampleUnit,
-} from '@octra/media';
+import { AudioRessource, AudioSelection, SampleUnit } from '@octra/media';
 import {
   addSegment,
   ASRQueueItemType,
@@ -46,6 +40,12 @@ import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
 import { DefaultComponent } from '../../../core/component/default.component';
 import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
+import {
+  AudioChunk,
+  AudioManager,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 
 @Component({
   selector: 'octra-transcr-window',

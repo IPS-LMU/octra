@@ -37,7 +37,6 @@ import {
   OSegment,
   Segment,
 } from '@octra/annotation';
-import { AudioManager } from '@octra/media';
 import { getModeState, LoginMode, RootState } from '../../store';
 import { TranslocoService } from '@ngneat/transloco';
 import { MaintenanceAPI } from '../../component/maintenance/maintenance-api';
@@ -52,6 +51,7 @@ import {
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TaskDto } from '@octra/api-types';
 import { RoutingService } from './routing.service';
+import { AudioManager } from '@octra/web-media';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 

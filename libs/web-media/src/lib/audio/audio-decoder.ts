@@ -1,13 +1,13 @@
-import { AudioInfo } from './audio-info';
-import { SampleUnit } from './audio-time';
 import {
-  SubscriptionManager,
-  TsWorker,
-  TsWorkerJob,
-  TsWorkerStatus,
-} from '@octra/utilities';
-import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
+  AudioFormat,
+  AudioInfo,
+  IntArray,
+  SampleUnit,
+  WavFormat,
+} from '@octra/media';
+import { SubscriptionManager } from '@octra/utilities';
 import { Subject, timer } from 'rxjs';
+import { TsWorker, TsWorkerJob, TsWorkerStatus } from '../worker';
 
 declare let window: unknown;
 
@@ -35,7 +35,7 @@ export class AudioDecoder {
 
   private channelData?: Float32Array;
   private channelDataOffset = 0;
-  private audioContext: AudioContext;
+  private audioContext: any;
 
   // workers used for decoding
   private tsWorkers: TsWorker[];

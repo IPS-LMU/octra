@@ -10,12 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import {
-  BrowserInfo,
-  hasProperty,
-  ShortcutGroup,
-  ShortcutManager,
-} from '@octra/utilities';
+import { hasProperty } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
 import { editorComponents } from '../../../../editors/components';
@@ -53,7 +48,6 @@ import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { IFile, Level, PartiturConverter } from '@octra/annotation';
-import { AudioManager } from '@octra/media';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
@@ -62,6 +56,12 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from '../../../store/authentication';
+import {
+  AudioManager,
+  BrowserInfo,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 
 @Component({
   selector: 'octra-transcription',

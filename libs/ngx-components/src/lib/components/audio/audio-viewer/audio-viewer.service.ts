@@ -1,15 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioviewerConfig } from './audio-viewer.config';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  AudioTimeCalculator,
-  PlayBackStatus,
-  SampleUnit,
-} from '@octra/media';
-import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { SubscriptionManager } from '@octra/utilities';
 import {
   addSegment,
   ASRQueueItemType,
@@ -20,6 +13,12 @@ import {
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MultiThreadingService } from '../../../multi-threading.service';
+import {
+  AudioChunk,
+  AudioManager,
+  AudioTimeCalculator,
+  TsWorkerJob,
+} from '@octra/web-media';
 
 @Injectable({
   providedIn: 'root',

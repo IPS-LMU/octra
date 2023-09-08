@@ -1,6 +1,6 @@
 {
   "name": "@octra/media",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "commonjs",
   "peerDependencies": {
     "@octra/utilities": "^0.0.0",

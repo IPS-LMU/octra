@@ -3,9 +3,9 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { AppInfo } from '../../../app.info';
 import { SubscriptionManager } from '@octra/utilities';
 import { downloadFile } from '@octra/ngx-utilities';
-import { AudioManager } from '@octra/media';
 import { Subject, Subscription } from 'rxjs';
 import { TaskInputOutputDto } from '@octra/api-types';
+import { AudioManager } from '@octra/web-media';
 
 @Injectable()
 export class AudioService {
@@ -56,7 +56,7 @@ export class AudioService {
               event.result,
               AppInfo.audioformats
             ).subscribe({
-              next: (result) => {
+              next: (result: any) => {
                 if (
                   result.audioManager !== undefined &&
                   result.audioManager !== null
@@ -72,7 +72,7 @@ export class AudioService {
                   subj.next(0.5 + 0.5 * result.decodeProgress);
                 }
               },
-              error: (error) => {
+              error: (error: any) => {
                 subj.error(error);
               },
             })

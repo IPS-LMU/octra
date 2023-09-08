@@ -1,0 +1,33 @@
+{
+  "name": "annotationn",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/annottionn/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/annottionn",
+        "main": "libs/annottionn/src/index.ts",
+        "tsConfig": "libs/annottionn/tsconfig.lib.json",
+        "assets": ["libs/annottionn/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs annottionn {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/annottionn/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

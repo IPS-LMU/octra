@@ -20,7 +20,6 @@ import { APIActions } from '../api';
 import { getBrowserLang, TranslocoService } from '@ngneat/transloco';
 import { uniqueHTTPRequest } from '@octra/ngx-utilities';
 import { ConfigurationService } from '../../shared/service/configuration.service';
-import { findElements, getAttr } from '@octra/utilities';
 import { AppConfigSchema } from '../../schemata/appconfig.schema';
 import { AppInfo } from '../../../app.info';
 import {
@@ -39,6 +38,7 @@ import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { environment } from '../../../../environments/environment';
+import { findElements, getAttr } from '@octra/web-media';
 
 @Injectable({
   providedIn: 'root',

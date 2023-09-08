@@ -1,13 +1,9 @@
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  SampleUnit,
-} from '@octra/media';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import { AudioViewerComponent } from '@octra/ngx-components';
 import { Level } from '@octra/annotation';
 import { DefaultComponent } from '../core/component/default.component';
 import { EventEmitter } from '@angular/core';
+import { AudioChunk, AudioManager } from '@octra/web-media';
 
 export interface OctraEditorRequirements {
   afterFirstInitialization(): void;

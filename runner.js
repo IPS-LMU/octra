@@ -72,7 +72,7 @@ const OCTRA = {
     await JSONValidator.build();
     await run('nx bundle annotation');
     await run('nx bundle assets');
-    await run('nx bundle media');
+    await run('nx bundle mediaa');
     await run('nx bundle utilities');
   },
 };

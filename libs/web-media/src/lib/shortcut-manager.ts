@@ -1,4 +1,4 @@
-import { BrowserInfo } from './browser-info';
+import {BrowserInfo} from './browser-info';
 
 /**
  * wrapper containing KeyboardEvent information with additional data

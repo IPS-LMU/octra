@@ -17,24 +17,12 @@ import {
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  SampleUnit,
-} from '@octra/media';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 import { LoginMode } from '../../core/store';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {
-  findElements,
-  getAttr,
-  selectAllTextOfNode,
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
   addSegment,
@@ -51,6 +39,14 @@ import { TranslocoService } from '@ngneat/transloco';
 import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
 import { Subscription, timer } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  AudioChunk,
+  AudioManager,
+  findElements,
+  getAttr,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 
 declare let validateAnnotation: any;
 
@@ -687,13 +683,25 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
       ];
       segmentLabel.contentEditable = 'true';
       segmentLabel.focus();
-      selectAllTextOfNode(segmentLabel);
+      this.selectAllTextOfNode(segmentLabel);
       this.selectedCell = {
         labelText: this.shownSegments[segmentNumber + 1].label,
         row: segmentNumber + 1,
         column: 1,
       };
     }
+  }
+
+  /**
+   * selects all text of a given element.
+   * @param el
+   */
+  private selectAllTextOfNode(element: any) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -995,7 +1003,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
             resolve();
           })
-          .catch((error) => {
+          .catch((error:any) => {
             console.error(error);
           });
       } else {
@@ -1011,7 +1019,7 @@ segments=${isNull}, ${this.transcrService.currentlevel!.segments.length}`);
 
             resolve();
           })
-          .catch((error) => {
+          .catch((error:any) => {
             console.error(error);
           });
       }

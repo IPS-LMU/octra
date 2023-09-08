@@ -9,7 +9,7 @@ export interface FileSize {
 }
 
 /**
- * checks if value is an function
+ * checks if value is a function
  * @param value
  */
 export function isFunction(value: any) {
@@ -55,26 +55,13 @@ export function hasPropertyTree(obj: any, treeString: string): boolean {
  * converts base64 to ArrayBuffer
  * @param base64
  */
-export function base64ToArrayBuffer(base64: any): ArrayBuffer {
-  const binaryString = window.atob(base64);
-  const len = binaryString.length;
+export function base64ToArrayBuffer(base64String: string): any {
+  const len = base64String.length;
   const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+    bytes[i] = base64String.charCodeAt(i);
   }
   return bytes.buffer as ArrayBuffer;
-}
-
-/**
- * selects all text of a given element.
- * @param el
- */
-export function selectAllTextOfNode(element: any) {
-  const range = document.createRange();
-  range.selectNodeContents(element);
-  const sel = window.getSelection();
-  sel?.removeAllRanges();
-  sel?.addRange(range);
 }
 
 export function isNumber(str: string): boolean {
@@ -171,39 +158,6 @@ export function insertString(
   return result;
 }
 
-export function setCursor(node: any, pos: any) {
-  node =
-    typeof node === 'string' || node instanceof String
-      ? document.getElementById('' + node + '')
-      : node;
-
-  if (!node) {
-    return false;
-  } else if (node.createTextRange) {
-    const textRange = node.createTextRange();
-    textRange.collapse(true);
-    textRange.moveEnd(pos);
-    textRange.moveStart(pos);
-    textRange.select();
-    return true;
-  } else if (node.setSelectionRange) {
-    node.setSelectionRange(pos, pos);
-    return true;
-  }
-
-  return false;
-}
-
-export function fileListToArray(fileList: FileList): File[] {
-  const result = [];
-
-  // tslint:disable-next-line:prefer-for-of
-  for (let i = 0; i < fileList.length; i++) {
-    result.push(fileList[i]);
-  }
-  return result;
-}
-
 export function afterTrue(observable: Observable<boolean>): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const subscription = observable.subscribe(
@@ -284,29 +238,6 @@ export function getProperties(obj: any): [string, any][] {
     return Object.entries(obj);
   }
   return [];
-}
-
-export function findElements(parent: HTMLElement, selector: string) {
-  if (parent) {
-    const result = parent.querySelectorAll(selector) as any;
-    return result !== undefined ? (result as HTMLElement[]) : [];
-  }
-  return [];
-}
-
-export function getAttr(elem: HTMLElement, attribute: string) {
-  if (elem.getAttribute !== undefined) {
-    const result = elem.getAttribute(attribute);
-    return result !== null ? result : undefined;
-  }
-  return undefined;
-}
-
-export function setStyle(elem: HTMLElement, styleObj: any) {
-  const styles = getProperties(styleObj);
-  for (const [name, value] of styles) {
-    (elem.style as any)[name] = value;
-  }
 }
 
 export function flatten(values: never[]) {
@@ -434,52 +365,6 @@ export function mapFnOnObject(
   return obj;
 }
 
-export async function downloadFile(
-  url: string,
-  type: XMLHttpRequestResponseType = 'text'
-): Promise<File> {
-  return new Promise<File>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = type;
-    xhr.open('get', url, true);
-    xhr.addEventListener('load', (result) => {
-      resolve(xhr.response);
-    });
-    xhr.addEventListener('error', (error) => {
-      reject(error);
-    });
-    xhr.send();
-  });
-}
-
-export async function readFileContents<T>(
-  file: File,
-  method: 'text' | 'binary' | 'arraybuffer',
-  encoding?: string
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('loadend', () => {
-      resolve(reader.result as T);
-    });
-    reader.addEventListener('error', (e) => {
-      reject(e);
-    });
-
-    switch (method) {
-      case 'text':
-        reader.readAsText(file, encoding);
-        break;
-      case 'binary':
-        reader.readAsBinaryString(file);
-        break;
-      case 'arraybuffer':
-        reader.readAsArrayBuffer(file);
-        break;
-    }
-  });
-}
-
 export function getTranscriptFromIO(io: any[]): any | undefined {
   return io.find(
     (a) =>
@@ -487,50 +372,4 @@ export function getTranscriptFromIO(io: any[]): any | undefined {
       !a.fileType!.includes('video') &&
       !a.fileType!.includes('image')
   )!;
-}
-
-export function popupCenter(url: string, title: string, w: number, h: number) {
-  const dualScreenLeft =
-      window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop =
-      window.screenTop !== undefined ? window.screenTop : window.screenY;
-
-  const width = window.innerWidth
-      ? window.innerWidth
-      : document.documentElement.clientWidth
-          ? document.documentElement.clientWidth
-          : screen.width;
-  const height = window.innerHeight
-      ? window.innerHeight
-      : document.documentElement.clientHeight
-          ? document.documentElement.clientHeight
-          : screen.height;
-
-  const systemZoom = width / window.screen.availWidth;
-  const left = (width - w) / 2 / systemZoom + dualScreenLeft;
-  const top = (height - h) / 2 / systemZoom + dualScreenTop;
-  const newWindow = window.open(
-      url,
-      title,
-      `
-      toolbar=no,
-      menubar=no,
-      scrollbars=yes,
-      width=${w / systemZoom},
-      height=${h / systemZoom},
-      top=${top},
-      left=${left}
-      `
-  );
-
-  if ((window as any).focus && newWindow) {
-    newWindow.focus();
-  }
-}
-
-/**
- * returns the base URL path to the application
- */
-export function getBaseHrefURL() {
-  return location.origin + document.querySelector('head base')?.getAttribute('href');
 }

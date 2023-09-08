@@ -4,12 +4,12 @@ import { AppInfo } from '../../../app.info';
 import { ASRLanguage, ASRSettings } from '../../obj/Settings';
 import { AlertService, TranscriptionService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { AudioChunk } from '@octra/media';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { ASRQueueItemType } from '../../store/asr';
 import { getSegmentBySamplePosition } from '@octra/annotation';
+import { AudioChunk } from '@octra/web-media';
 
 @Component({
   selector: 'octra-asr-options',

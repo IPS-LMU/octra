@@ -30,11 +30,11 @@ import {
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import * as X2JS from 'x2js';
 import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
-import { FileInfo, readFileContents } from '@octra/utilities';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
 import { TranslocoService } from '@ngneat/transloco';
+import { FileInfo, readFileContents } from '@octra/web-media';
 
 @Injectable({
   providedIn: 'root',
@@ -849,7 +849,7 @@ export class AsrEffects {
           );
           file
             .updateContentFromURL(this.http)
-            .then((text) => {
+            .then((text: any) => {
               // add messages to protocol
               resolve({
                 file: file.file!,
@@ -857,7 +857,7 @@ export class AsrEffects {
                 url: json.downloadLink,
               });
             })
-            .catch((error) => {
+            .catch((error: any) => {
               reject(error);
             });
         } else {

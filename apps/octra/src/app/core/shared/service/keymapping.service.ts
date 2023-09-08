@@ -5,7 +5,7 @@ import {
   ShortcutEvent,
   ShortcutGroup,
   ShortcutManager,
-} from '@octra/utilities';
+} from '@octra/web-media';
 
 @Injectable()
 export class KeymappingService {

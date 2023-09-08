@@ -7,9 +7,10 @@ import { BugReporter } from '../../obj/BugAPI/BugReporter';
 import { AppStorageService } from './appstorage.service';
 import { SettingsService } from './settings.service';
 import { TranscriptionService } from './transcription.service';
-import { BrowserInfo, getFileSize } from '@octra/utilities';
+import { getFileSize } from '@octra/utilities';
 import { LoginMode } from '../../store';
 import { DateTime } from 'luxon';
+import { BrowserInfo } from '@octra/web-media';
 
 export enum ConsoleType {
   LOG,

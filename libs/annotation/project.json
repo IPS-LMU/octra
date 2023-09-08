@@ -20,8 +20,7 @@
           "typescript"
         ],
         "format": [
-          "cjs",
-          "esm"
+          "cjs"
         ],
         "assets": [
           "libs/annotation/src/LICENSE.txt",

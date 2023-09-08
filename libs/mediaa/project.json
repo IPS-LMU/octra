@@ -1,0 +1,33 @@
+{
+  "name": "mediaa",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/mediaa/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/mediaa",
+        "main": "libs/mediaa/src/index.ts",
+        "tsConfig": "libs/mediaa/tsconfig.lib.json",
+        "assets": ["libs/mediaa/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs mediaa {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/mediaa/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

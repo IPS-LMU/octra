@@ -19,7 +19,7 @@
         "project": "libs/media/package.json",
         "compiler": "babel",
         "external": ["typescript"],
-        "format": ["cjs", "esm"]
+        "format": ["cjs"]
       }
     },
     "bundle": {

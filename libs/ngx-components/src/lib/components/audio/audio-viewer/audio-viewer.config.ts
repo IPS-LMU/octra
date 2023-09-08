@@ -1,4 +1,4 @@
-import { ShortcutGroup } from '@octra/utilities';
+import { ShortcutGroup } from '@octra/web-media';
 
 export class AudioviewerConfig {
   public multiLine = false;

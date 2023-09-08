@@ -6,11 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 
 import {
@@ -22,11 +18,17 @@ import {
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
+import { SampleUnit } from '@octra/media';
 import { getSegmentBySamplePosition, Segment } from '@octra/annotation';
 import { AudioplayerComponent } from '@octra/ngx-components';
 import { Subscription } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import {
+  AudioChunk,
+  AudioManager,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 
 @Component({
   selector: 'octra-audioplayer-gui',
@@ -273,11 +275,11 @@ export class DictaphoneEditorComponent
             value: $event.shortcut,
           });
           if (this.audiochunk.isPlaying) {
-            this.audiochunk.pausePlayback().catch((error) => {
+            this.audiochunk.pausePlayback().catch((error: any) => {
               console.error(error);
             });
           } else {
-            this.audiochunk.startPlayback(false).catch((error) => {
+            this.audiochunk.startPlayback(false).catch((error: any) => {
               console.error(error);
             });
           }
@@ -287,7 +289,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stopPlayback().catch((error) => {
+          this.audiochunk.stopPlayback().catch((error: any) => {
             console.error(error);
           });
           break;
@@ -296,7 +298,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stepBackward().catch((error) => {
+          this.audiochunk.stepBackward().catch((error: any) => {
             console.error(error);
           });
           break;
@@ -305,7 +307,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+          this.audiochunk.stepBackwardTime(0.5).catch((error: any) => {
             console.error(error);
           });
           break;

@@ -3,12 +3,7 @@ import { AppInfo } from '../../../app.info';
 import { DropZoneComponent } from '../drop-zone';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { SessionFile } from '../../obj/SessionFile';
-import {
-  contains,
-  fileListToArray,
-  FileSize,
-  getFileSize,
-} from '@octra/utilities';
+import { contains, FileSize, getFileSize } from '@octra/utilities';
 import { FileProgress } from '../../obj/objects';
 import {
   Converter,
@@ -19,10 +14,10 @@ import {
   OLabel,
   OSegment,
 } from '@octra/annotation';
-import { AudioManager } from '@octra/media';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
+import { AudioManager, fileListToArray } from '@octra/web-media';
 
 @Component({
   selector: 'octra-dropzone',

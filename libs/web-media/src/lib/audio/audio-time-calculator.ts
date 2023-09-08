@@ -1,5 +1,5 @@
+import { SampleUnit } from '@octra/media';
 import { AudioChunk } from './audio-manager';
-import { SampleUnit } from './audio-time';
 
 export class AudioTimeCalculator {
   set duration(value: SampleUnit) {

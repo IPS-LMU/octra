@@ -15,11 +15,7 @@ import Konva from 'konva';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioviewerConfig } from './audio-viewer.config';
 import { AudioViewerService } from './audio-viewer.service';
-import {
-  ShortcutGroup,
-  ShortcutManager,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import {
   ASRQueueItemType,
   getSegmentBySamplePosition,
@@ -27,16 +23,16 @@ import {
   getStartTimeBySegmentID,
   Segment,
 } from '@octra/annotation';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  PlayBackStatus,
-  SampleUnit,
-} from '@octra/media';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { Position, Size } from '../../../obj';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { Subject, Subscription, timer } from 'rxjs';
+import {
+  AudioChunk,
+  AudioManager,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;

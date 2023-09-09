@@ -1,9 +1,8 @@
 {
   "name": "@octra/media",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "commonjs",
   "peerDependencies": {
-    "@octra/utilities": "^0.0.0",
     "rxjs": ">=7.5.0"
   }
 }

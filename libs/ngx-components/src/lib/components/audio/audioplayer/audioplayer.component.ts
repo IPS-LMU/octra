@@ -25,7 +25,6 @@ import KonvaEventObject = Konva.KonvaEventObject;
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
-  constructor() {}
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:
     | ElementRef

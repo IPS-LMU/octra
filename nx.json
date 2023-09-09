@@ -65,5 +65,10 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "octra"
+  "defaultProject": "octra",
+  "pluginsConfig": {
+    "@nrwl/js": {
+      "analyzeSourceFiles": true
+    }
+  }
 }

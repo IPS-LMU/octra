@@ -1,11 +1,12 @@
 import { OLabel, OSegment } from './annotjson';
 import { ASRQueueItemType } from './asr';
+import { SampleUnit } from '@octra/media';
 
 export class Segment {
   private static counter = 1;
 
   speakerLabel = 'NOLABEL';
-  time!: any;
+  time!: SampleUnit;
   changed = false;
   isBlockedBy?: ASRQueueItemType;
   progressInfo?: {
@@ -16,7 +17,7 @@ export class Segment {
   private _value = '';
   private readonly _id: number;
 
-  constructor(time: any, speakerLabel: string, value = '', id?: number) {
+  constructor(time: SampleUnit, speakerLabel: string, value = '', id?: number) {
     this.time = time;
     this.speakerLabel = speakerLabel;
     this._value = value;
@@ -74,7 +75,12 @@ export class Segment {
       const transcript =
         transcriptLabel !== undefined ? transcriptLabel.value : '';
 
-      return new Segment({}, speakerLabel, transcript, oSegment.id);
+      return new Segment(
+        new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate),
+        speakerLabel,
+        transcript,
+        oSegment.id
+      );
     }
 
     return undefined;

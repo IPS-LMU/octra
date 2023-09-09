@@ -3,7 +3,7 @@ import {
   TranscriptionService,
   UserInteractionsService,
 } from '../../shared/service';
-import { AudioRessource } from '@octra/media';
+import { AudioRessource } from '@octra/web-media';
 import { FileSize } from '@octra/utilities';
 
 @Injectable()

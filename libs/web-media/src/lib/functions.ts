@@ -1,4 +1,6 @@
 import { getProperties } from '@octra/utilities';
+import { AudioFormat } from './audio/AudioFormats';
+import { AudioInfo } from './audio/audio-info';
 
 export async function readFileContents<T>(
   file: File,
@@ -84,12 +86,7 @@ export async function downloadFile(
   });
 }
 
-export function popupCenter(
-  url: string,
-  title: string,
-  w: number,
-  h: number
-) {
+export function popupCenter(url: string, title: string, w: number, h: number) {
   const dualScreenLeft =
     window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop =
@@ -98,13 +95,13 @@ export function popupCenter(
   const width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width;
+    ? document.documentElement.clientWidth
+    : screen.width;
   const height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-      ? document.documentElement.clientHeight
-      : screen.height;
+    ? document.documentElement.clientHeight
+    : screen.height;
 
   const systemZoom = width / window.screen.availWidth;
   const left = (width - w) / 2 / systemZoom + dualScreenLeft;
@@ -132,7 +129,9 @@ export function popupCenter(
  * returns the base URL path to the application
  */
 export function getBaseHrefURL() {
-  return location.origin + document.querySelector('head base')?.getAttribute('href');
+  return (
+    location.origin + document.querySelector('head base')?.getAttribute('href')
+  );
 }
 
 export function findElements(parent: HTMLElement, selector: string) {
@@ -142,7 +141,6 @@ export function findElements(parent: HTMLElement, selector: string) {
   }
   return [];
 }
-
 
 export function getAttr(elem: HTMLElement, attribute: string) {
   if (elem.getAttribute !== undefined) {
@@ -156,5 +154,26 @@ export function setStyle(elem: HTMLElement, styleObj: any) {
   const styles = getProperties(styleObj);
   for (const [name, value] of styles) {
     (elem.style as any)[name] = value;
+  }
+}
+
+export function getAudioInfo(
+  format: AudioFormat,
+  filename: string,
+  type: string,
+  buffer: ArrayBuffer
+): AudioInfo {
+  if (format.isValid(buffer)) {
+    return new AudioInfo(
+      filename,
+      type,
+      buffer.byteLength,
+      format.sampleRate,
+      format.duration,
+      format.channels,
+      format.bitsPerSample
+    );
+  } else {
+    throw new Error(`Audio file is not a valid ${format.extension} file.`);
   }
 }

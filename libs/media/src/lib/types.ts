@@ -1,10 +1,3 @@
-// type of audio source
-export const enum SourceType {
-  URL,
-  FILE,
-  ArrayBuffer,
-}
-
 export const enum PlayBackStatus {
   PREPARE = 'PREPARE',
   INITIALIZED = 'INITIALIZED',

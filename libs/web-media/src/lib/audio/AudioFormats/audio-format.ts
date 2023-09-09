@@ -1,5 +1,3 @@
-import { AudioInfo } from '../audio-info';
-
 export type IntArray = Uint8Array | Int16Array | Int32Array;
 
 export abstract class AudioFormat {
@@ -63,26 +61,6 @@ export abstract class AudioFormat {
       this.formatConstructor = Int16Array;
     } else if (this.bitsPerSample === 8) {
       this.formatConstructor = Uint8Array;
-    }
-  }
-
-  public getAudioInfo(
-    filename: string,
-    type: string,
-    buffer: ArrayBuffer
-  ): AudioInfo {
-    if (this.isValid(buffer)) {
-      return new AudioInfo(
-        filename,
-        type,
-        buffer.byteLength,
-        this.sampleRate,
-        this._duration,
-        this._channels,
-        this._bitsPerSample
-      );
-    } else {
-      throw new Error(`Audio file is not a valid ${this._extension} file.`);
     }
   }
 

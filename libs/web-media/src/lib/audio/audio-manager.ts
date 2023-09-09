@@ -1,17 +1,13 @@
 import { EventEmitter } from '@angular/core';
 import { AudioDecoder } from './audio-decoder';
+import { AudioInfo } from './audio-info';
+import { AudioRessource } from './audio-ressource';
 import { SubscriptionManager } from '@octra/utilities';
+import { SourceType } from '../types';
 import { Subject, Subscription, timer } from 'rxjs';
-import {
-  AudioFormat,
-  AudioInfo,
-  AudioRessource,
-  AudioSelection,
-  PlayBackStatus,
-  SampleUnit,
-  SourceType,
-  WavFormat,
-} from '@octra/media';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { getAudioInfo } from '../functions';
+import { AudioFormat, WavFormat } from './AudioFormats';
 
 declare let window: any;
 
@@ -82,7 +78,7 @@ export class AudioManager {
     return this._audioContext;
   }
 
-  get gainNode(): GainNode | undefined {
+  get gainNode(): any {
     return this._gainNode;
   }
 
@@ -196,7 +192,7 @@ export class AudioManager {
       let audioinfo: AudioInfo | undefined = undefined;
 
       try {
-        audioinfo = audioformat.getAudioInfo(filename, type, buffer);
+        audioinfo = getAudioInfo(audioformat, filename, type, buffer);
       } catch (err: any) {
         subj.error(err!.message);
       }
@@ -362,11 +358,11 @@ export class AudioManager {
           // Firefox issue causes playBackRate working only for volume up to 1
 
           // create a gain node
-          this._gainNode!.gain.value = volume;
-          this._source.connect(this._gainNode!);
+          this._gainNode.gain.value = volume;
+          this._source.connect(this._gainNode);
 
           // connect the gain node to an output destination
-          this._gainNode!.connect(this._audioContext!.destination);
+          this._gainNode.connect(this._audioContext!.destination);
 
           this._audio.playbackRate = playbackRate;
           this._audio.onerror = reject;
@@ -659,7 +655,7 @@ export class AudioManager {
       this.changeState(PlayBackStatus.ENDED);
     }
 
-    this.gainNode!.disconnect();
+    this.gainNode.disconnect();
   };
 
   private endPlayBack() {

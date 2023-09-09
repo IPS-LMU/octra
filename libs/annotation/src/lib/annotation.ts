@@ -1,6 +1,7 @@
 import { OAnnotJSON, OAudiofile } from './annotjson';
 import { Level } from './level';
 import { Link } from './link';
+import { SampleUnit } from '@octra/media';
 
 export class Annotation {
   private readonly _annotates: string;
@@ -53,7 +54,7 @@ export class Annotation {
     }
   }
 
-  public getObj(lastOriginalBoundary: any): OAnnotJSON {
+  public getObj(lastOriginalBoundary: SampleUnit): OAnnotJSON {
     const result = new OAnnotJSON(
       this._audiofile.name,
       this._audiofile.sampleRate,

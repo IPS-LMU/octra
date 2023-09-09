@@ -1,6 +1,6 @@
 import { NavigationExtras } from '@angular/router';
 import { EmailBugReporter } from './core/obj/BugAPI/EmailBugReporter';
-import { OggFormat, WavFormat } from '@octra/media';
+import { OggFormat, WavFormat } from '@octra/web-media';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,

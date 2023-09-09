@@ -24,7 +24,7 @@ import {
   UserInteractionsService,
 } from '../../../core/shared/service';
 import { AppStorageService } from '../../../core/shared/service/appstorage.service';
-import { AudioRessource, AudioSelection, SampleUnit } from '@octra/media';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import {
   addSegment,
   ASRQueueItemType,
@@ -43,6 +43,7 @@ import { AsrStoreService } from '../../../core/store/asr/asr-store-service.servi
 import {
   AudioChunk,
   AudioManager,
+  AudioRessource,
   ShortcutEvent,
   ShortcutGroup,
 } from '@octra/web-media';

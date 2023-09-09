@@ -5,6 +5,7 @@ import {
   OItem,
   OLevel,
 } from './annotjson';
+import { SampleUnit } from '@octra/media';
 import { OIDBLevel } from './db-objects';
 import { Segment } from './segment';
 import {
@@ -62,7 +63,7 @@ export class Level {
   public static fromObj(
     entry: OIDBLevel,
     sampleRate: number,
-    lastSample: any
+    lastSample: SampleUnit
   ): Level {
     let segments: Segment[] = [];
     let events: any[] = [];
@@ -93,7 +94,7 @@ export class Level {
     return result;
   }
 
-  public getObj(lastOriginalBoundary: any): OLevel | undefined {
+  public getObj(lastOriginalBoundary: SampleUnit): OLevel | undefined {
     let result: OLevel | undefined = undefined;
     if (this._type === AnnotationLevelType.SEGMENT) {
       result = new OLevel(
@@ -119,7 +120,7 @@ export class Level {
   }
 
   public addSegment(
-    time: any,
+    time: SampleUnit,
     label = '',
     transcript: string | undefined = undefined
   ) {
@@ -127,7 +128,7 @@ export class Level {
     this.segments = addSegment(this.segments, time, newLabel, transcript);
   }
 
-  public createSegment(time: any, transcript = '') {
+  public createSegment(time: SampleUnit, transcript = '') {
     return new Segment(time, this._name, transcript);
   }
 

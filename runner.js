@@ -70,10 +70,11 @@ const OCTRA = {
     await run('nx build ngx-utilities');
     await run(`npm run build:web-components`);
     await JSONValidator.build();
-    await run('nx bundle annotation');
-    await run('nx bundle assets');
-    await run('nx bundle mediaa');
     await run('nx bundle utilities');
+    await run('nx bundle assets');
+    await run('nx bundle annotation');
+    await run('nx bundle media');
+    await run('nx bundle web-media');
   },
 };
 

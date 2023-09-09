@@ -21,7 +21,7 @@ import {
   ASRStateQueue,
   ASRStateQueueItem,
 } from './index';
-import { WavFormat } from '@octra/media';
+import { FileInfo, readFileContents, WavFormat } from '@octra/web-media';
 import {
   AlertService,
   AudioService,
@@ -34,7 +34,6 @@ import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
 import { TranslocoService } from '@ngneat/transloco';
-import { FileInfo, readFileContents } from '@octra/web-media';
 
 @Injectable({
   providedIn: 'root',

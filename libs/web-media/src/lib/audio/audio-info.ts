@@ -1,5 +1,5 @@
-import { SampleUnit } from './audio-time';
-import { FileInfo } from '@octra/utilities';
+import { SampleUnit } from '@octra/media';
+import { FileInfo } from '../data-info';
 
 export class AudioInfo extends FileInfo {
   private readonly _bitrate: number = -1;

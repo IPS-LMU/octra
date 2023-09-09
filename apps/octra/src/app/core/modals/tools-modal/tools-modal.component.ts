@@ -31,7 +31,7 @@ import {
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { removeSegmentByIndex, Segment } from '@octra/annotation';
-import { IntArray, WavFormat } from '@octra/media';
+import { IntArray, WavFormat } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
 import { OctraModalService } from '../octra-modal.service';

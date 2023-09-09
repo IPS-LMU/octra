@@ -1,5 +1,6 @@
 import { OAudiofile, OLabel, OSegment } from './annotjson';
 import { Converter, IFile } from './converters';
+import { SampleUnit } from '@octra/media';
 import { Segment } from './segment';
 
 export function convertFromSupportedConverters(
@@ -35,7 +36,7 @@ export function contains(haystack: string, needle: string): boolean {
  */
 export function getSegmentBySamplePosition(
   segments: Segment[],
-  samples: any
+  samples: SampleUnit
 ): number {
   let begin = 0;
   for (let i = 0; i < segments.length; i++) {
@@ -54,15 +55,15 @@ export function getSegmentBySamplePosition(
 
 export function getSegmentsOfRange(
   entries: Segment[],
-  startSamples: any,
-  endSamples: any
+  startSamples: SampleUnit,
+  endSamples: SampleUnit
 ): Segment[] {
   if (startSamples.sampleRate !== endSamples.sampleRate) {
     throw new Error('Samplerate of both SampleUnits must be equal');
   }
 
   const result: Segment[] = [];
-  let start:any;
+  let start = new SampleUnit(0, startSamples.sampleRate);
 
   for (const segment of entries) {
     if (
@@ -147,7 +148,7 @@ export function betweenWhichSegment(
  */
 export function addSegment(
   entries: Segment[],
-  time: any,
+  time: SampleUnit,
   label: string,
   value: string | undefined = undefined
 ): Segment[] {
@@ -213,14 +214,14 @@ export function cleanup(entries: Segment[]) {
 export function getStartTimeBySegmentID(
   entries: Segment[],
   id: number
-): any | undefined {
+): SampleUnit | undefined {
   const segmentIndex = entries.findIndex((a) => a.id === id);
 
   if (segmentIndex > -1) {
     if (segmentIndex > 0) {
       return entries[segmentIndex].time.clone();
     } else {
-      return {};
+      return new SampleUnit(0, entries[segmentIndex].time.sampleRate);
     }
   }
   return undefined;
@@ -284,12 +285,15 @@ export function convertSegmentsToOSegments(
 export function convertOSegmentsToSegments(
   levelName: string,
   entries: OSegment[],
-  lastOriginalSample: any
+  lastOriginalSample: SampleUnit
 ): Segment[] {
   const result = entries.map(
     (a) =>
       new Segment(
-        {} as any,
+        new SampleUnit(
+          a.sampleStart + a.sampleDur,
+          lastOriginalSample.sampleRate
+        ),
         levelName,
         a.labels.find((a) => a.name === levelName)?.value,
         a.id
@@ -307,7 +311,7 @@ export function convertOSegmentsToSegments(
 /**
  * removes Segment by number of samples
  */
-export function removeBySamples(entries: Segment[], timeSamples: any) {
+export function removeBySamples(entries: Segment[], timeSamples: SampleUnit) {
   for (let i = 0; i < entries.length; i++) {
     const segment = entries[i];
 

@@ -6,6 +6,7 @@
   "targets": {
     "build": {
       "executor": "@nrwl/rollup:rollup",
+      "dependsOn": ["media"],
       "outputs": [
         "{options.outputPath}"
       ],
@@ -20,7 +21,7 @@
           "typescript"
         ],
         "format": [
-          "cjs"
+          "cjs", "esm"
         ],
         "assets": [
           "libs/annotation/src/LICENSE.txt",

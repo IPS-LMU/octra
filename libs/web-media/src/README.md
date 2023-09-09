@@ -1,4 +1,4 @@
-# media
+# web-media
 
 This library offers classes and functions for handling audio files in web browsers (e.g. chunked decoding etc.).
 
@@ -18,7 +18,7 @@ git checkout static
 3. Now go to your project folder and run
 
 ```shell
-npm install --legacy-peer-deps "../octra/libs/media"
+npm install --legacy-peer-deps "../octra/libs/web-media"
 ```
 
 ### UMD Bundle (Vanilla JS)
@@ -28,7 +28,7 @@ Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([se
 ````html
     <head>
         <!-- ... -->
-        <script type="application/javascript" src="../octra/libs/media/bundles/OctraMedia.umd.js"></script>
+        <script type="application/javascript" src="../octra/libs/web-media/bundles/OctraWebMedia.umd.js"></script>
         <!-- ... -->
     </head>
 ````
@@ -49,25 +49,25 @@ git pull
 
 #### ESM, Typescript
 
-Import the classes and functions from `@octra/media`. For example
+Import the classes and functions from `@octra/web-media`. For example
 
 ````typescript
-import {SampleUnit} from "@octra/media";
+import {SampleUnit} from "@octra/web-media";
 
 const unit = new SampleUnit(123123, 22100);
 ````
 
 #### UMD Bundle
 
-All functions and classes are available via global scope `OctraMedia`. For example:
+All functions and classes are available via global scope `OctraWebMedia`. For example:
 
 ```javascript
 /*
 make sure that you have injected the umd bundle as described before.
  */
-const validator = new OctraMedia.SampleUnit(123123, 22100);
+const validator = new OctraWebMedia.SampleUnit(123123, 22100);
 ```
 
 ### API
 
-You can find more information about classes and functions of `@octra/media` [here](https://ips-lmu.github.io/octra/modules/_octra_media.html).
+You can find more information about classes and functions of `@octra/web-media` [here](https://ips-lmu.github.io/octra/modules/_octra_web_media.html).

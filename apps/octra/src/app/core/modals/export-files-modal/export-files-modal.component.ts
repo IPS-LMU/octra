@@ -17,7 +17,7 @@ import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/nam
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Converter, IFile } from '@octra/annotation';
+import { Converter, ExportResult } from '@octra/annotation';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
@@ -121,7 +121,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   ngOnInit() {
     for (const converter of AppInfo.converters) {
-      this.exportStates.push("close");
+      this.exportStates.push('close');
     }
   }
 
@@ -211,23 +211,27 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
               this.transcriptionService.audioManager.resource.arraybuffer!;
           }
 
-          const result: IFile = converter.export(
+          const result: ExportResult = converter.export(
             oannotjson,
             this.transcriptionService.audiofile,
             levelnum
-          )!.file;
+          );
 
-          this.parentformat.download = result.name;
+          if (!result.error && result.file) {
+            this.parentformat.download = result.file.name;
 
-          if (this.parentformat.uri !== undefined) {
-            window.URL.revokeObjectURL(this.parentformat.uri.toString());
+            if (this.parentformat.uri !== undefined) {
+              window.URL.revokeObjectURL(this.parentformat.uri.toString());
+            }
+            const test = new File([result.file.content], result.file.name);
+            this.setParentFormatURI(window.URL.createObjectURL(test));
+            this.preparing = {
+              name: converter.name,
+              preparing: false,
+            };
+          } else {
+            console.error(`Annotation conversion error: ${result.error}`);
           }
-          const test = new File([result.content], result.name);
-          this.setParentFormatURI(window.URL.createObjectURL(test));
-          this.preparing = {
-            name: converter.name,
-            preparing: false,
-          };
         })
       );
     }

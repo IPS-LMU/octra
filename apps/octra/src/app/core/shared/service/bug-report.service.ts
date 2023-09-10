@@ -137,7 +137,7 @@ export class BugReportService {
     }
 
     if (!(this.transcrService === undefined)) {
-      const file = getFileSize(this.transcrService.audiofile.size);
+      const file = getFileSize(this.transcrService.audiofile.size!);
       result.octra.audiofile_size = file.size + ' ' + file.label;
       result.octra.audiofile_duration =
         this.transcrService.audioManager.resource.info.duration.seconds;

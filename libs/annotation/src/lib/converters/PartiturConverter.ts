@@ -29,13 +29,20 @@ export class PartiturConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
-  ): ExportResult | undefined {
-    if (annotation === undefined) {
-      // annotation is undefined;
-      console.error('BASPartitur Converter annotation is undefined');
-      return undefined;
+    levelnum?: number
+  ): ExportResult {
+    if (!annotation) {
+      return {
+        error: 'Annotation is undefined or null',
+      };
     }
+
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Samplerate is undefined or null',
+      };
+    }
+
     if (levelnum !== undefined && levelnum > -1) {
       const result: ExportResult = {
         file: {
@@ -83,124 +90,129 @@ LBD:\n`;
         content += trnElement;
       }
 
-      result.file.content = content;
+      result.file!.content = content;
 
       return result;
     } else {
       // levelnum is undefined;
-      console.error('BASPartitur Converter needs a level number for export');
-      return undefined;
+      return {
+        error: 'BASPartitur Converter needs a level number for export',
+      };
     }
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile) {
-      const lines = file.content.split(/\r?\n/g);
-      let pointer = 0;
-
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
-      const tiers: any = {};
-
-      // skip not needed information and read needed information
-      let previousTier = '';
-      let level = undefined;
-      let counter = 1;
-      while (pointer < lines.length) {
-        const search = lines[pointer].match(
-          new RegExp(
-            '^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
-              '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))',
-            'g'
-          )
-        );
-
-        if (search) {
-          const columns = lines[pointer].split(' ');
-
-          if (search[0] === 'SAM') {
-            if (audiofile.sampleRate !== Number(columns[1])) {
-              console.error(
-                `Sample Rate of audio file is not equal to the value from Partitur` +
-                  ` file! ${audiofile.sampleRate} !== ${columns[1]}`
-              );
-            }
-          }
-
-          if (search[0] === 'TRN') {
-            if (previousTier !== search[0]) {
-              if (level !== undefined) {
-                result.levels.push(level);
-              }
-              level =
-                search[0] !== 'TRN'
-                  ? new OLevel(search[0], AnnotationLevelType.ITEM, [])
-                  : new OLevel(search[0], AnnotationLevelType.SEGMENT, []);
-              previousTier = search[0];
-              tiers[`${previousTier}`] = [];
-            }
-            if (previousTier !== 'TRN') {
-              if (level === undefined) {
-                return {
-                  annotjson: result,
-                  audiofile: undefined,
-                  error: 'A level is missing.',
-                };
-              }
-              level.items.push(
-                new OItem(counter, [new OLabel(previousTier, columns[2])])
-              );
-              tiers[`${previousTier}`].push(columns[2]);
-            } else {
-              const transcript = lines[pointer];
-              const transcriptArray = transcript.match(
-                /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
-              );
-
-              if (level === undefined) {
-                return {
-                  annotjson: result,
-                  audiofile: undefined,
-                  error: 'A level is missing.',
-                };
-              }
-
-              if (transcriptArray) {
-                level.items.push(
-                  new OSegment(
-                    counter,
-                    Number(transcriptArray[1]),
-                    Number(transcriptArray[2]),
-                    [new OLabel(previousTier, transcriptArray[4])]
-                  )
-                );
-              }
-            }
-
-            counter++;
-          }
-        }
-        pointer++;
-      }
-      if (level) {
-        result.levels.push(level);
-        return {
-          annotjson: result,
-          audiofile: undefined,
-          error: '',
-        };
-      } else {
-        return {
-          annotjson: undefined,
-          audiofile: undefined,
-          error: `Input file not compatible with Praat Partitur.`,
-        };
-      }
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
     }
 
-    return {
-      annotjson: undefined,
-      audiofile: undefined,
-      error: `This Partitur file is not compatble with this audio file.`,
-    };
+    const lines = file.content.split(/\r?\n/g);
+    let pointer = 0;
+
+    const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+    const tiers: any = {};
+
+    // skip not needed information and read needed information
+    let previousTier = '';
+    let level = undefined;
+    let counter = 1;
+
+    while (pointer < lines.length) {
+      const search = lines[pointer].match(
+        new RegExp(
+          '^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
+            '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))',
+          'g'
+        )
+      );
+
+      if (search) {
+        const columns = lines[pointer].split(' ');
+
+        if (search[0] === 'SAM') {
+          if (audiofile.sampleRate !== Number(columns[1])) {
+            console.error(
+              `Sample Rate of audio file is not equal to the value from Partitur` +
+                ` file! ${audiofile.sampleRate} !== ${columns[1]}`
+            );
+          }
+        }
+
+        if (search[0] === 'TRN') {
+          if (previousTier !== search[0]) {
+            if (level !== undefined) {
+              result.levels.push(level);
+            }
+            level =
+              search[0] !== 'TRN'
+                ? new OLevel(search[0], AnnotationLevelType.ITEM, [])
+                : new OLevel(search[0], AnnotationLevelType.SEGMENT, []);
+            previousTier = search[0];
+            tiers[`${previousTier}`] = [];
+          }
+          if (previousTier !== 'TRN') {
+            if (level === undefined) {
+              return {
+                annotjson: result,
+                audiofile: undefined,
+                error: 'A level is missing.',
+              };
+            }
+            level.items.push(
+              new OItem(counter, [new OLabel(previousTier, columns[2])])
+            );
+            tiers[`${previousTier}`].push(columns[2]);
+          } else {
+            const transcript = lines[pointer];
+            const transcriptArray = transcript.match(
+              /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
+            );
+
+            if (level === undefined) {
+              return {
+                annotjson: result,
+                audiofile: undefined,
+                error: 'A level is missing.',
+              };
+            }
+
+            if (transcriptArray) {
+              level.items.push(
+                new OSegment(
+                  counter,
+                  Number(transcriptArray[1]),
+                  Number(transcriptArray[2]),
+                  [new OLabel(previousTier, transcriptArray[4])]
+                )
+              );
+            }
+          }
+
+          counter++;
+        }
+      }
+      pointer++;
+    }
+    if (level) {
+      result.levels.push(level);
+      return {
+        annotjson: result,
+        audiofile: undefined,
+        error: '',
+      };
+    } else {
+      return {
+        annotjson: undefined,
+        audiofile: undefined,
+        error: `Input file not compatible with Praat Partitur.`,
+      };
+    }
   }
 }

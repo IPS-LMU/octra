@@ -31,38 +31,45 @@ export class BundleJSONConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile
-  ): ExportResult | undefined {
+  ): ExportResult {
     let result = '';
     let filename = '';
 
-    if (annotation) {
-      const bundle = {
-        ssffFiles: [],
-        mediaFile: {
-          encoding: 'BASE654',
-          data: btoa(
-            new Uint8Array(audiofile.arraybuffer).reduce(
-              (data, byte) => data + String.fromCharCode(byte),
-              ''
-            )
-          ),
-        },
-        annotation,
-      };
-      result = JSON.stringify(bundle, undefined, 2);
-      filename = annotation.name + this._extension;
-
+    if(!annotation){
       return {
-        file: {
-          name: filename,
-          content: result,
-          encoding: 'UTF-8',
-          type: 'application/json',
-        },
+        error: "Annotation file is undefined or null"
+      };
+    }
+    if(!audiofile?.arraybuffer){
+      return {
+        error: "Arraybuffer is undefined or null"
       };
     }
 
-    return undefined;
+    const bundle = {
+      ssffFiles: [],
+      mediaFile: {
+        encoding: 'BASE654',
+        data: btoa(
+          new Uint8Array(audiofile.arraybuffer).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            ''
+          )
+        ),
+      },
+      annotation,
+    };
+    result = JSON.stringify(bundle, undefined, 2);
+    filename = annotation.name + this._extension;
+
+    return {
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'application/json',
+      },
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

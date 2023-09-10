@@ -33,7 +33,7 @@ export class CTMConverter extends Converter {
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
     levelnum: number
-  ): ExportResult | undefined {
+  ): ExportResult {
     let result = '';
     let filename = '';
 
@@ -42,127 +42,150 @@ export class CTMConverter extends Converter {
       levelnum < 0 ||
       levelnum > annotation.levels.length
     ) {
-      console.error(`CTMConverter needs a levelnumber`);
-      return undefined;
-    }
-    if (annotation) {
-      const level = annotation.levels[levelnum];
-
-      for (const levelItem of level.items) {
-        const transcript = levelItem.labels[0].value;
-        const start =
-          Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) /
-          100;
-        const duration =
-          Math.round((levelItem.sampleDur! / audiofile.sampleRate) * 100) / 100;
-        result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
-      }
-
-      filename = annotation.name + this._extension;
-
       return {
-        file: {
-          name: filename,
-          content: result,
-          encoding: 'UTF-8',
-          type: 'text/plain',
-        },
+        error: `CTMConverter needs a levelnumber`,
       };
     }
 
-    return undefined;
-  }
-
-  public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
-    if (audiofile) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
-
-      const content = file.content;
-      const lines: string[] = content.split('\n');
-
-      // check if filename is equal with audio file
-      const filename = lines[0].substr(0, lines[0].indexOf(' '));
-
-      if (contains(file.name, filename) && contains(audiofile.name, filename)) {
-        const olevel = new OLevel('Tier_1', AnnotationLevelType.SEGMENT);
-
-        let start = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i] !== '') {
-            const columns: string[] = lines[i].split(' ');
-            length = 0;
-            if (isNaN(Number(columns[2]))) {
-              return undefined;
-            } else {
-              start = Number(columns[2]);
-            }
-
-            if (isNaN(Number(columns[3]))) {
-              return undefined;
-            } else {
-              length = Number(columns[3]);
-            }
-            const sampleRate = audiofile.sampleRate;
-            let osegment;
-
-            if (i === 0 && start > 0) {
-              // first segment not set
-              osegment = new OSegment(i + 1, 0, start * sampleRate, [
-                new OLabel('Tier_1', ''),
-              ]);
-
-              olevel.items.push(osegment);
-            }
-
-            const olabels: OLabel[] = [];
-            olabels.push(new OLabel('Tier_1', columns[4]));
-            osegment = new OSegment(
-              i + 1,
-              Math.round(start * sampleRate),
-              Math.round(length * sampleRate),
-              olabels
-            );
-
-            olevel.items.push(osegment);
-
-            if (i === lines.length - 2) {
-              if (start + length < audiofile.duration) {
-                const osegmentEnd = new OSegment(
-                  i + 2,
-                  Math.round((start + length) * sampleRate),
-                  Math.round(
-                    (audiofile.duration - (start + length)) * sampleRate
-                  ),
-                  [new OLabel('Tier_1', '')]
-                );
-
-                olevel.items.push(osegmentEnd);
-              }
-            }
-
-            start += length;
-          }
-        }
-        result.levels.push(olevel);
-
-        return {
-          annotjson: result,
-          audiofile: undefined,
-          error: '',
-        };
-      } else {
-        return {
-          annotjson: undefined,
-          audiofile: undefined,
-          error: `The file name stated in the CTM file is not the same as the audio file's.`,
-        };
-      }
+    if (!annotation) {
+      return {
+        error: 'Annotation file is undefined or null',
+      };
     }
 
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Samplerate is undefined or null',
+      };
+    }
+
+    const level = annotation.levels[levelnum];
+
+    for (const levelItem of level.items) {
+      const transcript = levelItem.labels.find(
+        (a) => a.name !== 'Speaker'
+      )?.value;
+      const start =
+        Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) / 100;
+      const duration =
+        Math.round((levelItem.sampleDur! / audiofile.sampleRate) * 100) / 100;
+      result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
+    }
+
+    filename = annotation.name + this._extension;
+
     return {
-      annotjson: undefined,
-      audiofile: undefined,
-      error: `This CTM file is not compatible with this audio file.`,
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'text/plain',
+      },
     };
+  }
+
+  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+    if (!audiofile?.duration) {
+      return {
+        error: 'Missing audiofile duration',
+      };
+    }
+
+    const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+
+    const content = file.content;
+    const lines: string[] = content.split('\n');
+
+    // check if filename is equal with audio file
+    const filename = lines[0].substr(0, lines[0].indexOf(' '));
+
+    if (contains(file.name, filename) && contains(audiofile.name, filename)) {
+      const olevel = new OLevel('Tier_1', AnnotationLevelType.SEGMENT);
+
+      let start = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i] !== '') {
+          const columns: string[] = lines[i].split(' ');
+          length = 0;
+          if (isNaN(Number(columns[2]))) {
+            return {
+              error: `Parsing error at line ${i + 1} column 3`,
+            };
+          } else {
+            start = Number(columns[2]);
+          }
+
+          if (isNaN(Number(columns[3]))) {
+            return {
+              error: `Parsing error at line ${i + 1} column 4`,
+            };
+          } else {
+            length = Number(columns[3]);
+          }
+          const sampleRate = audiofile.sampleRate;
+          let osegment;
+
+          if (i === 0 && start > 0) {
+            // first segment not set
+            osegment = new OSegment(i + 1, 0, start * sampleRate, [
+              new OLabel('Tier_1', ''),
+            ]);
+
+            olevel.items.push(osegment);
+          }
+
+          const olabels: OLabel[] = [];
+          olabels.push(new OLabel('Tier_1', columns[4]));
+          osegment = new OSegment(
+            i + 1,
+            Math.round(start * sampleRate),
+            Math.round(length * sampleRate),
+            olabels
+          );
+
+          olevel.items.push(osegment);
+
+          if (i === lines.length - 2) {
+            if (start + length < audiofile.duration) {
+              const osegmentEnd = new OSegment(
+                i + 2,
+                Math.round((start + length) * sampleRate),
+                Math.round(
+                  (audiofile.duration - (start + length)) * sampleRate
+                ),
+                [new OLabel('Tier_1', '')]
+              );
+
+              olevel.items.push(osegmentEnd);
+            }
+          }
+
+          start += length;
+        }
+      }
+      result.levels.push(olevel);
+
+      return {
+        annotjson: result,
+        audiofile: undefined,
+        error: '',
+      };
+    } else {
+      return {
+        annotjson: undefined,
+        audiofile: undefined,
+        error: `The file name stated in the CTM file is not the same as the audio file's.`,
+      };
+    }
   }
 }

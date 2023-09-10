@@ -227,7 +227,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                               new OSegment(
                                 last.id + 1,
                                 last.sampleStart! + last.sampleDur!,
-                                this._oaudiofile.duration *
+                                this._oaudiofile.duration! *
                                   this._oaudiofile.sampleRate -
                                   (last.sampleStart! + last.sampleDur!),
                                 [new OLabel(level.name, '')]
@@ -257,15 +257,15 @@ export class OctraDropzoneComponent extends DefaultComponent {
                   };
 
                   if (
-                    !(importResult === undefined) &&
-                    !(importResult.audiofile === undefined)
+                    importResult !== undefined &&
+                    importResult.audiofile !== undefined
                   ) {
                     // is bundle file
                     this.dropFile('_bndl.json', true, true);
                     const audioProcess: FileProgress = {
                       status: 'progress',
                       file: new File(
-                        [importResult.audiofile.arraybuffer],
+                        [importResult.audiofile.arraybuffer!],
                         importResult.audiofile.name
                       ),
                       checked_converters: 0,

@@ -578,7 +578,7 @@ export class TranscriptionService {
           Level.fromObj(
             a,
             this._audiofile.sampleRate,
-            this.audioManager.createSampleUnit(this._audiofile.duration)
+            this.audioManager.createSampleUnit(this._audiofile.duration!)
           )
         )
       );
@@ -713,9 +713,10 @@ export class TranscriptionService {
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.sampleRate,
-      this._annotation.audiofile.duration,
+      this._annotation.audiofile.duration!,
       []
     );
+
 
     if (uiElements) {
       for (const elem of uiElements) {

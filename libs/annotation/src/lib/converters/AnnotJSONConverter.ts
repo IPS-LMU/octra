@@ -13,7 +13,7 @@ export class AnnotJSONConverter extends Converter {
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON): ExportResult | undefined {
+  public override export(annotation: OAnnotJSON): ExportResult {
     if (annotation) {
       return {
         file: {
@@ -25,7 +25,9 @@ export class AnnotJSONConverter extends Converter {
       };
     }
 
-    return undefined;
+    return {
+      error: 'Annotation is undefined or null',
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

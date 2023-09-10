@@ -41,11 +41,12 @@ export interface ILink {
 
 export interface IAudioFile {
   name: string;
-  size: number;
-  duration: number;
   sampleRate: number;
-  url: string;
-  type: string;
+  duration?: number;
+  size?: number;
+  arraybuffer?: ArrayBuffer;
+  url?: string;
+  type?: string;
 }
 
 /*
@@ -96,16 +97,16 @@ export class OAnnotJSON implements IAnnotJSON {
     }
   }
 }
+
 // TODO add extension and use name without it
 export class OAudiofile implements IAudioFile {
   name!: string;
-  // need type attribute
-  arraybuffer!: ArrayBuffer;
-  size!: number;
-  duration!: number;
   sampleRate!: number;
-  url!: string;
-  type!: string;
+  duration?: number;
+  size?: number;
+  url?: string;
+  type?: string;
+  arraybuffer?: ArrayBuffer;
 }
 
 export class OLevel implements ILevel {

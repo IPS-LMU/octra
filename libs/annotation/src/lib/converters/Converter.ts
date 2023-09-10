@@ -14,7 +14,8 @@ export interface ImportResult {
 }
 
 export interface ExportResult {
-  file: IFile;
+  file?: IFile;
+  error?: string;
 }
 
 export abstract class Converter {
@@ -79,14 +80,24 @@ export abstract class Converter {
     return this._multitiers;
   }
 
+  /**
+   * exports AnnotJSON to another annotation format considering an audio file and a level number (optional).
+   * @param annotation the AnnotJSON
+   * @param audiofile information about the audio file
+   * @param levelnum the level number for export
+   * returns resulted file or error.
+   */
   public abstract export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
     levelnum?: number
-  ): ExportResult | undefined;
+  ): ExportResult;
 
-  public abstract import(
-    file: IFile,
-    audiofile: OAudiofile
-  ): ImportResult | undefined;
+  /**
+   * converts an file to AnnotJSON considering the audio file. The audio file must be the one used for this transcript file.
+   * @param file the transcript file
+   * @param audiofile information about the audio file.
+   * returns object with an annotjson or an error.
+   */
+  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
 }

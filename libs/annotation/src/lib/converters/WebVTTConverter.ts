@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -9,10 +15,11 @@ import {
 } from '../annotjson';
 
 export class WebVTTConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'WebVTT';
+
   public constructor() {
     super();
     this._application = 'Videoplayer';
-    this._name = 'WebVTT Subtitles';
     this._extension = '.vtt';
     this._website.title = 'Web Video Text Tracks Format (WebVTT)\n';
     this._website.url =

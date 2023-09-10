@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   ISegment,
@@ -11,10 +17,11 @@ import {
 import { contains } from '../functions';
 
 export class PraatTableConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'AnnotJSON';
+
   public constructor() {
     super();
     this._application = 'Praat';
-    this._name = 'Text';
     this._extension = '.Table';
     this._website.title = 'Praat';
     this._website.url = 'http://www.fon.hum.uva.nl/praat/';

@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { IAnnotJSON, OAnnotJSON, OAudiofile } from '../annotjson';
 
 export interface Bundle {
@@ -15,10 +21,11 @@ export interface Bundle {
 }
 
 export class BundleJSONConverter extends Converter {
+  override _name:OctraAnnotationFormatType = "BundleJSON";
+
   public constructor() {
     super();
     this._application = '';
-    this._name = 'Bundle';
     this._extension = '_bndl.json';
     this._website.title = '';
     this._website.url = '';

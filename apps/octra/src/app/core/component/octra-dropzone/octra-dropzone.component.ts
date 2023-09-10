@@ -245,7 +245,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                     } else {
                       if (
                         file.checked_converters >= AppInfo.converters.length ||
-                        converter.name === 'Bundle'
+                        converter.name === 'BundleJSON'
                       ) {
                         // last converter to check
                         file.status = 'invalid';

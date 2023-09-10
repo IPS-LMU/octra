@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -10,12 +16,12 @@ import {
 import { contains } from '../functions';
 
 export class CTMConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'CTM';
   // http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#ctm_fmt_name_0
 
   public constructor() {
     super();
     this._application = 'CTM';
-    this._name = 'CTM';
     this._extension = '.ctm';
     this._website.title = 'CTM Format';
     this._website.url =

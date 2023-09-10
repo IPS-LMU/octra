@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -9,10 +15,11 @@ import {
 } from '../annotjson';
 
 export class SRTConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'SRT';
+
   public constructor() {
     super();
     this._application = 'Video';
-    this._name = 'SRT Subtitles';
     this._extension = '.srt';
     this._website.title = 'SRT Subtitles';
     this._website.url =

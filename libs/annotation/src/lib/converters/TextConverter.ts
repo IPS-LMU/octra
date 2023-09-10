@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -9,6 +15,8 @@ import {
 } from '../annotjson';
 
 export class TextConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'PlainText';
+
   public override options = {
     showTimestampSamples: false,
     showTimestampString: false,
@@ -17,7 +25,6 @@ export class TextConverter extends Converter {
   public constructor() {
     super();
     this._application = 'Text Editor';
-    this._name = 'Plain text';
     this._extension = '.txt';
     this._website.title = 'WebMaus';
     this._website.url =

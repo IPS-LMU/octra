@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -10,10 +16,11 @@ import {
 } from '../annotjson';
 
 export class PartiturConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'BASPartitur';
+
   public constructor() {
     super();
     this._application = '';
-    this._name = 'BAS Partitur Format';
     this._extension = '.par';
     this._website.title = 'BAS Partitur Format';
     this._website.url = 'http://www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html';

@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -11,10 +17,11 @@ import {
 import { contains } from '../functions';
 
 export class PraatTextgridConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'PraatTextTable';
+
   public constructor() {
     super();
     this._application = 'Praat';
-    this._name = 'TextGrid';
     this._extension = '.TextGrid';
     this._website.title = 'Praat';
     this._website.url = 'http://www.fon.hum.uva.nl/praat/';

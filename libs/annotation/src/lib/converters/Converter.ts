@@ -1,5 +1,16 @@
 import { OAnnotJSON, OAudiofile } from '../annotjson';
 
+export type OctraAnnotationFormatType =
+  | 'AnnotJSON'
+  | 'BundleJSON'
+  | 'CTM'
+  | 'ELAN'
+  | 'BASPartitur'
+  | 'PraatTextTable'
+  | 'SRT'
+  | 'PlainText'
+  | 'WebVTT';
+
 export interface IFile {
   name: string;
   content: string;
@@ -34,9 +45,9 @@ export abstract class Converter {
     return this._application;
   }
 
-  protected _name = '';
+  protected _name!: OctraAnnotationFormatType;
 
-  get name(): string {
+  get name(): OctraAnnotationFormatType {
     return this._name;
   }
 

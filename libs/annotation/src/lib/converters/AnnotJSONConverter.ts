@@ -1,11 +1,18 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { OAnnotJSON, OAudiofile } from '../annotjson';
 
 export class AnnotJSONConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'AnnotJSON';
+
   public constructor() {
     super();
     this._application = 'Emu-WebApp';
-    this._name = 'AnnotJSON';
     this._website.title = 'Emu-WebApp';
     this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
     this._extension = '_annot.json';

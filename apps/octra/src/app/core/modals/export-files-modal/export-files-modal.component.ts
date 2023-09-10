@@ -205,7 +205,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       };
       this.subscrManager.add(
         timer(300).subscribe(() => {
-          if (converter.name === 'Bundle') {
+          if (converter.name === 'BundleJSON') {
             // only this converter needs an array buffer
             this.transcriptionService.audiofile.arraybuffer =
               this.transcriptionService.audioManager.resource.arraybuffer!;

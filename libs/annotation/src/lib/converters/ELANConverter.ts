@@ -1,5 +1,11 @@
 import * as X2JS from 'x2js';
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   AnnotationLevelType,
   OAnnotJSON,
@@ -11,10 +17,11 @@ import {
 import { DateTime } from 'luxon';
 
 export class ELANConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'ELAN';
+
   public constructor() {
     super();
     this._application = 'ELAN';
-    this._name = 'ELAN';
     this._extension = '.eaf';
     this._website.title = 'ELAN';
     this._website.url = 'https://tla.mpi.nl/tools/tla-tools/elan/';

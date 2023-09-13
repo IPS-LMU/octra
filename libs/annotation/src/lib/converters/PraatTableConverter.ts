@@ -17,7 +17,7 @@ import {
 import { contains } from '../functions';
 
 export class PraatTableConverter extends Converter {
-  override _name: OctraAnnotationFormatType = 'AnnotJSON';
+  override _name: OctraAnnotationFormatType = 'PraatTextTable';
 
   public constructor() {
     super();

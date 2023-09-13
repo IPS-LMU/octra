@@ -17,7 +17,7 @@ import {
 import { contains } from '../functions';
 
 export class PraatTextgridConverter extends Converter {
-  override _name: OctraAnnotationFormatType = 'PraatTextTable';
+  override _name: OctraAnnotationFormatType = 'TextGrid';
 
   public constructor() {
     super();

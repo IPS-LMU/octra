@@ -9,6 +9,7 @@ export type OctraAnnotationFormatType =
   | 'PraatTextTable'
   | 'SRT'
   | 'PlainText'
+  | 'TextGrid'
   | 'WebVTT';
 
 export interface IFile {

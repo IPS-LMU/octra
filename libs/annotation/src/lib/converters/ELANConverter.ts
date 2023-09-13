@@ -1,4 +1,3 @@
-import * as X2JS from 'x2js';
 import {
   Converter,
   ExportResult,
@@ -15,6 +14,7 @@ import {
   OSegment,
 } from '../annotjson';
 import { DateTime } from 'luxon';
+import X2JS from 'x2js';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';

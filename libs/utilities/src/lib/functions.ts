@@ -373,3 +373,26 @@ export function getTranscriptFromIO(io: any[]): any | undefined {
       !a.fileType!.includes('image')
   )!;
 }
+
+/**
+ * converts time declaration from string to unix time (miliseconds).
+ *
+ * @param duration e.g. 2d, 1h, 5m
+ */
+export function convertDurationToUnix(duration: string) {
+  if (duration) {
+    const matches = /([0-9]+)([mhd])/g.exec(duration);
+    if (matches && matches.length > 2) {
+      if (matches[2] === 'm') {
+        return Number(matches[1]) * 60 * 1000;
+      }
+      if (matches[2] === 'h') {
+        return Number(matches[1]) * 60 * 60 * 1000;
+      }
+      if (matches[2] === 'd') {
+        return Number(matches[1]) * 60 * 60 * 24 * 1000;
+      }
+    }
+  }
+  return undefined;
+}

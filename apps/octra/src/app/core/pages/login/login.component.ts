@@ -1,5 +1,4 @@
 import {
-  ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
@@ -24,6 +23,7 @@ import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AccountLoginMethod } from '@octra/api-types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-login',
@@ -88,7 +88,7 @@ export class LoginComponent
   constructor(
     private router: Router,
     public appStorage: AppStorageService,
-    private cd: ChangeDetectorRef,
+    public api: OctraAPIService,
     public settingsService: SettingsService,
     public modService: OctraModalService,
     private langService: TranslocoService,
@@ -116,7 +116,7 @@ export class LoginComponent
     }
   }
 
-  onOnlineShibbolethSubmit($event: {
+  onOnlineSubmit($event: {
     type: AccountLoginMethod;
     credentials?: {
       usernameEmail: string;

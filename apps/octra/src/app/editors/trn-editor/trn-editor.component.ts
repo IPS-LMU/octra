@@ -17,17 +17,11 @@ import {
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { AudioChunk, AudioManager } from '@octra/media';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {
-  findElements,
-  getAttr,
-  selectAllTextOfNode,
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
   ASRContext,
@@ -44,6 +38,14 @@ import { Subscription, timer } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraGuidelines } from '@octra/assets';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import {
+  AudioChunk,
+  AudioManager,
+  findElements,
+  getAttr,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 
 declare let validateAnnotation: any;
 
@@ -708,13 +710,25 @@ export class TrnEditorComponent
       ];
       segmentLabel.contentEditable = 'true';
       segmentLabel.focus();
-      selectAllTextOfNode(segmentLabel);
+      this.selectAllTextOfNode(segmentLabel);
       this.selectedCell = {
         labelText: this.shownSegments[segmentNumber + 1].label,
         row: segmentNumber + 1,
         column: 1,
       };
     }
+  }
+
+  /**
+   * selects all text of a given element.
+   * @param el
+   */
+  private selectAllTextOfNode(element: any) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -1025,7 +1039,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
 
             resolve();
           })
-          .catch((error) => {
+          .catch((error:any) => {
             console.error(error);
           });
 
@@ -1043,7 +1057,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
 
             resolve();
           })
-          .catch((error) => {
+          .catch((error:any) => {
             console.error(error);
           });
       }

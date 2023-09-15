@@ -69,7 +69,7 @@ export function createSampleTask(
     updatedate: new Date().toISOString(),
     tool_configuration: {
       id: '345',
-      tool_id: '565',
+      tool_id: 565,
       name: 'localConfig',
       task_type: {
         name: 'annotation',

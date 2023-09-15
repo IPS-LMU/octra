@@ -13,6 +13,7 @@ import { TableConfiguratorComponent } from '../../tools/table-configurator/table
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { Converter } from '@octra/annotation';
+import { Converter, ExportResult } from '@octra/annotation';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
@@ -201,29 +202,33 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       };
       this.subscrManager.add(
         timer(300).subscribe(() => {
-          if (converter.name === 'Bundle') {
+          if (converter.name === 'BundleJSON') {
             // only this converter needs an array buffer
             this.transcriptionService.audiofile.arraybuffer =
               this.transcriptionService.audioManager.resource.arraybuffer!;
           }
 
-          const result: IFile = converter.export(
+          const result: ExportResult = converter.export(
             oannotjson,
             this.transcriptionService.audiofile,
             levelnum
-          )!.file;
+          );
 
-          this.parentformat.download = result.name;
+          if (!result.error && result.file) {
+            this.parentformat.download = result.file.name;
 
-          if (this.parentformat.uri !== undefined) {
-            window.URL.revokeObjectURL(this.parentformat.uri.toString());
+            if (this.parentformat.uri !== undefined) {
+              window.URL.revokeObjectURL(this.parentformat.uri.toString());
+            }
+            const test = new File([result.file.content], result.file.name);
+            this.setParentFormatURI(window.URL.createObjectURL(test));
+            this.preparing = {
+              name: converter.name,
+              preparing: false,
+            };
+          } else {
+            console.error(`Annotation conversion error: ${result.error}`);
           }
-          const test = new File([result.content], result.name);
-          this.setParentFormatURI(window.URL.createObjectURL(test));
-          this.preparing = {
-            name: converter.name,
-            preparing: false,
-          };
         })
       );
     }

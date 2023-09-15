@@ -21,7 +21,7 @@ import {
   ASRStateQueue,
   ASRStateQueueItem,
 } from './index';
-import { WavFormat } from '@octra/media';
+import { FileInfo, readFileContents, WavFormat } from '@octra/web-media';
 import {
   AlertService,
   AudioService,
@@ -30,7 +30,6 @@ import {
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import * as X2JS from 'x2js';
 import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
-import { FileInfo, readFileContents } from '@octra/utilities';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
@@ -849,7 +848,7 @@ export class AsrEffects {
           );
           file
             .updateContentFromURL(this.http)
-            .then((text) => {
+            .then((text: any) => {
               // add messages to protocol
               resolve({
                 file: file.file!,
@@ -857,7 +856,7 @@ export class AsrEffects {
                 url: json.downloadLink,
               });
             })
-            .catch((error) => {
+            .catch((error: any) => {
               reject(error);
             });
         } else {

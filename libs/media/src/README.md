@@ -1,6 +1,7 @@
 # media
 
-This library offers classes and functions for handling audio files in web browsers (e.g. chunked decoding etc.).
+This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units).
+If you are looking for decoding and playback of audio files see @octra/web-media library.
 
 ## Installation
 
@@ -27,10 +28,10 @@ Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([se
 
 ````html
     <head>
-        <!-- ... -->
-        <script type="application/javascript" src="../octra/libs/media/bundles/OctraMedia.umd.js"></script>
-        <!-- ... -->
-    </head>
+  <!-- ... -->
+  <script type="application/javascript" src="../octra/libs/media/bundles/OctraMedia.umd.js"></script>
+  <!-- ... -->
+</head>
 ````
 
 ## Update

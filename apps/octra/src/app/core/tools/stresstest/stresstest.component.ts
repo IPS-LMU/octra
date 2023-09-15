@@ -4,7 +4,8 @@ import {
   Component,
 } from '@angular/core';
 import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
-import { BrowserInfo, getFileSize } from '@octra/utilities';
+import { getFileSize } from '@octra/utilities';
+import { BrowserInfo } from '@octra/web-media';
 
 @Component({
   selector: 'octra-stresstest',

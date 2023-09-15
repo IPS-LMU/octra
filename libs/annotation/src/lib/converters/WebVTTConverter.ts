@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   OAnnotJSON,
   OAnyLevel,
@@ -9,10 +15,11 @@ import {
 import { OAudiofile } from '@octra/media';
 
 export class WebVTTConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'WebVTT';
+
   public constructor() {
     super();
     this._application = 'Videoplayer';
-    this._name = 'WebVTT Subtitles';
     this._extension = '.vtt';
     this._website.title = 'Web Video Text Tracks Format (WebVTT)\n';
     this._website.url =
@@ -29,19 +36,25 @@ export class WebVTTConverter extends Converter {
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
     levelnum: number
-  ): ExportResult | undefined {
-    if (annotation) {
-      let result = 'WEBVTT\n\n';
-      let filename = '';
+  ): ExportResult {
+    if (!annotation) {
+      return {
+        error: 'Annotation is undefined or null',
+      };
+    }
 
-      if (
-        levelnum === undefined ||
-        levelnum < 0 ||
-        levelnum > annotation.levels.length
-      ) {
-        console.error('WebVTTConverter needs a level number');
-        return undefined;
-      }
+    let result = 'WEBVTT\n\n';
+    let filename = '';
+
+    if (
+      levelnum === undefined ||
+      levelnum < 0 ||
+      levelnum > annotation.levels.length
+    ) {
+      return {
+        error: 'Missing level number',
+      };
+    }
 
       if (levelnum < annotation.levels.length) {
         const level: OAnyLevel<OSegment> = annotation.levels[levelnum];
@@ -62,36 +75,48 @@ export class WebVTTConverter extends Converter {
               annotation.sampleRate
             );
 
-            if (transcript !== '') {
-              result += `${counter}\n`;
-              result += `${start} --> ${end}\n`;
-              result += `${transcript}\n\n`;
-              counter++;
-            }
+          if (transcript !== '') {
+            result += `${counter}\n`;
+            result += `${start} --> ${end}\n`;
+            result += `${transcript}\n\n`;
+            counter++;
           }
         }
-
-        filename = `${annotation.name}`;
-        if (annotation.levels.length > 1) {
-          filename += `-${level.name}`;
-        }
-        filename += `${this._extension}`;
       }
 
-      return {
-        file: {
-          name: filename,
-          content: result,
-          encoding: 'UTF-8',
-          type: 'text/plain',
-        },
-      };
+      filename = `${annotation.name}`;
+      if (annotation.levels.length > 1) {
+        filename += `-${level.name}`;
+      }
+      filename += `${this._extension}`;
     }
-    return undefined;
+
+    return {
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'text/plain',
+      },
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile) {
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+    if (!audiofile?.duration) {
+      return {
+        error: 'Missing audiofile duration',
+      };
+    }
       const result = new OAnnotJSON(
         audiofile.name,
         file.name,
@@ -99,81 +124,81 @@ export class WebVTTConverter extends Converter {
       );
       result.levels.push(new OSegmentLevel(`OCTRA_1`));
 
-      const content = file.content;
+    const content = file.content;
 
-      let counterID = 1;
-      if (content !== '') {
-        // check header
-        const headerCheck = new RegExp('WEBVTT(?: - ([^\\n]+))?', 'g');
-        const headerMatches = headerCheck.exec(content);
+    let counterID = 1;
+    if (content !== '') {
+      // check header
+      const headerCheck = new RegExp('WEBVTT(?: - ([^\\n]+))?', 'g');
+      const headerMatches = headerCheck.exec(content);
 
-        if (headerMatches !== undefined) {
-          let body = content;
-          const findFirstCueRegex = new RegExp(
-            '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) --> ' +
-              '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
-            'g'
-          );
+      if (headerMatches !== undefined) {
+        let body = content;
+        const findFirstCueRegex = new RegExp(
+          '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) --> ' +
+            '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
+          'g'
+        );
 
-          const firstCueMatch = findFirstCueRegex.exec(content);
+        const firstCueMatch = findFirstCueRegex.exec(content);
 
-          if (firstCueMatch !== null) {
-            body = body.substring(firstCueMatch.index).replace(/^\n+/g, '');
-            const cues = body.split(/\n\n/g).filter((a) => a.trim() !== '');
+        if (firstCueMatch !== null) {
+          body = body.substring(firstCueMatch.index).replace(/^\n+/g, '');
+          const cues = body.split(/\n\n/g).filter((a) => a.trim() !== '');
 
-            for (const cue of cues) {
-              const regex = new RegExp(
-                '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) -->' +
-                  ' ([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
-                'g'
+          for (const cue of cues) {
+            const regex = new RegExp(
+              '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) -->' +
+                ' ([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
+              'g'
+            );
+            const matches = regex.exec(cue);
+
+            let lastEnd = 0;
+            if (matches !== null) {
+              const cueWithoutTimestamp = cue.substring(
+                matches.index + matches[0].length
               );
-              const matches = regex.exec(cue);
+              const linesOfCue = cueWithoutTimestamp
+                .split(/\n/g)
+                .filter((a) => a.trim() !== '');
 
-              let lastEnd = 0;
-              if (matches !== null) {
-                const cueWithoutTimestamp = cue.substring(
-                  matches.index + matches[0].length
-                );
-                const linesOfCue = cueWithoutTimestamp
-                  .split(/\n/g)
-                  .filter((a) => a.trim() !== '');
-
-                const timeStart = this.getSamplesFromTimeString(
-                  matches[1],
-                  audiofile.sampleRate
-                );
-                const timeEnd = this.getSamplesFromTimeString(
-                  matches[2],
-                  audiofile.sampleRate
-                );
-                let escapedTranscript = '';
-                if (
-                  timeStart > -1 &&
-                  timeEnd > -1 &&
-                  timeStart < audiofile.duration &&
-                  timeEnd < audiofile.duration
-                ) {
-                  for (let i = 0; i < linesOfCue.length; i++) {
-                    let transcriptLineOfCue = linesOfCue[i];
-                    if (
-                      transcriptLineOfCue === 'NOTE' ||
-                      transcriptLineOfCue === 'STYLE'
-                    ) {
-                      // stop reading cue because of NOTE block
-                      break;
-                    }
-
-                    transcriptLineOfCue = transcriptLineOfCue
-                      .replace(/NOTE\s.*/g, '')
-                      .replace(/(\n|\s)+$/g, '')
-                      .replace('&lt;', '<')
-                      .replace('&gt;', '>')
-                      .replace(/^-\s/g, '');
-
-                    if (transcriptLineOfCue.trim() !== '') {
-                      escapedTranscript += ` ${transcriptLineOfCue}`;
-                    }
+              const timeStart = this.getSamplesFromTimeString(
+                matches[1],
+                audiofile.sampleRate
+              );
+              const timeEnd = this.getSamplesFromTimeString(
+                matches[2],
+                audiofile.sampleRate
+              );
+              let escapedTranscript = '';
+              if (
+                timeStart > -1 &&
+                timeEnd > -1 &&
+                timeStart < audiofile.duration &&
+                timeEnd < audiofile.duration
+              ) {
+                for (let i = 0; i < linesOfCue.length; i++) {
+                  let transcriptLineOfCue = linesOfCue[i];
+                  if (
+                    transcriptLineOfCue === 'NOTE' ||
+                    transcriptLineOfCue === 'STYLE'
+                  ) {
+                    // stop reading cue because of NOTE block
+                    break;
                   }
+
+                  transcriptLineOfCue = transcriptLineOfCue
+                    .replace(/NOTE\s.*/g, '')
+                    .replace(/(\n|\s)+$/g, '')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>')
+                    .replace(/^-\s/g, '');
+
+                  if (transcriptLineOfCue.trim() !== '') {
+                    escapedTranscript += ` ${transcriptLineOfCue}`;
+                  }
+                }
 
                   if (escapedTranscript.trim() !== '') {
                     if (timeStart > lastEnd) {
@@ -196,20 +221,18 @@ export class WebVTTConverter extends Converter {
                       )
                     );
 
-                    lastEnd = timeEnd;
-                  } else {
-                    // ignore
-                  }
+                  lastEnd = timeEnd;
                 } else {
-                  return {
-                    annotjson: undefined,
-                    audiofile: undefined,
-                    error:
-                      "The last segment's end or start point is out of the audio duration.",
-                  };
+                  // ignore
                 }
+              } else {
+                return {
+                  error:
+                    "The last segment's end or start point is out of the audio duration.",
+                };
               }
             }
+          }
 
             for (let i = 0; i < result.levels.length; i++) {
               const level = result.levels[i] as OSegmentLevel<OSegment>;
@@ -239,33 +262,24 @@ export class WebVTTConverter extends Converter {
               }
             }
 
-            return {
-              annotjson: result,
-              audiofile: undefined,
-              error: '',
-            };
-          } else {
-            // not found
-            return {
-              annotjson: undefined,
-              audiofile: undefined,
-              error: 'Could not find a cue in VTT file',
-            };
-          }
-        } else {
           return {
-            annotjson: undefined,
-            audiofile: undefined,
-            error: 'This WebVTT file is bad formatted (header)',
+            annotjson: result,
+            error: '',
+          };
+        } else {
+          // not found
+          return {
+            error: 'Could not find a cue in VTT file',
           };
         }
+      } else {
+        return {
+          error: 'This WebVTT file is bad formatted (header)',
+        };
       }
     }
-
     return {
-      annotjson: undefined,
-      audiofile: undefined,
-      error: 'This WebVTT file is not compatible with this audio file.',
+      error: 'Empty file',
     };
   }
 

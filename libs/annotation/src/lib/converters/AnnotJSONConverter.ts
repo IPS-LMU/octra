@@ -3,10 +3,11 @@ import { OAnnotJSON } from '../annotjson';
 import { OAudiofile } from '@octra/media';
 
 export class AnnotJSONConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'AnnotJSON';
+
   public constructor() {
     super();
     this._application = 'Emu-WebApp';
-    this._name = 'AnnotJSON';
     this._website.title = 'Emu-WebApp';
     this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
     this._extension = '_annot.json';
@@ -14,7 +15,7 @@ export class AnnotJSONConverter extends Converter {
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON): ExportResult | undefined {
+  public override export(annotation: OAnnotJSON): ExportResult {
     if (annotation) {
       return {
         file: {
@@ -26,7 +27,9 @@ export class AnnotJSONConverter extends Converter {
       };
     }
 
-    return undefined;
+    return {
+      error: 'Annotation is undefined or null',
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

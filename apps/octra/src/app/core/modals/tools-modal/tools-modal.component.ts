@@ -26,7 +26,7 @@ import {
 } from '../../obj/tools/audio-cutting/cutting-format';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
-import { IntArray, WavFormat } from '@octra/media';
+import { IntArray, WavFormat } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
 import { OctraModalService } from '../octra-modal.service';

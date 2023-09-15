@@ -1,13 +1,9 @@
 import { AudioInfo } from './audio-info';
-import { SampleUnit } from './audio-time';
-import {
-  SubscriptionManager,
-  TsWorker,
-  TsWorkerJob,
-  TsWorkerStatus,
-} from '@octra/utilities';
-import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
+import { SubscriptionManager } from '@octra/utilities';
 import { Subject, timer } from 'rxjs';
+import { SampleUnit } from '@octra/media';
+import { TsWorker, TsWorkerJob, TsWorkerStatus } from '../worker';
+import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
 
 declare let window: unknown;
 

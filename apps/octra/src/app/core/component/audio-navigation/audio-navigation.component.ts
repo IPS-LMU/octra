@@ -10,8 +10,9 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { AudioChunk, PlayBackStatus } from '@octra/media';
+import { PlayBackStatus } from '@octra/media';
 import { DefaultComponent } from '../default.component';
+import { AudioChunk } from '@octra/web-media';
 
 export interface Buttons {
   play: {
@@ -247,7 +248,7 @@ export class AudioNavigationComponent
   private onPlayButtonClicked() {
     this.triggerButtonClick('play');
     if (this.audioChunk !== undefined) {
-      this.audioChunk.startPlayback(false).catch((error) => {
+      this.audioChunk.startPlayback(false).catch((error: any) => {
         console.error(error);
       });
     }
@@ -256,7 +257,7 @@ export class AudioNavigationComponent
   private onPauseButtonClicked() {
     this.triggerButtonClick('pause');
     if (this.audioChunk !== undefined) {
-      this.audioChunk.pausePlayback().catch((error) => {
+      this.audioChunk.pausePlayback().catch((error: any) => {
         console.error(error);
       });
     }
@@ -265,7 +266,7 @@ export class AudioNavigationComponent
   private onStopButtonClicked() {
     this.triggerButtonClick('stop');
     if (this.audioChunk !== undefined) {
-      this.audioChunk.stopPlayback().catch((error) => {
+      this.audioChunk.stopPlayback().catch((error: any) => {
         console.error(error);
       });
     }
@@ -282,7 +283,7 @@ export class AudioNavigationComponent
   private onBackwardButtonClicked() {
     if (this.audioChunk !== undefined) {
       this.triggerButtonClick('backward');
-      this.audioChunk.stepBackward().catch((error) => {
+      this.audioChunk.stepBackward().catch((error: any) => {
         console.error(error);
       });
     }
@@ -291,7 +292,7 @@ export class AudioNavigationComponent
   private onBackwardTimeButtonClicked() {
     if (this.audioChunk !== undefined) {
       this.triggerButtonClick('backward time');
-      this.audioChunk.stepBackwardTime(500 / 1000).catch((error) => {
+      this.audioChunk.stepBackwardTime(500 / 1000).catch((error: any) => {
         console.error(error);
       });
     }

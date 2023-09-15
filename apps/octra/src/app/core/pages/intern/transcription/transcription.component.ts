@@ -10,12 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import {
-  BrowserInfo,
-  hasProperty,
-  ShortcutGroup,
-  ShortcutManager,
-} from '@octra/utilities';
+import { hasProperty } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
 import * as X2JS from 'x2js';
 import { editorComponents } from '../../../../editors/components';
@@ -53,6 +48,7 @@ import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { IFile, PartiturConverter } from '@octra/annotation';
 import { AudioManager } from '@octra/media';
+import { Level, PartiturConverter } from '@octra/annotation';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
@@ -61,6 +57,12 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from '../../../store/authentication';
+import {
+  AudioManager,
+  BrowserInfo,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 
 @Component({
   selector: 'octra-transcription',
@@ -909,76 +911,86 @@ export class TranscriptionComponent
       this.audio.audioManager.resource.name,
       this.audio.audioManager.resource.info.sampleRate
     );
-    const result: IFile = converter.export(
+    const result = converter.export(
       oannotjson,
       this.audio.audioManager.resource.getOAudioFile(),
       0
-    )!.file;
-    result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
-
-    // upload transcript
-    const form: FormData = new FormData();
-    let host =
-      'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
-
-    if (!(this.appStorage.urlParams.host === undefined)) {
-      host = this.appStorage.urlParams.host;
-    }
-
-    const url = `${host}uploadFileMulti`;
-
-    form.append(
-      'file0',
-      new File([result.content], result.name, { type: 'text/plain' })
     );
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
+    if (!result.error && result.file) {
+      result.file.name = result.file.name.replace(
+        '-' + oannotjson.levels[0].name,
+        ''
+      );
 
-    xhr.onloadstart = () => {};
+      // upload transcript
+      const form: FormData = new FormData();
+      let host =
+        'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-    xhr.onerror = (e) => {
-      console.error(e);
-    };
-
-    xhr.onloadend = (e) => {
-      const result2 = (e.currentTarget as any).responseText;
-
-      const x2js = new X2JS();
-      let json: any = x2js.xml2js(result2);
-      json = json.UploadFileMultiResponse;
-
-      if (json.success === 'true') {
-        // TODO set urls to results only
-        let resulturl = '';
-        if (Array.isArray(json.fileList.entry)) {
-          resulturl = json.fileList.entry[0].value;
-        } else {
-          // json attribute entry is an object
-          resulturl = json.fileList.entry.value;
-        }
-
-        // send upload url to iframe owner
-        window.parent.postMessage(
-          {
-            data: {
-              transcript_url: resulturl,
-            },
-            status: 'success',
-          },
-          '*'
-        );
-      } else {
-        window.parent.postMessage(
-          {
-            status: 'error',
-            error: json.message,
-          },
-          '*'
-        );
+      if (!(this.appStorage.urlParams.host === undefined)) {
+        host = this.appStorage.urlParams.host;
       }
-    };
-    xhr.send(form);
+
+      const url = `${host}uploadFileMulti`;
+
+      form.append(
+        'file0',
+        new File([result.file.content], result.file.name, {
+          type: 'text/plain',
+        })
+      );
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+
+      xhr.onloadstart = () => {};
+
+      xhr.onerror = (e) => {
+        console.error(e);
+      };
+
+      xhr.onloadend = (e) => {
+        const result2 = (e.currentTarget as any).responseText;
+
+        const x2js = new X2JS();
+        let json: any = x2js.xml2js(result2);
+        json = json.UploadFileMultiResponse;
+
+        if (json.success === 'true') {
+          // TODO set urls to results only
+          let resulturl = '';
+          if (Array.isArray(json.fileList.entry)) {
+            resulturl = json.fileList.entry[0].value;
+          } else {
+            // json attribute entry is an object
+            resulturl = json.fileList.entry.value;
+          }
+
+          // send upload url to iframe owner
+          window.parent.postMessage(
+            {
+              data: {
+                transcript_url: resulturl,
+              },
+              status: 'success',
+            },
+            '*'
+          );
+        } else {
+          window.parent.postMessage(
+            {
+              status: 'error',
+              error: json.message,
+            },
+            '*'
+          );
+        }
+      };
+      xhr.send(form);
+    } else {
+      alert(`Annotation conversion failed: ${result.error}`);
+    }
   }
 
   public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {

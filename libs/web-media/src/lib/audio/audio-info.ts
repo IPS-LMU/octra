@@ -1,5 +1,5 @@
-import { SampleUnit } from './audio-time';
-import { FileInfo } from '@octra/utilities';
+import { SampleUnit } from '@octra/media';
+import { FileInfo } from '../data-info';
 
 export interface IAudioFile {
   name: string;

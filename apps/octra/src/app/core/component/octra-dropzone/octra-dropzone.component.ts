@@ -3,12 +3,7 @@ import { AppInfo } from '../../../app.info';
 import { DropZoneComponent } from '../drop-zone';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { SessionFile } from '../../obj/SessionFile';
-import {
-  contains,
-  fileListToArray,
-  FileSize,
-  getFileSize,
-} from '@octra/utilities';
+import { contains, FileSize, getFileSize } from '@octra/utilities';
 import { FileProgress } from '../../obj/objects';
 import {
   Converter,
@@ -24,6 +19,7 @@ import { AudioManager, OAudiofile } from '@octra/media';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
+import { AudioManager, fileListToArray } from '@octra/web-media';
 
 @Component({
   selector: 'octra-dropzone',
@@ -235,7 +231,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                               new OSegment(
                                 last.id + 1,
                                 last.sampleStart! + last.sampleDur!,
-                                this._oaudiofile.duration *
+                                this._oaudiofile.duration! *
                                   this._oaudiofile.sampleRate -
                                   (last.sampleStart! + last.sampleDur!),
                                 [new OLabel(level.name, '')]
@@ -253,7 +249,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                     } else {
                       if (
                         file.checked_converters >= AppInfo.converters.length ||
-                        converter.name === 'Bundle'
+                        converter.name === 'BundleJSON'
                       ) {
                         // last converter to check
                         file.status = 'invalid';
@@ -265,8 +261,8 @@ export class OctraDropzoneComponent extends DefaultComponent {
                   };
 
                   if (
-                    !(importResult === undefined) &&
-                    !(importResult.audiofile === undefined)
+                    importResult !== undefined &&
+                    importResult.audiofile !== undefined
                   ) {
                     // is bundle file
                     this.dropFile('_bndl.json', true, true);

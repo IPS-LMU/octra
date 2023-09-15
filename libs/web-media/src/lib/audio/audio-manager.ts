@@ -4,10 +4,11 @@ import { AudioInfo } from './audio-info';
 import { AudioResource } from './audio-resource';
 import { AudioFormat, WavFormat } from './AudioFormats';
 import { SubscriptionManager } from '@octra/utilities';
-import { SampleUnit } from './audio-time';
-import { PlayBackStatus, SourceType } from '../types';
-import { AudioSelection } from './audio-selection';
+import { SourceType } from '../types';
 import { Subject, Subscription, timer } from 'rxjs';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { getAudioInfo } from '../functions';
+import { AudioFormat, WavFormat } from './AudioFormats';
 
 declare let window: any;
 
@@ -194,7 +195,7 @@ export class AudioManager {
       let audioinfo: AudioInfo | undefined = undefined;
 
       try {
-        audioinfo = audioformat.getAudioInfo(filename, type, buffer);
+        audioinfo = getAudioInfo(audioformat, filename, type, buffer);
       } catch (err: any) {
         subj.error(err!.message);
       }

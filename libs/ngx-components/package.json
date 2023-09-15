@@ -8,6 +8,7 @@
     "@octra/utilties": "^0.0.1",
     "@octra/annotation": "^0.0.1",
     "@octra/media": "^0.0.1",
+    "@octra/web-media": "^0.0.1",
     "@octra/ngx-utilities": "^0.0.1",
     "konva": "^9.0.0",
     "rxjs": ">=7.5.0"

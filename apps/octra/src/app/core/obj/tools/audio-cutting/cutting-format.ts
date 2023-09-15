@@ -1,5 +1,5 @@
-import { AudioInfo } from '@octra/media';
 import { DateTime } from 'luxon';
+import { AudioInfo } from '@octra/web-media';
 
 abstract class CuttingFormat {
   public abstract exportList(

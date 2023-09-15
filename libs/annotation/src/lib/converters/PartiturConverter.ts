@@ -1,4 +1,10 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import {
   OAnnotJSON,
   OItem,
@@ -10,10 +16,11 @@ import {
 import { OAudiofile } from '@octra/media';
 
 export class PartiturConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'BASPartitur';
+
   public constructor() {
     super();
     this._application = '';
-    this._name = 'BAS Partitur Format';
     this._extension = '.par';
     this._website.title = 'BAS Partitur Format';
     this._website.url = 'http://www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html';
@@ -29,13 +36,20 @@ export class PartiturConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
-  ): ExportResult | undefined {
-    if (annotation === undefined) {
-      // annotation is undefined;
-      console.error('BASPartitur Converter annotation is undefined');
-      return undefined;
+    levelnum?: number
+  ): ExportResult {
+    if (!annotation) {
+      return {
+        error: 'Annotation is undefined or null',
+      };
     }
+
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Samplerate is undefined or null',
+      };
+    }
+
     if (levelnum !== undefined && levelnum > -1) {
       const result: ExportResult = {
         file: {
@@ -83,20 +97,31 @@ LBD:\n`;
         content += trnElement;
       }
 
-      result.file.content = content;
+      result.file!.content = content;
 
       return result;
     } else {
       // levelnum is undefined;
-      console.error('BASPartitur Converter needs a level number for export');
-      return undefined;
+      return {
+        error: 'BASPartitur Converter needs a level number for export',
+      };
     }
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile) {
-      const lines = file.content.split(/\r?\n/g);
-      let pointer = 0;
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+
+    const lines = file.content.split(/\r?\n/g);
+    let pointer = 0;
 
       const result = new OAnnotJSON(
         audiofile.name,
@@ -118,17 +143,17 @@ LBD:\n`;
           )
         );
 
-        if (search) {
-          const columns = lines[pointer].split(' ');
+      if (search) {
+        const columns = lines[pointer].split(' ');
 
-          if (search[0] === 'SAM') {
-            if (audiofile.sampleRate !== Number(columns[1])) {
-              console.error(
-                `Sample Rate of audio file is not equal to the value from Partitur` +
-                  ` file! ${audiofile.sampleRate} !== ${columns[1]}`
-              );
-            }
+        if (search[0] === 'SAM') {
+          if (audiofile.sampleRate !== Number(columns[1])) {
+            console.error(
+              `Sample Rate of audio file is not equal to the value from Partitur` +
+                ` file! ${audiofile.sampleRate} !== ${columns[1]}`
+            );
           }
+        }
 
           if (search[0] === 'TRN') {
             if (previousTier !== search[0]) {
@@ -160,51 +185,44 @@ LBD:\n`;
                 /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
               );
 
-              if (level === undefined) {
-                return {
-                  annotjson: result,
-                  audiofile: undefined,
-                  error: 'A level is missing.',
-                };
-              }
-
-              if (transcriptArray) {
-                level.items.push(
-                  new OSegment(
-                    counter,
-                    Number(transcriptArray[1]),
-                    Number(transcriptArray[2]),
-                    [new OLabel(previousTier, transcriptArray[4])]
-                  )
-                );
-              }
+            if (level === undefined) {
+              return {
+                annotjson: result,
+                audiofile: undefined,
+                error: 'A level is missing.',
+              };
             }
 
-            counter++;
+            if (transcriptArray) {
+              level.items.push(
+                new OSegment(
+                  counter,
+                  Number(transcriptArray[1]),
+                  Number(transcriptArray[2]),
+                  [new OLabel(previousTier, transcriptArray[4])]
+                )
+              );
+            }
           }
-        }
-        pointer++;
-      }
-      if (level) {
-        result.levels.push(level);
-        return {
-          annotjson: result,
-          audiofile: undefined,
-          error: '',
-        };
-      } else {
-        return {
-          annotjson: undefined,
-          audiofile: undefined,
-          error: `Input file not compatible with Praat Partitur.`,
-        };
-      }
-    }
 
-    return {
-      annotjson: undefined,
-      audiofile: undefined,
-      error: `This Partitur file is not compatble with this audio file.`,
-    };
+          counter++;
+        }
+      }
+      pointer++;
+    }
+    if (level) {
+      result.levels.push(level);
+      return {
+        annotjson: result,
+        audiofile: undefined,
+        error: '',
+      };
+    } else {
+      return {
+        annotjson: undefined,
+        audiofile: undefined,
+        error: `Input file not compatible with Praat Partitur.`,
+      };
+    }
   }
 }

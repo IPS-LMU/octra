@@ -108,7 +108,12 @@
     "or": "oder",
     "account": "Account",
     "settings": "Einstellungen",
-    "information": "Information"
+    "information": "Information",
+    "first name": "Vorname",
+    "last name": "Nachname",
+    "username": "Nutzername",
+    "locale": "Sprache",
+    "timezone": "Zeitzone"
   },
   "p": {
     "username or email": "Nutzername oder E-Mail",
@@ -117,7 +122,12 @@
     "manage account": "Account verwalten",
     "reset password": "Passwort zurücksetzen",
     "authenticated": "Ich bin authentifiziert.",
-    "selected level": "Ausgewähltes level"
+    "selected level": "Ausgewähltes level",
+    "sign up": "Neu registrieren",
+    "repeat password": "Passwort wiederholen",
+    "select locale": "Sprache wählen",
+    "select timezone": "Zeitzone wählen",
+    "back to login": "Zurück zur Anmeldung"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -433,5 +443,14 @@
     "resume transcription": "Transkription fortsetzen",
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",
     "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben."
+  },
+  "signup": {
+    "data correctness": "Ich bestätige die Richtigkeit meiner Angaben.",
+    "data policy": "Ich habe die <a href=\"{{dataPolicyURL}}\" target=\"_blank\">Datenschutzerklärung</a> gelesen und akzeptiere sie.",
+    "terms of service": "Ich habe die <a href=\"{{termsConditionsURL}}\" target=\"_blank\">AGB</a> gelesen und akzeptiere sie.",
+    "success": {
+      "email_verification": "Wir senden Dir eine E-Mail zu. Klicke bitte auf den darin enthaltenen Link, um deine E-Mail Adresse zu bestätigen.\n  Danach kannst Du dich anmelden.<br/><br/>\n  Du hast keine Email erhalten? Prüfe bitte deinen Spam/Junk-Ordner. Solltest Du auch nach 10 Minuten keine E-Mail\n  erhalten haben, wende dich bitte an einen Administrator.",
+      "login": "Deine Registrierung wurde erfolgreich abgeschlossen. Du kannst Dich nun mit deinen Zugangsdaten anmelden."
+    }
   }
 }

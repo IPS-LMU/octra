@@ -25,13 +25,13 @@ import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent,
 } from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import { AudioManager } from '@octra/media';
 import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import { getBaseHrefURL, joinURL, popupCenter } from '@octra/utilities';
+import { joinURL } from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
 import { AccountLoginMethod } from '@octra/api-types';
+import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -507,7 +507,7 @@ export class AuthenticationEffects {
           if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
-                this.apiService.authType,
+                this.apiService.authType!,
                 a.actionAfterSuccess
               );
             const subscr = this.reauthenticationRef.closed.subscribe({
@@ -556,10 +556,7 @@ export class AuthenticationEffects {
             ErrorModalComponent,
             ErrorModalComponent.options,
             {
-              text:
-                typeof a.error === 'string'
-                  ? a.error
-                  : a.error?.message ?? a.error.error?.message,
+              text: a.error.error?.message ?? a.error?.message ?? a.error,
             }
           );
         })

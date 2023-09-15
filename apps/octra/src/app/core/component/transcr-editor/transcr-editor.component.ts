@@ -18,19 +18,13 @@ import { TranslocoService } from '@ngneat/transloco';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {
-  BrowserInfo,
   escapeRegex,
-  findElements,
-  getAttr,
   insertString,
   isNumber,
-  setStyle,
-  ShortcutGroup,
-  ShortcutManager,
   SubscriptionManager,
   unEscapeHtml,
 } from '@octra/utilities';
-import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
+import { SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
@@ -43,6 +37,16 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { OctraGuidelines } from '@octra/assets';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { ASRProcessStatus, ASRStateQueue } from '../../store/asr';
+import {
+  AudioChunk,
+  AudioManager,
+  BrowserInfo,
+  findElements,
+  getAttr,
+  setStyle,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 

@@ -9,13 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
-import {
-  contains,
-  hasProperty,
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { contains, hasProperty, SubscriptionManager } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
@@ -34,13 +28,7 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent,
 } from '@octra/ngx-components';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  PlayBackStatus,
-  SampleUnit,
-} from '@octra/media';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import {
   ASRContext,
   ASRQueueItemType,
@@ -52,6 +40,12 @@ import { interval, map, Subscription, take, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
+import {
+  AudioChunk,
+  AudioManager,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 
 @Component({

@@ -3,10 +3,11 @@ import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { OAudiofile } from '@octra/media';
 
 export class SRTConverter extends Converter {
+  override _name: OctraAnnotationFormatType = 'SRT';
+
   public constructor() {
     super();
     this._application = 'Video';
-    this._name = 'SRT Subtitles';
     this._extension = '.srt';
     this._website.title = 'SRT Subtitles';
     this._website.url =
@@ -53,19 +54,25 @@ export class SRTConverter extends Converter {
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
     levelnum: number
-  ): ExportResult | undefined {
-    if (annotation) {
-      let result = '';
-      let filename = '';
+  ): ExportResult {
+    if (!annotation) {
+      return {
+        error: 'Annotation is undefined or null',
+      };
+    }
 
-      if (
-        levelnum === undefined ||
-        levelnum < 0 ||
-        levelnum > annotation.levels.length
-      ) {
-        console.error('SRTConverter needs a level number');
-        return undefined;
-      }
+    let result = '';
+    let filename = '';
+
+    if (
+      levelnum === undefined ||
+      levelnum < 0 ||
+      levelnum > annotation.levels.length
+    ) {
+      return {
+        error: `Missing level number`,
+      };
+    }
 
       if (levelnum < annotation.levels.length) {
         const level = annotation.levels[levelnum];
@@ -83,36 +90,49 @@ export class SRTConverter extends Converter {
               annotation.sampleRate
             );
 
-            if (transcript !== '') {
-              result += `${counter}\n`;
-              result += `${start} --> ${end}\n`;
-              result += `${transcript}\n\n`;
-              counter++;
-            }
+          if (transcript !== '') {
+            result += `${counter}\n`;
+            result += `${start} --> ${end}\n`;
+            result += `${transcript}\n\n`;
+            counter++;
           }
         }
-
-        filename = `${annotation.name}`;
-        if (annotation.levels.length > 1) {
-          filename += `-${level.name}`;
-        }
-        filename += `${this._extension}`;
       }
 
-      return {
-        file: {
-          name: filename,
-          content: result,
-          encoding: 'UTF-8',
-          type: 'text/plain',
-        },
-      };
+      filename = `${annotation.name}`;
+      if (annotation.levels.length > 1) {
+        filename += `-${level.name}`;
+      }
+      filename += `${this._extension}`;
     }
-    console.error(`annotation file is undefined`);
-    return undefined;
+
+    return {
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'text/plain',
+      },
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
+    if (!audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+    if (!audiofile?.duration) {
+      return {
+        error: 'Missing audiofile duration',
+      };
+    }
+
     if (audiofile) {
       const result = new OAnnotJSON(
         audiofile.name,
@@ -172,21 +192,16 @@ export class SRTConverter extends Converter {
         result.levels.push(olevel);
         return {
           annotjson: result,
-          audiofile: undefined,
           error: '',
         };
       } else {
         return {
-          annotjson: undefined,
-          audiofile: undefined,
           error: 'Input file is not comatible with SRT format.',
         };
       }
     }
 
     return {
-      annotjson: undefined,
-      audiofile: undefined,
       error: `This SRT file is not compatible with this audio file.`,
     };
   }

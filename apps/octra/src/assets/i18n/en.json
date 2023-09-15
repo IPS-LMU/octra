@@ -109,7 +109,12 @@
     "or": "oder",
     "account": "Account",
     "settings": "Preferences",
-    "information": "Information"
+    "information": "Information",
+    "first name": "First name",
+    "last name": "Last name",
+    "username": "Username",
+    "locale": "Language",
+    "timezone": "Timezone"
   },
   "p": {
     "username or email": "Username or E-Mail",
@@ -118,7 +123,12 @@
     "manage account": "Manage account",
     "reset password": "Reset password",
     "authenticated": "I'm authenticated.",
-    "selected level": "Selected level"
+    "selected level": "Selected level",
+    "sign up": "Sign up",
+    "repeat password": "Repeat password",
+    "select locale": "Select a language",
+    "select timezone": "Select a timezone",
+    "back to login": "Back to login"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -433,5 +443,14 @@
     "resume transcription": "Continue transcription",
     "introduction": "Please select a project that you want to transcribe and click on \"START\".",
     "no remaining tasks": "This project does not have any free tasks."
+  },
+  "signup": {
+    "data correctness": "Yes, the data I filled in the form is correct.",
+    "data policy": "Yes, I read and accept the <a href=\"{{dataPolicyURL}}\" target=\"_blank\">data policy</a>.",
+    "terms of service": "Yes, I read and accept the <a href=\"{{termsConditionsURL}}\" target=\"_blank\">terms of service</a>.",
+    "success": {
+      "email_verification": "We'll send you an E-Mail. Please click on the link provided in the email to confirm your E-Mail address.\n  After that you can sign in with your credentials.<br/><br/>\n  You didn't receive any E-Mail? Please check your spam/junk folder. If you don't get any E-Mail after 10 minutes, contact an administrator.",
+      "login": "Your registration was successful. You can now sign in with your credentials."
+    }
   }
 }

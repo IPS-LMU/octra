@@ -23,6 +23,15 @@ export function convertFromSupportedConverters(
 }
 
 /**
+ * checks if a given string contains a given substring
+ * @param haystack string that should be searched
+ * @param needle substring that is searched for
+ */
+export function contains(haystack: string, needle: string): boolean {
+  return haystack.indexOf(needle) !== -1;
+}
+
+/**
  * returns the segment by the sample position (BrowserSample)
  */
 export function getSegmentBySamplePosition(

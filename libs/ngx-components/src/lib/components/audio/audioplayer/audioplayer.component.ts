@@ -12,8 +12,9 @@ import {
 import Konva from 'konva';
 import { AudioplayerSettings } from './audioplayer-settings';
 import { SubscriptionManager } from '@octra/utilities';
-import { AudioChunk, PlayBackStatus, SampleUnit } from '@octra/media';
+import { PlayBackStatus, SampleUnit } from '@octra/media';
 import { Subscription, timer } from 'rxjs';
+import { AudioChunk } from '@octra/web-media';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({
@@ -24,7 +25,6 @@ import KonvaEventObject = Konva.KonvaEventObject;
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
-  constructor() {}
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:
     | ElementRef

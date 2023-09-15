@@ -70,6 +70,7 @@ import {
 import { checkAndThrowError } from '../../error.handlers';
 import { ASRActions } from '../../asr/asr.actions';
 import { SampleUnit } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';

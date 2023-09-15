@@ -51,6 +51,16 @@ export interface ILink {
   toID: number;
 }
 
+export interface IAudioFile {
+  name: string;
+  sampleRate: number;
+  duration?: number;
+  size?: number;
+  arraybuffer?: ArrayBuffer;
+  url?: string;
+  type?: string;
+}
+
 /*
  CLASSES
  Classes that are just container to build their interfaces

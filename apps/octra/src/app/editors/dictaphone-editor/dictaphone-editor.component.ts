@@ -6,11 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 
 import {
@@ -282,11 +278,11 @@ export class DictaphoneEditorComponent
             value: $event.shortcut,
           });
           if (this.audiochunk.isPlaying) {
-            this.audiochunk.pausePlayback().catch((error) => {
+            this.audiochunk.pausePlayback().catch((error: any) => {
               console.error(error);
             });
           } else {
-            this.audiochunk.startPlayback(false).catch((error) => {
+            this.audiochunk.startPlayback(false).catch((error: any) => {
               console.error(error);
             });
           }
@@ -296,7 +292,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stopPlayback().catch((error) => {
+          this.audiochunk.stopPlayback().catch((error: any) => {
             console.error(error);
           });
           break;
@@ -305,7 +301,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stepBackward().catch((error) => {
+          this.audiochunk.stepBackward().catch((error: any) => {
             console.error(error);
           });
           break;
@@ -314,7 +310,7 @@ export class DictaphoneEditorComponent
             shortcut: $event.shortcutName,
             value: $event.shortcut,
           });
-          this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+          this.audiochunk.stepBackwardTime(0.5).catch((error: any) => {
             console.error(error);
           });
           break;

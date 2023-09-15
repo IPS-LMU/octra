@@ -6,13 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {
-  BrowserInfo,
-  contains,
-  ShortcutEvent,
-  ShortcutGroup,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { contains, SubscriptionManager } from '@octra/utilities';
 import {
   TranscrEditorComponent,
   TranscrEditorConfig,
@@ -33,12 +27,7 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent,
 } from '@octra/ngx-components';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioSelection,
-  SampleUnit,
-} from '@octra/media';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import { LoginMode } from '../../core/store';
 import { Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';

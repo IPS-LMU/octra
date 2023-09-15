@@ -38,7 +38,7 @@ export class ReAuthenticationModalComponent
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
     private authService: AuthenticationStoreService,
-    private apiService: OctraAPIService
+    public apiService: OctraAPIService
   ) {
     super();
   }

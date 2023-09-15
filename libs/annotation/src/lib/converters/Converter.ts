@@ -1,5 +1,5 @@
 import { OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export type OctraAnnotationFormatType =
   | 'AnnotJSON'

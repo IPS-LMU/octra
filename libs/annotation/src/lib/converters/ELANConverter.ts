@@ -1,8 +1,14 @@
-import * as X2JS from 'x2js';
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import X2JS from 'x2js';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { DateTime } from 'luxon';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';
@@ -86,13 +92,13 @@ export class ELANConverter extends Converter {
           _TIME_VALUE: `0`,
         });
 
-          // read annotation
-          for (const segment of level.items as OSegment[]) {
-            const miliseconds = Math.round(
-              ((segment.sampleStart + segment.sampleDur) /
-                annotation.sampleRate) *
-                1000
-            );
+        // read annotation
+        for (const segment of level.items as OSegment[]) {
+          const miliseconds = Math.round(
+            ((segment.sampleStart + segment.sampleDur) /
+              annotation.sampleRate) *
+              1000
+          );
 
           // add time slot
           jsonObj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT.push({

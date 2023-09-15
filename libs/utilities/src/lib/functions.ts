@@ -416,6 +416,7 @@ export function getBaseHrefURL() {
   return (
     location.origin + document.querySelector('head base')?.getAttribute('href')
   );
+}
 
 /**
  * converts time declaration from string to unix time (miliseconds).

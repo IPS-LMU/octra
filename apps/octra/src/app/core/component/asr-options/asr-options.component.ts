@@ -10,6 +10,7 @@ import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { ASRQueueItemType } from '../../store/asr';
 import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AudioChunk } from '@octra/web-media';
 
 @Component({
   selector: 'octra-asr-options',

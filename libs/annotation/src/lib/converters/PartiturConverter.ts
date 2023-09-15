@@ -13,7 +13,7 @@ import {
   OSegment,
   OSegmentLevel,
 } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class PartiturConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'BASPartitur';
@@ -123,25 +123,25 @@ LBD:\n`;
     const lines = file.content.split(/\r?\n/g);
     let pointer = 0;
 
-      const result = new OAnnotJSON(
-        audiofile.name,
-        file.name,
-        audiofile.sampleRate
-      );
-      const tiers: any = {};
+    const result = new OAnnotJSON(
+      audiofile.name,
+      file.name,
+      audiofile.sampleRate
+    );
+    const tiers: any = {};
 
-      // skip not needed information and read needed information
-      let previousTier = '';
-      let level: OSegmentLevel<OSegment> | OItemLevel | undefined = undefined;
-      let counter = 1;
-      while (pointer < lines.length) {
-        const search = lines[pointer].match(
-          new RegExp(
-            '^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
-              '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))',
-            'g'
-          )
-        );
+    // skip not needed information and read needed information
+    let previousTier = '';
+    let level: OSegmentLevel<OSegment> | OItemLevel | undefined = undefined;
+    let counter = 1;
+    while (pointer < lines.length) {
+      const search = lines[pointer].match(
+        new RegExp(
+          '^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
+            '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))',
+          'g'
+        )
+      );
 
       if (search) {
         const columns = lines[pointer].split(' ');
@@ -155,35 +155,35 @@ LBD:\n`;
           }
         }
 
-          if (search[0] === 'TRN') {
-            if (previousTier !== search[0]) {
-              if (level !== undefined) {
-                result.levels.push(level);
-              }
-              level =
-                search[0] !== 'TRN'
-                  ? new OItemLevel(search[0])
-                  : new OSegmentLevel(search[0]);
-              previousTier = search[0];
-              tiers[`${previousTier}`] = [];
+        if (search[0] === 'TRN') {
+          if (previousTier !== search[0]) {
+            if (level !== undefined) {
+              result.levels.push(level);
             }
-            if (previousTier !== 'TRN') {
-              if (level === undefined) {
-                return {
-                  annotjson: result,
-                  audiofile: undefined,
-                  error: 'A level is missing.',
-                };
-              }
-              (level.items as OItem[]).push(
-                new OItem(counter, [new OLabel(previousTier, columns[2])])
-              );
-              tiers[`${previousTier}`].push(columns[2]);
-            } else {
-              const transcript = lines[pointer];
-              const transcriptArray = transcript.match(
-                /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
-              );
+            level =
+              search[0] !== 'TRN'
+                ? new OItemLevel(search[0])
+                : new OSegmentLevel(search[0]);
+            previousTier = search[0];
+            tiers[`${previousTier}`] = [];
+          }
+          if (previousTier !== 'TRN') {
+            if (level === undefined) {
+              return {
+                annotjson: result,
+                audiofile: undefined,
+                error: 'A level is missing.',
+              };
+            }
+            (level.items as OItem[]).push(
+              new OItem(counter, [new OLabel(previousTier, columns[2])])
+            );
+            tiers[`${previousTier}`].push(columns[2]);
+          } else {
+            const transcript = lines[pointer];
+            const transcriptArray = transcript.match(
+              /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
+            );
 
             if (level === undefined) {
               return {

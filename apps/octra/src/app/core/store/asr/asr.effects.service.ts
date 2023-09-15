@@ -28,12 +28,12 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import * as X2JS from 'x2js';
 import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
 import { TranslocoService } from '@ngneat/transloco';
+import X2JS from 'x2js';
 
 @Injectable({
   providedIn: 'root',

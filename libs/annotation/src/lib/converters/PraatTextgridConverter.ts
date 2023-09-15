@@ -14,7 +14,7 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { contains } from '../functions';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class PraatTextgridConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'TextGrid';
@@ -87,8 +87,8 @@ export class PraatTextgridConverter extends Converter {
           `        xmax = ${durSeconds} \n` +
           `        intervals: size = ${level.items.length} \n`;
 
-          for (let j = 0; j < level.items.length; j++) {
-            const segment = level.items[j] as OSegment;
+        for (let j = 0; j < level.items.length; j++) {
+          const segment = level.items[j] as OSegment;
 
           const secondsStart = segment.sampleStart! / audiofile.sampleRate;
           const secondsEnd =
@@ -129,18 +129,17 @@ export class PraatTextgridConverter extends Converter {
       };
     }
 
-    if (audiofile !== undefined) {
-      const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
-      const fileName =
-        file.name.indexOf('.') > -1
-          ? file.name.substr(0, file.name.lastIndexOf('.'))
-          : file.name;
-      if (name === fileName) {
-        const result = new OAnnotJSON(
-          audiofile.name,
-          file.name,
-          audiofile.sampleRate
-        );
+    const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
+    const fileName =
+      file.name.indexOf('.') > -1
+        ? file.name.substr(0, file.name.lastIndexOf('.'))
+        : file.name;
+    if (name === fileName) {
+      const result = new OAnnotJSON(
+        audiofile.name,
+        file.name,
+        audiofile.sampleRate
+      );
 
       let content = file.content;
       // replace
@@ -180,22 +179,22 @@ export class PraatTextgridConverter extends Converter {
                   classStr = test[1];
                   i++;
 
-                    // get lvl name
-                    let lvlName = undefined;
-                    test = lines[i].match(/name = "(.*)"/);
-                    if (!test) {
-                      return {
-                        annotjson: undefined,
-                        audiofile: undefined,
-                        error: `PraatTextGrid could not read line ${i}.`,
-                      };
-                    }
-                    lvlName = test[1];
-                    const olevel =
-                      classStr === 'IntervalTier'
-                        ? new OSegmentLevel(lvlName)
-                        : new OEventLevel(lvlName);
-                    i++;
+                  // get lvl name
+                  let lvlName = undefined;
+                  test = lines[i].match(/name = "(.*)"/);
+                  if (!test) {
+                    return {
+                      annotjson: undefined,
+                      audiofile: undefined,
+                      error: `PraatTextGrid could not read line ${i}.`,
+                    };
+                  }
+                  lvlName = test[1];
+                  const olevel =
+                    classStr === 'IntervalTier'
+                      ? new OSegmentLevel(lvlName)
+                      : new OEventLevel(lvlName);
+                  i++;
 
                   // ignore xmin and xmax, interval size
                   i++;
@@ -252,23 +251,23 @@ export class PraatTextgridConverter extends Converter {
                       i++;
                       const text = test[1];
 
-                        const olabels: OLabel[] = [];
-                        olabels.push(new OLabel(lvlName, text));
-                        const osegment = new OSegment(
-                          segNum,
-                          Math.round(xmin * audiofile.sampleRate),
-                          Math.round((xmax - xmin) * audiofile.sampleRate),
-                          olabels
-                        ) as OSegment;
-                        (olevel.items as OSegment[]).push(osegment);
-                      } else {
-                        test = lines[i].match(/number = (.*)/);
-                        if (!test) {
-                          return {
-                            error: `PraatTextGrid could not read line ${i}.`,
-                          };
-                        }
-                        i++;
+                      const olabels: OLabel[] = [];
+                      olabels.push(new OLabel(lvlName, text));
+                      const osegment = new OSegment(
+                        segNum,
+                        Math.round(xmin * audiofile.sampleRate),
+                        Math.round((xmax - xmin) * audiofile.sampleRate),
+                        olabels
+                      ) as OSegment;
+                      (olevel.items as OSegment[]).push(osegment);
+                    } else {
+                      test = lines[i].match(/number = (.*)/);
+                      if (!test) {
+                        return {
+                          error: `PraatTextGrid could not read line ${i}.`,
+                        };
+                      }
+                      i++;
 
                       const numberStr = Number(test[1]);
 
@@ -281,15 +280,15 @@ export class PraatTextgridConverter extends Converter {
                       i++;
                       const mark = test[1];
 
-                        const olabels: OLabel[] = [];
-                        olabels.push(new OLabel(lvlName, mark));
-                        const oevent = new OEvent(
-                          segNum,
-                          Math.round(numberStr * audiofile.sampleRate),
-                          olabels
-                        );
-                        (olevel.items as OEvent[]).push(oevent);
-                      }
+                      const olabels: OLabel[] = [];
+                      olabels.push(new OLabel(lvlName, mark));
+                      const oevent = new OEvent(
+                        segNum,
+                        Math.round(numberStr * audiofile.sampleRate),
+                        olabels
+                      );
+                      (olevel.items as OEvent[]).push(oevent);
+                    }
 
                     segNum++;
                     match = lines[i].match(/item \[([0-9]+)]:/);

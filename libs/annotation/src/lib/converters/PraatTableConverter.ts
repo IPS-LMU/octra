@@ -14,7 +14,7 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { contains } from '../functions';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class PraatTableConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'PraatTextTable';
@@ -94,13 +94,11 @@ export class PraatTableConverter extends Converter {
       };
     }
 
-  public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
-    if (audiofile) {
-      const result = new OAnnotJSON(
-        audiofile.name,
-        file.name,
-        audiofile.sampleRate
-      );
+    const result = new OAnnotJSON(
+      audiofile.name,
+      file.name,
+      audiofile.sampleRate
+    );
 
     const content = file.content;
     const lines: string[] = content.split('\n');
@@ -122,19 +120,19 @@ export class PraatTableConverter extends Converter {
         }
       }
 
-        for (const tierElement of tiers) {
-          const olevel = new OSegmentLevel(tierElement);
-          let start = 0;
-          let puffer = 0;
-          let id = 1;
-          // start at line 0
-          for (let i = 1; i < lines.length; i++) {
-            if (lines[i] !== '') {
-              const columns: string[] = lines[i].split('\t');
-              const tmin = Number(columns[0]);
-              const tier = columns[1];
-              const text = columns[2];
-              const tmax = Number(columns[3]);
+      for (const tierElement of tiers) {
+        const olevel = new OSegmentLevel(tierElement);
+        let start = 0;
+        let puffer = 0;
+        let id = 1;
+        // start at line 0
+        for (let i = 1; i < lines.length; i++) {
+          if (lines[i] !== '') {
+            const columns: string[] = lines[i].split('\t');
+            const tmin = Number(columns[0]);
+            const tier = columns[1];
+            const text = columns[2];
+            const tmax = Number(columns[3]);
 
             length = 0;
 
@@ -147,27 +145,30 @@ export class PraatTableConverter extends Converter {
             }
             const sampleRate = audiofile.sampleRate;
 
-              if (tier === tierElement) {
-                if (isNaN(tmin)) {
-                  return undefined;
-                } else {
-                  const last = (
-                    olevel.items.length > 0 &&
-                    !(
-                      olevel.items[olevel.items.length - 1] === undefined ||
-                      olevel.items[olevel.items.length - 1] === undefined
-                    )
-                      ? olevel.items[olevel.items.length - 1]
-                      : undefined
-                  ) as OSegment;
-                  if (
-                    last !== undefined &&
-                    last.sampleStart + last.sampleDur ===
-                      Math.round(Number(tmin))
-                  ) {
-                    start = tmin;
-                  }
+            if (tier === tierElement) {
+              if (isNaN(tmin)) {
+                return {
+                  error: `Parsing error at line ${
+                    i + 1
+                  } column 1: Not a number`,
+                };
+              } else {
+                const last = (
+                  olevel.items.length > 0 &&
+                  !(
+                    olevel.items[olevel.items.length - 1] === undefined ||
+                    olevel.items[olevel.items.length - 1] === undefined
+                  )
+                    ? olevel.items[olevel.items.length - 1]
+                    : undefined
+                ) as OSegment;
+                if (
+                  last !== undefined &&
+                  last.sampleStart + last.sampleDur === Math.round(Number(tmin))
+                ) {
+                  start = tmin;
                 }
+              }
 
               if (puffer > 0) {
                 // fill

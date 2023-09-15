@@ -6,15 +6,12 @@ import { AppInfo } from '../../../app.info';
 import { BugReporter } from '../../obj/BugAPI/BugReporter';
 import { AppStorageService } from './appstorage.service';
 import { SettingsService } from './settings.service';
-import {
-  BrowserInfo,
-  getFileSize,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { getFileSize, SubscriptionManager } from '@octra/utilities';
 import { LoginMode } from '../../store';
 import { DateTime } from 'luxon';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AudioService } from './audio.service';
+import { BrowserInfo } from '@octra/web-media';
 
 export enum ConsoleType {
   LOG,

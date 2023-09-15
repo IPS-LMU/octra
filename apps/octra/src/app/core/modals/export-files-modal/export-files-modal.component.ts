@@ -12,11 +12,10 @@ import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/nam
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { NavbarService } from '../../component/navbar/navbar.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { Converter } from '@octra/annotation';
-import { Converter, ExportResult } from '@octra/annotation';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { Converter } from '@octra/annotation';
 
 @Component({
   selector: 'octra-export-files-modal',

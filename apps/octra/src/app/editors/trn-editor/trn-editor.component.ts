@@ -16,8 +16,6 @@ import {
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { AudioChunk, AudioManager } from '@octra/media';
-import { AudioSelection, SampleUnit } from '@octra/media';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
@@ -557,7 +555,10 @@ export class TrnEditorComponent
   disableAllShortcuts() {}
 
   getStartPoint(index: number) {
-    return index > 0 && this.currentLevel.items[index - 1] instanceof Segment<ASRContext> ? (this.currentLevel.items[index - 1] as Segment<ASRContext>).time.unix : 0;
+    return index > 0 &&
+      this.currentLevel.items[index - 1] instanceof Segment<ASRContext>
+      ? (this.currentLevel.items[index - 1] as Segment<ASRContext>).time.unix
+      : 0;
   }
 
   openSegment() {
@@ -735,11 +736,7 @@ export class TrnEditorComponent
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  getShownSegment(
-    startSamples: number,
-    segment: Segment,
-    i: number
-  ) {
+  getShownSegment(startSamples: number, segment: Segment, i: number) {
     /* TODO implement
     const obj: ShownSegment = {
       start: startSamples,
@@ -1057,7 +1054,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
 
             resolve();
           })
-          .catch((error:any) => {
+          .catch((error: any) => {
             console.error(error);
           });
       }

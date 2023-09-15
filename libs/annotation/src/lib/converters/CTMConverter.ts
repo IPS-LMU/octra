@@ -1,10 +1,17 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { contains } from '@octra/utilities';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class CTMConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'CTM';
+
   // http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#ctm_fmt_name_0
 
   public constructor() {
@@ -55,15 +62,14 @@ export class CTMConverter extends Converter {
 
     const level = annotation.levels[levelnum];
 
-      for (const levelItem of level.items as OSegment[]) {
-        const transcript = levelItem.labels[0].value;
-        const start =
-          Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) /
-          100;
-        const duration =
-          Math.round((levelItem.sampleDur! / audiofile.sampleRate) * 100) / 100;
-        result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
-      }
+    for (const levelItem of level.items as OSegment[]) {
+      const transcript = levelItem.labels[0].value;
+      const start =
+        Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) / 100;
+      const duration =
+        Math.round((levelItem.sampleDur! / audiofile.sampleRate) * 100) / 100;
+      result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
+    }
 
     filename = annotation.name + this._extension;
 
@@ -94,13 +100,11 @@ export class CTMConverter extends Converter {
       };
     }
 
-  public import(file: IFile, audiofile: OAudiofile): ImportResult | undefined {
-    if (audiofile) {
-      const result = new OAnnotJSON(
-        audiofile.name,
-        file.name,
-        audiofile.sampleRate
-      );
+    const result = new OAnnotJSON(
+      audiofile.name,
+      file.name,
+      audiofile.sampleRate
+    );
 
     const content = file.content;
     const lines: string[] = content.split('\n');
@@ -108,8 +112,8 @@ export class CTMConverter extends Converter {
     // check if filename is equal with audio file
     const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
-      if (contains(file.name, filename) && contains(audiofile.name, filename)) {
-        const olevel = new OSegmentLevel('Tier_1');
+    if (contains(file.name, filename) && contains(audiofile.name, filename)) {
+      const olevel = new OSegmentLevel('Tier_1');
 
       let start = 0;
       for (let i = 0; i < lines.length; i++) {

@@ -61,7 +61,7 @@ import { TranscriptionSendingModalComponent } from '../../../modals/transcriptio
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../../application/application.actions';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { FileInfo, getTranscriptFromIO, hasProperty } from '@octra/utilities';
+import { getTranscriptFromIO, hasProperty } from '@octra/utilities';
 import {
   createSampleProjectDto,
   createSampleTask,
@@ -70,10 +70,11 @@ import {
 import { checkAndThrowError } from '../../error.handlers';
 import { ASRActions } from '../../asr/asr.actions';
 import { SampleUnit } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
+import { FileInfo } from '@octra/web-media';
 
 @Injectable()
 export class AnnotationEffects {

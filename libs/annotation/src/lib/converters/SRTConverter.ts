@@ -1,6 +1,12 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export class SRTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'SRT';
@@ -74,21 +80,21 @@ export class SRTConverter extends Converter {
       };
     }
 
-      if (levelnum < annotation.levels.length) {
-        const level = annotation.levels[levelnum];
+    if (levelnum < annotation.levels.length) {
+      const level = annotation.levels[levelnum];
 
-        let counter = 1;
-        if (level.type === 'SEGMENT') {
-          for (const item of level.items as OSegment[]) {
-            const transcript = item.labels[0].value;
-            const start = this.getTimeStringFromSamples(
-              item.sampleStart,
-              annotation.sampleRate
-            );
-            const end = this.getTimeStringFromSamples(
-              item.sampleStart + item.sampleDur,
-              annotation.sampleRate
-            );
+      let counter = 1;
+      if (level.type === 'SEGMENT') {
+        for (const item of level.items as OSegment[]) {
+          const transcript = item.labels[0].value;
+          const start = this.getTimeStringFromSamples(
+            item.sampleStart,
+            annotation.sampleRate
+          );
+          const end = this.getTimeStringFromSamples(
+            item.sampleStart + item.sampleDur,
+            annotation.sampleRate
+          );
 
           if (transcript !== '') {
             result += `${counter}\n`;

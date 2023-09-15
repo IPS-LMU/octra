@@ -14,7 +14,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { getProperties } from '@octra/utilities';
-import { TranscrEditorComponent } from '../../../core/component/transcr-editor';
+import { TranscrEditorComponent } from '../../../core/component';
 
 import {
   AudioService,
@@ -47,10 +47,10 @@ import { ASRProcessStatus } from '../../../core/store/asr';
 import {
   AudioChunk,
   AudioManager,
-  AudioRessource,
   ShortcutEvent,
   ShortcutGroup,
 } from '@octra/web-media';
+import { AudioResource } from '../../../../../../../libs/web-media/src/lib/audio/audio-resource';
 
 @Component({
   selector: 'octra-transcr-window',

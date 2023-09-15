@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { hasProperty } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
-import * as X2JS from 'x2js';
 import { editorComponents } from '../../../../editors/components';
 import {
   OCTRAEditor,
@@ -46,9 +45,6 @@ import {
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
-import { IFile, PartiturConverter } from '@octra/annotation';
-import { AudioManager } from '@octra/media';
-import { Level, PartiturConverter } from '@octra/annotation';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
@@ -63,6 +59,8 @@ import {
   ShortcutGroup,
   ShortcutManager,
 } from '@octra/web-media';
+import { PartiturConverter } from '@octra/annotation';
+import X2JS from 'x2js';
 
 @Component({
   selector: 'octra-transcription',

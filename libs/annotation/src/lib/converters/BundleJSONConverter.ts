@@ -1,7 +1,12 @@
-import { Converter, ExportResult, IFile, ImportResult } from './Converter';
-import { base64ToArrayBuffer, contains } from '@octra/utilities';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
 import { IAnnotJSON, OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OAudiofile } from '@octra/web-media';
 
 export interface Bundle {
   ssffFiles: {
@@ -17,7 +22,7 @@ export interface Bundle {
 }
 
 export class BundleJSONConverter extends Converter {
-  override _name:OctraAnnotationFormatType = "BundleJSON";
+  override _name: OctraAnnotationFormatType = 'BundleJSON';
 
   public constructor() {
     super();
@@ -31,21 +36,18 @@ export class BundleJSONConverter extends Converter {
     this._notice = 'Export to Bundle is currenty not possible';
   }
 
-  public export(
-    annotation: OAnnotJSON,
-    audiofile: OAudiofile
-  ): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
     let result = '';
     let filename = '';
 
-    if(!annotation){
+    if (!annotation) {
       return {
-        error: "Annotation file is undefined or null"
+        error: 'Annotation file is undefined or null',
       };
     }
-    if(!audiofile?.arraybuffer){
+    if (!audiofile?.arraybuffer) {
       return {
-        error: "Arraybuffer is undefined or null"
+        error: 'Arraybuffer is undefined or null',
       };
     }
 

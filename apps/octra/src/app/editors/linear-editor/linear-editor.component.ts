@@ -10,7 +10,7 @@ import { contains, SubscriptionManager } from '@octra/utilities';
 import {
   TranscrEditorComponent,
   TranscrEditorConfig,
-} from '../../core/component/transcr-editor';
+} from '../../core/component';
 
 import {
   AlertService,
@@ -38,6 +38,13 @@ import {
   Segment,
 } from '@octra/annotation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import {
+  AudioChunk,
+  AudioManager,
+  BrowserInfo,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 
 @Component({
   selector: 'octra-signal-gui',

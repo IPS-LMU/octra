@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { SubscriptionManager } from '@octra/utilities';
-import { TranscrEditorComponent } from '../../core/component/transcr-editor';
+import { TranscrEditorComponent } from '../../core/component';
 
 import {
   AudioService,
@@ -17,7 +17,12 @@ import {
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { AudioChunk, AudioManager, SampleUnit } from '@octra/media';
+import {
+  AudioChunk,
+  AudioManager,
+  ShortcutEvent,
+  ShortcutGroup,
+} from '@octra/web-media';
 import {
   OctraAnnotationSegmentLevel,
   OLabel,
@@ -27,6 +32,7 @@ import { AudioplayerComponent } from '@octra/ngx-components';
 import { Subscription } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { SampleUnit } from '@octra/media';
 
 @Component({
   selector: 'octra-audioplayer-gui',

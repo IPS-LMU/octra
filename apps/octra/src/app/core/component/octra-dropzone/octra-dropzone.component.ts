@@ -15,11 +15,10 @@ import {
   OSegment,
   Segment,
 } from '@octra/annotation';
-import { AudioManager, OAudiofile } from '@octra/media';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
-import { AudioManager, fileListToArray } from '@octra/web-media';
+import { AudioManager, fileListToArray, OAudiofile } from '@octra/web-media';
 
 @Component({
   selector: 'octra-dropzone',
@@ -494,7 +493,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                 }
               }
             },
-            (error) => {
+            (error: any) => {
               console.error(error);
             }
           )

@@ -1,14 +1,13 @@
 import { EventEmitter } from '@angular/core';
 import { AudioDecoder } from './audio-decoder';
 import { AudioInfo } from './audio-info';
-import { AudioResource } from './audio-resource';
-import { AudioFormat, WavFormat } from './AudioFormats';
 import { SubscriptionManager } from '@octra/utilities';
 import { SourceType } from '../types';
 import { Subject, Subscription, timer } from 'rxjs';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { getAudioInfo } from '../functions';
 import { AudioFormat, WavFormat } from './AudioFormats';
+import { AudioResource } from './audio-resource';
 
 declare let window: any;
 

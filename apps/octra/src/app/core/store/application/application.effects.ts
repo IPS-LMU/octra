@@ -423,7 +423,7 @@ export class ApplicationEffects {
           if (lastPagePath) {
             this.routerService.navigate('last page', [lastPagePath]);
           } else {
-            this.routerService.navigate('no last page', ['/load']);
+            this.routerService.navigate('no last page', ['/login']);
           }
         })
       ),
@@ -632,6 +632,7 @@ export class ApplicationEffects {
             environment.debugging.logging.actions
           ) {
             console.groupCollapsed(`--- ACTION ${action.type} ---`);
+            console.log(JSON.stringify(action, null, 2));
             console.groupEnd();
           }
         })

@@ -17,10 +17,44 @@ export interface ASRContext {
   };
 }
 
-export class Segment<T extends ASRContext = ASRContext>
+export class OctraAnnotationEvent
+  implements Serializable<OctraAnnotationEvent, OctraAnnotationEvent>
+{
+  id!: number;
+  samplePoint!: SampleUnit;
+  labels: OLabel[] = [];
+
+  constructor(id: number, samplePoint: SampleUnit, labels?: OLabel[]) {
+    this.id = id;
+    this.samplePoint = samplePoint;
+    this.labels = labels ?? [];
+  }
+
+  serialize(): OctraAnnotationEvent {
+    return new OctraAnnotationEvent(this.id, this.samplePoint, this.labels);
+  }
+
+  deserialize(jsonObject: OctraAnnotationEvent): OctraAnnotationEvent {
+    return OctraAnnotationEvent.deserialize(jsonObject);
+  }
+
+  static deserialize<T extends ASRContext>(
+    jsonObject: OctraAnnotationEvent
+  ): OctraAnnotationEvent {
+    return jsonObject;
+  }
+
+  clone(id?: number) {
+    return new OctraAnnotationEvent(id ?? this.id, this.samplePoint.clone(), [
+      ...this.labels,
+    ]);
+  }
+}
+
+export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
   implements
     SegmentWithContext<T>,
-    Serializable<SegmentWithContext<T>, Segment<T>>
+    Serializable<SegmentWithContext<T>, OctraAnnotationSegment<T>>
 {
   get id(): number {
     return this._id;
@@ -57,8 +91,8 @@ export class Segment<T extends ASRContext = ASRContext>
     );
   }
 
-  deserialize(jsonObject: SegmentWithContext<T>): Segment<T> {
-    return Segment.deserialize(jsonObject);
+  deserialize(jsonObject: SegmentWithContext<T>): OctraAnnotationSegment<T> {
+    return OctraAnnotationSegment.deserialize(jsonObject);
   }
 
   getLabel(name: string) {
@@ -72,7 +106,11 @@ export class Segment<T extends ASRContext = ASRContext>
   changeLabel(name: string, value: string) {
     const index = this.labels.findIndex((a) => a.name === name);
     if (index > -1) {
-      this.labels[index].value = value;
+      this.labels = [
+        ...this.labels.slice(0, index),
+        new OLabel(this.labels[index].name, value),
+        ...this.labels.slice(index + 1),
+      ];
       return true;
     }
     return false;
@@ -81,7 +119,11 @@ export class Segment<T extends ASRContext = ASRContext>
   changeFirstLabelWithoutName(notName: string, value: string) {
     const index = this.labels.findIndex((a) => a.name !== notName);
     if (index > -1) {
-      this.labels[index].value = value;
+      this.labels = [
+        ...this.labels.slice(0, index),
+        new OLabel(this.labels[index].name, value),
+        ...this.labels.slice(index + 1),
+      ];
       return true;
     }
     return false;
@@ -89,8 +131,8 @@ export class Segment<T extends ASRContext = ASRContext>
 
   static deserialize<T extends ASRContext>(
     jsonObject: SegmentWithContext<T>
-  ): Segment<T> {
-    const result = new Segment<T>(
+  ): OctraAnnotationSegment<T> {
+    const result = new OctraAnnotationSegment<T>(
       jsonObject.id,
       jsonObject.time,
       jsonObject.labels.map((a) => OLabel.deserialize(a)),
@@ -103,8 +145,8 @@ export class Segment<T extends ASRContext = ASRContext>
     jsonObject: ISegment,
     sampleRate: number,
     context?: T
-  ): Segment<T> {
-    return new Segment<T>(
+  ): OctraAnnotationSegment<T> {
+    return new OctraAnnotationSegment<T>(
       jsonObject.id,
       new SampleUnit(jsonObject.sampleStart + jsonObject.sampleDur, sampleRate),
       jsonObject.labels.map((a) => OLabel.deserialize(a)),
@@ -112,9 +154,19 @@ export class Segment<T extends ASRContext = ASRContext>
     );
   }
 
-  clone(id: number): Segment<T> {
-    return new Segment<T>(id, this.time, this.labels, this.context);
+  clone(id?: number): OctraAnnotationSegment<T> {
+    return new OctraAnnotationSegment<T>(
+      id ?? this._id,
+      this.time,
+      [...this.labels],
+      {
+        ...this.context,
+      } as any
+    );
   }
 }
 
-export type AnnotationAnySegment = Segment<ASRContext> | OItem | OEvent;
+export type AnnotationAnySegment =
+  | OctraAnnotationSegment<ASRContext>
+  | OItem
+  | OEvent;

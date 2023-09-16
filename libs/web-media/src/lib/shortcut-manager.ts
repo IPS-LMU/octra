@@ -166,6 +166,15 @@ export class ShortcutManager {
     this._shortcuts = this._shortcuts.filter((a) => a.name !== groupName);
   }
 
+  public unregisterItemFromGroup(groupName: string, itemName: string) {
+    this._shortcuts = this._shortcuts.map(a => {
+      if(a.name === groupName) {
+        a.items = a.items.filter(b => b.name !== itemName);
+      }
+      return a;
+    });
+  }
+
   public clearShortcuts() {
     this._shortcuts = [];
   }

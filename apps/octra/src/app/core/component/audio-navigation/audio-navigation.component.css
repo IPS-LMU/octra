@@ -27,6 +27,10 @@
   margin: 0;
 }
 
+.audio-nav .btn-group .bg-info {
+  min-height:40px;
+}
+
 .audio-nav .col-1 {
   padding: 0;
 }

@@ -32,7 +32,7 @@ import { DefaultComponent } from '../default.component';
 import { Config } from 'jodit/types/config';
 import { IControlType } from 'jodit/src/types';
 import { IJodit, IToolbarButton } from 'jodit/types/types';
-import { Segment } from '@octra/annotation';
+import { OctraAnnotationSegment } from '@octra/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraGuidelines } from '@octra/assets';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
@@ -127,7 +127,7 @@ export class TranscrEditorComponent
     },
   };
   @Output() highlightingEnabledChange = new EventEmitter();
-  @Input() segments?: Segment[] = undefined;
+  @Input() segments?: OctraAnnotationSegment[] = undefined;
   @Input() public transcript = '';
   private internalTyping: EventEmitter<string> = new EventEmitter<string>();
   private shortcutsManager: ShortcutManager;
@@ -255,10 +255,12 @@ export class TranscrEditorComponent
       return;
     }
 
+
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(
       $event as any,
       Date.now()
     );
+    console.log(shortcutInfo?.shortcut);
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
       if (
@@ -504,6 +506,9 @@ export class TranscrEditorComponent
         }
       }
 
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
       const validationError = document.createElement('div');
       validationError.setAttribute('class', 'card error-card');
       validationError.innerHTML = `
@@ -745,8 +750,6 @@ export class TranscrEditorComponent
         );
       }
     }
-    this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   /**
@@ -773,6 +776,7 @@ export class TranscrEditorComponent
           button.addEventListener('click', (event: MouseEvent) => {
             onClick(event, button);
           });
+          console.log(button.innerHTML);
           return button;
         }
         return c.container.children[0];
@@ -1226,7 +1230,7 @@ export class TranscrEditorComponent
     ) {
       this.saveSelection();
       const currentlyPlayedSegment =
-        this.annotationStoreService.currentLevel.items[segIndexPlayposition]! as Segment;
+        this.annotationStoreService.currentLevel.items[segIndexPlayposition]! as OctraAnnotationSegment;
 
       this.removeHighlight();
 
@@ -1404,7 +1408,7 @@ export class TranscrEditorComponent
     }
   }
 
-  private setSegments(segments: Segment[]) {
+  private setSegments(segments: OctraAnnotationSegment[]) {
     let result = '';
 
     for (let i = 0; i < segments.length; i++) {

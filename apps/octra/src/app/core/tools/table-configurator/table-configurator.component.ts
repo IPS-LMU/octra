@@ -5,8 +5,8 @@ import {
   ASRContext,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
-  Segment,
 } from '@octra/annotation';
 
 export interface ColumnDefinition {
@@ -19,7 +19,7 @@ export interface ColumnFormat {
   defaultValue: string;
   formatString: string;
   formatFunction: (
-    level: OctraAnnotationAnyLevel<Segment<ASRContext>>,
+    level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>,
     segmentNumber: number,
     counter: number
   ) => string;
@@ -45,7 +45,7 @@ export class TableConfiguratorComponent implements OnInit {
       }[];
     };
   }[] = [];
-  @Input() annotation!: OctraAnnotation<ASRContext, Segment<ASRContext>>;
+  @Input() annotation!: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
   @Input() options = {};
   @Input() currentLevelID!: number;
   @Input() view: 'expert' | 'easy' = 'easy';
@@ -91,7 +91,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '01:30:02.234',
           formatString: 'HH:mm:ss.mss',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -113,7 +113,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatString: '120345',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -133,7 +133,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -157,7 +157,7 @@ export class TableConfiguratorComponent implements OnInit {
           name: 'Timestamp',
           defaultValue: '01:30:02.234',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -177,7 +177,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '120345',
           defaultValue: '120345',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -193,7 +193,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -213,7 +213,7 @@ export class TableConfiguratorComponent implements OnInit {
           name: 'Timestamp',
           defaultValue: '01:30:02.234',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -237,7 +237,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '120345',
           defaultValue: '120345',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -260,7 +260,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '23.4567...',
           defaultValue: '23.4567',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -289,7 +289,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: 'Some transcript...',
           formatString: '',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -312,7 +312,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: 'OCTRA_1',
           formatString: '',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -334,7 +334,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '44100',
           formatString: '44100',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -350,7 +350,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '44,1kHz',
           formatString: '44,1kHz',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {
@@ -371,7 +371,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '1',
           formatString: '1',
           formatFunction: (
-            level: OctraAnnotationAnyLevel<Segment>,
+            level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
             segmentNumber: number,
             counter: number
           ) => {

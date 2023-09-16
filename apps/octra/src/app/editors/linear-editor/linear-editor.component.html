@@ -53,7 +53,7 @@
     [refreshOnInternChanges]="false"
     [silencePlaceholder]="'<P>'"
     [annotation]="annotationStoreService.transcript!"
-    (annotationChange)="onEntriesChange($event)"
+    (currentLevelChange)="onCurrentLevelChange($event)"
     style="height: 80px"
   >
   </octra-audio-viewer>
@@ -75,7 +75,7 @@
   [name]="'downLoupe'"
   [settings]="loupeSettings"
   [annotation]="annotationStoreService.transcript!"
-  (annotationChange)="onEntriesChange($event)"
+  (currentLevelChange)="onCurrentLevelChange($event)"
 >
 </octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">

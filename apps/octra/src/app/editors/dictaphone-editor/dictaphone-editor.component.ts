@@ -24,9 +24,10 @@ import {
   ShortcutGroup,
 } from '@octra/web-media';
 import {
+  ASRContext,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OLabel,
-  Segment,
 } from '@octra/annotation';
 import { AudioplayerComponent } from '@octra/ngx-components';
 import { Subscription } from 'rxjs';
@@ -66,7 +67,7 @@ export class DictaphoneEditorComponent
     this.appStorage.highlightingEnabled = value;
   }
 
-  public segments?: Segment[] = [];
+  public segments?: OctraAnnotationSegment[] = [];
 
   private oldRaw = '';
 
@@ -405,13 +406,10 @@ export class DictaphoneEditorComponent
   }
 
   saveTranscript() {
-    let transcript = this.annotationStoreService.transcript!;
-    transcript = transcript.clearAllItemsFromCurrentLevel();
+    let transcript = this.annotationStoreService.transcript!.clone();
 
-    if (
-      transcript.currentLevel &&
-      transcript.currentLevel instanceof OctraAnnotationSegmentLevel
-    ) {
+    if (transcript.currentLevel && transcript.currentLevel.type === 'SEGMENT') {
+      transcript.currentLevel.clear();
       const rawText = this.editor.rawText;
       // split text at the position of every boundary marker
       let segTexts: string[] = rawText.split(/\s*{[0-9]+}\s*/g);
@@ -445,7 +443,7 @@ export class DictaphoneEditorComponent
         return a.replace(/(^\s+)|(\s+$)/g, '');
       });
 
-      const segments: Segment[] = [];
+      const items: OctraAnnotationSegment<ASRContext>[] = [];
 
       for (let i = 0; i < segTexts.length; i++) {
         const time =
@@ -453,10 +451,13 @@ export class DictaphoneEditorComponent
             ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
             : this.audioManager.resource.info.duration;
 
-        transcript = transcript.addItemToCurrentLevel(time, [
-          new OLabel(transcript.currentLevel!.name, segTexts[i]),
-        ]);
+        items.push(
+          transcript.createSegment(time, [
+            new OLabel(transcript.currentLevel!.name, segTexts[i]),
+          ])
+        );
       }
+      transcript.currentLevel.overwriteItems(items as any);
       this.annotationStoreService.overwriteTranscript(transcript);
     }
   }

@@ -29,7 +29,7 @@ import {
   OctraAnnotation,
   OctraAnnotationAnyLevel,
   OctraAnnotationLink,
-  Segment,
+  OctraAnnotationSegment,
 } from '@octra/annotation';
 
 @Injectable({
@@ -167,7 +167,7 @@ export class AppStorageService {
     );
   }
 
-  get annotationLevels(): OctraAnnotationAnyLevel<Segment>[] {
+  get annotationLevels(): OctraAnnotationAnyLevel<OctraAnnotationSegment>[] {
     return getModeState(this._snapshot)!.transcript!.levels;
   }
 
@@ -344,7 +344,7 @@ export class AppStorageService {
   }
 
   public overwriteAnnotation = (
-    transcript: OctraAnnotation<ASRContext, Segment>,
+    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
     saveToDB = true
   ) => {
     this.store.dispatch(
@@ -489,7 +489,7 @@ export class AppStorageService {
 
   public changeAnnotationLevel(
     tiernum: number,
-    level: OctraAnnotationAnyLevel<Segment>
+    level: OctraAnnotationAnyLevel<OctraAnnotationSegment>
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.annotationLevels !== undefined) {

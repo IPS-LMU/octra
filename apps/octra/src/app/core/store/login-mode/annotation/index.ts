@@ -7,8 +7,8 @@ import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import {
   ASRContext,
   OctraAnnotation,
+  OctraAnnotationSegment,
   OSegment,
-  Segment,
   SegmentWithContext,
 } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
@@ -21,7 +21,7 @@ export interface GuidelinesItem {
   type?: string;
 }
 
-export class AnnotationStateSegment<T extends ASRContext> extends Segment<T> {
+export class AnnotationStateSegment<T extends ASRContext> extends OctraAnnotationSegment<T> {
   static override deserialize<T extends ASRContext>(
     jsonObject: SegmentWithContext<T>
   ): AnnotationStateSegment<T> {
@@ -64,7 +64,7 @@ export interface AnnotationState extends UndoRedoState {
     validate: (transcript: string, guidelines: any) => any;
     tidyUp: (transcript: string, guidelines: any) => any;
   };
-  transcript: OctraAnnotation<ASRContext, Segment<ASRContext>>;
+  transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
   histories: Histories;
   currentSession: AnnotationSessionState;
   previousSession?: {

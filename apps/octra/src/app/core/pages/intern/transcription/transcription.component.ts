@@ -907,7 +907,8 @@ export class TranscriptionComponent
     const converter = new PartiturConverter();
     const oannotjson = this.annotationStoreService.transcript!.serialize(
       this.audio.audioManager.resource.name,
-      this.audio.audioManager.resource.info.sampleRate
+      this.audio.audioManager.resource.info.sampleRate,
+      this.audio.audioManager.resource.info.duration
     );
     const result = converter.export(
       oannotjson,

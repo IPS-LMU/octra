@@ -57,8 +57,12 @@ export class KeymappingService {
     this._shortcutsManager.generalShortcuts = shortcutGroup;
   }
 
-  public unregister(identifier: string) {
-    this._shortcutsManager.unregisterShortcutGroup(identifier);
+  public unregister(group_name: string) {
+    this._shortcutsManager.unregisterShortcutGroup(group_name);
+  }
+
+  public unregisterItem(group_name: string, item_name: string) {
+    this._shortcutsManager.unregisterItemFromGroup(group_name, item_name);
   }
 
   public unregisterAll() {

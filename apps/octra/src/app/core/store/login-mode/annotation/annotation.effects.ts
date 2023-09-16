@@ -28,23 +28,15 @@ import {
 import { AppInfo } from '../../../../app.info';
 import {
   AnnotJSONConverter,
-  ASRContext,
   convertFromSupportedConverters,
   IFile,
   ImportResult,
   ISegment,
   OAnnotJSON,
   OctraAnnotation,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationEventLevel,
-  OctraAnnotationItemLevel,
-  OctraAnnotationLink,
-  OctraAnnotationSegmentLevel,
-  OEventLevel,
+  OctraAnnotationSegment,
   OLabel,
-  OSegmentLevel,
   PraatTextgridConverter,
-  Segment,
 } from '@octra/annotation';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import {
@@ -437,7 +429,7 @@ export class AnnotationEffects {
 
   loadSegments$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.loadSegments.do),
+      ofType(AnnotationActions.initTranscriptionService.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         this.initMaintenance(state);
@@ -489,7 +481,7 @@ export class AnnotationEffects {
                   importResult !== undefined &&
                   !(importResult.annotjson === undefined)
                 ) {
-                  return AnnotationActions.loadSegments.success({
+                  return AnnotationActions.initTranscriptionService.success({
                     mode: state.application.mode!,
                     transcript: OctraAnnotation.deserialize(
                       importResult.annotjson
@@ -497,7 +489,7 @@ export class AnnotationEffects {
                     saveToDB: false,
                   });
                 } else {
-                  return AnnotationActions.loadSegments.fail({
+                  return AnnotationActions.initTranscriptionService.fail({
                     error: "Can't import transcript",
                   });
                 }
@@ -508,7 +500,7 @@ export class AnnotationEffects {
             // overwrite with empty level
             const newAnnotation = new OctraAnnotation();
             return of(
-              AnnotationActions.loadSegments.success({
+              AnnotationActions.initTranscriptionService.success({
                 mode: state.application.mode!,
                 transcript: newAnnotation,
                 saveToDB: false,
@@ -526,7 +518,7 @@ export class AnnotationEffects {
   loadSegmentsSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.loadSegments.success),
+        ofType(AnnotationActions.initTranscriptionService.success),
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.routingService.navigate(
@@ -546,7 +538,7 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           this.store.dispatch(
-            AnnotationActions.loadSegments.do({
+            AnnotationActions.initTranscriptionService.do({
               mode: state.application.mode!,
             })
           );
@@ -772,7 +764,9 @@ export class AnnotationEffects {
               state.onlineMode.audio.fileName,
               state.onlineMode.audio.fileName.replace(/\.[^.]+$/g, ''),
               state.onlineMode.audio.sampleRate,
-              state.onlineMode.transcript.levels.map((a) => a.serialize()),
+              state.onlineMode.transcript.levels.map((a) =>
+                a.serialize(this.audio.audioManager.resource.info.duration)
+              ),
               state.onlineMode.transcript.links.map((a) => a.link)
             )
           )?.file?.content;
@@ -988,7 +982,7 @@ export class AnnotationEffects {
                   getModeState(state)!.transcript.levels[segmentIndex].items[
                     segmentIndex
                   ].id;
-                const newSegments: Segment[] = [];
+                const newSegments: OctraAnnotationSegment[] = [];
 
                 let itemCounter =
                   getModeState(state)?.transcript.idCounters.item ?? 1;
@@ -1001,7 +995,7 @@ export class AnnotationEffects {
                       wordItem.sampleDur <=
                     itemEnd
                   ) {
-                    const readSegment = new Segment(
+                    const readSegment = new OctraAnnotationSegment(
                       itemCounter++,
                       new SampleUnit(
                         item.time.sampleStart +
@@ -1124,6 +1118,7 @@ export class AnnotationEffects {
       modeState.transcript.levels === undefined ||
       modeState.transcript.levels.length === 0
     ) {
+      // create new annotation
       let newAnnotation = new OctraAnnotation();
 
       if (
@@ -1201,16 +1196,21 @@ export class AnnotationEffects {
             }
           }
         }
-
-        return of(
-          AnnotationActions.loadSegments.success({
-            mode: rootState.application.mode,
-            transcript: newAnnotation,
-            feedback,
-            saveToDB: true,
-          })
-        );
       } else {
+        // not URL oder ONLINE MODE, Annotation is null
+
+        const level = newAnnotation.createSegmentLevel('OCTRA_1');
+        level.items.push(
+          newAnnotation.createSegment(
+            this.audio.audioManager.resource.info.duration,
+            [
+              new OLabel('OCTRA_1', ''), // empty transcript
+            ]
+          )
+        );
+        newAnnotation.addLevel(level);
+        newAnnotation.changeLevelIndex(0);
+
         const projectSettings =
           getModeState(rootState)!.currentSession.task!.tool_configuration!
             .value;
@@ -1246,59 +1246,31 @@ export class AnnotationEffects {
           'version'
         );
       }
+
+      // new annotation set
+      return of(
+        AnnotationActions.initTranscriptionService.success({
+          mode: rootState.application.mode!,
+          transcript: newAnnotation,
+          feedback,
+          saveToDB: true,
+        })
+      );
     }
+
+    const transcript = modeState.transcript.changeSampleRate(
+      this.audio.audioManager.resource.info.sampleRate
+    );
+
     return of(
-      AnnotationActions.loadSegments.success({
+      AnnotationActions.initTranscriptionService.success({
         mode: rootState.application.mode!,
         feedback,
-        transcript: modeState.transcript,
+        transcript,
         saveToDB: false,
       })
     );
   }
-
-  private createNewAnnotation: () => {
-    levels: OctraAnnotationAnyLevel<Segment<ASRContext>>[];
-    links: OctraAnnotationLink[];
-  } = () => ({
-    levels: [
-      new OctraAnnotationSegmentLevel(1, 'OCTRA_1', [
-        new Segment(
-          1,
-          new SampleUnit(
-            this.audio.audioManager.resource.info.duration.samples,
-            this.audio.audioManager.resource.info.sampleRate
-          ),
-          [new OLabel('OCTRA_1', '')]
-        ),
-      ]),
-    ],
-    links: [],
-  });
-
-  private convertAnnotJSONToStateObject: (annotJSON: OAnnotJSON) => {
-    levels: OctraAnnotationAnyLevel<Segment<ASRContext>>[];
-    links: OctraAnnotationLink[];
-  } = (annotJSON: OAnnotJSON) => ({
-    levels: annotJSON.levels.map((a, i) => {
-      if (a instanceof OSegmentLevel) {
-        return new OctraAnnotationSegmentLevel(
-          i + 1,
-          a.name,
-          a.items.map((b) =>
-            Segment.deserializeFromOSegment(
-              b,
-              this.audio.audioManager.resource.info.sampleRate
-            )
-          )
-        );
-      } else if (a instanceof OEventLevel) {
-        return new OctraAnnotationEventLevel(i + 1, a.name, a.items);
-      }
-      return new OctraAnnotationItemLevel(i + 1, a.name, a.items);
-    }),
-    links: annotJSON.links.map((b, i) => new OctraAnnotationLink(i + 1, b)),
-  });
 
   public initMaintenance(state: RootState) {
     if (

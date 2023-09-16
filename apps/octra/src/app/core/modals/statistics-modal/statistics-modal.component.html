@@ -23,11 +23,11 @@
       <tbody>
         <tr>
           <td>Anzahl Segmente:</td>
-          <td>{{ (annotationStore.currentLevel$ | async)!.items!.length }}</td>
+          <td>{{annotationStore.currentLevel!.items!.length }}</td>
         </tr>
         <tr>
           <td>Anzahl Logeinträge:</td>
-          <td>{{ UIElements !== undefined ? UIElements.length : 0 }}</td>
+          <td>{{ UIElements !== undefined ? UIElements!.length : 0 }}</td>
         </tr>
       </tbody>
     </table>
@@ -44,7 +44,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let elem of UIElements">
+          <tr *ngFor="let elem of UIElements!">
             <td>{{ elem.timestamp | date : 'dd.MM.yy HH:mm:ss' }}</td>
             <td>{{ elem.type }}</td>
             <td>{{ elem.context }}</td>

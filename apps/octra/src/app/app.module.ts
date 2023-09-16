@@ -102,7 +102,7 @@ import { AsrEffects } from './core/store/asr/asr.effects.service';
     ),
     StoreDevtoolsModule.instrument({
       trace: true,
-      maxAge: 25,
+      maxAge: 50,
       logOnly: !environment.production,
     }),
     EffectsModule.forRoot([

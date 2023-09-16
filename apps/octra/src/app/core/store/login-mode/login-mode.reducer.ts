@@ -15,7 +15,11 @@ import { LoginMode } from '../index';
 import { ProjectSettings } from '../../obj';
 import { ApplicationActions } from '../application/application.actions';
 import { AnnotationState } from './annotation';
-import { ASRContext, OctraAnnotation, Segment } from '@octra/annotation';
+import {
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
 
 export const initialState: AnnotationState = {
   ...fromAnnotation.initialState,
@@ -27,7 +31,11 @@ const { createUndoRedoReducer } = undoRedo({
   allowedActionTypes: [
     AnnotationActions.changeAnnotationLevel.do.type,
     AnnotationActions.addAnnotationLevel.do.type,
+    AnnotationActions.addCurrentLevelItems.do.type,
     AnnotationActions.removeAnnotationLevel.do.type,
+    AnnotationActions.changeCurrentLevelItems.do.type,
+    AnnotationActions.removeCurrentLevelItems.do.type,
+    AnnotationActions.changeCurrentItemById.do.type,
   ],
 });
 
@@ -186,7 +194,7 @@ export class LoginModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
+              transcript: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(),
               currentSession: {},
             };
           }
@@ -200,7 +208,7 @@ export class LoginModeReducers {
             if (removeData) {
               return {
                 ...state,
-                transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
+                transcript: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(),
                 currentSession: {},
                 sessionFile,
               };

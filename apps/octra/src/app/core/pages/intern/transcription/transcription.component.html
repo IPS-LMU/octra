@@ -1,11 +1,11 @@
 <div
-  *ngIf="useMode === 'online' || useMode === 'demo'"
-  class="panel"
-  id="subnav"
+        *ngIf="useMode === 'online' || useMode === 'demo'"
+        class="panel"
+        id="subnav"
 >
-  <div class="row">
-    <div
-      [ngClass]="{
+    <div class="row">
+        <div
+                [ngClass]="{
         'col-12 col-sm-9':
           (annotationStoreService.textInput$ | async) !== undefined &&
           (annotationStoreService.textInput$ | async)?.content !== '',
@@ -13,185 +13,179 @@
           (annotationStoreService.textInput$ | async) !== undefined &&
           (annotationStoreService.textInput$ | async)?.content === ''
       }"
-      class="col-12 col-sm-9"
-      style="text-align: left; padding-left: 20px"
-    >
-      {{ audio.audioManager.resource.info!.fullname }}:
-      <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
+                class="col-12 col-sm-9"
+                style="text-align: left; padding-left: 20px"
+        >
+            {{ audio.audioManager.resource.info!.fullname }}:
+            <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
+        </div>
+        <div
+                *ngIf="(annotationStoreService.textInput$ | async) !== undefined"
+                class="col-12 col-sm-3"
+                style="text-align: right; padding-right: 20px"
+        >
+            <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
+                {{ 'g.prompt' | transloco }}
+            </a>
+        </div>
     </div>
-    <div
-      *ngIf="(annotationStoreService.textInput$ | async) !== undefined"
-      class="col-12 col-sm-3"
-      style="text-align: right; padding-right: 20px"
-    >
-      <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
-        {{ 'g.prompt' | transloco }}
-      </a>
-    </div>
-  </div>
 </div>
 
 <div class="flex">
   <span id="saving">
     <i
-      class="bi bi-save-fill"
-      style="color: #333333"
-      *ngIf="saving === 'saving'"
+            class="bi bi-save-fill"
+            style="color: #333333"
+            *ngIf="saving === 'saving'"
     ></i>
     <i
-      class="bi bi-save-fill"
-      style="color: red"
-      *ngIf="saving === 'error'"
+            class="bi bi-save-fill"
+            style="color: red"
+            *ngIf="saving === 'error'"
     ></i>
   </span>
-  <octra-fastbar
-    (guidelinesbtnclicked)="openGuidelines()"
-    (overviewbtnclicked)="openOverview()"
-    (shortcutbtnclicked)="openShortcutsModal()"
-    [buttonLabels]="{
+    <octra-fastbar
+            (guidelinesbtnclicked)="openGuidelines()"
+            (overviewbtnclicked)="openOverview()"
+            (shortcutbtnclicked)="openShortcutsModal()"
+            [buttonLabels]="{
       shortcuts: 'g.shortcuts' | transloco,
       guidelines: 'g.guidelines' | transloco,
       overview: 'g.overview' | transloco,
       help: 'g.help' | transloco
     }"
-    [responsive]="responsive"
-  ></octra-fastbar>
+            [responsive]="responsive"
+    ></octra-fastbar>
 
-  <div class="flex">
-    <div
-      *ngIf="
+    <div class="flex">
+        <div
+                *ngIf="
         !editorloaded || waitForSend || projectsettings === undefined;
         else showEditor
       "
-      id="editor-loading"
-      class="w-100 h-100 flex justify-content-center align-items-center"
-    >
-      <div
-        class="spinner-border"
-        role="status"
-        *ngIf="true"
-        style="color: lightgray; height: 150px; width: 150px"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
+                id="editor-loading"
+                class="w-100 h-100 flex justify-content-center align-items-center"
+        >
+            <div
+                    class="spinner-border"
+                    role="status"
+                    *ngIf="true"
+                    style="color: lightgray; height: 150px; width: 150px"
+            >
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <ng-template octraLoadeditor #showEditor></ng-template>
     </div>
-    <ng-template octraLoadeditor #showEditor></ng-template>
-  </div>
 
-  <div *ngIf="showCommentSection">
-    <form class="form-inline" id="bottom-comment">
-      <fieldset class="w-100">
-        <div class="form-group" style="padding-top: 0">
-          <textarea
+    <div *ngIf="showCommentSection" class="row">
+    <textarea
             [ngModel]="annotationStoreService.comment"
             (ngModelChange)="annotationStoreService.changeComment($event)"
-            class="w-100"
+            class="w-100 d-flex"
             name="comment"
             placeholder="{{ 'g.insert comment' | transloco }}"
-            style="height: 40px; resize: none"
-          ></textarea>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-  <div class="row" id="bottom-navigation" role="group">
-    <div class="btn-group w-100">
-      <ng-container
-        *ngIf="
+            style="resize: none; background-color:lightyellow; height:40px;"
+    ></textarea>
+    </div>
+    <div class="row" id="bottom-navigation" role="group">
+        <div class="btn-group w-100">
+            <ng-container
+                    *ngIf="
           selectedTheme === 'shortAudioFiles' &&
             (useMode === 'online' || useMode === 'demo');
         "
-      >
-        <button
-          (click)="abortTranscription()"
-          class="col-md-3 btn btn-secondary"
-          type="button"
-        >
-          <i class="bi bi-x-circle"></i>
-          <span>
+            >
+                <button
+                        (click)="abortTranscription()"
+                        class="col-md-3 btn btn-secondary"
+                        type="button"
+                >
+                    <i class="bi bi-x-circle"></i>
+                    <span>
             {{ 'g.quit' | transloco }}
           </span>
-        </button>
-        <button
-          (click)="sendTranscriptionForShortAudioFiles('bad')"
-          class="col-md-3 btn btn-danger"
-          type="button"
-        >
-          <i class="bi bi-star-fill"></i>
-        </button>
-        <button
-          (click)="sendTranscriptionForShortAudioFiles('middle')"
-          class="btn btn-raised btn-warning col-md-3 btn btn-warning"
-          type="button"
-          style="background-color: orange"
-        >
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-        </button>
-        <button
-          (click)="sendTranscriptionForShortAudioFiles('good')"
-          class="col-md-3 btn btn-primary"
-          type="button"
-        >
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-        </button>
-      </ng-container>
-    </div>
+                </button>
+                <button
+                        (click)="sendTranscriptionForShortAudioFiles('bad')"
+                        class="col-md-3 btn btn-danger"
+                        type="button"
+                >
+                    <i class="bi bi-star-fill"></i>
+                </button>
+                <button
+                        (click)="sendTranscriptionForShortAudioFiles('middle')"
+                        class="btn btn-raised btn-warning col-md-3 btn btn-warning"
+                        type="button"
+                        style="background-color: orange"
+                >
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                </button>
+                <button
+                        (click)="sendTranscriptionForShortAudioFiles('good')"
+                        class="col-md-3 btn btn-primary"
+                        type="button"
+                >
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                </button>
+            </ng-container>
+        </div>
 
-    <ng-template #defaultBottom>
-      <button
-        (click)="abortTranscription()"
-        *ngIf="useMode !== 'url'"
-        type="button"
-        class="col-md-6 btn btn-secondary"
-      >
-        <i class="bi bi-x-circle"></i>
-        <span
-          *ngIf="!appStorage.easymode"
-          [ngClass]="{ ' d-none d-md-inline': appc.octra.responsive.enabled }"
-        >
+        <ng-template #defaultBottom>
+            <button
+                    (click)="abortTranscription()"
+                    *ngIf="useMode !== 'url'"
+                    type="button"
+                    class="col-md-6 btn btn-secondary"
+            >
+                <i class="bi bi-x-circle"></i>
+                <span
+                        *ngIf="!appStorage.easymode"
+                        [ngClass]="{ ' d-none d-md-inline': appc.octra.responsive.enabled }"
+                >
           {{ 'g.quit' | transloco }}
         </span>
-      </button>
-      <button
-        (click)="navbarServ.doclick('export')"
-        *ngIf="useMode === 'local'"
-        class="col-md-6 btn btn-primary"
-        type="button"
-      >
-        <i class="bi bi-download"></i>
-        <span
-          *ngIf="!appStorage.easymode"
-          [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
-        >
+            </button>
+            <button
+                    (click)="navbarServ.doclick('export')"
+                    *ngIf="useMode === 'local'"
+                    class="col-md-6 btn btn-primary"
+                    type="button"
+            >
+                <i class="bi bi-download"></i>
+                <span
+                        *ngIf="!appStorage.easymode"
+                        [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
+                >
           {{ 'g.export data' | transloco }}</span
-        >
-      </button>
-      <button
-        (click)="onSendButtonClick()"
-        *ngIf="useMode === 'online' || useMode === 'demo'"
-        class="col-md-6 btn btn-primary"
-        type="button"
-      >
+                >
+            </button>
+            <button
+                    (click)="onSendButtonClick()"
+                    *ngIf="useMode === 'online' || useMode === 'demo'"
+                    class="col-md-6 btn btn-primary"
+                    type="button"
+            >
         <span
-          *ngIf="!appStorage.easymode"
-          [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
+                *ngIf="!appStorage.easymode"
+                [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
         >
           {{ 'transcription.send' | transloco }}
         </span>
-        <i class="bi bi-send-fill"></i>
-      </button>
-      <button
-        (click)="onSaveTranscriptionButtonClicked()"
-        *ngIf="useMode === 'url'"
-        class="btn btn-primary"
-        type="button"
-      >
-        <span>{{ 'transcription.send' | transloco }} </span>
-        <i class="bi bi-send-fill"></i>
-      </button>
-    </ng-template>
-  </div>
+                <i class="bi bi-send-fill"></i>
+            </button>
+            <button
+                    (click)="onSaveTranscriptionButtonClicked()"
+                    *ngIf="useMode === 'url'"
+                    class="btn btn-primary"
+                    type="button"
+            >
+                <span>{{ 'transcription.send' | transloco }} </span>
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </ng-template>
+    </div>
 </div>

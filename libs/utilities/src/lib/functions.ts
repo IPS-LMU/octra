@@ -147,8 +147,11 @@ export function insertString(
 
   if (pos <= input.length) {
     result = result.substring(0, pos) + insertion + result.substring(pos);
+  } else if (pos === input.length + 1) {
+    result += insertion;
   } else {
-    throw new Error('String cannot be inserted at position ' + pos);
+    console.error('String cannot be inserted at position ' + pos);
+    console.error(`${pos} in ${input.length}`);
   }
 
   return result;

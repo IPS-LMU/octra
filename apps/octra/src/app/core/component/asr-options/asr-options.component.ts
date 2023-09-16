@@ -8,7 +8,10 @@ import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { ASRQueueItemType } from '../../store/asr';
-import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
+import {
+  OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
+} from '@octra/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AudioChunk } from '@octra/web-media';
 
@@ -92,7 +95,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
           if (segNumber > -1) {
             const segment = this.annotationStoreService.currentLevel!.items[
               segNumber
-            ] as Segment;
+            ] as OctraAnnotationSegment;
 
             if (segment !== undefined) {
               this.asrStoreService.addToQueue(

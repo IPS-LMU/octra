@@ -25,7 +25,10 @@ import {
   TextTableConverter,
 } from '../../obj/tools/audio-cutting/cutting-format';
 import { AudioService, UserInteractionsService } from '../../shared/service';
-import { OctraAnnotationSegmentLevel, Segment } from '@octra/annotation';
+import {
+  OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
+} from '@octra/annotation';
 import { IntArray, WavFormat } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
@@ -554,14 +557,14 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
 
     let transcript = this.annotationStoreService.transcript;
-    const currentLevel: OctraAnnotationSegmentLevel<Segment> = transcript!
-      .levels[
-      this.annotationStoreService.currentLevelIndex
-    ] as OctraAnnotationSegmentLevel<Segment>;
+    const currentLevel: OctraAnnotationSegmentLevel<OctraAnnotationSegment> =
+      transcript!.levels[
+        this.annotationStoreService.currentLevelIndex
+      ] as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
 
     const maxWords = this.tools.combinePhrases.options.maxWordsPerSegment;
     const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
-    const isSilence = (segment: Segment) => {
+    const isSilence = (segment: OctraAnnotationSegment) => {
       return (
         segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '' ||
         segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===

@@ -1,7 +1,7 @@
 import { OLabel, OSegment } from './annotjson';
 import { Converter, IFile } from './converters';
 import { SampleUnit } from '@octra/media';
-import { Segment } from './segment';
+import { OctraAnnotationSegment } from './octraAnnotationSegment';
 import { OAudiofile } from '@octra/web-media';
 
 export function convertFromSupportedConverters(
@@ -36,7 +36,7 @@ export function contains(haystack: string, needle: string): boolean {
  * returns the segment by the sample position (BrowserSample)
  */
 export function getSegmentBySamplePosition(
-  segments: Segment[],
+  segments: OctraAnnotationSegment[],
   samples: SampleUnit
 ): number {
   let begin = 0;
@@ -55,15 +55,15 @@ export function getSegmentBySamplePosition(
 }
 
 export function getSegmentsOfRange(
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   startSamples: SampleUnit,
   endSamples: SampleUnit
-): Segment[] {
+): OctraAnnotationSegment[] {
   if (startSamples.sampleRate !== endSamples.sampleRate) {
     throw new Error('Samplerate of both SampleUnits must be equal');
   }
 
-  const result: Segment[] = [];
+  const result: OctraAnnotationSegment[] = [];
   let start = new SampleUnit(0, startSamples.sampleRate);
 
   for (const segment of entries) {
@@ -91,7 +91,7 @@ export function getSegmentsOfRange(
  * @param mergeTranscripts
  */
 export function removeSegmentByIndex(
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   index: number,
   silenceValue: string | undefined,
   mergeTranscripts = true
@@ -139,9 +139,9 @@ export function removeSegmentByIndex(
 }
 
 export function betweenWhichSegment(
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   samples: number
-): Segment | undefined {
+): OctraAnnotationSegment | undefined {
   let start = 0;
 
   for (const segment of entries) {
@@ -159,15 +159,15 @@ export function betweenWhichSegment(
  */
 export function addSegment(
   itemIDCounter: number,
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   time: SampleUnit,
   label: string,
   value: string | undefined = undefined
 ): {
-  entries: Segment[];
+  entries: OctraAnnotationSegment[];
   itemIDCounter: number;
 } {
-  const newSegment: Segment = new Segment(itemIDCounter, time, [
+  const newSegment: OctraAnnotationSegment = new OctraAnnotationSegment(itemIDCounter, time, [
     new OLabel(label, value ?? ''),
   ]);
 
@@ -191,7 +191,7 @@ export function addSegment(
 /**
  * sorts the segments by time in samples
  */
-export function sort(entries: Segment[]) {
+export function sort(entries: OctraAnnotationSegment[]) {
   entries.sort((a, b) => {
     if (a.time!.samples < b.time!.samples) {
       return -1;
@@ -204,7 +204,7 @@ export function sort(entries: Segment[]) {
   return entries;
 }
 
-export function cleanup(entries: Segment[]) {
+export function cleanup(entries: OctraAnnotationSegment[]) {
   const remove: number[] = [];
 
   if (entries.length > 1) {
@@ -226,7 +226,7 @@ export function cleanup(entries: Segment[]) {
 }
 
 export function getStartTimeBySegmentID(
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   id: number
 ): SampleUnit | undefined {
   const segmentIndex = entries.findIndex((a) => a.id === id);
@@ -242,7 +242,7 @@ export function getStartTimeBySegmentID(
 }
 
 export function combineSegments(
-  entries: Segment[],
+  entries: OctraAnnotationSegment[],
   segmentIndexStart: number,
   segmentIndexEnd: number,
   breakMarker: string
@@ -257,7 +257,7 @@ export function combineSegments(
 /**
  * returns an array of normal segment objects with original values.
  */
-export function convertSegmentsToOSegments(entries: Segment[]): OSegment[] {
+export function convertSegmentsToOSegments(entries: OctraAnnotationSegment[]): OSegment[] {
   return entries.map((a, i) =>
     a.serializeToOSegment(i > 0 ? entries[i - 1].time.samples : 0)
   );
@@ -266,16 +266,16 @@ export function convertSegmentsToOSegments(entries: Segment[]): OSegment[] {
 export function convertOSegmentsToSegments(
   entries: OSegment[],
   sampleRate: number
-): Segment[] {
+): OctraAnnotationSegment[] {
   return entries.map((a) =>
-    Segment.deserializeFromOSegment(a, sampleRate)
+    OctraAnnotationSegment.deserializeFromOSegment(a, sampleRate)
   );
 }
 
 /**
  * removes Segment by number of samples
  */
-export function removeBySamples(entries: Segment[], timeSamples: SampleUnit) {
+export function removeBySamples(entries: OctraAnnotationSegment[], timeSamples: SampleUnit) {
   for (let i = 0; i < entries.length; i++) {
     const segment = entries[i];
 

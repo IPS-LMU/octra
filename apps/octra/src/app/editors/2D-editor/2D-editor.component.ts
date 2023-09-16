@@ -27,6 +27,7 @@ import {
   AudioViewerComponent,
   AudioviewerConfig,
   AudioViewerShortcutEvent,
+  CurrentLevelChangeEvent,
 } from '@octra/ngx-components';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import {
@@ -34,9 +35,9 @@ import {
   ASRQueueItemType,
   getSegmentBySamplePosition,
   OctraAnnotation,
-  Segment,
+  OctraAnnotationSegment,
 } from '@octra/annotation';
-import { interval, map, Subscription, take, timer } from 'rxjs';
+import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
@@ -256,6 +257,11 @@ export class TwoDEditorComponent
       this.asrStoreService.asrEnabled$.subscribe({
         next: (enabled) => {
           this.viewer.settings.asr.enabled = enabled === true;
+          if (!this.viewer.settings.asr.enabled) {
+            this.keyMap.unregisterItem('2D-Editor viewer', 'do_maus');
+            this.keyMap.unregisterItem('2D-Editor viewer', 'do_asr');
+            this.keyMap.unregisterItem('2D-Editor viewer', 'do_asr_maus');
+          }
         },
       })
     );
@@ -647,74 +653,73 @@ export class TwoDEditorComponent
   }
 
   onSegmentEntered(selected: any) {
-    this.annotationStoreService.currentLevel$.pipe(
-      take(1),
-      map((currentLevel) => {
+    const currentLevel = this.annotationStoreService.currentLevel;
+
+    if (
+      currentLevel &&
+      currentLevel.items &&
+      selected.index > -1 &&
+      selected.index < currentLevel.items.length
+    ) {
+      const segment = currentLevel.items[selected.index];
+
+      if (segment !== undefined && segment instanceof OctraAnnotationSegment) {
         if (
-          currentLevel &&
-          currentLevel.items &&
-          selected.index > -1 &&
-          selected.index < currentLevel.items.length
+          segment.context?.asr?.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
+          segment.context?.asr?.isBlockedBy !== ASRQueueItemType.MAUS
         ) {
-          const segment = currentLevel.items[selected.index];
+          const start: SampleUnit =
+            selected.index > 0
+              ? (
+                  currentLevel.items[
+                    selected.index - 1
+                  ] as OctraAnnotationSegment
+                ).time.clone()
+              : this.audioManager.createSampleUnit(0);
+          this.selectedIndex = selected.index;
+          this.audioChunkWindow = new AudioChunk(
+            new AudioSelection(start, segment.time.clone()),
+            this.audioManager
+          );
+          this.shortcutsEnabled = false;
 
-          if (segment !== undefined && segment instanceof Segment) {
-            if (
-              segment.context?.asr?.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
-              segment.context?.asr?.isBlockedBy !== ASRQueueItemType.MAUS
-            ) {
-              const start: SampleUnit =
-                selected.index > 0
-                  ? (
-                      currentLevel.items[selected.index - 1] as Segment
-                    ).time.clone()
-                  : this.audioManager.createSampleUnit(0);
-              this.selectedIndex = selected.index;
-              this.audioChunkWindow = new AudioChunk(
-                new AudioSelection(start, segment.time.clone()),
-                this.audioManager
-              );
-              this.shortcutsEnabled = false;
+          this.viewer.disableShortcuts();
+          this.showWindow = true;
 
-              this.viewer.disableShortcuts();
-              this.showWindow = true;
-
-              this.uiService.addElementFromEvent(
-                'segment',
-                {
-                  value: 'entered',
-                },
-                Date.now(),
-                this.audioManager.playPosition,
-                -1,
-                undefined,
-                {
-                  start: start.samples,
-                  length:
-                    (currentLevel.items[selected.index] as Segment).time
-                      .samples - start.samples,
-                },
-                TwoDEditorComponent.editorname
-              );
-              this.cd.markForCheck();
-              this.cd.detectChanges();
-            } else {
-              // tslint:disable-next-line:max-line-length
-              this.alertService
-                .showAlert(
-                  'danger',
-                  "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first."
-                )
-                .catch((error) => {
-                  console.error(error);
-                });
-            }
-          } else {
-            console.error(`couldn't find segment with index ${selected.index}`);
-          }
+          this.uiService.addElementFromEvent(
+            'segment',
+            {
+              value: 'entered',
+            },
+            Date.now(),
+            this.audioManager.playPosition,
+            -1,
+            undefined,
+            {
+              start: start.samples,
+              length:
+                (currentLevel.items[selected.index] as OctraAnnotationSegment)
+                  .time.samples - start.samples,
+            },
+            TwoDEditorComponent.editorname
+          );
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        } else {
+          // tslint:disable-next-line:max-line-length
+          this.alertService
+            .showAlert(
+              'danger',
+              "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first."
+            )
+            .catch((error) => {
+              console.error(error);
+            });
         }
-      })
-    );
+      } else {
+        console.error(`couldn't find segment with index ${selected.index}`);
+      }
+    }
   }
 
   onWindowAction(state: string) {
@@ -928,137 +933,139 @@ export class TwoDEditorComponent
           ? $event.timePosition!
           : this.viewer.av.mouseCursor!;
 
-      this.annotationStoreService.currentLevel$.pipe(
-        take(1),
-        map((currentLevel) => {
-          const segmentNumber = getSegmentBySamplePosition(
-            currentLevel!.items as Segment[],
-            timePosition
-          );
+      const currentLevel = this.annotationStoreService.currentLevel;
 
-          if (segmentNumber > -1) {
-            if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
-              const segment = currentLevel!.items[segmentNumber] as Segment;
+      const segmentNumber = getSegmentBySamplePosition(
+        currentLevel!.items as OctraAnnotationSegment[],
+        timePosition
+      );
 
-              if (segment !== undefined) {
-                const sampleStart =
-                  segmentNumber > 0
-                    ? (currentLevel!.items[segmentNumber - 1] as Segment).time
-                        .samples
-                    : 0;
+      if (segmentNumber > -1) {
+        if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
+          const segment = currentLevel!.items[
+            segmentNumber
+          ] as OctraAnnotationSegment;
 
-                this.uiService.addElementFromEvent(
-                  'shortcut',
-                  $event,
-                  $event.timestamp,
-                  this.audioManager.playPosition,
-                  -1,
-                  undefined,
-                  {
-                    start: sampleStart,
-                    length: segment.time.samples - sampleStart,
-                  },
-                  'multi-lines-viewer'
-                );
+          if (segment !== undefined) {
+            const sampleStart =
+              segmentNumber > 0
+                ? (
+                    currentLevel!.items[
+                      segmentNumber - 1
+                    ] as OctraAnnotationSegment
+                  ).time.samples
+                : 0;
 
-                const selection: ASRTimeInterval = {
-                  sampleStart,
-                  sampleLength: segment.time.samples - sampleStart,
-                };
+            this.uiService.addElementFromEvent(
+              'shortcut',
+              $event,
+              $event.timestamp,
+              this.audioManager.playPosition,
+              -1,
+              undefined,
+              {
+                start: sampleStart,
+                length: segment.time.samples - sampleStart,
+              },
+              'multi-lines-viewer'
+            );
 
-                if (segment.context?.asr?.isBlockedBy === undefined) {
-                  if (
-                    $event.value === 'do_asr' ||
-                    $event.value === 'do_asr_maus' ||
-                    $event.value === 'do_maus'
-                  ) {
-                    this.viewer.selectSegment(segmentNumber);
+            const selection: ASRTimeInterval = {
+              sampleStart,
+              sampleLength: segment.time.samples - sampleStart,
+            };
 
-                    if ($event.value === 'do_asr') {
-                      this.asrStoreService.addToQueue(
-                        selection,
-                        ASRQueueItemType.ASR
-                      );
-                      segment.context = {
-                        ...segment.context,
-                        asr: {
-                          isBlockedBy: ASRQueueItemType.ASR,
-                        },
-                      };
-                    } else if ($event.value === 'do_asr_maus') {
-                      this.asrStoreService.addToQueue(
-                        selection,
-                        ASRQueueItemType.ASRMAUS
-                      );
-                      segment.context = {
-                        ...segment.context,
-                        asr: {
-                          isBlockedBy: ASRQueueItemType.ASRMAUS,
-                        },
-                      };
-                    } else if ($event.value === 'do_maus') {
-                      if (
-                        (segment.getFirstLabelWithoutName('Speaker') &&
-                          segment
-                            .getFirstLabelWithoutName('Speaker')!
-                            .value.trim() === '') ||
-                        segment
-                          .getFirstLabelWithoutName('Speaker')!
-                          .value.split(' ').length < 2
-                      ) {
-                        this.alertService
-                          .showAlert(
-                            'danger',
-                            this.langService.translate('asr.maus empty text'),
-                            false
-                          )
-                          .catch((error) => {
-                            console.error(error);
-                          });
-                      } else {
-                        this.asrStoreService.addToQueue(
-                          selection,
-                          ASRQueueItemType.MAUS,
-                          segment.getFirstLabelWithoutName('Speaker')?.value
-                        );
-                        segment.context = {
-                          ...segment.context,
-                          asr: {
-                            isBlockedBy: ASRQueueItemType.MAUS,
-                          },
-                        };
-                      }
-                    }
-                  }
-                  this.asrStoreService.startProcessing();
-                } else {
-                  this.asrStoreService.stopItemProcessing({
-                    sampleStart: selection.sampleStart,
-                    sampleLength: selection.sampleLength,
-                  });
+            if (segment.context?.asr?.isBlockedBy === undefined) {
+              if (
+                $event.value === 'do_asr' ||
+                $event.value === 'do_asr_maus' ||
+                $event.value === 'do_maus'
+              ) {
+                this.viewer.selectSegment(segmentNumber);
+
+                if ($event.value === 'do_asr') {
+                  this.asrStoreService.addToQueue(
+                    selection,
+                    ASRQueueItemType.ASR
+                  );
                   segment.context = {
                     ...segment.context,
                     asr: {
-                      isBlockedBy: undefined,
+                      isBlockedBy: ASRQueueItemType.ASR,
                     },
                   };
+                } else if ($event.value === 'do_asr_maus') {
+                  this.asrStoreService.addToQueue(
+                    selection,
+                    ASRQueueItemType.ASRMAUS
+                  );
+                  segment.context = {
+                    ...segment.context,
+                    asr: {
+                      isBlockedBy: ASRQueueItemType.ASRMAUS,
+                    },
+                  };
+                } else if ($event.value === 'do_maus') {
+                  if (
+                    (segment.getFirstLabelWithoutName('Speaker') &&
+                      segment
+                        .getFirstLabelWithoutName('Speaker')!
+                        .value.trim() === '') ||
+                    segment
+                      .getFirstLabelWithoutName('Speaker')!
+                      .value.split(' ').length < 2
+                  ) {
+                    this.alertService
+                      .showAlert(
+                        'danger',
+                        this.langService.translate('asr.maus empty text'),
+                        false
+                      )
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                  } else {
+                    this.asrStoreService.addToQueue(
+                      selection,
+                      ASRQueueItemType.MAUS,
+                      segment.getFirstLabelWithoutName('Speaker')?.value
+                    );
+                    segment.context = {
+                      ...segment.context,
+                      asr: {
+                        isBlockedBy: ASRQueueItemType.MAUS,
+                      },
+                    };
+                  }
                 }
               }
+              this.asrStoreService.startProcessing();
             } else {
-              // open transcr window
-              this.openSegment(segmentNumber);
-              this.alertService
-                .showAlert(
-                  'warning',
-                  this.langService.translate('asr.no asr selected').toString()
-                )
-                .catch((error) => {
-                  console.error(error);
-                });
+              this.asrStoreService.stopItemProcessing({
+                sampleStart: selection.sampleStart,
+                sampleLength: selection.sampleLength,
+              });
+              segment.context = {
+                ...segment.context,
+                asr: {
+                  isBlockedBy: undefined,
+                },
+              };
             }
           }
-        })
-      );
+        } else {
+          // open transcr window
+          this.openSegment(segmentNumber);
+          this.alertService
+            .showAlert(
+              'warning',
+              this.langService.translate('asr.no asr selected').toString()
+            )
+            .catch((error) => {
+              console.error(error);
+            });
+        }
+      }
     }
 
     if (
@@ -1270,7 +1277,36 @@ export class TwoDEditorComponent
     // this.viewer.height = this.linesViewHeight;
   }
 
-  onEntriesChange($events: OctraAnnotation<ASRContext, Segment>) {
-    // TODO this.annotationStoreService.saveSegments();
+  onEntriesChange(
+    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ) {
+    // this.annotationStoreService.saveSegments();
+    console.log(annotation);
+    this.annotationStoreService.overwriteTranscript(annotation);
+  }
+
+  onCurrentLevelChange($event: CurrentLevelChangeEvent) {
+    if ($event.type === 'change') {
+      this.annotationStoreService.changeCurrentLevelItems(
+        $event.items.map((a) => a.instance!)
+      );
+    }
+
+    if ($event.type === 'remove') {
+      this.annotationStoreService.removeCurrentLevelItems(
+        $event.items,
+        $event.removeOptions?.silenceCode,
+        $event.removeOptions?.mergeTranscripts
+      );
+    }
+
+    if ($event.type === 'add') {
+      this.annotationStoreService.addCurrentLevelItems(
+        $event.items.map((a) => a.instance!)
+      );
+    }
+
+    console.log('CurrentLevelChange!');
+    console.log($event);
   }
 }

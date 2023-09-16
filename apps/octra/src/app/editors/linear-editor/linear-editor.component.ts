@@ -26,6 +26,7 @@ import {
   AudioViewerComponent,
   AudioviewerConfig,
   AudioViewerShortcutEvent,
+  CurrentLevelChangeEvent,
 } from '@octra/ngx-components';
 import { AudioSelection, SampleUnit } from '@octra/media';
 import { LoginMode } from '../../core/store';
@@ -34,8 +35,8 @@ import { AudioNavigationComponent } from '../../core/component/audio-navigation'
 import {
   ASRContext,
   OctraAnnotation,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
-  Segment,
 } from '@octra/annotation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import {
@@ -358,7 +359,7 @@ export class LinearEditorComponent
           this.subscrManager.add(
             timer(1000).subscribe(() => {
               this.saving = true;
-              this.onSegmentChange();
+              this.onLevelChange();
             })
           );
         }
@@ -458,7 +459,7 @@ export class LinearEditorComponent
     });
   }
 
-  onSegmentChange() {
+  onLevelChange() {
     this.saving = false;
   }
 
@@ -1053,7 +1054,34 @@ export class LinearEditorComponent
     this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 
-  onEntriesChange(annotation: OctraAnnotation<ASRContext, Segment>) {
+  onEntriesChange(
+    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ) {
     this.annotationStoreService.overwriteTranscript(annotation);
+  }
+
+  onCurrentLevelChange($event: CurrentLevelChangeEvent) {
+    if ($event.type === 'change') {
+      this.annotationStoreService.changeCurrentLevelItems(
+        $event.items.map((a) => a.instance!)
+      );
+    }
+
+    if ($event.type === 'remove') {
+      this.annotationStoreService.removeCurrentLevelItems(
+        $event.items,
+        $event.removeOptions?.silenceCode,
+        $event.removeOptions?.mergeTranscripts
+      );
+    }
+
+    if ($event.type === 'add') {
+      this.annotationStoreService.addCurrentLevelItems(
+        $event.items.map((a) => a.instance!)
+      );
+    }
+
+    console.log('CurrentLevelChange!');
+    console.log($event);
   }
 }

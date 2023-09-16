@@ -24,7 +24,7 @@ import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
   ASRContext,
   OctraAnnotationAnyLevel,
-  Segment,
+  OctraAnnotationSegment,
 } from '@octra/annotation';
 import {
   ContextMenuAction,
@@ -61,7 +61,7 @@ export class TrnEditorComponent
     return this._textEditor;
   }
 
-  private currentLevel!: OctraAnnotationAnyLevel<Segment<ASRContext>>;
+  private currentLevel!: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
   private guidelines!: OctraGuidelines;
   private breakMarkerCode?: string;
   private idCounter = 1;
@@ -257,7 +257,7 @@ export class TrnEditorComponent
   };
 
   private audioManager!: AudioManager;
-  private tempSegments!: Segment[];
+  private tempSegments!: OctraAnnotationSegment[];
   private selectedCell = {
     labelText: '',
     row: 0,
@@ -296,8 +296,8 @@ export class TrnEditorComponent
     let intervalCounter = 0;
 
     for (let i = 1; i < this.currentLevel.items.length; i++) {
-      const segment = this.currentLevel.items[i] as Segment;
-      const previousSegment = this.currentLevel.items[i - 1] as Segment;
+      const segment = this.currentLevel.items[i] as OctraAnnotationSegment;
+      const previousSegment = this.currentLevel.items[i - 1] as OctraAnnotationSegment;
 
       if (segment.getLabel('Speaker') === previousSegment.getLabel('Speaker')) {
         intervals[intervalCounter].length++;
@@ -351,7 +351,7 @@ export class TrnEditorComponent
         next: (trasncriptState) => {
           this.currentLevel =
             trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
-          this.tempSegments = [...(this.currentLevel.items as Segment[])];
+          this.tempSegments = [...(this.currentLevel.items as OctraAnnotationSegment[])];
           this.idCounter = trasncriptState?.idCounters.item ?? 1;
         },
       })
@@ -556,8 +556,8 @@ export class TrnEditorComponent
 
   getStartPoint(index: number) {
     return index > 0 &&
-      this.currentLevel.items[index - 1] instanceof Segment<ASRContext>
-      ? (this.currentLevel.items[index - 1] as Segment<ASRContext>).time.unix
+      this.currentLevel.items[index - 1] instanceof OctraAnnotationSegment<ASRContext>
+      ? (this.currentLevel.items[index - 1] as OctraAnnotationSegment<ASRContext>).time.unix
       : 0;
   }
 
@@ -736,7 +736,7 @@ export class TrnEditorComponent
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  getShownSegment(startSamples: number, segment: Segment, i: number) {
+  getShownSegment(startSamples: number, segment: OctraAnnotationSegment, i: number) {
     /* TODO implement
     const obj: ShownSegment = {
       start: startSamples,

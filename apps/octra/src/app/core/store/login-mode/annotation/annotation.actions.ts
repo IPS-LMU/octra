@@ -1,14 +1,15 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
 import { LoginMode } from '../../index';
 import {
+  AnnotationAnySegment,
   AnnotationLevelType,
   ASRContext,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
   OctraAnnotationLink,
+  OctraAnnotationSegment,
   OEvent,
   OItem,
-  Segment,
 } from '@octra/annotation';
 import { ILog } from '../../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
@@ -92,7 +93,7 @@ export class AnnotationActions {
     source: `annotation/ overwrite transcript`,
     events: {
       do: props<{
-        transcript: OctraAnnotation<ASRContext, Segment>;
+        transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
         mode: LoginMode;
         saveToDB: boolean;
       }>(),
@@ -112,7 +113,7 @@ export class AnnotationActions {
     source: `annotation/ change level`,
     events: {
       do: props<{
-        level: OctraAnnotationAnyLevel<Segment<ASRContext>>;
+        level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
         mode: LoginMode;
       }>(),
     },
@@ -144,6 +145,40 @@ export class AnnotationActions {
     events: {
       do: props<{
         savingNeeded: boolean;
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static changeCurrentLevelItems = createActionGroup({
+    source: `annotation/ change items`,
+    events: {
+      do: props<{
+        items: AnnotationAnySegment[];
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static removeCurrentLevelItems = createActionGroup({
+    source: `annotation/ remove items`,
+    events: {
+      do: props<{
+        items: { index?: number; id?: number }[];
+        removeOptions?: {
+          silenceCode?: string;
+          mergeTranscripts?: boolean;
+        };
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
+  static addCurrentLevelItems = createActionGroup({
+    source: `annotation/ add items`,
+    events: {
+      do: props<{
+        items: AnnotationAnySegment[];
         mode: LoginMode;
       }>(),
     },
@@ -224,7 +259,7 @@ export class AnnotationActions {
     },
   });
 
-  static loadSegments = createActionGroup({
+  static initTranscriptionService = createActionGroup({
     source: `annotation/ init transcription service`,
     events: {
       do: props<{
@@ -232,7 +267,10 @@ export class AnnotationActions {
       }>(),
       success: props<{
         mode: LoginMode;
-        transcript: OctraAnnotation<ASRContext, Segment<ASRContext>>;
+        transcript: OctraAnnotation<
+          ASRContext,
+          OctraAnnotationSegment<ASRContext>
+        >;
         feedback?: FeedBackForm;
         saveToDB: boolean;
       }>(),
@@ -328,7 +366,7 @@ export class AnnotationActions {
       success: props<{
         mode: LoginMode;
         segmentID: number;
-        newSegments: Segment<ASRContext>[];
+        newSegments: OctraAnnotationSegment<ASRContext>[];
       }>(),
       fail: props<{
         error: string;
@@ -388,12 +426,8 @@ export class AnnotationActions {
     events: {
       do: props<{
         id: number;
-        item: OItem | OEvent | Segment<ASRContext>;
+        item: OItem | OEvent | OctraAnnotationSegment<ASRContext>;
         mode: LoginMode;
-      }>(),
-      success: emptyProps(),
-      fail: props<{
-        error: string;
       }>(),
     },
   });

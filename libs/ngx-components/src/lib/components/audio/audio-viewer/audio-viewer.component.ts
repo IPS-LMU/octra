@@ -17,14 +17,15 @@ import { AudioviewerConfig } from './audio-viewer.config';
 import { AudioViewerService } from './audio-viewer.service';
 import { SubscriptionManager } from '@octra/utilities';
 import {
+  AnnotationAnySegment,
   ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
   getSegmentsOfRange,
   getStartTimeBySegmentID,
   OctraAnnotation,
+  OctraAnnotationSegment,
   OLabel,
-  Segment,
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { Position, Size } from '../../../obj';
@@ -41,6 +42,19 @@ import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
 import Shape = Konva.Shape;
 
+export interface CurrentLevelChangeEvent {
+  type: 'change' | 'remove' | 'add';
+  items: {
+    index?: number;
+    id?: number;
+    instance?: AnnotationAnySegment;
+  }[];
+  removeOptions?: {
+    silenceCode: string | undefined;
+    mergeTranscripts: boolean;
+  };
+}
+
 @Component({
   selector: 'octra-audio-viewer',
   templateUrl: './audio-viewer.component.html',
@@ -52,15 +66,27 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
    * annotation of type OctraAnnotation
    * @param value
    */
-  @Input() set annotation(value: OctraAnnotation<ASRContext, Segment>) {
-    this.av.annotation = value;
+  @Input() set annotation(
+    value: OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined
+  ) {
+    this.av.annotation = value ? value.clone() : undefined;
+  }
+
+  get annotation():
+    | OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    | undefined {
+    return this.av.annotation;
+  }
+
+  @Output() get currentLevelChange(): EventEmitter<CurrentLevelChangeEvent> {
+    return this.av.currentLevelChange;
   }
 
   /**
    * triggered when annotation changes.
    */
   @Output() get annotationChange(): EventEmitter<
-    OctraAnnotation<ASRContext, Segment>
+    OctraAnnotation<ASRContext, OctraAnnotationSegment>
   > {
     return this.av.annotationChange;
   }
@@ -69,12 +95,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
    * defines if intern changes should redraw the signal display.
    */
   @Input() refreshOnInternChanges = true;
-
-  /**
-   * name of the current level
-   * @param value segments
-   */
-  @Input() levelName?: string;
 
   @Input() set currentLevelID(value: number | undefined) {
     this.av.currentLevelID = value;
@@ -333,15 +353,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       this.afterChunkUpdated();
     }
-    if (changes['entries'] && changes['entries'].currentValue !== undefined) {
+    if (
+      changes['annotation'] &&
+      changes['annotation'].currentValue !== undefined
+    ) {
       this.afterLevelUpdated();
     }
 
     if (
-      changes['breakMarker'] &&
-      changes['breakMarker'].currentValue !== undefined
+      changes['silencePlaceholder'] &&
+      changes['silencePlaceholder'].currentValue !== undefined
     ) {
-      this.av.breakMarker = this.silencePlaceholder;
+      this.av.silencePlaceholder = this.silencePlaceholder;
     }
 
     if (this.stage !== undefined && this.height !== undefined) {
@@ -441,13 +464,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             this.width !== undefined &&
             this.width > 0 &&
             this.audioChunk !== undefined &&
-            this.av.items &&
-            this.av.items.length > 0
+            this.av.annotation?.currentLevel &&
+            this.av.annotation.currentLevel.items.length > 0
           ) {
             const innerWidth =
               this.width -
               (this.settings.margin.left + this.settings.margin.right);
-            this.av.initialize(this.levelName, innerWidth, this.audioChunk);
+            this.av.initialize(innerWidth, this.audioChunk);
             this.settings.pixelPerSec = this.getPixelPerSecond(
               this.secondsPerLine
             );
@@ -494,38 +517,41 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async onResize() {
-    if (
-      this.audioChunk !== undefined &&
-      this.av.currentLevel &&
-      this.stage !== undefined &&
-      this.width !== undefined &&
-      this.height !== undefined &&
-      this.av.currentLevel.items.length > 0
-    ) {
-      const playpos = this.audioChunk?.absolutePlayposition.clone();
-      const drawnSelection = this.av.drawnSelection?.clone();
-      this.stage.width(this.width);
-      this.stage.height(this.height);
-      this.av.initialize(
-        this.levelName,
-        this.width - (this.settings.margin.left + this.settings.margin.right),
-        this.audioChunk
-      );
-      this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
-      await this.av.initializeSettings();
+    try{
+      if (
+        this.audioChunk !== undefined &&
+        this.av.currentLevel &&
+        this.stage !== undefined &&
+        this.width !== undefined &&
+        this.height !== undefined &&
+        this.av.currentLevel.items.length > 0
+      ) {
+        const playpos = this.audioChunk?.absolutePlayposition.clone();
+        const drawnSelection = this.av.drawnSelection?.clone();
+        this.stage.width(this.width);
+        this.stage.height(this.height);
+        this.av.initialize(
+          this.width - (this.settings.margin.left + this.settings.margin.right),
+          this.audioChunk
+        );
+        this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+        await this.av.initializeSettings();
 
-      if (this.audioChunk !== undefined) {
-        if (!this.audioChunk.isPlaying) {
-          this.audioChunk.absolutePlayposition = playpos.clone();
+        if (this.audioChunk !== undefined) {
+          if (!this.audioChunk.isPlaying) {
+            this.audioChunk.absolutePlayposition = playpos.clone();
+          }
+          this.av.drawnSelection = drawnSelection;
+          this.updateLines();
+          this.createSegmentsForCanvas();
+          this.updatePlayCursor();
         }
-        this.av.drawnSelection = drawnSelection;
-        this.updateLines();
-        this.createSegmentsForCanvas();
-        this.updatePlayCursor();
+        if (this.stage !== undefined) {
+          this.stage.batchDraw();
+        }
       }
-      if (this.stage !== undefined) {
-        this.stage.batchDraw();
-      }
+    } catch (e) {
+      //ignore
     }
   }
 
@@ -759,11 +785,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         this.audioManager !== undefined
       ) {
         const segment = this.av.currentLevel.items[segIndex];
-        if (!(segment instanceof Segment)) {
+        if (!(segment instanceof OctraAnnotationSegment)) {
           reject();
           return;
         }
-        const items = this.av.currentLevel.items as Segment[];
+        const items = this.av.currentLevel.items as OctraAnnotationSegment[];
 
         const startTime = getStartTimeBySegmentID(items, segment.id);
 
@@ -776,12 +802,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.av.innerWidth !== undefined
         ) {
           const absX = this.av.audioTCalculator.samplestoAbsX(segment.time);
-          let begin: Segment;
+          let begin: OctraAnnotationSegment;
 
           if (segIndex > 0) {
             begin = items[segIndex - 1];
           } else {
-            begin = new Segment(
+            begin = new OctraAnnotationSegment(
               this.av.getNextItemID(),
               this.audioManager.createSampleUnit(0),
               []
@@ -1461,7 +1487,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         }
 
         const segments = getSegmentsOfRange(
-          this.av.currentLevel.items as Segment[],
+          this.av.currentLevel.items as OctraAnnotationSegment[],
           this.audioChunk.time.start,
           this.audioChunk.time.end
         );
@@ -1592,7 +1618,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                           (a) => a.id === segment.id
                         );
 
-                        if (!(sceneSegment instanceof Segment)) {
+                        if (!(sceneSegment instanceof OctraAnnotationSegment)) {
                           return;
                         }
 
@@ -1816,7 +1842,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       from: number;
       to: number;
     },
-    segments: Segment[],
+    segments: OctraAnnotationSegment[],
     i: number,
     absX: number,
     beginTime: SampleUnit,
@@ -1889,7 +1915,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       from: number;
       to: number;
     },
-    segments: Segment[],
+    segments: OctraAnnotationSegment[],
     i: number,
     absX: number,
     beginTime: SampleUnit,
@@ -1916,7 +1942,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       if (
         sceneSegment === undefined ||
         segment?.time === undefined ||
-        !(sceneSegment instanceof Segment<ASRContext>)
+        !(sceneSegment instanceof OctraAnnotationSegment<ASRContext>)
       ) {
         console.error(`scenceSegment is undefined!`);
       } else {
@@ -2535,7 +2561,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   !this.settings.boundaries.readonly &&
                   this._focused &&
                   this.audioManager !== undefined &&
-                  this.av.items !== undefined
+                  this.annotation?.currentLevel?.items
                 ) {
                   const result = this.av.addOrRemoveSegment();
                   if (result !== undefined && result.msg !== undefined) {
@@ -2573,13 +2599,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                     this.av.currentLevel.items.length > 0
                   ) {
                     const segmentI = getSegmentBySamplePosition(
-                      this.av.currentLevel.items as Segment[],
+                      this.av.currentLevel.items as OctraAnnotationSegment[],
                       xSamples
                     );
                     const segment = this.av.currentLevel.items[segmentI];
 
                     if (segment) {
-                      if (segment instanceof Segment<ASRContext>) {
+                      if (
+                        segment instanceof OctraAnnotationSegment<ASRContext>
+                      ) {
                         if (
                           segmentI > -1 &&
                           segment.context?.asr?.isBlockedBy === undefined &&
@@ -2634,16 +2662,20 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   );
                   if (boundarySelect) {
                     const segmentI = getSegmentBySamplePosition(
-                      this.av.currentLevel.items as Segment<ASRContext>[],
+                      this.av.currentLevel
+                        .items as OctraAnnotationSegment<ASRContext>[],
                       xSamples
                     );
                     if (segmentI > -1) {
                       const segment = this.av.currentLevel.items[segmentI];
 
                       if (segment) {
-                        if (segment instanceof Segment<ASRContext>) {
+                        if (
+                          segment instanceof OctraAnnotationSegment<ASRContext>
+                        ) {
                           const startTime = getStartTimeBySegmentID(
-                            this.av.currentLevel.items as Segment<ASRContext>[],
+                            this.av.currentLevel
+                              .items as OctraAnnotationSegment<ASRContext>[],
                             segment.id
                           );
 
@@ -2667,12 +2699,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                             const begin = (
                               segmentI > 0
                                 ? this.av.currentLevel.items[segmentI - 1]
-                                : new Segment(
-                                    this.av.getNextItemID(),
+                                : this.annotation!.createSegment(
                                     this.audioManager.createSampleUnit(0),
-                                    [new OLabel(this.levelName!, '')]
+                                    [new OLabel(this.av.currentLevel.name, '')]
                                   )
-                            ) as Segment<ASRContext>;
+                            ) as OctraAnnotationSegment<ASRContext>;
 
                             if (
                               begin?.time !== undefined &&
@@ -2765,7 +2796,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 ) {
                   let start = undefined;
                   let end = undefined;
-                  let somethingChanged = false;
+                  const removedIDs: number[] = [];
 
                   if (this.av.currentLevel.items.length > 0) {
                     this.shortcut.emit({
@@ -2785,7 +2816,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                     ) {
                       const segment = this.av.currentLevel.items[
                         i
-                      ] as Segment<ASRContext>;
+                      ] as OctraAnnotationSegment<ASRContext>;
 
                       if (segment?.time !== undefined) {
                         if (
@@ -2799,10 +2830,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                           this.av.removeSegmentByIndex(
                             i,
                             this.silencePlaceholder,
-                            false,
+                            true,
                             false
                           );
-                          somethingChanged = true;
+                          removedIDs.push(segment.id);
                           i--;
                           if (start === undefined) {
                             start = i;
@@ -2830,8 +2861,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       this.av.drawnSelection.start.clone();
                   }
 
-                  if (somethingChanged) {
+                  if (removedIDs && removedIDs.length > 0) {
                     this.av.annotationChange.emit(this.av.annotation);
+                    this.av.currentLevelChange.emit({
+                      type: 'remove',
+                      items: removedIDs.map((a) => ({
+                        id: a,
+                      })),
+                      removeOptions: {
+                        silenceCode: this.silencePlaceholder,
+                        mergeTranscripts: true
+                      }
+                    });
                   }
                 }
                 break;
@@ -2855,7 +2896,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   });
 
                   const segInde = getSegmentBySamplePosition(
-                    this.av.currentLevel.items as Segment<ASRContext>[],
+                    this.av.currentLevel
+                      .items as OctraAnnotationSegment<ASRContext>[],
                     this.av.mouseCursor
                   );
                   this.selectSegment(segInde)
@@ -2957,12 +2999,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   this.av.mouseCursor !== undefined
                 ) {
                   const segmentI = getSegmentBySamplePosition(
-                    this.av.currentLevel.items as Segment<ASRContext>[],
+                    this.av.currentLevel
+                      .items as OctraAnnotationSegment<ASRContext>[],
                     this.av.mouseCursor
                   );
                   const segment = this.av.currentLevel.items[
                     segmentI
-                  ] as Segment<ASRContext>;
+                  ] as OctraAnnotationSegment<ASRContext>;
 
                   if (segmentI > -1) {
                     if (segment?.context?.asr?.isBlockedBy === undefined) {
@@ -2996,12 +3039,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   this.av.mouseCursor !== undefined
                 ) {
                   const segmentI = getSegmentBySamplePosition(
-                    this.av.currentLevel.items as Segment<ASRContext>[],
+                    this.av.currentLevel
+                      .items as OctraAnnotationSegment<ASRContext>[],
                     this.av.mouseCursor
                   );
                   const segment = this.av.currentLevel.items[
                     segmentI
-                  ] as Segment<ASRContext>;
+                  ] as OctraAnnotationSegment<ASRContext>;
 
                   if (segmentI > -1) {
                     if (segment?.context?.asr?.isBlockedBy === undefined) {
@@ -3036,12 +3080,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   this.av.mouseCursor !== undefined
                 ) {
                   const segmentI = getSegmentBySamplePosition(
-                    this.av.currentLevel.items as Segment<ASRContext>[],
+                    this.av.currentLevel
+                      .items as OctraAnnotationSegment<ASRContext>[],
                     this.av.mouseCursor
                   );
                   const segment = this.av.currentLevel.items[
                     segmentI
-                  ] as Segment<ASRContext>;
+                  ] as OctraAnnotationSegment<ASRContext>;
 
                   if (segmentI > -1) {
                     if (segment?.context?.asr?.isBlockedBy === undefined) {
@@ -3228,7 +3273,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     segmentHeight: number,
     numOfLines: number,
     absX: number,
-    segments: Segment[],
+    segments: OctraAnnotationSegment[],
     i: number
   ): number | undefined {
     const segment = segments[i];

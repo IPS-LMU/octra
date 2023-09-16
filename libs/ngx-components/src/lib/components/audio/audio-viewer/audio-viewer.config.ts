@@ -35,7 +35,7 @@ export class AudioviewerConfig {
       strokeWidth: 1,
     },
     selector: {
-      color: 'green',
+      color: 'rgb(10,140,140)',
       stroke: 'gray',
       strokeWidth: 1,
       width: 20,
@@ -69,6 +69,7 @@ export class AudioviewerConfig {
     enabled: true,
     color: 'rgb(224, 224, 224)',
   };
+
   public data: {
     color: string;
   } = {

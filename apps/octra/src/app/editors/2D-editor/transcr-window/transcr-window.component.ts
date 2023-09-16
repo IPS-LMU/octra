@@ -29,8 +29,7 @@ import {
   ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
-  OctraAnnotationAnyLevel,
-  Segment,
+  OctraAnnotationSegment,
 } from '@octra/annotation';
 import {
   AudioViewerComponent,
@@ -47,10 +46,10 @@ import { ASRProcessStatus } from '../../../core/store/asr';
 import {
   AudioChunk,
   AudioManager,
+  AudioResource,
   ShortcutEvent,
   ShortcutGroup,
 } from '@octra/web-media';
-import { AudioResource } from '../../../../../../../libs/web-media/src/lib/audio/audio-resource';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -73,9 +72,13 @@ export class TranscrWindowComponent
   @Input() segmentIndex!: number;
 
   private showWindow = false;
-  private tempSegments!: Segment[];
+  private tempSegments!: OctraAnnotationSegment[];
   private oldRaw = '';
-  private currentLevel!: OctraAnnotationAnyLevel<Segment<ASRContext>>;
+
+  private get currentLevel() {
+    return this.annotationStoreService.currentLevel;
+  }
+
   private guidelines!: OctraGuidelines;
   private breakMarkerCode?: string;
   private idCounter = 1;
@@ -289,7 +292,9 @@ export class TranscrWindowComponent
       const currentLevel = await firstValueFrom(
         this.annotationStoreService.currentLevel$
       );
-      const segment = currentLevel!.items[this.segmentIndex] as Segment;
+      const segment = currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
 
       if (segment?.context?.asr?.isBlockedBy === undefined) {
         this.audiochunk.startPlayback().catch((error) => {
@@ -388,15 +393,14 @@ export class TranscrWindowComponent
   };
 
   ngOnInit() {
-    this.subscrManager.add(
-      this.annotationStoreService.transcript$.subscribe({
-        next: (trasncriptState) => {
-          this.currentLevel = trasncriptState!.currentLevel!;
-          this.tempSegments = [...(this.currentLevel.items as Segment[])];
-          this.idCounter = trasncriptState?.idCounters.item ?? 1;
-        },
-      })
-    );
+    if (this.currentLevel) {
+      this.tempSegments = [
+        ...(this.currentLevel.items as OctraAnnotationSegment[]),
+      ];
+      this.idCounter =
+        this.annotationStoreService.transcript?.idCounters.item ?? 1;
+    }
+
     this.subscrManager.add(
       this.annotationStoreService.guidelines$.subscribe({
         next: (guidelines) => {
@@ -440,7 +444,7 @@ export class TranscrWindowComponent
         (
           this.annotationStoreService.currentLevel!.items[
             this.segmentIndex
-          ] as Segment
+          ] as OctraAnnotationSegment
         ).getFirstLabelWithoutName('Speaker')?.value ?? '';
     }
 
@@ -494,7 +498,7 @@ export class TranscrWindowComponent
       timer(500).subscribe(() => {
         const segment = this.annotationStoreService.currentLevel!.items[
           this.segmentIndex
-        ] as Segment;
+        ] as OctraAnnotationSegment;
 
         if (segment!.context?.asr?.isBlockedBy === undefined) {
           this.audiochunk.startPlayback().catch((error) => {
@@ -519,8 +523,11 @@ export class TranscrWindowComponent
 
     const startSample =
       this.segmentIndex > 0
-        ? (this.currentLevel.items[this.segmentIndex - 1] as Segment).time
-            .samples
+        ? (
+            this.currentLevel?.items[
+              this.segmentIndex - 1
+            ] as OctraAnnotationSegment
+          ).time.samples
         : 0;
 
     this.uiService.addElementFromEvent(
@@ -535,8 +542,11 @@ export class TranscrWindowComponent
       {
         start: startSample,
         length:
-          (this.currentLevel.items[this.segmentIndex - 1] as Segment).time
-            .samples - startSample,
+          (
+            this.currentLevel?.items[
+              this.segmentIndex
+            ] as OctraAnnotationSegment
+          ).time.samples - startSample,
       },
       'transcription window'
     );
@@ -555,10 +565,9 @@ export class TranscrWindowComponent
   save() {
     this.saveTranscript();
 
-    /* TODO:later check this
     if (
       this.segmentIndex > -1 &&
-      this.currentLevel.items &&
+      this.currentLevel?.items &&
       this.segmentIndex < this.currentLevel.items.length
     ) {
       if (
@@ -569,23 +578,20 @@ export class TranscrWindowComponent
       } else {
         // no boundaries inserted
         const segment =
-          this.transcrService.currentlevel!.segments[
+          this.annotationStoreService.currentLevel?.items[
             this.segmentIndex
-          ]!.clone();
+          ].clone();
         this.editor.updateRawText();
-        segment.value = this.editor.rawText;
-        segment.isBlockedBy =
-          this.transcrService.currentlevel!.segments[
-            this.segmentIndex
-          ].isBlockedBy;
-        this.transcrService.currentlevel!.segments[this.segmentIndex] = segment;
-        this.transcrService.saveSegments();
-      }
-    } else {
-      const isNull = this.transcrService.currentlevel!.segments === undefined;
-    }
 
-     */
+        if (this.currentLevel) {
+          if (this.currentLevel.type === 'SEGMENT') {
+            const seg = segment as OctraAnnotationSegment<ASRContext>;
+            seg.changeFirstLabelWithoutName('Speaker', this.editor.rawText);
+            this.annotationStoreService.changeCurrentLevelItems([seg]);
+          }
+        }
+      }
+    }
   }
 
   onButtonClick(event: { type: string; timestamp: number }) {
@@ -596,14 +602,16 @@ export class TranscrWindowComponent
       };
 
       if (this.segmentIndex > -1) {
-        const annoSegment = this.currentLevel.items[
+        const annoSegment = this.currentLevel!.items[
           this.segmentIndex
-        ] as Segment;
+        ] as OctraAnnotationSegment;
         segment.start = 0;
 
         if (this.segmentIndex > 0) {
           segment.start = (
-            this.currentLevel.items[this.segmentIndex - 1] as Segment
+            this.currentLevel!.items[
+              this.segmentIndex - 1
+            ] as OctraAnnotationSegment
           ).time.samples;
         }
 
@@ -650,12 +658,12 @@ export class TranscrWindowComponent
 
       if (
         this.segmentIndex > -1 &&
-        this.currentLevel.items &&
+        this.currentLevel?.items &&
         this.segmentIndex < this.currentLevel.items.length
       ) {
         const segmentsLength = this.currentLevel.items.length;
 
-        let segment: Segment | undefined = undefined;
+        let segment: OctraAnnotationSegment | undefined = undefined;
 
         let startIndex = 0;
         let limitFunc: (i: number) => boolean = (i) => true;
@@ -676,7 +684,9 @@ export class TranscrWindowComponent
 
         if (appliedDirection !== '') {
           for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
-            const tempSegment = this.currentLevel.items[i] as Segment;
+            const tempSegment = this.currentLevel.items[
+              i
+            ] as OctraAnnotationSegment;
             const breakMarker = this.guidelines.markers.find(
               (a) => a.type === 'break'
             );
@@ -696,8 +706,11 @@ export class TranscrWindowComponent
 
           const start =
             this.segmentIndex > 0
-              ? (this.currentLevel.items[this.segmentIndex - 1] as Segment).time
-                  .samples
+              ? (
+                  this.currentLevel.items[
+                    this.segmentIndex - 1
+                  ] as OctraAnnotationSegment
+                ).time.samples
               : 0;
           const valueString =
             appliedDirection === 'right' ? 'entered next' : 'entered previous';
@@ -711,8 +724,11 @@ export class TranscrWindowComponent
             {
               start,
               length:
-                (this.currentLevel.items[this.segmentIndex] as Segment).time
-                  .samples - start,
+                (
+                  this.currentLevel.items[
+                    this.segmentIndex
+                  ] as OctraAnnotationSegment
+                ).time.samples - start,
             },
             'transcription window'
           );
@@ -722,7 +738,7 @@ export class TranscrWindowComponent
         if (this.segmentIndex > 0) {
           begin = (this.currentLevel.items[
             this.segmentIndex - 1
-          ] as Segment)!.time.clone();
+          ] as OctraAnnotationSegment)!.time.clone();
         } else {
           begin = new SampleUnit(0, this.audioManager.sampleRate);
         }
@@ -730,7 +746,9 @@ export class TranscrWindowComponent
         if (segment !== undefined) {
           this.transcript =
             (
-              this.currentLevel.items[this.segmentIndex] as Segment
+              this.currentLevel.items[
+                this.segmentIndex
+              ] as OctraAnnotationSegment
             ).getFirstLabelWithoutName('Speaker')?.value ?? '';
           // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(
@@ -758,11 +776,15 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.currentLevel.items[this.segmentIndex] as Segment;
+      const annoSegment = this.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
       segment.start = 0;
       if (this.segmentIndex > 0) {
         segment.start = (
-          this.currentLevel.items[this.segmentIndex - 1] as Segment
+          this.currentLevel!.items[
+            this.segmentIndex - 1
+          ] as OctraAnnotationSegment
         ).time.samples;
       }
 
@@ -803,11 +825,15 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.currentLevel.items[this.segmentIndex] as Segment;
+      const annoSegment = this.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
       segment.start = 0;
       if (this.segmentIndex > 0) {
         segment.start = (
-          this.currentLevel.items[this.segmentIndex - 1] as Segment
+          this.currentLevel!.items[
+            this.segmentIndex - 1
+          ] as OctraAnnotationSegment
         ).time.samples;
       }
 
@@ -848,11 +874,15 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.currentLevel.items[this.segmentIndex] as Segment;
+      const annoSegment = this.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
       segment.start = 0;
       if (this.segmentIndex > 0) {
         segment.start = (
-          this.currentLevel.items[this.segmentIndex - 1] as Segment
+          this.currentLevel!.items[
+            this.segmentIndex - 1
+          ] as OctraAnnotationSegment
         ).time.samples;
       }
 
@@ -920,12 +950,16 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.currentLevel.items[this.segmentIndex] as Segment;
+      const annoSegment = this.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
       segment.start = 0;
 
       if (this.segmentIndex > 0) {
         segment.start = (
-          this.currentLevel.items[this.segmentIndex - 1] as Segment
+          this.currentLevel!.items[
+            this.segmentIndex - 1
+          ] as OctraAnnotationSegment
         ).time.samples;
       }
 
@@ -974,11 +1008,15 @@ export class TranscrWindowComponent
     };
 
     if (this.segmentIndex > -1) {
-      const annoSegment = this.currentLevel.items[this.segmentIndex] as Segment;
+      const annoSegment = this.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
       segment.start = 0;
       if (this.segmentIndex > 0) {
         segment.start = (
-          this.currentLevel.items[this.segmentIndex - 1] as Segment
+          this.currentLevel!.items[
+            this.segmentIndex - 1
+          ] as OctraAnnotationSegment
         ).time.samples;
       }
 
@@ -1014,7 +1052,7 @@ export class TranscrWindowComponent
 
   onBoundaryClicked(sample: SampleUnit) {
     const i: number = getSegmentBySamplePosition(
-      this.currentLevel.items as Segment[],
+      this.currentLevel!.items as OctraAnnotationSegment[],
       sample
     );
 
@@ -1060,16 +1098,15 @@ export class TranscrWindowComponent
 
   saveTranscript() {
     const segStart = getSegmentBySamplePosition(
-      this.currentLevel.items as Segment[],
+      this.currentLevel?.items as OctraAnnotationSegment[],
       this.audiochunk.time.start.add(
         new SampleUnit(20, this.audioManager.sampleRate)
       )
     );
-    const currentSegment = this.currentLevel.items[
-      this.segmentIndex
-    ] as Segment;
 
-    this.tempSegments = [...(this.currentLevel.items as Segment[])];
+    this.tempSegments = [
+      ...(this.currentLevel?.items as OctraAnnotationSegment[]),
+    ];
     const html = this.editor.getRawText();
     // split text at the position of every boundary marker
     const segTexts: string[] = html.split(/\s?{[0-9]+}\s?/g);
@@ -1115,10 +1152,9 @@ export class TranscrWindowComponent
     if (this.tempSegments[segStart + segTexts.length - 1]) {
       (this.tempSegments[
         segStart + segTexts.length - 1
-      ] as Segment)!.changeFirstLabelWithoutName(
-        'Speaker',
-        segTexts[segTexts.length - 1]
-      );
+      ] as OctraAnnotationSegment)!
+        .clone()
+        .changeFirstLabelWithoutName('Speaker', segTexts[segTexts.length - 1]);
     }
   }
 
@@ -1160,7 +1196,9 @@ export class TranscrWindowComponent
    * checks if next segment is the last one and contains only a break.
    */
   public isNextSegmentLastAndBreak(segmentIndex: number) {
-    const nextSegment = this.currentLevel!.items[segmentIndex + 1] as Segment;
+    const nextSegment = this.currentLevel!.items[
+      segmentIndex + 1
+    ] as OctraAnnotationSegment;
     return (
       segmentIndex === this.currentLevel!.items.length - 2 &&
       (nextSegment!.getFirstLabelWithoutName('Speaker') ===

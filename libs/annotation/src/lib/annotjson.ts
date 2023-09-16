@@ -125,22 +125,25 @@ export class OAnnotJSON
     };
   }
 
-  static deserialize(jsonObject: IAnnotJSON): OAnnotJSON {
-    return new OAnnotJSON(
-      jsonObject.annotates,
-      jsonObject.name,
-      jsonObject.sampleRate,
-      jsonObject.levels,
-      jsonObject.links
-    );
+  static deserialize(jsonObject: IAnnotJSON): OAnnotJSON | undefined {
+    if(jsonObject) {
+      return new OAnnotJSON(
+        jsonObject.annotates,
+        jsonObject.name,
+        jsonObject.sampleRate,
+        jsonObject.levels,
+        jsonObject.links
+      );
+    }
+    return undefined
   }
 
-  deserialize(jsonObject: IAnnotJSON): OAnnotJSON {
+  deserialize(jsonObject: IAnnotJSON): OAnnotJSON | undefined {
     return OAnnotJSON.deserialize(jsonObject);
   }
 }
 
-export class OLevel<T> implements ILevel {
+export class OLevel<T extends OItem> implements ILevel {
   name = '';
   type: AnnotationLevelType;
   items: T[];
@@ -151,7 +154,9 @@ export class OLevel<T> implements ILevel {
     this.items = items ?? [];
   }
 
-  clone = () => new OLevel(this.name, this.type, this.items);
+  clone() {
+    return new OLevel(this.name, this.type, this.items.map(a => a.clone()));
+  }
 }
 
 export class OSegmentLevel<T extends OSegment>
@@ -274,6 +279,10 @@ export class OItem implements IItem, Serializable<IItem, OItem> {
   static deserialize(jsonObject: IItem): OItem {
     return new OItem(jsonObject.id, jsonObject.labels);
   }
+
+  clone(id?: number) {
+    return new OItem(id ?? this.id, [...this.labels]);
+  }
 }
 
 export class OSegment
@@ -307,13 +316,22 @@ export class OSegment
     return OSegment.deserialize(jsonObject);
   }
 
-  static override deserialize(jsonObject: ISegment, sampleRate?: number): OSegment {
+  static override deserialize(
+    jsonObject: ISegment,
+    sampleRate?: number
+  ): OSegment {
     return new OSegment(
       jsonObject.id,
       jsonObject.sampleStart,
       jsonObject.sampleDur,
       jsonObject.labels.map((a) => OLabel.deserialize(a))
     );
+  }
+
+  override clone(id?: number) {
+    return new OSegment(id ?? this.id, this.sampleStart, this.sampleDur, [
+      ...this.labels,
+    ]);
   }
 }
 
@@ -339,6 +357,10 @@ export class OEvent extends OItem implements Serializable<IEvent, OEvent> {
 
   static override deserialize(jsonObject: IEvent): OEvent {
     return new OEvent(jsonObject.id, jsonObject.samplePoint, jsonObject.labels);
+  }
+
+  override clone(id?: number) {
+    return new OEvent(id ?? this.id, this.samplePoint, [...this.labels]);
   }
 }
 
@@ -389,6 +411,10 @@ export class OLink implements ILink, Serializable<ILink, OLink> {
 
   static deserialize(jsonObject: ILink): OLink {
     return new OLink(jsonObject.fromID, jsonObject.toID);
+  }
+
+  clone(){
+    return new OLink(this.fromID, this.toID);
   }
 }
 

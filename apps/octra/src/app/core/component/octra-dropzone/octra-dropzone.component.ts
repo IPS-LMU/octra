@@ -10,10 +10,10 @@ import {
   IFile,
   ImportResult,
   OAnnotJSON,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OLabel,
   OSegment,
-  Segment,
 } from '@octra/annotation';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
@@ -193,7 +193,8 @@ export class OctraDropzoneComponent extends DefaultComponent {
                       file.status = 'valid';
                       for (const level of importResult.annotjson.levels) {
                         if (
-                          level instanceof OctraAnnotationSegmentLevel<Segment>
+                          level instanceof
+                          OctraAnnotationSegmentLevel<OctraAnnotationSegment>
                         ) {
                           if (level.items[0].sampleStart !== 0) {
                             let temp = [];

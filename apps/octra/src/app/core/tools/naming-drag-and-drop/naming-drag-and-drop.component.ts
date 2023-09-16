@@ -8,7 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Subject } from 'rxjs';
-import { OEvent, OItem, Segment } from '@octra/annotation';
+import { OctraAnnotationSegment, OEvent, OItem } from '@octra/annotation';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { DefaultComponent } from '../../component/default.component';
 
@@ -31,7 +31,7 @@ export class NamingDragAndDropComponent extends DefaultComponent {
 
   @ViewChild('list', { static: true }) list!: ElementRef;
   @Input() fileName = '';
-  @Input() firstSegment?: OEvent | OItem | Segment;
+  @Input() firstSegment?: OEvent | OItem | OctraAnnotationSegment;
 
   @Output() namingConventionchanged: Subject<string> = new Subject<string>();
 
@@ -55,7 +55,7 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     let result = '';
     if (
       this.firstSegment !== undefined &&
-      this.firstSegment instanceof Segment
+      this.firstSegment instanceof OctraAnnotationSegment
     ) {
       for (const resultConvention of this.resultConvention) {
         const item = resultConvention;

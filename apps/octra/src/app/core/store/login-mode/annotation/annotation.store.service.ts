@@ -10,15 +10,16 @@ import {
   SubscriptionManager,
 } from '@octra/utilities';
 import {
+  AnnotationAnySegment,
   AnnotationLevelType,
   ASRContext,
   OAnnotJSON,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OEvent,
   OItem,
-  Segment,
   TextConverter,
 } from '@octra/annotation';
 import { AudioService } from '../../../shared/service';
@@ -45,7 +46,7 @@ export class AnnotationStoreService {
     return this._feedback;
   }
 
-  get transcript(): OctraAnnotation<ASRContext, Segment> | undefined {
+  get transcript(): OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined {
     return this._transcript;
   }
 
@@ -145,9 +146,9 @@ export class AnnotationStoreService {
     }
     return undefined;
   });
-  private _currentLevel?: OctraAnnotationAnyLevel<Segment>;
+  private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
 
-  get currentLevel(): OctraAnnotationAnyLevel<Segment> | undefined {
+  get currentLevel(): OctraAnnotationAnyLevel<OctraAnnotationSegment> | undefined {
     return this._currentLevel;
   }
 
@@ -167,7 +168,7 @@ export class AnnotationStoreService {
   transcript$ = this.store.select(
     (state: RootState) => getModeState(state)?.transcript
   );
-  private _transcript?: OctraAnnotation<ASRContext, Segment>;
+  private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
 
   transcriptString$ = this.transcript$.pipe(
     map((transcript) => {
@@ -177,7 +178,11 @@ export class AnnotationStoreService {
             this.audio.audioManager.resource.name,
             this.audio.audioManager.resource.name.replace(/\.[^.]+$/g, ''),
             this.audio.audiomanagers[0].resource.info.sampleRate,
-            transcript.levels.map((a) => a.serialize())
+            transcript.levels.map((a) =>
+              a.serialize(
+                this.audio.audioManager.resource.info.duration.clone()
+              )
+            )
           ),
           this.audio.audioManager.resource.getOAudioFile(),
           transcript.selectedLevelIndex!
@@ -293,7 +298,7 @@ export class AnnotationStoreService {
   changeComment(comment: string) {
     this.store.dispatch(
       LoginModeActions.changeComment.do({
-        mode: LoginMode.ONLINE,
+        mode: this.appStoreService.useMode!,
         comment,
       })
     );
@@ -706,7 +711,7 @@ export class AnnotationStoreService {
   }
 
   public validateAll(
-    currentLevel: OctraAnnotationSegmentLevel<Segment<ASRContext>>,
+    currentLevel: OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>,
     projectSettings: ProjectSettings,
     guidelines: any
   ) {
@@ -820,7 +825,7 @@ export class AnnotationStoreService {
     }
   }
 
-  overwriteTranscript(transcript: OctraAnnotation<ASRContext, Segment>) {
+  overwriteTranscript(transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>) {
     this.store.dispatch(
       AnnotationActions.overwriteTranscript.do({
         transcript,
@@ -830,13 +835,37 @@ export class AnnotationStoreService {
     );
   }
 
-  changeCurrentItemById(id: number, item: OItem | OEvent | Segment) {
+  changeCurrentItemById(id: number, item: OItem | OEvent | OctraAnnotationSegment) {
     this.store.dispatch(
       AnnotationActions.changeCurrentItemById.do({
         id,
         item,
-        mode: this.appStoreService.useMode!
+        mode: this.appStoreService.useMode!,
       })
     );
+  }
+
+  changeCurrentLevelItems(items: AnnotationAnySegment[]) {
+    this.store.dispatch(AnnotationActions.changeCurrentLevelItems.do({
+      items,
+      mode: this.appStoreService.useMode!
+    }));
+  }
+
+  removeCurrentLevelItems(items: {index?: number, id?: number}[], silenceCode?: string, mergeTranscripts?: boolean){
+    this.store.dispatch(AnnotationActions.removeCurrentLevelItems.do({
+      items,
+      mode: this.appStoreService.useMode!,
+      removeOptions: {
+        silenceCode, mergeTranscripts
+      }
+    }));
+  }
+
+  addCurrentLevelItems(items: AnnotationAnySegment[]){
+    this.store.dispatch(AnnotationActions.addCurrentLevelItems.do({
+      items,
+      mode: this.appStoreService.useMode!
+    }));
   }
 }

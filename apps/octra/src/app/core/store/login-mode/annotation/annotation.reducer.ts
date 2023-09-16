@@ -10,14 +10,17 @@ import {
   ASRContext,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OLabel,
-  Segment,
 } from '@octra/annotation';
 import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
-  transcript: new OctraAnnotation<ASRContext, Segment<ASRContext>>(),
+  transcript: new OctraAnnotation<
+    ASRContext,
+    OctraAnnotationSegment<ASRContext>
+  >(),
   savingNeeded: false,
   isSaving: false,
   audio: {
@@ -61,7 +64,7 @@ export class AnnotationStateReducers {
         }
       ),
       on(
-        AnnotationActions.loadSegments.success,
+        AnnotationActions.initTranscriptionService.success,
         (state: AnnotationState, { transcript, mode, feedback }) => {
           if (this.mode === mode) {
             return {
@@ -163,7 +166,7 @@ export class AnnotationStateReducers {
         (state: AnnotationState, { levelType, mode, audioDuration }) => {
           if (this.mode === mode) {
             let level:
-              | OctraAnnotationAnyLevel<Segment<ASRContext>>
+              | OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>
               | undefined = undefined;
             if (levelType === AnnotationLevelType.SEGMENT) {
               level = state.transcript.createSegmentLevel(
@@ -214,9 +217,7 @@ export class AnnotationStateReducers {
         (state: AnnotationState, annotations) => {
           return {
             ...state,
-            transcript: {
-              ...(annotations as any)[this.mode],
-            },
+            transcript: (annotations as any)[this.mode]
           };
         }
       ),
@@ -227,13 +228,59 @@ export class AnnotationStateReducers {
           savingNeeded,
         })
       ),
+      on(AnnotationActions.changeCurrentLevelItems.do, (state: AnnotationState, {items, mode}) => {
+        if (this.mode === mode) {
+          const currentLevel = state.transcript.currentLevel;
+
+          if (currentLevel) {
+            for (const item of items) {
+              console.log(`change ${item.id} to ${(item as any).time.seconds}`);
+              state.transcript = state.transcript.clone().changeCurrentItemById(item.id, item);
+            }
+          }
+        }
+
+        return state;
+      }),
+      on(AnnotationActions.addCurrentLevelItems.do, (state: AnnotationState, {items, mode}) => {
+        if (this.mode === mode) {
+          const currentLevel = state.transcript.currentLevel;
+
+          if (currentLevel) {
+            for (const item of items) {
+              state.transcript = state.transcript.clone().addItemToCurrentLevel((item as any).time, item.labels, (item as any).context);
+            }
+          }
+        }
+
+        return state;
+      }),
+      on(AnnotationActions.removeCurrentLevelItems.do, (state: AnnotationState, {items, mode, removeOptions}) => {
+        if (this.mode === mode) {
+          const currentLevel = state.transcript.currentLevel;
+
+          if (currentLevel) {
+            for (const item of items) {
+              if(item.id !== undefined && item.id !== null) {
+                state.transcript = state.transcript.clone().removeItemById(item.id, removeOptions?.silenceCode, removeOptions?.mergeTranscripts);
+              } else if(item.index !== undefined && item.index !== null) {
+                state.transcript = state.transcript.clone().removeItemByIndex(item.index, removeOptions?.silenceCode, removeOptions?.mergeTranscripts);
+              } else {
+                console.error(`removeCurrentLevelItems: Can't remove item, missing index or ID.`);
+              }
+            }
+          }
+        }
+
+        return state;
+      }),
       on(
         AnnotationActions.changeCurrentItemById.do,
         (state: AnnotationState, { id, item, mode }) => {
           if (mode === this.mode) {
             return {
               ...state,
-              transcript: state.transcript.changeCurrentItemById(id, item),
+              transcript: state.transcript.clone().changeCurrentItemById(id, item),
             };
           }
 
@@ -322,14 +369,14 @@ export class AnnotationStateReducers {
 
             if (segmentIndex > -1) {
               const segment = (
-                currentLevel as OctraAnnotationSegmentLevel<Segment>
+                currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>
               ).level.items[segmentIndex];
 
               return {
                 ...state,
                 transcript: state.transcript.changeCurrentItemByIndex(
                   segmentIndex,
-                  Segment.deserialize<ASRContext>({
+                  OctraAnnotationSegment.deserialize<ASRContext>({
                     ...segment,
                     id: segment.id,
                     labels: result

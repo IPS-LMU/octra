@@ -6,7 +6,7 @@ import { AudioChunk, AudioManager } from '@octra/web-media';
 import {
   ASRContext,
   OctraAnnotationAnyLevel,
-  Segment,
+  OctraAnnotationSegment,
 } from '@octra/annotation';
 
 export interface OctraEditorRequirements {
@@ -83,10 +83,10 @@ export abstract class OCTRAEditor extends DefaultComponent {
 
   protected checkIfSmallAudioChunk(
     audioChunk: AudioChunk,
-    currentLevel: OctraAnnotationAnyLevel<Segment<ASRContext>>
+    currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>
   ) {
     const emptySegmentIndex = currentLevel.items.findIndex((a) => {
-      return a instanceof Segment
+      return a instanceof OctraAnnotationSegment
         ? a.getFirstLabelWithoutName('Speaker')?.value === undefined ||
             a.getFirstLabelWithoutName('Speaker')?.value === ''
         : false;

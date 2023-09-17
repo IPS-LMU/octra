@@ -149,7 +149,7 @@ export class PraatTextgridConverter extends Converter {
                     // read items
                     let match = lines[i].match(/item \[([0-9]+)]:/);
 
-                    while (lines[i] !== '' && (match === null || match === undefined) && i < lines.length) {
+                    while (i < lines.length && lines[i] !== '' && (match === null || match === undefined)) {
                       let isActive = true;
                       test = lines[i].match(/intervals \[[0-9]+]:/);
                       if ((test === null || test === undefined)) {
@@ -240,7 +240,8 @@ export class PraatTextgridConverter extends Converter {
                       }
 
                       segNum++;
-                      match = lines[i].match(/item \[([0-9]+)]:/);
+
+                      match = i < lines.length ? lines[i].match(/item \[([0-9]+)]:/) : null;
                     }
                     segNum++;
                     i--;

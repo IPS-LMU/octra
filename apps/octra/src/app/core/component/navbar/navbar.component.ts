@@ -28,6 +28,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { LoginMode } from '../../store';
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import { AuthenticationStoreService } from '../../store/authentication';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-navigation',
@@ -104,7 +105,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public bugService: BugReportService,
     public annotationStoreService: AnnotationStoreService,
     public authStoreService: AuthenticationStoreService,
-    public audio: AudioService
+    public audio: AudioService,
+    public api: OctraAPIService
   ) {
     super();
   }

@@ -955,6 +955,7 @@ export class IDBEffects {
         AnnotationActions.removeAnnotationLevel.do,
         AnnotationActions.updateASRSegmentInformation.do,
         AnnotationActions.overwriteTranscript.do,
+        AnnotationActions.addCurrentLevelItems.do,
         AnnotationActions.removeCurrentLevelItems.do,
         AnnotationActions.changeCurrentLevelItems.do,
         AnnotationActions.changeCurrentItemById.do
@@ -970,14 +971,10 @@ export class IDBEffects {
           return this.idbService
             .saveAnnotation(
               action.mode,
-              new OAnnotJSON(
+              modeState.transcript.serialize(
                 modeState.audio.fileName,
-                modeState.audio.fileName.replace(/\.[^.]+/g, ''),
-                modeState.audio.sampleRate,
-                modeState.transcript.levels.map((a) =>
-                  a.serialize(this.audio.audioManager.resource.info.duration)
-                ),
-                modeState.transcript.links.map((a) => a.link)
+                this.audio.audioManager.resource.info.sampleRate,
+                this.audio.audioManager.resource.info.duration
               )
             )
             .pipe(

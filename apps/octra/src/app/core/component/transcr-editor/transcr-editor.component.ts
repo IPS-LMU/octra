@@ -260,7 +260,6 @@ export class TranscrEditorComponent
       $event as any,
       Date.now()
     );
-    console.log(shortcutInfo?.shortcut);
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
       if (
@@ -685,7 +684,6 @@ export class TranscrEditorComponent
       Object.keys(obj).includes('markers') &&
       obj['markers'].currentValue !== obj['markers'].previousValue
     ) {
-      console.log('markers changed');
       if (obj['markers'].currentValue === undefined) {
         this.markers = [];
       }
@@ -696,7 +694,6 @@ export class TranscrEditorComponent
       obj['easymode'].previousValue !== obj['easymode'].currentValue &&
       !obj['easymode'].firstChange
     ) {
-      console.log('easy mode changed');
       renew = true;
     }
     if (
@@ -724,7 +721,6 @@ export class TranscrEditorComponent
     }
 
     if (renew) {
-      console.log('RENEW TRANSCR EDITOR');
       this.initialize();
       this.initPopover();
     }
@@ -776,7 +772,6 @@ export class TranscrEditorComponent
           button.addEventListener('click', (event: MouseEvent) => {
             onClick(event, button);
           });
-          console.log(button.innerHTML);
           return button;
         }
         return c.container.children[0];

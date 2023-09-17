@@ -1,5 +1,4 @@
 import { NavigationExtras } from '@angular/router';
-import { EmailBugReporter } from './core/obj/BugAPI/EmailBugReporter';
 import { OggFormat, WavFormat } from '@octra/web-media';
 import {
   AnnotJSONConverter,
@@ -21,8 +20,6 @@ declare let octraLastUpdated: string;
 export class AppInfo {
   public static readonly audioformats = [new WavFormat(), new OggFormat()];
 
-  public static readonly bugreporters = [new EmailBugReporter()];
-
   public static readonly converters: Converter[] = [
     new AnnotJSONConverter(),
     new PraatTableConverter(),
@@ -42,8 +39,6 @@ export class AppInfo {
   static readonly lastUpdate = octraLastUpdated;
   static readonly manualURL =
     'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
-
-  static readonly debugging = true;
 
   static readonly maxAudioFileSize = 3000;
 

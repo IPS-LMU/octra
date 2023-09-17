@@ -660,11 +660,7 @@
                 Feedback
                 -->
                 <li
-                        *ngIf="
-            settService.appSettings !== undefined &&
-            settService.appSettings.octra.bugreport !== undefined &&
-            settService.appSettings.octra.bugreport.enabled
-          "
+                        *ngIf="api.appFeatures?.send_feedback"
                         class="nav-item"
                 >
                     <a (mouseup)="openBugReport()" class="nav-link">

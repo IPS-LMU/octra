@@ -34,7 +34,6 @@ export class AuthenticationComponent extends DefaultComponent {
 
   showForgetPassword = false;
   showSignup = false;
-  signUpLoading = false;
   passwordResetRequested = false;
   email?: string;
 

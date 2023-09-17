@@ -10,6 +10,7 @@ import {
   OLabel,
   OLevel,
   OLink,
+  OSegment,
   OSegmentLevel,
 } from './annotjson';
 import {
@@ -17,6 +18,7 @@ import {
   OctraAnnotationEvent,
   OctraAnnotationSegment,
 } from './octraAnnotationSegment';
+import { last } from '@octra/utilities';
 
 export class OctraAnnotationLink {
   get id(): number {
@@ -293,8 +295,12 @@ export class OctraAnnotation<
           const index = items.findIndex((a) => a.time.samples > time!.samples);
 
           if (index > -1) {
-            const oldLabels = index === 0 ? [new OLabel(level.name, '')] : [...items[index].labels];
-            items[index].labels = index === 0 ? items[index].labels : [new OLabel(level.name, '')];
+            const oldLabels =
+              index === 0
+                ? [new OLabel(level.name, '')]
+                : [...items[index].labels];
+            items[index].labels =
+              index === 0 ? items[index].labels : [new OLabel(level.name, '')];
             items = [
               ...items,
               new OctraAnnotationSegment(
@@ -676,13 +682,30 @@ export class OctraAnnotationSegmentLevel<
   }
 
   override serialize(lastSegmentTime: SampleUnit): any {
-    return {
-      items: this.level.items.map((a) =>
-        a.serializeToOSegment(lastSegmentTime.samples)
-      ),
+    let start = 0;
+    const res = {
+      items: this.level.items.map((a) => {
+        const result = a.serializeToOSegment(start);
+        start += a.time.samples;
+
+        return result;
+      }),
       name: this.level.name,
       type: this.type,
     };
+    const lastItem = last(res.items)!;
+    if (lastItem.sampleStart + lastItem.sampleDur < lastSegmentTime.samples) {
+      res.items.push(
+        new OSegment(
+          1000000000,
+          lastItem.sampleStart + lastItem.sampleDur,
+          lastSegmentTime.samples - lastItem.sampleStart + lastItem.sampleDur,
+          [new OLabel(this.name, '')]
+        )
+      );
+    }
+
+    return res;
   }
 
   clone() {

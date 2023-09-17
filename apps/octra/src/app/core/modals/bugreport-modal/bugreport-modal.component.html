@@ -33,7 +33,7 @@
     </div>
 
     <form>
-      <div class="row">
+      <div class="row" *ngIf="(authStoreService.me$ | async) === undefined">
         <div class="col-6">
           <div class="form-floating mb-3">
             <input
@@ -159,7 +159,7 @@
             <span>{{ 'g.protocol' | transloco }}:</span>
             <textarea
               #bgProtocol
-              [innerHTML]="visible ? bugService.getText() : ''"
+              [innerHTML]="bugService.pkgText"
               class="form-control"
               disabled
               id="bgProtocol"

@@ -1,25 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModal } from '../types';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalOptions,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AuthenticationStoreService } from '../../store/authentication';
 
 @Component({
   selector: 'octra-bugreport-modal',
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BugreportModalComponent extends OctraModal implements OnInit {
   public static options: NgbModalOptions = {
@@ -49,10 +39,9 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
   }
 
   constructor(
-    modalService: NgbModal,
     private appStorage: AppStorageService,
     public bugService: BugReportService,
-    private settService: SettingsService,
+    public authStoreService: AuthenticationStoreService,
     private cd: ChangeDetectorRef,
     protected override activeModal: NgbActiveModal
   ) {
@@ -64,6 +53,9 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
       username: this.appStorage.snapshot.authentication.me?.username ?? '',
       email: this.appStorage.snapshot.authentication.me?.email ?? '',
     };
+    this.bugService.getPackage();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   onHidden() {
@@ -82,10 +74,6 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
           this.profile.email,
           this.bgdescr,
           this.sendProObj,
-          {
-            auth_token: this.settService.appSettings.octra.bugreport.auth_token,
-            url: this.settService.appSettings.octra.bugreport.url,
-          },
           this.screenshots
         )
         .subscribe(

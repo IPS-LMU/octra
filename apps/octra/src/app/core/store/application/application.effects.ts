@@ -681,7 +681,8 @@ export class ApplicationEffects {
 
   private initConsoleLogging() {
     // overwrite console.log
-    if (!AppInfo.debugging) {
+    if (environment.debugging.logging.console) {
+      console.log('ACTIVATED');
       const oldLog = console.log;
       const serv = this.bugService;
       (() => {

@@ -7,7 +7,7 @@ import {
 } from './Converter';
 import { contains } from '@octra/utilities';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class CTMConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'CTM';

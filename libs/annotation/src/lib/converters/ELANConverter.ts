@@ -8,7 +8,7 @@ import {
 } from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { DateTime } from 'luxon';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';

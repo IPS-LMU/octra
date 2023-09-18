@@ -1,6 +1,7 @@
-import { AudioInfo, OAudiofile } from './audio-info';
+import { AudioInfo } from './audio-info';
 import { MediaResource } from '../media-resource';
 import { SourceType } from '../types';
+import { OAudiofile } from '@octra/media';
 
 export class AudioResource extends MediaResource {
   private _info: AudioInfo;

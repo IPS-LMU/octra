@@ -6,7 +6,7 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import { IAnnotJSON, OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export interface Bundle {
   ssffFiles: {

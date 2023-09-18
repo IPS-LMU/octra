@@ -13,7 +13,7 @@ import {
   OSegment,
   OSegmentLevel,
 } from '../annotjson';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class PartiturConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'BASPartitur';

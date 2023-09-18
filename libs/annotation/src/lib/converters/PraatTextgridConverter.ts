@@ -14,7 +14,7 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { contains } from '../functions';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class PraatTextgridConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'TextGrid';

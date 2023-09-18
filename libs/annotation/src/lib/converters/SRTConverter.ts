@@ -6,7 +6,7 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class SRTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'SRT';

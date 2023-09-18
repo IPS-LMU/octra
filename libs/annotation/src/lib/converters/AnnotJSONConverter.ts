@@ -6,7 +6,7 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import { OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 export class AnnotJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'AnnotJSON';

@@ -18,7 +18,8 @@ import {
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
-import { AudioManager, fileListToArray, OAudiofile } from '@octra/web-media';
+import { AudioManager, fileListToArray } from '@octra/web-media';
+import { OAudiofile } from '@octra/media';
 
 @Component({
   selector: 'octra-dropzone',

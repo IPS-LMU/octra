@@ -1,8 +1,7 @@
 import { OLabel, OSegment } from './annotjson';
 import { Converter, IFile } from './converters';
-import { SampleUnit } from '@octra/media';
+import { OAudiofile, SampleUnit } from '@octra/media';
 import { OctraAnnotationSegment } from './octraAnnotationSegment';
-import { OAudiofile } from '@octra/web-media';
 
 export function convertFromSupportedConverters(
   converters: Converter[],

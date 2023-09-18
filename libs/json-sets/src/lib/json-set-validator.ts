@@ -31,11 +31,18 @@ export class JSONSetValidator {
   }
 }
 
+export interface IFile {
+  name: string;
+  size: number;
+  type: string;
+}
+
 export class FileJSONSetValidator extends JSONSetValidator {
   override validate(
-    set: File[],
+    set: IFile[],
     setSchema: JSONFileSetDefinition
   ): JSONFileSetValidationError[] {
+
     const results: {
       statement: JSONSetStatement;
       validationResults: {
@@ -59,7 +66,7 @@ export class FileJSONSetValidator extends JSONSetValidator {
   }
 
   override __validate(
-    target: File,
+    target: IFile,
     constraints: JSONSETFileConstraints,
     path: string
   ): JSONFileSetValidationError[] {
@@ -165,7 +172,7 @@ export class FileJSONSetValidator extends JSONSetValidator {
   }
 
   private getValidFileNamesOfSelection(
-    pool: File[],
+    pool: IFile[],
     statement: JSONFileSetStatement,
     path: string
   ) {

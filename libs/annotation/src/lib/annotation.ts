@@ -18,7 +18,6 @@ import {
   OctraAnnotationEvent,
   OctraAnnotationSegment,
 } from './octraAnnotationSegment';
-import { last } from '@octra/utilities';
 
 export class OctraAnnotationLink {
   get id(): number {
@@ -693,7 +692,7 @@ export class OctraAnnotationSegmentLevel<
       name: this.level.name,
       type: this.type,
     };
-    const lastItem = last(res.items)!;
+    const lastItem = res.items[res.items.length - 1];
     if (lastItem.sampleStart + lastItem.sampleDur < lastSegmentTime.samples) {
       res.items.push(
         new OSegment(

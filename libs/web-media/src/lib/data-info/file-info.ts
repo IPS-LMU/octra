@@ -110,8 +110,26 @@ export class FileInfo extends DataInfo {
   }
 
   private static getMimeTypeByExtension(extension: string) {
-    if (['mp4'].includes(extension)) {
-      return 'video/mp4';
+    switch (extension.replace(/\./g, '')) {
+      // audio
+      case 'wav':
+        return 'audio/wave';
+      case 'mp3':
+        return 'audio/mpeg';
+      case 'ogg':
+        return 'audio/ogg';
+      case 'opus':
+        return 'audio/opus';
+      // video
+      case 'mp4':
+        return 'video/mp4';
+      case 'png':
+        return 'image/png';
+      case 'jpg':
+        return 'image/jpg';
+      //document
+      case 'pdf':
+        return 'application/pdf';
     }
     return 'text/plain';
   }

@@ -1,6 +1,4 @@
-export interface FileMetaData {}
-
-export interface AudioFileMetaData extends FileMetaData {
+export interface AudioFileMetaData {
   bitRate?: number;
   numberOfChannels?: number;
   duration?: { samples: number; seconds: number };

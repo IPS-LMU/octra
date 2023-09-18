@@ -13,12 +13,12 @@
         "tsConfig": "libs/json-sets/tsconfig.lib.json",
         "entryFile": "libs/json-sets/src/index.ts",
         "project": "libs/json-sets/package.json",
-        "compiler": "babel",
+        "compiler": "tsc",
         "external": ["typescript"],
-        "format": ["cjs", "esm"],
+        "format": ["cjs"],
         "assets": [
-          "libs/json-sets/LICENSE.txt",
-          "libs/json-sets/README.md"
+          "libs/json-sets/src/LICENSE.txt",
+          "libs/json-sets/src/README.md"
         ]
       }
     },

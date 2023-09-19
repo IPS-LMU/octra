@@ -111,7 +111,7 @@ export class ELANConverter extends Converter {
             ALIGNABLE_ANNOTATION: {
               _ANNOTATION_ID: `a${aidCounter}`,
               ANNOTATION_VALUE:
-                segment.labels.find((a) => a.name !== 'Speaker')?.value ?? '',
+                segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
               _TIME_SLOT_REF1: `ts${tsidCounter - 1}`,
               _TIME_SLOT_REF2: `ts${tsidCounter}`,
             },

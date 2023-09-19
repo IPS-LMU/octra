@@ -6,7 +6,6 @@
   "targets": {
     "build": {
       "executor": "@nrwl/rollup:rollup",
-      "dependsOn": ["media"],
       "outputs": [
         "{options.outputPath}"
       ],

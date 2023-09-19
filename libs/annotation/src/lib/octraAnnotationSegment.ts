@@ -49,6 +49,10 @@ export class OctraAnnotationEvent
       ...this.labels,
     ]);
   }
+
+  getFirstLabelWithoutName(notName: string) {
+    return this.labels?.find((a) => a.name !== notName);
+  }
 }
 
 export class OctraAnnotationSegment<T extends ASRContext = ASRContext>

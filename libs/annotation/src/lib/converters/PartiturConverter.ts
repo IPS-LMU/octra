@@ -70,9 +70,9 @@ LBD:\n`;
       let ortCounter = 0;
 
       for (const item of annotation.levels[levelnum].items as OSegment[]) {
-        const words = item.labels
-          .filter((a) => a.name !== 'Speaker')[0]
-          .value.split(' ');
+        const words = (
+          item.getFirstLabelWithoutName('Speaker')?.value ?? ''
+        ).split(' ');
         ort = ort.concat(words);
         let trnLine = `TRN: ${item.sampleStart} ${item.sampleDur} `;
 
@@ -84,7 +84,7 @@ LBD:\n`;
         }
         ortCounter += words.length;
         trnLine += ` ${
-          item.labels.filter((a) => a.name !== 'Speaker')[0].value
+          item.getFirstLabelWithoutName('Speaker')?.value ?? ''
         }\n`;
         trn.push(trnLine);
       }

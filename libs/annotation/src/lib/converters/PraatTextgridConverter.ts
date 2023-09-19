@@ -99,7 +99,7 @@ export class PraatTextgridConverter extends Converter {
             `            xmin = ${secondsStart} \n` +
             `            xmax = ${secondsEnd} \n` +
             `            text = "${
-              segment.labels.find((a) => a.name !== 'Speaker')?.value
+              segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
             }" \n`;
         }
       }

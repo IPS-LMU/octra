@@ -63,7 +63,8 @@ export class CTMConverter extends Converter {
     const level = annotation.levels[levelnum];
 
     for (const levelItem of level.items as OSegment[]) {
-      const transcript = levelItem.labels[0].value;
+      const transcript =
+        levelItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
       const start =
         Math.round((levelItem.sampleStart! / audiofile.sampleRate) * 100) / 100;
       const duration =

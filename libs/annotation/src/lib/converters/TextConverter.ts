@@ -65,7 +65,8 @@ export class TextConverter extends Converter {
       if (level.type === 'SEGMENT') {
         for (let j = 0; j < level.items.length; j++) {
           const item = level.items[j] as OSegment;
-          const transcript = item.labels[0].value;
+          const transcript =
+            item.getFirstLabelWithoutName('Speaker')?.value ?? '';
 
           result += transcript;
           if (j < level.items.length - 1) {

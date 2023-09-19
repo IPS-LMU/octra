@@ -6,7 +6,6 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import {
-  ISegment,
   OAnnotJSON,
   OAnyLevel,
   OLabel,
@@ -47,14 +46,13 @@ export class PraatTableConverter extends Converter {
     const addEntry = (
       res: string,
       level: OAnyLevel<OSegment>,
-      segment: ISegment
+      segment: OSegment
     ) => {
       const tmin = segment.sampleStart / annotation.sampleRate;
       const tmax =
         (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
-      const transcript = segment.labels.find(
-        (a) => a.name !== 'Speaker'
-      )?.value;
+      const transcript =
+        segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
 
       return `${res}${tmin}\t${level.name}\t${transcript}\t${tmax}\n`;
     };
@@ -64,8 +62,8 @@ export class PraatTableConverter extends Converter {
     for (const level of annotation.levels) {
       // export segments only
       if (level.type === 'SEGMENT') {
-        for (const segment of level.items) {
-          result = addEntry(result, level, segment as ISegment);
+        for (const segment of level.items as OSegment[]) {
+          result = addEntry(result, level, segment);
         }
       }
     }

@@ -126,7 +126,7 @@ export class OAnnotJSON
   }
 
   static deserialize(jsonObject: IAnnotJSON): OAnnotJSON | undefined {
-    if(jsonObject) {
+    if (jsonObject) {
       return new OAnnotJSON(
         jsonObject.annotates,
         jsonObject.name,
@@ -135,7 +135,7 @@ export class OAnnotJSON
         jsonObject.links
       );
     }
-    return undefined
+    return undefined;
   }
 
   deserialize(jsonObject: IAnnotJSON): OAnnotJSON | undefined {
@@ -155,7 +155,11 @@ export class OLevel<T extends OItem> implements ILevel {
   }
 
   clone() {
-    return new OLevel(this.name, this.type, this.items.map(a => a.clone()));
+    return new OLevel(
+      this.name,
+      this.type,
+      this.items.map((a) => a.clone())
+    );
   }
 }
 
@@ -278,6 +282,10 @@ export class OItem implements IItem, Serializable<IItem, OItem> {
 
   static deserialize(jsonObject: IItem): OItem {
     return new OItem(jsonObject.id, jsonObject.labels);
+  }
+
+  getFirstLabelWithoutName(notName: string) {
+    return this.labels?.find((a) => a.name !== notName);
   }
 
   clone(id?: number) {
@@ -413,7 +421,7 @@ export class OLink implements ILink, Serializable<ILink, OLink> {
     return new OLink(jsonObject.fromID, jsonObject.toID);
   }
 
-  clone(){
+  clone() {
     return new OLink(this.fromID, this.toID);
   }
 }

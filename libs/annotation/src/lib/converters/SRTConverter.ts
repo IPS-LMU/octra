@@ -86,7 +86,8 @@ export class SRTConverter extends Converter {
       let counter = 1;
       if (level.type === 'SEGMENT') {
         for (const item of level.items as OSegment[]) {
-          const transcript = item.labels[0].value;
+          const transcript =
+            item.getFirstLabelWithoutName('Speaker')?.value ?? '';
           const start = this.getTimeStringFromSamples(
             item.sampleStart,
             annotation.sampleRate

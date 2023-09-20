@@ -21,7 +21,7 @@
       "@octra/annotation": ["libs/annotation/src/index.ts"],
       "@octra/api-types": ["../octra-backend/extern/libs/api-types"],
       "@octra/assets": ["libs/assets/src/index.ts"],
-      "@octra/json-sets": ["libs/json-sets"],
+      "@octra/json-sets": ["libs/json-sets/src/index.ts"],
       "@octra/media": ["libs/media/src/index.ts"],
       "@octra/ngx-components": ["libs/ngx-components/src/index.ts"],
       "@octra/ngx-octra-api": ["../octra-backend/extern/libs/ngx-octra-api"],

@@ -1615,7 +1615,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         this.av.currentLevel.items.length > 0
                       ) {
                         const sceneSegment = this.av.currentLevel.items.find(
-                          (a) => a.id === segment.id
+                          (a:any) => a.id === segment.id
                         );
 
                         if (!(sceneSegment instanceof OctraAnnotationSegment)) {
@@ -1937,7 +1937,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         lineInterval.from *
         (this.settings.lineheight + this.settings.margin.top);
       const sceneSegment = this.av.currentLevel.items.find(
-        (a) => a.id === segment.id
+        (a:any) => a.id === segment.id
       );
       if (
         sceneSegment === undefined ||

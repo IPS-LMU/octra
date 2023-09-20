@@ -11,6 +11,9 @@ export class AuthenticationStoreService {
   constructor(private store: Store<RootState>) {}
 
   me$ = this.store.select((store: RootState) => store.authentication.me);
+  serverOnline$ = this.store.select(
+    (store: RootState) => store.authentication.serverOnline
+  );
 
   authenticated$ = this.store.select(
     (store: RootState) => store.authentication.authenticated

@@ -312,7 +312,7 @@ export class AnnotationEffects {
           if (state.application.mode === LoginMode.LOCAL) {
             this.routingService
               .navigate(
-                'reload aufio local',
+                'reload audio local',
                 ['/intern/transcr/reload-file'],
                 AppInfo.queryParamsHandling
               )

@@ -45,6 +45,7 @@ export class AudioResource extends MediaResource {
     result.url = this._info.url;
     result.name = this._info.name;
     result.arraybuffer = this.arraybuffer;
+    result.sampleRate = this._info.sampleRate;
 
     return result;
   }

@@ -16,21 +16,21 @@
 
             <p style="padding-top: 10px; margin-bottom: 10px">
                 <a (click)="startDemo()" class="link pointer">{{
-                    'login.demo' | transloco
+                  'login.demo' | transloco
                     }}</a>
             </p>
         </div>
     </div>
     <div class="row" id="loginrow">
         <div class="col-md-6">
-            <div class="card login-card" #onlinemode>
+            <div class="card login-card d-flex flex-column flex-fill h-100" #onlinemode>
                 <div class="card-body">
                     <p
                             *ngIf="!apc.octra.responsive.enabled && !state.local.validSize"
                             [innerHTML]="'browser.small window width' | transloco"
                             class="warning"
                     ></p>
-                    <section>
+                    <section class="d-flex flex-column flex-fill h-100">
                         <h4>{{ 'login.online mode' | transloco }}</h4>
                         <p style="text-align: center">
                             {{ 'login.online mode description' | transloco }}
@@ -38,30 +38,7 @@
                         <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                             {{ 'login.online mode disabled' | transloco }}
                         </div>
-                        <div *ngIf="apc.octra.login.enabled" class="form-horizontal">
-                            <div
-                                    *ngIf="state.online.apiStatus !== 'available'"
-                                    style="text-align: center; margin-top: 20%"
-                            >
-                                <ng-container *ngIf="state.online.apiStatus === 'unavailable'">
-                                    <div class="alert alert-danger" style="padding: 20px">
-                                        <div style="text-align: center">
-                                            <i
-                                                    class="bi bi-exclamation-triangle fs-4"
-                                                    style="color: red"
-                                            ></i>
-                                        </div>
-                                        <p style="text-align: justify; margin-top: 10px">
-                                            {{ 'login.api not available' | transloco }}
-                                        </p>
-                                    </div>
-                                </ng-container>
-                            </div>
-                            <div
-                                    class="text-center"
-                                    *ngIf="state.online.apiStatus === 'available'"
-                            >
-
+                        <div *ngIf="authStoreService.serverOnline$ | async; else showServerOffline" class="form-horizontal">
                                 <octra-authentication-component
                                         [showTitle]="false"
                                         (submitClick)="onOnlineSubmit($event)"
@@ -69,8 +46,12 @@
                                         [passwordReset]="api.appFeatures?.reset_password"
                                         [registrations]="api.appFeatures?.registrations"
                                 ></octra-authentication-component>
-                            </div>
                         </div>
+                        <ng-template #showServerOffline>
+                            <div class="text-center justify-content-center d-flex flex-column flex-fill h-100 bg-warning p-3 opacity-75">
+                                {{ 'login.api not available' | transloco }}
+                            </div>
+                        </ng-template>
                         <br/>
                     </section>
                 </div>

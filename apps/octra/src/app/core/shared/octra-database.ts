@@ -128,8 +128,8 @@ export class OctraDatabase extends Dexie {
 
     this.version(0.4)
       .stores({
-        annotation_levels: '++id',
-        annotation_links: '++id',
+        annotation_levels: null,
+        annotation_links: null,
         logs: 'timestamp',
         demo_data: 'name',
         online_data: 'name',
@@ -261,6 +261,11 @@ export class OctraDatabase extends Dexie {
     overwrite = false
   ) {
     const table = this.getTableFromString(mode);
+
+    if (!table) {
+      console.error(`table ${table} not found!`);
+    }
+
     if (table) {
       let prepared =
         typeof value === 'object' && value !== undefined && value !== null

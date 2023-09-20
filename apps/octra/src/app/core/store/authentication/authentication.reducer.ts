@@ -124,6 +124,7 @@ export const authenticationReducer = createReducer(
   on(APIActions.init.success, (state: AuthenticationState, data: any) => {
     return {
       ...state,
+      serverOnline: data.serverOnline,
       webToken: data.webToken,
       type: data.authType,
       authenticated: data.authenticated,

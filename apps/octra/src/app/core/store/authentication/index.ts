@@ -6,6 +6,7 @@ export * from './authentication.effects';
 export * from './authentication-store.service';
 
 export interface AuthenticationState {
+  serverOnline?: boolean;
   webToken?: string;
   authenticated: boolean;
   type?: AccountLoginMethod;

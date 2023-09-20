@@ -175,14 +175,14 @@ export class IDBService {
    * save one log item.
    */
   public saveLogs(mode: LoginMode, logs: any[]) {
-    return this.database.saveModeData(mode, 'logs', logs);
+    return this.database.saveModeData(mode, 'logs', logs, true);
   }
 
   /**
    * save one annotation level.
    */
   public saveAnnotation(mode: LoginMode, annotation: OAnnotJSON) {
-    return this.database.saveModeData(mode, 'annotation', annotation);
+    return this.database.saveModeData(mode, 'annotation', annotation, true);
   }
 
   /**

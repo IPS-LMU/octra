@@ -113,7 +113,7 @@ export class FileInfo extends DataInfo {
     switch (extension.replace(/\./g, '')) {
       // audio
       case 'wav':
-        return 'audio/wave';
+        return 'audio/wav';
       case 'mp3':
         return 'audio/mpeg';
       case 'ogg':

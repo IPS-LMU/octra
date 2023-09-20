@@ -7,11 +7,9 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { navigateTo } from '@octra/ngx-utilities';
 import { AppInfo } from '../../../app.info';
-import { OctraModalService } from '../../modals/octra-modal.service';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -21,7 +19,6 @@ import { LoginService } from './login.service';
 import { Observable } from 'rxjs';
 import { DefaultComponent } from '../../component/default.component';
 import { AuthenticationStoreService } from '../../store/authentication';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 
@@ -90,11 +87,8 @@ export class LoginComponent
     public appStorage: AppStorageService,
     public api: OctraAPIService,
     public settingsService: SettingsService,
-    public modService: OctraModalService,
-    private langService: TranslocoService,
     private audioService: AudioService,
-    private authStoreService: AuthenticationStoreService,
-    private annotationStoreService: AnnotationStoreService
+    public authStoreService: AuthenticationStoreService
   ) {
     super();
   }

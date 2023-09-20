@@ -15,7 +15,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { Converter } from '@octra/annotation';
+import { Converter, ExportResult } from '@octra/annotation';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -182,18 +182,19 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   updateParentFormat(converter: Converter, levelnum?: number) {
-    /*
     if (levelnum === undefined && !converter.multitiers) {
       levelnum = 0;
     }
 
     if (!this.preparing.preparing) {
-      if (this.transcriptionService.annotationLevels === undefined) {
+      if (this.annotationStoreService.transcript?.levels === undefined) {
         console.error(`annotation is undefined!`);
         return;
       }
-      const oannotjson = this.transcriptionService.annotationLevels.getObj(
-        this.transcriptionService.audioManager.resource.info.duration
+      const oannotjson = this.annotationStoreService.transcript?.serialize(
+        `${this.audio.audioManager.resource.info.name}_annot.json`,
+        this.audio.audioManager.sampleRate,
+        this.audio.audioManager.resource.info.duration
       );
       this.preparing = {
         name: converter.name,
@@ -203,13 +204,16 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         timer(300).subscribe(() => {
           if (converter.name === 'BundleJSON') {
             // only this converter needs an array buffer
+            /*
             this.transcriptionService.audiofile.arraybuffer =
               this.transcriptionService.audioManager.resource.arraybuffer!;
+             */
           }
 
+          const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
           const result: ExportResult = converter.export(
             oannotjson,
-            this.transcriptionService.audiofile,
+            oAudioFile,
             levelnum
           );
 
@@ -231,8 +235,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         })
       );
     }
-
-     */
   }
 
   getProtocol() {

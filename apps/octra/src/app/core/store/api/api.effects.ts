@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { exhaustMap, map } from 'rxjs';
+import { catchError, exhaustMap, map, of } from 'rxjs';
 import { APIActions } from './api.actions';
 import { RootState } from '../index';
 import { environment } from '../../../../environments/environment';
@@ -18,12 +18,25 @@ export class APIEffects {
           .pipe(
             map((appFeatures) =>
               APIActions.init.success({
+                serverOnline: true,
                 authenticated: this.apiService.authenticated,
                 webToken: this.apiService.webToken,
                 authType: a.authType || this.apiService.authType,
                 url: a.url,
               })
-            )
+            ),
+            catchError((error) => {
+              // ignore error
+              return of(
+                APIActions.init.success({
+                  serverOnline: false,
+                  authenticated: this.apiService.authenticated,
+                  webToken: this.apiService.webToken,
+                  authType: a.authType || this.apiService.authType,
+                  url: a.url,
+                })
+              );
+            })
           );
       })
     )

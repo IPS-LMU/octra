@@ -1,6 +1,5 @@
 import { createActionGroup, props } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
-import {LoginMode} from '../index';
 
 export class APIActions {
   static init = createActionGroup({
@@ -14,6 +13,7 @@ export class APIActions {
         authType?: AccountLoginMethod;
       }>(),
       success: props<{
+        serverOnline: boolean;
         url: string;
         webToken?: string;
         authenticated?: boolean;

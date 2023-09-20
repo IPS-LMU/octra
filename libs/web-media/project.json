@@ -20,7 +20,8 @@
         "compiler": "babel",
         "external": ["typescript"],
         "format": ["cjs", "esm"]
-      }
+      },
+      "dependsOn": ["media"]
     },
     "bundle": {
       "executor": "@nrwl/webpack:webpack",

@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import {
+  provideTransloco,
   Translation,
-  TRANSLOCO_CONFIG,
-  TRANSLOCO_LOADER,
-  translocoConfig,
   TranslocoLoader,
+  TranslocoModule,
 } from '@ngneat/transloco';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
@@ -14,22 +13,24 @@ export class TranslocoHttpLoader implements TranslocoLoader {
   constructor(private http: HttpClient) {}
 
   getTranslation(lang: string) {
-    return this.http.get<Translation>(`./assets/i18n/${lang}.json`);
+    const code = lang.replace(/-.*/g, '');
+    return this.http.get<Translation>(`assets/i18n/${code}.json`);
   }
 }
 
-export const TranslocoConfigProvider = {
-  provide: TRANSLOCO_CONFIG,
-  useValue: translocoConfig({
-    availableLangs: ['en'],
-    defaultLang: 'en',
-    fallbackLang: 'en',
-    prodMode: environment.production,
-    reRenderOnLangChange: true,
-  }),
-};
-
-export const TranslocoLoaderProvider = {
-  provide: TRANSLOCO_LOADER,
-  useClass: TranslocoHttpLoader,
-};
+@NgModule({
+  exports: [TranslocoModule],
+  providers: [
+    provideTransloco({
+      config: {
+        availableLangs: ['en'],
+        defaultLang: 'en',
+        fallbackLang: 'en',
+        prodMode: environment.production,
+        reRenderOnLangChange: true,
+      },
+      loader: TranslocoHttpLoader,
+    }),
+  ],
+})
+export class TranslocoRootModule {}

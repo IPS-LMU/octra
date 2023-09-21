@@ -27,7 +27,7 @@
       "@octra/ngx-octra-api": ["../octra-backend/extern/libs/ngx-octra-api"],
       "@octra/ngx-utilities": ["libs/ngx-utilities/src/index.ts"],
       "@octra/utilities": ["libs/utilities/src/index.ts"],
-      "@octra/web-media": ["libs/web-media/src/index.ts"],
+      "@octra/web-media": ["libs/web-media/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "doc"]

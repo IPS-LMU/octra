@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
-  CanActivate,
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
@@ -17,7 +16,7 @@ import { navigateTo } from '@octra/ngx-utilities';
 @Injectable({
   providedIn: 'root',
 })
-export class CompatibilityGuard implements CanActivate {
+export class CompatibilityGuard {
   constructor(
     private router: Router,
     private compatibility: CompatibilityService,

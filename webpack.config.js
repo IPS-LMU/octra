@@ -41,7 +41,7 @@ const modifyEntries = (config, libraryName, libraryTarget) => {
   if (libraryTarget.includes('module')) {
     // https://webpack.js.org/configuration/output/#librarytarget-module
     // for esm library name must be unset and config.experiments.outputModule = true - This is experimental and might result in empty umd output
-    config.experiments.outputModule = true
+    config.experiments.outputModule = true;
     config.experiments = {
       ...config.experiments,
       outputModule: true,
@@ -55,8 +55,10 @@ const modifyEntries = (config, libraryName, libraryTarget) => {
     };
   });
 
-  // @nrwl/web:webpack runs webpack 2 times with es5 and esm configurations
-  const outputFilename = config.output.filename.includes('es5') ? config.output.filename : '[name].js';
+  // @nx/web:webpack runs webpack 2 times with es5 and esm configurations
+  const outputFilename = config.output.filename.includes('es5')
+    ? config.output.filename
+    : '[name].js';
   config.output = {
     ...config.output,
     filename: outputFilename,
@@ -64,7 +66,12 @@ const modifyEntries = (config, libraryName, libraryTarget) => {
 };
 
 module.exports = (config, { options }) => {
-  const libraryTargets = options.libraryTargets ?? ['global', 'commonjs', 'amd', 'umd'];
+  const libraryTargets = options.libraryTargets ?? [
+    'global',
+    'commonjs',
+    'amd',
+    'umd',
+  ];
   const libraryName = options.libraryName;
 
   config.optimization.runtimeChunk = false;

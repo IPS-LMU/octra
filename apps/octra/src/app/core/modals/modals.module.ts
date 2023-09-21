@@ -28,10 +28,6 @@ import {
 } from '@ngneat/transloco';
 import { HttpClient } from '@angular/common/http';
 import { AppSharedModule } from '../../app.shared.module';
-import {
-  TranslocoConfigProvider,
-  TranslocoLoaderProvider,
-} from '../../app.transloco';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { FormsModule } from '@angular/forms';
 import { NamingDragAndDropComponent } from '../tools/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -99,7 +95,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NgbModalModule,
     OctraUtilitiesModule,
   ],
-  providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [
     BugreportModalComponent,
     ErrorModalComponent,

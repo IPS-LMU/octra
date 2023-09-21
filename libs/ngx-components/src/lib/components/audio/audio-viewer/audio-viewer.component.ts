@@ -18,6 +18,7 @@ import { AudioViewerService } from './audio-viewer.service';
 import { SubscriptionManager } from '@octra/utilities';
 import {
   AnnotationAnySegment,
+  AnnotationLevelType,
   ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
@@ -25,6 +26,7 @@ import {
   getStartTimeBySegmentID,
   OctraAnnotation,
   OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
   OLabel,
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
@@ -517,7 +519,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async onResize() {
-    try{
+    try {
       if (
         this.audioChunk !== undefined &&
         this.av.currentLevel &&
@@ -1615,7 +1617,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                         this.av.currentLevel.items.length > 0
                       ) {
                         const sceneSegment = this.av.currentLevel.items.find(
-                          (a:any) => a.id === segment.id
+                          (a: any) => a.id === segment.id
                         );
 
                         if (!(sceneSegment instanceof OctraAnnotationSegment)) {
@@ -1937,12 +1939,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         lineInterval.from *
         (this.settings.lineheight + this.settings.margin.top);
       const sceneSegment = this.av.currentLevel.items.find(
-        (a:any) => a.id === segment.id
-      );
+        (a: any) => a.id === segment.id
+      ) as OctraAnnotationSegment  |undefined;
       if (
         sceneSegment === undefined ||
         segment?.time === undefined ||
-        !(sceneSegment instanceof OctraAnnotationSegment<ASRContext>)
+        (this.av.currentLevel.type !== AnnotationLevelType.SEGMENT)
       ) {
         console.error(`scenceSegment is undefined!`);
       } else {
@@ -2602,44 +2604,41 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       this.av.currentLevel.items as OctraAnnotationSegment[],
                       xSamples
                     );
-                    const segment = this.av.currentLevel.items[segmentI];
-
-                    if (segment) {
+                    if (
+                      this.av.currentLevel.type === AnnotationLevelType.SEGMENT
+                    ) {
+                      const segment = this.av.currentLevel.items[segmentI] as OctraAnnotationSegment<ASRContext>;
                       if (
-                        segment instanceof OctraAnnotationSegment<ASRContext>
+                        segmentI > -1 &&
+                        segment.context?.asr?.isBlockedBy === undefined &&
+                        this.silencePlaceholder !== undefined
                       ) {
                         if (
-                          segmentI > -1 &&
-                          segment.context?.asr?.isBlockedBy === undefined &&
-                          this.silencePlaceholder !== undefined
+                          segment.getFirstLabelWithoutName('Speaker')?.value !==
+                          this.silencePlaceholder
                         ) {
-                          if (
-                            segment.getFirstLabelWithoutName('Speaker')
-                              ?.value !== this.silencePlaceholder
-                          ) {
-                            segment.changeFirstLabelWithoutName(
-                              'Speaker',
-                              this.silencePlaceholder
-                            );
-                            this.shortcut.emit({
-                              shortcut: comboKey,
-                              shortcutName,
-                              value: 'set_break',
-                              type: 'segment',
-                              timePosition: xSamples.clone(),
-                              timestamp: shortcutInfo.timestamp,
-                            });
-                          } else {
-                            segment.changeFirstLabelWithoutName('Speaker', '');
-                            this.shortcut.emit({
-                              shortcut: comboKey,
-                              shortcutName,
-                              value: 'remove_break',
-                              type: 'segment',
-                              timePosition: xSamples.clone(),
-                              timestamp: shortcutInfo.timestamp,
-                            });
-                          }
+                          segment.changeFirstLabelWithoutName(
+                            'Speaker',
+                            this.silencePlaceholder
+                          );
+                          this.shortcut.emit({
+                            shortcut: comboKey,
+                            shortcutName,
+                            value: 'set_break',
+                            type: 'segment',
+                            timePosition: xSamples.clone(),
+                            timestamp: shortcutInfo.timestamp,
+                          });
+                        } else {
+                          segment.changeFirstLabelWithoutName('Speaker', '');
+                          this.shortcut.emit({
+                            shortcut: comboKey,
+                            shortcutName,
+                            value: 'remove_break',
+                            type: 'segment',
+                            timePosition: xSamples.clone(),
+                            timestamp: shortcutInfo.timestamp,
+                          });
                         }
                       }
                     }
@@ -2667,117 +2666,117 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       xSamples
                     );
                     if (segmentI > -1) {
-                      const segment = this.av.currentLevel.items[segmentI];
+                      if (
+                        this.av.currentLevel.type ===
+                        AnnotationLevelType.SEGMENT
+                      ) {
+                        const currentLevel = this.av
+                          .currentLevel as OctraAnnotationSegmentLevel<
+                          OctraAnnotationSegment<ASRContext>
+                        >;
+                        const segment = currentLevel.items[segmentI];
 
-                      if (segment) {
+                        const startTime = getStartTimeBySegmentID(
+                          currentLevel.items as OctraAnnotationSegment<ASRContext>[],
+                          segment.id
+                        );
+
+                        // make shure, that segments boundaries are visible
                         if (
-                          segment instanceof OctraAnnotationSegment<ASRContext>
+                          segment?.time !== undefined &&
+                          (startTime as any).samples >=
+                            this.audioChunk.time.start.samples &&
+                          segment.time.samples <=
+                            this.audioChunk.time.end.samples + 1 &&
+                          this.av.audioTCalculator !== undefined
                         ) {
-                          const startTime = getStartTimeBySegmentID(
-                            this.av.currentLevel
-                              .items as OctraAnnotationSegment<ASRContext>[],
-                            segment.id
+                          const absX = this.av.audioTCalculator.samplestoAbsX(
+                            segment.time
                           );
+                          this.audioChunk.selection = boundarySelect.clone();
+                          this.av.drawnSelection = boundarySelect.clone();
+                          this.selchange.emit(this.audioChunk.selection);
+                          this.drawWholeSelection();
 
-                          // make shure, that segments boundaries are visible
+                          const begin = (
+                            segmentI > 0
+                              ? this.av.currentLevel.items[segmentI - 1]
+                              : this.annotation!.createSegment(
+                                  this.audioManager.createSampleUnit(0),
+                                  [new OLabel(this.av.currentLevel.name, '')]
+                                )
+                          ) as OctraAnnotationSegment<ASRContext>;
+
                           if (
-                            segment?.time !== undefined &&
-                            (startTime as any).samples >=
-                              this.audioChunk.time.start.samples &&
-                            segment.time.samples <=
-                              this.audioChunk.time.end.samples + 1 &&
-                            this.av.audioTCalculator !== undefined
+                            begin?.time !== undefined &&
+                            this.av.innerWidth !== undefined
                           ) {
-                            const absX = this.av.audioTCalculator.samplestoAbsX(
-                              segment.time
-                            );
-                            this.audioChunk.selection = boundarySelect.clone();
-                            this.av.drawnSelection = boundarySelect.clone();
-                            this.selchange.emit(this.audioChunk.selection);
-                            this.drawWholeSelection();
+                            const beginX =
+                              this.av.audioTCalculator.samplestoAbsX(
+                                begin.time
+                              );
 
-                            const begin = (
-                              segmentI > 0
-                                ? this.av.currentLevel.items[segmentI - 1]
-                                : this.annotation!.createSegment(
-                                    this.audioManager.createSampleUnit(0),
-                                    [new OLabel(this.av.currentLevel.name, '')]
-                                  )
-                            ) as OctraAnnotationSegment<ASRContext>;
+                            const posY1 =
+                              this.av.innerWidth < this.AudioPxWidth
+                                ? Math.floor(beginX / this.av.innerWidth + 1) *
+                                    (this.settings.lineheight +
+                                      this.settings.margin.bottom) -
+                                  this.settings.margin.bottom
+                                : 0;
+
+                            const posY2 =
+                              this.av.innerWidth < this.AudioPxWidth
+                                ? Math.floor(absX / this.av.innerWidth + 1) *
+                                    (this.settings.lineheight +
+                                      this.settings.margin.bottom) -
+                                  this.settings.margin.bottom
+                                : 0;
 
                             if (
-                              begin?.time !== undefined &&
-                              this.av.innerWidth !== undefined
+                              xSamples.samples >=
+                                this.audioChunk.selection.start.samples &&
+                              xSamples.samples <=
+                                this.audioChunk.selection.end.samples
                             ) {
-                              const beginX =
-                                this.av.audioTCalculator.samplestoAbsX(
-                                  begin.time
-                                );
+                              this.audioChunk.absolutePlayposition =
+                                this.audioChunk.selection.start.clone();
+                              this.changePlayCursorSamples(
+                                this.audioChunk.selection.start
+                              );
+                              this.updatePlayCursor();
 
-                              const posY1 =
-                                this.av.innerWidth < this.AudioPxWidth
-                                  ? Math.floor(
-                                      beginX / this.av.innerWidth + 1
-                                    ) *
-                                      (this.settings.lineheight +
-                                        this.settings.margin.bottom) -
-                                    this.settings.margin.bottom
-                                  : 0;
+                              this.shortcut.emit({
+                                shortcut: comboKey,
+                                shortcutName,
+                                value: shortcutName,
+                                type: 'audio',
+                                timePosition: xSamples.clone(),
+                                selection: boundarySelect.clone(),
+                                timestamp: shortcutInfo.timestamp,
+                              });
 
-                              const posY2 =
-                                this.av.innerWidth < this.AudioPxWidth
-                                  ? Math.floor(absX / this.av.innerWidth + 1) *
-                                      (this.settings.lineheight +
-                                        this.settings.margin.bottom) -
-                                    this.settings.margin.bottom
-                                  : 0;
-
-                              if (
-                                xSamples.samples >=
-                                  this.audioChunk.selection.start.samples &&
-                                xSamples.samples <=
-                                  this.audioChunk.selection.end.samples
-                              ) {
-                                this.audioChunk.absolutePlayposition =
-                                  this.audioChunk.selection.start.clone();
-                                this.changePlayCursorSamples(
-                                  this.audioChunk.selection.start
-                                );
-                                this.updatePlayCursor();
-
-                                this.shortcut.emit({
-                                  shortcut: comboKey,
-                                  shortcutName,
-                                  value: shortcutName,
-                                  type: 'audio',
-                                  timePosition: xSamples.clone(),
-                                  selection: boundarySelect.clone(),
-                                  timestamp: shortcutInfo.timestamp,
-                                });
-
-                                this.audioChunk.stopPlayback().then(() => {
-                                  if (this.audioChunk !== undefined) {
-                                    // after stopping start audio playback
-                                    this.audioChunk.selection =
-                                      boundarySelect.clone();
-                                    this.playSelection(this.afterAudioEnded);
-                                  }
-                                });
-                              }
-
-                              if (!this.settings.multiLine) {
-                                this.segmententer.emit({
-                                  index: segmentI,
-                                  pos: { Y1: posY1, Y2: posY2 },
-                                });
-                              }
-                            } else {
-                              // TODO check this case again!
-                              this.alert.emit({
-                                type: 'error',
-                                message: 'segment invisible',
+                              this.audioChunk.stopPlayback().then(() => {
+                                if (this.audioChunk !== undefined) {
+                                  // after stopping start audio playback
+                                  this.audioChunk.selection =
+                                    boundarySelect.clone();
+                                  this.playSelection(this.afterAudioEnded);
+                                }
                               });
                             }
+
+                            if (!this.settings.multiLine) {
+                              this.segmententer.emit({
+                                index: segmentI,
+                                pos: { Y1: posY1, Y2: posY2 },
+                              });
+                            }
+                          } else {
+                            // TODO check this case again!
+                            this.alert.emit({
+                              type: 'error',
+                              message: 'segment invisible',
+                            });
                           }
                         }
                       }
@@ -2870,8 +2869,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       })),
                       removeOptions: {
                         silenceCode: this.silencePlaceholder,
-                        mergeTranscripts: true
-                      }
+                        mergeTranscripts: true,
+                      },
                     });
                   }
                 }

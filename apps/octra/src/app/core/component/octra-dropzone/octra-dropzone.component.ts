@@ -6,14 +6,14 @@ import { SessionFile } from '../../obj/SessionFile';
 import { contains, FileSize, getFileSize } from '@octra/utilities';
 import { FileProgress } from '../../obj/objects';
 import {
+  AnnotationLevelType,
   Converter,
   IFile,
   ImportResult,
   OAnnotJSON,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
   OLabel,
   OSegment,
+  OSegmentLevel,
 } from '@octra/annotation';
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
@@ -192,11 +192,10 @@ export class OctraDropzoneComponent extends DefaultComponent {
                       importResult.error === ''
                     ) {
                       file.status = 'valid';
-                      for (const level of importResult.annotjson.levels) {
-                        if (
-                          level instanceof
-                          OctraAnnotationSegmentLevel<OctraAnnotationSegment>
-                        ) {
+                      for (const lvl of importResult.annotjson.levels) {
+                        if (lvl.type === AnnotationLevelType.SEGMENT) {
+                          const level = lvl as OSegmentLevel<OSegment>;
+
                           if (level.items[0].sampleStart !== 0) {
                             let temp = [];
                             temp.push(
@@ -506,8 +505,8 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   private dropFile(
     filename: string,
-    containsTrue: boolean = false,
-    containsnot: boolean = false
+    containsTrue = false,
+    containsnot = false
   ): boolean {
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i].file;

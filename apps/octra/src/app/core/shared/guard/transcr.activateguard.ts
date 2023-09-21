@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 import {
   ActivatedRouteSnapshot,
-  CanActivate,
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
@@ -14,7 +13,7 @@ import { ApplicationStoreService } from '../../store/application/application-sto
 import { Store } from '@ngrx/store';
 
 @Injectable()
-export class TranscActivateGuard implements CanActivate {
+export class TranscActivateGuard {
   constructor(
     private appStoreService: ApplicationStoreService,
     private router: Router,

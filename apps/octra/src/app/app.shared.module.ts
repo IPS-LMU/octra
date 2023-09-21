@@ -1,10 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslocoModule } from '@ngneat/transloco';
-import {
-  TranslocoConfigProvider,
-  TranslocoLoaderProvider,
-} from './app.transloco';
 import { AsrOptionsComponent } from './core/component/asr-options/asr-options.component';
 import { TranscriptionFeedbackComponent } from './core/component/transcription-feedback/transcription-feedback.component';
 import { ClipTextPipe } from './core/shared/clip-text.pipe';
@@ -21,6 +16,7 @@ import { AlertComponent, DropZoneComponent } from './core/component';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { SignupComponent } from './core/component/authentication-component/signup/signup.component';
+import { TranslocoModule } from '@ngneat/transloco';
 
 @NgModule({
   declarations: [
@@ -36,7 +32,6 @@ import { SignupComponent } from './core/component/authentication-component/signu
     CommonModule,
     FormsModule,
     RouterModule,
-    TranslocoModule,
     DragDropModule,
     NgbDropdownModule,
     NgbPopoverModule,
@@ -45,7 +40,6 @@ import { SignupComponent } from './core/component/authentication-component/signu
     TranslocoModule,
     NgbToast,
   ],
-  providers: [TranslocoConfigProvider, TranslocoLoaderProvider],
   exports: [
     AsrOptionsComponent,
     TranscriptionFeedbackComponent,

@@ -22,6 +22,7 @@ import { ValidationPopoverComponent } from '../../core/component/transcr-editor/
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
+  AnnotationLevelType,
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
@@ -556,7 +557,7 @@ export class TrnEditorComponent
 
   getStartPoint(index: number) {
     return index > 0 &&
-      this.currentLevel.items[index - 1] instanceof OctraAnnotationSegment<ASRContext>
+      this.currentLevel.type === AnnotationLevelType.SEGMENT
       ? (this.currentLevel.items[index - 1] as OctraAnnotationSegment<ASRContext>).time.unix
       : 0;
   }
@@ -1314,7 +1315,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj: any, caretPos: number = -1) => {
+    const triggerUIAction = (shortcutObj: any, caretPos = -1) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',

@@ -59,7 +59,7 @@ export const reducer = createReducer(
     initialized: true,
   })),
   on(
-    AuthenticationActions.loginOnline.redirecttourl,
+    AuthenticationActions.loginOnline.redirectToURL,
     (state: ApplicationState) => ({
       ...state,
       mode: LoginMode.ONLINE,

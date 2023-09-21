@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
+      "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/json-sets",
@@ -19,20 +19,18 @@
         "assets": [
           "libs/json-sets/src/LICENSE.txt",
           "libs/json-sets/src/README.md"
-        ]
+        ],
+        "babelUpwardRootMode": true,
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "bundle": {
-      "executor": "@nrwl/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraJSONSets",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/json-sets/tsconfig.lib.json",
         "main": "libs/json-sets/src/index.ts",
@@ -57,14 +55,14 @@
       "dependsOn": ["build"]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/json-sets/**/*.ts"]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/json-sets/jest.config.ts",

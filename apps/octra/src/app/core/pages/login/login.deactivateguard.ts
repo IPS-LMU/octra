@@ -1,11 +1,10 @@
-import { CanDeactivate } from '@angular/router';
 import { Observable } from 'rxjs';
 
 export interface ComponentCanDeactivate {
   canDeactivate: () => boolean | Observable<boolean>;
 }
 
-export class DeALoginGuard implements CanDeactivate<ComponentCanDeactivate> {
+export class DeALoginGuard  {
   canDeactivate(
     component: ComponentCanDeactivate
   ): Observable<boolean> | boolean {

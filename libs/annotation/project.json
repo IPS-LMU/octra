@@ -5,10 +5,8 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nx/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/annotation",
         "main": "libs/annotation/src/index.ts",
@@ -16,29 +14,23 @@
         "project": "libs/annotation/package.json",
         "entryFile": "libs/annotation/src/index.ts",
         "compiler": "babel",
-        "external": [
-          "typescript"
-        ],
-        "format": [
-          "cjs", "esm"
-        ],
+        "external": ["typescript"],
+        "format": ["cjs", "esm"],
         "assets": [
           "libs/annotation/src/LICENSE.txt",
           "libs/annotation/src/README.md"
-        ]
+        ],
+        "babelUpwardRootMode": true,
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "bundle": {
-      "executor": "@nrwl/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraAnnotation",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/annotation/tsconfig.lib.json",
         "main": "libs/annotation/src/index.ts",
@@ -53,28 +45,20 @@
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs annotation {args.ver} {args.tag}"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/annotation/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/annotation/**/*.ts"]
       }
     }
   },

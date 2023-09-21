@@ -5,34 +5,29 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
+      "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/media",
         "main": "libs/media/src/index.ts",
         "entryFile": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": [
-          "libs/media/src/LICENSE.txt",
-          "libs/media/src/README.md"
-        ],
+        "assets": ["libs/media/src/LICENSE.txt", "libs/media/src/README.md"],
         "project": "libs/media/package.json",
         "compiler": "babel",
         "external": ["typescript"],
-        "format": ["cjs", "esm"]
+        "format": ["cjs", "esm"],
+        "babelUpwardRootMode": true,
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "bundle": {
-      "executor": "@nrwl/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraMedia",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/media/tsconfig.lib.json",
         "main": "libs/media/src/index.ts",
@@ -57,7 +52,7 @@
       "dependsOn": ["build"]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/media/**/*.ts"]

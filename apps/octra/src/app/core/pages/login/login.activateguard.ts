@@ -1,17 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { RoutingService } from '../../shared/service/routing.service';
 
 @Injectable()
-export class ALoginGuard implements CanActivate {
+export class ALoginGuard {
   constructor(
     private appStoreService: ApplicationStoreService,
     private routingService: RoutingService

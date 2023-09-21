@@ -1105,7 +1105,7 @@ export class IDBEffects {
   saveModeBeforeURLRedirection$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthenticationActions.loginOnline.redirecttourl),
+        ofType(AuthenticationActions.loginOnline.redirectToURL),
         withLatestFrom(this.store),
         tap(([a, state]) => {
           this.idbService.saveOption('usemode', LoginMode.ONLINE);

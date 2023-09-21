@@ -47,10 +47,6 @@ import { ApplicationEffects } from './core/store/application/application.effects
 import { ModalsModule } from './core/modals/modals.module';
 import { AppSharedModule } from './app.shared.module';
 import { OctraComponentsModule } from '@octra/ngx-components';
-import {
-  TranslocoConfigProvider,
-  TranslocoLoaderProvider,
-} from './app.transloco';
 import { NgxOctraApiModule, OctraAPIService } from '@octra/ngx-octra-api';
 import {
   NgbCollapseModule,
@@ -68,6 +64,7 @@ import { APIEffects } from './core/store/api';
 import { PagesModule } from './core/pages/pages.module';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AsrEffects } from './core/store/asr/asr.effects.service';
+import { TranslocoRootModule } from './app.transloco';
 
 @NgModule({
   declarations: [AppComponent, NavigationComponent],
@@ -121,7 +118,7 @@ import { AsrEffects } from './core/store/asr/asr.effects.service';
     NgbTooltipModule,
     NgbCollapseModule,
     ModalsModule,
-    TranslocoModule,
+    TranslocoRootModule,
     NgxOctraApiModule,
     OctraComponentsModule,
     OctraUtilitiesModule,
@@ -145,8 +142,6 @@ import { AsrEffects } from './core/store/asr/asr.effects.service';
     BugReportService,
     CompatibilityService,
     MultiThreadingService,
-    TranslocoConfigProvider,
-    TranslocoLoaderProvider,
   ],
   exports: [],
 })

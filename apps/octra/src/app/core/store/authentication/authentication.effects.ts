@@ -131,7 +131,7 @@ export class AuthenticationEffects {
                   this.sessionStorageService.store('authenticated', false);
                 }
 
-                return AuthenticationActions.loginOnline.redirecttourl({
+                return AuthenticationActions.loginOnline.redirectToURL({
                   mode: LoginMode.ONLINE,
                   url,
                 });
@@ -567,7 +567,7 @@ export class AuthenticationEffects {
   redirectToURL$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthenticationActions.loginOnline.redirecttourl),
+        ofType(AuthenticationActions.loginOnline.redirectToURL),
         tap((a) => {
           setTimeout(() => {
             document.location.href = a.url;

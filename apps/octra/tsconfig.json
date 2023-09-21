@@ -8,8 +8,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
-    "lib": ["dom", "es2022"]
+    "allowSyntheticDefaultImports": true
   },
   "files": [],
   "include": [],

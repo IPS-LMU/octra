@@ -2,12 +2,12 @@
   "name": "ngx-utilities",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/ngx-utilities/src",
-  "prefix": "octra",
+  "prefix": "lib",
   "tags": [],
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/angular:package",
+      "executor": "@nx/angular:ng-packagr-lite",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
         "project": "libs/ngx-utilities/ng-package.json"
@@ -28,7 +28,8 @@
       "options": {
         "lintFilePatterns": [
           "libs/ngx-utilities/**/*.ts",
-          "libs/ngx-utilities/**/*.html"
+          "libs/ngx-utilities/**/*.html",
+          "libs/ngx-utilities/package.json"
         ]
       }
     }

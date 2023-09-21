@@ -6,35 +6,24 @@
   "targets": {
     "build": {
       "executor": "@nx/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "babelUpwardRootMode": true,
         "outputPath": "dist/libs/web-media",
         "main": "libs/web-media/src/index.ts",
-        "entryFile": "libs/web-media/src/index.ts",
         "tsConfig": "libs/web-media/tsconfig.lib.json",
         "assets": [
           "libs/web-media/src/LICENSE.txt",
           "libs/web-media/src/README.md"
         ],
         "project": "libs/web-media/package.json",
-        "compiler": "babel",
-        "external": [
-          "typescript",
-          "@octra/media",
-          "@octra/utilities"
-        ],
-        "format": [
-          "cjs",
-          "esm"
+        "compiler": "tsc",
+        "format": ["cjs", "esm"],
+        "external": ["@octra/utilities", "@octra/media"],
+        "dependsOn": [
+          "media",
+          "utilities"
         ]
-      },
-      "dependsOn": [
-        "media",
-        "utilities"
-      ]
+      }
     },
     "bundle": {
       "executor": "@nx/webpack:webpack",
@@ -51,7 +40,7 @@
         "tsConfig": "libs/web-media/tsconfig.lib.json",
         "main": "libs/web-media/src/index.ts",
         "outputPath": "dist/libs/web-media/bundles",
-        "compiler": "babel",
+        "compiler": "tsc",
         "optimization": true,
         "extractLicenses": true,
         "runtimeChunk": false,
@@ -65,23 +54,13 @@
         "build"
       ]
     },
-    "publish": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/scripts/publish.mjs web-media {args.ver} {args.tag}"
-      },
-      "dependsOn": [
-        "build"
-      ]
-    },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "libs/web-media/**/*.ts"
+          "libs/web-media/**/*.ts",
+          "libs/web-media/package.json"
         ]
       }
     }

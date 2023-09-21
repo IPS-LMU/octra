@@ -17,10 +17,8 @@
           "libs/utilities/src/README.md"
         ],
         "project": "libs/utilities/package.json",
-        "compiler": "babel",
-        "external": ["typescript"],
-        "format": ["cjs", "esm"],
-        "babelUpwardRootMode": true
+        "compiler": "tsc",
+        "format": ["cjs", "esm"]
       }
     },
     "bundle": {
@@ -34,7 +32,7 @@
         "tsConfig": "libs/utilities/tsconfig.lib.json",
         "main": "libs/utilities/src/index.ts",
         "outputPath": "dist/libs/utilities/bundles",
-        "compiler": "babel",
+        "compiler": "tsc",
         "optimization": true,
         "extractLicenses": true,
         "runtimeChunk": false,
@@ -57,21 +55,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/utilities/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/utilities/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "lintFilePatterns": ["utilities/**/*.ts", "utilities/package.json"]
       }
     }
   },

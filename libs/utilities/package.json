@@ -1,5 +1,8 @@
 {
   "name": "@octra/utilities",
   "version": "0.0.1",
-  "peerDependencies": {}
+  "dependencies": {},
+  "type": "commonjs",
+  "main": "./index.cjs",
+  "module": "./index.js"
 }

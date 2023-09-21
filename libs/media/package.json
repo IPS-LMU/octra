@@ -1,8 +1,8 @@
 {
   "name": "@octra/media",
-  "version": "0.0.5",
+  "version": "0.0.1",
+  "dependencies": {},
   "type": "commonjs",
-  "peerDependencies": {
-    "rxjs": ">=7.5.0"
-  }
+  "main": "./index.cjs",
+  "module": "./index.js"
 }

@@ -20,11 +20,21 @@
           "apps/web-components/src/LICENSE.txt",
           "apps/web-components/src/README.md"
         ],
-        "styles": [],
+        "styles": [
+          "apps/web-components/styles.css"
+        ],
         "scripts": []
       },
       "configurations": {
         "production": {
+          "optimization": {
+            "scripts": true,
+            "styles": {
+              "minify": true,
+              "inlineCritical": false
+            },
+            "fonts": false
+          },
           "budgets": [
             {
               "type": "initial",
@@ -40,8 +50,15 @@
           "outputHashing": "all"
         },
         "development": {
-          "buildOptimizer": true,
-          "optimization": true,
+          "buildOptimizer": false,
+          "optimization": {
+            "scripts": true,
+            "styles": {
+              "minify": true,
+              "inlineCritical": false
+            },
+            "fonts": false
+          },
           "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
@@ -76,6 +93,20 @@
           "apps/web-components/**/*.ts",
           "apps/web-components/**/*.html"
         ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/web-components/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
     }
   }

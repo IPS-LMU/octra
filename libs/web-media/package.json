@@ -1,5 +1,8 @@
 {
   "name": "@octra/web-media",
-  "version": "0.0.1",
-  "type": "commonjs"
+  "version": "0.0.2",
+  "dependencies": {},
+  "type": "commonjs",
+  "main": "./index.cjs",
+  "module": "./index.js"
 }

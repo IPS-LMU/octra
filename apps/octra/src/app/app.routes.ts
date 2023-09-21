@@ -1,4 +1,4 @@
-import { RouterModule, Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
 import {
   ALoginGuard,
@@ -10,18 +10,15 @@ import {
   LoadingComponent,
   NewsComponent,
 } from './core/pages';
-import { LoginComponent } from './core/pages/login';
-import { CompatibilityGuard } from './core/shared/guard/compatibility.guard';
-import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
-import {
-  APP_INITIALIZED_GUARD,
-  CONFIG_LOADED_GUARD,
-} from './core/shared/guard/appconfig-load.guard';
-import { IDB_LOADED_GUARD } from './core/shared/guard/idb.activateguard';
+import {LoginComponent} from './core/pages/login';
+import {CompatibilityGuard} from './core/shared/guard/compatibility.guard';
+import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
+import {APP_INITIALIZED_GUARD, CONFIG_LOADED_GUARD,} from './core/shared/guard/appconfig-load.guard';
+import {IDB_LOADED_GUARD} from './core/shared/guard/idb.activateguard';
 
-const APP_ROUTES: Routes = [
-  { path: 'load', component: LoadingComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+export const APP_ROUTES: Routes = [
+  {path: 'load', component: LoadingComponent},
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
   {
     path: 'login',
     component: LoginComponent,
@@ -62,9 +59,5 @@ const APP_ROUTES: Routes = [
     component: StresstestComponent,
     canActivate: [APP_INITIALIZED_GUARD],
   },
-  { path: '**', redirectTo: '/404', pathMatch: 'full' },
+  {path: '**', redirectTo: '/404', pathMatch: 'full'},
 ];
-
-export const routing = RouterModule.forRoot(APP_ROUTES, {
-  initialNavigation: 'enabledNonBlocking',
-});

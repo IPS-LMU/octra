@@ -14,7 +14,7 @@
         "assets": ["libs/media/src/LICENSE.txt", "libs/media/src/README.md"],
         "project": "libs/media/package.json",
         "compiler": "tsc",
-        "format": ["cjs", "esm"]
+        "format": ["cjs"]
       }
     },
     "bundle": {

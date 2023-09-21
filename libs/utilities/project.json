@@ -18,7 +18,7 @@
         ],
         "project": "libs/utilities/package.json",
         "compiler": "tsc",
-        "format": ["cjs", "esm"]
+        "format": ["cjs"]
       }
     },
     "bundle": {

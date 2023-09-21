@@ -26,6 +26,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
+        "externalDependencies": ["@octra/media", "@octra/utilities"],
         "libraryName": "OctraAnnotation",
         "libraryTargets": ["umd"],
         "index": "",

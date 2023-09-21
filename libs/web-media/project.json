@@ -17,7 +17,7 @@
         ],
         "project": "libs/web-media/package.json",
         "compiler": "tsc",
-        "format": ["cjs", "esm"],
+        "format": ["cjs"],
         "external": ["@octra/utilities", "@octra/media"],
         "dependsOn": [
           "media",

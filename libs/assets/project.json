@@ -25,8 +25,7 @@
             "output": "./src/lib/schemata"
           }
         ],
-        "babelUpwardRootMode": true,
-        "updateBuildableProjectDepsInPackageJson": true
+        "babelUpwardRootMode": true
       }
     },
     "bundle": {

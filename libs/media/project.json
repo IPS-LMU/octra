@@ -17,8 +17,7 @@
         "compiler": "babel",
         "external": ["typescript"],
         "format": ["cjs", "esm"],
-        "babelUpwardRootMode": true,
-        "updateBuildableProjectDepsInPackageJson": true
+        "babelUpwardRootMode": true
       }
     },
     "bundle": {

@@ -6,8 +6,11 @@
   "targets": {
     "build": {
       "executor": "@nx/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
+        "babelUpwardRootMode": true,
         "outputPath": "dist/libs/web-media",
         "main": "libs/web-media/src/index.ts",
         "entryFile": "libs/web-media/src/index.ts",
@@ -18,20 +21,32 @@
         ],
         "project": "libs/web-media/package.json",
         "compiler": "babel",
-        "external": ["typescript"],
-        "format": ["cjs", "esm"],
-        "babelUpwardRootMode": true,
-        "updateBuildableProjectDepsInPackageJson": true
+        "external": [
+          "typescript",
+          "@octra/media",
+          "@octra/utilities"
+        ],
+        "format": [
+          "cjs",
+          "esm"
+        ]
       },
-      "dependsOn": ["media"]
+      "dependsOn": [
+        "media",
+        "utilities"
+      ]
     },
     "bundle": {
       "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraWebMedia",
-        "libraryTargets": ["umd"],
+        "libraryTargets": [
+          "umd"
+        ],
         "index": "",
         "tsConfig": "libs/web-media/tsconfig.lib.json",
         "main": "libs/web-media/src/index.ts",
@@ -46,20 +61,28 @@
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs web-media {args.ver} {args.tag}"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/web-media/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/web-media/**/*.ts"
+        ]
       }
     }
   },

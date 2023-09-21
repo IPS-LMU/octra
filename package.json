@@ -60,6 +60,7 @@
     "@ngrx/router-store": "16.2.0",
     "@ngrx/store": "16.2.0",
     "@ngrx/store-devtools": "16.2.0",
+    "@nx/angular": "16.8.1",
     "@octra/api-types": "file:../octra-backend/extern/libs/api-types",
     "@octra/ngx-octra-api": "file:../octra-backend/extern/libs/ngx-octra-api",
     "@popperjs/core": "^2.11.6",
@@ -90,8 +91,7 @@
     "tslib": "^2.3.0",
     "video.js": "^7.20.1",
     "x2js": "^3.4.4",
-    "zone.js": "0.13.3",
-    "@nx/angular": "16.8.1"
+    "zone.js": "0.13.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "16.2.3",
@@ -103,8 +103,19 @@
     "@angular/cli": "~16.2.0",
     "@angular/compiler-cli": "16.2.6",
     "@angular/language-service": "16.2.6",
+    "@babel/preset-flow": "^7.22.15",
     "@babel/preset-typescript": "^7.22.5",
+    "@nx/cypress": "16.8.1",
+    "@nx/esbuild": "16.8.1",
+    "@nx/eslint-plugin": "16.8.1",
+    "@nx/jest": "16.8.1",
+    "@nx/js": "16.8.1",
+    "@nx/linter": "16.8.1",
+    "@nx/node": "16.8.1",
+    "@nx/rollup": "16.8.1",
+    "@nx/web": "16.8.1",
     "@nx/webpack": "16.8.1",
+    "@nx/workspace": "16.8.1",
     "@schematics/angular": "16.2.3",
     "@swc/cli": "0.1.62",
     "@swc/core": "^1.2.173",
@@ -143,16 +154,6 @@
     "typedoc": "^0.24.8",
     "typedoc-plugin-replace-text": "^3.1.0",
     "typescript": "5.1.6",
-    "yargs": "^17.7.2",
-    "@nx/workspace": "16.8.1",
-    "@nx/js": "16.8.1",
-    "@nx/esbuild": "16.8.1",
-    "@nx/cypress": "16.8.1",
-    "@nx/linter": "16.8.1",
-    "@nx/web": "16.8.1",
-    "@nx/eslint-plugin": "16.8.1",
-    "@nx/jest": "16.8.1",
-    "@nx/rollup": "16.8.1",
-    "@nx/node": "16.8.1"
+    "yargs": "^17.7.2"
   }
 }

@@ -9,6 +9,7 @@
       {
         "builtIns": false
       }
-    ]
+    ],
+    "@babel/preset-flow"
   ]
 }

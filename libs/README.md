@@ -70,7 +70,7 @@ Objects and other classes used to handle annotation tasks
 </tr>
 <tr>
 <td>
-<a href="./ngx-components/src/">ngx-components</a>
+<a href="./ngx-components">ngx-components</a>
 </td>
 <td>
 Angular
@@ -81,7 +81,7 @@ Angular components e.g. for the signal displays
 </tr>
 <tr>
 <td>
-<a href="./ngx-utilities/src/">ngx-utilities</a>
+<a href="./ngx-utilities">ngx-utilities</a>
 </td>
 <td>
 Angular

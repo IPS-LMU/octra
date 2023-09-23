@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@octra/media - v0.0.11 | Octra libraries - v2.0.0</title><meta name="description" content="Documentation for Octra libraries"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@octra/media - v0.0.12 | Octra libraries - v2.0.0</title><meta name="description" content="Documentation for Octra libraries"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -14,36 +14,24 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">Octra libraries</a></li>
 <li><a href="_octra_media.html">@octra/media</a></li></ul>
-<h1>Module @octra/media - v0.0.11</h1></div>
-<section class="tsd-panel tsd-typography"><a id="md:media" class="tsd-anchor"></a><h1><a href="#md:media">media</a></h1><p>This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units).
+<h1>Module @octra/media - v0.0.12</h1></div>
+<section class="tsd-panel tsd-typography"><a id="md:media" class="tsd-anchor"></a><h1><a href="#md:media">media</a></h1><p>This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units) used by <a href="https://github.com/IPS-LMU/octra">Octra</a>.
 If you are looking for decoding and playback of audio files see @octra/web-media library.</p>
-<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><a id="md:esm-cjs-amp-ts-definitions" class="tsd-anchor"></a><h3><a href="#md:esm-cjs-amp-ts-definitions">ESM, CJS &amp; TS definitions</a></h3><p>Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
-want to use the libraries in your project you have to manually install.</p>
-<ol>
-<li>Clone the OCTRA repository next to the project folder you want to use the libraries for.</li>
-<li>Switch tu branch &quot;static&quot;.</li>
-</ol>
-<pre><code class="language-shell"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">checkout</span><span class="hl-1"> </span><span class="hl-2">static</span>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><a id="md:esm-cjs-ts-definitions-amp-umd-optional" class="tsd-anchor"></a><h3><a href="#md:esm-cjs-ts-definitions-amp-umd-optional">ESM, CJS, TS definitions &amp; UMD (optional)</a></h3><pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--save</span><span class="hl-1"> </span><span class="hl-2">@octra/media</span>
 </code><button>Copy</button></pre>
-<ol start="3">
-<li>Now go to your project folder and run</li>
-</ol>
-<pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--legacy-peer-deps</span><span class="hl-1"> </span><span class="hl-2">&quot;../octra/libs/media&quot;</span>
+<a id="md:umd-bundle-for-vanilla-js" class="tsd-anchor"></a><h3><a href="#md:umd-bundle-for-vanilla-js">UMD Bundle (for Vanilla JS)</a></h3><p>You have two options to install this package und use it as UMD:</p>
+<p>a) Install via NPM and reference local files (no internet connection needed om production).</p>
+<pre><code class="language-html"><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-6"> </span><span class="hl-7">type</span><span class="hl-6">=</span><span class="hl-8">&quot;application/javascript&quot;</span><span class="hl-6"> </span><span class="hl-7">src</span><span class="hl-6">=</span><span class="hl-8">&quot;node_modules/@octra/media/bundles/OctraMedia.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span>
 </code><button>Copy</button></pre>
-<a id="md:umd-bundle-vanilla-js" class="tsd-anchor"></a><h3><a href="#md:umd-bundle-vanilla-js">UMD Bundle (Vanilla JS)</a></h3><p>Do steps 1 and 2 from the previous chapter and reference it in an HTML file (<a href="../../../apps/web-components-demo/index.html">see full example here</a>).</p>
-<pre><code class="language-html"><span class="hl-1">    </span><span class="hl-4">&lt;</span><span class="hl-5">head</span><span class="hl-4">&gt;</span><br/><span class="hl-1">  </span><span class="hl-6">&lt;!-- ... --&gt;</span><br/><span class="hl-1">  </span><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-7"> </span><span class="hl-8">type</span><span class="hl-7">=</span><span class="hl-9">&quot;application/javascript&quot;</span><span class="hl-7"> </span><span class="hl-8">src</span><span class="hl-7">=</span><span class="hl-9">&quot;../octra/libs/media/bundles/OctraMedia.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span><br/><span class="hl-1">  </span><span class="hl-6">&lt;!-- ... --&gt;</span><br/><span class="hl-4">&lt;/</span><span class="hl-5">head</span><span class="hl-4">&gt;</span>
+<p>b) Reference remote file  (internet connection needed on production).</p>
+<pre><code class="language-html"><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-6"> </span><span class="hl-7">type</span><span class="hl-6">=</span><span class="hl-8">&quot;application/javascript&quot;</span><span class="hl-6"> </span><span class="hl-7">src</span><span class="hl-6">=</span><span class="hl-8">&quot;https://unpkg.com/@octra/media/bundles/OctraMedia.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span>
 </code><button>Copy</button></pre>
-<a id="md:update" class="tsd-anchor"></a><h2><a href="#md:update">Update</a></h2><ol>
-<li>Go to the cloned octra repository. Make sure you are in branch <code>static</code>.</li>
-<li>Update directory:</li>
-</ol>
-<pre><code class="language-shell"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">pull</span>
-</code><button>Copy</button></pre>
+<p><a href="../../../apps/web-components-demo/index.html">See full example here</a></p>
 <a id="md:use" class="tsd-anchor"></a><h2><a href="#md:use">Use</a></h2><a id="md:import" class="tsd-anchor"></a><h3><a href="#md:import">Import</a></h3><a id="md:esm-typescript" class="tsd-anchor"></a><h4><a href="#md:esm-typescript">ESM, Typescript</a></h4><p>Import the classes and functions from <code>@octra/media</code>. For example</p>
-<pre><code class="language-typescript"><span class="hl-10">import</span><span class="hl-1"> {</span><span class="hl-11">SampleUnit</span><span class="hl-1">} </span><span class="hl-10">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@octra/media&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-12">unit</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">SampleUnit</span><span class="hl-1">(</span><span class="hl-13">123123</span><span class="hl-1">, </span><span class="hl-13">22100</span><span class="hl-1">);</span>
+<pre><code class="language-typescript"><span class="hl-9">import</span><span class="hl-1"> {</span><span class="hl-10">SampleUnit</span><span class="hl-1">} </span><span class="hl-9">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@octra/media&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-11">unit</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">SampleUnit</span><span class="hl-1">(</span><span class="hl-12">123123</span><span class="hl-1">, </span><span class="hl-12">22100</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 <a id="md:umd-bundle" class="tsd-anchor"></a><h4><a href="#md:umd-bundle">UMD Bundle</a></h4><p>All functions and classes are available via global scope <code>OctraMedia</code>. For example:</p>
-<pre><code class="language-javascript"><span class="hl-6">/*</span><br/><span class="hl-6">make sure that you have injected the umd bundle as described before.</span><br/><span class="hl-6"> */</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-12">validator</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-11">OctraMedia</span><span class="hl-1">.</span><span class="hl-0">SampleUnit</span><span class="hl-1">(</span><span class="hl-13">123123</span><span class="hl-1">, </span><span class="hl-13">22100</span><span class="hl-1">);</span>
+<pre><code class="language-javascript"><span class="hl-13">/*</span><br/><span class="hl-13">make sure that you have injected the umd bundle as described before.</span><br/><span class="hl-13"> */</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-11">validator</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-10">OctraMedia</span><span class="hl-1">.</span><span class="hl-0">SampleUnit</span><span class="hl-1">(</span><span class="hl-12">123123</span><span class="hl-1">, </span><span class="hl-12">22100</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 <a id="md:api" class="tsd-anchor"></a><h3><a href="#md:api">API</a></h3><p>You can find more information about classes and functions of <code>@octra/media</code> <a href="https://ips-lmu.github.io/octra/modules/_octra_media.html">here</a>.</p>
 </section>
@@ -93,9 +81,8 @@ want to use the libraries in your project you have to manually install.</p>
 <li><a href="#md:installation"><span>Installation</span></a></li>
 <li>
 <ul>
-<li><a href="#md:esm-cjs-amp-ts-definitions"><span>ESM, CJS &amp; TS definitions</span></a></li>
-<li><a href="#md:umd-bundle-vanilla-js"><span>UMD <wbr/>Bundle (<wbr/>Vanilla JS)</span></a></li></ul></li>
-<li><a href="#md:update"><span>Update</span></a></li>
+<li><a href="#md:esm-cjs-ts-definitions-amp-umd-optional"><span>ESM, CJS, TS definitions &amp; UMD (optional)</span></a></li>
+<li><a href="#md:umd-bundle-for-vanilla-js"><span>UMD <wbr/>Bundle (for <wbr/>Vanilla JS)</span></a></li></ul></li>
 <li><a href="#md:use"><span>Use</span></a></li>
 <li>
 <ul>
@@ -108,11 +95,11 @@ want to use the libraries in your project you have to manually install.</p>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>Octra libraries -<wbr/> v2.0.0</span></a>
 <ul class="tsd-small-nested-navigation">
-<li><a href="_octra_annotation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/annotation -<wbr/> v0.1.5</span></a></li>
+<li><a href="_octra_annotation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/annotation -<wbr/> v0.1.6</span></a></li>
 <li><a href="_octra_assets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/assets -<wbr/> v0.0.1</span></a></li>
-<li><a href="_octra_json_sets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets -<wbr/> v0.0.5</span></a></li>
+<li><a href="_octra_json_sets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets -<wbr/> v0.0.6</span></a></li>
 <li>
-<details class="tsd-index-accordion" open data-key="@octra/media"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><a href="_octra_media.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/media -<wbr/> v0.0.11</span></a></summary>
+<details class="tsd-index-accordion" open data-key="@octra/media"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><a href="_octra_media.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/media -<wbr/> v0.0.12</span></a></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
 <li><a href="../enums/_octra_media.PlayBackStatus.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Play<wbr/>Back<wbr/>Status</span></a></li>
@@ -124,8 +111,8 @@ want to use the libraries in your project you have to manually install.</p>
 <li><a href="../interfaces/_octra_media.SampleTimeValues.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Sample<wbr/>Time<wbr/>Values</span></a></li></ul></div></details></li>
 <li><a href="_octra_ngx_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>components -<wbr/> v0.0.5</span></a></li>
 <li><a href="_octra_ngx_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>utilities -<wbr/> v0.0.1</span></a></li>
-<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.3</span></a></li>
-<li><a href="_octra_web_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>media -<wbr/> v0.0.4</span></a></li>
+<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.4</span></a></li>
+<li><a href="_octra_web_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>media -<wbr/> v0.0.5</span></a></li>
 <li><a href="_octra_web_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>components -<wbr/> v0.0.1</span></a></li></ul></nav></div></div></div>
 <div class="tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>

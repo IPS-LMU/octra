@@ -1,8 +1,8 @@
 {
   "name": "@octra/assets",
   "version": "0.0.1",
-  "dependencies": {},
   "type": "commonjs",
   "main": "./index.cjs",
-  "module": "./index.js"
+  "module": "./index.js",
+  "typings": "./src/index.d.ts"
 }

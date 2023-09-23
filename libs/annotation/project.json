@@ -12,6 +12,7 @@
         "main": "libs/annotation/src/index.ts",
         "tsConfig": "libs/annotation/tsconfig.lib.json",
         "external": ["@octra/media", "@octra/utilities"],
+        "generateExportsField": true,
         "project": "libs/annotation/package.json",
         "compiler": "tsc",
         "format": ["cjs", "esm"],

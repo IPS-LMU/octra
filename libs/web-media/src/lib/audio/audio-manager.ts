@@ -1,4 +1,3 @@
-import { EventEmitter } from '@angular/core';
 import { AudioDecoder } from './audio-decoder';
 import { AudioInfo } from './audio-info';
 import { SubscriptionManager } from '@octra/utilities';
@@ -27,12 +26,12 @@ export class AudioManager {
   }>();
 
   // events
-  public afterDecoded: EventEmitter<AudioResource> =
-    new EventEmitter<AudioResource>();
-  public afterLoaded: EventEmitter<any> = new EventEmitter<any>();
-  public statechange: EventEmitter<PlayBackStatus> =
-    new EventEmitter<PlayBackStatus>();
-  public missingPermission = new EventEmitter<void>();
+  public afterDecoded: Subject<AudioResource> =
+    new Subject<AudioResource>();
+  public afterLoaded: Subject<any> = new Subject<any>();
+  public statechange: Subject<PlayBackStatus> =
+    new Subject<PlayBackStatus>();
+  public missingPermission = new Subject<void>();
 
   get audio(): HTMLAudioElement {
     return this._audio;
@@ -242,7 +241,7 @@ export class AudioManager {
 
         result._mainchunk = new AudioChunk(selection, result);
 
-        result.afterDecoded.emit(result.resource);
+        result.afterDecoded.next(result.resource);
         result.prepareAudioPlayBack();
 
         result.time.start = Date.now();
@@ -402,7 +401,7 @@ export class AudioManager {
               if (!this.playOnHover) {
                 if (error.name && error.name === 'NotAllowedError') {
                   // no permission
-                  this.missingPermission.emit();
+                  this.missingPermission.next();
                 }
 
                 this.statechange.error(new Error(error));
@@ -465,7 +464,7 @@ export class AudioManager {
 
     this._channel = undefined;
     this._state = PlayBackStatus.INITIALIZED;
-    this.afterLoaded.emit({ status: 'success', error: '' });
+    this.afterLoaded.next({ status: 'success', error: '' });
   }
 
   /**
@@ -609,7 +608,7 @@ export class AudioManager {
 
   private changeState(newstate: PlayBackStatus) {
     this._state = newstate;
-    this.statechange.emit(newstate);
+    this.statechange.next(newstate);
   }
 
   private removeEventListeners() {
@@ -673,8 +672,8 @@ export class AudioManager {
 
 export class AudioChunk {
   private static _counter = 0;
-  public statuschange: EventEmitter<PlayBackStatus> =
-    new EventEmitter<PlayBackStatus>();
+  public statuschange: Subject<PlayBackStatus> =
+    new Subject<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
   private subscrManager = new SubscriptionManager<Subscription>();
   private _playposition: SampleUnit;
@@ -1109,7 +1108,7 @@ export class AudioChunk {
   private setState(state: PlayBackStatus) {
     if (this._status !== state || state === PlayBackStatus.STOPPED) {
       this._status = state;
-      this.statuschange.emit(state);
+      this.statuschange.next(state);
     }
   }
 

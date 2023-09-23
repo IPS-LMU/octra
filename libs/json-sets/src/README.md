@@ -4,46 +4,27 @@ This library allows to define sets using JSON. JSONSetValidator parsed an array 
 
 ## Installation
 
-### ESM, CJS & TS definitions
+### ESM, CJS, TS definitions & UMD (optional)
 
-Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
-want to use the libraries in your project you have to manually install.
-
-1. Clone the OCTRA repository next to the project folder you want to use the libraries for.
-2. Switch tu branch "static".
-
-```shell
-git checkout static
-```
-
-3. Now go to your project folder and run
-
-```shell
-npm install --legacy-peer-deps "../octra/libs/json-sets"
-```
-
-### UMD Bundle (Vanilla JS)
-
-Do steps 1 and 2 from the previous chapter and reference it in an HTML
-file ([see full example here](../../apps/web-components-demo/index.html)).
-
-````html
-
-<head>
-    <!-- ... -->
-    <script type="application/javascript" src="../octra/libs/json-sets/bundles/OctraJSONSets.umd.js"></script>
-    <!-- ... -->
-</head>
+````shell
+npm install --save @octra/json-sets
 ````
 
-## Update
+### UMD Bundle (for Vanilla JS)
 
-1. Go to the cloned octra repository. Make sure you are in branch `static`.
-2. Update directory:
+You have two options to install this package und use it as UMD:
 
-```shell
-git pull
-```
+a) Install via NPM and reference local files (no internet connection needed om production).
+````html
+<script type="application/javascript" src="node_modules/@octra/json-sets/bundles/OctraJSONSets.umd.js"></script>
+````
+
+b) Reference remote file  (internet connection needed on production).
+````html
+<script type="application/javascript" src="https://unpkg.com/@octra/json-sets/bundles/OctraJSONSets.umd.js"></script>
+````
+
+[See full example here](../../../apps/web-components-demo/index.html)
 
 ## Use
 

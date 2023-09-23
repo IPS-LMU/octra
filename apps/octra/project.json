@@ -27,7 +27,8 @@
           "apps/octra/src/config",
           "apps/octra/src/media",
           "apps/octra/src/LICENSE.txt",
-          "apps/octra/src/.htaccess"
+          "apps/octra/src/.htaccess",
+          "apps/octra/src/ocb_info.json"
         ],
         "styles": [
           "node_modules/video.js/dist/video-js.min.css",

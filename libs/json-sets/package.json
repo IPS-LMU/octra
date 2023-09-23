@@ -1,8 +1,8 @@
 {
   "name": "@octra/json-sets",
-  "version": "0.0.5",
-  "dependencies": {},
+  "version": "0.0.6",
   "type": "commonjs",
   "main": "./index.cjs",
-  "module": "./index.js"
+  "module": "./index.js",
+  "typings": "./src/index.d.ts"
 }

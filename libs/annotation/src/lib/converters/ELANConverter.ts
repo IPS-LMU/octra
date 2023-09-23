@@ -7,7 +7,6 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { DateTime } from 'luxon';
 import { OAudiofile } from '@octra/media';
 
 export class ELANConverter extends Converter {
@@ -47,7 +46,7 @@ export class ELANConverter extends Converter {
       },
       ANNOTATION_DOCUMENT: {
         _AUTHOR: 'OCTRA',
-        _DATE: DateTime.now().toISODate(),
+        _DATE: new Date().toISOString(),
         _FORMAT: '3.0',
         _VERSION: '3.0',
         '_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',

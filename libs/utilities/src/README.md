@@ -1,47 +1,30 @@
 # @octra/utilities
 
-This library offers JS functions and classes to make some parts of app development easier. This library is used by Octra and Octra-Backend.
+This library offers JS functions and classes to make some parts of app development easier. This library is used by [Octra](https://github.com/IPS-LMU/octra) and Octra-Backend.
 
 ## Installation
 
-### ESM, CJS & TS definitions
+### ESM, CJS, TS definitions & UMD (optional)
 
-Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
-want to use the libraries in your project you have to manually install.
+````shell
+npm install --save @octra/utilities
+````
 
-1. Clone the OCTRA repository next to the project folder you want to use the libraries for.
-2. Switch tu branch "static".
+### UMD Bundle (for Vanilla JS)
 
-```shell
-git checkout static
-```
+You have two options to install this package und use it as UMD:
 
-3. Now go to your project folder and run
+a) Install via NPM and reference local files (no internet connection needed om production).
+````html
+<script type="application/javascript" src="node_modules/@octra/utilities/bundles/OctraUtilities.umd.js"></script>
+````
 
-```shell
-npm install --legacy-peer-deps "../octra/libs/utilities"
-```
+b) Reference remote file  (internet connection needed on production).
+````html
+<script type="application/javascript" src="https://unpkg.com/@octra/utilities/bundles/OctraUtilities.umd.js"></script>
+````
 
-### UMD Bundle (Vanilla JS)
-
-Do steps 1 and 2 from the previous chapter and reference it in an HTML file ([see full example here](../../../apps/web-components-demo/index.html)).
-
-```html
-<head>
-  <!-- ... -->
-  <script type="application/javascript" src="../octra/libs/utilities/bundles/OctraUtilities.umd.js"></script>
-  <!-- ... -->
-</head>
-```
-
-## Update
-
-1. Go to the cloned octra repository. Make sure you are in branch `static`.
-2. Update directory:
-
-```shell
-git pull
-```
+[See full example here](../../../apps/web-components-demo/index.html)
 
 ## Use
 
@@ -49,7 +32,7 @@ git pull
 
 #### ESM, Typescript
 
-Import the classes and functions from `@octra/utilties`. For example
+Import the classes and functions from `@octra/utilities`. For example
 
 ````typescript
 import {getFileSize} from "@octra/utilities";

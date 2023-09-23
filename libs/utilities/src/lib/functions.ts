@@ -1,4 +1,3 @@
-import {Observable} from 'rxjs';
 
 /**
  * represents a file size definition giving size and label.
@@ -155,49 +154,6 @@ export function insertString(
   }
 
   return result;
-}
-
-export function afterTrue(observable: Observable<boolean>): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const subscription = observable.subscribe(
-      (value) => {
-        if (value === true) {
-          try {
-            subscription.unsubscribe();
-          } catch (e) {
-            // ignore
-          }
-          resolve();
-        }
-      },
-      (error) => {
-        reject(error);
-      },
-      () => {
-        reject('comnpleted!');
-      }
-    );
-  });
-}
-
-export function afterDefined(observable: Observable<any>): Promise<any> {
-  return new Promise<any>((resolve, reject) => {
-    const subscription = observable.subscribe(
-      (value) => {
-        if (value !== undefined) {
-          try {
-            subscription.unsubscribe();
-          } catch (e) {
-            // ignore
-          }
-          resolve(value);
-        }
-      },
-      (error) => {
-        reject(error);
-      }
-    );
-  });
 }
 
 export function waitTillResultRetrieved<

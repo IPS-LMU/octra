@@ -1,49 +1,31 @@
 # annotation
 
 This library offers all annotation related classes and functions used by Octra. It uses AnnotJSON file format as base
-model. Here you can also find all Annotation converters used by Octra.
+model. Here you can also find all Annotation converters used by [Octra](https://github.com/IPS-LMU/octra).
 
 ## Installation
 
-### ESM, CJS & TS definitions
+### ESM, CJS, TS definitions & UMD (optional)
 
-Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
-want to use the libraries in your project you have to manually install.
-
-1. Clone the OCTRA repository next to the project folder you want to use the libraries for.
-2. Switch tu branch "static".
-
-```shell
-git checkout static
-```
-
-3. Now go to your project folder and run
-
-```shell
-npm install --legacy-peer-deps "../octra/libs/annotation"
-```
-
-### UMD Bundle (Vanilla JS)
-
-Do steps 1 and 2 from the previous chapter and reference it in an HTML
-file ([see full example here](../../../apps/web-components-demo/index.html)).
-
-````html
-<head>
-    <!-- ... -->
-    <script type="application/javascript" src="../octra/libs/annotation/bundles/OctraAnnotation.umd.js"></script>
-    <!-- ... -->
-</head>
+````shell
+npm install --save @octra/annotation
 ````
 
-## Update
+### UMD Bundle (for Vanilla JS)
 
-1. Go to the cloned octra repository. Make sure you are in branch `static`.
-2. Update directory:
+You have two options to install this package und use it as UMD:
 
-```shell
-git pull
-```
+a) Install via NPM and reference local files (no internet connection needed om production).
+````html
+<script type="application/javascript" src="node_modules/@octra/annotation/bundles/OctraAnnotation.umd.js"></script>
+````
+
+b) Reference remote file  (internet connection needed on production).
+````html
+<script type="application/javascript" src="https://unpkg.com/@octra/annotation/bundles/OctraAnnotation.umd.js"></script>
+````
+
+[See full example here](../../../apps/web-components-demo/index.html)
 
 ## Use
 
@@ -54,7 +36,16 @@ git pull
 Import the classes and functions from `@octra/annotation`. For example
 
 ````typescript
-import {Level} from "@octra/annotation";
+import { Level } from "@octra/annotation";
+
+const annotation = new OctraAnnotation();
+const level = annotation.addLevel(new OctraAnnotation.createSegmentLevel("OCTRA_1"));
+annotation.addItemToCurrentLevel(new SampleUnit(123456, 22050), [
+  new OLabel(
+    "OCTRA_1",
+    "hello world"
+  )
+]);
 ````
 
 #### UMD Bundle
@@ -65,7 +56,14 @@ All functions and classes are available via global scope `OctraAnnotation`. For 
 /*
 make sure that you have injected the umd bundle as described before.
  */
-const annotation = new OctraAnnotation.Level(1, "OCTRA_1", "SEGMENT", []);
+const annotation = new OctraAnnotation.OctraAnnotation();
+const level = annotation.addLevel(new OctraAnnotation.OctraAnnotation.createSegmentLevel("OCTRA_1"));
+annotation.addItemToCurrentLevel(new OctraAnnotation.SampleUnit(123456, 22050), [
+  new OctraAnnotation.OLabel(
+    "OCTRA_1",
+    "hello world"
+  )
+]);
 ```
 
 ### API

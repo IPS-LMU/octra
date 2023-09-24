@@ -3,14 +3,33 @@ const path = require('path');
 const fs = require('fs-extra');
 const process = require('node:child_process');
 const { exec } = require('node:child_process');
+const { pathExists } = require('@nx/eslint-plugin/src/utils/graph-utils');
 
 const JSONValidator = {
   build: async function () {
-    await run('nx bundle json-sets');
-    // await fs.mkdir("dist/libs/json-sets/src/lib/schema", { recursive: true });
-    //await fs.copyFile("libs/json-sets/src/lib/schema/json-set.schema.json", "dist/libs/json-sets/src/lib/schema/json-set-validator.schema.json");
+    await bundleLibrary("json-sets");
   },
 };
+
+async function preparePackageJSON(packagePath) {
+  if (await fs.pathExists(packagePath)) {
+    const json = await fs.readJSON(packagePath);
+    if (json.main === './index.cjs.js') {
+      json.main = './index.cjs';
+    }
+    if (json.module === './index.esm.js') {
+      json.module = './index.mjs';
+    }
+    await fs.writeJSON(packagePath, json, {
+      spaces: 2,
+    });
+  }
+}
+
+async function bundleLibrary(libraryName) {
+  await run(`nx bundle ${libraryName}`);
+  await preparePackageJSON(`./dist/libs/${libraryName}/package.json`);
+}
 
 const Project = {
   updateLicenses: async function () {
@@ -70,11 +89,11 @@ const OCTRA = {
     await run('nx build ngx-utilities');
     await run(`npm run build:web-components`);
     await JSONValidator.build();
-    await run('nx bundle utilities');
-    await run('nx bundle assets');
-    await run('nx bundle annotation');
-    await run('nx bundle media');
-    await run('nx bundle web-media');
+    await bundleLibrary('utilities');
+    await bundleLibrary('assets');
+    await bundleLibrary('annotation');
+    await bundleLibrary('media');
+    await bundleLibrary('web-media');
   },
 };
 

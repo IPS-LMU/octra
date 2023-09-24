@@ -8,10 +8,10 @@
       "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "rollupConfig": "libs/json-sets/rollup.cjs",
         "outputPath": "dist/libs/json-sets",
         "main": "libs/json-sets/src/index.ts",
         "tsConfig": "libs/json-sets/tsconfig.lib.json",
-        "generateExportsField": true,
         "assets": [
           "libs/json-sets/src/LICENSE.txt",
           "libs/json-sets/src/README.md"

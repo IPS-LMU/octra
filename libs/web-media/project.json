@@ -8,10 +8,10 @@
       "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "rollupConfig": "libs/web-media/rollup.cjs",
         "outputPath": "dist/libs/web-media",
         "main": "libs/web-media/src/index.ts",
         "tsConfig": "libs/web-media/tsconfig.lib.json",
-        "generateExportsField": true,
         "assets": [
           "libs/web-media/src/LICENSE.txt",
           "libs/web-media/src/README.md"

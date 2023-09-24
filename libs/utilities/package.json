@@ -1,8 +1,8 @@
 {
   "name": "@octra/utilities",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "commonjs",
   "main": "./index.cjs",
-  "module": "./index.js",
+  "module": "./index.mjs",
   "typings": "./src/index.d.ts"
 }

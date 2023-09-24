@@ -8,14 +8,14 @@
       "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "rollupConfig": "libs/media/rollup.cjs",
         "outputPath": "dist/libs/media",
         "main": "libs/media/src/index.ts",
         "tsConfig": "libs/media/tsconfig.lib.json",
-        "generateExportsField": true,
         "assets": ["libs/media/src/LICENSE.txt", "libs/media/src/README.md"],
         "project": "libs/media/package.json",
         "compiler": "tsc",
-        "format": ["cjs"]
+        "format": ["cjs", "esm"]
       }
     },
     "bundle": {

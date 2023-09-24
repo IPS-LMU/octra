@@ -8,9 +8,9 @@
       "executor": "@nx/rollup:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "rollupConfig": "libs/utilities/rollup.cjs",
         "outputPath": "dist/libs/utilities",
         "tsConfig": "libs/utilities/tsconfig.lib.json",
-        "generateExportsField": true,
         "main": "libs/utilities/src/index.ts",
         "entryFile": "libs/utilities/src/index.ts",
         "assets": [

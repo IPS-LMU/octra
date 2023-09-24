@@ -2640,6 +2640,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                             timestamp: shortcutInfo.timestamp,
                           });
                         }
+                        this.av.changeSegment(xSamples, segment);
+                        this.redraw();
                       }
                     }
                   }

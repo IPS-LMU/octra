@@ -1128,4 +1128,20 @@ export class AudioViewerService {
     });
     this.annotationChange.emit(result);
   }
+
+  public changeSegment(start: SampleUnit, segment: OctraAnnotationSegment) {
+    const result = this.annotation!.changeCurrentSegmentBySamplePosition(
+      start,
+      segment
+    );
+    this.currentLevelChange.emit({
+      type: 'change',
+      items: [
+        {
+          instance: segment,
+        },
+      ],
+    });
+    this.annotationChange.emit(result);
+  }
 }

@@ -13,7 +13,6 @@ import {
   AnnotationAnySegment,
   AnnotationLevelType,
   ASRContext,
-  OAnnotJSON,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
@@ -173,17 +172,14 @@ export class AnnotationStoreService {
   transcriptString$ = this.transcript$.pipe(
     map((transcript) => {
       if (transcript) {
+        const annotation = transcript.serialize(
+          this.audio.audioManager.resource.name,
+          this.audio.audioManager.resource.info.sampleRate,
+          this.audio.audioManager.resource.info.duration.clone()
+        );
+
         const result = new TextConverter().export(
-          new OAnnotJSON(
-            this.audio.audioManager.resource.name,
-            this.audio.audioManager.resource.name.replace(/\.[^.]+$/g, ''),
-            this.audio.audiomanagers[0].resource.info.sampleRate,
-            transcript.levels.map((a) =>
-              a.serialize(
-                this.audio.audioManager.resource.info.duration.clone()
-              )
-            )
-          ),
+         annotation,
           this.audio.audioManager.resource.getOAudioFile(),
           transcript.selectedLevelIndex!
         )!.file!;
@@ -307,6 +303,7 @@ export class AnnotationStoreService {
   changeLevelName(index: number, name: string) {
     this.store.dispatch(
       AnnotationActions.changeLevelName.do({
+        mode: this.appStorage.snapshot.application.mode!,
         index,
         name,
       })

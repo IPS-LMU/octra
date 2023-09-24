@@ -32,7 +32,6 @@ import {
   IFile,
   ImportResult,
   ISegment,
-  OAnnotJSON,
   OctraAnnotation,
   OctraAnnotationSegment,
   OLabel,
@@ -760,14 +759,10 @@ export class AnnotationEffects {
             );
           }
           const result = new AnnotJSONConverter().export(
-            new OAnnotJSON(
-              state.onlineMode.audio.fileName,
-              state.onlineMode.audio.fileName.replace(/\.[^.]+$/g, ''),
-              state.onlineMode.audio.sampleRate,
-              state.onlineMode.transcript.levels.map((a) =>
-                a.serialize(this.audio.audioManager.resource.info.duration)
-              ),
-              state.onlineMode.transcript.links.map((a) => a.link)
+            state.onlineMode.transcript.serialize(
+              this.audio.audioManager.resource.info.fullname,
+              this.audio.audioManager.resource.info.sampleRate,
+              this.audio.audioManager.resource.info.duration.clone()
             )
           )?.file?.content;
 
@@ -1113,7 +1108,6 @@ export class AnnotationEffects {
 
   private loadSegments(modeState: AnnotationState, rootState: RootState) {
     let feedback: FeedBackForm | undefined = undefined;
-
     if (
       modeState.transcript.levels === undefined ||
       modeState.transcript.levels.length === 0
@@ -1196,6 +1190,32 @@ export class AnnotationEffects {
             }
           }
         }
+
+        if (newAnnotation.levels.length === 0) {
+          const level = newAnnotation.createSegmentLevel('OCTRA_1');
+          level.items.push(
+            newAnnotation.createSegment(
+              this.audio.audioManager.resource.info.duration,
+              [
+                new OLabel('OCTRA_1', ''), // empty transcript
+              ]
+            )
+          );
+          newAnnotation.addLevel(level);
+          newAnnotation.changeLevelIndex(0);
+        } else {
+          const currentLevelIndex =
+            modeState.previousCurrentLevel === undefined ||
+            modeState.previousCurrentLevel === null ||
+            modeState.previousCurrentLevel >= newAnnotation.levels.length
+              ? Math.max(
+                  0,
+                  newAnnotation.levels.findIndex((a) => a.type === 'SEGMENT')
+                )
+              : modeState.previousCurrentLevel;
+
+          newAnnotation.changeCurrentLevelIndex(currentLevelIndex);
+        }
       } else {
         // not URL oder ONLINE MODE, Annotation is null
 
@@ -1261,6 +1281,17 @@ export class AnnotationEffects {
     const transcript = modeState.transcript.changeSampleRate(
       this.audio.audioManager.resource.info.sampleRate
     );
+
+    const currentLevelIndex =
+      modeState.previousCurrentLevel === undefined ||
+      modeState.previousCurrentLevel === null ||
+      modeState.previousCurrentLevel >= transcript.levels.length
+        ? Math.max(
+            0,
+            transcript.levels.findIndex((a) => a.type === 'SEGMENT')
+          )
+        : modeState.previousCurrentLevel;
+    transcript.changeCurrentLevelIndex(currentLevelIndex);
 
     return of(
       AnnotationActions.initTranscriptionService.success({

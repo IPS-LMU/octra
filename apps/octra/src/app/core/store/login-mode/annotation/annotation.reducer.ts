@@ -161,20 +161,31 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
+      on(AnnotationActions.changeLevelName.do, (state: AnnotationState, {index, mode, name}) => {
+        if(mode === this.mode) {
+          const transcript = state.transcript.clone();
+          transcript.changeLevelNameByIndex(index,  name);
+          state.transcript = transcript;
+        }
+
+        return state;
+      }),
       on(
         AnnotationActions.addAnnotationLevel.do,
         (state: AnnotationState, { levelType, mode, audioDuration }) => {
           if (this.mode === mode) {
+            const transcript = state.transcript.clone();
             let level:
               | OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>
               | undefined = undefined;
+
             if (levelType === AnnotationLevelType.SEGMENT) {
-              level = state.transcript.createSegmentLevel(
-                `OCTRA_${state.transcript.idCounters.level + 1}`,
+              level = transcript.createSegmentLevel(
+                `OCTRA_${transcript.idCounters.level + 1}`,
                 [
-                  state.transcript.createSegment(audioDuration.clone(), [
+                  transcript.createSegment(audioDuration.clone(), [
                     new OLabel(
-                      `OCTRA_${state.transcript.idCounters.level + 1}`,
+                      `OCTRA_${transcript.idCounters.level + 1}`,
                       ''
                     ),
                     new OLabel(`Speaker`, ''),
@@ -188,7 +199,7 @@ export class AnnotationStateReducers {
             if (level) {
               return {
                 ...state,
-                transcript: state.transcript.addLevel(level),
+                transcript: transcript.addLevel(level),
               };
             }
           }
@@ -202,7 +213,7 @@ export class AnnotationStateReducers {
             if (id > -1) {
               return {
                 ...state,
-                transcript: state.transcript.removeLevel(id),
+                transcript: state.transcript.clone().removeLevel(id),
               };
             } else {
               console.error(`can't remove level because id not valid.`);
@@ -331,7 +342,7 @@ export class AnnotationStateReducers {
           if (mode === this.mode) {
             return {
               ...state,
-              transcript: state.transcript.changeLevelIndex(currentLevelIndex),
+              transcript: state.transcript.clone().changeLevelIndex(currentLevelIndex),
             };
           }
           return state;
@@ -432,10 +443,7 @@ export class AnnotationStateReducers {
         AnnotationActions.duplicateLevel.do,
         (state: AnnotationState, { mode, index }) => {
           if (mode === this.mode) {
-            return {
-              ...state,
-              transcript: state.transcript.duplicateLevel(index),
-            };
+            state.transcript =  state.transcript.clone().duplicateLevel(index);
           }
           return state;
         }
@@ -453,6 +461,11 @@ export class AnnotationStateReducers {
         return {
           ...state,
           currentEditor: value !== undefined ? value : '2D-Editor',
+        };
+      case 'currentLevel':
+        return {
+          ...state,
+          previousCurrentLevel: value,
         };
       case 'logging':
         return {

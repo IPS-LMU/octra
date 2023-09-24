@@ -17,7 +17,11 @@ import {
   ConsoleType,
 } from '../../shared/service/bug-report.service';
 import { NavbarService } from './navbar.service';
-import { AnnotationLevelType } from '@octra/annotation';
+import {
+  AnnotationLevelType,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
 import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { BugreportModalComponent } from '../../modals/bugreport-modal/bugreport-modal.component';
@@ -172,15 +176,16 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     this.annotationStoreService.addAnnotationLevel(AnnotationLevelType.SEGMENT);
   }
 
-  onLevelRemoveClick(tiernum: number, id: number) {
-    // jQuery(this.tiersDropdown.nativeElement).addClass('show');
+  onLevelRemoveClick(level: OctraAnnotationAnyLevel<OctraAnnotationSegment>) {
     this.modService
       .openModal(YesNoModalComponent, YesNoModalComponent.options, {
-        text: 'The Tier will be deleted permanently. Are you sure?',
+        message: this.langService.translate('modal.level remove', {
+          name: level.name,
+        }),
       })
       .then((answer) => {
         if (answer === 'yes') {
-          this.appStorage.removeAnnotationLevel(id).catch((err) => {
+          this.appStorage.removeAnnotationLevel(level.id).catch((err) => {
             console.error(err);
           });
         }

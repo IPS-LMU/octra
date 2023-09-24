@@ -265,7 +265,8 @@
     },
     "overview": {
       "check transcription": "Wechsle zu dem TRN-Editor und überprüfe dein Transkript."
-    }
+    },
+    "level remove": "Bist Du dir sicher, dass Du die Ebene \"{{name}}\" permanent löschen möchtest?"
   },
   "login": {
     "online mode": "Online Modus",

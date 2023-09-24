@@ -38,7 +38,7 @@
                         <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                             {{ 'login.online mode disabled' | transloco }}
                         </div>
-                        <div *ngIf="authStoreService.serverOnline$ | async; else showServerOffline" class="form-horizontal">
+                        <div *ngIf="(authStoreService.serverOnline$ | async) === undefined ? true : (authStoreService.serverOnline$ | async) ; else showServerOffline" class="form-horizontal">
                                 <octra-authentication-component
                                         [showTitle]="false"
                                         (submitClick)="onOnlineSubmit($event)"

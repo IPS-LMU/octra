@@ -167,12 +167,12 @@
                     </a>
                     <div
                             ngbDropdownMenu
-                            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
+                            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right rounded rounded-3 rounded py-0"
                             role="menu"
                             style="min-width: 300px"
                             (click)="$event.stopPropagation()"
                     >
-                        <table style="width: 100%">
+                        <table class="w-100">
                             <tbody>
                             <tr
                                     *ngFor="
@@ -180,14 +180,16 @@
                     let i = index
                   "
                                     [ngClass]="{
-                    selected: annotationStoreService.currentLevelIndex === i
+                    selected: annotationStoreService.currentLevelIndex === i,
+                      'last': i === annotationStoreService.transcript!.levels.length - 1
                   }"
                                     class="level-row"
                             >
                                 <td
                                         (click)="selectLevel(i)"
                                         [ngClass]="{
-                      disabled: level.type !== 'SEGMENT'
+                      disabled: level.type !== 'SEGMENT',
+                      'rounded-top-3 rounded-end-0': i === 0
                     }"
                                         style="cursor: pointer"
                                 >
@@ -206,10 +208,12 @@
                                             style="width: 100%"
                                     />
                                 </td>
-                                <td>
-                                    <i
+                                <td [ngClass]="{
+                                  'rounded-top-3 rounded-start-0': i === 0
+                                }">
+                                    <i *ngIf="annotationStoreService.transcript!.levels.length > 1"
                                             class="bi bi-trash"
-                                            (click)="onLevelRemoveClick(i, level.id)"
+                                            (click)="onLevelRemoveClick(level)"
                                             style="cursor: pointer"
                                     ></i>
                                     <i
@@ -224,7 +228,7 @@
                                 <td
                                         colspan="3"
                                         (click)="onLevelAddClick()"
-                                        class="level-add-row"
+                                        class="level-add-row rounded rounded-bottom-3"
                                 >
                                     <i class="bi bi-plus-lg"></i>
                                 </td>

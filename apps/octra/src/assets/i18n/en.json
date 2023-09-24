@@ -265,7 +265,8 @@
     },
     "overview": {
       "check transcription": "Switch to TRN-Editor and check your transcript."
-    }
+    },
+    "level remove": "Are you sure you want to delete the layer \"{{name}}\" permanently?"
   },
   "login": {
     "online mode": "Online Mode",

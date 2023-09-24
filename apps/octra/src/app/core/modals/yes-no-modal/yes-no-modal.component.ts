@@ -10,7 +10,8 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class YesNoModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false,
+    backdrop: 'static',
+    size: 'md',
   };
   public message = '';
 

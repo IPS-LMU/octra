@@ -388,12 +388,9 @@ export class AnnotationActions {
     source: 'annotation/change level name',
     events: {
       do: props<{
+        mode: LoginMode;
         index: number;
         name: string;
-      }>(),
-      success: emptyProps(),
-      fail: props<{
-        error: string;
       }>(),
     },
   });

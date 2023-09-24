@@ -421,6 +421,7 @@ export interface IIDBModeOptions {
   feedback?: any;
   sessionfile?: any;
   currentEditor?: string | null;
+  currentLevel?: number | null;
   logging?: boolean | null;
   project?: ProjectDto | null;
   comment?: string | null;

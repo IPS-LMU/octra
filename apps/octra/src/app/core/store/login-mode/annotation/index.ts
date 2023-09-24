@@ -47,6 +47,7 @@ export interface AnnotationState extends UndoRedoState {
   savingNeeded: boolean;
   isSaving: boolean;
   currentEditor?: string;
+  previousCurrentLevel?: number;
   audio: {
     loaded: boolean;
     fileName: string;

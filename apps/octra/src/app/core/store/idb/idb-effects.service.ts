@@ -246,14 +246,10 @@ export class IDBEffects {
           return this.idbService
             .saveAnnotation(
               appState.application.mode!,
-              new OAnnotJSON(
-                modeState.audio.fileName,
-                modeState.audio.fileName.replace(/\.[^.]+$/g, ''),
-                modeState.audio.sampleRate,
-                modeState.transcript.levels.map((a) =>
-                  a.serialize(this.audio.audioManager.resource.info.duration)
-                ),
-                links
+              modeState.transcript.serialize(
+                this.audio.audioManager.resource.info.fullname,
+                this.audio.audioManager.resource.info.sampleRate,
+                this.audio.audioManager.resource.info.duration
               )
             )
             .pipe(
@@ -286,18 +282,13 @@ export class IDBEffects {
         const modeState = getModeState(appState);
 
         if (modeState) {
-          const links = modeState.transcript.links.map((a) => a.link);
           return this.idbService
             .saveAnnotation(
               appState.application.mode!,
-              new OAnnotJSON(
-                modeState.audio.fileName,
-                modeState.audio.fileName.replace(/\.[^.]+/g, ''),
-                modeState.audio.sampleRate,
-                modeState.transcript.levels.map((a) =>
-                  a.serialize(this.audio.audioManager.resource.info.duration)
-                ),
-                links
+              modeState.transcript.serialize(
+                this.audio.audioManager.resource.info.fullname,
+                this.audio.audioManager.resource.info.sampleRate,
+                this.audio.audioManager.resource.info.duration
               )
             )
             .pipe(
@@ -470,7 +461,8 @@ export class IDBEffects {
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
         AuthenticationActions.loginLocal.success,
-        LoginModeActions.startAnnotation.success
+        LoginModeActions.startAnnotation.success,
+        AnnotationActions.setLevelIndex.do
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]) => {
@@ -488,6 +480,7 @@ export class IDBEffects {
                   ? modeState.sessionFile.toAny()
                   : null,
               currentEditor: modeState.currentEditor ?? null,
+              currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
               logging: modeState.logging ?? null,
               project: modeState.currentSession?.loadFromServer
                 ? modeState.currentSession?.currentProject ?? null
@@ -958,7 +951,9 @@ export class IDBEffects {
         AnnotationActions.addCurrentLevelItems.do,
         AnnotationActions.removeCurrentLevelItems.do,
         AnnotationActions.changeCurrentLevelItems.do,
-        AnnotationActions.changeCurrentItemById.do
+        AnnotationActions.changeCurrentItemById.do,
+        AnnotationActions.changeLevelName.do,
+        AnnotationActions.duplicateLevel.do
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {

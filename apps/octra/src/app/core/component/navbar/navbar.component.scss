@@ -54,11 +54,14 @@
 }
 
 .level-row {
-  border: 1px solid gray;
   padding: 5px;
+  border-bottom:1px solid gray;
 }
 
-.level-row.selected,
+.level-row.last {
+  border-bottom: none !important;
+}
+
 .level-row.selected * {
   background-color: rgb(165, 250, 190);
 }
@@ -81,14 +84,14 @@
   margin-top: 5px;
   border: 1px dashed gray;
   text-align: center;
-  padding: 5px;
   cursor: pointer;
 }
 
 .level-row td {
-  padding-top: 5px;
+  padding: 5px 0;
   text-align: center;
   vertical-align: middle;
+  font-size:0.85rem;
   height: 100%;
 }
 

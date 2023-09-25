@@ -759,11 +759,13 @@ export class AnnotationEffects {
             );
           }
           const result = new AnnotJSONConverter().export(
-            state.onlineMode.transcript.serialize(
-              this.audio.audioManager.resource.info.fullname,
-              this.audio.audioManager.resource.info.sampleRate,
-              this.audio.audioManager.resource.info.duration.clone()
-            )
+            state.onlineMode.transcript
+              .clone()
+              .serialize(
+                this.audio.audioManager.resource.info.fullname,
+                this.audio.audioManager.resource.info.sampleRate,
+                this.audio.audioManager.resource.info.duration.clone()
+              )
           )?.file?.content;
 
           const outputs = result
@@ -844,6 +846,12 @@ export class AnnotationEffects {
         this.transcrSendingModal.timeout?.unsubscribe();
         this.transcrSendingModal.ref?.close();
 
+        this.alertService.showAlert(
+          'success',
+          this.transloco.translate('g.submission success')
+        );
+
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
         return of(
           LoginModeActions.clearOnlineSession.do({
             mode: a.mode,
@@ -865,6 +873,7 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(LoginModeActions.clearOnlineSession.do),
       exhaustMap((a) => {
+        this.audio.destroy(true);
         return of(a.actionAfterSuccess);
       })
     )

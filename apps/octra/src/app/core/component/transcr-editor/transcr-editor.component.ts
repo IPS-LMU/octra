@@ -74,7 +74,7 @@ export class TranscrEditorComponent
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
 
   @Input() visible = true;
-  @Input() markers: any[] = [];
+  @Input() markers?: any[] = [];
   @Input() easymode = true;
   @Input() height = 0;
   @Input() playposition?: SampleUnit;
@@ -285,7 +285,7 @@ export class TranscrEditorComponent
             this.joditComponent?.jodit?.history.redo();
           }
           this.triggerTyping();
-        } else {
+        } else if(this.markers) {
           for (const marker of this.markers) {
             if (
               marker.shortcut[shortcutInfo.platform] === shortcutInfo.shortcut
@@ -348,18 +348,20 @@ export class TranscrEditorComponent
     html = html.replace(/&nbsp;/g, ' ');
 
     // check for markers that are utf8 symbols
-    for (const marker of this.markers) {
-      if (
-        marker.icon !== undefined &&
-        marker.icon.indexOf('.png') < 0 &&
-        marker.icon.indexOf('.jpg') < 0 &&
-        marker.icon.indexOf('.gif') < 0 &&
-        marker.icon !== '' &&
-        marker.code !== '' &&
-        marker.icon !== marker.code
-      ) {
-        // replace all utf8 symbols with the marker's code
-        html = html.replace(new RegExp(marker.icon, 'g'), marker.code);
+    if(this.markers){
+      for (const marker of this.markers) {
+        if (
+          marker.icon !== undefined &&
+          marker.icon.indexOf('.png') < 0 &&
+          marker.icon.indexOf('.jpg') < 0 &&
+          marker.icon.indexOf('.gif') < 0 &&
+          marker.icon !== '' &&
+          marker.code !== '' &&
+          marker.icon !== marker.code
+        ) {
+          // replace all utf8 symbols with the marker's code
+          html = html.replace(new RegExp(marker.icon, 'g'), marker.code);
+        }
       }
     }
 
@@ -387,7 +389,7 @@ export class TranscrEditorComponent
           const value = getAttr(elem, 'data-value');
           attr += '=' + value;
         }
-        if (attr) {
+        if (attr && this.markers) {
           const markerCode = unEscapeHtml(attr);
 
           for (const marker of this.markers) {
@@ -666,6 +668,20 @@ export class TranscrEditorComponent
         },
       })
     );
+
+
+    this.subscrManager.removeByTag('typing_change');
+    this.subscrManager.add(
+      this.internalTyping.subscribe((status) => {
+        if (status === 'stopped') {
+          this.validate();
+          this.initPopover();
+        }
+
+        this.typing.emit(status);
+      }),
+      'typing_change'
+    );
   }
 
   ngOnInit() {
@@ -738,7 +754,7 @@ export class TranscrEditorComponent
    */
   initToolbar() {
     this.joditOptions.extraButtons = [];
-    if (this.markers !== undefined) {
+    if (this.markers) {
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
         this.joditOptions.extraButtons.push(
@@ -1030,19 +1046,21 @@ export class TranscrEditorComponent
 
     const regex2 = /{([0-9]+)}/g;
 
-    for (const marker of this.markers) {
-      const replaceFunc = (x: string, g1: string, g2: string, g3: string) => {
-        const s1 = g1 ? g1 : '';
-        const s3 = g3 ? g3 : '';
-        return s1 + 'X' + s3;
-      };
+    if(this.markers) {
+      for (const marker of this.markers) {
+        const replaceFunc = (x: string, g1: string, g2: string, g3: string) => {
+          const s1 = g1 ? g1 : '';
+          const s3 = g3 ? g3 : '';
+          return s1 + 'X' + s3;
+        };
 
-      const regex = new RegExp(
-        '(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*',
-        'g'
-      );
+        const regex = new RegExp(
+          '(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*',
+          'g'
+        );
 
-      rawtext = rawtext.replace(regex, replaceFunc);
+        rawtext = rawtext.replace(regex, replaceFunc);
+      }
     }
 
     const segTexts = rawtext.split(regex2).filter((a) => !isNumber(a));
@@ -1594,8 +1612,6 @@ export class TranscrEditorComponent
       }
 
       highlight.remove();
-    } else {
-      console.error(`item parent is undefined!`);
     }
   }
 
@@ -1646,22 +1662,6 @@ export class TranscrEditorComponent
   }
 
   onChange() {
-    this.init++;
-
-    if (this.init > 1) {
-      this.subscrManager.removeByTag('typing_change');
-      this.subscrManager.add(
-        this.internalTyping.subscribe((status) => {
-          if (status === 'stopped') {
-            this.validate();
-            this.initPopover();
-          }
-
-          this.typing.emit(status);
-        }),
-        'typing_change'
-      );
-    }
   }
 
   onPaste($event: Event) {

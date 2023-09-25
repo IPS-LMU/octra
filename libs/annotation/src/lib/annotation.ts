@@ -727,7 +727,7 @@ export class OctraAnnotationSegmentLevel<
     const res = {
       items: this.level.items.map((a) => {
         const result = a.serializeToOSegment(start);
-        start += a.time.samples;
+        start = a.time.samples;
 
         return result;
       }),

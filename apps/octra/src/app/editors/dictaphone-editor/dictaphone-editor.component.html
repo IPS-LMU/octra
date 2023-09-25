@@ -21,7 +21,7 @@
   [audiochunk]="audiochunk"
   [segments]="segments"
   [easymode]="appStorage.easymode"
-  [markers]="annotationStoreService.guidelines!.markers"
+  [markers]="annotationStoreService.guidelines?.markers"
   [validationEnabled]="
     appStorage.useMode !== 'url' &&
     (appStorage.useMode === 'demo' ||

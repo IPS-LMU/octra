@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { contains, SubscriptionManager } from '@octra/utilities';
+import { contains } from '@octra/utilities';
 import {
   TranscrEditorComponent,
   TranscrEditorConfig,
@@ -30,7 +30,7 @@ import {
 } from '@octra/ngx-components';
 import { AudioSelection, SampleUnit } from '@octra/media';
 import { LoginMode } from '../../core/store';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import {
   ASRContext,
@@ -226,7 +226,6 @@ export class LinearEditorComponent
     public appStorage: AppStorageService
   ) {
     super();
-    this.subscrManager = new SubscriptionManager<Subscription>();
 
     if (
       this.appStorage.useMode === LoginMode.ONLINE ||

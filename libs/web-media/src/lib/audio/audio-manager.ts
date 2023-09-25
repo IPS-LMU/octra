@@ -26,11 +26,9 @@ export class AudioManager {
   }>();
 
   // events
-  public afterDecoded: Subject<AudioResource> =
-    new Subject<AudioResource>();
+  public afterDecoded: Subject<AudioResource> = new Subject<AudioResource>();
   public afterLoaded: Subject<any> = new Subject<any>();
-  public statechange: Subject<PlayBackStatus> =
-    new Subject<PlayBackStatus>();
+  public statechange: Subject<PlayBackStatus> = new Subject<PlayBackStatus>();
   public missingPermission = new Subject<void>();
 
   get audio(): HTMLAudioElement {
@@ -339,10 +337,14 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       //make sur selection is not changed
       audioSelection = audioSelection.clone();
-      if (this._audioContext === undefined) {
+      if (
+        this._audioContext === undefined ||
+        this._audioContext.state === 'closed'
+      ) {
         this.initAudioContext();
       }
 
+      console.log(`try to resume for audiomanager ${this._id}`);
       this._audioContext
         ?.resume()
         .then(() => {
@@ -397,7 +399,7 @@ export class AudioManager {
               });
             })
             .catch((error) => {
-              this._playbackEndChecker!.unsubscribe();
+              this._playbackEndChecker?.unsubscribe();
               if (!this.playOnHover) {
                 if (error.name && error.name === 'NotAllowedError') {
                   // no permission
@@ -412,7 +414,7 @@ export class AudioManager {
             });
         })
         .catch((error) => {
-          this._playbackEndChecker!.unsubscribe();
+          this._playbackEndChecker?.unsubscribe();
           this.statechange.error(new Error(error));
           reject(error);
         });
@@ -672,8 +674,7 @@ export class AudioManager {
 
 export class AudioChunk {
   private static _counter = 0;
-  public statuschange: Subject<PlayBackStatus> =
-    new Subject<PlayBackStatus>();
+  public statuschange: Subject<PlayBackStatus> = new Subject<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
   private subscrManager = new SubscriptionManager<Subscription>();
   private _playposition: SampleUnit;

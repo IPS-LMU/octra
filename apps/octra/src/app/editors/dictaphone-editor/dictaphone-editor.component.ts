@@ -6,7 +6,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { SubscriptionManager } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
@@ -30,7 +29,6 @@ import {
   OLabel,
 } from '@octra/annotation';
 import { AudioplayerComponent } from '@octra/ngx-components';
-import { Subscription } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { SampleUnit } from '@octra/media';
@@ -54,9 +52,6 @@ export class DictaphoneEditorComponent
 
   public audiochunk!: AudioChunk;
   public audioManager!: AudioManager;
-  private subscrmanager: SubscriptionManager<Subscription>;
-  private boundaryselected = false;
-
   public initialized: EventEmitter<void> = new EventEmitter<void>();
 
   public get highlighting(): boolean {
@@ -141,13 +136,12 @@ export class DictaphoneEditorComponent
     public appStorage: AppStorageService
   ) {
     super();
-    this.subscrmanager = new SubscriptionManager<Subscription>();
 
     if (
       this.appStorage.useMode === 'online' ||
       this.appStorage.useMode === 'demo'
     ) {
-      this.subscrmanager.add(
+      this.subscrManager.add(
         this.keyMap.beforeShortcutTriggered.subscribe(
           (event: ShortcutEvent) => {
             if (
@@ -180,7 +174,8 @@ export class DictaphoneEditorComponent
     this.editor.settings.specialMarkers.boundary = true;
     this.editor.settings.highlightingEnabled = true;
 
-    this.subscrmanager.add(
+    this.subscrManager.removeByTag('shortcut');
+    this.subscrManager.add(
       this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered),
       'shortcut'
     );
@@ -289,6 +284,7 @@ export class DictaphoneEditorComponent
               console.error(error);
             });
           } else {
+            console.log(`PLAY CHUNK ${this.audiochunk.id}`);
             this.audiochunk.startPlayback(false).catch((error: any) => {
               console.error(error);
             });
@@ -484,10 +480,10 @@ export class DictaphoneEditorComponent
   }
 
   onTranscrEditorRedoUndo(type: 'undo' | 'redo') {
-    this.subscrmanager.removeByTag('annochange');
-    this.subscrmanager.add(
+    this.subscrManager.removeByTag('annochange');
+    this.subscrManager.add(
       this.appStorage.annotationChanged.subscribe(() => {
-        this.subscrmanager.removeByTag('annochange');
+        this.subscrManager.removeByTag('annochange');
         this.loadEditor();
       }),
       'annochange'

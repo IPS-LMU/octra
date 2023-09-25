@@ -65,6 +65,7 @@ export class LoginModeReducers {
           if (this.mode === mode) {
             return {
               ...initialState,
+              currentEditor: state.currentEditor,
               currentSession: {
                 currentProject: state.currentSession.currentProject,
               },
@@ -240,6 +241,7 @@ export class LoginModeReducers {
             return {
               ...state,
               projectConfig: projectSettings,
+              logging: projectSettings.logging.forced === true ? true : state.logging,
               currentSession: {
                 ...state.currentSession,
                 loadFromServer: true,

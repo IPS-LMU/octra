@@ -9,7 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
-import { contains, hasProperty, SubscriptionManager } from '@octra/utilities';
+import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
@@ -205,7 +205,6 @@ export class TwoDEditorComponent
     super();
     this.initialized = new EventEmitter<void>();
     this.miniLoupeSettings = new AudioviewerConfig();
-    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   ngOnInit() {

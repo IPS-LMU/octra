@@ -1,13 +1,15 @@
 <ngb-toast
         *ngFor="let toast of alertService.queue"
         [ngClass]="{
-         'bg-danger text-light': toast.type === 'danger'
+         'bg-danger text-light': toast.type === 'danger',
+         'bg-success text-light': toast.type === 'success',
+         'bg-warning text-dark': toast.type === 'warning'
         }"
         (mouseenter)="toast.autohide = false"
         (mouseleave)="toast.autohide = true"
         (hide)="toast.autohide = true"
         [autohide]="toast.autohide"
-        [delay]="5000"
+        [delay]="toast.duration"
         (hidden)="alertService.closeAlert(toast.id)"
 >
   {{ toast.message }}

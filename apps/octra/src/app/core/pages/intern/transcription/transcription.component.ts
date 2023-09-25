@@ -812,59 +812,41 @@ export class TranscriptionComponent
 
   onSendButtonClick() {
     this.waitForSend = true;
-    this.appStorage.afterSaving().then(() => {
-      // after saving
-      // make sure no tasks are pending
-      /* TODO add
-      new Promise<void>((resolve) => {
-        if (this.transcrService.tasksBeforeSend.length === 0) {
-          resolve();
-        } else {
-          Promise.all(this.transcrService.tasksBeforeSend).then(() => {
-            this.transcrService.tasksBeforeSend = [];
-            resolve();
-          });
-        }
-      }).then(() => {
-        let showOverview = true;
-        let validTranscriptOnly = false;
 
-        this.transcrService.validateAll();
-        const validTranscript = this.transcrService.transcriptValid;
+    let showOverview = true;
+    let validTranscriptOnly = false;
 
-        if (
-          this.projectsettings.octra !== undefined &&
-          this.projectsettings.octra.showOverviewIfTranscriptNotValid !==
-            undefined
-        ) {
-          showOverview =
-            this.projectsettings.octra.showOverviewIfTranscriptNotValid;
-        }
+    this.annotationStoreService.validateAll();
+    const validTranscript = this.annotationStoreService.transcriptValid;
 
-        if (
-          this.projectsettings.octra !== undefined &&
-          this.projectsettings.octra.sendValidatedTranscriptionOnly !==
-            undefined
-        ) {
-          validTranscriptOnly =
-            this.projectsettings.octra.sendValidatedTranscriptionOnly;
-        }
+    if (
+      this.projectsettings.octra !== undefined &&
+      this.projectsettings.octra.showOverviewIfTranscriptNotValid !== undefined
+    ) {
+      showOverview =
+        this.projectsettings.octra.showOverviewIfTranscriptNotValid;
+    }
 
-        if (
-          (!validTranscript &&
-            showOverview) /*||  !this.modalOverview.feedBackComponent.valid||
-          (validTranscriptOnly && !validTranscript)
-        ) {
-          this.waitForSend = false;
-          this.modalOverview = this.modService.openModalRef(
-            OverviewModalComponent,
-            OverviewModalComponent.options
-          );
-        } else {
-          this.onSendNowClick();
-        }
-      });*/
-    });
+    if (
+      this.projectsettings.octra !== undefined &&
+      this.projectsettings.octra.sendValidatedTranscriptionOnly !== undefined
+    ) {
+      validTranscriptOnly =
+        this.projectsettings.octra.sendValidatedTranscriptionOnly;
+    }
+
+    if (
+      (!validTranscript && showOverview) ||
+      (validTranscriptOnly && !validTranscript)
+    ) {
+      this.waitForSend = false;
+      this.modalOverview = this.modService.openModalRef(
+        OverviewModalComponent,
+        OverviewModalComponent.options
+      );
+    } else {
+      this.onSendNowClick();
+    }
   }
 
   reloadDemo() {

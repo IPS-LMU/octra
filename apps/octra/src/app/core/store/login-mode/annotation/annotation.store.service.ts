@@ -28,7 +28,6 @@ import { OLog, OLogging } from '../../../obj/Settings/logging';
 import { MouseStatisticElem } from '../../../obj/statistics/MouseStatisticElem';
 import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
 import { map, Observable } from 'rxjs';
-import { ProjectSettings } from '../../../obj';
 import { OctraGuidelines } from '@octra/assets';
 import { ApplicationStoreService } from '../../application/application-store.service';
 
@@ -45,7 +44,9 @@ export class AnnotationStoreService {
     return this._feedback;
   }
 
-  get transcript(): OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined {
+  get transcript():
+    | OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    | undefined {
     return this._transcript;
   }
 
@@ -147,7 +148,9 @@ export class AnnotationStoreService {
   });
   private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
 
-  get currentLevel(): OctraAnnotationAnyLevel<OctraAnnotationSegment> | undefined {
+  get currentLevel():
+    | OctraAnnotationAnyLevel<OctraAnnotationSegment>
+    | undefined {
     return this._currentLevel;
   }
 
@@ -179,7 +182,7 @@ export class AnnotationStoreService {
         );
 
         const result = new TextConverter().export(
-         annotation,
+          annotation,
           this.audio.audioManager.resource.getOAudioFile(),
           transcript.selectedLevelIndex!
         )!.file!;
@@ -707,12 +710,11 @@ export class AnnotationStoreService {
     this.segmentrequested.emit(segnumber);
   }
 
-  public validateAll(
-    currentLevel: OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>,
-    projectSettings: ProjectSettings,
-    guidelines: any
-  ) {
+  public validateAll() {
     this._validationArray = [];
+    const projectSettings = getModeState(
+      this.appStorage.snapshot
+    )?.projectConfig;
 
     if (
       this.appStorage.useMode !== LoginMode.URL &&
@@ -720,9 +722,9 @@ export class AnnotationStoreService {
         projectSettings?.octra?.validationEnabled === true)
     ) {
       let invalid = false;
-      if (currentLevel instanceof OctraAnnotationSegmentLevel) {
-        for (let i = 0; i < currentLevel!.items.length; i++) {
-          const segment = currentLevel!.items[i];
+      for (const level of this.transcript!.levels) {
+        for (let i = 0; i < level!.items.length; i++) {
+          const segment = level!.items[i];
 
           let segmentValidation = [];
           const labelIndex = segment.labels.findIndex(
@@ -822,7 +824,9 @@ export class AnnotationStoreService {
     }
   }
 
-  overwriteTranscript(transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>) {
+  overwriteTranscript(
+    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ) {
     this.store.dispatch(
       AnnotationActions.overwriteTranscript.do({
         transcript,
@@ -832,7 +836,10 @@ export class AnnotationStoreService {
     );
   }
 
-  changeCurrentItemById(id: number, item: OItem | OEvent | OctraAnnotationSegment) {
+  changeCurrentItemById(
+    id: number,
+    item: OItem | OEvent | OctraAnnotationSegment
+  ) {
     this.store.dispatch(
       AnnotationActions.changeCurrentItemById.do({
         id,
@@ -843,26 +850,37 @@ export class AnnotationStoreService {
   }
 
   changeCurrentLevelItems(items: AnnotationAnySegment[]) {
-    this.store.dispatch(AnnotationActions.changeCurrentLevelItems.do({
-      items,
-      mode: this.appStoreService.useMode!
-    }));
+    this.store.dispatch(
+      AnnotationActions.changeCurrentLevelItems.do({
+        items,
+        mode: this.appStoreService.useMode!,
+      })
+    );
   }
 
-  removeCurrentLevelItems(items: {index?: number, id?: number}[], silenceCode?: string, mergeTranscripts?: boolean){
-    this.store.dispatch(AnnotationActions.removeCurrentLevelItems.do({
-      items,
-      mode: this.appStoreService.useMode!,
-      removeOptions: {
-        silenceCode, mergeTranscripts
-      }
-    }));
+  removeCurrentLevelItems(
+    items: { index?: number; id?: number }[],
+    silenceCode?: string,
+    mergeTranscripts?: boolean
+  ) {
+    this.store.dispatch(
+      AnnotationActions.removeCurrentLevelItems.do({
+        items,
+        mode: this.appStoreService.useMode!,
+        removeOptions: {
+          silenceCode,
+          mergeTranscripts,
+        },
+      })
+    );
   }
 
-  addCurrentLevelItems(items: AnnotationAnySegment[]){
-    this.store.dispatch(AnnotationActions.addCurrentLevelItems.do({
-      items,
-      mode: this.appStoreService.useMode!
-    }));
+  addCurrentLevelItems(items: AnnotationAnySegment[]) {
+    this.store.dispatch(
+      AnnotationActions.addCurrentLevelItems.do({
+        items,
+        mode: this.appStoreService.useMode!,
+      })
+    );
   }
 }

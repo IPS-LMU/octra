@@ -56,7 +56,7 @@ export class AlertService {
           type,
           animation: 'opened',
           autohide: true,
-          duration: duration ? duration : 5,
+          duration: duration ? duration : 5000,
           message: typeof data === 'string' ? data : '',
           unique,
           id,

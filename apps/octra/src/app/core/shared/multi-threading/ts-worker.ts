@@ -78,7 +78,7 @@ export class TsWorker {
     if (this.getRunningJobID() < 0) {
       // no job running, start first job
       const job = this.getFirstFreeJob();
-      if (!(job === undefined || job === undefined)) {
+      if (!(job === undefined || job === null)) {
         job.changeStatus(TsWorkerStatus.RUNNING);
         this.run(this._queue[0])
           .then((result: any) => {

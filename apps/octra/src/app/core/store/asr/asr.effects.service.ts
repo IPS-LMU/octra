@@ -557,8 +557,6 @@ export class AsrEffects {
         )!;
 
         if (item) {
-          console.log('ABORT ITEM');
-          console.log(item);
           return of(
             AnnotationActions.updateASRSegmentInformation.do({
               mode: state.application.mode!,
@@ -726,9 +724,11 @@ export class AsrEffects {
             isEnabled:
               asrSettingsComplete &&
               (((action.task.tool_configuration?.value as ProjectSettings)
-                ?.octra?.asrEnabled &&
+                ?.octra?.asrEnabled === true &&
                 isShibbolethUser) ||
-                localASRSettingsComplete),
+                ((action.task.tool_configuration?.value as ProjectSettings)
+                  ?.octra?.asrEnabled === true &&
+                  localASRSettingsComplete)),
           })
         );
       })

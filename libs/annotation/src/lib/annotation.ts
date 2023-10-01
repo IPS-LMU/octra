@@ -327,7 +327,7 @@ export class OctraAnnotation<
               new OctraAnnotationSegment(
                 this.idCounters.item++,
                 time!,
-                oldLabels ?? labels,
+                labels ?? oldLabels,
                 context ?? {}
               ) as any,
             ];

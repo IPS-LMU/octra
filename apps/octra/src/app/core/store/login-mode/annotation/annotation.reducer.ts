@@ -84,12 +84,22 @@ export class AnnotationStateReducers {
         (state, { mode, newSegments, segmentID }) => {
           if (this.mode === mode) {
             // 1. unblock current segment
-            let transcript = state.transcript;
+            let transcript = state.transcript.clone();
+            const currentSegment = transcript.currentLevel!.items.find(a => a.id === segmentID)!.clone() as OctraAnnotationSegment;
+            currentSegment.context = {
+              ...currentSegment.context,
+              asr: {
+                progressInfo: undefined,
+                isBlockedBy: undefined,
+              }
+            };
+            transcript = transcript.changeCurrentItemById(segmentID, currentSegment);
 
             const segments = newSegments.filter(
               (a, i) => i < newSegments.length - 1
             );
 
+            // 3. add new segments
             for (const segment of segments) {
               transcript = transcript.addItemToCurrentLevel(
                 segment.time,

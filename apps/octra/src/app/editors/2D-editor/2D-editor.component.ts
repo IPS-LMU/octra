@@ -943,7 +943,7 @@ export class TwoDEditorComponent
         if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
           const segment = currentLevel!.items[
             segmentNumber
-          ] as OctraAnnotationSegment;
+          ].clone() as OctraAnnotationSegment;
 
           if (segment !== undefined) {
             const sampleStart =
@@ -987,23 +987,11 @@ export class TwoDEditorComponent
                     selection,
                     ASRQueueItemType.ASR
                   );
-                  segment.context = {
-                    ...segment.context,
-                    asr: {
-                      isBlockedBy: ASRQueueItemType.ASR,
-                    },
-                  };
                 } else if ($event.value === 'do_asr_maus') {
                   this.asrStoreService.addToQueue(
                     selection,
                     ASRQueueItemType.ASRMAUS
                   );
-                  segment.context = {
-                    ...segment.context,
-                    asr: {
-                      isBlockedBy: ASRQueueItemType.ASRMAUS,
-                    },
-                  };
                 } else if ($event.value === 'do_maus') {
                   if (
                     (segment.getFirstLabelWithoutName('Speaker') &&
@@ -1029,12 +1017,6 @@ export class TwoDEditorComponent
                       ASRQueueItemType.MAUS,
                       segment.getFirstLabelWithoutName('Speaker')?.value
                     );
-                    segment.context = {
-                      ...segment.context,
-                      asr: {
-                        isBlockedBy: ASRQueueItemType.MAUS,
-                      },
-                    };
                   }
                 }
               }
@@ -1044,12 +1026,6 @@ export class TwoDEditorComponent
                 sampleStart: selection.sampleStart,
                 sampleLength: selection.sampleLength,
               });
-              segment.context = {
-                ...segment.context,
-                asr: {
-                  isBlockedBy: undefined,
-                },
-              };
             }
           }
         } else {

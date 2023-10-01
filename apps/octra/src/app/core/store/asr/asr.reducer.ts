@@ -61,7 +61,7 @@ export const reducer = createReducer(
   initialState,
   on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
     ...state,
-    isEnabled,
+    isEnabled
   })),
   on(
     ASRActions.setASRMausLanguage.do,

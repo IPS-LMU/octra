@@ -567,21 +567,14 @@ export class AnnotationEffects {
               if (currentProject && task) {
                 if (!a.actionAfterSuccess) {
                   // normal load after task start or resuming session
-                  this.store.dispatch(
-                    LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                      {
-                        mode: LoginMode.ONLINE,
-                        me: currentAccount,
-                        currentProject,
-                        task,
-                      }
-                    )
+                  return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                    {
+                      mode: LoginMode.ONLINE,
+                      me: currentAccount,
+                      currentProject,
+                      task,
+                    }
                   );
-                  return LoginModeActions.prepareTaskDataForAnnotation.do({
-                    mode: LoginMode.ONLINE,
-                    currentProject,
-                    task,
-                  });
                 }
 
                 return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
@@ -691,22 +684,14 @@ export class AnnotationEffects {
                 }
               );
 
-              this.store.dispatch(
-                LoginModeActions.loadOnlineInformationAfterIDBLoaded.success({
+              return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                {
                   mode: a.mode,
                   me: createSampleUser(),
                   currentProject,
                   task,
-                  actionAfterSuccess:
-                    AnnotationActions.redirectToTranscription.do(),
-                })
+                }
               );
-
-              return LoginModeActions.prepareTaskDataForAnnotation.do({
-                mode: a.mode,
-                currentProject,
-                task,
-              });
             })
           );
         }
@@ -937,17 +922,17 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(ASRActions.runWordAlignmentOnItem.success),
       withLatestFrom(this.store),
-      exhaustMap(([{ item }, state]) => {
+      exhaustMap(([{ item, result }, state]) => {
         const converter = new PraatTextgridConverter();
         const audioManager = this.audio.audioManager;
         const audiofile = audioManager.resource.getOAudioFile();
         audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
 
-        if (item.result) {
+        if (result) {
           const convertedResult = converter.import(
             {
               name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-              content: item.result!,
+              content: result,
               type: 'text',
               encoding: 'utf-8',
             },
@@ -983,7 +968,7 @@ export class AnnotationEffects {
                 );
               } else {
                 const segmentID =
-                  getModeState(state)!.transcript.levels[segmentIndex].items[
+                  getModeState(state)!.transcript.currentLevel!.items[
                     segmentIndex
                   ].id;
                 const newSegments: OctraAnnotationSegment[] = [];
@@ -1007,7 +992,16 @@ export class AnnotationEffects {
                           wordItem.sampleDur,
                         this.audio.audioManager.resource.info.sampleRate
                       ),
-                      wordItem.labels.map((a) => OLabel.deserialize(a))
+                      wordItem.labels.map((a) =>
+                        OLabel.deserialize({
+                          ...a,
+                          name:
+                            a.name === 'ORT-MAU'
+                              ? getModeState(state)!.transcript!.currentLevel!
+                                  .name!
+                              : a.name,
+                        })
+                      )
                     );
 
                     const labelIndex = readSegment.labels.findIndex(

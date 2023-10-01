@@ -1,0 +1,365 @@
+{
+  "translation": {
+    "language name": "영어"
+  },
+  "g": {
+    "name": "이름",
+    "abort": "취소",
+    "continue": "계속",
+    "close": "닫기",
+    "open": "열기",
+    "delete": "삭제",
+    "save": "저장",
+    "send now": "지금 보내기",
+    "back": "뒤로 가기",
+    "OK": "승인",
+    "quit": "중지",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "play": "재생",
+    "pause": "잠시 멈춤",
+    "stop": "중지",
+    "backward": "뒤로 가기",
+    "backwardtime": "뒤로 가기 (시간 내)",
+    "replay": "다시 재생",
+    "shortcuts": "단축키",
+    "guidelines": "설명서",
+    "overview": "개요",
+    "help": "도움말",
+    "on focus only": "포커스 집중",
+    "wanted": "찾은 것들",
+    "unknown": "알 수 없음",
+    "please wait": "잠시 기다려주십시오.",
+    "logout successful": "로그아웃 완료",
+    "export data": "데이터 내보내기",
+    "export": "내보내기",
+    "text file": "텍스트 파일",
+    "statistics": "통계",
+    "transcript": "기록 (Transcript)",
+    "transcription": "기록문",
+    "timespan": "재생 길이",
+    "validation": "인증",
+    "search": "찾기",
+    "project": "프로젝트",
+    "authors": "작성자",
+    "no guidelines found": "설명서 찾을 수 없음",
+    "example": "예시",
+    "select database": "데이터베이스 선택",
+    "agreement": "동의서",
+    "agreement read": "나는 동의서를 읽었으며 그 내용에 동의합니다.",
+    "yes": "예",
+    "no": "아니오",
+    "errors found": "({{errors}}) 오류 발견",
+    "no errors found": "오류가 발견되지 않았습니다.",
+    "segment": "기록문 유닛",
+    "job number": "작업 번호",
+    "free jobs": "자유 작업",
+    "email": "이메일",
+    "description": "설명서",
+    "bug report": "버그 알리기",
+    "protocol": "프로토콜",
+    "submission success": "성공적으로 전송되었습니다.",
+    "duration": "기간",
+    "samplerate": "표본화 속도",
+    "bitspersecond": "초당 비트",
+    "filesize": "파일 크기",
+    "id": "아이디",
+    "download": "다운로드",
+    "application": "어플리케이션",
+    "website": "웹사이트",
+    "news": "뉴스",
+    "faq": "FAQ",
+    "features": "특성",
+    "transcription window": "기록문 창",
+    "supported files": "지원되는 파일",
+    "select one tier": "한 티어를 선택하십시오.",
+    "prompt": "프롬프트",
+    "feedback": "피드백",
+    "skip silence": "무음 건너 뛰기",
+    "good": "좋음",
+    "bad": "나쁨",
+    "middle": "중간",
+    "insert comment": "이곳에 댓글을 입력하십시오.. (선택 사항)",
+    "password": "비밀번호",
+    "preview": "미리보기",
+    "screenshots": "스크린샷",
+    "Language": "언어",
+    "Speech Recognition": "언어 인식",
+    "Service Provider": "서비스 제공자",
+    "SELECT ACTION": "액션 선택",
+    "Format": "파일 형식",
+    "Type": "유형",
+    "File extension": "파일 확장",
+    "tools": "도구",
+    "custom formats": "파일 형식 설정",
+    "meta data": "메타 데이터",
+    "manual": "수동",
+    "authenticate": "인증하기",
+    "im authenticated": "인증되었습니다!",
+    "dismissed": "{{value}}들 무시하기",
+    "Send feedback": "피드백 전송",
+    "reload": "다시 받기",
+    "Options": "옵션"
+  },
+  "bug report": {
+    "give feedback": "피드백 제공",
+    "description": "OCTRA에 대해 어떻게 생각하는지 알려주세요. 어떤 점을 발전시켜야 할까요? 버그를 찾으셨나요?",
+    "sent": "귀하의 피드백이 성공적으로 전송되었습니다. 🙂",
+    "error": "귀하의 피드백이 전송되지 않았습니다. 이메일 주소 {{email}}로 생각을 나누어 주세요.",
+    "send protocol": "프로토콜 추가"
+  },
+  "transcription": {
+    "start": "기록 계속하기",
+    "new": "새 기록 시작하기",
+    "finish": "기록 완료",
+    "stop": "기록 중지",
+    "check": "기록 체크",
+    "send": "기록 보내기",
+    "complete": "기록 완료",
+    "invalid": "유효한 기록만이 승인됩니다. 기록을 수정해주십시오.",
+    "no prompttext": "프롬프트 텍스트를 띄울 수 없습니다."
+  },
+  "segments": {
+    "total": "총 기록 유닛들",
+    "transcribed": "전사된 유닛들",
+    "with breaks": "연결이 끊긴 기록 유닛",
+    "not transcribed": "내용 없는 기록 유닛",
+    "previous": "이전 기록 유닛",
+    "next": "다음 기록 유닛"
+  },
+  "feedback": {
+    "unintelligible": "알아볼 수 없음",
+    "less intelligible": "거의 알아볼 수 없음",
+    "intelligible": "알아볼 수 있음",
+    "very good intelligible": "매우 잘 알아볼 수 있음",
+    "quality of signal": "신호 퀄리티",
+    "a lot of noises": "노이즈가 심한 신호",
+    "few noises": "노이즈가 개입된 신호",
+    "very few noises": "노이즈가 낮은 신호",
+    "no noises": "깨끗한 신호"
+  },
+  "interfaces": {
+    "simple editor": "딕터폰 편집기",
+    "linear editor": "선형 편집기",
+    "2D editor": "2차원 편집기"
+  },
+  "modal": {
+    "transcription": {
+      "delete": {
+        "header": "새 기록을 생성하시겠습니까?",
+        "text": "정말로 이전 기록을 지우고 새 기록을 생성하시겠습니까? <br><br>이전에 진행된 기록이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+        "delete old": "이전 기록 지우기"
+      },
+      "send": {
+        "header": "기록 보내기",
+        "text": "'지금 보내기'를 클릭하면 데이터가 서버로 전송되어 저장됩니다. 이 이후에는 데이터를 변경할 수 없습니다."
+      },
+      "sending": {
+        "header": "기록 지금 전송",
+        "text": "결과가 서버로 전송되고 있습니다... 전송이 성공적으로 완료될 때까지 기다리십시오."
+      },
+      "demoEnd": {
+        "header": "데모 모드",
+        "text": "현재 데모 모드를 사용하고 있습니다. <br/> <br/> 클릭...<ul><li>\"Continue\"를 눌러 현재 오디오 파일을 다시 로드합니다. 입력한 내용이 삭제되고 스크립트의 전송이 시뮬레이션됩니다.</li><li>\"종료\"를 선택하면 OCTRA를 종료할 수 있습니다. 입력한 내용이 삭제됩니다.</li><li>\"Back\"을 누르면 기록이 계속됩니다.</li> </ul>",
+        "exportText": "\"뒤로\"를 클릭한 다음 \"내보내기\"를 클릭하면 기록을 내보낼 수 있습니다."
+      }
+    },
+    "login": {
+      "header": "로그인 실패",
+      "text": "사용자 이름과 암호를 확인하십시오."
+    },
+    "supported": {
+      "header": "로컬 모드에서 지원되는 파일 형식",
+      "audio files": "오디오 파일",
+      "file formats for import": "가져올 파일 형식"
+    },
+    "shortcuts": {
+      "play pause": "재생/ 일시정지",
+      "stop playback": "플레이백 중지",
+      "step backward": "마지막 위치 이동",
+      "step backward time": "시간 내로 뒤로 가기",
+      "set segment": "기록 창 열기",
+      "set break": "기록 단위를 무음으로 표시",
+      "play selection": "재생 선택",
+      "transcribe segment": "전사 단위",
+      "move cursor left": "왼쪽으로 커서 이동",
+      "move cursor right": "오른쪽으로 커서 이동",
+      "audioplayer": "오디오 플레이어 단축키",
+      "top signaldisplay": "상단에 표시되는 신호의 단축키",
+      "down signaldisplay": "하단에 표시되는 신호의 단축키",
+      "2D-Editor": "하단에 표시되는 신호의 단축키",
+      "play audio on hover": "호버에서 오디오 재생",
+      "jump_last_segment": "이전 기록 단위로 저장 및 점프",
+      "jump_next_segment": "저장 후 다음 기록 단위로 이동",
+      "close_save": "저장 후 창 닫기",
+      "delete boundaries": "선택한 경계 삭제 및 기록 단위 결합",
+      "general shortcuts": "일반 단축키",
+      "feedback and send 1": "별 한 개와 기록 보내기",
+      "feedback and send 2": "별 두 개와 기록 보내기",
+      "feedback and send 3": "별 세 개와 기록 보내",
+      "do asr": "선택한 기록 단위에 ASR 적용",
+      "do asr maus": "선택한 기록 단위에 ASR & MAUS 분할 적용",
+      "do maus only": "MAUS를 사용하여 선택한 기록 유닛 단어 정렬 적용"
+    },
+    "inactivity": {
+      "header": "더 긴 부재가 감지됨",
+      "body": "OCTRA를 마치지 않은 채 {{value}}분 이상 부재하셨습니다. 장기 결석을 예측할 수 있는 경우 OCTRA를 종료하는 것이 좋습니다. 현재 전사를 계속하지 않으면 지금 OCTRA를 종료할 수 있습니다. 무엇을 하고 싶습니까?",
+      "new": "새 전사 시작",
+      "continue": "전사 계속",
+      "quit": "OCTRA 종료"
+    },
+    "missing permissions": {
+      "header": "사용 권한 누락",
+      "description": "OCTRA가 오디오를 재생할 수 있는 권한을 얻지 못했습니다. 계속하려면 OCTRA에 오디오 재생 권한을 부여해야 합니다. 다음 세 단계를 수행하고 이 창 하단에 있는 \"다시 로드\" 버튼을 누릅니다.",
+      "step1": "주소 표시줄 왼쪽에 있는 스트로크 아웃 재생 아이콘을 클릭합니다.",
+      "step2": "'자동 재생' 옆에 있는 버튼을 클릭합니다.",
+      "step3": "\"오디오 및 비디오 허용\"을 클릭합니다.",
+      "step4": "아래의 \"다시 로드\" 버튼을 클릭하십시오."
+    }
+  },
+  "login": {
+    "online mode": "온라인 모드",
+    "online mode disabled": "온라인 모드는 현재 비활성 상태입니다. OCTRA를 현지에서 사용하십시오.",
+    "online mode description": "온라인 모드에서는 녹음할 오디오 파일을 자동으로 가져옵니다.",
+    "local mode": "로컬 모드",
+    "local mode description": "로컬 모드에서는 컴퓨터에서 오디오 파일을 복사할 수 있습니다. 데이터는 서버에 업로드되지 않습니다.",
+    "old file found": "이전 기록 데이터를 사용할 수 있습니다. 작업을 계속하려면 다음 파일을 회색 상자로 끌어다 놓으십시오. <br/> <br/> {file_label}",
+    "online mode data warning": "로컬 모드에서 생성된 로컬 데이터를 사용할 수 있습니다. 온라인 모드에서 계속 진행하시려면 이 데이터를 덮어씁니다.",
+    "offline mode data warning": "온라인 모드에서 만든 로컬 데이터가 있습니다. 로컬 모드에서 계속 진행하려면 이 데이터를 덮어씁니다.\t",
+    "online mode continue": "이전 데이터를 찾았습니다! 계속하려면 로그인 데이터를 {{member_id}, {{member_project}, {{member_jobno}}(으)로 설정하십시오.\t",
+    "last used": "최근에 사용됨",
+    "login and remove": "로컬 모드 데이터 제거 및 로그인",
+    "local and remove": "온라인 모드 데이터 제거 후 계속 진행\t",
+    "demo": "기본 오디오 파일(데모)에서 OCTRA를 사용하려면 여기를 클릭하십시오.",
+    "api not available": "서버를 현재 사용할 수 없습니다. 나중에 다시 시도하십시오. 4시간 후에도 이 메시지가 계속 보인다면 피드백 양식을 통해 메시지를 보내 주십시오."
+  },
+  "dropzone": {
+    "drag&drop here": "오디오 파일(*.wav) (+ 가져오기 옵션 파일)을 여기로 끌어서 놓거나 여기를 클릭합니다.",
+    "file selected": "{{file_label}} 선택됨"
+  },
+  "browser": {
+    "invalid": "<b>브라우저가 호환되지 않습니다. 다음 브라우저 중 하나를 사용하십시오:",
+    "small window width": "<b>이 창문의 너비가 너무 작습니다.</b> 이 메시지를 숨기려면 이 창을 확장하십시오."
+  },
+  "reload-file": {
+    "header": "오디오 파일 재 로드",
+    "text": "응용 프로그램을 닫았거나 새로고침하셨습니다. 동일한 오디오 파일을 다시 선택하십시오. 그 뒤에 일을 진행할 수 있습니다.",
+    "file not supported": "파일 형식이 '{type}'은 지원되지 않습니다.",
+    "another file selected": "다른 파일을 선택했습니다. 이전과 동일한 파일을 선택하거나 새 기록을 시작하십시오. '{file}'을(를) 원합니다."
+  },
+  "logout": {
+    "successful text": "성공적으로 로그아웃되었습니다.",
+    "login again": "다시 로그인"
+  },
+  "signal-gui": {
+    "selection text": "마우스를 사용하여 신호의 일부를 선택하십시오. 마우스 왼쪽 버튼을 클릭한 상태에서 커서를 끝 위치로 이동합니다.",
+    "segment enter text": "커서를 옮겨 기록 유닛을 선택한 뒤 {{value}} 키를 눌러 선택하십시오."
+  },
+  "transcription-submit": {
+    "overview": "다음 표에서는 기록 유닛의 개요를 보여 줍니다.",
+    "form fill out": "양식을 작성해 주십시오.",
+    "intelligibility of the speaker": "화자의 명료성",
+    "comment description": "간단한 코멘트 (워크플로우, 대기 시간, 문제 등에 대한 참고 사항)"
+  },
+  "segment invisible": "이 기록 유닛은 내부에 포함된 오디오를 재생하기 위해 보여야 합니다.",
+  "boundary cannot delete": "이미 전사된 인접한 기록 유닛이 있으므로 경계를 삭제할 수 없습니다.\t",
+  "boundary cannot set": "이미 전사된 기록 유닛에서는 경계를 설정할 수 없습니다.",
+  "send error": "오류가 발생했습니다. 이 페이지를 다시 로드하고 다시 시도하십시오!",
+  "transcription submitted": {
+    "no jobs left": "사용 가능한 남은 작업 없음",
+    "transcription sent": "기록이 전송되었습니다.",
+    "transcription sent successfully": "기록이 성공적으로 전송되었습니다.",
+    "want to do": "무엇을 하고 싶으십니까?",
+    "quit": "종료 후 로그아웃",
+    "next transcription": "다음 기록 가져오기"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "자름 표시",
+      "description": "오디오 플레이어 또는 신호 디스플레이에서 재생 위치를 설정한 후 텍스트 위치에 자름 표시를 삽입할 수 있습니다."
+    }
+  },
+  "settings": {
+    "easy mode": "간편 모드",
+    "play on hover": "호버에서 재생",
+    "follow playcursor": "재생 커서 팔로우",
+    "logging": "사용자 작업 기록",
+    "show loupe": "루프 표시",
+    "seconds per line": "줄당 초"
+  },
+  "custom": {
+    "table configurator": {
+      "name": "테이블 구성기",
+      "description": "이 도구를 사용하여 자신만의 테이블 형식을 만들 수 있습니다.",
+      "add column": "열 추가",
+      "divider": "분리기",
+      "add header": "테이블에 헤더 추가",
+      "generate table": "테이블 생성",
+      "include line numbers": "행 번호를 포함하다",
+      "time format": "시간 형식"
+    }
+  },
+  "tools": {
+    "cut audio": {
+      "name": "오디오 파일 잘라내기",
+      "description": "이 도구는 오디오 파일을 기록 유닛에서 시퀀스로 잘라내는 기능을 제공합니다.",
+      "append meta files": "메타 파일 추가",
+      "add placeholder": "자리 표시자 추가",
+      "hide configurator": "구성자 숨기기",
+      "show configurator": "구성자 표시"
+    },
+    "combine phrases": {
+      "name": "구문 결합",
+      "warning": "단어 제한은 이 도구를 단어 분할이 있는 주석에 적용한 경우에만 가능합니다. 이 도구를 사용한 후에는 결과를 되돌릴 수 없습니다.",
+      "description": "이 도구를 사용하면 짧은 기록 유닛들을 줄이기 위해 무음 사이의 문구가 결합됩니다. 주어진 기간보다 짧은 침묵을 포함하는 기록 유닛은 인접한 유닛들과 병합됩니다.",
+      "hide settings": "설정 숨기기",
+      "show settings": "설정 표시",
+      "minimal silence desc": "무음이 포함된 모든 전사 단위는 지속 시간이 이 값보다 길 경우 무시됩니다.",
+      "minimal silence": "최소 무음 ㅅ간",
+      "maximal words": "최대 단어 수",
+      "maximal words desc": "병합 후 모든 전사 단위에는 최대 단어 수가 포함됩니다. (각 세그먼트에 하나의 단어만 포함된 경우에만 작동). 값이 0이면 제한이 없음을 의미합니다."
+    },
+    "alerts": {
+      "done": "'{value}}' 도구가 성공적으로 적용되었습니다."
+    }
+  },
+  "asr": {
+    "without asr": "ASR 없음",
+    "file too big": "ASR은 최대 10분의 오디오 시퀀스만 지원합니다. 영향을 받는 기록 유닛을 건너뛰었습니다.",
+    "click on logo": "자세한 내용을 보려면 서비스 로고를 클릭하십시오.",
+    "start this segment": "이 기록 유닛에 대해서만 시작",
+    "start for all next": "이 기록 유닛과 다음에 오는 모든 유닛들에 대해서 시작",
+    "stop this segment": "이 기록 유닛에 대해서만 중지",
+    "stop for all next": "이 기록 유닛과 다음에 오는 모든 유닛들에 대해서 중지",
+    "stop all": "모든 기록 유닛에 대해 중지",
+    "asr running": "ASR이 현재 실행 중입니다. 이 전사 단위에 대한 ASR을 중지하려면 여기를 클릭하십시오.",
+    "no asr selected": "바로 가기를 사용하기 전에 ASR 옵션을 선택하십시오.",
+    "no quota": "남은 할당량이 없습니다. 다른 ASR 공급자를 사용하십시오.",
+    "no auth": "추가 기록을 위해 인증이 필요합니다.",
+    "maus empty text": "선택한 전사 단위에는 텍스트가 없거나 두 개 미만의 단어가 포함되어 있습니다.",
+    "error": "오류가 발생했습니다. 수정할 오류에 대한 간단한 피드백을 보내주시기 바랍니다."
+  },
+  "alerts": {
+    "authentication needed": "ASR 또는 단어 정렬과 같은 기능을 사용하려면 인증하십시오. 인증을 클릭하면 별도의 창이 열립니다. 창이 열리지 않으면 브라우저에서 팝업이 활성화되었는지 확인합니다.",
+    "need playback": "스크립트를 제출하기 전에 한 번 이상 재생을 시작해야 합니다."
+  },
+  "authentication": {
+    "you are authenticated": "인증되었습니다!",
+    "window closed": "이 창은 {{seconds}초 후에 자동으로 닫힙니다.",
+    "description": "이 창을 닫고 \"인증되었습니다!\" 버튼에서 OCTRA를 클릭하여 인증을 확인합니다. 그 뒤 자동 처리가 계속됩니다."
+  },
+  "export": {
+    "meta data": {
+      "description": "전사 진행 중에 기록된 메타데이터를 다운로드합니다. (설정 메뉴에서 로깅이 활성화된 경우에만 사용 가능)."
+    },
+    "options": {
+      "add timestamps": "판독 가능한 타임스탬프로 전사 단위를 구분합니다(HH:MM:SS.s)",
+      "add samplepoints": "샘플 포인트별로 전사 단위를 구분합니다(예: 123456)",
+      "timestamp notice": "두 옵션을 모두 선택하면 두 시간 형식이 모두 삽입됩니다."
+    }
+  },
+  "maintenance": {
+    "banner": "<b>{start}}</b>부터 <b>{end}</b>(예상)까지 유지보수가 실행됩니다.<br/>이 시간에는 OCTRA를 사용할 수 없습니다. 이번에는 OCTRA를 사용하지 않도록 해주세요.",
+    "in app": "{{start}} </b>부터 {end} </b>(예상)까지 유지보수가 실행됩니다. <b>유지보수가 시작되기 15분 전에 OCTRA를 종료하십시오.</b>"
+  }
+}

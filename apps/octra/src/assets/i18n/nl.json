@@ -1,0 +1,365 @@
+{
+  "translation": {
+    "language name": "Nederlands"
+  },
+  "g": {
+    "name": "Naam",
+    "abort": "Breek af",
+    "continue": "Verder",
+    "close": "Sluit",
+    "open": "Open {{waarde}}",
+    "delete": "Verwijder",
+    "save": "Sla op",
+    "send now": "Stuur nu",
+    "back": "Terug",
+    "OK": "OK",
+    "quit": "Stop",
+    "login": "Log in",
+    "logout": "Log uit",
+    "play": "Speel",
+    "pause": "Pauze",
+    "stop": "Stop",
+    "backward": "Terug",
+    "backwardtime": "Terug (in tijd)",
+    "replay": "Herhaal",
+    "shortcuts": "Snelkoppelingen",
+    "guidelines": "Richtlijnen",
+    "overview": "Overzicht",
+    "help": "Help",
+    "on focus only": "alleen op focus",
+    "wanted": "Gezocht",
+    "unknown": "onbekend",
+    "please wait": "Even geduld a.u.b.    ",
+    "logout successful": "Succesvol uitgelogd",
+    "export data": "Exporteer Data",
+    "export": "Exporteer",
+    "text file": "Tekstbestand",
+    "statistics": "Statistiek",
+    "transcript": "Transcript",
+    "transcription": "Transcriptie",
+    "timespan": "Tijdsduur (s)",
+    "validation": "Validatie",
+    "search": "Zoeken",
+    "project": "Project",
+    "authors": "Auteurs",
+    "no guidelines found": "Geen richtlijnen gevonden",
+    "example": "Voorbeeld",
+    "select database": "Kies Database",
+    "agreement": "overeenkomst",
+    "agreement read": "Ik heb de overeenkomst gelezen en accepteer de inhoud",
+    "yes": "Ja",
+    "no": "Nee",
+    "errors found": "({{fouten}}) fouten gevonden",
+    "no errors found": "Geen fouten gevonden",
+    "segment": "Transcriptie eenheid",
+    "job number": "Job nummer",
+    "free jobs": "Vrije Banen",
+    "email": "E-mail",
+    "description": "Beschrijving",
+    "bug report": "Fouten Verslag",
+    "protocol": "Protokol",
+    "submission success": "succesvol verzonden",
+    "duration": "Duur",
+    "samplerate": "Bemonsteringsfrequentie",
+    "bitspersecond": "Bits per Seconde",
+    "filesize": "Bestandsgrootte",
+    "id": "ID",
+    "download": "Download",
+    "application": "Applicatie",
+    "website": "Website",
+    "news": "Nieuws",
+    "faq": "FAQ",
+    "features": "Kenmerken",
+    "transcription window": "Transcriptie venster",
+    "supported files": "Ondersteunde bestanden",
+    "select one tier": "Selecteer een niveau",
+    "prompt": "Prompt",
+    "feedback": "Feedback",
+    "skip silence": "stilte overslaa",
+    "good": "Goed",
+    "bad": "Slecht",
+    "middle": "Midden",
+    "insert comment": "Voeg hier commentaar toe... (optioneel)",
+    "password": "Paswoord",
+    "preview": "Voorbeeld",
+    "screenshots": "Schermafbeelding",
+    "Language": "Taal",
+    "Speech Recognition": "Spraakherkenning",
+    "Service Provider": "Dienstverlener",
+    "SELECT ACTION": "ACTIE KIEZEN",
+    "Format": "Formaat",
+    "Type": "Type",
+    "File extension": "Bestandsextensie",
+    "tools": "Hulpmiddelen",
+    "custom formats": "Aangepaste formaten",
+    "meta data": "Meta-data",
+    "manual": "Handmatig",
+    "authenticate": "Autentificeren",
+    "im authenticated": "Ik ben geauthenticeerd!",
+    "dismissed": "afgewezen in {{waarde}}s",
+    "Send feedback": "Feedback verzenden",
+    "reload": "herladen",
+    "Options": "Opties"
+  },
+  "bug report": {
+    "give feedback": "Geef feedback",
+    "description": "Vertel ons wat u vindt van OCTRA. Wat kunnen we beter doen? Hebt u bugs gevonden?    ",
+    "sent": "Uw feedback is succesvol gerapporteerd :-)",
+    "error": "Helaas kon uw feedback niet naar ons worden verzonden. Stuur ons a.u.b. een e-mail naar {{e-mail}}.",
+    "send protocol": "Protocol toevoegen (aanbevolen)"
+  },
+  "transcription": {
+    "start": "Doorgaan met transcriptie",
+    "new": "Start nieuwe transcriptie",
+    "finish": "Beëindig transcriptie",
+    "stop": "Stop transcriptie",
+    "check": "Controleer transcriptie",
+    "send": "Stuur transcriptie",
+    "complete": "Voltooi transcriptie",
+    "invalid": "Alleen geldige transcripties worden geaccepteerd. Gelieve uw transcriptie te corrigeren.",
+    "no prompttext": "De vraagtekst kan niet worden weergegeven."
+  },
+  "segments": {
+    "total": "Aantal transcriptie eenheden",
+    "transcribed": "Getranscribeerde eenheden",
+    "with breaks": "Stille transcriptie-eenheden",
+    "not transcribed": "Lege transcriptie-eenheden",
+    "previous": "vorige transcriptie-eenheid",
+    "next": "volgende transcriptie-eenheid"
+  },
+  "feedback": {
+    "unintelligible": "onverstaanbaar",
+    "less intelligible": "bijna onverstaanbaar",
+    "intelligible": "verstaanbaar",
+    "very good intelligible": "zeer goede verstaanbaarheid",
+    "quality of signal": "Kwaliteit van het signaal",
+    "a lot of noises": "signaal met veel ruis",
+    "few noises": "enige ruis in het signaal",
+    "very few noises": "weinig ruis in het signaal",
+    "no noises": "schoon signaal"
+  },
+  "interfaces": {
+    "simple editor": "Dictafoon-editor",
+    "linear editor": "Lineaire-editor",
+    "2D editor": "2D-editor"
+  },
+  "modal": {
+    "transcription": {
+      "delete": {
+        "header": "Maak een nieuwe transcriptie?",
+        "text": "Wilt u werkelijk de vorige transcriptie verwijderen en een nieuwe maken? <br><br> Uw voortgang van de vorige transcriptie  zal verwijderd worden. Deze actie kan niet ongedaan gemaakt worden.",
+        "delete old": "Verwijder de vorige transcriptie"
+      },
+      "send": {
+        "header": "Stuur transcriptie",
+        "text": "Als u op 'Nu verzenden' klikt, worden uw gegevens naar de server verzonden om te worden opgeslagen. Hierna kunt u uw gegevens niet meer wijzigen."
+      },
+      "sending": {
+        "header": "Stuur de transcriptie nu...",
+        "text": "Uw resultaten worden verzonden naar de server... Wacht alstublieft tot de transmissie succesvol is afgerond."
+      },
+      "demoEnd": {
+        "header": "Demomodus or Demo Modus",
+        "text": "U gebruikt momenteel de demomodus. <br/><br/>Klik op...<ul><li>\"Doorgaan\" om het huidige audiobestand opnieuw te laden. Uw invoer wordt verwijderd en de verzending van het transcript wordt gesimuleerd.</li><li>\"Sluiten\" om OCTRA af te sluiten. Uw invoer wordt verwijderd.</li><li>'Terug' om door te gaan met de transcriptie.</li></ul>",
+        "exportText": "U kunt uw transcript exporteren door op \"Terug\" en vervolgens op \"Exporteren\" te klikken:"
+      }
+    },
+    "login": {
+      "header": "Aanmelden mislukt or Inloggen mislukt",
+      "text": "Controleer uw gebruikersnaam en uw wachtwoord."
+    },
+    "supported": {
+      "header": "Ondersteunde bestandsindelingen voor de lokale modus",
+      "audio files": "Geluidsfiles or Geluidsbestanden",
+      "file formats for import": "Bestandsindelingen voor importeren"
+    },
+    "shortcuts": {
+      "play pause": "Speel / Pauze",
+      "stop playback": "Afspelen stoppen",
+      "step backward": "Spring naar de laatste positie",
+      "step backward time": "Spring terug in de tijd",
+      "set segment": "Transcriptievenster openen",
+      "set break": "Markeer transcriptie-eenheid als stilte",
+      "play selection": "Speel de selectie",
+      "transcribe segment": "Transcribeer eenheid",
+      "move cursor left": "Verplaats cursor naar links",
+      "move cursor right": "Verplaats cursor naar rechts",
+      "audioplayer": "Sneltoetsen voor audiospeler",
+      "top signaldisplay": "Snelkoppelingen van de signaalweergave bovenaan",
+      "down signaldisplay": "Snelkoppelingen van de signaalweergave onderaan",
+      "2D-Editor": "Snelkoppelingen van de 2D-editor",
+      "play audio on hover": "Speel audio af met zweven",
+      "jump_last_segment": "Opslaan en naar vorige transcriptie-eenheid springen",
+      "jump_next_segment": "Opslaan en naar volgende transcriptie-eenheid springen",
+      "close_save": "Venster opslaan en sluiten",
+      "delete boundaries": "Verwijder geselecteerde grenzen en voeg transcriptie-eenheden toe",
+      "general shortcuts": "Algemene sneltoetsen",
+      "feedback and send 1": "Verzend transcript met één ster",
+      "feedback and send 2": "Verzend transcript met twee sterren",
+      "feedback and send 3": "Verzend transcript met drie sterren",
+      "do asr": "Pas ASR toe op de geselecteerde transcriptie-eenheid",
+      "do asr maus": "Pas ASR en MAUS toe op de geselecteerde transcriptie-eenheid",
+      "do maus only": "Pas woorduitlijning met MAUS toe op de geselecteerde transcriptie-eenheid "
+    },
+    "inactivity": {
+      "header": "Langere afwezigheid gedetecteerd",
+      "body": "Je was minstens {{value}} minuten afwezig zonder OCTRA af te maken. Het wordt aanbevolen om OCTRA te verlaten als een langere afwezigheid voorspelbaar is. Als u op dit moment niet doorgaat met de transcriptie, kunt u nu stoppen met OCTRA. Wat wilt u doen?",
+      "new": "Begin een nieuwe transcriptie",
+      "continue": "Transcriptie voortzetten",
+      "quit": "Sluit OCTRA af"
+    },
+    "missing permissions": {
+      "header": "Ontbrekende rechten",
+      "description": "OCTRA heeft vastgesteld dat het geen toestemming krijgt om audio af te spelen. Om verder te gaan moet je OCTRA toestemming geven om audio af te spelen. Voer de volgende drie stappen uit en druk op de knop \"HERLADEN\" onderaan dit venster.",
+      "step1": "Klik op het stroke-out play-icoontje links van de adresbalk.",
+      "step2": "Klik op de knop naast 'Automatisch afspelen'",
+      "step3": "Klik op \"Audio en video toestaan\".",
+      "step4": "Klik op de \"HERLADEN\" knop hieronder."
+    }
+  },
+  "login": {
+    "online mode": "Online mode",
+    "online mode disabled": "De onlinemodus is momenteel inactief.",
+    "online mode description": "In de online modus krijg je automatisch audiobestanden voor transcriptie.",
+    "local mode": "Lokale modus",
+    "local mode description": "In de lokale modus kunt u audiobestanden van uw computer transcriberen. Uw gegevens worden niet geüpload naar een server.",
+    "old file found": "Er zijn gegevens van een eerdere transcriptie beschikbaar. Als u uw werk wilt voortzetten, sleept u het volgende bestand naar het grijze vak:<br/><br/>{{file_label}}",
+    "online mode data warning": "Er zijn lokale gegevens beschikbaar die in de lokale modus zijn gemaakt. Als u verder wilt gaan in de online modus, worden deze gegevens overschreven.",
+    "offline mode data warning": "Er zijn lokale gegevens beschikbaar die in de online modus zijn gemaakt. Als u in de lokale modus wilt doorgaan, worden deze gegevens overschreven.",
+    "online mode continue": "Oude gegevens gevonden! Om door te gaan, moet u de inloggegevens instellen op: {{member_id}} , {{member_project}}, {{member_jobno}}",
+    "last used": "laatst gebruikt",
+    "login and remove": "Gegevens in lokale modus verwijderen en inloggen",
+    "local and remove": "Gegevens online modus verwijderen & doorgaan",
+    "demo": "Klik hier om OCTRA te gebruiken op een standaard audiobestand (demo)",
+    "api not available": "De server is momenteel niet beschikbaar. Probeer het later nog eens. Als dit bericht na 4 uur nog steeds zichtbaar is, stuur ons dan een bericht via het feedbackformulier."
+  },
+  "dropzone": {
+    "drag&drop here": "Drag & Drop audiobestand (*.wav) (+ optioneel bestand om te importeren) hier of klik hier.",
+    "file selected": "{{file_label}} geselecteerd"
+  },
+  "browser": {
+    "invalid": "<b>Uw browser is niet compatibel</b>. Gebruik een van de volgende browsers:",
+    "small window width": "<b>De breedte van dit venster is te klein.</b> Vergroot dit venster om dit bericht te verbergen."
+  },
+  "reload-file": {
+    "header": "Herlaad audiobestand",
+    "text": "Deze toepassing is gesloten of vernieuwd. Selecteer hetzelfde audiobestand opnieuw. Daarna kun je verder met je werk.",
+    "file not supported": "Bestandstype is '{{type}}' en wordt niet ondersteund.",
+    "another file selected": "Een ander bestand geselecteerd. Selecteer hetzelfde bestand als voorheen of start een nieuwe transcriptie. Gezocht: '{{file}}'"
+  },
+  "logout": {
+    "successful text": "U bent succesvol uitgelogd.",
+    "login again": "Log opnieuw in"
+  },
+  "signal-gui": {
+    "selection text": "Selecteer een deel van het signaal met de muis: Klik en houd de linkermuisknop ingedrukt en houd deze ingedrukt terwijl u de cursor naar de eindpositie verplaatst.",
+    "segment enter text": "Selecteer een transcriptie-eenheid door er met de muis over te gaan en op de {{value}}-toets te drukken."
+  },
+  "transcription-submit": {
+    "overview": "De volgende tabel toont een overzicht van de transcriptie-eenheden:",
+    "form fill out": "Vul het formulier in",
+    "intelligibility of the speaker": "Verstaanbaarheid van de spreker",
+    "comment description": "Korte opmerking (Opmerkingen over workflows, wachttijden, problemen etc.)"
+  },
+  "segment invisible": "Deze transcriptie-eenheid moet zichtbaar zijn om de audio die erin zit af te spelen",
+  "boundary cannot delete": "Kan grens niet verwijderen omdat er aangrenzende transcriptie-eenheden zijn die al zijn getranscribeerd.",
+  "boundary cannot set": "Kan geen grens instellen in een transcriptie-eenheid die al is getranscribeerd.",
+  "send error": "Er is een fout opgetreden. Laad deze pagina opnieuw en probeer het opnieuw!",
+  "transcription submitted": {
+    "no jobs left": "Geen beschikbare vacatures meer",
+    "transcription sent": "transcriptie is verzonden",
+    "transcription sent successfully": "Uw transcriptie is succesvol verzonden.",
+    "want to do": "Wat zou je willen doen?",
+    "quit": "Afsluiten en uitloggen",
+    "next transcription": "Get next transcription"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "Bijsnijdmarkering",
+      "description": "Nadat hiermee de afspeelpositie in de audiospeler of signaalweergave is ingesteld, kunt u een bijsnijdmarkering op de tekstpositie invoegen."
+    }
+  },
+  "settings": {
+    "easy mode": "Eenvoudige modus",
+    "play on hover": "Play on hover",
+    "follow playcursor": "Volg de afspeelcursor",
+    "logging": "Gebruikersacties loggen",
+    "show loupe": "Vergrootglas weergeven",
+    "seconds per line": "Seconden per regel"
+  },
+  "custom": {
+    "table configurator": {
+      "name": "Tabel-configurator",
+      "description": "Deze tool stelt u in staat om uw eigen tabelformaat te creëren.",
+      "add column": "Kolom toevoegen",
+      "divider": "Verdeler",
+      "add header": "Koptekst toevoegen aan de tabel",
+      "generate table": "Genereer een tabel",
+      "include line numbers": "inclusief regelnummers",
+      "time format": "tijd formaat"
+    }
+  },
+  "tools": {
+    "cut audio": {
+      "name": "Audiobestand knippen",
+      "description": "Deze tool biedt aan om het audiobestand in sequenties van de transcriptie-eenheden te knippen.",
+      "append meta files": "Metabestanden toevoegen",
+      "add placeholder": "Tijdelijke aanduiding toevoegen",
+      "hide configurator": "Verberg configurator",
+      "show configurator": "Toon configurator"
+    },
+    "combine phrases": {
+      "name": "Combineren van zinnen",
+      "warning": "De woordbeperking is alleen mogelijk als deze tool wordt toegepast op een annotatie met woordsegmentatie. Na het gebruik van deze tool kunt u het resultaat niet meer terugdraaien.",
+      "description": "Met deze tool worden zinnen tussen stiltes gecombineerd om korte transcriptie-eenheden te verminderen. Transcriptie-eenheden die stilte bevatten die korter is dan een bepaalde duur, worden samengevoegd met hun buren.",
+      "hide settings": "Verberg instellingen",
+      "show settings": "Toon instellingen",
+      "minimal silence desc": "Alle transcriptie-eenheden die stilte bevatten, worden genegeerd als hun duur langer is dan deze waarde.",
+      "minimal silence": "Minimale stilteduur",
+      "maximal words": "Maximaal aantal woorden",
+      "maximal words desc": "Na de samenvoeging zullen alle transcriptie-eenheden een maximaal aantal woorden bevatten. (Werkt alleen als elk segment slechts één woord bevat). Een waarde van 0 betekent dat er geen beperking is."
+    },
+    "alerts": {
+      "done": "Tool '{{value}}' is succesvol toegepast."
+    }
+  },
+  "asr": {
+    "without asr": "Geen ASR",
+    "file too big": "De ASR ondersteunt alleen audiosequenties met max. duur van 10 minuten. Aangetaste transcriptie-eenheden werden overgeslagen.",
+    "click on logo": "Klik op een servicelogo voor meer informatie.",
+    "start this segment": "Start het alleen voor deze transcriptie-eenheid",
+    "start for all next": "Start het voor deze en alle volgende transcriptie-eenheden",
+    "stop this segment": "Stop het alleen voor deze transcriptie-eenheid",
+    "stop for all next": "Stop ermee voor deze en alle transcriptie-eenheden komen erna",
+    "stop all": "Stop het voor alle transcriptie-eenheden",
+    "asr running": "ASR is momenteel actief. Als u ASR voor deze transcriptie-eenheid wilt stoppen, klik dan hier.",
+    "no asr selected": "Selecteer ASR-opties voordat u de snelkoppeling gebruikt.",
+    "no quota": "Geen quotum meer. Gebruik een andere ASR-provider.",
+    "no auth": "Authenticatie nodig voor verdere transcriptie.",
+    "maus empty text": "De geselecteerde transcriptie-eenheid bevat geen tekst of minder dan twee woorden.",
+    "error": "Er is een fout opgetreden. Stuur ons een korte feedback om de fout te herstellen."
+  },
+  "alerts": {
+    "authentication needed": "Verifieer alstublieft om functies zoals ASR of woorduitlijning te gebruiken. Nadat u op \"Authenticeren\" heeft geklikt, wordt een apart venster geopend. Als er geen venster wordt geopend, zorg er dan voor dat pop-ups zijn ingeschakeld in uw browser.",
+    "need playback": "U moet het afspelen minstens één keer starten voordat u het transcript verzendt."
+  },
+  "authentication": {
+    "you are authenticated": "U bent geauthenticeerd!",
+    "window closed": "Dit venster wordt over {{seconds}} seconden automatisch gesloten.",
+    "description": "Sluit dit venster en klik in OCTRA op de \"I'm authenticated!\" knop om de authenticatie te bevestigen. Daarna gaat de geautomatiseerde verwerking verder."
+  },
+  "export": {
+    "meta data": {
+      "description": "Download de metagegevens die zijn vastgelegd terwijl uw transcriptie vorderde. (Alleen beschikbaar wanneer logboekregistratie was ingeschakeld in het instellingenmenu)."
+    },
+    "options": {
+      "add timestamps": "Scheid transcriptie-eenheden op leesbare tijdstempels (HH:MM:SS.s)",
+      "add samplepoints": "Scheid transcriptie-eenheden op monsterpunten (bijv. 123456)",
+      "timestamp notice": "Als u beide opties aanvinkt, worden beide tijdformaten ingevoegd:"
+    }
+  },
+  "maintenance": {
+    "banner": "Van <b>{{start}}</b> tot <b>{{end}}</b> (verwacht) gaat er onderhoud plaatsvinden.<br/>Op dit moment is OCTRA niet beschikbaar. Zorg ervoor dat u OCTRA in deze tijd niet gebruikt.",
+    "in app": "Van <b>{{start}}</b> tot <b>{{end}}</b> (verwacht) gaat er onderhoud plaatsvinden. <b>Beëindig OCTRA 15 minuten voordat het onderhoud begint.</b>"
+  }
+}

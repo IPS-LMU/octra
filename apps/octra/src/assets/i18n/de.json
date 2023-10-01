@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "Deutsch"
+  },
   "g": {
     "name": "Name",
     "abort": "Abbrechen",
@@ -48,7 +51,7 @@
     "no": "Nein",
     "errors found": "({{errors}}) Fehler gefunden",
     "no errors found": "Keine Fehler gefunden",
-    "segment": "Segment",
+    "segment": "Transkriptionseinheit",
     "job number": "Aufgabennummer",
     "free jobs": "Freie Aufgaben",
     "e-mail": "Email",
@@ -97,8 +100,14 @@
     "Send feedback": "Feedback senden",
     "reload": "NEU LADEN",
     "Options": "Optionen",
+    "about": "Über",
+    "MAUS language": "MAUS Sprache",
+    "quit and release": "Beenden & freigeben",
+    "quit continue later": "Beenden & später fortsetzen",
+    "continue transcription": "Transkription jetzt fortsetzen",
     "time": "Zeit",
     "speaker": "Sprecher",
+    "switch to": "Zu {{editor}} wechseln",
     "actions": "Aktionen",
     "error": "Fehler",
     "projects": "Projekte",
@@ -145,15 +154,16 @@
     "send": "Transkription senden",
     "complete": "Transkription abschließen",
     "invalid": "Es werden nur korrekte Transkriptionen angenommen. Korrigiere bitte die Fehler.",
-    "no prompttext": "Der Vorlagentext kann nicht angezeigt werden."
+    "no prompttext": "Der Vorlagentext kann nicht angezeigt werden.",
+    "need audio playback": "Beginne die Audiowiedergabe miindestens einmal bevor Du die Transkription absenden kannst."
   },
   "segments": {
-    "total": "Segmente insgesamt",
-    "transcribed": "Segmente transkribiert",
-    "with breaks": "Segmente mit Pausen",
-    "not transcribed": "Segmente ohne Inhalt",
-    "previous": "vorheriges Segment",
-    "next": "nächstes Segment"
+    "total": "Transkriptionseinheiten insgesamt",
+    "transcribed": "Einheiten transkribiert",
+    "with breaks": "Einheiten mit Pausen",
+    "not transcribed": "Einheiten ohne Inhalt",
+    "previous": "vorherige Transkriptionseinheit",
+    "next": "nächste Transkriptionseinheit"
   },
   "feedback": {
     "unintelligible": "unverständlich",
@@ -176,20 +186,20 @@
     "transcription": {
       "delete": {
         "header": "Neue Transkription erstellen?",
-        "text": "Möchten Sie die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
+        "text": "Möchtest Du die alte Transkription wirklich entfernen?<br><br>Dein Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
         "delete old": "Vorherige Transkription entfernen"
       },
       "stop": {
         "header": "Transkription beenden",
-        "text": "Möchten Sie die Transkription wirklich beenden?<br><br>Ihr Fortschritt wird lokal in diesem Browser gespeichert. Um später fortzufahren, sollten Sie nicht den Browserverlauf löschen und ausschließlich diesen Browser nutzen."
+        "text": "Möchtest Du die Transkription wirklich beenden? Während der Transkription sichert Octra deinen Fortschritt im Speicher dieses Webbrowsers.<br><br>Entscheide Dich für eine der folgenden Optionen:<ul class='mt-2'><li class='mt-1'><b>Beenden & freigeben</b><br/>Dein Fortschritt wird verworfen und die Aufgabe ggf. anderen TranskribiererInnen angeboten.</li><li class='mt-1'><b>Beenden & später fortsetzen</b><br/>Dein Fortschritt wird auf den Server übertragen. Du kannst dich später mit den gleichen Zugangsdaten an diesem Webbrowser anmelden und die Transkription fortsetzen. Wichtig: Entferne nicht die Browserdaten, da Du sonst nicht mit dem letzten Stand fortfahren kannst.</li><li class='mt-1'><b>Transkription fortsetzen:</b><br/>Wähle diese Option, wenn Du jetzt weitermachen möchtest.</li></ul>"
       },
       "send": {
         "header": "Transkription senden",
-        "text": "Durch Klicken auf 'Jetzt senden' werden Ihre Ergebnisse zentral gespeichert und können nicht mehr geändert werden."
+        "text": "Durch Klicken auf 'Jetzt senden' werden Deine Ergebnisse zentral gespeichert und können nicht mehr geändert werden."
       },
       "sending": {
         "header": "Transkription wird übertragen...",
-        "text": "Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
+        "text": "Deine Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
       },
       "demoEnd": {
         "header": "Demo Modus",
@@ -199,7 +209,7 @@
     },
     "login": {
       "header": "Anmeldung fehlgeschlagen",
-      "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
+      "text": "Bitte überprüfe Deinen Nutzernamen und ihr Passwort."
     },
     "supported": {
       "header": "Unterstützte Dateien für den lokalen Modus",
@@ -211,29 +221,33 @@
       "stop playback": "Wiedergabe beenden",
       "step backward": "Zur zuletzt pausierten Stelle springen",
       "step backward time": "Zeitversetzt zurückspringen",
-      "set segment": "Segmentgrenze setzen",
-      "set break": "Segment als Pause markieren",
+      "set segment": "Grenze setzen",
+      "set break": "Transkriptionseinheit als Pause markieren",
       "play selection": "Selektion abspielen",
       "transcribe segment": "Transkriptionsfenter öffnen",
       "move cursor left": "Cursor nach links bewegen",
       "move cursor right": "Cursor nach rechts bewegen",
       "audioplayer": "Tastenkombinationen des Audioplayers",
       "signaldisplay_top": "Tastenkombinationen des oberen Signaldsiplays",
+      "signaldisplay_top_audio": "Tastenkombinationen für die Audiowiedergabe des oberen Signaldisplays",
       "signaldisplay_down": "Tastenkombinationen des unteren Signaldsiplays",
+      "signaldisplay_down_audio": "Tastenkombinationen für die Audiowiedergabe des unteren Signaldisplays",
       "2D-Editor": "Tastenkombinationen des 2D-Editors",
+      "2D-Editor viewer": "Tastenkombinationen für das mehrzeilige Signaldisplay",
+      "2D-Editor audio": "Tastenkombinationen für die Audiowiedergabe des mehrzeiligen Signaldisplays",
       "transcription window": "Transkriptionsfenster",
       "play audio on hover": "Audio mit Mausbewegung abspielen",
-      "jump_last_segment": "Speichern & zum vorherigen Segment springen",
-      "jump_next_segment": "Speichern & zum nächsten Segment springen",
+      "jump_last_segment": "Speichern & zur vorherigen Einheit springen",
+      "jump_next_segment": "Speichern & zur nächsten Einheit springen",
       "close_save": "Speichern & Fenster schließen",
-      "delete boundaries": "Ausgewählte Segmentgrenzen entfernen und Transkript zusammenführen",
+      "delete boundaries": "Ausgewählte Grenzen entfernen und Transkript zusammenführen",
       "general shortcuts": "Allgmeneine Tastenkombinationen",
-      "feedback and send 1": "Transcription mit einem Stern senden",
-      "feedback and send 2": "Transcription mit zwei Sternen senden",
-      "feedback and send 3": "Transcription mit drei Sternen senden",
-      "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
-      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen",
-      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)",
+      "feedback and send 1": "Transkript mit einem Stern senden",
+      "feedback and send 2": "Transkript mit zwei Sternen senden",
+      "feedback and send 3": "Transkript mit drei Sternen senden",
+      "do asr": "Ausgewählte Transkriptionseinheit von ASR verarbeiten lassen",
+      "do asr maus": "Ausgewähte Transkriptionseinheit von ASR & MAUS segmentieren lassen",
+      "do maus only": "Ausgewählte Transkriptionseinheit mit MAUS verarbeiten (Wort-Segmentierung)",
       "TRN-Editor": "Tastenkombinationen des TRN-Editors",
       "TRN-Editor texteditor": "Tastenkürzel des Texteditors",
       "TRN-Editor table": "Tastenkürzel für die Tabelle",
@@ -250,7 +264,7 @@
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
-      "body": "Du warst seit mindestens {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorrausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
+      "body": "Du warst seit mindestens {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
       "new": "Neue Transkription beginnen",
       "continue": "Transkription fortsetzen",
       "quit": "OCTRA beenden"
@@ -260,28 +274,35 @@
       "description": "OCTRA hat nicht die Berechtigung Audio abszuspielen. Damit Du OCTRA weiter nutzen kannst, musst Du diese Berechtigung erteilen. Führe die folgenden Schritte aus und klicke anschließend auf die \"NEU LADEN\" Schaltfläche am Ende dieses Fensters.",
       "step1": "Klicke auf das durchgestrichene Play-Symbol links der Adresszeile.",
       "step2": "Klicke auf die Schaltfläche rechts von \"Autoplay\".",
-      "step3": "Klicke aud \"Audio und Video erlauben\".",
+      "step3": "Klicke auf \"Audio und Video erlauben\".",
       "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
     },
     "overview": {
       "check transcription": "Wechsle zu dem TRN-Editor und überprüfe dein Transkript."
     },
-    "level remove": "Bist Du dir sicher, dass Du die Ebene \"{{name}}\" permanent löschen möchtest?"
+    "level remove": "Bist Du dir sicher, dass Du die Ebene \"{{name}}\" permanent löschen möchtest?",
+    "about": {
+      "header": "Über OCTRA"
+    },
+    "feedback-notice": {
+      "header": "Feedback gewünscht",
+      "body": "Um Octra weiter zu verbessern oder Fehler zu beheben, benötigen wir dein Feedback. Du kannst uns einfach und schnell deine Meinung mitteilen, indem Du auf das Fragezeichen in der rechten oberen Ecke klickst und das Formular ausfüllst. <b>Wenn es ein technisches Problem gibt, ist es sehr wichtig so schnell wie möglich das Feedback einschl. des Protokolls an uns zu senden.</b> Das Protokoll hilft uns bei einer schnellen Diagnose und einer zeitnahen Fehlerbehebung.<br/><br/>Vielen Dank.<br/><br/><i>Das OCTRA Team</i>"
+    }
   },
   "login": {
     "online mode": "Online Modus",
-    "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Sie können OCTRA stattdessen lokal nutzen.",
+    "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Du kannst OCTRA stattdessen lokal nutzen.",
     "online mode description": "Im Online Modus werden automatisch Audiodateien zugewiesen, die verschriftlicht werden sollen.",
     "local mode": "Lokaler Modus",
-    "local mode description": "Im lokalen Modus können Sie selbst eine Audiodatei von Ihrer Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen.",
-    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
+    "local mode description": "Im lokalen Modus kannst Du selbst eine Audiodatei von Deiner Festplatte laden und transkribieren. Dabei werden keine Daten auf einen Server hochgeladen, solange Du keine der Web-Services nutzt (ASR oder Word-Alignment).",
+    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehe die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}",
     "last used": "zuletzt genutzt",
     "login and remove": "Daten des lokalen Modus löschen & anmelden",
     "local and remove": "Daten des online Modus löschen & weiter",
-    "demo": "Klicke hier um OCTRA mit einer beliebigen Audiodatei zu öffnen (Demo)",
+    "demo": "Öffne Demo",
     "api not available": "Der Server ist aktuell nicht erreichbar. Bitte versuche es später erneut. Sollte sich das auch nach 4 Stunden nicht ändern, sende uns bitte eine Nachricht über das Feedback Formular."
   },
   "dropzone": {
@@ -290,44 +311,44 @@
   },
   "browser": {
     "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:",
-    "small window width": "<b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet."
+    "small window width": "<b>Die Fensterbreite ist zu klein.</b> Bitte vergrößere dieses Fenster bis die Meldung verschwindet."
   },
   "reload-file": {
     "header": "Datei erneut einlesen",
-    "text": "Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wählen Sie erneut eine Audiodatei aus um sie einlesen zu lassen. Nach dem Einlesen können Sie ihre Arbeit fortsetzen.",
+    "text": "Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wähle erneut eine Audiodatei aus um sie einlesen zu lassen. Nach dem Einlesen kannst Du deine Arbeit fortsetzen.",
     "file not supported": "Die Datei ist vom Typ '{{type}}' und wird nicht unterstützt.",
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'"
   },
   "logout": {
-    "successful text": "Sie haben sich erfolgreich abgemeldet.",
+    "successful text": "Du hast Dich erfolgreich abgemeldet.",
     "login again": "Erneut anmelden"
   },
   "signal-gui": {
-    "selection text": "Bitte wählen Sie mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicken Sie mit der linken Maustaste an eine gewünschte Position, halten Sie diese gedrückt und ziehen Sie den Mauszeiger bis zur Endposition.",
-    "segment enter text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
+    "selection text": "Bitte wähle mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicke mit der linken Maustaste an eine gewünschte Position, halte diese gedrückt und ziehe den Mauszeiger bis zur Endposition.",
+    "segment enter text": "Bitte wähle eine Transkriptionseinheit aus, indem Du mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit": {
-    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
-    "form fill out": "Bitte füllen Sie kurz das Formular aus",
+    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Deine definierten Transkriptionseinheiten:",
+    "form fill out": "Bitte fülle kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
   },
-  "segment invisible": "Das Segment muss sichtbar sein, um es abspielen zu können",
-  "boundary cannot delete": "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden",
-  "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden",
+  "segment invisible": "Die Transkriptionseinheit muss sichtbar sein, um sie abspielen zu können",
+  "boundary cannot delete": "Die Grenze kann nicht gelöscht werden, da daran angrenzende Transkriptionseinheiten bereits transkribiert wurden",
+  "boundary cannot set": "Die Grenze kann nicht innerhalb einer trankribierten Transkriptioneinheit gesetzt werden",
   "send error": "Es ist ein Fehler aufgetreten. Lade diese Seite mit ihrem Browser noch einmal und versuche es erneut",
   "transcription submitted": {
     "no jobs left": "Keine freien Aufgaben verfügbar",
     "transcription sent": "Transkription wurde übertragen.",
-    "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
-    "want to do": "Was wollen Sie tun?",
+    "transcription sent successfully": "Deine Transkription wurde erfolgreich übertragen.",
+    "want to do": "Was möchtest Du tun?",
     "quit": "Beenden und Abmelden",
     "next transcription": "Jetzt nächste Transkription durchführen"
   },
   "special_markers": {
     "boundary": {
-      "insert": "Segmentgrenze",
-      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Segmentgrenze eingefügt werden."
+      "insert": "Grenze",
+      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Grenze eingefügt werden."
     }
   },
   "settings": {
@@ -353,7 +374,7 @@
   "tools": {
     "cut audio": {
       "name": "Audiodatei schneiden",
-      "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Segmentgrenzen geschnitten werden.",
+      "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Grenzen geschnitten werden.",
       "append meta files": "Meta Dateien hinzufügen",
       "add placeholder": "Platzhalter hinzufügen",
       "hide configurator": "Verstecke den Konfigurator",
@@ -362,13 +383,13 @@
     "combine phrases": {
       "name": "Kombiniere Phrasen",
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat nicht rückgängig gemacht werden.",
-      "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Segmente entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
+      "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Transkriptionseinheiten entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
       "hide settings": "Verstecke die Einstellungen",
       "show settings": "Zeige die Einstellungen",
       "minimal silence": "Minimale Pausenlänge (ms)",
       "minimal silence desc": "Alle Pausen, deren Länge größer oder gleich dem angegebenen Wert sind, werden nicht zusammengeführt.",
       "maximal words": "Maximale Anzahl an Wörtern",
-      "maximal words desc": "Die Segmente werden so zusammengeführt, dass ein Segment eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert."
+      "maximal words desc": "Die Transkriptionseinheiten werden so zusammengeführt, dass eine Einheit eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert."
     },
     "alerts": {
       "done": "Das Werkzeug '{{value}}' wurde erfolgreich angewendet."
@@ -376,24 +397,25 @@
   },
   "asr": {
     "without asr": "Ohne ASR",
-    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen.",
+    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Transkiptionseinheiten wurden übersprungen.",
     "click on logo": "Klicke für weitere Informationen auf ein Logo.",
-    "start this segment": "Verarbeite nur dieses Segment",
-    "start for all next": "Verarbeite alle folgende Segmente",
-    "stop this segment": "Beende Verarbeitung für dieses Segment",
-    "stop for all next": "Beende Verarbeitung für dieses und für alle folgende Segmente",
-    "stop all": "Beende Verarbeitung für alle Segmente",
-    "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
+    "start this segment": "Verarbeite nur diese Transkriptionseinheit",
+    "start for all next": "Verarbeite alle folgenden Einheiten",
+    "stop this segment": "Beende Verarbeitung für diese Einheit",
+    "stop for all next": "Beende Verarbeitung für dieses und für alle folgenden Einheiten",
+    "stop all": "Beende Verarbeitung für alle Einheiten",
+    "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für diese Transkriptionseinheit abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
     "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
-    "maus empty text": "Das ausgewählte Segment enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
-    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann.",
+    "maus empty text": "Die ausgewählte Transkriptionseinheit enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
+    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback zu dem Fehler, damit er behoben werden kann.",
     "max duration exceeded": "Um das Segment mit {{asrProvider}} verarbeiten zu lassen, muss es eine Länge von weniger als {{maxDuration}} Sekunden haben. Kürze das Segment oder wähle einen anderen ASR Provider.",
     "max signal size exceeded": "Die Dateigröße des gewählten Segments ist zu groß. Kürze das Segment oder wähle einen anderen ASR Provider."
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
+    "need playback": "Du musst die Audiowiedergabe mindestens einmal gestartet haben, bevor Du das Transkript absenden kannst.",
     "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich.",
     "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich.",
     "undo deactivated": "Du kannst aktuell Aktionen nicht rückgängig machen oder wiederholen."
@@ -412,14 +434,14 @@
       "description": "Lade die Daten herunter, die während deiner Transkription aufgezeichnet wurden. (Nur verfügbar, wenn die Protokollierung in den Einstellungen aktiviert wurde)."
     },
     "options": {
-      "add timestamps": "Trenne Segmente durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
-      "add samplepoints": "Trenne Segmente durch Zeitstempel im Sample-Format (z.B. 123456)",
+      "add timestamps": "Trenne Transkriptionseinheiten durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
+      "add samplepoints": "Trenne Transkriptionseinheiten durch Zeitstempel im Sample-Format (z.B. 123456)",
       "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
     }
   },
   "maintenance": {
-    "banner": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
-    "in app": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
+    "banner": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
+    "in app": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
   },
   "trn-editor": {
     "speaker-actions": {

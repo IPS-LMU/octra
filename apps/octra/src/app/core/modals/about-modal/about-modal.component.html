@@ -1,0 +1,93 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title">About OCTRA
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+
+    <h5 class="mt-1 pt-0">
+      Affiliations
+    </h5>
+    <div id="logos" class="align-items-center">
+      <a href="http://www.en.phonetik.uni-muenchen.de/"><img src="assets/img/ipsx60.png" style="height:60px;"/></a>
+      <a href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html"><img src="assets/img/bas.png"
+                                                                              style="height:60px;"/></a>
+      <a href="https://www.clarin-d.net/en/"><img src="assets/img/clarin-d.png" style="height:60px;"/></a>
+    </div>
+    <h5 style="margin-top:20px;">
+      Development team
+    </h5>
+    <table>
+      <tbody>
+      <tr>
+        <td class="pr-1">Project manager:</td>
+        <td>Christoph Draxler <a
+          href="https://www.en.phonetik.uni-muenchen.de/people/staff/draxler_christoph/index.html">(IPS, LMU
+          München)</a></td>
+      </tr>
+      <tr>
+        <td class="pr-1">Web developer:</td>
+        <td>Julian Pömp <a href="https://www.en.phonetik.uni-muenchen.de/people/staff/poemp_julian/index.html">(IPS,
+          LMU München)</a></td>
+      </tr>
+      </tbody>
+    </table>
+    <h5>Resources</h5>
+    <ul style="margin-left:0;">
+      <li>Literature:<br/>
+        Pömp, Julian and Draxler, Christoph (2017): OCTRA - a Configurable Browser-Based Editor for Orthographic Transcription Proceedings of Phonetik und Phonologie im deutschsprachigen Raum (2017), Berlin, Germany, pp. 145-148. <a [href]="bibtexCiteURL" target="_blank">[.bib]</a></li>
+      <li><a href="https://github.com/IPS-LMU/octra" target="_blank">Open source project on Github <i class="bi bi-github"></i></a></li>
+      <li><a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php" target="_blank">OCTRA
+        Translations</a></li>
+    </ul>
+    <h5>
+      Contributors
+    </h5>
+    <p>
+      Support OCTRA and add a new user interface language: open <a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php" target="_blank">OCTRA
+      Translations</a> and submit your translation!
+    </p>
+    <table class="table table-sm table-responsive-sm">
+      <thead>
+      <tr>
+        <th>Language</th>
+        <th>Language code</th>
+        <th>Translators</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Chinese</td>
+        <td>zh</td>
+        <td>Sishi Liao 🇨🇳</td>
+      </tr>
+      <tr>
+        <td>Dutch</td>
+        <td>nl</td>
+        <td>Arjan van Hessen 🇳🇱</td>
+      </tr>
+      <tr>
+        <td>Italian</td>
+        <td>it</td>
+        <td>Vincenzo Galatà 🇮🇹, anonymous (1x) 🇮🇹</td>
+      </tr>
+      <tr>
+        <td>Korean</td>
+        <td>ko</td>
+        <td>Sungeun Shin 🇰🇷</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+      {{"g.close" | transloco}}
+    </button>
+  </div>
+</div>

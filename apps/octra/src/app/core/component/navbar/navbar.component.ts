@@ -33,6 +33,7 @@ import { LoginMode } from '../../store';
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -104,7 +105,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public navbarServ: NavbarService,
     public sanitizer: DomSanitizer,
     public langService: TranslocoService,
-    public modService: OctraModalService,
+    public modalService: OctraModalService,
     public settService: SettingsService,
     public bugService: BugReportService,
     public annotationStoreService: AnnotationStoreService,
@@ -120,7 +121,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case 'export':
-            this.modalexport = this.modService.openModalRef(
+            this.modalexport = this.modalService.openModalRef(
               ExportFilesModalComponent,
               ExportFilesModalComponent.options,
               {
@@ -158,7 +159,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   public openBugReport() {
-    this.modService
+    this.modalService
       .openModal(BugreportModalComponent, BugreportModalComponent.options)
       .then(() => {
         window.location.hash = '';
@@ -177,7 +178,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   onLevelRemoveClick(level: OctraAnnotationAnyLevel<OctraAnnotationSegment>) {
-    this.modService
+    this.modalService
       .openModal(YesNoModalComponent, YesNoModalComponent.options, {
         message: this.langService.translate('modal.level remove', {
           name: level.name,
@@ -208,7 +209,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   openExportModal() {
-    this.modalexport = this.modService.openModalRef(
+    this.modalexport = this.modalService.openModalRef(
       ExportFilesModalComponent,
       ExportFilesModalComponent.options,
       {
@@ -219,14 +220,14 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   openToolsModal() {
-    this.modalTools = this.modService.openModalRef(
+    this.modalTools = this.modalService.openModalRef(
       ToolsModalComponent,
       ToolsModalComponent.options
     );
   }
 
   openStatisticsModal() {
-    this.modalStatistics = this.modService.openModalRef(
+    this.modalStatistics = this.modalService.openModalRef(
       StatisticsModalComponent,
       StatisticsModalComponent.options
     );
@@ -251,6 +252,13 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     return (
       project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
         .free ?? 0
+    );
+  }
+
+  openAboutModal() {
+    this.modalService.openModalRef(
+      AboutModalComponent,
+      AboutModalComponent.options
     );
   }
 }

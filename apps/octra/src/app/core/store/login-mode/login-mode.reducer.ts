@@ -20,6 +20,7 @@ import {
   OctraAnnotation,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import { SessionFile } from '../../obj/SessionFile';
 
 export const initialState: AnnotationState = {
   ...fromAnnotation.initialState,
@@ -46,8 +47,6 @@ export class LoginModeReducers {
     return createUndoRedoReducer(
       initialState,
       ...(new AnnotationStateReducers(this.mode).create() as any),
-      // TODO !!!
-      // prüfe, ob Task busy, falls ja, zeige Warnmeldung an mit Fortsetzen Funktion
       on(
         LoginModeActions.clearWholeSession.success,
         (state: AnnotationState, { mode }) => {
@@ -80,22 +79,22 @@ export class LoginModeReducers {
         (state: AnnotationState, { clearSession, mode }) => {
           return mode === this.mode && clearSession
             ? {
-              ...initialState,
-              currentSession: {
-                ...initialState.currentSession,
-              },
-            }
+                ...initialState,
+                currentSession: {
+                  ...initialState.currentSession,
+                },
+              }
             : {
-              ...state,
-              savingNeeded: false,
-              isSaving: false,
-              audio: {
-                fileName: '',
-                sampleRate: 0,
-                loaded: false,
-              },
-              histories: {},
-            };
+                ...state,
+                savingNeeded: false,
+                isSaving: false,
+                audio: {
+                  fileName: '',
+                  sampleRate: 0,
+                  loaded: false,
+                },
+                histories: {},
+              };
         }
       ),
       on(
@@ -195,7 +194,10 @@ export class LoginModeReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              transcript: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(),
+              transcript: new OctraAnnotation<
+                ASRContext,
+                OctraAnnotationSegment<ASRContext>
+              >(),
               currentSession: {},
             };
           }
@@ -209,7 +211,10 @@ export class LoginModeReducers {
             if (removeData) {
               return {
                 ...state,
-                transcript: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(),
+                transcript: new OctraAnnotation<
+                  ASRContext,
+                  OctraAnnotationSegment<ASRContext>
+                >(),
                 currentSession: {},
                 sessionFile,
               };
@@ -241,7 +246,8 @@ export class LoginModeReducers {
             return {
               ...state,
               projectConfig: projectSettings,
-              logging: projectSettings.logging.forced === true ? true : state.logging,
+              logging:
+                projectSettings.logging.forced === true ? true : state.logging,
               currentSession: {
                 ...state.currentSession,
                 loadFromServer: true,
@@ -334,15 +340,10 @@ export class LoginModeReducers {
         };
         break;
       case 'sessionfile':
-        if(state.sessionFile) {
-          state = {
-            ...state,
-            sessionFile: {
-              ...state.sessionFile,
-              ...value,
-            },
-          };
-        }
+        state = {
+          ...state,
+          sessionFile: SessionFile.fromAny(value),
+        };
         break;
     }
 

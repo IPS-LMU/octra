@@ -32,6 +32,7 @@ import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
+import { ApplicationActions } from '../application/application.actions';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -191,13 +192,19 @@ export class AuthenticationEffects {
   onLoginDemo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.loginDemo.do),
-      exhaustMap(() =>
-        of(
+      exhaustMap(() => {
+        this.routingService.navigate('login demo', ['/load']);
+        this.store.dispatch(
+          ApplicationActions.setRedirectionTo.success({
+            needsRedirectionTo: '/intern/transcr',
+          })
+        );
+        return of(
           AuthenticationActions.loginDemo.success({
             mode: LoginMode.DEMO,
           })
-        )
-      )
+        );
+      })
     )
   );
 

@@ -15,7 +15,7 @@ export enum TranscriptionStopModalAnswer {
 export class TranscriptionStopModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false,
+    backdrop: "static",
   };
 
   constructor(protected override activeModal: NgbActiveModal) {

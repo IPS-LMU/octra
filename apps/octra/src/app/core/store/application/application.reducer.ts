@@ -39,7 +39,7 @@ export const initialState: ApplicationState = {
 export const reducer = createReducer(
   initialState,
   on(
-    ApplicationActions.initApplication.success,
+    ApplicationActions.initApplication.setSessionStorageOptions,
     (
       state: ApplicationState,
       { followPlayCursor, playOnHover, reloaded, loggedIn }

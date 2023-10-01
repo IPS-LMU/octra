@@ -58,6 +58,7 @@ export class IDBActions {
   static loadAnnotation = createActionGroup({
     source: `IDB/Load annotation`,
     events: {
+      do: emptyProps(),
       success: props<{
         online: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
         demo: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;

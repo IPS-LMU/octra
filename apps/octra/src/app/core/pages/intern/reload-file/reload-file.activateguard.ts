@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { SettingsService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { Store } from '@ngrx/store';
 import { AppInfo } from '../../../../app.info';
 import { RoutingService } from '../../../shared/service/routing.service';
 
@@ -11,9 +9,7 @@ import { RoutingService } from '../../../shared/service/routing.service';
 export class ReloadFileGuard {
   constructor(
     private appStorage: AppStorageService,
-    private routingService: RoutingService,
-    private settingsService: SettingsService,
-    private store: Store
+    private routingService: RoutingService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {

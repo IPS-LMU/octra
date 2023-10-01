@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   catchError,
-  combineLatest,
   exhaustMap,
   filter,
   forkJoin,
@@ -46,10 +45,11 @@ import { AudioService } from '../../shared/service';
 export class IDBEffects {
   loadOptions$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ApplicationActions.loadSettings.success),
-      exhaustMap((action) => {
+      ofType(ApplicationActions.initApplication.setSessionStorageOptions),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
         return this.idbService
-          .initialize(action.settings.octra.database.name)
+          .initialize(state.application.appConfiguration!.octra.database.name)
           .pipe(
             map(() => {
               return forkJoin<
@@ -153,12 +153,14 @@ export class IDBEffects {
                   LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
-                    mode: LoginMode.DEMO,
+                    mode: state.application.mode,
                   })
                 );
               } else {
                 // do nothing
               }
+            } else {
+              this.store.dispatch(IDBActions.loadAnnotation.do());
             }
 
             return IDBActions.loadLogs.success({
@@ -174,7 +176,10 @@ export class IDBEffects {
 
   loadAnnotation$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(IDBActions.loadLogs.success),
+      ofType(
+        IDBActions.loadAnnotation.do,
+        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success
+      ),
       exhaustMap((action) => {
         return forkJoin([
           this.idbService.loadAnnotation(LoginMode.ONLINE),
@@ -999,7 +1004,7 @@ export class IDBEffects {
   loadConsoleEntries$ = createEffect(() =>
     this.actions$.pipe(
       ofType(IDBActions.loadAnnotation.success, IDBActions.loadAnnotation.fail),
-      exhaustMap((action) => {
+      mergeMap((action) => {
         const subject = new Subject<Action>();
 
         this.idbService
@@ -1028,49 +1033,6 @@ export class IDBEffects {
           });
 
         return subject;
-      })
-    )
-  );
-
-  afterIDBLoaded$ = createEffect(() =>
-    combineLatest([
-      this.actions$.pipe(ofType(IDBActions.loadOptions.success)),
-      this.actions$.pipe(ofType(IDBActions.loadLogs.success)),
-      this.actions$.pipe(
-        ofType(
-          IDBActions.loadAnnotation.success,
-          IDBActions.loadAnnotation.fail
-        )
-      ),
-      this.actions$.pipe(ofType(IDBActions.loadConsoleEntries.success)),
-    ]).pipe(
-      withLatestFrom(this.store),
-      exhaustMap(([a, state]) => {
-        // make sure online information is loaded
-        if (
-          state.application.mode === LoginMode.ONLINE &&
-          state.application.loggedIn
-        ) {
-          if (state.onlineMode.currentSession?.loadFromServer) {
-            if (
-              state.onlineMode.currentSession.currentProject !== undefined &&
-              state.onlineMode.currentSession.task !== undefined
-            ) {
-              return of(ApplicationActions.initApplication.finish());
-            } else {
-              return this.actions$.pipe(
-                ofType(
-                  LoginModeActions.loadOnlineInformationAfterIDBLoaded.success
-                ),
-                map((a) => ApplicationActions.initApplication.finish())
-              );
-            }
-          } else {
-            return of(ApplicationActions.initApplication.finish());
-          }
-        }
-
-        return of(ApplicationActions.initApplication.finish());
       })
     )
   );

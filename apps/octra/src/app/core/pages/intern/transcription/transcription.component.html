@@ -93,7 +93,7 @@
             <ng-container
                     *ngIf="
           selectedTheme === 'shortAudioFiles' &&
-            (useMode === 'online' || useMode === 'demo');
+            (useMode === 'online' || useMode === 'demo'); else defaultBottom;
         "
             >
                 <button
@@ -132,7 +132,6 @@
                     <i class="bi bi-star-fill"></i>
                 </button>
             </ng-container>
-        </div>
 
         <ng-template #defaultBottom>
             <button
@@ -187,5 +186,6 @@
                 <i class="bi bi-send-fill"></i>
             </button>
         </ng-template>
+        </div>
     </div>
 </div>

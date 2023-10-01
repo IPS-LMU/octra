@@ -15,6 +15,7 @@ import {
   OLabel,
 } from '@octra/annotation';
 import { AnnotationState } from './index';
+import { LoginModeActions } from '../login-mode.actions';
 
 export const initialState: AnnotationState = {
   transcript: new OctraAnnotation<
@@ -95,6 +96,7 @@ export class AnnotationStateReducers {
             };
             transcript = transcript.changeCurrentItemById(segmentID, currentSegment);
 
+            // 2. ignore last segment from results
             const segments = newSegments.filter(
               (a, i) => i < newSegments.length - 1
             );
@@ -113,10 +115,7 @@ export class AnnotationStateReducers {
               );
             }
 
-            state = {
-              ...state,
-              transcript,
-            };
+            state.transcript = transcript;
           }
           return state;
         }
@@ -171,15 +170,18 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
-      on(AnnotationActions.changeLevelName.do, (state: AnnotationState, {index, mode, name}) => {
-        if(mode === this.mode) {
-          const transcript = state.transcript.clone();
-          transcript.changeLevelNameByIndex(index,  name);
-          state.transcript = transcript;
-        }
+      on(
+        AnnotationActions.changeLevelName.do,
+        (state: AnnotationState, { index, mode, name }) => {
+          if (mode === this.mode) {
+            const transcript = state.transcript.clone();
+            transcript.changeLevelNameByIndex(index, name);
+            state.transcript = transcript;
+          }
 
-        return state;
-      }),
+          return state;
+        }
+      ),
       on(
         AnnotationActions.addAnnotationLevel.do,
         (state: AnnotationState, { levelType, mode, audioDuration }) => {
@@ -194,10 +196,7 @@ export class AnnotationStateReducers {
                 `OCTRA_${transcript.idCounters.level + 1}`,
                 [
                   transcript.createSegment(audioDuration.clone(), [
-                    new OLabel(
-                      `OCTRA_${transcript.idCounters.level + 1}`,
-                      ''
-                    ),
+                    new OLabel(`OCTRA_${transcript.idCounters.level + 1}`, ''),
                     new OLabel(`Speaker`, ''),
                   ]),
                 ]
@@ -238,7 +237,7 @@ export class AnnotationStateReducers {
         (state: AnnotationState, annotations) => {
           return {
             ...state,
-            transcript: (annotations as any)[this.mode]
+            transcript: (annotations as any)[this.mode],
           };
         }
       ),
@@ -249,59 +248,94 @@ export class AnnotationStateReducers {
           savingNeeded,
         })
       ),
-      on(AnnotationActions.changeCurrentLevelItems.do, (state: AnnotationState, {items, mode}) => {
-        if (this.mode === mode) {
-          const currentLevel = state.transcript.currentLevel;
+      on(
+        AnnotationActions.changeCurrentLevelItems.do,
+        (state: AnnotationState, { items, mode }) => {
+          if (this.mode === mode) {
+            const currentLevel = state.transcript.currentLevel;
 
-          if (currentLevel) {
-            for (const item of items) {
-              console.log(`change ${item.id} to ${(item as any).time.seconds}`);
-              state.transcript = state.transcript.clone().changeCurrentItemById(item.id, item);
-            }
-          }
-        }
-
-        return state;
-      }),
-      on(AnnotationActions.addCurrentLevelItems.do, (state: AnnotationState, {items, mode}) => {
-        if (this.mode === mode) {
-          const currentLevel = state.transcript.currentLevel;
-
-          if (currentLevel) {
-            for (const item of items) {
-              state.transcript = state.transcript.clone().addItemToCurrentLevel((item as any).time, item.labels, (item as any).context);
-            }
-          }
-        }
-
-        return state;
-      }),
-      on(AnnotationActions.removeCurrentLevelItems.do, (state: AnnotationState, {items, mode, removeOptions}) => {
-        if (this.mode === mode) {
-          const currentLevel = state.transcript.currentLevel;
-
-          if (currentLevel) {
-            for (const item of items) {
-              if(item.id !== undefined && item.id !== null) {
-                state.transcript = state.transcript.clone().removeItemById(item.id, removeOptions?.silenceCode, removeOptions?.mergeTranscripts);
-              } else if(item.index !== undefined && item.index !== null) {
-                state.transcript = state.transcript.clone().removeItemByIndex(item.index, removeOptions?.silenceCode, removeOptions?.mergeTranscripts);
-              } else {
-                console.error(`removeCurrentLevelItems: Can't remove item, missing index or ID.`);
+            if (currentLevel) {
+              for (const item of items) {
+                console.log(
+                  `change ${item.id} to ${(item as any).time.seconds}`
+                );
+                state.transcript = state.transcript
+                  .clone()
+                  .changeCurrentItemById(item.id, item);
               }
             }
           }
-        }
 
-        return state;
-      }),
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.addCurrentLevelItems.do,
+        (state: AnnotationState, { items, mode }) => {
+          if (this.mode === mode) {
+            const currentLevel = state.transcript.currentLevel;
+
+            if (currentLevel) {
+              for (const item of items) {
+                state.transcript = state.transcript
+                  .clone()
+                  .addItemToCurrentLevel(
+                    (item as any).time,
+                    item.labels,
+                    (item as any).context
+                  );
+              }
+            }
+          }
+
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.removeCurrentLevelItems.do,
+        (state: AnnotationState, { items, mode, removeOptions }) => {
+          if (this.mode === mode) {
+            const currentLevel = state.transcript.currentLevel;
+
+            if (currentLevel) {
+              for (const item of items) {
+                if (item.id !== undefined && item.id !== null) {
+                  state.transcript = state.transcript
+                    .clone()
+                    .removeItemById(
+                      item.id,
+                      removeOptions?.silenceCode,
+                      removeOptions?.mergeTranscripts
+                    );
+                } else if (item.index !== undefined && item.index !== null) {
+                  state.transcript = state.transcript
+                    .clone()
+                    .removeItemByIndex(
+                      item.index,
+                      removeOptions?.silenceCode,
+                      removeOptions?.mergeTranscripts
+                    );
+                } else {
+                  console.error(
+                    `removeCurrentLevelItems: Can't remove item, missing index or ID.`
+                  );
+                }
+              }
+            }
+          }
+
+          return state;
+        }
+      ),
       on(
         AnnotationActions.changeCurrentItemById.do,
         (state: AnnotationState, { id, item, mode }) => {
           if (mode === this.mode) {
             return {
               ...state,
-              transcript: state.transcript.clone().changeCurrentItemById(id, item),
+              transcript: state.transcript
+                .clone()
+                .changeCurrentItemById(id, item),
             };
           }
 
@@ -352,7 +386,25 @@ export class AnnotationStateReducers {
           if (mode === this.mode) {
             return {
               ...state,
-              transcript: state.transcript.clone().changeLevelIndex(currentLevelIndex),
+              transcript: state.transcript
+                .clone()
+                .changeLevelIndex(currentLevelIndex),
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
+        (state: AnnotationState, { currentProject, task, mode }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              currentSession: {
+                ...state.currentSession,
+                task,
+                currentProject,
+              },
             };
           }
           return state;
@@ -395,10 +447,10 @@ export class AnnotationStateReducers {
 
               return {
                 ...state,
-                transcript: state.transcript.changeCurrentItemByIndex(
+                transcript: state.transcript.clone().changeCurrentItemByIndex(
                   segmentIndex,
                   OctraAnnotationSegment.deserialize<ASRContext>({
-                    ...segment,
+                    ...segment.clone(segment.id),
                     id: segment.id,
                     labels: result
                       ? segment.labels.map((a: OLabel) =>
@@ -453,7 +505,7 @@ export class AnnotationStateReducers {
         AnnotationActions.duplicateLevel.do,
         (state: AnnotationState, { mode, index }) => {
           if (mode === this.mode) {
-            state.transcript =  state.transcript.clone().duplicateLevel(index);
+            state.transcript = state.transcript.clone().duplicateLevel(index);
           }
           return state;
         }

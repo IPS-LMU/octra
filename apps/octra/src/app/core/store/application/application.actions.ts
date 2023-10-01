@@ -16,7 +16,7 @@ export class ApplicationActions {
     source: 'app/init',
     events: {
       do: emptyProps(),
-      success: props<{
+      setSessionStorageOptions: props<{
         playOnHover: boolean;
         followPlayCursor: boolean;
         loggedIn: boolean;

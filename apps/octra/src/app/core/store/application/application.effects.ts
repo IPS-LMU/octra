@@ -30,7 +30,7 @@ import { AppSettings } from '../../obj';
 import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { SettingsService } from '../../shared/service';
-import { LoginMode, RootState } from '../index';
+import { getModeState, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
 import { Params } from '@angular/router';
@@ -44,19 +44,14 @@ import { findElements, getAttr } from '@octra/web-media';
   providedIn: 'root',
 })
 export class ApplicationEffects {
-  initApp$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(ApplicationActions.initApplication.do),
-        tap(() => {
-          this.transloco.setActiveLang('en');
-          this.store.dispatch(ApplicationActions.loadLanguage.do());
-          this.store.dispatch(ApplicationActions.loadSettings.do());
-
-          this.initConsoleLogging();
-        })
-      ),
-    { dispatch: false }
+  initApp$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.initApplication.do),
+      exhaustMap(() => {
+        this.initConsoleLogging();
+        return of(ApplicationActions.loadLanguage.do());
+      })
+    )
   );
 
   loadSettings$ = createEffect(() =>
@@ -98,8 +93,6 @@ export class ApplicationEffects {
                   .join('<br/>')}</ul>`,
               });
             }
-
-            return ApplicationActions.changeLanguage.success();
           }),
           catchError((err: HttpErrorResponse) => {
             return of(
@@ -350,7 +343,7 @@ export class ApplicationEffects {
             );
           }
           this.store.dispatch(
-            ApplicationActions.initApplication.success({
+            ApplicationActions.initApplication.setSessionStorageOptions({
               playOnHover: this.sessStr.retrieve('playonhover') ?? false,
               followPlayCursor:
                 this.sessStr.retrieve('followplaycursor') ?? false,
@@ -386,6 +379,7 @@ export class ApplicationEffects {
             }
             return;
           }
+
           if (!state.application.loggedIn) {
             this.routerService.navigate(
               'not logged in, back to login',
@@ -393,21 +387,18 @@ export class ApplicationEffects {
               AppInfo.queryParamsHandling
             );
           } else {
-            if (
-              state.application.mode === LoginMode.ONLINE &&
-              state.authentication.authenticated &&
-              environment.useCookies
-            ) {
-              this.store.dispatch(
-                LoginModeActions.loadCurrentAccountInformation.do({
-                  mode: state.application.mode,
-                  actionAfterSuccess: state.onlineMode.currentSession
-                    ?.currentProject
-                    ? ApplicationActions.redirectToLastPage.do()
-                    : AuthenticationActions.redirectToProjects.do(),
-                })
-              );
-            }
+            // logged in
+            console.log(`LOGGED IN! with mode ${state.application.mode}`);
+            const modeState = getModeState(state)!;
+            const t = JSON.parse(JSON.stringify(modeState));
+            this.store.dispatch(
+              AnnotationActions.prepareTaskDataForAnnotation.do({
+                currentProject:
+                  getModeState(state)!.currentSession.currentProject!,
+                mode: state.application.mode,
+                task: getModeState(state)!.currentSession!.task!,
+              })
+            );
           }
         })
       ),
@@ -430,22 +421,21 @@ export class ApplicationEffects {
     { dispatch: false }
   );
 
-  afterIDBLoaded$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(IDBActions.loadAnnotation.success),
-        withLatestFrom(this.store),
-        tap(([a, state]: [Action, RootState]) => {
-          this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
+  afterIDBLoaded$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.loadConsoleEntries.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]: [Action, RootState]) => {
+        this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
 
-          if (
-            state.asr.settings?.selectedService &&
-            state.asr.settings?.selectedLanguage
-          ) {
-            const selectedLanguage = state.asr.settings.selectedLanguage;
-            const selectedService = state.asr.settings.selectedService;
+        if (
+          state.asr.settings?.selectedService &&
+          state.asr.settings?.selectedLanguage
+        ) {
+          const selectedLanguage = state.asr.settings.selectedLanguage;
+          const selectedService = state.asr.settings.selectedService;
 
-            /* TODO Implement
+          /* TODO Implement
                         const lang: ASRLanguage | undefined =
                           this.asrService.getLanguageByCode(
                             selectedLanguage,
@@ -459,84 +449,72 @@ export class ApplicationEffects {
                         }
 
                          */
-          }
+        }
 
-          if (!this.settingsService.responsive.enabled) {
-            this.setFixedWidth();
-          }
+        if (!this.settingsService.responsive.enabled) {
+          this.setFixedWidth();
+        }
 
-          const queryParams = {
-            audio: this.getParameterByName('audio'),
-            host: this.getParameterByName('host'),
-            transcript: this.getParameterByName('transcript'),
-            embedded: this.getParameterByName('embedded'),
-          };
+        const queryParams = {
+          audio: this.getParameterByName('audio'),
+          host: this.getParameterByName('host'),
+          transcript: this.getParameterByName('transcript'),
+          embedded: this.getParameterByName('embedded'),
+        };
 
-          const transcriptURL =
-            queryParams.transcript !== undefined
-              ? queryParams.transcript
-              : undefined;
-          // define languages
-          const languages = state.application.appConfiguration!.octra.languages;
-          const browserLang =
-            navigator.language || (navigator as any).userLanguage;
+        const transcriptURL =
+          queryParams.transcript !== undefined
+            ? queryParams.transcript
+            : undefined;
+        // define languages
+        const languages = state.application.appConfiguration!.octra.languages;
+        const browserLang =
+          navigator.language || (navigator as any).userLanguage;
 
-          // check if browser language is available in translations
+        // check if browser language is available in translations
+        if (
+          this.appStorage.language === undefined ||
+          this.appStorage.language === ''
+        ) {
           if (
-            this.appStorage.language === undefined ||
-            this.appStorage.language === ''
+            state.application.appConfiguration!.octra.languages.find(
+              (value) => {
+                return value === browserLang;
+              }
+            ) !== undefined
           ) {
-            if (
-              state.application.appConfiguration!.octra.languages.find(
-                (value) => {
-                  return value === browserLang;
-                }
-              ) !== undefined
-            ) {
-              this.transloco.setActiveLang(browserLang);
-            } else {
-              // use first language defined as default language
-              this.transloco.setActiveLang(languages[0]);
-            }
+            this.transloco.setActiveLang(browserLang);
           } else {
-            if (
-              state.application.appConfiguration!.octra.languages.find(
-                (value) => {
-                  return value === this.appStorage.language;
-                }
-              ) !== undefined
-            ) {
-              this.transloco.setActiveLang(this.appStorage.language);
-            } else {
-              this.transloco.setActiveLang(languages[0]);
-            }
+            // use first language defined as default language
+            this.transloco.setActiveLang(languages[0]);
           }
-
-          // if url mode, set it in options
-          if (this.queryParamsSet(queryParams)) {
-            this.appStorage.setURLSession(
-              queryParams.audio!,
-              transcriptURL!,
-              queryParams.embedded === '1',
-              queryParams.host!
-            );
-          }
-
-          // settings finally loaded
-
+        } else {
           if (
-            !state.application.loggedIn &&
-            this.appStorage.useMode !== LoginMode.URL
+            state.application.appConfiguration!.octra.languages.find(
+              (value) => {
+                return value === this.appStorage.language;
+              }
+            ) !== undefined
           ) {
-            this.routerService.navigate(
-              'annotation loaded, not logged in',
-              ['/login'],
-              AppInfo.queryParamsHandling
-            );
+            this.transloco.setActiveLang(this.appStorage.language);
+          } else {
+            this.transloco.setActiveLang(languages[0]);
           }
-        })
-      ),
-    { dispatch: false }
+        }
+
+        // if url mode, set it in options
+        if (this.queryParamsSet(queryParams)) {
+          this.appStorage.setURLSession(
+            queryParams.audio!,
+            transcriptURL!,
+            queryParams.embedded === '1',
+            queryParams.host!
+          );
+        }
+
+        return of(ApplicationActions.initApplication.finish());
+      })
+    )
   );
 
   loadLanguage$ = createEffect(() =>
@@ -546,6 +524,15 @@ export class ApplicationEffects {
         this.transloco.setAvailableLangs(['en']);
         this.transloco.setActiveLang('en');
         return of(ApplicationActions.loadLanguage.success());
+      })
+    )
+  );
+
+  loadLanguageSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.loadLanguage.success),
+      exhaustMap((a) => {
+        return of(ApplicationActions.loadSettings.do());
       })
     )
   );

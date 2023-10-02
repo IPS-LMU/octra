@@ -101,7 +101,7 @@ export class AuthenticationStoreService {
 
   reauthenticate(
     method: AccountLoginMethod,
-    actionAfterSuccess: Action,
+    actionAfterSuccess?: Action,
     username?: string,
     password?: string
   ) {
@@ -115,7 +115,7 @@ export class AuthenticationStoreService {
     );
   }
 
-  setReAuthenticationSuccess(actionAfterSuccess: Action) {
+  setReAuthenticationSuccess(actionAfterSuccess?: Action) {
     this.store.dispatch(
       AuthenticationActions.needReAuthentication.success({ actionAfterSuccess })
     );

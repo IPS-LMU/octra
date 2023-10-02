@@ -39,6 +39,9 @@ export class ApplicationStoreService {
   appInitialized = this.store.select(
     (state: RootState) => state.application.initialized
   );
+  shortcutsEnabled$ = this.store.select(
+    (state: RootState) => state.application.shortcutsEnabled
+  );
 
   public initApplication() {
     this.store.dispatch(ApplicationActions.initApplication.do());

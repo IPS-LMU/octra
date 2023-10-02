@@ -49,7 +49,7 @@ import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from '../../../store/authentication';
@@ -61,6 +61,7 @@ import {
 } from '@octra/web-media';
 import { PartiturConverter } from '@octra/annotation';
 import X2JS from 'x2js';
+import { ApplicationStoreService } from '../../../store/application/application-store.service';
 
 @Component({
   selector: 'octra-transcription',
@@ -226,7 +227,7 @@ export class TranscriptionComponent
     public navbarServ: NavbarService,
     public settingsService: SettingsService,
     public modService: OctraModalService,
-    private modalService: NgbModal,
+    private appStoreService: ApplicationStoreService,
     public langService: TranslocoService,
     private api: OctraAPIService,
     private bugService: BugReportService,
@@ -449,6 +450,22 @@ export class TranscriptionComponent
         this.settingsService.isTheme('korbinian')) &&
       (this._useMode === 'online' || this._useMode === 'demo');
 
+    this.subscrManager.add(
+      this.appStoreService.shortcutsEnabled$.subscribe({
+        next: (shortcutsEnabled) => {
+          console.log('shortcutsEnabled changed');
+          if (this._currentEditor) {
+            console.log(
+              `set shortcuts to ${shortcutsEnabled} for editor ${
+                (this._currentEditor.instance as any).name
+              }`
+            );
+            (this._currentEditor.instance as OCTRAEditor).shortcutsEnabled =
+              shortcutsEnabled;
+          }
+        },
+      })
+    );
     /*
     this.subscrManager.add(
       this.transcrService.alertTriggered.subscribe((alertConfig) => {

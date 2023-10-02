@@ -131,7 +131,7 @@ export const authenticationReducer = createReducer(
     };
   }),
   on(
-    LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
+    LoginModeActions.loadProjectAndTaskInformation.success,
     (state: AuthenticationState, { me }) => ({
       ...state,
       me,

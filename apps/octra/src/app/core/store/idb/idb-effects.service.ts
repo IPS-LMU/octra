@@ -140,24 +140,26 @@ export class IDBEffects {
                   action.onlineOptions.transcriptID
                 ) {
                   this.store.dispatch(
-                    LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                    LoginModeActions.loadProjectAndTaskInformation.do({
                       projectID: action.onlineOptions.project.id,
                       taskID: action.onlineOptions.transcriptID,
                       mode: LoginMode.ONLINE,
                     })
                   );
+                } else {
+                  this.store.dispatch(IDBActions.loadAnnotation.do());
                 }
               } else if (state.application.mode) {
                 // other modes
                 this.store.dispatch(
-                  LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                  LoginModeActions.loadProjectAndTaskInformation.do({
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
                     mode: state.application.mode,
                   })
                 );
               } else {
-                // do nothing
+                this.store.dispatch(IDBActions.loadAnnotation.do());
               }
             } else {
               this.store.dispatch(IDBActions.loadAnnotation.do());
@@ -178,7 +180,7 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(
         IDBActions.loadAnnotation.do,
-        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success
+        LoginModeActions.loadProjectAndTaskInformation.success
       ),
       exhaustMap((action) => {
         return forkJoin([

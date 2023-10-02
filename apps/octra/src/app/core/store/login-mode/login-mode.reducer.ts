@@ -154,7 +154,7 @@ export class LoginModeReducers {
         }
       ),
       on(
-        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
+        LoginModeActions.loadProjectAndTaskInformation.success,
         (state: AnnotationState, { currentProject, task, mode }) => {
           if (this.mode === mode) {
             return {
@@ -174,7 +174,7 @@ export class LoginModeReducers {
         }
       ),
       on(
-        LoginModeActions.loadOnlineInformationAfterIDBLoaded.do,
+        LoginModeActions.loadProjectAndTaskInformation.do,
         (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {

@@ -30,7 +30,6 @@ import { SessionFile } from '../../obj/SessionFile';
 import { joinURL } from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
-import { AccountLoginMethod } from '@octra/api-types';
 import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
 import { ApplicationActions } from '../application/application.actions';
 
@@ -45,7 +44,7 @@ export class AuthenticationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         const waitForWindowResponse = (
-          actionAfterSuccess: Action,
+          actionAfterSuccess: Action | undefined,
           url: string,
           cid: number,
           appendings = ''
@@ -84,9 +83,9 @@ export class AuthenticationEffects {
 
         if (
           a.type === AuthenticationActions.reauthenticate.do.type &&
-          state.application.mode !== LoginMode.ONLINE
+          [LoginMode.DEMO, LoginMode.LOCAL].includes(state.application.mode!)
         ) {
-          // local reauthentication
+          // local re-authentication
           if (
             state.application.appConfiguration?.octra.plugins?.asr
               ?.shibbolethURL
@@ -308,17 +307,6 @@ export class AuthenticationEffects {
     )
   );
 
-  logoutSuccess$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(AuthenticationActions.logout.success),
-        tap((a) => {
-          this.routingService.navigate('logout', ['/login']);
-        })
-      ),
-    { dispatch: false }
-  );
-
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -342,7 +330,7 @@ export class AuthenticationEffects {
                   ) {
                     // load online data after login
                     this.store.dispatch(
-                      LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
+                      LoginModeActions.loadProjectAndTaskInformation.do({
                         projectID: state.onlineMode.previousSession.project.id,
                         taskID: state.onlineMode.previousSession.task.id,
                         mode: a.mode,
@@ -365,7 +353,7 @@ export class AuthenticationEffects {
           } else if (state.application.mode) {
             // is not online => load local configuration
             this.store.dispatch(
-              LoginModeActions.loadOnlineInformationAfterIDBLoaded.do({
+              LoginModeActions.loadProjectAndTaskInformation.do({
                 projectID: '7234892',
                 taskID: '73482',
                 mode: a.mode,
@@ -384,7 +372,7 @@ export class AuthenticationEffects {
 
   afterIDLoadedSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.success),
+      ofType(LoginModeActions.loadProjectAndTaskInformation.success),
       exhaustMap((a) => {
         if (a.actionAfterSuccess) {
           return of(a.actionAfterSuccess);
@@ -514,7 +502,7 @@ export class AuthenticationEffects {
           if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
-                this.apiService.authType!,
+                state.authentication.type!,
                 a.actionAfterSuccess
               );
             const subscr = this.reauthenticationRef.closed.subscribe({
@@ -523,18 +511,6 @@ export class AuthenticationEffects {
                 this.reauthenticationRef = undefined;
               },
             });
-            if (
-              state.application.mode === LoginMode.ONLINE &&
-              state.authentication.type === AccountLoginMethod.shibboleth
-            ) {
-              // auth via shibboleth account
-              this.reauthenticationRef.componentInstance.authentications =
-                state.application.appConfiguration?.api.authentications ?? [];
-            } else {
-              this.reauthenticationRef.componentInstance.authentications = [
-                AccountLoginMethod.shibboleth,
-              ];
-            }
           }
         })
       ),
@@ -548,7 +524,9 @@ export class AuthenticationEffects {
         tap((a) => {
           this.reauthenticationRef?.close();
           this.reauthenticationRef = undefined;
-          this.store.dispatch((a as any).actionAfterSuccess);
+          if (a.actionAfterSuccess) {
+            this.store.dispatch((a as any).actionAfterSuccess);
+          }
         })
       ),
     { dispatch: false }

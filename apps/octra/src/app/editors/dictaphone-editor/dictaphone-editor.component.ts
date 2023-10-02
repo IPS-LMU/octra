@@ -109,8 +109,6 @@ export class DictaphoneEditorComponent
     ],
   };
 
-  private shortcutsEnabled = true;
-
   public get settings() {
     return this.audioplayer.settings;
   }

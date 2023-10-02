@@ -28,10 +28,9 @@ export class ReAuthenticationModalComponent
 
   initialized = false;
   type?: AccountLoginMethod;
-  authentications: AccountLoginMethod[] = [];
   authenticationRunning = false;
 
-  actionAfterSuccess!: Action;
+  actionAfterSuccess?: Action;
 
   constructor(
     public activeModal: NgbActiveModal,

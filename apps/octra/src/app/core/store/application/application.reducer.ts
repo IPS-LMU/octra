@@ -9,6 +9,7 @@ import { AuthenticationActions } from '../authentication';
 
 export const initialState: ApplicationState = {
   initialized: false,
+  shortcutsEnabled: true,
   loading: {
     status: LoadingStatus.INITIALIZE,
     progress: 0,
@@ -57,6 +58,14 @@ export const reducer = createReducer(
   on(ApplicationActions.initApplication.finish, (state: ApplicationState) => ({
     ...state,
     initialized: true,
+  })),
+  on(AuthenticationActions.needReAuthentication.do, (state: ApplicationState) => ({
+    ...state,
+    shortcutsEnabled: false,
+  })),
+  on(AuthenticationActions.reauthenticate.success, AnnotationActions.prepareTaskDataForAnnotation.do, (state: ApplicationState) => ({
+    ...state,
+    shortcutsEnabled: true,
   })),
   on(
     AuthenticationActions.loginOnline.redirectToURL,
@@ -181,7 +190,6 @@ export const reducer = createReducer(
   on(AuthenticationActions.logout.success, (state: ApplicationState) => {
     return {
       ...state,
-      loading: initialState.loading,
       mode: undefined,
       queryParams: undefined,
       loggedIn: false,

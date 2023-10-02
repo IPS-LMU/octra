@@ -54,14 +54,13 @@ export class OctraModalService {
 
   public openReAuthenticationModal(
     type: AccountLoginMethod,
-    actionAfterSuccess: Action
+    actionAfterSuccess?: Action
   ) {
     const ref = this.openModalRef<ReAuthenticationModalComponent>(
       ReAuthenticationModalComponent,
       ReAuthenticationModalComponent.options
     );
     ref.componentInstance.type = type;
-    ref.componentInstance.authentications = [type];
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
     return ref;
   }

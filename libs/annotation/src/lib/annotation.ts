@@ -550,7 +550,7 @@ export class OctraAnnotation<
   ): OAnnotJSON {
     return new OAnnotJSON(
       mediaFileName,
-      mediaFileName.replace(/\.[^.]$/g, '') + '_annotation.json',
+      mediaFileName.replace(/\.[^.]+$/g, '') + '_annotation.json',
       sampleRate,
       this.levels.map((a) => {
         const result = a.serialize();

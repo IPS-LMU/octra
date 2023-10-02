@@ -395,7 +395,7 @@ export class AnnotationStateReducers {
         }
       ),
       on(
-        LoginModeActions.loadOnlineInformationAfterIDBLoaded.success,
+        LoginModeActions.loadProjectAndTaskInformation.success,
         (state: AnnotationState, { currentProject, task, mode }) => {
           if (mode === this.mode) {
             return {

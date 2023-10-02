@@ -13,6 +13,8 @@ export class KeymappingService {
   private readonly _beforeShortcutTriggered = new EventEmitter<ShortcutEvent>();
   private readonly _onShortcutTriggered: EventEmitter<ShortcutEvent>;
 
+  public shortcutsEnabled = true;
+
   public get shortcutsManager(): ShortcutManager {
     return this._shortcutsManager;
   }

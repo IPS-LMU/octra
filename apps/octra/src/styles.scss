@@ -476,3 +476,7 @@ a {
 .pointer {
   cursor: pointer;
 }
+
+.jodit-toolbar__box{
+  display: inline-table !important;
+}

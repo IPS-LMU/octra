@@ -213,8 +213,6 @@ export class LinearEditorComponent
     return this._miniLoupeSettings;
   }
 
-  private shortcutsEnabled = true;
-
   constructor(
     public audio: AudioService,
     public alertService: AlertService,

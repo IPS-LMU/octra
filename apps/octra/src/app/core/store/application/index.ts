@@ -39,6 +39,7 @@ export interface URLParameters {
 export interface ApplicationState {
   initialized: boolean;
   mode?: LoginMode;
+  shortcutsEnabled: boolean;
   queryParams?: URLParameters;
   loggedIn: boolean;
   loading: {

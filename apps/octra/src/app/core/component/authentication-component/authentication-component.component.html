@@ -57,7 +57,7 @@
       {{ 'authentication.signin university' | transloco }}
     </button>
   </form>
-  <div class="separator my-4"
+  <div class="separator my-4 text-center"
        *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined">{{ 'g.or' | transloco }}</div>
   <form *ngIf="isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')" #form="ngForm">
     <div class="form-floating mb-3">

@@ -548,7 +548,7 @@ export class AnnotationEffects {
 
   onLoadOnlineInfo$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.do),
+      ofType(LoginModeActions.loadProjectAndTaskInformation.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (a.mode === LoginMode.ONLINE) {
@@ -567,7 +567,7 @@ export class AnnotationEffects {
               if (currentProject && task) {
                 if (!a.actionAfterSuccess) {
                   // normal load after task start or resuming session
-                  return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
+                  return LoginModeActions.loadProjectAndTaskInformation.success(
                     {
                       mode: LoginMode.ONLINE,
                       me: currentAccount,
@@ -577,25 +577,21 @@ export class AnnotationEffects {
                   );
                 }
 
-                return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                  {
-                    mode: LoginMode.ONLINE,
-                    me: currentAccount,
-                    currentProject,
-                    task,
-                    actionAfterSuccess: a.actionAfterSuccess,
-                  }
-                );
+                return LoginModeActions.loadProjectAndTaskInformation.success({
+                  mode: LoginMode.ONLINE,
+                  me: currentAccount,
+                  currentProject,
+                  task,
+                  actionAfterSuccess: a.actionAfterSuccess,
+                });
               } else {
-                return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                  {
-                    mode: LoginMode.ONLINE,
-                    me: currentAccount,
-                    currentProject,
-                    task,
-                    actionAfterSuccess: a.actionAfterSuccess,
-                  }
-                );
+                return LoginModeActions.loadProjectAndTaskInformation.success({
+                  mode: LoginMode.ONLINE,
+                  me: currentAccount,
+                  currentProject,
+                  task,
+                  actionAfterSuccess: a.actionAfterSuccess,
+                });
               }
             }),
             catchError((error: HttpErrorResponse) => {
@@ -605,7 +601,7 @@ export class AnnotationEffects {
                   message: error.error?.message ?? error.message,
                 },
                 a,
-                LoginModeActions.loadOnlineInformationAfterIDBLoaded.fail({
+                LoginModeActions.loadProjectAndTaskInformation.fail({
                   error,
                 }),
                 this.store,
@@ -684,34 +680,16 @@ export class AnnotationEffects {
                 }
               );
 
-              return LoginModeActions.loadOnlineInformationAfterIDBLoaded.success(
-                {
-                  mode: a.mode,
-                  me: createSampleUser(),
-                  currentProject,
-                  task,
-                }
-              );
+              return LoginModeActions.loadProjectAndTaskInformation.success({
+                mode: a.mode,
+                me: createSampleUser(),
+                currentProject,
+                task,
+              });
             })
           );
         }
         return of();
-      })
-    )
-  );
-
-  onLoadOnlineFailed$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LoginModeActions.loadOnlineInformationAfterIDBLoaded.fail),
-      exhaustMap((a) => {
-        return of(
-          AuthenticationActions.logout.do({
-            message: a.error.message,
-            clearSession: true,
-            messageType: '',
-            mode: LoginMode.ONLINE,
-          })
-        );
       })
     )
   );

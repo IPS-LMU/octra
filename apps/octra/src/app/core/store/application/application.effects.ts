@@ -12,7 +12,6 @@ import {
   of,
   Subject,
   tap,
-  timer,
   withLatestFrom,
 } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -388,17 +387,24 @@ export class ApplicationEffects {
             );
           } else {
             // logged in
-            console.log(`LOGGED IN! with mode ${state.application.mode}`);
             const modeState = getModeState(state)!;
-            const t = JSON.parse(JSON.stringify(modeState));
-            this.store.dispatch(
-              AnnotationActions.prepareTaskDataForAnnotation.do({
-                currentProject:
-                  getModeState(state)!.currentSession.currentProject!,
-                mode: state.application.mode,
-                task: getModeState(state)!.currentSession!.task!,
-              })
-            );
+
+            if (
+              modeState.currentSession.currentProject &&
+              modeState.currentSession.task
+            ) {
+              this.store.dispatch(
+                AnnotationActions.prepareTaskDataForAnnotation.do({
+                  currentProject: modeState.currentSession.currentProject,
+                  mode: state.application.mode,
+                  task: modeState.currentSession.task,
+                })
+              );
+            } else {
+              this.store.dispatch(
+                AuthenticationActions.redirectToProjects.do()
+              );
+            }
           }
         })
       ),
@@ -547,24 +553,18 @@ export class ApplicationEffects {
 
         const subject = new Subject<Action>();
 
-        timer(10).subscribe(() => {
-          if (action.type === AuthenticationActions.logout.success.type) {
-            subject.next(LoginModeActions.clearSessionStorage.success());
-          } else {
-            subject.next(LoginModeActions.clearSessionStorage.success());
-          }
-          subject.complete();
+        subject.next(LoginModeActions.clearSessionStorage.success());
+        subject.complete();
 
-          this.routerService
-            .navigate(
-              'after logout success',
-              ['/login'],
-              AppInfo.queryParamsHandling
-            )
-            .catch((error) => {
-              console.error(error);
-            });
-        });
+        this.routerService
+          .navigate(
+            'after logout success',
+            ['/login'],
+            AppInfo.queryParamsHandling
+          )
+          .catch((error) => {
+            console.error(error);
+          });
 
         return subject;
       })
@@ -589,10 +589,7 @@ export class ApplicationEffects {
   showErrorMessage$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(
-          AnnotationActions.startAnnotation.fail,
-          ApplicationActions.showErrorModal.do
-        ),
+        ofType(ApplicationActions.showErrorModal.do),
         tap((a) => {
           const ref = this.modalService.openModalRef<ErrorModalComponent>(
             ErrorModalComponent,

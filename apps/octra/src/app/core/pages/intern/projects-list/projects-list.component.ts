@@ -5,8 +5,15 @@ import { ProjectDto } from '@octra/api-types';
 import { DefaultComponent } from '../../../component/default.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { AuthenticationStoreService } from '../../../store/authentication';
+import {
+  AuthenticationActions,
+  AuthenticationStoreService,
+} from '../../../store/authentication';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
+import { RootState } from '../../../store';
+import { Store } from '@ngrx/store';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
   selector: 'octra-projects-list',
@@ -22,12 +29,27 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     public appStorage: AppStorageService,
     private modalService: OctraModalService,
     public authStoreService: AuthenticationStoreService,
-    private annotationStoreService: AnnotationStoreService
+    private annotationStoreService: AnnotationStoreService,
+    private store: Store<RootState>,
+    private actions$: Actions
   ) {
     super();
   }
 
   async ngOnInit() {
+    this.subscrManager.add(
+      this.actions$
+        .pipe(ofType(AuthenticationActions.needReAuthentication.success.type))
+        .subscribe({
+          next: () => {
+            this.loadProjects();
+          },
+        })
+    );
+    this.loadProjects();
+  }
+
+  private loadProjects() {
     this.subscrManager.add(
       this.api.listProjects().subscribe({
         next: (projects) => {
@@ -66,17 +88,24 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             return -1;
           });
         },
-        error: (error) => {
-          const ref = this.modalService.openModalRef<ErrorModalComponent>(
-            ErrorModalComponent,
-            ErrorModalComponent.options
-          );
-          ref.componentInstance.text = error.message;
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            this.store.dispatch(
+              AuthenticationActions.needReAuthentication.do({
+                actionAfterSuccess: undefined,
+              })
+            );
+          } else {
+            const ref = this.modalService.openModalRef<ErrorModalComponent>(
+              ErrorModalComponent,
+              ErrorModalComponent.options
+            );
+            ref.componentInstance.text = error.message;
+          }
         },
       })
     );
   }
-
   onProjectClick(project: ProjectDto) {
     this.appStorage.startOnlineAnnotation(project);
   }

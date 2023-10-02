@@ -169,8 +169,6 @@ export class TwoDEditorComponent
     ],
   };
 
-  private shortcutsEnabled = true;
-
   public get editor(): TranscrEditorComponent | undefined {
     if (!this.window) {
       return undefined;

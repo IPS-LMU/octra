@@ -134,7 +134,7 @@ export class AuthenticationActions {
         method: AccountLoginMethod;
         username?: string;
         password?: string;
-        actionAfterSuccess: Action;
+        actionAfterSuccess?: Action;
       }>(),
       success: props<{
         auth: AuthDto;
@@ -152,10 +152,10 @@ export class AuthenticationActions {
     source: 'auth/need re-authentication',
     events: {
       do: props<{
-        actionAfterSuccess: Action;
+        actionAfterSuccess?: Action;
       }>(),
       success: props<{
-        actionAfterSuccess: Action;
+        actionAfterSuccess?: Action;
       }>(),
       abort: emptyProps(),
       fail: props<{

@@ -20,6 +20,8 @@ export interface OctraEditorRequirements {
 }
 
 export abstract class OCTRAEditor extends DefaultComponent {
+  public shortcutsEnabled = true;
+
   protected doPlayOnHover(
     audioManager: AudioManager,
     isPlayingOnhover: boolean,

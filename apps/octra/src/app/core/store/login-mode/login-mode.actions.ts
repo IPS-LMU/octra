@@ -1,5 +1,5 @@
 import { AnnotationActions } from './annotation/annotation.actions';
-import {Action, createAction, createActionGroup, emptyProps, props} from '@ngrx/store';
+import { Action, createAction, createActionGroup, props } from '@ngrx/store';
 import { LoginMode } from '../index';
 import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
 import { URLParameters } from '../application';
@@ -59,8 +59,8 @@ export class LoginModeActions extends AnnotationActions {
     },
   });
 
-  static loadOnlineInformationAfterIDBLoaded = createActionGroup({
-    source: `annotation/ load task information`,
+  static loadProjectAndTaskInformation = createActionGroup({
+    source: `annotation/ load project and task information`,
     events: {
       do: props<{
         projectID: string;
@@ -96,9 +96,8 @@ export class LoginModeActions extends AnnotationActions {
       fail: props<{
         error: string;
       }>(),
-    }
+    },
   });
-
 
   static endTranscription = createActionGroup({
     source: 'annotation/ redirect to transcription end',

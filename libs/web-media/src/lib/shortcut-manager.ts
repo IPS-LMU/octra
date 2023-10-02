@@ -185,9 +185,11 @@ export class ShortcutManager {
     checkPressKey = true
   ): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
+      console.log("shortcuts enabled")
       if (event.type === 'keydown') {
         // run shortcut check
         const shortcut = this.getShorcutCombination(event);
+        console.log(`shortcut combo is ${shortcut}`)
         const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
         if (this.isProtectedShortcut(shortcut)) {
@@ -287,7 +289,7 @@ export class ShortcutManager {
           // Firefox
           if (
             code === 224 &&
-            (event.code === 'OSLeft' || event.code === 'OSRight')
+            (event.code === 'MetaLeft' || event.code === 'MetaRight')
           ) {
             return 'CMD';
           }
@@ -391,6 +393,7 @@ export class ShortcutManager {
 
   private checkPressedKey(event: KeyboardEvent) {
     const keyName = this.getNameByEvent(event);
+    console.log(`pressed kex in checkedPressedKey: '${keyName}'`)
     const valueToSet = event.type === 'keydown';
 
     switch (keyName) {
@@ -411,7 +414,7 @@ export class ShortcutManager {
     this._pressedKeys.other = valueToSet ? this.getKeyCode(event) : -1;
   }
 
-  private resetPressedKeys() {
+  public resetPressedKeys() {
     this._pressedKeys = {
       alt: false,
       shift: false,

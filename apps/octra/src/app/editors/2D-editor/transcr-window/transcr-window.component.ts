@@ -36,7 +36,7 @@ import {
   AudioViewerShortcutEvent,
 } from '@octra/ngx-components';
 import { LoginMode } from '../../../core/store';
-import { firstValueFrom, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
 import { DefaultComponent } from '../../../core/component/default.component';
 import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
@@ -289,9 +289,7 @@ export class TranscrWindowComponent
 
     if (direction !== 'down') {
       await this.goToSegment(direction);
-      const currentLevel = await firstValueFrom(
-        this.annotationStoreService.currentLevel$
-      );
+      const currentLevel = this.annotationStoreService.currentLevel;
       const segment = currentLevel!.items[
         this.segmentIndex
       ] as OctraAnnotationSegment;
@@ -311,9 +309,8 @@ export class TranscrWindowComponent
 
   onShortcutTriggered = async ($event: ShortcutEvent) => {
     if (!this.loading) {
-      const currentLevel = await firstValueFrom(
-        this.annotationStoreService.currentLevel$
-      );
+      const currentLevel = this.annotationStoreService.currentLevel;
+
       switch ($event.shortcutName) {
         case 'play_pause':
           this.triggerUIAction({

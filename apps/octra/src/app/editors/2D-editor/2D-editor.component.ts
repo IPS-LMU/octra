@@ -797,7 +797,6 @@ export class TwoDEditorComponent
 
   onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
     this.triggerUIAction($event);
-
     if ($event.shortcutName === 'undo' || $event.shortcutName === 'redo') {
       if (this.appStorage.undoRedoDisabled) {
         this.alertService.showAlert(
@@ -1254,7 +1253,6 @@ export class TwoDEditorComponent
     annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
   ) {
     // this.annotationStoreService.saveSegments();
-    console.log(annotation);
     this.annotationStoreService.overwriteTranscript(annotation);
   }
 
@@ -1278,8 +1276,5 @@ export class TwoDEditorComponent
         $event.items.map((a) => a.instance!)
       );
     }
-
-    console.log('CurrentLevelChange!');
-    console.log($event);
   }
 }

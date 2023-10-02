@@ -255,13 +255,13 @@ export class TranscrEditorComponent
       return;
     }
 
-
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(
       $event as any,
       Date.now()
     );
     if (shortcutInfo !== undefined) {
       $event.preventDefault();
+      this.shortcutsManager.resetPressedKeys();
       if (
         shortcutInfo.shortcut === 'ALT + S' &&
         this.settings.specialMarkers.boundary
@@ -1692,7 +1692,7 @@ export class TranscrEditorComponent
   onAfterInit = () => {
     this.subscrManager.removeByTag('afterInit');
     this.subscrManager.add(
-      timer(50).subscribe(() => {
+      timer(200).subscribe(() => {
         if (this.workplace?.parentNode && !this.popovers.segmentBoundary) {
           const segmentBoundary = document.createElement('div');
           segmentBoundary.setAttribute('class', 'panel seg-popover');

@@ -13,6 +13,7 @@ import {
 } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
+import { SessionFile } from '../../../obj/SessionFile';
 
 export interface GuidelinesItem {
   filename: string;
@@ -76,7 +77,7 @@ export interface AnnotationState extends UndoRedoState {
       id: string;
     };
   };
-  sessionFile?: any;
+  sessionFile?: SessionFile;
 }
 
 export interface AnnotationSessionState {

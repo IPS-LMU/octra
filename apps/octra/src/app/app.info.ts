@@ -1,5 +1,5 @@
 import { NavigationExtras } from '@angular/router';
-import { OggFormat, WavFormat } from '@octra/web-media';
+import { WavFormat } from '@octra/web-media';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -18,7 +18,7 @@ declare let octraVersion: string;
 declare let octraLastUpdated: string;
 
 export class AppInfo {
-  public static readonly audioformats = [new WavFormat(), new OggFormat()];
+  public static readonly audioformats = [new WavFormat()];
 
   public static readonly converters: Converter[] = [
     new AnnotJSONConverter(),

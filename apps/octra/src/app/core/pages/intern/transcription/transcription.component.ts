@@ -409,19 +409,7 @@ export class TranscriptionComponent
   }
 
   abortTranscription = () => {
-    if (
-      (this._useMode === LoginMode.ONLINE ||
-        this._useMode === LoginMode.DEMO) &&
-      this.projectsettings.octra !== undefined &&
-      this.projectsettings.octra.theme !== undefined &&
-      this.settingsService.isTheme('shortAudioFiles')
-    ) {
-      // clear transcription
-
-      this.annotationStoreService.endTranscription();
-      this.annotationStoreService.quit(true, true);
-    } else {
-      // TODO check other themes than shortAudioFiles
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
       this.modService
         .openModal(
           TranscriptionStopModalComponent,
@@ -429,12 +417,17 @@ export class TranscriptionComponent
         )
         .then((answer: any) => {
           if (answer === TranscriptionStopModalAnswer.QUIT) {
-            this.logout(false);
+            this.annotationStoreService.quit(false, false, false);
+          } else if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
+            this.annotationStoreService.quit(true, true, false);
           }
+          // else do nothing
         })
         .catch((error) => {
           console.error(error);
         });
+    } else {
+      this.annotationStoreService.quit(false, false, false);
     }
   };
 
@@ -1006,14 +999,6 @@ export class TranscriptionComponent
     }
 
     this.onSendButtonClick();
-  }
-
-  private logout(clearSession: boolean) {
-    this.annotationStoreService.endTranscription(true);
-    if (clearSession) {
-      this.uiService.elements = [];
-    }
-    this.appStorage.logout(clearSession);
   }
 
   openGuidelines() {

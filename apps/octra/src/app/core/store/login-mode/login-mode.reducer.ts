@@ -205,19 +205,29 @@ export class LoginModeReducers {
         }
       ),
       on(
-        AuthenticationActions.loginLocal.success,
-        (state: AnnotationState, { mode, sessionFile, removeData }) => {
+        AuthenticationActions.loginLocal.prepare,
+        (state: AnnotationState, { mode, sessionFile, removeData, files, annotation }) => {
           if (this.mode === mode) {
-            if (removeData) {
-              return {
-                ...state,
-                transcript: new OctraAnnotation<
-                  ASRContext,
-                  OctraAnnotationSegment<ASRContext>
-                >(),
-                currentSession: {},
-                sessionFile,
-              };
+            if (removeData || annotation) {
+              if (!annotation) {
+                return {
+                  ...state,
+                  transcript: new OctraAnnotation<
+                    ASRContext,
+                    OctraAnnotationSegment<ASRContext>
+                  >(),
+                  currentSession: {},
+                  sessionFile,
+                };
+              } else {
+                const deserialized = OctraAnnotation.deserialize(annotation);
+                return {
+                  ...state,
+                  transcript: deserialized,
+                  currentSession: {},
+                  sessionFile
+                }
+              }
             } else {
               return {
                 ...state,

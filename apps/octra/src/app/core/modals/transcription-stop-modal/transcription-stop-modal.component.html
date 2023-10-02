@@ -1,25 +1,29 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="modal-title">
-      {{ 'modal.transcription.stop.header' | transloco }}?
-    </h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-describedby="modal-title"
-      (click)="close()"
-    ></button>
+    <h4 class="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h4>
   </div>
-  <div
-    class="modal-body"
-    [innerHTML]="'modal.transcription.stop.text' | transloco"
-  ></div>
-  <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="close('QUIT')">
-      {{ 'g.quit' | transloco }}
-    </button>
-    <button class="btn primary" (click)="close('CONTINUE')" type="button">
-      {{ 'g.continue' | transloco }}
-    </button>
+  <div class="modal-body">
+    <div [innerHTML]="'modal.transcription.stop.text' | transloco">
+    </div>
+  </div>
+  <div class="row p-3 g-1">
+    <div class="col-12 col-lg-auto order-3 order-lg-1">
+      <button type="button" class="btn btn-raised btn-danger w-100"
+              (click)="close('QUIT RELEASE');">
+        {{"g.quit and release" | transloco}}
+      </button>
+    </div>
+    <div class="col-12 col-lg-auto order-2 order-lg-2">
+      <button type="button" class="btn btn-raised btn-secondary w-100"
+              (click)="close('QUIT');">
+        {{"g.quit continue later" | transloco}}
+      </button>
+    </div>
+    <div class="col-12 col-lg order-1 order-lg-3">
+      <button type="button" class="btn btn-raised btn-primary w-100" data-dismiss="modal"
+              (click)="close('CONTINUE')">
+        {{"g.continue transcription" | transloco}}
+      </button>
+    </div>
   </div>
 </div>

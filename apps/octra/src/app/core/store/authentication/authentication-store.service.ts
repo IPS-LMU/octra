@@ -3,6 +3,7 @@ import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from './authentication.actions';
 import { LoginMode, RootState } from '../index';
+import { OAnnotJSON } from '@octra/annotation';
 
 @Injectable({
   providedIn: 'root',
@@ -71,10 +72,11 @@ export class AuthenticationStoreService {
     );
   }
 
-  async loginLocal(files: File[], removeData: boolean) {
+  async loginLocal(files: File[], annotation?: OAnnotJSON, removeData = false) {
     this.store.dispatch(
       AuthenticationActions.loginLocal.do({
         files,
+        annotation,
         removeData,
         mode: LoginMode.LOCAL,
       })

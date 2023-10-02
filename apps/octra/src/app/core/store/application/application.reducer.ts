@@ -287,6 +287,7 @@ export const reducer = createReducer(
   ),
   on(
     AnnotationActions.loadAudio.success,
+    AuthenticationActions.logout.success,
     (state: ApplicationState, { mode }) => ({
       ...state,
       loading: {

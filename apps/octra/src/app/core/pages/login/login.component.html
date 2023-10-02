@@ -102,7 +102,7 @@
               </button>
               <button
                 (click)="onOfflineSubmit(true)"
-                *ngIf="getFileStatus() === 'new'"
+                *ngIf="getFileStatus() !== 'unknown'"
                 class="btn btn-raised btn-danger offline-delete-btn"
               >
                 {{ 'transcription.new' | transloco }}

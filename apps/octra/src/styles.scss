@@ -473,10 +473,14 @@ a {
   margin-left: 3px;
 }
 
+.jodit-toolbar__box {
+  display: inline-table !important;
+}
+
 .pointer {
   cursor: pointer;
 }
 
-.jodit-toolbar__box{
-  display: inline-table !important;
+ngx-jodit {
+  height: 200px !important;
 }

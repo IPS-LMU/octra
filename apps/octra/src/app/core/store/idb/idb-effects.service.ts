@@ -467,6 +467,7 @@ export class IDBEffects {
         AnnotationActions.setLogging.do,
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
+        AuthenticationActions.loginLocal.prepare,
         AuthenticationActions.loginLocal.success,
         LoginModeActions.startAnnotation.success,
         AnnotationActions.setLevelIndex.do
@@ -960,7 +961,8 @@ export class IDBEffects {
         AnnotationActions.changeCurrentLevelItems.do,
         AnnotationActions.changeCurrentItemById.do,
         AnnotationActions.changeLevelName.do,
-        AnnotationActions.duplicateLevel.do
+        AnnotationActions.duplicateLevel.do,
+        AuthenticationActions.loginLocal.prepare
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {

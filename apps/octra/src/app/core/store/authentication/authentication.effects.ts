@@ -11,6 +11,7 @@ import {
   from,
   map,
   of,
+  take,
   tap,
   withLatestFrom,
 } from 'rxjs';
@@ -32,6 +33,7 @@ import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
 import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
 import { ApplicationActions } from '../application/application.actions';
+import { IDBActions } from '../idb/idb.actions';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -228,10 +230,23 @@ export class AuthenticationEffects {
             }
 
             if (audiofile !== undefined) {
-              return of(
-                AuthenticationActions.loginLocal.success({
+              this.store.dispatch(
+                AuthenticationActions.loginLocal.prepare({
                   ...a,
                   sessionFile: this.getSessionFile(audiofile),
+                })
+              );
+              return this.actions$.pipe(
+                ofType(IDBActions.saveModeOptions.success),
+                take(1),
+                exhaustMap(() => {
+                  console.log('OK KLAPPT');
+                  return of(
+                    AuthenticationActions.loginLocal.success({
+                      ...a,
+                      sessionFile: this.getSessionFile(audiofile!),
+                    })
+                  );
                 })
               );
             } else {
@@ -277,18 +292,23 @@ export class AuthenticationEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.do),
-      exhaustMap((a) => {
-        return this.apiService.logout().pipe(
-          map(() => {
-            this.sessionStorageService.clear();
-            return AuthenticationActions.logout.success(a);
-          }),
-          catchError((err: HttpErrorResponse) => {
-            // ignore
-            this.sessionStorageService.clear();
-            return of(AuthenticationActions.logout.success(a));
-          })
-        );
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        if (state.application.mode === LoginMode.ONLINE) {
+          return this.apiService.logout().pipe(
+            map(() => {
+              this.sessionStorageService.clear();
+              return AuthenticationActions.logout.success(action);
+            }),
+            catchError((err: HttpErrorResponse) => {
+              // ignore
+              this.sessionStorageService.clear();
+              return of(AuthenticationActions.logout.success(action));
+            })
+          );
+        }
+        this.sessionStorageService.clear();
+        return of(AuthenticationActions.logout.success(action));
       })
     )
   );

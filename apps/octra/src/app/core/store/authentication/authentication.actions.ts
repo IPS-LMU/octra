@@ -7,6 +7,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoginMode } from '../index';
 import { SessionFile } from '../../obj/SessionFile';
+import { OAnnotJSON } from '@octra/annotation';
 
 export class AdaptedAuthDto extends AuthDto {
   method!: AccountLoginMethod;
@@ -55,12 +56,21 @@ export class AuthenticationActions {
     events: {
       do: props<{
         files: File[];
+        annotation?: OAnnotJSON;
         removeData: boolean;
         mode: LoginMode.LOCAL;
+      }>(),
+      prepare: props<{
+        mode: LoginMode;
+        files: File[];
+        annotation?: OAnnotJSON;
+        sessionFile: SessionFile;
+        removeData: boolean;
       }>(),
       success: props<{
         mode: LoginMode;
         files: File[];
+        annotation?: OAnnotJSON;
         sessionFile: SessionFile;
         removeData: boolean;
       }>(),

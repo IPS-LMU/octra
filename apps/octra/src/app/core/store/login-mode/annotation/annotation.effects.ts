@@ -43,6 +43,7 @@ import {
   ProjectDto,
   TaskDto,
   TaskInputOutputCreatorType,
+  TaskInputOutputDto,
   ToolConfigurationAssetDto,
 } from '@octra/api-types';
 import { AnnotationState, GuidelinesItem } from './index';
@@ -426,6 +427,18 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
+  afterLogoutSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthenticationActions.logout.success),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          this.audio.destroy(true);
+        })
+      ),
+    { dispatch: false }
+  );
+
   loadSegments$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.initTranscriptionService.do),
@@ -656,27 +669,44 @@ export class AnnotationEffects {
           ]).pipe(
             map(([projectConfig, guidelines, functions]) => {
               const currentProject = createSampleProjectDto(a.projectID);
+
+              const inputs: TaskInputOutputDto[] =
+                state.application.mode === LoginMode.DEMO
+                  ? state.application
+                      .appConfiguration!.octra.audioExamples.map((a) => ({
+                        filename: FileInfo.fromURL(a.url).fullname,
+                        fileType: 'audio/wave',
+                        type: 'input',
+                        url: a.url,
+                        creator_type: TaskInputOutputCreatorType.user,
+                        content: '',
+                        content_type: '',
+                      }))
+                      .slice(0, 1)
+                  : [
+                      {
+                        filename: state.localMode.sessionFile!.name,
+                        fileType: state.localMode.sessionFile!.type,
+                        type: 'input',
+                        creator_type: TaskInputOutputCreatorType.user,
+                        content: '',
+                        content_type: '',
+                      },
+                    ];
               const task = createSampleTask(
                 a.taskID,
-                state.application
-                  .appConfiguration!.octra.audioExamples.map((a) => ({
-                    filename: FileInfo.fromURL(a.url).fullname,
-                    fileType: 'audio/wave',
-                    type: 'input',
-                    url: a.url,
-                    creator_type: TaskInputOutputCreatorType.user,
-                    content: '',
-                    content_type: '',
-                  }))
-                  .slice(0, 1),
+                inputs,
                 [],
                 projectConfig,
                 functions,
                 guidelines,
                 {
-                  orgtext:
-                    state.application.appConfiguration!.octra.audioExamples[0]
-                      .description,
+                  orgtext: [LoginMode.ONLINE, LoginMode.DEMO].includes(
+                    state.application.mode!
+                  )
+                    ? state.application.appConfiguration!.octra.audioExamples[0]
+                        .description
+                    : '',
                 }
               );
 

@@ -10,6 +10,7 @@ import {
   OLabel,
   OLevel,
   OLink,
+  OSegment,
   OSegmentLevel,
 } from './annotjson';
 import {
@@ -579,11 +580,12 @@ export class OctraAnnotation<
     const result = new OctraAnnotation<S, T>();
 
     for (const jsonObjectElement of jsonObject.levels) {
-      if (jsonObjectElement instanceof OSegmentLevel) {
+      if (jsonObjectElement.type === AnnotationLevelType.SEGMENT) {
+        const level = jsonObjectElement as OSegmentLevel<OSegment>;
         result.levels.push(
           result.createSegmentLevel(
-            jsonObjectElement.name,
-            jsonObjectElement.items.map((a) =>
+            level.name,
+            level.items.map((a) =>
               OctraAnnotationSegment.deserializeFromOSegment(
                 a,
                 jsonObject.sampleRate
@@ -591,11 +593,12 @@ export class OctraAnnotation<
             ) as T[]
           )
         );
-      } else if (jsonObjectElement instanceof OEventLevel) {
+      } else if (jsonObjectElement.type === AnnotationLevelType.EVENT) {
+        const level = jsonObjectElement as OEventLevel;
         result.levels.push(
           result.createEventLevel(
-            jsonObjectElement.name,
-            jsonObjectElement.items.map(
+            level.name,
+            level.items.map(
               (a) =>
                 new OctraAnnotationEvent(
                   a.id,

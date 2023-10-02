@@ -97,6 +97,7 @@ export class LoginComponent
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
       this.dropzone.files.map((a) => a.file),
+      this.dropzone.oannotation,
       removeData
     );
   };

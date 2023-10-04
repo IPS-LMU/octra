@@ -18,7 +18,6 @@ import { TranscrEditorComponent } from '../../../core/component';
 
 import {
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../../core/shared/service';
@@ -47,9 +46,11 @@ import {
   AudioChunk,
   AudioManager,
   AudioResource,
-  ShortcutEvent,
+  Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
+import { ShortcutService } from '../../../core/shared/service/shortcut.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -151,6 +152,115 @@ export class TranscrWindowComponent
     }
   }
 
+  onAudioPlayPause = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    if (this.audiochunk.isPlaying) {
+      this.audiochunk.pausePlayback().catch((error) => {
+        console.error(error);
+      });
+    } else {
+      this.audiochunk.startPlayback(false).catch((error) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onStopAudio = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audiochunk.stopPlayback().catch((error) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackward = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audiochunk.stepBackward().catch((error) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackwardTime = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+      console.error(error);
+    });
+  };
+
+  onJumpRight = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    if (
+      this.hasSegmentBoundaries ||
+      (!this.isNextSegmentLastAndBreak(this.segmentIndex) &&
+        this.segmentIndex <
+          this.annotationStoreService.currentLevel!.items.length - 1)
+    ) {
+      this.doDirectionAction('right');
+    } else {
+      this.save();
+      this.close();
+      this.act.emit('overview');
+    }
+  };
+
+  onJumpLeft = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.doDirectionAction('left');
+  };
+
+  onClose = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.doDirectionAction('down');
+  };
+
   private audioShortcuts: ShortcutGroup = {
     name: '',
     enabled: true,
@@ -163,6 +273,7 @@ export class TranscrWindowComponent
         },
         title: 'play pause',
         focusonly: false,
+        callback: this.onAudioPlayPause,
       },
       {
         name: 'stop',
@@ -172,6 +283,7 @@ export class TranscrWindowComponent
         },
         title: 'stop playback',
         focusonly: false,
+        callback: this.onStopAudio,
       },
       {
         name: 'step_backward',
@@ -181,6 +293,7 @@ export class TranscrWindowComponent
         },
         title: 'step backward',
         focusonly: false,
+        callback: this.onStepBackward,
       },
       {
         name: 'step_backwardtime',
@@ -190,6 +303,7 @@ export class TranscrWindowComponent
         },
         title: 'step backward time',
         focusonly: false,
+        callback: this.onStepBackwardTime,
       },
     ],
   };
@@ -197,7 +311,7 @@ export class TranscrWindowComponent
   public transcript = '';
 
   constructor(
-    public keyMap: KeymappingService,
+    private shortcutsService: ShortcutService,
     public annotationStoreService: AnnotationStoreService,
     public audio: AudioService,
     public uiService: UserInteractionsService,
@@ -307,88 +421,6 @@ export class TranscrWindowComponent
     this._loading = false;
   };
 
-  onShortcutTriggered = async ($event: ShortcutEvent) => {
-    if (!this.loading) {
-      const currentLevel = this.annotationStoreService.currentLevel;
-
-      switch ($event.shortcutName) {
-        case 'play_pause':
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp,
-          });
-          if (this.audiochunk.isPlaying) {
-            this.audiochunk.pausePlayback().catch((error) => {
-              console.error(error);
-            });
-          } else {
-            this.audiochunk.startPlayback(false).catch((error) => {
-              console.error(error);
-            });
-          }
-          break;
-        case 'stop':
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp,
-          });
-          this.audiochunk.stopPlayback().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case 'step_backward':
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp,
-          });
-          this.audiochunk.stepBackward().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case 'step_backwardtime':
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp,
-          });
-          this.audiochunk.stepBackwardTime(0.5).catch((error) => {
-            console.error(error);
-          });
-          break;
-        case 'jump_right':
-          if (
-            this.hasSegmentBoundaries ||
-            (!this.isNextSegmentLastAndBreak(this.segmentIndex) &&
-              this.segmentIndex < currentLevel!.items.length - 1)
-          ) {
-            this.doDirectionAction('right');
-          } else {
-            this.save();
-            this.close();
-            this.act.emit('overview');
-          }
-          break;
-        case 'jump_left':
-          this.doDirectionAction('left');
-          break;
-        case 'close_save':
-          this.doDirectionAction('down');
-          break;
-      }
-    }
-  };
-
   ngOnInit() {
     if (this.currentLevel) {
       this.tempSegments = [
@@ -445,16 +477,14 @@ export class TranscrWindowComponent
         ).getFirstLabelWithoutName('Speaker')?.value ?? '';
     }
 
+    /*
     const shortcutGroup =
-      this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
+      this.shortcutsService.getShortcutGroup('2D-Editor viewer');
     shortcutGroup!.enabled = false;
+     */
 
     this.cd.markForCheck();
     this.cd.detectChanges();
-
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered)
-    );
   }
 
   setValidationEnabledToDefault() {
@@ -484,6 +514,44 @@ export class TranscrWindowComponent
   }
 
   ngAfterViewInit() {
+    this.shortcutsService.disableGroup('2D-Editor audio');
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'play_pause',
+      this.onAudioPlayPause
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'stop',
+      this.onStopAudio
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'step_backward',
+      this.onStepBackward
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'step_backwardtime',
+      this.onStepBackwardTime
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'jump_left',
+      this.onJumpLeft
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'jump_right',
+      this.onJumpRight
+    );
+    this.shortcutsService.overwriteCallback(
+      'transcription window',
+      'close_save',
+      this.onClose
+    );
+    this.shortcutsService.enableGroup('transcription window');
+
     this.loupe.av.zoomY = 6;
     this.audiochunk.startpos = this.audiochunk.time.start.clone();
     this.loupe.av.drawnSelection = new AudioSelection(
@@ -514,9 +582,8 @@ export class TranscrWindowComponent
   close() {
     this.showWindow = false;
 
-    const shortcutGroup =
-      this.keyMap.shortcutsManager.getShortcutGroup('2D-Editor viewer');
-    shortcutGroup!.enabled = true;
+    this.shortcutsService.enableGroup('2D-Editor audio');
+    this.shortcutsService.disableGroup('transcription window');
 
     const startSample =
       this.segmentIndex > 0

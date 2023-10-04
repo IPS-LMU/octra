@@ -10,7 +10,6 @@ import { TranscrEditorComponent } from '../../core/component';
 
 import {
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../core/shared/service';
@@ -19,7 +18,7 @@ import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import {
   AudioChunk,
   AudioManager,
-  ShortcutEvent,
+  Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
 import {
@@ -32,6 +31,8 @@ import { AudioplayerComponent } from '@octra/ngx-components';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { SampleUnit } from '@octra/media';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
+import { HotkeysEvent } from 'hotkeys-js';
 
 @Component({
   selector: 'octra-audioplayer-gui',
@@ -66,7 +67,74 @@ export class DictaphoneEditorComponent
 
   private oldRaw = '';
 
-  private shortcuts: ShortcutGroup = {
+  onAudioPlayerPlay = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction(keyboardEvent, {
+      shortcut: shortcut.name,
+      value: hotKeyEvent.shortcut,
+    });
+
+    if (this.audiochunk.isPlaying) {
+      this.audiochunk.pausePlayback().catch((error: any) => {
+        console.error(error);
+      });
+    } else {
+      console.log(`PLAY CHUNK ${this.audiochunk.id}`);
+      this.audiochunk.startPlayback(false).catch((error: any) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onAudioStop = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction(keyboardEvent, {
+      shortcut: shortcut.name,
+      value: hotKeyEvent.shortcut,
+    });
+
+    this.audiochunk.stopPlayback().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackward = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction(keyboardEvent, {
+      shortcut: shortcut.name,
+      value: hotKeyEvent.shortcut,
+    });
+
+    this.audiochunk.stepBackward().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackwardTime = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction(keyboardEvent, {
+      shortcut: shortcut.name,
+      value: hotKeyEvent.shortcut,
+    });
+
+    this.audiochunk.stepBackwardTime(0.5).catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  public shortcuts: ShortcutGroup = {
     name: 'audioplayer',
     enabled: true,
     items: [
@@ -74,37 +142,37 @@ export class DictaphoneEditorComponent
         name: 'play_pause',
         keys: {
           mac: 'TAB',
-          pc: 'TAB',
         },
         title: 'play pause',
         focusonly: false,
+        callback: this.onAudioPlayerPlay,
       },
       {
         name: 'stop',
         keys: {
           mac: 'ESC',
-          pc: 'ESC',
         },
         title: 'stop playback',
         focusonly: false,
+        callback: this.onAudioStop,
       },
       {
         name: 'step_backward',
         keys: {
           mac: 'SHIFT + BACKSPACE',
-          pc: 'SHIFT + BACKSPACE',
         },
         title: 'step backward',
         focusonly: false,
+        callback: this.onStepBackward,
       },
       {
         name: 'step_backwardtime',
         keys: {
           mac: 'SHIFT + TAB',
-          pc: 'SHIFT + TAB',
         },
         title: 'step backward time',
         focusonly: false,
+        callback: this.onStepBackwardTime,
       },
     ],
   };
@@ -127,7 +195,7 @@ export class DictaphoneEditorComponent
 
   constructor(
     public audio: AudioService,
-    public keyMap: KeymappingService,
+    public shortcutService: ShortcutService,
     public annotationStoreService: AnnotationStoreService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
@@ -135,6 +203,7 @@ export class DictaphoneEditorComponent
   ) {
     super();
 
+    /*
     if (
       this.appStorage.useMode === 'online' ||
       this.appStorage.useMode === 'demo'
@@ -155,12 +224,12 @@ export class DictaphoneEditorComponent
                   });
                 })
               );
-              */
+
             }
           }
         )
       );
-    }
+    } */
   }
 
   ngOnInit() {
@@ -172,12 +241,8 @@ export class DictaphoneEditorComponent
     this.editor.settings.specialMarkers.boundary = true;
     this.editor.settings.highlightingEnabled = true;
 
-    this.subscrManager.removeByTag('shortcut');
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered),
-      'shortcut'
-    );
-    this.keyMap.register(this.shortcuts);
+    this.shortcutService.unregisterShortcutGroup(this.shortcuts.name);
+    this.shortcutService.registerShortcutGroup(this.shortcuts);
 
     this.initialized.emit();
   }
@@ -191,7 +256,7 @@ export class DictaphoneEditorComponent
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
     });
-    this.keyMap.unregisterAll();
+    this.shortcutService.destroy();
   }
 
   onButtonClick(event: { type: string; timestamp: number }) {
@@ -255,68 +320,18 @@ export class DictaphoneEditorComponent
     }
   }
 
-  onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj: any) => {
-      shortcutObj.value = `audio:${shortcutObj.value}`;
-      this.uiService.addElementFromEvent(
-        'shortcut',
-        shortcutObj,
-        $event.timestamp,
-        this.audioManager.playPosition,
-        this.editor.caretpos,
-        undefined,
-        undefined,
-        'texteditor'
-      );
-    };
-
-    if (this.shortcutsEnabled) {
-      switch ($event.shortcutName) {
-        case 'play_pause':
-          triggerUIAction({
-            shortcut: $event.shortcutName,
-            value: $event.shortcut,
-          });
-          if (this.audiochunk.isPlaying) {
-            this.audiochunk.pausePlayback().catch((error: any) => {
-              console.error(error);
-            });
-          } else {
-            console.log(`PLAY CHUNK ${this.audiochunk.id}`);
-            this.audiochunk.startPlayback(false).catch((error: any) => {
-              console.error(error);
-            });
-          }
-          break;
-        case 'stop':
-          triggerUIAction({
-            shortcut: $event.shortcutName,
-            value: $event.shortcut,
-          });
-          this.audiochunk.stopPlayback().catch((error: any) => {
-            console.error(error);
-          });
-          break;
-        case 'step_backward':
-          triggerUIAction({
-            shortcut: $event.shortcutName,
-            value: $event.shortcut,
-          });
-          this.audiochunk.stepBackward().catch((error: any) => {
-            console.error(error);
-          });
-          break;
-        case 'step_backwardtime':
-          triggerUIAction({
-            shortcut: $event.shortcutName,
-            value: $event.shortcut,
-          });
-          this.audiochunk.stepBackwardTime(0.5).catch((error: any) => {
-            console.error(error);
-          });
-          break;
-      }
-    }
+  private triggerUIAction = (keyboardEvent: Event, shortcutObj: any) => {
+    shortcutObj.value = `audio:${shortcutObj.value}`;
+    this.uiService.addElementFromEvent(
+      'shortcut',
+      shortcutObj,
+      Date.now(),
+      this.audioManager.playPosition,
+      this.editor.caretpos,
+      undefined,
+      undefined,
+      'texteditor'
+    );
   };
 
   onBoundaryClicked(samples: SampleUnit) {
@@ -400,7 +415,7 @@ export class DictaphoneEditorComponent
   }
 
   saveTranscript() {
-    let transcript = this.annotationStoreService.transcript!.clone();
+    const transcript = this.annotationStoreService.transcript!.clone();
 
     if (transcript.currentLevel && transcript.currentLevel.type === 'SEGMENT') {
       transcript.currentLevel.clear();

@@ -22,16 +22,25 @@ export class ShortcutComponent implements OnInit {
 
   ngOnInit(): void {
     const shortcut = this.replaceWithUTF8Symbols(this.shortcut);
-    const splitted = shortcut
-      .split(' ')
-      .filter((a) => a !== undefined && a !== '');
+    const splitted =
+      shortcut !== '+'
+        ? shortcut.split('+').filter((a) => a !== undefined && a !== '')
+        : ['+'];
 
     this.parts = [];
-    for (const part of splitted) {
+    for (let i = 0; i < splitted.length; i++) {
+      const part = splitted[i];
+
       this.parts.push({
-        type: part.trim() !== '+' ? 'key' : 'separator',
+        type: 'key',
         content: part,
       });
+      if (i < splitted.length - 1) {
+        this.parts.push({
+          type: 'separator',
+          content: '<i class="bi bi-plus-lg"></i>',
+        });
+      }
     }
   }
 
@@ -39,31 +48,35 @@ export class ShortcutComponent implements OnInit {
     let result = keyString;
 
     const regex = new RegExp(
-      /((?:ARROW(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g
+      /((?:(ARROW)?(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g
     );
 
     result = result.replace(regex, (g0, g1) => {
       switch (g1) {
         case 'ARROWUP':
-          return '⬆';
+        case 'UP':
+          return '<i class="bi bi-arrow-up"></i>';
         case 'ARROWLEFT':
-          return '⬅';
+        case 'LEFT':
+          return '<i class="bi bi-arrow-left"></i>';
         case 'ARROWRIGHT':
-          return '⮕';
+        case 'RIGHT':
+          return '<i class="bi bi-arrow-right"></i>';
         case 'ARROWDOWN':
-          return '⬇';
+        case 'DOWN':
+          return '<i class="bi bi-arrow-down"></i>';
         case 'STRG':
           return 'strg';
         case 'CMD':
-          return '⌘';
+          return '<i class="bi bi-command"></i>';
         case 'ENTER':
-          return '⮐';
+          return '<i class="bi bi-arrow-return-left"></i>';
         case 'BACKSPACE':
-          return '⭠';
+          return '<i class="bi bi-backspace"></i>';
         case 'TAB':
-          return '⇥';
+          return '<i class="bi bi-indent"></i>';
         case 'SHIFT':
-          return '⇧';
+          return '<i class="bi bi-shift"></i>';
         default:
           return g1.toLowerCase();
       }

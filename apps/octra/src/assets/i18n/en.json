@@ -221,7 +221,7 @@
       "stop playback": "Stop Playback",
       "step backward": "Jump to the last position",
       "step backward time": "Jump back in time",
-      "set segment": "Open transcription window",
+      "set segment": "Set transcription unit boundary",
       "set break": "Mark transcription unit as silence",
       "play selection": "Play selection",
       "transcribe segment": "Transcribe unit",
@@ -260,7 +260,15 @@
       "select all segments": "Select all segments",
       "remove selected completely": "Remove selected segments completely",
       "undo": "Undo last action",
-      "redo": "Redo last action"
+      "redo": "Redo last action",
+      "editor specific shortcuts": "Editor",
+      "modal shortcuts": "Modals",
+      "transcription": "Transcription",
+      "zoom in": "Zoom in",
+      "zoom out": "Zoom out",
+      "shortcuts": "Open window about shortcuts",
+      "guidelines": "Open window about guidelines",
+      "overview": "Open oevrview window"
     },
     "inactivity": {
       "header": "Longer absence detected",

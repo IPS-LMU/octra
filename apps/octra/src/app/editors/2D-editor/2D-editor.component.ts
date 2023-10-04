@@ -16,7 +16,6 @@ import {
   AlertService,
   AlertType,
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../core/shared/service';
@@ -44,10 +43,12 @@ import { AsrStoreService } from '../../core/store/asr/asr-store-service.service'
 import {
   AudioChunk,
   AudioManager,
-  ShortcutEvent,
+  Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
+import { HotkeysEvent } from 'hotkeys-js';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -90,40 +91,115 @@ export class TwoDEditorComponent
   private intervalID = undefined;
   private factor = 8;
   private scrolltimer?: Subscription;
-  private shortcuts: any = {};
+  private shortcuts!: ShortcutGroup;
   private authWindow?: Window;
-  private windowShortcuts: ShortcutGroup = {
-    name: 'transcription window',
-    enabled: true,
-    items: [
-      {
-        name: 'jump_left',
-        keys: {
-          mac: 'ALT + ARROWLEFT',
-          pc: 'ALT + ARROWLEFT',
-        },
-        focusonly: false,
-        title: 'jump_last_segment',
-      },
-      {
-        name: 'jump_right',
-        keys: {
-          mac: 'ALT + ARROWRIGHT',
-          pc: 'ALT + ARROWRIGHT',
-        },
-        focusonly: false,
-        title: 'jump_next_segment',
-      },
-      {
-        name: 'close_save',
-        keys: {
-          mac: 'ALT + ARROWDOWN',
-          pc: 'ALT + ARROWDOWN',
-        },
-        focusonly: false,
-        title: 'close_save',
-      },
-    ],
+
+  onAudioPlayPause = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    if (this.audioChunkLines.isPlaying) {
+      this.audioChunkLines.pausePlayback().catch((error: any) => {
+        console.error(error);
+      });
+    } else {
+      this.audioChunkLines.startPlayback(false).catch((error: any) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onAudioStop = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audioChunkLines.stopPlayback().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackward = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audioChunkLines.stepBackward().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackwardTime = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent.shortcut,
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.audioChunkLines.stepBackwardTime(0.5).catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onZoomInOut = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    if (this.shortcutsEnabled) {
+      if (this.appStorage.showLoupe) {
+        if (hotkeyEvent.key === '.' || hotkeyEvent.key === ',') {
+          if (hotkeyEvent.key === '.') {
+            this.factor = Math.min(20, this.factor + 1);
+          } else if (hotkeyEvent.key === ',') {
+            if (this.factor > 3) {
+              this.factor = Math.max(1, this.factor - 1);
+            }
+          }
+
+          this.changeArea(
+            this.loupe,
+            this.viewer,
+            this.audioManager,
+            this.audioChunkLoupe,
+            this.viewer.av.mouseCursor!,
+            this.factor
+          ).then((newLoupeChunk) => {
+            if (newLoupeChunk !== undefined) {
+              this.audioChunkLoupe = newLoupeChunk;
+              this.cd.detectChanges();
+            }
+          });
+        }
+      }
+    }
   };
 
   private audioShortcuts: ShortcutGroup = {
@@ -138,6 +214,7 @@ export class TwoDEditorComponent
         },
         title: 'play pause',
         focusonly: false,
+        callback: this.onAudioPlayPause,
       },
       {
         name: 'stop',
@@ -147,6 +224,7 @@ export class TwoDEditorComponent
         },
         title: 'stop playback',
         focusonly: false,
+        callback: this.onAudioStop,
       },
       {
         name: 'step_backward',
@@ -156,6 +234,7 @@ export class TwoDEditorComponent
         },
         title: 'step backward',
         focusonly: false,
+        callback: this.onStepBackward,
       },
       {
         name: 'step_backwardtime',
@@ -165,6 +244,69 @@ export class TwoDEditorComponent
         },
         title: 'step backward time',
         focusonly: false,
+        callback: this.onStepBackwardTime,
+      },
+    ],
+  };
+
+  private windowShortcuts: ShortcutGroup = {
+    name: 'transcription window',
+    enabled: false,
+    items: [
+      ...this.audioShortcuts.items.map((a) => ({ ...a, callback: undefined })),
+      {
+        name: 'jump_left',
+        keys: {
+          mac: 'ALT + LEFT',
+          pc: 'ALT + LEFT',
+        },
+        focusonly: false,
+        title: 'jump_last_segment',
+      },
+      {
+        name: 'jump_right',
+        keys: {
+          mac: 'ALT + RIGHT',
+          pc: 'ALT + RIGHT',
+        },
+        focusonly: false,
+        title: 'jump_next_segment',
+      },
+      {
+        name: 'close_save',
+        keys: {
+          mac: 'ALT + DOWN',
+          pc: 'ALT + DOWN',
+        },
+        focusonly: false,
+        title: 'close_save',
+      },
+    ],
+  };
+
+  private miniLoupeShortcuts: ShortcutGroup = {
+    name: 'mini loupe',
+    enabled: true,
+    items: [
+      {
+        name: 'zoom in',
+        title: 'zoom in',
+        keys: {
+          mac: '.',
+          pc: '.',
+        },
+        focusonly: false,
+        callback: this.onZoomInOut,
+      },
+      {
+        name: 'zoom out',
+        title: 'zoom out',
+        keys: {
+          mac: ',',
+          pc: ',',
+        },
+        focusonly: false,
+        callback: this.onZoomInOut,
       },
     ],
   };
@@ -190,7 +332,6 @@ export class TwoDEditorComponent
 
   constructor(
     public annotationStoreService: AnnotationStoreService,
-    public keyMap: KeymappingService,
     public audio: AudioService,
     public uiService: UserInteractionsService,
     public alertService: AlertService,
@@ -198,7 +339,8 @@ export class TwoDEditorComponent
     public appStorage: AppStorageService,
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
-    private asrStoreService: AsrStoreService
+    private asrStoreService: AsrStoreService,
+    private shortcutService: ShortcutService
   ) {
     super();
     this.initialized = new EventEmitter<void>();
@@ -209,20 +351,20 @@ export class TwoDEditorComponent
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
-    this.shortcuts = this.keyMap.register({
+
+    this.shortcutService.registerShortcutGroup({
       name: '2D-Editor viewer',
       enabled: true,
       items: this.viewer.settings.shortcuts.items,
     });
-    this.shortcuts = this.keyMap.register({
+    this.shortcutService.registerShortcutGroup({
       name: '2D-Editor audio',
       enabled: true,
       items: this.audioShortcuts.items,
     });
-    this.keyMap.register(this.windowShortcuts);
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered)
-    );
+    this.shortcutService.registerShortcutGroup(this.miniLoupeShortcuts);
+    this.shortcutService.registerShortcutGroup(this.windowShortcuts);
+
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
     this.viewer.settings.margin.top = 5;
@@ -255,9 +397,18 @@ export class TwoDEditorComponent
         next: (enabled) => {
           this.viewer.settings.asr.enabled = enabled === true;
           if (!this.viewer.settings.asr.enabled) {
-            this.keyMap.unregisterItem('2D-Editor viewer', 'do_maus');
-            this.keyMap.unregisterItem('2D-Editor viewer', 'do_asr');
-            this.keyMap.unregisterItem('2D-Editor viewer', 'do_asr_maus');
+            this.shortcutService.unregisterItemFromGroup(
+              '2D-Editor viewer',
+              'do_maus'
+            );
+            this.shortcutService.unregisterItemFromGroup(
+              '2D-Editor viewer',
+              'do_asr'
+            );
+            this.shortcutService.unregisterItemFromGroup(
+              '2D-Editor viewer',
+              'do_asr_maus'
+            );
           }
         },
       })
@@ -636,7 +787,7 @@ export class TwoDEditorComponent
       )
     );
 
-    this.keyMap.unregisterAll();
+    this.shortcutService.destroy();
   }
 
   ngAfterViewInit() {
@@ -811,108 +962,6 @@ export class TwoDEditorComponent
       }
     }
   }
-
-  onShortCutTriggered = ($event: ShortcutEvent) => {
-    if (this.shortcutsEnabled) {
-      if (this.audioChunkLines !== undefined) {
-        let shortcutTriggered = false;
-        switch ($event.shortcutName) {
-          case 'play_pause':
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              shortcutName: $event.shortcutName,
-              value: $event.shortcutName,
-              type: 'audio',
-              timestamp: $event.timestamp,
-            });
-            if (this.audioChunkLines.isPlaying) {
-              this.audioChunkLines.pausePlayback().catch((error: any) => {
-                console.error(error);
-              });
-            } else {
-              this.audioChunkLines.startPlayback(false).catch((error: any) => {
-                console.error(error);
-              });
-            }
-            shortcutTriggered = true;
-            break;
-          case 'stop':
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              shortcutName: $event.shortcutName,
-              value: $event.shortcutName,
-              type: 'audio',
-              timestamp: $event.timestamp,
-            });
-            this.audioChunkLines.stopPlayback().catch((error: any) => {
-              console.error(error);
-            });
-            shortcutTriggered = true;
-            break;
-          case 'step_backward':
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              shortcutName: $event.shortcutName,
-              value: $event.shortcutName,
-              type: 'audio',
-              timestamp: $event.timestamp,
-            });
-            this.audioChunkLines.stepBackward().catch((error: any) => {
-              console.error(error);
-            });
-            break;
-          case 'step_backwardtime':
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              shortcutName: $event.shortcutName,
-              value: $event.shortcutName,
-              type: 'audio',
-              timestamp: $event.timestamp,
-            });
-            this.audioChunkLines.stepBackwardTime(0.5).catch((error: any) => {
-              console.error(error);
-            });
-            shortcutTriggered = true;
-            break;
-        }
-
-        if (shortcutTriggered) {
-          $event.event.preventDefault();
-          this.cd.detectChanges();
-        }
-      }
-
-      if (this.appStorage.showLoupe) {
-        const event = $event.event;
-
-        if (event.key === '+' || event.key === '-') {
-          if (event.key === '+') {
-            this.factor = Math.min(20, this.factor + 1);
-          } else if (event.key === '-') {
-            if (this.factor > 3) {
-              this.factor = Math.max(1, this.factor - 1);
-            }
-          }
-
-          this.changeArea(
-            this.loupe,
-            this.viewer,
-            this.audioManager,
-            this.audioChunkLoupe,
-            this.viewer.av.mouseCursor!,
-            this.factor
-          ).then((newLoupeChunk) => {
-            if (newLoupeChunk !== undefined) {
-              this.audioChunkLoupe = newLoupeChunk;
-              this.cd.detectChanges();
-            }
-          });
-
-          $event.event.preventDefault();
-        }
-      }
-    }
-  };
 
   private triggerUIAction($event: AudioViewerShortcutEvent) {
     if (

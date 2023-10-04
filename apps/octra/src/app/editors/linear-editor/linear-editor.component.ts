@@ -16,7 +16,6 @@ import {
   AlertService,
   AlertType,
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../core/shared/service';
@@ -43,9 +42,11 @@ import {
   AudioChunk,
   AudioManager,
   BrowserInfo,
-  ShortcutEvent,
+  Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
+import { HotkeysEvent } from 'hotkeys-js';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -97,7 +98,162 @@ export class LinearEditorComponent
 
   private mousestate = 'initiliazied';
 
-  private audioShortcutsTopDisplay = {
+  private onAudioPlayPause = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent,
+    shortcutGroup: ShortcutGroup
+  ) => {
+    const currentAudioChunk =
+      shortcutGroup.name === 'signaldisplay_top_audio'
+        ? this.audioChunkTop
+        : this.audioChunkDown;
+    const controlName = shortcutGroup.name.replace('_audio', '');
+
+    if (currentAudioChunk) {
+      this.selectedAudioChunk = currentAudioChunk;
+      this.triggerUIActionAfterShortcut(
+        {
+          shortcut: hotKeyEvent.shortcut,
+          value: shortcut.name,
+        },
+        controlName,
+        Date.now()
+      );
+      if (currentAudioChunk.isPlaying) {
+        currentAudioChunk.pausePlayback().catch((error) => {
+          console.error(error);
+        });
+      } else {
+        currentAudioChunk.startPlayback(false).catch((error) => {
+          console.error(error);
+        });
+      }
+    }
+  };
+
+  private onAudioStop = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent,
+    shortcutGroup: ShortcutGroup
+  ) => {
+    const currentAudioChunk =
+      shortcutGroup.name === 'signaldisplay_top_audio'
+        ? this.audioChunkTop
+        : this.audioChunkDown;
+    const controlName = shortcutGroup.name.replace('_audio', '');
+
+    if (currentAudioChunk) {
+      this.selectedAudioChunk = currentAudioChunk;
+      this.triggerUIActionAfterShortcut(
+        {
+          shortcut: hotKeyEvent.shortcut,
+          value: shortcut.name,
+        },
+        controlName,
+        Date.now()
+      );
+      currentAudioChunk.stopPlayback().catch((error) => {
+        console.error(error);
+      });
+    }
+  };
+
+  private onStepBackward = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent,
+    shortcutGroup: ShortcutGroup
+  ) => {
+    const currentAudioChunk =
+      shortcutGroup.name === 'signaldisplay_top_audio'
+        ? this.audioChunkTop
+        : this.audioChunkDown;
+    const controlName = shortcutGroup.name.replace('_audio', '');
+
+    if (currentAudioChunk) {
+      this.selectedAudioChunk = currentAudioChunk;
+      this.triggerUIActionAfterShortcut(
+        {
+          shortcut: hotKeyEvent.shortcut,
+          value: shortcut.name,
+        },
+        controlName,
+        Date.now()
+      );
+      currentAudioChunk.stepBackward().catch((error) => {
+        console.error(error);
+      });
+    }
+  };
+
+  private onStepBackwardTime = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent,
+    shortcutGroup: ShortcutGroup
+  ) => {
+    const currentAudioChunk =
+      shortcutGroup.name === 'signaldisplay_top_audio'
+        ? this.audioChunkTop
+        : this.audioChunkDown;
+    const controlName = shortcutGroup.name.replace('_audio', '');
+
+    if (currentAudioChunk) {
+      this.selectedAudioChunk = currentAudioChunk;
+      this.triggerUIActionAfterShortcut(
+        {
+          shortcut: hotKeyEvent.shortcut,
+          value: shortcut.name,
+        },
+        controlName,
+        Date.now()
+      );
+      currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onZoomInOut = (
+    $event: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent
+  ) => {
+    if (this.shortcutsEnabled) {
+      if (this.appStorage.showLoupe) {
+        if (this.miniloupe !== undefined && this.signalDisplayTop.focused) {
+          if (hotkeyEvent.key === '.' || hotkeyEvent.key === ',') {
+            if (hotkeyEvent.key === '.') {
+              this.factor = Math.min(12, this.factor + 1);
+              this.miniloupeComponent.av.zoomY = Math.max(1, this.factor);
+            } else if (hotkeyEvent.key === ',') {
+              if (this.factor > 3) {
+                this.factor = Math.max(1, this.factor - 1);
+                this.miniloupeComponent.av.zoomY = Math.max(4, this.factor);
+              }
+            }
+
+            this.changeArea(
+              this.miniloupeComponent,
+              this.signalDisplayTop,
+              this.audioManager,
+              this.audioChunkLoupe,
+              this.signalDisplayTop.av.mouseCursor!,
+              this.factor
+            ).then((newLoupeChunk) => {
+              if (newLoupeChunk !== undefined) {
+                this.audioChunkLoupe = newLoupeChunk;
+              }
+            });
+          }
+        }
+      }
+    }
+  };
+
+  private audioShortcutsTopDisplay: ShortcutGroup = {
     name: 'signaldisplay_top',
     enabled: true,
     items: [
@@ -109,6 +265,7 @@ export class LinearEditorComponent
         },
         title: 'play pause',
         focusonly: false,
+        callback: this.onAudioPlayPause,
       },
       {
         name: 'stop',
@@ -118,6 +275,7 @@ export class LinearEditorComponent
         },
         title: 'stop playback',
         focusonly: false,
+        callback: this.onAudioStop,
       },
       {
         name: 'step_backward',
@@ -127,6 +285,7 @@ export class LinearEditorComponent
         },
         title: 'step backward',
         focusonly: false,
+        callback: this.onStepBackward,
       },
       {
         name: 'step_backwardtime',
@@ -136,6 +295,7 @@ export class LinearEditorComponent
         },
         title: 'step backward time',
         focusonly: false,
+        callback: this.onStepBackwardTime,
       },
     ],
   };
@@ -152,6 +312,7 @@ export class LinearEditorComponent
         },
         title: 'play pause',
         focusonly: false,
+        callback: this.onAudioPlayPause,
       },
       {
         name: 'stop',
@@ -161,6 +322,7 @@ export class LinearEditorComponent
         },
         title: 'stop playback',
         focusonly: false,
+        callback: this.onAudioStop,
       },
       {
         name: 'step_backward',
@@ -170,15 +332,44 @@ export class LinearEditorComponent
         },
         title: 'step backward',
         focusonly: false,
+        callback: this.onStepBackward,
       },
       {
         name: 'step_backwardtime',
         keys: {
-          mac: 'SHIFT + ´',
-          pc: 'SHIFT + ´',
+          mac: 'SHIFT + *',
+          pc: 'SHIFT + *',
         },
         title: 'step backward time',
         focusonly: false,
+        callback: this.onStepBackwardTime,
+      },
+    ],
+  };
+
+  private miniLoupeShortcuts: ShortcutGroup = {
+    name: 'mini loupe',
+    enabled: true,
+    items: [
+      {
+        name: 'zoom in',
+        title: 'zoom in',
+        keys: {
+          mac: '.',
+          pc: '.',
+        },
+        focusonly: false,
+        callback: this.onZoomInOut,
+      },
+      {
+        name: 'zoom out',
+        title: 'zoom out',
+        keys: {
+          mac: ',',
+          pc: ',',
+        },
+        focusonly: false,
+        callback: this.onZoomInOut,
       },
     ],
   };
@@ -202,7 +393,7 @@ export class LinearEditorComponent
       segmentEnterShortcut !== undefined &&
       this.signalDisplayTop.settings !== undefined
     ) {
-      return segmentEnterShortcut.keys[this.platform];
+      return segmentEnterShortcut.keys[this.platform]!;
     }
     return '';
   }
@@ -216,8 +407,8 @@ export class LinearEditorComponent
   constructor(
     public audio: AudioService,
     public alertService: AlertService,
-    public keyMap: KeymappingService,
     public annotationStoreService: AnnotationStoreService,
+    public shortcutService: ShortcutService,
     public cd: ChangeDetectorRef,
     public uiService: UserInteractionsService,
     public settingsService: SettingsService,
@@ -229,6 +420,7 @@ export class LinearEditorComponent
       this.appStorage.useMode === LoginMode.ONLINE ||
       this.appStorage.useMode === LoginMode.DEMO
     ) {
+      /* TODO:later
       this.subscrManager.add(
         this.keyMap.beforeShortcutTriggered.subscribe(
           (event: ShortcutEvent) => {
@@ -237,7 +429,6 @@ export class LinearEditorComponent
               event.shortcut === 'SHIFT + ALT + 2' ||
               event.shortcut === 'SHIFT + ALT + 3'
             ) {
-              /* TODO:later
               this.transcrService.tasksBeforeSend.push(
                 new Promise<void>((resolve) => {
                   if (
@@ -254,11 +445,11 @@ export class LinearEditorComponent
                 })
               );
 
-               */
             }
           }
         )
       );
+               */
     }
   }
 
@@ -297,13 +488,13 @@ export class LinearEditorComponent
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
     this.selectedAudioChunk = this.audioChunkTop;
 
-    this.keyMap.register({
+    this.shortcutService.registerShortcutGroup({
       name: 'signaldisplay_top_audio',
       enabled: true,
       items: this.audioShortcutsTopDisplay.items,
     });
 
-    this.keyMap.register({
+    this.shortcutService.registerShortcutGroup({
       name: 'signaldisplay_top',
       enabled: true,
       items: this.signalDisplayTop.settings.shortcuts.items,
@@ -318,16 +509,17 @@ export class LinearEditorComponent
     this.signalDisplayTop.settings.margin.top = 5;
 
     this.loupeSettings = new AudioviewerConfig();
-    this.keyMap.register({
+    this.shortcutService.registerShortcutGroup({
       name: 'signaldisplay_down_audio',
       enabled: true,
       items: this.audioShortcutsBottomDisplay.items,
     });
-    this.keyMap.register({
+    this.shortcutService.registerShortcutGroup({
       name: 'signaldisplay_down',
       enabled: true,
       items: this.loupeSettings.shortcuts.items,
     });
+    this.shortcutService.registerShortcutGroup(this.miniLoupeShortcuts);
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
     this.loupeSettings.boundaries.enabled = true;
@@ -373,11 +565,6 @@ export class LinearEditorComponent
       })
     );
 
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered),
-      'shortcut'
-    );
-
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -387,7 +574,7 @@ export class LinearEditorComponent
     this.audioManager.stopPlayback().catch(() => {
       console.error(`could not stop audio on editor switched`);
     });
-    this.keyMap.unregisterAll();
+    this.shortcutService.destroy();
   }
 
   onButtonClick(event: { type: string; timestamp: number }) {
@@ -548,120 +735,6 @@ export class LinearEditorComponent
       this.appStorage.redo();
     }
   }
-
-  // TODO:later Redo undo not working in linear editor?
-  onShortcutTriggered = ($event: ShortcutEvent) => {
-    if (this.shortcutsEnabled) {
-      const comboKey = $event.shortcut;
-
-      if (
-        this.audioShortcutsTopDisplay !== undefined &&
-        this.audioShortcutsBottomDisplay !== undefined
-      ) {
-        const currentAudioChunk =
-          $event.shortcutGroupName === 'signaldisplay_top_audio'
-            ? this.audioChunkTop
-            : this.audioChunkDown;
-        const controlName = $event.shortcutGroupName.replace('_audio', '');
-        if (currentAudioChunk !== undefined) {
-          switch ($event.shortcutName) {
-            case 'play_pause':
-              this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut(
-                {
-                  shortcut: comboKey,
-                  value: $event.shortcutName,
-                },
-                controlName,
-                $event.timestamp
-              );
-              if (currentAudioChunk.isPlaying) {
-                currentAudioChunk.pausePlayback().catch((error) => {
-                  console.error(error);
-                });
-              } else {
-                currentAudioChunk.startPlayback(false).catch((error) => {
-                  console.error(error);
-                });
-              }
-              break;
-            case 'stop':
-              this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut(
-                {
-                  shortcut: comboKey,
-                  value: $event.shortcutName,
-                },
-                controlName,
-                $event.timestamp
-              );
-              currentAudioChunk.stopPlayback().catch((error) => {
-                console.error(error);
-              });
-              break;
-            case 'step_backward':
-              this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut(
-                {
-                  shortcut: comboKey,
-                  value: $event.shortcutName,
-                },
-                controlName,
-                $event.timestamp
-              );
-              currentAudioChunk.stepBackward().catch((error) => {
-                console.error(error);
-              });
-              break;
-            case 'step_backwardtime':
-              this.selectedAudioChunk = currentAudioChunk;
-              this.triggerUIActionAfterShortcut(
-                {
-                  shortcut: comboKey,
-                  value: $event.shortcutName,
-                },
-                controlName,
-                $event.timestamp
-              );
-              currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
-                console.error(error);
-              });
-              break;
-          }
-        }
-
-        if (this.appStorage.showLoupe) {
-          const event = $event.event;
-          if (this.miniloupe !== undefined && this.signalDisplayTop.focused) {
-            if (event.key === '+' || event.key === '-') {
-              if (event.key === '+') {
-                this.factor = Math.min(12, this.factor + 1);
-                this.miniloupeComponent.av.zoomY = Math.max(1, this.factor);
-              } else if (event.key === '-') {
-                if (this.factor > 3) {
-                  this.factor = Math.max(1, this.factor - 1);
-                  this.miniloupeComponent.av.zoomY = Math.max(4, this.factor);
-                }
-              }
-
-              this.changeArea(
-                this.miniloupeComponent,
-                this.signalDisplayTop,
-                this.audioManager,
-                this.audioChunkLoupe,
-                this.signalDisplayTop.av.mouseCursor!,
-                this.factor
-              ).then((newLoupeChunk) => {
-                if (newLoupeChunk !== undefined) {
-                  this.audioChunkLoupe = newLoupeChunk;
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-  };
 
   private triggerUIActionAfterShortcut(
     $event: any,
@@ -1042,13 +1115,13 @@ export class LinearEditorComponent
   public onAudioViewerMouseLeave(
     keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
   ) {
-    this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
+    // this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
   }
 
   public onAudioViewerMouseEnter(
     keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
   ) {
-    this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
+    // this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 
   onEntriesChange(

@@ -11,15 +11,19 @@
     ></button>
   </div>
   <div class="modal-body">
+    <h4>{{ 'modal.shortcuts.editor specific shortcuts' | transloco }}</h4>
     <div
       class="shortcut-group"
-      *ngFor="let shortcutGroup of keyMap.shortcutGroups"
+      *ngFor="let shortcutGroup of shortcutService.groups"
     >
       <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
       <table class="table table-striped table-bordered">
         <tbody>
           <tr *ngFor="let entry of shortcutGroup!.items">
-            <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
+            <td *ngIf="entry.label === undefined">
+              {{ 'modal.shortcuts.' + entry.title | transloco }}
+            </td>
+            <td *ngIf="entry.label !== undefined">{{ entry.label }}</td>
             <td>
               <octra-shortcut
                 [shortcut]="getShortcut(entry, platform)"
@@ -33,11 +37,16 @@
       </table>
     </div>
     <div>
-      <h5>{{ 'modal.shortcuts.general shortcuts' | transloco }}</h5>
-      <div>
+      <hr />
+      <h4>{{ 'modal.shortcuts.general shortcuts' | transloco }}</h4>
+      <div
+        class="shortcut-group"
+        *ngFor="let shortcutGroup of shortcutService.generalShortcuts"
+      >
+        <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
         <table class="table table-striped table-bordered">
           <tbody>
-            <tr *ngFor="let entry of keyMap.generalShortcuts.items">
+            <tr *ngFor="let entry of shortcutGroup!.items">
               <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
               <td>
                 <octra-shortcut

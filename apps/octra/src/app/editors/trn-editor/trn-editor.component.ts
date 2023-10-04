@@ -10,7 +10,6 @@ import {
 import {
   AlertService,
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../core/shared/service';
@@ -69,7 +68,6 @@ export class TrnEditorComponent
 
   constructor(
     public audio: AudioService,
-    public keyMap: KeymappingService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
@@ -367,11 +365,13 @@ export class TrnEditorComponent
         },
       })
     );
-
+/*
     this.keyMap.register(this.shortcuts);
     this.keyMap.register(this.tableShortcuts);
     this.keyMap.register(this.audioShortcuts);
 
+
+ */
     this.audioViewerSettings = new AudioviewerConfig();
     // this..name = 'transcr-window viewer';
     this.audioViewerSettings.margin.top = 5;
@@ -395,9 +395,12 @@ export class TrnEditorComponent
     this.cd.markForCheck();
     this.cd.detectChanges();
     this.initialized.emit();
+    /*
     this.subscrManager.add(
       this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered)
     );
+
+     */
 
     this.contextMenuProperties.actions.push(
       {
@@ -590,6 +593,7 @@ export class TrnEditorComponent
     labelCol: HTMLTableCellElement,
     rowNumber: number
   ) {
+    /*
     if (!(this.keyMap.pressedKeys.ctrl || this.keyMap.pressedKeys.cmd)) {
       labelCol.contentEditable = 'true';
       this.selectedCell = {
@@ -600,6 +604,8 @@ export class TrnEditorComponent
     } else {
       this.onTableLineClick($event, rowNumber);
     }
+
+     */
   }
 
   onTimestampMouseDown($event: any, rowNumber: number) {
@@ -692,6 +698,7 @@ export class TrnEditorComponent
   }
 
   onTranscriptCellMouseDown($event: any, i: number) {
+    /*
     if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       this.onTableLineClick($event, i);
     } else {
@@ -701,6 +708,8 @@ export class TrnEditorComponent
         this.openTranscrEditor(i);
       });
     }
+
+     */
   }
 
   focusOnNextSpeakerLabel(segmentNumber: number) {
@@ -1573,6 +1582,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
   }
 
   onTableLineClick($event: any, rowNumber: number) {
+    /*
     const selectedSegment = this.shownSegments[rowNumber];
     if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       // de- select line
@@ -1582,6 +1592,8 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
     } else {
       this.deselectAllRows();
     }
+
+     */
   }
 
   openPermutationsReplaceModal() {
@@ -1599,7 +1611,7 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
 
   override ngOnDestroy() {
     super.ngOnDestroy();
-    this.keyMap.unregisterAll();
+    // this.keyMap.unregisterAll();
   }
 }
 

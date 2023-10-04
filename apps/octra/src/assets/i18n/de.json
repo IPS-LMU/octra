@@ -260,7 +260,16 @@
       "select all segments": "Alle Segmente markieren",
       "remove selected completely": "Ausgewählte Segmnente vollständig löschen",
       "undo": "Letzte Aktion rückgängig machen",
-      "redo": "Letzte Aktion wiederholen"
+      "redo": "Letzte Aktion wiederholen",
+      "editor specific shortcuts": "Editor",
+      "modal shortcuts": "Fenster",
+      "transcription": "Transkription",
+      "zoom in": "Ansicht vergrößern",
+      "zoom out": "Ansicht verkleinern",
+      "shortcuts": "Fenster mit Tastenkombinationen öffnen",
+      "guidelines": "Fenster mit Transkriptionsrichtlinien öffnen",
+      "overview": "Fenster mit Übersicht öffnen",
+      "texteditor": "Texteditor"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",

@@ -1,10 +1,5 @@
 import { Component, EventEmitter, OnInit } from '@angular/core';
-import {
-  AudioService,
-  KeymappingService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
+import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 
@@ -22,8 +17,6 @@ export class NewEditorComponent
 
   constructor(
     public audio: AudioService,
-    public keyMap: KeymappingService,
-    private uiService: UserInteractionsService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService
   ) {

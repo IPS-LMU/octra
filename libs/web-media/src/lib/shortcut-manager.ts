@@ -1,4 +1,5 @@
 import {BrowserInfo} from './browser-info';
+import {HotkeysEvent} from "hotkeys-js";
 
 /**
  * wrapper containing KeyboardEvent information with additional data
@@ -8,7 +9,7 @@ export interface ShortcutEvent {
   platform: string;
   shortcutName: string;
   shortcutGroupName: string;
-  onFocusOnly: boolean;
+  onFocusOnly?: boolean;
   event: KeyboardEvent;
   timestamp: number;
 }
@@ -27,11 +28,18 @@ export interface KeyMappingEntry {
 export interface Shortcut {
   name: string;
   keys: {
-    mac: string;
-    pc: string;
+    mac?: string;
+    pc?: string;
   };
   title: string;
-  focusonly: boolean;
+  label?: string;
+  callback?: (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotkeyEvent: HotkeysEvent,
+    shortcutGroup: ShortcutGroup
+  ) => void;
+  focusonly?: boolean;
 }
 
 /**
@@ -185,11 +193,9 @@ export class ShortcutManager {
     checkPressKey = true
   ): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
-      console.log("shortcuts enabled")
       if (event.type === 'keydown') {
         // run shortcut check
         const shortcut = this.getShorcutCombination(event);
-        console.log(`shortcut combo is ${shortcut}`)
         const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
         if (this.isProtectedShortcut(shortcut)) {
@@ -393,7 +399,6 @@ export class ShortcutManager {
 
   private checkPressedKey(event: KeyboardEvent) {
     const keyName = this.getNameByEvent(event);
-    console.log(`pressed kex in checkedPressedKey: '${keyName}'`)
     const valueToSet = event.type === 'keydown';
 
     switch (keyName) {

@@ -6,7 +6,6 @@
       light: theme === 'light',
       separator: part.type === 'separator'
     }"
-  >
-    {{ part.content }}
+   [innerHTML]="part.content">
   </div>
 </ng-container>

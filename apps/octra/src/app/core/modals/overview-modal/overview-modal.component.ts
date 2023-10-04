@@ -7,11 +7,7 @@ import {
 } from '@angular/core';
 import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
 import { isFunction } from '@octra/utilities';
-import {
-  KeymappingService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoginMode } from '../../store';
 import { NavbarService } from '../../component/navbar/navbar.service';
@@ -76,7 +72,6 @@ export class OverviewModalComponent extends OctraModal {
     public settingsService: SettingsService,
     public annotationStoreService: AnnotationStoreService,
     public appStorage: AppStorageService,
-    private keyService: KeymappingService,
     private uiService: UserInteractionsService,
     private cd: ChangeDetectorRef,
     private navbarService: NavbarService,

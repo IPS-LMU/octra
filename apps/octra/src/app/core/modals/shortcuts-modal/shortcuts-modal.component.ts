@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { KeymappingService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserInfo } from '@octra/web-media';
+import { ShortcutService } from '../../shared/service/shortcut.service';
 
 @Component({
   selector: 'octra-shortcuts-modal',
@@ -12,7 +12,7 @@ import { BrowserInfo } from '@octra/web-media';
 })
 export class ShortcutsModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
-    keyboard: false,
+    keyboard: true,
     backdrop: true,
     scrollable: true,
     size: 'lg',
@@ -28,7 +28,7 @@ export class ShortcutsModalComponent extends OctraModal {
 
   constructor(
     public appStorage: AppStorageService,
-    public keyMap: KeymappingService,
+    public shortcutService: ShortcutService,
     protected override activeModal: NgbActiveModal
   ) {
     super('ShortcutsModalComponent', activeModal);

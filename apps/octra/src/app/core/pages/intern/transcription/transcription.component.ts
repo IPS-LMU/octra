@@ -38,30 +38,29 @@ import { LoadeditorDirective } from '../../../shared/directive/loadeditor.direct
 import {
   AlertService,
   AudioService,
-  KeymappingService,
   SettingsService,
   UserInteractionsService,
 } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { BugReportService } from '../../../shared/service/bug-report.service';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
-import { OctraAPIService } from '@octra/ngx-octra-api';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from '../../../store/authentication';
 import {
   AudioManager,
   BrowserInfo,
+  Shortcut,
   ShortcutGroup,
-  ShortcutManager,
 } from '@octra/web-media';
 import { PartiturConverter } from '@octra/annotation';
 import X2JS from 'x2js';
 import { ApplicationStoreService } from '../../../store/application/application-store.service';
+import { ShortcutService } from '../../../shared/service/shortcut.service';
+import { HotkeysEvent } from 'hotkeys-js';
 
 @Component({
   selector: 'octra-transcription',
@@ -96,13 +95,9 @@ export class TranscriptionComponent
   public editorloaded = false;
   user?: number;
   public platform = BrowserInfo.platform;
-  private sendOk = false;
   private _useMode = '';
   private _selectedTheme = '';
-  private levelSubscriptionID = 0;
   private audioManager: AudioManager;
-
-  private shortcutManager: ShortcutManager;
 
   modalVisiblities = {
     overview: false,
@@ -112,6 +107,116 @@ export class TranscriptionComponent
     sending: false,
     demoEnd: false,
     guidelines: false,
+  };
+
+  private onAltSend = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    if (
+      this._useMode === LoginMode.ONLINE ||
+      this._useMode === LoginMode.DEMO
+    ) {
+      if (
+        ['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(
+          shortcut.keys.mac!
+        )
+      ) {
+        this.waitForSend = true;
+
+        this.appStorage
+          .afterSaving()
+          .then(() => {
+            this.waitForSend = false;
+            if (shortcut.keys.mac! === 'SHIFT + ALT + 1') {
+              this.sendTranscriptionForShortAudioFiles('bad');
+              this.uiService.addElementFromEvent(
+                'shortcut',
+                {
+                  value: 'send_transcription:1',
+                },
+                Date.now(),
+                this.audio.audiomanagers[0].playPosition,
+                -1,
+                undefined,
+                undefined,
+                this.interface
+              );
+            } else if (shortcut.keys.mac! === 'SHIFT + ALT + 2') {
+              this.sendTranscriptionForShortAudioFiles('middle');
+              this.uiService.addElementFromEvent(
+                'shortcut',
+                {
+                  value: 'send_transcription:2',
+                },
+                Date.now(),
+                this.audio.audiomanagers[0].playPosition,
+                -1,
+                undefined,
+                undefined,
+                this.interface
+              );
+            } else if (shortcut.keys.mac! === 'SHIFT + ALT + 3') {
+              this.sendTranscriptionForShortAudioFiles('good');
+              this.uiService.addElementFromEvent(
+                'shortcut',
+                {
+                  value: 'send_transcription:3',
+                },
+                Date.now(),
+                this.audio.audiomanagers[0].playPosition,
+                -1,
+                undefined,
+                undefined,
+                this.interface
+              );
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+  };
+
+  private onShortcutsModal = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    if (!this.modalVisiblities.shortcuts) {
+      this.openShortcutsModal();
+    } else {
+      this.modalShortcutsDialogue!.close();
+      this.modalVisiblities.shortcuts = false;
+    }
+  };
+
+  private onGuidelinesModal = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    if (!this.modalVisiblities.guidelines) {
+      this.openGuidelines();
+    } else {
+      this.modalGuidelines!.close();
+      this.modalVisiblities.guidelines = false;
+    }
+  };
+
+  private onOverviewModal = (
+    keyboardEvent: KeyboardEvent,
+    shortcut: Shortcut,
+    hotKeyEvent: HotkeysEvent
+  ) => {
+    if (!this.modalVisiblities.overview) {
+      this.openOverview();
+    } else {
+      this.modalOverview!.close();
+      this.modalVisiblities.overview = false;
+    }
   };
 
   private modalShortcuts: ShortcutGroup = {
@@ -126,6 +231,7 @@ export class TranscriptionComponent
           mac: 'ALT + 8',
           pc: 'ALT + 8',
         },
+        callback: this.onShortcutsModal,
       },
       {
         name: 'guidelines',
@@ -135,6 +241,7 @@ export class TranscriptionComponent
           mac: 'ALT + 9',
           pc: 'ALT + 9',
         },
+        callback: this.onGuidelinesModal,
       },
       {
         name: 'overview',
@@ -144,12 +251,19 @@ export class TranscriptionComponent
           mac: 'ALT + 0',
           pc: 'ALT + 0',
         },
+        callback: this.onOverviewModal,
       },
     ],
   };
 
-  public generalShortcuts: ShortcutGroup = {
-    name: 'general shortcuts',
+  public editorShortcuts: ShortcutGroup = {
+    name: 'text editor',
+    enabled: false,
+    items: [],
+  };
+
+  public transcriptionShortcuts: ShortcutGroup = {
+    name: 'transcription',
     enabled: true,
     items: [
       {
@@ -160,6 +274,7 @@ export class TranscriptionComponent
           mac: 'SHIFT + ALT + 1',
           pc: 'SHIFT + ALT + 1',
         },
+        callback: this.onAltSend,
       },
       {
         name: 'feedback2',
@@ -169,6 +284,7 @@ export class TranscriptionComponent
           mac: 'SHIFT + ALT + 2',
           pc: 'SHIFT + ALT + 2',
         },
+        callback: this.onAltSend,
       },
       {
         name: 'feedback3',
@@ -178,6 +294,7 @@ export class TranscriptionComponent
           mac: 'SHIFT + ALT + 3',
           pc: 'SHIFT + ALT + 3',
         },
+        callback: this.onAltSend,
       },
     ],
   };
@@ -223,14 +340,13 @@ export class TranscriptionComponent
     public audio: AudioService,
     public uiService: UserInteractionsService,
     public appStorage: AppStorageService,
-    public keyMap: KeymappingService,
+    public shortcutService: ShortcutService,
     public navbarServ: NavbarService,
     public settingsService: SettingsService,
     public modService: OctraModalService,
     private appStoreService: ApplicationStoreService,
     public langService: TranslocoService,
-    private api: OctraAPIService,
-    private bugService: BugReportService,
+    private ngbModalService: NgbModal,
     private cd: ChangeDetectorRef,
     private alertService: AlertService,
     public annotationStoreService: AnnotationStoreService,
@@ -238,9 +354,7 @@ export class TranscriptionComponent
   ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
-
-    this.shortcutManager = new ShortcutManager();
-    this.shortcutManager.registerShortcutGroup(this.modalShortcuts);
+    this.shortcutService.registerGeneralShortcutGroup(this.modalShortcuts);
 
     this.subscrManager.add(
       this.audioManager.statechange.subscribe(
@@ -273,76 +387,6 @@ export class TranscriptionComponent
           console.error(error);
         }
       )
-    );
-
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe((event) => {
-        if (
-          this._useMode === LoginMode.ONLINE ||
-          this._useMode === LoginMode.DEMO
-        ) {
-          if (
-            ['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(
-              event.shortcut
-            )
-          ) {
-            event.event.preventDefault();
-            this.waitForSend = true;
-
-            this.appStorage
-              .afterSaving()
-              .then(() => {
-                this.waitForSend = false;
-                if (event.shortcut === 'SHIFT + ALT + 1') {
-                  this.sendTranscriptionForShortAudioFiles('bad');
-                  this.uiService.addElementFromEvent(
-                    'shortcut',
-                    {
-                      value: 'send_transcription:1',
-                    },
-                    Date.now(),
-                    this.audio.audiomanagers[0].playPosition,
-                    -1,
-                    undefined,
-                    undefined,
-                    this.interface
-                  );
-                } else if (event.shortcut === 'SHIFT + ALT + 2') {
-                  this.sendTranscriptionForShortAudioFiles('middle');
-                  this.uiService.addElementFromEvent(
-                    'shortcut',
-                    {
-                      value: 'send_transcription:2',
-                    },
-                    Date.now(),
-                    this.audio.audiomanagers[0].playPosition,
-                    -1,
-                    undefined,
-                    undefined,
-                    this.interface
-                  );
-                } else if (event.shortcut === 'SHIFT + ALT + 3') {
-                  this.sendTranscriptionForShortAudioFiles('good');
-                  this.uiService.addElementFromEvent(
-                    'shortcut',
-                    {
-                      value: 'send_transcription:3',
-                    },
-                    Date.now(),
-                    this.audio.audiomanagers[0].playPosition,
-                    -1,
-                    undefined,
-                    undefined,
-                    this.interface
-                  );
-                }
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }
-        }
-      })
     );
 
     this.subscrManager.add(
@@ -474,8 +518,9 @@ export class TranscriptionComponent
      */
 
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-
-    this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
+    this.shortcutService.registerGeneralShortcutGroup(
+      this.transcriptionShortcuts
+    );
 
     /**
      for (const marker of this.transcrService.guidelines.markers) {
@@ -629,57 +674,9 @@ export class TranscriptionComponent
     }
   }
 
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown($event: KeyboardEvent) {
-    const shortcutInfo = this.shortcutManager.checkKeyEvent($event, Date.now());
-    if (shortcutInfo !== undefined) {
-      $event.preventDefault();
-
-      switch (shortcutInfo.shortcutName) {
-        case 'shortcuts':
-          if (!this.modalVisiblities.shortcuts) {
-            this.modalShortcutsDialogue = this.modService.openModalRef(
-              ShortcutsModalComponent,
-              ShortcutsModalComponent.options
-            );
-            this.modalVisiblities.shortcuts = true;
-          } else {
-            this.modalShortcutsDialogue!.close();
-            this.modalVisiblities.shortcuts = false;
-          }
-          break;
-        case 'guidelines':
-          if (!this.modalVisiblities.guidelines) {
-            this.modalGuidelines = this.modService.openModalRef(
-              TranscriptionGuidelinesModalComponent,
-              TranscriptionGuidelinesModalComponent.options
-            );
-            this.modalVisiblities.guidelines = true;
-          } else {
-            this.modalGuidelines!.close();
-            this.modalVisiblities.guidelines = false;
-          }
-          break;
-        case 'overview':
-          if (!this.modalVisiblities.overview) {
-            this.annotationStoreService.analyse();
-            this.modalOverview = this.modService.openModalRef(
-              OverviewModalComponent,
-              OverviewModalComponent.options
-            );
-            this.modalVisiblities.overview = true;
-          } else {
-            this.modalOverview!.close();
-            this.modalVisiblities.overview = false;
-          }
-          break;
-      }
-    }
-  }
-
   @HostListener('window:keyup', ['$event'])
   onKeyUp($event: KeyboardEvent) {
-    this.shortcutManager.checkKeyEvent($event, Date.now());
+    // this.shortcutManager.checkKeyEvent($event, Date.now());
   }
 
   changeEditor(name: string): Promise<void> {
@@ -772,7 +769,7 @@ export class TranscriptionComponent
   }
 
   public onSendNowClick() {
-    this.sendOk = true;
+    // this.sendOk = true;
 
     if (this._useMode === LoginMode.ONLINE) {
       if (this._useMode === LoginMode.ONLINE) {
@@ -1006,14 +1003,21 @@ export class TranscriptionComponent
       TranscriptionGuidelinesModalComponent,
       TranscriptionGuidelinesModalComponent.options
     );
+    this.modalGuidelines.result.then(() => {
+      this.modalVisiblities.guidelines = false;
+    });
     this.modalVisiblities.guidelines = true;
   }
 
   openOverview() {
+    this.annotationStoreService.analyse();
     this.modalOverview = this.modService.openModalRef(
       OverviewModalComponent,
       OverviewModalComponent.options
     );
+    this.modalOverview.result.then(() => {
+      this.modalVisiblities.overview = false;
+    });
     this.modalVisiblities.overview = true;
   }
 
@@ -1022,6 +1026,9 @@ export class TranscriptionComponent
       ShortcutsModalComponent,
       ShortcutsModalComponent.options
     );
+    this.modalShortcutsDialogue.result.then(() => {
+      this.modalVisiblities.shortcuts = false;
+    });
     this.modalVisiblities.shortcuts = true;
   }
 

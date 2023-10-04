@@ -151,14 +151,6 @@ export class TranscriptionGuidelinesModalComponent
       form.remove();
     }
   }
-
-  public override close() {
-    this.cd.markForCheck();
-    this.cd.detectChanges();
-
-    return super.close();
-  }
-
   toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }

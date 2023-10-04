@@ -615,6 +615,7 @@ export class TranscrWindowComponent
       'transcription window'
     );
 
+    this.audiochunk.stopPlayback();
     this.act.emit('close');
   }
 

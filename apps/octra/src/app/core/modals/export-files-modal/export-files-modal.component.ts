@@ -115,8 +115,25 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   ngOnInit() {
+    this.uiService.addElementFromEvent(
+      'export',
+      {
+        value: 'opened',
+      },
+      Date.now(),
+      this.audio.audioManager.playPosition,
+      -1,
+      undefined,
+      undefined,
+      'modals'
+    );
+
     for (const converter of AppInfo.converters) {
       this.exportStates.push('close');
+    }
+
+    if (this.tableConfigurator) {
+      this.tableConfigurator.updateAllTableCells();
     }
   }
 

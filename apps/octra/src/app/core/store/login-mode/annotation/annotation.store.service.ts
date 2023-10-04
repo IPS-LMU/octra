@@ -271,15 +271,6 @@ export class AnnotationStoreService {
     );
   }
 
-  setLogs(value: any[], mode: LoginMode) {
-    this.store.dispatch(
-      AnnotationActions.saveLogs.do({
-        logs: value ?? [],
-        mode,
-      })
-    );
-  }
-
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
     this.store.dispatch(
       AnnotationActions.quit.do({

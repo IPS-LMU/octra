@@ -5,6 +5,8 @@ import { Store } from '@ngrx/store';
 import { ASRLanguage } from '../../obj';
 import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
 import { SubscriptionManager } from '@octra/utilities';
+import { Actions, ofType } from '@ngrx/effects';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,13 @@ export class AsrStoreService {
 
   queue$ = this.store.select((state) => state.asr.queue);
   asrEnabled$ = this.store.select((state) => state.asr.isEnabled);
+  itemChange$ = this.actions$.pipe(
+    ofType(
+      ASRActions.processQueueItem.success,
+      ASRActions.processQueueItem.fail
+    ),
+    map((action) => action.item)
+  );
 
   changeASRService(asrInfo?: ASRLanguage) {
     this.store.dispatch(
@@ -69,7 +78,7 @@ export class AsrStoreService {
     this.store.dispatch(ASRActions.stopProcessing.do());
   }
 
-  constructor(private store: Store<RootState>) {
+  constructor(private store: Store<RootState>, private actions$: Actions) {
     this.subscrManager.add(
       this.asrOptions$.subscribe({
         next: (asrOptions) => {

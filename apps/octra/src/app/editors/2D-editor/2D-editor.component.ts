@@ -38,7 +38,7 @@ import {
 } from '@octra/annotation';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { ASRTimeInterval } from '../../core/store/asr';
+import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
 import {
   AudioChunk,
@@ -483,289 +483,55 @@ export class TwoDEditorComponent
       })
     );
 
-    /* TODO implemenet
-        this.subscrManager.add(
-          this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+    this.subscrManager.add(
+      this.asrStoreService.itemChange$.subscribe((item) => {
+        if (item.status !== ASRProcessStatus.IDLE) {
+          const segmentIndex =
+            this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
+              this.audio.audioManager.createSampleUnit(
+                item.time.sampleStart + item.time.sampleLength
+              )
+            ) ?? -1;
 
-            if (item.status !== ASRProcessStatus.IDLE) {
-              const segmentBoundary = new SampleUnit(
-                item.time.sampleStart + item.time.sampleLength,
-                this.audioManager.sampleRate
+          if (segmentIndex > -1) {
+            if (item.status === ASRProcessStatus.FINISHED) {
+              this.uiService.addElementFromEvent(
+                item.type.toLowerCase(),
+                {
+                  value: 'finished',
+                },
+                Date.now(),
+                undefined,
+                undefined,
+                undefined,
+                {
+                  start: item.time.sampleStart,
+                  length: item.time.sampleLength,
+                },
+                'automation'
               );
-              let segmentIndex =
-                this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-                  segmentBoundary
-                );
-
-              if (segmentIndex > -1) {
-                let segment =
-                  this.transcrService.currentlevel!.segments.get(segmentIndex);
-                segment!.progressInfo = {
-                  progress: item.progress,
-                  statusLabel: item.type,
-                };
-                this.viewer.redraw();
-
-                if (
-                  item.status !== ASRProcessStatus.STARTED &&
-                  item.status !== ASRProcessStatus.RUNNING
-                ) {
-                  if (segment !== undefined) {
-                    segment = segment.clone();
-                    segment.isBlockedBy = undefined;
-
-                    if (item.status === ASRProcessStatus.NOQUOTA) {
-                      this.alertService
-                        .showAlert(
-                          'danger',
-                          this.langService.translate('asr.no quota')
-                        )
-                        .catch((error) => {
-                          console.error(error);
-                        });
-                    } else if (item.status === ASRProcessStatus.NOAUTH) {
-                      console.log(`NO AUTH`);
-                      this.uiService.addElementFromEvent(
-                        item.type.toLowerCase(),
-                        {
-                          value: 'no_auth',
-                        },
-                        Date.now(),
-                        undefined,
-                        undefined,
-                        undefined,
-                        {
-                          start: item.time.sampleStart,
-                          length: item.time.sampleLength,
-                        },
-                        'automation'
-                      );
-
-                      this.alertService
-                        .showAlert(
-                          'warning',
-                          AuthenticationNeededComponent,
-                          true,
-                          -1
-                        )
-                        .then((alertItem) => {
-                          const auth =
-                            alertItem.component as AuthenticationNeededComponent;
-                          this.subscrManager.add(
-                            auth.authenticateClick.subscribe(() => {
-                              this.openAuthWindow();
-                            })
-                          );
-                          this.subscrManager.add(
-                            auth.confirmationClick.subscribe(() => {
-                              this.resetQueueItemsWithNoAuth();
-                              this.alertService.closeAlert(alertItem.id);
-                            })
-                          );
-                        });
-                    } else {
-                      if (item.status === ASRProcessStatus.FINISHED) {
-                        this.uiService.addElementFromEvent(
-                          item.type.toLowerCase(),
-                          {
-                            value: 'finished',
-                          },
-                          Date.now(),
-                          undefined,
-                          undefined,
-                          undefined,
-                          {
-                            start: item.time.sampleStart,
-                            length: item.time.sampleLength,
-                          },
-                          'automation'
-                        );
-                        if (item.type === ASRQueueItemType.ASR) {
-                          segment.transcript = item.result.replace(/(<\/p>)/g, '');
-
-                          const index =
-                            this.transcrService.currentlevel!.segments.segments.findIndex(
-                              (a: any) => {
-                                return a.time.samples === segment!.time.samples;
-                              }
-                            );
-                          if (index > -1) {
-                            this.transcrService.currentlevel!.segments.change(
-                              index,
-                              segment
-                            );
-                          }
-                        } else if (
-                          item.type === ASRQueueItemType.ASRMAUS ||
-                          item.type === ASRQueueItemType.MAUS
-                        ) {
-                          const converter = new PraatTextgridConverter();
-
-                          const audiofile = new OAudiofile();
-                          const audioInfo = this.audioManager.resource.info;
-                          audiofile.duration = audioInfo.duration.samples;
-                          audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-                          audiofile.sampleRate = this.audioManager.sampleRate;
-                          audiofile.size = this.audioManager.resource.info.size;
-                          audiofile.type = this.audioManager.resource.info.type;
-
-                          const convertedResult = converter.import(
-                            {
-                              name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-                              content: item.result,
-                              type: 'text',
-                              encoding: 'utf-8',
-                            },
-                            audiofile
-                          );
-
-                          const wordsTier = convertedResult.annotjson!.levels.find(
-                            (a: any) => {
-                              return a.name === 'ORT-MAU';
-                            }
-                          );
-
-                          if (wordsTier !== undefined) {
-                            let counter = 0;
-
-                            if (segmentIndex < 0) {
-                              console.error(
-                                `could not find segment to be precessed by ASRMAUS!`
-                              );
-                            } else {
-                              for (const wordItem of wordsTier.items) {
-                                const itemEnd =
-                                  item.time.sampleStart + item.time.sampleLength;
-                                if (
-                                  item.time.sampleStart +
-                                    wordItem.sampleStart! +
-                                    wordItem.sampleDur! <=
-                                  itemEnd
-                                ) {
-                                  const readSegment = Segment.fromObj(
-                                    this.transcrService.currentlevel!.name,
-                                    new OSegment(
-                                      1,
-                                      wordItem.sampleStart!,
-                                      wordItem.sampleDur!,
-                                      wordItem.labels
-                                    ),
-                                    this.audioManager.sampleRate
-                                  );
-                                  if (
-                                    readSegment!.transcript === '<p:>' ||
-                                    readSegment!.transcript === ''
-                                  ) {
-                                    readSegment!.transcript =
-                                      this.transcrService.breakMarker.code;
-                                  }
-
-                                  if (counter === wordsTier.items.length - 1) {
-                                    // the processed segment is now the very right one. Replace its content with
-                                    // the content of the last word item.
-                                    segmentIndex =
-                                      this.transcrService.currentlevel!.segments.getSegmentBySamplePosition(
-                                        segmentBoundary
-                                      );
-
-                                    this.transcrService.currentlevel!.segments.segments[
-                                      segmentIndex
-                                    ].transcript = readSegment!.transcript;
-                                    this.transcrService.currentlevel!.segments.segments[
-                                      segmentIndex
-                                    ].isBlockedBy = undefined;
-                                  } else {
-                                    const origTime = new SampleUnit(
-                                      item.time.sampleStart +
-                                        readSegment!.time.samples,
-                                      this.audioManager.sampleRate
-                                    );
-                                    this.transcrService.currentlevel!.addSegment(
-                                      origTime,
-                                      '',
-                                      readSegment!.transcript,
-                                      false
-                                    );
-                                  }
-                                } else {
-                                  console.error(
-                                    `wordItem samples are out of the correct boundaries.`
-                                  );
-                                  // tslint:disable-next-line:max-line-length
-                                  console.error(
-                                    `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`
-                                  );
-                                }
-                                counter++;
-                              }
-
-                              this.transcrService.currentLevelSegmentChange.emit();
-                            }
-                          } else {
-                            console.error(`word tier not found!`);
-                          }
-                        }
-                      } else if (item.status === ASRProcessStatus.FAILED) {
-                        if (item.result.indexOf('[Error]') === 0) {
-                          const errorMessage = item.result.replace('[Error] ', '');
-                          const translatedError = this.langService.translate(
-                            `asr.${errorMessage}`,
-                            {
-                              asrProvider: item.selectedLanguage.asr,
-                              maxDuration: item.selectedASRInfo.maxSignalDuration,
-                              maxSignalSize: item.selectedASRInfo.maxSignalSize,
-                            }
-                          );
-                          this.alertService
-                            .showAlert('danger', translatedError, true, 30)
-                            .catch((error) => {
-                              console.error(error);
-                            });
-                        } else {
-                          this.alertService
-                            .showAlert('danger', ErrorOccurredComponent, true, -1)
-                            .catch((error) => {
-                              console.error(error);
-                            });
-                        }
-                        console.error(item.result);
-                        this.transcrService.currentlevel!.segments.segments[
-                          segmentIndex
-                        ].isBlockedBy = undefined;
-                        this.transcrService.currentLevelSegmentChange.emit();
-                        this.cd.markForCheck();
-                      } else if (item.status === ASRProcessStatus.STOPPED) {
-                        this.cd.markForCheck();
-                      }
-                    }
-                  } else {
-                    console.error(`can't start ASR because segment not found!`);
-                  }
-                } else if (item.status === ASRProcessStatus.STARTED) {
-                  // item started
-                  this.uiService.addElementFromEvent(
-                    item.type.toLowerCase(),
-                    {
-                      value: 'started',
-                    },
-                    Date.now(),
-                    undefined,
-                    undefined,
-                    undefined,
-                    {
-                      start: item.time.sampleStart,
-                      length: item.time.sampleLength,
-                    },
-                    'automation'
-                  );
-                }
-              } else {
-                console.error(new Error(`couldn't find segment number`));
-              }
+            } else if (item.status === ASRProcessStatus.STARTED) {
+              // item started
+              this.uiService.addElementFromEvent(
+                item.type.toLowerCase(),
+                {
+                  value: 'started',
+                },
+                Date.now(),
+                undefined,
+                undefined,
+                undefined,
+                {
+                  start: item.time.sampleStart,
+                  length: item.time.sampleLength,
+                },
+                'automation'
+              );
             }
-            checkUndoRedo();
-          })
-        ); */
+          }
+        }
+      })
+    );
   }
 
   override ngOnDestroy() {

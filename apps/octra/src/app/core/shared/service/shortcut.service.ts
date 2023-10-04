@@ -50,13 +50,8 @@ export class ShortcutService {
           const Group = groups.find((a) => a.name === group.name);
           if (Group && item.callback) {
             if (Group.enabled) {
-              console.log(`run callback for ${group.name}, ${item.name}`);
               kEvent.preventDefault();
               item.callback(kEvent, item, hEvent, Group);
-            } else {
-              console.log(
-                `Can't run callback, group is disabled ${group.name}`
-              );
             }
           }
         });
@@ -89,7 +84,6 @@ export class ShortcutService {
   public disableGroup(groupName: string) {
     this._groups = this._groups.map((a) => {
       if (a.name === groupName) {
-        console.log(`disable group ${groupName}`);
         return {
           ...a,
           enabled: false,
@@ -102,7 +96,6 @@ export class ShortcutService {
   public enableGroup(groupName: string) {
     this._groups = this._groups.map((a) => {
       if (a.name === groupName) {
-        console.log(`enable group ${groupName}`);
         return {
           ...a,
           enabled: true,

@@ -53,11 +53,16 @@ import { TranscriptionSendingModalComponent } from '../../../modals/transcriptio
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../../application/application.actions';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { getTranscriptFromIO, hasProperty } from '@octra/utilities';
+import {
+  getTranscriptFromIO,
+  hasProperty,
+  SubscriptionManager,
+} from '@octra/utilities';
 import {
   createSampleProjectDto,
   createSampleTask,
   createSampleUser,
+  StatisticElem,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
 import { ASRActions } from '../../asr/asr.actions';
@@ -75,6 +80,8 @@ export class AnnotationEffects {
     timeout?: Subscription;
     error?: string;
   } = {};
+
+  subscrManager = new SubscriptionManager();
 
   startAnnotation$ = createEffect(() =>
     this.actions$.pipe(
@@ -191,7 +198,40 @@ export class AnnotationEffects {
     () =>
       this.actions$.pipe(
         ofType(AnnotationActions.startAnnotation.success),
-        tap((a) => {
+        withLatestFrom(this.store),
+        tap(([a, state]) => {
+          // INIT UI SERVICE
+          if (a.projectSettings.logging || getModeState(state)!.logging) {
+            this.uiService.enabled = true;
+            this.uiService.elements = getModeState(state)!.logs.map((a) =>
+              StatisticElem.fromAny(a)
+            );
+            this.uiService.addElementFromEvent(
+              'octra',
+              { value: AppInfo.version },
+              Date.now(),
+              undefined,
+              -1,
+              undefined,
+              undefined,
+              'version'
+            );
+            this.subscrManager.removeByTag('uiService');
+            this.subscrManager.add(
+              this.uiService.afteradd.subscribe({
+                next: (item: StatisticElem) => {
+                  this.store.dispatch(
+                    AnnotationActions.addLog.do({
+                      mode: state.application.mode!,
+                      log: item.getDataClone(),
+                    })
+                  );
+                },
+              }),
+              'uiService'
+            );
+          }
+
           this.routingService.navigate('start annotation', ['/load/']);
           this.store.dispatch(
             AnnotationActions.loadAudio.do({
@@ -841,7 +881,9 @@ export class AnnotationEffects {
 
         this.alertService.showAlert(
           'success',
-          this.transloco.translate('g.submission success')
+          this.transloco.translate('g.submission success'),
+          true,
+          2000
         );
 
         this.store.dispatch(ApplicationActions.waitForEffects.do());
@@ -1136,7 +1178,7 @@ export class AnnotationEffects {
         // import logs
         this.store.dispatch(
           AnnotationActions.saveLogs.do({
-            logs: task?.log ?? [],
+            logs: modeState.logs ?? task?.log ?? [],
             mode: rootState.application.mode,
           })
         );
@@ -1313,6 +1355,28 @@ export class AnnotationEffects {
       })
     );
   }
+
+  levelIndexChange$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.setLevelIndex.do),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          this.uiService.addElementFromEvent(
+            'level',
+            { value: 'changed' },
+            Date.now(),
+            this.audio.audioManager.createSampleUnit(0),
+            -1,
+            undefined,
+            undefined,
+            getModeState(state)?.transcript?.levels[action.currentLevelIndex]
+              ?.name
+          );
+        })
+      ),
+    { dispatch: false }
+  );
 
   public initMaintenance(state: RootState) {
     if (

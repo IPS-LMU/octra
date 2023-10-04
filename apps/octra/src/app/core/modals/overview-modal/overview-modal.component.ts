@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -28,7 +29,7 @@ declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
 })
-export class OverviewModalComponent extends OctraModal {
+export class OverviewModalComponent extends OctraModal implements OnInit{
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: false,
@@ -38,6 +39,7 @@ export class OverviewModalComponent extends OctraModal {
   @ViewChild('feedback', { static: false })
   feedback!: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
+
 
   protected data = undefined;
   private shortcutID = -1;
@@ -78,6 +80,28 @@ export class OverviewModalComponent extends OctraModal {
     protected override activeModal: NgbActiveModal
   ) {
     super('overviewModal', activeModal);
+  }
+
+  ngOnInit(){
+    /* TODO add shortcuts
+      if (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast')) {
+        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
+          switch (keyObj.comboKey) {
+            case('CTRL + 1'):
+              this.sendTranscriptionForShortAudioFiles('good');
+              break;
+            case('CTRL + 2'):
+              this.sendTranscriptionForShortAudioFiles('middle');
+              break;
+            case('CTRL + 3'):
+              this.sendTranscriptionForShortAudioFiles('bad');
+              break;
+          }
+        }));
+      }
+     */
+    this.uiService.addElementFromEvent('overview', {value: 'opened'},
+      Date.now(), undefined, undefined, undefined, undefined, 'overview');
   }
 
   public override close(fromModal = false) {

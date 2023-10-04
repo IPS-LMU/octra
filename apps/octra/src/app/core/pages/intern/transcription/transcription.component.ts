@@ -3,7 +3,6 @@ import {
   Component,
   ComponentFactoryResolver,
   ComponentRef,
-  HostListener,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -357,8 +356,8 @@ export class TranscriptionComponent
     this.shortcutService.registerGeneralShortcutGroup(this.modalShortcuts);
 
     this.subscrManager.add(
-      this.audioManager.statechange.subscribe(
-        async (state) => {
+      this.audioManager.statechange.subscribe({
+        next: async (state) => {
           if (!appStorage.playonhover && !this.modalVisiblities.overview) {
             let caretpos = -1;
 
@@ -383,10 +382,10 @@ export class TranscriptionComponent
             }
           }
         },
-        (error) => {
+        error: (error) => {
           console.error(error);
-        }
-      )
+        },
+      })
     );
 
     this.subscrManager.add(
@@ -581,26 +580,6 @@ export class TranscriptionComponent
     this.navbarServ.showExport =
       this.settingsService.projectsettings?.navigation?.export === true;
 
-    /*
-    this.subscrManager.add(
-      this.transcrService.levelchanged.subscribe((level: Level) => {
-        (this.currentEditor.instance as any).update();
-
-        // important: subscribe to level changes in order to save proceedings
-        this.subscrManager.removeById(this.levelSubscriptionID);
-        this.uiService.addElementFromEvent(
-          'level',
-          { value: 'changed' },
-          Date.now(),
-          this.audioManager.createSampleUnit(0),
-          -1,
-          undefined,
-          undefined,
-          level.name
-        );
-      })
-    );*/
-
     if (
       this._useMode === LoginMode.ONLINE ||
       this._useMode === LoginMode.DEMO
@@ -672,11 +651,6 @@ export class TranscriptionComponent
     if (found === undefined) {
       this.appStorage.interface = this.projectsettings.interfaces[0];
     }
-  }
-
-  @HostListener('window:keyup', ['$event'])
-  onKeyUp($event: KeyboardEvent) {
-    // this.shortcutManager.checkKeyEvent($event, Date.now());
   }
 
   changeEditor(name: string): Promise<void> {

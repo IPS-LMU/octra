@@ -66,6 +66,7 @@ export class DictaphoneEditorComponent
   public segments?: OctraAnnotationSegment[] = [];
 
   private oldRaw = '';
+  boundaryselected = false;
 
   onAudioPlayerPlay = (
     keyboardEvent: KeyboardEvent,
@@ -335,18 +336,17 @@ export class DictaphoneEditorComponent
   };
 
   onBoundaryClicked(samples: SampleUnit) {
-    /*
-    const i: number = getSegmentBySamplePosition(
-      this.transcrService.currentlevel!.segments,
-      samples
-    );
-
-    this.boundaryselected = true;
+    const i: number =
+      this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
+        samples
+      ) ?? -1;
 
     if (i > -1) {
+      this.boundaryselected = true;
       const start =
         i > 0
-          ? this.transcrService.currentlevel!.segments[i - 1]!.time.samples
+          ? (this.annotationStoreService.currentLevel?.items[i - 1]! as any)
+              .time.samples
           : 0;
 
       new Promise<void>((resolve) => {
@@ -357,8 +357,8 @@ export class DictaphoneEditorComponent
         }
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
-        this.audiochunk.selection.end =
-          this.transcrService.currentlevel!.segments[i]!.time.clone();
+        this.audiochunk.selection.end = (this.annotationStoreService
+          .currentLevel!.items[i] as any)!.time.clone();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos to selected boundary
@@ -370,7 +370,6 @@ export class DictaphoneEditorComponent
     } else {
       this.boundaryselected = false;
     }
-    */
   }
 
   onBoundaryInserted() {

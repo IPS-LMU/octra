@@ -1,11 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SessionStorageService } from 'ngx-webstorage';
 import { SessionFile } from '../../obj/SessionFile';
-import {
-  getProperties,
-  SubscriptionManager,
-  waitTillResultRetrieved,
-} from '@octra/utilities';
+import { SubscriptionManager, waitTillResultRetrieved } from '@octra/utilities';
 import { getModeState, LoadingStatus, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
@@ -19,7 +15,6 @@ import {
   AnnotationSessionState,
   AnnotationState,
 } from '../../store/login-mode/annotation';
-import { ILog } from '../../obj/Settings/logging';
 import { LoginModeActions } from '../../store/login-mode';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { ProjectDto, TaskDto } from '@octra/api-types';
@@ -447,26 +442,6 @@ export class AppStorageService {
   }
 
   private maintenanceChecker!: Subscription;
-
-  public saveLogItem(log: ILog) {
-    if (log !== undefined) {
-      const properties = getProperties(log);
-      for (const [name, value] of properties) {
-        if (value === undefined) {
-          delete (log as any)['' + name];
-        }
-      }
-
-      this.store.dispatch(
-        AnnotationActions.addLog.do({
-          mode: this.useMode,
-          log: log,
-        })
-      );
-    } else {
-      console.error("Can't save log because it is undefined.");
-    }
-  }
 
   public afterSaving(): Promise<void> {
     return new Promise<void>((resolve, reject) => {

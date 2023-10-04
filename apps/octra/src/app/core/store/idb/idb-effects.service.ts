@@ -165,6 +165,9 @@ export class IDBEffects {
               this.store.dispatch(IDBActions.loadAnnotation.do());
             }
 
+            console.log('loaded logs from online:');
+            console.log(onlineModeLogs);
+
             return IDBActions.loadLogs.success({
               online: onlineModeLogs,
               demo: localModeLogs,

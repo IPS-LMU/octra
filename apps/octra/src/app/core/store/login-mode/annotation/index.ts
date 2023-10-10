@@ -81,6 +81,7 @@ export interface AnnotationState extends UndoRedoState {
 }
 
 export interface AnnotationSessionState {
+  status?: "processing" | "sending";
   loadFromServer?: boolean;
   currentProject?: ProjectDto;
   task?: TaskDto;

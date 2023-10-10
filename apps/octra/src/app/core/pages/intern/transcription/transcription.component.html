@@ -60,7 +60,7 @@
     <div class="flex">
         <div
                 *ngIf="
-        !editorloaded || waitForSend || projectsettings === undefined;
+        !editorloaded || (annotationStoreService.status$ | async) === 'sending' || projectsettings === undefined;
         else showEditor
       "
                 id="editor-loading"

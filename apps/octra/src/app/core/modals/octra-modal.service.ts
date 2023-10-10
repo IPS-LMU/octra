@@ -8,6 +8,7 @@ import { NgbModalWrapper } from './ng-modal-wrapper';
 import { AccountLoginMethod } from '@octra/api-types';
 import { Action } from '@ngrx/store';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
+import { ErrorModalComponent } from './error-modal/error-modal.component';
 
 @Injectable()
 export class OctraModalService {
@@ -63,5 +64,13 @@ export class OctraModalService {
     ref.componentInstance.type = type;
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
     return ref;
+  }
+
+  openErrorModal(text: string) {
+    const ref = this.openModalRef<ErrorModalComponent>(
+      ErrorModalComponent,
+      ErrorModalComponent.options
+    );
+    ref.componentInstance.text = text;
   }
 }

@@ -787,6 +787,7 @@ export class AnnotationEffects {
           ) {
             return of(
               AnnotationActions.sendAnnotation.fail({
+                mode: state.application.mode!,
                 error: 'Current project or current task is undefined',
               })
             );
@@ -846,6 +847,7 @@ export class AnnotationEffects {
                   },
                   a,
                   AnnotationActions.sendAnnotation.fail({
+                    mode: state.application.mode!,
                     error: error.error?.message ?? error.message,
                   }),
                   this.store,
@@ -864,11 +866,27 @@ export class AnnotationEffects {
         }
         return of(
           AnnotationActions.sendAnnotation.fail({
+            mode: state.application.mode!,
             error: 'Not implemented',
           })
         );
       })
     )
+  );
+
+  sendAnnotationFail$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.sendAnnotation.fail),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          this.transcrSendingModal.timeout?.unsubscribe();
+          this.transcrSendingModal.ref?.close();
+
+          this.modalsService.openErrorModal(action.error);
+        })
+      ),
+    { dispatch: false }
   );
 
   afterAnnotationSent$ = createEffect(() =>

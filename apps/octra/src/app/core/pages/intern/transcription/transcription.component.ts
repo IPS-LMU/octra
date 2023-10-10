@@ -78,7 +78,6 @@ export class TranscriptionComponent
     return this._useMode;
   }
 
-  public waitForSend = false;
   modalShortcutsDialogue?: NgbModalRef;
   modalOverview?: NgbModalRef;
   transcrSendingModal?: NgbModalRef;
@@ -122,12 +121,9 @@ export class TranscriptionComponent
           shortcut.keys.mac!
         )
       ) {
-        this.waitForSend = true;
-
         this.appStorage
           .afterSaving()
           .then(() => {
-            this.waitForSend = false;
             if (shortcut.keys.mac! === 'SHIFT + ALT + 1') {
               this.sendTranscriptionForShortAudioFiles('bad');
               this.uiService.addElementFromEvent(
@@ -762,7 +758,6 @@ export class TranscriptionComponent
         )
         .then((action: any) => {
           this.appStorage.savingNeeded = false;
-          this.waitForSend = false;
 
           switch (action) {
             case ModalEndAnswer.CANCEL:
@@ -792,8 +787,6 @@ export class TranscriptionComponent
   }
 
   onSendButtonClick() {
-    this.waitForSend = true;
-
     let showOverview = true;
     let validTranscriptOnly = false;
 
@@ -820,7 +813,6 @@ export class TranscriptionComponent
       (!validTranscript && showOverview) ||
       (validTranscriptOnly && !validTranscript)
     ) {
-      this.waitForSend = false;
       this.modalOverview = this.modService.openModalRef(
         OverviewModalComponent,
         OverviewModalComponent.options

@@ -86,15 +86,20 @@ export class AnnotationStateReducers {
           if (this.mode === mode) {
             // 1. unblock current segment
             let transcript = state.transcript.clone();
-            const currentSegment = transcript.currentLevel!.items.find(a => a.id === segmentID)!.clone() as OctraAnnotationSegment;
+            const currentSegment = transcript
+              .currentLevel!.items.find((a) => a.id === segmentID)!
+              .clone() as OctraAnnotationSegment;
             currentSegment.context = {
               ...currentSegment.context,
               asr: {
                 progressInfo: undefined,
                 isBlockedBy: undefined,
-              }
+              },
             };
-            transcript = transcript.changeCurrentItemById(segmentID, currentSegment);
+            transcript = transcript.changeCurrentItemById(
+              segmentID,
+              currentSegment
+            );
 
             // 2. ignore last segment from results
             const segments = newSegments.filter(
@@ -499,6 +504,31 @@ export class AnnotationStateReducers {
           }
 
           return result;
+        }
+      ),
+      on(
+        AnnotationActions.sendAnnotation.do,
+        (state: AnnotationState, { mode }) => {
+          if (mode === this.mode) {
+            state.currentSession = {
+              ...state.currentSession,
+              status: 'sending',
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.sendAnnotation.fail,
+        AnnotationActions.sendAnnotation.success,
+        (state: AnnotationState, { mode }) => {
+          if (mode === this.mode) {
+            state.currentSession = {
+              ...state.currentSession,
+              status: 'processing',
+            };
+          }
+          return state;
         }
       ),
       on(

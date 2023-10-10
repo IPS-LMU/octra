@@ -18,6 +18,7 @@ import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
 import { SampleUnit } from '@octra/media';
 import { GuidelinesItem } from './index';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
+import videojs from 'video.js';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -307,7 +308,9 @@ export class AnnotationActions {
   static sendAnnotation = createActionGroup({
     source: `annotation/ send to server`,
     events: {
-      do: emptyProps(),
+      do: props<{
+        mode: LoginMode;
+      }>(),
       start: props<{
         mode: LoginMode;
       }>(),
@@ -316,6 +319,7 @@ export class AnnotationActions {
         mode: LoginMode;
       }>(),
       fail: props<{
+        mode: LoginMode;
         error: string;
       }>(),
     },

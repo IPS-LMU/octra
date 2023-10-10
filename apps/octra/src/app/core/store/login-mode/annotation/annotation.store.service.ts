@@ -170,6 +170,9 @@ export class AnnotationStoreService {
   transcript$ = this.store.select(
     (state: RootState) => getModeState(state)?.transcript
   );
+  status$ = this.store.select(
+    (state: RootState) => getModeState(state)?.currentSession?.status
+  );
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
 
   transcriptString$ = this.transcript$.pipe(
@@ -282,7 +285,9 @@ export class AnnotationStoreService {
   }
 
   sendAnnotation() {
-    this.store.dispatch(AnnotationActions.sendAnnotation.do());
+    this.store.dispatch(AnnotationActions.sendAnnotation.do({
+      mode: this.appStorage.snapshot.application.mode!
+    }));
   }
 
   changeComment(comment: string) {

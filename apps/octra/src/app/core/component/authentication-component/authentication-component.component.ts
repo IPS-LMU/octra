@@ -37,6 +37,14 @@ export class AuthenticationComponent extends DefaultComponent {
   passwordResetRequested = false;
   email?: string;
 
+  credentials: {
+    usernameEmail: string;
+    password: string;
+  } = {
+    usernameEmail: '',
+    password: '',
+  };
+
   protected readonly AccountLoginMethod = AccountLoginMethod;
 
   resetPassword() {

@@ -61,26 +61,23 @@
        *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined">{{ 'g.or' | transloco }}</div>
   <form *ngIf="isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')" #form="ngForm">
     <div class="form-floating mb-3">
-      <input type="text" id="inputName" class="form-control" [placeholder]="'p.username or email' | transloco"
-             name="name" #name required autofocus/>
+      <input type="text" id="inputName" class="form-control" [placeholder]="'p.username or email' | transloco" [(ngModel)]="credentials.usernameEmail"
+             name="name" required autofocus/>
       <label for="inputName">{{ 'p.username or email' | transloco }}</label>
     </div>
     <div class="form-floating mb-3">
-      <input type="password" id="inputPassword" class="form-control" [placeholder]="'g.password' | transloco"
-             name="password" #password required/>
+      <input type="password" id="inputPassword" class="form-control" [placeholder]="'g.password' | transloco" [(ngModel)]="credentials.password"
+             name="password" required/>
       <label for="inputPassword">{{ 'g.password' | transloco }}</label>
     </div>
     <button
       class="w-100 btn btn-primary mt-3"
-      [disabled]="!form.valid"
+      [disabled]="form.invalid"
       type="submit"
       (click)="
         submitClick.emit({
           type: AccountLoginMethod.local,
-          credentials: {
-            usernameEmail: name.value,
-            password: password.value
-          }
+          credentials
         })
       "
     >

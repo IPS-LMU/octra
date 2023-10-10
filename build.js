@@ -23,6 +23,10 @@ if (process.argv[2] === "dev=true") {
   dev = "--configuration=development";
 }
 
+if (process.argv[2] === "beta=true") {
+  dev = "--configuration=beta";
+}
+
 if (process.argv[3] === "isUpdate=true") {
   isUpdate = true;
 }

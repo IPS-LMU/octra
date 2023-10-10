@@ -9,6 +9,7 @@
     "build:docs": "typedoc && node runner.js prepare:docs",
     "build:release": "node runner.js build:release",
     "build:dev": "node runner.js build:dev",
+    "build:beta": "node runner.js build:beta",
     "build:prod": "node runner.js build:prod",
     "build:libs": "node runner.js build:libs",
     "build:extern": "node runner.js build:extern",

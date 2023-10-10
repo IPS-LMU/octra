@@ -20,6 +20,14 @@
       >
         ({{ appStorage.useMode }})
       </ng-container>
+      <span class="text-outline-white d-inline-block d-md-none text-danger fw-bold" style="font-size: 0.85rem;" *ngIf="environment.beta_version || environment.dev_version">
+          <ng-container *ngIf="environment.dev_version; else betaVersion">
+            in development
+          </ng-container>
+          <ng-template #betaVersion>
+            beta
+          </ng-template>
+        </span>
     </a>
     <button
       class="navbar-toggler"

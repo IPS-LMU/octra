@@ -4,13 +4,18 @@
   <header>
     <octra-navigation #navigation [version]="version"></octra-navigation>
   </header>
-  <main style="margin-top:40px;">
+  <main style="margin-top: 40px">
     <div
       *ngIf="environment.dev_version"
-      class="d-none d-md-block"
-      id="beta_mark"
+      class="d-none d-md-block beta_mark text-outline-white"
     >
       in development
+    </div>
+    <div
+      *ngIf="environment.beta_version"
+      class="d-none d-md-block beta_mark text-outline-white"
+    >
+      beta
     </div>
     <div class="container-fluid flex">
       <router-outlet></router-outlet>

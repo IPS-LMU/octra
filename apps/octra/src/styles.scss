@@ -484,3 +484,19 @@ a {
 ngx-jodit {
   height: 200px !important;
 }
+
+.text-outline-white{
+  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white !important;
+}
+
+.beta_mark {
+  color: red;
+  position: absolute;
+  margin-left: 97px;
+  margin-top: 30px;
+  left: 0;
+  top: 0;
+  z-index: 1031;
+  font-weight: 600;
+  letter-spacing: 1px;
+}

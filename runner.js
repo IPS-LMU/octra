@@ -72,6 +72,11 @@ const OCTRA = {
       'node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/'
     );
   },
+  buildBeta: async function () {
+    await run(
+      'node ./build.js beta=true isUpdate=true url=/apps/octra/octra-dev/'
+    );
+  },
   prepareExtern: async function () {
     if (fs.pathExistsSync('extern')) {
       fs.emptydirSync('extern');
@@ -109,6 +114,7 @@ yargs
   )
   .command('build:prod', 'Builds production version of OCTRA.', OCTRA.buildProd)
   .command('build:dev', 'Builds development version of OCTRA.', OCTRA.buildDev)
+  .command('build:beta', 'Builds beta version of OCTRA.', OCTRA.buildBeta)
   .command('build:libs', 'Builds all libraries.', OCTRA.buildLibs)
   .command('build:extern', 'Builds extern libraries.', OCTRA.buildExtern)
   .command('build:json-sets', 'Builds json-sets library.', JSONValidator.build)

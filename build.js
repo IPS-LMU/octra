@@ -38,7 +38,7 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
-let command = ["./node_modules/nx/bin/nx.js", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`, '--skip-nx-cache'];
+let command = ["./node_modules/nx/bin/nx.js", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`];
 
 if (dev !== "") {
   command.splice(3, 1);

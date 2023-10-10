@@ -22,6 +22,14 @@
         },
         "validation_url": {
           "type": "string"
+        },
+        "pdf": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          }
         }
       },
       "type": "object",

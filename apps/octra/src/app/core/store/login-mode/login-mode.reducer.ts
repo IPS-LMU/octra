@@ -297,10 +297,17 @@ export class LoginModeReducers {
       on(
         ApplicationActions.setAppLanguage,
         (state: AnnotationState, { language }) => {
-          const guideline = state.guidelines?.list.find(
-            (a) => a.filename === `guidelines_${language}.json`
-          );
-          if (state.guidelines && guideline) {
+          if (state.guidelines?.list && state.guidelines?.list.length > 0) {
+            let guideline = state.guidelines.list.find(
+              (a) => a.filename === `guidelines_${language}.json`
+            );
+            // fallback to english
+            guideline = guideline ?? state.guidelines.list.find(
+              (a) => a.filename === `guidelines_en.json`
+            );
+            // fallback to first language
+            guideline = guideline ?? state.guidelines.list[0];
+
             return {
               ...state,
               guidelines: {

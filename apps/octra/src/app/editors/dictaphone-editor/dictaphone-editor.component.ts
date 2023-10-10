@@ -83,7 +83,6 @@ export class DictaphoneEditorComponent
         console.error(error);
       });
     } else {
-      console.log(`PLAY CHUNK ${this.audiochunk.id}`);
       this.audiochunk.startPlayback(false).catch((error: any) => {
         console.error(error);
       });

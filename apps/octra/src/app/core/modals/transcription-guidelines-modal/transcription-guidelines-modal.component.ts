@@ -1,6 +1,4 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   OnInit,
   SecurityContext,
@@ -10,22 +8,15 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoService } from '@ngneat/transloco';
 import { timer } from 'rxjs';
 import { SettingsService } from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModal } from '../types';
 import videojs from 'video.js';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalOptions,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
 export class TranscriptionGuidelinesModalComponent
@@ -51,13 +42,9 @@ export class TranscriptionGuidelinesModalComponent
   private videoPlayers: any[] = [];
 
   constructor(
-    modalService: NgbModal,
     private lang: TranslocoService,
     public annotationStoreService: AnnotationStoreService,
-    private appStorage: AppStorageService,
-    private bugService: BugReportService,
     public settService: SettingsService,
-    private cd: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     protected override activeModal: NgbActiveModal
   ) {
@@ -199,32 +186,6 @@ export class TranscriptionGuidelinesModalComponent
     }
 
     return this.sanitizer.sanitize(SecurityContext.HTML, html)!;
-  }
-
-  public isPDFExportEnabled() {
-    return (
-      this.settService.projectsettings?.plugins.pdfexport !== undefined &&
-      this.settService.projectsettings?.plugins.pdfexport.url !== undefined
-    );
-  }
-
-  public isPDFLinkOnly() {
-    return (
-      this.isPDFExportEnabled() &&
-      this.settService.projectsettings?.plugins?.pdfexport?.url &&
-      this.settService.projectsettings!.plugins.pdfexport.url.indexOf(
-        'pdfconverter'
-      ) < 0
-    );
-  }
-
-  public getPDFNameFromLink() {
-    const url = this.settService.projectsettings?.plugins.pdfexport.url ?? '';
-    if (this.isPDFLinkOnly() && url.lastIndexOf('/') > -1) {
-      return url.substr(url.lastIndexOf('/') + 1);
-    }
-
-    return '';
   }
 
   private unCollapseAll() {

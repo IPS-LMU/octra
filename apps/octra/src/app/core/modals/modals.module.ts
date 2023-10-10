@@ -35,6 +35,7 @@ import { ShortcutComponent } from '../shortcut/shortcut.component';
 import { TableConfiguratorComponent } from '../tools/table-configurator/table-configurator.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
+  NgbAccordionCollapse,
   NgbCollapseModule,
   NgbDropdownModule,
   NgbModalModule,
@@ -82,7 +83,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     TableConfiguratorComponent,
     ReAuthenticationModalComponent,
     AuthenticationComponent,
-    AboutModalComponent
+    AboutModalComponent,
   ],
   imports: [
     CommonModule,
@@ -96,6 +97,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NgbDropdownModule,
     NgbModalModule,
     OctraUtilitiesModule,
+    NgbAccordionCollapse,
   ],
   exports: [
     BugreportModalComponent,
@@ -120,7 +122,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     YesNoModalComponent,
     ProtectedModalComponent,
     AuthenticationComponent,
-    AboutModalComponent
+    AboutModalComponent,
   ],
 })
 export class ModalsModule {}

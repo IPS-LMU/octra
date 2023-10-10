@@ -36,7 +36,7 @@ export class BugReportService {
   private subscrManager = new SubscriptionManager();
   private _console: ConsoleEntry[] = [];
 
-  pkgText = "";
+  pkgText = '';
 
   get console(): ConsoleEntry[] {
     return this._console;
@@ -137,8 +137,8 @@ export class BugReportService {
       result.protocol!.tool.jobID = this.appStorage.onlineSession?.task?.id;
     }
 
-    if(this.annotationStoreService.transcript){
-      if(this.audio.audioManager){
+    if (this.annotationStoreService.transcript) {
+      if (this.audio.audioManager) {
         const file = getFileSize(this.audio.audioManager.resource.size!);
         result.protocol!.tool.audiofile_size = file.size + ' ' + file.label;
         result.protocol!.tool.audiofile_duration =
@@ -175,7 +175,7 @@ export class BugReportService {
     const pkg = this.getPackage();
     let body: FeedbackRequestPropertiesDto = {
       ...pkg,
-      message,
+      message: message ?? '',
       requester: {
         email,
         name,
@@ -186,9 +186,10 @@ export class BugReportService {
       body = removeProperties(body, ['technicalInformation', 'protocol']);
     }
 
+    console.log("send feedback");
     return this.api.sendFeedback(
       body,
-      screenshots.map((a) => a.blob)
+      screenshots?.map((a) => a.blob)
     );
   }
 }

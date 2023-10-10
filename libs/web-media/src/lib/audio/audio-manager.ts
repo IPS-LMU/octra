@@ -461,7 +461,9 @@ export class AudioManager {
    */
   public prepareAudioPlayBack() {
     this._audio.src = URL.createObjectURL(
-      new File([this._resource.arraybuffer!], this._resource.info.fullname)
+      new File([this._resource.arraybuffer!], this._resource.info.fullname, {
+        type: this._resource.info.type,
+      })
     );
 
     this._channel = undefined;

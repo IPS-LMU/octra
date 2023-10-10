@@ -165,9 +165,6 @@ export class IDBEffects {
               this.store.dispatch(IDBActions.loadAnnotation.do());
             }
 
-            console.log('loaded logs from online:');
-            console.log(onlineModeLogs);
-
             return IDBActions.loadLogs.success({
               online: onlineModeLogs,
               demo: localModeLogs,
@@ -973,8 +970,6 @@ export class IDBEffects {
         const modeState = this.getModeStateFromString(appState, action.mode);
 
         if (modeState) {
-          console.log(`save levels`);
-          console.log(modeState.transcript.levels[0]);
           return this.idbService
             .saveAnnotation(
               action.mode,

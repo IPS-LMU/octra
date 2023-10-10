@@ -240,7 +240,6 @@ export class AuthenticationEffects {
                 ofType(IDBActions.saveModeOptions.success),
                 take(1),
                 exhaustMap(() => {
-                  console.log('OK KLAPPT');
                   return of(
                     AuthenticationActions.loginLocal.success({
                       ...a,

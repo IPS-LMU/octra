@@ -160,8 +160,6 @@ export class IDBService {
   }
 
   public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {
-    console.log(`save mode options fro mode ${mode}`);
-    console.log(options);
     return this.database.saveModeData(mode, 'options', options);
   }
 

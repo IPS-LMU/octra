@@ -43,7 +43,7 @@ export class AudioResource extends MediaResource {
     result.duration = this._info.duration.samples;
     result.size = this.size ?? 0;
     result.url = this._info.url;
-    result.name = this._info.name;
+    result.name = this._info.fullname;
     result.arraybuffer = this.arraybuffer;
     result.sampleRate = this._info.sampleRate;
 

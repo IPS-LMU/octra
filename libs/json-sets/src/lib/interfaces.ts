@@ -56,6 +56,7 @@ export interface JSONFileSetValidationError {
   path?: string;
   constraint?: string;
   message: string;
+  statement?: JSONSetStatement
 }
 
 export interface JSONSetStatement {

@@ -1150,8 +1150,5 @@ export class LinearEditorComponent
         $event.items.map((a) => a.instance!)
       );
     }
-
-    console.log('CurrentLevelChange!');
-    console.log($event);
   }
 }

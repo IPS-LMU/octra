@@ -137,6 +137,9 @@ export interface OctraGuidelines {
     date: string;
     encoding: string;
     validation_url: string;
+    pdf: {
+      url: string;
+    }
   },
   instructions: {
     group: string;

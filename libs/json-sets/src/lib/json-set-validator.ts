@@ -62,6 +62,9 @@ export class FileJSONSetValidator extends JSONSetValidator {
       );
     }
 
+    console.log(`valid filenames:`);
+    console.log(results);
+
     return this.analyzeValidationResults(results);
   }
 
@@ -300,6 +303,8 @@ export class FileJSONSetValidator extends JSONSetValidator {
 
       quantity = this.calculateQuantityTable(validations);
     };
+    console.log("Quantity:");
+    console.log(quantity);
 
     const noRemainingTakesOrSets = () => {
       return (
@@ -356,12 +361,14 @@ export class FileJSONSetValidator extends JSONSetValidator {
             filename: '',
             path: statement.name,
             constraint: 'take',
+            statement,
             message: `There are ${numberOfTakes} missing files that meet the constraints.`,
           });
         } else if (statement.takeMin) {
           results.push({
             filename: '',
             path: statement.name,
+            statement,
             constraint: 'take',
             message: `There are ${numberOfTakes} missing files that meet the constraints.`,
           });
@@ -385,6 +392,7 @@ export class FileJSONSetValidator extends JSONSetValidator {
           results.push({
             filename: '',
             path: statement.name,
+            statement,
             constraint: 'take',
             message: `Only ${statement.take} files may meet the constraints.`,
           });
@@ -400,6 +408,7 @@ export class FileJSONSetValidator extends JSONSetValidator {
           results.push({
             filename: '',
             path: statement.name,
+            statement,
             constraint: 'take',
             message: `Max. ${statement.take} files may meet the constraints.`,
           });

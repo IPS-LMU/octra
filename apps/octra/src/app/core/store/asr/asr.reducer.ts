@@ -8,6 +8,7 @@ import {
 } from './index';
 import { IDBActions } from '../idb/idb.actions';
 import { AuthenticationActions } from '../authentication';
+import { ApplicationActions } from '../application/application.actions';
 
 export const initialState: ASRState = {
   queue: {
@@ -59,9 +60,16 @@ function calculateStatistics(queue: ASRStateQueue) {
 
 export const reducer = createReducer(
   initialState,
+  on(
+    ApplicationActions.loadASRSettings.success,
+    (state: ASRState, { languageSettings }) => ({
+      ...state,
+      languageSettings,
+    })
+  ),
   on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
     ...state,
-    isEnabled
+    isEnabled,
   })),
   on(
     ASRActions.setASRMausLanguage.do,
@@ -110,7 +118,7 @@ export const reducer = createReducer(
     ...state,
     queue: {
       ...initialState.queue!,
-      status: ASRProcessStatus.STOPPED
+      status: ASRProcessStatus.STOPPED,
     },
   })),
   on(ASRActions.stopItemProcessing.do, (state: ASRState, { time }) => {

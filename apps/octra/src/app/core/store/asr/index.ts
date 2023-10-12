@@ -1,4 +1,4 @@
-import { ASRLanguage, ASRService } from '../../obj';
+import { ASRLanguage, ASRService, ASRSettings } from '../../obj';
 
 export interface ASRStateSettings {
   selectedLanguage?: string;
@@ -58,6 +58,7 @@ export interface ASRStateQueue {
 
 export interface ASRState {
   settings?: ASRStateSettings;
+  languageSettings?: ASRSettings;
   isEnabled?: boolean;
   queue?: ASRStateQueue;
 }

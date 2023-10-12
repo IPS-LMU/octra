@@ -24,7 +24,6 @@
     </div>
     <octra-asr-options
       *ngIf="asrStoreService.asrEnabled$ | async"
-      [asrSettings]="settingsService.appSettings.octra.plugins!.asr!"
       [audioChunk]="audiochunk"
       [enabled]="editor.rawText === ''"
     ></octra-asr-options>

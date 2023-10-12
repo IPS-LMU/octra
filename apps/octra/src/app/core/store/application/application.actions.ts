@@ -6,7 +6,7 @@ import {
 } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../index';
-import { AppSettings } from '../../obj';
+import { AppSettings, ASRSettings } from '../../obj';
 import { HttpErrorResponse } from '@angular/common/http';
 
 const context = 'Application';
@@ -41,7 +41,7 @@ export class ApplicationActions {
         settings: AppSettings;
       }>(),
       success: props<{
-        settings: AppSettings;
+        languageSettings: ASRSettings;
       }>(),
       fail: props<{
         error: HttpErrorResponse;

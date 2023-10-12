@@ -1,7 +1,7 @@
 <div class="row justify-items-center align-middle align-items-center">
   <div class="col-auto">
     <label class="me-2"
-      for="dropdownMenuButton"
+           for="dropdownMenuButton"
     >
       ASR-{{ 'g.Language' | transloco }}:
     </label>
@@ -30,31 +30,29 @@
         class="dropdown-menu"
         aria-labelledby="dropdownMenuButton"
         style="padding: 5px; height: 300px; overflow-y: scroll"
+        (scroll)="onScroll()"
       >
-        <p style="font-size: 0.9em; text-align: center">
+        <p style="font-size: 0.85rem; text-align: center">
           {{ 'asr.click on logo' | transloco }}
         </p>
         <table class="table table-hover languageTable">
-          <thead>
+          <thead class="text-secondary">
           <tr>
             <th>{{ 'g.Language' | transloco }}</th>
             <th>{{ 'g.Service Provider' | transloco }}</th>
+            <th>{{ 'g.free quota' | transloco }}</th>
           </tr>
           </thead>
           <tbody>
-          <tr>
-            <td (click)="onASRLangChanged()" colspan="2">
+          <tr [ngClass]="{
+              'selected': (asrStoreService.asrOptions$|async)?.selectedLanguage === undefined || (asrStoreService.asrOptions$|async)?.selectedLanguage === ''
+            }">
+            <td (click)="onASRLangChanged()" colspan="3" class="text-center">
               {{ 'asr.without asr' | transloco }}
             </td>
           </tr>
-          <ng-container
-            *ngFor="
-              let lang of asrSettings.languages;
-              let i = index
-            "
-          >
-            <tr
-              [ngClass]="{
+          <ng-container *ngIf="languageSettings !== undefined">
+            <tr *ngFor="let lang of languageSettings!.languages; let i = index" [ngClass]="{
               selected:
                 (asrStoreService.asrOptions$|async)?.selectedLanguage === lang.code &&
                 (asrStoreService.asrOptions$|async)?.selectedService === lang.asr
@@ -78,7 +76,8 @@
               </td>
               <td class="col-asr">
                 <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
-                     [ngbPopover]="asrDescription" popoverTitle="Service information"/>
+                     [ngbPopover]="asrDescription" [container]="'body'" [autoClose]="true"
+                     [disablePopover]="disablePopovers" popoverTitle="Service information" />
 
                 <ng-template #asrDescription>
                   <table class="table table-sm table-borderless">

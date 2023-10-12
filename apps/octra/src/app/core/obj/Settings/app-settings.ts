@@ -80,6 +80,7 @@ export interface ASRService {
   maxSignalSize?: number;
   quotaPerMonth?: number;
   knownIssues?: string;
+  usedQuota?: number;
   type: string;
   termsURL: string;
   dataStoragePolicy: string;
@@ -94,4 +95,6 @@ export interface ASRSettings {
   services: ASRService[];
   languages: ASRLanguage[];
   asrInfoURL?: string;
+  basConfigURL?: string;
+  asrQuotaInfoURL?: string;
 }

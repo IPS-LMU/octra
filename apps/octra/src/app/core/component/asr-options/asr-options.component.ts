@@ -27,12 +27,15 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
     allSegmentsNext: false,
   };
 
-  @Input() asrSettings!: ASRSettings;
   @Input() audioChunk?: AudioChunk;
   @Input() enabled = true;
   @ViewChild('dropdown', { static: true }) dropdown!: NgbDropdown;
   @ViewChild('dropdown2', { static: true }) dropdown2!: NgbDropdown;
   @ViewChild('pop', { static: true }) pop!: NgbPopover;
+
+  languageSettings?: ASRSettings;
+
+  disablePopovers = false;
 
   public get manualURL(): string {
     return AppInfo.manualURL;
@@ -49,9 +52,18 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   }
 
   ngOnInit() {
-    for (const provider of this.asrSettings.services) {
-      this.serviceProviders['' + provider.provider] = provider;
-    }
+    this.subscrManager.add(
+      this.asrStoreService.languageSettings$.subscribe({
+        next: (settings) => {
+          this.languageSettings = settings;
+          if (settings) {
+            for (const provider of settings.services) {
+              this.serviceProviders['' + provider.provider] = provider;
+            }
+          }
+        },
+      })
+    );
   }
 
   getShortCode(code: string) {
@@ -246,5 +258,12 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
       }
     }
     return '';
+  }
+
+  onScroll() {
+    this.disablePopovers = true;
+    setTimeout(() => {
+      this.disablePopovers = false;
+    }, 50);
   }
 }

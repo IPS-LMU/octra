@@ -8,6 +8,7 @@ import {
   catchError,
   exhaustMap,
   forkJoin,
+  from,
   map,
   of,
   Subject,
@@ -25,7 +26,7 @@ import {
   BugReportService,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
-import { AppSettings } from '../../obj';
+import { AppSettings, ASRSettings } from '../../obj';
 import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { SettingsService } from '../../shared/service';
@@ -38,6 +39,8 @@ import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
 import { environment } from '../../../../environments/environment';
 import { findElements, getAttr } from '@octra/web-media';
+import X2JS from 'x2js';
+import { isNumber } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
@@ -122,19 +125,16 @@ export class ApplicationEffects {
             .pipe(
               map((result) => {
                 if (!settings.octra.plugins?.asr?.services) {
-                  return ApplicationActions.loadSettings.fail({
-                    error:
-                      'Missing asr.services property in application settings.',
-                  });
+                  throw new Error(
+                    'Missing asr.services property in application settings.'
+                  );
                 }
 
-                const document = new DOMParser().parseFromString(
+                const doc = new DOMParser().parseFromString(
                   result,
                   'text/html'
                 );
-                const basTable = document.getElementById(
-                  '#bas-asr-service-table'
-                );
+                const basTable = doc.getElementById('bas-asr-service-table');
                 const basASRInfoContainers = findElements(
                   basTable!,
                   '.bas-asr-info-container'
@@ -240,12 +240,22 @@ export class ApplicationEffects {
                 }
 
                 // overwrite data of config
-                for (const service of settings.octra.plugins.asr.services) {
+                const asrSettings = JSON.parse(
+                  JSON.stringify(settings.octra.plugins.asr)
+                );
+
+                for (let i = 0; i < asrSettings.services.length; i++) {
+                  const service = asrSettings.services[i];
+
                   if (service.basName !== undefined) {
                     const basInfo = asrInfos.find(
                       (a) => a.name === service.basName
                     );
+
                     if (basInfo !== undefined) {
+                      console.log(`info for asr provider ${basInfo?.name} is `);
+                      console.log(settings.octra.plugins.asr);
+
                       service.dataStoragePolicy =
                         basInfo.dataStoragePolicy !== undefined
                           ? basInfo.dataStoragePolicy
@@ -279,9 +289,26 @@ export class ApplicationEffects {
                   }
                 }
 
-                return ApplicationActions.loadASRSettings.success({
-                  settings,
-                });
+                return asrSettings as ASRSettings;
+              }),
+              exhaustMap((asrSettings) => {
+                return from(this.updateASRQuotaInfo(asrSettings)).pipe(
+                  exhaustMap((settings) => {
+                    return of(
+                      ApplicationActions.loadASRSettings.success({
+                        languageSettings: settings,
+                      })
+                    );
+                  })
+                );
+              }),
+              catchError((error) => {
+                console.error(error);
+                return of(
+                  ApplicationActions.loadASRSettings.fail({
+                    error,
+                  })
+                );
               })
             );
         } else {
@@ -295,10 +322,104 @@ export class ApplicationEffects {
     )
   );
 
+  public async updateASRQuotaInfo(
+    asrSettings: ASRSettings
+  ): Promise<ASRSettings> {
+    const results = [];
+    if (asrSettings?.services) {
+      for (const service of asrSettings.services) {
+        if (service.type === 'ASR' && asrSettings.asrQuotaInfoURL) {
+          results.push(
+            await this.getASRQuotaInfo(
+              asrSettings.asrQuotaInfoURL,
+              service.provider
+            )
+          );
+        }
+      }
+
+      for (const result of results) {
+        const serviceIndex = asrSettings.services.findIndex(
+          (a) => a.provider === result.asrName
+        );
+
+        if (serviceIndex > -1) {
+          asrSettings.services[serviceIndex].usedQuota = result.usedQuota;
+          asrSettings.services[serviceIndex].quotaPerMonth =
+            result.monthlyQuota;
+        } else {
+          console.error(`could not find ${result.asrName}`);
+        }
+      }
+    }
+
+    return asrSettings;
+  }
+
+  getASRQuotaInfo(url: string, asrName: string) {
+    return new Promise<{
+      asrName: string;
+      monthlyQuota?: number;
+      usedQuota?: number;
+    }>((resolve, reject) => {
+      this.http
+        .get(`${url}?ASRType=call${asrName}ASR`, { responseType: 'text' })
+        .subscribe((result) => {
+          const x2js = new X2JS();
+          const response: any = x2js.xml2js(result);
+          const asrQuotaInfo: {
+            asrName: string;
+            monthlyQuota?: number;
+            usedQuota?: number;
+          } = {
+            asrName,
+          };
+
+          if (response.basQuota) {
+            const info = {
+              monthlyQuota:
+                response.basQuota &&
+                response.basQuota.monthlyQuota &&
+                isNumber(response.basQuota.monthlyQuota)
+                  ? Number(response.basQuota.monthlyQuota)
+                  : null,
+              secsAvailable:
+                response.basQuota &&
+                response.basQuota.secsAvailable &&
+                isNumber(response.basQuota.secsAvailable)
+                  ? Number(response.basQuota.secsAvailable)
+                  : null,
+            };
+
+            if (info.monthlyQuota && info.monthlyQuota !== 999999) {
+              asrQuotaInfo.monthlyQuota = info.monthlyQuota;
+            }
+
+            if (
+              info.monthlyQuota &&
+              info.secsAvailable !== undefined &&
+              info.secsAvailable !== null &&
+              info.secsAvailable !== 999999
+            ) {
+              asrQuotaInfo.usedQuota = info.monthlyQuota - info.secsAvailable;
+            }
+          }
+
+          resolve(asrQuotaInfo);
+        });
+    });
+  }
+
   settingsLoaded$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationActions.loadSettings.success),
       exhaustMap((a) => {
+        this.store.dispatch(
+          ApplicationActions.loadASRSettings.do({
+            settings: a.settings,
+          })
+        );
+
         // set language
         const language = this.localStorage.retrieve('language');
         this.transloco.setAvailableLangs(a.settings.octra.languages);

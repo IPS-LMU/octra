@@ -21,6 +21,7 @@ export class AsrStoreService {
   }
 
   queue$ = this.store.select((state) => state.asr.queue);
+  languageSettings$ = this.store.select((state) => state.asr.languageSettings);
   asrEnabled$ = this.store.select((state) => state.asr.isEnabled);
   itemChange$ = this.actions$.pipe(
     ofType(

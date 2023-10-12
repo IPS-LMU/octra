@@ -122,7 +122,8 @@
     "last name": "Last name",
     "username": "Username",
     "locale": "Language",
-    "timezone": "Timezone"
+    "timezone": "Timezone",
+    "free quota": "Free Quota"
   },
   "p": {
     "username or email": "Username or E-Mail",

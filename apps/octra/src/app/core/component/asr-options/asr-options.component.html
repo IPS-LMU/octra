@@ -1,14 +1,10 @@
-<div class="row justify-items-center align-middle align-items-center">
-  <div class="col-auto">
-    <label class="me-2"
-           for="dropdownMenuButton"
-    >
-      ASR-{{ 'g.Language' | transloco }}:
-    </label>
-    <div #dropdown="ngbDropdown" ngbDropdown class="btn-group dropend" (mousemove)="onMouseMove()"
+<div class="row justify-items-center align-middle align-items-center g-0">
+  <div class="col-auto justify-items-center align-middle align-items-center pe-2">
+    <span style="margin-top: 3px; display: inline-block; margin-right: 5px;">ASR-{{ 'g.Language' | transloco }}:</span>
+    <div #dropdown="ngbDropdown" ngbDropdown class="btn-group dropend" style="float:right;" (mousemove)="onMouseMove()"
          (mouseleave)="onMouseOut();">
       <button
-        class="btn btn-info dropdown-toggle"
+        class="btn btn-outline-secondary btn-sm dropdown-toggle"
         type="button"
         id="dropdownMenuButton"
         aria-expanded="false"
@@ -176,13 +172,55 @@
       </div>
     </div>
   </div>
-  <div class="col-auto align-middle">
-    <label
-      for="dropdownMenuButton2"
-      class="me-2"
+  <div class="col-auto ps-2 justify-content-center justify-items-center align-middle"
+       style="border-left:1px solid rgb(128,128,128);">
+    <span for="dropdownMenuButton3" style="float:left; margin-top:3px;">MAUS
+      - {{"g.Language" | transloco}}
+      : </span>
+    <div
+      #dropdown3
+      ngbDropdown
+      class="btn-group dropend"
+      style="margin-left: 10px; float:left;"
+      (mousemove)="onMouseMove()"
+      (mouseleave)="onMouseOut();"
     >
-      {{ 'g.SELECT ACTION' | transloco }}
-    </label>
+      <button
+        [disabled]="!(asrStoreService.asrOptions$|async)?.selectedLanguage"
+        class="btn btn-outline-secondary btn-sm dropdown-toggle"
+        type="button"
+        id="dropdownMenuButton3"
+        aria-expanded="false"
+        ngbDropdownToggle
+      >
+        <ng-container *ngIf="asrStoreService.asrOptions?.selectedMausLanguage === null; else mausAllSet">
+          Nothing selected
+        </ng-container>
+        <ng-template #mausAllSet>
+          {{asrStoreService.asrOptions?.selectedMausLanguage}}
+        </ng-template>
+      </button>
+      <div
+        ngbDropdownMenu
+        class="dropdown-menu"
+        aria-labelledby="dropdownMenuButton"
+        style="padding: 5px; max-height:400px;overflow-y: auto;"
+      >
+        <li *ngFor="let language of asrStoreService.mausLanguages$ | async"
+            (click)="onMAUSLangChanged(language.description, language.value)">
+        <span class="dropdown-item"
+              style="padding:5px 5px; min-height: 0.85rem; font-size:0.8rem; cursor: pointer;">
+          {{language.description}}
+        </span>
+        </li>
+      </div>
+    </div>
+    <a [href]="manualURL + 'using-asr'" style="margin-left: 10px; float: left;" target="_blank">
+      <i class="bi bi-question-circle-fill fs-5"></i>
+    </a>
+  </div>
+
+  <div class="col-auto align-middle justify-items-center ps-2">
     <div
       #dropdown2
       ngbDropdown
@@ -193,22 +231,13 @@
     >
       <button
         [disabled]="!(asrStoreService.asrOptions$|async)?.selectedLanguage"
-        class="btn btn-info dropdown-toggle"
+        class="btn btn-primary btn-sm dropdown-toggle"
         type="button"
         id="dropdownMenuButton2"
         aria-expanded="false"
         ngbDropdownToggle
       >
-        <ng-container
-          *ngIf="!(asrStoreService.asrOptions$|async)?.selectedMausLanguage; else asrAllSet"
-        >
-          {{ 'asr.without asr' | transloco }}
-        </ng-container>
-        <ng-template #asrAllSet>
-          {{ (asrStoreService.asrOptions$|async)?.selectedMausLanguage }} ({{
-          (asrStoreService.asrOptions$|async)?.selectedMausLanguage
-          }})
-        </ng-template>
+        {{ 'g.SELECT ACTION' | transloco }}
       </button>
       <div
         ngbDropdownMenu
@@ -248,38 +277,5 @@
         </ng-container>
       </div>
     </div>
-    <a [href]="manualURL + 'using-asr'" style="margin-left: 10px" target="_blank">
-      <i class="bi bi-question-circle-fill fs-5"></i>
-    </a>
-  </div> <!--
-  <div id="dropdown-button3" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
-       (mouseleave)="onMouseOut();"
-       [insideClick]="true" #dropdown2="bs-dropdown"
-       style="border-left:1px solid lightgray;padding-left:10px; margin-left:10px;">
-    <label for="button-basic3" style="vertical-align: middle;margin-right:10px;">MAUS
-      - {{"general.Language" | transloco}}
-      : </label>
-    <button id="button-basic3" dropdownToggle type="button"
-            class="btn btn-outline-secondary btn-sm dropdown-toggle"
-            aria-controls="dropdown-basic3">
-      <ng-container *ngIf="asrService.selectedMAUSLanguage === null || asrService.selectedMAUSLanguage.code === null; else mausAllSet">
-        Nothing selected
-      </ng-container>
-      <ng-template #mausAllSet>
-        {{asrService.selectedMAUSLanguage.language}}
-      </ng-template>
-      <span class="caret"></span>
-    </button>
-    <ul id="dropdown-basic3" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
-        (mouseleave)="onMouseOut();"
-        role="menu" aria-labelledby="button-basic3" style="padding:5px;height:300px;overflow-y: auto;">
-      <li *ngFor="let language of asrService.allowedMAUSLanguages"
-          (click)="onMAUSLangChanged(language.label, language.code)">
-        <span class="dropdown-item"
-              style="padding:5px 5px; min-height: 0.85rem; font-size:0.8rem; cursor: pointer;">
-          {{language.label}}
-        </span>
-      </li>
-    </ul>
-  </div> -->
+  </div>
 </div>

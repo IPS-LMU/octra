@@ -42,6 +42,10 @@ export class ApplicationActions {
       }>(),
       success: props<{
         languageSettings: ASRSettings;
+        mausLanguages: {
+          value: string;
+          description: string;
+        }[];
       }>(),
       fail: props<{
         error: HttpErrorResponse;

@@ -94,6 +94,7 @@ export class AsrEffects {
               id: state.asr.queue.idCounter + 1,
               selectedASRInfo: asrInfo,
               selectedLanguage: asrLanguage,
+              selectedMausLanguage: state.asr.settings?.selectedMausLanguage,
               status: ASRProcessStatus.IDLE,
               progress: 0,
               time: action.item.timeInterval,
@@ -474,6 +475,7 @@ export class AsrEffects {
       withLatestFrom(this.store),
       mergeMap(([{ item, audioURL, transcriptURL }, state]) => {
         return this.callMAUS(
+          item.selectedMausLanguage,
           item.selectedLanguage,
           audioURL,
           transcriptURL,
@@ -905,6 +907,7 @@ export class AsrEffects {
   }
 
   private callMAUS(
+    mausLanguage: string | undefined,
     languageObject: ASRLanguage,
     audioURL: string,
     transcriptURL: string,
@@ -918,7 +921,7 @@ export class AsrEffects {
       .replace('{{audioURL}}', audioURL)
       .replace('{{transcriptURL}}', transcriptURL)
       .replace('{{asrType}}', languageObject.asr)
-      .replace('{{language}}', languageObject.code);
+      .replace('{{language}}', mausLanguage ?? languageObject.code);
 
     const info = FileInfo.fromURL(mausURL);
     return this.http

@@ -10,6 +10,7 @@ import {
   forkJoin,
   from,
   map,
+  Observable,
   of,
   Subject,
   tap,
@@ -292,11 +293,20 @@ export class ApplicationEffects {
                 return asrSettings as ASRSettings;
               }),
               exhaustMap((asrSettings) => {
-                return from(this.updateASRQuotaInfo(asrSettings)).pipe(
-                  exhaustMap((settings) => {
+                return forkJoin([
+                  from(this.updateASRQuotaInfo(asrSettings)),
+                  this.getMAUSLanguages(asrSettings),
+                ]).pipe(
+                  exhaustMap(([setttings, mausLanguages]) => {
                     return of(
                       ApplicationActions.loadASRSettings.success({
-                        languageSettings: settings,
+                        languageSettings: setttings,
+                        mausLanguages: mausLanguages
+                          ?.filter((a) => a.ParameterValue.Description !== '')
+                          .map((a) => ({
+                            value: a.ParameterValue.Value,
+                            description: a.ParameterValue.Description,
+                          })),
                       })
                     );
                   })
@@ -408,6 +418,25 @@ export class ApplicationEffects {
           resolve(asrQuotaInfo);
         });
     });
+  }
+
+  public getMAUSLanguages(asrSettings?: ASRSettings): Observable<
+    {
+      ParameterValue: { Value: string; Description: string };
+    }[]
+  > {
+    if (asrSettings?.basConfigURL) {
+      return this.http.get<
+        {
+          ParameterValue: { Value: string; Description: string };
+        }[]
+      >(
+        `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runPipeline/Input/LANGUAGE/Values/`,
+        { responseType: 'json' }
+      );
+    } else {
+      return of([]);
+    }
   }
 
   settingsLoaded$ = createEffect(() =>

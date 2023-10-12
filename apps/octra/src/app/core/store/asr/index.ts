@@ -32,6 +32,7 @@ export interface ASRTimeInterval {
 export interface ASRStateQueueItem {
   id: number;
   time: ASRTimeInterval;
+  selectedMausLanguage?: string;
   selectedLanguage: ASRLanguage;
   selectedASRInfo: ASRService;
   type: ASRQueueItemType;
@@ -59,6 +60,10 @@ export interface ASRStateQueue {
 export interface ASRState {
   settings?: ASRStateSettings;
   languageSettings?: ASRSettings;
+  mausLanguages?: {
+    value: string;
+    description: string;
+  }[];
   isEnabled?: boolean;
   queue?: ASRStateQueue;
 }

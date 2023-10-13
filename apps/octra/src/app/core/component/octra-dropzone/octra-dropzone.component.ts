@@ -277,14 +277,6 @@ export class OctraDropzoneComponent extends DefaultComponent {
                       error: '',
                     };
                     this._files.push(audioProcess);
-                    // TODO bundle file check
-                    /* this.decodeArrayBuffer(importResult.audiofile.arraybuffer, audioProcess, false).then(
-                      () => {
-                        setAnnotation();
-                      }
-                    ).catch((err) => {
-                      console.error(err);
-                    }); */
                   } else {
                     setAnnotation();
                   }

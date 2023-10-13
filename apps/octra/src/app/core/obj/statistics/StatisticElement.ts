@@ -10,22 +10,23 @@ export class StatisticElem {
     type: undefined,
     context: undefined,
     value: undefined,
+    audioSelection: undefined,
   };
 
-  get selection(): SampleInterval {
-    return this.data.selection;
+  get audioSelection(): SampleInterval {
+    return this.data.audioSelection;
   }
 
-  set selection(value: SampleInterval) {
-    this.data.selection = value;
+  set audioSelection(value: SampleInterval) {
+    this.data.audioSelection = value;
   }
 
-  get segment(): SampleInterval {
-    return this.data.segment;
+  get transcriptionUnit(): SampleInterval {
+    return this.data.transcriptionUnit;
   }
 
-  set segment(value: SampleInterval) {
-    this.data.segment = value;
+  set transcriptionUnit(value: SampleInterval) {
+    this.data.transcriptionUnit = value;
   }
 
   get value(): any {
@@ -52,8 +53,8 @@ export class StatisticElem {
     return this.data.playpos;
   }
 
-  get caretpos(): number {
-    return this.data.caretpos;
+  get textSelection(): { start?: number; end?: number } | undefined {
+    return this.data.textSelection;
   }
 
   constructor(
@@ -61,19 +62,19 @@ export class StatisticElem {
     context: string,
     value: any,
     timestamp: number,
-    playpos: number,
-    selection: SampleInterval,
-    segment: SampleInterval
+    playpos?: number,
+    audioSelection?: SampleInterval,
+    transcriptionUnit?: SampleInterval
   ) {
     this.data.type = type;
     this.data.context = context;
     this.data.timestamp = timestamp;
     this.data.value = value;
-    if (!(playpos === undefined || playpos === undefined)) {
+    if (!(playpos === undefined || playpos === null)) {
       this.data.playpos = playpos;
     }
-    this.data.selection = selection;
-    this.data.segment = segment;
+    this.data.audioSelection = audioSelection;
+    this.data.transcriptionUnit = transcriptionUnit;
   }
 
   public static fromAny(elem: ILog): StatisticElem {
@@ -83,8 +84,8 @@ export class StatisticElem {
       timestamp: undefined,
       type: undefined,
       playpos: undefined,
-      selection: undefined,
-      segment: undefined,
+      audioSelection: undefined,
+      transcriptionUnit: undefined,
     };
 
     for (const [name, value] of getProperties(elem)) {
@@ -95,7 +96,7 @@ export class StatisticElem {
         hasProperty(elem, 'type') ||
         hasProperty(elem, 'playpos') ||
         hasProperty(elem, 'playerpos') ||
-        hasProperty(elem, 'cursorpos')
+        hasProperty(elem, 'textSelection')
       ) {
         if (name === 'playerpos') {
           result.playpos = value;
@@ -110,9 +111,9 @@ export class StatisticElem {
       result.context!,
       result.value,
       result.timestamp!,
-      result.playpos!,
-      result.selection!,
-      result.segment!
+      result.playpos,
+      result.audioSelection,
+      result.transcriptionUnit
     );
   }
 

@@ -345,7 +345,7 @@ export class AnnotationStoreService {
    * destroys audio service and transcr service. Call this after quit.
    * @param destroyaudio
    */
-  public endTranscription = (destroyaudio: boolean = true) => {
+  public endTranscription = (destroyaudio = true) => {
     this.audio.destroy(destroyaudio);
   };
 
@@ -446,9 +446,9 @@ export class AnnotationStoreService {
           elem.context,
           '',
           elem.playpos,
-          elem.caretpos,
-          elem.selection,
-          elem.segment
+          elem.textSelection,
+          elem.audioSelection,
+          elem.transcriptionUnit
         );
 
         if (elem instanceof MouseStatisticElem) {

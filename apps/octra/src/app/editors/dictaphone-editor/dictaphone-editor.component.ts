@@ -265,7 +265,7 @@ export class DictaphoneEditorComponent
       { value: event.type },
       event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'audio_buttons'
@@ -279,7 +279,7 @@ export class DictaphoneEditorComponent
       event,
       event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'audio_speed'
@@ -293,7 +293,7 @@ export class DictaphoneEditorComponent
       event,
       event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'audio_volume'
@@ -327,7 +327,7 @@ export class DictaphoneEditorComponent
       shortcutObj,
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'texteditor'
@@ -377,7 +377,7 @@ export class DictaphoneEditorComponent
       { value: 'boundaries:add' },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'texteditor'
@@ -390,7 +390,7 @@ export class DictaphoneEditorComponent
       { value: 'markers:' + markerCode },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'texteditor'
@@ -405,7 +405,7 @@ export class DictaphoneEditorComponent
       { value: markerCode },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'texteditor_toolbar'

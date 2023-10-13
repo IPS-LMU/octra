@@ -13,7 +13,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "lib",
+            "prefix": "octra",
             "style": "camelCase"
           }
         ],
@@ -21,7 +21,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "lib",
+            "prefix": "octra",
             "style": "kebab-case"
           }
         ]

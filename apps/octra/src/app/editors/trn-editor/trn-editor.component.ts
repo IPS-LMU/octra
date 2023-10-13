@@ -1324,14 +1324,14 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj: any, caretPos = -1) => {
+    const triggerUIAction = (shortcutObj: any, textSelection?: {start?: number; end?: number}) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',
         shortcutObj,
         Date.now(),
         this.audioManager.playPosition,
-        caretPos,
+        textSelection,
         undefined,
         undefined,
         'texteditor'

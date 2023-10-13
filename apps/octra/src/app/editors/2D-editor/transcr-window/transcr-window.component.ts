@@ -601,7 +601,7 @@ export class TranscrWindowComponent
       },
       Date.now(),
       this.loupe.av.PlayCursor!.timePos,
-      -1,
+      undefined,
       undefined,
       {
         start: startSample,
@@ -638,9 +638,8 @@ export class TranscrWindowComponent
       if (
         this.editor.html.indexOf(
           '<img src="assets/img/components/transcr-editor/boundary.png"'
-        ) > -1
+        ) < 0
       ) {
-      } else {
         // no boundaries inserted
         const segment =
           this.annotationStoreService.currentLevel?.items[
@@ -703,7 +702,7 @@ export class TranscrWindowComponent
         { value: event.type },
         event.timestamp,
         this.audioManager.playPosition,
-        this.editor.caretpos,
+        this.editor.textSelection,
         selection,
         segment,
         'audio_buttons'
@@ -784,7 +783,7 @@ export class TranscrWindowComponent
             { value: valueString },
             Date.now(),
             this.audioManager.playPosition,
-            this.editor.caretpos,
+            this.editor.textSelection,
             undefined,
             {
               start,
@@ -835,40 +834,52 @@ export class TranscrWindowComponent
   }
 
   triggerUIAction($event: AudioViewerShortcutEvent) {
-    const segment = {
-      start: -1,
-      length: 0,
-    };
+    let segment: any;
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.currentLevel!.items[
         this.segmentIndex
       ] as OctraAnnotationSegment;
-      segment.start = 0;
+
       if (this.segmentIndex > 0) {
-        segment.start = (
-          this.currentLevel!.items[
-            this.segmentIndex - 1
-          ] as OctraAnnotationSegment
-        ).time.samples;
+        segment = {
+          start: (
+            this.currentLevel!.items[
+              this.segmentIndex - 1
+            ] as OctraAnnotationSegment
+          ).time.samples,
+        };
+      } else {
+        segment = {
+          start: 0,
+        };
       }
 
-      segment.length = annoSegment!.time.samples - segment.start;
-
-      segment.start = Math.round(segment.start);
-      segment.length = Math.round(segment.length);
+      segment = {
+        start: Math.round(segment.start),
+        length: Math.round(
+          annoSegment!.time.samples - Math.round(segment.start)
+        ),
+      };
     }
 
     let selection = undefined;
     if (
+      segment &&
       this.loupe.av.drawnSelection!.start.samples >= segment.start &&
       this.loupe.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
-      selection = {
-        start: this.loupe.av.drawnSelection!.start.samples,
-        length: this.loupe.av.drawnSelection!.duration.samples,
-      };
+      selection =
+        this.loupe.av.drawnSelection!.duration.samples > 0
+          ? {
+              start: this.loupe.av.drawnSelection!.start.samples,
+              length: this.loupe.av.drawnSelection!.duration.samples,
+            }
+          : {
+              start: this.loupe.audioChunk!.selection!.start.samples,
+              length: this.loupe.audioChunk!.selection!.end.samples,
+            };
     }
 
     this.uiService.addElementFromEvent(
@@ -876,7 +887,7 @@ export class TranscrWindowComponent
       $event,
       $event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       selection,
       segment,
       'loupe'
@@ -925,7 +936,7 @@ export class TranscrWindowComponent
       { value: markerCode },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       selection,
       segment,
       'markers'
@@ -974,7 +985,7 @@ export class TranscrWindowComponent
       { value: markerCode },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       selection,
       segment,
       'texteditor_toolbar'
@@ -1050,7 +1061,7 @@ export class TranscrWindowComponent
       event,
       event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       selection,
       segment,
       'audio_speed'
@@ -1108,7 +1119,7 @@ export class TranscrWindowComponent
       event,
       event.timestamp,
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       selection,
       segment,
       'audio_volume'
@@ -1140,7 +1151,7 @@ export class TranscrWindowComponent
       { value: 'boundaries:add' },
       Date.now(),
       this.audioManager.playPosition,
-      this.editor.caretpos,
+      this.editor.textSelection,
       undefined,
       undefined,
       'texteditor'
@@ -1276,4 +1287,8 @@ export class TranscrWindowComponent
   public onKeyUp() {
     this.appStorage.savingNeeded = true;
   }
+
+  onSelectionChange(
+    selectionEvent: { start?: number; end?: number } | undefined
+  ) {}
 }

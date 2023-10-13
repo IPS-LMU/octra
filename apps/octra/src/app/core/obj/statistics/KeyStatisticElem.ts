@@ -1,6 +1,6 @@
-import { StatisticElem } from './StatisticElement';
-import { ILog } from '../Settings/logging';
-import { getProperties, hasProperty } from '@octra/utilities';
+import { StatisticElem } from "./StatisticElement";
+import { ILog, SampleInterval } from "../Settings/logging";
+import { getProperties, hasProperty } from "@octra/utilities";
 
 /***
  * Statistic Element Class
@@ -15,27 +15,24 @@ export class KeyStatisticElem extends StatisticElem {
     name: string,
     value: any,
     timestamp: number,
-    playpos: number,
-    caretpos: number,
-    selection: {
-      start: number;
-      length: number;
+    playpos?: number,
+    textSelection?: {
+      start?: number;
+      end?: number;
     },
-    segment: {
-      start: number;
-      length: number;
-    }
+    audioSelection?: SampleInterval,
+    transcriptionUnit?: SampleInterval
   ) {
-    super(type, name, value, timestamp, playpos, selection, segment);
+    super(type, name, value, timestamp, playpos, audioSelection, transcriptionUnit);
     this.data = {
       timestamp,
       type,
       context: name,
       value,
       playpos,
-      caretpos,
-      selection,
-      segment,
+      textSelection,
+      audioSelection,
+      transcriptionUnit,
     };
   }
 
@@ -45,10 +42,10 @@ export class KeyStatisticElem extends StatisticElem {
       context: undefined,
       timestamp: undefined,
       type: undefined,
-      playpos: -1,
-      caretpos: -1,
-      selection: undefined,
-      segment: undefined,
+      playpos: undefined,
+      textSelection: undefined,
+      audioSelection: undefined,
+      transcriptionUnit: undefined,
     };
 
     for (const [name] of getProperties(elem)) {
@@ -64,7 +61,7 @@ export class KeyStatisticElem extends StatisticElem {
         hasProperty(elem, 'char') ||
         hasProperty(elem, 'playpos') ||
         hasProperty(elem, 'playerpos') ||
-        hasProperty(elem, 'caretpos') ||
+        hasProperty(elem, 'textSelection') ||
         hasProperty(elem, 'control')
       ) {
         if (name === 'playerpos') {
@@ -81,9 +78,9 @@ export class KeyStatisticElem extends StatisticElem {
       result.value,
       result.timestamp!,
       result.playpos,
-      result.caretpos,
-      result.selection!,
-      result.segment!
+      result.textSelection,
+      result.audioSelection,
+      result.transcriptionUnit
     );
   }
 }

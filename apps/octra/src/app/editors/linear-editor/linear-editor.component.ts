@@ -47,6 +47,7 @@ import {
 } from '@octra/web-media';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
+import { SampleInterval } from '../../core/obj/Settings/logging';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -579,7 +580,7 @@ export class LinearEditorComponent
 
   onButtonClick(event: { type: string; timestamp: number }) {
     // only top signal display
-    const caretpos = this.editor.caretpos;
+    const caretpos = this.editor.textSelection;
     this.uiService.addElementFromEvent(
       'mouseclick',
       { value: event.type },
@@ -699,7 +700,7 @@ export class LinearEditorComponent
         },
         Date.now(),
         this.audioManager.playPosition,
-        -1,
+        undefined,
         undefined,
         {
           start,
@@ -758,7 +759,7 @@ export class LinearEditorComponent
           )
         )
       ) {
-        const caretpos = this.editor.caretpos;
+        const textSelection = this.editor.textSelection;
         $event.value = $event.type + ':' + $event.value;
 
         let segment = undefined;
@@ -784,15 +785,14 @@ export class LinearEditorComponent
           };
         }
 
-        const selection = {
-          start: -1,
-          length: 0,
-        };
+        let audioSelection: SampleInterval | undefined = undefined;
 
         let playPosition = component!.audioChunk!.absolutePlayposition;
 
-        selection.start = component!.av.drawnSelection!.start.samples;
-        selection.length = component!.av.drawnSelection!.duration.samples;
+        audioSelection = {
+          start: component!.av.drawnSelection!.start.samples,
+          length: component!.av.drawnSelection!.duration.samples,
+        };
 
         if (!component!.audioChunk!.isPlaying) {
           if ($event.type === 'boundary') {
@@ -805,8 +805,8 @@ export class LinearEditorComponent
           $event,
           timestamp,
           playPosition,
-          caretpos,
-          selection,
+          textSelection,
+          audioSelection,
           segment,
           control
         );
@@ -877,7 +877,7 @@ export class LinearEditorComponent
         { value: markerCode },
         Date.now(),
         this.audioManager.playPosition,
-        this.editor.caretpos,
+        this.editor.textSelection,
         undefined,
         segment,
         'texteditor_markers'
@@ -917,7 +917,7 @@ export class LinearEditorComponent
         { value: markerCode },
         Date.now(),
         this.audioManager.playPosition,
-        this.editor.caretpos,
+        this.editor.textSelection,
         undefined,
         segment,
         'texteditor_toolbar'
@@ -983,7 +983,7 @@ export class LinearEditorComponent
         event,
         event.timestamp,
         this.audioManager.playPosition,
-        this.editor.caretpos,
+        this.editor.textSelection,
         undefined,
         segment,
         'audio_speed'
@@ -1022,7 +1022,7 @@ export class LinearEditorComponent
         event,
         event.timestamp,
         this.audioManager.playPosition,
-        this.editor.caretpos,
+        this.editor.textSelection,
         undefined,
         segment,
         'audio_volume'

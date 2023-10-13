@@ -1,6 +1,6 @@
-import { StatisticElem } from './StatisticElement';
-import { ILog } from '../Settings/logging';
-import { getProperties, hasProperty } from '@octra/utilities';
+import { StatisticElem } from "./StatisticElement";
+import { ILog, SampleInterval } from "../Settings/logging";
+import { getProperties, hasProperty } from "@octra/utilities";
 
 /***
  * Statistic Element Class
@@ -11,18 +11,12 @@ export class MouseStatisticElem extends StatisticElem {
     name: string,
     value: string,
     timestamp: number,
-    playpos: number,
-    caretpos: number,
-    selection: {
-      start: number;
-      length: number;
-    },
-    segment: {
-      start: number;
-      length: number;
-    }
+    playpos?: number,
+    textSelection?: {start?: number; end?: number},
+    audioSelection?: SampleInterval,
+    transcriptionUnit?: SampleInterval
   ) {
-    super(type, name, value, timestamp, playpos, selection, segment);
+    super(type, name, value, timestamp, playpos, audioSelection, transcriptionUnit);
 
     this.data = {
       timestamp,
@@ -30,9 +24,9 @@ export class MouseStatisticElem extends StatisticElem {
       context: name,
       value,
       playpos,
-      caretpos,
-      selection,
-      segment,
+      textSelection,
+      audioSelection,
+      transcriptionUnit,
     };
   }
 
@@ -42,10 +36,10 @@ export class MouseStatisticElem extends StatisticElem {
       context: undefined,
       timestamp: undefined,
       type: undefined,
-      playpos: -1,
-      caretpos: -1,
-      selection: undefined,
-      segment: undefined,
+      playpos: undefined,
+      textSelection: undefined,
+      audioSelection: undefined,
+      transcriptionUnit: undefined,
     };
 
     for (const [name] of getProperties(elem)) {
@@ -56,8 +50,8 @@ export class MouseStatisticElem extends StatisticElem {
         hasProperty(elem, 'type') ||
         hasProperty(elem, 'playpos') ||
         hasProperty(elem, 'playerpos') ||
-        hasProperty(elem, 'caretpos') ||
-        hasProperty(elem, 'segment')
+        hasProperty(elem, 'textSelection') ||
+        hasProperty(elem, 'transcriptionUnit')
       ) {
         if (name === 'playerpos') {
           result.playpos = (elem as any)[`${name}`];
@@ -73,9 +67,9 @@ export class MouseStatisticElem extends StatisticElem {
       result.value!,
       result.timestamp!,
       result.playpos,
-      result.caretpos,
-      result.selection!,
-      result.segment!
+      result.textSelection,
+      result.audioSelection,
+      result.transcriptionUnit
     );
   }
 }

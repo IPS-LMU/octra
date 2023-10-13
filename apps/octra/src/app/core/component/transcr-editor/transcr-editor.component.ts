@@ -74,7 +74,8 @@ export class TranscrEditorComponent
   @Output() boundaryclicked: EventEmitter<SampleUnit> =
     new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
+  @Output() selectionchanged: EventEmitter<{ start?: number; end?: number } | undefined> =
+    new EventEmitter<{ start?: number; end?: number } | undefined>();
 
   @Input() visible = true;
   @Input() markers?: any[] = [];
@@ -184,12 +185,11 @@ export class TranscrEditorComponent
     this.highlightingEnabledChange.emit(value);
   }
 
-  public get caretpos(): number {
+  public get textSelection(): { start?: number; end?: number } | undefined {
     if (!this.focused) {
-      return -1;
+      return undefined;
     }
-    // TODO replace caret
-    return -1;
+    return this._textSelection;
   }
 
   get audioManager(): AudioManager {
@@ -233,14 +233,13 @@ export class TranscrEditorComponent
     this._isTyping = value;
   }
 
-  private _textSelection = {
+  private _textSelection: {
+    start: number;
+    end: number;
+  } = {
     start: 0,
     end: 0,
   };
-
-  get textSelection(): { start: number; end: number } {
-    return this._textSelection;
-  }
 
   private _rawText = '';
 
@@ -411,7 +410,7 @@ export class TranscrEditorComponent
             this.focused = false;
           },
           mouseup: () => {
-            this.selectionchanged.emit(this.caretpos);
+            this.selectionchanged.emit(this.textSelection);
           },
           afterInit: this.onAfterInit,
         },

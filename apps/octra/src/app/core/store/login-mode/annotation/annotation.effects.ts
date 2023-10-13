@@ -211,7 +211,7 @@ export class AnnotationEffects {
               { value: AppInfo.version },
               Date.now(),
               undefined,
-              -1,
+              undefined,
               undefined,
               undefined,
               'version'
@@ -432,12 +432,16 @@ export class AnnotationEffects {
                 )
               );
           } else {
-            return of(
-              AuthenticationActions.logout.do({
-                clearSession: a.clearSession,
-                mode: state.application.mode,
-              })
-            );
+            if (a.redirectToProjects) {
+              return of(AnnotationActions.redirectToProjects.do());
+            } else {
+              return of(
+                AuthenticationActions.logout.do({
+                  clearSession: a.clearSession,
+                  mode: state.application.mode,
+                })
+              );
+            }
           }
         } else {
           return of(
@@ -1331,7 +1335,7 @@ export class AnnotationEffects {
           { value: AppInfo.version },
           Date.now(),
           undefined,
-          -1,
+          undefined,
           undefined,
           undefined,
           'version'
@@ -1385,7 +1389,7 @@ export class AnnotationEffects {
             { value: 'changed' },
             Date.now(),
             this.audio.audioManager.createSampleUnit(0),
-            -1,
+            undefined,
             undefined,
             undefined,
             getModeState(state)?.transcript?.levels[action.currentLevelIndex]

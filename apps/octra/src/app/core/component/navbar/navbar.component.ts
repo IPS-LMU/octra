@@ -242,7 +242,11 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
       this.appStorage.snapshot.onlineMode.currentSession.currentProject
     ) {
-      this.annotationStoreService.quit(true, true, redirectToProjects); // TODO change
+      this.annotationStoreService.quit(
+        true,
+        !redirectToProjects,
+        redirectToProjects
+      );
     } else {
       this.appStorage.logout(true);
     }

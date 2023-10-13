@@ -20,9 +20,9 @@ export interface ILog {
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
   playpos?: number; // Samples
-  caretpos?: number; // Position des Cursors im// Text (wird Caret genannt)
-  selection?: SampleInterval;
-  segment?: SampleInterval;
+  textSelection?: {start?: number; end?: number}; // Position des Cursors im// Text (wird Caret genannt)
+  audioSelection?: SampleInterval;
+  transcriptionUnit?: SampleInterval;
 }
 
 export class OLogging implements ILogging {
@@ -65,42 +65,28 @@ export class OLog implements ILog {
   type: string;
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
-  playpos: number; // Samples
-  caretpos: number; // Position des Cursors im Text (wird Caret genannt)
-  selection: SampleInterval;
-  segment: SampleInterval;
+  playpos?: number; // Samples
+  textSelection?: {start?: number; end?: number}; // Position des Cursors im Text (wird Caret genannt)
+  audioSelection?: SampleInterval;
+  transcriptionUnit?: SampleInterval;
 
   constructor(
     timestamp: number,
     type: string,
     context: string,
     value: any,
-    playpos: number,
-    caretpos: number,
-    selection?: SampleInterval,
-    segment?: SampleInterval
+    playpos?: number,
+    textSelection?: {start?: number; end?: number},
+    audioSelection?: SampleInterval,
+    transcriptionUnit?: SampleInterval
   ) {
     this.timestamp = timestamp;
     this.type = type;
     this.context = context;
     this.value = value;
     this.playpos = playpos;
-    this.caretpos = caretpos;
-    this.selection = selection!;
-    this.segment = segment!;
-
-    if (selection === undefined) {
-      delete (this as any).selection;
-    }
-    if (segment === undefined) {
-      delete (this as any).segment;
-    }
-
-    if (caretpos < 0) {
-      delete (this as any).caretpos;
-    }
-    if (caretpos < 0) {
-      delete (this as any).caretpos;
-    }
+    this.textSelection = textSelection;
+    this.audioSelection = audioSelection;
+    this.transcriptionUnit = transcriptionUnit;
   }
 }

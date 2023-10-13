@@ -133,7 +133,7 @@ export class TranscriptionComponent
                 },
                 Date.now(),
                 this.audio.audiomanagers[0].playPosition,
-                -1,
+                undefined,
                 undefined,
                 undefined,
                 this.interface
@@ -147,7 +147,7 @@ export class TranscriptionComponent
                 },
                 Date.now(),
                 this.audio.audiomanagers[0].playPosition,
-                -1,
+                undefined,
                 undefined,
                 undefined,
                 this.interface
@@ -161,7 +161,7 @@ export class TranscriptionComponent
                 },
                 Date.now(),
                 this.audio.audiomanagers[0].playPosition,
-                -1,
+                undefined,
                 undefined,
                 undefined,
                 this.interface
@@ -355,13 +355,14 @@ export class TranscriptionComponent
       this.audioManager.statechange.subscribe({
         next: async (state) => {
           if (!appStorage.playonhover && !this.modalVisiblities.overview) {
-            let caretpos = -1;
+            let caretpos = undefined;
 
             if (
               this.currentEditor !== undefined &&
               (this.currentEditor.instance as any).editor !== undefined
             ) {
-              caretpos = (this.currentEditor.instance as any).editor.caretpos;
+              caretpos = (this.currentEditor.instance as any).editor
+                .textSelection;
             }
 
             if (this.appStorage.interface) {

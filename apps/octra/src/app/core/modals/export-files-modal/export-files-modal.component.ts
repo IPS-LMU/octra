@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 import { AppInfo } from '../../../app.info';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { HttpClient } from '@angular/common/http';
 import { timer } from 'rxjs';
 import {
   fadeInExpandOnEnterAnimation,
@@ -11,7 +10,6 @@ import {
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { NavbarService } from '../../component/navbar/navbar.service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
@@ -105,8 +103,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
-    private httpClient: HttpClient,
-    private appStorage: AppStorageService,
     private audio: AudioService,
     public annotationStoreService: AnnotationStoreService,
     protected override activeModal: NgbActiveModal
@@ -122,7 +118,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       },
       Date.now(),
       this.audio.audioManager.playPosition,
-      -1,
+      undefined,
       undefined,
       undefined,
       'modals'
@@ -145,7 +141,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       },
       Date.now(),
       this.audio.audiomanagers[0].playPosition,
-      -1,
+      undefined,
       undefined,
       undefined,
       'modals'

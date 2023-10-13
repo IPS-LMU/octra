@@ -607,7 +607,7 @@ export class TwoDEditorComponent
             },
             Date.now(),
             this.audioManager.playPosition,
-            -1,
+            undefined,
             undefined,
             {
               start: start.samples,
@@ -772,7 +772,7 @@ export class TwoDEditorComponent
               $event,
               $event.timestamp,
               this.audioManager.playPosition,
-              -1,
+              undefined,
               undefined,
               {
                 start: sampleStart,
@@ -886,7 +886,7 @@ export class TwoDEditorComponent
         selection = undefined;
       }
 
-      const caretpos = this.editor ? this.editor.caretpos : -1;
+      const textSelection = this.editor?.textSelection;
       let playPosition = this.audioManager.playPosition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
@@ -899,7 +899,7 @@ export class TwoDEditorComponent
         $event,
         $event.timestamp,
         playPosition,
-        caretpos,
+        textSelection,
         selection,
         undefined,
         'multi-lines-viewer'
@@ -916,13 +916,13 @@ export class TwoDEditorComponent
     this.appStorage.audioSpeed = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = this.editor ? this.editor.caretpos : -1;
+      const textSelection = this.editor?.textSelection;
       this.uiService.addElementFromEvent(
         'slider',
         event,
         event.timestamp,
         this.audioManager.playPosition,
-        caretpos,
+        textSelection,
         undefined,
         undefined,
         'audio_speed'
@@ -934,13 +934,13 @@ export class TwoDEditorComponent
     this.appStorage.audioVolume = event.new_value;
 
     if (this.appStorage.logging) {
-      const caretpos = this.editor ? this.editor.caretpos : -1;
+      const textSelection = this.editor?.textSelection;
       this.uiService.addElementFromEvent(
         'slider',
         event,
         event.timestamp,
         this.audioManager.playPosition,
-        caretpos,
+        textSelection,
         undefined,
         undefined,
         'audio_volume'
@@ -951,9 +951,9 @@ export class TwoDEditorComponent
   onButtonClick(event: { type: string; timestamp: number }) {
     this.selectedIndex = -1;
     if (this.appStorage.logging) {
-      const caretpos = this.editor ? this.editor.caretpos : -1;
+      const textSelection = this.editor?.textSelection;
 
-      const selection = {
+      const audioSelection = {
         start: this.viewer.av.drawnSelection!.start.samples,
         length: this.viewer.av.drawnSelection!.duration.samples,
       };
@@ -963,8 +963,8 @@ export class TwoDEditorComponent
         { value: 'click:' + event.type },
         event.timestamp,
         this.audioManager.playPosition,
-        caretpos,
-        selection,
+        textSelection,
+        audioSelection,
         undefined,
         'audio_buttons'
       );

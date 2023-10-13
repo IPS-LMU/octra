@@ -62,14 +62,14 @@ export class UserInteractionsService {
     event: any,
     timestamp: number,
     playpos: SampleUnit | undefined,
-    caretpos: number | undefined,
-    selection:
+    textSelection: { start?: number; end?: number } | undefined,
+    audioSelection:
       | {
           start: number;
           length: number;
         }
       | undefined,
-    segment:
+    transcriptionUnit:
       | {
           start: number;
           length: number;
@@ -79,7 +79,16 @@ export class UserInteractionsService {
     targetName?: string
   ) {
     this._lastAction = Date.now();
-    const originalPlayerPos = playpos !== undefined ? playpos.samples : -1;
+    const originalPlayerPos = playpos?.samples;
+    textSelection = textSelection
+      ? textSelection.end !== undefined &&
+        textSelection.start !== undefined &&
+        textSelection.end < textSelection.start
+        ? {
+            start: textSelection.start,
+          }
+        : textSelection
+      : undefined;
 
     if (this._enabled) {
       let name = '';
@@ -100,17 +109,17 @@ export class UserInteractionsService {
       } else {
         name = targetName;
       }
-      let elem = undefined;
+      let elem: StatisticElem | undefined = undefined;
       if (contains(type, 'key') || contains(type, 'shortcut')) {
         elem = new KeyStatisticElem(
           type,
           name,
           event.value,
           timestamp,
-          playpos !== undefined ? playpos.samples : -1,
-          caretpos!,
-          selection!,
-          segment!
+          playpos?.samples,
+          textSelection,
+          audioSelection,
+          transcriptionUnit
         );
       } else if (contains(type, 'mouse')) {
         elem = new MouseStatisticElem(
@@ -119,9 +128,9 @@ export class UserInteractionsService {
           event.value,
           timestamp,
           originalPlayerPos,
-          caretpos!,
-          selection!,
-          segment!
+          textSelection,
+          audioSelection,
+          transcriptionUnit
         );
       } else if (contains(type, 'slider')) {
         elem = new MouseStatisticElem(
@@ -130,9 +139,9 @@ export class UserInteractionsService {
           event.new_value,
           timestamp,
           originalPlayerPos,
-          caretpos!,
-          selection!,
-          segment!
+          textSelection,
+          audioSelection,
+          transcriptionUnit
         );
       } else {
         elem = new StatisticElem(
@@ -141,8 +150,8 @@ export class UserInteractionsService {
           event.value,
           timestamp,
           originalPlayerPos,
-          selection!,
-          segment!
+          audioSelection,
+          transcriptionUnit
         );
       }
 
@@ -155,7 +164,7 @@ export class UserInteractionsService {
           elem.context,
           '',
           elem.playpos,
-          elem.caretpos
+          elem.textSelection
         );
 
         if (elem instanceof MouseStatisticElem) {
@@ -173,8 +182,8 @@ export class UserInteractionsService {
     context: string,
     state: PlayBackStatus,
     playposition: SampleUnit,
-    caretpos: number,
-    selection: { start: number; length: number } | undefined,
+    textSelection: { start?: number; end?: number } | undefined,
+    audioSelection: { start: number; length: number } | undefined,
     segment: { start: number; length: number } | undefined
   ) {
     if (
@@ -187,8 +196,8 @@ export class UserInteractionsService {
         { value: state.toLowerCase() },
         Date.now(),
         playposition,
-        caretpos,
-        selection,
+        textSelection,
+        audioSelection,
         segment,
         context
       );

@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { OLog } from '../../obj/Settings/logging';
+import { ILog, OLog } from '../../obj/Settings/logging';
 import { KeyStatisticElem } from '../../obj/statistics/KeyStatisticElem';
 import { MouseStatisticElem } from '../../obj/statistics/MouseStatisticElem';
 import { StatisticElem } from '../../obj/statistics/StatisticElement';
@@ -12,6 +12,9 @@ import { PlayBackStatus, SampleUnit } from '@octra/media';
 export class UserInteractionsService {
   private _afteradd: EventEmitter<StatisticElem> =
     new EventEmitter<StatisticElem>();
+
+  startTime?: number;
+  startReference?: ILog;
 
   get afteradd(): EventEmitter<StatisticElem> {
     return this._afteradd;
@@ -54,6 +57,12 @@ export class UserInteractionsService {
     this._elements = [];
   }
 
+  init(enabled: boolean, startTime?: number, startReference?: ILog) {
+    this.enabled = enabled;
+    this.startTime = startTime;
+    this.startReference = startReference;
+  }
+
   /**
    * Parse Events
    */
@@ -78,6 +87,13 @@ export class UserInteractionsService {
       | undefined,
     targetName?: string
   ) {
+    if (!this.startTime) {
+      throw new Error('Start time is undefined in logging!');
+    }
+
+    timestamp =
+      Date.now() - this.startTime + (this.startReference?.timestamp ?? 0);
+
     this._lastAction = Date.now();
     const originalPlayerPos = playpos?.samples;
     textSelection = textSelection

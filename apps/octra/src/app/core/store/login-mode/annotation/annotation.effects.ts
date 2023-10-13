@@ -201,9 +201,14 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           // INIT UI SERVICE
-          if (a.projectSettings.logging || getModeState(state)!.logging) {
-            this.uiService.enabled = true;
-            this.uiService.elements = getModeState(state)!.logs.map((a) =>
+          const modeState = getModeState(state)!;
+          if (a.projectSettings.logging || modeState.logging.enabled) {
+            this.uiService.init(
+              true,
+              modeState.logging.startTime,
+              modeState.logging.startReference
+            );
+            this.uiService.elements = modeState.logging.logs.map((a) =>
               StatisticElem.fromAny(a)
             );
             this.uiService.addElementFromEvent(
@@ -240,6 +245,23 @@ export class AnnotationEffects {
               ),
               mode: a.mode,
             })
+          );
+        })
+      ),
+    { dispatch: false }
+  );
+
+  setLogging$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.setLogging.do),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          const modeState = getModeState(state)!;
+          this.uiService.init(
+            action.logging,
+            modeState.logging.startTime,
+            modeState.logging.startReference
           );
         })
       ),
@@ -828,7 +850,7 @@ export class AnnotationEffects {
               {
                 assessment: state.onlineMode.currentSession.assessment,
                 comment: state.onlineMode.currentSession.comment,
-                log: state.onlineMode.logs,
+                log: state.onlineMode.logging.logs,
               },
               outputs
             )
@@ -1200,7 +1222,7 @@ export class AnnotationEffects {
         // import logs
         this.store.dispatch(
           AnnotationActions.saveLogs.do({
-            logs: modeState.logs ?? task?.log ?? [],
+            logs: modeState.logging.logs ?? task?.log ?? [],
             mode: rootState.application.mode,
           })
         );

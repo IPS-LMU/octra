@@ -110,7 +110,7 @@ export class AppStorageService {
   }
 
   get logging(): boolean {
-    return getModeState(this._snapshot)?.logging ?? false;
+    return getModeState(this._snapshot)?.logging.enabled ?? false;
   }
 
   set logging(value: boolean) {
@@ -264,7 +264,7 @@ export class AppStorageService {
   }
 
   get logs(): any[] {
-    return getModeState(this._snapshot)!.logs;
+    return getModeState(this._snapshot)!.logging.logs;
   }
 
   get onlineSession(): AnnotationSessionState | undefined {

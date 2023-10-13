@@ -29,8 +29,10 @@ export const initialState: AnnotationState = {
     sampleRate: 0,
     fileName: '',
   },
-  logs: [],
-  logging: false,
+  logging: {
+    enabled: false,
+    logs: [],
+  },
   currentSession: {},
   histories: {},
 };
@@ -368,7 +370,10 @@ export class AnnotationStateReducers {
           if (this.mode === mode) {
             return {
               ...state,
-              logs: !Array.isArray(state.logs) ? [log] : [...state.logs, log],
+              logging: {
+                ...state.logging,
+                logs: !Array.isArray(state.logging.logs) ? [log] : [...state.logging.logs, log],
+              }
             };
           }
           return state;
@@ -376,13 +381,21 @@ export class AnnotationStateReducers {
       ),
       on(AnnotationActions.saveLogs.do, (state: AnnotationState, { logs }) => ({
         ...state,
-        logs,
+        logging: {
+          ...state.logging,
+          logs
+        }
       })),
       on(
         AnnotationActions.setLogging.do,
         (state: AnnotationState, { logging }) => ({
           ...state,
-          logging,
+          logging: {
+            ...state.logging,
+            enabled: logging,
+            startTime: Date.now(),
+            startReference: state.logging.logs.length > 0 ? state.logging.logs[state.logging.logs.length - 1] : undefined
+          },
         })
       ),
       on(
@@ -417,12 +430,18 @@ export class AnnotationStateReducers {
       ),
       on(AnnotationActions.clearLogs.do, (state) => ({
         ...state,
-        logs: [],
+        logging: {
+          ...state.logging,
+          logs: [],
+        }
       })),
       on(IDBActions.loadLogs.success, (state: AnnotationState, logs) => {
         return {
           ...state,
-          logs: (logs as any)[this.mode],
+          logging: {
+            ...state.logging,
+            logs: (logs as any)[this.mode],
+          }
         };
       }),
       on(
@@ -562,7 +581,10 @@ export class AnnotationStateReducers {
       case 'logging':
         return {
           ...state,
-          logging: value !== undefined ? value : true,
+          logging: {
+            ...state.logging,
+            enabled: value !== undefined ? value : true,
+          }
         };
     }
 

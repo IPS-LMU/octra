@@ -165,9 +165,11 @@ export class LoginModeReducers {
                 task,
                 comment: state.currentSession.comment ?? task?.comment ?? '',
               },
-              logging:
-                (task?.tool_configuration?.value as ProjectSettings)?.logging
-                  ?.forced ?? false,
+              logging: {
+                ...state.logging,
+                enabled: (task?.tool_configuration?.value as ProjectSettings)?.logging
+                  ?.forced === true ? true : state.logging.enabled
+              },
             };
           }
           return state;
@@ -256,8 +258,12 @@ export class LoginModeReducers {
             return {
               ...state,
               projectConfig: projectSettings,
-              logging:
-                projectSettings.logging.forced === true ? true : state.logging,
+              logging: {
+                ...state.logging,
+                enabled: projectSettings.logging.forced === true ? true : state.logging.enabled,
+                startTime: Date.now(),
+                startReference: state.logging.logs.length > 0 ? state.logging.logs[state.logging.logs.length - 1] : undefined
+              },
               currentSession: {
                 ...state.currentSession,
                 loadFromServer: true,

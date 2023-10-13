@@ -167,8 +167,8 @@ export class IDBEffects {
 
             return IDBActions.loadLogs.success({
               online: onlineModeLogs,
-              demo: localModeLogs,
-              local: demoModeLogs,
+              demo: demoModeLogs,
+              local: localModeLogs,
             });
           })
         );
@@ -489,7 +489,7 @@ export class IDBEffects {
                   : null,
               currentEditor: modeState.currentEditor ?? null,
               currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
-              logging: modeState.logging ?? null,
+              logging: modeState.logging.enabled ?? null,
               project: modeState.currentSession?.loadFromServer
                 ? modeState.currentSession?.currentProject ?? null
                 : undefined,
@@ -917,8 +917,6 @@ export class IDBEffects {
       ofType(AnnotationActions.saveLogs.do, AnnotationActions.addLog.do),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]: [Action, RootState]) => {
-        const subject = new Subject<Action>();
-
         const modeState = this.getModeStateFromString(
           appState,
           (action as any).mode
@@ -926,7 +924,7 @@ export class IDBEffects {
 
         if (modeState) {
           return this.idbService
-            .saveLogs((action as any).mode, modeState.logs)
+            .saveLogs((action as any).mode, modeState.logging.logs)
             .pipe(
               map(() => IDBActions.saveLogs.success()),
               catchError((error) => {

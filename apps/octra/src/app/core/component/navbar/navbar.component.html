@@ -136,7 +136,8 @@
           <li
             *ngIf="
               appStorage.loggedIn &&
-              navbarServ.showInterfaces
+              navbarServ.showInterfaces &&
+              isAdministrator
             "
             class="nav-item"
           >
@@ -526,8 +527,7 @@
                       (click)="toggleSettings('logging')"
                       [checked]="appStorage.logging"
                       [disabled]="
-                        appStorage.useMode === 'online' ||
-                        appStorage.useMode === 'demo'
+                        appStorage.useMode === 'online'
                       "
                       id="logging"
                     />

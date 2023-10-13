@@ -59,8 +59,12 @@ export interface AnnotationState extends UndoRedoState {
     selected?: GuidelinesItem;
     list: GuidelinesItem[];
   };
-  logs: ILog[];
-  logging: boolean;
+  logging: {
+    enabled: boolean;
+    logs: ILog[];
+    startTime?: number;
+    startReference?: ILog;
+  };
   projectConfig?: ProjectSettings;
   methods?: {
     validate: (transcript: string, guidelines: any) => any;

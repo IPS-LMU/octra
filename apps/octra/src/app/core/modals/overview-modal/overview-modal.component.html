@@ -28,58 +28,11 @@
           border-right: 1px solid lightgray;
         "
       >
-        <h4>{{ 'g.statistics' | transloco }}</h4>
-
-        <table class="table table-bordered" id="statistics">
-          <thead>
-            <tr>
-              <th>{{ 'segments.total' | transloco }}</th>
-              <th>{{ 'segments.transcribed' | transloco }}</th>
-              <th>{{ 'segments.with breaks' | transloco }}</th>
-              <th>{{ 'segments.not transcribed' | transloco }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="table-default text-center">{{ numberOfSegments }}</td>
-              <td class="table-success text-center">{{ transcrSegments }}</td>
-              <td class="table-info text-center">{{ pauseSegments }}</td>
-              <td class="table-danger text-center">
-                <b
-                  ><u>{{ emptySegments }}</u></b
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p [hidden]="shownSegments.length === 0" style="text-align: center">
-          <ng-container *ngIf="validationFound">
-            <span *ngIf="foundErrors === 0" class="text-success found-errors">{{
-              'g.no errors found' | transloco
-            }}</span>
-          </ng-container>
-        </p>
-        <div *ngIf="foundErrors > 0">
-          <div class="text-danger found-errors">
-            {{
-              'g.errors found' | transloco : { errors: foundErrors + '' }
-            }}<br />
-            {{ 'modal.overview.check transcription' | transloco }}
-          </div>
-          <button
-            class="btn btn-primary btn-raised"
-            (click)="switchToTRNEditor()"
-          >
-            {{
-              'g.switch to'
-                | transloco
-                  : {
-                      editor: 'interfaces.TRN editor' | transloco
-                    }
-            }}
-          </button>
-        </div>
-        <span *ngIf="!validationFound">No validation methods found</span>
+        <octra-transcr-overview
+          #overview
+          [currentLevel]="annotationStoreService.currentLevel"
+          (segmentclicked)="onSegmentInOverviewClicked($event)">
+        </octra-transcr-overview>
       </div>
       <div
         *ngIf="

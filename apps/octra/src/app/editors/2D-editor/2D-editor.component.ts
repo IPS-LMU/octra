@@ -532,6 +532,14 @@ export class TwoDEditorComponent
         }
       })
     );
+
+    this.subscrManager.add(
+      this.annotationStoreService.segmentrequested.subscribe(
+        (segnumber: number) => {
+          this.openSegment(segnumber);
+        }
+      )
+    );
   }
 
   override ngOnDestroy() {
@@ -544,14 +552,6 @@ export class TwoDEditorComponent
     if (this.scrolltimer !== undefined) {
       this.scrolltimer.unsubscribe();
     }
-
-    this.subscrManager.add(
-      this.annotationStoreService.segmentrequested.subscribe(
-        (segnumber: number) => {
-          this.openSegment(segnumber);
-        }
-      )
-    );
 
     this.shortcutService.destroy();
   }

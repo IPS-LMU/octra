@@ -85,7 +85,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ReAuthenticationModalComponent,
     AuthenticationComponent,
     AboutModalComponent,
-    FeedbackNoticeModalComponent
+    FeedbackNoticeModalComponent,
   ],
   imports: [
     CommonModule,

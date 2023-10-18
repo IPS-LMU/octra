@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { NgxJoditModule } from 'ngx-jodit';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { AuthComponent } from './auth';
 import { LoadingComponent } from '../loading';
@@ -8,7 +7,7 @@ import { ReloadFileComponent } from './reload-file';
 import { TranscriptionComponent } from './transcription';
 import { TranscriptionEndComponent } from './transcription-end';
 import { InternComponent } from './intern.component';
-import { FastbarComponent, TranscrEditorComponent } from '../../component';
+import { FastbarComponent } from '../../component';
 import { AudioNavigationComponent } from '../../component/audio-navigation';
 import { LoadeditorDirective } from '../../shared/directive/loadeditor.directive';
 import {
@@ -19,7 +18,6 @@ import {
 } from '../../../editors';
 import { NewEditorComponent } from '../../../editors/new-editor/new-editor.component';
 import { TranscrWindowComponent } from '../../../editors/2D-editor/transcr-window';
-import { ValidationPopoverComponent } from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import { ErrorOccurredComponent } from '../../alerts/error-occurred/error-occurred.component';
 import { ContextMenuComponent } from '../../component/context-menu/context-menu.component';
 import { DynComponentDirective } from '../../shared/directive/dyn-component.directive';
@@ -31,12 +29,12 @@ import { InternRoutingModule } from './intern-routing.module';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@ngneat/transloco';
 import { StoreModule } from '@ngrx/store';
-import { LoginModeReducers } from '../../store/login-mode/login-mode.reducer';
+import { LoginModeReducers } from '../../store/login-mode';
 import { LoginMode } from '../../store';
 import { EffectsModule } from '@ngrx/effects';
 import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import {AuthSuccessPageComponent} from './auth-success/auth-success.page.component';
+import { AuthSuccessPageComponent } from './auth-success/auth-success.page.component';
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];
 
@@ -62,9 +60,7 @@ export const EDITORS: any[] = [
     EDITORS,
     NewEditorComponent,
     InternComponent,
-    TranscrEditorComponent,
     TranscrWindowComponent,
-    ValidationPopoverComponent,
     AuthComponent,
     ErrorOccurredComponent,
     ContextMenuComponent,
@@ -77,11 +73,9 @@ export const EDITORS: any[] = [
   imports: [
     CommonModule,
     FormsModule,
-    NgxJoditModule,
     OctraComponentsModule,
     InternRoutingModule,
     AppSharedModule,
-    NgxJoditModule,
     TranslocoModule,
     StoreModule.forFeature(
       'onlineMode',
@@ -112,9 +106,7 @@ export const EDITORS: any[] = [
     EDITORS,
     NewEditorComponent,
     InternComponent,
-    TranscrEditorComponent,
     TranscrWindowComponent,
-    ValidationPopoverComponent,
     AuthComponent,
     ErrorOccurredComponent,
     ContextMenuComponent,

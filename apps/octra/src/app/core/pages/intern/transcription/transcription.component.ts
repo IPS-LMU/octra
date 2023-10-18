@@ -707,8 +707,10 @@ export class TranscriptionComponent
                             this.currentEditor.instance as any
                           ).enableAllShortcuts();
                         })
-                        .catch((error) => {
-                          console.error(error);
+                        .catch(() => {
+                          (
+                            this.currentEditor.instance as any
+                          ).enableAllShortcuts();
                         });
                     }
                   )
@@ -982,9 +984,17 @@ export class TranscriptionComponent
       OverviewModalComponent,
       OverviewModalComponent.options
     );
-    this.modalOverview.result.then(() => {
-      this.modalVisiblities.overview = false;
-    });
+    this.modalOverview.result
+      .then(() => {
+        const editor = this._currentEditor.instance as OctraEditorRequirements;
+        editor.enableAllShortcuts();
+        this.modalVisiblities.overview = false;
+      })
+      .catch((err) => {
+        const editor = this._currentEditor.instance as OctraEditorRequirements;
+        editor.enableAllShortcuts();
+        this.modalVisiblities.overview = false;
+      });
     this.modalVisiblities.overview = true;
   }
 

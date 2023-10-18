@@ -1,17 +1,15 @@
 import {
-  ChangeDetectorRef,
   Component,
   EventEmitter,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
 import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
-import { isFunction } from '@octra/utilities';
 import { SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoginMode } from '../../store';
-import { NavbarService } from '../../component/navbar/navbar.service';
 import { OctraModal } from '../types';
 import {
   NgbActiveModal,
@@ -29,7 +27,10 @@ declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
 })
-export class OverviewModalComponent extends OctraModal implements OnInit{
+export class OverviewModalComponent
+  extends OctraModal
+  implements OnInit, OnDestroy
+{
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: false,
@@ -40,9 +41,9 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
   feedback!: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
-
   protected data = undefined;
   private shortcutID = -1;
+  visible = false;
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
@@ -59,7 +60,6 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
     );
   }
 
-  public selectedError: any = '';
   public shownSegments: {
     transcription: {
       html: string;
@@ -75,14 +75,12 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
     public annotationStoreService: AnnotationStoreService,
     public appStorage: AppStorageService,
     private uiService: UserInteractionsService,
-    private cd: ChangeDetectorRef,
-    private navbarService: NavbarService,
     protected override activeModal: NgbActiveModal
   ) {
     super('overviewModal', activeModal);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     /* TODO add shortcuts
       if (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast')) {
         this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
@@ -100,8 +98,16 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
         }));
       }
      */
-    this.uiService.addElementFromEvent('overview', {value: 'opened'},
-      Date.now(), undefined, undefined, undefined, undefined, 'overview');
+    this.uiService.addElementFromEvent(
+      'overview',
+      { value: 'opened' },
+      Date.now(),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'overview'
+    );
   }
 
   public override close(fromModal = false) {
@@ -169,66 +175,6 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
     ) {
       this.sendTranscription();
     }
-  }
-
-  public get numberOfSegments(): number {
-    return this.annotationStoreService.currentLevel !== undefined &&
-      this.annotationStoreService.currentLevel.items
-      ? this.annotationStoreService.currentLevel.items.length
-      : 0;
-  }
-
-  public get transcrSegments(): number {
-    return this.annotationStoreService.currentLevel !== undefined &&
-      this.annotationStoreService.currentLevel.items
-      ? this.annotationStoreService.statistics.transcribed
-      : 0;
-  }
-
-  public get pauseSegments(): number {
-    return this.annotationStoreService.currentLevel !== undefined &&
-      this.annotationStoreService.currentLevel.items
-      ? this.annotationStoreService.statistics.pause
-      : 0;
-  }
-
-  public get emptySegments(): number {
-    return this.annotationStoreService.currentLevel !== undefined &&
-      this.annotationStoreService.currentLevel.items
-      ? this.annotationStoreService.statistics.empty
-      : 0;
-  }
-
-  public get foundErrors(): number {
-    let found = 0;
-
-    if (this.shownSegments.length > 0) {
-      let resultStr = '';
-      for (const shownSegment of this.shownSegments) {
-        resultStr += shownSegment.transcription.html;
-      }
-
-      found = (resultStr.match(/<span class='val-error'/) || []).length;
-    }
-
-    return found;
-  }
-
-  public get validationFound() {
-    return (
-      typeof validateAnnotation !== 'undefined' &&
-      isFunction(validateAnnotation) &&
-      typeof tidyUpAnnotation !== 'undefined' &&
-      isFunction(tidyUpAnnotation)
-    );
-  }
-
-  updateView() {
-    this.updateSegments();
-    this.annotationStoreService.analyse();
-
-    this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   getShownSegment(
@@ -345,8 +291,7 @@ export class OverviewModalComponent extends OctraModal implements OnInit{
     }
   }
 
-  switchToTRNEditor() {
-    this.navbarService.interfacechange.emit('TRN-Editor');
-    this.close(false);
+  override ngOnDestroy() {
+    super.ngOnDestroy();
   }
 }

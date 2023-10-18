@@ -54,3 +54,27 @@
 .ripple-container {
     display: none;
 }
+
+.bg-danger {
+    background-color: #ffd4dc !important;
+    border: 1px solid #fc9dac !important;
+    color: black !important;
+}
+
+.bg-info {
+    background-color: lightblue !important;
+    border: 1px solid #64aabd !important;
+    color: black !important;
+}
+
+.bg-success {
+    background-color: #9ad09a !important;
+    border: 1px solid #51a451 !important;
+    color: black !important;
+}
+
+.bg-highlight{
+  background-color: yellow !important;
+  border: 1px solid #ffdd00 !important;
+  color: black;
+}

@@ -65,10 +65,9 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AsrEffects } from './core/store/asr/asr.effects.service';
 import { TranslocoRootModule } from './app.transloco';
 import { RouterModule } from '@angular/router';
-import { TranscrOverviewComponent } from './core/component/transcr-overview';
 
 @NgModule({
-  declarations: [AppComponent, NavigationComponent, TranscrOverviewComponent],
+  declarations: [AppComponent, NavigationComponent],
   imports: [
     BrowserModule,
     AppSharedModule,

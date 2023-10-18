@@ -1279,7 +1279,7 @@ export class TranscrWindowComponent
     ] as OctraAnnotationSegment;
     return (
       segmentIndex === this.currentLevel!.items.length - 2 &&
-      (nextSegment!.getFirstLabelWithoutName('Speaker') ===
+      (nextSegment!.getFirstLabelWithoutName('Speaker')?.value ===
         this.breakMarkerCode ||
         nextSegment!.context?.asr?.isBlockedBy === ASRQueueItemType.ASRMAUS ||
         nextSegment!.context?.asr?.isBlockedBy === ASRQueueItemType.MAUS)

@@ -104,15 +104,12 @@
             </span>
           </button>
         </div>
-        <div class="col-md-4 d-flex">
+        <div class="col-md-4 d-flex"
+             *ngIf="segmentIndex < annotationStoreService.currentLevel!.items.length - 1 && !isNextSegmentLastAndBreak(segmentIndex)"
+        >
           <button
             class="btn btn-info w-100 rounded-0"
             (click)="save(); doDirectionAction('right')"
-            *ngIf="
-              hasSegmentBoundaries ||
-              (!isNextSegmentLastAndBreak(segmentIndex) &&
-                segmentIndex < annotationStoreService.currentLevel!.items.length - 1)
-            "
           >
             <span
               *ngIf="responsive || easyMode"
@@ -132,12 +129,7 @@
         </div>
         <div
           class="col-md-4 d-flex"
-          *ngIf="
-            !hasSegmentBoundaries &&
-            (segmentIndex ===
-              annotationStoreService.currentLevel!.items.length - 1 ||
-              isNextSegmentLastAndBreak(segmentIndex))
-          "
+          *ngIf="segmentIndex === annotationStoreService.currentLevel!.items.length - 1 || isNextSegmentLastAndBreak(segmentIndex)"
         >
           <!-- check if last segment ord if the next segment is a break -->
           <button

@@ -1,91 +1,127 @@
-<!-- <h4>{{"general.statistics" | transloco}}</h4>
+<h4>{{"g.statistics" | transloco}}</h4>
 
 <table id="statistics" class="table table-bordered">
-    <thead>
-    <tr>
-      <th>{{"segments.total" | transloco}}</th>
-      <th>{{"segments.transcribed" | transloco}}</th>
-      <th>{{"segments.with breaks" | transloco}}</th>
-      <th>{{"segments.not transcribed" | transloco}}</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td class="alert-default">{{numberOfSegments}}</td>
-        <td class="alert-success">{{transcrSegments}}</td>
-        <td class="alert-info">{{pauseSegments}}</td>
-        <td class="alert-danger"><b><u>{{emptySegments}}</u></b></td>
-    </tr>
-    </tbody>
+  <thead>
+  <tr>
+    <th>{{"segments.total" | transloco}}</th>
+    <th>{{"segments.transcribed" | transloco}}</th>
+    <th>{{"segments.with breaks" | transloco}}</th>
+    <th>{{"segments.not transcribed" | transloco}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>{{numberOfSegments}}</td>
+    <td class="bg-success">{{transcrSegments}}</td>
+    <td class="bg-info">{{pauseSegments}}</td>
+    <td class="bg-danger"><b><u>{{emptySegments}}</u></b></td>
+  </tr>
+  </tbody>
 </table>
 <p [hidden]="shownSegments.length === 0" style="text-align: center">
-    <ng-container *ngIf="validationFound">
+  <ng-container *ngIf="validationFound">
         <span *ngIf="foundErrors === 0"
-              class="text-success found-errors">{{"general.no errors found" | transloco}}</span>
-        <span *ngIf="foundErrors > 0"
-              class="text-danger found-errors">{{"general.errors found" | transloco : {errors: foundErrors + ''} }}</span>
-    </ng-container>
-    <span *ngIf="!validationFound">No validation methods found</span>
+              class="text-success found-errors">{{"g.no errors found" | transloco}}</span>
+    <span *ngIf="foundErrors > 0"
+          class="text-danger found-errors">{{"g.errors found" | transloco : { errors: foundErrors + '' } }}</span>
+  </ng-container>
+  <span *ngIf="!validationFound">No validation methods found</span>
 </p>
-<h4 [hidden]="!showTranscriptionTable">{{"general.transcript" | transloco}}</h4>
+<h4 [hidden]="!showTranscriptionTable">{{"g.transcript" | transloco}}</h4>
 <div [hidden]="!showLoading">
-    <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
-        <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
-    </div>
+  <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
+    <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
+  </div>
 </div>
-<app-validation-popover #validationPopover
-                        [ngStyle]="{
+<octra-validation-popover #validationPopover
+                          [ngStyle]="{
                                 'margin-left': popovers.validation.location.x + 'px',
                                 'margin-top': popovers.validation.location.y + 'px'
-                            }"></app-validation-popover>
+                            }"></octra-validation-popover>
 
 <table id="transcription-table" *ngIf="shownSegments.length > 0" class="table table-bordered"
        [hidden]="!showTranscriptionTable">
-    <thead id="table-head">
-    <tr>
-        <th id="table-first-column"></th>
-      <th id="table-second-column">{{"general.segment" | transloco}}</th>
-      <th id="table-third-column">{{"general.transcription" | transloco}}</th>
-        <th class="last-column">
-            <fa-icon [icon]="['fas', playAllState.icon]" (click)="togglePlayAll()"></fa-icon>
-            <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
-                   [checked]="playAllState.skipSilence">
-          <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let segment of shownSegments; let i = index"
-        class="segment-row"
-        [ngClass]="{'alert-success': (segment.transcription.text !== '' && segment.transcription.text != transcrService.breakMarker.code), 'alert-info': (segment.transcription.text == transcrService.breakMarker.code), 'alert-danger': (segment.transcription.text === '')}">
-        <td style="width:25px;vertical-align:middle;">
-            <fa-icon [icon]="['fas', 'exclamation-triangle']" class="segment-warning" [ngStyle]="{
-                  'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
-            </fa-icon>
-        </td>
-        <td class="segment-number"><span class="link"
-                                         (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shownSegments.length}}</span>
-        </td>
-        <td *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
-            (mouseleave)="onTextEditorLeave($event, i)">
-            <div>
-                <app-transcr-editor #transcrEditor
-                                    [height]="60"
-                                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-                                    [easymode]="true"
-                                    [audiochunk]="textEditor.audiochunk"
-                                    [(font)]="appStorage.editorFont"
-                ></app-transcr-editor>
-            </div>
-        </td>
-        <ng-template #editorNotActive>
-            <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event, i)"
-                (mousedown)="onMouseOver($event, i); onMouseDown($event, i);" class="segment-transcript"></td>
-        </ng-template>
-        <td class="last-column">
-            <fa-icon [icon]="['fas', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></fa-icon>
-        </td>
-    </tr>
-    </tbody>
+  <thead id="table-head">
+  <tr>
+    <th id="table-first-column"></th>
+    <th id="table-second-column">{{"g.segment" | transloco}}</th>
+    <th id="table-third-column">{{"g.transcription" | transloco}}</th>
+    <th class="last-column">
+      <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
+             [checked]="playAllState.skipSilence">
+      <label for="skip-silence-checkbox">{{"g.skip silence" | transloco}}</label>
+      <i [class]="playAllState.icon" (click)="togglePlayAll()" style="font-size:1.2rem;"></i>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let segment of shownSegments; let i = index"
+      class="segment-row"
+      [ngClass]="{
+      'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+      'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+      'bg-danger': (segment.transcription.text === ''),
+      'bg-highlight': playAllState.currentSegment === i
+      }">
+    <td style="width:25px;vertical-align:middle;"
+        [ngClass]="
+        {
+        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+        'bg-danger': (segment.transcription.text === ''),
+        'bg-highlight': playAllState.currentSegment === i
+        }">
+      <i class="bi bi-exclamation-triangle segment-warning" [ngStyle]="{
+                  'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"></i>
+    </td>
+    <td class="segment-number"
+        [ngClass]="{
+        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+        'bg-danger': (segment.transcription.text === ''),
+        'bg-highlight': playAllState.currentSegment === i
+        }">
+      <span class="link"
+            (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shownSegments.length}}</span>
+    </td>
+    <td *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
+        [ngClass]="{
+        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+        'bg-danger': (segment.transcription.text === ''),
+        'bg-highlight': playAllState.currentSegment === i
+        }"
+        (mouseleave)="onTextEditorLeave(i)">
+      <div>
+        <octra-transcr-editor #transcrEditor
+                              [height]="60"
+                              [markers]="(annotationStoreService.guidelines !== undefined) ? annotationStoreService.guidelines.markers : undefined"
+                              [easymode]="true"
+                              [audiochunk]="textEditor.audioChunk"
+                              [(font)]="appStorage.editorFont"
+                              (enterKeyPressed)="onEnterPressed(i)"
+        ></octra-transcr-editor>
+      </div>
+    </td>
+    <ng-template #editorNotActive>
+      <td [innerHTML]="sanitizeHTML(segment.transcription.html)"
+          [ngClass]="{
+          'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+          'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+          'bg-danger': (segment.transcription.text === ''),
+          'bg-highlight': playAllState.currentSegment === i
+          }"
+          (mousedown)="onMouseOver($event, i); onMouseDown(i);" class="segment-transcript"></td>
+    </ng-template>
+    <td class="last-column"
+        [ngClass]="{
+        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
+        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
+        'bg-danger': (segment.transcription.text === ''),
+        'bg-highlight': playAllState.currentSegment === i
+        }">
+      <i [class]="playStateSegments[i].icon" (click)="playSelectedSegment(i)"></i>
+    </td>
+  </tr>
+  </tbody>
 </table>
--->

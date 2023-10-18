@@ -12,11 +12,18 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
-import { AlertComponent, DropZoneComponent } from './core/component';
+import {
+  AlertComponent,
+  DropZoneComponent,
+  TranscrEditorComponent,
+} from './core/component';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { SignupComponent } from './core/component/authentication-component/signup/signup.component';
 import { TranslocoModule } from '@ngneat/transloco';
+import { TranscrOverviewComponent } from './core/component/transcr-overview';
+import { NgxJoditModule } from 'ngx-jodit';
+import { ValidationPopoverComponent } from './core/component/transcr-editor/validation-popover/validation-popover.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +34,9 @@ import { TranslocoModule } from '@ngneat/transloco';
     DropZoneComponent,
     AlertComponent,
     SignupComponent,
+    TranscrOverviewComponent,
+    TranscrEditorComponent,
+    ValidationPopoverComponent,
   ],
   imports: [
     CommonModule,
@@ -39,6 +49,7 @@ import { TranslocoModule } from '@ngneat/transloco';
     OctraUtilitiesModule,
     TranslocoModule,
     NgbToast,
+    NgxJoditModule,
   ],
   exports: [
     AsrOptionsComponent,
@@ -48,6 +59,9 @@ import { TranslocoModule } from '@ngneat/transloco';
     DropZoneComponent,
     AlertComponent,
     SignupComponent,
+    TranscrOverviewComponent,
+    TranscrEditorComponent,
+    ValidationPopoverComponent,
   ],
 })
 export class AppSharedModule {}

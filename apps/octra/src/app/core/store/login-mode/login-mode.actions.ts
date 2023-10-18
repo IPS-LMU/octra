@@ -13,14 +13,6 @@ export class LoginModeActions extends AnnotationActions {
     }>()
   );
 
-  public static setServerDataEntry = createAction(
-    `login mode Set serverDataEntry`,
-    props<{
-      serverDataEntry: TaskDto;
-      mode: LoginMode;
-    }>()
-  );
-
   public static setFeedback = createAction(
     `annotation Set feedback`,
     props<{

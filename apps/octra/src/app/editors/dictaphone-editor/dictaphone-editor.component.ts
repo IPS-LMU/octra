@@ -56,7 +56,7 @@ export class DictaphoneEditorComponent
   public initialized: EventEmitter<void> = new EventEmitter<void>();
 
   public get highlighting(): boolean {
-    return this.appStorage.highlightingEnabled;
+    return this.appStorage.highlightingEnabled ?? false;
   }
 
   public set highlighting(value: boolean) {

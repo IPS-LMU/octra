@@ -74,12 +74,23 @@ export class TranscrEditorComponent
   @Output() boundaryclicked: EventEmitter<SampleUnit> =
     new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectionchanged: EventEmitter<{ start?: number; end?: number } | undefined> =
-    new EventEmitter<{ start?: number; end?: number } | undefined>();
+  @Output() selectionchanged: EventEmitter<
+    | {
+        start?: number;
+        end?: number;
+      }
+    | undefined
+  > = new EventEmitter<
+    | {
+        start?: number;
+        end?: number;
+      }
+    | undefined
+  >();
 
   @Input() visible = true;
   @Input() markers?: any[] = [];
-  @Input() easymode = true;
+  @Input() easymode?: undefined | null | boolean = true;
   @Input() height = 0;
   @Input() playposition?: SampleUnit;
   @Input() audiochunk?: AudioChunk;
@@ -87,6 +98,12 @@ export class TranscrEditorComponent
   @Input() externalShortcutManager?: ShortcutManager;
   // tslint:disable-next-line:no-output-on-prefix
   @Output() redoUndo = new EventEmitter<'undo' | 'redo'>();
+
+  @Input()
+  font?: string | null;
+
+  @Output()
+  fontChange = new EventEmitter<string>();
 
   @ViewChild('validationPopover', { static: true })
   validationPopover!: ValidationPopoverComponent;
@@ -185,7 +202,12 @@ export class TranscrEditorComponent
     this.highlightingEnabledChange.emit(value);
   }
 
-  public get textSelection(): { start?: number; end?: number } | undefined {
+  public get textSelection():
+    | {
+        start?: number;
+        end?: number;
+      }
+    | undefined {
     if (!this.focused) {
       return undefined;
     }
@@ -431,6 +453,9 @@ export class TranscrEditorComponent
           );
         }
       }
+      this.joditOptions.extraButtons!.push(
+        this.createFontSelectionButton() as any
+      );
 
       this.cd.markForCheck();
       this.cd.detectChanges();
@@ -469,9 +494,51 @@ export class TranscrEditorComponent
       if (this._settings.highlightingEnabled) {
         this.startRecurringHighlight();
       }
+
+      if (this.font) {
+        this.changeFont(this.font, false);
+      }
+
       this.initialized = true;
     }
   };
+
+  private changeFont = (fontName: string, trigger = false) => {
+    if (
+      this.joditComponent?.jodit &&
+      fontName &&
+      typeof fontName === 'string' &&
+      fontName !== ''
+    ) {
+      const fontFamily = this.getFontFamily(fontName);
+      const joditContainer = this.joditComponent.jodit
+        .container as HTMLDivElement;
+      const wysiwyg = joditContainer!.querySelector(
+        '.jodit-wysiwyg'
+      ) as HTMLElement;
+      wysiwyg!.style!.fontFamily = fontFamily;
+
+      if (trigger) {
+        this.fontChange.emit(fontName);
+      }
+    }
+  };
+
+  private getFontFamily(fontName: string) {
+    switch (fontName) {
+      case 'Arial':
+        return 'Arial, Helvetica, serif';
+      case 'Helvetica':
+        return 'Helvetica, Arial, serif';
+      case 'Courier New':
+        return "'Courier New', serif";
+      case 'Times New Roman':
+        return "'Times New Roman', serif";
+      case 'Verdana':
+        return 'Verdana, Geneva, sans-serif';
+    }
+    return 'Helvetica, Arial, serif';
+  }
 
   onASRQueueChange(queue?: ASRStateQueue) {
     if (queue !== undefined) {
@@ -696,8 +763,10 @@ export class TranscrEditorComponent
   createButton(
     name: string,
     tooltip: string,
-    getContent: () => string,
-    onClick: (event: MouseEvent, button: HTMLElement) => void,
+    getContent: () => string | HTMLElement,
+    events?: {
+      onClick?: (event: MouseEvent, button: HTMLElement) => void;
+    },
     hotkeys?: string
   ): IControlType<IJodit, IToolbarButton> {
     return {
@@ -707,12 +776,21 @@ export class TranscrEditorComponent
       },
       getContent: (a, b, c) => {
         if (!this.initialized) {
+          const content = getContent();
+
           const button = document.createElement('span');
           button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
-          button.innerHTML = getContent();
-          button.addEventListener('click', (event: MouseEvent) => {
-            onClick(event, button);
-          });
+          if (typeof content === 'string') {
+            button.innerHTML = getContent();
+            if (events?.onClick) {
+              button.addEventListener('click', (event: MouseEvent) => {
+                events!.onClick!(event, button);
+              });
+            }
+          } else {
+            button.appendChild(content);
+          }
+
           return button;
         }
         return c.container.children[0];
@@ -790,10 +868,12 @@ export class TranscrEditorComponent
         }
         return content;
       },
-      () => {
-        // invoke insertText method with 'hello' on editor module.
-        this.insertMarker(marker.code, marker.icon!);
-        this.markerClick.emit(marker.name);
+      {
+        onClick: () => {
+          // invoke insertText method with 'hello' on editor module.
+          this.insertMarker(marker.code, marker.icon!);
+          this.markerClick.emit(marker.name);
+        },
       }
     );
   }
@@ -894,11 +974,8 @@ export class TranscrEditorComponent
          class="btn-icon highlight-button me-1" style="height:15px;"/>`;
       return content;
     };
-    return this.createButton(
-      'highlight',
-      'enable highlighting',
-      getContent,
-      (event, button) => {
+    return this.createButton('highlight', 'enable highlighting', getContent, {
+      onClick: (event, button) => {
         if (!this.wysiwyg || !this.toolbar) {
           return;
         }
@@ -911,8 +988,45 @@ export class TranscrEditorComponent
         }
 
         (event.target! as any).outerHTML = getContent();
-      }
-    );
+      },
+    });
+  }
+
+  createFontSelectionButton(): IControlType<IJodit, IToolbarButton> {
+    const getContent = () => {
+      const currentFont = this.font
+        ? this.font
+        : BrowserInfo.platform === 'mac'
+        ? 'Helvetica'
+        : 'Arial';
+
+      const createOption = (fontName: string) => {
+        const option = document.createElement('option');
+        option.setAttribute('value', fontName);
+        option.style.fontSize = '0.85rem';
+        option.innerText = fontName;
+        if (fontName === currentFont) {
+          option.setAttribute('selected', 'selected');
+        }
+        return option;
+      };
+
+      const selection: HTMLSelectElement = document.createElement('select');
+      selection.value = currentFont;
+      selection.appendChild(createOption('Helvetica'));
+      selection.appendChild(createOption('Arial'));
+      selection.appendChild(createOption('Courier New'));
+      selection.appendChild(createOption('Times New Roman'));
+      selection.appendChild(createOption('Verdana'));
+      selection.style.fontSize = '0.85rem';
+
+      selection.addEventListener('change', (event) => {
+        this.changeFont((event.target as any).value, true);
+      });
+      return selection;
+    };
+
+    return this.createButton('font', 'change font', getContent);
   }
 
   insertBoundary(imgURL: string) {
@@ -1310,19 +1424,21 @@ export class TranscrEditorComponent
         }
         return content;
       },
-      () => {
-        this.markerClick.emit('boundary');
-        this.insertBoundary(
-          'assets/img/components/transcr-editor/boundary.png'
-        );
-        this.subscrManager.add(
-          timer(100).subscribe({
-            next: () => {
-              this.validate();
-              this.initPopover();
-            },
-          })
-        );
+      {
+        onClick: () => {
+          this.markerClick.emit('boundary');
+          this.insertBoundary(
+            'assets/img/components/transcr-editor/boundary.png'
+          );
+          this.subscrManager.add(
+            timer(100).subscribe({
+              next: () => {
+                this.validate();
+                this.initPopover();
+              },
+            })
+          );
+        },
       }
     );
   }

@@ -658,7 +658,7 @@ export class LinearEditorComponent
 
     this.doPlayOnHover(
       this.audioManager,
-      this.appStorage.playonhover,
+      this.appStorage.playOnHover ?? false,
       this.audioChunkTop,
       this.signalDisplayTop.av.mouseCursor!
     );
@@ -814,7 +814,7 @@ export class LinearEditorComponent
         $event.value !== undefined &&
         contains($event.value, 'playonhover')
       ) {
-        this.appStorage.playonhover = !this.appStorage.playonhover;
+        this.appStorage.playOnHover = !this.appStorage.playOnHover;
       }
     }
   }

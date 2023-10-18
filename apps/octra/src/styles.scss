@@ -500,3 +500,27 @@ ngx-jodit {
   font-weight: 600;
   letter-spacing: 1px;
 }
+
+
+#editor-change-font-btn {
+  border: 1px solid gray;
+  padding: 3px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+#editor-change-font-btn:after {
+  content: '▾';
+  padding-left: 5px;
+}
+
+.editor-change-font-dropdown {
+  width: 95%;
+}
+
+.editor-change-font-dropdown .dropdown-item {
+  text-transform: capitalize;
+  font-size: 0.8rem;
+  padding: 10px;
+  min-height: 1em;
+}

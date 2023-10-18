@@ -354,7 +354,7 @@ export class TranscriptionComponent
     this.subscrManager.add(
       this.audioManager.statechange.subscribe({
         next: async (state) => {
-          if (!appStorage.playonhover && !this.modalVisiblities.overview) {
+          if (!appStorage.playOnHover && !this.modalVisiblities.overview) {
             let caretpos = undefined;
 
             if (

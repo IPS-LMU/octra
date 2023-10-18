@@ -34,7 +34,7 @@
       (buttonClick)="onButtonClick($event)"
       (keyup)="onKeyUp()"
       [audioChunk]="audiochunk"
-      [easyMode]="easymode"
+      [easyMode]="easyMode"
       [playbackRate]="appStorage.audioSpeed"
       [responsive]="settingsService.responsive.enabled"
       [volume]="appStorage.audioVolume"
@@ -56,10 +56,12 @@
       (markerInsert)="onMarkerInsert($event)"
       (typing)="afterTyping($event)"
       [audiochunk]="audiochunk"
-      [easymode]="easymode"
+      [easymode]="easyMode"
       [height]="100"
       [markers]="annotationStoreService.guidelines?.markers!"
       [validationEnabled]="validationEnabled"
+      [font]="(appStoreService.options$ | async)?.editorFont"
+      (fontChange)="onFontChange($event)"
       (selectionchanged)="onSelectionChange($event)"
       id="trancr"
     ></octra-transcr-editor>
@@ -71,13 +73,13 @@
             (click)="save(); doDirectionAction('left')"
           >
             <span
-              *ngIf="responsive || easymode"
-              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+              *ngIf="responsive || easyMode"
+              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
             >
               <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
             </span>
             <span
-              *ngIf="!easymode"
+              *ngIf="!easyMode"
               [ngClass]="{ 'd-none d-lg-inline': responsive }"
             >
               {{ 'g.save' | transloco }} &
@@ -88,13 +90,13 @@
         <div class="col-md-4 d-flex">
           <button (click)="save(); close()" class="btn btn-info w-100 rounded-0">
             <span
-              *ngIf="responsive || easymode"
-              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+              *ngIf="responsive || easyMode"
+              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
             >
               <i class="bi bi-save-fill"></i>
             </span>
             <span
-              *ngIf="!easymode"
+              *ngIf="!easyMode"
               [ngClass]="{ 'd-none d-lg-inline': responsive }"
             >
               {{ 'g.save' | transloco }} &
@@ -113,14 +115,14 @@
             "
           >
             <span
-              *ngIf="responsive || easymode"
-              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+              *ngIf="responsive || easyMode"
+              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
             >
               <i class="bi bi-save-fill"></i> &
               <i class="bi bi-arrow-right"></i>
             </span>
             <span
-              *ngIf="!easymode"
+              *ngIf="!easyMode"
               [ngClass]="{ 'd-none d-lg-inline': responsive }"
             >
               {{ 'g.save' | transloco }} &
@@ -143,13 +145,13 @@
             class="btn btn-info w-100 rounded-0"
           >
             <span
-              *ngIf="responsive || easymode"
-              [ngClass]="{ 'd-lg-none': responsive && !easymode }"
+              *ngIf="responsive || easyMode"
+              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
             >
               <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
             </span>
             <span
-              *ngIf="!easymode"
+              *ngIf="!easyMode"
               [ngClass]="{ 'd-none d-lg-inline': responsive }"
             >
               {{ 'g.save' | transloco }} &

@@ -493,9 +493,6 @@ export class ApplicationEffects {
           }
           this.store.dispatch(
             ApplicationActions.initApplication.setSessionStorageOptions({
-              playOnHover: this.sessStr.retrieve('playonhover') ?? false,
-              followPlayCursor:
-                this.sessStr.retrieve('followplaycursor') ?? false,
               loggedIn:
                 this.sessStr.retrieve('loggedIn') ?? a.authenticated ?? false,
               reloaded: this.sessStr.retrieve('reloaded') ?? false,

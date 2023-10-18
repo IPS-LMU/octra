@@ -93,7 +93,7 @@ export class ReAuthenticationModalComponent
       this.appStorage.logout();
       this.activeModal.close();
     } else {
-      this.appStorage.abortReauthentication();
+      this.appStorage.abortReAuthentication();
       this.activeModal.close();
     }
   }

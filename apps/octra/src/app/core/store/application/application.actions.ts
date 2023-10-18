@@ -8,6 +8,7 @@ import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../index';
 import { AppSettings, ASRSettings } from '../../obj';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IDBApplicationOptionName } from '../../shared/octra-database';
 
 const context = 'Application';
 
@@ -17,8 +18,6 @@ export class ApplicationActions {
     events: {
       do: emptyProps(),
       setSessionStorageOptions: props<{
-        playOnHover: boolean;
-        followPlayCursor: boolean;
         loggedIn: boolean;
         reloaded: boolean;
       }>(),
@@ -183,38 +182,6 @@ export class ApplicationActions {
     }>()
   );
 
-  public static consoleEntriesLoadSuccess = createAction(
-    `[IDB] Console Entries Load Success`
-  );
-
-  public static consoleEntriesLoadFailed = createAction(
-    `[IDB] Console Entries Load Failed`,
-    props<{
-      error: string;
-    }>()
-  );
-
-  public static setPlayOnHover = createAction(
-    `[${context}] set playOnHover`,
-    props<{
-      playOnHover: boolean;
-    }>()
-  );
-
-  public static setJobsLeft = createAction(
-    `[${context}] set jobsLeft`,
-    props<{
-      jobsLeft: number;
-    }>()
-  );
-
-  public static setFollowPlayCursor = createAction(
-    `[${context}] set follow play cursor`,
-    props<{
-      followPlayCursor: boolean;
-    }>()
-  );
-
   public static setAudioSettings = createAction(
     `[${context}] Set volume`,
     props<{
@@ -251,5 +218,18 @@ export class ApplicationActions {
     }>()
   );
 
-  public static clearSettings = createAction(`[Configuration] Clear Settings`);
+  static changeApplicationOption = createActionGroup({
+      source: `app/change option`,
+      events: {
+        do: props<{
+          name: IDBApplicationOptionName;
+          value: boolean | string | number;
+        }>(),
+        success: emptyProps(),
+        fail: props<{
+          error: string;
+        }>(),
+      }
+  });
+
 }

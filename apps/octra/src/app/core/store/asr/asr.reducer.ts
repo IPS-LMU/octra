@@ -90,7 +90,7 @@ export const reducer = createReducer(
     IDBActions.loadOptions.success,
     (state: ASRState, { applicationOptions }) => ({
       ...state,
-      settings: applicationOptions.asr,
+      settings: applicationOptions.asr ?? undefined,
     })
   ),
   on(

@@ -2,6 +2,7 @@ import { pipe } from 'rxjs';
 import { LoadingStatus, LoginMode, RootState } from '../index';
 import { AppSettings } from '../../obj';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import { IIDBApplicationOptions } from '../../shared/octra-database';
 
 export const selectApplication = (state: RootState) => state.application;
 export const selectLoadingStatus = pipe(
@@ -55,16 +56,5 @@ export interface ApplicationState {
   language: string;
   appConfiguration?: AppSettings;
   consoleEntries: ConsoleEntry[];
-  options: {
-    playOnHover: boolean;
-    followPlayCursor: boolean;
-    showLoupe: boolean;
-    audioSettings: {
-      volume: number;
-      speed: number;
-    };
-    easyMode: boolean;
-    secondsPerLine: number;
-    highlightingEnabled: boolean;
-  };
+  options: IIDBApplicationOptions;
 }

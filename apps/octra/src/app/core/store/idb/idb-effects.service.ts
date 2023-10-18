@@ -32,10 +32,12 @@ import { ApplicationActions } from '../application/application.actions';
 import { ASRActions } from '../asr/asr.actions';
 import { UserActions } from '../user/user.actions';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
-import { IIDBModeOptions } from '../../shared/octra-database';
+import {
+  IIDBApplicationOptions,
+  IIDBModeOptions,
+} from '../../shared/octra-database';
 import { hasProperty } from '@octra/utilities';
 import { AuthenticationActions } from '../authentication';
-import { ASRStateSettings } from '../asr';
 import { AnnotationState } from '../login-mode/annotation';
 import { AudioService } from '../../shared/service';
 
@@ -54,22 +56,7 @@ export class IDBEffects {
             map(() => {
               return forkJoin<
                 [
-                  {
-                    version?: string;
-                    easymode?: boolean;
-                    language?: string;
-                    usemode?: any;
-                    user?: string;
-                    showLoupe?: boolean;
-                    secondsPerLine?: number;
-                    audioSettings?: {
-                      volume: number;
-                      speed: number;
-                    };
-                    highlightingEnabled?: boolean;
-                    playOnHofer?: boolean;
-                    asr?: ASRStateSettings;
-                  },
+                  IIDBApplicationOptions,
                   IIDBModeOptions,
                   IIDBModeOptions,
                   IIDBModeOptions
@@ -77,14 +64,16 @@ export class IDBEffects {
               >([
                 this.idbService.loadOptions([
                   'version',
-                  'easymode',
+                  'easyMode',
                   'language',
-                  'usemode',
-                  'user',
+                  'useMode',
                   'showLoupe',
                   'secondsPerLine',
                   'audioSettings',
                   'highlightingEnabled',
+                  'editorFont',
+                  'playOnHover',
+                  'followPlayCursor',
                   'asr',
                 ]),
                 this.idbService.loadModeOptions(LoginMode.LOCAL),
@@ -401,46 +390,6 @@ export class IDBEffects {
     )
   );
 
-  /*
-  overwriteAnnotation$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(
-        AnnotationActions.overwriteTranscript.do,
-        AnnotationActions.initTranscriptionService.success
-      ),
-      exhaustMap((action) => {
-        if (action.saveToDB) {
-          return this.idbService.clearAnnotationData((action as any).mode).pipe(
-            map(() => IDBActions.overwriteTranscript.success()),
-            catchError((error) => {
-              return of(
-                IDBActions.overwriteTranscript.fail({
-                  error,
-                })
-              );
-            })
-          );
-        } else {
-          return of(IDBActions.overwriteTranscript.success());
-        }
-      })
-    )
-  );
-   */
-
-  /*
-      onClearOnlineSession$ = createEffect(() =>
-          this.actions$.pipe(
-            ofType(OnlineModeActions.clearOnlineSession.do),
-            exhaustMap((a) => {
-              return forkJoin({
-                options: this.idbService.clearOptions()
-              })
-            })
-          )
-        );
-       */
-
   logoutSession$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthenticationActions.logout.success),
@@ -470,6 +419,7 @@ export class IDBEffects {
         AuthenticationActions.loginLocal.prepare,
         AuthenticationActions.loginLocal.success,
         LoginModeActions.startAnnotation.success,
+        ApplicationActions.changeApplicationOption.do,
         AnnotationActions.setLevelIndex.do
       ),
       withLatestFrom(this.store),
@@ -531,6 +481,25 @@ export class IDBEffects {
     )
   );
 
+  changeApplicationOption$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.changeApplicationOption.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        return this.idbService.saveOption(action.name, action.value).pipe(
+          map((a) => ApplicationActions.changeApplicationOption.success()),
+          catchError((error: Error) =>
+            of(
+              ApplicationActions.changeApplicationOption.fail({
+                error: error?.message ?? error,
+              })
+            )
+          )
+        );
+      })
+    )
+  );
+
   saveUserProfile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.setUserProfile),
@@ -587,29 +556,11 @@ export class IDBEffects {
     )
   );
 
-  saveShowLoupe$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.setShowLoupe),
-      exhaustMap((action) => {
-        return this.idbService.saveOption('showLoupe', action.showLoupe).pipe(
-          map(() => IDBActions.saveShowLoupe.success()),
-          catchError((error: Error) => {
-            return of(
-              IDBActions.saveShowLoupe.fail({
-                error: error.message,
-              })
-            );
-          })
-        );
-      })
-    )
-  );
-
   saveEasyMode$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationActions.setEasyMode),
       exhaustMap((action) => {
-        return this.idbService.saveOption('easymode', action.easyMode).pipe(
+        return this.idbService.saveOption('easyMode', action.easyMode).pipe(
           map(() => IDBActions.saveEasyMode.success()),
           catchError((error: Error) => {
             return of(
@@ -619,29 +570,6 @@ export class IDBEffects {
             );
           })
         );
-      })
-    )
-  );
-
-  saveSecondsPerLine$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.setSecondsPerLine),
-      exhaustMap((action) => {
-        if (this.idbService.isReady) {
-          return this.idbService
-            .saveOption('secondsPerLine', action.secondsPerLine)
-            .pipe(
-              map(() => IDBActions.saveSecondsPerLine.success()),
-              catchError((error: Error) => {
-                return of(
-                  IDBActions.saveSecondsPerLine.fail({
-                    error: error.message,
-                  })
-                );
-              })
-            );
-        }
-        return of();
       })
     )
   );
@@ -710,7 +638,7 @@ export class IDBEffects {
         ),
         tap(async (action) => {
           this.sessStr.store('loggedIn', true);
-          await this.idbService.saveOption('usemode', action.mode);
+          await this.idbService.saveOption('useMode', action.mode);
         })
       ),
     { dispatch: false }
@@ -721,7 +649,7 @@ export class IDBEffects {
       ofType(AuthenticationActions.logout.success),
       exhaustMap((action) => {
         this.sessStr.store('loggedIn', false);
-        return this.idbService.saveOption('usemode', undefined).pipe(
+        return this.idbService.saveOption('useMode', undefined).pipe(
           map(() => IDBActions.saveLogout.success()),
           catchError((error: Error) => {
             return of(
@@ -731,62 +659,6 @@ export class IDBEffects {
             );
           })
         );
-      })
-    )
-  );
-
-  savePlayOnHover$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.setPlayOnHover),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        try {
-          this.sessStr.store('playonhover', action.playOnHover);
-          setTimeout(() => {
-            subject.next(IDBActions.saveFollowPlayCursor.success());
-            subject.complete();
-          }, 200);
-        } catch (error) {
-          setTimeout(() => {
-            subject.next(
-              IDBActions.saveFollowPlayCursor.fail({
-                error: error as any,
-              })
-            );
-            subject.complete();
-          }, 200);
-        }
-
-        return subject;
-      })
-    )
-  );
-
-  saveFollowPlayCursor$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.setFollowPlayCursor),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        try {
-          this.sessStr.store('followplaycursor', action.followPlayCursor);
-          setTimeout(() => {
-            subject.next(IDBActions.saveFollowPlayCursor.success());
-            subject.complete();
-          }, 200);
-        } catch (error) {
-          setTimeout(() => {
-            subject.next(
-              IDBActions.saveFollowPlayCursor.fail({
-                error: error as any,
-              })
-            );
-            subject.complete();
-          }, 200);
-        }
-
-        return subject;
       })
     )
   );
@@ -807,34 +679,6 @@ export class IDBEffects {
           setTimeout(() => {
             subject.next(
               IDBActions.saveAppReloaded.fail({
-                error: error as any,
-              })
-            );
-            subject.complete();
-          }, 200);
-        }
-
-        return subject;
-      })
-    )
-  );
-
-  saveServerDataEntry$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LoginModeActions.setServerDataEntry),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        try {
-          this.sessStr.store('serverDataEntry', action.serverDataEntry);
-          setTimeout(() => {
-            subject.next(IDBActions.saveServerDataEntry.success());
-            subject.complete();
-          }, 200);
-        } catch (error) {
-          setTimeout(() => {
-            subject.next(
-              IDBActions.saveServerDataEntry.fail({
                 error: error as any,
               })
             );
@@ -1065,7 +909,7 @@ export class IDBEffects {
         ofType(AuthenticationActions.loginOnline.redirectToURL),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          this.idbService.saveOption('usemode', LoginMode.ONLINE);
+          this.idbService.saveOption('useMode', LoginMode.ONLINE);
         })
       ),
     { dispatch: false }

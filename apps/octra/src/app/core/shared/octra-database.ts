@@ -4,6 +4,7 @@ import { LoginMode } from '../store';
 import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
 import { ProjectDto } from '@octra/api-types';
 import { removeEmptyProperties } from '@octra/utilities';
+import { ASRStateSettings } from '../store/asr';
 
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
@@ -431,6 +432,28 @@ export interface IIDBModeOptions {
     email: string;
   } | null;
 }
+
+export interface IIDBApplicationOptions {
+  asr?: ASRStateSettings | null;
+  audioSettings?: {
+    volume: number;
+    speed: number;
+  } | null;
+  console?: any[] | null;
+  easyMode?: boolean | null;
+  highlightingEnabled?: boolean | null;
+  interface?: string | null;
+  language?: string | null;
+  secondsPerLine?: number | null;
+  showLoupe?: boolean | null;
+  useMode?: LoginMode | null;
+  version?: number | null;
+  editorFont?: string | null;
+  playOnHover?: boolean | null;
+  followPlayCursor?: boolean | null;
+}
+
+export type IDBApplicationOptionName = "asr" | "audioSettings" | "console" | "easyMode" | "highlightingEnabled" | "interface" | "language" | "secondsPerLine" | "showLoupe" | "useMode" | "version" | "editorFont" | "playOnHover" | "followPlayCursor";
 
 export const DefaultModeOptions: IIDBModeOptions = {
   logging: true,

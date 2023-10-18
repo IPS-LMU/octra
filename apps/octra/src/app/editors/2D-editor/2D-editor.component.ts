@@ -380,7 +380,7 @@ export class TwoDEditorComponent
     this.viewer.settings.showProgressBars = true;
     this.viewer.name = 'multiline viewer';
 
-    this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
+    this.viewer.secondsPerLine = this.appStorage.secondsPerLine ?? 5;
 
     this.miniLoupeSettings.roundValues = false;
     this.miniLoupeSettings.shortcutsEnabled = false;
@@ -658,7 +658,7 @@ export class TwoDEditorComponent
 
     this.doPlayOnHover(
       this.audioManager,
-      this.appStorage.playonhover,
+      this.appStorage.playOnHover ?? false,
       this.audioChunkLines,
       this.viewer.av.mouseCursor!
     );
@@ -908,7 +908,7 @@ export class TwoDEditorComponent
       $event.value !== undefined &&
       contains($event.value, 'playonhover')
     ) {
-      this.appStorage.playonhover = !this.appStorage.playonhover;
+      this.appStorage.playOnHover = !this.appStorage.playOnHover;
     }
   }
 

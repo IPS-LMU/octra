@@ -1,6 +1,9 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import { IIDBModeOptions } from '../../shared/octra-database';
+import {
+  IIDBApplicationOptions,
+  IIDBModeOptions,
+} from '../../shared/octra-database';
 import {
   ASRContext,
   OctraAnnotation,
@@ -12,25 +15,7 @@ export class IDBActions {
     source: `IDB/Load options`,
     events: {
       success: props<{
-        applicationOptions: {
-          version?: string;
-          easymode?: boolean;
-          language?: string;
-          usemode?: any;
-          user?: string;
-          showLoupe?: boolean;
-          secondsPerLine?: number;
-          audioSettings?: {
-            volume: number;
-            speed: number;
-          };
-          highlightingEnabled?: boolean;
-          playOnHofer?: boolean;
-          asr?: {
-            selectedLanguage?: string;
-            selectedService?: string;
-          };
-        };
+        applicationOptions: IIDBApplicationOptions;
         localOptions: IIDBModeOptions;
         onlineOptions: IIDBModeOptions;
         demoOptions: IIDBModeOptions;

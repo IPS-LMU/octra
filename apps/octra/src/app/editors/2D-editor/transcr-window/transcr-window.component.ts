@@ -51,6 +51,7 @@ import {
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { ShortcutService } from '../../../core/shared/service/shortcut.service';
+import { ApplicationStoreService } from '../../../core/store/application/application-store.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -68,7 +69,7 @@ export class TranscrWindowComponent
   @ViewChild('window', { static: true }) window!: ElementRef;
   @ViewChild('main', { static: true }) main!: ElementRef;
   @Output() act: EventEmitter<string> = new EventEmitter<string>();
-  @Input() easymode = false;
+  @Input() easyMode: boolean | undefined | null = false;
   @Input() audiochunk!: AudioChunk;
   @Input() segmentIndex!: number;
 
@@ -318,6 +319,7 @@ export class TranscrWindowComponent
     public asrStoreService: AsrStoreService,
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
+    public appStoreService: ApplicationStoreService,
     public cd: ChangeDetectorRef
   ) {
     super();
@@ -1289,6 +1291,15 @@ export class TranscrWindowComponent
   }
 
   onSelectionChange(
-    selectionEvent: { start?: number; end?: number } | undefined
+    selectionEvent:
+      | {
+          start?: number;
+          end?: number;
+        }
+      | undefined
   ) {}
+
+  onFontChange(fontName: string) {
+    this.appStoreService.changeApplicationOption('editorFont', fontName);
+  }
 }

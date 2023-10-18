@@ -4,7 +4,7 @@
     (act)="onWindowAction($event)"
     *ngIf="showWindow"
     [audiochunk]="audioChunkWindow"
-    [easymode]="appStorage.easymode"
+    [easyMode]="appStorage.easyMode"
     [segmentIndex]="selectedIndex"
   ></octra-transcr-window>
   <octra-audio-navigation
@@ -13,7 +13,7 @@
     (afterVolumeChange)="afterVolumeChange($event)"
     (buttonClick)="onButtonClick($event)"
     [audioChunk]="audioChunkLines"
-    [easyMode]="appStorage.easymode"
+    [easyMode]="appStorage.easyMode"
     [playbackRate]="appStorage.audioSpeed"
     [responsive]="settingsService.responsive.enabled"
     [volume]="appStorage.audioVolume"

@@ -73,8 +73,8 @@ export class AudioNavigationComponent
     new_value: number;
     timestamp: number;
   }>();
-  @Input() responsive = false;
-  @Input() easyMode = false;
+  @Input() responsive: boolean | undefined | null = false;
+  @Input() easyMode: boolean | undefined | null = false;
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
 
@@ -110,38 +110,38 @@ export class AudioNavigationComponent
 
   private _volume = 1;
 
-  get volume(): number {
+  get volume(): number | undefined | null {
     return this._volume;
   }
 
-  @Input() set volume(value: number) {
+  @Input() set volume(value: number | undefined | null) {
     this.volumeChange.emit({
       old_value: Number(this._volume),
       new_value: Number(value),
       timestamp: Date.now(),
     });
-    this._volume = value;
+    this._volume = value ?? 1;
     if (this.audioChunk) {
-      this.audioChunk.volume = value;
+      this.audioChunk.volume = value ?? 1;
     }
   }
 
   private _playbackRate = 1;
 
-  get playbackRate(): number {
+  get playbackRate(): number | undefined | null {
     return this._playbackRate;
   }
 
-  @Input() set playbackRate(value: number) {
+  @Input() set playbackRate(value: number | undefined | null) {
     this.playbackRateChange.emit({
       old_value: Number(this._playbackRate),
       new_value: Number(value),
       timestamp: Date.now(),
     });
-    this._playbackRate = value;
+    this._playbackRate = value ?? 1;
 
     if (this.audioChunk !== undefined) {
-      this.audioChunk.playbackRate = value;
+      this.audioChunk.playbackRate = value ?? 1;
     }
   }
 
@@ -206,7 +206,7 @@ export class AudioNavigationComponent
    */
   afterVolumeChanged() {
     this.afterVolumeChange.emit({
-      new_value: this.volume,
+      new_value: this.volume ?? 1,
       timestamp: Date.now(),
     });
   }
@@ -216,7 +216,7 @@ export class AudioNavigationComponent
    */
   afterPlaybackRateChanged() {
     this.afterPlaybackRateChange.emit({
-      new_value: this.playbackRate,
+      new_value: this.playbackRate ?? 1,
       timestamp: Date.now(),
     });
   }

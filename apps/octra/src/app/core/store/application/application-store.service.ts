@@ -3,6 +3,7 @@ import { LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
 import { ApplicationActions } from './application.actions';
 import { SubscriptionManager } from '@octra/utilities';
+import { IDBApplicationOptionName } from '../../shared/octra-database';
 
 @Injectable({
   providedIn: 'root',
@@ -43,11 +44,25 @@ export class ApplicationStoreService {
     (state: RootState) => state.application.shortcutsEnabled
   );
 
+  options$ = this.store.select((state: RootState) => state.application.options);
+
   public initApplication() {
     this.store.dispatch(ApplicationActions.initApplication.do());
   }
 
   public destroy() {
     this.subscrManager.destroy();
+  }
+
+  changeApplicationOption(
+    name: IDBApplicationOptionName,
+    value: boolean | number | string
+  ) {
+    this.store.dispatch(
+      ApplicationActions.changeApplicationOption.do({
+        name,
+        value,
+      })
+    );
   }
 }

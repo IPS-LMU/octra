@@ -1,12 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { SessionStorageService } from 'ngx-webstorage';
 import { SessionFile } from '../../obj/SessionFile';
 import { SubscriptionManager, waitTillResultRetrieved } from '@octra/utilities';
-import { getModeState, LoadingStatus, LoginMode, RootState } from '../../store';
+import { getModeState, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
 import { ConsoleEntry } from './bug-report.service';
-import { Router } from '@angular/router';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
@@ -20,10 +18,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { AuthenticationActions } from '../../store/authentication';
 import {
-  ASRContext,
-  OctraAnnotation,
   OctraAnnotationAnyLevel,
-  OctraAnnotationLink,
   OctraAnnotationSegment,
 } from '@octra/annotation';
 
@@ -43,13 +38,29 @@ export class AppStorageService {
     return this._snapshot.localMode.sessionFile!;
   }
 
-  get playonhover(): boolean {
+  get playOnHover(): boolean | undefined | null {
     return this._snapshot.application.options.playOnHover;
   }
 
-  set playonhover(value: boolean) {
+  set playOnHover(value: boolean) {
     this.store.dispatch(
-      ApplicationActions.setPlayOnHover({ playOnHover: value })
+      ApplicationActions.changeApplicationOption.do({
+        name: 'playOnHover',
+        value,
+      })
+    );
+  }
+
+  get editorFont(): string | undefined | null {
+    return this._snapshot.application.options.editorFont;
+  }
+
+  set editorFont(value: string) {
+    this.store.dispatch(
+      ApplicationActions.changeApplicationOption.do({
+        name: 'editorFont',
+        value,
+      })
     );
   }
 
@@ -78,15 +89,6 @@ export class AppStorageService {
     );
   }
 
-  set serverDataEntry(value: any) {
-    this.store.dispatch(
-      LoginModeActions.setServerDataEntry({
-        serverDataEntry: value,
-        mode: this.useMode,
-      })
-    );
-  }
-
   set feedback(value: any) {
     this.store.dispatch(
       LoginModeActions.setFeedback({
@@ -104,11 +106,6 @@ export class AppStorageService {
     this.store.dispatch(ApplicationActions.setAppLanguage({ language: value }));
   }
 
-  /* Getter/Setter IDB Storage */
-  get dbVersion(): number {
-    return this._snapshot.application.idb.version!;
-  }
-
   get logging(): boolean {
     return getModeState(this._snapshot)?.logging.enabled ?? false;
   }
@@ -122,14 +119,15 @@ export class AppStorageService {
     );
   }
 
-  get showLoupe(): boolean {
+  get showLoupe(): boolean | undefined | null {
     return this._snapshot.application.options.showLoupe;
   }
 
   set showLoupe(value: boolean) {
     this.store.dispatch(
-      ApplicationActions.setShowLoupe({
-        showLoupe: value,
+      ApplicationActions.changeApplicationOption.do({
+        name: 'showLoupe',
+        value,
       })
     );
   }
@@ -150,11 +148,11 @@ export class AppStorageService {
     return this._snapshot.application.queryParams;
   }
 
-  get easymode(): boolean {
+  get easyMode(): boolean | undefined | null {
     return this._snapshot.application.options.easyMode;
   }
 
-  set easymode(value: boolean) {
+  set easyMode(value: boolean) {
     this.store.dispatch(
       ApplicationActions.setEasyMode({
         easyMode: value,
@@ -166,18 +164,15 @@ export class AppStorageService {
     return getModeState(this._snapshot)!.transcript!.levels;
   }
 
-  get annotationLinks(): OctraAnnotationLink[] {
-    return getModeState(this._snapshot)!.transcript?.links;
-  }
-
-  get secondsPerLine(): number {
+  get secondsPerLine(): number | undefined | null {
     return this._snapshot.application.options.secondsPerLine;
   }
 
   set secondsPerLine(value: number) {
     this.store.dispatch(
-      ApplicationActions.setSecondsPerLine({
-        secondsPerLine: value,
+      ApplicationActions.changeApplicationOption.do({
+        name: 'secondsPerLine',
+        value,
       })
     );
     this.settingschange.next({
@@ -186,11 +181,7 @@ export class AppStorageService {
     });
   }
 
-  get loadingStatus(): LoadingStatus {
-    return this._snapshot?.application?.loading?.status;
-  }
-
-  get highlightingEnabled(): boolean {
+  get highlightingEnabled(): boolean | undefined | null {
     return this._snapshot.application?.options.highlightingEnabled;
   }
 
@@ -204,12 +195,7 @@ export class AppStorageService {
 
   private _undoRedoDisabled = false;
 
-  constructor(
-    public sessStr: SessionStorageService,
-    private store: Store<RootState>,
-    private actions: Actions,
-    private router: Router
-  ) {
+  constructor(private store: Store<RootState>, private actions: Actions) {
     this.subscrManager.add(
       this.store.subscribe((state: RootState) => {
         this._snapshot = state;
@@ -218,12 +204,11 @@ export class AppStorageService {
   }
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
-  public settingschange = new Subject<{ key: string; value: any }>();
-
+  public settingschange = new Subject<{
+    key: string;
+    value: any;
+  }>();
   private subscrManager = new SubscriptionManager<Subscription>();
-
-  private _loaded = new EventEmitter();
-
   private _snapshot!: RootState;
 
   get savingNeeded(): boolean {
@@ -241,26 +226,15 @@ export class AppStorageService {
 
   set followPlayCursor(value: boolean) {
     this.store.dispatch(
-      ApplicationActions.setFollowPlayCursor({
-        followPlayCursor: value,
+      ApplicationActions.changeApplicationOption.do({
+        name: 'followPlayCursor',
+        value,
       })
     );
   }
 
-  get followPlayCursor(): boolean {
+  get followPlayCursor(): boolean | undefined | null {
     return this._snapshot.application.options.followPlayCursor;
-  }
-
-  get idbLoaded(): boolean {
-    return this._snapshot.application.idb.loaded;
-  }
-
-  set jobsLeft(jobsLeft: number) {
-    this.store.dispatch(
-      ApplicationActions.setJobsLeft({
-        jobsLeft,
-      })
-    );
   }
 
   get logs(): any[] {
@@ -279,7 +253,7 @@ export class AppStorageService {
     return undefined;
   }
 
-  public get audioVolume(): number {
+  public get audioVolume(): number | undefined | null {
     return this._snapshot?.application?.options?.audioSettings?.volume;
   }
 
@@ -287,12 +261,12 @@ export class AppStorageService {
     this.store.dispatch(
       ApplicationActions.setAudioSettings({
         volume: value,
-        speed: this.audioSpeed,
+        speed: this.audioSpeed ?? 1,
       })
     );
   }
 
-  public get audioSpeed(): number {
+  public get audioSpeed(): number | undefined {
     return this._snapshot.application?.options?.audioSettings?.speed;
   }
 
@@ -300,7 +274,7 @@ export class AppStorageService {
     this.store.dispatch(
       ApplicationActions.setAudioSettings({
         speed: value,
-        volume: this.audioVolume,
+        volume: this.audioVolume ?? 1,
       })
     );
   }
@@ -338,35 +312,14 @@ export class AppStorageService {
     );
   }
 
-  public overwriteAnnotation = (
-    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-    saveToDB = true
-  ) => {
-    this.store.dispatch(
-      AnnotationActions.overwriteTranscript.do({
-        mode: this.useMode,
-        transcript,
-        saveToDB,
-      })
-    );
-  };
-
-  public overwriteLinks = (value: OctraAnnotationLink[]) => {
-    this.store.dispatch(
-      AnnotationActions.overwriteLinks.do({
-        links: value,
-      })
-    );
-  };
-
   setURLSession(
     audio: string,
     transcript: string,
     embedded: boolean,
     host: string
   ) {
-    if (this.easymode === undefined) {
-      this.easymode = false;
+    if (this.easyMode === undefined) {
+      this.easyMode = false;
     }
 
     if (this.interface === undefined) {
@@ -440,8 +393,6 @@ export class AppStorageService {
     }
     return true;
   }
-
-  private maintenanceChecker!: Subscription;
 
   public afterSaving(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -524,15 +475,6 @@ export class AppStorageService {
         mode: this.useMode,
       })
     );
-  }
-
-  public getLevelByID(id: number) {
-    for (const level of this.annotationLevels) {
-      if (level.id === id) {
-        return level;
-      }
-    }
-    return undefined;
   }
 
   public startOnlineAnnotation(project: ProjectDto) {
@@ -618,7 +560,7 @@ export class AppStorageService {
     return Promise.all(promises);
   }
 
-  public abortReauthentication() {
+  public abortReAuthentication() {
     this.store.dispatch(AuthenticationActions.needReAuthentication.abort());
   }
 }

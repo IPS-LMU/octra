@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ConsoleEntry } from './bug-report.service';
 import {
   DefaultModeOptions,
+  IDBApplicationOptionName,
+  IIDBApplicationOptions,
   IIDBModeOptions,
   OctraDatabase,
 } from '../octra-database';
@@ -91,26 +93,9 @@ export class IDBService {
   /**
    * load options
    */
-  public loadOptions(keys: string[]): Observable<{
-    version?: string;
-    easymode?: boolean;
-    language?: string;
-    usemode?: any;
-    user?: string;
-    showLoupe?: boolean;
-    secondsPerLine?: number;
-    audioSettings?: {
-      volume: number;
-      speed: number;
-    };
-    highlightingEnabled?: boolean;
-    playOnHofer?: boolean;
-    asr?: {
-      selectedLanguage?: string;
-      selectedService?: string;
-      selectedMausLanguage?: string;
-    };
-  }> {
+  public loadOptions(
+    keys: IDBApplicationOptionName[]
+  ): Observable<IIDBApplicationOptions> {
     return from(this.database.options.bulkGet(keys)).pipe(
       map((values) => {
         const entries = values.filter((a) => a !== undefined);

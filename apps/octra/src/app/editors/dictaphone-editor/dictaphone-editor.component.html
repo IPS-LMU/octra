@@ -4,7 +4,7 @@
   (afterVolumeChange)="afterVolumeChange($event)"
   (buttonClick)="onButtonClick($event)"
   [audioChunk]="audiochunk"
-  [easyMode]="appStorage.easymode"
+  [easyMode]="appStorage.easyMode"
   [playbackRate]="appStorage.audioSpeed"
   [responsive]="settingsService.responsive.enabled"
   [volume]="appStorage.audioVolume"
@@ -20,7 +20,7 @@
   (typing)="afterTyping($event)"
   [audiochunk]="audiochunk"
   [segments]="segments"
-  [easymode]="appStorage.easymode"
+  [easymode]="appStorage.easyMode"
   [markers]="annotationStoreService.guidelines?.markers"
   [validationEnabled]="
     appStorage.useMode !== 'url' &&

@@ -34,6 +34,7 @@ export const initialState: ApplicationState = {
     easyMode: false,
     secondsPerLine: 10,
     highlightingEnabled: false,
+    editorFont: '', // TODO remove
   },
 };
 
@@ -43,14 +44,9 @@ export const reducer = createReducer(
     ApplicationActions.initApplication.setSessionStorageOptions,
     (
       state: ApplicationState,
-      { followPlayCursor, playOnHover, reloaded, loggedIn }
+      {reloaded, loggedIn }
     ) => ({
       ...state,
-      options: {
-        ...state.options,
-        followPlayCursor,
-        playOnHover,
-      },
       reloaded,
       loggedIn,
     })
@@ -59,14 +55,21 @@ export const reducer = createReducer(
     ...state,
     initialized: true,
   })),
-  on(AuthenticationActions.needReAuthentication.do, (state: ApplicationState) => ({
-    ...state,
-    shortcutsEnabled: false,
-  })),
-  on(AuthenticationActions.reauthenticate.success, AnnotationActions.prepareTaskDataForAnnotation.do, (state: ApplicationState) => ({
-    ...state,
-    shortcutsEnabled: true,
-  })),
+  on(
+    AuthenticationActions.needReAuthentication.do,
+    (state: ApplicationState) => ({
+      ...state,
+      shortcutsEnabled: false,
+    })
+  ),
+  on(
+    AuthenticationActions.reauthenticate.success,
+    AnnotationActions.prepareTaskDataForAnnotation.do,
+    (state: ApplicationState) => ({
+      ...state,
+      shortcutsEnabled: true,
+    })
+  ),
   on(
     AuthenticationActions.loginOnline.redirectToURL,
     (state: ApplicationState) => ({
@@ -134,14 +137,16 @@ export const reducer = createReducer(
     IDBActions.loadOptions.success,
     (state: ApplicationState, { applicationOptions }) => ({
       ...state,
-      mode: applicationOptions.usemode,
+      mode: applicationOptions.useMode ?? undefined,
       language: applicationOptions.language ?? 'en',
       options: {
         ...state.options,
         showLoupe: applicationOptions.showLoupe ?? false,
+        playOnHover: applicationOptions.playOnHover ?? false,
+        followPlayCursor: applicationOptions.followPlayCursor ?? false,
         secondsPerLine: applicationOptions.secondsPerLine ?? 5,
-        easyMode: applicationOptions.easymode ?? false,
-        playOnHover: applicationOptions.playOnHofer ?? false,
+        editorFont: applicationOptions.editorFont,
+        easyMode: applicationOptions.easyMode ?? false,
         highlightingEnabled: applicationOptions.highlightingEnabled ?? false,
         audioSettings: applicationOptions.audioSettings ?? {
           volume: 1,
@@ -196,16 +201,22 @@ export const reducer = createReducer(
     };
   }),
   on(
-    ApplicationActions.setPlayOnHover,
-    (state: ApplicationState, { playOnHover }) => ({
-      ...state,
-      options: {
+    ApplicationActions.changeApplicationOption.do,
+    (state: ApplicationState, { name, value }) => {
+      const options = {
         ...state.options,
-        playOnHover,
-      },
-    })
-  ),
+      };
 
+      if (Object.keys(options).includes(name)) {
+        (options as any)[name] = value;
+      }
+
+      return {
+        ...state,
+        options,
+      };
+    }
+  ),
   on(ApplicationActions.setAudioSettings, (state: ApplicationState, data) => ({
     ...state,
     options: {
@@ -310,75 +321,3 @@ export const reducer = createReducer(
     })
   )
 );
-
-function writeOptionToStore(
-  state: ApplicationState,
-  attribute: string,
-  value: any
-): ApplicationState {
-  switch (attribute) {
-    case 'version':
-      return {
-        ...state,
-        idb: {
-          ...state.idb,
-          version: value,
-        },
-      };
-    case 'language':
-      return {
-        ...state,
-        language: value !== undefined ? value : 'en',
-      };
-    case 'usemode':
-      return {
-        ...state,
-        mode: value,
-      };
-    case 'easymode':
-      return {
-        ...state,
-        options: {
-          ...state.options,
-          easyMode: value !== undefined ? value : false,
-        },
-      };
-    case 'showLoupe':
-      return {
-        ...state,
-        options: {
-          ...state.options,
-          showLoupe: value !== undefined ? value : false,
-        },
-      };
-    case 'secondsPerLine':
-      return {
-        ...state,
-        options: {
-          ...state.options,
-          secondsPerLine: value !== undefined ? value : 5,
-        },
-      };
-    case 'audioSettings':
-      return {
-        ...state,
-        options: {
-          ...state.options,
-          audioSettings: {
-            volume: value !== undefined ? value.volume : 1,
-            speed: value !== undefined ? value.speed : 1,
-          },
-        },
-      };
-    case 'highlightingEnabled':
-      return {
-        ...state,
-        options: {
-          ...state.options,
-          highlightingEnabled: value !== undefined ? value : false,
-        },
-      };
-    default:
-      return state;
-  }
-}

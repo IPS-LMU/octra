@@ -45,6 +45,7 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 import { AuthenticationComponent } from '../component/authentication-component/authentication-component.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
+import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -84,6 +85,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ReAuthenticationModalComponent,
     AuthenticationComponent,
     AboutModalComponent,
+    FeedbackNoticeModalComponent
   ],
   imports: [
     CommonModule,

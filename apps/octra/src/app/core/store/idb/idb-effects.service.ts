@@ -74,6 +74,7 @@ export class IDBEffects {
                   'editorFont',
                   'playOnHover',
                   'followPlayCursor',
+                  'showFeedbackNotice',
                   'asr',
                 ]),
                 this.idbService.loadModeOptions(LoginMode.LOCAL),

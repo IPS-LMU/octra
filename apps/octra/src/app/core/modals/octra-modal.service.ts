@@ -9,6 +9,7 @@ import { AccountLoginMethod } from '@octra/api-types';
 import { Action } from '@ngrx/store';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 import { ErrorModalComponent } from './error-modal/error-modal.component';
+import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 
 @Injectable()
 export class OctraModalService {
@@ -72,5 +73,12 @@ export class OctraModalService {
       ErrorModalComponent.options
     );
     ref.componentInstance.text = text;
+  }
+
+  openFeedbackModal() {
+    const ref = this.openModalRef<FeedbackNoticeModalComponent>(
+      FeedbackNoticeModalComponent,
+      FeedbackNoticeModalComponent.options
+    );
   }
 }

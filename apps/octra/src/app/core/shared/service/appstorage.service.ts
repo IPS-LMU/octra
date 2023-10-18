@@ -64,6 +64,19 @@ export class AppStorageService {
     );
   }
 
+  get showFeedbackNotice(): boolean | undefined | null {
+    return this._snapshot.application.options.showFeedbackNotice;
+  }
+
+  set showFeedbackNotice(value: boolean) {
+    this.store.dispatch(
+      ApplicationActions.changeApplicationOption.do({
+        name: 'showFeedbackNotice',
+        value,
+      })
+    );
+  }
+
   public get currentTask(): TaskDto | undefined {
     const mode = getModeState(this._snapshot);
     return mode?.currentSession.task;

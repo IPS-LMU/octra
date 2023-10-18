@@ -451,9 +451,10 @@ export interface IIDBApplicationOptions {
   editorFont?: string | null;
   playOnHover?: boolean | null;
   followPlayCursor?: boolean | null;
+  showFeedbackNotice?: boolean | null;
 }
 
-export type IDBApplicationOptionName = "asr" | "audioSettings" | "console" | "easyMode" | "highlightingEnabled" | "interface" | "language" | "secondsPerLine" | "showLoupe" | "useMode" | "version" | "editorFont" | "playOnHover" | "followPlayCursor";
+export type IDBApplicationOptionName = "asr" | "audioSettings" | "console" | "easyMode" | "highlightingEnabled" | "interface" | "language" | "secondsPerLine" | "showLoupe" | "useMode" | "version" | "editorFont" | "playOnHover" | "followPlayCursor" | "showFeedbackNotice";
 
 export const DefaultModeOptions: IIDBModeOptions = {
   logging: true,

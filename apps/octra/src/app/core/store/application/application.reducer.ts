@@ -148,6 +148,7 @@ export const reducer = createReducer(
         editorFont: applicationOptions.editorFont,
         easyMode: applicationOptions.easyMode ?? false,
         highlightingEnabled: applicationOptions.highlightingEnabled ?? false,
+        showFeedbackNotice: applicationOptions.showFeedbackNotice ?? true,
         audioSettings: applicationOptions.audioSettings ?? {
           volume: 1,
           speed: 1,

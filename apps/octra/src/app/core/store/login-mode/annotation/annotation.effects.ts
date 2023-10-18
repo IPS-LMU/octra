@@ -1364,6 +1364,13 @@ export class AnnotationEffects {
         );
       }
 
+      if (
+        rootState.application.options.showFeedbackNotice &&
+        this.apiService.appFeatures?.send_feedback
+      ) {
+        this.modalsService.openFeedbackModal();
+      }
+
       // new annotation set
       return of(
         AnnotationActions.initTranscriptionService.success({
@@ -1389,6 +1396,13 @@ export class AnnotationEffects {
           )
         : modeState.previousCurrentLevel;
     transcript.changeCurrentLevelIndex(currentLevelIndex);
+
+    if (
+      rootState.application.options.showFeedbackNotice &&
+      this.apiService.appFeatures?.send_feedback
+    ) {
+      this.modalsService.openFeedbackModal();
+    }
 
     return of(
       AnnotationActions.initTranscriptionService.success({

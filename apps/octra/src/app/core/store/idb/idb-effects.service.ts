@@ -314,6 +314,7 @@ export class IDBEffects {
       filter(
         (a) =>
           a.type === AnnotationActions.clearLogs.do.type ||
+          a.type === LoginModeActions.clearOnlineSession.do.type ||
           a.type === AnnotationActions.clearWholeSession.do.type
       ),
       exhaustMap((action) =>
@@ -367,6 +368,7 @@ export class IDBEffects {
         (action) =>
           action.type === AnnotationActions.clearAnnotation.do.type ||
           action.type === LoginModeActions.clearWholeSession.do.type ||
+          action.type === LoginModeActions.clearOnlineSession.do.type ||
           action.type === AuthenticationActions.logout.success.type
       ),
       exhaustMap((action) => {

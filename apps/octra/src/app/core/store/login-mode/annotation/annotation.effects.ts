@@ -931,6 +931,7 @@ export class AnnotationEffects {
         );
 
         this.store.dispatch(ApplicationActions.waitForEffects.do());
+
         return of(
           LoginModeActions.clearOnlineSession.do({
             mode: a.mode,

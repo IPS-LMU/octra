@@ -458,7 +458,7 @@ export class AnnotationEffects {
             if (a.redirectToProjects) {
               return of(AnnotationActions.redirectToProjects.do());
             } else {
-              return this.saveTaskToServer(state, TaskStatus.busy).pipe(
+              return this.saveTaskToServer(state, TaskStatus.paused).pipe(
                 map(() => {
                   return AuthenticationActions.logout.do({
                     clearSession: a.clearSession,

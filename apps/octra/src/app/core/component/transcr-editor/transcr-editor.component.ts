@@ -498,6 +498,7 @@ export class TranscrEditorComponent
 
       this.size.height = this.transcrEditor.nativeElement.offsetHeight;
       this.size.width = this.transcrEditor.nativeElement.offsetWidth;
+
       if (this._settings.highlightingEnabled) {
         this.startRecurringHighlight();
       }
@@ -990,8 +991,8 @@ export class TranscrEditorComponent
           this.highlightingEnabled = false;
           this.stopRecurringHighlight();
         } else {
-          this.startRecurringHighlight();
           this.highlightingEnabled = true;
+          this.startRecurringHighlight();
         }
 
         (event.target! as any).outerHTML = getContent();
@@ -1238,10 +1239,9 @@ export class TranscrEditorComponent
   }
 
   public startRecurringHighlight() {
-    if (this.highlightingRunning) {
-      this.subscrManager.removeByTag('highlight');
-      this.lockHighlighting = false;
-    }
+    this.subscrManager.removeByTag('highlight');
+    this.lockHighlighting = false;
+
     if (this._highlightingEnabled && this._settings.highlightingEnabled) {
       this.highlightingRunning = true;
 
@@ -1270,7 +1270,6 @@ export class TranscrEditorComponent
   }
 
   public highlightCurrentSegment(playPosition: SampleUnit) {
-    // TODO change algorithm
     if (!this.annotationStoreService.currentLevel || !this.wysiwyg) {
       return;
     }

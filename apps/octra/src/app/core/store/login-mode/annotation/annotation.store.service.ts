@@ -284,8 +284,8 @@ export class AnnotationStoreService {
     );
   }
 
-  sendAnnotation() {
-    this.store.dispatch(AnnotationActions.sendAnnotation.do({
+  sendOnlineAnnotation() {
+    this.store.dispatch(AnnotationActions.sendOnlineAnnotation.do({
       mode: this.appStorage.snapshot.application.mode!
     }));
   }

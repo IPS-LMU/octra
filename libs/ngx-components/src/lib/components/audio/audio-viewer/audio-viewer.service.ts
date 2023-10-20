@@ -309,7 +309,6 @@ export class AudioViewerService {
                 this.audioChunk.selection.checkSelection();
                 this._drawnSelection = this.audioChunk.selection.clone();
 
-                // TODO check this!
                 this.PlayCursor.changeSamples(
                   this.audioChunk.absolutePlayposition.clone(),
                   this.audioTCalculator,

@@ -5,7 +5,6 @@ import { AUTHENTICATED_GUARD } from './intern.activateguard';
 import { TranscriptionComponent } from './transcription';
 import { TranscActivateGuard } from '../../shared/guard/transcr.activateguard';
 import { TranscriptionEndComponent } from './transcription-end';
-import { TranscrEndGuard } from '../../shared/guard';
 import { ReloadFileComponent } from './reload-file';
 import { ReloadFileGuard } from './reload-file/reload-file.activateguard';
 import { AuthComponent } from './auth';
@@ -25,7 +24,6 @@ const MEMBER_ROUTES: Routes = [
   {
     path: 'transcr/end',
     component: TranscriptionEndComponent,
-    canActivate: [TranscrEndGuard],
   },
   {
     path: 'transcr/reload-file',

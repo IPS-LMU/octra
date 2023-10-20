@@ -17,7 +17,6 @@ export class PlayCursor {
   }
 
   get relX(): number {
-    // TODO INCORRECT
     return this._innerWidth > 0 ? this._absX % this._innerWidth : 0;
   }
 

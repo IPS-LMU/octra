@@ -34,7 +34,6 @@ import {
   AudioViewerComponent,
   AudioViewerShortcutEvent,
 } from '@octra/ngx-components';
-import { LoginMode } from '../../../core/store';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
 import { DefaultComponent } from '../../../core/component/default.component';
@@ -324,40 +323,6 @@ export class TranscrWindowComponent
   ) {
     super();
 
-    if (
-      this.appStorage.useMode === LoginMode.ONLINE ||
-      this.appStorage.useMode === LoginMode.DEMO
-    ) {
-      /* TODO:later implement
-
-      this.subscrManager.add(
-        this.keyMap.beforeShortcutTriggered.subscribe(
-          (event: ShortcutEvent) => {
-            if (
-              event.shortcut === 'SHIFT + ALT + 1' ||
-              event.shortcut === 'SHIFT + ALT + 2' ||
-              event.shortcut === 'SHIFT + ALT + 3'
-            ) {
-              this.transcrService.tasksBeforeSend.push(
-                new Promise<void>((resolve) => {
-                  this.save();
-
-                  if (this.oldRaw === this.editor.rawText) {
-                    this.appStorage.saving.emit('success');
-                  }
-
-                  this.close();
-                  resolve();
-                })
-              );
-            }
-          }
-        )
-      );
-
-       */
-    }
-
     this.subscrManager.add(
       this.asrStoreService.queue$.subscribe(
         (queue) => {
@@ -375,7 +340,6 @@ export class TranscrWindowComponent
               this.transcript = item.result;
             }
 
-            // TODO:later find a better solution
             this.loupe.redraw();
 
             this.cd.markForCheck();
@@ -710,9 +674,6 @@ export class TranscrWindowComponent
         'audio_buttons'
       );
     }
-
-    // TODO:later important what about this?
-    // this.loupe.onButtonClick(event);
   }
 
   /**

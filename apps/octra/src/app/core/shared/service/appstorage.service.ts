@@ -492,7 +492,7 @@ export class AppStorageService {
 
   public startOnlineAnnotation(project: ProjectDto) {
     this.store.dispatch(
-      AnnotationActions.startAnnotation.do({
+      AnnotationActions.startOnlineAnnotation.do({
         project,
         mode: LoginMode.ONLINE,
       })

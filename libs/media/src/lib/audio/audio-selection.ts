@@ -2,7 +2,6 @@ import { SampleUnit } from './audio-time';
 
 export class AudioSelection {
   get length(): number {
-    // TODO is this implementation correct?
     if (this._start && this._end && this._start.samples > this._end.samples) {
       return Math.abs(this._start.samples - this._end.samples);
     } else {

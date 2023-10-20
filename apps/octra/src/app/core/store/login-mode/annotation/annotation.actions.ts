@@ -274,8 +274,8 @@ export class AnnotationActions {
     },
   });
 
-  static startAnnotation = createActionGroup({
-    source: `annotation/start`,
+  static startOnlineAnnotation = createActionGroup({
+    source: `annotation/start online`,
     events: {
       do: props<{
         project: ProjectDto;
@@ -298,8 +298,8 @@ export class AnnotationActions {
     },
   });
 
-  static sendAnnotation = createActionGroup({
-    source: `annotation/ send to server`,
+  static sendOnlineAnnotation = createActionGroup({
+    source: `annotation/ send online annotation`,
     events: {
       do: props<{
         mode: LoginMode;

@@ -265,7 +265,7 @@
                 -->
         <li
           class="nav-item dropdown"
-          *ngIf="appStorage.loggedIn && appStorage.audioLoaded"
+          *ngIf="appStorage.loggedIn && appStorage.audioLoaded && audio.audioManager !== undefined && audio.audioManager?.resource !== undefined"
           ngbDropdown
           [container]="'body'"
           display="dynamic"
@@ -320,7 +320,7 @@
                   <span>{{ 'g.name' | transloco }}:</span>
                 </td>
                 <td>
-                  <span>{{ audio.audioManager!.resource.info!.fullname }}</span>
+                  <span>{{ audio.audioManager!.resource.info?.fullname }}</span>
                 </td>
               </tr>
               <tr>
@@ -328,7 +328,7 @@
                   <span>{{ 'g.duration' | transloco }}:</span>
                 </td>
                 <td>
-                  <span
+                  <span *ngIf="audio.audioManager!.resource.info !== undefined"
                     >{{
                       audio.audioManager!.resource.info!.duration.unix
                         | timespan
@@ -346,7 +346,7 @@
                 </td>
                 <td>
                   <span>{{
-                    audio.audioManager!.resource!.info!.sampleRate
+                    audio.audioManager!.resource!.info?.sampleRate
                   }}</span>
                 </td>
               </tr>
@@ -357,7 +357,7 @@
                 <td>
                   <span
                     >{{
-                      audio.audioManager!.resource!.info!.bitrate
+                      audio.audioManager!.resource!.info?.bitrate
                     }}
                     Bit/s</span
                   >

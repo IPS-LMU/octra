@@ -421,7 +421,7 @@ export class IDBEffects {
         AuthenticationActions.loginDemo.success,
         AuthenticationActions.loginLocal.prepare,
         AuthenticationActions.loginLocal.success,
-        LoginModeActions.startAnnotation.success,
+        LoginModeActions.startOnlineAnnotation.success,
         ApplicationActions.changeApplicationOption.do,
         AnnotationActions.setLevelIndex.do
       ),
@@ -925,7 +925,6 @@ export class IDBEffects {
     private store: Store<RootState>,
     private audio: AudioService
   ) {
-    // TODO add this as effect
     actions$.subscribe((action) => {
       if (action.type.toLocaleLowerCase().indexOf('failed') > -1) {
         const errorMessage = (action as any).error;

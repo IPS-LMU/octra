@@ -202,34 +202,6 @@ export class DictaphoneEditorComponent
     public appStorage: AppStorageService
   ) {
     super();
-
-    /*
-    if (
-      this.appStorage.useMode === 'online' ||
-      this.appStorage.useMode === 'demo'
-    ) {
-      this.subscrManager.add(
-        this.keyMap.beforeShortcutTriggered.subscribe(
-          (event: ShortcutEvent) => {
-            if (
-              event.shortcut === 'SHIFT + ALT + 1' ||
-              event.shortcut === 'SHIFT + ALT + 2' ||
-              event.shortcut === 'SHIFT + ALT + 3'
-            ) {
-              /* TODO:later
-              this.transcrService.tasksBeforeSend.push(
-                new Promise<void>((resolve) => {
-                  this.appStorage.afterSaving().then(() => {
-                    resolve();
-                  });
-                })
-              );
-
-            }
-          }
-        )
-      );
-    } */
   }
 
   ngOnInit() {

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   OnDestroy,
@@ -18,6 +19,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
+import { ShortcutService } from '../../shared/service/shortcut.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -29,7 +31,7 @@ declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 })
 export class OverviewModalComponent
   extends OctraModal
-  implements OnInit, OnDestroy
+  implements OnInit, OnDestroy, AfterViewInit
 {
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -73,6 +75,7 @@ export class OverviewModalComponent
     public modalService: NgbModal,
     public settingsService: SettingsService,
     public annotationStoreService: AnnotationStoreService,
+    private shortcutsService: ShortcutService,
     public appStorage: AppStorageService,
     private uiService: UserInteractionsService,
     protected override activeModal: NgbActiveModal
@@ -81,23 +84,51 @@ export class OverviewModalComponent
   }
 
   ngOnInit() {
-    /* TODO add shortcuts
-      if (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast')) {
-        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
-          switch (keyObj.comboKey) {
-            case('CTRL + 1'):
+    if (
+      this.settingsService.isTheme('shortAudioFiles') ||
+      this.settingsService.isTheme('secondSegmentFast')
+    ) {
+      this.shortcutsService.registerShortcutGroup({
+        name: 'overview modal',
+        items: [
+          {
+            name: 'send good',
+            title: 'overview modal.good',
+            keys: {
+              mac: 'CTRL + 1',
+              pc: 'CTRL + 1',
+            },
+            callback: () => {
               this.sendTranscriptionForShortAudioFiles('good');
-              break;
-            case('CTRL + 2'):
+            },
+          },
+          {
+            name: 'send middle',
+            title: 'overview modal.middle',
+            keys: {
+              mac: 'CTRL + 2',
+              pc: 'CTRL + 2',
+            },
+            callback: () => {
               this.sendTranscriptionForShortAudioFiles('middle');
-              break;
-            case('CTRL + 3'):
+            },
+          },
+          {
+            name: 'send bad',
+            title: 'overview modal.bad',
+            keys: {
+              mac: 'CTRL + 3',
+              pc: 'CTRL + 3',
+            },
+            callback: () => {
               this.sendTranscriptionForShortAudioFiles('bad');
-              break;
-          }
-        }));
-      }
-     */
+            },
+          },
+        ],
+        enabled: true,
+      });
+    }
+
     this.uiService.addElementFromEvent(
       'overview',
       { value: 'opened' },
@@ -110,7 +141,13 @@ export class OverviewModalComponent
     );
   }
 
+  ngAfterViewInit() {
+    this.feedback.comment = this.annotationStoreService.comment;
+  }
+
   public override close(fromModal = false) {
+    this.annotationStoreService.comment = this.feedback.comment;
+
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
       this.subscrManager.removeById(this.shortcutID);
@@ -149,8 +186,11 @@ export class OverviewModalComponent
       this.appStorage.useMode === LoginMode.ONLINE ||
       this.appStorage.useMode === LoginMode.DEMO
     ) {
-      this.feedback.saveFeedbackform();
+      // TODO implement feedback form
+      // this.feedback.saveFeedbackform();
     }
+
+    this.annotationStoreService.comment = this.feedback.comment;
     this.transcriptionSend.emit();
   }
 
@@ -293,5 +333,6 @@ export class OverviewModalComponent
 
   override ngOnDestroy() {
     super.ngOnDestroy();
+    this.shortcutsService.unregisterShortcutGroup('overview modal');
   }
 }

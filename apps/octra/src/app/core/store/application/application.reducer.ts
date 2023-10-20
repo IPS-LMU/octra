@@ -34,7 +34,6 @@ export const initialState: ApplicationState = {
     easyMode: false,
     secondsPerLine: 10,
     highlightingEnabled: false,
-    editorFont: '', // TODO remove
   },
 };
 

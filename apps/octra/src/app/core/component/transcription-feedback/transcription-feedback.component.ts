@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -17,10 +18,12 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.scss'],
 })
-export class TranscriptionFeedbackComponent implements OnChanges {
+export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
   @ViewChild('fo', { static: true }) feedbackForm!: NgForm;
+
+  comment = '';
 
   public get valid(): boolean {
     return this.feedbackForm.valid!;
@@ -116,5 +119,9 @@ export class TranscriptionFeedbackComponent implements OnChanges {
         break;
       }
     }
+  }
+
+  ngOnDestroy() {
+    this.annotationStoreService.comment = this.comment;
   }
 }

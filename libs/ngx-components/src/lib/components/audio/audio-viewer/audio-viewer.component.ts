@@ -1414,7 +1414,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.audioChunk.relativePlayposition !== undefined &&
       this.av.PlayCursor !== undefined
     ) {
-      // TODO check this!
       let currentAbsX = this.av.audioTCalculator.samplestoAbsX(
         this.audioChunk.relativePlayposition
       );
@@ -2774,7 +2773,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                               });
                             }
                           } else {
-                            // TODO check this case again!
                             this.alert.emit({
                               type: 'error',
                               message: 'segment invisible',

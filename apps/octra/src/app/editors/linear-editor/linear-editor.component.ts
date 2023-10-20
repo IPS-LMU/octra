@@ -28,7 +28,6 @@ import {
   CurrentLevelChangeEvent,
 } from '@octra/ngx-components';
 import { AudioSelection, SampleUnit } from '@octra/media';
-import { LoginMode } from '../../core/store';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import {
@@ -416,42 +415,6 @@ export class LinearEditorComponent
     public appStorage: AppStorageService
   ) {
     super();
-
-    if (
-      this.appStorage.useMode === LoginMode.ONLINE ||
-      this.appStorage.useMode === LoginMode.DEMO
-    ) {
-      /* TODO:later
-      this.subscrManager.add(
-        this.keyMap.beforeShortcutTriggered.subscribe(
-          (event: ShortcutEvent) => {
-            if (
-              event.shortcut === 'SHIFT + ALT + 1' ||
-              event.shortcut === 'SHIFT + ALT + 2' ||
-              event.shortcut === 'SHIFT + ALT + 3'
-            ) {
-              this.transcrService.tasksBeforeSend.push(
-                new Promise<void>((resolve) => {
-                  if (
-                    this.audioChunkDown !== undefined &&
-                    this.segmentselected &&
-                    this.selectedIndex > -1
-                  ) {
-                    this.editor.updateRawText();
-                    this.save();
-                    resolve();
-                  } else {
-                    resolve();
-                  }
-                })
-              );
-
-            }
-          }
-        )
-      );
-               */
-    }
   }
 
   /**

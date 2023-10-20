@@ -581,29 +581,6 @@ export class ApplicationEffects {
       exhaustMap(([a, state]: [Action, RootState]) => {
         this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
 
-        if (
-          state.asr.settings?.selectedService &&
-          state.asr.settings?.selectedLanguage
-        ) {
-          const selectedLanguage = state.asr.settings.selectedLanguage;
-          const selectedService = state.asr.settings.selectedService;
-
-          /* TODO Implement
-                        const lang: ASRLanguage | undefined =
-                          this.asrService.getLanguageByCode(
-                            selectedLanguage,
-                            selectedService
-                          );
-
-                        if (lang) {
-                          // TODO implement this.asrService.se = lang;
-                        } else {
-                          console.error('Could not read ASR language from database');
-                        }
-
-                         */
-        }
-
         if (!this.settingsService.responsive.enabled) {
           this.setFixedWidth();
         }

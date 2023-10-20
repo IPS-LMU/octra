@@ -86,10 +86,9 @@ export class AnnotationEffects {
 
   startAnnotation$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.startAnnotation.do),
+      ofType(AnnotationActions.startOnlineAnnotation.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        // TODO write for Local and URL and DEMO
         return this.apiService
           .startTask(a.project.id, {
             task_type: 'annotation',
@@ -118,7 +117,7 @@ export class AnnotationEffects {
                   message: error.error?.message ?? error.message,
                 },
                 a,
-                AnnotationActions.startAnnotation.fail({
+                AnnotationActions.startOnlineAnnotation.fail({
                   error: error.error?.message ?? error.message,
                   showOKButton: true,
                 }),
@@ -142,7 +141,7 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       map(([{ task, currentProject, mode }, state]) => {
         if (!task.tool_configuration) {
-          return AnnotationActions.startAnnotation.fail({
+          return AnnotationActions.startOnlineAnnotation.fail({
             error: 'Missing tool configuration',
             showOKButton: true,
           });
@@ -152,7 +151,7 @@ export class AnnotationEffects {
           !task.tool_configuration.assets ||
           task.tool_configuration.assets.length === 0
         ) {
-          return AnnotationActions.startAnnotation.fail({
+          return AnnotationActions.startOnlineAnnotation.fail({
             error: 'Missing tool configuration assets',
             showOKButton: true,
           });
@@ -183,7 +182,7 @@ export class AnnotationEffects {
           }
         }
 
-        return AnnotationActions.startAnnotation.success({
+        return AnnotationActions.startOnlineAnnotation.success({
           task,
           project: currentProject,
           mode,
@@ -198,7 +197,7 @@ export class AnnotationEffects {
   onAnnotationStart$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.startAnnotation.success),
+        ofType(AnnotationActions.startOnlineAnnotation.success),
         withLatestFrom(this.store),
         tap(([a, state]) => {
           // INIT UI SERVICE
@@ -803,7 +802,7 @@ export class AnnotationEffects {
 
   onAnnotationSend$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.sendAnnotation.do),
+      ofType(AnnotationActions.sendOnlineAnnotation.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (state.application.mode === LoginMode.ONLINE) {
@@ -823,7 +822,7 @@ export class AnnotationEffects {
             !state.onlineMode.currentSession.task?.id
           ) {
             return of(
-              AnnotationActions.sendAnnotation.fail({
+              AnnotationActions.sendOnlineAnnotation.fail({
                 mode: state.application.mode!,
                 error: 'Current project or current task is undefined',
               })
@@ -832,7 +831,7 @@ export class AnnotationEffects {
 
           return this.saveTaskToServer(state, TaskStatus.finished).pipe(
             map((a) => {
-              return AnnotationActions.sendAnnotation.success({
+              return AnnotationActions.sendOnlineAnnotation.success({
                 mode: state.application.mode!,
                 task: a,
               });
@@ -848,7 +847,7 @@ export class AnnotationEffects {
                   message: error.error?.message ?? error.message,
                 },
                 a,
-                AnnotationActions.sendAnnotation.fail({
+                AnnotationActions.sendOnlineAnnotation.fail({
                   mode: state.application.mode!,
                   error: error.error?.message ?? error.message,
                 }),
@@ -857,17 +856,15 @@ export class AnnotationEffects {
                   if (this.transcrSendingModal.ref) {
                     this.transcrSendingModal.ref.componentInstance.error =
                       error.error?.message ?? error.message;
-                    /* TODO if error is because of not busy => select new annotation? */
                   }
                 }
               );
             })
           );
-        } else {
-          // TODO add other modes
         }
+
         return of(
-          AnnotationActions.sendAnnotation.fail({
+          AnnotationActions.sendOnlineAnnotation.fail({
             mode: state.application.mode!,
             error: 'Not implemented',
           })
@@ -879,7 +876,7 @@ export class AnnotationEffects {
   sendAnnotationFail$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.sendAnnotation.fail),
+        ofType(AnnotationActions.sendOnlineAnnotation.fail),
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.transcrSendingModal.timeout?.unsubscribe();
@@ -893,7 +890,7 @@ export class AnnotationEffects {
 
   afterAnnotationSent$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.sendAnnotation.success),
+      ofType(AnnotationActions.sendOnlineAnnotation.success),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         this.transcrSendingModal.timeout?.unsubscribe();
@@ -911,7 +908,7 @@ export class AnnotationEffects {
         return of(
           LoginModeActions.clearOnlineSession.do({
             mode: a.mode,
-            actionAfterSuccess: AnnotationActions.startAnnotation.do({
+            actionAfterSuccess: AnnotationActions.startOnlineAnnotation.do({
               mode: a.mode,
               project: state.onlineMode.currentSession.currentProject!,
               actionAfterFail: LoginModeActions.endTranscription.do({

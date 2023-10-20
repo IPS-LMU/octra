@@ -17,11 +17,7 @@ import { NavbarService } from './core/component/navbar/navbar.service';
 import { ReloadFileGuard } from './core/pages/intern/reload-file/reload-file.activateguard';
 
 import { OctraModalService } from './core/modals/octra-modal.service'; // modules
-import {
-  ALoginGuard,
-  DeALoginGuard,
-  TranscrEndGuard,
-} from './core/shared/guard';
+import { ALoginGuard, DeALoginGuard } from './core/shared/guard';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 
@@ -136,7 +132,6 @@ import { RouterModule } from '@angular/router';
     IDBService,
     TranscActivateGuard,
     SettingsService,
-    TranscrEndGuard,
     BugReportService,
     CompatibilityService,
     MultiThreadingService,

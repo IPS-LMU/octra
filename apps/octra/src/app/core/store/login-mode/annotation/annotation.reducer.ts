@@ -526,7 +526,7 @@ export class AnnotationStateReducers {
         }
       ),
       on(
-        AnnotationActions.sendAnnotation.do,
+        AnnotationActions.sendOnlineAnnotation.do,
         (state: AnnotationState, { mode }) => {
           if (mode === this.mode) {
             state.currentSession = {
@@ -538,8 +538,8 @@ export class AnnotationStateReducers {
         }
       ),
       on(
-        AnnotationActions.sendAnnotation.fail,
-        AnnotationActions.sendAnnotation.success,
+        AnnotationActions.sendOnlineAnnotation.fail,
+        AnnotationActions.sendOnlineAnnotation.success,
         (state: AnnotationState, { mode }) => {
           if (mode === this.mode) {
             state.currentSession = {

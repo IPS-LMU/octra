@@ -46,8 +46,7 @@
           #feedback
           [feedbackData]="annotationStoreService.feedback$ | async"
           [showCommentFieldOnly]="
-            settingsService.isTheme('shortAudioFiles') ||
-            settingsService.isTheme('korbinian')
+            settingsService.isTheme('shortAudioFiles')
           "
         >
         </octra-transcription-feedback>

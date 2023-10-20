@@ -265,7 +265,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
 
     // start cutting
-    // TODO arraybuffer is c
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
       this.audio.audioManager.resource.info.fullname,
@@ -358,7 +357,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
             let sizeProcessed = 0;
             const startZipping = Date.now();
-            /** TODO better use stream **/
             zip(
               this.tools.audioCutting.archiveStructure,
               { level: 9 },

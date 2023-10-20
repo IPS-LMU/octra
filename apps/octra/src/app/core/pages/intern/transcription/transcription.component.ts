@@ -479,8 +479,7 @@ export class TranscriptionComponent
         ? 'default'
         : this.projectsettings?.octra.theme;
     this.showCommentSection =
-      (this.settingsService.isTheme('shortAudioFiles') ||
-        this.settingsService.isTheme('korbinian')) &&
+      this.settingsService.isTheme('shortAudioFiles') &&
       (this._useMode === 'online' || this._useMode === 'demo');
 
     this.subscrManager.add(
@@ -639,7 +638,6 @@ export class TranscriptionComponent
   }
 
   private async checkCurrentEditor() {
-    // TODO move this to another place
     const currentEditor = this.appStorage.interface;
     const found = this.projectsettings.interfaces.find((x) => {
       return currentEditor === x;
@@ -697,11 +695,29 @@ export class TranscriptionComponent
                       (
                         this.currentEditor.instance as any
                       ).disableAllShortcuts();
-                      this.modService
-                        .openModal(
-                          OverviewModalComponent,
-                          OverviewModalComponent.options
-                        )
+
+                      this.subscrManager.removeByTag(
+                        'overview modal transcr send'
+                      );
+                      this.modalOverview = this.modService.openModalRef(
+                        OverviewModalComponent,
+                        OverviewModalComponent.options
+                      );
+                      this.subscrManager.add(
+                        this.modalOverview.componentInstance.transcriptionSend.subscribe(
+                          () => {
+                            const editor = this._currentEditor
+                              .instance as OctraEditorRequirements;
+                            editor.enableAllShortcuts();
+                            this.modalOverview?.close();
+                            this.modalVisiblities.overview = false;
+                            this.onSendNowClick();
+                          }
+                        ),
+                        'overview modal transcr send'
+                      );
+
+                      this.modalOverview.result
                         .then(() => {
                           (
                             this.currentEditor.instance as any
@@ -746,7 +762,7 @@ export class TranscriptionComponent
 
     if (this._useMode === LoginMode.ONLINE) {
       if (this._useMode === LoginMode.ONLINE) {
-        this.annotationStoreService.sendAnnotation();
+        this.annotationStoreService.sendOnlineAnnotation();
       }
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
@@ -819,6 +835,18 @@ export class TranscriptionComponent
       this.modalOverview = this.modService.openModalRef(
         OverviewModalComponent,
         OverviewModalComponent.options
+      );
+      this.subscrManager.removeByTag('overview modal transcr send');
+      this.subscrManager.add(
+        this.modalOverview.componentInstance.transcriptionSend.subscribe(() => {
+          const editor = this._currentEditor
+            .instance as OctraEditorRequirements;
+          editor.enableAllShortcuts();
+          this.modalOverview?.close();
+          this.modalVisiblities.overview = false;
+          this.onSendNowClick();
+        }),
+        'overview modal transcr send'
       );
     } else {
       this.onSendNowClick();
@@ -984,6 +1012,19 @@ export class TranscriptionComponent
       OverviewModalComponent,
       OverviewModalComponent.options
     );
+
+    this.subscrManager.removeByTag('overview modal transcr send');
+    this.subscrManager.add(
+      this.modalOverview.componentInstance.transcriptionSend.subscribe(() => {
+        const editor = this._currentEditor.instance as OctraEditorRequirements;
+        editor.enableAllShortcuts();
+        this.modalOverview?.close();
+        this.modalVisiblities.overview = false;
+        this.onSendNowClick();
+      }),
+      'overview modal transcr send'
+    );
+
     this.modalOverview.result
       .then(() => {
         const editor = this._currentEditor.instance as OctraEditorRequirements;

@@ -101,7 +101,7 @@ export const authenticationReducer = createReducer(
     (state: AuthenticationState, dto) => {
       return {
         ...state,
-        me: undefined,
+        me: dto.clearSession ? undefined : state.me,
         authenticated: false,
         type: undefined,
         webToken: undefined,

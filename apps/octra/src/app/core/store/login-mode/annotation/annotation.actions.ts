@@ -18,7 +18,6 @@ import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
 import { SampleUnit } from '@octra/media';
 import { GuidelinesItem } from './index';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
-import videojs from 'video.js';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({
@@ -201,12 +200,6 @@ export class AnnotationActions {
         clearSession: boolean;
         freeTask: boolean;
         redirectToProjects?: boolean;
-      }>(),
-      success: props<{
-        mode: LoginMode;
-      }>(),
-      fail: props<{
-        error: string;
       }>(),
     },
   });

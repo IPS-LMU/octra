@@ -44,6 +44,7 @@ import {
   TaskDto,
   TaskInputOutputCreatorType,
   TaskInputOutputDto,
+  TaskStatus,
   ToolConfigurationAssetDto,
 } from '@octra/api-types';
 import { AnnotationState, GuidelinesItem } from './index';
@@ -457,10 +458,20 @@ export class AnnotationEffects {
             if (a.redirectToProjects) {
               return of(AnnotationActions.redirectToProjects.do());
             } else {
-              return of(
-                AuthenticationActions.logout.do({
-                  clearSession: a.clearSession,
-                  mode: state.application.mode,
+              return this.saveTaskToServer(state, TaskStatus.busy).pipe(
+                map(() => {
+                  return AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode,
+                  });
+                }),
+                catchError(() => {
+                  return of(
+                    AuthenticationActions.logout.do({
+                      clearSession: a.clearSession,
+                      mode: state.application.mode,
+                    })
+                  );
                 })
               );
             }
@@ -818,75 +829,40 @@ export class AnnotationEffects {
               })
             );
           }
-          const result = new AnnotJSONConverter().export(
-            state.onlineMode.transcript
-              .clone()
-              .serialize(
-                this.audio.audioManager.resource.info.fullname,
-                this.audio.audioManager.resource.info.sampleRate,
-                this.audio.audioManager.resource.info.duration.clone()
-              )
-          )?.file?.content;
 
-          const outputs = result
-            ? [
-                new File(
-                  [result],
-                  state.onlineMode.audio.fileName.substring(
-                    0,
-                    state.onlineMode.audio.fileName.lastIndexOf('.')
-                  ) + '_annot.json',
-                  {
-                    type: 'application/json',
-                  }
-                ),
-              ]
-            : [];
+          return this.saveTaskToServer(state, TaskStatus.finished).pipe(
+            map((a) => {
+              return AnnotationActions.sendAnnotation.success({
+                mode: state.application.mode!,
+                task: a,
+              });
+            }),
+            catchError((error: HttpErrorResponse) => {
+              if (error.status === 401) {
+                this.transcrSendingModal.timeout?.unsubscribe();
+              }
 
-          return this.apiService
-            .saveTask(
-              state.onlineMode.currentSession.currentProject.id,
-              state.onlineMode.currentSession.task.id,
-              {
-                assessment: state.onlineMode.currentSession.assessment,
-                comment: state.onlineMode.currentSession.comment,
-                log: state.onlineMode.logging.logs,
-              },
-              outputs
-            )
-            .pipe(
-              map((a) => {
-                return AnnotationActions.sendAnnotation.success({
+              return checkAndThrowError(
+                {
+                  statusCode: error.status,
+                  message: error.error?.message ?? error.message,
+                },
+                a,
+                AnnotationActions.sendAnnotation.fail({
                   mode: state.application.mode!,
-                  task: a,
-                });
-              }),
-              catchError((error: HttpErrorResponse) => {
-                if (error.status === 401) {
-                  this.transcrSendingModal.timeout?.unsubscribe();
-                }
-
-                return checkAndThrowError(
-                  {
-                    statusCode: error.status,
-                    message: error.error?.message ?? error.message,
-                  },
-                  a,
-                  AnnotationActions.sendAnnotation.fail({
-                    mode: state.application.mode!,
-                    error: error.error?.message ?? error.message,
-                  }),
-                  this.store,
-                  () => {
-                    if (this.transcrSendingModal.ref) {
-                      this.transcrSendingModal.ref.componentInstance.error =
-                        error.error?.message ?? error.message;
-                      /* TODO if error is because of not busy => select new annotation? */
-                    }
+                  error: error.error?.message ?? error.message,
+                }),
+                this.store,
+                () => {
+                  if (this.transcrSendingModal.ref) {
+                    this.transcrSendingModal.ref.componentInstance.error =
+                      error.error?.message ?? error.message;
+                    /* TODO if error is because of not busy => select new annotation? */
                   }
-                );
-              })
-            );
+                }
+              );
+            })
+          );
         } else {
           // TODO add other modes
         }
@@ -1498,6 +1474,45 @@ export class AnnotationEffects {
           // ignore
         });
     }
+  }
+
+  private saveTaskToServer(state: RootState, status: TaskStatus) {
+    const result = new AnnotJSONConverter().export(
+      state.onlineMode.transcript
+        .clone()
+        .serialize(
+          this.audio.audioManager.resource.info.fullname,
+          this.audio.audioManager.resource.info.sampleRate,
+          this.audio.audioManager.resource.info.duration.clone()
+        )
+    )?.file?.content;
+
+    const outputs = result
+      ? [
+          new File(
+            [result],
+            state.onlineMode.audio.fileName.substring(
+              0,
+              state.onlineMode.audio.fileName.lastIndexOf('.')
+            ) + '_annot.json',
+            {
+              type: 'application/json',
+            }
+          ),
+        ]
+      : [];
+
+    return this.apiService.saveTask(
+      state.onlineMode.currentSession!.currentProject!.id,
+      state.onlineMode.currentSession!.task!.id,
+      {
+        assessment: state.onlineMode.currentSession.assessment,
+        comment: state.onlineMode.currentSession.comment,
+        log: state.onlineMode.logging.logs,
+        status,
+      },
+      outputs
+    );
   }
 
   private maintenanceChecker?: Subscription;

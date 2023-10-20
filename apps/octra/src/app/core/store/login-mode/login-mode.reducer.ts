@@ -167,8 +167,11 @@ export class LoginModeReducers {
               },
               logging: {
                 ...state.logging,
-                enabled: (task?.tool_configuration?.value as ProjectSettings)?.logging
-                  ?.forced === true ? true : state.logging.enabled
+                enabled:
+                  (task?.tool_configuration?.value as ProjectSettings)?.logging
+                    ?.forced === true
+                    ? true
+                    : state.logging.enabled,
               },
             };
           }
@@ -208,7 +211,10 @@ export class LoginModeReducers {
       ),
       on(
         AuthenticationActions.loginLocal.prepare,
-        (state: AnnotationState, { mode, sessionFile, removeData, files, annotation }) => {
+        (
+          state: AnnotationState,
+          { mode, sessionFile, removeData, files, annotation }
+        ) => {
           if (this.mode === mode) {
             if (removeData || annotation) {
               if (!annotation) {
@@ -227,8 +233,8 @@ export class LoginModeReducers {
                   ...state,
                   transcript: deserialized,
                   currentSession: {},
-                  sessionFile
-                }
+                  sessionFile,
+                };
               }
             } else {
               return {
@@ -260,9 +266,15 @@ export class LoginModeReducers {
               projectConfig: projectSettings,
               logging: {
                 ...state.logging,
-                enabled: projectSettings.logging.forced === true ? true : state.logging.enabled,
+                enabled:
+                  projectSettings.logging.forced === true
+                    ? true
+                    : state.logging.enabled,
                 startTime: Date.now(),
-                startReference: state.logging.logs.length > 0 ? state.logging.logs[state.logging.logs.length - 1] : undefined
+                startReference:
+                  state.logging.logs.length > 0
+                    ? state.logging.logs[state.logging.logs.length - 1]
+                    : undefined,
               },
               currentSession: {
                 ...state.currentSession,
@@ -308,9 +320,11 @@ export class LoginModeReducers {
               (a) => a.filename === `guidelines_${language}.json`
             );
             // fallback to english
-            guideline = guideline ?? state.guidelines.list.find(
-              (a) => a.filename === `guidelines_en.json`
-            );
+            guideline =
+              guideline ??
+              state.guidelines.list.find(
+                (a) => a.filename === `guidelines_en.json`
+              );
             // fallback to first language
             guideline = guideline ?? state.guidelines.list[0];
 

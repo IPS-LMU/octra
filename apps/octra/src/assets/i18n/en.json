@@ -137,7 +137,8 @@
     "repeat password": "Repeat password",
     "select locale": "Select a language",
     "select timezone": "Select a timezone",
-    "back to login": "Back to login"
+    "back to login": "Back to login",
+    "contribute translations": "Contribute translations"
   },
   "bug report": {
     "give feedback": "Give feedback",

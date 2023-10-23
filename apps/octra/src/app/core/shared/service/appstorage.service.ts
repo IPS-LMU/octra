@@ -157,10 +157,6 @@ export class AppStorageService {
     );
   }
 
-  get urlParams(): any {
-    return this._snapshot.application.queryParams;
-  }
-
   get easyMode(): boolean | undefined | null {
     return this._snapshot.application.options.easyMode;
   }
@@ -325,32 +321,6 @@ export class AppStorageService {
     );
   }
 
-  setURLSession(
-    audio: string,
-    transcript: string,
-    embedded: boolean,
-    host: string
-  ) {
-    if (this.easyMode === undefined) {
-      this.easyMode = false;
-    }
-
-    if (this.interface === undefined) {
-      this.interface = '2D-Editor';
-    }
-
-    this.store.dispatch(
-      LoginModeActions.loginURLParameters({
-        urlParams: {
-          audio,
-          transcript,
-          embedded,
-          host,
-        },
-      })
-    );
-  }
-
   public save(key: string, value: any): boolean {
     // TODO why not url?
     if (this.useMode !== LoginMode.URL) {
@@ -492,7 +462,7 @@ export class AppStorageService {
 
   public startOnlineAnnotation(project: ProjectDto) {
     this.store.dispatch(
-      AnnotationActions.startOnlineAnnotation.do({
+      AnnotationActions.startNewAnnotation.do({
         project,
         mode: LoginMode.ONLINE,
       })

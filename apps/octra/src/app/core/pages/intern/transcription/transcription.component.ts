@@ -45,7 +45,7 @@ import { NavbarService } from '../../../component/navbar/navbar.service';
 import { LoginMode } from '../../../store';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../../component/default.component';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { AuthenticationStoreService } from '../../../store/authentication';
@@ -60,6 +60,7 @@ import X2JS from 'x2js';
 import { ApplicationStoreService } from '../../../store/application/application-store.service';
 import { ShortcutService } from '../../../shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
+import { RoutingService } from '../../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-transcription',
@@ -341,7 +342,7 @@ export class TranscriptionComponent
     public modService: OctraModalService,
     private appStoreService: ApplicationStoreService,
     public langService: TranslocoService,
-    private ngbModalService: NgbModal,
+    private routingService: RoutingService,
     private cd: ChangeDetectorRef,
     private alertService: AlertService,
     public annotationStoreService: AnnotationStoreService,
@@ -862,19 +863,6 @@ export class TranscriptionComponent
   closeTranscriptionAndGetNew() {
     // close current session
     if (this._useMode === LoginMode.ONLINE) {
-      /* TODO
-        this.api.freeAnnotation(this.appStorage.onlineSession.currentProject.id, this.appStorage.onlineSession.sessionData.transcriptID).then(() => {
-        this.api.startAnnotation(this.appStorage.onlineSession.currentProject.id).then((result) => {
-          this.transcrService.endTranscription(false);
-          navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch((error) => {
-            console.error(error);
-          });
-        }).catch((error) => {
-          console.error(error);
-        });
-      }).catch((error) => {
-        console.error(error);
-      }); */
     } else if (this._useMode === LoginMode.DEMO) {
       this.reloadDemo();
     }
@@ -913,8 +901,8 @@ export class TranscriptionComponent
       let host =
         'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-      if (!(this.appStorage.urlParams.host === undefined)) {
-        host = this.appStorage.urlParams.host;
+      if (this.routingService.staticQueryParams?.host) {
+        host = this.routingService.staticQueryParams.host;
       }
 
       const url = `${host}uploadFileMulti`;

@@ -31,7 +31,7 @@ import { AppSettings, ASRSettings } from '../../obj';
 import { IDBActions } from '../idb/idb.actions';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { SettingsService } from '../../shared/service';
-import { getModeState, RootState } from '../index';
+import { getModeState, LoginMode, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
 import { Params } from '@angular/router';
@@ -51,6 +51,15 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
+        const queryParams = {
+          audio: this.getParameterByName('audio'),
+          host: this.getParameterByName('host'),
+          transcript: this.getParameterByName('transcript'),
+          embedded: this.getParameterByName('embedded'),
+        };
+
+        this.routerService.addStaticParams(queryParams);
+
         this.initConsoleLogging();
         return of(ApplicationActions.loadLanguage.do());
       })
@@ -506,52 +515,75 @@ export class ApplicationEffects {
   afterInitApplication$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(ApplicationActions.initApplication.finish),
+        ofType(
+          ApplicationActions.initApplication.finish,
+          LoginModeActions.loadProjectAndTaskInformation.success
+        ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          if (!state.application.mode) {
-            // no mode active
-            if (state.authentication.authenticated) {
-              this.store.dispatch(
-                AuthenticationActions.logout.do({
-                  message: 'logout due undefined mode',
-                  messageType: 'error',
-                  mode: undefined,
-                  clearSession: false,
-                })
+          if (state.application.initialized) {
+            if (!state.application.mode) {
+              // no mode active
+              if (state.authentication.authenticated) {
+                this.store.dispatch(
+                  AuthenticationActions.logout.do({
+                    message: 'logout due undefined mode',
+                    messageType: 'error',
+                    mode: undefined,
+                    clearSession: false,
+                  })
+                );
+              } else {
+                this.store.dispatch(ApplicationActions.redirectToLastPage.do());
+              }
+              return;
+            }
+
+            if (!state.application.loggedIn) {
+              this.routerService.navigate(
+                'not logged in, back to login',
+                ['/login'],
+                AppInfo.queryParamsHandling
               );
             } else {
-              this.store.dispatch(ApplicationActions.redirectToLastPage.do());
+              // logged in
+              const modeState = getModeState(state)!;
+
+              if (
+                modeState.currentSession.currentProject &&
+                modeState.currentSession.task
+              ) {
+                this.store.dispatch(
+                  AnnotationActions.prepareTaskDataForAnnotation.do({
+                    currentProject: modeState.currentSession.currentProject,
+                    mode: state.application.mode,
+                    task: modeState.currentSession.task,
+                  })
+                );
+              } else {
+                this.store.dispatch(
+                  AuthenticationActions.redirectToProjects.do()
+                );
+              }
             }
-            return;
           }
+        })
+      ),
+    { dispatch: false }
+  );
 
-          if (!state.application.loggedIn) {
-            this.routerService.navigate(
-              'not logged in, back to login',
-              ['/login'],
-              AppInfo.queryParamsHandling
-            );
-          } else {
-            // logged in
-            const modeState = getModeState(state)!;
-
-            if (
-              modeState.currentSession.currentProject &&
-              modeState.currentSession.task
-            ) {
-              this.store.dispatch(
-                AnnotationActions.prepareTaskDataForAnnotation.do({
-                  currentProject: modeState.currentSession.currentProject,
-                  mode: state.application.mode,
-                  task: modeState.currentSession.task,
-                })
-              );
-            } else {
-              this.store.dispatch(
-                AuthenticationActions.redirectToProjects.do()
-              );
-            }
+  onProjectAndTaskInfoLoaded$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          LoginModeActions.loadProjectAndTaskInformation.fail,
+          LoginModeActions.loadProjectAndTaskInformation.success
+        ),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          if (!state.application.initialized) {
+            // load on startup
+            this.store.dispatch(IDBActions.loadAnnotation.do());
           }
         })
       ),
@@ -574,77 +606,79 @@ export class ApplicationEffects {
     { dispatch: false }
   );
 
-  afterIDBLoaded$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(IDBActions.loadConsoleEntries.success),
-      withLatestFrom(this.store),
-      exhaustMap(([a, state]: [Action, RootState]) => {
-        this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
-
-        if (!this.settingsService.responsive.enabled) {
-          this.setFixedWidth();
-        }
-
-        const queryParams = {
-          audio: this.getParameterByName('audio'),
-          host: this.getParameterByName('host'),
-          transcript: this.getParameterByName('transcript'),
-          embedded: this.getParameterByName('embedded'),
-        };
-
-        const transcriptURL =
-          queryParams.transcript !== undefined
-            ? queryParams.transcript
-            : undefined;
-        // define languages
-        const languages = state.application.appConfiguration!.octra.languages;
-        const browserLang =
-          navigator.language || (navigator as any).userLanguage;
-
-        // check if browser language is available in translations
-        if (
-          this.appStorage.language === undefined ||
-          this.appStorage.language === ''
-        ) {
-          if (
-            state.application.appConfiguration!.octra.languages.find(
-              (value) => {
-                return value === browserLang;
-              }
-            ) !== undefined
-          ) {
-            this.transloco.setActiveLang(browserLang);
-          } else {
-            // use first language defined as default language
-            this.transloco.setActiveLang(languages[0]);
+  redirectTo$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.redirectTo.success),
+        tap((a) => {
+          if (a.needsRedirectionTo) {
+            this.routerService.navigate('last page', [a.needsRedirectionTo]);
           }
-        } else {
-          if (
-            state.application.appConfiguration!.octra.languages.find(
-              (value) => {
-                return value === this.appStorage.language;
-              }
-            ) !== undefined
-          ) {
-            this.transloco.setActiveLang(this.appStorage.language);
-          } else {
-            this.transloco.setActiveLang(languages[0]);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  afterIDBLoaded$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(IDBActions.loadConsoleEntries.success),
+        withLatestFrom(this.store),
+        tap(([a, state]: [Action, RootState]) => {
+          this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
+
+          if (!this.settingsService.responsive.enabled) {
+            this.setFixedWidth();
           }
-        }
 
-        // if url mode, set it in options
-        if (this.queryParamsSet(queryParams)) {
-          this.appStorage.setURLSession(
-            queryParams.audio!,
-            transcriptURL!,
-            queryParams.embedded === '1',
-            queryParams.host!
-          );
-        }
+          // define languages
+          const languages = state.application.appConfiguration!.octra.languages;
+          const browserLang =
+            navigator.language || (navigator as any).userLanguage;
 
-        return of(ApplicationActions.initApplication.finish());
-      })
-    )
+          // check if browser language is available in translations
+          if (
+            this.appStorage.language === undefined ||
+            this.appStorage.language === ''
+          ) {
+            if (
+              state.application.appConfiguration!.octra.languages.find(
+                (value) => {
+                  return value === browserLang;
+                }
+              ) !== undefined
+            ) {
+              this.transloco.setActiveLang(browserLang);
+            } else {
+              // use first language defined as default language
+              this.transloco.setActiveLang(languages[0]);
+            }
+          } else {
+            if (
+              state.application.appConfiguration!.octra.languages.find(
+                (value) => {
+                  return value === this.appStorage.language;
+                }
+              ) !== undefined
+            ) {
+              this.transloco.setActiveLang(this.appStorage.language);
+            } else {
+              this.transloco.setActiveLang(languages[0]);
+            }
+          }
+
+          if (this.routerService.staticQueryParams?.audio) {
+            this.store.dispatch(
+              AuthenticationActions.loginURL.do({
+                mode: LoginMode.URL,
+              })
+            );
+          }
+
+          this.store.dispatch(ApplicationActions.initApplication.finish());
+        })
+      ),
+    { dispatch: false }
   );
 
   loadLanguage$ = createEffect(() =>

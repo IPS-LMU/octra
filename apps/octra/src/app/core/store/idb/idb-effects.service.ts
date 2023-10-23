@@ -59,6 +59,7 @@ export class IDBEffects {
                   IIDBApplicationOptions,
                   IIDBModeOptions,
                   IIDBModeOptions,
+                  IIDBModeOptions,
                   IIDBModeOptions
                 ]
               >([
@@ -80,6 +81,7 @@ export class IDBEffects {
                 this.idbService.loadModeOptions(LoginMode.LOCAL),
                 this.idbService.loadModeOptions(LoginMode.DEMO),
                 this.idbService.loadModeOptions(LoginMode.ONLINE),
+                this.idbService.loadModeOptions(LoginMode.URL),
               ]);
             }),
             mergeAll()
@@ -91,12 +93,14 @@ export class IDBEffects {
                 localOptions,
                 demoOptions,
                 onlineOptions,
+                urlOptions,
               ]) => {
                 return IDBActions.loadOptions.success({
                   applicationOptions,
                   localOptions,
                   onlineOptions,
                   demoOptions,
+                  urlOptions,
                 });
               }
             ),
@@ -121,44 +125,33 @@ export class IDBEffects {
           this.idbService.loadLogs(LoginMode.ONLINE),
           this.idbService.loadLogs(LoginMode.LOCAL),
           this.idbService.loadLogs(LoginMode.DEMO),
+          this.idbService.loadLogs(LoginMode.URL),
         ]).pipe(
-          map(([onlineModeLogs, localModeLogs, demoModeLogs]) => {
-            if (state.application.loggedIn) {
-              if (state.application.mode === LoginMode.ONLINE) {
-                if (
-                  action.onlineOptions.project &&
-                  action.onlineOptions.transcriptID
-                ) {
-                  this.store.dispatch(
-                    LoginModeActions.loadProjectAndTaskInformation.do({
-                      projectID: action.onlineOptions.project.id,
-                      taskID: action.onlineOptions.transcriptID,
-                      mode: LoginMode.ONLINE,
-                    })
-                  );
-                } else {
-                  this.store.dispatch(IDBActions.loadAnnotation.do());
-                }
-              } else if (state.application.mode) {
-                // other modes
-                this.store.dispatch(
-                  LoginModeActions.loadProjectAndTaskInformation.do({
-                    projectID: action.demoOptions?.project?.id ?? '1234',
-                    taskID: action.demoOptions?.transcriptID ?? '38295',
-                    mode: state.application.mode,
-                  })
-                );
-              } else {
-                this.store.dispatch(IDBActions.loadAnnotation.do());
-              }
+          map(([onlineModeLogs, localModeLogs, demoModeLogs, urlModeLogs]) => {
+            if (state.application.mode === LoginMode.ONLINE) {
+              this.store.dispatch(
+                LoginModeActions.loadProjectAndTaskInformation.do({
+                  projectID: action.onlineOptions.project!.id,
+                  taskID: action.onlineOptions.transcriptID!,
+                  mode: LoginMode.ONLINE,
+                })
+              );
             } else {
-              this.store.dispatch(IDBActions.loadAnnotation.do());
+              // other modes
+              this.store.dispatch(
+                LoginModeActions.loadProjectAndTaskInformation.do({
+                  projectID: action.demoOptions?.project?.id ?? '1234',
+                  taskID: action.demoOptions?.transcriptID ?? '38295',
+                  mode: state.application.mode!,
+                })
+              );
             }
 
             return IDBActions.loadLogs.success({
               online: onlineModeLogs,
               demo: demoModeLogs,
               local: localModeLogs,
+              url: urlModeLogs,
             });
           })
         );
@@ -168,10 +161,7 @@ export class IDBEffects {
 
   loadAnnotation$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(
-        IDBActions.loadAnnotation.do,
-        LoginModeActions.loadProjectAndTaskInformation.success
-      ),
+      ofType(IDBActions.loadAnnotation.do),
       exhaustMap((action) => {
         return forkJoin([
           this.idbService.loadAnnotation(LoginMode.ONLINE),
@@ -214,6 +204,10 @@ export class IDBEffects {
                 online: oAnnotation,
                 local: lAnnotation,
                 demo: dAnnotation,
+                url: new OctraAnnotation<
+                  ASRContext,
+                  OctraAnnotationSegment<ASRContext>
+                >(), // IGNORE
               });
             }
           ),
@@ -419,9 +413,10 @@ export class IDBEffects {
         AnnotationActions.setLogging.do,
         AnnotationActions.setCurrentEditor.do,
         AuthenticationActions.loginDemo.success,
+        AuthenticationActions.loginURL.success,
         AuthenticationActions.loginLocal.prepare,
         AuthenticationActions.loginLocal.success,
-        LoginModeActions.startOnlineAnnotation.success,
+        LoginModeActions.startAnnotation.success,
         ApplicationActions.changeApplicationOption.do,
         AnnotationActions.setLevelIndex.do
       ),
@@ -595,40 +590,6 @@ export class IDBEffects {
           );
       })
     )
-  );
-
-  saveLoginDemo$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthenticationActions.loginDemo.success),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        this.sessStr.store('loggedIn', true);
-
-        timer(0)
-          .toPromise()
-          .then(() => {
-            subject.next(IDBActions.saveDemoSession.success());
-            subject.complete();
-          });
-
-        return subject;
-      })
-    )
-  );
-
-  saveLoggedIn$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(
-          AuthenticationActions.loginOnline.success,
-          AuthenticationActions.loginDemo.success
-        ),
-        tap((a) => {
-          this.sessStr.store('loggedIn', true);
-        })
-      ),
-    { dispatch: false }
   );
 
   saveLogin$ = createEffect(
@@ -941,6 +902,8 @@ export class IDBEffects {
       modeState = appState.localMode;
     } else if (mode === 'demo') {
       modeState = appState.demoMode;
+    } else if (mode === 'url') {
+      modeState = appState.urlMode;
     }
     return modeState;
   }

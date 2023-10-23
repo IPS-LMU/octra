@@ -89,6 +89,10 @@ export const EDITORS: any[] = [
       'localMode',
       new LoginModeReducers(LoginMode.LOCAL).create()
     ),
+    StoreModule.forFeature(
+      'urlMode',
+      new LoginModeReducers(LoginMode.URL).create()
+    ),
     EffectsModule.forFeature([AnnotationEffects]),
     OctraUtilitiesModule,
   ],

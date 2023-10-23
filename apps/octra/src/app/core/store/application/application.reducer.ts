@@ -2,7 +2,6 @@ import { createReducer, on } from '@ngrx/store';
 import { LoadingStatus, LoginMode } from '../index';
 import { ApplicationActions } from './application.actions';
 import { IDBActions } from '../idb/idb.actions';
-import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ApplicationState } from './index';
 import { AuthenticationActions } from '../authentication';
@@ -165,31 +164,12 @@ export const reducer = createReducer(
   on(
     AuthenticationActions.loginOnline.success,
     AuthenticationActions.loginDemo.success,
+    AuthenticationActions.loginURL.success,
     AuthenticationActions.loginLocal.success,
     (state: ApplicationState, { mode }) => ({
       ...state,
       mode,
       loggedIn: true,
-    })
-  ),
-  on(
-    LoginModeActions.loginURLParameters,
-    (state: ApplicationState, { urlParams }) => ({
-      ...state,
-      mode: LoginMode.URL,
-      loggedIn: true,
-      queryParams: urlParams,
-    })
-  ),
-  on(ApplicationActions.setMode, (state: ApplicationState, { mode }) => ({
-    ...state,
-    mode,
-  })),
-  on(
-    ApplicationActions.setLoggedIn,
-    (state: ApplicationState, { loggedIn }) => ({
-      ...state,
-      loggedIn,
     })
   ),
   on(AuthenticationActions.logout.success, (state: ApplicationState) => {

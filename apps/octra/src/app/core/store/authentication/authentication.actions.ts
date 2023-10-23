@@ -78,6 +78,21 @@ export class AuthenticationActions {
     },
   });
 
+  static loginURL = createActionGroup({
+    source: 'auth/login URL',
+    events: {
+      do: props<{
+        mode: LoginMode;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static loginAuto = createActionGroup({
     source: 'auth/login online automatically',
     events: {

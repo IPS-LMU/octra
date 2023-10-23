@@ -37,6 +37,7 @@ export const authenticationReducer = createReducer(
   on(
     AuthenticationActions.loginDemo.success,
     AuthenticationActions.loginLocal.success,
+    AuthenticationActions.loginURL.success,
     (state: AuthenticationState) => {
       return {
         ...state,

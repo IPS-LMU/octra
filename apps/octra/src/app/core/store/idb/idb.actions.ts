@@ -19,6 +19,7 @@ export class IDBActions {
         localOptions: IIDBModeOptions;
         onlineOptions: IIDBModeOptions;
         demoOptions: IIDBModeOptions;
+        urlOptions: IIDBModeOptions;
       }>(),
       fail: props<{
         error: string;
@@ -33,9 +34,7 @@ export class IDBActions {
         online: any[];
         demo: any[];
         local: any[];
-      }>(),
-      fail: props<{
-        error: string;
+        url: any[];
       }>(),
     },
   });
@@ -48,6 +47,7 @@ export class IDBActions {
         online: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
         demo: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
         local: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
+        url: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
       }>(),
       fail: props<{
         error: string;

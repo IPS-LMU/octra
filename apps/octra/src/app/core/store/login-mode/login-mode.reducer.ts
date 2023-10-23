@@ -194,7 +194,7 @@ export class LoginModeReducers {
         }
       ),
       on(
-        LoginModeActions.startOnlineAnnotation.do,
+        LoginModeActions.startAnnotation.do,
         (state: AnnotationState, { mode }) => {
           if (this.mode === mode) {
             return {
@@ -248,7 +248,7 @@ export class LoginModeReducers {
         }
       ),
       on(
-        LoginModeActions.startOnlineAnnotation.success,
+        LoginModeActions.startAnnotation.success,
         (
           state: AnnotationState,
           {

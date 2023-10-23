@@ -5,7 +5,6 @@ import {
   props,
 } from '@ngrx/store';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import { LoginMode } from '../index';
 import { AppSettings, ASRSettings } from '../../obj';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
@@ -80,7 +79,7 @@ export class ApplicationActions {
     },
   });
 
-  static setRedirectionTo = createActionGroup({
+  static redirectTo = createActionGroup({
     source: 'app/set redirection',
     events: {
       success: props<{
@@ -132,20 +131,6 @@ export class ApplicationActions {
   );
 
   public static finishLoading = createAction(`[${context}] Finish Loading`);
-
-  public static setLoggedIn = createAction(
-    `[${context}] Set loggedIn`,
-    props<{
-      loggedIn: boolean;
-    }>()
-  );
-
-  public static setMode = createAction(
-    `[${context}] Set Mode`,
-    props<{
-      mode: LoginMode;
-    }>()
-  );
 
   public static addError = createAction(
     `[${context}] Add Error`,

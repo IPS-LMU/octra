@@ -49,14 +49,14 @@ export class IDBService {
    * clears all options
    */
   public clearModeOptions(mode: LoginMode) {
-    return this.database.clearDataOfMode(mode, 'options');
+    return this.database.clearDataOfMode(mode, 'app_options');
   }
 
   /**
    * clears all options
    */
   public clearOptions(mode: LoginMode): Promise<any> {
-    return this.database.options.clear();
+    return this.database.app_options.clear();
   }
 
   /**
@@ -64,7 +64,7 @@ export class IDBService {
    */
   public loadConsoleEntries(): Promise<ConsoleEntry[]> {
     return new Promise<ConsoleEntry[]>((resolve, reject) => {
-      this.database.options
+      this.database.app_options
         .get('console')
         .then((entry) => {
           if (entry !== undefined) {
@@ -84,7 +84,7 @@ export class IDBService {
    * @param entries
    */
   public saveConsoleEntries(entries: ConsoleEntry[]) {
-    return this.database.options.put({
+    return this.database.app_options.put({
       name: 'console',
       value: entries,
     });
@@ -96,7 +96,7 @@ export class IDBService {
   public loadOptions(
     keys: IDBApplicationOptionName[]
   ): Observable<IIDBApplicationOptions> {
-    return from(this.database.options.bulkGet(keys)).pipe(
+    return from(this.database.app_options.bulkGet(keys)).pipe(
       map((values) => {
         const entries = values.filter((a) => a !== undefined);
         const result: any = {};
@@ -134,9 +134,9 @@ export class IDBService {
    */
   public saveOption<T>(key: string, value: T) {
     if (this.isReady) {
-      return from(this.database.options.put({ name: key, value }, key)).pipe(
-        map((result: string) => result)
-      );
+      return from(
+        this.database.app_options.put({ name: key, value }, key)
+      ).pipe(map((result: string) => result));
     } else {
       return throwError(() => {
         return new Error(`can't save option ${key}, because idb is not ready.`);

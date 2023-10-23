@@ -39,7 +39,7 @@ export interface RootState {
   onlineMode: AnnotationState;
   demoMode: AnnotationState;
   localMode: AnnotationState;
-  // TODO missing URL Mode state
+  urlMode: AnnotationState;
   user: UserState;
 }
 
@@ -50,7 +50,7 @@ export function getModeState(appState: RootState) {
     case LoginMode.LOCAL:
       return appState.localMode;
     case LoginMode.URL:
-      return appState.onlineMode;
+      return appState.urlMode;
     case LoginMode.ONLINE:
       return appState.onlineMode;
   }

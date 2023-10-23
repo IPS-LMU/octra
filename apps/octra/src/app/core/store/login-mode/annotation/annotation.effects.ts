@@ -29,7 +29,6 @@ import { AppInfo } from '../../../../app.info';
 import {
   AnnotJSONConverter,
   convertFromSupportedConverters,
-  IFile,
   ImportResult,
   ISegment,
   OctraAnnotation,
@@ -84,53 +83,63 @@ export class AnnotationEffects {
 
   subscrManager = new SubscriptionManager();
 
-  startAnnotation$ = createEffect(() =>
+  startNewAnnotation$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AnnotationActions.startOnlineAnnotation.do),
+      ofType(AnnotationActions.startNewAnnotation.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        return this.apiService
-          .startTask(a.project.id, {
-            task_type: 'annotation',
-          })
-          .pipe(
-            map((task) => {
-              if (task) {
-                return AnnotationActions.prepareTaskDataForAnnotation.do({
-                  currentProject: a.project,
-                  task,
-                  mode: a.mode,
-                });
-              }
-
-              if (!task && a.actionAfterFail) {
-                this.store.dispatch(ApplicationActions.waitForEffects.do());
-                // no remaining task
-                return a.actionAfterFail;
-              }
-              return AnnotationActions.showNoRemainingTasksModal.do();
-            }),
-            catchError((error: HttpErrorResponse) =>
-              checkAndThrowError(
-                {
-                  statusCode: error.status,
-                  message: error.error?.message ?? error.message,
-                },
-                a,
-                AnnotationActions.startOnlineAnnotation.fail({
-                  error: error.error?.message ?? error.message,
-                  showOKButton: true,
-                }),
-                this.store,
-                () => {
-                  this.alertService.showAlert(
-                    'danger',
-                    error.error?.message ?? error.message
-                  );
+        if (a.mode === LoginMode.ONLINE) {
+          return this.apiService
+            .startTask(a.project.id, {
+              task_type: 'annotation',
+            })
+            .pipe(
+              map((task) => {
+                if (task) {
+                  return AnnotationActions.prepareTaskDataForAnnotation.do({
+                    currentProject: a.project,
+                    task,
+                    mode: a.mode,
+                  });
                 }
+
+                if (!task && a.actionAfterFail) {
+                  this.store.dispatch(ApplicationActions.waitForEffects.do());
+                  // no remaining task
+                  return a.actionAfterFail;
+                }
+                return AnnotationActions.showNoRemainingTasksModal.do();
+              }),
+              catchError((error: HttpErrorResponse) =>
+                checkAndThrowError(
+                  {
+                    statusCode: error.status,
+                    message: error.error?.message ?? error.message,
+                  },
+                  a,
+                  AnnotationActions.startAnnotation.fail({
+                    error: error.error?.message ?? error.message,
+                    showOKButton: true,
+                  }),
+                  this.store,
+                  () => {
+                    this.alertService.showAlert(
+                      'danger',
+                      error.error?.message ?? error.message
+                    );
+                  }
+                )
               )
-            )
-          );
+            );
+        } else if (state.application.mode) {
+        }
+
+        return of(
+          AnnotationActions.startAnnotation.fail({
+            error: 'error.error?.message ?? error.message',
+            showOKButton: true,
+          })
+        );
       })
     )
   );
@@ -141,7 +150,7 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       map(([{ task, currentProject, mode }, state]) => {
         if (!task.tool_configuration) {
-          return AnnotationActions.startOnlineAnnotation.fail({
+          return AnnotationActions.startAnnotation.fail({
             error: 'Missing tool configuration',
             showOKButton: true,
           });
@@ -151,7 +160,7 @@ export class AnnotationEffects {
           !task.tool_configuration.assets ||
           task.tool_configuration.assets.length === 0
         ) {
-          return AnnotationActions.startOnlineAnnotation.fail({
+          return AnnotationActions.startAnnotation.fail({
             error: 'Missing tool configuration assets',
             showOKButton: true,
           });
@@ -182,7 +191,7 @@ export class AnnotationEffects {
           }
         }
 
-        return AnnotationActions.startOnlineAnnotation.success({
+        return AnnotationActions.startAnnotation.success({
           task,
           project: currentProject,
           mode,
@@ -197,7 +206,7 @@ export class AnnotationEffects {
   onAnnotationStart$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.startOnlineAnnotation.success),
+        ofType(AnnotationActions.startAnnotation.success),
         withLatestFrom(this.store),
         tap(([a, state]) => {
           // INIT UI SERVICE
@@ -521,84 +530,8 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         this.initMaintenance(state);
-        if (
-          state.application.mode === LoginMode.URL &&
-          state.application.queryParams!.transcript !== undefined
-        ) {
-          // load transcript file via URL
-          return this.http
-            .get(state.application.queryParams!.transcript, {
-              responseType: 'text',
-            })
-            .pipe(
-              map((content) => {
-                let filename = state.application.queryParams!.transcript;
-                filename = filename.substring(filename.lastIndexOf('/') + 1);
 
-                const file: IFile = {
-                  name: filename,
-                  content,
-                  type: 'text',
-                  encoding: 'utf-8',
-                };
-
-                // convert par to annotJSON
-                const oAudioFile =
-                  this.audio.audioManager.resource.getOAudioFile();
-
-                let importResult: ImportResult | undefined;
-                // find valid converter...
-                for (const converter of AppInfo.converters) {
-                  if (filename.indexOf(converter.extension) > -1) {
-                    // test converter
-                    const tempImportResult = converter.import(file, oAudioFile);
-
-                    if (
-                      tempImportResult !== undefined &&
-                      tempImportResult.error === ''
-                    ) {
-                      importResult = tempImportResult;
-                      break;
-                    } else {
-                      console.error(tempImportResult!.error);
-                    }
-                  }
-                }
-
-                if (
-                  importResult !== undefined &&
-                  !(importResult.annotjson === undefined)
-                ) {
-                  return AnnotationActions.initTranscriptionService.success({
-                    mode: state.application.mode!,
-                    transcript: OctraAnnotation.deserialize(
-                      importResult.annotjson
-                    ),
-                    saveToDB: false,
-                  });
-                } else {
-                  return AnnotationActions.initTranscriptionService.fail({
-                    error: "Can't import transcript",
-                  });
-                }
-              })
-            );
-        } else {
-          if (this.appStorage.useMode === LoginMode.URL) {
-            // overwrite with empty level
-            const newAnnotation = new OctraAnnotation();
-            return of(
-              AnnotationActions.initTranscriptionService.success({
-                mode: state.application.mode!,
-                transcript: newAnnotation,
-                saveToDB: false,
-              })
-            );
-          } else {
-            // it's not URL mode
-            return this.loadSegments(getModeState(state)!, state);
-          }
-        }
+        return this.loadSegments(getModeState(state)!, state);
       })
     )
   );
@@ -618,6 +551,9 @@ export class AnnotationEffects {
       ),
     { dispatch: false }
   );
+
+  // TODO implement startAnnotation as Startingpoint
+  //
 
   onAudioLoadSuccess$ = createEffect(
     () =>
@@ -653,35 +589,12 @@ export class AnnotationEffects {
               .pipe(catchError((a) => of(undefined)))
           ).pipe(
             map(([currentAccount, currentProject, task]) => {
-              if (currentProject && task) {
-                if (!a.actionAfterSuccess) {
-                  // normal load after task start or resuming session
-                  return LoginModeActions.loadProjectAndTaskInformation.success(
-                    {
-                      mode: LoginMode.ONLINE,
-                      me: currentAccount,
-                      currentProject,
-                      task,
-                    }
-                  );
-                }
-
-                return LoginModeActions.loadProjectAndTaskInformation.success({
-                  mode: LoginMode.ONLINE,
-                  me: currentAccount,
-                  currentProject,
-                  task,
-                  actionAfterSuccess: a.actionAfterSuccess,
-                });
-              } else {
-                return LoginModeActions.loadProjectAndTaskInformation.success({
-                  mode: LoginMode.ONLINE,
-                  me: currentAccount,
-                  currentProject,
-                  task,
-                  actionAfterSuccess: a.actionAfterSuccess,
-                });
-              }
+              return LoginModeActions.loadProjectAndTaskInformation.success({
+                mode: LoginMode.ONLINE,
+                me: currentAccount,
+                currentProject: currentProject ?? undefined,
+                task: task ?? undefined,
+              });
             }),
             catchError((error: HttpErrorResponse) => {
               return checkAndThrowError(
@@ -704,7 +617,7 @@ export class AnnotationEffects {
             })
           );
         } else if (
-          [LoginMode.DEMO, LoginMode.ONLINE, LoginMode.LOCAL].includes(a.mode)
+          [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
         ) {
           // mode is not online => load configuration for local environment
           return forkJoin<
@@ -743,32 +656,65 @@ export class AnnotationEffects {
               responseType: 'text',
             }),
           ]).pipe(
-            map(([projectConfig, guidelines, functions]) => {
+            exhaustMap(([projectConfig, guidelines, functions]) => {
               const currentProject = createSampleProjectDto(a.projectID);
 
-              const inputs: TaskInputOutputDto[] =
-                state.application.mode === LoginMode.DEMO
-                  ? state.application
-                      .appConfiguration!.octra.audioExamples.map((a) => ({
-                        filename: FileInfo.fromURL(a.url).fullname,
-                        fileType: 'audio/wave',
-                        type: 'input',
-                        url: a.url,
-                        creator_type: TaskInputOutputCreatorType.user,
-                        content: '',
-                        content_type: '',
-                      }))
-                      .slice(0, 1)
-                  : [
-                      {
-                        filename: state.localMode.sessionFile!.name,
-                        fileType: state.localMode.sessionFile!.type,
-                        type: 'input',
-                        creator_type: TaskInputOutputCreatorType.user,
-                        content: '',
-                        content_type: '',
-                      },
-                    ];
+              let inputs: TaskInputOutputDto[] = [];
+
+              if (state.application.mode === LoginMode.DEMO) {
+                inputs = state.application
+                  .appConfiguration!.octra.audioExamples.map((a) => ({
+                    filename: FileInfo.fromURL(a.url).fullname,
+                    fileType: 'audio/wave',
+                    type: 'input',
+                    url: a.url,
+                    creator_type: TaskInputOutputCreatorType.user,
+                    content: '',
+                    content_type: '',
+                  }))
+                  .slice(0, 1); // TODO select audio
+              } else if (state.application.mode === LoginMode.LOCAL) {
+                inputs = [
+                  {
+                    filename: state.localMode.sessionFile!.name,
+                    fileType: state.localMode.sessionFile!.type,
+                    type: 'input',
+                    creator_type: TaskInputOutputCreatorType.user,
+                    content: '',
+                    content_type: '',
+                  },
+                ];
+              } else if (state.application.mode === LoginMode.URL) {
+                // URL mode
+                if (
+                  Object.keys(this.routingService.staticQueryParams).includes(
+                    'audio'
+                  )
+                ) {
+                  inputs = [
+                    {
+                      filename: FileInfo.fromURL(
+                        this.routingService.staticQueryParams['audio']
+                      ).fullname,
+                      fileType: 'audio/wave',
+                      type: 'input',
+                      url: this.routingService.staticQueryParams['audio'],
+                      creator_type: TaskInputOutputCreatorType.user,
+                      content: '',
+                      content_type: '',
+                    },
+                  ];
+                } else {
+                  return of(
+                    LoginModeActions.loadProjectAndTaskInformation.fail({
+                      error: new HttpErrorResponse({
+                        error: new Error('Missing query param "audio"'),
+                      }),
+                    })
+                  );
+                }
+              }
+
               const task = createSampleTask(
                 a.taskID,
                 inputs,
@@ -777,25 +723,66 @@ export class AnnotationEffects {
                 functions,
                 guidelines,
                 {
-                  orgtext: [LoginMode.ONLINE, LoginMode.DEMO].includes(
-                    state.application.mode!
-                  )
-                    ? state.application.appConfiguration!.octra.audioExamples[0]
-                        .description
-                    : '',
+                  orgtext:
+                    LoginMode.DEMO === state.application.mode!
+                      ? state.application.appConfiguration!.octra
+                          .audioExamples[0].description
+                      : '',
                 }
               );
 
-              return LoginModeActions.loadProjectAndTaskInformation.success({
-                mode: a.mode,
-                me: createSampleUser(),
-                currentProject,
-                task,
-              });
+              if (
+                state.application.mode === LoginMode.URL &&
+                this.routingService.staticQueryParams?.transcript !== undefined
+              ) {
+                // load transcript file via URL
+                return this.http
+                  .get(this.routingService.staticQueryParams.transcript, {
+                    responseType: 'text',
+                  })
+                  .pipe(
+                    exhaustMap((content) => {
+                      let filename =
+                        this.routingService.staticQueryParams.transcript;
+                      filename = filename.substring(
+                        filename.lastIndexOf('/') + 1
+                      );
+
+                      task.inputs.push({
+                        filename,
+                        fileType: 'text/plain',
+                        type: 'input',
+                        creator_type: TaskInputOutputCreatorType.user,
+                        content,
+                        content_type: '',
+                      });
+
+                      return of(
+                        LoginModeActions.loadProjectAndTaskInformation.success({
+                          mode: a.mode,
+                          me: createSampleUser(),
+                          currentProject,
+                          task,
+                        })
+                      );
+                    })
+                  );
+              }
+
+              return of(
+                LoginModeActions.loadProjectAndTaskInformation.success({
+                  mode: a.mode,
+                  me: createSampleUser(),
+                  currentProject,
+                  task,
+                })
+              );
             })
           );
         }
-        return of();
+
+        // no mode set
+        return of(LoginModeActions.loadProjectAndTaskInformation.success({}));
       })
     )
   );
@@ -908,7 +895,7 @@ export class AnnotationEffects {
         return of(
           LoginModeActions.clearOnlineSession.do({
             mode: a.mode,
-            actionAfterSuccess: AnnotationActions.startOnlineAnnotation.do({
+            actionAfterSuccess: AnnotationActions.startNewAnnotation.do({
               mode: a.mode,
               project: state.onlineMode.currentSession.currentProject!,
               actionAfterFail: LoginModeActions.endTranscription.do({

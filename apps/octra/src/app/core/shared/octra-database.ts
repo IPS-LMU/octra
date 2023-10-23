@@ -9,8 +9,9 @@ import { ASRStateSettings } from '../store/asr';
 export class OctraDatabase extends Dexie {
   public demoData: Dexie.Table<IIDBEntry, string>;
   public onlineData: Dexie.Table<IIDBEntry, string>;
+  public urlData: Dexie.Table<IIDBEntry, string>;
   public localData: Dexie.Table<IIDBEntry, string>;
-  public options: Dexie.Table<IIDBEntry, string>;
+  public app_options: Dexie.Table<IIDBEntry, string>;
   public onReady: Subject<void>;
 
   private defaultOptions: IIDBEntry[] = [
@@ -131,19 +132,22 @@ export class OctraDatabase extends Dexie {
       .stores({
         annotation_levels: null,
         annotation_links: null,
-        logs: 'timestamp',
+        logs: null,
+        options: null,
         demo_data: 'name',
         online_data: 'name',
         local_data: 'name',
-        options: 'name',
+        url_data: 'name',
+        app_options: 'name',
       })
       .upgrade(this.upgradeToDatabaseV4);
 
     this.demoData = this.table('demo_data');
     this.onlineData = this.table('online_data');
     this.localData = this.table('local_data');
+    this.urlData = this.table('url_data');
 
-    this.options = this.table('options');
+    this.app_options = this.table('app_options');
 
     this.on('ready', () => {
       this.checkAndFillPopulation()
@@ -161,12 +165,12 @@ export class OctraDatabase extends Dexie {
   }
 
   private upgradeToDatabaseV2(transaction: Transaction) {
-    return transaction.table('options').bulkPut(this.defaultOptions);
+    return transaction.table('app_options').bulkPut(this.defaultOptions);
   }
 
   private upgradeToDatabaseV3(transaction: Transaction) {
     return transaction
-      .table('options')
+      .table('app_options')
       .toCollection()
       .modify((option: IIDBEntry) => {
         if (option.name === 'uselocalmode') {
@@ -181,7 +185,7 @@ export class OctraDatabase extends Dexie {
   }
 
   private async upgradeToDatabaseV4(transaction: Transaction) {
-    await transaction.table('options').get('usemode');
+    await transaction.table('app_options').get('usemode');
   }
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
@@ -197,6 +201,9 @@ export class OctraDatabase extends Dexie {
       case LoginMode.ONLINE:
         table = this.onlineData;
         break;
+      case LoginMode.URL:
+        table = this.urlData;
+        break;
     }
 
     return table;
@@ -205,7 +212,7 @@ export class OctraDatabase extends Dexie {
   private checkAndFillPopulation(): Observable<void> {
     const subj = new Subject<void>();
 
-    this.countEntries(this.options)
+    this.countEntries(this.app_options)
       .pipe(take(1))
       .subscribe({
         next: (count) => {
@@ -215,6 +222,7 @@ export class OctraDatabase extends Dexie {
               this.populateModeOptions(LoginMode.DEMO),
               this.populateModeOptions(LoginMode.ONLINE),
               this.populateModeOptions(LoginMode.LOCAL),
+              this.populateModeOptions(LoginMode.URL),
             ]).subscribe(() => {
               subj.next();
               subj.complete();
@@ -347,7 +355,7 @@ export class OctraDatabase extends Dexie {
 
   private populateOptions() {
     return from(
-      this.options.bulkPut([
+      this.app_options.bulkPut([
         {
           name: 'version',
           value: 3,
@@ -454,7 +462,22 @@ export interface IIDBApplicationOptions {
   showFeedbackNotice?: boolean | null;
 }
 
-export type IDBApplicationOptionName = "asr" | "audioSettings" | "console" | "easyMode" | "highlightingEnabled" | "interface" | "language" | "secondsPerLine" | "showLoupe" | "useMode" | "version" | "editorFont" | "playOnHover" | "followPlayCursor" | "showFeedbackNotice";
+export type IDBApplicationOptionName =
+  | 'asr'
+  | 'audioSettings'
+  | 'console'
+  | 'easyMode'
+  | 'highlightingEnabled'
+  | 'interface'
+  | 'language'
+  | 'secondsPerLine'
+  | 'showLoupe'
+  | 'useMode'
+  | 'version'
+  | 'editorFont'
+  | 'playOnHover'
+  | 'followPlayCursor'
+  | 'showFeedbackNotice';
 
 export const DefaultModeOptions: IIDBModeOptions = {
   logging: true,

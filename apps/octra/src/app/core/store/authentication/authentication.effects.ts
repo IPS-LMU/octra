@@ -195,15 +195,24 @@ export class AuthenticationEffects {
     this.actions$.pipe(
       ofType(AuthenticationActions.loginDemo.do),
       exhaustMap(() => {
-        this.routingService.navigate('login demo', ['/load']);
-        this.store.dispatch(
-          ApplicationActions.setRedirectionTo.success({
-            needsRedirectionTo: '/intern/transcr',
-          })
-        );
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
         return of(
           AuthenticationActions.loginDemo.success({
             mode: LoginMode.DEMO,
+          })
+        );
+      })
+    )
+  );
+
+  onLoginURL$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthenticationActions.loginURL.do),
+      exhaustMap(() => {
+        this.routingService.navigate('login url', ['/load']);
+        return of(
+          AuthenticationActions.loginURL.success({
+            mode: LoginMode.URL,
           })
         );
       })
@@ -333,6 +342,7 @@ export class AuthenticationEffects {
         ofType(
           AuthenticationActions.loginOnline.success,
           AuthenticationActions.loginDemo.success,
+          AuthenticationActions.loginURL.success,
           AuthenticationActions.loginLocal.success
         ),
         withLatestFrom(this.store),
@@ -354,8 +364,6 @@ export class AuthenticationEffects {
                         projectID: state.onlineMode.previousSession.project.id,
                         taskID: state.onlineMode.previousSession.task.id,
                         mode: a.mode,
-                        actionAfterSuccess:
-                          AuthenticationActions.redirectToProjects.do(),
                       })
                     );
                   }
@@ -388,18 +396,6 @@ export class AuthenticationEffects {
         })
       ),
     { dispatch: false }
-  );
-
-  afterIDLoadedSuccess$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LoginModeActions.loadProjectAndTaskInformation.success),
-      exhaustMap((a) => {
-        if (a.actionAfterSuccess) {
-          return of(a.actionAfterSuccess);
-        }
-        return of();
-      })
-    )
   );
 
   redirectToProjects$ = createEffect(

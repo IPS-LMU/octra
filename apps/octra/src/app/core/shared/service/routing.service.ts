@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SubscriptionManager } from '@octra/utilities';
+import { removeEmptyProperties, SubscriptionManager } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { environment } from '../../../../environments/environment';
 
@@ -29,9 +29,11 @@ export class RoutingService {
     }
   }
 
-  public addStaticParams(params: Record<string, string>) {
+  public addStaticParams(params: Record<string, string | undefined | null>) {
     this._staticQueryParams = {
-      ...this._staticQueryParams,
+      ...removeEmptyProperties<Record<string, string | undefined | null>>(
+        params
+      ),
       ...params,
     };
   }

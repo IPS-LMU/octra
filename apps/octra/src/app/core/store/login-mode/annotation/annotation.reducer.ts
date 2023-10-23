@@ -16,6 +16,7 @@ import {
 } from '@octra/annotation';
 import { AnnotationState } from './index';
 import { LoginModeActions } from '../login-mode.actions';
+import { AuthenticationActions } from '../../authentication';
 
 export const initialState: AnnotationState = {
   transcript: new OctraAnnotation<
@@ -177,6 +178,10 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
+      on(AuthenticationActions.loginURL.success, (state: AnnotationState) => ({
+        ...state,
+        currentEditor: '2D-Editor',
+      })),
       on(
         AnnotationActions.changeLevelName.do,
         (state: AnnotationState, { index, mode, name }) => {
@@ -372,8 +377,10 @@ export class AnnotationStateReducers {
               ...state,
               logging: {
                 ...state.logging,
-                logs: !Array.isArray(state.logging.logs) ? [log] : [...state.logging.logs, log],
-              }
+                logs: !Array.isArray(state.logging.logs)
+                  ? [log]
+                  : [...state.logging.logs, log],
+              },
             };
           }
           return state;
@@ -383,8 +390,8 @@ export class AnnotationStateReducers {
         ...state,
         logging: {
           ...state.logging,
-          logs
-        }
+          logs,
+        },
       })),
       on(
         AnnotationActions.setLogging.do,
@@ -394,7 +401,10 @@ export class AnnotationStateReducers {
             ...state.logging,
             enabled: logging,
             startTime: Date.now(),
-            startReference: state.logging.logs.length > 0 ? state.logging.logs[state.logging.logs.length - 1] : undefined
+            startReference:
+              state.logging.logs.length > 0
+                ? state.logging.logs[state.logging.logs.length - 1]
+                : undefined,
           },
         })
       ),
@@ -433,7 +443,7 @@ export class AnnotationStateReducers {
         logging: {
           ...state.logging,
           logs: [],
-        }
+        },
       })),
       on(IDBActions.loadLogs.success, (state: AnnotationState, logs) => {
         return {
@@ -441,7 +451,7 @@ export class AnnotationStateReducers {
           logging: {
             ...state.logging,
             logs: (logs as any)[this.mode],
-          }
+          },
         };
       }),
       on(
@@ -571,7 +581,7 @@ export class AnnotationStateReducers {
       case 'currentEditor':
         return {
           ...state,
-          currentEditor: value !== undefined ? value : '2D-Editor',
+          currentEditor: value ?? '2D-Editor',
         };
       case 'currentLevel':
         return {
@@ -583,8 +593,8 @@ export class AnnotationStateReducers {
           ...state,
           logging: {
             ...state.logging,
-            enabled: value !== undefined ? value : true,
-          }
+            enabled: value === true,
+          },
         };
     }
 

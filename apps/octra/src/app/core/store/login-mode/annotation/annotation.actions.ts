@@ -6,7 +6,6 @@ import {
   ASRContext,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
-  OctraAnnotationLink,
   OctraAnnotationSegment,
   OEvent,
   OItem,
@@ -96,15 +95,6 @@ export class AnnotationActions {
         transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
         mode: LoginMode;
         saveToDB: boolean;
-      }>(),
-    },
-  });
-
-  static overwriteLinks = createActionGroup({
-    source: `annotation/ overwrite links`,
-    events: {
-      do: props<{
-        links: OctraAnnotationLink[];
       }>(),
     },
   });
@@ -274,8 +264,8 @@ export class AnnotationActions {
     },
   });
 
-  static startOnlineAnnotation = createActionGroup({
-    source: `annotation/start online`,
+  static startAnnotation = createActionGroup({
+    source: `annotation/start`,
     events: {
       do: props<{
         project: ProjectDto;
@@ -295,6 +285,17 @@ export class AnnotationActions {
         showOKButton: true;
       }>(),
       noTasks: emptyProps(),
+    },
+  });
+
+  static startNewAnnotation = createActionGroup({
+    source: 'annotation/start new',
+    events: {
+      do: props<{
+        project: ProjectDto;
+        mode: LoginMode;
+        actionAfterFail?: Action;
+      }>(),
     },
   });
 

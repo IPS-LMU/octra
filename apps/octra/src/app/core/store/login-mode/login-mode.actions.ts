@@ -2,17 +2,9 @@ import { AnnotationActions } from './annotation/annotation.actions';
 import { Action, createAction, createActionGroup, props } from '@ngrx/store';
 import { LoginMode } from '../index';
 import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
-import { URLParameters } from '../application';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export class LoginModeActions extends AnnotationActions {
-  public static loginURLParameters = createAction(
-    `login mode Login URLParameters`,
-    props<{
-      urlParams: URLParameters;
-    }>()
-  );
-
   public static setFeedback = createAction(
     `annotation Set feedback`,
     props<{
@@ -58,14 +50,12 @@ export class LoginModeActions extends AnnotationActions {
         projectID: string;
         taskID: string;
         mode: LoginMode;
-        actionAfterSuccess?: Action;
       }>(),
       success: props<{
-        mode: LoginMode;
-        me: CurrentAccountDto;
+        mode?: LoginMode;
+        me?: CurrentAccountDto;
         currentProject?: ProjectDto;
         task?: TaskDto;
-        actionAfterSuccess?: Action;
       }>(),
       fail: props<{
         error: HttpErrorResponse;

@@ -38,7 +38,6 @@ import {
 } from '@octra/annotation';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import {
-  CurrentAccountDto,
   ProjectDto,
   TaskDto,
   TaskInputOutputCreatorType,
@@ -131,7 +130,6 @@ export class AnnotationEffects {
                 )
               )
             );
-        } else if (state.application.mode) {
         }
 
         return of(
@@ -577,27 +575,58 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (a.mode === LoginMode.ONLINE) {
-          return forkJoin<
-            [CurrentAccountDto, ProjectDto | undefined, TaskDto | undefined]
-          >(
-            this.apiService.getMyAccountInformation(),
-            this.apiService
-              .getProject(a.projectID)
-              .pipe(catchError((a) => of(undefined))),
-            this.apiService
-              .getTask(a.projectID, a.taskID)
-              .pipe(catchError((a) => of(undefined)))
-          ).pipe(
-            map(([currentAccount, currentProject, task]) => {
-              return LoginModeActions.loadProjectAndTaskInformation.success({
-                mode: LoginMode.ONLINE,
-                me: currentAccount,
-                currentProject: currentProject ?? undefined,
-                task: task ?? undefined,
-              });
+          return this.apiService.getMyAccountInformation().pipe(
+            exhaustMap((currentAccount) => {
+              if (!a.taskID || !a.projectID) {
+                return of(
+                  LoginModeActions.loadProjectAndTaskInformation.success({
+                    mode: LoginMode.ONLINE,
+                    me: currentAccount,
+                  })
+                );
+              }
+
+              return forkJoin<[ProjectDto | undefined, TaskDto | undefined]>(
+                this.apiService
+                  .getProject(a.projectID)
+                  .pipe(catchError((b) => of(undefined))),
+                this.apiService
+                  .getTask(a.projectID, a.taskID)
+                  .pipe(catchError((b) => of(undefined)))
+              ).pipe(
+                map(([currentProject, task]) => {
+                  return LoginModeActions.loadProjectAndTaskInformation.success(
+                    {
+                      mode: LoginMode.ONLINE,
+                      me: currentAccount,
+                      currentProject: currentProject ?? undefined,
+                      task: task ?? undefined,
+                    }
+                  );
+                }),
+                catchError((error: HttpErrorResponse) => {
+                  return checkAndThrowError(
+                    {
+                      statusCode: error.status,
+                      message: error.error?.message ?? error.message,
+                    },
+                    a,
+                    LoginModeActions.loadProjectAndTaskInformation.fail({
+                      error,
+                    }),
+                    this.store,
+                    () => {
+                      this.alertService.showAlert(
+                        'danger',
+                        error.error?.message ?? error.message
+                      );
+                    }
+                  );
+                })
+              );
             }),
-            catchError((error: HttpErrorResponse) => {
-              return checkAndThrowError(
+            catchError((error) =>
+              checkAndThrowError(
                 {
                   statusCode: error.status,
                   message: error.error?.message ?? error.message,
@@ -613,8 +642,8 @@ export class AnnotationEffects {
                     error.error?.message ?? error.message
                   );
                 }
-              );
-            })
+              )
+            )
           );
         } else if (
           [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
@@ -657,7 +686,7 @@ export class AnnotationEffects {
             }),
           ]).pipe(
             exhaustMap(([projectConfig, guidelines, functions]) => {
-              const currentProject = createSampleProjectDto(a.projectID);
+              const currentProject = createSampleProjectDto('1234');
 
               let inputs: TaskInputOutputDto[] = [];
 
@@ -716,7 +745,7 @@ export class AnnotationEffects {
               }
 
               const task = createSampleTask(
-                a.taskID,
+                a.taskID ?? '-1',
                 inputs,
                 [],
                 projectConfig,

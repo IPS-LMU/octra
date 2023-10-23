@@ -47,8 +47,8 @@ export class LoginModeActions extends AnnotationActions {
     source: `annotation/ load project and task information`,
     events: {
       do: props<{
-        projectID: string;
-        taskID: string;
+        projectID?: string;
+        taskID?: string;
         mode: LoginMode;
       }>(),
       success: props<{

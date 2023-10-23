@@ -131,8 +131,8 @@ export class IDBEffects {
             if (state.application.mode === LoginMode.ONLINE) {
               this.store.dispatch(
                 LoginModeActions.loadProjectAndTaskInformation.do({
-                  projectID: action.onlineOptions.project!.id,
-                  taskID: action.onlineOptions.transcriptID!,
+                  projectID: action.onlineOptions.project?.id,
+                  taskID: action.onlineOptions.transcriptID ?? undefined,
                   mode: LoginMode.ONLINE,
                 })
               );

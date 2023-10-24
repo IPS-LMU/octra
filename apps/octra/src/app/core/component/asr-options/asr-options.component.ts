@@ -179,7 +179,8 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
             });
           } else {
             if (
-              segment.getFirstLabelWithoutName('Speaker')?.value &&
+              segment.getFirstLabelWithoutName('Speaker')?.value !==
+                undefined &&
               segment.getFirstLabelWithoutName('Speaker')!.value.trim() ===
                 '' &&
               this.annotationStoreService.breakMarker?.code !== undefined &&
@@ -203,7 +204,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
           );
         }
       }
-      // this.asrService.startASR();
+      this.asrStoreService.startProcessing();
     } else {
       console.error(
         `could not start ASR for all next because segment number was not found.`

@@ -549,7 +549,7 @@ export class TranscrEditorComponent
   }
 
   onASRQueueChange(queue?: ASRStateQueue) {
-    if (queue !== undefined) {
+    if (queue !== undefined && this.audiochunk) {
       const item = queue.items.find(
         (a) =>
           a.time.sampleStart === (this.audiochunk as any).time.start.samples &&

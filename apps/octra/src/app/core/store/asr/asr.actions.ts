@@ -193,6 +193,7 @@ export class ASRActions {
         newStatus: ASRProcessStatus;
         error: string;
       }>(),
+      abort: emptyProps(),
     },
   });
 
@@ -216,7 +217,7 @@ export class ASRActions {
         time: ASRTimeInterval;
       }>(),
       success: props<{
-        id: number;
+        item: ASRStateQueueItem;
       }>(),
       fail: props<{
         error: string;

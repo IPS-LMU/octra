@@ -65,7 +65,7 @@ export const reducer = createReducer(
     (state: ASRState, { languageSettings, mausLanguages }) => ({
       ...state,
       languageSettings,
-      mausLanguages
+      mausLanguages,
     })
   ),
   on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
@@ -118,9 +118,18 @@ export const reducer = createReducer(
   on(ASRActions.stopProcessing.do, (state: ASRState) => ({
     ...state,
     queue: {
-      ...initialState.queue!,
+      ...(state.queue! ?? initialState.queue),
       status: ASRProcessStatus.STOPPED,
     },
+  })),
+  on(ASRActions.setQueueStatus.do, (state: ASRState, { status }) => ({
+    ...state,
+    queue: state.queue
+      ? {
+          ...state.queue,
+          status,
+        }
+      : undefined,
   })),
   on(ASRActions.stopItemProcessing.do, (state: ASRState, { time }) => {
     if (state.queue) {
@@ -148,8 +157,32 @@ export const reducer = createReducer(
               }
             : undefined,
         };
+      } else {
+        console.error("Can't stop item in reducer: index < 0");
       }
     }
+    return state;
+  }),
+  on(ASRActions.stopItemProcessing.success, (state: ASRState, { item }) => {
+    const index = state.queue
+      ? state.queue.items.findIndex((a) => a.id === item.id)
+      : -1;
+
+    if (index > -1) {
+      return {
+        ...state,
+        queue: state.queue
+          ? {
+              ...state.queue,
+              items: [
+                ...state.queue.items.slice(0, index),
+                ...state.queue.items.slice(index + 1),
+              ],
+            }
+          : undefined,
+      };
+    }
+
     return state;
   }),
   on(ASRActions.removeItemFromQueue.success, (state: ASRState, { index }) => ({

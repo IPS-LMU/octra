@@ -147,7 +147,8 @@ export class AsrEffects {
         ASRActions.startProcessing.do,
         ASRActions.processQueueItem.do,
         ASRActions.processQueueItem.success,
-        ASRActions.processQueueItem.fail
+        ASRActions.processQueueItem.fail,
+        ASRActions.stopItemProcessing.success
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
@@ -332,7 +333,7 @@ export class AsrEffects {
             // stopped, don't continue
             return of(
               ASRActions.stopItemProcessing.success({
-                id: item.id,
+                item,
               })
             );
           }),
@@ -397,19 +398,34 @@ export class AsrEffects {
           audioURL,
           state.application.appConfiguration!.octra.plugins!.asr!
         ).pipe(
-          exhaustMap((result) =>
-            of(
-              ASRActions.runASROnItem.success({
-                item,
-                audioURL,
-                options,
-                result: {
-                  url: result.url,
-                  text: result.text,
-                },
+          withLatestFrom(this.store),
+          exhaustMap(([result, state2]) => {
+            const item2 = state2.asr.queue?.items?.find(
+              (a) => a.time === item.time
+            );
+
+            if (item2) {
+              if (item2.status !== ASRProcessStatus.STOPPED) {
+                return of(
+                  ASRActions.runASROnItem.success({
+                    item,
+                    audioURL,
+                    options,
+                    result: {
+                      url: result.url,
+                      text: result.text,
+                    },
+                  })
+                );
+              }
+            }
+
+            return of(
+              ASRActions.stopItemProcessing.success({
+                item: item2 ?? item,
               })
-            )
-          ),
+            );
+          }),
           catchError((error) => {
             return this.handleShibbolethError(
               item,
@@ -486,12 +502,27 @@ export class AsrEffects {
               return from(
                 readFileContents<string>(result.file, 'text', 'utf-8')
               ).pipe(
-                exhaustMap((contents) => {
+                withLatestFrom(this.store),
+                exhaustMap(([contents, state2]) => {
+                  const item2 = state2.asr.queue?.items?.find(
+                    (a) => a.time === item.time
+                  );
+
+                  if (item2) {
+                    if (item2.status !== ASRProcessStatus.STOPPED) {
+                      return of(
+                        ASRActions.runWordAlignmentOnItem.success({
+                          item,
+                          result: contents,
+                          transcriptURL: contents.replace(/\n/g, '').trim(),
+                        })
+                      );
+                    }
+                  }
+
                   return of(
-                    ASRActions.runWordAlignmentOnItem.success({
-                      item,
-                      result: contents,
-                      transcriptURL: contents.replace(/\n/g, '').trim(),
+                    ASRActions.stopItemProcessing.success({
+                      item: item2 ?? item,
                     })
                   );
                 })
@@ -500,7 +531,7 @@ export class AsrEffects {
             // do nothing
             return of(
               ASRActions.stopItemProcessing.success({
-                id: item.id,
+                item,
               })
             );
           }),
@@ -550,13 +581,14 @@ export class AsrEffects {
         ASRActions.runASROnItem.fail,
         ASRActions.runWordAlignmentOnItem.fail,
         ASRActions.processQueueItem.success,
-        ASRActions.processQueueItem.fail
+        ASRActions.processQueueItem.fail,
+        ASRActions.stopItemProcessing.success
       ),
       withLatestFrom(this.store),
       mergeMap(([action, state]) => {
-        const item = state.asr.queue!.items.find(
-          (a) => a.id === action.item.id
-        )!;
+        const item =
+          state.asr.queue!.items.find((a) => a.id === action.item.id) ??
+          action.item;
 
         if (item) {
           return of(
@@ -697,6 +729,67 @@ export class AsrEffects {
                 );
               }
             }
+          }
+        })
+      ),
+    { dispatch: false }
+  );
+
+  stopProcessing$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ASRActions.stopProcessing.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        if (state.asr.queue?.items) {
+          for (const item of state.asr.queue.items) {
+            this.store.dispatch(
+              ASRActions.stopItemProcessing.do({
+                time: item.time,
+              })
+            );
+          }
+        }
+
+        return of(ASRActions.stopProcessing.success());
+      })
+    )
+  );
+
+  stopItemProcessing$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ASRActions.stopItemProcessing.do),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          const item = state.asr.queue?.items?.find(
+            (a) =>
+              a.time.sampleLength === action.time.sampleLength &&
+              a.time.sampleStart === action.time.sampleStart
+          );
+
+          if (item) {
+            this.store.dispatch(
+              AnnotationActions.updateASRSegmentInformation.do({
+                mode: state.application.mode!,
+                timeInterval: item.time,
+                progress: item.progress,
+                itemType: item.type,
+                result:
+                  item.status === ASRProcessStatus.FINISHED
+                    ? item.result
+                    : undefined,
+                isBlockedBy:
+                  item.status !== ASRProcessStatus.STOPPED &&
+                  item.status !== ASRProcessStatus.FINISHED &&
+                  item.status !== ASRProcessStatus.FAILED
+                    ? item.type
+                    : undefined,
+              })
+            );
+          } else {
+            console.log('queue:');
+            console.log(state.asr.queue?.items);
+            console.error('Item is undefined');
           }
         })
       ),

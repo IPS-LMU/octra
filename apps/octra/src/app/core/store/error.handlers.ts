@@ -36,6 +36,7 @@ export const checkAndThrowError: (
     return of(
       AuthenticationActions.needReAuthentication.do({
         actionAfterSuccess: lastAction,
+        forceLogout: true
       })
     );
   } else if (callback) {

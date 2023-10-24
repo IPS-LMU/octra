@@ -56,6 +56,7 @@ export class OctraModalService {
 
   public openReAuthenticationModal(
     type: AccountLoginMethod,
+    forceLogout = false,
     actionAfterSuccess?: Action
   ) {
     const ref = this.openModalRef<ReAuthenticationModalComponent>(
@@ -63,6 +64,7 @@ export class OctraModalService {
       ReAuthenticationModalComponent.options
     );
     ref.componentInstance.type = type;
+    ref.componentInstance.forceLogout = forceLogout;
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
     return ref;
   }

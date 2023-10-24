@@ -608,7 +608,9 @@ export class AsrEffects {
             ) {
               this.store.dispatch(
                 AuthenticationActions.needReAuthentication.do({
+                  forceAuthentication: AccountLoginMethod.shibboleth,
                   actionAfterSuccess: ASRActions.startProcessing.do(),
+                  forceLogout: false,
                 })
               );
               this.alertService.showAlert(
@@ -619,7 +621,9 @@ export class AsrEffects {
             } else {
               this.store.dispatch(
                 AuthenticationActions.needReAuthentication.do({
+                  forceAuthentication: AccountLoginMethod.shibboleth,
                   actionAfterSuccess: ASRActions.startProcessing.do(),
+                  forceLogout: false,
                 })
               );
             }

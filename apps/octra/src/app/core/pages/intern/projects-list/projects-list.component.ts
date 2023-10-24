@@ -93,6 +93,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             this.store.dispatch(
               AuthenticationActions.needReAuthentication.do({
                 actionAfterSuccess: undefined,
+                forceLogout: true,
               })
             );
           } else {

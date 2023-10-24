@@ -34,7 +34,6 @@ import { AlertService } from '../../shared/service';
 import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
 import { ApplicationActions } from '../application/application.actions';
 import { IDBActions } from '../idb/idb.actions';
-import { AccountLoginMethod } from '@octra/api-types';
 
 @Injectable()
 export class AuthenticationEffects {
@@ -518,9 +517,8 @@ export class AuthenticationEffects {
           if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
-                state.application.mode === LoginMode.LOCAL
-                  ? AccountLoginMethod.shibboleth
-                  : state.authentication.type!,
+                a.forceAuthentication ?? state.authentication.type!,
+                a.forceLogout,
                 a.actionAfterSuccess
               );
             const subscr = this.reauthenticationRef.closed.subscribe({
@@ -581,6 +579,7 @@ export class AuthenticationEffects {
   );
 
   private reauthenticationRef?: NgbModalRef;
+  forceLogout = false;
 
   getSessionFile = (file: File) => {
     return new SessionFile(

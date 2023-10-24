@@ -30,6 +30,8 @@ export class ReAuthenticationModalComponent
   type?: AccountLoginMethod;
   authenticationRunning = false;
 
+  forceLogout = false;
+
   actionAfterSuccess?: Action;
 
   constructor(
@@ -89,7 +91,10 @@ export class ReAuthenticationModalComponent
   }
 
   abort() {
-    if (this.appStorage.snapshot.application.mode === LoginMode.ONLINE) {
+    if (
+      this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
+      this.forceLogout
+    ) {
       this.appStorage.logout();
       this.activeModal.close();
     } else {

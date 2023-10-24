@@ -16,7 +16,7 @@ import {
   fadeInExpandOnEnterAnimation,
   fadeOutCollapseOnLeaveAnimation,
 } from 'angular-animations';
-import { interval, timer } from 'rxjs';
+import { interval } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { NavbarService } from '../../component/navbar/navbar.service';
@@ -25,10 +25,7 @@ import {
   TextTableConverter,
 } from '../../obj/tools/audio-cutting/cutting-format';
 import { AudioService, UserInteractionsService } from '../../shared/service';
-import {
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-} from '@octra/annotation';
+import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { IntArray, WavFormat } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
@@ -53,7 +50,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 export class ToolsModalComponent extends OctraModal implements OnDestroy {
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: false,
+    backdrop: true,
     scrollable: true,
     size: 'xl',
   };
@@ -545,100 +542,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
   }
 
   private combinePhrases() {
-    if (
-      !(
-        this.annotationStoreService.currentLevel instanceof
-        OctraAnnotationSegmentLevel
-      )
-    ) {
-      return;
-    }
-
-    let transcript = this.annotationStoreService.transcript;
-    const currentLevel: OctraAnnotationSegmentLevel<OctraAnnotationSegment> =
-      transcript!.levels[
-        this.annotationStoreService.currentLevelIndex
-      ] as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
-
-    const maxWords = this.tools.combinePhrases.options.maxWordsPerSegment;
-    const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
-    const isSilence = (segment: OctraAnnotationSegment) => {
-      return (
-        segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '' ||
-        segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-          this.annotationStoreService.breakMarker?.code ||
-        segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '<p:>' ||
-        segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-          this.annotationStoreService.breakMarker?.code
-      );
-    };
-
-    const countWords = (text: string) => {
-      return text.trim().split(' ').length;
-    };
-
-    let wordCounter = 0;
-
-    for (let i = 0; i < currentLevel.items.length; i++) {
-      const segment = currentLevel.items[i];
-
-      let startPos = 0;
-      if (i > 0) {
-        startPos = currentLevel.items[i - 1].time.unix;
-      }
-      let duration = segment.time.unix - startPos;
-      if (!isSilence(segment) || duration < minSilenceLength) {
-        if (maxWords > 0 && wordCounter >= maxWords) {
-          wordCounter = isSilence(segment)
-            ? 0
-            : countWords(
-                segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
-              );
-        } else {
-          if (i > 0) {
-            const lastSegment = currentLevel.items[i - 1];
-            startPos = 0;
-            if (i > 1) {
-              startPos = currentLevel.items[i - 2].time.unix;
-            }
-            duration = lastSegment.time.unix - startPos;
-            if (!isSilence(lastSegment) || duration < minSilenceLength) {
-              let lastSegmentText =
-                lastSegment.getFirstLabelWithoutName('Speaker')?.value;
-              let segmentText =
-                segment.getFirstLabelWithoutName('Speaker')?.value;
-
-              if (isSilence(lastSegment)) {
-                lastSegmentText = '';
-              }
-
-              if (!isSilence(segment)) {
-                segment.changeFirstLabelWithoutName(
-                  'Speaker',
-                  `${lastSegmentText} ${segmentText}`
-                );
-                wordCounter = countWords(`${lastSegmentText} ${segmentText}`);
-              } else {
-                segmentText = '';
-                segment.changeFirstLabelWithoutName(
-                  'Speaker',
-                  `${lastSegmentText}`
-                );
-              }
-              transcript = transcript!.removeItemByIndex(i - 1, '', false);
-              i--;
-            }
-          }
-        }
-      }
-    }
-
-    this.close();
-
-    this.subscrManager.add(
-      timer(1000).subscribe(() => {
-        this.navbarServ.toolApplied.emit('combinePhrases');
-      })
+    this.annotationStoreService.combinePhrases(
+      this.tools.combinePhrases.options
     );
+    this.close();
   }
 }

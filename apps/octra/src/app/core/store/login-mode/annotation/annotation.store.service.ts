@@ -879,4 +879,8 @@ export class AnnotationStoreService {
       })
     );
   }
+
+  combinePhrases(options: any){
+    this.store.dispatch(AnnotationActions.combinePhrases.do({options, mode: this.appStorage.useMode!}));
+  }
 }

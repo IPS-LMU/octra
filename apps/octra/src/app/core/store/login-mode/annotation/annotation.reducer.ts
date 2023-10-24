@@ -178,10 +178,28 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
-      on(AuthenticationActions.loginURL.success, (state: AnnotationState) => ({
-        ...state,
-        currentEditor: '2D-Editor',
-      })),
+      on(
+        AuthenticationActions.loginURL.success,
+        (state: AnnotationState, { mode }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              currentEditor: '2D-Editor',
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        AnnotationActions.combinePhrases.success,
+        (state: AnnotationState, { transcript, mode }) => {
+          if (this.mode === mode) {
+              state.transcript = transcript;
+          }
+
+          return state;
+        }
+      ),
       on(
         AnnotationActions.changeLevelName.do,
         (state: AnnotationState, { index, mode, name }) => {

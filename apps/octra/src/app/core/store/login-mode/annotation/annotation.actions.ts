@@ -426,4 +426,24 @@ export class AnnotationActions {
       }>(),
     },
   });
+
+  static combinePhrases = createActionGroup({
+    source: 'annotation/combine phrases',
+    events: {
+      do: props<{
+        mode: LoginMode;
+        options: {
+          minSilenceLength: number;
+          maxWordsPerSegment: number;
+        };
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
 }

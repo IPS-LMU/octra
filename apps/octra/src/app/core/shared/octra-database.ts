@@ -7,11 +7,11 @@ import { removeEmptyProperties } from '@octra/utilities';
 import { ASRStateSettings } from '../store/asr';
 
 export class OctraDatabase extends Dexie {
-  public demoData: Dexie.Table<IIDBEntry, string>;
-  public onlineData: Dexie.Table<IIDBEntry, string>;
-  public urlData: Dexie.Table<IIDBEntry, string>;
-  public localData: Dexie.Table<IIDBEntry, string>;
-  public app_options: Dexie.Table<IIDBEntry, string>;
+  public demoData!: Dexie.Table<IIDBEntry, string>;
+  public onlineData!: Dexie.Table<IIDBEntry, string>;
+  public urlData!: Dexie.Table<IIDBEntry, string>;
+  public localData!: Dexie.Table<IIDBEntry, string>;
+  public app_options!: Dexie.Table<IIDBEntry, string>;
   public onReady: Subject<void>;
 
   private defaultOptions: IIDBEntry[] = [
@@ -110,6 +110,10 @@ export class OctraDatabase extends Dexie {
     super(dbName);
     this.onReady = new Subject<void>();
 
+    this.init();
+  }
+
+  private init() {
     this.version(0.2)
       .stores({
         annotation_levels: '++id',
@@ -142,6 +146,20 @@ export class OctraDatabase extends Dexie {
       })
       .upgrade(this.upgradeToDatabaseV4);
 
+    this.version(0.5)
+      .stores({
+        annotation_levels: null,
+        annotation_links: null,
+        logs: null,
+        options: null,
+        demo_data: 'name',
+        online_data: 'name',
+        local_data: 'name',
+        url_data: 'name',
+        app_options: 'name',
+      })
+      .upgrade(this.upgradeToDatabaseV5);
+
     this.demoData = this.table('demo_data');
     this.onlineData = this.table('online_data');
     this.localData = this.table('local_data');
@@ -165,10 +183,12 @@ export class OctraDatabase extends Dexie {
   }
 
   private upgradeToDatabaseV2(transaction: Transaction) {
+    console.log('upgrade to V2');
     return transaction.table('app_options').bulkPut(this.defaultOptions);
   }
 
   private upgradeToDatabaseV3(transaction: Transaction) {
+    console.log('upgrade to V3');
     return transaction
       .table('app_options')
       .toCollection()
@@ -184,9 +204,9 @@ export class OctraDatabase extends Dexie {
       });
   }
 
-  private async upgradeToDatabaseV4(transaction: Transaction) {
-    await transaction.table('app_options').get('usemode');
-  }
+  private async upgradeToDatabaseV4(transaction: Transaction) {}
+
+  private async upgradeToDatabaseV5(transaction: Transaction) {}
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
     let table: Dexie.Table<IIDBEntry, string> = undefined as any;

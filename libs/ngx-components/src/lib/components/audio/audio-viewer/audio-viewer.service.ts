@@ -11,6 +11,7 @@ import {
   OctraAnnotation,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
   OLabel,
 } from '@octra/annotation';
 import { Subject } from 'rxjs';
@@ -27,7 +28,10 @@ import {
   providedIn: 'root',
 })
 export class AudioViewerService {
-  get boundaryDragging(): Subject<'started' | 'stopped'> {
+  get boundaryDragging(): Subject<{
+    status: 'started' | 'stopped' | 'dragging';
+    shiftPressed?: boolean;
+  }> {
     return this._boundaryDragging;
   }
 
@@ -60,7 +64,10 @@ export class AudioViewerService {
   protected mouseClickPos: SampleUnit | undefined;
   protected playcursor: PlayCursor | undefined;
 
-  private _boundaryDragging: Subject<'started' | 'stopped'>;
+  private _boundaryDragging: Subject<{
+    status: 'started' | 'stopped' | 'dragging';
+    shiftPressed?: boolean;
+  }>;
   currentLevelID?: number;
 
   annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
@@ -134,7 +141,10 @@ export class AudioViewerService {
   set dragableBoundaryNumber(value: number) {
     if (value > -1 && this._dragableBoundaryNumber === -1) {
       // started
-      this._boundaryDragging.next('started');
+      this._boundaryDragging.next({
+        shiftPressed: this.shiftPressed,
+        status: 'started',
+      });
     }
     this._dragableBoundaryNumber = value;
   }
@@ -185,7 +195,10 @@ export class AudioViewerService {
   }
 
   constructor(private multiThreadingService: MultiThreadingService) {
-    this._boundaryDragging = new Subject<'started' | 'stopped'>();
+    this._boundaryDragging = new Subject<{
+      status: 'started' | 'stopped' | 'dragging';
+      shiftPressed?: boolean;
+    }>();
   }
 
   public initialize(innerWidth: number, audioChunk: AudioChunk) {
@@ -233,7 +246,9 @@ export class AudioViewerService {
               this.audioChunk.startpos = this.mouseClickPos.clone();
               this.audioChunk.selection.start = absXInTime.clone();
               this.audioChunk.selection.end = absXInTime.clone();
-              this._drawnSelection = this.audioChunk.selection.clone();
+              if (!this.shiftPressed) {
+                this._drawnSelection = this.audioChunk.selection.clone();
+              }
 
               if (this._dragableBoundaryNumber > -1) {
                 const segmentBefore = (
@@ -286,23 +301,108 @@ export class AudioViewerService {
                 )?.clone();
 
                 if (segment) {
-                  segment.time = this.audioTCalculator.absXChunktoSampleUnit(
-                    absX,
-                    this.audioChunk
-                  )!;
+                  if (!this.shiftPressed) {
+                    // move only this boundary
+                    segment.time = this.audioTCalculator.absXChunktoSampleUnit(
+                      absX,
+                      this.audioChunk
+                    )!;
 
-                  this.currentLevelChange.emit({
-                    type: 'change',
-                    items: [
-                      {
-                        instance: segment,
-                      },
-                    ],
-                  });
-                  this.annotationChange.emit(this.annotation);
+                    this.currentLevelChange.emit({
+                      type: 'change',
+                      items: [
+                        {
+                          instance: segment,
+                        },
+                      ],
+                    });
+                    this.annotationChange.emit(this.annotation);
+                  } else if (this.drawnSelection?.duration?.samples) {
+                    // move all segments with difference to left or right
+                    const oldSamplePosition = segment.time.samples;
+                    const newSamplePosition =
+                      this.audioTCalculator.absXChunktoSampleUnit(
+                        absX,
+                        this.audioChunk
+                      )?.samples;
+                    const diff = newSamplePosition! - oldSamplePosition;
+                    let changedItems: OctraAnnotationSegment[] = [];
+
+                    if (diff > 0) {
+                      // shift to right
+                      for (const currentLevelElement of (this.annotation
+                        .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
+                        .items) {
+                        if (
+                          currentLevelElement.time.samples >=
+                            segment.time.samples &&
+                          currentLevelElement.time.samples + diff <
+                            this.drawnSelection.end!.samples
+                        ) {
+                          const newItem = currentLevelElement.clone(
+                            currentLevelElement.id
+                          );
+                          newItem.time = currentLevelElement.time.add(
+                            this.audioManager.createSampleUnit(diff)
+                          );
+                          this.annotation =
+                            this.annotation.changeCurrentItemById(
+                              currentLevelElement.id,
+                              newItem
+                            );
+                          changedItems.push(newItem);
+                        }
+                      }
+                    } else {
+                      // shift to left
+                      for (const currentLevelElement of (this.annotation
+                        .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
+                        .items) {
+                        console.log(
+                          `move to ${currentLevelElement.time.samples + diff}`
+                        );
+                        if (
+                          currentLevelElement.time.samples <=
+                            segment.time.samples &&
+                          currentLevelElement.time.samples + diff >
+                            this.drawnSelection.start!.samples
+                        ) {
+                          const newItem = currentLevelElement.clone(
+                            currentLevelElement.id
+                          );
+                          newItem.time = currentLevelElement.time.add(
+                            this.audioManager.createSampleUnit(diff)
+                          );
+                          this.annotation =
+                            this.annotation.changeCurrentItemById(
+                              currentLevelElement.id,
+                              newItem
+                            );
+                          changedItems.push(newItem);
+                        } else if (
+                          currentLevelElement.time.samples - diff <
+                          0
+                        ) {
+                          changedItems = [];
+                          break;
+                        }
+                      }
+                    }
+
+                    if (changedItems.length > 0) {
+                      this.currentLevelChange.emit({
+                        type: 'change',
+                        items: changedItems.map((a) => ({ instance: a })),
+                      });
+                      this.annotationChange.emit(this.annotation);
+                    }
+                  }
                 }
 
-                this._boundaryDragging.next('stopped');
+                this._boundaryDragging.next({
+                  shiftPressed: this.shiftPressed,
+                  status: 'stopped',
+                });
               } else {
                 // set selection
                 this.audioChunk.selection.end = absXInTime.clone();
@@ -612,8 +712,11 @@ export class AudioViewerService {
 
         if (this.mouseDown && this._dragableBoundaryNumber < 0) {
           // mouse down, nothing dragged
-          this.audioChunk.selection.end = absXTime.clone();
-          this._drawnSelection = this.audioChunk.selection.clone();
+          if (!this.shiftPressed) {
+            console.log('reset selection');
+            this.audioChunk.selection.end = absXTime.clone();
+            this._drawnSelection = this.audioChunk.selection.clone();
+          }
         } else if (
           this.settings.boundaries.enabled &&
           this.mouseDown &&

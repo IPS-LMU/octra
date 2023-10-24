@@ -111,8 +111,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.subscrManager = new SubscriptionManager<Subscription>();
 
     this.subscrManager.add(
-      this.av.boundaryDragging.subscribe((status) => {
-        if (status === 'stopped') {
+      this.av.boundaryDragging.subscribe((event) => {
+        if (event.status === 'stopped') {
           this.renderer.setStyle(
             this.konvaContainer?.nativeElement,
             'cursor',
@@ -253,7 +253,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
    * triggers when the boundary was dragged.
    */
   @Output()
-  public get boundaryDragging(): Subject<'started' | 'stopped'> {
+  public get boundaryDragging(): Subject<{
+    status: 'started' | 'stopped' | 'dragging';
+    shiftPressed?: boolean;
+  }> {
     return this.av.boundaryDragging;
   }
 
@@ -1939,11 +1942,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         (this.settings.lineheight + this.settings.margin.top);
       const sceneSegment = this.av.currentLevel.items.find(
         (a: any) => a.id === segment.id
-      ) as OctraAnnotationSegment  |undefined;
+      ) as OctraAnnotationSegment | undefined;
       if (
         sceneSegment === undefined ||
         segment?.time === undefined ||
-        (this.av.currentLevel.type !== AnnotationLevelType.SEGMENT)
+        this.av.currentLevel.type !== AnnotationLevelType.SEGMENT
       ) {
         console.error(`scenceSegment is undefined!`);
       } else {
@@ -2170,7 +2173,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             this.audioChunk.absolutePlayposition.clone();
           this.audioChunk.selection.end =
             this.audioChunk.absolutePlayposition.clone();
-          this.av.drawnSelection = this.audioChunk.selection.clone();
         }
 
         this.av
@@ -2509,10 +2511,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   private onKeyDown = (event: KeyboardEvent) => {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(event, Date.now());
 
+    this.av.shiftPressed =
+      event.keyCode === 16 || event.code?.includes('Shift') || event.key?.includes('Shift');
+
     if (shortcutInfo !== undefined) {
       const comboKey = shortcutInfo.shortcut;
-
-      this.av.shiftPressed = comboKey === 'SHIFT';
 
       if (this.settings.shortcutsEnabled) {
         if (this._focused && this.isDisabledKey(comboKey)) {
@@ -2606,7 +2609,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                     if (
                       this.av.currentLevel.type === AnnotationLevelType.SEGMENT
                     ) {
-                      const segment = this.av.currentLevel.items[segmentI] as OctraAnnotationSegment<ASRContext>;
+                      const segment = this.av.currentLevel.items[
+                        segmentI
+                      ] as OctraAnnotationSegment<ASRContext>;
                       if (
                         segmentI > -1 &&
                         segment.context?.asr?.isBlockedBy === undefined &&
@@ -3118,6 +3123,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   private onKeyUp = (event: KeyboardEvent) => {
+    this.av.onKeyUp();
     this.shortcutsManager.checkKeyEvent(event, Date.now());
   };
 

@@ -157,8 +157,6 @@ export const reducer = createReducer(
               }
             : undefined,
         };
-      } else {
-        console.error("Can't stop item in reducer: index < 0");
       }
     }
     return state;
@@ -272,8 +270,6 @@ export const reducer = createReducer(
             statistics: calculateStatistics(queue),
           },
         };
-      } else {
-        console.error(`can't find queue item with id ${item.id}`);
       }
     }
 
@@ -297,8 +293,6 @@ export const reducer = createReducer(
             ],
           },
         };
-      } else {
-        console.error(`can't find queue item with id ${item.id}`);
       }
     }
 
@@ -327,8 +321,6 @@ export const reducer = createReducer(
             statistics: calculateStatistics(queue),
           },
         };
-      } else {
-        console.error(`can't find queue item with id ${item.id}`);
       }
     }
 
@@ -360,8 +352,6 @@ export const reducer = createReducer(
               statistics: calculateStatistics(queue),
             },
           };
-        } else {
-          console.error(`can't find queue item with id ${item.id}`);
         }
       }
 
@@ -396,8 +386,6 @@ export const reducer = createReducer(
               statistics: calculateStatistics(queue),
             },
           };
-        } else {
-          console.error(`can't find queue item with id ${item.id}`);
         }
       }
 

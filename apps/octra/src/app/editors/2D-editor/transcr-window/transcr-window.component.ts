@@ -324,20 +324,28 @@ export class TranscrWindowComponent
     super();
 
     this.subscrManager.add(
-      this.asrStoreService.queue$.subscribe(
-        (queue) => {
-          const item = queue?.items.find(
-            (a) =>
-              a.time.sampleStart === this.audiochunk.time.start.samples &&
-              a.time.sampleLength === this.audiochunk.time.duration.samples
-          );
+      this.asrStoreService.queue$.subscribe({
+        next: (queue) => {
+          const item = this.audiochunk
+            ? queue?.items.find(
+                (a) =>
+                  a.time.sampleStart === this.audiochunk.time.start.samples &&
+                  a.time.sampleLength === this.audiochunk.time.duration.samples
+              )
+            : undefined;
 
+          console.log(queue?.items);
           if (item) {
             if (
               item.status === ASRProcessStatus.FINISHED &&
               item.result !== undefined
             ) {
+              console.log(`set transcript in window: ${item.result}`);
               this.transcript = item.result;
+            } else {
+              console.log(
+                `Can't set transcript, ${item.status}, ${item.result}`
+              );
             }
 
             this.loupe.redraw();
@@ -346,10 +354,10 @@ export class TranscrWindowComponent
             this.cd.detectChanges();
           }
         },
-        (error) => {
+        error: (error) => {
           console.error(error);
-        }
-      )
+        },
+      })
     );
   }
 
@@ -583,6 +591,7 @@ export class TranscrWindowComponent
 
     this.audiochunk.stopPlayback();
     this.act.emit('close');
+    this.subscrManager.destroy();
   }
 
   public open() {

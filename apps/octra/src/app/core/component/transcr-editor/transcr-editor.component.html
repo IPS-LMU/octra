@@ -1,7 +1,7 @@
 <div
   #transcrEditor
   (change)="updateTextField()"
-  class="transcr-editor flex h-100"
+  class="transcr-editor flex h-100 position-relative"
 >
   <octra-validation-popover
     #validationPopover
@@ -11,22 +11,12 @@
     }"
   ></octra-validation-popover>
   <div
-    (click)="onASROverlayClick()"
-    [ngClass]="{
-      'asr-running': asr.status === 'active'
-    }"
-    [ngStyle]="{
-      height: size.height + 'px',
-      width: size.width + 'px',
-      display: asr.status === 'active' ? 'block' : 'none'
-    }"
     id="asrOverlay"
+    class="asr-running h-100 w-100 d-flex flex-column justify-content-center justify-items-center"
+    (click)="onASROverlayClick()"
+    *ngIf="asr.status === 'active'"
   >
-    <!--
-    (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
-    -->
     <p
-      *ngIf="asr.status === 'active'"
       style="margin-top: 50px; text-align: center"
     >
       {{ 'asr.asr running' | transloco }}

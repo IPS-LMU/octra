@@ -591,6 +591,18 @@ export class AsrEffects {
           action.item;
 
         if (item) {
+          if (
+            [ASRProcessStatus.FINISHED, ASRProcessStatus.FAILED].includes(
+              item.status
+            )
+          ) {
+            this.store.dispatch(
+              ASRActions.removeItemFromQueue.do({
+                id: item.id,
+              })
+            );
+          }
+
           return of(
             AnnotationActions.updateASRSegmentInformation.do({
               mode: state.application.mode!,
@@ -786,10 +798,6 @@ export class AsrEffects {
                     : undefined,
               })
             );
-          } else {
-            console.log('queue:');
-            console.log(state.asr.queue?.items);
-            console.error('Item is undefined');
           }
         })
       ),

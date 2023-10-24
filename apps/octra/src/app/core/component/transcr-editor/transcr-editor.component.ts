@@ -274,7 +274,7 @@ export class TranscrEditorComponent
    * called when key pressed in editor
    */
   onKeyDown = ($event: KeyboardEvent) => {
-    if ($event.key === "Enter" || $event.keyCode === 13){
+    if ($event.key === 'Enter' || $event.keyCode === 13) {
       this.enterKeyPressed.emit();
       $event.preventDefault();
       $event.stopPropagation();
@@ -422,6 +422,11 @@ export class TranscrEditorComponent
       this.shortcutService.unregisterShortcutGroup('texteditor');
       this.shortcutService.registerShortcutGroup(this.shortcuts);
 
+      this.asrStoreService.stopItemProcessing({
+        sampleStart: this.audiochunk.time.start.samples,
+        sampleLength: this.audiochunk.time.duration.samples,
+      });
+
       this.joditOptions = {
         ...this.joditDefaultOptions,
         showCharsCounter: false,
@@ -491,11 +496,6 @@ export class TranscrEditorComponent
       this.asr.error = '';
       this.asr.result = '';
 
-      this.asrStoreService.stopItemProcessing({
-        sampleStart: this.audiochunk.time.start.samples,
-        sampleLength: this.audiochunk.time.duration.samples,
-      });
-
       this.size.height = this.transcrEditor.nativeElement.offsetHeight;
       this.size.width = this.transcrEditor.nativeElement.offsetWidth;
 
@@ -548,7 +548,7 @@ export class TranscrEditorComponent
     return 'Helvetica, Arial, serif';
   }
 
-  onASRQueueChange(queue?: ASRStateQueue) {
+  onASRQueueChange = (queue?: ASRStateQueue) => {
     if (queue !== undefined && this.audiochunk) {
       const item = queue.items.find(
         (a) =>
@@ -572,9 +572,11 @@ export class TranscrEditorComponent
         } else if (item.status === ASRProcessStatus.NOAUTH) {
           this.asr.status = 'active';
         }
+
+        this.cd.markForCheck();
       }
     }
-  }
+  };
 
   /**
    * inserts a marker to the editors html
@@ -726,6 +728,7 @@ export class TranscrEditorComponent
       obj['transcript'].currentValue !== undefined &&
       !obj['transcript'].firstChange
     ) {
+      console.log("set transcript");
       this.setTranscript(obj['transcript'].currentValue);
     }
 

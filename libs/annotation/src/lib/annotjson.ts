@@ -161,6 +161,16 @@ export class OLevel<T extends OItem> implements ILevel {
       this.items.map((a) => a.clone())
     );
   }
+
+  getLeftSibling(item: OItem): T | undefined {
+    const index = this.items.findIndex((a) => a.id === item.id);
+    return index > 0 ? this.items[index - 1] : undefined;
+  }
+
+  getRightSibling(item: OItem): T | undefined {
+    const index = this.items.findIndex((a) => a.id === item.id);
+    return index > -1 && index < this.items.length - 1 ? this.items[index + 1] : undefined;
+  }
 }
 
 export class OSegmentLevel<T extends OSegment>

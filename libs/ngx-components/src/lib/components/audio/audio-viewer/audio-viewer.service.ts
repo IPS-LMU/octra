@@ -71,6 +71,7 @@ export class AudioViewerService {
   currentLevelID?: number;
 
   annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
+  tempAnnotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
 
   // AUDIO
   protected audioPxW = 0;
@@ -132,21 +133,23 @@ export class AudioViewerService {
     this.playcursor = playcursor;
   }
 
-  private _dragableBoundaryNumber = -1;
+  private _dragableBoundaryID = -1;
 
-  get dragableBoundaryNumber(): number {
-    return this._dragableBoundaryNumber;
+  get dragableBoundaryID(): number {
+    return this._dragableBoundaryID;
   }
 
-  set dragableBoundaryNumber(value: number) {
-    if (value > -1 && this._dragableBoundaryNumber === -1) {
+  set dragableBoundaryID(value: number) {
+    if (value > -1 && this._dragableBoundaryID === -1) {
       // started
+      this.tempAnnotation = this.annotation;
+      console.log(`boundary ${value} started dragging`);
       this._boundaryDragging.next({
         shiftPressed: this.shiftPressed,
         status: 'started',
       });
     }
-    this._dragableBoundaryNumber = value;
+    this._dragableBoundaryID = value;
   }
 
   private _zoomY = 1;
@@ -239,7 +242,7 @@ export class AudioViewerService {
           if (!this.audioManager.isPlaying) {
             // same line
             // fix margin settings
-            if ($event.type === 'mousedown' && !this.shiftPressed) {
+            if ($event.type === 'mousedown') {
               // no line defined or same line
               this.mouseClickPos = absXInTime.clone();
 
@@ -250,29 +253,19 @@ export class AudioViewerService {
                 this._drawnSelection = this.audioChunk.selection.clone();
               }
 
-              if (this._dragableBoundaryNumber > -1) {
-                const segmentBefore = (
-                  this._dragableBoundaryNumber > 0
-                    ? this.annotation.currentLevel.items[
-                        this._dragableBoundaryNumber - 1
-                      ]
-                    : this.annotation.currentLevel.items[
-                        this._dragableBoundaryNumber
-                      ]
-                ) as OctraAnnotationSegment<ASRContext>;
+              if (this._dragableBoundaryID > -1) {
+                const currentLevel = this
+                  .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+                const segmentBefore = currentLevel!.getLeftSibling(
+                  currentLevel.items[this._dragableBoundaryID]
+                );
                 const segment = this.annotation.currentLevel.items[
-                  this._dragableBoundaryNumber
+                  this._dragableBoundaryID
                 ] as OctraAnnotationSegment<ASRContext>;
-                const segmentAfter = (
-                  this._dragableBoundaryNumber <
-                  this.annotation.currentLevel.items.length - 1
-                    ? this.annotation.currentLevel.items[
-                        this._dragableBoundaryNumber + 1
-                      ]
-                    : this.annotation.currentLevel.items[
-                        this._dragableBoundaryNumber
-                      ]
-                ) as OctraAnnotationSegment<ASRContext>;
+                const segmentAfter = currentLevel!.getRightSibling(
+                  currentLevel.items[this._dragableBoundaryID]
+                );
+
                 if (
                   segment?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR ||
                   segmentBefore?.context?.asr?.isBlockedBy ===
@@ -281,144 +274,21 @@ export class AudioViewerService {
                     ASRQueueItemType.ASR
                 ) {
                   // prevent dragging boundary of blocked segment
-                  this._dragableBoundaryNumber = -1;
+                  this._dragableBoundaryID = -1;
                 }
               }
               this._mouseDown = true;
             } else if ($event.type === 'mouseup') {
-              if (
-                this.settings.boundaries.enabled &&
-                !this.settings.boundaries.readonly &&
-                this._dragableBoundaryNumber > -1 &&
-                this._dragableBoundaryNumber <
-                  this.annotation.currentLevel.items.length
-              ) {
-                // some boundary dragged
-                const segment: OctraAnnotationSegment | undefined = (
-                  this.annotation.currentLevel.items[
-                    this._dragableBoundaryNumber
-                  ] as OctraAnnotationSegment<ASRContext>
-                )?.clone();
+              this.handleBoundaryDragging(absX, absXInTime, true);
 
-                if (segment) {
-                  if (!this.shiftPressed) {
-                    // move only this boundary
-                    segment.time = this.audioTCalculator.absXChunktoSampleUnit(
-                      absX,
-                      this.audioChunk
-                    )!;
-
-                    this.currentLevelChange.emit({
-                      type: 'change',
-                      items: [
-                        {
-                          instance: segment,
-                        },
-                      ],
-                    });
-                    this.annotationChange.emit(this.annotation);
-                  } else if (this.drawnSelection?.duration?.samples) {
-                    // move all segments with difference to left or right
-                    const oldSamplePosition = segment.time.samples;
-                    const newSamplePosition =
-                      this.audioTCalculator.absXChunktoSampleUnit(
-                        absX,
-                        this.audioChunk
-                      )?.samples;
-                    const diff = newSamplePosition! - oldSamplePosition;
-                    let changedItems: OctraAnnotationSegment[] = [];
-
-                    if (diff > 0) {
-                      // shift to right
-                      for (const currentLevelElement of (this.annotation
-                        .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
-                        .items) {
-                        if (
-                          currentLevelElement.time.samples >=
-                            segment.time.samples &&
-                          currentLevelElement.time.samples + diff <
-                            this.drawnSelection.end!.samples
-                        ) {
-                          const newItem = currentLevelElement.clone(
-                            currentLevelElement.id
-                          );
-                          newItem.time = currentLevelElement.time.add(
-                            this.audioManager.createSampleUnit(diff)
-                          );
-                          this.annotation =
-                            this.annotation.changeCurrentItemById(
-                              currentLevelElement.id,
-                              newItem
-                            );
-                          changedItems.push(newItem);
-                        }
-                      }
-                    } else {
-                      // shift to left
-                      for (const currentLevelElement of (this.annotation
-                        .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
-                        .items) {
-                        console.log(
-                          `move to ${currentLevelElement.time.samples + diff}`
-                        );
-                        if (
-                          currentLevelElement.time.samples <=
-                            segment.time.samples &&
-                          currentLevelElement.time.samples + diff >
-                            this.drawnSelection.start!.samples
-                        ) {
-                          const newItem = currentLevelElement.clone(
-                            currentLevelElement.id
-                          );
-                          newItem.time = currentLevelElement.time.add(
-                            this.audioManager.createSampleUnit(diff)
-                          );
-                          this.annotation =
-                            this.annotation.changeCurrentItemById(
-                              currentLevelElement.id,
-                              newItem
-                            );
-                          changedItems.push(newItem);
-                        } else if (
-                          currentLevelElement.time.samples - diff <
-                          0
-                        ) {
-                          changedItems = [];
-                          break;
-                        }
-                      }
-                    }
-
-                    if (changedItems.length > 0) {
-                      this.currentLevelChange.emit({
-                        type: 'change',
-                        items: changedItems.map((a) => ({ instance: a })),
-                      });
-                      this.annotationChange.emit(this.annotation);
-                    }
-                  }
-                }
-
-                this._boundaryDragging.next({
-                  shiftPressed: this.shiftPressed,
-                  status: 'stopped',
-                });
-              } else {
-                // set selection
-                this.audioChunk.selection.end = absXInTime.clone();
-                this.audioChunk.selection.checkSelection();
-                this._drawnSelection = this.audioChunk.selection.clone();
-
-                this.PlayCursor.changeSamples(
-                  this.audioChunk.absolutePlayposition.clone(),
-                  this.audioTCalculator,
-                  this.audioChunk
-                );
-              }
-
-              this._dragableBoundaryNumber = -1;
+              this._dragableBoundaryID = -1;
               this.overboundary = false;
               this._mouseDown = false;
+
+              this._boundaryDragging.next({
+                shiftPressed: this.shiftPressed,
+                status: 'stopped',
+              });
             }
 
             resolve(lineNum);
@@ -443,7 +313,7 @@ export class AudioViewerService {
                   );
 
                   this._mouseDown = false;
-                  this._dragableBoundaryNumber = -1;
+                  this._dragableBoundaryID = -1;
                 }
 
                 resolve(lineNum);
@@ -455,6 +325,164 @@ export class AudioViewerService {
         }
       }
     });
+  }
+
+  handleBoundaryDragging(absX: number, absXInTime: SampleUnit, emit = false) {
+    let annotation = this.tempAnnotation?.clone();
+    const currentLevel =
+      annotation?.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+    const limitPadding = 500;
+
+    const draggedItem = currentLevel?.items?.find(
+      (a) => a.id === this._dragableBoundaryID
+    );
+    if (
+      annotation &&
+      currentLevel &&
+      draggedItem &&
+      this.audioTCalculator &&
+      this.audioChunk &&
+      this.audioManager &&
+      this.PlayCursor
+    ) {
+      if (
+        this.settings.boundaries.enabled &&
+        !this.settings.boundaries.readonly &&
+        this._dragableBoundaryID > -1
+      ) {
+        // some boundary dragged
+        const segment: OctraAnnotationSegment | undefined =
+          draggedItem?.clone();
+
+        if (segment) {
+          if (!this.shiftPressed) {
+            // move only this boundary
+            const previousSegment: OctraAnnotationSegment | undefined =
+              currentLevel.getLeftSibling(draggedItem)!;
+            const nextSegment: OctraAnnotationSegment | undefined =
+              currentLevel.getRightSibling(draggedItem)!;
+
+            let newTime = this.audioTCalculator.absXChunktoSampleUnit(
+              absX,
+              this.audioChunk
+            )!;
+
+            if (
+              previousSegment &&
+              newTime.samples < previousSegment.time.samples + limitPadding
+            ) {
+              newTime = previousSegment.time.add(
+                this.audioManager.createSampleUnit(limitPadding)
+              );
+            } else if (
+              nextSegment &&
+              newTime.samples > nextSegment.time.samples - limitPadding
+            ) {
+              newTime = nextSegment.time.sub(
+                this.audioManager.createSampleUnit(limitPadding)
+              );
+            }
+
+            segment.time = newTime;
+            annotation.changeCurrentSegmentBySamplePosition(
+              segment.time,
+              segment
+            );
+
+            if (emit) {
+              this.currentLevelChange.emit({
+                type: 'change',
+                items: [
+                  {
+                    instance: segment,
+                  },
+                ],
+              });
+              this.annotationChange.emit(annotation);
+            }
+          } else if (this.drawnSelection?.duration?.samples) {
+            // move all segments with difference to left or right
+            const oldSamplePosition = segment.time.samples;
+            const newSamplePosition =
+              this.audioTCalculator.absXChunktoSampleUnit(
+                absX,
+                this.audioChunk
+              )?.samples;
+            const diff = newSamplePosition! - oldSamplePosition;
+            let changedItems: OctraAnnotationSegment[] = [];
+
+            if (diff > 0) {
+              // shift to right
+              for (const currentLevelElement of (annotation.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
+                .items) {
+                if (
+                  currentLevelElement.time.samples >= segment.time.samples &&
+                  currentLevelElement.time.samples + diff <
+                    this.drawnSelection.end!.samples
+                ) {
+                  const newItem = currentLevelElement.clone(
+                    currentLevelElement.id
+                  );
+                  newItem.time = currentLevelElement.time.add(
+                    this.audioManager.createSampleUnit(diff)
+                  );
+                  annotation = annotation.changeCurrentItemById(
+                    currentLevelElement.id,
+                    newItem
+                  );
+                  changedItems.push(newItem);
+                }
+              }
+            } else {
+              // shift to left
+              for (const currentLevelElement of (annotation.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!
+                .items) {
+                if (
+                  currentLevelElement.time.samples <= segment.time.samples &&
+                  currentLevelElement.time.samples + diff >
+                    this.drawnSelection.start!.samples
+                ) {
+                  const newItem = currentLevelElement.clone(
+                    currentLevelElement.id
+                  );
+                  newItem.time = currentLevelElement.time.add(
+                    this.audioManager.createSampleUnit(diff)
+                  );
+                  annotation = annotation.changeCurrentItemById(
+                    currentLevelElement.id,
+                    newItem
+                  );
+                  changedItems.push(newItem);
+                } else if (currentLevelElement.time.samples - diff < 0) {
+                  changedItems = [];
+                  break;
+                }
+              }
+            }
+
+            if (changedItems.length > 0 && emit) {
+              this.currentLevelChange.emit({
+                type: 'change',
+                items: changedItems.map((a) => ({ instance: a })),
+              });
+              this.annotationChange.emit(annotation);
+            }
+          }
+        }
+        this.annotation = annotation;
+      } else {
+        // set selection
+        this.audioChunk.selection.end = absXInTime.clone();
+        this.audioChunk.selection.checkSelection();
+        this._drawnSelection = this.audioChunk.selection.clone();
+
+        this.PlayCursor.changeSamples(
+          this.audioChunk.absolutePlayposition.clone(),
+          this.audioTCalculator,
+          this.audioChunk
+        );
+      }
+    }
   }
 
   onKeyUp = () => {
@@ -702,7 +730,7 @@ export class AudioViewerService {
       this.annotation?.currentLevel?.items &&
       this.annotation.currentLevel.items.length > 0
     ) {
-      let absXTime = this.audioTCalculator.absXChunktoSampleUnit(
+      const absXTime = this.audioTCalculator.absXChunktoSampleUnit(
         absX,
         this.audioChunk
       );
@@ -710,77 +738,25 @@ export class AudioViewerService {
       if (absXTime !== undefined) {
         this._mouseCursor = absXTime.clone();
 
-        if (this.mouseDown && this._dragableBoundaryNumber < 0) {
+        if (this.mouseDown && this._dragableBoundaryID < 0) {
           // mouse down, nothing dragged
           if (!this.shiftPressed) {
-            console.log('reset selection');
             this.audioChunk.selection.end = absXTime.clone();
             this._drawnSelection = this.audioChunk.selection.clone();
           }
         } else if (
           this.settings.boundaries.enabled &&
           this.mouseDown &&
-          this._dragableBoundaryNumber > -1
+          this._dragableBoundaryID > -1
         ) {
-          // mouse down something dragged
-          const segment = (
-            this.annotation.currentLevel.items[
-              this._dragableBoundaryNumber
-            ] as any
-          ).clone();
-          const absXSeconds = absXTime.seconds;
+          this.handleBoundaryDragging(absX, absXTime, false);
 
-          // prevent overwriting another boundary
-          const segmentBefore = (
-            this._dragableBoundaryNumber > 0
-              ? this.annotation.currentLevel.items[
-                  this._dragableBoundaryNumber - 1
-                ]
-              : undefined
-          ) as OctraAnnotationSegment<ASRContext>;
-          const segmentAfter = (
-            this._dragableBoundaryNumber <
-            this.annotation.currentLevel.items.length - 1
-              ? this.annotation.currentLevel.items[
-                  this._dragableBoundaryNumber + 1
-                ]
-              : undefined
-          ) as OctraAnnotationSegment<ASRContext>;
-          if (
-            segmentBefore?.time !== undefined &&
-            this.audioManager !== undefined
-          ) {
-            // check segment boundary before this segment
-            if (absXSeconds < segmentBefore.time.seconds + 0.02) {
-              absXTime = this.audioManager.createSampleUnit(
-                segmentBefore.time.samples +
-                  Math.round(0.02 * this.audioManager.resource.info.sampleRate)
-              );
-            }
-          }
-          if (segmentAfter !== undefined && this.audioManager !== undefined) {
-            // check segment boundary after this segment
-            if (
-              segmentAfter?.time !== undefined &&
-              absXSeconds > segmentAfter.time.seconds - 0.02
-            ) {
-              absXTime = this.audioManager.createSampleUnit(
-                segmentAfter.time.samples -
-                  Math.round(0.02 * this.audioManager.resource.info.sampleRate)
-              );
-            }
-          }
-
-          segment.time = absXTime.clone();
-          this.annotation.currentLevel.items[this._dragableBoundaryNumber] =
-            segment;
-        } else {
-          this._mouseDown = false;
+          this._boundaryDragging.next({
+            shiftPressed: this.shiftPressed,
+            status: 'dragging',
+          });
         }
       }
-
-      // set if boundary was dragged
-      // this.overboundary = (dragableBoundaryTemp > -1);
     }
   }
 

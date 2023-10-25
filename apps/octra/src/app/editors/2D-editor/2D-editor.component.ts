@@ -1092,8 +1092,4 @@ export class TwoDEditorComponent
       );
     }
   }
-
-  onBoundaryDragged($event: any) {
-    console.log($event);
-  }
 }

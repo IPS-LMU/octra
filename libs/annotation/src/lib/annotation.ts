@@ -716,6 +716,14 @@ export class OctraAnnotationLevel<T extends OLevel<S>, S extends OItem> {
 
     return this;
   }
+
+  getLeftSibling(item: S) {
+    return this.level.getLeftSibling(item);
+  }
+
+  getRightSibling(item: S) {
+    return this.level.getRightSibling(item);
+  }
 }
 
 export class OctraAnnotationSegmentLevel<
@@ -863,6 +871,16 @@ export class OctraAnnotationEventLevel {
     }
 
     return this;
+  }
+
+  getLeftSibling(item: OctraAnnotationEvent) {
+    const index = this.items.findIndex((a) => a.id === item.id);
+    return index > 0 ? this.items[index - 1] : undefined;
+  }
+
+  getRightSibling(item: OctraAnnotationEvent) {
+    const index = this.items.findIndex((a) => a.id === item.id);
+    return index > -1 && index < this.items.length - 1 ? this.items[index + 1] : undefined;
   }
 }
 

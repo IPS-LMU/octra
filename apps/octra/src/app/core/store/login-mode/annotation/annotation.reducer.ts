@@ -286,9 +286,6 @@ export class AnnotationStateReducers {
 
             if (currentLevel) {
               for (const item of items) {
-                console.log(
-                  `change ${item.id} to ${(item as any).time.seconds}`
-                );
                 state.transcript = state.transcript
                   .clone()
                   .changeCurrentItemById(item.id, item);

@@ -381,22 +381,24 @@ export class AudioManager {
           this._audio.addEventListener('ended', this.onPlayBackChanged);
           this._audio.addEventListener('error', this.onPlaybackFailed);
 
+
+          this._playbackEndChecker = timer(
+            Math.round(audioSelection.duration.unix / playbackRate)
+          ).subscribe(() => {
+            this.endPlayBack();
+            this.subscrManager.add(
+              timer(100).subscribe(() => {
+                resolve();
+              })
+            );
+          });
+
           this._audio
             .play()
             .then(() => {
               const time = Math.round(
                 audioSelection.duration.unix / playbackRate
               );
-              this._playbackEndChecker = timer(
-                Math.round(audioSelection.duration.unix / playbackRate)
-              ).subscribe(() => {
-                this.endPlayBack();
-                this.subscrManager.add(
-                  timer(100).subscribe(() => {
-                    resolve();
-                  })
-                );
-              });
             })
             .catch((error) => {
               this._playbackEndChecker?.unsubscribe();

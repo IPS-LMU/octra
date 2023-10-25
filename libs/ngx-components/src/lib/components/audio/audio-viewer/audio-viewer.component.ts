@@ -118,6 +118,19 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             'cursor',
             'auto'
           );
+        }
+
+        if (event.status === 'dragging') {
+          this.subscrManager.add(
+            timer(0).subscribe({
+              next: () => {
+                this.refresh();
+              },
+            })
+          );
+        }
+
+        if (['stopped', 'started'].includes(event.status)) {
           if (this.refreshOnInternChanges) {
             this.refresh();
           }
@@ -1741,7 +1754,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
             boundaryObj.on('mousedown', () => {
               if (!this.settings.boundaries.readonly) {
-                this.av.dragableBoundaryNumber = boundary.num;
+                this.av.dragableBoundaryID = boundary.id;
               }
             });
             boundaryObj.on('mouseenter', () => {
@@ -1914,6 +1927,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       context.fillStrokeShape(shape);
     }
   };
+
   private overlaySceneFunction = (
     lineInterval: {
       from: number;
@@ -2495,7 +2509,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       }
 
       this.av.setMouseMovePosition(absXPos);
-      if (this.av.dragableBoundaryNumber < 0) {
+      if (this.av.dragableBoundaryID < 0) {
         this.drawWholeSelection();
       }
 
@@ -2512,7 +2526,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     const shortcutInfo = this.shortcutsManager.checkKeyEvent(event, Date.now());
 
     this.av.shiftPressed =
-      event.keyCode === 16 || event.code?.includes('Shift') || event.key?.includes('Shift');
+      event.keyCode === 16 ||
+      event.code?.includes('Shift') ||
+      event.key?.includes('Shift');
 
     if (shortcutInfo !== undefined) {
       const comboKey = shortcutInfo.shortcut;

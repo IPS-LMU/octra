@@ -78,7 +78,7 @@
     "hotkeys-js": "^3.12.0",
     "immer": "^9.0.21",
     "jodit": "^3.24.9",
-    "konva": "^9.0.0",
+    "konva": "^9.2.2",
     "luxon": "^3.0.4",
     "modernizr": "^3.12.0",
     "ngrx-wieder": "^11.0.0",

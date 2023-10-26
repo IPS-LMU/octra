@@ -1,7 +1,7 @@
 import { ASRLanguage, ASRService, ASRSettings } from '../../obj';
 
 export interface ASRStateSettings {
-  selectedLanguage?: string;
+  selectedLanguage?: string | null;
   selectedService?: string;
   selectedMausLanguage?: string;
   accessCode?: string;
@@ -16,7 +16,6 @@ export enum ASRQueueItemType {
 export enum ASRProcessStatus {
   IDLE = 'IDLE',
   STARTED = 'STARTED',
-  RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',
   NOQUOTA = 'NOQUOTA',
   NOAUTH = 'NOAUTH',

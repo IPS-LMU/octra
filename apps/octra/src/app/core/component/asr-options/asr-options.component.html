@@ -11,7 +11,7 @@
         ngbDropdownToggle
       >
         <ng-container
-          *ngIf="(asrStoreService.asrOptions$|async)?.selectedLanguage === undefined; else asrAllSet"
+          *ngIf="(asrStoreService.asrOptions$|async)?.selectedLanguage === null || (asrStoreService.asrOptions$|async)?.selectedLanguage === undefined || (asrStoreService.asrOptions$|async)?.selectedLanguage === ''; else asrAllSet"
         >
           {{ 'asr.without asr' | transloco }}
         </ng-container>

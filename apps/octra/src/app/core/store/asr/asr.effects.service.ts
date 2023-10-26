@@ -174,13 +174,21 @@ export class AsrEffects {
                   item,
                 })
               );
+            } else if (
+              ![
+                ASRActions.processQueueItem.do.type,
+                ASRActions.startProcessing.do.type,
+              ].includes(action.type as any)
+            ) {
+              if (queue.statistics.running === 0) {
+                // no free item after continuation and nothing running
+                return of(
+                  ASRActions.setQueueStatus.do({
+                    status: ASRProcessStatus.IDLE,
+                  })
+                );
+              }
             }
-            // no free item
-            return of(
-              ASRActions.setQueueStatus.do({
-                status: ASRProcessStatus.IDLE,
-              })
-            );
           }
 
           // max parallel reached
@@ -190,11 +198,7 @@ export class AsrEffects {
             })
           );
         }
-        return of(
-          ASRActions.setQueueStatus.do({
-            status: ASRProcessStatus.IDLE,
-          })
-        );
+        return of();
       })
     )
   );

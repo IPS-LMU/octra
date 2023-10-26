@@ -382,7 +382,7 @@ export class TranscrWindowComponent
         this.segmentIndex
       ] as OctraAnnotationSegment;
 
-      if (segment?.context?.asr?.isBlockedBy === undefined) {
+      if (!segment?.context?.asr?.isBlockedBy) {
         this.audiochunk.startPlayback().catch((error) => {
           console.error(error);
         });
@@ -539,7 +539,7 @@ export class TranscrWindowComponent
           this.segmentIndex
         ] as OctraAnnotationSegment;
 
-        if (segment!.context?.asr?.isBlockedBy === undefined) {
+        if (!segment!.context?.asr?.isBlockedBy) {
           this.audiochunk.startPlayback().catch((error) => {
             console.error(error);
           });
@@ -1111,6 +1111,7 @@ export class TranscrWindowComponent
           : this.audioManager.createSampleUnit(0);
       this.audiochunk.selection.end = this.tempSegments[i]!.time.clone();
       this.loupe.av.drawnSelection = this.audiochunk.selection;
+
       this.audiochunk.startPlayback().catch((error) => {
         console.error(error);
       });

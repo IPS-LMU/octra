@@ -422,11 +422,6 @@ export class TranscrEditorComponent
       this.shortcutService.unregisterShortcutGroup('texteditor');
       this.shortcutService.registerShortcutGroup(this.shortcuts);
 
-      this.asrStoreService.stopItemProcessing({
-        sampleStart: this.audiochunk.time.start.samples,
-        sampleLength: this.audiochunk.time.duration.samples,
-      });
-
       this.joditOptions = {
         ...this.joditDefaultOptions,
         showCharsCounter: false,

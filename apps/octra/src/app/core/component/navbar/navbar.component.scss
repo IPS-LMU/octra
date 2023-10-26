@@ -6,7 +6,6 @@
 .info-menu {
   padding: 20px;
   font-size: 0.7em;
-  min-width: 300px;
 }
 
 .dropdown-menu.options-menu.show label,
@@ -109,4 +108,8 @@
 
 .dropdown-toggle::after {
   content: unset;
+}
+
+.form-switch.form-check-reverse {
+  display: block;
 }

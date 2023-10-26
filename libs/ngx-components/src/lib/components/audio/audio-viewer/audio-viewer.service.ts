@@ -143,7 +143,6 @@ export class AudioViewerService {
     if (value > -1 && this._dragableBoundaryID === -1) {
       // started
       this.tempAnnotation = this.annotation;
-      console.log(`boundary ${value} started dragging`);
       this._boundaryDragging.next({
         shiftPressed: this.shiftPressed,
         status: 'started',

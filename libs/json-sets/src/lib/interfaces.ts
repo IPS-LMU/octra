@@ -1,3 +1,5 @@
+import { IFile } from './json-file-set-validator';
+
 export interface AudioFileMetaData {
   bitRate?: number;
   numberOfChannels?: number;
@@ -9,17 +11,18 @@ export interface AudioFileMetaData {
 }
 
 export interface JSONSetConstraints {
+  take?: string; // e.g. x => 1
+  name: string;
   description?: string;
 }
 
 export interface JSONSETFileConstraints extends JSONSetConstraints {
   extension?: string[];
   description?: string;
-  contentFormat?: string;
   mimeType?: string[];
   namePattern?: string;
   file?: {
-    maxSize?: string;
+    size?: string;
   };
 }
 
@@ -54,23 +57,25 @@ export interface JSONSetValidationError {
 export interface JSONFileSetValidationError {
   filename: string;
   path?: string;
-  constraint?: string;
   message: string;
-  statement?: JSONSetStatement
+  statement?: JSONSetStatement;
 }
 
 export interface JSONSetStatement {
-  combination: JSONSetCombination;
   name?: string;
   description?: string;
-  optional?: boolean;
-  take?: number;
-  takeMax?: number;
-  takeMin?: number;
   constraints: JSONSetConstraints[];
 }
 
-export enum JSONSetCombination {
-  'union' = 'union',
-  'difference' = 'difference',
+export interface JSONValidationResult {
+  isValid: boolean;
+  results: {
+    statement: JSONSetStatement;
+    validationResults: {
+      target?: IFile;
+      errors: JSONFileSetValidationError[];
+    }[];
+  }[];
 }
+
+export type ConstraintsChecks = Record<string, JSONFileSetValidationError | true>;

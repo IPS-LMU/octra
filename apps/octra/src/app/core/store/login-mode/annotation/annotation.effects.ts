@@ -73,6 +73,12 @@ import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { FileInfo } from '@octra/web-media';
 
+declare const BUILD: {
+  version: string;
+  hash: string;
+  timestamp: string;
+};
+
 @Injectable()
 export class AnnotationEffects {
   transcrSendingModal: {
@@ -221,7 +227,7 @@ export class AnnotationEffects {
             );
             this.uiService.addElementFromEvent(
               'octra',
-              { value: AppInfo.version },
+              { value: BUILD.version },
               Date.now(),
               undefined,
               undefined,
@@ -1496,7 +1502,7 @@ export class AnnotationEffects {
 
         this.uiService.addElementFromEvent(
           'octra',
-          { value: AppInfo.version },
+          { value: BUILD.version },
           Date.now(),
           undefined,
           undefined,

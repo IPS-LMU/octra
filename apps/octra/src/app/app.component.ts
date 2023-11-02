@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../environments/environment';
-import { AppInfo } from './app.info';
 import { NavigationComponent } from './core/component';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
@@ -22,10 +21,6 @@ export class AppComponent
     | NavigationComponent
     | undefined;
 
-  public get version(): string {
-    return AppInfo.version;
-  }
-
   public get environment(): any {
     return environment;
   }
@@ -45,8 +40,7 @@ export class AppComponent
     if (environment.debugging.enabled && environment.debugging.logging.routes) {
       this.subscrManager.add(
         this.router.events.subscribe((event: any) => {
-          if (event.url) {
-          } else if (event.snapshot) {
+          if (event.snapshot) {
             console.log(
               `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
             );

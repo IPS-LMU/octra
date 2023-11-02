@@ -81,8 +81,6 @@ node.on("exit", function(code) {
   indexHTML = indexHTML.replace(/(runtime\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(styles\.[0-9a-z]*\.css)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(vendor\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(const octraLastUpdated = ').*(';)/g, `$1${timeNow}$2`);
-  indexHTML = indexHTML.replace(/(const octraVersion = ').*(';)/g, `$1${version}$2`);
 
   fs.writeFileSync(`${buildDir}index.html`, indexHTML, {
     encoding: "utf8"

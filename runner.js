@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const process = require('node:child_process');
 const { exec } = require('node:child_process');
 const { pathExists } = require('@nx/eslint-plugin/src/utils/graph-utils');
+const crypto = require("crypto");
 
 const JSONValidator = {
   build: async function () {
@@ -63,19 +64,23 @@ const OCTRA = {
   },
   buildProd: async function () {
     await run('node ./build.js dev=false isUpdate=true url=/apps/octra/octra/');
+    await setBuildVariable();
   },
   buildRelease: async function () {
     await run('node ./build.js dev=false isUpdate=false url=/');
+    await setBuildVariable();
   },
   buildDev: async function () {
     await run(
       'node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/'
     );
+    await setBuildVariable();
   },
   buildBeta: async function () {
     await run(
       'node ./build.js beta=true isUpdate=true url=/apps/octra/octra-dev/'
     );
+    await setBuildVariable();
   },
   prepareExtern: async function () {
     if (fs.pathExistsSync('extern')) {
@@ -172,4 +177,29 @@ async function run(scriptPath, showOutput = true, returnAfterExit = true) {
       reject("Can't run script.");
     }
   });
+}
+
+async function setBuildVariable() {
+  let content = await fs.readFile('./dist/apps/octra/index.html', {
+    encoding: 'utf-8',
+  });
+
+  const pkg = await fs.readJSON('./package.json', {
+    encoding: 'utf-8',
+  });
+
+  let hash = crypto.randomUUID();
+
+  content = content.replace(/(var BUILD =)([^;]*)(;)/gs, (g0, g1, g2, g3) => {
+    const build = JSON.parse(g2);
+    build.version = pkg.version;
+    build.timestamp = new Date().toISOString();
+    build.hash = hash;
+
+    return `${g1} ${JSON.stringify(build)}${g3}`;
+  });
+
+  await fs.writeFile('./dist/apps/octra/index.html', content, { encoding: 'utf-8' });
+
+  console.log(`BUILD-HASH: ${hash}`);
 }

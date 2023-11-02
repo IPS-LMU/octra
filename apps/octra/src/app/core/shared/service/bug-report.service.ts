@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslocoService } from '@ngneat/transloco';
 import { Observable } from 'rxjs';
-import { AppInfo } from '../../../app.info';
 import { AppStorageService } from './appstorage.service';
 import { getFileSize, SubscriptionManager } from '@octra/utilities';
 import { LoginMode } from '../../store';
@@ -29,6 +28,12 @@ export interface BugReportCredentials {
   auth_token: string;
   url: string;
 }
+
+declare const BUILD: {
+  version: string;
+  hash: string;
+  timestamp: string;
+};
 
 @Injectable()
 export class BugReportService {
@@ -106,12 +111,12 @@ export class BugReportService {
       },
       protocol: {
         tool: {
-          version: AppInfo.version,
+          version: BUILD.version,
           language: this.langService.getActiveLang(),
           signed_in: this.appStorage.loggedIn,
           useMode: this.appStorage.useMode,
           url: window.location.href,
-          lastUpdated: AppInfo.lastUpdate,
+          lastUpdated: BUILD.timestamp,
           project: undefined,
           user: undefined,
           jobID: undefined,
@@ -186,7 +191,7 @@ export class BugReportService {
       body = removeProperties(body, ['technicalInformation', 'protocol']);
     }
 
-    console.log("send feedback");
+    console.log('send feedback');
     return this.api.sendFeedback(
       body,
       screenshots?.map((a) => a.blob)

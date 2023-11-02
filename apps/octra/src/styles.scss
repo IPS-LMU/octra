@@ -485,7 +485,7 @@ ngx-jodit {
   height: 200px !important;
 }
 
-.text-outline-white{
+.text-outline-white {
   text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white !important;
 }
 
@@ -523,4 +523,8 @@ ngx-jodit {
   font-size: 0.8rem;
   padding: 10px;
   min-height: 1em;
+}
+
+.version-popover {
+  min-width: 300px;
 }

@@ -7,12 +7,9 @@
 >
   <div class="container-fluid">
     <a
-      [title]="
-        'last update: ' + (AppInfo.lastUpdate | date : 'dd.MM.yyyy H:mm z')
-      "
+      [ngbPopover]="versionPopover" popoverClass="version-popover"
       class="navbar-brand"
-      href="#"
-      >OCTRA v{{ version }}
+      >OCTRA v{{ BUILD.version }}
       <ng-container
         *ngIf="
           appStorage.useMode !== undefined && appStorage.useMode !== undefined
@@ -29,6 +26,34 @@
           </ng-template>
         </span>
     </a>
+    <ng-template #versionPopover>
+      <div id="build-information">
+        <div>
+          <div class="fw-bold">
+            Version:
+          </div>
+          <div>
+            {{BUILD.version}}
+          </div>
+        </div>
+        <div>
+          <div class="fw-bold">
+            Last updated:
+          </div>
+          <div>
+            {{BUILD.timestamp}}
+          </div>
+        </div>
+        <div>
+          <div class="fw-bold">
+            Hash:
+          </div>
+          <div style="font-size: 0.7rem;">
+            {{BUILD.hash}}
+          </div>
+        </div>
+      </div>
+    </ng-template>
     <button
       class="navbar-toggler"
       type="button"

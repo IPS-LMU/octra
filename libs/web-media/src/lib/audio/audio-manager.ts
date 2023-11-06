@@ -272,7 +272,7 @@ export class AudioManager {
           );
       }
     } else {
-      subj.error(`audio format not supported`);
+      subj.error(`audio format not supported: ${filename.substring(filename.lastIndexOf('.'))} from ${filename}`);
     }
 
     return subj;

@@ -1,7 +1,6 @@
 import {
   ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver,
   ComponentRef,
   OnDestroy,
   OnInit,
@@ -332,7 +331,6 @@ export class TranscriptionComponent
 
   constructor(
     public router: Router,
-    private _componentFactoryResolver: ComponentFactoryResolver,
     public audio: AudioService,
     public uiService: UserInteractionsService,
     public appStorage: AppStorageService,
@@ -342,7 +340,7 @@ export class TranscriptionComponent
     public modService: OctraModalService,
     private appStoreService: ApplicationStoreService,
     public langService: TranslocoService,
-    private routingService: RoutingService,
+    public routingService: RoutingService,
     private cd: ChangeDetectorRef,
     private alertService: AlertService,
     public annotationStoreService: AnnotationStoreService,

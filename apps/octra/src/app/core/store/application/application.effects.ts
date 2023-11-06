@@ -34,7 +34,6 @@ import { SettingsService } from '../../shared/service';
 import { getModeState, LoginMode, RootState } from '../index';
 import { AuthenticationActions } from '../authentication';
 import { RoutingService } from '../../shared/service/routing.service';
-import { Params } from '@angular/router';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
@@ -52,9 +51,11 @@ export class ApplicationEffects {
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
         const queryParams = {
-          audio: this.getParameterByName('audio'),
+          audio_url: this.getParameterByName('audio_url'),
+          audio_name: this.getParameterByName('audio_name'),
           host: this.getParameterByName('host'),
           transcript: this.getParameterByName('transcript'),
+          readonly: this.getParameterByName('readonly'),
           embedded: this.getParameterByName('embedded'),
         };
 
@@ -667,7 +668,7 @@ export class ApplicationEffects {
             }
           }
 
-          if (this.routerService.staticQueryParams?.audio) {
+          if (this.routerService.staticQueryParams?.audio_url) {
             this.store.dispatch(
               AuthenticationActions.loginURL.do({
                 mode: LoginMode.URL,
@@ -962,12 +963,5 @@ export class ApplicationEffects {
       return '';
     }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
-  }
-
-  private queryParamsSet(queryParams: Params): boolean {
-    return (
-      queryParams['audio'] !== undefined &&
-      queryParams['embedded'] !== undefined
-    );
   }
 }

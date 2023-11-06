@@ -90,12 +90,20 @@ export class FileInfo extends DataInfo {
     createdAt = 0
   ) {
     let fullname = '';
-    const extension = url.substr(url.lastIndexOf('.') + 1);
+    let extension = url.substring(url.lastIndexOf('.') + 1);
+
+    if (extension.indexOf('?') > 0) {
+      extension = extension.substring(0, extension.indexOf('?'));
+    }
 
     if (name != undefined) {
       fullname = name + '.' + extension;
     } else {
-      fullname = url.substr(url.lastIndexOf('/') + 1);
+      fullname = url.substring(url.lastIndexOf('/') + 1);
+
+      if (fullname.indexOf('?') > 0) {
+        fullname = fullname.substring(0, fullname.indexOf('?'));
+      }
     }
     const result = new FileInfo(
       fullname,

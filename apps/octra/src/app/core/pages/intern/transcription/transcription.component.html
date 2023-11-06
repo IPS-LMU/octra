@@ -178,7 +178,7 @@
             </button>
             <button
                     (click)="onSaveTranscriptionButtonClicked()"
-                    *ngIf="useMode === 'url'"
+                    *ngIf="useMode === 'url' && !routingService.staticQueryParams.readonly"
                     class="btn btn-primary"
                     type="button"
             >

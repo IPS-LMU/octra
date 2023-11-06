@@ -305,7 +305,10 @@ export class AnnotationEffects {
           ) {
             // online, url or demo
             if (a.audioFile) {
-              const src = this.apiService.prepareFileURL(a.audioFile!.url!);
+              const src =
+                state.application.mode === LoginMode.ONLINE
+                  ? this.apiService.prepareFileURL(a.audioFile!.url!)
+                  : a.audioFile!.url!;
               // extract filename
 
               filename = filename.substring(0, filename.lastIndexOf('.'));
@@ -724,17 +727,20 @@ export class AnnotationEffects {
                 // URL mode
                 if (
                   Object.keys(this.routingService.staticQueryParams).includes(
-                    'audio'
+                    'audio_url'
                   )
                 ) {
+
+                  const fileInfoAudio = FileInfo.fromURL(
+                    this.routingService.staticQueryParams['audio_url']
+                  );
+
                   inputs = [
                     {
-                      filename: FileInfo.fromURL(
-                        this.routingService.staticQueryParams['audio']
-                      ).fullname,
+                      filename: this.routingService.staticQueryParams['audio_name'] ?? fileInfoAudio.fullname,
                       fileType: 'audio/wave',
                       type: 'input',
-                      url: this.routingService.staticQueryParams['audio'],
+                      url: this.routingService.staticQueryParams['audio_url'],
                       creator_type: TaskInputOutputCreatorType.user,
                       content: '',
                       content_type: '',
@@ -778,14 +784,23 @@ export class AnnotationEffects {
                   })
                   .pipe(
                     exhaustMap((content) => {
-                      let filename =
-                        this.routingService.staticQueryParams.transcript;
-                      filename = filename.substring(
-                        filename.lastIndexOf('/') + 1
+                      const fileInfoTranscript = FileInfo.fromURL(
+                        this.routingService.staticQueryParams['transcript']
+                      );
+                      const fileInfoAudio = FileInfo.fromURL(
+                        this.routingService.staticQueryParams['audio_url']
+                      );
+                      let audioName =
+                        this.routingService.staticQueryParams.audio_name ??
+                        fileInfoAudio.fullname;
+
+                      audioName = audioName.substring(
+                        0,
+                        audioName.lastIndexOf('.')
                       );
 
                       task.inputs.push({
-                        filename,
+                        filename: audioName + fileInfoTranscript.extension,
                         fileType: 'text/plain',
                         type: 'input',
                         creator_type: TaskInputOutputCreatorType.user,

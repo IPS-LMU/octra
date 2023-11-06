@@ -49,3 +49,5 @@ future_features.txt
 
 .angular
 deploy
+
+.nx/cache

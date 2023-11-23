@@ -1,7 +1,20 @@
 {
   "name": "@octra/media",
+  "description": "This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units) used by [Octra](https://github.com/IPS-LMU/octra).\nIf you are looking for decoding and playback of audio files see @octra/web-media library.",
   "version": "0.0.12",
-  "dependencies": {},
+  "license": "MIT",
+  "private": false,
+  "author": {
+    "name": "Julian Poemp"
+  },
+  "bugs": {
+    "url": "https://github.com/IPS-LMU/octra/issues"
+  },
+  "homepage": "https://github.com/IPS-LMU/octra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IPS-LMU/octra"
+  },
   "type": "commonjs",
   "main": "./index.cjs",
   "typings": "./src/index.d.ts"

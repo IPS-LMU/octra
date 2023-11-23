@@ -1,4 +1,4 @@
-# media
+# @octra/media <a href="https://www.npmjs.com/package/@octra/media"><img alt="npm" src="https://img.shields.io/npm/v/@octra/media"></a>
 
 This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units) used by [Octra](https://github.com/IPS-LMU/octra).
 If you are looking for decoding and playback of audio files see @octra/web-media library.
@@ -55,3 +55,7 @@ const validator = new OctraMedia.SampleUnit(123123, 22100);
 ### API
 
 You can find more information about classes and functions of `@octra/media` [here](https://ips-lmu.github.io/octra/modules/_octra_media.html).
+
+### Changelog
+
+[Go to changelog](https://github.com/IPS-LMU/octra/blob/main/libs/media/CHANGELOG.md)

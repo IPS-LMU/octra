@@ -13,6 +13,7 @@
         "tsConfig": "libs/utilities/tsconfig.lib.json",
         "main": "libs/utilities/src/index.ts",
         "entryFile": "libs/utilities/src/index.ts",
+        "generateExportsField": true,
         "assets": [
           "libs/utilities/src/LICENSE.txt",
           "libs/utilities/src/README.md"

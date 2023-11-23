@@ -62,7 +62,7 @@
         "preset": "angular",
         "postTargets": ["annotation:github"],
         "baseBranch": "main",
-        "commitMessageFormat": "build(${projectName}): release version ${version}"
+        "commitMessageFormat": "build({projectName}): release version ${version}"
       }
     },
     "github": {

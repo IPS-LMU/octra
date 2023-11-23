@@ -1,4 +1,4 @@
-# annotation
+# @octra/annotation <a href="https://www.npmjs.com/package/@octra/annotation"><img alt="npm" src="https://img.shields.io/npm/v/@octra/annotation"></a>
 
 This library offers all annotation related classes and functions used by Octra. It uses AnnotJSON file format as base
 model. Here you can also find all Annotation converters used by [Octra](https://github.com/IPS-LMU/octra).
@@ -69,3 +69,7 @@ annotation.addItemToCurrentLevel(new OctraAnnotation.SampleUnit(123456, 22050), 
 ### API
 
 You can find more information about classes and functions of `@octra/annotation` [here](https://ips-lmu.github.io/octra/modules/_octra_annotation.html).
+
+### Changelog
+
+[Go to changelog](https://github.com/IPS-LMU/octra/blob/main/libs/annotation/CHANGELOG.md)

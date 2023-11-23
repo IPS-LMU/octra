@@ -1,6 +1,20 @@
 {
   "name": "@octra/ngx-utilities",
+  "description": "Angular utilities used in OCTRA projects",
   "version": "0.0.1",
+  "license": "MIT",
+  "private": false,
+  "author": {
+    "name": "Julian Poemp"
+  },
+  "bugs": {
+    "url": "https://github.com/IPS-LMU/octra/issues"
+  },
+  "homepage": "https://github.com/IPS-LMU/octra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IPS-LMU/octra"
+  },
   "peerDependencies": {
     "@angular/common": ">15.0.0",
     "@angular/router": ">15.0.0",

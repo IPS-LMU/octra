@@ -1,4 +1,4 @@
-# assets
+# @octra/assets <a href="https://www.npmjs.com/package/@octra/assets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/assets"></a>
 
 This library contains assets like JSON schema definitions.
 

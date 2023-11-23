@@ -19,6 +19,8 @@
     "build:watch:deploy": "nx build octra --configuration=public-development --base-href=/apps/octra/octra-dev/ --outputPath ./deploy --watch",
     "release:lib:annotation": "nx run annotation:version --releaseAs=patch --push",
     "publish:lib:annotation": "nx npm annotation",
+    "release:lib:assets": "nx run assets:version --releaseAs=patch --push",
+    "publish:lib:assets": "nx npm assets",
     "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",
     "affected:apps": "nx affected:apps",

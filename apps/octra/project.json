@@ -161,6 +161,12 @@
       "options": {
         "buildTarget": "octra:build"
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   }
 }

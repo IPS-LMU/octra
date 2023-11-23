@@ -20,23 +20,16 @@
         "compiler": "tsc",
         "format": ["cjs", "esm"],
         "external": ["@octra/utilities", "@octra/media"],
-        "dependsOn": [
-          "media",
-          "utilities"
-        ]
+        "dependsOn": ["media", "utilities"]
       }
     },
     "bundle": {
       "executor": "@nx/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "babelUpwardRootMode": true,
         "libraryName": "OctraWebMedia",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/web-media/tsconfig.lib.json",
         "main": "libs/web-media/src/index.ts",
@@ -51,9 +44,7 @@
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -63,6 +54,12 @@
           "libs/web-media/**/*.ts",
           "libs/web-media/package.json"
         ]
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
       }
     }
   },

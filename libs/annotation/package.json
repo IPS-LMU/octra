@@ -1,9 +1,23 @@
 {
   "name": "@octra/annotation",
+  "description": "library containing annotation related classes and functions used by OCTRA (e.g. file converters)",
   "version": "0.1.7",
+  "license": "MIT",
+  "private": false,
+  "author": {
+    "name": "Julian Poemp"
+  },
+  "bugs": {
+    "url": "https://github.com/IPS-LMU/octra/issues"
+  },
+  "homepage": "https://github.com/IPS-LMU/octra",
   "peerDependencies": {
     "@octra/media": "~0.0.11",
     "@octra/utilities": "~0.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IPS-LMU/octra"
   },
   "type": "commonjs",
   "main": "./index.cjs",

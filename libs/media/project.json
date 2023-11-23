@@ -47,6 +47,12 @@
       "options": {
         "lintFilePatterns": ["libs/media/**/*.ts", "libs/media/package.json"]
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   },
   "tags": []

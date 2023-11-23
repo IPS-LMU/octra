@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@nx/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "rollupConfig": "libs/assets/rollup.cjs",
         "outputPath": "dist/libs/assets",
@@ -16,10 +14,7 @@
         "tsConfig": "libs/assets/tsconfig.lib.json",
         "project": "libs/assets/package.json",
         "compiler": "tsc",
-        "format": [
-          "cjs",
-          "esm"
-        ],
+        "format": ["cjs", "esm"],
         "assets": [
           "libs/assets/src/README.md",
           "libs/assets/src/LICENSE.txt",
@@ -33,14 +28,10 @@
     },
     "bundle": {
       "executor": "@nx/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "libraryName": "OctraAssets",
-        "libraryTargets": [
-          "umd"
-        ],
+        "libraryTargets": ["umd"],
         "index": "",
         "tsConfig": "libs/assets/tsconfig.lib.json",
         "main": "libs/assets/src/index.ts",
@@ -55,29 +46,26 @@
         "namedChunks": false,
         "webpackConfig": "webpack.config.js"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs assets {args.ver} {args.tag}"
       },
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/assets/**/*.ts",
-          "libs/assets/package.json"
-        ]
+        "lintFilePatterns": ["libs/assets/**/*.ts", "libs/assets/package.json"]
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
       }
     }
   },

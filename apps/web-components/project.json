@@ -20,9 +20,7 @@
           "apps/web-components/src/LICENSE.txt",
           "apps/web-components/src/README.md"
         ],
-        "styles": [
-          "apps/web-components/styles.css"
-        ],
+        "styles": ["apps/web-components/styles.css"],
         "scripts": []
       },
       "configurations": {
@@ -107,6 +105,12 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
       }
     }
   }

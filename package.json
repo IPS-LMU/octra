@@ -31,6 +31,8 @@
     "publish:lib:ngx-utilities": "nx build ngx-utilities && nx npm ngx-utilities",
     "release:lib:utilities": "nx bundle utilities && nx run utilities:version --push",
     "publish:lib:utilities": "nx bundle utilities && nx npm utilities",
+    "release:lib:web-media": "nx bundle web-media && nx run web-media:version --push",
+    "publish:lib:web-media": "nx bundle web-media && nx npm web-media",
     "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",
     "affected:apps": "nx affected:apps",

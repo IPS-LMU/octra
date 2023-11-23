@@ -1,4 +1,4 @@
-# web-media
+# @octra/web-media <a href="https://www.npmjs.com/package/@octra/web-media"><img alt="npm" src="https://img.shields.io/npm/v/@octra/web-media"></a>
 
 This library offers classes and functions for handling audio files in web browsers (e.g. chunked decoding etc.) used by [Octra](https://github.com/IPS-LMU/octra).
 
@@ -54,3 +54,7 @@ const validator = new OctraWebMedia.SampleUnit(123123, 22100);
 ### API
 
 You can find more information about classes and functions of `@octra/web-media` [here](https://ips-lmu.github.io/octra/modules/_octra_web_media.html).
+
+### Changelog
+
+[Go to changelog](https://github.com/IPS-LMU/octra/blob/main/libs/web-media/CHANGELOG.md)

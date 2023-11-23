@@ -1,4 +1,4 @@
-# @octra/utilities
+# @octra/utilities <a href="https://www.npmjs.com/package/@octra/utilities"><img alt="npm" src="https://img.shields.io/npm/v/@octra/utilities"></a>
 
 This library offers JS functions and classes to make some parts of app development easier. This library is used by [Octra](https://github.com/IPS-LMU/octra) and Octra-Backend.
 
@@ -53,3 +53,7 @@ const sizeInMb = OctraUtilities.getFileSize(bytes);
 ### API
 
 You can find more information about classes and functions of `@octra/utilities` [here](https://ips-lmu.github.io/octra/modules/_octra_utilities.html).
+
+### Changelog
+
+[Go to changelog](https://github.com/IPS-LMU/octra/blob/main/libs/utilities/CHANGELOG.md)

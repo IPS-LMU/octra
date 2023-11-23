@@ -1,6 +1,20 @@
 {
   "name": "@octra/utilities",
+  "description": "This library offers JS functions and classes to make some parts of app development easier. This library is used by [Octra](https://github.com/IPS-LMU/octra) and Octra-Backend.",
   "version": "0.0.5",
+  "license": "MIT",
+  "private": false,
+  "author": {
+    "name": "Julian Poemp"
+  },
+  "bugs": {
+    "url": "https://github.com/IPS-LMU/octra/issues"
+  },
+  "homepage": "https://github.com/IPS-LMU/octra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IPS-LMU/octra"
+  },
   "type": "commonjs",
   "main": "./index.cjs",
   "module": "./index.mjs",

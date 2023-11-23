@@ -29,6 +29,8 @@
     "publish:lib:ngx-components": "nx build ngx-components && nx npm ngx-components",
     "release:lib:ngx-utilities": "nx build ngx-utilities && nx run ngx-utilities:version --push",
     "publish:lib:ngx-utilities": "nx build ngx-utilities && nx npm ngx-utilities",
+    "release:lib:utilities": "nx bundle utilities && nx run utilities:version --push",
+    "publish:lib:utilities": "nx bundle utilities && nx npm utilities",
     "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",
     "affected:apps": "nx affected:apps",

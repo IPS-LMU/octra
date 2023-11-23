@@ -62,6 +62,7 @@
         "preset": "angular",
         "postTargets": ["annotation:github"],
         "baseBranch": "main",
+        "releaseAs": "patch",
         "commitMessageFormat": "build({projectName}): release version ${version}"
       }
     },
@@ -75,7 +76,8 @@
     "npm": {
       "executor": "ngx-deploy-npm:deploy",
       "options": {
-        "access": "public"
+        "access": "public",
+        "noBuild": true
       }
     }
   },

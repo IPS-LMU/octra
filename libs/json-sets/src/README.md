@@ -1,4 +1,4 @@
-# json-sets (still in development)
+# @octra/json-sets (still in development) <a href="https://www.npmjs.com/package/@octra/json-sets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/json-sets"></a>
 
 This library allows to define sets using JSON. JSONSetValidator parsed an array of objects and validates it using the JSON definition.
 
@@ -53,3 +53,6 @@ const validator = new OctraJSONSets.JSONSetValidator();
 
 You can find more information about classes and functions of `@octra/json-sets` [here](https://ips-lmu.github.io/octra/modules/_octra_json_sets.html).
 
+### Changelog
+
+[Go to changelog](https://github.com/IPS-LMU/octra/blob/main/libs/json-sets/CHANGELOG.md)

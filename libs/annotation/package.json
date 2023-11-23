@@ -2,8 +2,8 @@
   "name": "@octra/annotation",
   "version": "0.1.7",
   "peerDependencies": {
-    "@octra/media": "^0.0.11",
-    "@octra/utilities": "^0.0.3"
+    "@octra/media": "~0.0.11",
+    "@octra/utilities": "~0.0.3"
   },
   "type": "commonjs",
   "main": "./index.cjs",

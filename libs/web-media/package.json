@@ -4,8 +4,8 @@
   "peerDependencies": {
     "rxjs": "^7.6.0",
     "platform": "^1.3.6",
-    "@octra/media": "^0.0.11",
-    "@octra/utilities": "^0.0.3"
+    "@octra/media": "~0.0.11",
+    "@octra/utilities": "~0.0.3"
   },
   "type": "commonjs",
   "main": "./index.cjs",

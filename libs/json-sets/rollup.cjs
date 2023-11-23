@@ -10,6 +10,6 @@ module.exports = (config, b) => {
           return `index.mjs`;
         }
       },
-    },
+    }
   };
 };

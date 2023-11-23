@@ -11,5 +11,6 @@ module.exports = (config, b) => {
         }
       },
     },
+    external: ["@octra/media", "@octra/utilities"]
   };
 };

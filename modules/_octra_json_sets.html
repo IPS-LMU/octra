@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@octra/json-sets - v0.0.7 | Octra libraries - v2.0.0</title><meta name="description" content="Documentation for Octra libraries"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@octra/json-sets - v0.0.8 | Octra libraries - v2.0.0</title><meta name="description" content="Documentation for Octra libraries"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -14,8 +14,26 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">Octra libraries</a></li>
 <li><a href="_octra_json_sets.html">@octra/json-sets</a></li></ul>
-<h1>Module @octra/json-sets - v0.0.7</h1></div>
-<section class="tsd-panel tsd-typography"><p><a href="./src/README.md">GO TO README HERE</a></p>
+<h1>Module @octra/json-sets - v0.0.8</h1></div>
+<section class="tsd-panel tsd-typography"><a id="md:octrajson-sets-still-in-development-" class="tsd-anchor"></a><h1><a href="#md:octrajson-sets-still-in-development-">@octra/json-sets (still in development) <a href="https://www.npmjs.com/package/@octra/json-sets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/json-sets"></a></a></h1><p>This library allows to define sets using JSON. JSONSetValidator parsed an array of objects and validates it using the JSON definition.</p>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><a id="md:esm-cjs-ts-definitions-amp-umd-optional" class="tsd-anchor"></a><h3><a href="#md:esm-cjs-ts-definitions-amp-umd-optional">ESM, CJS, TS definitions &amp; UMD (optional)</a></h3><pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--save</span><span class="hl-1"> </span><span class="hl-2">@octra/json-sets</span>
+</code><button>Copy</button></pre>
+<a id="md:umd-bundle-for-vanilla-js" class="tsd-anchor"></a><h3><a href="#md:umd-bundle-for-vanilla-js">UMD Bundle (for Vanilla JS)</a></h3><p>You have two options to install this package und use it as UMD:</p>
+<p>a) Install via NPM and reference local files (no internet connection needed om production).</p>
+<pre><code class="language-html"><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-6"> </span><span class="hl-7">type</span><span class="hl-6">=</span><span class="hl-8">&quot;application/javascript&quot;</span><span class="hl-6"> </span><span class="hl-7">src</span><span class="hl-6">=</span><span class="hl-8">&quot;node_modules/@octra/json-sets/index.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span>
+</code><button>Copy</button></pre>
+<p>b) Reference remote file  (internet connection needed on production).</p>
+<pre><code class="language-html"><span class="hl-4">&lt;</span><span class="hl-5">script</span><span class="hl-6"> </span><span class="hl-7">type</span><span class="hl-6">=</span><span class="hl-8">&quot;application/javascript&quot;</span><span class="hl-6"> </span><span class="hl-7">src</span><span class="hl-6">=</span><span class="hl-8">&quot;https://unpkg.com/@octra/json-sets/index.umd.js&quot;</span><span class="hl-4">&gt;&lt;/</span><span class="hl-5">script</span><span class="hl-4">&gt;</span>
+</code><button>Copy</button></pre>
+<p><a href="https://github.com/IPS-LMU/octra/tree/main/apps/web-components-demo">See full example here</a></p>
+<a id="md:use" class="tsd-anchor"></a><h2><a href="#md:use">Use</a></h2><a id="md:import" class="tsd-anchor"></a><h3><a href="#md:import">Import</a></h3><a id="md:esm-typescript" class="tsd-anchor"></a><h4><a href="#md:esm-typescript">ESM, Typescript</a></h4><p>Import the classes and functions from <code>@octra/json-sets</code>. For example</p>
+<pre><code class="language-typescript"><span class="hl-9">import</span><span class="hl-1"> {</span><span class="hl-10">JsonSetValidator</span><span class="hl-1">} </span><span class="hl-9">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@octra/json-sets&quot;</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<a id="md:umd-bundle" class="tsd-anchor"></a><h4><a href="#md:umd-bundle">UMD Bundle</a></h4><p>All functions and classes are available via global scope <code>OctraJSONSets</code>. For example:</p>
+<pre><code class="language-javascript"><span class="hl-13">/*</span><br/><span class="hl-13">make sure that you have injected the umd bundle as described before.</span><br/><span class="hl-13"> */</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-11">validator</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-10">OctraJSONSets</span><span class="hl-1">.</span><span class="hl-0">JSONSetValidator</span><span class="hl-1">();</span>
+</code><button>Copy</button></pre>
+<a id="md:api" class="tsd-anchor"></a><h3><a href="#md:api">API</a></h3><p>You can find more information about classes and functions of <code>@octra/json-sets</code> <a href="https://ips-lmu.github.io/octra/modules/_octra_json_sets.html">here</a>.</p>
+<a id="md:changelog" class="tsd-anchor"></a><h3><a href="#md:changelog">Changelog</a></h3><p><a href="https://github.com/IPS-LMU/octra/blob/main/libs/json-sets/CHANGELOG.md">Go to changelog</a></p>
 </section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
@@ -56,14 +74,38 @@
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
 <div class="tsd-theme-toggle">
-<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div></div>
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:octrajson-sets-still-in-development-"><span>@octra/json-<wbr/>sets (still in development) </span></a></li>
+<li>
+<ul>
+<li><a href="#md:installation"><span>Installation</span></a></li>
+<li>
+<ul>
+<li><a href="#md:esm-cjs-ts-definitions-amp-umd-optional"><span>ESM, CJS, TS definitions &amp; UMD (optional)</span></a></li>
+<li><a href="#md:umd-bundle-for-vanilla-js"><span>UMD <wbr/>Bundle (for <wbr/>Vanilla JS)</span></a></li></ul></li>
+<li><a href="#md:use"><span>Use</span></a></li>
+<li>
+<ul>
+<li><a href="#md:import"><span>Import</span></a></li>
+<li>
+<ul>
+<li><a href="#md:esm-typescript"><span>ESM, <wbr/>Typescript</span></a></li>
+<li><a href="#md:umd-bundle"><span>UMD <wbr/>Bundle</span></a></li></ul></li>
+<li><a href="#md:api"><span>API</span></a></li>
+<li><a href="#md:changelog"><span>Changelog</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>Octra libraries -<wbr/> v2.0.0</span></a>
 <ul class="tsd-small-nested-navigation">
-<li><a href="_octra_annotation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/annotation -<wbr/> v0.1.9</span></a></li>
-<li><a href="_octra_assets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/assets -<wbr/> v0.0.2</span></a></li>
+<li><a href="_octra_annotation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/annotation -<wbr/> v0.1.10</span></a></li>
+<li><a href="_octra_assets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/assets -<wbr/> v0.0.3</span></a></li>
 <li>
-<details class="tsd-index-accordion" open data-key="@octra/json-sets"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><a href="_octra_json_sets.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets -<wbr/> v0.0.7</span></a></summary>
+<details class="tsd-index-accordion" open data-key="@octra/json-sets"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><a href="_octra_json_sets.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/json-<wbr/>sets -<wbr/> v0.0.8</span></a></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
 <li><a href="../enums/_octra_json_sets.JSONSetCombination.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>JSONSet<wbr/>Combination</span></a></li>
@@ -79,11 +121,11 @@
 <li><a href="../interfaces/_octra_json_sets.JSONSetDefinition.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>JSONSet<wbr/>Definition</span></a></li>
 <li><a href="../interfaces/_octra_json_sets.JSONSetStatement.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>JSONSet<wbr/>Statement</span></a></li>
 <li><a href="../interfaces/_octra_json_sets.JSONSetValidationError.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>JSONSet<wbr/>Validation<wbr/>Error</span></a></li></ul></div></details></li>
-<li><a href="_octra_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/media -<wbr/> v0.0.13</span></a></li>
+<li><a href="_octra_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/media -<wbr/> v0.0.14</span></a></li>
 <li><a href="_octra_ngx_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>components -<wbr/> v0.0.6</span></a></li>
 <li><a href="_octra_ngx_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/ngx-<wbr/>utilities -<wbr/> v0.0.2</span></a></li>
-<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.8</span></a></li>
-<li><a href="_octra_web_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>media -<wbr/> v0.0.7</span></a></li>
+<li><a href="_octra_utilities.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/utilities -<wbr/> v0.0.10</span></a></li>
+<li><a href="_octra_web_media.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>media -<wbr/> v0.0.8</span></a></li>
 <li><a href="_octra_web_components.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>@octra/web-<wbr/>components -<wbr/> v0.0.1</span></a></li></ul></nav></div></div></div>
 <div class="tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>

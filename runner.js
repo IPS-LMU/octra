@@ -32,6 +32,13 @@ async function bundleLibrary(libraryName) {
   await preparePackageJSON(`./dist/libs/${libraryName}/package.json`);
 }
 
+async function buildLibrary(libraryName) {
+  await run(`nx build ${libraryName}`);
+  await fs.copyFile(`libs/${libraryName}/LICENSE.txt`, `dist/libs/${libraryName}/LICENSE.txt`);
+  await fs.copyFile(`libs/${libraryName}/README.md`, `dist/libs/${libraryName}/README.md`);
+  await fs.copyFile(`libs/${libraryName}/CHANGELOG.md`, `dist/libs/${libraryName}/CHANGELOG.md`);
+}
+
 const Project = {
   updateLicenses: async function () {
     await fs.copyFile(`./LICENSE.txt`, `./libs/annotation/src/LICENSE.txt`);
@@ -121,6 +128,11 @@ yargs
   .command('build:dev', 'Builds development version of OCTRA.', OCTRA.buildDev)
   .command('build:beta', 'Builds beta version of OCTRA.', OCTRA.buildBeta)
   .command('build:libs', 'Builds all libraries.', OCTRA.buildLibs)
+  .command('build:lib [library]', 'Builds a library.', (yargs) => yargs.positional("library", {
+    describe: "library name"
+  }), (argv) => {
+    buildLibrary(argv.library)
+  })
   .command('build:extern', 'Builds extern libraries.', OCTRA.buildExtern)
   .command('build:json-sets', 'Builds json-sets library.', JSONValidator.build)
   .command(

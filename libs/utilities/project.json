@@ -1,57 +1,16 @@
 {
   "name": "utilities",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/utilities/src",
+  "sourceRoot": "utilities/src",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
+      "generateExportsField": true,
       "options": {
-        "rollupConfig": "libs/utilities/rollup.cjs",
-        "outputPath": "dist/libs/utilities",
-        "tsConfig": "libs/utilities/tsconfig.lib.json",
-        "main": "libs/utilities/src/index.ts",
-        "entryFile": "libs/utilities/src/index.ts",
-        "generateExportsField": true,
-        "assets": [
-          "libs/utilities/src/LICENSE.txt",
-          "libs/utilities/src/README.md"
-        ],
-        "project": "libs/utilities/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"]
+        "outputPath": "dist/libs/utilities"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "babelUpwardRootMode": true,
-        "libraryName": "OctraUtilities",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/utilities/tsconfig.lib.json",
-        "main": "libs/utilities/src/index.ts",
-        "outputPath": "dist/libs/utilities/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
-    },
-    "publish": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/scripts/publish.mjs utilities {args.ver} {args.tag}"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.10](https://github.com/IPS-LMU/octra/compare/utilities-0.0.9...utilities-0.0.10) (2023-11-24)
+
+
+### Bug Fixes
+
+* **utilities:** missing typings ([5cefe60](https://github.com/IPS-LMU/octra/commit/5cefe60a96bf49b843017212e13879aa8a28ee15))
+
+
+
 ## [0.0.9](https://github.com/IPS-LMU/octra/compare/utilities-0.0.8...utilities-0.0.9) (2023-11-24)
 
 

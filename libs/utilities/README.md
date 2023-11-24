@@ -14,17 +14,17 @@ npm install --save @octra/utilities
 
 You have two options to install this package und use it as UMD:
 
-a) Install via NPM and reference local files (no internet connection needed om production).
+a) Install via NPM and reference local files (no internet connection needed on production).
 ````html
-<script type="application/javascript" src="node_modules/@octra/utilities/bundles/OctraUtilities.umd.js"></script>
+<script type="application/javascript" src="node_modules/@octra/utilities/index.umd.js"></script>
 ````
 
 b) Reference remote file  (internet connection needed on production).
 ````html
-<script type="application/javascript" src="https://unpkg.com/@octra/utilities/bundles/OctraUtilities.umd.js"></script>
+<script type="application/javascript" src="https://unpkg.com/@octra/utilities/index.umd.js"></script>
 ````
 
-[See full example here](../../apps/web-components-demo/index.html)
+[See full example here](https://github.com/IPS-LMU/octra/blob/main/apps/web-components-demo/index.html)
 
 ## Use
 

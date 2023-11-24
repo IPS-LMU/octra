@@ -16,6 +16,7 @@
     "url": "https://github.com/IPS-LMU/octra"
   },
   "type": "commonjs",
-  "main": "./index.cjs",
-  "typings": "./src/index.d.ts"
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "typings": "./index.d.ts"
 }

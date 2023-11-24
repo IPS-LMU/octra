@@ -5,47 +5,17 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "rollupConfig": "libs/media/rollup.cjs",
-        "outputPath": "dist/libs/media",
-        "main": "libs/media/src/index.ts",
-        "tsConfig": "libs/media/tsconfig.lib.json",
-        "assets": ["libs/media/src/LICENSE.txt", "libs/media/src/README.md"],
-        "project": "libs/media/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"]
+        "outputPath": "dist/libs/media"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "babelUpwardRootMode": true,
-        "libraryName": "OctraMedia",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/media/tsconfig.lib.json",
-        "main": "libs/media/src/index.ts",
-        "outputPath": "dist/libs/media/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/media/**/*.ts", "libs/media/package.json"]
+        "lintFilePatterns": ["media/**/*.ts", "media/package.json"]
       }
     },
     "version": {

@@ -1,65 +1,22 @@
 {
   "name": "assets",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/assets/src",
+  "sourceRoot": "assets/src",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
+      "generateExportsField": true,
       "options": {
-        "rollupConfig": "libs/assets/rollup.cjs",
-        "outputPath": "dist/libs/assets",
-        "main": "libs/assets/src/index.ts",
-        "tsConfig": "libs/assets/tsconfig.lib.json",
-        "project": "libs/assets/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"],
-        "assets": [
-          "libs/assets/src/README.md",
-          "libs/assets/src/LICENSE.txt",
-          {
-            "input": "libs/assets/src/lib/schemata",
-            "glob": "**.json",
-            "output": "./src/lib/schemata"
-          }
-        ]
+        "outputPath": "dist/libs/assets"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "libraryName": "OctraAssets",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/assets/tsconfig.lib.json",
-        "main": "libs/assets/src/index.ts",
-        "outputPath": "dist/libs/assets/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
-    },
-    "publish": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/scripts/publish.mjs assets {args.ver} {args.tag}"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/assets/**/*.ts", "libs/assets/package.json"]
+        "lintFilePatterns": ["assets/**/*.ts", "assets/package.json"]
       }
     },
     "version": {
@@ -68,6 +25,7 @@
         "preset": "angular",
         "postTargets": ["assets:github"],
         "baseBranch": "main",
+        "releaseAs": "patch",
         "commitMessageFormat": "build({projectName}): release version ${version}"
       }
     },
@@ -81,7 +39,8 @@
     "npm": {
       "executor": "ngx-deploy-npm:deploy",
       "options": {
-        "access": "public"
+        "access": "public",
+        "noBuild": true
       }
     }
   },

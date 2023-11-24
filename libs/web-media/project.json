@@ -1,59 +1,22 @@
 {
   "name": "web-media",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/web-media/src",
+  "sourceRoot": "web-media/src",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
+      "generateExportsField": true,
       "options": {
-        "rollupConfig": "libs/web-media/rollup.cjs",
-        "outputPath": "dist/libs/web-media",
-        "main": "libs/web-media/src/index.ts",
-        "tsConfig": "libs/web-media/tsconfig.lib.json",
-        "assets": [
-          "libs/web-media/src/LICENSE.txt",
-          "libs/web-media/src/README.md"
-        ],
-        "project": "libs/web-media/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"],
-        "external": ["@octra/utilities", "@octra/media"],
-        "dependsOn": ["media", "utilities"]
+        "outputPath": "dist/libs/web-media"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "babelUpwardRootMode": true,
-        "libraryName": "OctraWebMedia",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/web-media/tsconfig.lib.json",
-        "main": "libs/web-media/src/index.ts",
-        "outputPath": "dist/libs/web-media/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/web-media/**/*.ts",
-          "libs/web-media/package.json"
-        ]
+        "lintFilePatterns": ["web-media/**/*.ts", "web-media/package.json"]
       }
     },
     "version": {

@@ -22,7 +22,7 @@
     "@octra/utilities": "~0.0.3"
   },
   "type": "commonjs",
-  "main": "./index.cjs",
-  "module": "./index.js",
-  "typings": "./src/index.d.ts"
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "typings": "./index.d.ts"
 }

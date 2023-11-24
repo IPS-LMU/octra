@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.8](https://github.com/IPS-LMU/octra/compare/web-media-0.0.7...web-media-0.0.8) (2023-11-24)
+
+
+
 ## [0.0.7](https://github.com/IPS-LMU/octra/compare/web-media-0.0.6...web-media-0.0.7) (2023-11-23)
 
 

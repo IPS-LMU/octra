@@ -1,7 +1,7 @@
 {
   "name": "@octra/media",
   "description": "This library offers classes that describes data related to media (e.g. SampleUnit class that describes one point in time of type sample with conversions to other time units) used by [Octra](https://github.com/IPS-LMU/octra).\nIf you are looking for decoding and playback of audio files see @octra/web-media library.",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "license": "MIT",
   "private": false,
   "author": {

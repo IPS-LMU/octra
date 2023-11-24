@@ -5,52 +5,18 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
+      "generateExportsField": true,
       "options": {
-        "rollupConfig": "libs/json-sets/rollup.cjs",
-        "outputPath": "dist/libs/json-sets",
-        "main": "libs/json-sets/src/index.ts",
-        "tsConfig": "libs/json-sets/tsconfig.lib.json",
-        "assets": [
-          "libs/json-sets/src/LICENSE.txt",
-          "libs/json-sets/src/README.md"
-        ],
-        "project": "libs/json-sets/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"]
+        "outputPath": "dist/libs/json-sets"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "libraryName": "OctraJSONSets",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/json-sets/tsconfig.lib.json",
-        "main": "libs/json-sets/src/index.ts",
-        "outputPath": "dist/libs/json-sets/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/json-sets/**/*.ts",
-          "libs/json-sets/package.json"
-        ]
+        "lintFilePatterns": ["json-sets/**/*.ts", "json-sets/package.json"]
       }
     },
     "version": {

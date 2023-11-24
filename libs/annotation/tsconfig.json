@@ -10,6 +10,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true
   },
+  "files": [],
   "include": [],
   "references": [
     {

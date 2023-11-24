@@ -1,59 +1,22 @@
 {
   "name": "annotation",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/annotation/src",
+  "sourceRoot": "annotation/src",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/rollup:rollup",
+      "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
+      "generateExportsField": true,
       "options": {
-        "rollupConfig": "libs/annotation/rollup.cjs",
-        "outputPath": "dist/libs/annotation",
-        "main": "libs/annotation/src/index.ts",
-        "tsConfig": "libs/annotation/tsconfig.lib.json",
-        "external": ["@octra/media", "@octra/utilities"],
-        "project": "libs/annotation/package.json",
-        "compiler": "tsc",
-        "format": ["cjs", "esm"],
-        "assets": [
-          "libs/annotation/src/LICENSE.txt",
-          "libs/annotation/src/README.md"
-        ]
+        "outputPath": "dist/libs/annotation"
       }
-    },
-    "bundle": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "babelUpwardRootMode": true,
-        "externalDependencies": ["@octra/media", "@octra/utilities"],
-        "libraryName": "OctraAnnotation",
-        "libraryTargets": ["umd"],
-        "index": "",
-        "tsConfig": "libs/annotation/tsconfig.lib.json",
-        "main": "libs/annotation/src/index.ts",
-        "outputPath": "dist/libs/annotation/bundles",
-        "compiler": "tsc",
-        "optimization": true,
-        "extractLicenses": true,
-        "runtimeChunk": false,
-        "vendorChunk": false,
-        "generateIndexHtml": false,
-        "commonChunk": false,
-        "namedChunks": false,
-        "webpackConfig": "webpack.config.js"
-      },
-      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/annotation/**/*.ts",
-          "libs/annotation/package.json"
-        ]
+        "lintFilePatterns": ["annotation/**/*.ts", "annotation/package.json"]
       }
     },
     "version": {

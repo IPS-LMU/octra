@@ -1,13 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
-import {
-  AppStorageService,
-  KeymappingService,
-  SettingsService,
-  TranscriptionService,
-  UserInteractionsService
-} from '../../shared/service';
+import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
@@ -198,7 +192,15 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     }
 
     if (this.sendValidTranscriptOnly && this.transcrService.transcriptValid || !this.sendValidTranscriptOnly) {
-      this.sendTranscription();
+      if (this.settingsService.appSettings.octra.database.name === 'octra_duden') {
+        if ((type === 'bad' || type === 'middle') && (!this.transcrService.comment || this.transcrService.comment.trim() === '')) {
+          if (this.feedback && this.feedback.commentArea) {
+            this.feedback.commentArea.nativeElement.style.border = '3px solid red';
+          }
+        } else {
+          this.sendTranscription();
+        }
+      }
     }
   }
 

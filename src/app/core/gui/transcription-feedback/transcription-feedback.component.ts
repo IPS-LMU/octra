@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {TranslocoService} from '@ngneat/transloco';
 import {NgForm} from '@angular/forms';
@@ -13,6 +13,7 @@ export class TranscriptionFeedbackComponent implements OnInit {
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
   @ViewChild('fo', {static: true}) feedbackForm: NgForm;
+  @ViewChild('commentArea', {static: false}) commentArea: ElementRef;
 
   public get valid(): boolean {
     return this.feedbackForm.valid;
@@ -73,6 +74,12 @@ export class TranscriptionFeedbackComponent implements OnInit {
         }
         break;
       }
+    }
+  }
+
+  onCommentChange() {
+    if (this.commentArea) {
+      this.commentArea.nativeElement.style.border = 'none';
     }
   }
 }

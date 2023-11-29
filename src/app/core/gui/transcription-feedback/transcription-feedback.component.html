@@ -43,7 +43,8 @@
             </ng-container>
             <div class="form-group">
               <label>{{"transcription-submit.comment description" | transloco}}</label>
-                <textarea class="form-control" [(ngModel)]="transcrService.feedback.comment"
+              <textarea class="form-control" [(ngModel)]="transcrService.feedback.comment" #commentArea
+                        (ngModelChange)="onCommentChange()"
                           name="comment"></textarea>
             </div>
         </ng-container>

@@ -12,13 +12,13 @@
 }
 
 #black {
-  position: fixed;
+  position: absolute;
   top:0;
   width: 100%;
   display: block;
   height: 100%;
   z-index: 99;
-  background-color: black;
+  background-color: white;
   opacity: 0.5;
 }
 

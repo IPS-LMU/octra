@@ -7,6 +7,7 @@ import {
   Component,
   ComponentFactoryResolver,
   ComponentRef,
+  ElementRef,
   HostListener,
   OnChanges,
   OnDestroy,
@@ -71,6 +72,10 @@ import {
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
 
+  @ViewChild('commentArea', {
+    static: false
+  }) commentArea?: ElementRef;
+
   public get Interface(): string {
     return this.interface;
   }
@@ -95,7 +100,7 @@ export class TranscriptionComponent implements OnInit,
     return this._currentEditor;
   }
 
-  private get appSettings() {
+  public get appSettings() {
     return this.settingsService.appSettings;
   }
 
@@ -979,7 +984,15 @@ export class TranscriptionComponent implements OnInit,
     }
 
     if (type !== 'postpone_before') {
-      this.onSendButtonClick();
+      if (this.appSettings.octra.database.name === 'octra_duden') {
+        if ((type === 'bad' || type === 'middle') && (!this.transcrService.comment || this.transcrService.comment.trim() === '')) {
+          if (this.commentArea) {
+            this.commentArea!.nativeElement.style.border = '3px solid red';
+          }
+        } else {
+          this.onSendButtonClick();
+        }
+      }
     } else {
       this.modalPostponeAll.open();
     }
@@ -1004,6 +1017,12 @@ export class TranscriptionComponent implements OnInit,
     if (this.levelSubscriptionID > 0) {
       this.subscrmanager.removeById(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
+    }
+  }
+
+  onCommentChange() {
+    if (this.commentArea) {
+      this.commentArea.nativeElement.style.border = 'none';
     }
   }
 

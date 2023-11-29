@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
+import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -112,9 +112,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
-              private modalService: BsModalService,
               private httpClient: HttpClient,
-              private appStorage: AppStorageService,
               private audio: AudioService,
               private settService: SettingsService,
               public transloco: TranslocoService

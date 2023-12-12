@@ -1,12 +1,34 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TimespanPipe } from './pipes/timespan.pipe';
-import { LeadingNullPipe } from './pipes/leadingnull.pipe';
-import { ProcentPipe } from './pipes/procent.pipe';
+import {
+  CapitalLetterPipe,
+  JoinPipe,
+  LeadingNullPipe,
+  MapPipe,
+  ProcentPipe,
+  TimespanPipe,
+  UnixDurationPipe,
+} from './pipes';
 
 @NgModule({
-  declarations: [TimespanPipe, LeadingNullPipe, ProcentPipe],
+  declarations: [
+    TimespanPipe,
+    LeadingNullPipe,
+    ProcentPipe,
+    CapitalLetterPipe,
+    JoinPipe,
+    MapPipe,
+    UnixDurationPipe,
+  ],
   imports: [CommonModule],
-  exports: [TimespanPipe, LeadingNullPipe, ProcentPipe],
+  exports: [
+    TimespanPipe,
+    LeadingNullPipe,
+    ProcentPipe,
+    CapitalLetterPipe,
+    JoinPipe,
+    MapPipe,
+    UnixDurationPipe,
+  ],
 })
 export class OctraUtilitiesModule {}

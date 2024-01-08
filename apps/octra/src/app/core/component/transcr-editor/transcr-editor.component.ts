@@ -30,8 +30,7 @@ import { Subscription, timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { DefaultComponent } from '../default.component';
 import { Config } from 'jodit/types/config';
-import { IControlType } from 'jodit/src/types';
-import { IJodit, IToolbarButton } from 'jodit/types/types';
+import { IControlType, IJodit, IToolbarButton } from 'jodit/types/types';
 import { OctraAnnotationSegment } from '@octra/annotation';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraGuidelines } from '@octra/assets';
@@ -424,9 +423,6 @@ export class TranscrEditorComponent
 
       this.joditOptions = {
         ...this.joditDefaultOptions,
-        showCharsCounter: false,
-        showWordsCounter: false,
-        showXPathInStatusbar: false,
         disablePlugins:
           'add-new-line,image-processor,image-properties,image,video,media,file,resize-cells,select-cells,' +
           'table-keyboard-navigation,table,preview,print,about,drag-and-drop,iframe,indent,inline-popup,' +
@@ -780,33 +776,30 @@ export class TranscrEditorComponent
       data: {
         active: false,
       },
-      getContent: (a, b, c) => {
-        if (!this.initialized) {
-          const content = getContent();
+      getContent: (a: IJodit, b: IToolbarButton) => {
+        const content = getContent();
 
-          const button = document.createElement('span');
-          button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
-          if (typeof content === 'string') {
-            button.innerHTML = getContent();
-            if (events?.onClick) {
-              button.addEventListener('click', (event: MouseEvent) => {
-                events!.onClick!(event, button);
-              });
-            }
-          } else {
-            button.appendChild(content);
+        const button = document.createElement('span');
+        button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
+        if (typeof content === 'string') {
+          button.innerHTML = getContent();
+          if (events?.onClick) {
+            button.addEventListener('click', (event: MouseEvent) => {
+              events!.onClick!(event, button);
+            });
           }
-
-          return button;
+        } else {
+          button.appendChild(content);
         }
-        return c.container.children[0];
+
+        return button;
       },
-      isActive: function (editor, btn) {
+      /* isActive: function (editor, btn) {
         if (btn.data) {
           return btn.data['active'];
         }
         return false;
-      },
+      },*/
       tooltip,
       hotkeys,
     };

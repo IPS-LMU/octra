@@ -22,7 +22,7 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { SignupComponent } from './core/component/authentication-component/signup/signup.component';
 import { TranslocoModule } from '@ngneat/transloco';
 import { TranscrOverviewComponent } from './core/component/transcr-overview';
-import { NgxJoditModule } from 'ngx-jodit';
+import { NgxJoditComponent } from 'ngx-jodit';
 import { ValidationPopoverComponent } from './core/component/transcr-editor/validation-popover/validation-popover.component';
 
 @NgModule({
@@ -49,7 +49,7 @@ import { ValidationPopoverComponent } from './core/component/transcr-editor/vali
     OctraUtilitiesModule,
     TranslocoModule,
     NgbToast,
-    NgxJoditModule,
+    NgxJoditComponent,
   ],
   exports: [
     AsrOptionsComponent,

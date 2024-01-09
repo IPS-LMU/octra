@@ -33,26 +33,32 @@ export function uniqueHTTPRequest(
   }
 }
 
-export function downloadFile(
+/**
+ * downloads a File with given response type and type. Reports progress.
+ * @param http Angular HTTP client
+ * @param url URL for download
+ * @param responseType response type
+ */
+export function downloadFile<T>(
   http: HttpClient,
-  url: string
+  url: string,
+  responseType: 'arraybuffer' | 'blob' | 'json' | 'text'
 ): Subject<{
   progress: number;
-  result: any;
+  result?: T;
 }> {
   const subj: Subject<any> = new Subject<any>();
 
   const req = new HttpRequest('GET', url, {
     reportProgress: true,
-    responseType: 'arraybuffer',
+    responseType,
   });
 
-  http.request(req).subscribe(
-    (event: any) => {
+  http.request(req).subscribe({
+    next: (event: any) => {
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
-          progress: event.total ? event.loaded / event.total : 0,
-          result: undefined,
+          progress: event.total ? event.loaded / event.total : 0
         });
       } else if (event instanceof HttpResponse) {
         subj.next({
@@ -62,10 +68,10 @@ export function downloadFile(
         subj.complete();
       }
     },
-    (error) => {
+    error: (error) => {
       subj.error(error);
-    }
-  );
+    },
+  });
 
   return subj;
 }

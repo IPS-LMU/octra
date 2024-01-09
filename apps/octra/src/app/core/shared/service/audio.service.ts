@@ -49,7 +49,7 @@ export class AudioService {
 
     const subj = new Subject<number>();
 
-    downloadFile(this.http, url).subscribe({
+    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer').subscribe({
       next: (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {

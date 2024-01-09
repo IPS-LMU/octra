@@ -39,7 +39,7 @@
         "preset": "angular",
         "postTargets": ["ngx-utilities:github"],
         "baseBranch": "main",
-        "releaseAs": "patch",
+        "releaseAs": "minor",
         "commitMessageFormat": "build({projectName}): release version ${version}"
       }
     },

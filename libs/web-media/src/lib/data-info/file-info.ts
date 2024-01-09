@@ -83,32 +83,31 @@ export class FileInfo extends DataInfo {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
+  /**
+   * creates a FileInfo instance form a URL. It doesn't contain the file itself.
+   * @param url
+   * @param type
+   * @param name
+   * @param createdAt
+   * @param size
+   */
   public static fromURL(
     url: string,
     type?: string,
     name?: string,
-    createdAt = 0
+    createdAt = 0,
+    size?: number
   ) {
-    let fullname = '';
-    let extension = url.substring(url.lastIndexOf('.') + 1);
+    const matches = /\/([^/?]*)(\.[^?]+)(?:\?|$)/g.exec(url);
 
-    if (extension.indexOf('?') > 0) {
-      extension = extension.substring(0, extension.indexOf('?'));
+    if (matches === null || matches.length < 3) {
+      throw new Error("Can't read file from URL.");
     }
 
-    if (name != undefined) {
-      fullname = name + '.' + extension;
-    } else {
-      fullname = url.substring(url.lastIndexOf('/') + 1);
-
-      if (fullname.indexOf('?') > 0) {
-        fullname = fullname.substring(0, fullname.indexOf('?'));
-      }
-    }
     const result = new FileInfo(
-      fullname,
-      type ?? this.getMimeTypeByExtension(extension),
-      0,
+      name ?? `${matches[1]}${matches[2]}`,
+      type ?? this.getMimeTypeByExtension(matches[2]),
+      size ?? 0,
       undefined,
       createdAt
     );
@@ -117,7 +116,7 @@ export class FileInfo extends DataInfo {
     return result;
   }
 
-  private static getMimeTypeByExtension(extension: string) {
+  public static getMimeTypeByExtension(extension: string) {
     switch (extension.replace(/\./g, '')) {
       // audio
       case 'wav':

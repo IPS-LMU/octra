@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.9](https://github.com/IPS-LMU/octra/compare/web-media-0.0.8...web-media-0.0.9) (2024-01-09)
+
+
+### Bug Fixes
+
+* **web-media:** FileInfo.fromURL() doesn't parse file name correctly. ([614f5b1](https://github.com/IPS-LMU/octra/commit/614f5b11db3e97575809a6998f9f3769420ba509))
+
+
+
 ## [0.0.8](https://github.com/IPS-LMU/octra/compare/web-media-0.0.7...web-media-0.0.8) (2023-11-24)
 
 

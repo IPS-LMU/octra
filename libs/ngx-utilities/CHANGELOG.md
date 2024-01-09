@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.2.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.1.0...ngx-utilities-0.2.0) (2024-01-09)
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.0.2...ngx-utilities-0.1.0) (2023-12-12)
 
 

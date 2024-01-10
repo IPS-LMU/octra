@@ -11,6 +11,7 @@ export type OctraAnnotationFormatType =
   | 'SRT'
   | 'PlainText'
   | 'TextGrid'
+  | 'WhisperJSON'
   | 'WebVTT';
 
 export interface IFile {

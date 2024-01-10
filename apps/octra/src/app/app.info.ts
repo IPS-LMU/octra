@@ -12,6 +12,7 @@ import {
   SRTConverter,
   TextConverter,
   WebVTTConverter,
+  WhisperJSONConverter,
 } from '@octra/annotation';
 
 export class AppInfo {
@@ -19,6 +20,7 @@ export class AppInfo {
 
   public static readonly converters: Converter[] = [
     new AnnotJSONConverter(),
+    new WhisperJSONConverter(),
     new PraatTableConverter(),
     new PraatTextgridConverter(),
     new CTMConverter(),

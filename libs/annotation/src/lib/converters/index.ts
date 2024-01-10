@@ -10,3 +10,4 @@ export * from './TextConverter';
 export * from './ELANConverter';
 export * from './WebVTTConverter';
 export * from './SRTConverter';
+export * from './WhisperJSONConverter';

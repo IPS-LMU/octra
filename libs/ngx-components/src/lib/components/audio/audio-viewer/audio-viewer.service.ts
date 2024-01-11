@@ -30,6 +30,7 @@ import {
 export class AudioViewerService {
   get boundaryDragging(): Subject<{
     status: 'started' | 'stopped' | 'dragging';
+    id: number;
     shiftPressed?: boolean;
   }> {
     return this._boundaryDragging;
@@ -66,6 +67,7 @@ export class AudioViewerService {
 
   private _boundaryDragging: Subject<{
     status: 'started' | 'stopped' | 'dragging';
+    id: number;
     shiftPressed?: boolean;
   }>;
   currentLevelID?: number;
@@ -145,6 +147,7 @@ export class AudioViewerService {
       this.tempAnnotation = this.annotation;
       this._boundaryDragging.next({
         shiftPressed: this.shiftPressed,
+        id: value,
         status: 'started',
       });
     }
@@ -199,6 +202,7 @@ export class AudioViewerService {
   constructor(private multiThreadingService: MultiThreadingService) {
     this._boundaryDragging = new Subject<{
       status: 'started' | 'stopped' | 'dragging';
+      id: number;
       shiftPressed?: boolean;
     }>();
   }
@@ -280,14 +284,15 @@ export class AudioViewerService {
             } else if ($event.type === 'mouseup') {
               this.handleBoundaryDragging(absX, absXInTime, true);
 
-              this._dragableBoundaryID = -1;
               this.overboundary = false;
               this._mouseDown = false;
 
               this._boundaryDragging.next({
                 shiftPressed: this.shiftPressed,
+                id: this._dragableBoundaryID,
                 status: 'stopped',
               });
+              this._dragableBoundaryID = -1;
             }
 
             resolve(lineNum);
@@ -755,6 +760,7 @@ export class AudioViewerService {
 
           this._boundaryDragging.next({
             shiftPressed: this.shiftPressed,
+            id: this._dragableBoundaryID,
             status: 'dragging',
           });
         }

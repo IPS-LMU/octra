@@ -268,6 +268,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   public get boundaryDragging(): Subject<{
     status: 'started' | 'stopped' | 'dragging';
+    id: number;
     shiftPressed?: boolean;
   }> {
     return this.av.boundaryDragging;
@@ -565,7 +566,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
-          this.stage.batchDraw();
+          this.layers?.background.cache();
+          this.layers?.overlay.cache();
         }
       }
     } catch (e) {
@@ -655,6 +657,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         addSingleLineOnly();
       }
 
+      this.layers.background.cache();
       this.createSegmentsForCanvas();
 
       this.canvasElements.playHead = this.createLinePlayCursor();
@@ -729,8 +732,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       if (scrollbars !== undefined && scrollbars.length > 0) {
         scrollbars[0].x(this.av.innerWidth + this.settings.margin.left);
       }
-
-      this.drawWholeSelection();
     }
   };
 
@@ -1123,18 +1124,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     line.add(frame);
   }
 
-  private createLineSelection(line: Konva.Group, size: Size) {
-    const frame = new Konva.Rect({
-      name: 'selection',
-      opacity: 0.2,
-      fill: this.settings.selection.color,
-      width: 0,
-      height: size.height,
-      transformsEnabled: 'position',
-    });
-    line.add(frame);
-  }
-
   private createLineGrid(line: Konva.Group, size: Size) {
     const frame = new Konva.Shape({
       opacity: 0.2,
@@ -1147,9 +1136,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.layers !== undefined &&
           this.stage !== undefined &&
           this.audioManager !== undefined &&
-          line.y() + line.height() >= Math.abs(this.layers.background.y()) &&
-          line.y() <=
-            Math.abs(this.layers.background.y()) + this.stage.height() &&
           this.av.audioTCalculator !== undefined
         ) {
           const position = {
@@ -1271,12 +1257,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         (this.canvasElements.lastLine.y() +
           this.canvasElements.lastLine.height()) *
         deltaY;
+
+      // move all layers but keep scrollbars fixed
       this.layers.background.y(newY);
-      this.layers.playhead.y(newY);
       this.layers.overlay.y(newY);
       this.layers.boundaries.y(newY);
-
-      this.stage.batchDraw();
+      this.layers.playhead.y(newY);
     }
   }
 
@@ -1307,7 +1293,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.createLineBackground(selectedGroup, size);
     this.createLineGrid(selectedGroup, size);
     this.createLineSignal(selectedGroup, size, lineNum);
-    this.createLineSelection(selectedGroup, size);
     this.createLineBorder(selectedGroup, size);
 
     if (
@@ -1351,9 +1336,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         if (
           this.layers !== undefined &&
           this.stage !== undefined &&
-          line.y() + line.height() >= Math.abs(this.layers.background.y()) &&
-          line.y() <=
-            Math.abs(this.layers.background.y()) + this.stage.height() &&
           this.av.innerWidth
         ) {
           const timeLineHeight = this.settings.timeline.enabled
@@ -1413,7 +1395,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       },
       transformsEnabled: 'position',
     });
-    frame.perfectDrawEnabled(false);
     line.add(frame);
   }
 
@@ -1533,14 +1514,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 beginTime = previousSegment.time;
               }
               const beginX = this.av.audioTCalculator.samplestoAbsX(beginTime);
-              const lineNum1 =
-                this.av.innerWidth < this.AudioPxWidth
-                  ? Math.floor(beginX / this.av.innerWidth)
-                  : 0;
-              const lineNum2 =
-                this.av.innerWidth < this.AudioPxWidth
-                  ? Math.floor(absX / this.av.innerWidth)
-                  : 0;
+              const lineNum1 = 0;
+              const lineNum2 = Math.floor(
+                this.AudioPxWidth / this.av.innerWidth
+              );
 
               const segmentEnd = segment.time.clone();
               const audioChunkStart = this.audioChunk.time.start.clone();
@@ -1575,7 +1552,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   sceneFunc: (context: any, shape: Shape) => {
                     this.overlaySceneFunction(
                       {
-                        from: lineNum1,
+                        from: 0,
                         to: lineNum2,
                       },
                       segments,
@@ -1647,8 +1624,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                             context,
                             sceneSegment.getFirstLabelWithoutName('Speaker')!
                               .value,
-                            lineNum1,
-                            lineNum2,
+                            this.av.innerWidth! < this.AudioPxWidth
+                              ? Math.floor(beginX / this.av.innerWidth!)
+                              : 0,
+                            this.av.innerWidth! < this.AudioPxWidth
+                              ? Math.floor(absX / this.av.innerWidth!)
+                              : 0,
                             segmentEnd,
                             beginTime,
                             lastI,
@@ -1669,7 +1650,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               }
 
               y =
-                lineNum2 *
+                (this.av.innerWidth < this.AudioPxWidth
+                  ? Math.floor(absX / this.av.innerWidth)
+                  : 0) *
                 (this.settings.lineheight + this.settings.margin.top);
 
               // draw boundary
@@ -1780,7 +1763,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             drawnBoundaries++;
           }
           this.removeNonExistingSegments();
+          this.layers.boundaries.cache();
         }
+        root.cache();
       }
     }
   }
@@ -1801,55 +1786,49 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         // draw time label
         y = j * (this.settings.lineheight + this.settings.margin.top);
 
-        if (
-          y + this.settings.lineheight >=
-            Math.abs(this.layers.background.y()) &&
-          y <= Math.abs(this.layers.background.y()) + this.stage.height()
-        ) {
-          let startTime =
-            this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
-          let endTime = 0;
+        let startTime =
+          this.audioChunk.time.start.unix + j * (this.secondsPerLine * 1000);
+        let endTime = 0;
 
-          if (numOfLines > 1) {
-            endTime = Math.min(
-              startTime + this.secondsPerLine * 1000,
-              this.audioChunk.time.duration.unix
-            );
-            endTime = Math.ceil(endTime / 1000) * 1000;
-            startTime = Math.floor(startTime / 1000) * 1000;
-          } else {
-            endTime =
-              this.audioChunk.time.start.unix +
-              this.audioChunk.time.duration.unix;
-          }
-
-          const pipe = new TimespanPipe();
-          const maxDuration = this.audioChunk.time.duration.unix;
-          const startTimeString = pipe.transform(startTime, {
-            showHour: true,
-            showMilliSeconds: !this.settings.multiLine,
-            maxDuration,
-          });
-          const endTimeString = pipe.transform(endTime, {
-            showHour: true,
-            showMilliSeconds: !this.settings.multiLine,
-            maxDuration,
-          });
-          const length = this.layers.overlay
-            .getContext()
-            .measureText(startTimeString).width;
-          context.fillStyle = 'dimgray';
-          context.fillText(startTimeString, 3, y + 8);
-          context.fillText(
-            endTimeString,
-            (j < numOfLines - 1
-              ? this.av.innerWidth
-              : this.canvasElements.lastLine.width()) -
-              length -
-              3,
-            y + 8
+        if (numOfLines > 1) {
+          endTime = Math.min(
+            startTime + this.secondsPerLine * 1000,
+            this.audioChunk.time.duration.unix
           );
+          endTime = Math.ceil(endTime / 1000) * 1000;
+          startTime = Math.floor(startTime / 1000) * 1000;
+        } else {
+          endTime =
+            this.audioChunk.time.start.unix +
+            this.audioChunk.time.duration.unix;
         }
+
+        const pipe = new TimespanPipe();
+        const maxDuration = this.audioChunk.time.duration.unix;
+        const startTimeString = pipe.transform(startTime, {
+          showHour: true,
+          showMilliSeconds: !this.settings.multiLine,
+          maxDuration,
+        });
+        const endTimeString = pipe.transform(endTime, {
+          showHour: true,
+          showMilliSeconds: !this.settings.multiLine,
+          maxDuration,
+        });
+        const length = this.layers.overlay
+          .getContext()
+          .measureText(startTimeString).width;
+        context.fillStyle = 'dimgray';
+        context.fillText(startTimeString, 3, y + 8);
+        context.fillText(
+          endTimeString,
+          (j < numOfLines - 1
+            ? this.av.innerWidth
+            : this.canvasElements.lastLine.width()) -
+            length -
+            3,
+          y + 8
+        );
       }
     }
   };
@@ -1882,11 +1861,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           j * (this.settings.lineheight + this.settings.margin.top);
         const segment = segments[i];
 
-        if (
-          absY + segmentHeight >= Math.abs(this.layers.background.y()) &&
-          absY <= Math.abs(this.layers.background.y()) + this.stage.height() &&
-          segment?.time !== undefined
-        ) {
+        if (segment?.time !== undefined) {
           const lineWidth =
             j < numOfLines - 1
               ? this.av.innerWidth
@@ -1968,12 +1943,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           const localY =
             j * (this.settings.lineheight + this.settings.margin.top);
 
-          if (
-            absY + segmentHeight >= Math.abs(this.layers.background.y()) &&
-            absY <=
-              Math.abs(this.layers.background.y()) + this.stage.height() &&
-            this.av.innerWidth !== undefined
-          ) {
+          if (this.av.innerWidth !== undefined) {
             const startSecond = j * this.secondsPerLine;
             let endSecond = 0;
 
@@ -2025,12 +1995,17 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             if (select.end < 1) {
               w = 0;
             }
-            if (select.end < 1 || select.end > lineWidth) {
+            if (select.end > lineWidth) {
               w = select.end;
             }
 
             if (j === numOfLines - 1 && i === segments.length - 1) {
               w = lineWidth - select.start;
+            }
+
+            if (w === 0) {
+              // skip drawing empty rect
+              continue;
             }
 
             if (sceneSegment.context?.asr?.isBlockedBy === undefined) {
@@ -2054,6 +2029,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               ) {
                 context.fillStyle = 'rgba(0,128,0,0.2)';
               }
+              console.log(
+                `fill rect size(${w}, ${h}), position(${x}, ${localY})`
+              );
               context.fillRect(x, localY, w, h);
             } else {
               // something running
@@ -2387,8 +2365,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             selections[lineNum].x(x);
           }
         }
-
-        this.layers.background.batchDraw();
       }
     }
     return undefined;
@@ -3260,14 +3236,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.av.audioTCalculator !== undefined &&
       this.av.currentLevel?.items &&
       this.av.currentLevel.items.length > 0 &&
-      this.layers !== undefined &&
-      !this.refreshRunning
+      this.layers !== undefined
     ) {
-      this.refreshRunning = true;
-      this.createSegmentsForCanvas();
+      if (!this.refreshRunning) {
+        this.refreshRunning = true;
+        this.createSegmentsForCanvas();
+        this.refreshRunning = false;
+      }
       this.layers.overlay.batchDraw();
       this.layers.boundaries.batchDraw();
-      this.refreshRunning = false;
     }
   };
 
@@ -3314,175 +3291,170 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         const localY =
           (j + 1) * (this.settings.lineheight + this.settings.margin.top);
 
-        if (
-          y + segmentHeight >= Math.abs(this.layers.background.y()) &&
-          y <= Math.abs(this.layers.background.y()) + this.stage.height()
-        ) {
-          const lineWidth =
-            j < numOfLines - 1
-              ? this.av.innerWidth
-              : this.canvasElements.lastLine.width();
-          const select = this.av.getRelativeSelectionByLine(
-            j,
-            lineWidth,
-            beginTime,
-            segment.time,
-            this.av.innerWidth
+        const lineWidth =
+          j < numOfLines - 1
+            ? this.av.innerWidth
+            : this.canvasElements.lastLine.width();
+        const select = this.av.getRelativeSelectionByLine(
+          j,
+          lineWidth,
+          beginTime,
+          segment.time,
+          this.av.innerWidth
+        );
+        let w = 0;
+        let x = select.start;
+
+        if (select.start > -1 && select.end > -1) {
+          w = Math.abs(select.end - select.start);
+        }
+
+        if (select.start < 1 || select.start > lineWidth) {
+          x = 1;
+        }
+        if (select.end < 1) {
+          w = 0;
+        }
+        if (select.end < 1 || select.end > lineWidth) {
+          w = select.end;
+        }
+
+        if (j === numOfLines - 1 && i === segments.length - 1) {
+          w = lineWidth - select.start + 1;
+        }
+
+        if (lineNum1 === lineNum2) {
+          let textLength = context.measureText(text).width;
+          let newText = text;
+          // segment in same line
+          if (textLength > w - 4) {
+            // crop text
+            const overflow = 1 - 1 / (textLength / (w - 35));
+            const charsToRemove = Math.ceil((text.length * overflow) / 2);
+            const start = Math.ceil(text.length / 2 - charsToRemove);
+            const end = start + charsToRemove * 2;
+            newText = text.substring(0, start);
+            newText += '...';
+            newText += text.substring(end);
+            textLength = context.measureText(newText).width;
+          }
+          const localX = (w - 4 - textLength) / 2 + x;
+          context.fillText(
+            newText,
+            localX,
+            localY - 5 - this.settings.margin.top
           );
-          let w = 0;
-          let x = select.start;
+        } else {
+          const totalWidth = this.av.audioTCalculator.samplestoAbsX(
+            segmentEnd.sub(beginTime)
+          );
 
-          if (select.start > -1 && select.end > -1) {
-            w = Math.abs(select.end - select.start);
-          }
+          if (j === lineNum1) {
+            // current line is start line
+            const ratio = w / totalWidth;
 
-          if (select.start < 1 || select.start > lineWidth) {
-            x = 1;
-          }
-          if (select.end < 1) {
-            w = 0;
-          }
-          if (select.end < 1 || select.end > lineWidth) {
-            w = select.end;
-          }
+            // crop text
+            let newText = text.substring(
+              0,
+              Math.floor(text.length * ratio) - 2
+            );
+            const textLength = context.measureText(newText).width;
 
-          if (j === numOfLines - 1 && i === segments.length - 1) {
-            w = lineWidth - select.start + 1;
-          }
-
-          if (lineNum1 === lineNum2) {
-            let textLength = context.measureText(text).width;
-            let newText = text;
-            // segment in same line
-            if (textLength > w - 4) {
+            if (textLength > w) {
               // crop text
-              const overflow = 1 - 1 / (textLength / (w - 35));
-              const charsToRemove = Math.ceil((text.length * overflow) / 2);
-              const start = Math.ceil(text.length / 2 - charsToRemove);
-              const end = start + charsToRemove * 2;
-              newText = text.substring(0, start);
-              newText += '...';
-              newText += text.substring(end);
-              textLength = context.measureText(newText).width;
+              const leftHalf = w / textLength;
+              newText = newText.substring(
+                0,
+                Math.floor(newText.length * leftHalf) - 2
+              );
             }
+            lastI = newText.length;
+            newText += '...';
+
             const localX = (w - 4 - textLength) / 2 + x;
             context.fillText(
               newText,
               localX,
               localY - 5 - this.settings.margin.top
             );
-          } else {
-            const totalWidth = this.av.audioTCalculator.samplestoAbsX(
-              segmentEnd.sub(beginTime)
-            );
+          } else if (j === lineNum2 && lastI !== undefined) {
+            // crop text
+            let newText = text.substring(lastI);
+            const textLength = context.measureText(newText).width;
 
-            if (j === lineNum1) {
-              // current line is start line
-              const ratio = w / totalWidth;
-
+            if (textLength > w) {
               // crop text
-              let newText = text.substring(
+              const leftHalf = w / textLength;
+              newText = newText.substring(
                 0,
-                Math.floor(text.length * ratio) - 2
+                Math.floor(newText.length * leftHalf) - 3
               );
-              const textLength = context.measureText(newText).width;
+              newText = '...' + newText + '...';
+            } else if (text !== this.silencePlaceholder) {
+              newText = '...' + newText;
+            } else {
+              newText = text;
+            }
 
-              if (textLength > w) {
-                // crop text
-                const leftHalf = w / textLength;
-                newText = newText.substring(
-                  0,
-                  Math.floor(newText.length * leftHalf) - 2
-                );
+            const localX = (w - 4 - textLength) / 2 + x;
+            context.fillText(
+              newText,
+              localX,
+              localY - 5 - this.settings.margin.top
+            );
+            lastI = 0;
+          } else if (lastI !== undefined) {
+            let w2 = 0;
+
+            if (lineNum1 > -1) {
+              const lastPart = this.av.getRelativeSelectionByLine(
+                lineNum1,
+                w,
+                beginTime,
+                segmentEnd,
+                this.av.innerWidth
+              );
+
+              if (lastPart.start > -1 && lastPart.end > -1) {
+                w2 = Math.abs(lastPart.end - lastPart.start);
               }
-              lastI = newText.length;
-              newText += '...';
+              if (lastPart.end < 1) {
+                w2 = 0;
+              }
+              if (lastPart.end < 1 || lastPart.end > lineWidth) {
+                w2 = lastPart.end;
+              }
+            }
 
-              const localX = (w - 4 - textLength) / 2 + x;
-              context.fillText(
-                newText,
-                localX,
-                localY - 5 - this.settings.margin.top
-              );
-            } else if (j === lineNum2 && lastI !== undefined) {
+            const ratio = w / totalWidth;
+            const endIndex = lastI + Math.floor(text.length * ratio);
+
+            // placeholder
+            let newText = text.substring(lastI, endIndex);
+            const textLength = context.measureText(newText).width;
+
+            if (textLength > w) {
               // crop text
-              let newText = text.substring(lastI);
-              const textLength = context.measureText(newText).width;
-
-              if (textLength > w) {
-                // crop text
-                const leftHalf = w / textLength;
-                newText = newText.substring(
-                  0,
-                  Math.floor(newText.length * leftHalf) - 3
-                );
-                newText = '...' + newText + '...';
-              } else if (text !== this.silencePlaceholder) {
-                newText = '...' + newText;
-              } else {
-                newText = text;
-              }
-
-              const localX = (w - 4 - textLength) / 2 + x;
-              context.fillText(
-                newText,
-                localX,
-                localY - 5 - this.settings.margin.top
-              );
-              lastI = 0;
-            } else if (lastI !== undefined) {
-              let w2 = 0;
-
-              if (lineNum1 > -1) {
-                const lastPart = this.av.getRelativeSelectionByLine(
-                  lineNum1,
-                  w,
-                  beginTime,
-                  segmentEnd,
-                  this.av.innerWidth
-                );
-
-                if (lastPart.start > -1 && lastPart.end > -1) {
-                  w2 = Math.abs(lastPart.end - lastPart.start);
-                }
-                if (lastPart.end < 1) {
-                  w2 = 0;
-                }
-                if (lastPart.end < 1 || lastPart.end > lineWidth) {
-                  w2 = lastPart.end;
-                }
-              }
-
-              const ratio = w / totalWidth;
-              const endIndex = lastI + Math.floor(text.length * ratio);
-
-              // placeholder
-              let newText = text.substring(lastI, endIndex);
-              const textLength = context.measureText(newText).width;
-
-              if (textLength > w) {
-                // crop text
-                const leftHalf = w / textLength;
-                newText = newText.substring(
-                  0,
-                  Math.floor(newText.length * leftHalf) - 3
-                );
-              }
-              lastI += newText.length;
-
-              if (text !== this.silencePlaceholder) {
-                newText = '...' + newText + '...';
-              } else {
-                newText = text;
-              }
-
-              const localX = (w - 4 - textLength) / 2 + x;
-              context.fillText(
-                newText,
-                localX,
-                localY - 5 - this.settings.margin.top
+              const leftHalf = w / textLength;
+              newText = newText.substring(
+                0,
+                Math.floor(newText.length * leftHalf) - 3
               );
             }
+            lastI += newText.length;
+
+            if (text !== this.silencePlaceholder) {
+              newText = '...' + newText + '...';
+            } else {
+              newText = text;
+            }
+
+            const localX = (w - 4 - textLength) / 2 + x;
+            context.fillText(
+              newText,
+              localX,
+              localY - 5 - this.settings.margin.top
+            );
           }
         }
       }

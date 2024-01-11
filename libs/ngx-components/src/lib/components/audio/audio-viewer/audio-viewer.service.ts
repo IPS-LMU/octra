@@ -255,15 +255,15 @@ export class AudioViewerService {
               if (this._dragableBoundaryID > -1) {
                 const currentLevel = this
                   .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
-                const segmentBefore = currentLevel!.getLeftSibling(
-                  currentLevel.items[this._dragableBoundaryID]
+                const index = this.annotation.currentLevel.items.findIndex(
+                  (a) => a.id === this._dragableBoundaryID
                 );
+
+                const segmentBefore = currentLevel!.getLeftSibling(index);
                 const segment = this.annotation.currentLevel.items[
-                  this._dragableBoundaryID
+                  index
                 ] as OctraAnnotationSegment<ASRContext>;
-                const segmentAfter = currentLevel!.getRightSibling(
-                  currentLevel.items[this._dragableBoundaryID]
-                );
+                const segmentAfter = currentLevel!.getRightSibling(index);
 
                 if (
                   segment?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR ||
@@ -332,18 +332,21 @@ export class AudioViewerService {
       annotation?.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
     const limitPadding = 500;
 
-    const draggedItem = currentLevel?.items?.find(
+    const index = currentLevel?.items.findIndex(
       (a) => a.id === this._dragableBoundaryID
     );
     if (
       annotation &&
       currentLevel &&
-      draggedItem &&
+      index !== undefined &&
+      index > -1 &&
       this.audioTCalculator &&
       this.audioChunk &&
       this.audioManager &&
       this.PlayCursor
     ) {
+      const draggedItem = currentLevel.items[index];
+
       if (
         this.settings.boundaries.enabled &&
         !this.settings.boundaries.readonly &&
@@ -357,9 +360,9 @@ export class AudioViewerService {
           if (!this.shiftPressed) {
             // move only this boundary
             const previousSegment: OctraAnnotationSegment | undefined =
-              currentLevel.getLeftSibling(draggedItem)!;
+              currentLevel.getLeftSibling(index)!;
             const nextSegment: OctraAnnotationSegment | undefined =
-              currentLevel.getRightSibling(draggedItem)!;
+              currentLevel.getRightSibling(index)!;
 
             let newTime = this.audioTCalculator.absXChunktoSampleUnit(
               absX,

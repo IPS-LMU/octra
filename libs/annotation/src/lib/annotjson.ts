@@ -162,13 +162,11 @@ export class OLevel<T extends OItem> implements ILevel {
     );
   }
 
-  getLeftSibling(item: OItem): T | undefined {
-    const index = this.items.findIndex((a) => a.id === item.id);
+  getLeftSibling(index: number): T | undefined {
     return index > 0 ? this.items[index - 1] : undefined;
   }
 
-  getRightSibling(item: OItem): T | undefined {
-    const index = this.items.findIndex((a) => a.id === item.id);
+  getRightSibling(index: number): T | undefined {
     return index > -1 && index < this.items.length - 1 ? this.items[index + 1] : undefined;
   }
 }

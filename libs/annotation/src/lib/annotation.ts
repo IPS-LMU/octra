@@ -717,12 +717,12 @@ export class OctraAnnotationLevel<T extends OLevel<S>, S extends OItem> {
     return this;
   }
 
-  getLeftSibling(item: S) {
-    return this.level.getLeftSibling(item);
+  getLeftSibling(index: number) {
+    return this.level.getLeftSibling(index);
   }
 
-  getRightSibling(item: S) {
-    return this.level.getRightSibling(item);
+  getRightSibling(index: number) {
+    return this.level.getRightSibling(index);
   }
 }
 

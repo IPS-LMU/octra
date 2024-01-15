@@ -98,7 +98,7 @@ export class FileInfo extends DataInfo {
     createdAt = 0,
     size?: number
   ) {
-    const matches = /\/([^/?]*)(\.[^?]+)(?:\?|$)/g.exec(url);
+    const matches = /\/([^/?]*)(\.[^/?]+)(?:\?|$)/g.exec(url);
 
     if (matches === null || matches.length < 3) {
       throw new Error("Can't read file from URL.");

@@ -289,9 +289,6 @@ export class AsrEffects {
               );
 
               if (serviceRequirementsError === '') {
-                const formData: FormData = new FormData();
-                formData.append('file0', fileBlob);
-
                 const filesForUpload: File[] = [fileBlob];
 
                 if (action.item.transcriptInput) {
@@ -1000,11 +997,11 @@ export class AsrEffects {
           json = json.UploadFileMultiResponse;
 
           if (json.success === 'true') {
-            if (json.fileList) {
-              if (!Array.isArray(json.fileList)) {
+            if (json.fileList?.entry) {
+              if (!Array.isArray(json.fileList.entry)) {
                 return of([json.fileList.entry.value]);
               } else {
-                return of(json.fileList.map((a: any) => a.entry.value));
+                return of(json.fileList.entry.map((a: any) => a.value));
               }
             }
             return throwError(() => new Error('fileList ist undefined'));
@@ -1032,7 +1029,7 @@ export class AsrEffects {
       .replace('{{asrType}}', languageObject.asr)
       .replace('{{language}}', mausLanguage ?? languageObject.code);
 
-    const info = FileInfo.fromURL(mausURL);
+    const info = FileInfo.fromURL(audioURL);
     return this.http
       .post(
         mausURL,

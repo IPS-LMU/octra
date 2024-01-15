@@ -132,7 +132,8 @@
     "validationEnabled": true,
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": false,
-    "theme": "shortAudioFiles"
+    "theme": "shortAudioFiles",
+    "asrEnabled": true
   },
   "guidelines": {
     "showExampleNumbers": false,

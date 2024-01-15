@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.8](https://github.com/IPS-LMU/octra/compare/ngx-components-0.0.7...ngx-components-0.0.8) (2024-01-15)
+
+
+### Bug Fixes
+
+* **ngx-components:** audio viewer does not draw on bigger audio files ([1e896f5](https://github.com/IPS-LMU/octra/commit/1e896f59b189ed85238714695c5fea6d6db9f9d6))
+* **ngx-components:** invisible selection in audio-viewer component ([b880117](https://github.com/IPS-LMU/octra/commit/b8801179dbc20745fdc610585da53435942ce09c))
+
+
+
 ## [0.0.7](https://github.com/IPS-LMU/octra/compare/ngx-components-0.0.6...ngx-components-0.0.7) (2024-01-11)
 
 

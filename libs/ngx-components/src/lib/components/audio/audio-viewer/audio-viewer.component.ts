@@ -1124,6 +1124,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     line.add(frame);
   }
 
+  private createLineSelection(line: Konva.Group, size: Size) {
+    const frame = new Konva.Rect({
+      name: 'selection',
+      opacity: 0.2,
+      fill: this.settings.selection.color,
+      width: 0,
+      height: size.height,
+      transformsEnabled: 'position',
+    });
+    line.add(frame);
+  }
+
   private createLineGrid(line: Konva.Group, size: Size) {
     const frame = new Konva.Shape({
       opacity: 0.2,
@@ -1293,6 +1305,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.createLineBackground(selectedGroup, size);
     this.createLineGrid(selectedGroup, size);
     this.createLineSignal(selectedGroup, size, lineNum);
+    this.createLineSelection(selectedGroup, size);
     this.createLineBorder(selectedGroup, size);
 
     if (
@@ -2029,9 +2042,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               ) {
                 context.fillStyle = 'rgba(0,128,0,0.2)';
               }
-              console.log(
-                `fill rect size(${w}, ${h}), position(${x}, ${localY})`
-              );
               context.fillRect(x, localY, w, h);
             } else {
               // something running
@@ -2318,7 +2328,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   private drawSelection = (
     lineNum: number,
     lineWidth: number
-  ): Konva.Rect | undefined => {
+  ) => {
     if (
       this.av.drawnSelection !== undefined &&
       this.av.drawnSelection.length > 0 &&
@@ -2336,7 +2346,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       );
 
       const selections = this.stage.find('.selection');
-
       if (selections.length > lineNum && selections.length > 0) {
         if (lineNum > -1 && select) {
           const left = select.start;
@@ -2367,7 +2376,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         }
       }
     }
-    return undefined;
   };
 
   private resetSelection() {
@@ -2418,14 +2426,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             j < numOfLines - 1
               ? this.av.innerWidth
               : this.canvasElements.lastLine.width();
-          const selectionRect = this.drawSelection(j, lineWidth);
-
-          if (selectionRect !== undefined) {
-            this.layers.overlay.add(selectionRect);
-          }
+          this.drawSelection(j, lineWidth);
         }
+        this.layers.background.cache();
       } else {
-        this.layers.background.batchDraw();
+        this.layers.background.cache();
       }
     }
   }

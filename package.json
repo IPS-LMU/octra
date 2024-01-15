@@ -93,7 +93,7 @@
     "hotkeys-js": "^3.12.0",
     "immer": "^9.0.21",
     "jodit": "^4.0.1",
-    "konva": "^9.2.2",
+    "konva": "^9.3.0",
     "luxon": "^3.0.4",
     "modernizr": "^3.12.0",
     "ngrx-wieder": "^11.0.0",
@@ -120,6 +120,8 @@
     "@angular/compiler-cli": "~16.2.0",
     "@angular/language-service": "~16.2.0",
     "@jscutlery/semver": "^4.1.0",
+    "@nx/devkit": "17.0.3",
+    "@nx/eslint": "17.0.3",
     "@nx/eslint-plugin": "17.0.3",
     "@nx/jest": "17.0.3",
     "@nx/js": "17.0.3",
@@ -162,7 +164,6 @@
     "vite": "~4.3.9",
     "vite-plugin-dts": "~2.3.0",
     "vitest": "~0.32.0",
-    "yargs": "^17.7.2",
-    "@nx/eslint": "17.0.3"
+    "yargs": "^17.7.2"
   }
 }

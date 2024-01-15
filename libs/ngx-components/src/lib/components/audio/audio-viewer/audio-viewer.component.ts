@@ -566,8 +566,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
-          this.layers?.background.cache();
-          this.layers?.overlay.cache();
+          this.layers?.background.batchDraw();
+          this.layers?.overlay.batchDraw();
         }
       }
     } catch (e) {
@@ -611,6 +611,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             0
           );
           this.layers?.background.add(line);
+          line.cache();
           this.canvasElements.lastLine = line;
         }
       };
@@ -634,6 +635,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 i
               );
               this.layers.background.add(line);
+              line.cache();
               y += this.settings.lineheight + this.settings.margin.top;
               this.canvasElements.lastLine = line;
               drawnWidth += lineWidth;
@@ -657,8 +659,47 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         addSingleLineOnly();
       }
 
-      this.layers.background.cache();
+      this.layers.background.batchDraw();
       this.createSegmentsForCanvas();
+
+
+
+
+      let y = 0;
+      let lineWidth = this.av.innerWidth!;
+      const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
+
+      if (numOfLines > 1) {
+        let drawnWidth = 0;
+        const selectionGroup = new Konva.Group({
+          name: "line-selections"
+        });
+
+        for (let i = 0; i < numOfLines - 1; i++) {
+          selectionGroup.add(this.createLineSelectionGroup(
+            new Size(lineWidth, this.settings.lineheight),
+            new Position(this.settings.margin.left, y),
+            i
+          ));
+          y += this.settings.lineheight + this.settings.margin.top;
+          drawnWidth += lineWidth;
+        }
+
+        // add last line
+        lineWidth = this.av.AudioPxWidth - drawnWidth;
+        if (lineWidth > 0) {
+          selectionGroup.add(this.createLineSelectionGroup(
+            new Size(lineWidth, this.settings.lineheight),
+            new Position(this.settings.margin.left, y),
+            numOfLines - 1
+          ));
+        }
+
+        this.layers.overlay.add(selectionGroup);
+      }
+      this.layers.overlay.batchDraw();
+
+
 
       this.canvasElements.playHead = this.createLinePlayCursor();
       if (this.settings.selection.enabled) {
@@ -1292,21 +1333,20 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       transformsEnabled: 'position',
     });
 
-    let selectedGroup = result;
+    let lineGroup = result;
 
     if (
       this.settings.cropping === 'circle' &&
       this.av.innerWidth !== undefined
     ) {
-      selectedGroup = this.createCropContainer();
+      lineGroup = this.createCropContainer();
       size = new Size(this.av.innerWidth, this.av.innerWidth);
     }
 
-    this.createLineBackground(selectedGroup, size);
-    this.createLineGrid(selectedGroup, size);
-    this.createLineSignal(selectedGroup, size, lineNum);
-    this.createLineSelection(selectedGroup, size);
-    this.createLineBorder(selectedGroup, size);
+    this.createLineBackground(lineGroup, size);
+    this.createLineGrid(lineGroup, size);
+    this.createLineSignal(lineGroup, size, lineNum);
+    this.createLineBorder(lineGroup, size);
 
     if (
       this.settings.cropping === 'circle' &&
@@ -1325,7 +1365,64 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         shadowOpacity: 1,
       });
       result.add(shadowCircle);
-      result.add(selectedGroup);
+      result.add(lineGroup);
+      const borderedCircle = new Konva.Circle({
+        stroke: 'black',
+        strokeWidth: 2,
+        x: this.croppingData.x,
+        y: this.croppingData.y,
+        radius: this.croppingData.radius,
+      });
+      result.add(borderedCircle);
+    }
+
+    return result;
+  }
+
+  private createLineSelectionGroup(
+    size: Size,
+    position: Position,
+    lineNum: number
+  ): Konva.Group {
+    const result = new Konva.Group({
+      name: 'line-selection',
+      x: position.x,
+      y: position.y,
+      width: size.width,
+      height: size.height,
+      transformsEnabled: 'position',
+    });
+
+    let lineGroup = result;
+
+    if (
+      this.settings.cropping === 'circle' &&
+      this.av.innerWidth !== undefined
+    ) {
+      lineGroup = this.createCropContainer();
+      size = new Size(this.av.innerWidth, this.av.innerWidth);
+    }
+
+    this.createLineSelection(lineGroup, size);
+
+    if (
+      this.settings.cropping === 'circle' &&
+      this.croppingData !== undefined
+    ) {
+      const shadowCircle = new Konva.Circle({
+        stroke: 'black',
+        strokeWidth: 1,
+        x: this.croppingData.x,
+        y: this.croppingData.y,
+        radius: this.croppingData.radius,
+        shadowColor: 'black',
+        shadowEnabled: true,
+        shadowBlur: 5,
+        shadowOffset: { x: 2.5, y: 0 },
+        shadowOpacity: 1,
+      });
+      result.add(shadowCircle);
+      result.add(lineGroup);
       const borderedCircle = new Konva.Circle({
         stroke: 'black',
         strokeWidth: 2,
@@ -1776,9 +1873,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             drawnBoundaries++;
           }
           this.removeNonExistingSegments();
-          this.layers.boundaries.cache();
+          this.layers.boundaries.batchDraw();
         }
-        root.cache();
+        root.draw();
       }
     }
   }
@@ -2428,9 +2525,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               : this.canvasElements.lastLine.width();
           this.drawSelection(j, lineWidth);
         }
-        this.layers.background.cache();
+        this.layers.overlay.batchDraw();
       } else {
-        this.layers.background.cache();
+        this.layers.overlay.batchDraw();
+        this.layers.background.batchDraw();
       }
     }
   }

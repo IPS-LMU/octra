@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.11](https://github.com/IPS-LMU/octra/compare/utilities-0.0.10...utilities-0.0.11) (2024-01-16)
+
+
+### Features
+
+* **utilities:** add extractFileNameFromURL function ([0b5e574](https://github.com/IPS-LMU/octra/commit/0b5e5749c8bf861fe3f491d3e41b582d36632b4c))
+
+
+
 ## [0.0.10](https://github.com/IPS-LMU/octra/compare/utilities-0.0.9...utilities-0.0.10) (2023-11-24)
 
 

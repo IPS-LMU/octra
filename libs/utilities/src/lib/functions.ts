@@ -1,4 +1,3 @@
-
 /**
  * represents a file size definition giving size and label.
  */
@@ -398,4 +397,24 @@ export function convertDurationToUnix(duration: string) {
     }
   }
   return undefined;
+}
+
+/**
+ * returns the file name and extension part of an URL. Extension contains the dot.
+ * @param url
+ */
+export function extractFileNameFromURL(url: string): {
+  name: string;
+  extension: string;
+} {
+  const matches = /\/([^/?]*)(\.[^/?]+)(?:\?|$)/g.exec(url);
+
+  if (matches === null || matches.length < 3) {
+    throw new Error("Can't read file from URL.");
+  }
+
+  return {
+    name: decodeURI(matches[1]),
+    extension: matches[2],
+  };
 }

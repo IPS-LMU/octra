@@ -2,6 +2,25 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.10](https://github.com/IPS-LMU/octra/compare/web-media-0.0.9...web-media-0.0.10) (2024-01-16)
+
+
+### Bug Fixes
+
+* **octra:** word alignment only not working ([6d59c8f](https://github.com/IPS-LMU/octra/commit/6d59c8f0c4b06902fe24741eb61a45a0028ac571))
+
+
+### Code Refactoring
+
+* **web-media:** use extractFileNameFromURL function from utilities library ([7ba0a1c](https://github.com/IPS-LMU/octra/commit/7ba0a1cd91d6eada9391a3fab6667613821088d9))
+
+
+### BREAKING CHANGES
+
+* **web-media:** needs @octra/utilities >= 0.0.11
+
+
+
 ## [0.0.9](https://github.com/IPS-LMU/octra/compare/web-media-0.0.8...web-media-0.0.9) (2024-01-09)
 
 

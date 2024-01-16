@@ -1,4 +1,5 @@
 import { DataInfo } from './data-info';
+import { extractFileNameFromURL } from '@octra/utilities';
 
 export class FileInfo extends DataInfo {
   /**
@@ -98,15 +99,10 @@ export class FileInfo extends DataInfo {
     createdAt = 0,
     size?: number
   ) {
-    const matches = /\/([^/?]*)(\.[^/?]+)(?:\?|$)/g.exec(url);
-
-    if (matches === null || matches.length < 3) {
-      throw new Error("Can't read file from URL.");
-    }
-
+    const extraction = extractFileNameFromURL(url);
     const result = new FileInfo(
-      name ?? `${matches[1]}${matches[2]}`,
-      type ?? this.getMimeTypeByExtension(matches[2]),
+      name ?? extraction.name,
+      type ?? this.getMimeTypeByExtension(extraction.extension),
       size ?? 0,
       undefined,
       createdAt

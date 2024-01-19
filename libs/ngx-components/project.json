@@ -54,7 +54,7 @@
       "executor": "ngx-deploy-npm:deploy",
       "options": {
         "access": "public",
-        "noBuild": true
+        "distFolderPath": "dist/libs/ngx-components"
       }
     }
   }

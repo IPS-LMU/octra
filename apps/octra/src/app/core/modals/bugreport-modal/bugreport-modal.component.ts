@@ -5,6 +5,7 @@ import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticationStoreService } from '../../store/authentication';
+import { JoditConfig } from 'ngx-jodit';
 
 @Component({
   selector: 'octra-bugreport-modal',
@@ -18,6 +19,11 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
     backdrop: true,
   };
 
+  joditOptions: JoditConfig = {
+    maxHeight: 300,
+    statusbar: false,
+    placeholder: 'Please write a message in German or English...',
+  };
   public visible = false;
   public bgdescr = '';
   public sendProObj = true;
@@ -66,6 +72,15 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
   }
 
   sendBugReport() {
+    if (this.bgdescr.length > 10000) {
+      alert(
+        `Please write a message with less 10000 letters. Remove ${
+          this.bgdescr.length - 10000
+        } letters.`
+      );
+      return;
+    }
+
     this.sendStatus = 'sending';
     this.subscrManager.add(
       this.bugService

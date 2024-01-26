@@ -46,6 +46,7 @@ import { ReAuthenticationModalComponent } from './re-authentication-modal/re-aut
 import { AuthenticationComponent } from '../component/authentication-component/authentication-component.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
+import { NgxJoditComponent } from 'ngx-jodit';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -100,6 +101,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NgbModalModule,
     OctraUtilitiesModule,
     NgbAccordionCollapse,
+    NgxJoditComponent,
   ],
   exports: [
     BugreportModalComponent,

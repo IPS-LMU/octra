@@ -46,8 +46,8 @@
               [(ngModel)]="profile.username"
             />
             <label for="inputName" class="form-label">{{
-              'g.name' | transloco
-            }}</label>
+                'g.name' | transloco
+              }}</label>
           </div>
         </div>
         <div class="col-6">
@@ -62,26 +62,25 @@
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{
-              'g.email' | transloco
-            }}</label>
+                'g.email' | transloco
+              }}</label>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-12">
-          <div class="form-floating mb-3">
-            <textarea
+          <div class="d-block mb-3">
+            <label for="bgDescr">{{ 'g.description' | transloco }}:</label>
+            <ngx-jodit
               [(ngModel)]="bgdescr"
-              class="form-control"
+              [options]="joditOptions"
+              class="w-100"
+              style="display: flex !important; flex-direction: column; flex: auto; height: 100% !important;"
               aria-describedby="bgDescr"
-              [placeholder]="'g.description' | transloco"
               id="bgDescr"
               maxlength="1000"
-              rows="3"
               name="bgdescr"
-              style="height: 100px"
-            ></textarea>
-            <label for="bgDescr">{{ 'g.description' | transloco }}</label>
+            ></ngx-jodit>
             <div id="emailHelp" class="form-text">German or English</div>
           </div>
         </div>
@@ -99,7 +98,7 @@
                 class="upload-screenshot"
               >
                 <span (click)="removeScreenshot(i)" class="cross rounded-circle"
-                  >X</span
+                >X</span
                 >
                 <input
                   #uploadInput2

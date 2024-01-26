@@ -222,9 +222,14 @@ export class AnnotationEffects {
               modeState.logging.startTime,
               modeState.logging.startReference
             );
-            this.uiService.elements = modeState.logging.logs.map((a) =>
-              StatisticElem.fromAny(a)
-            );
+            if (
+              modeState.logging.logs &&
+              Array.isArray(modeState.logging.logs)
+            ) {
+              this.uiService.elements = modeState.logging.logs.map((a) =>
+                StatisticElem.fromAny(a)
+              );
+            }
             this.uiService.addElementFromEvent(
               'octra',
               { value: BUILD.version },
@@ -730,14 +735,15 @@ export class AnnotationEffects {
                     'audio_url'
                   )
                 ) {
-
                   const fileInfoAudio = FileInfo.fromURL(
                     this.routingService.staticQueryParams['audio_url']
                   );
 
                   inputs = [
                     {
-                      filename: this.routingService.staticQueryParams['audio_name'] ?? fileInfoAudio.fullname,
+                      filename:
+                        this.routingService.staticQueryParams['audio_name'] ??
+                        fileInfoAudio.fullname,
                       fileType: 'audio/wave',
                       type: 'input',
                       url: this.routingService.staticQueryParams['audio_url'],

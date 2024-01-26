@@ -20,7 +20,7 @@ export class UserInteractionsService {
     return this._afteradd;
   }
 
-  private _elements: StatisticElem[];
+  private _elements: StatisticElem[] = [];
 
   get elements(): StatisticElem[] {
     return this._elements;

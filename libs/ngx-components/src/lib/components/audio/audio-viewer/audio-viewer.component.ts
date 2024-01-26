@@ -566,7 +566,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
-          this.layers?.background.batchDraw();
+          const groups: Konva.Group[] | undefined = this.layers?.background.find(".line");
+          groups?.map(a => {
+            a.cache();
+            return a;
+          });
           this.layers?.overlay.batchDraw();
         }
       }

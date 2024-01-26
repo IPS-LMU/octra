@@ -398,7 +398,7 @@ export class TranscrWindowComponent
   ngOnInit() {
     if (this.currentLevel) {
       this.tempSegments = [
-        ...(this.currentLevel.items as OctraAnnotationSegment[]),
+        ...(this.currentLevel.clone().items as OctraAnnotationSegment[]),
       ];
       this.idCounter =
         this.annotationStoreService.transcript?.idCounters.item ?? 1;
@@ -629,6 +629,8 @@ export class TranscrWindowComponent
             this.annotationStoreService.changeCurrentLevelItems([seg]);
           }
         }
+      } else {
+        this.annotationStoreService.changeCurrentLevelItems(this.tempSegments);
       }
     }
   }
@@ -1199,11 +1201,12 @@ export class TranscrWindowComponent
 
     // shift rest of text to next segment
     if (this.tempSegments[segStart + segTexts.length - 1]) {
-      (this.tempSegments[
+      this.tempSegments[segStart + segTexts.length - 1] = (this.tempSegments[
         segStart + segTexts.length - 1
-      ] as OctraAnnotationSegment)!
-        .clone()
-        .changeFirstLabelWithoutName('Speaker', segTexts[segTexts.length - 1]);
+      ] as OctraAnnotationSegment)!.clone();
+      this.tempSegments[
+        segStart + segTexts.length - 1
+      ].changeFirstLabelWithoutName('Speaker', segTexts[segTexts.length - 1]);
     }
   }
 

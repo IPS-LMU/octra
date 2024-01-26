@@ -194,7 +194,7 @@ export class AnnotationStateReducers {
         AnnotationActions.combinePhrases.success,
         (state: AnnotationState, { transcript, mode }) => {
           if (this.mode === mode) {
-              state.transcript = transcript;
+            state.transcript = transcript;
           }
 
           return state;
@@ -286,9 +286,23 @@ export class AnnotationStateReducers {
 
             if (currentLevel) {
               for (const item of items) {
-                state.transcript = state.transcript
-                  .clone()
-                  .changeCurrentItemById(item.id, item);
+                const index = state.transcript.currentLevel?.items.findIndex(
+                  (a) => a.id === item.id
+                );
+                if (index !== undefined && index > -1) {
+                  state.transcript = state.transcript
+                    .clone()
+                    .changeCurrentItemByIndex(index, item);
+                } else {
+                  // add item
+                  state.transcript = state.transcript
+                    .clone()
+                    .addItemToCurrentLevel(
+                      (item as any).time,
+                      item.labels,
+                      (item as any).context
+                    );
+                }
               }
             }
           }

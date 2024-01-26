@@ -328,7 +328,7 @@ export class OctraAnnotation<
               new OctraAnnotationSegment(
                 this.idCounters.item++,
                 time!,
-                labels ?? oldLabels,
+                labels && (labels.length > 0) ? labels : oldLabels,
                 context ?? {}
               ) as any,
             ];
@@ -880,7 +880,9 @@ export class OctraAnnotationEventLevel {
 
   getRightSibling(item: OctraAnnotationEvent) {
     const index = this.items.findIndex((a) => a.id === item.id);
-    return index > -1 && index < this.items.length - 1 ? this.items[index + 1] : undefined;
+    return index > -1 && index < this.items.length - 1
+      ? this.items[index + 1]
+      : undefined;
   }
 }
 

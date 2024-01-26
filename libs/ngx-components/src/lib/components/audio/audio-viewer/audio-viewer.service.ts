@@ -893,8 +893,7 @@ export class AudioViewerService {
         // no selection
 
         this.addSegment(
-          this.audioManager!.createSampleUnit(Math.round(absXTime)),
-          ''
+          this.audioManager!.createSampleUnit(Math.round(absXTime))
         );
 
         return {
@@ -1199,16 +1198,18 @@ export class AudioViewerService {
   }
 
   public addSegment(start: SampleUnit, value?: string) {
-    const result = this.annotation!.addItemToCurrentLevel(start, [
-      new OLabel(this.currentLevel!.name, value ?? ''),
-    ]);
+    const result = this.annotation!.addItemToCurrentLevel(
+      start,
+      value ? [new OLabel(this.currentLevel!.name, value)] : undefined
+    );
     this.currentLevelChange.emit({
       type: 'add',
       items: [
         {
-          instance: this.annotation!.createSegment(start, [
-            new OLabel(this.currentLevel!.name, value ?? ''),
-          ]),
+          instance: this.annotation!.createSegment(
+            start,
+            value ? [new OLabel(this.currentLevel!.name, value)] : undefined
+          ),
         },
       ],
     });

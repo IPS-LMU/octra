@@ -9,6 +9,7 @@ import {
   TimespanPipe,
   UnixDurationPipe,
 } from './pipes';
+import { SubscriberComponent } from './components';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import {
     JoinPipe,
     MapPipe,
     UnixDurationPipe,
+    SubscriberComponent,
   ],
   imports: [CommonModule],
   exports: [
@@ -29,6 +31,7 @@ import {
     JoinPipe,
     MapPipe,
     UnixDurationPipe,
+    SubscriberComponent,
   ],
 })
 export class OctraUtilitiesModule {}

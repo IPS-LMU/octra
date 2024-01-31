@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.3.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.2.0...ngx-utilities-0.3.0) (2024-01-31)
+
+
+### Features
+
+* **ngx-utilities:** new class SubscriberComponent for secure subscription management. ([6a5d85f](https://github.com/IPS-LMU/octra/commit/6a5d85f8408922442a10b0874090c30f5cce5a5e))
+
+
+
 # [0.2.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.1.0...ngx-utilities-0.2.0) (2024-01-09)
 
 

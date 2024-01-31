@@ -9,14 +9,18 @@
       "outputs": ["{options.outputPath}"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/annotation"
+        "outputPath": "dist/libs/annotation",
+        "tsConfig": "libs/annotation/tsconfig.lib.json"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["annotation/**/*.ts", "annotation/package.json"]
+        "lintFilePatterns": [
+          "libs/annotation",
+          "annotation/**/*.ts",
+          "annotation/package.json"
+        ]
       }
     },
     "version": {

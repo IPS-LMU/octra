@@ -8,14 +8,18 @@
       "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/media"
+        "outputPath": "dist/libs/media",
+        "tsConfig": "libs/media/tsconfig.lib.json"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["media/**/*.ts", "media/package.json"]
+        "lintFilePatterns": [
+          "libs/media",
+          "media/**/*.ts",
+          "media/package.json"
+        ]
       }
     },
     "version": {

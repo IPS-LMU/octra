@@ -9,14 +9,18 @@
       "outputs": ["{options.outputPath}"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/json-sets"
+        "outputPath": "dist/libs/json-sets",
+        "tsConfig": "libs/json-sets/tsconfig.lib.json"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["json-sets/**/*.ts", "json-sets/package.json"]
+        "lintFilePatterns": [
+          "libs/json-sets",
+          "json-sets/**/*.ts",
+          "json-sets/package.json"
+        ]
       }
     },
     "version": {

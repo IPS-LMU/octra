@@ -9,14 +9,18 @@
       "outputs": ["{options.outputPath}"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/utilities"
+        "outputPath": "dist/libs/utilities",
+        "tsConfig": "libs/utilities/tsconfig.lib.json"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["utilities/**/*.ts", "utilities/package.json"]
+        "lintFilePatterns": [
+          "libs/utilities",
+          "utilities/**/*.ts",
+          "utilities/package.json"
+        ]
       }
     },
     "version": {

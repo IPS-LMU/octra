@@ -97,6 +97,7 @@ import { RouterModule } from '@angular/router';
       trace: true,
       maxAge: 50,
       logOnly: !environment.production,
+      connectInZone: true,
     }),
     EffectsModule.forRoot([
       IDBEffects,
@@ -105,7 +106,9 @@ import { RouterModule } from '@angular/router';
       APIEffects,
       AuthenticationEffects,
     ]),
-    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    !environment.production
+      ? StoreDevtoolsModule.instrument({ connectInZone: true })
+      : [],
     EffectsModule.forFeature([]),
     NgbDropdownModule,
     NgbNavModule,

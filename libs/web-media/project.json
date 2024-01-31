@@ -9,14 +9,18 @@
       "outputs": ["{options.outputPath}"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/web-media"
+        "outputPath": "dist/libs/web-media",
+        "tsConfig": "libs/web-media/tsconfig.lib.json"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["web-media/**/*.ts", "web-media/package.json"]
+        "lintFilePatterns": [
+          "libs/web-media",
+          "web-media/**/*.ts",
+          "web-media/package.json"
+        ]
       }
     },
     "version": {

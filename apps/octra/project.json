@@ -120,12 +120,12 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "octra:build:production",
-          "port": 5321
+          "port": 5321,
+          "buildTarget": "octra:build:production"
         },
         "development": {
-          "browserTarget": "octra:build:development",
-          "port": 5321
+          "port": 5321,
+          "buildTarget": "octra:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -133,28 +133,18 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "octra:build"
+        "buildTarget": "octra:build"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/octra/**/*.ts", "apps/octra/**/*.html"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/octra/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "jestConfig": "apps/octra/jest.config.ts"
       }
     },
     "serve-static": {

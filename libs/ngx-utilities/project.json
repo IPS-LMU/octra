@@ -10,7 +10,8 @@
       "executor": "@nx/angular:ng-packagr-lite",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "libs/ngx-utilities/ng-package.json"
+        "project": "libs/ngx-utilities/ng-package.json",
+        "tsConfig": "libs/ngx-utilities/tsconfig.lib.json"
       },
       "configurations": {
         "production": {
@@ -24,14 +25,7 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "libs/ngx-utilities/**/*.ts",
-          "libs/ngx-utilities/**/*.html",
-          "libs/ngx-utilities/package.json"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "version": {
       "executor": "@jscutlery/semver:version",

@@ -13,6 +13,7 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { OAudiofile } from '@octra/media';
+import { last } from '@octra/utilities';
 
 export class WhisperJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'WhisperJSON';
@@ -181,6 +182,46 @@ export class WhisperJSONConverter extends Converter {
       return {
         error: `Invalid JSON format.`,
       };
+    }
+
+    // check if last boundary fits end of audio file
+    for (const level of result.annotjson.levels) {
+      if (level.type === 'SEGMENT') {
+        const segmentLevel = level as OSegmentLevel<OSegment>;
+        const lastSegment = last(segmentLevel.items);
+
+        if (!lastSegment) {
+          // fill gap
+          segmentLevel.items.push(
+            new OSegment(1, 0, audiofile.duration, [
+              new OLabel(segmentLevel.name, ''),
+            ])
+          );
+        } else {
+          if (
+            lastSegment.sampleStart + lastSegment.sampleDur <
+            audiofile.duration
+          ) {
+            // fill gap
+            segmentLevel.items.push(
+              new OSegment(
+                lastSegment.id + 1,
+                lastSegment.sampleStart + lastSegment.sampleDur,
+                audiofile.duration -
+                  (lastSegment.sampleStart + lastSegment.sampleDur),
+                [new OLabel(segmentLevel.name, '')]
+              )
+            );
+          } else if (
+            lastSegment.sampleStart + lastSegment.sampleDur >
+            audiofile.duration
+          ) {
+            return {
+              error: `Last boundary of level ${level.name} is bigger than audio duration.`,
+            };
+          }
+        }
+      }
     }
 
     return result;

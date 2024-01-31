@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.1](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.3.0...ngx-utilities-0.3.1) (2024-01-31)
+
+
+### Features
+
+* **ngx-utilities:** add parameter for tag to subscribe function ([3d51a13](https://github.com/IPS-LMU/octra/commit/3d51a1314d163a4de247b995e754dfdd77cb1fb7))
+
+
+
 # [0.3.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.2.0...ngx-utilities-0.3.0) (2024-01-31)
 
 

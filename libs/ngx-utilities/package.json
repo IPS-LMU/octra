@@ -1,7 +1,7 @@
 {
   "name": "@octra/ngx-utilities",
   "description": "Angular utilities used in OCTRA projects",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "private": false,
   "author": {

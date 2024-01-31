@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { SubscriptionManager } from '@octra/utilities';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Observer, Subscription } from 'rxjs';
 
 @Component({
   template: '',
@@ -15,23 +15,15 @@ export class SubscriberComponent implements OnDestroy {
   /**
    * subscribes an observable that is internally added to the subscription manager and destroyed automatically on ngDestroy
    * @param observable
-   * @param next
-   * @param error
-   * @param complete
+   * @param observerOrNext
+   * @param tag
    * @protected
    */
   protected subscribe<R, E>(
     observable: Observable<R>,
-    next?: (result: R) => void,
-    error?: (error: E) => void,
-    complete?: () => void
+    observerOrNext?: Partial<Observer<R>> | ((value: R) => void),
+    tag?: string
   ) {
-    this.subscriptionManager.add(
-      observable.subscribe({
-        next,
-        error,
-        complete,
-      })
-    );
+    this.subscriptionManager.add(observable.subscribe(observerOrNext), tag);
   }
 }

@@ -8,7 +8,7 @@
         <button class="btn btn-success w-100 mb-5" *ngIf="authenticationRunning" (click)="onAuthenticatedClick()">
           {{ 'p.authenticated' | transloco }}
         </button>
-        <octra-authentication-component [type]="type" (submitClick)="onSubmit($event)" [authentications]="apiService.appFeatures?.authentications" [passwordReset]="apiService.appFeatures?.reset_password" [registrations]="false"></octra-authentication-component>
+        <octra-authentication-component [type]="type" (submitClick)="onSubmit($event)" [authentications]="apiService.appProperties?.authentications" [passwordReset]="apiService.appProperties?.reset_password" [registrations]="false"></octra-authentication-component>
       </div>
       <div class="col"></div>
     </div>

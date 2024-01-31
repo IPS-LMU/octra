@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   AccountLoginMethod,
-  AppFeatureDtoAuthenticationsEnum,
+  AppPropertiesDtoAuthenticationsEnum,
   LANGUAGES,
   TIMEZONE_NAMES,
 } from '@octra/api-types';
@@ -23,7 +23,7 @@ export class AuthenticationComponent extends DefaultComponent {
     };
   }>();
 
-  @Input() authentications?: AppFeatureDtoAuthenticationsEnum[] = [
+  @Input() authentications?: AppPropertiesDtoAuthenticationsEnum[] = [
     AccountLoginMethod.local,
     AccountLoginMethod.shibboleth,
   ];

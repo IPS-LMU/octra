@@ -708,6 +708,7 @@ export class AnnotationEffects {
               if (state.application.mode === LoginMode.DEMO) {
                 inputs = state.application
                   .appConfiguration!.octra.audioExamples.map((a) => ({
+                    id: Date.now().toString(),
                     filename: FileInfo.fromURL(a.url).fullname,
                     fileType: 'audio/wave',
                     type: 'input',
@@ -720,6 +721,7 @@ export class AnnotationEffects {
               } else if (state.application.mode === LoginMode.LOCAL) {
                 inputs = [
                   {
+                    id: Date.now().toString(),
                     filename: state.localMode.sessionFile!.name,
                     fileType: state.localMode.sessionFile!.type,
                     type: 'input',
@@ -741,6 +743,7 @@ export class AnnotationEffects {
 
                   inputs = [
                     {
+                      id: Date.now().toString(),
                       filename:
                         this.routingService.staticQueryParams['audio_name'] ??
                         fileInfoAudio.fullname,
@@ -806,6 +809,7 @@ export class AnnotationEffects {
                       );
 
                       task.inputs.push({
+                        id: Date.now().toString(),
                         filename: audioName + fileInfoTranscript.extension,
                         fileType: 'text/plain',
                         type: 'input',
@@ -1535,7 +1539,7 @@ export class AnnotationEffects {
 
       if (
         rootState.application.options.showFeedbackNotice &&
-        this.apiService.appFeatures?.send_feedback
+        this.apiService.appProperties?.send_feedback
       ) {
         this.modalsService.openFeedbackModal();
       }
@@ -1568,7 +1572,7 @@ export class AnnotationEffects {
 
     if (
       rootState.application.options.showFeedbackNotice &&
-      this.apiService.appFeatures?.send_feedback
+      this.apiService.appProperties?.send_feedback
     ) {
       this.modalsService.openFeedbackModal();
     }

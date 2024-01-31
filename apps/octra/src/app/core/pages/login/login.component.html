@@ -47,9 +47,9 @@
               <octra-authentication-component
                 [showTitle]="false"
                 (submitClick)="onOnlineSubmit($event)"
-                [authentications]="api.appFeatures?.authentications"
-                [passwordReset]="api.appFeatures?.reset_password"
-                [registrations]="api.appFeatures?.registrations"
+                [authentications]="api.appProperties?.authentications"
+                [passwordReset]="api.appProperties?.reset_password"
+                [registrations]="api.appProperties?.registrations"
               ></octra-authentication-component>
             </div>
             <ng-template #showServerOffline>

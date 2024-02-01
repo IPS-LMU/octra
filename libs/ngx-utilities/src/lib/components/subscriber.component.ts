@@ -23,7 +23,10 @@ export class SubscriberComponent implements OnDestroy {
     observable: Observable<R>,
     observerOrNext?: Partial<Observer<R>> | ((value: R) => void),
     tag?: string
-  ) {
-    this.subscriptionManager.add(observable.subscribe(observerOrNext), tag);
+  ): number {
+    return this.subscriptionManager.add(
+      observable.subscribe(observerOrNext),
+      tag
+    );
   }
 }

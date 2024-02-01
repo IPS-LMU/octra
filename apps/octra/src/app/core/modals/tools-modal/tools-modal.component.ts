@@ -189,7 +189,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.subscrManager.destroy();
+    this.subscriptionManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
@@ -271,8 +271,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     let totalSize = 0;
     let cuttingStarted = 0;
 
-    this.tools.audioCutting.subscriptionIDs[1] = this.subscrManager.add(
-      this.tools.audioCutting.wavFormat.onaudiocut.subscribe({
+    this.tools.audioCutting.subscriptionIDs[1] = this.subscribe(
+      this.tools.audioCutting.wavFormat.onaudiocut,
+      {
         next: (status: {
           finishedSegments: number;
           fileName: string;
@@ -308,10 +309,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 1000
             );
 
-            this.tools.audioCutting.subscriptionIDs[2] = this.subscrManager.add(
-              interval(1000).subscribe(() => {
+            this.tools.audioCutting.subscriptionIDs[2] = this.subscribe(
+              interval(1000),
+              () => {
                 this.tools.audioCutting.timeLeft -= 1000;
-              })
+              }
             );
           }
 
@@ -362,7 +364,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                   if (sizeProcessed === 0) {
                     // first process
                     if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-                      this.subscrManager.removeById(
+                      this.subscriptionManager.removeById(
                         this.tools.audioCutting.subscriptionIDs[2]
                       );
                       this.tools.audioCutting.subscriptionIDs[2] = -1;
@@ -451,7 +453,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         },
         error: (err: any) => {
           if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-            this.subscrManager.removeById(
+            this.subscriptionManager.removeById(
               this.tools.audioCutting.subscriptionIDs[2]
             );
             this.tools.audioCutting.subscriptionIDs[2] = -1;
@@ -462,7 +464,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           console.error(`other error`);
           console.error(err);
         },
-      })
+      }
     );
 
     this.tools.audioCutting.status = 'running';
@@ -490,7 +492,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       const subscriptionID = this.tools.audioCutting.subscriptionIDs[i];
 
       if (subscriptionID > -1) {
-        this.subscrManager.removeById(subscriptionID);
+        this.subscriptionManager.removeById(subscriptionID);
       }
       this.tools.audioCutting.subscriptionIDs[i] = -1;
     }

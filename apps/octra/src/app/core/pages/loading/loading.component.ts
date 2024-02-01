@@ -48,13 +48,11 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
         this.text = translation + '... ';
       });
 
-    this.subscrManager.add(
-      this.appStoreService.loading$.subscribe({
-        next: (loading) => {
-          this.loading = loading;
-        },
-      })
-    );
+    this.subscribe(this.appStoreService.loading$, {
+      next: (loading) => {
+        this.loading = loading;
+      },
+    });
   }
 
   retry() {

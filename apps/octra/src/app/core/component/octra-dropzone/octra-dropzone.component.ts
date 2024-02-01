@@ -339,11 +339,9 @@ export class OctraDropzoneComponent extends DefaultComponent {
       this.dropzone.clicklocked = true;
       // make sure, that event click does not trigger
 
-      this.subscrManager.add(
-        timer(300).subscribe(() => {
-          this.dropzone.clicklocked = false;
-        })
-      );
+      this.subscribe(timer(300), () => {
+        this.dropzone.clicklocked = false;
+      });
     }
   }
 
@@ -411,88 +409,87 @@ export class OctraDropzoneComponent extends DefaultComponent {
       fileProcess.file.name.lastIndexOf('.')
     );
 
-    this.subscrManager.add(
-      timer(200).subscribe(() => {
-        // check audio
-        this.subscrManager.add(
-          AudioManager.decodeAudio(
-            fileProcess.file.name,
-            fileProcess.file.type,
-            buffer,
-            AppInfo.audioformats
-          ).subscribe(
-            (result) => {
-              fileProcess.progress = result.decodeProgress / 2 + 0.5;
-              if (result.audioManager === undefined) {
-                // not finished
-              } else {
-                // finished, get result
-                if (!(this._audiomanager === undefined)) {
-                  this._audiomanager.destroy();
-                  this._audiomanager = undefined;
+    this.subscribe(timer(200), () => {
+      // check audio
+      this.subscribe(
+        AudioManager.decodeAudio(
+          fileProcess.file.name,
+          fileProcess.file.type,
+          buffer,
+          AppInfo.audioformats
+        ),
+        {
+          next: (result) => {
+            fileProcess.progress = result.decodeProgress / 2 + 0.5;
+            if (result.audioManager === undefined) {
+              // not finished
+            } else {
+              // finished, get result
+              if (!(this._audiomanager === undefined)) {
+                this._audiomanager.destroy();
+                this._audiomanager = undefined;
+              }
+
+              this._audiomanager = result.audioManager;
+              fileProcess.status = 'valid';
+              this._oaudiofile = new OAudiofile();
+              this._oaudiofile.name = fileProcess.file.name;
+              this._oaudiofile.size = fileProcess.file.size;
+              this._oaudiofile.duration =
+                this._audiomanager.resource.info.duration.samples;
+              this._oaudiofile.sampleRate = this._audiomanager.sampleRate;
+              this._oaudiofile.arraybuffer = buffer;
+
+              this.checkState();
+
+              if (checkimport) {
+                // load import data
+                const files = fileListToArray(this.dropzone.files!);
+                for (const importfile of files) {
+                  if (
+                    !AudioManager.isValidAudioFileName(
+                      importfile.name,
+                      AppInfo.audioformats
+                    )
+                  ) {
+                    this.dropFile(importfile.name);
+
+                    const newfile: FileProgress = {
+                      status: 'progress',
+                      file: importfile,
+                      checked_converters: 0,
+                      progress: 0,
+                      error: '',
+                    };
+                    this.dropFile(extension, true, true);
+                    this._files.push(newfile);
+                    this.isValidImportData(newfile);
+                  }
                 }
 
-                this._audiomanager = result.audioManager;
-                fileProcess.status = 'valid';
-                this._oaudiofile = new OAudiofile();
-                this._oaudiofile.name = fileProcess.file.name;
-                this._oaudiofile.size = fileProcess.file.size;
-                this._oaudiofile.duration =
-                  this._audiomanager.resource.info.duration.samples;
-                this._oaudiofile.sampleRate = this._audiomanager.sampleRate;
-                this._oaudiofile.arraybuffer = buffer;
-
-                this.checkState();
-
-                if (checkimport) {
-                  // load import data
-                  const files = fileListToArray(this.dropzone.files!);
-                  for (const importfile of files) {
-                    if (
-                      !AudioManager.isValidAudioFileName(
-                        importfile.name,
-                        AppInfo.audioformats
-                      )
-                    ) {
-                      this.dropFile(importfile.name);
-
-                      const newfile: FileProgress = {
-                        status: 'progress',
-                        file: importfile,
-                        checked_converters: 0,
-                        progress: 0,
-                        error: '',
-                      };
-                      this.dropFile(extension, true, true);
-                      this._files.push(newfile);
-                      this.isValidImportData(newfile);
-                    }
-                  }
-
-                  // check for data already exist
-                  for (const importfile of this.files) {
-                    if (
-                      !AudioManager.isValidAudioFileName(
-                        importfile.file.name,
-                        AppInfo.audioformats
-                      )
-                    ) {
-                      importfile.status = 'progress';
-                      importfile.checked_converters = 0;
-                      this.isValidImportData(importfile);
-                      break;
-                    }
+                // check for data already exist
+                for (const importfile of this.files) {
+                  if (
+                    !AudioManager.isValidAudioFileName(
+                      importfile.file.name,
+                      AppInfo.audioformats
+                    )
+                  ) {
+                    importfile.status = 'progress';
+                    importfile.checked_converters = 0;
+                    this.isValidImportData(importfile);
+                    break;
                   }
                 }
               }
-            },
-            (error: any) => {
-              console.error(error);
             }
-          )
-        );
-      })
-    );
+          },
+          error: (error: any) => {
+            console.error(error);
+          },
+        }
+      );
+    });
   }
 
   private dropFile(

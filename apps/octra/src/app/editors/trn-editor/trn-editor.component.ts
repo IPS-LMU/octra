@@ -18,7 +18,6 @@ import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import { SubscriptionManager } from '@octra/utilities';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
   AnnotationLevelType,
@@ -32,7 +31,7 @@ import {
 } from '../../core/component/context-menu/context-menu.component';
 import { TranslocoService } from '@ngneat/transloco';
 import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraGuidelines } from '@octra/assets';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
@@ -79,7 +78,6 @@ export class TrnEditorComponent
     public annotationStoreService: AnnotationStoreService
   ) {
     super();
-    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   public static editorname = 'TRN-Editor';
@@ -345,25 +343,25 @@ export class TrnEditorComponent
   };
 
   ngOnInit() {
-    this.subscrManager.add(
-      this.annotationStoreService.transcript$.subscribe({
+    this.subscribe(
+      this.annotationStoreService.transcript$,{
         next: (trasncriptState) => {
           this.currentLevel =
             trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
           this.tempSegments = [...(this.currentLevel.items as OctraAnnotationSegment[])];
           this.idCounter = trasncriptState?.idCounters.item ?? 1;
         },
-      })
+      }
     );
-    this.subscrManager.add(
-      this.annotationStoreService.guidelines$.subscribe({
+    this.subscribe(
+      this.annotationStoreService.guidelines$,{
         next: (guidelines) => {
           this.guidelines = guidelines!.selected!.json;
           this.breakMarkerCode = guidelines?.selected?.json.markers.find(
             (a) => a.type === 'break'
           )?.code;
         },
-      })
+      }
     );
 /*
     this.keyMap.register(this.shortcuts);
@@ -396,8 +394,8 @@ export class TrnEditorComponent
     this.cd.detectChanges();
     this.initialized.emit();
     /*
-    this.subscrManager.add(
-      this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered)
+    this.subscribe(
+      this.keyMap.onShortcutTriggered,this.onShortcutTriggered)
     );
 
      */
@@ -814,10 +812,10 @@ export class TrnEditorComponent
     } else if ($event.code === 'Escape') {
       // close without saving
       this._textEditor.audiochunk.stopPlayback();
-      this.subscrManager.add(
-        timer(1000).subscribe(() => {
+      this.subscribe(
+        timer(1000),() => {
           this.closeTextEditor();
-        })
+        }
       );
     }
   }
@@ -971,14 +969,14 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
       this.cd.detectChanges();
     }
 
-    this.subscrManager.add(
-      timer(60).subscribe(() => {
+    this.subscribe(
+      timer(60),() => {
         if (Date.now() - this.lastResizing > 50) {
           this.showSignalDisplay = false;
           this.cd.markForCheck();
           this.cd.detectChanges();
         }
-      })
+      }
     );
     this.lastResizing = Date.now();
   }
@@ -1470,8 +1468,8 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
       started = Date.now();
       this.cd.markForCheck();
       this.cd.detectChanges();
-      this.subscrManager.add(
-        this.transcrEditor.loaded.subscribe(() => {
+      this.subscribe(
+        this.transcrEditor.loaded,() => {
           this.subscrManager.removeByTag('openingBlocked');
           this._textEditor.openingBlocked = false;
           this.transcrEditor.focus().catch((error) => {

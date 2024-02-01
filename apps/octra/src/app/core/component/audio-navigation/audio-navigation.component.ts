@@ -157,7 +157,7 @@ export class AudioNavigationComponent
       const newAudioChunk: AudioChunk = changes['audioChunk'].currentValue;
 
       if (newAudioChunk !== undefined) {
-        this.subscrManager.destroy();
+        this.subscriptionManager.destroy();
         this.connectEvents();
         this.initialize();
         this._isReady = true;
@@ -230,18 +230,16 @@ export class AudioNavigationComponent
 
   private connectEvents() {
     if (this.audioChunk !== undefined) {
-      this.subscrManager.add(
-        this.audioChunk.statuschange.subscribe(
-          (status: PlayBackStatus) => {
-            this._isAudioPlaying = status === PlayBackStatus.PLAYING;
-            this.cd.markForCheck();
-            this.cd.detectChanges();
-          },
-          (error) => {
-            console.error(error);
-          }
-        )
-      );
+      this.subscribe(this.audioChunk.statuschange, {
+        next: (status: PlayBackStatus) => {
+          this._isAudioPlaying = status === PlayBackStatus.PLAYING;
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
     }
   }
 

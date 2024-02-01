@@ -57,8 +57,9 @@ export class SignupComponent extends DefaultComponent implements OnInit {
   showSignUpForm() {
     this.signUpLoading = true;
 
-    this.subscrManager.add(
-      this.api.listLatestPolicies().subscribe({
+    this.subscribe(
+      this.api.listLatestPolicies(),
+      {
         next: (policies) => {
           this.signUpLoading = false;
           this.signUpForm.policies = policies.map(
@@ -68,7 +69,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
         error: (e) => {
           console.error(e);
         },
-      }),
+      },
       'signup'
     );
   }

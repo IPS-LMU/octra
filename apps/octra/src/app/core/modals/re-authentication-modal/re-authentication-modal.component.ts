@@ -61,13 +61,11 @@ export class ReAuthenticationModalComponent
   }) {
     if ($event.type === 'shibboleth') {
       this.authenticationRunning = false;
-      this.subscrManager.add(
-        timer(2000).subscribe({
-          next: () => {
-            this.authenticationRunning = true;
-          },
-        })
-      );
+      this.subscribe(timer(2000), {
+        next: () => {
+          this.authenticationRunning = true;
+        },
+      });
     }
     this.authService.reauthenticate(
       $event.type,
@@ -78,16 +76,14 @@ export class ReAuthenticationModalComponent
   }
 
   onAuthenticatedClick() {
-    this.subscrManager.add(
-      this.apiService.getMyAccountInformation().subscribe({
-        next: (account) => {
-          this.authService.setReAuthenticationSuccess(this.actionAfterSuccess);
-        },
-        error: (error) => {
-          this.authenticationRunning = true;
-        },
-      })
-    );
+    this.subscribe(this.apiService.getMyAccountInformation(), {
+      next: (account) => {
+        this.authService.setReAuthenticationSuccess(this.actionAfterSuccess);
+      },
+      error: (error) => {
+        this.authenticationRunning = true;
+      },
+    });
   }
 
   abort() {

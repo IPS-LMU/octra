@@ -43,9 +43,9 @@ declare const BUILD: {
 };
 
 @Component({
-  selector: "octra-navigation",
-  templateUrl: "./navbar.component.html",
-  styleUrls: ["./navbar.component.scss"]
+  selector: 'octra-navigation',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {
   modalexport?: NgbModalRef;
@@ -56,7 +56,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     return BUILD;
   }
 
-  public test = "ok";
+  public test = 'ok';
 
   isCollapsed = true;
 
@@ -99,8 +99,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
           return true;
         }
         if (
-          typeof a.message === "string" &&
-          a.message.indexOf("AFTER RELOAD") > -1
+          typeof a.message === 'string' &&
+          a.message.indexOf('AFTER RELOAD') > -1
         ) {
           beginCheck = true;
         }
@@ -126,24 +126,24 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   ngOnInit() {
-    BUILD.timestamp = DateTime.fromISO(BUILD.timestamp).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
-
-    this.subscrManager.add(
-      this.navbarServ.onclick.subscribe((name) => {
-        switch (name) {
-          case "export":
-            this.modalexport = this.modalService.openModalRef(
-              ExportFilesModalComponent,
-              ExportFilesModalComponent.options,
-              {
-                navbarService: this,
-                uiService: this.uiService
-              }
-            );
-            break;
-        }
-      })
+    BUILD.timestamp = DateTime.fromISO(BUILD.timestamp).toLocaleString(
+      DateTime.DATETIME_SHORT_WITH_SECONDS
     );
+
+    this.subscribe(this.navbarServ.onclick, (name) => {
+      switch (name) {
+        case 'export':
+          this.modalexport = this.modalService.openModalRef(
+            ExportFilesModalComponent,
+            ExportFilesModalComponent.options,
+            {
+              navbarService: this,
+              uiService: this.uiService,
+            }
+          );
+          break;
+      }
+    });
   }
 
   setInterface(newInterface: string) {
@@ -164,7 +164,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
 
   toggleSettings(option: string) {
     (this.appStorage as any)[option] = !(this.appStorage as any)[option];
-    if (option === "logging") {
+    if (option === 'logging') {
       this.uiService.enabled = this.appStorage[option];
     }
   }
@@ -173,7 +173,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     this.modalService
       .openModal(BugreportModalComponent, BugreportModalComponent.options)
       .then(() => {
-        window.location.hash = "";
+        window.location.hash = '';
       })
       .catch((err) => {
         console.error(err);
@@ -191,12 +191,12 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   onLevelRemoveClick(level: OctraAnnotationAnyLevel<OctraAnnotationSegment>) {
     this.modalService
       .openModal(YesNoModalComponent, YesNoModalComponent.options, {
-        message: this.langService.translate("modal.level remove", {
-          name: level.name
-        })
+        message: this.langService.translate('modal.level remove', {
+          name: level.name,
+        }),
       })
       .then((answer) => {
-        if (answer === "yes") {
+        if (answer === 'yes') {
           this.appStorage.removeAnnotationLevel(level.id).catch((err) => {
             console.error(err);
           });
@@ -225,7 +225,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       ExportFilesModalComponent.options,
       {
         navbarService: this,
-        uiService: this.uiService
+        uiService: this.uiService,
       }
     );
   }
@@ -265,7 +265,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
 
   getFreeAnnotationTasks(project: ProjectDto | undefined) {
     return (
-      project?.statistics?.tasks.find((a) => a.type === "annotation")?.status
+      project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
         .free ?? 0
     );
   }

@@ -19,16 +19,14 @@ export class AuthComponent extends DefaultComponent implements OnInit {
   constructor(private router: Router, private navbarService: NavbarService) {
     super();
     this.navbarService.showNavbar = false;
-    this.subscrManager.add(
-      interval(1000).subscribe({
-        next: () => {
-          if (this._secondsToClose <= 0) {
-            window.close();
-          }
-          this._secondsToClose--;
-        },
-      })
-    );
+    this.subscribe(interval(1000), {
+      next: () => {
+        if (this._secondsToClose <= 0) {
+          window.close();
+        }
+        this._secondsToClose--;
+      },
+    });
   }
 
   ngOnInit() {

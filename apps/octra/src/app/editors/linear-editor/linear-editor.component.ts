@@ -506,28 +506,22 @@ export class LinearEditorComponent
     this.editorSettings.responsive = this.settingsService.responsive.enabled;
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
-    this.subscrManager.add(
-      this.annotationStoreService.currentLevel$.subscribe(($event) => {
-        if (!this.saving) {
-          this.subscrManager.add(
-            timer(1000).subscribe(() => {
-              this.saving = true;
-              this.onLevelChange();
-            })
-          );
-        }
-      })
-    );
+    this.subscribe(this.annotationStoreService.currentLevel$, ($event) => {
+      if (!this.saving) {
+        this.subscribe(timer(1000), () => {
+          this.saving = true;
+          this.onLevelChange();
+        });
+      }
+    });
 
-    this.subscrManager.add(
-      this.signalDisplayTop.alert.subscribe((result) => {
-        this.alertService
-          .showAlert(result.type as AlertType, result.message)
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-    );
+    this.subscribe(this.signalDisplayTop.alert, (result) => {
+      this.alertService
+        .showAlert(result.type as AlertType, result.message)
+        .catch((error) => {
+          console.error(error);
+        });
+    });
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -565,19 +559,19 @@ export class LinearEditorComponent
       this.miniloupeComponent.av.zoomY = this.factor;
     }
 
-    this.subscrManager.add(
-      this.annotationStoreService.segmentrequested.subscribe(
-        (segnumber: number) => {
-          this.openSegment(segnumber);
-        }
-      )
+    this.subscribe(
+      this.annotationStoreService.segmentrequested,
+      (segnumber: number) => {
+        this.openSegment(segnumber);
+      }
     );
 
-    this.subscrManager.add(
-      this.signalDisplayTop.onInitialized.subscribe(() => {
+    this.subscribe(
+      this.signalDisplayTop.onInitialized,
+      () => {
         this.initialized.emit();
-        this.subscrManager.removeByTag('topSignalInitialized');
-      }),
+        this.subscriptionManager.removeByTag('topSignalInitialized');
+      },
       'topSignalInitialized'
     );
   }
@@ -615,7 +609,7 @@ export class LinearEditorComponent
     event: MouseEvent | undefined;
     time: SampleUnit | undefined;
   }) {
-    this.subscrManager.removeByTag('mouseTimer');
+    this.subscriptionManager.removeByTag('mouseTimer');
 
     this.miniloupe.component = this.signalDisplayTop as any;
 
@@ -628,11 +622,12 @@ export class LinearEditorComponent
 
     if (this.appStorage.showLoupe) {
       this.miniloupe.isHidden = false;
-      this.subscrManager.add(
-        timer(20).subscribe(() => {
+      this.subscribe(
+        timer(20),
+        () => {
           this.changeLoupePosition($event.event!, $event.time!);
           this.mousestate = 'ended';
-        }),
+        },
         'mouseTimer'
       );
     }

@@ -82,33 +82,30 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
     }
 
     this.sendStatus = 'sending';
-    this.subscrManager.add(
-      this.bugService
-        .sendReport(
-          this.profile.username,
-          this.profile.email,
-          this.bgdescr,
-          this.sendProObj,
-          this.screenshots
-        )
-        .subscribe(
-          () => {
-            this.sendStatus = 'success';
-            this.bugsent = true;
-            this.update();
-            this.subscrManager.add(
-              timer(2000).subscribe(() => {
-                this.bgdescr = '';
-                this.close();
-              })
-            );
-          },
-          (error) => {
-            console.error(error);
-            this.sendStatus = 'error';
-            this.update();
-          }
-        )
+    this.subscribe(
+      this.bugService.sendReport(
+        this.profile.username,
+        this.profile.email,
+        this.bgdescr,
+        this.sendProObj,
+        this.screenshots
+      ),
+      {
+        next: () => {
+          this.sendStatus = 'success';
+          this.bugsent = true;
+          this.update();
+          this.subscribe(timer(2000), () => {
+            this.bgdescr = '';
+            this.close();
+          });
+        },
+        error: (error) => {
+          console.error(error);
+          this.sendStatus = 'error';
+          this.update();
+        },
+      }
     );
   }
 

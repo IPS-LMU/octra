@@ -52,18 +52,16 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.subscrManager.add(
-      this.asrStoreService.languageSettings$.subscribe({
-        next: (settings) => {
-          this.languageSettings = settings;
-          if (settings) {
-            for (const provider of settings.services) {
-              this.serviceProviders['' + provider.provider] = provider;
-            }
+    this.subscribe(this.asrStoreService.languageSettings$, {
+      next: (settings) => {
+        this.languageSettings = settings;
+        if (settings) {
+          for (const provider of settings.services) {
+            this.serviceProviders['' + provider.provider] = provider;
           }
-        },
-      })
-    );
+        }
+      },
+    });
   }
 
   getShortCode(code: string) {

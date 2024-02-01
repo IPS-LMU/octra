@@ -392,39 +392,36 @@ export class TwoDEditorComponent
 
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.subscrManager.add(
-      this.asrStoreService.asrEnabled$.subscribe({
-        next: (enabled) => {
-          this.viewer.settings.asr.enabled = enabled === true;
-          if (!this.viewer.settings.asr.enabled) {
-            this.shortcutService.unregisterItemFromGroup(
-              '2D-Editor viewer',
-              'do_maus'
-            );
-            this.shortcutService.unregisterItemFromGroup(
-              '2D-Editor viewer',
-              'do_asr'
-            );
-            this.shortcutService.unregisterItemFromGroup(
-              '2D-Editor viewer',
-              'do_asr_maus'
-            );
-          }
-        },
-      })
-    );
-    this.subscrManager.add(
-      this.viewer.alert.subscribe((result: any) => {
-        this.alertService
-          .showAlert(result.type as AlertType, result.message)
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-    );
+    this.subscribe(this.asrStoreService.asrEnabled$, {
+      next: (enabled) => {
+        this.viewer.settings.asr.enabled = enabled === true;
+        if (!this.viewer.settings.asr.enabled) {
+          this.shortcutService.unregisterItemFromGroup(
+            '2D-Editor viewer',
+            'do_maus'
+          );
+          this.shortcutService.unregisterItemFromGroup(
+            '2D-Editor viewer',
+            'do_asr'
+          );
+          this.shortcutService.unregisterItemFromGroup(
+            '2D-Editor viewer',
+            'do_asr_maus'
+          );
+        }
+      },
+    });
+    this.subscribe(this.viewer.alert, (result: any) => {
+      this.alertService
+        .showAlert(result.type as AlertType, result.message)
+        .catch((error) => {
+          console.error(error);
+        });
+    });
 
-    this.subscrManager.add(
-      this.audioChunkLines.statuschange.subscribe((state: PlayBackStatus) => {
+    this.subscribe(
+      this.audioChunkLines.statuschange,
+      (state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
           if (this.appStorage.followPlayCursor) {
             if (this.scrolltimer !== undefined) {
@@ -450,95 +447,88 @@ export class TwoDEditorComponent
             this.scrolltimer.unsubscribe();
           }
         }
-      })
+      }
     );
 
-    this.subscrManager.add(
-      this.appStorage.settingschange.subscribe((event) => {
-        switch (event.key) {
-          case 'secondsPerLine':
-            this.viewer.onSecondsPerLineChanged(event.value);
-            break;
-        }
-      })
-    );
+    this.subscribe(this.appStorage.settingschange, (event) => {
+      switch (event.key) {
+        case 'secondsPerLine':
+          this.viewer.onSecondsPerLineChanged(event.value);
+          break;
+      }
+    });
 
-    this.subscrManager.add(
-      this.asrStoreService.queue$.subscribe({
-        next: (queue) => {
-          const checkUndoRedo = () => {
-            if (queue) {
-              if (queue.statistics.running === 0) {
-                this.appStorage.enableUndoRedo();
-              } else {
-                this.appStorage.disableUndoRedo();
-              }
-            }
-          };
-
+    this.subscribe(this.asrStoreService.queue$, {
+      next: (queue) => {
+        const checkUndoRedo = () => {
           if (queue) {
-            // this.viewer.redraw();
-          }
-        },
-      })
-    );
-
-    this.subscrManager.add(
-      this.asrStoreService.itemChange$.subscribe((item) => {
-        if (item.status !== ASRProcessStatus.IDLE) {
-          const segmentIndex =
-            this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-              this.audio.audioManager.createSampleUnit(
-                item.time.sampleStart + item.time.sampleLength
-              )
-            ) ?? -1;
-
-          if (segmentIndex > -1) {
-            if (item.status === ASRProcessStatus.FINISHED) {
-              this.uiService.addElementFromEvent(
-                item.type.toLowerCase(),
-                {
-                  value: 'finished',
-                },
-                Date.now(),
-                undefined,
-                undefined,
-                undefined,
-                {
-                  start: item.time.sampleStart,
-                  length: item.time.sampleLength,
-                },
-                'automation'
-              );
-            } else if (item.status === ASRProcessStatus.STARTED) {
-              // item started
-              this.uiService.addElementFromEvent(
-                item.type.toLowerCase(),
-                {
-                  value: 'started',
-                },
-                Date.now(),
-                undefined,
-                undefined,
-                undefined,
-                {
-                  start: item.time.sampleStart,
-                  length: item.time.sampleLength,
-                },
-                'automation'
-              );
+            if (queue.statistics.running === 0) {
+              this.appStorage.enableUndoRedo();
+            } else {
+              this.appStorage.disableUndoRedo();
             }
           }
-        }
-      })
-    );
+        };
 
-    this.subscrManager.add(
-      this.annotationStoreService.segmentrequested.subscribe(
-        (segnumber: number) => {
-          this.openSegment(segnumber);
+        if (queue) {
+          // this.viewer.redraw();
         }
-      )
+      },
+    });
+
+    this.subscribe(this.asrStoreService.itemChange$, (item) => {
+      if (item.status !== ASRProcessStatus.IDLE) {
+        const segmentIndex =
+          this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
+            this.audio.audioManager.createSampleUnit(
+              item.time.sampleStart + item.time.sampleLength
+            )
+          ) ?? -1;
+
+        if (segmentIndex > -1) {
+          if (item.status === ASRProcessStatus.FINISHED) {
+            this.uiService.addElementFromEvent(
+              item.type.toLowerCase(),
+              {
+                value: 'finished',
+              },
+              Date.now(),
+              undefined,
+              undefined,
+              undefined,
+              {
+                start: item.time.sampleStart,
+                length: item.time.sampleLength,
+              },
+              'automation'
+            );
+          } else if (item.status === ASRProcessStatus.STARTED) {
+            // item started
+            this.uiService.addElementFromEvent(
+              item.type.toLowerCase(),
+              {
+                value: 'started',
+              },
+              Date.now(),
+              undefined,
+              undefined,
+              undefined,
+              {
+                start: item.time.sampleStart,
+                length: item.time.sampleLength,
+              },
+              'automation'
+            );
+          }
+        }
+      }
+    });
+
+    this.subscribe(
+      this.annotationStoreService.segmentrequested,
+      (segnumber: number) => {
+        this.openSegment(segnumber);
+      }
     );
   }
 
@@ -653,7 +643,7 @@ export class TwoDEditorComponent
     event: MouseEvent | undefined;
     time: SampleUnit | undefined;
   }) {
-    this.subscrManager.removeByTag('mouseTimer');
+    this.subscriptionManager.removeByTag('mouseTimer');
     this.mousestate = 'moving';
 
     this.doPlayOnHover(
@@ -669,11 +659,12 @@ export class TwoDEditorComponent
         this.viewer.av.mouseCursor!.seconds
       ) {
         this.loupeHidden = false;
-        this.subscrManager.add(
-          timer(20).subscribe(() => {
+        this.subscribe(
+          timer(20),
+          () => {
             this.changeLoupePosition($event.event!, $event.time!);
             this.mousestate = 'ended';
-          }),
+          },
           'mouseTimer'
         );
       } else {

@@ -54,7 +54,7 @@ export class TranscriptionGuidelinesModalComponent
   ngOnInit() {
     this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     this.unCollapseAll();
-    this.subscrManager.add(
+    this.subscriptionManager.add(
       timer(1000).subscribe(() => {
         this.initVideoPlayers();
       })

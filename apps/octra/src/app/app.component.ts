@@ -38,15 +38,15 @@ export class AppComponent
     this.appStoreService.initApplication();
 
     if (environment.debugging.enabled && environment.debugging.logging.routes) {
-      this.subscrManager.add(
-        this.router.events.subscribe((event: any) => {
+      this.subscribe(this.router.events, {
+        next: (event: any) => {
           if (event.snapshot) {
             console.log(
               `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
             );
           }
-        })
-      );
+        },
+      });
     }
   }
 

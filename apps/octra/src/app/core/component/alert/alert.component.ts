@@ -1,12 +1,9 @@
-import { Component, SecurityContext, ViewChild } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 import {
   fadeInOnEnterAnimation,
   fadeOutOnLeaveAnimation,
 } from 'angular-animations';
-import { interval, Subscription } from 'rxjs';
-import { DynComponentDirective } from '../../shared/directive/dyn-component.directive';
-import { AlertEntry, AlertService } from '../../shared/service/alert.service';
+import { AlertService } from '../../shared/service/alert.service';
 import { DefaultComponent } from '../default.component';
 
 @Component({

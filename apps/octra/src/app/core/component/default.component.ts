@@ -1,13 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
-import { SubscriptionManager } from '@octra/utilities';
+import { SubscriberComponent } from '@octra/ngx-utilities';
 
 @Component({
   template: '',
+  standalone: true,
 })
-export class DefaultComponent implements OnDestroy {
-  protected subscrManager = new SubscriptionManager();
-
-  ngOnDestroy() {
-    this.subscrManager.destroy();
-  }
-}
+export class DefaultComponent
+  extends SubscriberComponent
+  implements OnDestroy {}

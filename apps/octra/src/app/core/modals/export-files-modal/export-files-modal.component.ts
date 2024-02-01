@@ -213,40 +213,38 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         name: converter.name,
         preparing: true,
       };
-      this.subscrManager.add(
-        timer(300).subscribe(() => {
-          if (converter.name === 'BundleJSON') {
-            // only this converter needs an array buffer
-            /*
+      this.subscribe(timer(300), () => {
+        if (converter.name === 'BundleJSON') {
+          // only this converter needs an array buffer
+          /*
             this.transcriptionService.audiofile.arraybuffer =
               this.transcriptionService.audioManager.resource.arraybuffer!;
              */
+        }
+
+        const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
+        const result: ExportResult = converter.export(
+          oannotjson,
+          oAudioFile,
+          levelnum
+        );
+
+        if (!result.error && result.file) {
+          this.parentformat.download = result.file.name;
+
+          if (this.parentformat.uri !== undefined) {
+            window.URL.revokeObjectURL(this.parentformat.uri.toString());
           }
-
-          const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
-          const result: ExportResult = converter.export(
-            oannotjson,
-            oAudioFile,
-            levelnum
-          );
-
-          if (!result.error && result.file) {
-            this.parentformat.download = result.file.name;
-
-            if (this.parentformat.uri !== undefined) {
-              window.URL.revokeObjectURL(this.parentformat.uri.toString());
-            }
-            const test = new File([result.file.content], result.file.name);
-            this.setParentFormatURI(window.URL.createObjectURL(test));
-            this.preparing = {
-              name: converter.name,
-              preparing: false,
-            };
-          } else {
-            console.error(`Annotation conversion error: ${result.error}`);
-          }
-        })
-      );
+          const test = new File([result.file.content], result.file.name);
+          this.setParentFormatURI(window.URL.createObjectURL(test));
+          this.preparing = {
+            name: converter.name,
+            preparing: false,
+          };
+        } else {
+          console.error(`Annotation conversion error: ${result.error}`);
+        }
+      });
     }
   }
 
@@ -279,11 +277,9 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onDownloadClick(i: number) {
-    this.subscrManager.add(
-      timer(500).subscribe(() => {
-        this.exportStates[i] = 'inactive';
-      })
-    );
+    this.subscribe(timer(500), () => {
+      this.exportStates[i] = 'inactive';
+    });
   }
 
   onHidden() {
@@ -299,7 +295,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     this.tools.audioCutting.result.url = undefined;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
-    this.subscrManager.destroy();
+    this.subscriptionManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);

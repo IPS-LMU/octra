@@ -323,42 +323,38 @@ export class TranscrWindowComponent
   ) {
     super();
 
-    this.subscrManager.add(
-      this.asrStoreService.queue$.subscribe({
-        next: (queue) => {
-          const item = this.audiochunk
-            ? queue?.items.find(
-                (a) =>
-                  a.time.sampleStart === this.audiochunk.time.start.samples &&
-                  a.time.sampleLength === this.audiochunk.time.duration.samples
-              )
-            : undefined;
+    this.subscribe(this.asrStoreService.queue$, {
+      next: (queue) => {
+        const item = this.audiochunk
+          ? queue?.items.find(
+              (a) =>
+                a.time.sampleStart === this.audiochunk.time.start.samples &&
+                a.time.sampleLength === this.audiochunk.time.duration.samples
+            )
+          : undefined;
 
-          console.log(queue?.items);
-          if (item) {
-            if (
-              item.status === ASRProcessStatus.FINISHED &&
-              item.result !== undefined
-            ) {
-              console.log(`set transcript in window: ${item.result}`);
-              this.transcript = item.result;
-            } else {
-              console.log(
-                `Can't set transcript, ${item.status}, ${item.result}`
-              );
-            }
-
-            this.loupe.redraw();
-
-            this.cd.markForCheck();
-            this.cd.detectChanges();
+        console.log(queue?.items);
+        if (item) {
+          if (
+            item.status === ASRProcessStatus.FINISHED &&
+            item.result !== undefined
+          ) {
+            console.log(`set transcript in window: ${item.result}`);
+            this.transcript = item.result;
+          } else {
+            console.log(`Can't set transcript, ${item.status}, ${item.result}`);
           }
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      })
-    );
+
+          this.loupe.redraw();
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   public doDirectionAction = async (direction: string) => {
@@ -404,16 +400,14 @@ export class TranscrWindowComponent
         this.annotationStoreService.transcript?.idCounters.item ?? 1;
     }
 
-    this.subscrManager.add(
-      this.annotationStoreService.guidelines$.subscribe({
-        next: (guidelines) => {
-          this.guidelines = guidelines!.selected!.json;
-          this.breakMarkerCode = guidelines?.selected?.json.markers.find(
-            (a) => a.type === 'break'
-          )?.code;
-        },
-      })
-    );
+    this.subscribe(this.annotationStoreService.guidelines$, {
+      next: (guidelines) => {
+        this.guidelines = guidelines!.selected!.json;
+        this.breakMarkerCode = guidelines?.selected?.json.markers.find(
+          (a) => a.type === 'break'
+        )?.code;
+      },
+    });
 
     this._loading = false;
     this.setValidationEnabledToDefault();
@@ -437,7 +431,7 @@ export class TranscrWindowComponent
     this.loupe.settings.multiLine = false;
     this.loupe.av.drawnSelection = undefined;
 
-    this.subscrManager.removeByTag('editor');
+    this.subscriptionManager.removeByTag('editor');
     if (
       this.segmentIndex > -1 &&
       this.annotationStoreService.currentLevel!.items &&
@@ -533,19 +527,17 @@ export class TranscrWindowComponent
       this.audioManager.createSampleUnit(0)
     );
 
-    this.subscrManager.add(
-      timer(500).subscribe(() => {
-        const segment = this.annotationStoreService.currentLevel!.items[
-          this.segmentIndex
-        ] as OctraAnnotationSegment;
+    this.subscribe(timer(500), () => {
+      const segment = this.annotationStoreService.currentLevel!.items[
+        this.segmentIndex
+      ] as OctraAnnotationSegment;
 
-        if (!segment!.context?.asr?.isBlockedBy) {
-          this.audiochunk.startPlayback().catch((error) => {
-            console.error(error);
-          });
-        }
-      })
-    );
+      if (!segment!.context?.asr?.isBlockedBy) {
+        this.audiochunk.startPlayback().catch((error) => {
+          console.error(error);
+        });
+      }
+    });
     this.editor.focus(true, true);
   }
 
@@ -591,7 +583,7 @@ export class TranscrWindowComponent
 
     this.audiochunk.stopPlayback();
     this.act.emit('close');
-    this.subscrManager.destroy();
+    this.subscriptionManager.destroy();
   }
 
   public open() {
@@ -975,20 +967,21 @@ export class TranscrWindowComponent
   }
 
   listenToAudioChunkStatusChanges() {
-    this.subscrManager.removeByTag('audiochunkStatus');
-    this.subscrManager.add(
-      this.audiochunk.statuschange.subscribe(
-        (status) => {
+    this.subscriptionManager.removeByTag('audiochunkStatus');
+    this.subscribe(
+      this.audiochunk.statuschange,
+      {
+        next: (status) => {
           this.cd.markForCheck();
           this.cd.detectChanges();
         },
-        (error) => {
+        error: (error) => {
           console.error(
             `couldn't update view for audio chunk in transcription window.`
           );
           console.error(error);
-        }
-      ),
+        },
+      },
       'audiochunkStatus'
     );
   }

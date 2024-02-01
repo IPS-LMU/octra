@@ -463,10 +463,10 @@ export class DictaphoneEditorComponent
   }
 
   onTranscrEditorRedoUndo(type: 'undo' | 'redo') {
-    this.subscrManager.removeByTag('annochange');
-    this.subscrManager.add(
+    this.subscriptionManager.removeByTag('annochange');
+    this.subscriptionManager.add(
       this.appStorage.annotationChanged.subscribe(() => {
-        this.subscrManager.removeByTag('annochange');
+        this.subscriptionManager.removeByTag('annochange');
         this.loadEditor();
       }),
       'annochange'

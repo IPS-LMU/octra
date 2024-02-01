@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import {DefaultComponent} from '../../../component/default.component';
-import {ApplicationStoreService} from '../../../store/application/application-store.service';
+import { DefaultComponent } from '../../../component/default.component';
+import { ApplicationStoreService } from '../../../store/application/application-store.service';
 
 @Component({
-  selector: 'ocb-re-authentication-page',
+  selector: 'octra-re-authentication-page',
   templateUrl: './auth-success.page.component.html',
   styleUrls: ['./auth-success.page.component.scss'],
 })
-export class AuthSuccessPageComponent extends DefaultComponent implements OnInit {
+export class AuthSuccessPageComponent
+  extends DefaultComponent
+  implements OnInit
+{
   constructor(private appService: ApplicationStoreService) {
     super();
   }

@@ -75,6 +75,6 @@ pages={145--148}
 
   onHidden() {
     this.visible = false;
-    this.subscrManager.destroy();
+    this.subscriptionManager.destroy();
   }
 }

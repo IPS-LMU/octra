@@ -150,7 +150,7 @@ export class OverviewModalComponent
 
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
-      this.subscrManager.removeById(this.shortcutID);
+      this.subscriptionManager.removeById(this.shortcutID);
       this.shortcutID = -1;
     }
 

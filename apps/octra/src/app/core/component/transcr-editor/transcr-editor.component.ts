@@ -21,12 +21,11 @@ import {
   escapeRegex,
   insertString,
   isNumber,
-  SubscriptionManager,
   unEscapeHtml,
 } from '@octra/utilities';
 import { SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { DefaultComponent } from '../default.component';
 import { Config } from 'jodit/types/config';
@@ -187,7 +186,6 @@ export class TranscrEditorComponent
   ) {
     super();
     this._settings = new TranscrEditorConfig();
-    this.subscrManager = new SubscriptionManager<Subscription>();
   }
 
   private _highlightingEnabled = true;
@@ -637,11 +635,9 @@ export class TranscrEditorComponent
       };
 
       if (later) {
-        this.subscrManager.add(
-          timer(300).subscribe(() => {
-            func();
-          })
-        );
+        this.subscribe(timer(300), () => {
+          func();
+        });
       } else {
         func();
       }
@@ -655,37 +651,34 @@ export class TranscrEditorComponent
     }
     this.initialize();
 
-    this.subscrManager.add(
-      this.asrStoreService.queue$.subscribe({
-        next: this.onASRQueueChange,
-        error: (error) => {
-          console.error(error);
-        },
-      })
-    );
+    this.subscribe(this.asrStoreService.queue$, {
+      next: this.onASRQueueChange,
+      error: (error) => {
+        console.error(error);
+      },
+    });
 
-    this.subscrManager.removeByTag('typing_change');
-    this.subscrManager.add(
-      this.internalTyping.subscribe((status) => {
+    this.subscriptionManager.removeByTag('typing_change');
+    this.subscribe(
+      this.internalTyping,
+      (status) => {
         if (status === 'stopped') {
           this.validate();
           this.initPopover();
         }
 
         this.typing.emit(status);
-      }),
+      },
       'typing_change'
     );
   }
 
   ngOnInit() {
-    this.subscrManager.add(
-      this.annotationStoreService.guidelines$.subscribe({
-        next: (guidelines) => {
-          this.guidelines = guidelines?.selected?.json;
-        },
-      })
-    );
+    this.subscribe(this.annotationStoreService.guidelines$, {
+      next: (guidelines) => {
+        this.guidelines = guidelines?.selected?.json;
+      },
+    });
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -719,7 +712,7 @@ export class TranscrEditorComponent
       obj['transcript'].currentValue !== undefined &&
       !obj['transcript'].firstChange
     ) {
-      console.log("set transcript");
+      console.log('set transcript');
       this.setTranscript(obj['transcript'].currentValue);
     }
 
@@ -738,7 +731,7 @@ export class TranscrEditorComponent
   }
 
   public update() {
-    this.subscrManager.destroy();
+    this.subscriptionManager.destroy();
     this.initialize();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -1042,23 +1035,19 @@ export class TranscrEditorComponent
     );
 
     // timeout needed to fix summernote
-    this.subscrManager.add(
-      timer(100).subscribe(() => {
-        this.joditComponent?.jodit?.selection.insertHTML(element.outerHTML);
+    this.subscribe(timer(100), () => {
+      this.joditComponent?.jodit?.selection.insertHTML(element.outerHTML);
 
-        this.subscrManager.add(
-          timer(200).subscribe(() => {
-            // set popover
-            element.addEventListener('click', this.onDataSampleClick);
-            element.addEventListener('mouseover', this.onSegmentBoundaryOver);
-            element.addEventListener(
-              'mouseleave',
-              this.onSegmentBoundaryMouseLeave
-            );
-          })
+      this.subscribe(timer(200), () => {
+        // set popover
+        element.addEventListener('click', this.onDataSampleClick);
+        element.addEventListener('mouseover', this.onSegmentBoundaryOver);
+        element.addEventListener(
+          'mouseleave',
+          this.onSegmentBoundaryMouseLeave
         );
-      })
-    );
+      });
+    });
   }
 
   saveSelection() {
@@ -1230,7 +1219,7 @@ export class TranscrEditorComponent
   }
 
   public startRecurringHighlight() {
-    this.subscrManager.removeByTag('highlight');
+    this.subscriptionManager.removeByTag('highlight');
     this.lockHighlighting = false;
 
     if (this._highlightingEnabled && this._settings.highlightingEnabled) {
@@ -1241,10 +1230,11 @@ export class TranscrEditorComponent
           if (!this.lockHighlighting) {
             this.highlightCurrentSegment(this.audiochunk!.absolutePlayposition);
           }
-          this.subscrManager.add(
-            timer(100).subscribe(() => {
+          this.subscribe(
+            timer(100),
+            () => {
               highlight();
-            }),
+            },
             'highlight'
           );
         } else {
@@ -1361,11 +1351,9 @@ export class TranscrEditorComponent
     return new Promise<void>((resolve, reject) => {
       if (this.validationEnabled) {
         if (this.isValidating) {
-          this.subscrManager.add(
-            this.validationFinish.subscribe(() => {
-              resolve();
-            })
-          );
+          this.subscribe(this.validationFinish, () => {
+            resolve();
+          });
         } else {
           resolve();
         }
@@ -1427,14 +1415,12 @@ export class TranscrEditorComponent
           this.insertBoundary(
             'assets/img/components/transcr-editor/boundary.png'
           );
-          this.subscrManager.add(
-            timer(100).subscribe({
-              next: () => {
-                this.validate();
-                this.initPopover();
-              },
-            })
-          );
+          this.subscribe(timer(100), {
+            next: () => {
+              this.validate();
+              this.initPopover();
+            },
+          });
         },
       }
     );
@@ -1476,23 +1462,21 @@ export class TranscrEditorComponent
 
   private triggerTyping() {
     // this.highlightingRunning = false;
-    this.subscrManager.add(
-      timer(500).subscribe(() => {
-        if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
-          if (this._isTyping) {
-            if (this.audiochunk!.id === this._lastAudioChunkID) {
-              this._isTyping = false;
-              this.internalTyping.emit('stopped');
+    this.subscribe(timer(500), () => {
+      if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
+        if (this._isTyping) {
+          if (this.audiochunk!.id === this._lastAudioChunkID) {
+            this._isTyping = false;
+            this.internalTyping.emit('stopped');
 
-              this.lastkeypress = -1;
-            } else {
-              // ignore typing stop after audioChunk was changed
-              this._lastAudioChunkID = this.audiochunk!.id;
-            }
+            this.lastkeypress = -1;
+          } else {
+            // ignore typing stop after audioChunk was changed
+            this._lastAudioChunkID = this.audiochunk!.id;
           }
         }
-      })
-    );
+      }
+    });
 
     if (!this._isTyping) {
       this.internalTyping.emit('started');
@@ -1737,9 +1721,10 @@ export class TranscrEditorComponent
   }
 
   onAfterInit = () => {
-    this.subscrManager.removeByTag('afterInit');
-    this.subscrManager.add(
-      timer(200).subscribe(() => {
+    this.subscriptionManager.removeByTag('afterInit');
+    this.subscribe(
+      timer(200),
+      () => {
         if (this.workplace?.parentNode && !this.popovers.segmentBoundary) {
           const segmentBoundary = document.createElement('div');
           segmentBoundary.setAttribute('class', 'panel seg-popover');
@@ -1768,7 +1753,7 @@ export class TranscrEditorComponent
           .catch((error) => {
             console.error(error);
           });
-      }),
+      },
       'afterInit'
     );
   };

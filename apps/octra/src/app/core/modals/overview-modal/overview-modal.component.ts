@@ -34,9 +34,11 @@ export class OverviewModalComponent
   implements OnInit, OnDestroy, AfterViewInit
 {
   public static options: NgbModalOptions = {
-    size: 'xl',
     keyboard: false,
     backdrop: true,
+    scrollable: true,
+    size: "xl",
+    fullscreen: "xl"
   };
 
   @ViewChild('feedback', { static: false })

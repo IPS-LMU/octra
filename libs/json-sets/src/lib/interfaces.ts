@@ -8,69 +8,58 @@ export interface AudioFileMetaData {
   lossless?: boolean;
 }
 
-export interface JSONSetConstraints {
-  description?: string;
+export class JSONSetValidationError {
+  path?: string;
+  message!: string;
+  statement?: JSONSetStatement;
+  combinationType?: 'and' | 'or';
+
+  constructor(message: string, path?: string) {
+    this.message = message;
+    this.path = path;
+  }
 }
 
-export interface JSONSETFileConstraints extends JSONSetConstraints {
-  extension?: string[];
-  description?: string;
-  contentFormat?: string;
+export class JSONSetConditions {
+  fileSize?: number;
+  content?: string[];
   mimeType?: string[];
-  namePattern?: string;
-  file?: {
-    maxSize?: string;
-  };
+
+  constructor(partial: JSONSetConditions) {
+    this.fileSize = partial.fileSize;
+    this.content = partial.content;
+    this.mimeType = partial.mimeType;
+  }
 }
 
-export interface JSONFileSetStatement extends JSONSetStatement {
-  constraints: JSONSETFileConstraints[];
-}
-
-export interface JSONFileSetDefinition {
-  description?: string;
-  name?: string;
-  unique?: boolean;
-  uniqueSelector?: 'object';
-
-  statements: JSONFileSetStatement[];
-}
-
-export interface JSONSetDefinition {
-  description?: string;
-  name?: string;
-  unique?: boolean;
-  uniqueSelector?: 'object';
-
-  statements: JSONSetStatement[];
-}
-
-export interface JSONSetValidationError {
-  path?: string;
-  constraint?: string;
-  message: string;
-}
-
-export interface JSONFileSetValidationError {
-  filename: string;
-  path?: string;
-  constraint?: string;
-  message: string;
-  statement?: JSONSetStatement
-}
-
-export interface JSONSetStatement {
-  combination: JSONSetCombination;
+export class JSONSetStatement {
+  select: number;
+  with: JSONSetConditions;
   name?: string;
   description?: string;
-  optional?: boolean;
-  take?: number;
-  takeMax?: number;
-  takeMin?: number;
-  constraints: JSONSetConstraints[];
+
+  constructor(partial: JSONSetStatement) {
+    this.select = partial.select;
+    this.with = partial.with;
+    this.name = partial.name;
+    this.description = partial.description;
+  }
 }
 
-export enum JSONSetCombination {
-  'union' = 'union',
-  'difference' = 'difference',
+export class JSONSetCombination {
+  type: 'and' | 'or';
+  expressions: JSONSetExpression[];
+
+  constructor(partial: JSONSetCombination) {
+    this.type = partial.type;
+    this.expressions = partial.expressions;
+  }
 }
+
+export class JSONSet {
+  group?: string;
+  description?: string;
+  combine!: JSONSetCombination;
+}
+
+export type JSONSetExpression = JSONSetStatement | JSONSet;

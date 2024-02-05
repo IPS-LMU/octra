@@ -21,6 +21,7 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
 
   joditOptions: JoditConfig = {
     maxHeight: 300,
+    buttons: ['align'],
     statusbar: false,
     placeholder: 'Please write a message in German or English...',
   };

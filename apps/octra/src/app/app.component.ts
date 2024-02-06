@@ -60,6 +60,11 @@ export class AppComponent
           type: 'audio/wav',
         },
         {
+          name: 'test2.wav',
+          size: 1000,
+          type: 'audio/wav',
+        },
+        {
           name: 'test.json',
           size: 1000,
           type: 'application/json',
@@ -76,7 +81,7 @@ export class AppComponent
         group: 'root',
         description: 'root description',
         combine: {
-          type: 'and',
+          type: 'or',
           expressions: [
             {
               select: 1,

@@ -70,31 +70,15 @@ export class FileJSONSetValidator extends JSONSetValidator {
         // foreach result in column
         for (const tableElementElementElement of tableElementElement) {
           if (!Array.isArray(tableElementElementElement)) {
-            const key = `${tableElementElementElement.statement?.select}x ${tableElementElementElement.statement?.name!}`;
-            if (
-              value[key] == undefined
-            ) {
-              if (tableElementElementElement.combinationType === 'and') {
-                value[key] = 1;
-              } else {
-                value[key] = 0;
-              }
+            const key = `${
+              tableElementElementElement.statement?.select
+            }x ${tableElementElementElement.statement?.name!}`;
+            if (value[key] === undefined) {
+              value[key] = 1;
             }
 
-            // logic and, or
-            if (tableElementElementElement.combinationType === 'and') {
-              value[key] =
-                value[key] &&
-                tableElementElementElement.valid
-                  ? 1
-                  : 0;
-            } else {
-              value[key] =
-                value[key] ||
-                tableElementElementElement.valid
-                  ? 1
-                  : 0;
-            }
+            // logic and for with attributes
+            value[key] = value[key] && tableElementElementElement.valid ? 1 : 0;
           } else {
             convertFileToLogTableRow(key, value, [tableElementElementElement]);
           }
@@ -116,7 +100,22 @@ export class FileJSONSetValidator extends JSONSetValidator {
           tableElement
         );
         result[remainingFiles[i].name]['sum'] = sum(
-          Object.keys(result[remainingFiles[i].name]).map((a) => result[remainingFiles[i].name][a])
+          Object.keys(result[remainingFiles[i].name]).map(
+            (a) => result[remainingFiles[i].name][a]
+          )
+        );
+      }
+
+      result['sum'] = {};
+      const header = Object.keys(result[Object.keys(result)[0]]).filter(
+        (a) => a !== 'sum'
+      );
+
+      for (const headerElement of header) {
+        result['sum'][headerElement] = sum(
+          Object.keys(result)
+            .filter((a) => a !== 'sum')
+            .map((a) => result[a][headerElement])
         );
       }
 
@@ -165,6 +164,35 @@ export class FileJSONSetValidator extends JSONSetValidator {
     }
 
     return result;
+  }
+
+  private convertFileString(fileString: string) {
+    const matches =
+      /\s*([0-9]+(?:\.?[0-9]+)?)\s?((?:B)|(?:KB)|(?:MB)|(?:TB))$/g.exec(
+        fileString
+      );
+    if (!matches || matches.length < 3) {
+      return undefined;
+    }
+    try {
+      const size = Number(matches[1]);
+      const label = matches[2];
+
+      switch (label) {
+        case 'KB':
+          return 1000 * size;
+        case 'MB':
+          return 1000000 * size;
+        case 'GB':
+          return 1000000000 * size;
+        case 'TB':
+          return 1000000000000 * size;
+      }
+    } catch (e) {
+      return undefined;
+    }
+
+    return undefined;
   }
 }
 

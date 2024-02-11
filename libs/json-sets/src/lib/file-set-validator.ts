@@ -2,10 +2,10 @@ import { JSONSetValidator } from './json-set-validator';
 import {
   JSONSet,
   JSONSetExpression,
-  JSONSetStatement,
   JSONSetValidationError,
 } from './interfaces';
 import { sum } from '@octra/api-types';
+import { JSONSetResult } from './decision-tree';
 
 export interface IFile {
   name: string;
@@ -14,25 +14,10 @@ export interface IFile {
   type: string;
 }
 
-export class JSONSetResult {
-  valid!: boolean;
-  path?: string;
-  statement?: JSONSetStatement;
-  error?: string;
-  combinationType?: 'and' | 'or';
-}
-
 type JSONSetResultGroup = JSONSetResult[] | JSONSetResultGroup[];
 type logType = boolean | logType[];
 
 export class FileJSONSetValidator extends JSONSetValidator {
-  private validationMethods: ((
-    file: IFile,
-    statement: JSONSetStatement,
-    combinationType: 'and' | 'or',
-    path: string
-  ) => JSONSetResult)[] = [validateMimeType, validateContent, validateFileSize];
-
   override validate(
     set: IFile[],
     setSchema: JSONSet
@@ -147,17 +132,6 @@ export class FileJSONSetValidator extends JSONSetValidator {
           (path += `.${statement.group}`)
         );
       } else {
-        for (const validationMethod of this.validationMethods) {
-          const validationResult = validationMethod(
-            file,
-            statement,
-            combinationType,
-            path + `+${statement.name}`
-          );
-          if (validationResult) {
-            validationStatementTable.push([validationResult]);
-          }
-        }
       }
 
       result.push(validationStatementTable);
@@ -165,115 +139,4 @@ export class FileJSONSetValidator extends JSONSetValidator {
 
     return result;
   }
-
-  private convertFileString(fileString: string) {
-    const matches =
-      /\s*([0-9]+(?:\.?[0-9]+)?)\s?((?:B)|(?:KB)|(?:MB)|(?:TB))$/g.exec(
-        fileString
-      );
-    if (!matches || matches.length < 3) {
-      return undefined;
-    }
-    try {
-      const size = Number(matches[1]);
-      const label = matches[2];
-
-      switch (label) {
-        case 'KB':
-          return 1000 * size;
-        case 'MB':
-          return 1000000 * size;
-        case 'GB':
-          return 1000000000 * size;
-        case 'TB':
-          return 1000000000000 * size;
-      }
-    } catch (e) {
-      return undefined;
-    }
-
-    return undefined;
-  }
-}
-
-function validateFileSize(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (statement.with.fileSize && file.size > statement.with.fileSize) {
-    return {
-      valid: false,
-      error: `File size must be less than ${statement.with.fileSize}B.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
-}
-
-function validateContent(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (
-    statement.with.content &&
-    statement.with.content.length > 0 &&
-    file.content !== undefined &&
-    !statement.with.content.includes(file.content)
-  ) {
-    return {
-      valid: false,
-      error: `File content type must be one of ${statement.with.content.join(
-        ','
-      )}.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
-}
-
-function validateMimeType(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (
-    statement.with.mimeType &&
-    statement.with.mimeType.length > 0 &&
-    file.type !== undefined &&
-    !statement.with.mimeType.includes(file.type)
-  ) {
-    return {
-      valid: false,
-      error: `File type must be one of ${statement.with.mimeType.join(',')}.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
 }

@@ -33,7 +33,7 @@ export class JSONSetConditions {
 }
 
 export class JSONSetStatement {
-  select: number;
+  select: string;
   with: JSONSetConditions;
   name?: string;
   description?: string;

@@ -1,4 +1,9 @@
-import { IFile, JSONSet, JSONSetStatement } from '@octra/json-sets';
+import {
+  IFile,
+  JSONSet,
+  JSONSetExpression,
+  JSONSetStatement,
+} from '@octra/json-sets';
 
 export class JSONSetResult {
   valid!: boolean;
@@ -6,6 +11,16 @@ export class JSONSetResult {
   statement?: JSONSetStatement;
   error?: string;
   combinationType?: 'and' | 'or';
+}
+
+export class PossibleSolution {
+  statement!: JSONSetExpression;
+  path!: string;
+  selection!: IFile;
+
+  constructor(obj: PossibleSolution) {
+    Object.assign(this, obj);
+  }
 }
 
 const validationMethods: ((
@@ -16,7 +31,7 @@ const validationMethods: ((
 ) => JSONSetResult)[] = [validateMimeType, validateContent, validateFileSize];
 
 export class DecisionTreeNode {
-  get possibleSelections(): IFile[][] {
+  get possibleSelections(): PossibleSolution[][] {
     return this._possibleSelections;
   }
 
@@ -34,7 +49,7 @@ export class DecisionTreeNode {
 
   get path(): string {
     return this._parent
-      ? `${this._parent.path}`
+      ? `${this._parent.path}.${this._name}`
       : this._name ?? `node[${this._id}]`;
   }
 
@@ -43,7 +58,7 @@ export class DecisionTreeNode {
   private readonly _description?: string;
   private readonly _name?: string;
   protected readonly _parent?: DecisionTreeCombination;
-  protected _possibleSelections: IFile[][] = [];
+  protected _possibleSelections: PossibleSolution[][] = [];
 
   constructor(
     parent?: DecisionTreeCombination,
@@ -84,18 +99,120 @@ export class DecisionTreeExpression extends DecisionTreeNode {
     this._possibleSelections = [];
 
     if (result.length > 0) {
-      // TODO imiplement min
-      // TODO implement max
+      const parsedSelectStatement = this.parseSelectStatement(
+        this.statement.select
+      );
 
-      // select statement exact x
-      const x = 1;
-      for (let i = 1; i < result.length; i++) {
-        const resultElement = result[i];
-        this._possibleSelections.push([result[0], resultElement]);
-      }
+      this._possibleSelections = this.generatePossibleSolutions(
+        parsedSelectStatement.type,
+        parsedSelectStatement.selectNumber,
+        result
+      );
     }
 
     this.validItem = this.possibleSelections.length > 0;
+  }
+
+  private generatePossibleSolutions(
+    selectType: 'exact' | 'min' | 'max',
+    selectNumber: number,
+    files: IFile[]
+  ): PossibleSolution[][] {
+    if (selectNumber > files.length) {
+      return []; // can't select more items than available
+    }
+
+    if (selectNumber === 0 && files.length > 0) {
+      return []; // no solutions because should be 0
+    }
+
+    if (selectType === 'exact') {
+      return powArray(files, selectNumber - 1, selectNumber - 1)
+        .map((a) =>
+          a.map(
+            (b) =>
+              new PossibleSolution({
+                path: this.path,
+                statement: this.statement,
+                selection: b,
+              })
+          )
+        )
+        .filter(cleanUpSolutions);
+    }
+    if (selectType === 'min') {
+      console.log('MIN TRUE');
+      return powArray(files, selectNumber - 1, files.length)
+        .map((a) =>
+          a.map(
+            (b) =>
+              new PossibleSolution({
+                path: this.path,
+                statement: this.statement,
+                selection: b,
+              })
+          )
+        )
+        .filter(cleanUpSolutions);
+    }
+    if (selectType === 'max') {
+      console.log('MAX TRUE');
+      return [
+        [],
+        ...powArray(files, 0, selectNumber - 1),
+      ].map((a) =>
+        a.map(
+          (b) =>
+            new PossibleSolution({
+              path: this.path,
+              statement: this.statement,
+              selection: b,
+            })
+        )
+      ).filter(cleanUpSolutions);
+    }
+
+    throw new Error('Not working');
+  }
+
+  private parseSelectStatement(selectStatement: string): {
+    type: 'min' | 'max' | 'exact';
+    selectNumber: number;
+  } {
+    const matches = /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+)$/g.exec(
+      selectStatement
+    );
+    if (!matches) {
+      throw new Error(`JSONSetValidationError: Invalid select statement.`);
+    }
+
+    if (matches) {
+      if (matches[1] === undefined || matches[1] === '=') {
+        // exact
+        return {
+          type: 'exact',
+          selectNumber: Number(matches[2]),
+        };
+      }
+
+      if (matches[1] === '>=') {
+        // min
+        return {
+          type: 'min',
+          selectNumber: Number(matches[2]),
+        };
+      }
+
+      if (matches[1] === '<=') {
+        // max
+        return {
+          type: 'max',
+          selectNumber: Number(matches[2]),
+        };
+      }
+    }
+
+    throw new Error(`JSONSetValidationError: Invalid select statement.`);
   }
 }
 
@@ -105,11 +222,12 @@ export class DecisionTreeCombination extends DecisionTreeNode {
 
   constructor(
     combination: 'and' | 'or',
+    parent?: DecisionTreeCombination,
     name?: string,
     description?: string,
     children: DecisionTreeNode[] = []
   ) {
-    super(undefined, name, description);
+    super(parent, name, description);
     this.combination = combination;
     this.children = children;
   }
@@ -161,7 +279,7 @@ export class DecisionTreeCombination extends DecisionTreeNode {
     }
 
     if (this.combination === 'and') {
-      let product: IFile[][] = this.children[0].possibleSelections;
+      let product: PossibleSolution[][] = this.children[0].possibleSelections;
       for (let i = 1; i < this.children.length; i++) {
         const child = this.children[i];
         const filtered = child.possibleSelections.filter(
@@ -171,7 +289,7 @@ export class DecisionTreeCombination extends DecisionTreeNode {
           product = [];
           break;
         } else {
-          const newProduct: IFile[][] = [];
+          const newProduct: PossibleSolution[][] = [];
           for (const firstSelect of product) {
             for (const filteredElement of filtered) {
               newProduct.push([...firstSelect, ...filteredElement]);
@@ -180,17 +298,41 @@ export class DecisionTreeCombination extends DecisionTreeNode {
           product = newProduct;
         }
       }
-      this._possibleSelections = product;
+      this._possibleSelections = product.filter(cleanUpSolutions);
     }
 
     if (this.combination === 'or') {
-      // TODO implement
+      let product: PossibleSolution[][] = [];
+      product = this.children.map((a) => a.possibleSelections).flat();
+
+      for (let i = 1; i < this.children.length; i++) {
+        const child = this.children[i];
+        const filtered = child.possibleSelections.filter(
+          (a) => !product.find((b) => areEqualArray(a, b))
+        );
+        if (filtered.length === 0) {
+          product = [];
+          break;
+        } else {
+          const newProduct: PossibleSolution[][] = [];
+          for (const firstSelect of product) {
+            for (const filteredElement of filtered) {
+              newProduct.push([...firstSelect, ...filteredElement]);
+            }
+          }
+          product.push(...newProduct);
+        }
+      }
+      this._possibleSelections = product
+        .filter((a) => a.length > 0)
+        .filter(cleanUpSolutions);
     }
   }
 
   override clone(recursive = true): DecisionTreeCombination {
     return new DecisionTreeCombination(
       this.combination,
+      this._parent,
       this.name,
       this.description,
       recursive
@@ -233,16 +375,17 @@ export class DecisionTreeCombination extends DecisionTreeNode {
     return undefined;
   }
 
-  static json2treeCombination(json: any) {
+  static json2treeCombination(json: any, parent?: DecisionTreeCombination) {
     const root = new DecisionTreeCombination(
       json.combine.type,
+      parent,
       json.group,
       json.description
     );
 
     for (const expression of json.combine.expressions) {
-      if (expression instanceof JSONSet) {
-        const set = this.json2treeCombination(expression);
+      if (Object.keys(expression).includes('combine')) {
+        const set = this.json2treeCombination(expression, root);
         root.append(set);
       } else if (JSONSetStatement) {
         const expr = new DecisionTreeExpression(root, expression);
@@ -362,7 +505,7 @@ export class DecisionTree {
         return acc;
       } else {
         return node.possibleSelections.map((a) =>
-          a.map((b) => b.name).join(',')
+          a.map((b) => `{${b.path}: ${b.selection.name}`).join(',')
         );
       }
     };
@@ -372,16 +515,17 @@ export class DecisionTree {
   }
 }
 
-function areEqualArray(array: IFile[], array2: IFile[]) {
+function areEqualArray(array: PossibleSolution[], array2: PossibleSolution[]) {
   if (array.length === array2.length) {
-    for (const iFile of array) {
+    for (const solution of array) {
       if (
         !array2.find(
           (a) =>
-            a.name === iFile.name &&
-            a.type === iFile.type &&
-            a.size === iFile.size &&
-            a.content === iFile.content
+            a.path === solution.path &&
+            a.selection.name === solution.selection.name &&
+            a.selection.type === solution.selection.type &&
+            a.selection.size === solution.selection.size &&
+            a.selection.content === solution.selection.content
         )
       ) {
       }
@@ -411,16 +555,16 @@ export function powArray(array: IFile[], start: number, end: number) {
   return result;
 }
 
-export function cleanUpFiles(a: IFile[], index: number, items: IFile[][]) {
+export function cleanUpSolutions(a: PossibleSolution[], index: number, solutions: PossibleSolution[][]) {
   const anyDuplicate = a.some(
-    (b, i, so) => so.findIndex((c) => c.name === b.name) !== i
+    (b, i, so) => so.findIndex((c) => c.selection.name === b.selection.name) !== i
   );
 
   return (
     !anyDuplicate &&
-    items.findIndex((b) => {
+    solutions.findIndex((b) => {
       for (const iFile of a) {
-        const i = b.findIndex((c) => c.name === iFile.name);
+        const i = b.findIndex((c) => c.path === iFile.path && c.selection.name === iFile.selection.name);
         if (i < 0) {
           return false;
         }
@@ -428,32 +572,4 @@ export function cleanUpFiles(a: IFile[], index: number, items: IFile[][]) {
       return true;
     }) === index
   );
-}
-
-export function generatePossibleSolutions(
-  selectType: 'exact' | 'min' | 'max',
-  selectNumber: number,
-  files: IFile[]
-) {
-  if (selectNumber >  files.length) {
-    return []; // can't select more items than available
-  }
-
-  if (selectNumber === 0 && files.length > 0) {
-    return []; // no solutions because should be 0
-  }
-
-  if (selectType === 'exact') {
-    return powArray(files, selectNumber - 1, selectNumber - 1).filter(cleanUpFiles);
-  }
-  if (selectType === 'min') {
-    console.log('MIN TRUE');
-    return powArray(files, selectNumber - 1, files.length).filter(cleanUpFiles);
-  }
-  if (selectType === 'max') {
-    console.log('MAX TRUE');
-    return [[], ...powArray(files, 0, selectNumber - 1).filter(cleanUpFiles)];
-  }
-
-  throw new Error('Not working');
 }

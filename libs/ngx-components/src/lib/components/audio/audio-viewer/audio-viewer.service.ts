@@ -506,7 +506,7 @@ export class AudioViewerService {
   /**
    * initialize settings
    */
-  public async initializeSettings() {
+  public initializeSettings = async () => {
     if (!this.audioManager) {
       throw new Error('Audiomanager is undefined');
     }
@@ -548,7 +548,7 @@ export class AudioViewerService {
     this._drawnSelection.end = this._drawnSelection.start.clone();
 
     return this.afterChannelInititialized();
-  }
+  };
 
   public refreshComputedData(): Promise<any> {
     return new Promise<void>((resolve, reject) => {

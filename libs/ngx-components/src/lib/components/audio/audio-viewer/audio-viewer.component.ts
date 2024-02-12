@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   OnChanges,
   OnDestroy,
@@ -10,6 +11,7 @@ import {
   Renderer2,
   SimpleChanges,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import Konva from 'konva';
 import { PlayCursor } from '../../../obj/play-cursor';
@@ -62,6 +64,7 @@ export interface CurrentLevelChangeEvent {
   templateUrl: './audio-viewer.component.html',
   styleUrls: ['./audio-viewer.component.css'],
   providers: [AudioViewerService],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   /**
@@ -285,6 +288,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   private stage: Konva.Stage | undefined;
   private hoveredLine = -1;
   private refreshRunning = false;
+  private resizing = false;
 
   private lastResize = 0;
 
@@ -535,14 +539,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  async onResize() {
+  onResize = async () => {
     try {
       if (
         this.audioChunk !== undefined &&
         this.av.currentLevel &&
         this.stage !== undefined &&
-        this.width !== undefined &&
-        this.height !== undefined &&
+        this.width &&
+        this.height &&
         this.av.currentLevel.items.length > 0
       ) {
         const playpos = this.audioChunk?.absolutePlayposition.clone();
@@ -566,8 +570,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
-          const groups: Konva.Group[] | undefined = this.layers?.background.find(".line");
-          groups?.map(a => {
+          const groups: Konva.Group[] | undefined =
+            this.layers?.background.find('.line');
+          groups?.map((a) => {
             a.cache();
             return a;
           });
@@ -576,8 +581,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       }
     } catch (e) {
       //ignore
+      console.error(e);
     }
-  }
+  };
 
   public initializeView() {
     if (
@@ -666,9 +672,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers.background.batchDraw();
       this.createSegmentsForCanvas();
 
-
-
-
       let y = 0;
       let lineWidth = this.av.innerWidth!;
       const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
@@ -676,15 +679,17 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       if (numOfLines > 1) {
         let drawnWidth = 0;
         const selectionGroup = new Konva.Group({
-          name: "line-selections"
+          name: 'line-selections',
         });
 
         for (let i = 0; i < numOfLines - 1; i++) {
-          selectionGroup.add(this.createLineSelectionGroup(
-            new Size(lineWidth, this.settings.lineheight),
-            new Position(this.settings.margin.left, y),
-            i
-          ));
+          selectionGroup.add(
+            this.createLineSelectionGroup(
+              new Size(lineWidth, this.settings.lineheight),
+              new Position(this.settings.margin.left, y),
+              i
+            )
+          );
           y += this.settings.lineheight + this.settings.margin.top;
           drawnWidth += lineWidth;
         }
@@ -692,18 +697,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         // add last line
         lineWidth = this.av.AudioPxWidth - drawnWidth;
         if (lineWidth > 0) {
-          selectionGroup.add(this.createLineSelectionGroup(
-            new Size(lineWidth, this.settings.lineheight),
-            new Position(this.settings.margin.left, y),
-            numOfLines - 1
-          ));
+          selectionGroup.add(
+            this.createLineSelectionGroup(
+              new Size(lineWidth, this.settings.lineheight),
+              new Position(this.settings.margin.left, y),
+              numOfLines - 1
+            )
+          );
         }
 
         this.layers.overlay.add(selectionGroup);
       }
       this.layers.overlay.batchDraw();
-
-
 
       this.canvasElements.playHead = this.createLinePlayCursor();
       if (this.settings.selection.enabled) {
@@ -954,6 +959,32 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.shortcutsManager.clearShortcuts();
   }
 
+  @HostListener('window:resize', ['$event'])
+  onWindowResize(){
+    const wait = 100;
+    this.lastResize = Date.now();
+    this.subscrManager.removeByTag('resize');
+    this.subscrManager.add(
+      timer(wait).subscribe({
+        next: () => {
+          if (Date.now() - this.lastResize >= wait && !this.resizing) {
+            this.resizing = true;
+            this.onResize()
+              .then(() => {
+                this.lastResize = Date.now();
+                this.resizing = false;
+              })
+              .catch((error) => {
+                console.error(error);
+                this.resizing = false;
+              });
+          }
+        },
+      }),
+      'resize'
+    );
+  }
+
   public init() {
     if (
       this.width !== undefined &&
@@ -1041,32 +1072,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       container.addEventListener('mouseleave', this.onMouseLeave);
       container.removeEventListener('mouseenter', this.onMouseEnter);
       container.addEventListener('mouseenter', this.onMouseEnter);
-
-      let resizing = false;
-      window.onresize = () => {
-        const wait = 50;
-        this.lastResize = Date.now();
-        this.subscrManager.removeByTag('resize');
-        this.subscrManager.add(
-          timer(wait).subscribe({
-            next: () => {
-              if (Date.now() - this.lastResize >= wait && !resizing) {
-                resizing = true;
-                this.onResize()
-                  .then(() => {
-                    this.lastResize = Date.now();
-                    resizing = false;
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                    resizing = false;
-                  });
-              }
-            },
-          }),
-          'resize'
-        );
-      };
 
       this.shortcutsManager.clearShortcuts();
       this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
@@ -2426,10 +2431,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     }
   };
 
-  private drawSelection = (
-    lineNum: number,
-    lineWidth: number
-  ) => {
+  private drawSelection = (lineNum: number, lineWidth: number) => {
     if (
       this.av.drawnSelection !== undefined &&
       this.av.drawnSelection.length > 0 &&

@@ -8,10 +8,10 @@ export interface AudioFileMetaData {
   lossless?: boolean;
 }
 
-export class JSONSetValidationError {
+export class JSONSetValidationError<U> {
   path?: string;
   message!: string;
-  statement?: JSONSetStatement;
+  statement?: JSONSetStatement<U>;
   combinationType?: 'and' | 'or';
 
   constructor(message: string, path?: string) {
@@ -20,25 +20,13 @@ export class JSONSetValidationError {
   }
 }
 
-export class JSONSetConditions {
-  fileSize?: number;
-  content?: string[];
-  mimeType?: string[];
-
-  constructor(partial: JSONSetConditions) {
-    this.fileSize = partial.fileSize;
-    this.content = partial.content;
-    this.mimeType = partial.mimeType;
-  }
-}
-
-export class JSONSetStatement {
+export class JSONSetStatement<U> {
   select: string;
-  with: JSONSetConditions;
+  with: U | U[];
   name?: string;
   description?: string;
 
-  constructor(partial: JSONSetStatement) {
+  constructor(partial: JSONSetStatement<U>) {
     this.select = partial.select;
     this.with = partial.with;
     this.name = partial.name;
@@ -46,20 +34,20 @@ export class JSONSetStatement {
   }
 }
 
-export class JSONSetCombination {
+export class JSONSetCombination<U> {
   type: 'and' | 'or';
-  expressions: JSONSetExpression[];
+  expressions: JSONSetExpression<U>[];
 
-  constructor(partial: JSONSetCombination) {
+  constructor(partial: JSONSetCombination<U>) {
     this.type = partial.type;
     this.expressions = partial.expressions;
   }
 }
 
-export class JSONSet {
+export class JSONSet<U> {
   name?: string;
   description?: string;
-  combine!: JSONSetCombination;
+  combine!: JSONSetCombination<U>;
 }
 
-export type JSONSetExpression = JSONSetStatement | JSONSet;
+export type JSONSetExpression<U> = JSONSetStatement<U> | JSONSet<U>;

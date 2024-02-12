@@ -1,5 +1,4 @@
-# @octra/json-sets (still in development) <a href="https://www.npmjs.com/package/@octra/json-sets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/json-sets"></a>
-
+# @octra/json-sets  <a href="https://www.npmjs.com/package/@octra/json-sets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/json-sets"></a>
 This library allows to define sets using JSON. JSONSetValidator parsed an array of objects and validates it using the JSON definition.
 
 ## Installation

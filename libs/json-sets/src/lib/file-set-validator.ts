@@ -4,7 +4,7 @@ import {
   PossibleSolution,
 } from './decision-tree';
 import { JsonSetValidator } from './json-set-validator';
-import { JSONSet, JSONSetStatement } from './interfaces';
+import { JSONSet } from './interfaces';
 
 export class IFile {
   name!: string;
@@ -13,11 +13,26 @@ export class IFile {
   size?: number;
 }
 
-export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
+export class JSONSetFileConditions {
+  fileSize?: number;
+  content?: string[];
+  mimeType?: string[];
+
+  constructor(partial: JSONSetFileConditions) {
+    this.fileSize = partial.fileSize;
+    this.content = partial.content;
+    this.mimeType = partial.mimeType;
+  }
+}
+
+export class JSONSetFileBlueprint extends JSONSetBlueprint<
+  IFile,
+  JSONSetFileConditions
+> {
   constructor(
     validationMethods: ((
       item: any,
-      statement: JSONSetStatement,
+      conditions: JSONSetFileConditions,
       combinationType: 'and' | 'or',
       path: string
     ) => JSONSetResult)[] = []
@@ -31,8 +46,8 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
   }
 
   override areEqualArray(
-    array: PossibleSolution<IFile>[],
-    array2: PossibleSolution<IFile>[]
+    array: PossibleSolution<IFile, JSONSetFileConditions>[],
+    array2: PossibleSolution<IFile, JSONSetFileConditions>[]
   ): boolean {
     if (array.length === array2.length) {
       for (const solution of array) {
@@ -55,50 +70,43 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
 
   private validateFileSize(
     item: IFile,
-    statement: JSONSetStatement,
+    conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
     path: string
   ): JSONSetResult {
-    if (
-      statement.with.fileSize &&
-      item.size &&
-      item.size > statement.with.fileSize
-    ) {
+    if (conditions.fileSize && item.size && item.size > conditions.fileSize) {
       return {
         valid: false,
-        error: `File size must be less than ${statement.with.fileSize}B.`,
+        error: `File size condition not met by ${path}.`,
         path,
-        statement,
         combinationType,
       };
     }
+
     return {
       valid: true,
       path,
-      statement,
       combinationType,
     };
   }
 
   private validateContent(
     item: IFile,
-    statement: JSONSetStatement,
+    conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
     path: string
   ): JSONSetResult {
     if (
-      statement.with.content &&
-      statement.with.content.length > 0 &&
-      item.content !== undefined &&
-      !statement.with.content.includes(item.content)
+      conditions.content &&
+      conditions.content.length > 0 &&
+      (!item.content || !conditions.content.includes(item.content))
     ) {
       return {
         valid: false,
-        error: `File content type must be one of ${statement.with.content.join(
+        error: `File content type must be one of ${conditions.content.join(
           ','
         )}.`,
         path,
-        statement,
         combinationType,
       };
     }
@@ -106,43 +114,40 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
     return {
       valid: true,
       path,
-      statement,
       combinationType,
     };
   }
 
   private validateMimeType(
     item: IFile,
-    statement: JSONSetStatement,
+    conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
     path: string
   ): JSONSetResult {
     if (
-      statement.with.mimeType &&
-      statement.with.mimeType.length > 0 &&
+      conditions.mimeType &&
+      conditions.mimeType.length > 0 &&
       item.type !== undefined &&
-      !statement.with.mimeType.includes(item.type)
+      !conditions.mimeType.includes(item.type)
     ) {
       return {
         valid: false,
-        error: `File type must be one of ${statement.with.mimeType.join(',')}.`,
+        error: `File type must be one of ${conditions.mimeType.join(',')}.`,
         path,
-        statement,
         combinationType,
       };
     }
     return {
       valid: true,
       path,
-      statement,
       combinationType,
     };
   }
 
   override cleanUpSolutions(
-    a: PossibleSolution<IFile>[],
+    a: PossibleSolution<IFile, JSONSetFileConditions>[],
     index: number,
-    solutions: PossibleSolution<IFile>[][]
+    solutions: PossibleSolution<IFile, JSONSetFileConditions>[][]
   ): boolean {
     const anyDuplicate = a.some(
       (b, i, so) =>
@@ -167,11 +172,14 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
   }
 }
 
-export class FileSetValidator extends JsonSetValidator<IFile> {
+export class FileSetValidator extends JsonSetValidator<
+  IFile,
+  JSONSetFileConditions
+> {
   override blueprint: JSONSetFileBlueprint = new JSONSetFileBlueprint();
 
-  constructor(jsonSet: JSONSet) {
+  constructor(jsonSet: JSONSet<JSONSetFileConditions>) {
     super();
-    this.parse(jsonSet)
+    this.parse(jsonSet);
   }
 }

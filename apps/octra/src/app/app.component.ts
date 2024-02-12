@@ -7,7 +7,6 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { DefaultComponent } from './core/component/default.component';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
-import { DecisionTree } from '../../../../libs/json-sets/src/lib/decision-tree';
 
 @Component({
   selector: 'octra-app',
@@ -49,75 +48,6 @@ export class AppComponent
         },
       });
     }
-
-    const tree = DecisionTree.json2tree({
-      group: 'root',
-      description: 'root description',
-      combine: {
-        type: 'and',
-        expressions: [
-          {
-            group: 'g1',
-            combine: {
-              type: 'and',
-              expressions: [
-                {
-                  select: '1',
-                  name: 'audiofile',
-                  description: '',
-                  with: {
-                    fileSize: 2000, // - // <- oder Verbindungen          //  |- und Verbindungen
-                    mimeType: ['audio/wav'], // <- oder Verbindungen  // -
-                  },
-                },
-                {
-                  select: '<= 1',
-                  name: 'textfile',
-                  description: '',
-                  with: {
-                    fileSize: 2000,
-                    mimeType: ['application/json'],
-                    content: ['AnnotJSON'],
-                  },
-                },
-              ],
-            },
-          },
-          {
-            select: '1',
-            name: 'audiofile',
-            description: '',
-            with: {
-              fileSize: 2000, // - // <- oder Verbindungen          //  |- und Verbindungen
-              mimeType: ['audio/wav'], // <- oder Verbindungen  // -
-            },
-          },
-        ],
-      },
-    });
-
-    tree.validate([
-      {
-        name: 'a',
-        size: 1000,
-        type: 'audio/wav',
-      },
-      {
-        name: 'c',
-        size: 1000,
-        type: 'application/json',
-        content: 'AnnotJSON',
-      },
-    ]);
-    console.log(`TREE__________`);
-    console.log(tree);
-    console.log(`SOLUTION__________`);
-    console.log(
-      tree.root.possibleSelections.map(
-        (a: any[]) =>
-          `(${a.map((b) => `{${b.path}: ${b.selection.name}}`).join(',')})`
-      )
-    );
   }
 
   ngOnInit() {

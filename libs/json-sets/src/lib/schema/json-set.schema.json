@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "group": {
+    "name": {
       "type": "string"
     },
     "description": {

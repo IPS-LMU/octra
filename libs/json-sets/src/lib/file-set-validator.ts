@@ -1,142 +1,177 @@
-import { JSONSetValidator } from './json-set-validator';
 import {
-  JSONSet,
-  JSONSetExpression,
-  JSONSetValidationError,
-} from './interfaces';
-import { sum } from '@octra/api-types';
-import { JSONSetResult } from './decision-tree';
+  JSONSetBlueprint,
+  JSONSetResult,
+  PossibleSolution,
+} from './decision-tree';
+import { JsonSetValidator } from './json-set-validator';
+import { JSONSet, JSONSetStatement } from './interfaces';
 
-export interface IFile {
-  name: string;
+export class IFile {
+  name!: string;
+  type?: string;
   content?: string;
-  size: number;
-  type: string;
+  size?: number;
 }
 
-type JSONSetResultGroup = JSONSetResult[] | JSONSetResultGroup[];
-type logType = boolean | logType[];
-
-export class FileJSONSetValidator extends JSONSetValidator {
-  override validate(
-    set: IFile[],
-    setSchema: JSONSet
-  ): JSONSetValidationError[] {
-    return this.__validate(setSchema, set, [], set);
+export class JSONSetFileBlueprint extends JSONSetBlueprint<IFile> {
+  constructor(
+    validationMethods: ((
+      item: any,
+      statement: JSONSetStatement,
+      combinationType: 'and' | 'or',
+      path: string
+    ) => JSONSetResult)[] = []
+  ) {
+    super(validationMethods);
+    this._validationMethods = [
+      this.validateMimeType,
+      this.validateContent,
+      this.validateFileSize,
+    ];
   }
 
-  private __validate(
-    setSchema: JSONSet,
-    set: IFile[],
-    parsedFiles: IFile[] = [],
-    remainingFiles: IFile[] = []
-  ): JSONSetValidationError[] {
-    const result: JSONSetValidationError[] = [];
-    const table: JSONSetResultGroup[][] = [];
-    console.log(`validate group ${setSchema.group}:`);
-    for (const file of remainingFiles) {
-      table.push(
-        this.validateFile(
-          file,
-          setSchema.combine.expressions,
-          setSchema.combine.type
-        )
-      );
-    }
-
-    const convertFileToLogTableRow = (
-      key: string,
-      value: any,
-      fileResults: JSONSetResultGroup[]
-    ) => {
-      const result: any = {};
-      // foreach column
-      for (const tableElementElement of fileResults) {
-        // foreach result in column
-        for (const tableElementElementElement of tableElementElement) {
-          if (!Array.isArray(tableElementElementElement)) {
-            const key = `${
-              tableElementElementElement.statement?.select
-            }x ${tableElementElementElement.statement?.name!}`;
-            if (value[key] === undefined) {
-              value[key] = 1;
-            }
-
-            // logic and for with attributes
-            value[key] = value[key] && tableElementElementElement.valid ? 1 : 0;
-          } else {
-            convertFileToLogTableRow(key, value, [tableElementElementElement]);
-          }
+  override areEqualArray(
+    array: PossibleSolution<IFile>[],
+    array2: PossibleSolution<IFile>[]
+  ): boolean {
+    if (array.length === array2.length) {
+      for (const solution of array) {
+        if (
+          !array2.find(
+            (a) =>
+              a.path === solution.path &&
+              a.selection.name === solution.selection.name &&
+              a.selection.type === solution.selection.type &&
+              a.selection.size === solution.selection.size &&
+              a.selection.content === solution.selection.content
+          )
+        ) {
         }
       }
-
-      return result;
-    };
-
-    const convertToLogTable = (table: JSONSetResultGroup[][]) => {
-      const result: any = {};
-
-      for (let i = 0; i < table.length; i++) {
-        const tableElement = table[i];
-        result[remainingFiles[i].name] = {};
-        convertFileToLogTableRow(
-          remainingFiles[i].name,
-          result[remainingFiles[i].name],
-          tableElement
-        );
-        result[remainingFiles[i].name]['sum'] = sum(
-          Object.keys(result[remainingFiles[i].name]).map(
-            (a) => result[remainingFiles[i].name][a]
-          )
-        );
-      }
-
-      result['sum'] = {};
-      const header = Object.keys(result[Object.keys(result)[0]]).filter(
-        (a) => a !== 'sum'
-      );
-
-      for (const headerElement of header) {
-        result['sum'][headerElement] = sum(
-          Object.keys(result)
-            .filter((a) => a !== 'sum')
-            .map((a) => result[a][headerElement])
-        );
-      }
-
-      return result;
-    };
-
-    console.table(convertToLogTable(table));
-    console.log(table);
-    return result;
-  }
-
-  // validate each row of column
-  private validateFile(
-    file: IFile,
-    statements: JSONSetExpression[],
-    combinationType: 'and' | 'or',
-    path = ''
-  ): JSONSetResultGroup[] {
-    const result: JSONSetResultGroup[] = [];
-
-    for (const statement of statements) {
-      const validationStatementTable: JSONSetResultGroup[] = [];
-
-      if (statement instanceof JSONSet) {
-        return this.validateFile(
-          file,
-          statement.combine.expressions,
-          statement.combine.type,
-          (path += `.${statement.group}`)
-        );
-      } else {
-      }
-
-      result.push(validationStatementTable);
     }
 
-    return result;
+    return false;
+  }
+
+  private validateFileSize(
+    item: IFile,
+    statement: JSONSetStatement,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult {
+    if (
+      statement.with.fileSize &&
+      item.size &&
+      item.size > statement.with.fileSize
+    ) {
+      return {
+        valid: false,
+        error: `File size must be less than ${statement.with.fileSize}B.`,
+        path,
+        statement,
+        combinationType,
+      };
+    }
+    return {
+      valid: true,
+      path,
+      statement,
+      combinationType,
+    };
+  }
+
+  private validateContent(
+    item: IFile,
+    statement: JSONSetStatement,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult {
+    if (
+      statement.with.content &&
+      statement.with.content.length > 0 &&
+      item.content !== undefined &&
+      !statement.with.content.includes(item.content)
+    ) {
+      return {
+        valid: false,
+        error: `File content type must be one of ${statement.with.content.join(
+          ','
+        )}.`,
+        path,
+        statement,
+        combinationType,
+      };
+    }
+
+    return {
+      valid: true,
+      path,
+      statement,
+      combinationType,
+    };
+  }
+
+  private validateMimeType(
+    item: IFile,
+    statement: JSONSetStatement,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult {
+    if (
+      statement.with.mimeType &&
+      statement.with.mimeType.length > 0 &&
+      item.type !== undefined &&
+      !statement.with.mimeType.includes(item.type)
+    ) {
+      return {
+        valid: false,
+        error: `File type must be one of ${statement.with.mimeType.join(',')}.`,
+        path,
+        statement,
+        combinationType,
+      };
+    }
+    return {
+      valid: true,
+      path,
+      statement,
+      combinationType,
+    };
+  }
+
+  override cleanUpSolutions(
+    a: PossibleSolution<IFile>[],
+    index: number,
+    solutions: PossibleSolution<IFile>[][]
+  ): boolean {
+    const anyDuplicate = a.some(
+      (b, i, so) =>
+        so.findIndex((c) => c.selection.name === b.selection.name) !== i
+    );
+
+    return (
+      !anyDuplicate &&
+      solutions.findIndex((b) => {
+        for (const iFile of a) {
+          const i = b.findIndex(
+            (c) =>
+              c.path === iFile.path && c.selection.name === iFile.selection.name
+          );
+          if (i < 0) {
+            return false;
+          }
+        }
+        return true;
+      }) === index
+    );
+  }
+}
+
+export class FileSetValidator extends JsonSetValidator<IFile> {
+  override blueprint: JSONSetFileBlueprint = new JSONSetFileBlueprint();
+
+  constructor(jsonSet: JSONSet) {
+    super();
+    this.parse(jsonSet)
   }
 }

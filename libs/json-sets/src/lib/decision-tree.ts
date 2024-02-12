@@ -1,9 +1,4 @@
-import {
-  IFile,
-  JSONSet,
-  JSONSetExpression,
-  JSONSetStatement,
-} from '@octra/json-sets';
+import { JSONSet, JSONSetExpression, JSONSetStatement } from './interfaces';
 
 export class JSONSetResult {
   valid!: boolean;
@@ -13,25 +8,66 @@ export class JSONSetResult {
   combinationType?: 'and' | 'or';
 }
 
-export class PossibleSolution {
+export class PossibleSolution<T> {
   statement!: JSONSetExpression;
   path!: string;
-  selection!: IFile;
+  selection!: T;
 
-  constructor(obj: PossibleSolution) {
+  constructor(obj: PossibleSolution<T>) {
     Object.assign(this, obj);
   }
 }
 
-const validationMethods: ((
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-) => JSONSetResult)[] = [validateMimeType, validateContent, validateFileSize];
+export class JSONSetBlueprint<T> {
+  get validationMethods(): ((
+    item: T,
+    statement: JSONSetStatement,
+    combinationType: 'and' | 'or',
+    path: string
+  ) => JSONSetResult)[] {
+    return this._validationMethods;
+  }
 
-export class DecisionTreeNode {
-  get possibleSelections(): PossibleSolution[][] {
+  protected _validationMethods: ((
+    item: T,
+    statement: JSONSetStatement,
+    combinationType: 'and' | 'or',
+    path: string
+  ) => JSONSetResult)[] = [];
+
+  constructor(
+    validationMethods: ((
+      item: T,
+      statement: JSONSetStatement,
+      combinationType: 'and' | 'or',
+      path: string
+    ) => JSONSetResult)[] = []
+  ) {
+    this._validationMethods = validationMethods;
+  }
+
+  areEqualArray(
+    array: PossibleSolution<T>[],
+    array2: PossibleSolution<T>[]
+  ): boolean {
+    throw new Error(`JSONSetBlueprint: not implemented`);
+  }
+
+  outputTreeWithSolutions() {
+    throw new Error(`JSONSetBlueprint: not implemented`);
+  }
+
+  cleanUpSolutions(
+    a: PossibleSolution<T>[],
+    index: number,
+    solutions: PossibleSolution<T>[][]
+  ): boolean {
+    throw new Error(`JSONSetBlueprint: not implemented`);
+  }
+}
+
+export class DecisionTreeNode<T> {
+  get possibleSelections(): PossibleSolution<T>[][] {
     return this._possibleSelections;
   }
 
@@ -57,11 +93,13 @@ export class DecisionTreeNode {
   private static id = 1;
   private readonly _description?: string;
   private readonly _name?: string;
-  protected readonly _parent?: DecisionTreeCombination;
-  protected _possibleSelections: PossibleSolution[][] = [];
+  protected readonly _parent?: DecisionTreeCombination<T>;
+  protected readonly blueprint: JSONSetBlueprint<T>;
+  protected _possibleSelections: PossibleSolution<T>[][] = [];
 
   constructor(
-    parent?: DecisionTreeCombination,
+    blueprint: JSONSetBlueprint<T>,
+    parent?: DecisionTreeCombination<T>,
     name?: string,
     description?: string
   ) {
@@ -69,30 +107,63 @@ export class DecisionTreeNode {
     this._description = description;
     this._name = name;
     this._parent = parent;
+    this.blueprint = blueprint;
   }
 
-  clone(): DecisionTreeNode {
+  clone(): DecisionTreeNode<T> {
     throw new Error('Not implemented');
   }
 
-  validate(file: IFile[]) {}
+  validate(items: T[]) {}
+
+  static json2tree<T>(json: JSONSet, blueprint: JSONSetBlueprint<T>) {
+    return DecisionTreeCombination.json2treeCombination<T>(json, blueprint);
+  }
+
+  outputSolutions() {
+    return this.blueprint.outputTreeWithSolutions();
+  }
+
+  protected powArray<T>(array: T[], start: number, end: number) {
+    let result: T[][] = array.map((a) => [a]);
+
+    for (let i = 0; i < end; i++) {
+      let newArray: T[][] = [];
+      for (const resultElement of result) {
+        for (const iFile of array) {
+          newArray.push([...resultElement, iFile]);
+        }
+      }
+      if (i < start) {
+        result = newArray;
+      } else {
+        result.push(...newArray);
+      }
+    }
+
+    return result;
+  }
 }
 
-export class DecisionTreeExpression extends DecisionTreeNode {
+export class DecisionTreeExpression<T> extends DecisionTreeNode<T> {
   statement: JSONSetStatement;
   validItem = false;
 
-  constructor(parent: DecisionTreeCombination, statement: JSONSetStatement) {
-    super(parent, statement.name, statement.description);
+  constructor(
+    blueprint: JSONSetBlueprint<T>,
+    parent: DecisionTreeCombination<T> | undefined,
+    statement: JSONSetStatement
+  ) {
+    super(blueprint, parent, statement.name, statement.description);
     this.statement = statement;
   }
 
-  override validate(files: IFile[]) {
-    const result = files.filter((file) => {
-      return !validationMethods
+  override validate(items: T[]) {
+    const result = items.filter((item) => {
+      return !this.blueprint.validationMethods
         .map(
           (m) =>
-            m(file, this.statement, this._parent!.combination, this.path)?.valid
+            m(item, this.statement, this._parent!.combination, this.path)?.valid
         )
         .some((a) => !a);
     });
@@ -116,8 +187,8 @@ export class DecisionTreeExpression extends DecisionTreeNode {
   private generatePossibleSolutions(
     selectType: 'exact' | 'min' | 'max',
     selectNumber: number,
-    files: IFile[]
-  ): PossibleSolution[][] {
+    files: T[]
+  ): PossibleSolution<T>[][] {
     if (selectNumber > files.length) {
       return []; // can't select more items than available
     }
@@ -127,7 +198,7 @@ export class DecisionTreeExpression extends DecisionTreeNode {
     }
 
     if (selectType === 'exact') {
-      return powArray(files, selectNumber - 1, selectNumber - 1)
+      return this.powArray(files, selectNumber - 1, selectNumber - 1)
         .map((a) =>
           a.map(
             (b) =>
@@ -138,11 +209,10 @@ export class DecisionTreeExpression extends DecisionTreeNode {
               })
           )
         )
-        .filter(cleanUpSolutions);
+        .filter(this.blueprint.cleanUpSolutions);
     }
     if (selectType === 'min') {
-      console.log('MIN TRUE');
-      return powArray(files, selectNumber - 1, files.length)
+      return this.powArray(files, selectNumber - 1, files.length)
         .map((a) =>
           a.map(
             (b) =>
@@ -153,23 +223,21 @@ export class DecisionTreeExpression extends DecisionTreeNode {
               })
           )
         )
-        .filter(cleanUpSolutions);
+        .filter(this.blueprint.cleanUpSolutions);
     }
     if (selectType === 'max') {
-      console.log('MAX TRUE');
-      return [
-        [],
-        ...powArray(files, 0, selectNumber - 1),
-      ].map((a) =>
-        a.map(
-          (b) =>
-            new PossibleSolution({
-              path: this.path,
-              statement: this.statement,
-              selection: b,
-            })
+      return [[], ...this.powArray(files, 0, selectNumber - 1)]
+        .map((a) =>
+          a.map(
+            (b) =>
+              new PossibleSolution({
+                path: this.path,
+                statement: this.statement,
+                selection: b,
+              })
+          )
         )
-      ).filter(cleanUpSolutions);
+        .filter(this.blueprint.cleanUpSolutions);
     }
 
     throw new Error('Not working');
@@ -216,23 +284,24 @@ export class DecisionTreeExpression extends DecisionTreeNode {
   }
 }
 
-export class DecisionTreeCombination extends DecisionTreeNode {
+export class DecisionTreeCombination<T> extends DecisionTreeNode<T> {
   combination: 'and' | 'or';
-  children: DecisionTreeNode[] = [];
+  children: DecisionTreeNode<T>[] = [];
 
   constructor(
+    blueprint: JSONSetBlueprint<T>,
     combination: 'and' | 'or',
-    parent?: DecisionTreeCombination,
+    parent?: DecisionTreeCombination<T>,
     name?: string,
     description?: string,
-    children: DecisionTreeNode[] = []
+    children: DecisionTreeNode<T>[] = []
   ) {
-    super(parent, name, description);
+    super(blueprint, parent, name, description);
     this.combination = combination;
     this.children = children;
   }
 
-  append(node: DecisionTreeNode) {
+  append(node: DecisionTreeNode<T>) {
     this.children.push(node);
   }
 
@@ -257,7 +326,7 @@ export class DecisionTreeCombination extends DecisionTreeNode {
     }
   }
 
-  insert(index: number, node: DecisionTreeNode) {
+  insert(index: number, node: DecisionTreeNode<T>) {
     if (index < this.children.length) {
       this.children = [
         ...this.children.slice(0, index),
@@ -273,23 +342,24 @@ export class DecisionTreeCombination extends DecisionTreeNode {
     }
   }
 
-  override validate(files: IFile[]) {
+  override validate(files: T[]) {
     for (const child of this.children) {
       child.validate(files);
     }
 
     if (this.combination === 'and') {
-      let product: PossibleSolution[][] = this.children[0].possibleSelections;
+      let product: PossibleSolution<T>[][] =
+        this.children[0].possibleSelections;
       for (let i = 1; i < this.children.length; i++) {
         const child = this.children[i];
         const filtered = child.possibleSelections.filter(
-          (a) => !product.find((b) => areEqualArray(a, b))
+          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b))
         );
         if (filtered.length === 0) {
           product = [];
           break;
         } else {
-          const newProduct: PossibleSolution[][] = [];
+          const newProduct: PossibleSolution<T>[][] = [];
           for (const firstSelect of product) {
             for (const filteredElement of filtered) {
               newProduct.push([...firstSelect, ...filteredElement]);
@@ -298,23 +368,23 @@ export class DecisionTreeCombination extends DecisionTreeNode {
           product = newProduct;
         }
       }
-      this._possibleSelections = product.filter(cleanUpSolutions);
+      this._possibleSelections = product.filter(this.blueprint.cleanUpSolutions);
     }
 
     if (this.combination === 'or') {
-      let product: PossibleSolution[][] = [];
+      let product: PossibleSolution<T>[][] = [];
       product = this.children.map((a) => a.possibleSelections).flat();
 
       for (let i = 1; i < this.children.length; i++) {
         const child = this.children[i];
         const filtered = child.possibleSelections.filter(
-          (a) => !product.find((b) => areEqualArray(a, b))
+          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b))
         );
         if (filtered.length === 0) {
           product = [];
           break;
         } else {
-          const newProduct: PossibleSolution[][] = [];
+          const newProduct: PossibleSolution<T>[][] = [];
           for (const firstSelect of product) {
             for (const filteredElement of filtered) {
               newProduct.push([...firstSelect, ...filteredElement]);
@@ -325,12 +395,13 @@ export class DecisionTreeCombination extends DecisionTreeNode {
       }
       this._possibleSelections = product
         .filter((a) => a.length > 0)
-        .filter(cleanUpSolutions);
+        .filter(this.blueprint.cleanUpSolutions);
     }
   }
 
-  override clone(recursive = true): DecisionTreeCombination {
+  override clone(recursive = true): DecisionTreeCombination<T> {
     return new DecisionTreeCombination(
+      this.blueprint,
       this.combination,
       this._parent,
       this.name,
@@ -375,201 +446,29 @@ export class DecisionTreeCombination extends DecisionTreeNode {
     return undefined;
   }
 
-  static json2treeCombination(json: any, parent?: DecisionTreeCombination) {
+  static json2treeCombination<T>(
+    json: any,
+    blueprint: JSONSetBlueprint<T>,
+    parent?: DecisionTreeCombination<T>
+  ) {
     const root = new DecisionTreeCombination(
+      blueprint,
       json.combine.type,
       parent,
-      json.group,
+      json.name,
       json.description
     );
 
     for (const expression of json.combine.expressions) {
       if (Object.keys(expression).includes('combine')) {
-        const set = this.json2treeCombination(expression, root);
+        const set = this.json2treeCombination(expression, blueprint, root);
         root.append(set);
       } else if (JSONSetStatement) {
-        const expr = new DecisionTreeExpression(root, expression);
+        const expr = new DecisionTreeExpression<T>(blueprint, root, expression);
         root.append(expr);
       }
     }
 
     return root;
   }
-}
-
-function validateFileSize(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (statement.with.fileSize && file.size > statement.with.fileSize) {
-    return {
-      valid: false,
-      error: `File size must be less than ${statement.with.fileSize}B.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
-}
-
-function validateContent(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (
-    statement.with.content &&
-    statement.with.content.length > 0 &&
-    file.content !== undefined &&
-    !statement.with.content.includes(file.content)
-  ) {
-    return {
-      valid: false,
-      error: `File content type must be one of ${statement.with.content.join(
-        ','
-      )}.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
-}
-
-function validateMimeType(
-  file: IFile,
-  statement: JSONSetStatement,
-  combinationType: 'and' | 'or',
-  path: string
-): JSONSetResult {
-  if (
-    statement.with.mimeType &&
-    statement.with.mimeType.length > 0 &&
-    file.type !== undefined &&
-    !statement.with.mimeType.includes(file.type)
-  ) {
-    return {
-      valid: false,
-      error: `File type must be one of ${statement.with.mimeType.join(',')}.`,
-      path,
-      statement,
-      combinationType,
-    };
-  }
-  return {
-    valid: true,
-    path,
-    statement,
-    combinationType,
-  };
-}
-
-export class DecisionTree {
-  root!: DecisionTreeCombination;
-
-  constructor(root: DecisionTreeCombination) {
-    this.root = root;
-  }
-
-  validate(files: IFile[]) {
-    this.root.validate(files);
-  }
-
-  static json2tree(json: JSONSet) {
-    const root = DecisionTreeCombination.json2treeCombination(json);
-    return new DecisionTree(root);
-  }
-
-  outputTreeWithSolutions() {
-    const build = (node: DecisionTreeNode, acc: any = {}): any => {
-      if (node instanceof DecisionTreeCombination) {
-        acc[node.combination] = [];
-        for (const child of node.children) {
-          acc[node.combination].push(build(child, acc));
-        }
-        return acc;
-      } else {
-        return node.possibleSelections.map((a) =>
-          a.map((b) => `{${b.path}: ${b.selection.name}`).join(',')
-        );
-      }
-    };
-    const result = build(this.root);
-
-    console.log(JSON.stringify(result, null, 2));
-  }
-}
-
-function areEqualArray(array: PossibleSolution[], array2: PossibleSolution[]) {
-  if (array.length === array2.length) {
-    for (const solution of array) {
-      if (
-        !array2.find(
-          (a) =>
-            a.path === solution.path &&
-            a.selection.name === solution.selection.name &&
-            a.selection.type === solution.selection.type &&
-            a.selection.size === solution.selection.size &&
-            a.selection.content === solution.selection.content
-        )
-      ) {
-      }
-    }
-  }
-
-  return false;
-}
-
-export function powArray(array: IFile[], start: number, end: number) {
-  let result: IFile[][] = array.map((a) => [a]);
-
-  for (let i = 0; i < end; i++) {
-    let newArray: IFile[][] = [];
-    for (const resultElement of result) {
-      for (const iFile of array) {
-        newArray.push([...resultElement, iFile]);
-      }
-    }
-    if (i < start) {
-      result = newArray;
-    } else {
-      result.push(...newArray);
-    }
-  }
-
-  return result;
-}
-
-export function cleanUpSolutions(a: PossibleSolution[], index: number, solutions: PossibleSolution[][]) {
-  const anyDuplicate = a.some(
-    (b, i, so) => so.findIndex((c) => c.selection.name === b.selection.name) !== i
-  );
-
-  return (
-    !anyDuplicate &&
-    solutions.findIndex((b) => {
-      for (const iFile of a) {
-        const i = b.findIndex((c) => c.path === iFile.path && c.selection.name === iFile.selection.name);
-        if (i < 0) {
-          return false;
-        }
-      }
-      return true;
-    }) === index
-  );
 }

@@ -57,7 +57,7 @@ export class JSONSetCombination {
 }
 
 export class JSONSet {
-  group?: string;
+  name?: string;
   description?: string;
   combine!: JSONSetCombination;
 }

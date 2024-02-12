@@ -414,7 +414,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       if (product.length === 0) {
         this._errors.push(
           new JSONSetValidationError(
-            `Logical "${this.combination}" failed for condition "${this.path}."`
+            `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
           )
         );
         product = [];
@@ -427,7 +427,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
     if (this._possibleSelections.length === 0) {
       this._errors.push(
         new JSONSetValidationError(
-          `Logical "${this.combination}" failed for condition "${this.path}."`
+          `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
         )
       );
       this._possibleSelections = [];
@@ -450,35 +450,6 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
           })
         : []
     );
-  }
-
-  private convertFileString(fileString: string) {
-    const matches =
-      /\s*([0-9]+(?:\.?[0-9]+)?)\s?((?:B)|(?:KB)|(?:MB)|(?:TB))$/g.exec(
-        fileString
-      );
-    if (!matches || matches.length < 3) {
-      return undefined;
-    }
-    try {
-      const size = Number(matches[1]);
-      const label = matches[2];
-
-      switch (label) {
-        case 'KB':
-          return 1000 * size;
-        case 'MB':
-          return 1000000 * size;
-        case 'GB':
-          return 1000000000 * size;
-        case 'TB':
-          return 1000000000000 * size;
-      }
-    } catch (e) {
-      return undefined;
-    }
-
-    return undefined;
   }
 
   static json2treeCombination<T, U>(

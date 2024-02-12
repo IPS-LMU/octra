@@ -14,14 +14,16 @@ export class IFile {
 }
 
 export class JSONSetFileConditions {
-  fileSize?: number;
+  size?: string;
   content?: string[];
   mimeType?: string[];
+  extension?: string[];
 
   constructor(partial: JSONSetFileConditions) {
-    this.fileSize = partial.fileSize;
+    this.size = partial.size;
     this.content = partial.content;
     this.mimeType = partial.mimeType;
+    this.extension = partial.extension;
   }
 }
 
@@ -68,19 +70,94 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     return false;
   }
 
-  private validateFileSize(
+  private convertFileString = (fileString: string) => {
+    const matches =
+      /\s*([0-9]+(?:\.?[0-9]+)?)\s*((?:B)|(?:KB)|(?:MB)|(?:TB))$/g.exec(
+        fileString
+      );
+    if (!matches || matches.length < 3) {
+      return undefined;
+    }
+    try {
+      const size = Number(matches[1]);
+      const label = matches[2];
+
+      switch (label) {
+        case 'B':
+          return size;
+        case 'KB':
+          return 1000 * size;
+        case 'MB':
+          return 1000000 * size;
+        case 'GB':
+          return 1000000000 * size;
+        case 'TB':
+          return 1000000000000 * size;
+      }
+    } catch (e) {
+      return undefined;
+    }
+
+    return undefined;
+  };
+
+  private validateFileSize = (
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
     path: string
-  ): JSONSetResult {
-    if (conditions.fileSize && item.size && item.size > conditions.fileSize) {
-      return {
-        valid: false,
-        error: `File size condition not met by ${path}.`,
-        path,
-        combinationType,
-      };
+  ) => {
+    if (conditions.size && item.size) {
+      const matches =
+        /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
+          conditions.size
+        );
+
+      if (!matches) {
+        throw new Error(
+          `JSONFileSetValidationError: Invalid file size statement.`
+        );
+      }
+
+      if (matches) {
+        const size = this.convertFileString(matches[2])!;
+
+        if (matches[1] === undefined || matches[1] === '=') {
+          // exact
+          if (item.size !== size) {
+            return {
+              valid: false,
+              error: `File size condition not met by ${path}.`,
+              path,
+              combinationType,
+            };
+          }
+        }
+
+        if (matches[1] === '>=') {
+          // min
+          if (item.size < size) {
+            return {
+              valid: false,
+              error: `File size condition not met by ${path}.`,
+              path,
+              combinationType,
+            };
+          }
+        }
+
+        if (matches[1] === '<=') {
+          // max
+          if (item.size > size) {
+            return {
+              valid: false,
+              error: `File size condition not met by ${path}.`,
+              path,
+              combinationType,
+            };
+          }
+        }
+      }
     }
 
     return {
@@ -88,6 +165,15 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       path,
       combinationType,
     };
+  };
+
+  private validateExtension(
+    item: IFile,
+    conditions: JSONSetFileConditions,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult {
+    throw new Error(`not implemented`);
   }
 
   private validateContent(

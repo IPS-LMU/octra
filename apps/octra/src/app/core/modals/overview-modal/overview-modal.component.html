@@ -14,14 +14,13 @@
     <div class="row" style="overflow: auto; flex: auto">
       <div
         [ngClass]="{
-          'col-md-8 col-lg-9':
+          'col-md-6 col-lg-9':
             appStorage.useMode === 'online' ||
             this.appStorage.useMode === 'demo',
           'col-12':
             appStorage.useMode !== 'online' &&
             this.appStorage.useMode !== 'demo'
         }"
-        class="col-md-6"
         style="
           overflow: auto;
           max-height: 1200px;
@@ -36,7 +35,7 @@
       </div>
       <div
         *ngIf="
-          appStorage.useMode === 'online' || this.appStorage.useMode === 'demo'
+          appStorage.useMode === 'online' || appStorage.useMode === 'demo'
         "
         class="col-md-4 col-lg-3"
         style="overflow: auto; max-height: 1200px"

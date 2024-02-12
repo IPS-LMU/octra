@@ -37,19 +37,18 @@ export class OverviewModalComponent
     keyboard: false,
     backdrop: true,
     scrollable: true,
-    size: "xl",
-    fullscreen: "xl"
+    size: 'xl',
+    fullscreen: 'xl',
   };
 
-  @ViewChild('feedback', { static: false })
-  feedback!: TranscriptionFeedbackComponent;
+  @ViewChild('feedback', {static: false}) feedback?: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = undefined;
   private shortcutID = -1;
   visible = false;
 
-  public get feedBackComponent(): TranscriptionFeedbackComponent {
+  public get feedBackComponent(): TranscriptionFeedbackComponent | undefined {
     return this.feedback;
   }
 
@@ -144,11 +143,15 @@ export class OverviewModalComponent
   }
 
   ngAfterViewInit() {
-    this.feedback.comment = this.annotationStoreService.comment;
+    if (this.feedback) {
+      this.feedback.comment = this.annotationStoreService.comment;
+    }
   }
 
   public override close(fromModal = false) {
-    this.annotationStoreService.comment = this.feedback.comment;
+    if (this.feedback) {
+      this.annotationStoreService.comment = this.feedback.comment;
+    }
 
     // unsubscribe shortcut listener
     if (this.shortcutID > -1) {
@@ -157,8 +160,9 @@ export class OverviewModalComponent
     }
 
     if (
-      this.appStorage.useMode === LoginMode.ONLINE ||
-      this.appStorage.useMode === LoginMode.DEMO
+      (this.appStorage.useMode === LoginMode.ONLINE ||
+        this.appStorage.useMode === LoginMode.DEMO) &&
+      this.feedback
     ) {
       this.feedback.saveFeedbackform();
     }
@@ -192,7 +196,9 @@ export class OverviewModalComponent
       // this.feedback.saveFeedbackform();
     }
 
-    this.annotationStoreService.comment = this.feedback.comment;
+    if (this.feedback) {
+      this.annotationStoreService.comment = this.feedback.comment;
+    }
     this.transcriptionSend.emit();
   }
 

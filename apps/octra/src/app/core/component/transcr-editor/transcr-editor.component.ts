@@ -620,7 +620,7 @@ export class TranscrEditorComponent
             return;
           }
 
-          if (this.joditComponent?.value !== '') {
+          if (this.joditComponent) {
             if (this.wysiwyg.innerHTML.indexOf('<p>') === 0) {
               this.placeAtEnd(this.wysiwyg.getElementsByTagName('p')[0]);
             } else {

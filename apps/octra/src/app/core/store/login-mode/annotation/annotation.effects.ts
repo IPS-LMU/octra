@@ -707,16 +707,18 @@ export class AnnotationEffects {
 
               if (state.application.mode === LoginMode.DEMO) {
                 inputs = state.application
-                  .appConfiguration!.octra.audioExamples.map((a) => ({
-                    id: Date.now().toString(),
-                    filename: FileInfo.fromURL(a.url).fullname,
-                    fileType: 'audio/wave',
-                    type: 'input',
-                    url: a.url,
-                    creator_type: TaskInputOutputCreatorType.user,
-                    content: '',
-                    content_type: '',
-                  }))
+                  .appConfiguration!.octra.audioExamples.map((a) => {
+                    return {
+                      id: Date.now().toString(),
+                      filename: FileInfo.fromURL(a.url).fullname,
+                      fileType: 'audio/wave',
+                      type: 'input',
+                      url: a.url,
+                      creator_type: TaskInputOutputCreatorType.user,
+                      content: '',
+                      content_type: '',
+                    };
+                  })
                   .slice(0, 1); // TODO select audio
               } else if (state.application.mode === LoginMode.LOCAL) {
                 inputs = [

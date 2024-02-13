@@ -328,7 +328,7 @@ export class OctraAnnotation<
               new OctraAnnotationSegment(
                 this.idCounters.item++,
                 time!,
-                labels && (labels.length > 0) ? labels : oldLabels,
+                labels && labels.length > 0 ? labels : oldLabels,
                 context ?? {}
               ) as any,
             ];
@@ -551,7 +551,7 @@ export class OctraAnnotation<
   ): OAnnotJSON {
     return new OAnnotJSON(
       mediaFileName,
-      mediaFileName.replace(/\.[^.]+$/g, '') + '_annotation.json',
+      mediaFileName.replace(/\.[^.]+$/g, ''),
       sampleRate,
       this.levels.map((a) => {
         const result = a.serialize();

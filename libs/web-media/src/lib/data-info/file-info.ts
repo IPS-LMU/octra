@@ -101,7 +101,7 @@ export class FileInfo extends DataInfo {
   ) {
     const extraction = extractFileNameFromURL(url);
     const result = new FileInfo(
-      name ?? `${extraction.name}.${extraction.extension}`,
+      name ?? `${extraction.name}${extraction.extension}`,
       type ?? this.getMimeTypeByExtension(extraction.extension),
       size ?? 0,
       undefined,

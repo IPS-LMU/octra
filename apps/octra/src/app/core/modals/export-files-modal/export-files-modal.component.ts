@@ -205,7 +205,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         return;
       }
       const oannotjson = this.annotationStoreService.transcript?.serialize(
-        `${this.audio.audioManager.resource.info.name}_annot.json`,
+        this.audio.audioManager.resource.info.fullname,
         this.audio.audioManager.sampleRate,
         this.audio.audioManager.resource.info.duration
       );

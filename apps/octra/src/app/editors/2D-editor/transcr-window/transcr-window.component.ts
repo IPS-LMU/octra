@@ -362,33 +362,53 @@ export class TranscrWindowComponent
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this._validationEnabled = false;
-    this.editor.updateRawText();
-    this.save();
-    this.setValidationEnabledToDefault();
-
-    if (this.audioManager.isPlaying) {
-      await this.audiochunk.stopPlayback();
-    }
-
-    if (direction !== 'down') {
-      await this.goToSegment(direction);
-      const currentLevel = this.annotationStoreService.currentLevel;
-      const segment = currentLevel!.items[
-        this.segmentIndex
-      ] as OctraAnnotationSegment;
-
-      if (!segment?.context?.asr?.isBlockedBy) {
-        this.audiochunk.startPlayback().catch((error) => {
-          console.error(error);
-        });
+    const doFunc = async () => {
+      try {
+        this._validationEnabled = false;
+        this.editor.updateRawText();
+        this.save();
+        this.setValidationEnabledToDefault();
+      } catch (e) {
+        console.error(e);
       }
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    } else {
-      this.close();
-    }
-    this._loading = false;
+
+      if (this.audioManager.isPlaying) {
+        try {
+          await this.audiochunk.stopPlayback();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (direction !== 'down') {
+        try {
+          await this.goToSegment(direction);
+          const currentLevel = this.annotationStoreService.currentLevel;
+          const segment = currentLevel!.items[
+            this.segmentIndex
+          ] as OctraAnnotationSegment;
+
+          if (!segment?.context?.asr?.isBlockedBy) {
+            this.audiochunk.startPlayback().catch((error) => {
+              console.error(error);
+            });
+          }
+        } catch (e) {
+          // ignore
+          console.error(e);
+        } finally {
+          this._loading = false;
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        }
+      } else {
+        this.close();
+      }
+    };
+
+    this.subscribe(timer(0), {
+      next: doFunc,
+    });
   };
 
   ngOnInit() {
@@ -683,7 +703,7 @@ export class TranscrWindowComponent
    * selects the next segment on the left or on the right side
    */
   goToSegment(direction: string) {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       this.editor.isTyping = false;
 
       if (
@@ -785,11 +805,25 @@ export class TranscrWindowComponent
             new AudioSelection(begin, segment.time.clone())
           )!;
 
-          // resolve only after the audio viewer is ready
-          const subscr = this.loupe.onInitialized.subscribe(() => {
-            subscr.unsubscribe();
-            resolve();
+          this.subscribe(timer(0), {
+            next: () => {
+              // resolve only after the audio viewer is ready
+              this.subscriptionManager.removeByTag('oninitialized');
+              this.subscribe(
+                this.loupe.onInitialized,
+                {
+                  next: () => {
+                    this.subscriptionManager.removeByTag('oninitialized');
+                    resolve();
+                  },
+                },
+                'oninitialized'
+              );
+            },
           });
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
         } else {
           resolve();
         }

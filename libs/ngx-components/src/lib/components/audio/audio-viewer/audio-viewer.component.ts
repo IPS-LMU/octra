@@ -595,7 +595,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       this.stage.height(this.height);
 
-      this.onInitialized.next();
       for (const [, value] of Object.entries(this.layers)) {
         value.removeChildren();
       }
@@ -742,6 +741,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       }
 
       this.stage.batchDraw();
+      this.onInitialized.next();
     } else {
       console.error(`transcriptionLevel is undefined`);
     }

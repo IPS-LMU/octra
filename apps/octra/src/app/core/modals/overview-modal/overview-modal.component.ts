@@ -33,6 +33,7 @@ export class OverviewModalComponent
   extends OctraModal
   implements OnInit, OnDestroy, AfterViewInit
 {
+  public override name = 'OverviewModalComponent';
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
@@ -41,7 +42,8 @@ export class OverviewModalComponent
     fullscreen: 'xl',
   };
 
-  @ViewChild('feedback', {static: false}) feedback?: TranscriptionFeedbackComponent;
+  @ViewChild('feedback', { static: false })
+  feedback?: TranscriptionFeedbackComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = undefined;

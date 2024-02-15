@@ -42,12 +42,12 @@ export class OctraModalService {
     this.applyData(ref, data);
     this.onModalAction.emit({
       type: 'open',
-      name: modal.name,
+      name: (ref.componentInstance! as any).name,
     });
     ref.result.then((result) => {
       this.onModalAction.emit({
         type: 'close',
-        name: modal.name,
+        name: (ref.componentInstance! as any).name,
         result,
       });
     });

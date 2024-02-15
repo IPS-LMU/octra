@@ -8,69 +8,46 @@ export interface AudioFileMetaData {
   lossless?: boolean;
 }
 
-export interface JSONSetConstraints {
-  description?: string;
-}
-
-export interface JSONSETFileConstraints extends JSONSetConstraints {
-  extension?: string[];
-  description?: string;
-  contentFormat?: string;
-  mimeType?: string[];
-  namePattern?: string;
-  file?: {
-    maxSize?: string;
-  };
-}
-
-export interface JSONFileSetStatement extends JSONSetStatement {
-  constraints: JSONSETFileConstraints[];
-}
-
-export interface JSONFileSetDefinition {
-  description?: string;
-  name?: string;
-  unique?: boolean;
-  uniqueSelector?: 'object';
-
-  statements: JSONFileSetStatement[];
-}
-
-export interface JSONSetDefinition {
-  description?: string;
-  name?: string;
-  unique?: boolean;
-  uniqueSelector?: 'object';
-
-  statements: JSONSetStatement[];
-}
-
-export interface JSONSetValidationError {
+export class JSONSetValidationError<U> {
   path?: string;
-  constraint?: string;
-  message: string;
+  message!: string;
+  statement?: JSONSetStatement<U>;
+  combinationType?: 'and' | 'or';
+
+  constructor(message: string, path?: string) {
+    this.message = message;
+    this.path = path;
+  }
 }
 
-export interface JSONFileSetValidationError {
-  filename: string;
-  path?: string;
-  constraint?: string;
-  message: string;
-  statement?: JSONSetStatement
-}
-
-export interface JSONSetStatement {
-  combination: JSONSetCombination;
+export class JSONSetStatement<U> {
+  select: string;
+  with: U | U[];
   name?: string;
   description?: string;
-  optional?: boolean;
-  take?: number;
-  takeMax?: number;
-  takeMin?: number;
-  constraints: JSONSetConstraints[];
+
+  constructor(partial: JSONSetStatement<U>) {
+    this.select = partial.select;
+    this.with = partial.with;
+    this.name = partial.name;
+    this.description = partial.description;
+  }
 }
 
-export enum JSONSetCombination {
-  'union' = 'union',
-  'difference' = 'difference',
+export class JSONSetCombination<U> {
+  type: 'and' | 'or';
+  expressions: JSONSetExpression<U>[];
+
+  constructor(partial: JSONSetCombination<U>) {
+    this.type = partial.type;
+    this.expressions = partial.expressions;
+  }
 }
+
+export class JSONSet<U> {
+  name?: string;
+  description?: string;
+  combine!: JSONSetCombination<U>;
+}
+
+export type JSONSetExpression<U> = JSONSetStatement<U> | JSONSet<U>;

@@ -7,6 +7,7 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { DefaultComponent } from './core/component/default.component';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
+import { FileSetValidator } from '@octra/json-sets';
 
 @Component({
   selector: 'octra-app',
@@ -48,6 +49,73 @@ export class AppComponent
         },
       });
     }
+
+    const validator = new FileSetValidator({
+      name: 'one audio file and one text file',
+      description: 'root description',
+      combine: {
+        type: 'and',
+        expressions: [
+          {
+            select: '1',
+            name: 'audiofile',
+            description: '',
+            with: [
+              {
+                size: '<= 2MB',
+                mimeType: ['audio/wav', 'audio/ogg'],
+              },
+            ],
+          },
+          {
+            select: '1',
+            name: 'textfile',
+            description: '',
+            with: {
+              size: '<= 2MB',
+              mimeType: ['application/json'],
+              content: ['AnnotJSON'],
+            },
+          },
+        ],
+      },
+    });
+
+    validator.validate([
+      {
+        name: 'test.wav',
+        size: 1000,
+        type: 'audio/wav',
+      },
+      {
+        name: 'test.ogg',
+        size: 1000,
+        type: 'audio/ogg',
+      },
+      {
+        name: 'test.json',
+        size: 1000,
+        type: 'application/json',
+        content: 'AnnotJSON',
+      },
+    ]);
+    console.log(`TREE__________`);
+    console.log(validator);
+    console.log(`SOLUTION__________`);
+    console.log(
+      JSON.stringify(
+        validator.decisionTree!.possibleSelections.map((a: any) =>
+          a.map((b: any) => ({
+            path: b.path,
+            selection: b.selection,
+          }))
+        ),
+        null,
+        2
+      )
+    );
+    console.log('ERRORS');
+    console.log(validator.decisionTree!._errors);
   }
 
   ngOnInit() {

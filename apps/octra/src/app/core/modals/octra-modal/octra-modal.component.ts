@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppInfo } from '../../../app.info';
 import { hasProperty } from '@octra/utilities';
 import { APIService } from '../../shared/service';
@@ -75,23 +75,6 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
       this.appStorage.snapshot.authentication.me?.email !== undefined
         ? this.appStorage.snapshot.authentication.me?.email
         : '';
-
-    this.subscribe(this.modService.showmodal, (result: any) => {
-      this.data = result;
-
-      if (result.type !== undefined) {
-        this.openModal(result.type)
-          .then((answer) => {
-            result.emitter.emit(answer);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      } else {
-        const emitter: EventEmitter<any> = result.emitter;
-        emitter.error('modal function not supported');
-      }
-    });
   }
 
   openModal(name: string, data?: any): Promise<any> {

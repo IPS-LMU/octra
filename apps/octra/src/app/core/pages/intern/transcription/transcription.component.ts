@@ -2,7 +2,6 @@ import {
   ChangeDetectorRef,
   Component,
   ComponentRef,
-  EventEmitter,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -403,33 +402,6 @@ export class TranscriptionComponent
             (this._currentEditor.instance as any).update();
           }
           break;
-      }
-    });
-
-    this.subscribe(this.modService.showmodal, {
-      next: (event: {
-        type: string;
-        data?: any;
-        emitter: EventEmitter<any>;
-      }) => {
-        if (
-          this.currentEditor !== undefined &&
-          (this.currentEditor.instance as any).editor !== undefined
-        ) {
-          const editor = this._currentEditor
-            .instance as OctraEditorRequirements;
-          editor.disableAllShortcuts();
-        }
-      },
-    });
-
-    this.subscribe(this.modService.closemodal, () => {
-      if (
-        this.currentEditor !== undefined &&
-        (this.currentEditor.instance as any).editor !== undefined
-      ) {
-        const editor = this._currentEditor.instance as OctraEditorRequirements;
-        editor.enableAllShortcuts();
       }
     });
 

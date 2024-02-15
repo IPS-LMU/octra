@@ -13,13 +13,11 @@ import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-n
 
 @Injectable()
 export class OctraModalService {
-  public showmodal = new EventEmitter<{
-    type: string;
-    data?: any;
-    emitter: EventEmitter<any>;
+  onModalAction = new EventEmitter<{
+    name: string;
+    type: 'open' | 'close';
+    result?: any;
   }>();
-  public closemodal = new EventEmitter<{ type: string }>();
-  private modalaction = new EventEmitter<any>();
 
   constructor(private modalService: NgbModal) {}
 
@@ -42,6 +40,17 @@ export class OctraModalService {
       ...config,
     }) as NgbModalWrapper<T>;
     this.applyData(ref, data);
+    this.onModalAction.emit({
+      type: 'open',
+      name: modal.name,
+    });
+    ref.result.then((result) => {
+      this.onModalAction.emit({
+        type: 'close',
+        name: modal.name,
+        result,
+      });
+    });
 
     return ref;
   }
@@ -66,6 +75,19 @@ export class OctraModalService {
     ref.componentInstance.type = type;
     ref.componentInstance.forceLogout = forceLogout;
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
+
+    this.onModalAction.emit({
+      type: 'open',
+      name: 're-authentication',
+    });
+    ref.result.then((result) => {
+      this.onModalAction.emit({
+        type: 'close',
+        name: 're-authentication',
+        result,
+      });
+    });
+
     return ref;
   }
 
@@ -75,6 +97,18 @@ export class OctraModalService {
       ErrorModalComponent.options
     );
     ref.componentInstance.text = text;
+
+    this.onModalAction.emit({
+      type: 'open',
+      name: 'error',
+    });
+    ref.result.then((result) => {
+      this.onModalAction.emit({
+        type: 'close',
+        name: 'error',
+        result,
+      });
+    });
   }
 
   openFeedbackModal() {
@@ -82,5 +116,17 @@ export class OctraModalService {
       FeedbackNoticeModalComponent,
       FeedbackNoticeModalComponent.options
     );
+
+    this.onModalAction.emit({
+      type: 'open',
+      name: 'feedback',
+    });
+    ref.result.then((result) => {
+      this.onModalAction.emit({
+        type: 'close',
+        name: 'feedback',
+        result,
+      });
+    });
   }
 }

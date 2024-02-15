@@ -49,6 +49,7 @@ import {
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
+import { OctraModalService } from '../../core/modals/octra-modal.service';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -340,11 +341,15 @@ export class TwoDEditorComponent
     private cd: ChangeDetectorRef,
     private langService: TranslocoService,
     private asrStoreService: AsrStoreService,
+    private modalService: OctraModalService,
     private shortcutService: ShortcutService
   ) {
     super();
     this.initialized = new EventEmitter<void>();
     this.miniLoupeSettings = new AudioviewerConfig();
+    this.subscribe(this.modalService.onModalAction, {
+      next: this.onModalAction,
+    });
   }
 
   ngOnInit() {
@@ -1083,4 +1088,10 @@ export class TwoDEditorComponent
       );
     }
   }
+
+  private onModalAction = (event: any) => {
+    if (event.type === 'open' && event.name === 'OverviewModalComponent') {
+      this.window.close();
+    }
+  };
 }

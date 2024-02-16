@@ -18,12 +18,14 @@ export class JSONSetFileConditions {
   content?: string[];
   mimeType?: string[];
   extension?: string[];
+  namePattern?: string;
 
   constructor(partial: JSONSetFileConditions) {
     this.size = partial.size;
     this.content = partial.content;
     this.mimeType = partial.mimeType;
     this.extension = partial.extension;
+    this.namePattern = partial.namePattern;
   }
 }
 
@@ -45,6 +47,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       this.validateContent,
       this.validateFileSize,
       this.validateExtension,
+      this.validateNamePattern
     ];
   }
 
@@ -217,6 +220,31 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
         error: `File content type must be one of ${conditions.content.join(
           ','
         )}.`,
+        path,
+        combinationType,
+      };
+    }
+
+    return {
+      valid: true,
+      path,
+      combinationType,
+    };
+  }
+
+  private validateNamePattern(
+    item: IFile,
+    conditions: JSONSetFileConditions,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult {
+    if (
+      conditions.namePattern &&
+      new RegExp(conditions.namePattern).exec(item.name) === null
+    ) {
+      return {
+        valid: false,
+        error: `File name does not match pattern "${conditions.namePattern}".`,
         path,
         combinationType,
       };

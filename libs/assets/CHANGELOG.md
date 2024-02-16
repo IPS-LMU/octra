@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.1.0](https://github.com/IPS-LMU/octra/compare/assets-0.0.3...assets-0.1.0) (2024-02-16)
+
+
+### Features
+
+* **assets:** add JSON definitions inputs and outputs ([e527f39](https://github.com/IPS-LMU/octra/commit/e527f399f1032219c086105905db2281906a2535))
+
+
+
 ## [0.0.3](https://github.com/IPS-LMU/octra/compare/assets-0.0.2...assets-0.0.3) (2023-11-24)
 
 

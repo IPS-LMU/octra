@@ -29,7 +29,7 @@
                 ],
                 "properties": {
                   "select": {
-                    "type": "number"
+                    "type": "string"
                   },
                   "name": {
                     "type": "string"
@@ -38,16 +38,34 @@
                     "type": "string"
                   },
                   "with": {
-                    "type": "object",
-                    "properties": {
-                      "fileSize": {
-                        "type": "number"
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "size": {
+                            "type": "string"
+                          },
+                          "mimeType": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "content": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
                       }
-                    }
+                    ]
                   }
                 }
               },
-              { "$ref": "#" }
+              {
+                "$ref": "#"
+              }
             ]
           }
         }

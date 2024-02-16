@@ -183,16 +183,17 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
     let result = checkedConditions.filter((a) => a.length > 0).flat();
     this._possibleSelections = [];
 
+    const parsedSelectStatement = this.parseSelectStatement(
+      this.statement.select
+    );
     if (result.length > 0) {
-      const parsedSelectStatement = this.parseSelectStatement(
-        this.statement.select
-      );
-
       this._possibleSelections = this.generatePossibleSolutions(
         parsedSelectStatement.type,
         parsedSelectStatement.selectNumber,
         result
       );
+    } else if(parsedSelectStatement.type === "max"){
+      this._possibleSelections.push([]);
     }
 
     this.validItem = this.possibleSelections.length > 0;

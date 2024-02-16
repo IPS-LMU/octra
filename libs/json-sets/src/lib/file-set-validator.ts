@@ -44,6 +44,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       this.validateMimeType,
       this.validateContent,
       this.validateFileSize,
+      this.validateExtension,
     ];
   }
 
@@ -72,7 +73,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
 
   private convertFileString = (fileString: string) => {
     const matches =
-      /\s*([0-9]+(?:\.?[0-9]+)?)\s*((?:B)|(?:KB)|(?:MB)|(?:TB))$/g.exec(
+      /\s*([0-9]+(?:\.?[0-9]+)?)\s*((?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB))$/g.exec(
         fileString
       );
     if (!matches || matches.length < 3) {
@@ -109,7 +110,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   ) => {
     if (conditions.size && item.size) {
       const matches =
-        /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
+        /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+\.?[0-9]*\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
           conditions.size
         );
 
@@ -173,7 +174,31 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     combinationType: 'and' | 'or',
     path: string
   ): JSONSetResult {
-    throw new Error(`not implemented`);
+    if (conditions.extension && conditions.extension.length > 0 && item.name) {
+      for (const ext of conditions.extension) {
+        if (new RegExp(`${ext.replace(/\./g, '\\.')}$`).exec(item.name)) {
+          return {
+            valid: true,
+            path,
+            combinationType,
+          };
+        }
+      }
+
+      return {
+        valid: false,
+        error: `File content type must be one of ${conditions.extension.join(
+          ','
+        )}.`,
+        path,
+        combinationType,
+      };
+    }
+    return {
+      valid: true,
+      path,
+      combinationType,
+    };
   }
 
   private validateContent(

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.0...json-sets-0.1.1) (2024-02-16)
+
+
+### Features
+
+* **json-sets:** add attribute "namePattern" for file name validation ([5f29025](https://github.com/IPS-LMU/octra/commit/5f290255a05dc11e41bfdba795bb9ad871719446))
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/json-sets-0.0.8...json-sets-0.1.0) (2024-02-16)
 
 

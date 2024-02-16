@@ -59,6 +59,17 @@ library with shared assets in octra applications e.g. JSON schemata
 </tr>
 <tr>
 <td>
+<a href="./json-sets/src/">json-sets</a>
+</td>
+<td>
+Browser, NodeJS
+</td>
+<td>
+This library allows to define a set of valid objects using JSON and valid these.
+</td>
+</tr>
+<tr>
+<td>
 <a href="./annotation/src/">annotation</a>
 </td>
 <td>

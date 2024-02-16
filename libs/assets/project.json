@@ -10,7 +10,10 @@
       "generateExportsField": true,
       "options": {
         "outputPath": "dist/libs/assets",
-        "tsConfig": "libs/assets/tsconfig.lib.json"
+        "tsConfig": "libs/assets/tsconfig.lib.json",
+        "assets": [
+          { "glob": "inputs_outputs.set.json", "input": "./libsass/assets/src/lib/schemata/", "output": "./asas" }
+        ]
       }
     },
     "lint": {

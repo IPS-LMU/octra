@@ -15,6 +15,7 @@
     "build:extern": "node runner.js build:extern",
     "build:json-sets": "node runner.js build:json-sets",
     "build:assets": "nx build assets",
+    "bundle:assets": "node runner.js bundle:assets",
     "build:web-components": "nx build ngx-components && nx build web-components --outputHashing none && node prepare_web-components.js",
     "build:watch:deploy": "nx build octra --configuration=public-development --base-href=/apps/octra/octra-dev/ --outputPath ./deploy --watch",
     "release:lib:annotation": "node runner.js build:lib annotation && nx run annotation:version --push",

@@ -1,0 +1,145 @@
+{
+  "inputs": {
+    "name": "one audio file and one text file",
+    "description": "root description",
+    "combine": {
+      "type": "and",
+      "expressions": [
+        {
+          "select": "1",
+          "name": "audiofile",
+          "description": "",
+          "with": [
+            {
+              "size": "<= 1.9GB",
+              "mimeType": [
+                "audio/wav",
+                "audio/ogg"
+              ],
+              "extension": [
+                ".wav",
+                ".ogg"
+              ]
+            }
+          ]
+        },
+        {
+          "select": "<= 1",
+          "name": "transcript",
+          "description": "Transcript file",
+          "with": [
+            {
+              "mimeType": [
+                "application/json"
+              ],
+              "extension": [
+                "_annot.json"
+              ],
+              "content": [
+                "AnnotJSON"
+              ]
+            },
+            {
+              "extension": [
+                ".ctm"
+              ],
+              "content": [
+                "CTM"
+              ]
+            },
+            {
+              "extension": [
+                ".eaf"
+              ],
+              "content": [
+                "ELAN"
+              ]
+            },
+            {
+              "extension": [
+                ".par"
+              ],
+              "content": [
+                "BASPartitur"
+              ]
+            },
+            {
+              "extension": [
+                ".Table"
+              ],
+              "content": [
+                "PraatTable"
+              ]
+            },
+            {
+              "extension": [
+                ".TextGrid"
+              ],
+              "content": [
+                "TextGrid"
+              ]
+            },
+            {
+              "extension": [
+                ".srt"
+              ],
+              "content": [
+                "SRT"
+              ]
+            },
+            {
+              "extension": [
+                ".txt"
+              ],
+              "mimeType": [
+                "text/plain"
+              ],
+              "content": [
+                "Text"
+              ]
+            },
+            {
+              "extension": [
+                ".vtt"
+              ],
+              "content": [
+                "WebVTT"
+              ]
+            },
+            {
+              "extension": [
+                ".json"
+              ],
+              "content": [
+                "WhisperJSON"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "name": "one audio file and one text file",
+    "description": "root description",
+    "combine": {
+      "type": "and",
+      "expressions": [
+        {
+          "select": "1",
+          "name": "transcript",
+          "description": "The transcribed content of an audio file",
+          "with": {
+            "mimeType": [
+              "application/json"
+            ],
+            "extension": [
+              "_annot.json"
+            ],
+            "content": "AnnotJSON"
+          }
+        }
+      ]
+    }
+  }
+}

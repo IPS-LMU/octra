@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.11](https://github.com/IPS-LMU/octra/compare/web-media-0.0.10...web-media-0.0.11) (2024-02-17)
+
+
+### Bug Fixes
+
+* **octra:** exported files with wrong naming ([2bd0540](https://github.com/IPS-LMU/octra/commit/2bd05403b3cc8e7c1f6d7e0b647e378f2aa1996d))
+* **octra:** logger.map function not found, extract full name without extension ([1bceed3](https://github.com/IPS-LMU/octra/commit/1bceed3e2755e91e78c4c95ad3f8cd098c09fdfd))
+
+
+
 ## [0.0.10](https://github.com/IPS-LMU/octra/compare/web-media-0.0.9...web-media-0.0.10) (2024-01-16)
 
 

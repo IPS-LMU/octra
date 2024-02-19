@@ -415,7 +415,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       if (product.length === 0) {
         this._errors.push(
           new JSONSetValidationError(
-            `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
+            this.description ?? `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
           )
         );
         product = [];
@@ -428,7 +428,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
     if (this._possibleSelections.length === 0) {
       this._errors.push(
         new JSONSetValidationError(
-          `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
+          this.description ?? `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
         )
       );
       this._possibleSelections = [];

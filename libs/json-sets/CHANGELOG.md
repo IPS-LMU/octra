@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.2](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.1...json-sets-0.1.2) (2024-02-19)
+
+
+### Features
+
+* **json-sets:** show description as error message instead of logical error ([63acb0b](https://github.com/IPS-LMU/octra/commit/63acb0b971c4ccd8900a1d4b3a9674c8772917f4))
+
+
+
 ## [0.1.1](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.0...json-sets-0.1.1) (2024-02-16)
 
 

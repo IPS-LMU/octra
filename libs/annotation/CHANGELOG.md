@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.12](https://github.com/IPS-LMU/octra/compare/annotation-0.1.11...annotation-0.1.12) (2024-02-28)
+
+
+### Bug Fixes
+
+* **annotation:** full name instead of name set on AnnotJSON on format import ([0419bd4](https://github.com/IPS-LMU/octra/commit/0419bd4a21079eb2dc5e4ea617680090f0fce919))
+
+
+
 ## [0.1.11](https://github.com/IPS-LMU/octra/compare/annotation-0.1.10...annotation-0.1.11) (2024-02-28)
 
 

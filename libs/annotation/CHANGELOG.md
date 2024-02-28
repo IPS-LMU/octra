@@ -2,6 +2,33 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.11](https://github.com/IPS-LMU/octra/compare/annotation-0.1.10...annotation-0.1.11) (2024-02-28)
+
+
+### Bug Fixes
+
+* **ngx-components:** placing boundary on transcribed segment removes transcript ([5fc3cb7](https://github.com/IPS-LMU/octra/commit/5fc3cb73528084a92430164483e52304d42887f8))
+* **octra:** exported files with wrong naming ([2bd0540](https://github.com/IPS-LMU/octra/commit/2bd05403b3cc8e7c1f6d7e0b647e378f2aa1996d))
+
+
+### Code Refactoring
+
+* **annotation:** getLeftSibling() and getRightSibling() now uses index as parameter ([828b984](https://github.com/IPS-LMU/octra/commit/828b984a1acd9df5bd439f0c6a16737b4482933f))
+
+
+### Features
+
+* **annotation:** fix missing segment at the end of whisper json annotation ([91d6008](https://github.com/IPS-LMU/octra/commit/91d60083f839c1578f9fc4dc572416eac6fda0e3))
+* **annotation:** new converter for WhisperJSON format ([ecc0038](https://github.com/IPS-LMU/octra/commit/ecc00383e6d3f44031440fb664c7880be131fb64))
+
+
+### BREAKING CHANGES
+
+* **annotation:** check your calls of getLeftSibling() and
+getRightSibling() and change parameters to index values.
+
+
+
 ## [0.1.10](https://github.com/IPS-LMU/octra/compare/annotation-0.1.9...annotation-0.1.10) (2023-11-24)
 
 

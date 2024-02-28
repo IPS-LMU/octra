@@ -103,7 +103,7 @@ export class CTMConverter extends Converter {
 
     const result = new OAnnotJSON(
       audiofile.name,
-      file.name,
+      this.getFileName(file.name),
       audiofile.sampleRate
     );
 

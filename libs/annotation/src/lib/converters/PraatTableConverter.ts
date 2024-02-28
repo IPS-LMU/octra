@@ -102,7 +102,7 @@ export class PraatTableConverter extends Converter {
     const lines: string[] = content.split('\n');
 
     // check if filename is equal with audio file
-    const filename = file.name.substr(0, file.name.indexOf('.Table'));
+    const filename = this.getFileName(file.name);
 
     if (contains(audiofile.name, filename)) {
       const tiers: string[] = [];

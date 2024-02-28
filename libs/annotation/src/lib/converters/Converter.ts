@@ -114,4 +114,16 @@ export abstract class Converter {
    * returns object with an annotjson or an error.
    */
   public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
+
+  /**
+   * removes the extension of the current convert from the filename
+   * @param fullname
+   * @protected
+   */
+  protected getFileName(fullname: string) {
+    return fullname.replace(
+      new RegExp(this._extension.replace(/\./g, '\\.') + '$'),
+      ''
+    );
+  }
 }

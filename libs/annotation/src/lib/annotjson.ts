@@ -69,6 +69,9 @@ export interface IAudioFile {
 export class OAnnotJSON
   implements IAnnotJSON, Serializable<IAnnotJSON, OAnnotJSON>
 {
+  /**
+   * name of the annotation file WITHOUT extension
+   */
   name = '';
   annotates = '';
   sampleRate;
@@ -88,6 +91,14 @@ export class OAnnotJSON
     return Math.max(1, last(this.levels.map((a, i) => i + 1))!);
   }
 
+  /**
+   * initiates a new AnnotJSON object
+   * @param annotates
+   * @param name file name WITHOUT extension
+   * @param sampleRate
+   * @param levels
+   * @param links
+   */
   constructor(
     annotates: string,
     name: string,

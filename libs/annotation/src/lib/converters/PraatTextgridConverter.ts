@@ -130,10 +130,7 @@ export class PraatTextgridConverter extends Converter {
     }
 
     const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
-    const fileName =
-      file.name.indexOf('.') > -1
-        ? file.name.substr(0, file.name.lastIndexOf('.'))
-        : file.name;
+    const fileName = this.getFileName(file.name);
     if (name === fileName) {
       const result = new OAnnotJSON(
         audiofile.name,

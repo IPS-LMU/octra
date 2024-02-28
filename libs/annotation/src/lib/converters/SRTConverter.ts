@@ -143,7 +143,7 @@ export class SRTConverter extends Converter {
     if (audiofile) {
       const result = new OAnnotJSON(
         audiofile.name,
-        file.name,
+        this.getFileName(file.name),
         audiofile.sampleRate
       );
 

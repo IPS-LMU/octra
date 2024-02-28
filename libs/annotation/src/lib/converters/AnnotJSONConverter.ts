@@ -42,7 +42,7 @@ export class AnnotJSONConverter extends Converter {
     if (audiofile) {
       let result = new OAnnotJSON(
         audiofile.name,
-        file.name,
+        this.getFileName(file.name),
         audiofile.sampleRate
       );
       const content = file.content;

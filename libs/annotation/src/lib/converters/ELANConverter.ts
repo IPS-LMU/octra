@@ -154,7 +154,7 @@ export class ELANConverter extends Converter {
 
     result.annotjson = new OAnnotJSON(
       audiofile.name,
-      file.name,
+      this.getFileName(file.name),
       audiofile.sampleRate
     );
 

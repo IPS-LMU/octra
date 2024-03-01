@@ -39,6 +39,8 @@ export class TranscriptionEndComponent
   }
 
   backToProjectsList() {
+    this.annotationStoreService.endTranscription();
+    this.uiService.elements = [];
     navigateTo(this.router, ['intern/projects']);
   }
 }

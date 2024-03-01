@@ -7,6 +7,8 @@ import {
   TaskInputOutputDto,
   TaskStatus,
 } from '@octra/api-types';
+import { Converter } from '@octra/annotation';
+import { OAudiofile } from '@octra/media';
 
 export function createSampleProjectDto(
   projectID: string,
@@ -117,4 +119,54 @@ export function createSampleUser(): CurrentAccountDto {
     locale: 'en-EN',
     timezone: 'Europe/Berlin',
   };
+}
+
+export function getAnnotationFromTask(
+  task: TaskDto,
+  converters: Converter[],
+  audiofileName: string,
+  audiofile: OAudiofile
+): any | undefined {
+  const getValidAnnotation = (ios: TaskInputOutputDto[]) => {
+    for (const converter of converters) {
+      for (const io of ios) {
+        if (
+          !io.fileType!.includes('audio') &&
+          !io.fileType!.includes('video') &&
+          !io.fileType!.includes('image')
+        ) {
+          try {
+            const result = converter.import(
+              {
+                name: `${audiofileName}_annot.json`,
+                content: io.content,
+                type: io.fileType!,
+                encoding: 'utf-8',
+              },
+              audiofile
+            );
+
+            if (result?.annotjson) {
+              return result.annotjson;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+    }
+
+    return undefined;
+  };
+
+  // check if this task has given annotation in its outputs field.
+  let found = getValidAnnotation(task.outputs);
+  if (!found) {
+    found = getValidAnnotation(task.inputs);
+  }
+  if (!found && task.use_outputs_from_task) {
+    found = getValidAnnotation((task.use_outputs_from_task as any).outputs);
+  }
+
+  return found;
 }

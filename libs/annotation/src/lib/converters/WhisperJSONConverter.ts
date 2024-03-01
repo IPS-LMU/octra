@@ -177,8 +177,6 @@ export class WhisperJSONConverter extends Converter {
         }
       }
     } catch (e) {
-      console.error(e);
-
       return {
         error: `Invalid JSON format.`,
       };

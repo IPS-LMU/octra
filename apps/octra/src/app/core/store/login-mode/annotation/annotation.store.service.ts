@@ -30,6 +30,8 @@ import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
 import { map, Observable } from 'rxjs';
 import { OctraGuidelines } from '@octra/assets';
 import { ApplicationStoreService } from '../../application/application-store.service';
+import { TaskInputOutputDto } from '@octra/api-types';
+import { ApplicationActions } from '../../application/application.actions';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -135,7 +137,7 @@ export class AnnotationStoreService {
     const mode = getModeState(state);
     const result = getTranscriptFromIO(
       mode?.currentSession?.task?.inputs ?? []
-    );
+    ) as TaskInputOutputDto;
     return result;
   });
 
@@ -285,9 +287,11 @@ export class AnnotationStoreService {
   }
 
   sendOnlineAnnotation() {
-    this.store.dispatch(AnnotationActions.sendOnlineAnnotation.do({
-      mode: this.appStorage.snapshot.application.mode!
-    }));
+    this.store.dispatch(
+      AnnotationActions.sendOnlineAnnotation.do({
+        mode: this.appStorage.snapshot.application.mode!,
+      })
+    );
   }
 
   changeComment(comment: string) {
@@ -347,6 +351,7 @@ export class AnnotationStoreService {
    */
   public endTranscription = (destroyaudio = true) => {
     this.audio.destroy(destroyaudio);
+    this.store.dispatch(ApplicationActions.finishLoading());
   };
 
   public destroy() {
@@ -880,7 +885,12 @@ export class AnnotationStoreService {
     );
   }
 
-  combinePhrases(options: any){
-    this.store.dispatch(AnnotationActions.combinePhrases.do({options, mode: this.appStorage.useMode!}));
+  combinePhrases(options: any) {
+    this.store.dispatch(
+      AnnotationActions.combinePhrases.do({
+        options,
+        mode: this.appStorage.useMode!,
+      })
+    );
   }
 }

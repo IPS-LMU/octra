@@ -325,7 +325,7 @@ export function getTranscriptFromIO(io: any[]): any | undefined {
       !a.fileType!.includes('audio') &&
       !a.fileType!.includes('video') &&
       !a.fileType!.includes('image')
-  )!;
+  );
 }
 
 export function popupCenter(url: string, title: string, w: number, h: number) {

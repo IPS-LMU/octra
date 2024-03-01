@@ -361,7 +361,7 @@ export class LoginModeReducers {
           previousSession: {
             ...state.previousSession,
             project: {
-              id: value.id as string,
+              id: value?.id as string,
             },
           } as any,
         };

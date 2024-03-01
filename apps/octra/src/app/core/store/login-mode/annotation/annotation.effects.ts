@@ -28,7 +28,6 @@ import {
 import { AppInfo } from '../../../../app.info';
 import {
   AnnotJSONConverter,
-  convertFromSupportedConverters,
   ImportResult,
   ISegment,
   OctraAnnotation,
@@ -53,15 +52,12 @@ import { TranscriptionSendingModalComponent } from '../../../modals/transcriptio
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
 import { ApplicationActions } from '../../application/application.actions';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import {
-  getTranscriptFromIO,
-  hasProperty,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { hasProperty, SubscriptionManager } from '@octra/utilities';
 import {
   createSampleProjectDto,
   createSampleTask,
   createSampleUser,
+  getAnnotationFromTask,
   StatisticElem,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
@@ -257,14 +253,44 @@ export class AnnotationEffects {
           }
 
           this.routingService.navigate('start annotation', ['/load/']);
-          this.store.dispatch(
-            AnnotationActions.loadAudio.do({
-              audioFile: a.task.inputs.find(
-                (a) => a.fileType!.indexOf('audio') > -1
-              ),
-              mode: a.mode,
-            })
+          let audioFile: TaskInputOutputDto | undefined = a.task.inputs.find(
+            (b) => b.fileType && b.fileType!.indexOf('audio') > -1
           );
+
+          if (!audioFile && a.task.use_outputs_from_task) {
+            console.log(
+              'No audio file found, look for audio in outputs from use_outputs_from_task...'
+            );
+            audioFile = (a.task.use_outputs_from_task as any).outputs.find(
+              (b: TaskInputOutputDto) =>
+                b.fileType && b.fileType!.indexOf('audio') > -1
+            );
+          }
+
+          if (!audioFile && a.task.use_outputs_from_task) {
+            console.log(
+              'No audio file found in use_outputs_from_task outputs, look for audio in outputs from use_outputs_from_task...'
+            );
+            audioFile = (a.task.use_outputs_from_task as any).inputs.find(
+              (b: TaskInputOutputDto) =>
+                b.fileType && b.fileType.indexOf('audio') > -1
+            );
+          }
+
+          if (audioFile) {
+            this.store.dispatch(
+              AnnotationActions.loadAudio.do({
+                audioFile,
+                mode: a.mode,
+              })
+            );
+          } else {
+            this.store.dispatch(
+              AnnotationActions.loadAudio.fail({
+                error: `No audio file found in given IO.`,
+              })
+            );
+          }
         })
       ),
     { dispatch: false }
@@ -403,6 +429,9 @@ export class AnnotationEffects {
               .catch((error) => {
                 console.error(error);
               });
+          } else {
+            // it's an error
+            this.modalsService.openErrorModal(a.error);
           }
         })
       ),
@@ -1403,64 +1432,17 @@ export class AnnotationEffects {
         );
 
         const serverTranscript = task
-          ? getTranscriptFromIO(task.outputs) ??
-            getTranscriptFromIO(task.inputs)
-          : '';
+          ? getAnnotationFromTask(
+              task,
+              AppInfo.converters,
+              this.audio.audioManager.resource.name,
+              this.audio.audioManager.resource.getOAudioFile()
+            )
+          : undefined;
 
         if (serverTranscript) {
-          // check if it's AnnotJSON
-          annotResult = convertFromSupportedConverters(
-            AppInfo.converters,
-            {
-              name: `${this.audio.audioManager.resource.info.name}_annot.json`,
-              content: serverTranscript.content,
-              type: serverTranscript.fileType!,
-              encoding: 'utf-8',
-            },
-            this.audio.audioManager.resource.getOAudioFile()
-          );
-
-          // import servertranscript
-          if (annotResult && annotResult.annotjson) {
-            newAnnotation = OctraAnnotation.deserialize(annotResult.annotjson);
-          }
-        }
-
-        if (!annotResult) {
-          // no transcript found
-          if (task) {
-            const textInput = getTranscriptFromIO(task.inputs);
-            if (textInput) {
-              // prompt text available and server transcript is undefined
-              // set prompt as new transcript
-
-              // check if prompttext ist a transcription format like AnnotJSON
-              const converted: ImportResult | undefined =
-                convertFromSupportedConverters(
-                  AppInfo.converters,
-                  {
-                    name: this.audio.audioManager.resource.name,
-                    content: textInput.content,
-                    type: 'text',
-                    encoding: 'utf8',
-                  },
-                  this.audio.audioManager.resource.getOAudioFile()
-                );
-
-              if (converted === undefined) {
-                // prompttext is raw text
-                newAnnotation.levels[0].items[0].labels[0] = new OLabel(
-                  'OCTRA_1',
-                  textInput.content
-                );
-              } else if (converted.annotjson) {
-                // use imported annotJSON
-                newAnnotation = OctraAnnotation.deserialize(
-                  converted.annotjson
-                );
-              }
-            }
-          }
+          // import server transcript
+          newAnnotation = OctraAnnotation.deserialize(serverTranscript);
         }
 
         if (newAnnotation.levels.length === 0) {

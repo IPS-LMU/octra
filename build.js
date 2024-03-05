@@ -103,7 +103,7 @@ node.on("exit", function(code) {
         break;
       }
     }
-    if (item !== "index.html" && item !== targetFolder && !found) {
+    if (item !== "index.html" && item !== "ocb_info.json" && item !== targetFolder && !found) {
       execSync(`mv "./${buildDir}${item}" "./${buildDir}${targetFolder}/${item}"`);
     }
   }

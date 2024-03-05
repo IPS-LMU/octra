@@ -98,6 +98,12 @@ const OCTRA = {
     );
     await setBuildVariable();
   },
+  buildBetaProd: async function () {
+    await run('node ./build.js beta=true isUpdate=false url=/');
+    await setBuildVariable();
+    await fs.rm('dist/apps/octra/media', { recursive: true });
+    await fs.rm('dist/apps/octra/config/appconfig.json');
+  },
   prepareExtern: async function () {
     if (fs.pathExistsSync('extern')) {
       fs.emptydirSync('extern');
@@ -155,6 +161,11 @@ yargs
   .command('build:prod', 'Builds production version of OCTRA.', OCTRA.buildProd)
   .command('build:dev', 'Builds development version of OCTRA.', OCTRA.buildDev)
   .command('build:beta', 'Builds beta version of OCTRA.', OCTRA.buildBeta)
+  .command(
+    'build:prod:beta',
+    'Builds prod beta version of OCTRA.',
+    OCTRA.buildBetaProd
+  )
   .command('build:libs', 'Builds all libraries.', OCTRA.buildLibs)
   .command('bundle:assets', 'Bundle assets.', OCTRA.bundleAssets)
   .command(

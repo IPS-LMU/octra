@@ -1,16 +1,17 @@
 {
   "version": "2.0.0",
-  "audio_server": {
-    "url": ""
+  "api": {
+    "url": "",
+    "appToken": ""
   },
   "octra": {
     "database": {
       "name": "octra"
     },
     "login": {
-      "enabled": false
+      "enabled": true
     },
-    "showdetails": false,
+    "showdetails": true,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200
@@ -21,15 +22,65 @@
       "auth_token": "",
       "url": ""
     },
-    "allowed_browsers": [],
+    "plugins": {
+    },
+    "allowed_browsers": [
+      {
+        "name": "Chrome",
+        "version": ""
+      },
+      {
+        "name": "Chrome Mobile",
+        "version": ""
+      },
+      {
+        "name": "Firefox",
+        "version": ""
+      },
+      {
+        "name": "Firefox Mobile",
+        "version": ""
+      },
+      {
+        "name": "Opera",
+        "version": ""
+      },
+      {
+        "name": "Opera Mini",
+        "version": ""
+      },
+      {
+        "name": "Opera Mobile",
+        "version": ""
+      }
+    ],
     "allowed_projects": [],
-    "languages": ["de", "en"],
+    "languages": ["en", "de", "nl", "it", "ko", "zh"],
+    "audioExamples": [
+      {
+        "language": "de",
+        "url": "media/Bahnauskunft.wav",
+        "description": "Individuelle Beschreibung der Audiosequenz"
+      },
+      {
+        "language": "en",
+        "url": "media/Bahnauskunft.wav",
+        "description": "Description for the audio sequence"
+      }
+    ],
     "tracking": {
-      "active": "",
+      "active": "inactive",
       "matomo": {
         "host": "",
         "siteID": 0
       }
+    },
+    "inactivityNotice": {
+      "showAfter": 60
+    },
+    "maintenanceNotification": {
+      "active": "inactive",
+      "apiURL": ""
     }
   }
 }

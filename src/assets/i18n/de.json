@@ -107,6 +107,7 @@
     "continue transcription": "Transkription fortsetzen"
   },
   "bug report": {
+    "notice": "Bitte fülle ebenfalls die Felder \"Name\" und \"E-Mail Adresse\" aus, sodass wir auf deine Nachricht antworten können.",
     "give feedback": "Feedback geben",
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
     "sent": "Dein Feedback wurde erfolgreich gesendet \uD83D\uDE42",

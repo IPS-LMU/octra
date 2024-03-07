@@ -107,6 +107,7 @@
     "continue transcription": "Continue transcription"
   },
   "bug report": {
+    "notice": "Please also fill in the fields \"Name\" and \"E-mail address\" so that we can reply to your message.",
     "give feedback": "Give feedback",
     "description": "Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?",
     "sent": "Your feedback was successfully reported \uD83D\uDE42",

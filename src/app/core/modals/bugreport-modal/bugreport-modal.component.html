@@ -12,6 +12,9 @@
         <p>
           {{"bug report.description" | transloco}}
         </p>
+        <div style="background-color:#ffd500;" class="p-2">
+          <i>{{ "bug report.notice" | transloco }}</i>
+        </div>
         <div *ngIf="sendStatus === 'error'" class="alert alert-danger bugsent" [innerHTML]="'bug report.error' | transloco : {
           email: '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' + bgdescr +'\'>octra@phonetik.uni-muenchen.de</a>'
         }"></div>

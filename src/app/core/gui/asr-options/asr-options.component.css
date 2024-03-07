@@ -73,3 +73,7 @@
   font-size: 0.8em;
   max-width: none;
 }
+
+.inactive {
+  opacity: 0.5;
+}

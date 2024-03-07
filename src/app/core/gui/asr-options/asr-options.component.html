@@ -38,7 +38,8 @@
           <tr [ngClass]="{
                             selected:  !(asrService.selectedLanguage === null)
                                         && (asrService.selectedLanguage.code === lang.code)
-                                        && (asrService.selectedLanguage.asr === lang.asr)
+                                        && (asrService.selectedLanguage.asr === lang.asr),
+                            'inactive': lang.state === 'inactive'
                             }"
           >
             <td class="col-language" (click)="onASRLangChanged(lang)">

@@ -61,8 +61,10 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   onASRLangChanged(lang: ASRLanguage) {
-    this.asrService.selectedLanguage = lang;
-    this.dropdown.hide();
+    if (lang.state === 'active') {
+      this.asrService.selectedLanguage = lang;
+      this.dropdown.hide();
+    }
   }
 
   startASRForThisSegment() {

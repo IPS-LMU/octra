@@ -73,8 +73,10 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   onMouseOut() {}
 
   onASRLangChanged(lang?: ASRLanguage) {
-    this.asrStoreService.changeASRService(lang);
-    this.dropdown.close();
+    if (lang?.state === 'active') {
+      this.asrStoreService.changeASRService(lang);
+      this.dropdown.close();
+    }
   }
 
   startASRForThisSegment() {

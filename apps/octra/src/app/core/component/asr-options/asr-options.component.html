@@ -51,7 +51,8 @@
             <tr *ngFor="let lang of languageSettings!.languages; let i = index" [ngClass]="{
               selected:
                 (asrStoreService.asrOptions$|async)?.selectedLanguage === lang.code &&
-                (asrStoreService.asrOptions$|async)?.selectedService === lang.asr
+                (asrStoreService.asrOptions$|async)?.selectedService === lang.asr,
+                'inactive': lang.state === 'inactive'
             }"
             >
               <td (click)="onASRLangChanged(lang)" class="col-language">
@@ -73,7 +74,7 @@
               <td class="col-asr">
                 <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
                      [ngbPopover]="asrDescription" [container]="'body'" [autoClose]="true"
-                     [disablePopover]="disablePopovers" popoverTitle="Service information" />
+                     [disablePopover]="disablePopovers || lang.state !== 'active'" popoverTitle="Service information" />
 
                 <ng-template #asrDescription>
                   <table class="table table-sm table-borderless">
@@ -149,7 +150,7 @@
                          [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(lang.asr) + '</div>'"></div>
                   </ng-template>
                   <!-- [popover]="popTemplate" -->
-                  <div class="progress-bar bg-success" role="progressbar" [ngbPopover]="popTemplate"
+                  <div class="progress-bar bg-success" role="progressbar" [ngbPopover]="popTemplate" [disablePopover]="disablePopovers || lang.state !== 'active'"
                        triggers="mouseenter:mouseleave"
                        [ngStyle]="{
                                     width: (100 - getQuotaPercentage(lang.asr)) + '%'

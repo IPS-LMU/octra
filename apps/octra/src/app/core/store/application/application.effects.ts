@@ -264,9 +264,6 @@ export class ApplicationEffects {
                     );
 
                     if (basInfo !== undefined) {
-                      console.log(`info for asr provider ${basInfo?.name} is `);
-                      console.log(settings.octra.plugins.asr);
-
                       service.dataStoragePolicy =
                         basInfo.dataStoragePolicy !== undefined
                           ? basInfo.dataStoragePolicy
@@ -306,11 +303,26 @@ export class ApplicationEffects {
                 return forkJoin([
                   from(this.updateASRQuotaInfo(asrSettings)),
                   this.getMAUSLanguages(asrSettings),
+                  this.getActiveASRProviders(asrSettings),
                 ]).pipe(
-                  exhaustMap(([setttings, mausLanguages]) => {
+                  exhaustMap(([setttings, mausLanguages, activeProviders]) => {
                     return of(
                       ApplicationActions.loadASRSettings.success({
-                        languageSettings: setttings,
+                        languageSettings: {
+                          ...setttings,
+                          languages: setttings.languages.map((a) => {
+                            return {
+                              ...a,
+                              state:
+                                activeProviders.find(
+                                  (b) =>
+                                    b.ParameterValue.Value === `call${a.asr}ASR`
+                                ) && a.state === 'active'
+                                  ? 'active'
+                                  : 'inactive',
+                            };
+                          }),
+                        },
                         mausLanguages: mausLanguages
                           ?.filter((a) => a.ParameterValue.Description !== '')
                           .map((a) => ({
@@ -442,6 +454,25 @@ export class ApplicationEffects {
         }[]
       >(
         `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runPipeline/Input/LANGUAGE/Values/`,
+        { responseType: 'json' }
+      );
+    } else {
+      return of([]);
+    }
+  }
+
+  public getActiveASRProviders(asrSettings?: ASRSettings): Observable<
+    {
+      ParameterValue: { Value: string; Description: string };
+    }[]
+  > {
+    if (asrSettings?.basConfigURL) {
+      return this.http.get<
+        {
+          ParameterValue: { Value: string; Description: string };
+        }[]
+      >(
+        `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runASR/Input/ASRType/Values/`,
         { responseType: 'json' }
       );
     } else {

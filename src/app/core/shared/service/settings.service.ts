@@ -727,6 +727,29 @@ export class SettingsService {
     });
   }
 
+  public async getActiveASRProviders() {
+    return new Promise<{
+      ParameterValue: { Value: string; Description: string };
+    }[]>((resolve, reject) => {
+      if (this._appSettings.octra.plugins.asr.basConfigURL) {
+        this.http.get(`${this._appSettings.octra.plugins.asr.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runASR/Input/ASRType/Values/`, {responseType: 'json'})
+          .subscribe({
+            next: (result: {
+              ParameterValue: { Value: string; Description: string };
+            }[]) => {
+              console.log(result);
+              resolve(result);
+            },
+            error: (err) => {
+              reject(err);
+            }
+          });
+      } else {
+        resolve([]);
+      }
+    });
+  }
+
   getASRQuotaInfo(url: string, asrName: string) {
     return new Promise<{
       asrName: string;

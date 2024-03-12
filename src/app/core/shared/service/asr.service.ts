@@ -104,6 +104,19 @@ export class AsrService {
     }).catch((err) => {
       console.error(err);
     });
+
+    this.settingsService.getActiveASRProviders().then((providers) => {
+      this.asrSettings.languages = this.asrSettings.languages.map(a => {
+        return {
+          ...a,
+          state: providers.some(b => {
+            console.log(a.asr);
+            console.log(`${b.ParameterValue.Value} === ${`call${a.asr}ASR`}`);
+            return b.ParameterValue.Value === `call${a.asr}ASR`;
+          }) ? a.state : 'inactive'
+        };
+      });
+    });
   }
 
   public init() {
@@ -140,7 +153,11 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
+  public addToQueue(timeInterval: {
+    sampleStart: number,
+    sampleLength: number,
+    browserSampleEnd: number
+  }, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
     const item = new ASRQueueItem({
       sampleStart: timeInterval.sampleStart,
       sampleLength: timeInterval.sampleLength,

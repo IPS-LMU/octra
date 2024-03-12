@@ -200,6 +200,8 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         } else {
           this.sendTranscription();
         }
+      } else {
+        this.sendTranscription();
       }
     }
   }

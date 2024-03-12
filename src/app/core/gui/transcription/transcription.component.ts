@@ -992,6 +992,8 @@ export class TranscriptionComponent implements OnInit,
         } else {
           this.onSendButtonClick();
         }
+      } else {
+        this.onSendButtonClick();
       }
     } else {
       this.modalPostponeAll.open();

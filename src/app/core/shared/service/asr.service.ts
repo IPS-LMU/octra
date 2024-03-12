@@ -110,8 +110,6 @@ export class AsrService {
         return {
           ...a,
           state: providers.some(b => {
-            console.log(a.asr);
-            console.log(`${b.ParameterValue.Value} === ${`call${a.asr}ASR`}`);
             return b.ParameterValue.Value === `call${a.asr}ASR`;
           }) ? a.state : 'inactive'
         };

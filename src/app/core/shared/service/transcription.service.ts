@@ -980,7 +980,6 @@ export class TranscriptionService {
       }
       this._transcriptValid = !invalid;
     } else {
-      console.log(this.settingsService.projectsettings.octra.validationEnabled);
       console.log(`validationEnabled is disabled`);
       this._transcriptValid = true;
     }

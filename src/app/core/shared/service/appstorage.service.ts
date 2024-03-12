@@ -993,8 +993,6 @@ export class AppStorageService {
           this._loaded.complete();
         }
       );
-
-      console.log(this._audioSettings);
     });
   }
 

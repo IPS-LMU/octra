@@ -737,7 +737,6 @@ export class SettingsService {
             next: (result: {
               ParameterValue: { Value: string; Description: string };
             }[]) => {
-              console.log(result);
               resolve(result);
             },
             error: (err) => {

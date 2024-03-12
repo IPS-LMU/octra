@@ -410,10 +410,8 @@ export class TranscriptionComponent implements OnInit,
     // first change
     this.changeEditor(this.interface).then(() => {
       if (this.appStorage.showFeedbackNotice) {
-        console.log('TRUE');
         this.modalService.show('feedbackNotice');
       } else {
-        console.log('FALSE');
       }
 
       (this._currentEditor.instance as any).afterFirstInitialization();

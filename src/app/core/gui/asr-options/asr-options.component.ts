@@ -45,7 +45,6 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.settingsService.appSettings.octra.plugins.asr);
   }
 
   onMouseMove() {
@@ -61,7 +60,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   onASRLangChanged(lang: ASRLanguage) {
-    if (lang.state === 'active') {
+    if (lang && lang.state === 'active') {
       this.asrService.selectedLanguage = lang;
       this.dropdown.hide();
     }
@@ -77,7 +76,6 @@ export class AsrOptionsComponent implements OnInit {
         const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(time);
 
         if (segNumber > -1) {
-          console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.value}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
           if (!isNullOrUndefined(segment)) {

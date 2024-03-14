@@ -8,6 +8,7 @@ import {
 } from './Converter';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { OAudiofile } from '@octra/media';
+import { last } from '@octra/utilities';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';
@@ -22,9 +23,10 @@ export class ELANConverter extends Converter {
     this._conversion.import = true;
     this._encoding = 'UTF-8';
     this._multitiers = true;
-    this._notice =
-      'The attributes MEDIA_URL and MEDIA_RELATIVE_URL will be both set with the relative path. In order to open the ' +
-      'transcript in ELAN the transcript file must be in the same folder as the audio file.';
+    this._notice = `
+- The attributes MEDIA_URL and MEDIA_RELATIVE_URL will be both set with the relative path. In order to open the transcript in ELAN the transcript file must be in the same folder as the audio file.
+- Only attribute "ANNOTATION" of tier is going to be parsed.
+`;
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
@@ -142,7 +144,7 @@ export class ELANConverter extends Converter {
     }
     if (!audiofile?.name) {
       return {
-        error: 'Missing audiofile name',
+        error: 'Missing audio file name',
       };
     }
 
@@ -213,11 +215,27 @@ export class ELANConverter extends Converter {
             for (const annotationElement of tier.ANNOTATION) {
               readTier(annotationElement);
             }
-          } else {
+          } else if (tier.ANNOTATION) {
             readTier(tier.ANNOTATION as any);
           }
 
           if (level.items.length > 0) {
+            if (
+              last(level.items) &&
+              last(level.items)!.sampleStart + last(level.items)!.sampleDur <
+                audiofile.duration
+            ) {
+              // file space at end
+              (level.items as OSegment[]).push(
+                new OSegment(
+                  counter++,
+                  lastSample,
+                  audiofile.duration - lastSample,
+                  [new OLabel(tier._TIER_ID, '')]
+                )
+              );
+            }
+
             result.annotjson.levels.push(level);
           }
         }

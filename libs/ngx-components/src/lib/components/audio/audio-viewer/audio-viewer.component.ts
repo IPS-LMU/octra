@@ -588,15 +588,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           this.av.drawnSelection = drawnSelection;
           this.updateLines();
           this.updateAllSegments();
+          this.drawWholeSelection();
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
           const groups: Konva.Group[] | undefined =
-            this.layers?.background.find('.line');
-          groups?.map((a) => {
-            a.cache();
-            return a;
-          });
+            this.layers?.background.find('.line') ?? [];
+          for (const group of groups) {
+            this.cacheAllChildren(group);
+          }
         }
       }
     } catch (e) {
@@ -604,6 +604,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       console.error(e);
     }
   };
+
+  private cacheAllChildren(group: Konva.Group){
+    group.cache();
+  }
 
   public initializeView() {
     if (
@@ -640,7 +644,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             0
           );
           this.layers?.background.add(line);
-          line.cache();
+          this.cacheAllChildren(line);
           this.canvasElements.lastLine = line;
         }
       };
@@ -664,7 +668,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                 i
               );
               this.layers.background.add(line);
-              line.cache();
+              this.cacheAllChildren(line);
               y += this.settings.lineheight + this.settings.margin.top;
               this.canvasElements.lastLine = line;
               drawnWidth += lineWidth;
@@ -703,12 +707,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       });
 
       for (let i = 0; i < numOfLines - 1; i++) {
+        const selectElem = this.createLineSelectionGroup(
+          new Size(lineWidth, this.settings.lineheight),
+          new Position(this.settings.margin.left, y),
+          i
+        );
+
         selectionGroup.add(
-          this.createLineSelectionGroup(
-            new Size(lineWidth, this.settings.lineheight),
-            new Position(this.settings.margin.left, y),
-            i
-          )
+          selectElem
         );
         y += this.settings.lineheight + this.settings.margin.top;
         drawnWidth += lineWidth;
@@ -717,12 +723,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       // add last line
       lineWidth = this.av.AudioPxWidth - drawnWidth;
       if (lineWidth > 0) {
+        const selectElem = this.createLineSelectionGroup(
+          new Size(lineWidth, this.settings.lineheight),
+          new Position(this.settings.margin.left, y),
+          numOfLines - 1
+        );
         selectionGroup.add(
-          this.createLineSelectionGroup(
-            new Size(lineWidth, this.settings.lineheight),
-            new Position(this.settings.margin.left, y),
-            numOfLines - 1
-          )
+          selectElem
         );
       }
 
@@ -769,13 +776,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   public updateLines = () => {
     const lines: Group[] | undefined = this.layers?.background?.find('.line');
+    const lineSelections: Group[] | undefined = this.layers?.overlay?.find('.line-selection');
 
     if (this.av.innerWidth !== undefined) {
-      if (lines !== undefined) {
+      if (lines && lineSelections) {
         // check all lines but the last one
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
+          const lineSelection = lineSelections[i];
           line.width(this.av.innerWidth);
+          lineSelection.width(this.av.innerWidth);
           const geometrics = line.getChildren();
           for (let j = 0; j < geometrics.length; j++) {
             const elem = geometrics[j];
@@ -783,16 +793,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               (lines.length > 1 && i < lines.length - 1) ||
               lines.length === 1
             ) {
-              if (elem.name() !== 'selection' && elem.id() !== 'scrollBar') {
-                elem.width(this.av.innerWidth);
-              }
+              elem.width(this.av.innerWidth);
             } else {
               const width = this.av.AudioPxWidth % this.av.innerWidth;
               line.width(width);
               // last line
-              if (elem.name() !== 'selection' && elem.id() !== 'scrollBar') {
-                elem.width(width);
-              }
+              elem.width(width);
             }
           }
         }
@@ -1208,7 +1214,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     line.add(frame);
   }
 
-  private createLineGrid(line: Konva.Group, size: Size) {
+  private createLineGrid(line: Konva.Group, size: Size, lineNum: number) {
     const frame = new Konva.Shape({
       opacity: 0.2,
       stroke: this.settings.grid.color,
@@ -1216,7 +1222,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       width: size.width,
       height: size.height,
       sceneFunc: (context, shape) => {
-
         if (
           this.layers !== undefined &&
           this.stage !== undefined &&
@@ -1376,7 +1381,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.createLineBackground(lineGroup, size);
-    this.createLineGrid(lineGroup, size);
+    this.createLineGrid(lineGroup, size, lineNum);
     this.createLineSignal(lineGroup, size, lineNum);
     this.createLineBorder(lineGroup, size);
 
@@ -1421,8 +1426,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       x: position.x,
       y: position.y,
       width: size.width,
-      height: size.height,
-      transformsEnabled: 'position',
+      height: size.height
     });
 
     let lineGroup = result;
@@ -1927,7 +1931,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
           const overlaySegment = new Konva.Shape({
             x: this.settings.margin.left,
-            y: 0,
+            y: lineNum1 *
+              (this.settings.lineheight + this.settings.margin.top),
             fontFamily: 'Arial',
             fontSize: 9,
             width: this.av.innerWidth,
@@ -1960,6 +1965,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                       ] as OctraAnnotationSegment)
                     : undefined;
 
+
                 this.overlaySceneFunction(
                   {
                     from: lineNum1,
@@ -1974,6 +1980,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   context,
                   shape
                 );
+
               }
             },
           });
@@ -2254,7 +2261,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers !== undefined &&
       this.stage !== undefined &&
       this.audioChunk !== undefined &&
-      this.av.innerWidth !== undefined
+      this.av.innerWidth !== undefined &&
+      this.av.innerWidth
     ) {
       for (let j = 0; j < numOfLines; j++) {
         // draw time label
@@ -2330,8 +2338,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers !== undefined &&
       this.stage !== undefined &&
       this.canvasElements?.lastLine !== undefined &&
-      this.av.innerWidth !== undefined &&
-      this.isVisibleInView(0, viewY, this.av.innerWidth, viewHeight)
+      this.av.innerWidth !== undefined
     ) {
       for (let j = lineInterval.from; j <= lineInterval.to; j++) {
         const localY =
@@ -2416,7 +2423,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           viewY;
 
         if (this.isVisibleInView(0, viewY, this.av.innerWidth, viewHeight)) {
-          for (let j = lineInterval.from; j <= lineInterval.to; j++) {
+          for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
             let localY =
               j * (this.settings.lineheight + this.settings.margin.top);
 
@@ -2453,7 +2460,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   ? this.av.innerWidth
                   : this.canvasElements.lastLine.width();
               const select = this.av.getRelativeSelectionByLine(
-                j,
+                j + lineInterval.from,
                 lineWidth,
                 beginTime,
                 sceneSegment.time,
@@ -2818,7 +2825,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         this.av.innerWidth
       );
 
-      const selections = this.stage.find('.selection');
+      const selections = this.layers.overlay.find('.selection');
       if (selections.length > lineNum && selections.length > 0) {
         if (lineNum > -1 && select) {
           const left = select.start;
@@ -2852,11 +2859,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   private resetSelection() {
-    if (this.stage !== undefined) {
-      this.stage.find('.selection').forEach((child) => {
+    if (this.layers?.overlay) {
+      this.layers.overlay.find('.selection').forEach((child) => {
         child.width(0);
         child.x(0);
       });
+      this.layers.overlay.find('.line-selections')[0].zIndex(this.layers.overlay.children.length - 1)
     }
   }
 
@@ -2901,11 +2909,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               : this.canvasElements.lastLine.width();
           this.drawSelection(j, lineWidth);
         }
-        this.layers.overlay.batchDraw();
-      } else {
-        this.layers.overlay.batchDraw();
-        this.layers.background.batchDraw();
       }
+      this.layers.overlay.batchDraw();
     }
   }
 
@@ -3812,8 +3817,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.canvasElements?.lastLine !== undefined &&
       this.av.innerWidth !== undefined &&
       segment?.time !== undefined &&
-      this.av.audioTCalculator !== undefined &&
-      this.isVisibleInView(0, viewY, this.av.innerWidth, viewHeight)
+      this.av.audioTCalculator !== undefined
     ) {
       const y =
         lineNum1 * (this.settings.lineheight + this.settings.margin.top);

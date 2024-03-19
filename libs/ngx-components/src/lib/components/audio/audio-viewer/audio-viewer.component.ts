@@ -1917,8 +1917,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           const lineNum2 = this.settings.multiLine ? Math.floor(endX / this.av.innerWidth): 0;
 
           const segmentEnd = segment.time.clone();
+          const audioChunkStart = this.audioChunk.time.start.clone();
+          const audioChunkEnd = this.audioChunk.time.end.clone();
           let overlayGroup: Konva.Group | undefined = undefined;
 
+          if (
+            (segmentEnd.samples >= audioChunkStart.samples &&
+              segmentEnd.samples <= audioChunkEnd.samples) ||
+            (beginTime.samples >= audioChunkStart.samples &&
+              beginTime.samples <= audioChunkEnd.samples) ||
+            (beginTime.samples < audioChunkStart.samples &&
+              segmentEnd.samples > audioChunkEnd.samples)
+          ) {
           let lastI: number | undefined = 0;
           this.removeSegmentFromCanvas(segment.id); // TODO hier werden segmente entfernt
           const segmentHeight =
@@ -2007,16 +2017,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const prevSeg =
                     segIndex > segmentInterval.start
                       ? (this.av.currentLevel.items[
-                          segIndex - 1
+                      segIndex - 1
                         ] as OctraAnnotationSegment)
                       : undefined;
                   const seg = this.av.currentLevel.items[
                     segIndex
-                  ] as OctraAnnotationSegment;
+                    ] as OctraAnnotationSegment;
                   const nextSeg =
                     segIndex < segmentInterval.end
                       ? (this.av.currentLevel.items[
-                          segIndex + 1
+                      segIndex + 1
                         ] as OctraAnnotationSegment)
                       : undefined;
 
@@ -2058,16 +2068,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
                   const prevSeg =
                     segIndex > segmentInterval.start
                       ? (this.av.currentLevel.items[
-                          segIndex - 1
+                      segIndex - 1
                         ] as OctraAnnotationSegment)
                       : undefined;
                   const seg = this.av.currentLevel.items[
                     segIndex
-                  ] as OctraAnnotationSegment;
+                    ] as OctraAnnotationSegment;
                   const nextSeg =
                     segIndex < segmentInterval.end
                       ? (this.av.currentLevel.items[
-                          segIndex + 1
+                      segIndex + 1
                         ] as OctraAnnotationSegment)
                       : undefined;
 
@@ -2103,6 +2113,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             });
             overlayGroup.add(segmentText);
           }
+        }
 
           if (overlayGroup) {
             return {
@@ -2161,7 +2172,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.drawAllBoundaries();
     }
 
-    console.log(`applyChanges took only ${Date.now() - old} for viewer ${this.name}`);
+    console.log(`applyChanges with ${changes.length} changes took only ${Date.now() - old} for viewer ${this.name}`);
   }
 
   private addNewSegmentOnCanvas(id: number) {
@@ -2422,7 +2433,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
             (this.settings.lineheight + this.settings.margin.top) -
           viewY;
 
-        if (this.isVisibleInView(0, viewY, this.av.innerWidth, viewHeight)) {
+        if (true) {
+          console.log("sceneSegment is");
           for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
             let localY =
               j * (this.settings.lineheight + this.settings.margin.top);

@@ -69,7 +69,9 @@ export class AsrEffects {
           (a) => state.asr.settings?.selectedService === a.provider
         );
         const asrLanguage = asrSettings.languages.find(
-          (a) => a.code === state.asr.settings?.selectedLanguage
+          (a) =>
+            a.code === state.asr.settings?.selectedLanguage &&
+            a.asr === asrInfo?.provider
         );
 
         if (!asrInfo || !asrLanguage) {

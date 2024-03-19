@@ -1091,7 +1091,7 @@ export class TwoDEditorComponent
 
   private onModalAction = (event: any) => {
     if (event.type === 'open' && event.name === 'OverviewModalComponent') {
-      this.window.close();
+      this.window?.close();
     }
   };
 }

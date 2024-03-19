@@ -29,8 +29,8 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
 
   @Input() audioChunk?: AudioChunk;
   @Input() enabled = true;
-  @ViewChild('dropdown', { static: true }) dropdown!: NgbDropdown;
-  @ViewChild('dropdown2', { static: true }) dropdown2!: NgbDropdown;
+  @ViewChild('dropdown', { static: true }) dropdown?: NgbDropdown;
+  @ViewChild('dropdown2', { static: true }) dropdown2?: NgbDropdown;
   @ViewChild('pop', { static: true }) pop!: NgbPopover;
 
   languageSettings?: ASRSettings;
@@ -75,7 +75,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
   onASRLangChanged(lang?: ASRLanguage) {
     if (lang?.state === 'active') {
       this.asrStoreService.changeASRService(lang);
-      this.dropdown.close();
+      this.dropdown?.close();
     }
   }
 
@@ -225,7 +225,7 @@ export class AsrOptionsComponent extends DefaultComponent implements OnInit {
 
   onMAUSLangChanged(language: string, code: string) {
     this.asrStoreService.changeASRSelectedMausLanguage(code);
-    this.dropdown2.close();
+    this.dropdown2?.close();
   }
 
   getQuotaPercentage(langAsr: string) {

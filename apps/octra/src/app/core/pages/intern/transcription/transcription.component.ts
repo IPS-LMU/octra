@@ -183,7 +183,7 @@ export class TranscriptionComponent
     if (!this.modalVisiblities.shortcuts) {
       this.openShortcutsModal();
     } else {
-      this.modalShortcutsDialogue!.close();
+      this.modalShortcutsDialogue?.close();
       this.modalVisiblities.shortcuts = false;
     }
   };
@@ -196,7 +196,7 @@ export class TranscriptionComponent
     if (!this.modalVisiblities.guidelines) {
       this.openGuidelines();
     } else {
-      this.modalGuidelines!.close();
+      this.modalGuidelines?.close();
       this.modalVisiblities.guidelines = false;
     }
   };
@@ -209,7 +209,7 @@ export class TranscriptionComponent
     if (!this.modalVisiblities.overview) {
       this.openOverview();
     } else {
-      this.modalOverview!.close();
+      this.modalOverview?.close();
       this.modalVisiblities.overview = false;
     }
   };

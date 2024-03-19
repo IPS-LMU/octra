@@ -10,8 +10,11 @@ import {
   betweenWhichSegment,
   OctraAnnotation,
   OctraAnnotationAnyLevel,
+  OctraAnnotationEvent,
+  OctraAnnotationLink,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
+  OItem,
   OLabel,
 } from '@octra/annotation';
 import { Subject } from 'rxjs';
@@ -1231,4 +1234,321 @@ export class AudioViewerService {
     });
     this.annotationChange.emit(result);
   }
+
+  getChanges(
+    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
+    newAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ): AnnotationChange[] {
+    if (!oldAnnotation || !newAnnotation) {
+      return [];
+    }
+
+    const result: AnnotationChange[] = [];
+    const state: {
+      old: {
+        levelIDs: number[];
+        itemIDs: number[];
+        linkIDs: number[];
+      };
+      new: {
+        levelIDs: number[];
+        itemIDs: number[];
+        linkIDs: number[];
+      };
+    } = {
+      old: {
+        levelIDs: [],
+        itemIDs: [],
+        linkIDs: [],
+      },
+      new: {
+        levelIDs: [],
+        itemIDs: [],
+        linkIDs: [],
+      },
+    };
+
+    // first read all IDs
+    const readIDs: (
+      annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    ) => {
+      levelIDs: number[];
+      itemIDs: number[];
+      linkIDs: number[];
+    } = (annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>) => {
+      const idResult: {
+        levelIDs: number[];
+        itemIDs: number[];
+        linkIDs: number[];
+      } = {
+        levelIDs: [],
+        itemIDs: [],
+        linkIDs: [],
+      };
+
+      // read level ids
+      for (const level of annotation.levels) {
+        idResult.levelIDs.push(level.id);
+        for (const item of level.items) {
+          idResult.itemIDs.push(item.id);
+        }
+      }
+
+      // read link ids
+      for (const link of annotation.links) {
+        idResult.linkIDs.push(link.id);
+      }
+
+      return idResult;
+    };
+
+    state.old = readIDs(oldAnnotation);
+    state.new = readIDs(newAnnotation);
+
+    // iterate old annotation and compare with new annotation
+    for (const oldAnnoLevel of oldAnnotation.levels) {
+      const newLevel = newAnnotation.levels.find(
+        (a) => a.id === oldAnnoLevel.id
+      );
+
+      if (!newLevel) {
+        // level was removed
+        result.push({
+          type: 'remove',
+          level: {
+            old: oldAnnoLevel,
+            new: undefined,
+          },
+        });
+      } else {
+        for (const item of oldAnnoLevel.items) {
+          const found = newLevel.items.find((a) => a.id === item.id);
+
+          if (found) {
+            // compare changes
+            if (item.type === found.type) {
+              if (
+                item.type === 'segment' &&
+                item instanceof OctraAnnotationSegment &&
+                found instanceof OctraAnnotationSegment
+              ) {
+                if (!item.isEqualWith(found)) {
+                  // changed
+                  result.push({
+                    type: 'change',
+                    level: {
+                      old: newLevel,
+                      new: newLevel,
+                    },
+                    item: {
+                      old: item,
+                      new: found,
+                    },
+                  });
+                }
+                state.old.itemIDs = state.old.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+                state.new.itemIDs = state.new.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+              } else if (
+                item.type === 'event' &&
+                item instanceof OctraAnnotationEvent &&
+                found instanceof OctraAnnotationEvent
+              ) {
+                if (!item.isEqualWith(found)) {
+                  // changed
+                  result.push({
+                    type: 'change',
+                    level: {
+                      old: newLevel,
+                      new: newLevel,
+                    },
+                    item: {
+                      old: item,
+                      new: found,
+                    },
+                  });
+                }
+                state.old.itemIDs = state.old.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+                state.new.itemIDs = state.new.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+              } else if (
+                item.type === 'item' &&
+                item instanceof OItem &&
+                found instanceof OItem
+              ) {
+                if (!item.isEqualWith(found)) {
+                  // changed
+                  result.push({
+                    type: 'change',
+                    level: {
+                      old: newLevel,
+                      new: newLevel,
+                    },
+                    item: {
+                      old: item,
+                      new: found,
+                    },
+                  });
+                }
+                state.old.itemIDs = state.old.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+                state.new.itemIDs = state.new.itemIDs.filter(
+                  (a) => a !== item.id
+                );
+              } else {
+                throw new Error("Can't find correct item instance");
+              }
+            } else {
+              // types changed
+              result.push({
+                type: 'change',
+                level: {
+                  old: newLevel,
+                  new: newLevel,
+                },
+                item: {
+                  old: item,
+                  new: found,
+                },
+              });
+              state.old.itemIDs = state.old.itemIDs.filter(
+                (a) => a !== item.id
+              );
+              state.new.itemIDs = state.new.itemIDs.filter(
+                (a) => a !== item.id
+              );
+            }
+          } else {
+            // newAnnotation doesn't have this item => was removed
+            result.push({
+              type: 'remove',
+              item: {
+                old: item,
+                new: undefined,
+              },
+            });
+            state.old.itemIDs = state.old.itemIDs.filter((a) => a !== item.id);
+            state.new.itemIDs = state.new.itemIDs.filter((a) => a !== item.id);
+          }
+        }
+        state.old.levelIDs = state.old.levelIDs.filter(
+          (a) => a !== oldAnnoLevel.id
+        );
+        state.new.levelIDs = state.new.levelIDs.filter(
+          (a) => a !== oldAnnoLevel.id
+        );
+      }
+    }
+    if (state.new.levelIDs.length > 0) {
+      // new levels added
+      for (const id of state.new.levelIDs) {
+        const level: OctraAnnotationAnyLevel<OctraAnnotationSegment> =
+          newAnnotation.levels.find((a) => a.id === id)!;
+        result.push({
+          type: 'add',
+          level: {
+            old: undefined,
+            new: level,
+          },
+        });
+
+        state.new.itemIDs = state.new.itemIDs.filter(
+          (a) => level.items.find((b) => b.id === a) === undefined
+        );
+      }
+    }
+
+    if (state.new.itemIDs.length > 0) {
+      // new levels added
+      for (const id of state.new.itemIDs) {
+        let item: AnnotationAnySegment | undefined;
+        const level: OctraAnnotationAnyLevel<OctraAnnotationSegment> =
+          newAnnotation.levels.find((a) => {
+            const found = a.items.find((b) => b.id === id);
+            if (found) {
+              item = found;
+              return true;
+            }
+            return false;
+          })!;
+
+        result.push({
+          type: 'add',
+          item: {
+            old: undefined,
+            new: item,
+          },
+          level: {
+            old: level,
+            new: level,
+          },
+        });
+      }
+    }
+
+    // iterate old links and compare with new annotation
+    for (const link of oldAnnotation.links) {
+      const found = newAnnotation.links.find((a) => a.id === link.id);
+      if (found) {
+        if (
+          link.link.fromID !== found.link.fromID ||
+          link.link.toID !== found.link.toID
+        ) {
+          // changed
+          result.push({
+            type: 'change',
+            link: {
+              old: link,
+              new: found,
+            },
+          });
+          state.old.linkIDs = state.old.linkIDs.filter((a) => a !== link.id);
+          state.new.linkIDs = state.new.linkIDs.filter((a) => a !== link.id);
+        }
+      } else {
+        // removed
+        state.old.linkIDs = state.old.linkIDs.filter((a) => a !== link.id);
+      }
+    }
+
+    if (state.new.linkIDs.length > 0) {
+      for (const id of state.new.linkIDs) {
+        const link: OctraAnnotationLink = newAnnotation.links.find(
+          (a) => a.id === id
+        )!;
+        result.push({
+          type: 'add',
+          link: {
+            old: undefined,
+            new: link,
+          },
+        });
+      }
+    }
+
+    return result;
+  }
+}
+
+export interface AnnotationChange {
+  type: 'add' | 'remove' | 'change';
+  level?: {
+    old?: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
+    new?: OctraAnnotationAnyLevel<OctraAnnotationSegment>
+  };
+  item?: {
+    old?: AnnotationAnySegment;
+    new?: AnnotationAnySegment;
+  };
+  link?: {
+    old?: OctraAnnotationLink;
+    new?: OctraAnnotationLink;
+  };
 }

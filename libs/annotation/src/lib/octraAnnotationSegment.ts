@@ -1,4 +1,4 @@
-import { ISegment, OEvent, OItem, OLabel, OSegment } from './annotjson';
+import { ISegment, OItem, OLabel, OSegment } from './annotjson';
 import { SampleUnit } from '@octra/media';
 import { Serializable } from '@octra/utilities';
 import { ASRQueueItemType } from './asr';
@@ -20,6 +20,7 @@ export interface ASRContext {
 export class OctraAnnotationEvent
   implements Serializable<OctraAnnotationEvent, OctraAnnotationEvent>
 {
+  public readonly type: 'segment' | 'event' | 'item' = 'event';
   id!: number;
   samplePoint!: SampleUnit;
   labels: OLabel[] = [];
@@ -53,6 +54,33 @@ export class OctraAnnotationEvent
   getFirstLabelWithoutName(notName: string) {
     return this.labels?.find((a) => a.name !== notName);
   }
+
+  isEqualWith(other: OctraAnnotationEvent): boolean {
+    if (!other) {
+      return false;
+    }
+
+    let labelsEqual = true;
+
+    if (this.labels.length === other.labels.length) {
+      for (const label of this.labels) {
+        const found = other.labels.find((a) => a.name === label.name);
+        if (!found || found.value !== label.value) {
+          labelsEqual = false;
+          break;
+        }
+      }
+    } else {
+      labelsEqual = false;
+    }
+
+    return (
+      other &&
+      this.id === other.id &&
+      this.samplePoint === other.samplePoint &&
+      labelsEqual
+    );
+  }
 }
 
 export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
@@ -60,6 +88,8 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
     SegmentWithContext<T>,
     Serializable<SegmentWithContext<T>, OctraAnnotationSegment<T>>
 {
+  public readonly type: 'segment' | 'event' | 'item' = 'segment';
+
   get id(): number {
     return this._id;
   }
@@ -168,9 +198,33 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
       } as any
     );
   }
+
+  isEqualWith(other: OctraAnnotationSegment<T>) {
+    let labelsEqual = true;
+
+    if (this.labels.length === other.labels.length) {
+      for (const label of this.labels) {
+        const found = other.labels.find((a) => a.name === label.name);
+        if (!found || found.value !== label.value) {
+          labelsEqual = false;
+          break;
+        }
+      }
+    } else {
+      labelsEqual = false;
+    }
+
+    return (
+      this._id === other.id &&
+      this.time.equals(other.time) &&
+      JSON.stringify(this.context ?? {}) ==
+        JSON.stringify(other.context ?? {}) &&
+      labelsEqual
+    );
+  }
 }
 
 export type AnnotationAnySegment =
   | OctraAnnotationSegment<ASRContext>
   | OItem
-  | OEvent;
+  | OctraAnnotationEvent;

@@ -178,7 +178,9 @@ export class OLevel<T extends OItem> implements ILevel {
   }
 
   getRightSibling(index: number): T | undefined {
-    return index > -1 && index < this.items.length - 1 ? this.items[index + 1] : undefined;
+    return index > -1 && index < this.items.length - 1
+      ? this.items[index + 1]
+      : undefined;
   }
 }
 
@@ -276,6 +278,8 @@ export type OAnyLevel<T extends OSegment> =
   | OEventLevel;
 
 export class OItem implements IItem, Serializable<IItem, OItem> {
+  public readonly type: 'segment' | 'event' | 'item' = 'item';
+
   id = 0;
   labels: OLabel[];
 
@@ -309,6 +313,24 @@ export class OItem implements IItem, Serializable<IItem, OItem> {
 
   clone(id?: number) {
     return new OItem(id ?? this.id, [...this.labels]);
+  }
+
+  isEqualWith(other: OItem) {
+    let labelsEqual = true;
+
+    if (this.labels.length === other.labels.length) {
+      for (const label of this.labels) {
+        const found = other.labels.find((a) => a.name === label.name);
+        if (!found || found.value !== label.value) {
+          labelsEqual = false;
+          break;
+        }
+      }
+    } else {
+      labelsEqual = false;
+    }
+
+    return this.id === other.id && labelsEqual;
   }
 }
 
@@ -363,6 +385,7 @@ export class OSegment
 }
 
 export class OEvent extends OItem implements Serializable<IEvent, OEvent> {
+  public override readonly type: 'segment' | 'event' | 'item' = 'event';
   samplePoint;
 
   constructor(id: number, samplePoint: number, labels?: ILabel[]) {

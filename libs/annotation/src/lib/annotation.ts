@@ -14,6 +14,7 @@ import {
   OSegmentLevel,
 } from './annotjson';
 import {
+  AnnotationAnySegment,
   ASRContext,
   OctraAnnotationEvent,
   OctraAnnotationSegment,
@@ -131,6 +132,16 @@ export class OctraAnnotation<
       name,
       items
     );
+  }
+
+  getItemById(id: number): AnnotationAnySegment | undefined {
+    for (const level of this._levels) {
+      const found = level.items.find((a) => a.id === id);
+      if (found) {
+        return found as AnnotationAnySegment;
+      }
+    }
+    return undefined;
   }
 
   clearAllItemsFromCurrentLevel() {

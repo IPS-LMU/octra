@@ -57,15 +57,21 @@ export function getSegmentsOfRange(
   entries: OctraAnnotationSegment[],
   startSamples: SampleUnit,
   endSamples: SampleUnit
-): OctraAnnotationSegment[] {
+): {
+  startIndex: number;
+  endIndex: number;
+} {
   if (startSamples.sampleRate !== endSamples.sampleRate) {
     throw new Error('Samplerate of both SampleUnits must be equal');
   }
 
-  const result: OctraAnnotationSegment[] = [];
   let start = new SampleUnit(0, startSamples.sampleRate);
+  let startIndex = -1;
+  let endIndex = -1;
 
-  for (const segment of entries) {
+  for (let i = 0; i < entries.length; i++) {
+    const segment = entries[i];
+
     if (
       (segment.time!.samples >= startSamples.samples &&
         segment.time!.samples <= endSamples.samples) ||
@@ -74,12 +80,14 @@ export function getSegmentsOfRange(
       (start.samples <= startSamples.samples &&
         segment.time!.samples >= endSamples.samples)
     ) {
-      result.push(segment);
+      if (startIndex < 0) {
+        startIndex = i;
+      }
+      endIndex = i;
     }
-    start = segment.time!.clone();
   }
 
-  return result;
+  return {startIndex, endIndex};
 }
 
 /***
@@ -103,11 +111,13 @@ export function removeSegmentByIndex(
       silenceValue !== ''
     ) {
       const nextSegment = entries[index + 1];
-      const transcription = entries[index].getFirstLabelWithoutName('Spealer')?.value;
+      const transcription =
+        entries[index].getFirstLabelWithoutName('Spealer')?.value;
 
       if (
         silenceValue !== undefined &&
-        nextSegment.getFirstLabelWithoutName('Speaker')?.value !== silenceValue &&
+        nextSegment.getFirstLabelWithoutName('Speaker')?.value !==
+          silenceValue &&
         transcription !== silenceValue &&
         mergeTranscripts
       ) {
@@ -118,15 +128,22 @@ export function removeSegmentByIndex(
         ) {
           nextSegment.changeFirstLabelWithoutName(
             'Speaker',
-            transcription + ' ' + nextSegment.getFirstLabelWithoutName('Speaker')?.value
+            transcription +
+              ' ' +
+              nextSegment.getFirstLabelWithoutName('Speaker')?.value
           );
         } else if (
           nextSegment.getFirstLabelWithoutName('Speaker')?.value === '' &&
           transcription !== ''
         ) {
-          nextSegment.changeFirstLabelWithoutName('Speaker', transcription ?? '');
+          nextSegment.changeFirstLabelWithoutName(
+            'Speaker',
+            transcription ?? ''
+          );
         }
-      } else if (nextSegment.getFirstLabelWithoutName('Speaker')?.value === silenceValue) {
+      } else if (
+        nextSegment.getFirstLabelWithoutName('Speaker')?.value === silenceValue
+      ) {
         // delete pause
         nextSegment.changeFirstLabelWithoutName('Speaker', transcription ?? '');
       }
@@ -166,9 +183,11 @@ export function addSegment(
   entries: OctraAnnotationSegment[];
   itemIDCounter: number;
 } {
-  const newSegment: OctraAnnotationSegment = new OctraAnnotationSegment(itemIDCounter, time, [
-    new OLabel(label, value ?? ''),
-  ]);
+  const newSegment: OctraAnnotationSegment = new OctraAnnotationSegment(
+    itemIDCounter,
+    time,
+    [new OLabel(label, value ?? '')]
+  );
 
   if (
     entries.find((a) => {
@@ -256,7 +275,9 @@ export function combineSegments(
 /**
  * returns an array of normal segment objects with original values.
  */
-export function convertSegmentsToOSegments(entries: OctraAnnotationSegment[]): OSegment[] {
+export function convertSegmentsToOSegments(
+  entries: OctraAnnotationSegment[]
+): OSegment[] {
   return entries.map((a, i) =>
     a.serializeToOSegment(i > 0 ? entries[i - 1].time.samples : 0)
   );
@@ -274,7 +295,10 @@ export function convertOSegmentsToSegments(
 /**
  * removes Segment by number of samples
  */
-export function removeBySamples(entries: OctraAnnotationSegment[], timeSamples: SampleUnit) {
+export function removeBySamples(
+  entries: OctraAnnotationSegment[],
+  timeSamples: SampleUnit
+) {
   for (let i = 0; i < entries.length; i++) {
     const segment = entries[i];
 

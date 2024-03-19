@@ -587,7 +587,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           }
           this.av.drawnSelection = drawnSelection;
           this.updateLines();
-          this.drawAllBoundaries();
+          this.updateAllSegments();
           this.updatePlayCursor();
         }
         if (this.stage !== undefined) {
@@ -1216,78 +1216,70 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       width: size.width,
       height: size.height,
       sceneFunc: (context, shape) => {
+
         if (
-          this.isVisibleInView(
-            shape.x(),
-            shape.y(),
-            shape.width(),
-            shape.height()
-          )
+          this.layers !== undefined &&
+          this.stage !== undefined &&
+          this.audioManager !== undefined &&
+          this.av.audioTCalculator !== undefined
         ) {
-          if (
-            this.layers !== undefined &&
-            this.stage !== undefined &&
-            this.audioManager !== undefined &&
-            this.av.audioTCalculator !== undefined
-          ) {
-            const position = {
-              x: 0,
-              y: 0,
-            };
-            const pxPerSecond = Math.round(
-              this.av.audioTCalculator.samplestoAbsX(
-                new SampleUnit(
-                  this.audioManager.sampleRate,
-                  this.audioManager.sampleRate
-                )
+          const position = {
+            x: 0,
+            y: 0,
+          };
+          const pxPerSecond = Math.round(
+            this.av.audioTCalculator.samplestoAbsX(
+              new SampleUnit(
+                this.audioManager.sampleRate,
+                this.audioManager.sampleRate
               )
+            )
+          );
+
+          if (pxPerSecond >= 5) {
+            const timeLineHeight = this.settings.timeline.enabled
+              ? this.settings.timeline.height
+              : 0;
+            const vZoom = Math.round(
+              (this.settings.lineheight - timeLineHeight) /
+              this.grid.horizontalLines
             );
 
-            if (pxPerSecond >= 5) {
-              const timeLineHeight = this.settings.timeline.enabled
-                ? this.settings.timeline.height
-                : 0;
-              const vZoom = Math.round(
-                (this.settings.lineheight - timeLineHeight) /
-                  this.grid.horizontalLines
-              );
+            if (pxPerSecond > 0 && vZoom > 0) {
+              // --- get the appropriate context
+              context.beginPath();
 
-              if (pxPerSecond > 0 && vZoom > 0) {
-                // --- get the appropriate context
-                context.beginPath();
-
-                // set horizontal lines
-                for (
-                  let y = Math.round(vZoom / 2);
-                  y < this.settings.lineheight - timeLineHeight;
-                  y = y + vZoom
-                ) {
-                  context.moveTo(position.x, y + position.y);
-                  context.lineTo(
-                    position.x +
-                      shape.width() -
-                      (this.settings.margin.left + this.settings.margin.right),
-                    y + position.y
-                  );
-                }
-                // set vertical lines
-                for (
-                  let x = pxPerSecond;
-                  x <
+              // set horizontal lines
+              for (
+                let y = Math.round(vZoom / 2);
+                y < this.settings.lineheight - timeLineHeight;
+                y = y + vZoom
+              ) {
+                context.moveTo(position.x, y + position.y);
+                context.lineTo(
+                  position.x +
                   shape.width() -
-                    (this.settings.margin.left + this.settings.margin.right);
-                  x = x + pxPerSecond
-                ) {
-                  context.moveTo(position.x + x, position.y);
-                  context.lineTo(
-                    position.x + x,
-                    position.y + this.settings.lineheight - timeLineHeight
-                  );
-                }
-
-                context.stroke();
-                context.fillStrokeShape(shape);
+                  (this.settings.margin.left + this.settings.margin.right),
+                  y + position.y
+                );
               }
+              // set vertical lines
+              for (
+                let x = pxPerSecond;
+                x <
+                shape.width() -
+                (this.settings.margin.left + this.settings.margin.right);
+                x = x + pxPerSecond
+              ) {
+                context.moveTo(position.x + x, position.y);
+                context.lineTo(
+                  position.x + x,
+                  position.y + this.settings.lineheight - timeLineHeight
+                );
+              }
+
+              context.stroke();
+              context.fillStrokeShape(shape);
             }
           }
         }
@@ -1486,13 +1478,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         if (
           this.layers !== undefined &&
           this.stage !== undefined &&
-          this.av.innerWidth &&
-          this.isVisibleInView(
-            shape.x(),
-            shape.y(),
-            shape.width(),
-            shape.height()
-          )
+          this.av.innerWidth
         ) {
           const timeLineHeight = this.settings.timeline.enabled
             ? this.settings.timeline.height
@@ -2268,9 +2254,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.layers !== undefined &&
       this.stage !== undefined &&
       this.audioChunk !== undefined &&
-      this.av.innerWidth !== undefined &&
-      this.av.innerWidth &&
-      this.isVisibleInView(shape.x(), shape.y(), shape.width(), shape.height())
+      this.av.innerWidth !== undefined
     ) {
       for (let j = 0; j < numOfLines; j++) {
         // draw time label

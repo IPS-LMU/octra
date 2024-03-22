@@ -121,7 +121,7 @@ export class AudioViewerService {
   };
   private stage: Konva.Stage | undefined;
   private konvaContainer?: HTMLDivElement;
-  private renderer?: Renderer2;
+  public renderer?: Renderer2;
   public shortcut = new EventEmitter<AudioViewerShortcutEvent>();
   public selchange = new EventEmitter<AudioSelection>();
 
@@ -383,11 +383,9 @@ export class AudioViewerService {
     stageWidth: number | undefined,
     stageHeight: number | undefined,
     container: HTMLDivElement | undefined,
-    audioChunk: AudioChunk | undefined,
-    renderer?: Renderer2
+    audioChunk: AudioChunk | undefined
   ) {
-    if (stageWidth && stageHeight && container && renderer) {
-      this.renderer = renderer;
+    if (stageWidth && stageHeight && container && this.renderer) {
       this.konvaContainer = container;
       this.audioChunk = audioChunk;
       this.updateSize(stageWidth, stageHeight);
@@ -437,12 +435,7 @@ export class AudioViewerService {
       let i = 0;
       for (const line of lines) {
         line.visible(
-          this.isVisibleInView(
-            line.x(),
-            line.y() + this.layers.background.y(),
-            line.width(),
-            line.height()
-          )
+          this.isVisibleInView(line.x(), line.y(), line.width(), line.height())
         );
         i++;
       }
@@ -461,20 +454,24 @@ export class AudioViewerService {
       if (change.type === 'change') {
         if (change.item?.new) {
           // item changed
-          this.redrawSegment(change.item.new.id);
+          this.removeSegmentFromCanvas(change.item.new.id);
+          this.addNewSegmentOnCanvas(change.item.new.id);
+          const rightNeighbour = (this
+            .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!.getRightSibling(
+            change.item.new.id
+          );
+          if (rightNeighbour) {
+            this.removeSegmentFromCanvas(rightNeighbour.id);
+            this.addNewSegmentOnCanvas(rightNeighbour.id);
+          }
 
-          if (
-            !(change.item.new as OctraAnnotationSegment).time.equals(
-              (change.item.old as OctraAnnotationSegment).time
-            )
-          ) {
-            const rightNeighbour = (this
-              .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!.getRightSibling(
-              change.item.new.id
-            );
-            if (rightNeighbour) {
-              this.redrawSegment(rightNeighbour.id);
-            }
+          const leftNeighbour = (this
+            .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!.getRightSibling(
+            change.item.new.id
+          );
+          if (leftNeighbour) {
+            this.removeSegmentFromCanvas(leftNeighbour.id);
+            this.addNewSegmentOnCanvas(leftNeighbour.id);
           }
 
           segmentChanged = true;
@@ -491,14 +488,20 @@ export class AudioViewerService {
     }
 
     if (segmentChanged) {
+      this.layers?.overlay.batchDraw();
       this.drawAllBoundaries();
     }
 
-    console.log(
-      `applyChanges with ${changes.length} changes took only ${
-        Date.now() - old
-      } for viewer ${this.name}`
-    );
+    this.bringToFront('#timeStamps');
+    this.bringToFront('.line-selections');
+  }
+
+  private bringToFront(name: string) {
+    this.layers?.overlay.find(name).map((a) => {
+      // selections to foreground
+      a.zIndex((this.layers?.overlay.children?.length ?? 1) - 1);
+      return a;
+    });
   }
 
   public getPixelPerSecond(secondsPerLine: number) {
@@ -531,27 +534,30 @@ export class AudioViewerService {
       ) {
         const playpos = this.audioChunk?.absolutePlayposition.clone();
         const drawnSelection = this.drawnSelection?.clone();
+        const viewport = this.viewport;
         this.initialize(
           newWidth,
           newHeight,
           this.konvaContainer,
-          this.audioChunk,
-          this.renderer
+          this.audioChunk
         );
         this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
         await this.initializeSettings();
+        this.initializeView();
 
         if (this.audioChunk !== undefined) {
           if (!this.audioChunk.isPlaying) {
             this.audioChunk.absolutePlayposition = playpos.clone();
           }
           this.drawnSelection = drawnSelection;
-          this.updateLines();
-          this.updateAllSegments();
-          this.drawWholeSelection();
-          this.updatePlayCursor();
-          this.layers?.background.batchDraw();
         }
+        this.scrollToAbsY(viewport?.y!);
+        this.bringToFront('#timeStamps');
+        this.bringToFront('.line-selections');
+
+        this.drawWholeSelection();
+        this.updatePlayCursor();
+        this.layers?.playhead.draw();
       }
     } catch (e) {
       //ignore
@@ -606,7 +612,6 @@ export class AudioViewerService {
 
         if (lineWidth !== undefined) {
           const numOfLines = Math.ceil(this.AudioPxWidth / lineWidth);
-          console.log(`!!!! Create ${numOfLines} lines`);
           let y = 0;
           if (numOfLines > 1) {
             let drawnWidth = 0;
@@ -652,7 +657,6 @@ export class AudioViewerService {
       }
 
       // this.layers.background.batchDraw();
-      console.log(`initializeView for ${this.name}`);
       this.updateAllSegments();
 
       let y = 0;
@@ -761,7 +765,7 @@ export class AudioViewerService {
             line.visible(
               this.isVisibleInView(
                 line.x(),
-                line.y() + this.layers.background.y(),
+                line.y(),
                 line.width(),
                 line.height()
               )
@@ -780,8 +784,8 @@ export class AudioViewerService {
   private updateViewPort() {
     if (this.size && this.layers?.background) {
       this.viewport = {
-        x: this.layers.background.x(),
-        y: this.layers.background.y(),
+        x: Math.abs(this.layers.background.x()),
+        y: Math.abs(this.layers.background.y()),
         width: this.size.width,
         height: this.size.height,
       };
@@ -888,86 +892,88 @@ export class AudioViewerService {
     line.add(frame);
   }
 
-  private createLineGrid(line: Konva.Group, size: Size, lineNum: number) {
+  private createLineGrid(line: Konva.Group, size: Size) {
     const frame = new Konva.Shape({
       opacity: 0.2,
       stroke: this.settings.grid.color,
       strokeWidth: 1,
       width: size.width,
       height: size.height,
-      sceneFunc: (context, shape) => {
-        if (
-          this.layers !== undefined &&
-          this.stage !== undefined &&
-          this.audioManager !== undefined &&
-          this.audioTCalculator !== undefined
-        ) {
-          const position = {
-            x: 0,
-            y: 0,
-          };
-          const pxPerSecond = Math.round(
-            this.audioTCalculator.samplestoAbsX(
-              new SampleUnit(
-                this.audioManager.sampleRate,
-                this.audioManager.sampleRate
-              )
-            )
-          );
-
-          if (pxPerSecond >= 5) {
-            const timeLineHeight = this.settings.timeline.enabled
-              ? this.settings.timeline.height
-              : 0;
-            const vZoom = Math.round(
-              (this.settings.lineheight - timeLineHeight) /
-                this.grid.horizontalLines
-            );
-
-            if (pxPerSecond > 0 && vZoom > 0) {
-              // --- get the appropriate context
-              context.beginPath();
-
-              // set horizontal lines
-              for (
-                let y = Math.round(vZoom / 2);
-                y < this.settings.lineheight - timeLineHeight;
-                y = y + vZoom
-              ) {
-                context.moveTo(position.x, y + position.y);
-                context.lineTo(
-                  position.x +
-                    shape.width() -
-                    (this.settings.margin.left + this.settings.margin.right),
-                  y + position.y
-                );
-              }
-              // set vertical lines
-              for (
-                let x = pxPerSecond;
-                x <
-                shape.width() -
-                  (this.settings.margin.left + this.settings.margin.right);
-                x = x + pxPerSecond
-              ) {
-                context.moveTo(position.x + x, position.y);
-                context.lineTo(
-                  position.x + x,
-                  position.y + this.settings.lineheight - timeLineHeight
-                );
-              }
-
-              context.stroke();
-              context.fillStrokeShape(shape);
-            }
-          }
-        }
-      },
+      sceneFunc: this.sceneFuncGrid,
       transformsEnabled: 'position',
     });
     frame.perfectDrawEnabled(false);
     line.add(frame);
   }
+
+  private sceneFuncGrid = (context: Konva.Context, shape: Konva.Shape) => {
+    if (
+      this.layers !== undefined &&
+      this.stage !== undefined &&
+      this.audioManager !== undefined &&
+      this.audioTCalculator !== undefined
+    ) {
+      const position = {
+        x: 0,
+        y: 0,
+      };
+      const pxPerSecond = Math.round(
+        this.audioTCalculator.samplestoAbsX(
+          new SampleUnit(
+            this.audioManager.sampleRate,
+            this.audioManager.sampleRate
+          )
+        )
+      );
+
+      if (pxPerSecond >= 5) {
+        const timeLineHeight = this.settings.timeline.enabled
+          ? this.settings.timeline.height
+          : 0;
+        const vZoom = Math.round(
+          (this.settings.lineheight - timeLineHeight) /
+            this.grid.horizontalLines
+        );
+
+        if (pxPerSecond > 0 && vZoom > 0) {
+          // --- get the appropriate context
+          context.beginPath();
+
+          // set horizontal lines
+          for (
+            let y = Math.round(vZoom / 2);
+            y < this.settings.lineheight - timeLineHeight;
+            y = y + vZoom
+          ) {
+            context.moveTo(position.x, y + position.y);
+            context.lineTo(
+              position.x +
+                shape.width() -
+                (this.settings.margin.left + this.settings.margin.right),
+              y + position.y
+            );
+          }
+          // set vertical lines
+          for (
+            let x = pxPerSecond;
+            x <
+            shape.width() -
+              (this.settings.margin.left + this.settings.margin.right);
+            x = x + pxPerSecond
+          ) {
+            context.moveTo(position.x + x, position.y);
+            context.lineTo(
+              position.x + x,
+              position.y + this.settings.lineheight - timeLineHeight
+            );
+          }
+
+          context.stroke();
+          context.fillStrokeShape(shape);
+        }
+      }
+    }
+  };
 
   private createLinePlayCursor() {
     const group = new Konva.Group({
@@ -1032,7 +1038,7 @@ export class AudioViewerService {
     }
 
     this.createLineBackground(lineGroup, size);
-    this.createLineGrid(lineGroup, size, lineNum);
+    this.createLineGrid(lineGroup, size);
     this.createLineSignal(lineGroup, size, lineNum);
     this.createLineBorder(lineGroup, size);
 
@@ -1127,66 +1133,74 @@ export class AudioViewerService {
       width: size.width,
       height: size.height,
       sceneFunc: (context, shape) => {
-        if (
-          this.layers !== undefined &&
-          this.stage !== undefined &&
-          this.innerWidth
-        ) {
-          const timeLineHeight = this.settings.timeline.enabled
-            ? this.settings.timeline.height
-            : 0;
-          const midline = Math.round(
-            (this.settings.lineheight - timeLineHeight) / 2
-          );
-          const absXPos = lineNum * this.innerWidth;
-
-          const zoomX = this.zoomX;
-          const zoomY = this.zoomY;
-
-          const position = {
-            x: 0,
-            y: 0,
-          };
-          context.beginPath();
-          context.moveTo(
-            position.x,
-            position.y + midline - this.minmaxarray[absXPos]
-          );
-
-          if (
-            !(midline === null || midline === undefined) &&
-            !(zoomY === null || zoomY === undefined)
-          ) {
-            for (let x = 0; x + absXPos < absXPos + shape.width(); x++) {
-              const xDraw = !this.settings.roundValues
-                ? position.x + x * zoomX
-                : Math.round(position.x + x * zoomX);
-              const yDraw = !this.settings.roundValues
-                ? position.y + midline - this.minmaxarray[x + absXPos] * zoomY
-                : Math.round(
-                    position.y + midline - this.minmaxarray[x + absXPos] * zoomY
-                  );
-
-              if (!isNaN(yDraw) && !isNaN(xDraw)) {
-                context.lineTo(xDraw, yDraw);
-              } else {
-                context.lineTo(x, midline);
-              }
-            }
-          } else {
-            if (midline === undefined || midline === undefined) {
-              throw Error('midline is undefined!');
-            } else if (zoomY === undefined || zoomY === undefined) {
-              throw Error('ZoomY is undefined!');
-            }
-          }
-          context.fillStrokeShape(shape);
-        }
+        this.sceneFuncSignal(context, shape, lineNum);
       },
       transformsEnabled: 'position',
     });
     line.add(frame);
   }
+
+  private sceneFuncSignal = (
+    context: Konva.Context,
+    shape: Konva.Shape,
+    lineNum: number
+  ) => {
+    if (
+      this.layers !== undefined &&
+      this.stage !== undefined &&
+      this.innerWidth
+    ) {
+      const timeLineHeight = this.settings.timeline.enabled
+        ? this.settings.timeline.height
+        : 0;
+      const midline = Math.round(
+        (this.settings.lineheight - timeLineHeight) / 2
+      );
+      const absXPos = lineNum * this.innerWidth;
+
+      const zoomX = this.zoomX;
+      const zoomY = this.zoomY;
+
+      const position = {
+        x: 0,
+        y: 0,
+      };
+      context.beginPath();
+      context.moveTo(
+        position.x,
+        position.y + midline - this.minmaxarray[absXPos]
+      );
+
+      if (
+        !(midline === null || midline === undefined) &&
+        !(zoomY === null || zoomY === undefined)
+      ) {
+        for (let x = 0; x + absXPos < absXPos + shape.width(); x++) {
+          const xDraw = !this.settings.roundValues
+            ? position.x + x * zoomX
+            : Math.round(position.x + x * zoomX);
+          const yDraw = !this.settings.roundValues
+            ? position.y + midline - this.minmaxarray[x + absXPos] * zoomY
+            : Math.round(
+                position.y + midline - this.minmaxarray[x + absXPos] * zoomY
+              );
+
+          if (!isNaN(yDraw) && !isNaN(xDraw)) {
+            context.lineTo(xDraw, yDraw);
+          } else {
+            context.lineTo(x, midline);
+          }
+        }
+      } else {
+        if (midline === undefined || midline === undefined) {
+          throw Error('midline is undefined!');
+        } else if (zoomY === undefined || zoomY === undefined) {
+          throw Error('ZoomY is undefined!');
+        }
+      }
+      context.fillStrokeShape(shape);
+    }
+  };
 
   private doPlayHeadAnimation = () => {
     this.updatePlayCursor();
@@ -1236,6 +1250,18 @@ export class AudioViewerService {
   updateAllSegments() {
     const now = Date.now();
     let y = 0;
+    const segCanvasElements = this.layers?.overlay.find('.segments');
+    if (
+      segCanvasElements &&
+      segCanvasElements.length > 0 &&
+      segCanvasElements[0]
+    ) {
+      segCanvasElements[0].destroy();
+    }
+    const segTimeLabels = this.layers?.overlay.find('#timeStamps');
+    if (segTimeLabels && segTimeLabels.length > 0 && segTimeLabels[0]) {
+      segTimeLabels[0].destroy();
+    }
 
     if (this.innerWidth !== undefined) {
       const maxLineWidth = this.innerWidth;
@@ -1251,6 +1277,8 @@ export class AudioViewerService {
         this.currentLevel &&
         this.currentLevel.items.length > 0 &&
         this.audioChunk !== undefined &&
+        this.viewport &&
+        this._innerWidth &&
         this.size
       ) {
         let root: Konva.Group | Konva.Layer = this.layers.overlay;
@@ -1277,8 +1305,8 @@ export class AudioViewerService {
 
         const { startIndex, endIndex } = getSegmentsOfRange(
           this.currentLevel.items as OctraAnnotationSegment[],
-          this.audioChunk.time.start,
-          this.audioChunk.time.end
+          this.audioChunk.time.start.clone(),
+          this.audioChunk.time.end.clone()
         );
         const segments = this.currentLevel.items as OctraAnnotationSegment[];
 
@@ -1289,54 +1317,85 @@ export class AudioViewerService {
           id: number;
         }[] = [];
 
-        if (this.audioTCalculator !== undefined) {
+        if (
+          this.audioTCalculator !== undefined &&
+          startIndex >= 0 &&
+          endIndex >= 0 &&
+          endIndex >= startIndex
+        ) {
+          const newShapes: (Group | Shape)[] = [];
+
           for (let i = startIndex; i <= endIndex; i++) {
             const segment = segments[i];
-            const start = segment.time.sub(this.audioChunk.time.start);
-            const absX = this.audioTCalculator.samplestoAbsX(
+            const beginTime =
+              i > 0
+                ? segments[i - 1].time.clone()
+                : this.audioManager.createSampleUnit(0);
+            const start = beginTime.sub(this.audioChunk.time.start.clone());
+            const absXStart = this.audioTCalculator.samplestoAbsX(
               start,
               this.audioChunk.time.duration
             );
-
-            const createdShapes = this.createSegmentOnCanvas(
-              numOfLines,
-              {
-                index: i,
-                segment: segments[i],
-              },
-              { start: startIndex, end: endIndex }
+            const absXEnd = this.audioTCalculator.samplestoAbsX(
+              segment.time,
+              this.audioChunk.time.duration
             );
 
-            if (createdShapes) {
-              root.add(createdShapes.overlayGroup);
-            }
-
-            y =
+            const yStart =
               (this.innerWidth < this.AudioPxWidth
-                ? Math.floor(absX / this.innerWidth)
+                ? Math.floor(absXStart / this.innerWidth)
                 : 0) *
               (this.settings.lineheight + this.settings.margin.top);
 
-            // draw boundary
+            const yEnd =
+              (this.innerWidth < this.AudioPxWidth
+                ? Math.ceil(absXEnd / this.innerWidth)
+                : 0) *
+              (this.settings.lineheight + this.settings.margin.top);
+
             if (
-              segment.time.samples !==
-                this.audioManager.resource.info.duration.samples &&
-              segment.time.samples <=
-                this.audioManager.resource.info.duration.samples
+              this.isVisibleInView(
+                0,
+                yStart,
+                this._innerWidth!,
+                yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart
+              )
             ) {
-              let relX = 0;
-              if (this.settings.multiLine) {
-                relX = (absX % this.innerWidth) + this.settings.margin.left;
-              } else {
-                relX = absX + this.settings.margin.left;
+              const createdShapes = this.createSegmentOnCanvas(
+                numOfLines,
+                {
+                  index: i,
+                  segment: segments[i],
+                },
+                { start: startIndex, end: endIndex }
+              );
+
+              if (createdShapes) {
+                newShapes.push(createdShapes.overlayGroup);
               }
 
-              boundariesToDraw.push({
-                x: relX,
-                y,
-                num: i,
-                id: segment.id,
-              });
+              // draw boundary
+              if (
+                segment.time.samples !==
+                  this.audioManager.resource.info.duration.samples &&
+                segment.time.samples <=
+                  this.audioManager.resource.info.duration.samples
+              ) {
+                let relX = 0;
+                if (this.settings.multiLine) {
+                  relX =
+                    (absXStart % this.innerWidth) + this.settings.margin.left;
+                } else {
+                  relX = absXStart + this.settings.margin.left;
+                }
+
+                boundariesToDraw.push({
+                  x: relX,
+                  y: yStart,
+                  num: i,
+                  id: segment.id,
+                });
+              }
             }
           }
 
@@ -1364,16 +1423,17 @@ export class AudioViewerService {
 
           this.drawAllBoundaries();
 
-          root.draw();
+          const segmentsGroup = new Konva.Group({
+            name: 'segments',
+          });
+          segmentsGroup.add(...newShapes);
+          root.add(segmentsGroup);
         }
       }
     }
-    console.log(
-      `updateAllSegments took ${Date.now() - now}ms for viewer ${this.name}`
-    );
-    console.log(
-      `height of background layer is ${this.layers?.background.height()}`
-    );
+
+    this.bringToFront('#timeStamps');
+    this.bringToFront('.line-selections');
   }
 
   drawAllBoundaries() {
@@ -1391,8 +1451,8 @@ export class AudioViewerService {
       let y = 0;
       const { startIndex, endIndex } = getSegmentsOfRange(
         this.currentLevel.items as OctraAnnotationSegment[],
-        this.audioChunk.time.start,
-        this.audioChunk.time.end
+        this.audioChunk.time.start.clone(),
+        this.audioChunk.time.end.clone()
       );
       const segments = this.currentLevel.items as OctraAnnotationSegment[];
 
@@ -1406,7 +1466,7 @@ export class AudioViewerService {
       if (this.audioTCalculator !== undefined) {
         for (let i = startIndex; i <= endIndex; i++) {
           const segment = segments[i];
-          const start = segment.time.sub(this.audioChunk.time.start);
+          const start = segment.time.sub(this.audioChunk.time.start.clone());
           const absX = this.audioTCalculator.samplestoAbsX(
             start,
             this.audioChunk.time.duration
@@ -1535,7 +1595,7 @@ export class AudioViewerService {
     ) {
       if (this.audioTCalculator !== undefined) {
         if (segment !== undefined && segment?.time !== undefined) {
-          const start = segment.time.sub(this.audioChunk.time.start);
+          const start = segment.time.sub(this.audioChunk.time.start.clone());
           const absX = this.audioTCalculator.samplestoAbsX(
             start,
             this.audioChunk.time.duration
@@ -1592,48 +1652,18 @@ export class AudioViewerService {
               height: segmentHeight,
               transformsEnabled: 'position',
               listening: false,
-              sceneFunc: (context: any, shape: Shape) => {
-                if (
-                  this.currentLevel?.items &&
-                  this.audioManager &&
-                  this.innerWidth
-                ) {
-                  // TODO perhaps there is a problem with segInterval if indices changes
-                  const segIndex = this.currentLevel.items.findIndex(
-                    (a) => a.id === segment.id
-                  );
-                  const seg = this.currentLevel.items[
-                    segIndex
-                  ] as OctraAnnotationSegment;
-                  const prevSeg =
-                    segIndex > segmentInterval.start
-                      ? (this.currentLevel.items[
-                          segIndex - 1
-                        ] as OctraAnnotationSegment)
-                      : undefined;
-
-                  const nextSeg =
-                    segIndex < segmentInterval.end
-                      ? (this.currentLevel.items[
-                          segIndex + 1
-                        ] as OctraAnnotationSegment)
-                      : undefined;
-
-                  this.overlaySceneFunction(
-                    {
-                      from: lineNum1,
-                      to: lineNum2,
-                    },
-                    seg,
-                    nextSeg === undefined,
-                    prevSeg
-                      ? prevSeg.time.clone()
-                      : this.audioManager.createSampleUnit(0),
-                    numOfLines,
-                    context,
-                    shape
-                  );
-                }
+              sceneFunc: (context, shape) => {
+                this.sceneFuncOverlay(
+                  context,
+                  shape,
+                  segment,
+                  numOfLines,
+                  segmentInterval,
+                  {
+                    start: lineNum1,
+                    end: lineNum2,
+                  }
+                );
               },
             });
 
@@ -1648,46 +1678,18 @@ export class AudioViewerService {
                 listening: false,
                 height: segmentHeight,
                 transformsEnabled: 'position',
-                sceneFunc: (context: any, shape) => {
-                  if (
-                    this.currentLevel?.items &&
-                    this.audioManager &&
-                    this.innerWidth
-                  ) {
-                    const segIndex = this.currentLevel.items.findIndex(
-                      (a) => a.id === segment.id
-                    );
-                    const prevSeg =
-                      segIndex > segmentInterval.start
-                        ? (this.currentLevel.items[
-                            segIndex - 1
-                          ] as OctraAnnotationSegment)
-                        : undefined;
-                    const seg = this.currentLevel.items[
-                      segIndex
-                    ] as OctraAnnotationSegment;
-                    const nextSeg =
-                      segIndex < segmentInterval.end
-                        ? (this.currentLevel.items[
-                            segIndex + 1
-                          ] as OctraAnnotationSegment)
-                        : undefined;
-
-                    this.transcriptBackgroundSceneFunc(
-                      {
-                        from: lineNum1,
-                        to: lineNum2,
-                      },
-                      seg,
-                      segIndex === this.currentLevel.items.length - 1,
-                      prevSeg
-                        ? prevSeg.time.clone()
-                        : this.audioManager.createSampleUnit(0),
-                      numOfLines,
-                      context,
-                      shape
-                    );
-                  }
+                sceneFunc: (context: Konva.Context, shape: Konva.Shape) => {
+                  this.sceneFuncTranscripts(
+                    context,
+                    shape,
+                    segmentInterval,
+                    segment,
+                    {
+                      from: lineNum1,
+                      to: lineNum2,
+                    },
+                    numOfLines
+                  );
                 },
               });
 
@@ -1771,6 +1773,87 @@ export class AudioViewerService {
     return undefined;
   }
 
+  private sceneFuncTranscripts = (
+    context: Konva.Context,
+    shape: Konva.Shape,
+    segmentInterval: {
+      start: number;
+      end: number;
+    },
+    segment: OctraAnnotationSegment,
+    lineInterval: {
+      from: number;
+      to: number;
+    },
+    numOfLines: number
+  ) => {
+    if (this.currentLevel?.items && this.audioManager && this.innerWidth) {
+      const segIndex = this.currentLevel.items.findIndex(
+        (a) => a.id === segment.id
+      );
+      const prevSeg =
+        segIndex > segmentInterval.start
+          ? (this.currentLevel.items[segIndex - 1] as OctraAnnotationSegment)
+          : undefined;
+      const seg = this.currentLevel.items[segIndex] as OctraAnnotationSegment;
+
+      this.transcriptBackgroundSceneFunc(
+        lineInterval,
+        seg,
+        segIndex === this.currentLevel.items.length - 1,
+        prevSeg ? prevSeg.time.clone() : this.audioManager.createSampleUnit(0),
+        numOfLines,
+        context,
+        shape
+      );
+    }
+  };
+
+  private sceneFuncOverlay = (
+    context: Konva.Context,
+    shape: Konva.Shape,
+    segment: OctraAnnotationSegment,
+    numOfLines: number,
+    segmentInterval: {
+      start: number;
+      end: number;
+    },
+    lineInterval: {
+      start: number;
+      end: number;
+    }
+  ) => {
+    if (this.currentLevel?.items && this.audioManager && this.innerWidth) {
+      // TODO perhaps there is a problem with segInterval if indices changes
+      const segIndex = this.currentLevel.items.findIndex(
+        (a) => a.id === segment.id
+      );
+      const seg = this.currentLevel.items[segIndex] as OctraAnnotationSegment;
+      const prevSeg =
+        segIndex > segmentInterval.start
+          ? (this.currentLevel.items[segIndex - 1] as OctraAnnotationSegment)
+          : undefined;
+
+      const nextSeg =
+        segIndex < segmentInterval.end
+          ? (this.currentLevel.items[segIndex + 1] as OctraAnnotationSegment)
+          : undefined;
+
+      this.overlaySceneFunction(
+        {
+          from: lineInterval.start,
+          to: lineInterval.end,
+        },
+        seg,
+        nextSeg === undefined,
+        prevSeg ? prevSeg.time.clone() : this.audioManager.createSampleUnit(0),
+        numOfLines,
+        context,
+        shape
+      );
+    }
+  };
+
   /**
    * saves mouse click position
    */
@@ -1848,6 +1931,7 @@ export class AudioViewerService {
                 status: 'stopped',
               });
               this._dragableBoundaryID = -1;
+              this.updateAllSegments();
             }
 
             resolve(lineNum);
@@ -2161,18 +2245,46 @@ export class AudioViewerService {
   private isVisibleInView(x: number, y: number, width: number, height: number) {
     if (this.viewport) {
       const view = this.viewport;
-      const result =
-        // is left and right boundary completely in view
-        (((x >= view.x && x <= view.x + view.width) ||
-          (x + width >= view.x && x + width <= view.x + view.width) ||
-          // left boundary out of view, right boundary in view
-          (x < view.x && x + width > view.x + view.width)) &&
-          ((y >= view.y && y <= view.y + view.height) ||
-            (y + height >= view.y && y + height <= view.y + view.height))) ||
-        // left boundary out of view, right boundary in view
-        (y <= view.y && y + height >= view.y + view.height);
+      const coordinates: {
+        x: number;
+        y: number;
+      }[] = [];
+      coordinates.push(
+        ...[
+          // top left
+          {
+            x,
+            y,
+          },
+          // top right
+          {
+            x: x + width,
+            y,
+          },
+          // bottom left
+          {
+            x,
+            y: y + height,
+          },
+          // bottom right
+          {
+            x: x + width,
+            y: y + height,
+          },
+        ]
+      );
 
-      return result;
+      // one of the corners must be in view.
+      for (const coordinate of coordinates) {
+        if (
+          coordinate.x >= view.x &&
+          coordinate.x <= view.x + view.width &&
+          coordinate.y >= view.y &&
+          coordinate.y <= view.y + view.height
+        ) {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -3099,6 +3211,7 @@ export class AudioViewerService {
             id: this._dragableBoundaryID,
             status: 'dragging',
           });
+          this.layers?.overlay.batchDraw();
         }
       }
     }
@@ -3583,9 +3696,6 @@ export class AudioViewerService {
         }
 
         this.drawNewBoundaries(boundariesToDraw);
-        console.log(
-          `height of background layer is ${this.layers.background.height()}`
-        );
       }
     }
   }
@@ -4120,209 +4230,193 @@ export class AudioViewerService {
       ) {
         console.error(`scenceSegment is undefined!`);
       } else {
-        const viewY =
-          lineInterval.from *
-          (this.settings.lineheight + this.settings.margin.top);
-        const viewHeight =
-          (lineInterval.to + 1) *
-            (this.settings.lineheight + this.settings.margin.top) -
-          viewY;
+        for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
+          let localY =
+            j * (this.settings.lineheight + this.settings.margin.top);
 
-        if (true) {
-          for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
-            let localY =
-              j * (this.settings.lineheight + this.settings.margin.top);
+          if (this.innerWidth !== undefined) {
+            const startSecond = j * this.secondsPerLine;
+            let endSecond = 0;
 
-            if (this.innerWidth !== undefined) {
-              const startSecond = j * this.secondsPerLine;
-              let endSecond = 0;
-
-              if (numOfLines > 1) {
-                endSecond = Math.ceil(
-                  Math.min(
-                    startSecond + this.secondsPerLine,
-                    this.audioChunk.time.duration.seconds
-                  )
-                );
-              } else {
-                endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
-              }
-
-              const pipe = new TimespanPipe();
-              const maxDuration = this.audioChunk.time.duration.unix;
-
-              const timeString = pipe.transform(endSecond * 1000, {
-                showHour: true,
-                showMilliSeconds: !this.settings.multiLine,
-                maxDuration,
-              });
-              const timestampWidth = this.layers.overlay
-                .getContext()
-                .measureText(timeString).width;
-
-              const h = this.settings.lineheight;
-              const lineWidth =
-                j < numOfLines - 1
-                  ? this.innerWidth
-                  : this.canvasElements.lastLine.width();
-              const select = this.getRelativeSelectionByLine(
-                j + lineInterval.from,
-                lineWidth,
-                beginTime,
-                sceneSegment.time,
-                this.innerWidth
+            if (numOfLines > 1) {
+              endSecond = Math.ceil(
+                Math.min(
+                  startSecond + this.secondsPerLine,
+                  this.audioChunk.time.duration.seconds
+                )
               );
-              let w = 0;
-              let x = select.start;
+            } else {
+              endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
+            }
 
-              if (select.start > -1 && select.end > -1) {
-                w = Math.abs(select.end - select.start);
-              }
+            const pipe = new TimespanPipe();
+            const maxDuration = this.audioChunk.time.duration.unix;
 
-              if (select.start < 1 || select.start > lineWidth) {
-                x = 0;
-              }
-              if (select.end < 1) {
-                w = 0;
-              }
-              if (select.end > lineWidth) {
-                w = select.end;
-              }
+            const timeString = pipe.transform(endSecond * 1000, {
+              showHour: true,
+              showMilliSeconds: !this.settings.multiLine,
+              maxDuration,
+            });
+            const timestampWidth = this.layers.overlay
+              .getContext()
+              .measureText(timeString).width;
 
-              if (j === numOfLines - 1 && isLastSegment) {
-                w = lineWidth - select.start;
-              }
+            const h = this.settings.lineheight;
+            const lineWidth =
+              j < numOfLines - 1
+                ? this.innerWidth
+                : this.canvasElements.lastLine.width();
+            const select = this.getRelativeSelectionByLine(
+              j + lineInterval.from,
+              lineWidth,
+              beginTime,
+              sceneSegment.time,
+              this.innerWidth
+            );
+            let w = 0;
+            let x = select.start;
 
-              if (w === 0) {
-                // skip drawing empty rect
-                continue;
-              }
+            if (select.start > -1 && select.end > -1) {
+              w = Math.abs(select.end - select.start);
+            }
 
-              if (sceneSegment.context?.asr?.isBlockedBy === undefined) {
-                // not blocked
-                if (
-                  sceneSegment.getFirstLabelWithoutName('Speaker')?.value ===
-                    undefined ||
-                  sceneSegment.getFirstLabelWithoutName('Speaker')?.value === ''
-                ) {
-                  context.fillStyle = 'rgba(255,0,0,0.2)';
-                } else if (
-                  this.silencePlaceholder !== undefined &&
-                  sceneSegment.getFirstLabelWithoutName('Speaker')?.value ===
-                    this.silencePlaceholder
-                ) {
-                  context.fillStyle = 'rgba(0,0,255,0.2)';
-                } else if (
-                  sceneSegment.getFirstLabelWithoutName('Speaker')?.value !==
-                    undefined &&
-                  sceneSegment.getFirstLabelWithoutName('Speaker')?.value !== ''
-                ) {
-                  context.fillStyle = 'rgba(0,128,0,0.2)';
-                } else {
-                  console.error(`Audioviewer shows black segment`);
-                }
-                context.clearRect(x, localY, w, h);
-                context.fillRect(x, localY, w, h);
+            if (select.start < 1 || select.start > lineWidth) {
+              x = 0;
+            }
+            if (select.end < 1) {
+              w = 0;
+            }
+            if (select.end > lineWidth) {
+              w = select.end;
+            }
+
+            if (j === numOfLines - 1 && isLastSegment) {
+              w = lineWidth - select.start;
+            }
+
+            if (w === 0) {
+              // skip drawing empty rect
+              continue;
+            }
+
+            // console.log(`draw overlay for line ${j + lineInterval.from} and segment at ${sceneSegment.time.seconds}`);
+            if (sceneSegment.context?.asr?.isBlockedBy === undefined) {
+              // not blocked
+              if (
+                sceneSegment.getFirstLabelWithoutName('Speaker')?.value ===
+                  undefined ||
+                sceneSegment.getFirstLabelWithoutName('Speaker')?.value === ''
+              ) {
+                context.fillStyle = 'rgba(255,0,0,0.2)';
+              } else if (
+                this.silencePlaceholder !== undefined &&
+                sceneSegment.getFirstLabelWithoutName('Speaker')?.value ===
+                  this.silencePlaceholder
+              ) {
+                context.fillStyle = 'rgba(0,0,255,0.2)';
+              } else if (
+                sceneSegment.getFirstLabelWithoutName('Speaker')?.value !==
+                  undefined &&
+                sceneSegment.getFirstLabelWithoutName('Speaker')?.value !== ''
+              ) {
+                context.fillStyle = 'rgba(0,128,0,0.2)';
               } else {
-                // something running
-                let progressBarFillColor = '';
-                let progressBarForeColor = '';
-                if (
-                  sceneSegment.context?.asr?.isBlockedBy ===
-                  ASRQueueItemType.ASR
-                ) {
-                  // blocked by ASR
-                  context.fillStyle = 'rgba(255,191,0,0.5)';
-                  progressBarFillColor = 'rgba(221,167,14,0.8)';
-                  progressBarForeColor = 'black';
-                } else if (
-                  sceneSegment.context?.asr?.isBlockedBy ===
-                  ASRQueueItemType.ASRMAUS
-                ) {
-                  context.fillStyle = 'rgba(179,10,179,0.5)';
-                  progressBarFillColor = 'rgba(179,10,179,0.8)';
-                  progressBarForeColor = 'white';
-                } else if (
-                  sceneSegment.context?.asr?.isBlockedBy ===
-                  ASRQueueItemType.MAUS
-                ) {
-                  context.fillStyle = 'rgba(26,229,160,0.5)';
-                  progressBarFillColor = 'rgba(17,176,122,0.8)';
-                  progressBarForeColor = 'white';
-                }
-                context.clearRect(x, localY, w, h);
-                context.fillRect(x, localY, w, h);
+                console.error(`Audioviewer shows black segment`);
+              }
+              context.clearRect(x, localY, w, h);
+              context.fillRect(x, localY, w, h);
+            } else {
+              // something running
+              let progressBarFillColor = '';
+              let progressBarForeColor = '';
+              if (
+                sceneSegment.context?.asr?.isBlockedBy === ASRQueueItemType.ASR
+              ) {
+                // blocked by ASR
+                context.fillStyle = 'rgba(255,191,0,0.5)';
+                progressBarFillColor = 'rgba(221,167,14,0.8)';
+                progressBarForeColor = 'black';
+              } else if (
+                sceneSegment.context?.asr?.isBlockedBy ===
+                ASRQueueItemType.ASRMAUS
+              ) {
+                context.fillStyle = 'rgba(179,10,179,0.5)';
+                progressBarFillColor = 'rgba(179,10,179,0.8)';
+                progressBarForeColor = 'white';
+              } else if (
+                sceneSegment.context?.asr?.isBlockedBy === ASRQueueItemType.MAUS
+              ) {
+                context.fillStyle = 'rgba(26,229,160,0.5)';
+                progressBarFillColor = 'rgba(17,176,122,0.8)';
+                progressBarForeColor = 'white';
+              }
+              context.clearRect(x, localY, w, h);
+              context.fillRect(x, localY, w, h);
 
-                if (this.settings.showProgressBars) {
-                  let timeStampsWidth = 0;
+              if (this.settings.showProgressBars) {
+                let timeStampsWidth = 0;
 
-                  if (w === lineWidth) {
-                    // time labels on both sides
-                    timeStampsWidth = timestampWidth * 2;
-                  } else {
-                    if (x === 0 || select.start + w === lineWidth) {
-                      // time label on the left or on the right
-                      timeStampsWidth = timestampWidth;
-                    }
+                if (w === lineWidth) {
+                  // time labels on both sides
+                  timeStampsWidth = timestampWidth * 2;
+                } else {
+                  if (x === 0 || select.start + w === lineWidth) {
+                    // time label on the left or on the right
+                    timeStampsWidth = timestampWidth;
                   }
+                }
 
-                  const progressWidth = w - timeStampsWidth - 20;
-                  if (
-                    progressWidth > 10 &&
-                    sceneSegment.context?.asr?.progressInfo !== undefined
-                  ) {
-                    const progressStart =
-                      x + 10 + (x === 0 ? timestampWidth : 0);
-                    const loadedPixels = Math.round(
-                      progressWidth *
-                        (sceneSegment.context?.asr?.progressInfo.progress / 100)
-                    );
+                const progressWidth = w - timeStampsWidth - 20;
+                if (
+                  progressWidth > 10 &&
+                  sceneSegment.context?.asr?.progressInfo !== undefined
+                ) {
+                  const progressStart = x + 10 + (x === 0 ? timestampWidth : 0);
+                  const loadedPixels = Math.round(
+                    progressWidth *
+                      (sceneSegment.context?.asr?.progressInfo.progress / 100)
+                  );
 
-                    this.drawRoundedRect(
-                      context,
-                      progressStart,
-                      localY + 3,
-                      15,
-                      progressWidth,
-                      5,
-                      'transparent',
-                      progressBarFillColor
-                    );
-                    this.drawRoundedRect(
-                      context,
-                      progressStart,
-                      localY + 3,
-                      15,
-                      loadedPixels,
-                      5,
-                      progressBarFillColor
-                    );
+                  this.drawRoundedRect(
+                    context,
+                    progressStart,
+                    localY + 3,
+                    15,
+                    progressWidth,
+                    5,
+                    'transparent',
+                    progressBarFillColor
+                  );
+                  this.drawRoundedRect(
+                    context,
+                    progressStart,
+                    localY + 3,
+                    15,
+                    loadedPixels,
+                    5,
+                    progressBarFillColor
+                  );
 
-                    if (progressWidth > 100) {
-                      const progressString = `${sceneSegment.context?.asr?.progressInfo.statusLabel} ${sceneSegment.context?.asr?.progressInfo.progress}%`;
-                      const textLength =
-                        context.measureText(progressString).width;
-                      const textPosition = Math.round(
-                        progressStart + (progressWidth - textLength) / 2
-                      );
-                      context.fillStyle =
-                        progressStart + loadedPixels > textPosition &&
-                        progressBarForeColor === 'white'
-                          ? 'white'
-                          : 'black';
-                      context.fillText(
-                        progressString,
-                        textPosition,
-                        localY + 14
-                      );
-                    }
+                  if (progressWidth > 100) {
+                    const progressString = `${sceneSegment.context?.asr?.progressInfo.statusLabel} ${sceneSegment.context?.asr?.progressInfo.progress}%`;
+                    const textLength =
+                      context.measureText(progressString).width;
+                    const textPosition = Math.round(
+                      progressStart + (progressWidth - textLength) / 2
+                    );
+                    context.fillStyle =
+                      progressStart + loadedPixels > textPosition &&
+                      progressBarForeColor === 'white'
+                        ? 'white'
+                        : 'black';
+                    context.fillText(progressString, textPosition, localY + 14);
                   }
                 }
               }
             }
           }
-          context.fillStrokeShape(shape);
         }
+        context.fillStrokeShape(shape);
       }
     }
   };
@@ -4980,13 +5074,16 @@ export class AudioViewerService {
           this.canvasElements.lastLine.height()) *
         deltaY;
 
-      // move all layers but keep scrollbars fixed
-      this.layers.background.y(newY);
-      this.layers.overlay.y(newY);
-      this.layers.boundaries.y(newY);
-      this.layers.playhead.y(newY);
-      this.showOnlyLinesInViewport();
-      this.layers.background.batchDraw();
+      if (newY !== this.layers.background.y()) {
+        // move all layers but keep scrollbars fixed
+        this.layers.background.y(newY);
+        this.layers.overlay.y(newY);
+        this.layers.boundaries.y(newY);
+        this.layers.playhead.y(newY);
+        this.updateViewPort();
+        this.showOnlyLinesInViewport();
+        this.updateAllSegments();
+      }
     }
   }
 
@@ -5118,7 +5215,7 @@ export class AudioViewerService {
 }
 
 export interface AnnotationChange {
-  type: "add" | "remove" | "change";
+  type: 'add' | 'remove' | 'change';
   level?: {
     old?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
     new?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;

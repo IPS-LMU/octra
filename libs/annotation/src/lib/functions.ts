@@ -74,16 +74,14 @@ export function getSegmentsOfRange(
 
     if (
       (segment.time!.samples >= startSamples.samples &&
-        segment.time!.samples <= endSamples.samples) ||
-      (start.samples >= startSamples.samples &&
-        start.samples <= endSamples.samples) ||
-      (start.samples <= startSamples.samples &&
-        segment.time!.samples >= endSamples.samples)
+        segment.time!.samples <= endSamples.samples)
     ) {
       if (startIndex < 0) {
         startIndex = i;
       }
       endIndex = i;
+    } else if(segment.time.samples > endSamples.samples){
+      break;
     }
   }
 

@@ -265,7 +265,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
     const audioChunk = changes['audioChunk'];
     if (audioChunk && audioChunk.currentValue !== undefined) {
-      this.afterChunkUpdated();
+      this.afterChunkUpdated(audioChunk.currentValue);
     }
 
     const annotation = changes['annotation'];
@@ -303,13 +303,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.av.destroy();
   }
 
-  afterChunkUpdated() {
-    if (this.audioChunk) {
+  afterChunkUpdated(audioChunk?: AudioChunk) {
+    if (audioChunk) {
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
 
       this.subscrManager.add(
-        this.audioChunk.statuschange.subscribe({
+        audioChunk.statuschange.subscribe({
           next: this.onAudioChunkStatusChanged,
           error: (error) => {
             console.error(error);
@@ -320,9 +320,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
       let time = Date.now();
       new Promise<void>((resolve, reject) => {
-        if (this.audioChunk && !this.audioChunk.audioManager.channel) {
+        if (audioChunk && !audioChunk.audioManager.channel) {
           this.subscrManager.add(
-            this.audioChunk.audioManager.onChannelDataChange.subscribe({
+            audioChunk.audioManager.onChannelDataChange.subscribe({
               next: () => {
                 resolve();
               },
@@ -342,7 +342,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           // channel data is ready
           if (
             this.width &&
-            this.audioChunk &&
+            audioChunk &&
             this.av.annotation?.currentLevel &&
             this.av.annotation.currentLevel.items.length > 0
           ) {
@@ -350,7 +350,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
               this.width,
               this.height,
               this.konvaContainer?.nativeElement,
-              this.audioChunk
+              audioChunk
             );
 
             this.av
@@ -440,13 +440,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public init() {
-    this.av.initialize(
-      this.width,
-      this.height,
-      this.konvaContainer?.nativeElement,
-      this.audioChunk,
-      this.renderer
-    );
+    this.av.renderer = this.renderer;
   }
 
   private onAudioChunkStatusChanged = (status: PlayBackStatus) => {

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.12](https://github.com/IPS-LMU/octra/compare/utilities-0.0.11...utilities-0.0.12) (2024-03-25)
+
+
+### Bug Fixes
+
+* **octra:** octra doesn't load IO from task_use_ouputs_from_task attribute ([3cbbb00](https://github.com/IPS-LMU/octra/commit/3cbbb004fc7c5be0827c48641dc95ea16e72c378))
+
+
+
 ## [0.0.11](https://github.com/IPS-LMU/octra/compare/utilities-0.0.10...utilities-0.0.11) (2024-01-16)
 
 

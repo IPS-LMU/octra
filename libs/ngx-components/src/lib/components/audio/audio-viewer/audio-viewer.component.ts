@@ -208,14 +208,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   /**
    * triggers when the user enters a selected segment
    */
-  @Output() get segmententer(){
+  @Output() get segmententer() {
     return this.av.segmententer;
   }
 
   /**
    * triggers whenever the mousecursor position changes.
    */
-  @Output() get mousecursorchange(){
+  @Output() get mousecursorchange() {
     return this.av.mousecursorchange;
   }
 
@@ -281,10 +281,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         ) {
           this.av.updateAllSegments();
         } else {
-          this.afterLevelUpdated(parsedChanges);
+          this.afterLevelUpdated(parsedChanges, annotation.previousValue);
         }
       } else {
-        this.afterLevelUpdated(parsedChanges);
+        this.afterLevelUpdated(parsedChanges, annotation.previousValue);
       }
     }
 
@@ -374,11 +374,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private afterLevelUpdated(changes: AnnotationChange[]) {
+  private afterLevelUpdated(
+    changes: AnnotationChange[],
+    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ) {
     if (this.av.currentLevel && this.av.currentLevel.items.length > 0) {
       // subscribe to levelChanges for extern changes
       this.subscrManager.removeByTag('externLevelChanges');
-      this.av.applyChanges(changes);
+      this.av.applyChanges(changes, oldAnnotation);
     }
   }
 

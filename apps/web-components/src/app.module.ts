@@ -21,11 +21,11 @@ export class AppModule implements DoBootstrap {
     const audioPlayer = createCustomElement(AudioplayerComponent, {
       injector: this.injector,
     });
-    customElements.define('oc-audioplayer', audioPlayer);
+    customElements.define('octra-audioplayer', audioPlayer);
 
     const audioViewer = createCustomElement(AudioViewerComponent, {
       injector: this.injector,
     });
-    customElements.define('oc-audioviewer', audioViewer);
+    customElements.define('octra-audioviewer', audioViewer);
   }
 }

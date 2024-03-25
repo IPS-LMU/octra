@@ -4,7 +4,7 @@ let annotation = undefined;
 
 function initAudioPlayer(audioManager) {
   // <oc-audioplayer> is a web component from web-components library
-  audioplayer = document.createElement("oc-audioplayer");
+  audioplayer = document.createElement("octra-audioplayer");
   // connect audiochunk with audioplayer
   audioplayer.audioChunk = audioManager.mainchunk;
 
@@ -33,30 +33,28 @@ function initAudioViewer(audioManager) {
   }, oAudioFile);
 
   // retrieve first level object from importResult
-  const annotation = new OctraAnnotation.Annotation(
-    "Bahnauskunft.wav", oAudioFile,
-    importResult.annotjson.levels.map((level, i) => OctraAnnotation.Level.fromObj({
-      id: level.id,
-      level,
-      sortorder: i
-    }, audioManager.resource.info.sampleRate, audioManager.resource.info.duration))
-  );
+  const annotation = OctraAnnotation.OctraAnnotation.deserialize(importResult.annotjson);
+  annotation.changeCurrentLevelIndex(0);
 
-  // <oc-audioplayer> is a web component from web-components library
-  audioViewer = document.createElement("oc-audioviewer");
-  audioViewer.audioChunk = audioManager.mainchunk;
-  audioViewer.entries = annotation.levels[0].segments;
-  audioViewer.isMultiLine = true;
-  audioViewer.breakMarker = "<P>"
-  audioViewer.levelName = annotation.levels[0].name;
-
+  // <octra-audioplayer> is a web component from web-components library
+  audioViewer = document.createElement("octra-audioviewer");
   const wrapper = document.getElementById("audioviewer-wrapper");
   wrapper.appendChild(audioViewer);
 
-  audioViewer.settings.showTranscripts = true;
-  audioViewer.style.height = "600px";
-  audioViewer.settings.scrollbar.enabled = true;
+  // first set audiochunk before applying any settings
+  audioViewer.annotation = annotation;
+  audioViewer.audioChunk = audioManager.mainchunk;
 
+  // settings
+  audioViewer.style.height = "600px";
+  audioViewer.refreshOnInternChanges = true;
+  audioViewer.isMultiLine = true;
+  audioViewer.breakMarker = "<P>";
+  audioViewer.settings.showTranscripts = true;
+  audioViewer.settings.scrollbar.enabled = true;
+  audioViewer.enableShortcuts();
+
+  // events
   audioViewer.addEventListener("entriesChange", (event) => {
     const segments = event.detail;
     // annotation.levels[0] is referenced in audioviewer, so it the changes are automatically available.
@@ -66,7 +64,7 @@ function initAudioViewer(audioManager) {
 
 async function main() {
   // download audio file
-  const downloadedBlob = await OctraUtilities.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
+  const downloadedBlob = await OctraWebMedia.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
   const file = new File(
     [downloadedBlob],
     "Bahnauskunft.wav",
@@ -76,8 +74,8 @@ async function main() {
   );
 
   // read arraybuffer
-  const arrayBuffer = await OctraUtilities.readFileContents(file, "arraybuffer");
-  OctraMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraMedia.WavFormat()]).subscribe({
+  const arrayBuffer = await OctraWebMedia.readFileContents(file, "arraybuffer");
+  OctraWebMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraWebMedia.WavFormat()]).subscribe({
     next: (status) => {
       console.log(status)
 

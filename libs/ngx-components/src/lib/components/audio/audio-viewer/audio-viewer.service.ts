@@ -447,49 +447,61 @@ export class AudioViewerService {
    * @param changes
    * @private
    */
-  public applyChanges(changes: AnnotationChange[]) {
-    const old = Date.now();
-    let segmentChanged = false;
+  public applyChanges(
+    changes: AnnotationChange[],
+    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+  ) {
+    const getIndexOfSegmentID = (
+      level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
+      id: number
+    ) => {
+      return level.items.findIndex((a) => a.id === id);
+    };
+
+    const checkNeighbours = (item: AnnotationAnySegment) => {
+      const currentLevel = (this
+        .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!;
+      const rightNeighbour = currentLevel.getRightSibling(
+        getIndexOfSegmentID(currentLevel, item.id)
+      );
+      if (rightNeighbour) {
+        this.removeSegmentFromCanvas(rightNeighbour.id);
+        this.addNewSegmentOnCanvas(rightNeighbour.id);
+      }
+
+      const leftNeighbour = currentLevel.getLeftSibling(
+        getIndexOfSegmentID(currentLevel, item.id)
+      );
+      if (leftNeighbour) {
+        this.removeSegmentFromCanvas(leftNeighbour.id);
+        this.addNewSegmentOnCanvas(leftNeighbour.id);
+      }
+    };
     for (const change of changes) {
       if (change.type === 'change') {
         if (change.item?.new) {
           // item changed
           this.removeSegmentFromCanvas(change.item.new.id);
           this.addNewSegmentOnCanvas(change.item.new.id);
-          const rightNeighbour = (this
-            .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!.getRightSibling(
-            change.item.new.id
-          );
-          if (rightNeighbour) {
-            this.removeSegmentFromCanvas(rightNeighbour.id);
-            this.addNewSegmentOnCanvas(rightNeighbour.id);
-          }
 
-          const leftNeighbour = (this
-            .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!.getRightSibling(
-            change.item.new.id
-          );
-          if (leftNeighbour) {
-            this.removeSegmentFromCanvas(leftNeighbour.id);
-            this.addNewSegmentOnCanvas(leftNeighbour.id);
-          }
-
-          segmentChanged = true;
+          checkNeighbours(change.item.new);
         }
       } else if (change.type === 'add') {
         if (change.item?.new) {
           this.addNewSegmentOnCanvas(change.item.new.id);
+          checkNeighbours(change.item.new);
         }
       } else if (change.type === 'remove') {
         if (change.item?.old) {
           this.removeSegmentFromCanvas(change.item.old.id);
+          const oldLevel =
+            oldAnnotation.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+          const oldLeft = oldLevel.getLeftSibling(
+            getIndexOfSegmentID(oldLevel, change!.item!.old!.id!)
+          )! as OctraAnnotationSegment;
+          checkNeighbours(oldLeft);
         }
       }
-    }
-
-    if (segmentChanged) {
-      this.layers?.overlay.batchDraw();
-      this.drawAllBoundaries();
     }
 
     this.bringToFront('#timeStamps');
@@ -1727,7 +1739,7 @@ export class AudioViewerService {
                           ] as OctraAnnotationSegment)
                         : undefined;
 
-                    if (!(seg instanceof OctraAnnotationSegment)) {
+                    if (seg.type !== 'segment') {
                       return;
                     }
 
@@ -2925,8 +2937,10 @@ export class AudioViewerService {
         this.audioChunk !== undefined &&
         this.audioManager !== undefined
       ) {
-        const segment = this.currentLevel.items[segIndex];
-        if (!(segment instanceof OctraAnnotationSegment)) {
+        const segment = this.currentLevel.items[
+          segIndex
+        ] as OctraAnnotationSegment;
+        if (segment.type !== 'segment') {
           reject();
           return;
         }
@@ -3915,12 +3929,12 @@ export class AudioViewerService {
           if (found) {
             // compare changes
             if (item.type === found.type) {
-              if (
-                item.type === 'segment' &&
-                item instanceof OctraAnnotationSegment &&
-                found instanceof OctraAnnotationSegment
-              ) {
-                if (!item.isEqualWith(found)) {
+              if (item.type === 'segment' && found.type === 'segment') {
+                if (
+                  !(item as OctraAnnotationSegment).isEqualWith(
+                    found as OctraAnnotationSegment
+                  )
+                ) {
                   // changed
                   result.push({
                     type: 'change',
@@ -3940,12 +3954,12 @@ export class AudioViewerService {
                 state.new.itemIDs = state.new.itemIDs.filter(
                   (a) => a !== item.id
                 );
-              } else if (
-                item.type === 'event' &&
-                item instanceof OctraAnnotationEvent &&
-                found instanceof OctraAnnotationEvent
-              ) {
-                if (!item.isEqualWith(found)) {
+              } else if (item.type === 'event' && found.type === 'event') {
+                if (
+                  !(item as OctraAnnotationEvent).isEqualWith(
+                    found as OctraAnnotationEvent
+                  )
+                ) {
                   // changed
                   result.push({
                     type: 'change',
@@ -3965,12 +3979,8 @@ export class AudioViewerService {
                 state.new.itemIDs = state.new.itemIDs.filter(
                   (a) => a !== item.id
                 );
-              } else if (
-                item.type === 'item' &&
-                item instanceof OItem &&
-                found instanceof OItem
-              ) {
-                if (!item.isEqualWith(found)) {
+              } else if (item.type === 'item' && found.type === 'item') {
+                if (!(item as OItem).isEqualWith(found as OItem)) {
                   // changed
                   result.push({
                     type: 'change',

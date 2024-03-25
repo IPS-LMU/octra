@@ -2,6 +2,29 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.1.0](https://github.com/IPS-LMU/octra/compare/ngx-components-0.0.8...ngx-components-0.1.0) (2024-03-25)
+
+
+### Bug Fixes
+
+* **ngx-components:** audio viewer does not draw segment rectangles ([509e207](https://github.com/IPS-LMU/octra/commit/509e207913ef602813b9db020c2f651fd897f357))
+* **ngx-components:** audio-viewer does not resize properly ([ac19481](https://github.com/IPS-LMU/octra/commit/ac1948190c6787e9f8f63a8c57529ec1a0af60d3))
+* **ngx-components:** placing boundary on transcribed segment removes transcript ([5fc3cb7](https://github.com/IPS-LMU/octra/commit/5fc3cb73528084a92430164483e52304d42887f8))
+* **ngx-components:** resizing does not work on audio-viewer ([45e4a6f](https://github.com/IPS-LMU/octra/commit/45e4a6fcb19b79db5babd42da3fab983e819f53e))
+* **ngx-components:** slow audio viewer ([d8e36fa](https://github.com/IPS-LMU/octra/commit/d8e36fa002b1d295b5cccc1dcd08c2fae238badb))
+* **octra:** 2D-Editor switching between segments in detail window sometimes not working ([dc79496](https://github.com/IPS-LMU/octra/commit/dc7949691162d64a793497eb3621e9b38c2b996f))
+* **octra:** resizing does not draw signal and grid ([4a5b2fb](https://github.com/IPS-LMU/octra/commit/4a5b2fb20d5045c53c69457a6a7a96bcfd302087))
+* **octra:** selection not working after resize ([6bb216d](https://github.com/IPS-LMU/octra/commit/6bb216d3b32ea3fbdf437829ec40137cefd18e64))
+* **octra:** single-line audioviewer does not show correct background color ([027aa79](https://github.com/IPS-LMU/octra/commit/027aa7996d8ba1d4904b8fc9651f071cdf3a44d4))
+* **web-components:** demo not working ([2080869](https://github.com/IPS-LMU/octra/commit/2080869267e90b6a07468f48d5afd0f6771ab4c1))
+
+
+### Performance Improvements
+
+* **ngx-components:** improved drawing algorithm of audio-viewer ([eab131d](https://github.com/IPS-LMU/octra/commit/eab131dc647b8c505b45a81164b26ffe6a656564))
+
+
+
 ## [0.0.8](https://github.com/IPS-LMU/octra/compare/ngx-components-0.0.7...ngx-components-0.0.8) (2024-01-15)
 
 

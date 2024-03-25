@@ -8,31 +8,16 @@ const crypto = require('crypto');
 
 const JSONValidator = {
   build: async function () {
-    await bundleLibrary('json-sets');
+    await buildLibrary('json-sets');
   },
 };
 
-async function preparePackageJSON(packagePath) {
-  if (await fs.pathExists(packagePath)) {
-    const json = await fs.readJSON(packagePath);
-    if (json.main === './index.cjs.js') {
-      json.main = './index.cjs';
-    }
-    if (json.module === './index.esm.js') {
-      json.module = './index.mjs';
-    }
-    await fs.writeJSON(packagePath, json, {
-      spaces: 2,
-    });
-  }
-}
-
-async function bundleLibrary(libraryName) {
-  await run(`nx bundle ${libraryName}`);
-  await preparePackageJSON(`./dist/libs/${libraryName}/package.json`);
-}
-
 async function buildLibrary(libraryName) {
+  if (await pathExists(`dist/libs/${libraryName}`)) {
+    await fs.rm(`dist/libs/${libraryName}`, {
+      recursive: true
+    })
+  }
   await run(`nx build ${libraryName} --skip-nx-cache`);
   await fs.copyFile(
     `libs/${libraryName}/LICENSE.txt`,
@@ -121,13 +106,13 @@ const OCTRA = {
     await run('nx build ngx-utilities');
     await run(`npm run build:web-components`);
     await JSONValidator.build();
-    await bundleLibrary('utilities');
-    await this.bundleAssets();
-    await bundleLibrary('annotation');
-    await bundleLibrary('media');
-    await bundleLibrary('web-media');
+    await buildLibrary('utilities');
+    await this.buildAssets();
+    await buildLibrary('annotation');
+    await buildLibrary('media');
+    await buildLibrary('web-media');
   },
-  bundleAssets: async function () {
+  buildAssets: async function () {
     await buildLibrary('assets');
     await fs.copyFile(
       './libs/assets/src/lib/schemata/inputs_outputs.set.json',
@@ -167,7 +152,6 @@ yargs
     OCTRA.buildBetaProd
   )
   .command('build:libs', 'Builds all libraries.', OCTRA.buildLibs)
-  .command('bundle:assets', 'Bundle assets.', OCTRA.bundleAssets)
   .command(
     'build:lib [library]',
     'Builds a library.',
@@ -179,6 +163,7 @@ yargs
       buildLibrary(argv.library);
     }
   )
+  .command('build:assets', 'Builds assets library.', OCTRA.buildAssets)
   .command('build:extern', 'Builds extern libraries.', OCTRA.buildExtern)
   .command('build:json-sets', 'Builds json-sets library.', JSONValidator.build)
   .command(

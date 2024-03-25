@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.13](https://github.com/IPS-LMU/octra/compare/annotation-0.1.12...annotation-0.1.13) (2024-03-25)
+
+
+### Bug Fixes
+
+* **annotation:** importing ELAN file fails on unknown attributes ([745a67f](https://github.com/IPS-LMU/octra/commit/745a67f356f2188b64634726c3a761e32b51134f))
+* **ngx-components:** slow audio viewer ([d8e36fa](https://github.com/IPS-LMU/octra/commit/d8e36fa002b1d295b5cccc1dcd08c2fae238badb))
+* **octra:** octra doesn't load IO from task_use_ouputs_from_task attribute ([3cbbb00](https://github.com/IPS-LMU/octra/commit/3cbbb004fc7c5be0827c48641dc95ea16e72c378))
+
+
+### Performance Improvements
+
+* **ngx-components:** improved drawing algorithm of audio-viewer ([eab131d](https://github.com/IPS-LMU/octra/commit/eab131dc647b8c505b45a81164b26ffe6a656564))
+
+
+
 ## [0.1.12](https://github.com/IPS-LMU/octra/compare/annotation-0.1.11...annotation-0.1.12) (2024-02-28)
 
 

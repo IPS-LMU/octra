@@ -2245,46 +2245,39 @@ export class AudioViewerService {
   private isVisibleInView(x: number, y: number, width: number, height: number) {
     if (this.viewport) {
       const view = this.viewport;
-      const coordinates: {
-        x: number;
-        y: number;
-      }[] = [];
-      coordinates.push(
-        ...[
-          // top left
-          {
-            x,
-            y,
-          },
-          // top right
-          {
-            x: x + width,
-            y,
-          },
-          // bottom left
-          {
-            x,
-            y: y + height,
-          },
-          // bottom right
-          {
-            x: x + width,
-            y: y + height,
-          },
-        ]
-      );
+      const { topLeft, topRight, bottomLeft, bottomRight } = {
+        topLeft: {
+          x,
+          y,
+        },
+        topRight: {
+          x: x + width,
+          y,
+        },
+        bottomLeft: {
+          x,
+          y: y + height,
+        },
+        bottomRight: {
+          x: x + width,
+          y: y + height,
+        },
+      };
 
-      // one of the corners must be in view.
-      for (const coordinate of coordinates) {
-        if (
-          coordinate.x >= view.x &&
-          coordinate.x <= view.x + view.width &&
-          coordinate.y >= view.y &&
-          coordinate.y <= view.y + view.height
-        ) {
-          return true;
+      return Konva.Util.haveIntersection(
+        {
+          x,
+          y,
+          width,
+          height,
+        },
+        {
+          x: view.x,
+          y: view.y,
+          height: view.height,
+          width: view.width,
         }
-      }
+      );
     }
     return false;
   }

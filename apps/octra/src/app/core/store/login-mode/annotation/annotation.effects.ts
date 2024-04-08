@@ -572,7 +572,6 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         this.initMaintenance(state);
-
         return this.loadSegments(getModeState(state)!, state);
       })
     )
@@ -1426,7 +1425,10 @@ export class AnnotationEffects {
         // import logs
         this.store.dispatch(
           AnnotationActions.saveLogs.do({
-            logs: modeState.logging.logs ?? task?.log ?? [],
+            logs:
+              modeState.logging.logs && modeState.logging.logs.length > 0
+                ? modeState.logging.logs
+                : task?.log ?? [],
             mode: rootState.application.mode,
           })
         );
@@ -1682,6 +1684,7 @@ export class AnnotationEffects {
         ]
       : [];
 
+    console.log("saveTask");
     return this.apiService.saveTask(
       state.onlineMode.currentSession!.currentProject!.id,
       state.onlineMode.currentSession!.task!.id,

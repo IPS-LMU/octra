@@ -343,7 +343,7 @@ export class OctraDatabase extends Dexie {
         table.put(
           {
             name: name,
-            value: {},
+            value: null,
           },
           name
         )

@@ -277,6 +277,8 @@ export class AnnotationStoreService {
   }
 
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
+    console.log(`quit `);
+    console.log({ clearSession, freeTask, redirectToProjects });
     this.store.dispatch(
       AnnotationActions.quit.do({
         clearSession,

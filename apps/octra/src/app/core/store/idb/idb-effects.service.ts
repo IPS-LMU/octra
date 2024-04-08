@@ -8,6 +8,7 @@ import {
   map,
   mergeAll,
   mergeMap,
+  Observable,
   of,
   Subject,
   tap,
@@ -370,7 +371,15 @@ export class IDBEffects {
           !hasProperty(action, 'clearSession') ||
           (action as any).clearSession
         ) {
-          return this.idbService.clearAnnotationData((action as any).mode).pipe(
+          return forkJoin<{
+            annotation: Observable<void>;
+            logs: Observable<void>;
+          }>({
+            annotation: this.idbService.clearAnnotationData(
+              (action as any).mode
+            ),
+            logs: this.idbService.clearLoggingData((action as any).mode),
+          }).pipe(
             map(() => IDBActions.clearAnnotation.success()),
             catchError((error) => {
               return of(

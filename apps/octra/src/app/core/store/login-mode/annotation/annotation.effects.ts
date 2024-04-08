@@ -1685,6 +1685,21 @@ export class AnnotationEffects {
       : [];
 
     console.log("saveTask");
+    console.log({
+      projectID: state.onlineMode.currentSession!.currentProject!.id,
+      taskID: state.onlineMode.currentSession!.task!.id,
+      properties: {
+        assessment: state.onlineMode.currentSession.assessment,
+        comment: state.onlineMode.currentSession.comment,
+        log: state.onlineMode.logging.logs,
+        status},
+      outputs: outputs.map(a => ({
+        name: a.name,
+        type: a.type,
+        size: a.size,
+        content: result
+      }))
+    });
     return this.apiService.saveTask(
       state.onlineMode.currentSession!.currentProject!.id,
       state.onlineMode.currentSession!.task!.id,

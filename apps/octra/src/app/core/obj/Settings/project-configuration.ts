@@ -28,6 +28,7 @@ export interface ProjectSettings {
   feedback_form: Group[];
   octra?: {
     asrEnabled?: boolean;
+    tools?: ('combine-phrases' | 'cut-audio')[];
     validationEnabled?: boolean;
     sendValidatedTranscriptionOnly?: boolean;
     showOverviewIfTranscriptNotValid?: boolean;

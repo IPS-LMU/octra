@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import {
   Component,
   ElementRef,
@@ -19,23 +18,22 @@ import {
 import { interval } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
-import { NavbarService } from '../../component/navbar/navbar.service';
 import {
   JSONConverter,
   TextTableConverter,
 } from '../../obj/tools/audio-cutting/cutting-format';
-import { AudioService, UserInteractionsService } from '../../shared/service';
+import {
+  AudioService,
+  SettingsService,
+  UserInteractionsService,
+} from '../../shared/service';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { IntArray, WavFormat } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
 import { OctraModalService } from '../octra-modal.service';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalOptions,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
@@ -168,13 +166,11 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   constructor(
     private sanitizer: DomSanitizer,
-    public navbarServ: NavbarService,
-    modalService: NgbModal,
     private modalsService: OctraModalService,
-    private httpClient: HttpClient,
     public annotationStoreService: AnnotationStoreService,
     public audio: AudioService,
     public transloco: TranslocoService,
+    protected settings: SettingsService,
     protected override activeModal: NgbActiveModal
   ) {
     super('toolsModal', activeModal);
@@ -548,5 +544,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       this.tools.combinePhrases.options
     );
     this.close();
+  }
+
+  isToolEnabled(tool: string) {
+    return (
+      this.settings.projectsettings?.octra?.tools?.find((a) => a === tool) !==
+      undefined
+    );
   }
 }

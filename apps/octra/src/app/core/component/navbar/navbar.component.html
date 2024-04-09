@@ -419,7 +419,7 @@
           *ngIf="
             appStorage.loggedIn &&
             appStorage.audioLoaded &&
-            navbarServ.showExport
+            navbarServ.showExport && (settService.projectsettings?.octra?.tools ?? []).length > 0
           "
           class="nav-item"
         >

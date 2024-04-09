@@ -1,7 +1,9 @@
 {
-  "$id": "v0.0.1",
+  "$id": "v0.0.2",
   "type": "object",
-  "required": ["version"],
+  "required": [
+    "version"
+  ],
   "properties": {
     "version": {
       "type": "string",
@@ -119,6 +121,16 @@
             }
           },
           "type": "object"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cut-audio",
+              "combine-phrases"
+            ]
+          }
         },
         "bugreport": {
           "properties": {

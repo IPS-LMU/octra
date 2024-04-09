@@ -13,15 +13,16 @@
   <div class="modal-body" #content id="tools-table">
     <table class="table">
       <thead>
-        <tr>
-          <th></th>
-          <th>{{ 'g.name' | transloco }}</th>
-          <th>{{ 'g.description' | transloco }}</th>
-          <th></th>
-        </tr>
+      <tr>
+        <th></th>
+        <th>{{ 'g.name' | transloco }}</th>
+        <th>{{ 'g.description' | transloco }}</th>
+        <th></th>
+      </tr>
       </thead>
       <tbody>
-        <!-- combine phrases tool -->
+      <!-- combine phrases tool -->
+      <ng-container *ngIf="isToolEnabled('combine-phrases')">
         <tr class="top-tr">
           <td
             (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened"
@@ -73,64 +74,64 @@
                 <form>
                   <table class="table" style="max-width: 400px">
                     <tbody>
-                      <tr>
-                        <td>
-                          <label for="minSilenceLength">{{
+                    <tr>
+                      <td>
+                        <label for="minSilenceLength">{{
                             'tools.combine phrases.minimal silence' | transloco
                           }}</label>
-                        </td>
-                        <td>
-                          <input
-                            [(ngModel)]="
+                      </td>
+                      <td>
+                        <input
+                          [(ngModel)]="
                               tools.combinePhrases.options.minSilenceLength
                             "
-                            id="minSilenceLength"
-                            name="minSilenceLength"
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <i
-                            class="bi bi-question-circle"
-                            [ngbTooltip]="
+                          id="minSilenceLength"
+                          name="minSilenceLength"
+                          type="number"
+                        />
+                      </td>
+                      <td>
+                        <i
+                          class="bi bi-question-circle"
+                          [ngbTooltip]="
                               transloco.translate(
                                 'tools.combine phrases.minimal silence desc'
                               )
                             "
-                            placement="right"
-                            style="color: darkblue"
-                          ></i>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <label for="maxWordsPerSegment">{{
+                          placement="right"
+                          style="color: darkblue"
+                        ></i>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label for="maxWordsPerSegment">{{
                             'tools.combine phrases.maximal words' | transloco
                           }}</label>
-                        </td>
-                        <td>
-                          <input
-                            [(ngModel)]="
+                      </td>
+                      <td>
+                        <input
+                          [(ngModel)]="
                               tools.combinePhrases.options.maxWordsPerSegment
                             "
-                            id="maxWordsPerSegment"
-                            name="maxWordsPerSegment"
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <i
-                            class="bi bi-question-circle"
-                            [ngbTooltip]="
+                          id="maxWordsPerSegment"
+                          name="maxWordsPerSegment"
+                          type="number"
+                        />
+                      </td>
+                      <td>
+                        <i
+                          class="bi bi-question-circle"
+                          [ngbTooltip]="
                               transloco.translate(
                                 'tools.combine phrases.maximal words desc'
                               )
                             "
-                            placement="right"
-                            style="color: darkblue"
-                          ></i>
-                        </td>
-                      </tr>
+                          placement="right"
+                          style="color: darkblue"
+                        ></i>
+                      </td>
+                    </tr>
                     </tbody>
                   </table>
                 </form>
@@ -145,8 +146,10 @@
             </div>
           </td>
         </tr>
+      </ng-container>
 
-        <!-- cut audio files -->
+      <!-- cut audio files -->
+      <ng-container *ngIf="isToolEnabled('cut-audio')">
         <tr
           *ngIf="
             audio.audioManager.resource.info.extension ===
@@ -226,7 +229,7 @@
 
                   <div class="form-control">
                     <span
-                      >{{ 'tools.cut audio.append meta files' | transloco }}:
+                    >{{ 'tools.cut audio.append meta files' | transloco }}:
                     </span>
                     <div
                       *ngFor="
@@ -247,7 +250,7 @@
                       <label
                         class="form-check-label"
                         for="inlineCheckbox{{ i }}"
-                        >{{ exportFormat.label }}</label
+                      >{{ exportFormat.label }}</label
                       >
                     </div>
                   </div>
@@ -322,6 +325,7 @@
             </td>
           </tr>
         </ng-container>
+      </ng-container>
       </tbody>
     </table>
   </div>

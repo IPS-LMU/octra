@@ -3,7 +3,7 @@
 */
 
 export const OctraProjectConfigJSONSchema = {
-  $id: 'v0.0.1',
+  $id: 'v0.0.2',
   type: 'object',
   required: ['version'],
   properties: {
@@ -111,6 +111,13 @@ export const OctraProjectConfigJSONSchema = {
         },
         showdetails: {
           type: 'boolean',
+        },
+        tools: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: ['cut-audio', 'combine-phrases'],
+          },
         },
         responsive: {
           $id: '/properties/octra/responsive',

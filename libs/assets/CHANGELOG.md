@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/IPS-LMU/octra/compare/assets-0.1.0...assets-0.1.1) (2024-04-09)
+
+
+### Features
+
+* **octra:** define allowed tools in projectconfig.json ([1abf16c](https://github.com/IPS-LMU/octra/commit/1abf16cd606ab900597a4b0896cbe8816f03c3d5))
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/assets-0.0.3...assets-0.1.0) (2024-02-16)
 
 

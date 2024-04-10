@@ -149,7 +149,7 @@ export class AnnotationStateReducers {
               audio: {
                 ...state.audio,
                 loaded: true,
-                sampleRate: audioFile!.metadata?.sampleRate,
+                sampleRate: audioFile!.metadata?.sampleRate!,
                 fileName: audioFile!.filename,
                 file: audioFile,
               },
@@ -415,13 +415,21 @@ export class AnnotationStateReducers {
           return state;
         }
       ),
-      on(AnnotationActions.saveLogs.do, (state: AnnotationState, { logs }) => ({
-        ...state,
-        logging: {
-          ...state.logging,
-          logs,
-        },
-      })),
+      on(
+        AnnotationActions.saveLogs.do,
+        (state: AnnotationState, { logs, mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              logging: {
+                ...state.logging,
+                logs,
+              },
+            };
+          }
+          return state;
+        }
+      ),
       on(
         AnnotationActions.setLogging.do,
         (state: AnnotationState, { logging }) => ({

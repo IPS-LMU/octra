@@ -1684,7 +1684,7 @@ export class AnnotationEffects {
         ]
       : [];
 
-    console.log("saveTask");
+    console.log('saveTask');
     console.log({
       projectID: state.onlineMode.currentSession!.currentProject!.id,
       taskID: state.onlineMode.currentSession!.task!.id,
@@ -1692,13 +1692,14 @@ export class AnnotationEffects {
         assessment: state.onlineMode.currentSession.assessment,
         comment: state.onlineMode.currentSession.comment,
         log: state.onlineMode.logging.logs,
-        status},
-      outputs: outputs.map(a => ({
+        status,
+      },
+      outputs: outputs.map((a) => ({
         name: a.name,
         type: a.type,
         size: a.size,
-        content: result
-      }))
+        content: result,
+      })),
     });
     return this.apiService.saveTask(
       state.onlineMode.currentSession!.currentProject!.id,
@@ -1706,9 +1707,17 @@ export class AnnotationEffects {
       {
         assessment: state.onlineMode.currentSession.assessment,
         comment: state.onlineMode.currentSession.comment,
-        log: state.onlineMode.logging.logs,
         status,
       },
+      state.onlineMode.logging.logs
+        ? new File(
+            [JSON.stringify(state.onlineMode.logging.logs)],
+            'log.json',
+            {
+              type: 'application/json',
+            }
+          )
+        : undefined,
       outputs
     );
   }

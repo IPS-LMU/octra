@@ -364,11 +364,12 @@ export class IDBEffects {
           action.type === AnnotationActions.clearAnnotation.do.type ||
           action.type === LoginModeActions.clearWholeSession.do.type ||
           action.type === LoginModeActions.clearOnlineSession.do.type ||
-          action.type === AuthenticationActions.logout.success.type
+          action.type === AuthenticationActions.logout.success.type ||
+          action.type === LoginModeActions.endTranscription.do.type
       ),
       exhaustMap((action) => {
         if (
-          !hasProperty(action, 'clearSession') ||
+          hasProperty(action, 'clearSession') &&
           (action as any).clearSession
         ) {
           return forkJoin<{
@@ -427,6 +428,7 @@ export class IDBEffects {
         AuthenticationActions.loginLocal.success,
         LoginModeActions.startAnnotation.success,
         ApplicationActions.changeApplicationOption.do,
+        LoginModeActions.endTranscription.do,
         AnnotationActions.setLevelIndex.do
       ),
       withLatestFrom(this.store),

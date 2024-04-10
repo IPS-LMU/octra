@@ -21,7 +21,7 @@ import { Actions, ofType } from '@ngrx/effects';
   styleUrls: ['./projects-list.component.scss'],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
-  projects: ProjectDto[] = [];
+  projects?: ProjectDto[];
   selectedFile?: File;
 
   constructor(

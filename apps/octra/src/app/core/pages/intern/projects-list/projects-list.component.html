@@ -34,8 +34,8 @@
         ></span>
         <p>
           <a class="link" (click)="resumeTaskManually()">{{
-            'projects-list.resume transcription' | transloco
-          }}</a>
+              'projects-list.resume transcription' | transloco
+            }}</a>
         </p>
       </div>
     </ng-template>
@@ -44,50 +44,57 @@
       {{ 'projects-list.introduction' | transloco }}
     </p>
     <div class="table-wrapper flex overflow-y-scroll h-100">
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover" *ngIf="projects !== undefined; else showSpinner;">
         <thead>
-          <tr>
-            <th></th>
-            <th>{{ 'g.name' | transloco }}</th>
-            <th>{{ 'g.description' | transloco }}</th>
-            <th class="text-center">{{ 'g.free tasks' | transloco }}</th>
-            <th class="text-center">{{ 'g.action' | transloco }}</th>
-          </tr>
+        <tr>
+          <th></th>
+          <th>{{ 'g.name' | transloco }}</th>
+          <th>{{ 'g.description' | transloco }}</th>
+          <th class="text-center">{{ 'g.free tasks' | transloco }}</th>
+          <th class="text-center">{{ 'g.action' | transloco }}</th>
+        </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let project of projects"
-            [ngClass]="{
+        <tr
+          *ngFor="let project of projects;"
+          [ngClass]="{
               deactivated: getFreeAnnotationTasks(project) < 1
             }"
-          >
-            <td>
-              <i
-                *ngIf="project.active"
-                class="bi bi-check-circle"
-                style="color: green"
-              ></i>
-              <i
-                *ngIf="!project.active"
-                class="bi bi-dash-circle"
-                style="color: red"
-              ></i>
-            </td>
-            <td>{{ project.name }}</td>
-            <td class="description">{{ project.description }}</td>
-            <td class="text-center">{{ getFreeAnnotationTasks(project) }}</td>
-            <td class="text-center">
-              <button
-                class="btn btn-primary btn-sm"
-                size="sm"
-                (click)="onProjectClick(project)"
-              >
-                {{ 'g.start' | transloco }}
-              </button>
-            </td>
-          </tr>
+        >
+          <td>
+            <i
+              *ngIf="project.active"
+              class="bi bi-check-circle"
+              style="color: green"
+            ></i>
+            <i
+              *ngIf="!project.active"
+              class="bi bi-dash-circle"
+              style="color: red"
+            ></i>
+          </td>
+          <td>{{ project.name }}</td>
+          <td class="description">{{ project.description }}</td>
+          <td class="text-center">{{ getFreeAnnotationTasks(project) }}</td>
+          <td class="text-center">
+            <button
+              class="btn btn-primary btn-sm"
+              size="sm"
+              (click)="onProjectClick(project)"
+            >
+              {{ 'g.start' | transloco }}
+            </button>
+          </td>
+        </tr>
         </tbody>
       </table>
+      <ng-template #showSpinner>
+        <div class="text-center mt-5">
+          <div class="spinner-border" role="status" style="width:3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

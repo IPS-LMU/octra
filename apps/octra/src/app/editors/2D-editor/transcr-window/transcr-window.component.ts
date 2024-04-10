@@ -120,7 +120,7 @@ export class TranscrWindowComponent
   }
 
   public get hasSegmentBoundaries() {
-    return this.editor.rawText.match(/{[0-9]+}/) !== undefined;
+    return this.editor.rawText.match(/{[0-9]+}/) !== null;
   }
 
   private _validationEnabled = false;

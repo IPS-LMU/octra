@@ -289,26 +289,28 @@ export class TwoDEditorComponent
     name: 'mini loupe',
     enabled: true,
     items: [
-      {
-        name: 'zoom in',
-        title: 'zoom in',
-        keys: {
-          mac: '.',
-          pc: '.',
-        },
-        focusonly: false,
-        callback: this.onZoomInOut,
-      },
-      {
-        name: 'zoom out',
-        title: 'zoom out',
-        keys: {
-          mac: ',',
-          pc: ',',
-        },
-        focusonly: false,
-        callback: this.onZoomInOut,
-      },
+      /** TODO fix shortcut on focus
+       * {
+       *         name: 'zoom in',
+       *         title: 'zoom in',
+       *         keys: {
+       *           mac: '.',
+       *           pc: '.',
+       *         },
+       *         focusonly: true,
+       *         callback: this.onZoomInOut,
+       *       },
+       *       {
+       *         name: 'zoom out',
+       *         title: 'zoom out',
+       *         keys: {
+       *           mac: ',',
+       *           pc: ',',
+       *         },
+       *         focusonly: true,
+       *         callback: this.onZoomInOut,
+       *       },
+       */
     ],
   };
 

@@ -44,7 +44,7 @@
       {{ 'projects-list.introduction' | transloco }}
     </p>
     <div class="table-wrapper flex overflow-y-scroll h-100">
-      <table class="table table-striped table-hover" *ngIf="projects !== undefined; else showSpinner;">
+      <table class="table table-striped table-hover" *ngIf="projects?.list !== undefined; else showSpinner;">
         <thead>
         <tr>
           <th></th>
@@ -56,7 +56,7 @@
         </thead>
         <tbody>
         <tr
-          *ngFor="let project of projects;"
+          *ngFor="let project of projects?.list;"
           [ngClass]="{
               deactivated: getFreeAnnotationTasks(project) < 1
             }"

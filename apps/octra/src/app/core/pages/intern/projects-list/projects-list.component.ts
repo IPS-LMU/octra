@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { ProjectDto } from '@octra/api-types';
+import { ProjectDto, ProjectListDto } from '@octra/api-types';
 import { DefaultComponent } from '../../../component/default.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
@@ -21,7 +21,7 @@ import { Actions, ofType } from '@ngrx/effects';
   styleUrls: ['./projects-list.component.scss'],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
-  projects?: ProjectDto[];
+  projects?: ProjectListDto;
   selectedFile?: File;
 
   constructor(
@@ -51,60 +51,72 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   private loadProjects() {
-    this.subscribe(this.api.listProjects(), {
-      next: (projects) => {
-        this.projects = projects.filter((a) => {
-          const annotationStatistics = a.statistics?.tasks.find(
-            (a) => a.type === 'annotation'
-          );
+    this.subscribe(
+      this.api.listProjects({
+        manageable: false,
+        start: 1,
+        representation: 'page',
+        length: 3,
+      }),
+      {
+        next: (projects) => {
+          console.log(projects);
+          this.projects = {
+            ...projects,
+            list: projects.list?.filter((a: any) => {
+              const annotationStatistics = a.statistics?.tasks.find(
+                (a: any) => a.type === 'annotation'
+              );
 
-          if (annotationStatistics) {
-            if (annotationStatistics.status.free > 0) {
-              return true;
-            }
-          }
+              if (annotationStatistics) {
+                if (annotationStatistics.status.free > 0) {
+                  return true;
+                }
+              }
 
-          return false;
-        });
+              return false;
+            }),
+          };
 
-        this.projects.sort((a, b) => {
-          if (a.active && !b.active) {
-            return 1;
-          } else if (a.active && b.active) {
-            const annotationStatisticsA =
-              a.statistics!.tasks.find((c) => c.type === 'annotation')?.status
-                .free ?? 0;
-            const annotationStatisticsB =
-              b.statistics!.tasks.find((c) => c.type === 'annotation')?.status
-                .free ?? 0;
-
-            if (annotationStatisticsA > annotationStatisticsB) {
+          this.projects?.list?.sort((a, b) => {
+            if (a.active && !b.active) {
               return 1;
-            } else if (annotationStatisticsA < annotationStatisticsB) {
-              return annotationStatisticsA === 0 ? -1 : 1;
+            } else if (a.active && b.active) {
+              const annotationStatisticsA =
+                a.statistics!.tasks.find((c) => c.type === 'annotation')?.status
+                  .free ?? 0;
+              const annotationStatisticsB =
+                b.statistics!.tasks.find((c) => c.type === 'annotation')?.status
+                  .free ?? 0;
+
+              if (annotationStatisticsA > annotationStatisticsB) {
+                return 1;
+              } else if (annotationStatisticsA < annotationStatisticsB) {
+                return annotationStatisticsA === 0 ? -1 : 1;
+              }
+              return 0;
             }
-            return 0;
+            return -1;
+          });
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            this.store.dispatch(
+              AuthenticationActions.needReAuthentication.do({
+                actionAfterSuccess: undefined,
+                forceLogout: true,
+              })
+            );
+          } else {
+            const ref = this.modalService.openModalRef<ErrorModalComponent>(
+              ErrorModalComponent,
+              ErrorModalComponent.options
+            );
+            ref.componentInstance.text = error.message;
           }
-          return -1;
-        });
-      },
-      error: (error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          this.store.dispatch(
-            AuthenticationActions.needReAuthentication.do({
-              actionAfterSuccess: undefined,
-              forceLogout: true,
-            })
-          );
-        } else {
-          const ref = this.modalService.openModalRef<ErrorModalComponent>(
-            ErrorModalComponent,
-            ErrorModalComponent.options
-          );
-          ref.componentInstance.text = error.message;
-        }
-      },
-    });
+        },
+      }
+    );
   }
 
   onProjectClick(project: ProjectDto) {

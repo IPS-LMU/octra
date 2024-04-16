@@ -193,4 +193,12 @@ export class IDBService {
     (this.database as any)[tableName].delete(key);
     return;
   }
+
+  public backup() {
+    return this.database.exportDatabase();
+  }
+
+  public import(file: File) {
+    return this.database.importDatabase(file);
+  }
 }

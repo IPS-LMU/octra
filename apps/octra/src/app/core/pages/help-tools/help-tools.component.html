@@ -88,12 +88,44 @@
         <div class="card-body d-flex flex-column">
           <p class="card-text flex">This tool backups your local octra data to a downloadable Zip Archive.</p>
           <a
-            [routerLink]="['/stresstest']"
-            [target]="'_blank'"
             class="btn btn-raised text-light w-100" style="background-color:purple"
+            (click)="backupLocalData()"
           >
             Backup local data
           </a>
+          <p *ngIf="localBackup" class="p-2 text-center">
+            <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 is-table-row">
+      <div class="card">
+        <div class="card-header">
+          <button
+            class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
+            type="button"
+          >
+            5
+          </button>
+          Restore local backup
+        </div>
+        <div class="card-body d-flex flex-column">
+          <p class="card-text flex">Restore a backup file using this tool.</p>
+
+          <div>
+            <input type="file" #file name="files" accept="application/json" (change)="onBackupFilesChange($event)" filter=".json"/>
+          </div>
+
+          <button [disabled]="!backupFiles || backupFiles.length === 0"
+            class="btn btn-raised text-light w-100" style="background-color:darkorange"
+            (click)="importBackup(backupFiles![0])"
+          >
+            Backup local data
+          </button>
+          <p *ngIf="localBackup" class="p-2 text-center">
+            <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
+          </p>
         </div>
       </div>
     </div>

@@ -2,6 +2,9 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { DefaultComponent } from '../../component/default.component';
 import { getBaseHrefURL, joinURL } from '@octra/utilities';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { IDBService } from '../../shared/service/idb.service';
+import { OctraModalService } from '../../modals/octra-modal.service';
 
 @Component({
   selector: 'octra-help-tools',
@@ -10,8 +13,19 @@ import { getBaseHrefURL, joinURL } from '@octra/utilities';
 })
 export class HelpToolsComponent extends DefaultComponent {
   @ViewChild('canvas', { static: false }) canvas!: ElementRef;
+  localBackup?: {
+    name: string;
+    url: SafeResourceUrl;
+  };
 
-  constructor(private appStorage: AppStorageService) {
+  backupFiles?: FileList;
+
+  constructor(
+    private appStorage: AppStorageService,
+    private idbService: IDBService,
+    private sanitizer: DomSanitizer,
+    private modalService: OctraModalService
+  ) {
     super();
   }
 
@@ -25,5 +39,29 @@ export class HelpToolsComponent extends DefaultComponent {
         document.location.href = joinURL(getBaseHrefURL(), 'login');
       }, 1000);
     });
+  }
+
+  async backupLocalData() {
+    const blob = await this.idbService.backup();
+    this.localBackup = {
+      name: `octra_local_backup_${Date.now()}.json`,
+      url: this.sanitizer.bypassSecurityTrustResourceUrl(
+        URL.createObjectURL(blob)
+      ),
+    };
+  }
+
+  async importBackup(file: File) {
+    try {
+      await this.idbService.import(file);
+      alert('Import successful. Octra will be reloaded next.');
+      document.location.href = joinURL(getBaseHrefURL(), 'login');
+    } catch (e: any) {
+      this.modalService.openErrorModal(e.message);
+    }
+  }
+
+  onBackupFilesChange($event: any) {
+    this.backupFiles = $event.target!.files;
   }
 }

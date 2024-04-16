@@ -129,7 +129,6 @@ export class IDBEffects {
           this.idbService.loadLogs(LoginMode.URL),
         ]).pipe(
           map(([onlineModeLogs, localModeLogs, demoModeLogs, urlModeLogs]) => {
-            // TODO HIER WEITER
             if (this.sessStr.retrieve('last_page_path') !== '/help-tools') {
               if (state.application.mode === LoginMode.ONLINE) {
                 this.store.dispatch(

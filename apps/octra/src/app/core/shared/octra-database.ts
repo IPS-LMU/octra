@@ -1,4 +1,5 @@
 import Dexie, { Transaction } from 'dexie';
+import 'dexie-export-import';
 import { IAnnotJSON } from '@octra/annotation';
 import { LoginMode } from '../store';
 import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
@@ -433,6 +434,18 @@ export class OctraDatabase extends Dexie {
         },
       ])
     );
+  }
+
+  exportDatabase() {
+    return this.export({
+      prettyJson: true,
+    });
+  }
+
+  importDatabase(file: File) {
+    return this.import(file, {
+      clearTablesBeforeImport: true,
+    });
   }
 }
 

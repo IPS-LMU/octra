@@ -579,11 +579,7 @@ export class ApplicationEffects {
             }
 
             if (!state.application.loggedIn) {
-              this.routerService.navigate(
-                'not logged in, back to login',
-                ['/login'],
-                AppInfo.queryParamsHandling
-              );
+              this.store.dispatch(ApplicationActions.redirectToLastPage.do());
             } else {
               // logged in
               const modeState = getModeState(state)!;
@@ -639,7 +635,7 @@ export class ApplicationEffects {
         ofType(ApplicationActions.redirectToLastPage.do),
         tap((a) => {
           const lastPagePath = this.sessStr.retrieve('last_page_path');
-          if (lastPagePath) {
+          if (lastPagePath && !['', '/'].includes(lastPagePath)) {
             this.routerService.navigate('last page', [lastPagePath]);
           } else {
             this.routerService.navigate('no last page', ['/login']);

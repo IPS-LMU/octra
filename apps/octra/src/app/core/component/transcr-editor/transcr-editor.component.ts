@@ -1462,8 +1462,8 @@ export class TranscrEditorComponent
 
   private triggerTyping() {
     // this.highlightingRunning = false;
-    this.subscribe(timer(500), () => {
-      if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
+    this.subscribe(timer(1000), () => {
+      if (Date.now() - this.lastkeypress >= 900 && this.lastkeypress > -1) {
         if (this._isTyping) {
           if (this.audiochunk!.id === this._lastAudioChunkID) {
             this._isTyping = false;

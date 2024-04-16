@@ -1,59 +1,29 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { APIService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { LoginMode } from '../../store';
-import { Store } from '@ngrx/store';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { RoutingService } from '../../shared/service/routing.service';
+import { DefaultComponent } from '../../component/default.component';
+import { getBaseHrefURL, joinURL } from '@octra/utilities';
 
 @Component({
   selector: 'octra-help-tools',
   templateUrl: './help-tools.component.html',
   styleUrls: ['./help-tools.component.scss'],
 })
-export class HelpToolsComponent {
+export class HelpToolsComponent extends DefaultComponent {
   @ViewChild('canvas', { static: false }) canvas!: ElementRef;
 
-  constructor(
-    private appStorage: AppStorageService,
-    private api: APIService,
-    private store: Store,
-    private modalService: OctraModalService,
-    private routingService: RoutingService
-  ) {}
+  constructor(private appStorage: AppStorageService) {
+    super();
+  }
 
   refreshApp() {
     document.location.reload();
   }
 
   clearAllData() {
-    const clearSession = () => {
-      this.appStorage.clearWholeSession().then(() => {
-        this.appStorage.logout(false);
-        setTimeout(() => {
-          document.location.reload();
-        }, 1000);
-      });
-    };
-
-    if (
-      this.appStorage.useMode === LoginMode.LOCAL ||
-      this.appStorage.useMode === LoginMode.DEMO ||
-      this.appStorage.useMode === LoginMode.URL
-    ) {
-      clearSession();
-    } else if (this.appStorage.useMode === LoginMode.ONLINE) {
-      this.api
-        .setOnlineSessionToFree(this.appStorage)
-        .then(() => {
-          clearSession();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else {
-      this.routingService.navigate('navigate before forced reload', ['/login']);
-      document.location.reload();
-    }
+    this.appStorage.clearWholeSession().then(() => {
+      setTimeout(() => {
+        document.location.href = joinURL(getBaseHrefURL(), 'login');
+      }, 1000);
+    });
   }
 }

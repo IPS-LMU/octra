@@ -58,7 +58,7 @@ export class RoutingService {
       });
       const joined = commands.join('/');
       if (joined !== '/load') {
-        this.sessionStorage.store('last_page_path', joined);
+        // this.sessionStorage.store('last_page_path', joined);
       }
     } catch (e) {
       console.error(e);

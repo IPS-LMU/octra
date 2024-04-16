@@ -1127,6 +1127,16 @@ export class AnnotationEffects {
     )
   );
 
+  onClearWholeSession$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LoginModeActions.clearOnlineSession.do),
+      exhaustMap((a) => {
+        this.audio.destroy(true);
+        return of(a.actionAfterSuccess);
+      })
+    )
+  );
+
   redirectToProjects$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.redirectToProjects.do),

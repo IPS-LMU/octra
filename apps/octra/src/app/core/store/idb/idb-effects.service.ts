@@ -129,23 +129,28 @@ export class IDBEffects {
           this.idbService.loadLogs(LoginMode.URL),
         ]).pipe(
           map(([onlineModeLogs, localModeLogs, demoModeLogs, urlModeLogs]) => {
-            if (state.application.mode === LoginMode.ONLINE) {
-              this.store.dispatch(
-                LoginModeActions.loadProjectAndTaskInformation.do({
-                  projectID: action.onlineOptions.project?.id,
-                  taskID: action.onlineOptions.transcriptID ?? undefined,
-                  mode: LoginMode.ONLINE,
-                })
-              );
+            // TODO HIER WEITER
+            if (this.sessStr.retrieve('last_page_path') !== '/help-tools') {
+              if (state.application.mode === LoginMode.ONLINE) {
+                this.store.dispatch(
+                  LoginModeActions.loadProjectAndTaskInformation.do({
+                    projectID: action.onlineOptions.project?.id,
+                    taskID: action.onlineOptions.transcriptID ?? undefined,
+                    mode: LoginMode.ONLINE,
+                  })
+                );
+              } else {
+                // other modes
+                this.store.dispatch(
+                  LoginModeActions.loadProjectAndTaskInformation.do({
+                    projectID: action.demoOptions?.project?.id ?? '1234',
+                    taskID: action.demoOptions?.transcriptID ?? '38295',
+                    mode: state.application.mode!,
+                  })
+                );
+              }
             } else {
-              // other modes
-              this.store.dispatch(
-                LoginModeActions.loadProjectAndTaskInformation.do({
-                  projectID: action.demoOptions?.project?.id ?? '1234',
-                  taskID: action.demoOptions?.transcriptID ?? '38295',
-                  mode: state.application.mode!,
-                })
-              );
+              this.store.dispatch(ApplicationActions.initApplication.finish());
             }
 
             return IDBActions.loadLogs.success({
@@ -309,8 +314,7 @@ export class IDBEffects {
       filter(
         (a) =>
           a.type === AnnotationActions.clearLogs.do.type ||
-          a.type === LoginModeActions.clearOnlineSession.do.type ||
-          a.type === AnnotationActions.clearWholeSession.do.type
+          a.type === LoginModeActions.clearOnlineSession.do.type
       ),
       exhaustMap((action) =>
         this.idbService.clearLoggingData((action as any).mode).pipe(
@@ -329,16 +333,12 @@ export class IDBEffects {
 
   clearAllOptions$ = createEffect(() =>
     this.actions$.pipe(
-      filter(
-        (a) =>
-          a.type === IDBActions.clearAllOptions.do.type ||
-          a.type === LoginModeActions.clearWholeSession.do.type
-      ),
+      filter((a) => a.type === IDBActions.clearAllOptions.do.type),
       exhaustMap((action) => {
         const subject = new Subject<Action>();
 
         this.idbService
-          .clearOptions((action as any).mode)
+          .clearOptions()
           .then(() => {
             subject.next(IDBActions.clearAllOptions.success());
             subject.complete();
@@ -362,7 +362,6 @@ export class IDBEffects {
       filter(
         (action) =>
           action.type === AnnotationActions.clearAnnotation.do.type ||
-          action.type === LoginModeActions.clearWholeSession.do.type ||
           action.type === LoginModeActions.clearOnlineSession.do.type ||
           action.type === AuthenticationActions.logout.success.type ||
           action.type === LoginModeActions.endTranscription.do.type
@@ -381,7 +380,9 @@ export class IDBEffects {
             ),
             logs: this.idbService.clearLoggingData((action as any).mode),
           }).pipe(
-            map(() => IDBActions.clearAnnotation.success()),
+            map(() => {
+              return IDBActions.clearAnnotation.success();
+            }),
             catchError((error) => {
               return of(
                 IDBActions.clearAnnotation.fail({
@@ -885,6 +886,21 @@ export class IDBEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           this.idbService.saveOption('useMode', LoginMode.ONLINE);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  clearAllData$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(IDBActions.clearAllData.do),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          this.sessStr.clear();
+          this.idbService.clearAllData().then(() => {
+            this.store.dispatch(IDBActions.clearAllData.success());
+          });
         })
       ),
     { dispatch: false }

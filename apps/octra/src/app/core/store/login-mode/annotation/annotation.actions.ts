@@ -71,7 +71,9 @@ export class AnnotationActions {
   static clearWholeSession = createActionGroup({
     source: `annotation/ session storage/ clear all`,
     events: {
-      do: emptyProps(),
+      do: props<{
+        clearSession: boolean;
+      }>(),
       success: props<{
         mode: LoginMode;
       }>(),

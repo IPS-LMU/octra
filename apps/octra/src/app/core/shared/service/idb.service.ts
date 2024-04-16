@@ -39,6 +39,13 @@ export class IDBService {
   }
 
   /**
+   * clears data
+   */
+  public clearAllData() {
+    return this.database.delete();
+  }
+
+  /**
    * clears all annotaiton data
    */
   public clearAnnotationData(mode: LoginMode) {
@@ -55,7 +62,7 @@ export class IDBService {
   /**
    * clears all options
    */
-  public clearOptions(mode: LoginMode): Promise<any> {
+  public clearOptions(): Promise<any> {
     return this.database.app_options.clear();
   }
 

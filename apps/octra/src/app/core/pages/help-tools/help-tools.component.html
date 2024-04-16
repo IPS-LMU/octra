@@ -12,8 +12,8 @@
           </button>
           Refresh App
         </div>
-        <div class="card-body">
-          <p class="card-text">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text flex">
             This tool forces the App to reload and refreshComputedData the
             browser cache.
           </p>
@@ -37,8 +37,8 @@
           </button>
           Clear all Storage Data
         </div>
-        <div class="card-body">
-          <p class="card-text">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text flex">
             This tool removes all local data including (transcript, logs and
             settings).
           </p>
@@ -62,14 +62,37 @@
           </button>
           Stresstest
         </div>
-        <div class="card-body">
-          <p class="card-text">Test your browser's capabilities.</p>
+        <div class="card-body d-flex flex-column">
+          <p class="card-text flex">Test your browser's capabilities.</p>
           <a
             [routerLink]="['/stresstest']"
             [target]="'_blank'"
             class="btn btn-raised btn-info w-100"
           >
             Open Stresstest
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 is-table-row">
+      <div class="card">
+        <div class="card-header">
+          <button
+            class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
+            type="button"
+          >
+            4
+          </button>
+          Backup local data
+        </div>
+        <div class="card-body d-flex flex-column">
+          <p class="card-text flex">This tool backups your local octra data to a downloadable Zip Archive.</p>
+          <a
+            [routerLink]="['/stresstest']"
+            [target]="'_blank'"
+            class="btn btn-raised text-light w-100" style="background-color:purple"
+          >
+            Backup local data
           </a>
         </div>
       </div>

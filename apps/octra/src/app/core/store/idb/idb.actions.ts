@@ -421,4 +421,15 @@ export class IDBActions {
       }>(),
     },
   });
+
+  static clearAllData = createActionGroup({
+    source: 'IDB/clear all data',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
 }

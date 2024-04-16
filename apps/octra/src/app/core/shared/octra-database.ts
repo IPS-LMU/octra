@@ -357,6 +357,10 @@ export class OctraDatabase extends Dexie {
     }
   }
 
+  public clear() {
+    return this;
+  }
+
   public loadDataOfMode<T>(mode: LoginMode, name: string, emptyValue: T) {
     const table = this.getTableFromString(mode);
     if (table) {

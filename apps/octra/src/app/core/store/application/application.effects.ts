@@ -40,7 +40,7 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
 import { environment } from '../../../../environments/environment';
 import { findElements, getAttr } from '@octra/web-media';
 import X2JS from 'x2js';
-import { isNumber } from '@octra/utilities';
+import { getBaseHrefURL, isNumber } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +50,12 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
+        const part: string = window.location.href.replace(getBaseHrefURL(), '');
+        console.log(part);
+        if (part !== 'load') {
+          this.sessionStorage.store('last_page_path', `/${part}`);
+        }
+
         const queryParams = {
           audio_url: this.getParameterByName('audio_url'),
           audio_name: this.getParameterByName('audio_name'),
@@ -484,18 +490,18 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.loadSettings.success),
       exhaustMap((a) => {
-        this.store.dispatch(
-          ApplicationActions.loadASRSettings.do({
-            settings: a.settings,
-          })
-        );
-
         // set language
         const language = this.localStorage.retrieve('language');
         this.transloco.setAvailableLangs(a.settings.octra.languages);
 
         this.transloco.setActiveLang(
           language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en'
+        );
+
+        this.store.dispatch(
+          ApplicationActions.loadASRSettings.do({
+            settings: a.settings,
+          })
         );
 
         const webToken = this.sessStr.retrieve('webToken');
@@ -532,6 +538,7 @@ export class ApplicationEffects {
               state.application.appConfiguration
             );
           }
+
           this.store.dispatch(
             ApplicationActions.initApplication.setSessionStorageOptions({
               loggedIn:
@@ -592,10 +599,14 @@ export class ApplicationEffects {
                     task: modeState.currentSession.task,
                   })
                 );
-              } else {
+              } else if (
+                this.sessionStorage.retrieve('last_page_path') !== '/help-tools'
+              ) {
                 this.store.dispatch(
                   AuthenticationActions.redirectToProjects.do()
                 );
+              } else {
+                this.store.dispatch(ApplicationActions.redirectToLastPage.do());
               }
             }
           }
@@ -850,7 +861,8 @@ export class ApplicationEffects {
     private appStorage: AppStorageService,
     private settingsService: SettingsService,
     private routerService: RoutingService,
-    private modalService: OctraModalService
+    private modalService: OctraModalService,
+    private sessionStorage: SessionStorageService
   ) {}
 
   private initConsoleLogging() {

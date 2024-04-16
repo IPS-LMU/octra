@@ -515,32 +515,14 @@ export class AppStorageService {
     );
   }
 
-  public clearWholeSession(): Promise<void[]> {
-    const promises: Promise<void>[] = [];
-    promises.push(
-      waitTillResultRetrieved<Actions, Action, void>(
-        this.actions,
-        IDBActions.clearAllOptions.success,
-        IDBActions.clearAllOptions.fail
-      ),
-      waitTillResultRetrieved<Actions, Action, void>(
-        this.actions,
-        IDBActions.clearLogs.success,
-        IDBActions.clearLogs.fail
-      ),
-      waitTillResultRetrieved<Actions, Action, void>(
-        this.actions,
-        IDBActions.clearAnnotation.success,
-        IDBActions.clearAnnotation.fail
-      )
-    );
-    this.store.dispatch(
-      AnnotationActions.clearWholeSession.success({
-        mode: this.useMode,
-      })
-    );
+  public clearWholeSession(): Promise<void> {
+    this.store.dispatch(IDBActions.clearAllData.do());
 
-    return Promise.all(promises);
+    return waitTillResultRetrieved<Actions, Action, void>(
+      this.actions,
+      IDBActions.clearAllData.success,
+      IDBActions.clearAllData.fail
+    );
   }
 
   public abortReAuthentication() {

@@ -22,6 +22,10 @@
 </div>
 </div>
 
+## Editors:
+
+Octra supports different editors that you can choose according to your preferences. You can also switch between these easily while you are working on the same task.
+
 * Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.

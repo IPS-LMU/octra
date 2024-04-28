@@ -9,6 +9,14 @@ const configText = fs.readFileSync('./deploy.config.json', {
   encoding: 'utf8',
 });
 const config = JSON.parse(configText);
+const execCommandOpts = {
+  onStdout: (buffer) => {
+    console.log(buffer.toString());
+  },
+  onStderr: (buffer) => {
+    console.log(buffer.toString());
+  },
+};
 
 console.log(`connect via ssh...`);
 const timeStamp = getDateTimeString();
@@ -139,52 +147,29 @@ async function start() {
   }
 }
 
-ssh
-  .connect({
-    host: config.server.host,
-    username: config.server.userName,
-    password: config.server.password,
-    tryKeyboard: true,
-    port: config.server.port,
-  })
-  .then(() => {})
-  .catch((error) => {
-    console.log(error);
-  });
-
 function clearRemote(distPath, remotePath) {
   const files = fs.readdirSync(distPath);
   const promises = [];
 
   for (const file of files) {
-    promises.push(ssh.execCommand(`rm -rf ${remotePath}${file}`));
+    promises.push(ssh.execCommand(`rm -rf ${remotePath}${file}`, execCommandOpts));
   }
   return Promise.all(promises);
 }
 
 async function backupDir(ssh, remotePath, backupDir) {
-  return new Promise((resolve, reject) => {
-    let tmpPath = remotePath.substr(0, remotePath.length - 1);
-    const dirName = tmpPath.substring(tmpPath.lastIndexOf('/') + 1);
+  let tmpPath = remotePath.substring(0, remotePath.length - 1);
+  const dirName = tmpPath.substring(tmpPath.lastIndexOf('/') + 1);
+  const label = `${backupDir}${timeStamp}_${dirName}`;
+  console.log(`cp -rf "${remotePath} ${label}"`);
+  const result = await ssh.execCommand(`cp -rf "${remotePath}" "${label}"`, execCommandOpts);
 
-    console.log(`cp -rf ${remotePath} ${backupDir}${timeStamp}_${dirName}`);
-    ssh
-      .execCommand(`cp -rf ${remotePath} ${backupDir}${timeStamp}_${dirName}`)
-      .then(function (result) {
-        console.log('copy result');
-        console.log(result);
+  console.log('copy result');
+  console.log(result);
 
-        if (result.stderr) {
-          reject(result.stderr);
-        } else {
-          resolve();
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-        reject(e);
-      });
-  });
+  if (result.stderr) {
+    throw new Error(result.stderr);
+  }
 }
 
 function getDateTimeString() {

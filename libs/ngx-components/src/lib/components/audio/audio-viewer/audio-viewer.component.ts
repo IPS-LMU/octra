@@ -279,7 +279,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           annotation.previousValue.selectedLevelIndex !==
           annotation.currentValue.selectedLevelIndex
         ) {
-          this.av.updateAllSegments();
+          this.av.updateAllSegments(true);
         } else {
           this.afterLevelUpdated(parsedChanges, annotation.previousValue);
         }

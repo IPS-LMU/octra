@@ -1259,20 +1259,16 @@ export class AudioViewerService {
     }
   };
 
-  updateAllSegments() {
-    const now = Date.now();
+  updateAllSegments(clearAll = false) {
     let y = 0;
     const segCanvasElements = this.layers?.overlay.find('.segments');
-    if (
-      segCanvasElements &&
-      segCanvasElements.length > 0 &&
-      segCanvasElements[0]
-    ) {
-      segCanvasElements[0].destroy();
+    if (clearAll) {
+      segCanvasElements?.forEach((a) => a.destroy());
     }
+
     const segTimeLabels = this.layers?.overlay.find('#timeStamps');
-    if (segTimeLabels && segTimeLabels.length > 0 && segTimeLabels[0]) {
-      segTimeLabels[0].destroy();
+    if (clearAll) {
+      segTimeLabels?.forEach((a) => a.destroy());
     }
 
     if (this.innerWidth !== undefined) {
@@ -1739,7 +1735,7 @@ export class AudioViewerService {
                           ] as OctraAnnotationSegment)
                         : undefined;
 
-                    if (seg.type !== 'segment') {
+                    if (seg?.type !== 'segment') {
                       return;
                     }
 

@@ -1510,6 +1510,7 @@ export class AudioViewerService {
         }
 
         if (this.settings.boundaries.enabled) {
+          this.layers.boundaries.children.forEach((a) => a.destroy());
           this.drawNewBoundaries(boundariesToDraw);
           this.layers.boundaries.batchDraw();
         }

@@ -68,8 +68,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   public showLoading = true;
 
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
-  @ViewChild('validationPopover', { static: true })
-  validationPopover?: ValidationPopoverComponent;
 
   @ViewChild('transcrEditor', { static: false })
   transcrEditor?: TranscrEditorComponent;
@@ -221,49 +219,33 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  onMouseOver($event: MouseEvent, rowNumber: number) {
-    if (this.validationPopover) {
+  async onMouseOver($event: MouseEvent, rowNumber: number, row: HTMLDivElement, validationPopover: ValidationPopoverComponent) {
+    if (validationPopover) {
       if (this.textEditor.state === 'inactive') {
         let target = $event.target as HTMLElement;
         if (
-          target.hasAttribute('.val-error') ||
-          target.parentElement!.hasAttribute('.val-error')
+          target.getAttribute("class") === 'val-error' ||
+          target.parentElement!.getAttribute("class") === 'val-error'
         ) {
           if (!this.popovers.validation.mouse.enter) {
-            if (!target.hasAttribute('.val-error')) {
+            if (target.getAttribute("class") !== 'val-error') {
               target = target.parentElement!;
             }
 
-            let marginTop = 0;
-
-            for (let i = 0; i < rowNumber; i++) {
-              const elem =
-                this.elementRef.nativeElement.querySelector('.segment-row')[i];
-              marginTop += elem.outerHeight();
-            }
-
-            marginTop += target.offsetTop;
-
-            const headHeight = this.elementRef.nativeElement
-              .querySelector('#table-head')
-              .outerHeight();
-
             const errorcode = target.getAttribute('data-errorcode')!;
-
             this.selectedError =
-              this.annotationStoreService.getErrorDetails(errorcode);
+             await this.annotationStoreService.getErrorDetails(errorcode);
 
             if (this.selectedError !== null) {
-              this.validationPopover.show();
-              this.validationPopover.description =
+              validationPopover.show();
+              validationPopover.description =
                 this.selectedError.description;
-              this.validationPopover.title = this.selectedError.title;
+              validationPopover.title = this.selectedError.title;
               this.cd.markForCheck();
               this.cd.detectChanges();
 
-              this.popovers.validation.location.y =
-                headHeight + marginTop - this.validationPopover.height;
-              this.popovers.validation.location.x = $event.offsetX - 24;
+              this.popovers.validation.location.y = - validationPopover.height;
+              this.popovers.validation.location.x = 0;
               this.popovers.validation.mouse.enter = true;
               this.cd.markForCheck();
               this.cd.detectChanges();
@@ -272,7 +254,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         } else {
           this.selectedError = null;
           this.popovers.validation.mouse.enter = false;
-          this.validationPopover.hide();
+          validationPopover.hide();
         }
       } else {
         this.popovers.validation.visible = false;
@@ -321,7 +303,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onTextEditorLeave(i: number) {
+  async onTextEditorLeave(i: number) {
     if (
       this.transcrEditor &&
       this._internLevel?.items &&
@@ -337,7 +319,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.cd.markForCheck();
       this.cd.detectChanges();
 
-      this.updateSegments();
+      await this.updateSegments();
 
       this.annotationStoreService.changeCurrentItemById(segment.id, segment);
       this.textEditor.state = 'inactive';
@@ -372,9 +354,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  updateView() {
+  async updateView() {
     console.log(`update View!`);
-    this.updateSegments();
+    await this.updateSegments();
     this.annotationStoreService.analyse();
 
     this.cd.markForCheck();
@@ -385,7 +367,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     this.segmentclicked.emit(segnumber);
   }
 
-  private updateSegments() {
+  private async updateSegments() {
     this.playStateSegments = [];
     this.annotationStoreService.validateAll();
     if (
@@ -412,11 +394,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         for (let i = 0; i < level.items.length; i++) {
           const segment = level.items[i];
 
-          const obj = this.getShownSegment(
+          const obj = await this.getShownSegment(
             startTime,
             segment.time.samples,
+            i,
+            this.annotationStoreService.validationArray.filter(a => a.level === level.id),
             segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
-            i
           );
 
           result.push(obj);
@@ -445,12 +428,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  getShownSegment(
+  async getShownSegment(
     startSamples: number,
     endSamples: number,
-    rawText: string,
-    i: number
-  ): {
+    i: number,
+    validation: any[],
+    rawText?: string,
+  ): Promise<{
     start: number;
     end: number;
     transcription: {
@@ -458,13 +442,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       html: string;
     };
     validation: string;
-  } {
+  }> {
     const obj = {
       start: startSamples,
       end: endSamples,
       transcription: {
-        text: rawText,
-        html: rawText,
+        text: rawText ?? '',
+        html: rawText ?? '',
       },
       validation: '',
     };
@@ -473,19 +457,19 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       if (
         typeof validateAnnotation !== 'undefined' &&
         typeof validateAnnotation === 'function' &&
-        this.annotationStoreService.validationArray[i]
+        validation[i].validation.length > 0
       ) {
         obj.transcription.html = this.annotationStoreService.underlineTextRed(
           obj.transcription.text,
-          this.annotationStoreService.validationArray[i].validation
+          validation[i].validation
         );
       }
 
-      obj.transcription.html = this.annotationStoreService.rawToHTML(
+      obj.transcription.html = await this.annotationStoreService.rawToHTML(
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
-        /((?:\[\[\[)|(?:]]]))/g,
+        /((?:\[\[\[)|(?:]]]))/,
         (g0, g1) => {
           if (g1 === '[[[') {
             return '<';
@@ -494,7 +478,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         }
       );
     } else {
-      obj.transcription.html = this.annotationStoreService.rawToHTML(
+      obj.transcription.html = await this.annotationStoreService.rawToHTML(
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
@@ -789,11 +773,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onEnterPressed(i: number) {
-    this.onTextEditorLeave(i);
+  async onEnterPressed(i: number) {
+    await this.onTextEditorLeave(i);
     if (this._internLevel?.items && i < this._internLevel.items.length - 1) {
       this.onMouseDown(i + 1);
     }
+    this.annotationStoreService.validateAll();
+    await this.updateSegments();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   toggleSkipCheckbox() {

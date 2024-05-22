@@ -681,7 +681,7 @@ export class TranscrEditorComponent
     });
   }
 
-  ngOnChanges(obj: SimpleChanges) {
+  async ngOnChanges(obj: SimpleChanges) {
     let renew = false;
     if (
       Object.keys(obj).includes('markers') &&
@@ -713,7 +713,7 @@ export class TranscrEditorComponent
       !obj['transcript'].firstChange
     ) {
       console.log('set transcript');
-      this.setTranscript(obj['transcript'].currentValue);
+      await this.setTranscript(obj['transcript'].currentValue);
     }
 
     if (
@@ -1117,7 +1117,7 @@ export class TranscrEditorComponent
     return -1;
   }
 
-  public validate() {
+  public async validate() {
     if (!this.wysiwyg) {
       return;
     }
@@ -1151,7 +1151,7 @@ export class TranscrEditorComponent
             code,
             this.annotationStoreService.validate(code)
           );
-          code = this.annotationStoreService.rawToHTML(code);
+          code = await this.annotationStoreService.rawToHTML(code);
 
           if (!focusAtEnd) {
             code = code.replace(
@@ -1426,14 +1426,14 @@ export class TranscrEditorComponent
     );
   }
 
-  private setTranscript(rawText: string) {
+  private async setTranscript(rawText: string) {
     if (this.joditComponent?.jodit) {
       this._rawText = this.tidyUpRaw(rawText);
 
       // set cursor at the end after focus
 
       this.joditComponent.jodit.value =
-        this.annotationStoreService.rawToHTML(rawText);
+        await this.annotationStoreService.rawToHTML(rawText);
       this.validate();
       this.initPopover();
 
@@ -1573,7 +1573,7 @@ export class TranscrEditorComponent
     }
   };
 
-  private onValidationErrorMouseOver = (event: MouseEvent) => {
+  private onValidationErrorMouseOver = async (event: MouseEvent) => {
     let target: HTMLElement = event.target as HTMLElement;
     if (getAttr(event.target as HTMLElement, 'data-errorcode') === undefined) {
       target = (event.target as HTMLElement).parentNode as HTMLElement;
@@ -1582,8 +1582,9 @@ export class TranscrEditorComponent
     const errorCode = getAttr(target, 'data-errorcode');
 
     if (errorCode !== undefined) {
-      const errorDetails =
-        this.annotationStoreService.getErrorDetails(errorCode);
+      const errorDetails = await this.annotationStoreService.getErrorDetails(
+        errorCode
+      );
       if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
@@ -1694,7 +1695,7 @@ export class TranscrEditorComponent
 
   onChange() {}
 
-  onPaste($event: Event) {
+  async onPaste($event: Event) {
     $event.preventDefault();
     const bufferText = (
       (($event as any).originalEvent || $event).clipboardData ||
@@ -1705,7 +1706,7 @@ export class TranscrEditorComponent
       .replace(new RegExp(/\[\|/, 'g'), '{')
       .replace(new RegExp(/\|]/, 'g'), '}');
     html = unEscapeHtml(html);
-    html = '<span>' + this.annotationStoreService.rawToHTML(html) + '</span>';
+    html = '<span>' + await this.annotationStoreService.rawToHTML(html) + '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
     const htmlObj = document.createElement('span');
     htmlObj.innerHTML = html;
@@ -1725,16 +1726,18 @@ export class TranscrEditorComponent
     this.subscribe(
       timer(200),
       () => {
-        if (this.workplace?.parentNode && !this.popovers.segmentBoundary) {
-          const segmentBoundary = document.createElement('div');
-          segmentBoundary.setAttribute('class', 'panel seg-popover');
-          segmentBoundary.innerHTML = '00:00:000';
-          this.popovers.segmentBoundary = segmentBoundary;
+        if (this.workplace?.parentNode) {
+          if (!this.popovers.segmentBoundary) {
+            const segmentBoundary = document.createElement('div');
+            segmentBoundary.setAttribute('class', 'panel seg-popover');
+            segmentBoundary.innerHTML = '00:00:000';
+            this.popovers.segmentBoundary = segmentBoundary;
 
-          this.workplace?.parentNode?.insertBefore(
-            this.popovers.segmentBoundary!,
-            this.workplace
-          );
+            this.workplace?.parentNode?.insertBefore(
+              this.popovers.segmentBoundary!,
+              this.workplace
+            );
+          }
         } else {
           console.error(
             "Can't set segment boundary because workplace or parentNode is undefined"

@@ -12,6 +12,7 @@ import { OctraModal } from '../types';
 import videojs from 'video.js';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraGuidelines } from '@octra/assets';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
@@ -30,15 +31,11 @@ export class TranscriptionGuidelinesModalComponent
     scrollable: true,
   };
 
-  public get guidelines() {
-    return this.annotationStoreService.guidelines;
-  }
-
-  public shownGuidelines: any;
+  protected guidelines?: OctraGuidelines;
+  public shownGuidelines?: OctraGuidelines;
   public collapsed: any[][] = [];
 
   protected data = undefined;
-  private entries = 0;
   private videoPlayers: any[] = [];
 
   constructor(
@@ -51,14 +48,46 @@ export class TranscriptionGuidelinesModalComponent
     super('transcriptionGuidelinesModal', activeModal);
   }
 
-  ngOnInit() {
-    this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
-    this.unCollapseAll();
-    this.subscriptionManager.add(
-      timer(1000).subscribe(() => {
-        this.initVideoPlayers();
-      })
-    );
+  async ngOnInit() {
+    if (this.annotationStoreService.guidelines) {
+      this.guidelines = await this.prepareGuidelines(
+        this.annotationStoreService.guidelines
+      );
+      this.shownGuidelines = { ...this.guidelines } as any;
+      this.unCollapseAll();
+      this.subscriptionManager.add(
+        timer(1000).subscribe(() => {
+          this.initVideoPlayers();
+        })
+      );
+    }
+  }
+
+  private async prepareGuidelines(
+    guidelines: OctraGuidelines
+  ): Promise<OctraGuidelines | undefined> {
+    if (!guidelines) {
+      return undefined;
+    }
+
+    const result = JSON.parse(JSON.stringify(guidelines));
+    for (let i = 0; i < result.instructions.length; i++) {
+      for (let j = 0; j < result.instructions[i].entries.length; j++) {
+        result.instructions[i].entries[j] = {
+          ...result.instructions[i].entries[j],
+          description: (await this.getGuidelineHTML(
+            result.instructions[i].entries[j].description
+          )) as string,
+        };
+
+        for (const example of result.instructions[i].entries[j].examples) {
+          example.annotation = (await this.getGuidelineHTML(
+            example.annotation
+          )) as string;
+        }
+      }
+    }
+    return result;
   }
 
   videoplayerExists(player: string): number {
@@ -138,12 +167,13 @@ export class TranscriptionGuidelinesModalComponent
       form.remove();
     }
   }
+
   toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
 
   search(text: string) {
-    if (text !== '') {
+    if (text !== '' && this.shownGuidelines) {
       this.shownGuidelines.instructions = [];
       if (this.guidelines) {
         for (const instruction of this.guidelines.instructions) {
@@ -173,14 +203,35 @@ export class TranscriptionGuidelinesModalComponent
     }
   }
 
-  public getGuidelineHTML(text: string): SafeHtml {
-    let html = text;
+  public async getGuidelineHTML(text: string): Promise<SafeHtml> {
+    let html = text ?? '';
     if (text.indexOf('{{') > -1) {
-      html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
-        return this.annotationStoreService
-          .rawToHTML(g1)
-          .replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
-      });
+      const regex = /{{([^{}]+)}}/g;
+      let matches = regex.exec(text);
+      const replacements: {
+        start: number;
+        length: number;
+        text: string;
+      }[] = [];
+
+      while (matches && matches.length > 1) {
+        replacements.push({
+          start: matches.index,
+          length: matches[0].length,
+          text: (
+            await this.annotationStoreService.rawToHTML(matches[1])
+          ).replace(/(<p>)|(<\/p>)|(<br\/>)/g, ''),
+        });
+        matches = regex.exec(text);
+      }
+
+      for (let i = replacements.length - 1; i >= 0; i--) {
+        const replacement = replacements[i];
+        html =
+          html.substring(0, replacement.start) +
+          replacement.text +
+          html.substring(replacement.start + replacement.length);
+      }
     } else {
       html = `${html}`;
     }

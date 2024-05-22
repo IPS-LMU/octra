@@ -32,6 +32,8 @@ import { OctraGuidelines } from '@octra/assets';
 import { ApplicationStoreService } from '../../application/application-store.service';
 import { TaskInputOutputDto } from '@octra/api-types';
 import { ApplicationActions } from '../../application/application.actions';
+import { MultiThreadingService } from '@octra/ngx-components';
+import { TsWorkerJob } from '@octra/web-media';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -107,12 +109,13 @@ export class AnnotationStoreService {
   }
 
   private _validationArray: {
+    level: number;
     segment: number;
     validation: any[];
   }[] = [];
   private subscrManager = new SubscriptionManager();
 
-  get validationArray(): { segment: number; validation: any[] }[] {
+  get validationArray(): { segment: number; validation: any[]; level: number;}[] {
     return this._validationArray;
   }
 
@@ -230,7 +233,8 @@ export class AnnotationStoreService {
     private store: Store<RootState>,
     private audio: AudioService,
     private appStoreService: ApplicationStoreService,
-    private appStorage: AppStorageService
+    private appStorage: AppStorageService,
+    private multiThreading: MultiThreadingService
   ) {
     this.subscrManager.add(
       this.transcript$.subscribe({
@@ -476,127 +480,146 @@ export class AnnotationStoreService {
   /**
    * converts raw text of markers to html
    */
-  public rawToHTML(rawtext: string): string {
-    let result: string = rawtext;
+  public async rawToHTML(rawtext: string): Promise<string> {
+    const job = new TsWorkerJob(
+      function (rawtext, guidelines) {
+        return new Promise<string>((resolve, reject) => {
+          try {
+            let result: string = rawtext;
 
-    if (rawtext !== '') {
-      result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      // replace markers with no wrap
+            if (rawtext !== '') {
+              result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+              // replace markers with no wrap
 
-      const markers = this.guidelines!.markers;
-      // replace all tags that are not markers
-      result = result.replace(
-        new RegExp(/(<\/?)?([^<>]+)(>)/, 'g'),
-        (g0, g1, g2, g3) => {
-          g1 = g1 === undefined ? '' : g1;
-          g2 = g2 === undefined ? '' : g2;
-          g3 = g3 === undefined ? '' : g3;
+              const escapeRegex = function (regexStr: string) {
+                // escape special chars in regex
+                return regexStr.replace(/[-/\\^$*+?ß%.()|[\]{}]/g, '\\$&');
+              };
+              const markers = guidelines.markers;
+              // replace all tags that are not markers
+              result = result.replace(
+                new RegExp(/(<\/?)?([^<>]+)(>)/, 'g'),
+                (g0, g1, g2, g3) => {
+                  g1 = g1 === undefined ? '' : g1;
+                  g2 = g2 === undefined ? '' : g2;
+                  g3 = g3 === undefined ? '' : g3;
 
-          // check if its an html tag
-          if (
-            g2 === 'img' &&
-            g2 === 'span' &&
-            g2 === 'div' &&
-            g2 === 'i' &&
-            g2 === 'b' &&
-            g2 === 'u' &&
-            g2 === 's'
-          ) {
-            return `[[[${g2}]]]`;
-          }
+                  // check if its an html tag
+                  if (
+                    g2 === 'img' &&
+                    g2 === 'span' &&
+                    g2 === 'div' &&
+                    g2 === 'i' &&
+                    g2 === 'b' &&
+                    g2 === 'u' &&
+                    g2 === 's'
+                  ) {
+                    return `[[[${g2}]]]`;
+                  }
 
-          // check if it's a marker
-          for (const marker of markers) {
-            if (`${g1}${g2}${g3}` === marker.code) {
-              return `[[[${g2}]]]`;
+                  // check if it's a marker
+                  for (const marker of markers) {
+                    if (`${g1}${g2}${g3}` === marker.code) {
+                      return `[[[${g2}]]]`;
+                    }
+                  }
+
+                  return `${g1}${g2}${g3}`;
+                }
+              );
+
+              // replace
+              result = result.replace(/([<>])/g, (g0, g1) => {
+                if (g1 === '<') {
+                  return '&lt;';
+                }
+
+                return '&gt;';
+              });
+
+              result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
+                if (g2 === undefined && g1 !== undefined) {
+                  return '<';
+                } else {
+                  return '>';
+                }
+              });
+
+              for (const marker of markers) {
+                // replace {<number>} with boundary HTMLElement
+                result = result.replace(/\s?{([0-9]+)}\s?/g, (x, g1) => {
+                  return (
+                    ' <img src="assets/img/components/transcr-editor/boundary.png" ' +
+                    'class="btn-icon-text boundary" style="height:16px;" ' +
+                    'data-samples="' +
+                    g1 +
+                    '" alt="[|' +
+                    g1 +
+                    '|]"> '
+                  );
+                });
+
+                // replace markers
+                const regex = new RegExp(
+                  '( )*(' + escapeRegex(marker.code) + ')( )*',
+                  'g'
+                );
+                result = result.replace(regex, (x, g1, g2, g3) => {
+                  const s1 = g1 ? g1 : '';
+                  const s3 = g3 ? g3 : '';
+
+                  let img = '';
+                  if (
+                    !(marker.icon === undefined || marker.icon === '') &&
+                    (marker.icon.indexOf('.png') > -1 ||
+                      marker.icon.indexOf('.jpg') > -1 ||
+                      marker.icon.indexOf('.gif') > -1)
+                  ) {
+                    const markerCode = marker.code
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;');
+
+                    img =
+                      "<img src='" +
+                      marker.icon +
+                      "' class='btn-icon-text boundary' style='height:16px;' " +
+                      "data-marker-code='" +
+                      markerCode +
+                      "' alt='" +
+                      markerCode +
+                      "'/>";
+                  } else {
+                    // is text or ut8 symbol
+                    if (marker.icon !== undefined && marker.icon !== '') {
+                      img = marker.icon;
+                    } else {
+                      img = marker.code
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    }
+                  }
+
+                  return s1 + img + s3;
+                });
+              }
+              // replace more than one empty spaces
+              result = result.replace(/\s+$/g, '&nbsp;');
             }
+
+            // wrap result with <p>. Missing this would cause the editor fail on marker insertion
+            result =
+              result !== '' && result !== ' ' ? '<p>' + result + '</p>' : '';
+
+            resolve(result.replace(/\uFEFF/gm, ''));
+          } catch (e) {
+            reject(e);
           }
-
-          return `${g1}${g2}${g3}`;
-        }
-      );
-
-      // replace
-      result = result.replace(/([<>])/g, (g0, g1) => {
-        if (g1 === '<') {
-          return '&lt;';
-        }
-
-        return '&gt;';
-      });
-
-      result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
-        if (g2 === undefined && g1 !== undefined) {
-          return '<';
-        } else {
-          return '>';
-        }
-      });
-
-      for (const marker of markers) {
-        // replace {<number>} with boundary HTMLElement
-        result = result.replace(/\s?{([0-9]+)}\s?/g, (x, g1) => {
-          return (
-            ' <img src="assets/img/components/transcr-editor/boundary.png" ' +
-            'class="btn-icon-text boundary" style="height:16px;" ' +
-            'data-samples="' +
-            g1 +
-            '" alt="[|' +
-            g1 +
-            '|]"> '
-          );
         });
+      },
+      [rawtext, this.guidelines]
+    );
 
-        // replace markers
-        const regex = new RegExp(
-          '( )*(' + escapeRegex(marker.code) + ')( )*',
-          'g'
-        );
-        result = result.replace(regex, (x, g1, g2, g3) => {
-          const s1 = g1 ? g1 : '';
-          const s3 = g3 ? g3 : '';
-
-          let img = '';
-          if (
-            !(marker.icon === undefined || marker.icon === '') &&
-            (marker.icon.indexOf('.png') > -1 ||
-              marker.icon.indexOf('.jpg') > -1 ||
-              marker.icon.indexOf('.gif') > -1)
-          ) {
-            const markerCode = marker.code
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;');
-
-            img =
-              "<img src='" +
-              marker.icon +
-              "' class='btn-icon-text boundary' style='height:16px;' " +
-              "data-marker-code='" +
-              markerCode +
-              "' alt='" +
-              markerCode +
-              "'/>";
-          } else {
-            // is text or ut8 symbol
-            if (marker.icon !== undefined && marker.icon !== '') {
-              img = marker.icon;
-            } else {
-              img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            }
-          }
-
-          return s1 + img + s3;
-        });
-      }
-
-      // replace more than one empty spaces
-      result = result.replace(/\s+$/g, '&nbsp;');
-    }
-
-    // wrap result with <p>. Missing this would cause the editor fail on marker insertion
-    result = result !== '' && result !== ' ' ? '<p>' + result + '</p>' : '';
-
-    return result.replace(/\uFEFF/gm, '');
+    return this.multiThreading.run(job);
   }
 
   public underlineTextRed(rawtext: string, validation: any[]) {
@@ -682,7 +705,7 @@ export class AnnotationStoreService {
     return result;
   }
 
-  public getErrorDetails(code: string): any {
+  public async getErrorDetails(code: string) {
     if (this.guidelines?.instructions !== undefined) {
       const instructions = this.guidelines.instructions;
 
@@ -697,7 +720,7 @@ export class AnnotationStoreService {
               newEntry.description = newEntry.description.replace(
                 /{{([^{}]+)}}/g,
                 (g0: string, g1: string) => {
-                  return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
+                  return ''; // (await this.rawToHTML(g1)).replace(/(<p>)|(<\/p>)/g, '');
                 }
               );
               return newEntry;
@@ -724,6 +747,7 @@ export class AnnotationStoreService {
       (this.appStorage.useMode === LoginMode.DEMO ||
         projectSettings?.octra?.validationEnabled === true)
     ) {
+
       let invalid = false;
       for (const level of this.transcript!.levels) {
         for (let i = 0; i < level!.items.length; i++) {
@@ -738,6 +762,7 @@ export class AnnotationStoreService {
           }
 
           this._validationArray.push({
+            level: level.id,
             segment: i,
             validation: segmentValidation,
           });

@@ -18,7 +18,6 @@ import {
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { ShortcutService } from '../../shared/service/shortcut.service';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
@@ -224,120 +223,6 @@ export class OverviewModalComponent
       !this.sendValidTranscriptOnly
     ) {
       this.sendTranscription();
-    }
-  }
-
-  getShownSegment(
-    startSamples: number,
-    endSamples: number,
-    rawText: string,
-    i: number
-  ): {
-    start: number;
-    end: number;
-    transcription: {
-      text: string;
-      html: string;
-    };
-    validation: string;
-  } {
-    const obj = {
-      start: startSamples,
-      end: endSamples,
-      transcription: {
-        text: rawText,
-        html: rawText,
-      },
-      validation: '',
-    };
-
-    if (this.appStorage.useMode !== LoginMode.URL) {
-      if (
-        typeof validateAnnotation !== 'undefined' &&
-        typeof validateAnnotation === 'function' &&
-        this.annotationStoreService.validationArray[i] !== undefined
-      ) {
-        obj.transcription.html = this.annotationStoreService.underlineTextRed(
-          obj.transcription.text,
-          this.annotationStoreService.validationArray[i].validation
-        );
-      }
-
-      obj.transcription.html = this.annotationStoreService.rawToHTML(
-        obj.transcription.html
-      );
-      obj.transcription.html = obj.transcription.html.replace(
-        /((?:\[\[\[)|(?:]]]))/g,
-        (g0, g1) => {
-          if (g1 === '[[[') {
-            return '<';
-          }
-          return '>';
-        }
-      );
-    } else {
-      obj.transcription.html = this.annotationStoreService.rawToHTML(
-        obj.transcription.html
-      );
-      obj.transcription.html = obj.transcription.html.replace(
-        /((?:\[\[\[)|(?:]]]))/g,
-        (g0, g1) => {
-          if (g1 === '[[[') {
-            return '<';
-          }
-          return '>';
-        }
-      );
-    }
-
-    obj.transcription.html = obj.transcription.html.replace(
-      /(<p>)|(<\/p>)/g,
-      ''
-    );
-    return obj;
-  }
-
-  private updateSegments() {
-    if (
-      this.annotationStoreService.validationArray.length > 0 ||
-      this.appStorage.useMode === LoginMode.URL ||
-      !this.settingsService.projectsettings?.octra?.validationEnabled
-    ) {
-      if (
-        !this.annotationStoreService!.currentLevel!.items ||
-        !this.annotationStoreService!.guidelines
-      ) {
-        this.shownSegments = [];
-      }
-
-      let startTime = 0;
-      const result = [];
-
-      if (
-        this.annotationStoreService.currentLevel instanceof
-        OctraAnnotationSegmentLevel
-      ) {
-        for (
-          let i = 0;
-          i < this.annotationStoreService.currentLevel!.items.length;
-          i++
-        ) {
-          const segment = this.annotationStoreService.currentLevel!.items[i];
-
-          const obj = this.getShownSegment(
-            startTime,
-            segment.time.samples,
-            segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
-            i
-          );
-
-          result.push(obj);
-
-          startTime = segment.time.samples;
-        }
-      }
-
-      this.shownSegments = result;
     }
   }
 

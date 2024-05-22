@@ -1,61 +1,55 @@
-<h4>{{"g.statistics" | transloco}}</h4>
+<h4>{{ "g.statistics" | transloco }}</h4>
 
 <table id="statistics" class="table table-bordered">
   <thead>
   <tr>
-    <th>{{"segments.total" | transloco}}</th>
-    <th>{{"segments.transcribed" | transloco}}</th>
-    <th>{{"segments.with breaks" | transloco}}</th>
-    <th>{{"segments.not transcribed" | transloco}}</th>
+    <th>{{ "segments.total" | transloco }}</th>
+    <th>{{ "segments.transcribed" | transloco }}</th>
+    <th>{{ "segments.with breaks" | transloco }}</th>
+    <th>{{ "segments.not transcribed" | transloco }}</th>
   </tr>
   </thead>
   <tbody>
   <tr>
-    <td>{{numberOfSegments}}</td>
-    <td class="bg-success">{{transcrSegments}}</td>
-    <td class="bg-info">{{pauseSegments}}</td>
-    <td class="bg-danger"><b><u>{{emptySegments}}</u></b></td>
+    <td>{{ numberOfSegments }}</td>
+    <td class="bg-success">{{ transcrSegments }}</td>
+    <td class="bg-info">{{ pauseSegments }}</td>
+    <td class="bg-danger"><b><u>{{ emptySegments }}</u></b></td>
   </tr>
   </tbody>
 </table>
 <p [hidden]="shownSegments.length === 0" style="text-align: center">
   <ng-container *ngIf="validationFound">
         <span *ngIf="foundErrors === 0"
-              class="text-success found-errors">{{"g.no errors found" | transloco}}</span>
+              class="text-success found-errors">{{ "g.no errors found" | transloco }}</span>
     <span *ngIf="foundErrors > 0"
-          class="text-danger found-errors">{{"g.errors found" | transloco : { errors: foundErrors + '' } }}</span>
+          class="text-danger found-errors">{{ "g.errors found" | transloco : { errors: foundErrors + '' } }}</span>
   </ng-container>
   <span *ngIf="!validationFound">No validation methods found</span>
 </p>
-<h4 [hidden]="!showTranscriptionTable">{{"g.transcript" | transloco}}</h4>
+<h4 [hidden]="!showTranscriptionTable">{{ "g.transcript" | transloco }}</h4>
 <div [hidden]="!showLoading">
   <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
     <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
   </div>
 </div>
-<octra-validation-popover #validationPopover
-                          [ngStyle]="{
-                                'margin-left': popovers.validation.location.x + 'px',
-                                'margin-top': popovers.validation.location.y + 'px'
-                            }"></octra-validation-popover>
-
 <table id="transcription-table" *ngIf="shownSegments.length > 0" class="table table-bordered"
        [hidden]="!showTranscriptionTable">
   <thead id="table-head">
   <tr>
     <th id="table-first-column"></th>
-    <th id="table-second-column">{{"g.segment" | transloco}}</th>
-    <th id="table-third-column">{{"g.transcription" | transloco}}</th>
+    <th id="table-second-column">{{ "g.segment" | transloco }}</th>
+    <th id="table-third-column">{{ "g.transcription" | transloco }}</th>
     <th class="last-column">
       <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
              [checked]="playAllState.skipSilence">
-      <label for="skip-silence-checkbox">{{"g.skip silence" | transloco}}</label>
+      <label for="skip-silence-checkbox">{{ "g.skip silence" | transloco }}</label>
       <i [class]="playAllState.icon" (click)="togglePlayAll()" style="font-size:1.2rem;"></i>
     </th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let segment of shownSegments; let i = index"
+  <tr *ngFor="let segment of shownSegments; let i = index" #row
       class="segment-row"
       [ngClass]="{
       'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
@@ -82,7 +76,7 @@
         'bg-highlight': playAllState.currentSegment === i
         }">
       <span class="link"
-            (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shownSegments.length}}</span>
+            (click)="onSegmentClicked(i)"># {{ i + 1 | leadingnull: shownSegments.length }}</span>
     </td>
     <td *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
         [ngClass]="{
@@ -104,14 +98,23 @@
       </div>
     </td>
     <ng-template #editorNotActive>
-      <td [innerHTML]="sanitizeHTML(segment.transcription.html)"
-          [ngClass]="{
+      <td
+        style="position:relative"
+        [ngClass]="{
           'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
           'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
           'bg-danger': (segment.transcription.text === ''),
           'bg-highlight': playAllState.currentSegment === i
-          }"
-          (mousedown)="onMouseOver($event, i); onMouseDown(i);" class="segment-transcript"></td>
+          }" class="segment-transcript" (mousedown)="onMouseDown(i);"
+        (mouseover)="onMouseOver($event, i, row, validationPopover);">
+        <octra-validation-popover #validationPopover
+                                  style="position:absolute;"
+                                  [ngStyle]="{
+                                'margin-left': popovers.validation.location.x + 'px',
+                                'margin-top': popovers.validation.location.y + 'px'
+                            }"></octra-validation-popover>
+        <p [innerHTML]="sanitizeHTML(segment.transcription.html)"></p>
+      </td>
     </ng-template>
     <td class="last-column"
         [ngClass]="{
@@ -120,7 +123,7 @@
         'bg-danger': (segment.transcription.text === ''),
         'bg-highlight': playAllState.currentSegment === i
         }">
-      <i [class]="playStateSegments[i].icon" (click)="playSelectedSegment(i)"></i>
+      <i [class]="playStateSegments[i]?.icon" (click)="playSelectedSegment(i)"></i>
     </td>
   </tr>
   </tbody>

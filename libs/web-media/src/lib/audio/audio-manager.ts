@@ -272,7 +272,11 @@ export class AudioManager {
           );
       }
     } else {
-      subj.error(`audio format not supported: ${filename.substring(filename.lastIndexOf('.'))} from ${filename}`);
+      subj.error(
+        `audio format not supported: ${filename.substring(
+          filename.lastIndexOf('.')
+        )} from ${filename}`
+      );
     }
 
     return subj;
@@ -345,6 +349,21 @@ export class AudioManager {
       }
 
       console.log(`try to resume for audiomanager ${this._id}`);
+      const initPlayback = () => {
+        this._playbackEndChecker = timer(
+          Math.round(audioSelection.duration.unix / playbackRate)
+        ).subscribe(() => {
+          this.endPlayBack();
+          this.subscrManager.add(
+            timer(100).subscribe(() => {
+              resolve();
+            })
+          );
+        });
+        this._statusRequest = PlayBackStatus.PLAYING;
+        this.changeState(PlayBackStatus.PLAYING);
+      };
+
       this._audioContext
         ?.resume()
         .then(() => {
@@ -357,9 +376,9 @@ export class AudioManager {
               this._audio
             );
           }
-          this.changeState(PlayBackStatus.STARTED);
 
           // Firefox issue causes playBackRate working only for volume up to 1
+          this.changeState(PlayBackStatus.STARTED);
 
           // create a gain node
           this._gainNode.gain.value = volume;
@@ -374,46 +393,38 @@ export class AudioManager {
           this._playOnHover = playOnHover;
           this._stepBackward = false;
           this.playPosition = audioSelection.start!.clone();
-          this._statusRequest = PlayBackStatus.PLAYING;
-          this.changeState(PlayBackStatus.PLAYING);
 
           this._audio.addEventListener('pause', this.onPlayBackChanged);
           this._audio.addEventListener('ended', this.onPlayBackChanged);
           this._audio.addEventListener('error', this.onPlaybackFailed);
 
+          const playPromise = this._audio.play();
 
-          this._playbackEndChecker = timer(
-            Math.round(audioSelection.duration.unix / playbackRate)
-          ).subscribe(() => {
-            this.endPlayBack();
-            this.subscrManager.add(
-              timer(100).subscribe(() => {
-                resolve();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                initPlayback();
+                const time = Math.round(
+                  audioSelection.duration.unix / playbackRate
+                );
               })
-            );
-          });
+              .catch((error) => {
+                this._playbackEndChecker?.unsubscribe();
+                if (!this.playOnHover) {
+                  if (error.name && error.name === 'NotAllowedError') {
+                    // no permission
+                    this.missingPermission.next();
+                  }
 
-          this._audio
-            .play()
-            .then(() => {
-              const time = Math.round(
-                audioSelection.duration.unix / playbackRate
-              );
-            })
-            .catch((error) => {
-              this._playbackEndChecker?.unsubscribe();
-              if (!this.playOnHover) {
-                if (error.name && error.name === 'NotAllowedError') {
-                  // no permission
-                  this.missingPermission.next();
+                  this.statechange.error(new Error(error));
+                  reject(error);
+                } else {
+                  resolve();
                 }
-
-                this.statechange.error(new Error(error));
-                reject(error);
-              } else {
-                resolve();
-              }
-            });
+              });
+          } else {
+            initPlayback();
+          }
         })
         .catch((error) => {
           this._playbackEndChecker?.unsubscribe();

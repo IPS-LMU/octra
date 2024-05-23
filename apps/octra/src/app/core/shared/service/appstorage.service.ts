@@ -1,6 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SessionFile } from '../../obj/SessionFile';
-import { SubscriptionManager, waitTillResultRetrieved } from '@octra/utilities';
+import {
+  getBaseHrefURL,
+  SubscriptionManager,
+  waitTillResultRetrieved,
+} from '@octra/utilities';
 import { getModeState, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
@@ -21,6 +25,7 @@ import {
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import { SessionStorageService } from 'ngx-webstorage';
 
 @Injectable({
   providedIn: 'root',
@@ -204,7 +209,11 @@ export class AppStorageService {
 
   private _undoRedoDisabled = false;
 
-  constructor(private store: Store<RootState>, private actions: Actions) {
+  constructor(
+    private store: Store<RootState>,
+    private actions: Actions,
+    private sessionStorage: SessionStorageService
+  ) {
     this.subscrManager.add(
       this.store.subscribe((state: RootState) => {
         this._snapshot = state;
@@ -527,5 +536,12 @@ export class AppStorageService {
 
   public abortReAuthentication() {
     this.store.dispatch(AuthenticationActions.needReAuthentication.abort());
+  }
+
+  public saveCurrentPageAsLastPage() {
+    const part: string = window.location.href.replace(getBaseHrefURL(), '');
+    if (part !== 'load') {
+      this.sessionStorage.store('last_page_path', `/${part}`);
+    }
   }
 }

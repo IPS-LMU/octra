@@ -40,7 +40,7 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
 import { environment } from '../../../../environments/environment';
 import { findElements, getAttr } from '@octra/web-media';
 import X2JS from 'x2js';
-import { getBaseHrefURL, isNumber } from '@octra/utilities';
+import { isNumber } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',
@@ -50,11 +50,7 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
-        const part: string = window.location.href.replace(getBaseHrefURL(), '');
-        console.log(part);
-        if (part !== 'load') {
-          this.sessionStorage.store('last_page_path', `/${part}`);
-        }
+        this.appStorage.saveCurrentPageAsLastPage();
 
         const queryParams = {
           audio_url: this.getParameterByName('audio_url'),

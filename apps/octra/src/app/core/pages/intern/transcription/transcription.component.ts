@@ -590,6 +590,7 @@ export class TranscriptionComponent
 
     this.cd.markForCheck();
     this.cd.detectChanges();
+    this.appStorage.saveCurrentPageAsLastPage();
   }
 
   private async checkCurrentEditor() {

@@ -109,6 +109,7 @@ export class AuthenticationEffects {
             );
           }
         }
+
         return this.apiService.login(a.method, a.username, a.password).pipe(
           map((auth) => {
             if (auth.openURL !== undefined) {

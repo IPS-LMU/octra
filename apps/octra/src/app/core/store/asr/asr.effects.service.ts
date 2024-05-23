@@ -517,7 +517,7 @@ export class AsrEffects {
                         ASRActions.runWordAlignmentOnItem.success({
                           item,
                           result: contents,
-                          transcriptURL: contents.replace(/\n/g, '').trim(),
+                          transcriptURL: result.url,
                         })
                       );
                     }

@@ -61,13 +61,13 @@ import {
   StatisticElem,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
-import { ASRActions } from '../../asr/asr.actions';
 import { SampleUnit } from '@octra/media';
 
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { FileInfo } from '@octra/web-media';
+import { ASRQueueItemType } from '../../asr';
 
 declare const BUILD: {
   version: string;
@@ -1227,147 +1227,156 @@ export class AnnotationEffects {
 
   asrRunWordAlignmentSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ASRActions.runWordAlignmentOnItem.success),
+      ofType(AnnotationActions.updateASRSegmentInformation.do),
       withLatestFrom(this.store),
-      exhaustMap(([{ item, result }, state]) => {
-        const converter = new PraatTextgridConverter();
-        const audioManager = this.audio.audioManager;
-        const audiofile = audioManager.resource.getOAudioFile();
-        audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-
-        if (result) {
-          const convertedResult = converter.import(
-            {
-              name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-              content: result,
-              type: 'text',
-              encoding: 'utf-8',
-            },
-            audiofile
+      exhaustMap(([action, state]) => {
+        if (
+          (action.itemType === ASRQueueItemType.ASRMAUS ||
+            action.itemType === ASRQueueItemType.MAUS) &&
+          action.result
+        ) {
+          const segmentBoundary = new SampleUnit(
+            action.timeInterval.sampleStart +
+              action.timeInterval.sampleLength / 2,
+            getModeState(state)!.audio.sampleRate!
           );
-
-          if (convertedResult?.annotjson) {
-            const wordsTier = convertedResult.annotjson.levels.find(
-              (a: any) => {
-                return a.name === 'ORT-MAU';
-              }
+          const segmentIndex =
+            getModeState(
+              state
+            )!.transcript.getCurrentSegmentIndexBySamplePosition(
+              segmentBoundary
             );
 
-            if (wordsTier !== undefined) {
-              let counter = 0;
+          const converter = new PraatTextgridConverter();
+          const audioManager = this.audio.audioManager;
+          const audiofile = audioManager.resource.getOAudioFile();
+          audiofile.name = `OCTRA_ASRqueueItem_${segmentIndex}.wav`;
 
-              const segmentBoundary = new SampleUnit(
-                item.time.sampleStart + item.time.sampleLength,
-                audioManager.sampleRate
+          if (action.result) {
+            const convertedResult = converter.import(
+              {
+                name: `OCTRA_ASRqueueItem_${segmentIndex}.TextGrid`,
+                content: action.result,
+                type: 'text',
+                encoding: 'utf-8',
+              },
+              audiofile
+            );
+
+            if (convertedResult?.annotjson) {
+              const wordsTier = convertedResult.annotjson.levels.find(
+                (a: any) => {
+                  return a.name === 'ORT-MAU';
+                }
               );
-              const segmentIndex =
-                getModeState(
-                  state
-                )!.transcript.getCurrentSegmentIndexBySamplePosition(
-                  segmentBoundary
-                );
 
-              if (segmentIndex < 0) {
+              if (wordsTier !== undefined) {
+                let counter = 0;
+
+                if (segmentIndex < 0) {
+                  return of(
+                    AnnotationActions.addMultipleASRSegments.fail({
+                      error: `could not find segment to be precessed by ASRMAUS!`,
+                    })
+                  );
+                } else {
+                  const segmentID =
+                    getModeState(state)!.transcript.currentLevel!.items[
+                      segmentIndex
+                    ].id;
+                  const newSegments: OctraAnnotationSegment[] = [];
+
+                  let itemCounter =
+                    getModeState(state)?.transcript.idCounters.item ?? 1;
+                  for (const wordItem of wordsTier.items as ISegment[]) {
+                    const itemEnd =
+                      action.timeInterval.sampleStart +
+                      action.timeInterval.sampleLength;
+                    if (
+                      action.timeInterval.sampleStart +
+                        wordItem.sampleStart +
+                        wordItem.sampleDur <=
+                      itemEnd
+                    ) {
+                      const readSegment = new OctraAnnotationSegment(
+                        itemCounter++,
+                        new SampleUnit(
+                          action.timeInterval.sampleStart +
+                            wordItem.sampleStart +
+                            wordItem.sampleDur,
+                          this.audio.audioManager.resource.info.sampleRate
+                        ),
+                        wordItem.labels.map((a) =>
+                          OLabel.deserialize({
+                            ...a,
+                            name:
+                              a.name === 'ORT-MAU'
+                                ? getModeState(state)!.transcript!.currentLevel!
+                                    .name!
+                                : a.name,
+                          })
+                        )
+                      );
+
+                      const labelIndex = readSegment.labels.findIndex(
+                        (a) => a.value === '<p:>' || a.value === ''
+                      );
+
+                      if (labelIndex > -1) {
+                        readSegment.labels[labelIndex].value =
+                          getModeState(
+                            state
+                          )!.guidelines?.selected?.json.markers.find(
+                            (a) => a.type === 'break'
+                          )?.code ?? '';
+                      }
+
+                      newSegments.push(readSegment);
+                      // the last segment is the original segment
+                    } else {
+                      // tslint:disable-next-line:max-line-length
+                      console.error(
+                        `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${action.timeInterval.sampleStart} + ${action.timeInterval.sampleLength}`
+                      );
+                      return of(
+                        AnnotationActions.addMultipleASRSegments.fail({
+                          error: `wordItem samples are out of the correct boundaries.`,
+                        })
+                      );
+                    }
+                    counter++;
+                  }
+                  return of(
+                    AnnotationActions.addMultipleASRSegments.success({
+                      mode: state.application.mode!,
+                      segmentID,
+                      newSegments,
+                    })
+                  );
+                }
+              } else {
                 return of(
                   AnnotationActions.addMultipleASRSegments.fail({
-                    error: `could not find segment to be precessed by ASRMAUS!`,
-                  })
-                );
-              } else {
-                const segmentID =
-                  getModeState(state)!.transcript.currentLevel!.items[
-                    segmentIndex
-                  ].id;
-                const newSegments: OctraAnnotationSegment[] = [];
-
-                let itemCounter =
-                  getModeState(state)?.transcript.idCounters.item ?? 1;
-                for (const wordItem of wordsTier.items as ISegment[]) {
-                  const itemEnd =
-                    item.time.sampleStart + item.time.sampleLength;
-                  if (
-                    item.time.sampleStart +
-                      wordItem.sampleStart +
-                      wordItem.sampleDur <=
-                    itemEnd
-                  ) {
-                    const readSegment = new OctraAnnotationSegment(
-                      itemCounter++,
-                      new SampleUnit(
-                        item.time.sampleStart +
-                          wordItem.sampleStart +
-                          wordItem.sampleDur,
-                        this.audio.audioManager.resource.info.sampleRate
-                      ),
-                      wordItem.labels.map((a) =>
-                        OLabel.deserialize({
-                          ...a,
-                          name:
-                            a.name === 'ORT-MAU'
-                              ? getModeState(state)!.transcript!.currentLevel!
-                                  .name!
-                              : a.name,
-                        })
-                      )
-                    );
-
-                    const labelIndex = readSegment.labels.findIndex(
-                      (a) => a.value === '<p:>' || a.value === ''
-                    );
-
-                    if (labelIndex > -1) {
-                      readSegment.labels[labelIndex].value =
-                        getModeState(
-                          state
-                        )!.guidelines?.selected?.json.markers.find(
-                          (a) => a.type === 'break'
-                        )?.code ?? '';
-                    }
-
-                    newSegments.push(readSegment);
-                    // the last segment is the original segment
-                  } else {
-                    // tslint:disable-next-line:max-line-length
-                    console.error(
-                      `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`
-                    );
-                    return of(
-                      AnnotationActions.addMultipleASRSegments.fail({
-                        error: `wordItem samples are out of the correct boundaries.`,
-                      })
-                    );
-                  }
-                  counter++;
-                }
-                return of(
-                  AnnotationActions.addMultipleASRSegments.success({
-                    mode: state.application.mode!,
-                    segmentID,
-                    newSegments,
+                    error: 'word tier not found!',
                   })
                 );
               }
             } else {
               return of(
                 AnnotationActions.addMultipleASRSegments.fail({
-                  error: 'word tier not found!',
+                  error: 'importresult ist undefined',
                 })
               );
             }
           } else {
             return of(
               AnnotationActions.addMultipleASRSegments.fail({
-                error: 'importresult ist undefined',
+                error: 'Result is undefined',
               })
             );
           }
-        } else {
-          return of(
-            AnnotationActions.addMultipleASRSegments.fail({
-              error: 'Result is undefined',
-            })
-          );
         }
+        return of();
       })
     )
   );

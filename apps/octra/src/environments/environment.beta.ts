@@ -4,10 +4,10 @@ export const environment = {
   beta_version: true,
   useCookies: true,
   debugging: {
-    enabled: false,
+    enabled: true,
     logging: {
       console: true,
-      actions: false,
+      actions: true,
       routes: false
     }
   }

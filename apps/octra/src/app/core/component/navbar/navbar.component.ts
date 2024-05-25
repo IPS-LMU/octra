@@ -14,6 +14,8 @@ import {
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
   BugReportService,
+  ConsoleEntry,
+  ConsoleGroupEntry,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
 import { NavbarService } from './navbar.service';
@@ -95,16 +97,32 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     let beginCheck = false;
     return (
       this.bugService.console.filter((a) => {
-        if (a.type === ConsoleType.ERROR && beginCheck) {
-          return true;
-        }
+        const hasError = (b: ConsoleEntry) => {
+          if (b.type === ConsoleType.ERROR && beginCheck) {
+            return true;
+          }
+          if (
+            typeof b.message === 'string' &&
+            b.message.indexOf('AFTER RELOAD') > -1
+          ) {
+            beginCheck = true;
+          }
+          return false;
+        };
+
         if (
-          typeof a.message === 'string' &&
-          a.message.indexOf('AFTER RELOAD') > -1
+          Object.keys(a).includes('label') ||
+          Object.keys(a).includes('entries')
         ) {
-          beginCheck = true;
+          for (const entry of (a as ConsoleGroupEntry).entries) {
+            if (hasError(entry)) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          return hasError(a as ConsoleEntry);
         }
-        return false;
       }).length > 0
     );
   }

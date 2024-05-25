@@ -1,7 +1,10 @@
 import { pipe } from 'rxjs';
 import { LoadingStatus, LoginMode, RootState } from '../index';
 import { AppSettings } from '../../obj';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import {
+  ConsoleEntry,
+  ConsoleGroupEntry,
+} from '../../shared/service/bug-report.service';
 import { IIDBApplicationOptions } from '../../shared/octra-database';
 
 export const selectApplication = (state: RootState) => state.application;
@@ -54,6 +57,6 @@ export interface ApplicationState {
   };
   language: string;
   appConfiguration?: AppSettings;
-  consoleEntries: ConsoleEntry[];
+  consoleEntries: (ConsoleEntry | ConsoleGroupEntry)[];
   options: IIDBApplicationOptions;
 }

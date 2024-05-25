@@ -4,7 +4,10 @@ import {
   emptyProps,
   props,
 } from '@ngrx/store';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import {
+  ConsoleEntry,
+  ConsoleGroupEntry,
+} from '../../shared/service/bug-report.service';
 import { AppSettings, ASRSettings } from '../../obj';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
@@ -163,7 +166,7 @@ export class ApplicationActions {
   public static setConsoleEntries = createAction(
     `[${context}] Set Console Entries`,
     props<{
-      consoleEntries: ConsoleEntry[];
+      consoleEntries: (ConsoleEntry | ConsoleGroupEntry)[];
     }>()
   );
 

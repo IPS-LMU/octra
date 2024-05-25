@@ -806,10 +806,11 @@ export class ApplicationEffects {
         tap((action) => {
           if (
             environment.debugging.enabled &&
-            environment.debugging.logging.actions
+            environment.debugging.logging.actions &&
+            action.type.indexOf('Set Console Entries') < 0 // ignore Set Console
           ) {
             console.groupCollapsed(`--- ACTION ${action.type} ---`);
-            console.log(JSON.stringify(action, null, 2));
+            console.log(action);
             console.groupEnd();
           }
         })
@@ -929,6 +930,28 @@ export class ApplicationEffects {
           serv.addEntry(ConsoleType.WARN, args[0]);
           // eslint-disable-next-line prefer-rest-params
           oldWarn.apply(console, args);
+        };
+      })();
+
+      // overwrite console.collapsedGroup
+      const oldGroupCollapsed = console.groupCollapsed;
+      (() => {
+        // tslint:disable-next-line:only-arrow-functions
+        console.groupCollapsed = function (...args) {
+          serv.beginGroup(args[0]);
+          // eslint-disable-next-line prefer-rest-params
+          oldGroupCollapsed.apply(console, args);
+        };
+      })();
+
+      // overwrite console.groupEnd
+      const oldGroupEnd = console.groupEnd;
+      (() => {
+        // tslint:disable-next-line:only-arrow-functions
+        console.groupEnd = function (...args) {
+          serv.endGroup();
+          // eslint-disable-next-line prefer-rest-params
+          oldGroupEnd.apply(console, args);
         };
       })();
     }

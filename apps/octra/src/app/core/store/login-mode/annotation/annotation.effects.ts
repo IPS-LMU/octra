@@ -192,6 +192,8 @@ export class AnnotationEffects {
           }
         }
 
+        console.log("START ANNOTATION");
+        console.log(task);
         return AnnotationActions.startAnnotation.success({
           task,
           project: currentProject,

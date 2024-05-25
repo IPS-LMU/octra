@@ -6,7 +6,7 @@ export const environment = {
   debugging: {
     enabled: true,
     logging: {
-      console: false,
+      console: true,
       actions: true,
       routes: true
     }

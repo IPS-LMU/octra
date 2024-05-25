@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ConsoleEntry } from './bug-report.service';
+import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
 import {
   DefaultModeOptions,
   IDBApplicationOptionName,
@@ -90,7 +90,7 @@ export class IDBService {
    * saves console entries.
    * @param entries
    */
-  public saveConsoleEntries(entries: ConsoleEntry[]) {
+  public saveConsoleEntries(entries: (ConsoleEntry | ConsoleGroupEntry)[]) {
     return this.database.app_options.put({
       name: 'console',
       value: entries,

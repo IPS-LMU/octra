@@ -8,7 +8,7 @@ import {
 import { getModeState, LoginMode, RootState } from '../../store';
 import { Action, Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
-import { ConsoleEntry } from './bug-report.service';
+import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
 import { IDBActions } from '../../store/idb/idb.actions';
@@ -18,7 +18,7 @@ import {
   AnnotationState,
 } from '../../store/login-mode/annotation';
 import { LoginModeActions } from '../../store/login-mode';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { asapScheduler, Observable, Subject, Subscription } from 'rxjs';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { AuthenticationActions } from '../../store/authentication';
 import {
@@ -150,15 +150,17 @@ export class AppStorageService {
     );
   }
 
-  get consoleEntries(): ConsoleEntry[] {
+  get consoleEntries(): (ConsoleEntry | ConsoleGroupEntry)[] {
     return this._snapshot.application.consoleEntries;
   }
 
-  set consoleEntries(consoleEntries: ConsoleEntry[]) {
-    this.store.dispatch(
-      ApplicationActions.setConsoleEntries({
-        consoleEntries,
-      })
+  set consoleEntries(consoleEntries: (ConsoleEntry | ConsoleGroupEntry)[]) {
+    asapScheduler.schedule(() =>
+      this.store.dispatch(
+        ApplicationActions.setConsoleEntries({
+          consoleEntries,
+        })
+      )
     );
   }
 

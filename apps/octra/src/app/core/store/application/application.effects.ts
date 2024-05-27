@@ -807,9 +807,10 @@ export class ApplicationEffects {
           if (
             environment.debugging.enabled &&
             environment.debugging.logging.actions &&
-            action.type.indexOf('Set Console Entries') < 0 // ignore Set Console
+            action.type.indexOf('Set Console Entries') < 0 &&
+            (!environment.production || !this.isIgnoredAction(action.type))
           ) {
-            console.groupCollapsed(`--- ACTION ${action.type} ---`);
+            console.groupCollapsed(`ACTION ${action.type} ---`);
             console.log(action);
             console.groupEnd();
           }
@@ -1021,5 +1022,19 @@ export class ApplicationEffects {
       return '';
     }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
+  private isIgnoredAction(type: string) {
+    return (
+      [
+        AnnotationActions.loadAudio.progress.type,
+        AnnotationActions.addLog.do.type,
+        IDBActions.loadConsoleEntries.success.type,
+        IDBActions.loadOptions.success.type,
+        ApplicationActions.loadSettings.success.type,
+        APIActions.init.do.type,
+        IDBActions.loadLogs.success.type,
+      ] as string[]
+    ).includes(type);
   }
 }

@@ -30,11 +30,6 @@ export interface ConsoleGroupEntry {
   entries: ConsoleEntry[];
 }
 
-export interface BugReportCredentials {
-  auth_token: string;
-  url: string;
-}
-
 declare const BUILD: {
   version: string;
   hash: string;
@@ -51,6 +46,8 @@ export class BugReportService {
     return this._console;
   }
 
+  private startedGroup?: ConsoleGroupEntry;
+
   constructor(
     private langService: TranslocoService,
     private appStorage: AppStorageService,
@@ -58,8 +55,6 @@ export class BugReportService {
     private audio: AudioService,
     private api: OctraAPIService
   ) {}
-
-  private startedGroup?: ConsoleGroupEntry;
 
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {

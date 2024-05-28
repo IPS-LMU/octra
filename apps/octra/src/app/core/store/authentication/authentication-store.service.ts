@@ -87,20 +87,6 @@ export class AuthenticationStoreService {
     this.store.dispatch(AuthenticationActions.loginAuto.do({ method, params }));
   }
 
-  continueSessionAfterAgreement(
-    method: AccountLoginMethod,
-    sessionToken: string,
-    params?: any
-  ) {
-    this.store.dispatch(
-      AuthenticationActions.continueSessionAfterAgreement.do({
-        method,
-        sessionToken,
-        params,
-      })
-    );
-  }
-
   reauthenticate(
     method: AccountLoginMethod,
     actionAfterSuccess?: Action,

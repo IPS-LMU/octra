@@ -38,7 +38,6 @@ import {
 } from '@octra/annotation';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import {
-  ProjectDto,
   TaskDto,
   TaskInputOutputCreatorType,
   TaskInputOutputDto,
@@ -192,8 +191,6 @@ export class AnnotationEffects {
           }
         }
 
-        console.log("START ANNOTATION");
-        console.log(task);
         return AnnotationActions.startAnnotation.success({
           task,
           project: currentProject,
@@ -623,6 +620,7 @@ export class AnnotationEffects {
           return this.apiService.getMyAccountInformation().pipe(
             exhaustMap((currentAccount) => {
               if (!a.taskID || !a.projectID) {
+                // user logged in without old annotation
                 return of(
                   LoginModeActions.loadProjectAndTaskInformation.success({
                     mode: LoginMode.ONLINE,
@@ -631,15 +629,15 @@ export class AnnotationEffects {
                 );
               }
 
-              return forkJoin<[ProjectDto | undefined, TaskDto | undefined]>(
-                this.apiService
+              return forkJoin({
+                currentProject: this.apiService
                   .getProject(a.projectID)
                   .pipe(catchError((b) => of(undefined))),
-                this.apiService
-                  .getTask(a.projectID, a.taskID)
-                  .pipe(catchError((b) => of(undefined)))
-              ).pipe(
-                map(([currentProject, task]) => {
+                task: this.apiService
+                  .continueTask(a.projectID, a.taskID)
+                  .pipe(catchError((b) => of(undefined))),
+              }).pipe(
+                map(({ currentProject, task }) => {
                   return LoginModeActions.loadProjectAndTaskInformation.success(
                     {
                       mode: LoginMode.ONLINE,

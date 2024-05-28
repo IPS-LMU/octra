@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppInfo } from '../../../app.info';
 import { hasProperty } from '@octra/utilities';
-import { APIService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModalService } from '../octra-modal.service';
@@ -64,7 +63,6 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
   constructor(
     private modService: OctraModalService,
     public bugService: BugReportService,
-    private api: APIService,
     private appStorage: AppStorageService
   ) {
     super();

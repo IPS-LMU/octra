@@ -780,7 +780,8 @@ export class IDBEffects {
         AnnotationActions.changeLevelName.do,
         AnnotationActions.duplicateLevel.do,
         AuthenticationActions.loginLocal.prepare,
-        AnnotationActions.addMultipleASRSegments.success
+        AnnotationActions.addMultipleASRSegments.success,
+        AnnotationActions.initTranscriptionService.success
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {

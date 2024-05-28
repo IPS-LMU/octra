@@ -21,11 +21,7 @@ import { ALoginGuard, DeALoginGuard } from './core/shared/guard';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 
-import {
-  APIService,
-  AudioService,
-  SettingsService,
-} from './core/shared/service';
+import { AudioService, SettingsService } from './core/shared/service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { BugReportService } from './core/shared/service/bug-report.service';
 import { CompatibilityService } from './core/shared/service/compatibility.service';
@@ -125,7 +121,6 @@ import { RouterModule } from '@angular/router';
   bootstrap: [AppComponent],
   providers: [
     ALoginGuard,
-    APIService,
     AudioService,
     DeALoginGuard,
     OctraModalService,

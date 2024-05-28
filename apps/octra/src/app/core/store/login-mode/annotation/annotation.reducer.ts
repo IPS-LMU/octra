@@ -482,6 +482,18 @@ export class AnnotationStateReducers {
           logs: [],
         },
       })),
+      on(AnnotationActions.startNewAnnotation.do, (state, { mode }) => {
+        if (mode === this.mode) {
+          return {
+            ...state,
+            transcript: new OctraAnnotation<
+              ASRContext,
+              OctraAnnotationSegment<ASRContext>
+            >(),
+          };
+        }
+        return state;
+      }),
       on(IDBActions.loadLogs.success, (state: AnnotationState, logs) => {
         return {
           ...state,

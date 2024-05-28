@@ -1,4 +1,3 @@
-export * from './api.service';
 export * from './audio.service';
 export * from '../../pages/login/login.service';
 export * from './userInteractions.service';

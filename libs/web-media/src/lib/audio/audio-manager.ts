@@ -348,14 +348,13 @@ export class AudioManager {
         this.initAudioContext();
       }
 
-      console.log(`try to resume for audiomanager ${this._id}`);
       const initPlayback = () => {
         this._playbackEndChecker = timer(
           Math.round(audioSelection.duration.unix / playbackRate)
         ).subscribe(() => {
           this.endPlayBack();
           this.subscrManager.add(
-            timer(100).subscribe(() => {
+            timer(0).subscribe(() => {
               resolve();
             })
           );
@@ -378,8 +377,6 @@ export class AudioManager {
           }
 
           // Firefox issue causes playBackRate working only for volume up to 1
-          this.changeState(PlayBackStatus.STARTED);
-
           // create a gain node
           this._gainNode.gain.value = volume;
           this._source.connect(this._gainNode);
@@ -403,10 +400,8 @@ export class AudioManager {
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
+                this.playPosition = audioSelection.start!.clone();
                 initPlayback();
-                const time = Math.round(
-                  audioSelection.duration.unix / playbackRate
-                );
               })
               .catch((error) => {
                 this._playbackEndChecker?.unsubscribe();
@@ -631,6 +626,7 @@ export class AudioManager {
   private removeEventListeners() {
     this._audio.removeEventListener('ended', this.onPlayBackChanged);
     this._audio.removeEventListener('pause', this.onPlayBackChanged);
+    this._audio.removeEventListener('error', this.onPlaybackFailed);
     this._gainNode?.disconnect();
     this._source?.disconnect();
     this._playbackEndChecker?.unsubscribe();

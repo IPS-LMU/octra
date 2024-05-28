@@ -848,7 +848,7 @@ export class AudioViewerService {
   }
 
   public onPlaybackStarted() {
-    if (this.animation.playHead !== undefined) {
+    if (this.animation.playHead && !this.animation.playHead.isRunning()) {
       this.animation.playHead.start();
     }
   }
@@ -1221,11 +1221,11 @@ export class AudioViewerService {
   public updatePlayCursor = () => {
     if (
       this.settings.selection.enabled &&
-      this.audioChunk !== undefined &&
-      this.canvasElements?.playHead !== undefined &&
-      this.audioTCalculator !== undefined &&
-      this.audioChunk.relativePlayposition !== undefined &&
-      this.PlayCursor !== undefined
+      this.audioChunk &&
+      this.canvasElements?.playHead &&
+      this.audioTCalculator &&
+      this.audioChunk.relativePlayposition &&
+      this.PlayCursor
     ) {
       let currentAbsX = this.audioTCalculator.samplestoAbsX(
         this.audioChunk.relativePlayposition
@@ -1900,7 +1900,6 @@ export class AudioViewerService {
             if ($event.type === 'mousedown') {
               // no line defined or same line
               this.mouseClickPos = absXInTime.clone();
-
               this.audioChunk.startpos = this.mouseClickPos.clone();
               this.audioChunk.selection.start = absXInTime.clone();
               this.audioChunk.selection.end = absXInTime.clone();

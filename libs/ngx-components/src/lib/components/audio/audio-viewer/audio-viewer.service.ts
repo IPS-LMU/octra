@@ -1271,6 +1271,11 @@ export class AudioViewerService {
       segTimeLabels?.forEach((a) => a.destroy());
     }
 
+    if (clearAll && this.layers?.boundaries) {
+      this.layers.boundaries.children.forEach((a) => a.destroy());
+      this.layers.boundaries.children = [];
+    }
+
     if (this.innerWidth !== undefined) {
       const maxLineWidth = this.innerWidth;
       let numOfLines = Math.ceil(this.AudioPxWidth / maxLineWidth);

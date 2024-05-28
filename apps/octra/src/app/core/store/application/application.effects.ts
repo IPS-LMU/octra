@@ -41,6 +41,7 @@ import { environment } from '../../../../environments/environment';
 import { findElements, getAttr } from '@octra/web-media';
 import X2JS from 'x2js';
 import { isNumber } from '@octra/utilities';
+import { ASRActions } from '../asr/asr.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -1034,6 +1035,10 @@ export class ApplicationEffects {
         ApplicationActions.loadSettings.success.type,
         APIActions.init.do.type,
         IDBActions.loadLogs.success.type,
+        LoginModeActions.changeComment.do.type,
+        AnnotationActions.setSavingNeeded.do.type,
+        AnnotationActions.overwriteTranscript.do.type,
+        ASRActions.processQueueItem.do.type,
       ] as string[]
     ).includes(type);
   }

@@ -366,6 +366,10 @@ export class AuthenticationEffects {
                         mode: a.mode,
                       })
                     );
+                  } else {
+                    this.store.dispatch(
+                      AuthenticationActions.redirectToProjects.do()
+                    );
                   }
                 }
               } else {

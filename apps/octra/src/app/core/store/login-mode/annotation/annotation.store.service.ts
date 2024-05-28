@@ -30,7 +30,7 @@ import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
 import { map, Observable } from 'rxjs';
 import { OctraGuidelines } from '@octra/assets';
 import { ApplicationStoreService } from '../../application/application-store.service';
-import { TaskInputOutputDto } from '@octra/api-types';
+import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { ApplicationActions } from '../../application/application.actions';
 import { MultiThreadingService } from '@octra/ngx-components';
 import { TsWorkerJob } from '@octra/web-media';
@@ -52,6 +52,10 @@ export class AnnotationStoreService {
     | OctraAnnotation<ASRContext, OctraAnnotationSegment>
     | undefined {
     return this._transcript;
+  }
+
+  get task() {
+    return this._task;
   }
 
   public get statistics$(): Observable<{
@@ -115,7 +119,11 @@ export class AnnotationStoreService {
   }[] = [];
   private subscrManager = new SubscriptionManager();
 
-  get validationArray(): { segment: number; validation: any[]; level: number;}[] {
+  get validationArray(): {
+    segment: number;
+    validation: any[];
+    level: number;
+  }[] {
     return this._validationArray;
   }
 
@@ -179,6 +187,7 @@ export class AnnotationStoreService {
     (state: RootState) => getModeState(state)?.currentSession?.status
   );
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
+  private _task?: TaskDto;
 
   transcriptString$ = this.transcript$.pipe(
     map((transcript) => {
@@ -244,6 +253,13 @@ export class AnnotationStoreService {
       })
     );
     this.subscrManager.add(
+      this.task$.subscribe({
+        next: (task) => {
+          this._task = task;
+        },
+      })
+    );
+    this.subscrManager.add(
       this.guidelines$.subscribe({
         next: (guidelines) => {
           this._guidelines = guidelines?.selected?.json;
@@ -281,8 +297,6 @@ export class AnnotationStoreService {
   }
 
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
-    console.log(`quit `);
-    console.log({ clearSession, freeTask, redirectToProjects });
     this.store.dispatch(
       AnnotationActions.quit.do({
         clearSession,
@@ -747,7 +761,6 @@ export class AnnotationStoreService {
       (this.appStorage.useMode === LoginMode.DEMO ||
         projectSettings?.octra?.validationEnabled === true)
     ) {
-
       let invalid = false;
       for (const level of this.transcript!.levels) {
         for (let i = 0; i < level!.items.length; i++) {

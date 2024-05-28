@@ -3078,7 +3078,7 @@ export class AudioViewerService {
           xZoom,
         ]);
 
-        promises.push(this.multiThreadingService.run(tsJob));
+        promises.push(this.multiThreadingService.run<number[]>(tsJob));
       }
 
       Promise.all(promises)
@@ -4225,11 +4225,9 @@ export class AudioViewerService {
       this.canvasElements?.lastLine
     ) {
       if (
-        sceneSegment === undefined ||
-        this.currentLevel.type !== AnnotationLevelType.SEGMENT
+        sceneSegment &&
+        this.currentLevel.type === AnnotationLevelType.SEGMENT
       ) {
-        console.error(`scenceSegment is undefined!`);
-      } else {
         for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
           let localY =
             j * (this.settings.lineheight + this.settings.margin.top);

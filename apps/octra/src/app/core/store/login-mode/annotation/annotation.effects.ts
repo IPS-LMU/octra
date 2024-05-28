@@ -8,6 +8,7 @@ import {
   catchError,
   exhaustMap,
   forkJoin,
+  from,
   interval,
   map,
   of,
@@ -67,6 +68,7 @@ import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { FileInfo } from '@octra/web-media';
 import { ASRQueueItemType } from '../../asr';
+import { TranscriptionBackupEndModalComponent } from '../../../modals/transcription-backup-end/transcription-backup-end-modal.component';
 
 declare const BUILD: {
   version: string;
@@ -458,14 +460,13 @@ export class AnnotationEffects {
       ofType(AnnotationActions.quit.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        this.store.dispatch(ApplicationActions.waitForEffects.do());
-
         if (state.application.mode === LoginMode.ONLINE) {
           if (
             a.freeTask &&
             state.onlineMode.currentSession.currentProject &&
             state.onlineMode.currentSession.task
           ) {
+            this.store.dispatch(ApplicationActions.waitForEffects.do());
             return this.apiService
               .freeTask(
                 state.onlineMode.currentSession.currentProject.id,
@@ -505,20 +506,31 @@ export class AnnotationEffects {
               );
           } else {
             if (a.redirectToProjects) {
+              this.store.dispatch(ApplicationActions.waitForEffects.do());
               return of(AnnotationActions.redirectToProjects.do());
             } else {
-              return this.saveTaskToServer(state, TaskStatus.paused).pipe(
-                map(() => {
-                  return AuthenticationActions.logout.do({
-                    clearSession: a.clearSession,
-                    mode: state.application.mode,
-                  });
-                }),
-                catchError(() => {
-                  return of(
-                    AuthenticationActions.logout.do({
-                      clearSession: a.clearSession,
-                      mode: state.application.mode,
+              return from(
+                this.modalsService.openModal(
+                  TranscriptionBackupEndModalComponent,
+                  TranscriptionBackupEndModalComponent.options
+                )
+              ).pipe(
+                exhaustMap((action) => {
+                  this.store.dispatch(ApplicationActions.waitForEffects.do());
+                  return this.saveTaskToServer(state, TaskStatus.paused).pipe(
+                    map(() => {
+                      return AuthenticationActions.logout.do({
+                        clearSession: a.clearSession,
+                        mode: state.application.mode,
+                      });
+                    }),
+                    catchError(() => {
+                      return of(
+                        AuthenticationActions.logout.do({
+                          clearSession: a.clearSession,
+                          mode: state.application.mode,
+                        })
+                      );
                     })
                   );
                 })
@@ -526,6 +538,7 @@ export class AnnotationEffects {
             }
           }
         } else {
+          this.store.dispatch(ApplicationActions.waitForEffects.do());
           return of(
             AuthenticationActions.logout.do({
               clearSession: a.clearSession,
@@ -1703,23 +1716,6 @@ export class AnnotationEffects {
         ]
       : [];
 
-    console.log('saveTask');
-    console.log({
-      projectID: state.onlineMode.currentSession!.currentProject!.id,
-      taskID: state.onlineMode.currentSession!.task!.id,
-      properties: {
-        assessment: state.onlineMode.currentSession.assessment,
-        comment: state.onlineMode.currentSession.comment,
-        log: state.onlineMode.logging.logs,
-        status,
-      },
-      outputs: outputs.map((a) => ({
-        name: a.name,
-        type: a.type,
-        size: a.size,
-        content: result,
-      })),
-    });
     return this.apiService.saveTask(
       state.onlineMode.currentSession!.currentProject!.id,
       state.onlineMode.currentSession!.task!.id,

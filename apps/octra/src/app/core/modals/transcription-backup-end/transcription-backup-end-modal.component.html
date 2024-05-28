@@ -1,0 +1,25 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-title">
+      {{ "modal.backup-notice.header" | transloco }}
+    </h5>
+  </div>
+  <div class="modal-body" style="font-size: 0.9em;">
+    <p [innerHTML]="'modal.backup-notice.body' | transloco">
+    </p>
+    <div class="text-center">
+      <a class="btn btn-primary" *ngIf="downloadFile" (click)="downloadClicked = true" [download]="downloadFile.name"
+         [href]="downloadFile.url"><i class="bi bi-floppy-fill"></i>
+        {{ "modal.backup-notice.button" | transloco }}
+      </a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button (click)="close('IGNORE')" class="btn btn-danger" type="button">
+      {{ 'g.ignore' | transloco }}
+    </button>
+    <button (click)="close('CONTINUE')" class="btn btn-primary" type="button" [disabled]="!downloadClicked">
+      {{ 'g.continue' | transloco }}
+    </button>
+  </div>
+</div>

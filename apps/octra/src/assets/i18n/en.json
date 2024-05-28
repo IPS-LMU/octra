@@ -123,7 +123,8 @@
     "username": "Username",
     "locale": "Language",
     "timezone": "Timezone",
-    "free quota": "Free Quota"
+    "free quota": "Free Quota",
+    "ignore": "Ignore"
   },
   "p": {
     "username or email": "Username or E-Mail",
@@ -297,6 +298,11 @@
     "feedback-notice": {
       "header": "Feedback needed",
       "body": "To further improve Octra or fix bugs, we need your feedback. You can send us your feedback easy and fast using the feedback feature. You can easily and quickly tell us your opinion by clicking on the question mark in the upper right corner and filling in the form. <b>If there is a technical problem, it is very important to send the feedback including the protocol to us as soon as possible.</b> The protocol helps us to quickly diagnose and troubleshoot problems in a timely manner.<br/><br/>Thank you.<br/><br/><i>The Octra team</i>"
+    },
+    "backup-notice": {
+      "header": "Backup Notice",
+      "body": "Your progress is going to be saved on the server. Due to a known issue, it is recommended that you also download a local backup. This measure is temporarily necessary. Click on 'Download backup' to download the backup file and then on 'Continue'.<br/><br/>You can delete the backup files after the task has been completed.",
+      "button": "Download backup"
     }
   },
   "login": {

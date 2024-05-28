@@ -47,6 +47,7 @@ import { AuthenticationComponent } from '../component/authentication-component/a
 import { AboutModalComponent } from './about-modal/about-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 import { NgxJoditComponent } from 'ngx-jodit';
+import { TranscriptionBackupEndModalComponent } from './transcription-backup-end/transcription-backup-end-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -87,6 +88,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     AuthenticationComponent,
     AboutModalComponent,
     FeedbackNoticeModalComponent,
+    TranscriptionBackupEndModalComponent
   ],
   imports: [
     CommonModule,
@@ -127,6 +129,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ProtectedModalComponent,
     AuthenticationComponent,
     AboutModalComponent,
+    TranscriptionBackupEndModalComponent
   ],
 })
 export class ModalsModule {}

@@ -123,7 +123,8 @@
     "username": "Nutzername",
     "locale": "Sprache",
     "timezone": "Zeitzone",
-    "free quota": "Kostenloses Kontingent"
+    "free quota": "Kostenloses Kontingent",
+    "ignore": "Ignorieren"
   },
   "p": {
     "username or email": "Nutzername oder E-Mail",
@@ -298,6 +299,11 @@
     "feedback-notice": {
       "header": "Feedback gewünscht",
       "body": "Um Octra weiter zu verbessern oder Fehler zu beheben, benötigen wir dein Feedback. Du kannst uns einfach und schnell deine Meinung mitteilen, indem Du auf das Fragezeichen in der rechten oberen Ecke klickst und das Formular ausfüllst. <b>Wenn es ein technisches Problem gibt, ist es sehr wichtig so schnell wie möglich das Feedback einschl. des Protokolls an uns zu senden.</b> Das Protokoll hilft uns bei einer schnellen Diagnose und einer zeitnahen Fehlerbehebung.<br/><br/>Vielen Dank.<br/><br/><i>Das OCTRA Team</i>"
+    },
+    "backup-notice": {
+      "header": "Backup Erinnerung",
+      "body": "Dein Fortschritt wird auf dem Server gespeichert. Wegen eines bekannten Problems wird empfohlen zusätzlich eine lokale Sicherung herunterzuladen. Diese Maßnahme ist vorübergehend notwendig. Klicke auf 'Sicherung herunterladen', um die Sicherungsdatei herunterzuladen und anschließend auf 'Weiter'.<br/><br/>Die Sicherungsdateien kannst Du löschen, nachdem die Aufgabe fertiggestellt wurde.",
+      "button": "Sicherung herunterladen"
     }
   },
   "login": {

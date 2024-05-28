@@ -22,8 +22,8 @@ export class MultiThreadingService {
     }
   }
 
-  public run(job: TsWorkerJob): Promise<any> {
-    return new Promise<void>((resolve, reject) => {
+  public run<T>(job: TsWorkerJob): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
       const bestWorker = this.getBestWorker();
 
       if (bestWorker !== undefined) {

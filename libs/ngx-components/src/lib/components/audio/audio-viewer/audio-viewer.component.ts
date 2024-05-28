@@ -270,10 +270,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
     const annotation = changes['annotation'];
     if (annotation && annotation.currentValue !== undefined) {
+      const t = Date.now();
       const parsedChanges = this.av.getChanges(
         annotation.previousValue,
         annotation.currentValue
       );
+      console.log(`getChanges took ${Date.now()-t}ms, ${parsedChanges.length} changed`);
       if (annotation.previousValue && annotation.currentValue) {
         if (
           annotation.previousValue.selectedLevelIndex !==

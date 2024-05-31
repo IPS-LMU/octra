@@ -60,7 +60,7 @@ export class AudioService {
               url
             ).subscribe({
               next: (result) => {
-                if (result.audioManager) {
+                if (result.audioManager && result.progress === 1) {
                   // finished
                   result.audioManager.resource.info.url = url;
                   this.registerAudioManager(result.audioManager);

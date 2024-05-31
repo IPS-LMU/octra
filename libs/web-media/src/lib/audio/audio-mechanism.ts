@@ -1,4 +1,4 @@
-import { AudioSelection, SampleUnit } from '@octra/media';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { Observable, of, Subject } from 'rxjs';
 import { AudioResource } from '@octra/web-media';
 import { SubscriptionManager } from '@octra/utilities';
@@ -13,23 +13,35 @@ export interface AudioMechanismPrepareOptions {
 }
 
 export abstract class AudioMechanism {
+  get state(): PlayBackStatus {
+    return this._state;
+  }
+
+  get channelDataFactor(): number | undefined {
+    return this._channelDataFactor;
+  }
+
+  get channel(): Float32Array | undefined {
+    return this._channel;
+  }
+
   get resource(): AudioResource | undefined {
     return this._resource;
   }
 
   protected audioSelection?: AudioSelection;
   protected volume?: number;
-  protected _playbackRate = 1;
+  protected _playbackRate = 2;
   protected playOnHover?: boolean;
   protected stepBackward = false;
   protected _gainNode?: GainNode;
-  protected _sampleRate?: number;
   protected _source?: AudioBufferSourceNode | MediaElementAudioSourceNode;
   protected _channel?: Float32Array;
   protected _resource?: AudioResource;
   protected _audioContext?: AudioContext;
-  public missingPermission = new Subject<void>();
+  protected _channelDataFactor?: number;
   protected subscrManager = new SubscriptionManager();
+  protected _state: PlayBackStatus = PlayBackStatus.PREPARE;
 
   get audioContext(): AudioContext | undefined {
     return this._audioContext;
@@ -43,8 +55,12 @@ export abstract class AudioMechanism {
   };
 
   // events
-  public onChannelDataChange = new Subject<void>();
-  public afterDecoded: Subject<AudioResource> = new Subject<AudioResource>();
+  public readonly onChannelDataChange = new Subject<void>();
+  public readonly afterDecoded: Subject<AudioResource> =
+    new Subject<AudioResource>();
+  public readonly statechange: Subject<PlayBackStatus> =
+    new Subject<PlayBackStatus>();
+  public missingPermission = new Subject<void>();
 
   abstract get playPosition(): SampleUnit | undefined;
   abstract set playPosition(value: SampleUnit | undefined);
@@ -76,10 +92,7 @@ export abstract class AudioMechanism {
       window.mozAudioContext ||
       false;
     if (audioContext) {
-      if (this._audioContext === undefined || this._audioContext === null) {
-        // reuse old audiocontext
-        this._audioContext = new audioContext();
-      }
+      this._audioContext = new audioContext();
     }
   }
 
@@ -134,4 +147,14 @@ export abstract class AudioMechanism {
     }
     this.subscrManager.destroy();
   }
+
+  protected changeStatus(newStatus: PlayBackStatus) {
+    this._state = newStatus;
+    this.statechange.next(this._state);
+  }
+
+  /**
+   * stops the decoding process.
+   */
+  public abstract stopDecoding(): void;
 }

@@ -20,9 +20,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private onEnd = () => {};
   private onPlaying = () => {};
   private _playbackEndChecker?: Subscription;
-  private _state!: PlayBackStatus;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
-  public statechange: Subject<PlayBackStatus> = new Subject<PlayBackStatus>();
   private callBacksAfterEnded: (() => void)[] = [];
   private _playPosition!: SampleUnit;
 
@@ -30,13 +28,16 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private decoder?: AudioDecoder;
 
   get playPosition(): SampleUnit | undefined {
-    if (!this._audio || !this._sampleRate) {
+    if (!this._audio || !this._resource?.info?.sampleRate) {
       return undefined;
     }
 
     return new SampleUnit(
-      SampleUnit.calculateSamples(this._audio.currentTime, this._sampleRate),
-      this._sampleRate
+      SampleUnit.calculateSamples(
+        this._audio.currentTime,
+        this._resource.info.sampleRate
+      ),
+      this._resource.info.sampleRate
     );
   }
 
@@ -60,12 +61,10 @@ export class HtmlAudioMechanism extends AudioMechanism {
   override prepare(options: AudioMechanismPrepareOptions): Observable<{
     progress: number;
   }> {
-    console.log('prepare...');
     return concat(
       super.prepare(options),
       this.prepareAudioChannel(options).pipe(
         map(({ decodeProgress }) => {
-          console.log(decodeProgress);
           if (decodeProgress === 1) {
             this.prepareAudioPlayback({
               ...options,
@@ -81,7 +80,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
             });
           }
           return {
-            progress: 0.5 + 0.5 * decodeProgress,
+            progress: decodeProgress,
           };
         })
       )
@@ -109,7 +108,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     type,
     url,
   }: AudioMechanismPrepareOptions) {
-    console.log('prepare audio channel');
+    this._channel = undefined;
     const subj = new Subject<{
       decodeProgress: number;
     }>();
@@ -167,13 +166,11 @@ export class HtmlAudioMechanism extends AudioMechanism {
         this.statistics.decoding.started = Date.now();
         const subscr = this.decodeAudio(this._resource).subscribe(
           (statusItem) => {
-            console.log(`emit ${statusItem.progress}`);
             if (statusItem.progress === 1) {
               this.statistics.decoding.duration =
                 Date.now() - this.statistics.decoding.started;
 
-              this._channel = undefined;
-              this._state = PlayBackStatus.INITIALIZED;
+              this.changeStatus(PlayBackStatus.INITIALIZED);
 
               setTimeout(() => {
                 subj.next({
@@ -204,7 +201,6 @@ export class HtmlAudioMechanism extends AudioMechanism {
   }
 
   override decodeAudio(resource: AudioResource) {
-    console.log('decode audio');
     const result = new Subject<{ progress: number }>();
 
     const format = new WavFormat();
@@ -217,10 +213,10 @@ export class HtmlAudioMechanism extends AudioMechanism {
 
     const subj = this.decoder.onChannelDataCalculate.subscribe({
       next: (status) => {
-        console.log(`on channel data calculate ${status.progress}`);
         if (status.progress === 1 && status.result !== undefined) {
           this.decoder!.destroy();
           this._channel = status.result;
+          this._channelDataFactor = this.decoder!.channelDataFactor;
           this.onChannelDataChange.next();
           this.onChannelDataChange.complete();
 
@@ -316,7 +312,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     }
   }
 
-  private initPlayback() {
+  private initPlayback = () => {
     if (!this._audio) {
       throw new Error(`AudioElement not initialized`);
     }
@@ -327,16 +323,14 @@ export class HtmlAudioMechanism extends AudioMechanism {
       throw new Error(`PlaybackRate not initialized`);
     }
 
-    this._statusRequest = PlayBackStatus.PLAYING;
-    this.changeState(PlayBackStatus.PLAYING);
-    console.log(`play at ${this._audio.currentTime}`);
+    this.changeStatus(PlayBackStatus.PLAYING);
 
     this._playbackEndChecker = timer(
       Math.round(this.audioSelection.duration.unix / this._playbackRate)
     ).subscribe({
       next: this.onEnd,
     });
-  }
+  };
 
   override initalizeSource() {
     if (!this.audioContext) {
@@ -399,22 +393,17 @@ export class HtmlAudioMechanism extends AudioMechanism {
   };
 
   private onPause = () => {
-    this.changeState(PlayBackStatus.PAUSED);
+    this.changeStatus(PlayBackStatus.PAUSED);
   };
 
   private onStop = () => {
-    this.changeState(PlayBackStatus.STOPPED);
+    this.changeStatus(PlayBackStatus.STOPPED);
   };
-
-  private changeState(newstate: PlayBackStatus) {
-    this._state = newstate;
-    this.statechange.next(newstate);
-  }
 
   private onEnded = () => {
     if (this._state === PlayBackStatus.PLAYING) {
       // audio ended normally
-      this.changeState(PlayBackStatus.ENDED);
+      this.changeStatus(PlayBackStatus.ENDED);
     }
 
     this._gainNode?.disconnect();
@@ -456,5 +445,14 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private endPlayBack() {
     this._statusRequest = PlayBackStatus.ENDED;
     this._audio?.pause();
+  }
+
+  /**
+   * stops the decoding process.
+   */
+  public override stopDecoding() {
+    if (this.decoder) {
+      this.decoder.requeststopDecoding();
+    }
   }
 }

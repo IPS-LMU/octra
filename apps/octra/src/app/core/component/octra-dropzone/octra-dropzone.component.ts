@@ -29,14 +29,14 @@ import { OAudiofile } from '@octra/media';
 export class OctraDropzoneComponent extends DefaultComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
   @Input() height = '250px';
-  private _audiomanager?: AudioManager;
+  private _audioManager?: AudioManager;
 
   get AppInfo(): AppInfo {
     return AppInfo;
   }
 
   get audioManager(): AudioManager | undefined {
-    return this._audiomanager;
+    return this._audioManager;
   }
 
   public _files: FileProgress[] = [];
@@ -331,7 +331,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
       this.dropFile(entry);
       if (contains(entry, '.wav') || contains(entry, '.ogg')) {
         this._oaudiofile = undefined;
-        AudioManager.stopDecoding();
+        this._audioManager?.stopDecoding();
         this.resetFormatFileProgresses();
       } else {
         this._oannotation = undefined;
@@ -419,24 +419,24 @@ export class OctraDropzoneComponent extends DefaultComponent {
         ),
         {
           next: (result) => {
-            fileProcess.progress = result.progress;
-            if (result.audioManager === undefined) {
-              // not finished
-            } else {
+            fileProcess.progress = 0.5 + 0.5 * result.progress;
+            this._audioManager = result.audioManager;
+
+            if (result.audioManager && result.progress === 1) {
               // finished, get result
-              if (!(this._audiomanager === undefined)) {
-                this._audiomanager.destroy();
-                this._audiomanager = undefined;
+              if (!(this._audioManager === undefined)) {
+                this._audioManager.destroy();
+                this._audioManager = undefined;
               }
 
-              this._audiomanager = result.audioManager;
+              this._audioManager = result.audioManager;
               fileProcess.status = 'valid';
               this._oaudiofile = new OAudiofile();
               this._oaudiofile.name = fileProcess.file.name;
               this._oaudiofile.size = fileProcess.file.size;
               this._oaudiofile.duration =
-                this._audiomanager.resource.info.duration.samples;
-              this._oaudiofile.sampleRate = this._audiomanager.sampleRate;
+                this._audioManager.resource.info.duration.samples;
+              this._oaudiofile.sampleRate = this._audioManager.sampleRate;
               this._oaudiofile.arraybuffer = buffer;
 
               this.checkState();

@@ -19,8 +19,6 @@ xhr.onloadend = () => {
     new WavFormat()
   ]).subscribe({
     next: async (event) => {
-      console.log(`PROGRESS ${event.decodeProgress}`);
-
       if (event.decodeProgress === 1) {
         const audioManager = event.audioManager;
 
@@ -31,7 +29,6 @@ xhr.onloadend = () => {
 
         // starts the audio playback (user needs to interact with the website before)
         await audioManager.startPlayback(selection, 1, 1);
-        console.log("Finished playback!");
 
         audioManager.destroy();
       }

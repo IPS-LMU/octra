@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { AppInfo } from '../../../app.info';
 import { SubscriptionManager } from '@octra/utilities';
 import { downloadFile } from '@octra/ngx-utilities';
 import { Subject, Subscription } from 'rxjs';
@@ -54,27 +53,23 @@ export class AudioService {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {
           this.subscrmanager.add(
-            AudioManager.decodeAudio(
+            AudioManager.create(
               audioInput.filename,
               audioInput.type,
               event.result,
-              AppInfo.audioformats,
               url
             ).subscribe({
-              next: (result: any) => {
-                if (
-                  result.audioManager !== undefined &&
-                  result.audioManager !== null
-                ) {
+              next: (result) => {
+                if (result.audioManager) {
                   // finished
                   result.audioManager.resource.info.url = url;
                   this.registerAudioManager(result.audioManager);
                   this.afterloaded.emit({ status: 'success' });
 
-                  subj.next(1);
+                  subj.next(result.progress);
                   subj.complete();
                 } else {
-                  subj.next(0.5 + 0.5 * result.decodeProgress);
+                  subj.next(result.progress);
                 }
               },
               error: (error: any) => {
@@ -102,7 +97,7 @@ export class AudioService {
         this._audiomanagers.push(manager);
 
         this.subscrmanager.add(
-          manager.missingPermission.subscribe(() => {
+          manager.audioMechanism!.missingPermission.subscribe(() => {
             this.missingPermission.emit();
             this.missingPermission.complete();
           })
@@ -111,9 +106,9 @@ export class AudioService {
     }
   }
 
-  public destroy(disconnect: boolean = true) {
-    for (const audiomanager of this._audiomanagers) {
-      audiomanager.destroy(disconnect);
+  public async destroy(disconnect = true) {
+    for (const audioManager of this._audiomanagers) {
+      await audioManager.destroy(disconnect);
     }
     this._audiomanagers = [];
     this.subscrmanager.destroy();

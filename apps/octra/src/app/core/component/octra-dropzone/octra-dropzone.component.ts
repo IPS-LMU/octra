@@ -412,15 +412,14 @@ export class OctraDropzoneComponent extends DefaultComponent {
     this.subscribe(timer(200), () => {
       // check audio
       this.subscribe(
-        AudioManager.decodeAudio(
+        AudioManager.create(
           fileProcess.file.name,
           fileProcess.file.type,
-          buffer,
-          AppInfo.audioformats
+          buffer
         ),
         {
           next: (result) => {
-            fileProcess.progress = result.decodeProgress / 2 + 0.5;
+            fileProcess.progress = result.progress;
             if (result.audioManager === undefined) {
               // not finished
             } else {

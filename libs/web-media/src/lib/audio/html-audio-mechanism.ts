@@ -1,0 +1,460 @@
+import {
+  AudioMechanism,
+  AudioMechanismPrepareOptions,
+} from './audio-mechanism';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
+import {
+  AudioDecoder,
+  AudioFormat,
+  AudioInfo,
+  AudioManager,
+  AudioResource,
+  getAudioInfo,
+  WavFormat,
+} from '@octra/web-media';
+import { SourceType } from '../types';
+
+export class HtmlAudioMechanism extends AudioMechanism {
+  private _audio?: HTMLAudioElement;
+  private onEnd = () => {};
+  private onPlaying = () => {};
+  private _playbackEndChecker?: Subscription;
+  private _state!: PlayBackStatus;
+  private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
+  public statechange: Subject<PlayBackStatus> = new Subject<PlayBackStatus>();
+  private callBacksAfterEnded: (() => void)[] = [];
+  private _playPosition!: SampleUnit;
+
+  private audioFormats: AudioFormat[] = [new WavFormat()];
+  private decoder?: AudioDecoder;
+
+  get playPosition(): SampleUnit | undefined {
+    if (!this._audio || !this._sampleRate) {
+      return undefined;
+    }
+
+    return new SampleUnit(
+      SampleUnit.calculateSamples(this._audio.currentTime, this._sampleRate),
+      this._sampleRate
+    );
+  }
+
+  set playPosition(value: SampleUnit) {
+    if (this._audio) {
+      this._audio.currentTime = value.seconds;
+      this._playPosition = value.clone();
+    }
+  }
+
+  set playBackRate(value: number) {
+    if (value > 0) {
+      this._playbackRate = value;
+    }
+  }
+
+  get playBackRate(): number {
+    return this._playbackRate;
+  }
+
+  override prepare(options: AudioMechanismPrepareOptions): Observable<{
+    progress: number;
+  }> {
+    console.log('prepare...');
+    return concat(
+      super.prepare(options),
+      this.prepareAudioChannel(options).pipe(
+        map(({ decodeProgress }) => {
+          console.log(decodeProgress);
+          if (decodeProgress === 1) {
+            this.prepareAudioPlayback({
+              ...options,
+              url: URL.createObjectURL(
+                new File(
+                  [this._resource!.arraybuffer!],
+                  this._resource!.info.fullname,
+                  {
+                    type: this._resource!.info.type,
+                  }
+                )
+              ),
+            });
+          }
+          return {
+            progress: 0.5 + 0.5 * decodeProgress,
+          };
+        })
+      )
+    );
+  }
+
+  private prepareAudioPlayback({ url }: AudioMechanismPrepareOptions) {
+    if (!url) {
+      throw new Error(`HTMLAudioMechanism needs an url to the audio file`);
+    }
+
+    this._audio = new Audio();
+    this._audio.autoplay = false;
+    this._audio.defaultPlaybackRate = 1;
+    this._audio.defaultMuted = false;
+    this._audio.loop = false;
+    this._audio.src = url;
+
+    this.initAudioContext();
+  }
+
+  private prepareAudioChannel({
+    filename,
+    buffer,
+    type,
+    url,
+  }: AudioMechanismPrepareOptions) {
+    console.log('prepare audio channel');
+    const subj = new Subject<{
+      decodeProgress: number;
+    }>();
+
+    const audioformat: AudioFormat | undefined = AudioManager.getFileFormat(
+      filename.substring(filename.lastIndexOf('.')),
+      this.audioFormats
+    );
+
+    if (!audioformat) {
+      subj.error(
+        `audio format not supported: ${filename.substring(
+          filename.lastIndexOf('.')
+        )} from ${filename}`
+      );
+    } else if (!buffer) {
+      subj.error(`buffer is undefined`);
+    } else {
+      audioformat.init(filename, buffer);
+
+      try {
+        let audioInfo = getAudioInfo(audioformat, filename, type, buffer);
+
+        const bufferLength = buffer.byteLength;
+        // decode first 10 seconds
+        const sampleDur = new SampleUnit(
+          Math.min(audioformat.sampleRate * 30, audioformat.duration),
+          audioformat.sampleRate
+        );
+
+        audioInfo = new AudioInfo(
+          filename,
+          type,
+          bufferLength,
+          audioformat.sampleRate,
+          (audioformat.sampleRate * audioformat.duration) /
+            audioformat.sampleRate,
+          audioformat.channels,
+          audioInfo.bitrate
+        );
+        audioInfo.file = new File([buffer], filename, { type: 'audio/wav' });
+
+        this._playPosition = new SampleUnit(0, audioInfo.sampleRate);
+        this._resource = new AudioResource(
+          filename,
+          SourceType.ArrayBuffer,
+          audioInfo,
+          buffer,
+          bufferLength,
+          url
+        );
+
+        // this.afterDecoded.next(this._resource); // TODO don't return resource
+
+        this.statistics.decoding.started = Date.now();
+        const subscr = this.decodeAudio(this._resource).subscribe(
+          (statusItem) => {
+            console.log(`emit ${statusItem.progress}`);
+            if (statusItem.progress === 1) {
+              this.statistics.decoding.duration =
+                Date.now() - this.statistics.decoding.started;
+
+              this._channel = undefined;
+              this._state = PlayBackStatus.INITIALIZED;
+
+              setTimeout(() => {
+                subj.next({
+                  decodeProgress: 1,
+                });
+                subj.complete();
+              }, 0);
+            } else {
+              subj.next({
+                decodeProgress: statusItem.progress,
+              });
+            }
+          },
+          (error) => {
+            console.error(error);
+            subscr.unsubscribe();
+          },
+          () => {
+            subscr.unsubscribe();
+          }
+        );
+      } catch (err: any) {
+        subj.error(err!.message);
+      }
+    }
+
+    return subj;
+  }
+
+  override decodeAudio(resource: AudioResource) {
+    console.log('decode audio');
+    const result = new Subject<{ progress: number }>();
+
+    const format = new WavFormat();
+    format.init(resource.info.name, resource.arraybuffer!);
+    this.decoder = new AudioDecoder(
+      format,
+      resource.info,
+      resource.arraybuffer!
+    );
+
+    const subj = this.decoder.onChannelDataCalculate.subscribe({
+      next: (status) => {
+        console.log(`on channel data calculate ${status.progress}`);
+        if (status.progress === 1 && status.result !== undefined) {
+          this.decoder!.destroy();
+          this._channel = status.result;
+          this.onChannelDataChange.next();
+          this.onChannelDataChange.complete();
+
+          subj.unsubscribe();
+        }
+
+        result.next({ progress: status.progress });
+        if (status.progress === 1 && status.result !== undefined) {
+          result.complete();
+        }
+      },
+      error: (error) => {
+        this.onChannelDataChange.error(error);
+        result.error(error);
+      },
+    });
+
+    this.decoder.started = Date.now();
+    this.decoder
+      .getChunkedChannelData(
+        new SampleUnit(0, resource.info.sampleRate),
+        new SampleUnit(
+          Math.min(
+            resource.info.sampleRate * 60, // chunk of 1 minute
+            resource.info.duration.samples
+          ),
+          resource.info.sampleRate
+        )
+      )
+      .catch((error) => {
+        console.error(error);
+      });
+
+    return result;
+  }
+
+  override async play(
+    audioSelection: AudioSelection,
+    volume: number,
+    playbackRate: number,
+    playOnHover: boolean,
+    onPlaying: () => void,
+    onEnd: () => void,
+    onError: () => void
+  ) {
+    this.onEnd = () => {
+      this.endPlayBack();
+      onEnd();
+    };
+    await super.play(
+      audioSelection,
+      volume,
+      playbackRate,
+      playOnHover,
+      onPlaying,
+      onEnd,
+      onError
+    );
+
+    if (!this._audio) {
+      throw new Error(`AudioElement not initialized`);
+    }
+
+    if (!this.audioContext) {
+      throw new Error('AudioContext not initialized');
+    }
+
+    this._audio.removeEventListener('canplay', this.initPlayback);
+    this._audio.addEventListener('canplay', this.initPlayback);
+
+    await this.audioContext.resume();
+    this.afterAudioContextResumed();
+    this._audio.onerror = onError;
+
+    this.playPosition = audioSelection.start!.clone();
+    const playPromise = this._audio.play();
+
+    if (playPromise !== undefined) {
+      try {
+        await playPromise;
+      } catch (error: any) {
+        this._playbackEndChecker?.unsubscribe();
+        if (!this.playOnHover) {
+          if (error.name && error.name === 'NotAllowedError') {
+            // no permission
+            this.missingPermission.next();
+          }
+
+          this.statechange.error(new Error(error));
+          throw new Error(error);
+        }
+      }
+    }
+  }
+
+  private initPlayback() {
+    if (!this._audio) {
+      throw new Error(`AudioElement not initialized`);
+    }
+    if (!this.audioSelection) {
+      throw new Error(`AudioSelection not initialized`);
+    }
+    if (!this._playbackRate) {
+      throw new Error(`PlaybackRate not initialized`);
+    }
+
+    this._statusRequest = PlayBackStatus.PLAYING;
+    this.changeState(PlayBackStatus.PLAYING);
+    console.log(`play at ${this._audio.currentTime}`);
+
+    this._playbackEndChecker = timer(
+      Math.round(this.audioSelection.duration.unix / this._playbackRate)
+    ).subscribe({
+      next: this.onEnd,
+    });
+  }
+
+  override initalizeSource() {
+    if (!this.audioContext) {
+      throw new Error('AudioContext not initialized');
+    }
+    if (!this._audio) {
+      throw new Error(`AudioElement not initialized`);
+    }
+
+    this._source = this.audioContext.createMediaElementSource(this._audio);
+  }
+
+  override afterAudioContextResumed() {
+    super.afterAudioContextResumed();
+
+    // Firefox issue causes playBackRate working only for volume up to 1
+    // create a gain node
+    this._gainNode!.gain.value = this.volume!;
+    this._source!.connect(this._gainNode!);
+    // connect the gain node to an output destination
+    this._gainNode!.connect(this.audioContext!.destination);
+    this._audio!.playbackRate = this._playbackRate!;
+
+    this._audio!.addEventListener('pause', this.onPlayBackChanged);
+    this._audio!.addEventListener('ended', this.onPlayBackChanged);
+    this._audio!.addEventListener('error', this.onPlaybackFailed);
+  }
+
+  private removeEventListeners() {
+    this._audio?.removeEventListener('ended', this.onPlayBackChanged);
+    this._audio?.removeEventListener('pause', this.onPlayBackChanged);
+    this._audio?.removeEventListener('error', this.onPlaybackFailed);
+    this._gainNode?.disconnect();
+    this._source?.disconnect();
+    this._playbackEndChecker?.unsubscribe();
+  }
+
+  private onPlayBackChanged = () => {
+    switch (this._statusRequest) {
+      case PlayBackStatus.PAUSED:
+        this.onPause();
+        break;
+      case PlayBackStatus.STOPPED:
+        this.onStop();
+        break;
+      default:
+        this.onEnded();
+        break;
+    }
+    this.removeEventListeners();
+
+    for (const callback of this.callBacksAfterEnded) {
+      callback();
+    }
+    this.callBacksAfterEnded = [];
+  };
+
+  private onPlaybackFailed = (error: any) => {
+    console.error(error);
+  };
+
+  private onPause = () => {
+    this.changeState(PlayBackStatus.PAUSED);
+  };
+
+  private onStop = () => {
+    this.changeState(PlayBackStatus.STOPPED);
+  };
+
+  private changeState(newstate: PlayBackStatus) {
+    this._state = newstate;
+    this.statechange.next(newstate);
+  }
+
+  private onEnded = () => {
+    if (this._state === PlayBackStatus.PLAYING) {
+      // audio ended normally
+      this.changeState(PlayBackStatus.ENDED);
+    }
+
+    this._gainNode?.disconnect();
+  };
+
+  override stop(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!this._audio) {
+        reject(new Error('Missing Audio instance.'));
+        return;
+      }
+      if (this._state === 'PLAYING') {
+        this._statusRequest = PlayBackStatus.STOPPED;
+        this.callBacksAfterEnded.push(() => {
+          resolve();
+        });
+        this._audio.pause();
+      } else {
+        // ignore
+        resolve();
+      }
+    });
+  }
+
+  override pause(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this._state === 'PLAYING') {
+        this._statusRequest = PlayBackStatus.PAUSED;
+        this.callBacksAfterEnded.push(() => {
+          resolve();
+        });
+        this._audio?.pause();
+      } else {
+        reject('cant pause because not playing');
+      }
+    });
+  }
+
+  private endPlayBack() {
+    this._statusRequest = PlayBackStatus.ENDED;
+    this._audio?.pause();
+  }
+}

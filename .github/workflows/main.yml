@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies (if the cached directory was not found)
         if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Create the docs directory locally in CI
         run: npx typedoc && node runner.js prepare:docs

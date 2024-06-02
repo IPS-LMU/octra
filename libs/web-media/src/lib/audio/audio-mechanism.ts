@@ -120,7 +120,7 @@ export abstract class AudioMechanism {
     }
   }
 
-  public abstract initalizeSource(): void;
+  public abstract initializeSource(): void;
 
   protected afterAudioContextResumed() {
     if (!this.audioContext) {
@@ -133,7 +133,7 @@ export abstract class AudioMechanism {
 
     // create an audio context and hook up the video element as the source
     if (this._source === undefined) {
-      this.initalizeSource();
+      this.initializeSource();
     }
   }
 

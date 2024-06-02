@@ -18,11 +18,9 @@ import { SourceType } from '../types';
 export class HtmlAudioMechanism extends AudioMechanism {
   private _audio?: HTMLAudioElement;
   private onEnd = () => {};
-  private onPlaying = () => {};
   private _playbackEndChecker?: Subscription;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
   private callBacksAfterEnded: (() => void)[] = [];
-  private _playPosition!: SampleUnit;
 
   private audioFormats: AudioFormat[] = [new WavFormat()];
   private decoder?: AudioDecoder;
@@ -44,7 +42,6 @@ export class HtmlAudioMechanism extends AudioMechanism {
   set playPosition(value: SampleUnit) {
     if (this._audio) {
       this._audio.currentTime = value.seconds;
-      this._playPosition = value.clone();
     }
   }
 
@@ -151,7 +148,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
         );
         audioInfo.file = new File([buffer], filename, { type: 'audio/wav' });
 
-        this._playPosition = new SampleUnit(0, audioInfo.sampleRate);
+        this.playPosition = new SampleUnit(0, audioInfo.sampleRate);
         this._resource = new AudioResource(
           filename,
           SourceType.ArrayBuffer,
@@ -161,11 +158,11 @@ export class HtmlAudioMechanism extends AudioMechanism {
           url
         );
 
-        // this.afterDecoded.next(this._resource); // TODO don't return resource
+        this.afterDecoded.next(this._resource);
 
         this.statistics.decoding.started = Date.now();
-        const subscr = this.decodeAudio(this._resource).subscribe(
-          (statusItem) => {
+        const subscr = this.decodeAudio(this._resource).subscribe({
+          next: (statusItem) => {
             if (statusItem.progress === 1) {
               this.statistics.decoding.duration =
                 Date.now() - this.statistics.decoding.started;
@@ -184,14 +181,14 @@ export class HtmlAudioMechanism extends AudioMechanism {
               });
             }
           },
-          (error) => {
+          error: (error) => {
             console.error(error);
             subscr.unsubscribe();
           },
-          () => {
+          complete: () => {
             subscr.unsubscribe();
-          }
-        );
+          },
+        });
       } catch (err: any) {
         subj.error(err!.message);
       }
@@ -332,7 +329,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     });
   };
 
-  override initalizeSource() {
+  override initializeSource() {
     if (!this.audioContext) {
       throw new Error('AudioContext not initialized');
     }

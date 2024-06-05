@@ -281,8 +281,10 @@ export class HtmlAudioMechanism extends AudioMechanism {
       throw new Error('AudioContext not initialized');
     }
 
-    this._audio.removeEventListener('canplay', this.initPlayback);
     this._audio.addEventListener('canplay', this.initPlayback);
+    this._audio!.addEventListener('pause', this.onPlayBackChanged);
+    this._audio!.addEventListener('ended', this.onPlayBackChanged);
+    this._audio!.addEventListener('error', this.onPlaybackFailed);
 
     await this.audioContext.resume();
     this.afterAudioContextResumed();
@@ -350,22 +352,20 @@ export class HtmlAudioMechanism extends AudioMechanism {
     // connect the gain node to an output destination
     this._gainNode!.connect(this.audioContext!.destination);
     this._audio!.playbackRate = this._playbackRate!;
-
-    this._audio!.addEventListener('pause', this.onPlayBackChanged);
-    this._audio!.addEventListener('ended', this.onPlayBackChanged);
-    this._audio!.addEventListener('error', this.onPlaybackFailed);
   }
 
   private removeEventListeners() {
     this._audio?.removeEventListener('ended', this.onPlayBackChanged);
     this._audio?.removeEventListener('pause', this.onPlayBackChanged);
     this._audio?.removeEventListener('error', this.onPlaybackFailed);
+    this._audio?.removeEventListener('canplay', this.initPlayback);
     this._gainNode?.disconnect();
     this._source?.disconnect();
     this._playbackEndChecker?.unsubscribe();
   }
 
   private onPlayBackChanged = () => {
+    this.removeEventListeners();
     switch (this._statusRequest) {
       case PlayBackStatus.PAUSED:
         this.onPause();
@@ -377,10 +377,9 @@ export class HtmlAudioMechanism extends AudioMechanism {
         this.onEnded();
         break;
     }
-    this.removeEventListeners();
 
-    for (const callback of this.callBacksAfterEnded) {
-      callback();
+    for (const callBacksAfterEndedElement of this.callBacksAfterEnded) {
+      callBacksAfterEndedElement();
     }
     this.callBacksAfterEnded = [];
   };

@@ -389,9 +389,7 @@ export class TranscrWindowComponent
           ] as OctraAnnotationSegment;
 
           if (!segment?.context?.asr?.isBlockedBy) {
-            this.audiochunk.startPlayback().catch((error) => {
-              console.error(error);
-            });
+            await this.audiochunk.startPlayback();
           }
         } catch (e) {
           // ignore

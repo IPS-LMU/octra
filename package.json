@@ -34,7 +34,7 @@
     "publish:lib:utilities": "node runner.js build:lib utilities && nx npm utilities",
     "release:lib:web-media": "node runner.js build:lib web-media && nx run web-media:version --push",
     "publish:lib:web-media": "node runner.js build:lib web-media && nx npm web-media",
-    "analyze:octra": "nx build --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
+    "analyze:octra": "nx build octra --configuration production --stats-json && webpack-bundle-analyzer dist/apps/octra/stats.json",
     "lint": "nx workspace-lint && ng lint",
     "affected:apps": "nx affected:apps",
     "affected:libs": "nx affected:libs",
@@ -108,8 +108,7 @@
     "ssh2": "^1.11.0",
     "tslib": "^2.3.0",
     "video.js": "^8.12.0",
-    "x2js": "^3.4.4",
-    "zone.js": "0.14.3"
+    "x2js": "^3.4.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "18.0.3",

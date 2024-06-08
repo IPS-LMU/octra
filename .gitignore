@@ -51,3 +51,4 @@ future_features.txt
 deploy
 
 .nx/cache
+.nx/workspace-data

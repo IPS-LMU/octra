@@ -1,5 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AudioplayerComponent } from './components/audio/audioplayer';
@@ -8,13 +11,13 @@ import { AudioViewerComponent } from './components/audio/audio-viewer';
 
 @NgModule({
   declarations: [AudioplayerComponent, AudioViewerComponent],
+  exports: [AudioplayerComponent, AudioViewerComponent],
   imports: [
     CommonModule,
     FormsModule,
-    HttpClientModule,
     ReactiveFormsModule,
     OctraUtilitiesModule,
   ],
-  exports: [AudioplayerComponent, AudioViewerComponent],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class OctraComponentsModule {}

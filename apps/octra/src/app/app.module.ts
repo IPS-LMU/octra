@@ -1,5 +1,8 @@
 // angular
-import { HttpClientModule } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -60,11 +63,12 @@ import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [AppComponent, NavigationComponent],
+  bootstrap: [AppComponent],
+  exports: [],
   imports: [
     BrowserModule,
     AppSharedModule,
     FormsModule,
-    HttpClientModule,
     NgxWebstorageModule.forRoot({
       separator: '.',
       prefix: 'custom',
@@ -118,7 +122,6 @@ import { RouterModule } from '@angular/router';
     OctraComponentsModule,
     OctraUtilitiesModule,
   ],
-  bootstrap: [AppComponent],
   providers: [
     ALoginGuard,
     AudioService,
@@ -133,7 +136,7 @@ import { RouterModule } from '@angular/router';
     BugReportService,
     CompatibilityService,
     MultiThreadingService,
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  exports: [],
 })
 export class AppModule {}

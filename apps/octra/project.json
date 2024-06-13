@@ -13,6 +13,7 @@
         "outputPath": "dist/apps/octra",
         "index": "apps/octra/src/index.html",
         "main": "apps/octra/src/main.ts",
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/octra/tsconfig.app.json",
         "allowedCommonJsDependencies": [
           "jodit-angular",

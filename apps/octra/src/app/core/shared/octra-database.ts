@@ -497,6 +497,10 @@ export interface IIDBApplicationOptions {
   playOnHover?: boolean | null;
   followPlayCursor?: boolean | null;
   showFeedbackNotice?: boolean | null;
+  userProfile?: {
+    name: string;
+    email: string;
+  } | null;
 }
 
 export type IDBApplicationOptionName =
@@ -510,6 +514,7 @@ export type IDBApplicationOptionName =
   | 'secondsPerLine'
   | 'showLoupe'
   | 'useMode'
+  | 'userProfile'
   | 'version'
   | 'editorFont'
   | 'playOnHover'

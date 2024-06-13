@@ -220,4 +220,17 @@ export class ApplicationActions {
       }
   });
 
+  static setShortcutsEnabled = createActionGroup({
+      source: 'app/set shortcuts enabled',
+      events: {
+        do: props<{
+          shortcutsEnabled: boolean;
+        }>(),
+        success: emptyProps(),
+        fail: props<{
+          error: string;
+        }>(),
+      }
+  });
+
 }

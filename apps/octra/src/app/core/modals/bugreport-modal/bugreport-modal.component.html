@@ -33,7 +33,7 @@
     </div>
 
     <form>
-      <div class="row" *ngIf="(authStoreService.me$ | async) === undefined">
+      <div class="row" *ngIf="appStorage.useMode !== 'online' || !appStorage.loggedIn">
         <div class="col-6">
           <div class="form-floating mb-3">
             <input
@@ -43,7 +43,7 @@
               name="name"
               aria-describedby="name"
               [placeholder]="'g.name' | transloco"
-              [(ngModel)]="profile.username"
+              [(ngModel)]="profileName"
             />
             <label for="inputName" class="form-label">{{
                 'g.name' | transloco
@@ -58,7 +58,7 @@
               id="inputEmail"
               name="email"
               aria-describedby="email"
-              [(ngModel)]="profile.email"
+              [(ngModel)]="profileEmail"
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{
@@ -74,6 +74,7 @@
             <ngx-jodit
               [(ngModel)]="bgdescr"
               [options]="joditOptions"
+              #editor
               class="w-100"
               style="display: flex !important; flex-direction: column; flex: auto; height: 100% !important;"
               aria-describedby="bgDescr"

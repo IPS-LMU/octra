@@ -3,10 +3,7 @@ import {
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
-import {
-  NgModule,
-  provideExperimentalZonelessChangeDetection,
-} from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -140,7 +137,6 @@ import { RouterModule } from '@angular/router';
     CompatibilityService,
     MultiThreadingService,
     provideHttpClient(withInterceptorsFromDi()),
-    provideExperimentalZonelessChangeDetection(),
   ],
 })
 export class AppModule {}

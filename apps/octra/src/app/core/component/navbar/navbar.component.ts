@@ -37,6 +37,7 @@ import { AuthenticationStoreService } from '../../store/authentication';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
 import { DateTime } from 'luxon';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
 
 declare const BUILD: {
   version: string;
@@ -129,6 +130,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
 
   constructor(
     public appStorage: AppStorageService,
+    private appStoreService: ApplicationStoreService,
     public navbarServ: NavbarService,
     public sanitizer: DomSanitizer,
     public langService: TranslocoService,
@@ -188,12 +190,18 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   public openBugReport() {
+    this.appStorage.disableUndoRedo();
+    this.appStoreService.setShortcutsEnabled(false);
     this.modalService
       .openModal(BugreportModalComponent, BugreportModalComponent.options)
       .then(() => {
+        this.appStorage.enableUndoRedo();
+        this.appStoreService.setShortcutsEnabled(true);
         window.location.hash = '';
       })
       .catch((err) => {
+        this.appStorage.enableUndoRedo();
+        this.appStoreService.setShortcutsEnabled(true);
         console.error(err);
       });
   }

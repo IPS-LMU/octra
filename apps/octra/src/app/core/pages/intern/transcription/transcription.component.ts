@@ -456,8 +456,13 @@ export class TranscriptionComponent
               (this._currentEditor.instance as any).name
             }`
           );
-          (this._currentEditor.instance as OCTRAEditor).shortcutsEnabled =
-            shortcutsEnabled;
+          if (shortcutsEnabled) {
+            (this._currentEditor.instance as OCTRAEditor).enableAllShortcuts();
+            this.shortcutService.enableAll();
+          } else {
+            (this._currentEditor.instance as OCTRAEditor).disableAllShortcuts();
+            this.shortcutService.disableAll();
+          }
         }
       },
     });

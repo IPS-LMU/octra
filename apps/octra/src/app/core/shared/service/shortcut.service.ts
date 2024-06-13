@@ -9,12 +9,14 @@ export class ShortcutService {
   get generalShortcuts(): ShortcutGroup[] {
     return this._generalShortcuts;
   }
+
   get groups(): ShortcutGroup[] {
     return this._groups;
   }
 
   private _groups: ShortcutGroup[] = [];
   private _generalShortcuts: ShortcutGroup[] = [];
+  private previouslyEnabled: string[] = [];
 
   constructor() {}
 
@@ -91,6 +93,22 @@ export class ShortcutService {
       }
       return a;
     });
+  }
+
+  disableAll() {
+    this.previouslyEnabled = this._groups
+      .filter((a) => a.enabled)
+      .map((a) => a.name);
+    this._groups.forEach((group) => {
+      group.enabled = false;
+    });
+  }
+
+  enableAll() {
+    this._groups.forEach((group) => {
+      group.enabled = this.previouslyEnabled.includes(group.name);
+    });
+    this.previouslyEnabled = [];
   }
 
   public enableGroup(groupName: string) {

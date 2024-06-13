@@ -77,6 +77,7 @@ export class IDBEffects {
                   'playOnHover',
                   'followPlayCursor',
                   'showFeedbackNotice',
+                  'userProfile',
                   'asr',
                 ]),
                 this.idbService.loadModeOptions(LoginMode.LOCAL),

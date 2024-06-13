@@ -7,5 +7,5 @@ import '@angular/localize/init';
 import 'jodit/esm/plugins/justify/justify.js';
 
 platformBrowserDynamic()
-  .bootstrapModule(AppModule, {ngZone: 'noop'})
+  .bootstrapModule(AppModule)
   .catch((err) => console.error(err));

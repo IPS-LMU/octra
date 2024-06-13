@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { UserActions } from './user.actions';
 import { UserState } from './index';
+import { IDBActions } from '../idb/idb.actions';
 
 export const initialState: UserState = {
   name: '',
@@ -14,5 +15,12 @@ export const reducer = createReducer(
       ...state,
       ...user,
     };
-  })
+  }),
+  on(
+    IDBActions.loadOptions.success,
+    (state: UserState, { applicationOptions }) => ({
+      ...state,
+      ...(applicationOptions.userProfile ?? {}),
+    })
+  )
 );

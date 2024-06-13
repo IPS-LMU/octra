@@ -40,10 +40,7 @@ export const reducer = createReducer(
   initialState,
   on(
     ApplicationActions.initApplication.setSessionStorageOptions,
-    (
-      state: ApplicationState,
-      {reloaded, loggedIn }
-    ) => ({
+    (state: ApplicationState, { reloaded, loggedIn }) => ({
       ...state,
       reloaded,
       loggedIn,
@@ -58,6 +55,13 @@ export const reducer = createReducer(
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: false,
+    })
+  ),
+  on(
+    ApplicationActions.setShortcutsEnabled.do,
+    (state: ApplicationState, { shortcutsEnabled }) => ({
+      ...state,
+      shortcutsEnabled,
     })
   ),
   on(

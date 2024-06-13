@@ -20,7 +20,7 @@ export interface OctraEditorRequirements {
 }
 
 export abstract class OCTRAEditor extends DefaultComponent {
-  public shortcutsEnabled = true;
+  protected shortcutsEnabled = true;
 
   protected doPlayOnHover(
     audioManager: AudioManager,
@@ -44,6 +44,9 @@ export abstract class OCTRAEditor extends DefaultComponent {
       });
     }
   }
+
+  abstract enableAllShortcuts():void;
+  abstract disableAllShortcuts():void;
 
   protected changeArea(
     loupe: AudioViewerComponent,

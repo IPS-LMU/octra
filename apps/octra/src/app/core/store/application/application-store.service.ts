@@ -54,6 +54,14 @@ export class ApplicationStoreService {
     this.subscrManager.destroy();
   }
 
+  setShortcutsEnabled(shortcutsEnabled: boolean) {
+    this.store.dispatch(
+      ApplicationActions.setShortcutsEnabled.do({
+        shortcutsEnabled,
+      })
+    );
+  }
+
   changeApplicationOption(
     name: IDBApplicationOptionName,
     value: boolean | number | string

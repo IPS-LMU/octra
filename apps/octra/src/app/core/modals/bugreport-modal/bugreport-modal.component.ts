@@ -1,18 +1,39 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { timer } from 'rxjs';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
 import { OctraModal } from '../types';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticationStoreService } from '../../store/authentication';
-import { JoditConfig } from 'ngx-jodit';
+import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
+import { RootState } from '../../store';
+import { Store } from '@ngrx/store';
+import { UserActions } from '../../store/user/user.actions';
 
 @Component({
   selector: 'octra-bugreport-modal',
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.scss'],
 })
-export class BugreportModalComponent extends OctraModal implements OnInit {
+export class BugreportModalComponent
+  extends OctraModal
+  implements OnInit, AfterViewInit
+{
+  get profileEmail(): string {
+    return this._profileEmail;
+  }
+
+  get profileName(): string {
+    return this._profileName;
+  }
+
+  @ViewChild('editor') editor?: NgxJoditComponent;
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: false,
@@ -40,24 +61,58 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
   public bugsent = false;
   public sendStatus: 'pending' | 'success' | 'error' | 'sending' = 'pending';
   public screenshots: {
-    blob: File;
+    blob: Blob;
     previewURL: string;
   }[] = [];
   protected data = undefined;
 
-  profile = {
+  _profile = {
     email: '',
-    username: '',
+    name: '',
   };
+  private _profileEmail = '';
+  private _profileName = '';
+
+  set profileEmail(value: string) {
+    this._profileEmail = value;
+    this.store.dispatch(
+      UserActions.setUserProfile({
+        email: this._profileEmail,
+        name: this._profileName,
+      })
+    );
+  }
+
+  set profileName(value: string) {
+    this._profileName = value;
+    this.store.dispatch(
+      UserActions.setUserProfile({
+        email: this._profileEmail,
+        name: this._profileName,
+      })
+    );
+  }
 
   public get isvalid(): boolean {
     return this.sendProObj || this.bgdescr !== '';
   }
 
+  ngAfterViewInit() {
+    if (
+      this.appStorage.useMode === 'online' ||
+      (this.profileEmail && this.profileName)
+    ) {
+      setTimeout(() => {
+        this.editor?.jodit?.focus();
+      }, 0);
+    }
+  }
+
   constructor(
-    private appStorage: AppStorageService,
+    public appStorage: AppStorageService,
     public bugService: BugReportService,
     public authStoreService: AuthenticationStoreService,
+    public store: Store<RootState>,
     private cd: ChangeDetectorRef,
     protected override activeModal: NgbActiveModal
   ) {
@@ -65,11 +120,19 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
   }
 
   ngOnInit() {
-    this.profile = {
-      username: this.appStorage.snapshot.authentication.me?.username ?? '',
-      email: this.appStorage.snapshot.authentication.me?.email ?? '',
-    };
-    this.bugService.getPackage();
+    if (this.appStorage.useMode !== 'online') {
+      this._profileName = this.appStorage.snapshot.user.name ?? '';
+      this._profileEmail = this.appStorage.snapshot.user.email ?? '';
+    } else {
+      this._profileName =
+        this.appStorage.snapshot.authentication.me?.username ?? '';
+      this._profileEmail =
+        this.appStorage.snapshot.authentication.me?.email ?? '';
+    }
+
+    setTimeout(() => {
+      this.bugService.getPackage();
+    }, 1000);
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -94,8 +157,8 @@ export class BugreportModalComponent extends OctraModal implements OnInit {
     this.sendStatus = 'sending';
     this.subscribe(
       this.bugService.sendReport(
-        this.profile.username,
-        this.profile.email,
+        this.profileName,
+        this.profileEmail,
         this.bgdescr,
         this.sendProObj,
         this.screenshots

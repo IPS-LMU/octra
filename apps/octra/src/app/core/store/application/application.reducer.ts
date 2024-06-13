@@ -58,6 +58,13 @@ export const reducer = createReducer(
     })
   ),
   on(
+    AuthenticationActions.needReAuthentication.success,
+    (state: ApplicationState) => ({
+      ...state,
+      shortcutsEnabled: true,
+    })
+  ),
+  on(
     ApplicationActions.setShortcutsEnabled.do,
     (state: ApplicationState, { shortcutsEnabled }) => ({
       ...state,

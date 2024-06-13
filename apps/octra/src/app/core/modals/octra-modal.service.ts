@@ -39,15 +39,16 @@ export class OctraModalService {
     const ref = this.modalService.open(modal, {
       ...config,
     }) as NgbModalWrapper<T>;
+    const name = (ref.componentInstance! as any).name;
     this.applyData(ref, data);
     this.onModalAction.emit({
       type: 'open',
-      name: (ref.componentInstance! as any).name,
+      name,
     });
     ref.result.then((result) => {
       this.onModalAction.emit({
         type: 'close',
-        name: (ref.componentInstance! as any).name,
+        name,
         result,
       });
     });

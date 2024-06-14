@@ -42,6 +42,7 @@ import { findElements, getAttr } from '@octra/web-media';
 import X2JS from 'x2js';
 import { isNumber } from '@octra/utilities';
 import { ASRActions } from '../asr/asr.actions';
+import { UserActions } from '../user/user.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -1039,6 +1040,10 @@ export class ApplicationEffects {
         AnnotationActions.setSavingNeeded.do.type,
         AnnotationActions.overwriteTranscript.do.type,
         ASRActions.processQueueItem.do.type,
+        ApplicationActions.loadASRSettings.do.type,
+        ApplicationActions.loadASRSettings.success.type,
+        IDBActions.saveUserProfile.success.type,
+        UserActions.setUserProfile.type,
       ] as string[]
     ).includes(type);
   }

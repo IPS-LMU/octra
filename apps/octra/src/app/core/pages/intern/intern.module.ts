@@ -27,7 +27,7 @@ import { AppSharedModule } from '../../../app.shared.module';
 import { AuthenticationNeededComponent } from '../../alerts/authentication-needed/authentication-needed.component';
 import { InternRoutingModule } from './intern-routing.module';
 import { FormsModule } from '@angular/forms';
-import { TranslocoModule } from '@ngneat/transloco';
+import { TranslocoModule } from '@jsverse/transloco';
 import { StoreModule } from '@ngrx/store';
 import { LoginModeReducers } from '../../store/login-mode';
 import { LoginMode } from '../../store';

@@ -4,7 +4,7 @@ import {
   Translation,
   TranslocoLoader,
   TranslocoModule,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 

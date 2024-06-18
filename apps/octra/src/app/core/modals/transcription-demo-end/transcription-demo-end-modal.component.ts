@@ -1,6 +1,6 @@
 import { Component, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { OctraModal } from '../types';
 import {
   NgbActiveModal,

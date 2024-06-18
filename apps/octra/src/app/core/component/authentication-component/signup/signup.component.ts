@@ -3,7 +3,7 @@ import { LANGUAGES, PolicyListItemDto, TIMEZONE_NAMES } from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../default.component';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 
 export class PreparedPolicyListItemDto extends PolicyListItemDto {
   checked = false;

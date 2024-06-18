@@ -29,7 +29,7 @@ import {
   ContextMenuAction,
   ContextMenuComponent,
 } from '../../core/component/context-menu/context-menu.component';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
 import { timer } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

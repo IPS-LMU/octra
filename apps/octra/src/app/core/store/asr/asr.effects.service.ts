@@ -32,7 +32,7 @@ import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import X2JS from 'x2js';
 
 @Injectable({

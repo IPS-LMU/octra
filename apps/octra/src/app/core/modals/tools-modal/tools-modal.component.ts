@@ -10,7 +10,7 @@ import {
   SafeResourceUrl,
   SafeUrl,
 } from '@angular/platform-browser';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   fadeInExpandOnEnterAnimation,
   fadeOutCollapseOnLeaveAnimation,

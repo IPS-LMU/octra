@@ -25,7 +25,7 @@ import {
   Translation,
   TranslocoLoader,
   TranslocoModule,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
 import { AppSharedModule } from '../../app.shared.module';
 import { OctraComponentsModule } from '@octra/ngx-components';

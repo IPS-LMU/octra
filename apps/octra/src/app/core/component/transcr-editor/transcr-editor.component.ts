@@ -14,7 +14,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 import {

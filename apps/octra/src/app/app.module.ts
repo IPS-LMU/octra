@@ -8,10 +8,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // icons
-import { TranslocoModule } from '@ngneat/transloco'; // third-party
+import { TranslocoModule } from '@jsverse/transloco'; // third-party
 import { environment } from '../environments/environment';
 
-import { NgxWebstorageModule } from 'ngx-webstorage';
+import {
+  provideNgxWebstorage,
+  withLocalStorage,
+  withNgxWebstorageConfig,
+  withSessionStorage,
+} from 'ngx-webstorage';
 import { AppComponent } from './app.component';
 import { APP_ROUTES } from './app.routes'; // other
 import { NavigationComponent } from './core/component';
@@ -69,10 +74,6 @@ import { RouterModule } from '@angular/router';
     BrowserModule,
     AppSharedModule,
     FormsModule,
-    NgxWebstorageModule.forRoot({
-      separator: '.',
-      prefix: 'custom',
-    }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
     PagesModule,
@@ -137,6 +138,14 @@ import { RouterModule } from '@angular/router';
     CompatibilityService,
     MultiThreadingService,
     provideHttpClient(withInterceptorsFromDi()),
+    provideNgxWebstorage(
+      withNgxWebstorageConfig({
+        separator: '.',
+        prefix: 'custom',
+      }),
+      withLocalStorage(),
+      withSessionStorage()
+    ),
   ],
 })
 export class AppModule {}

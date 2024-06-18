@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { Observable } from 'rxjs';
 import { AppStorageService } from './appstorage.service';
 import { getFileSize } from '@octra/utilities';

@@ -8,7 +8,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 

@@ -9,12 +9,12 @@ import { NewsComponent } from './news';
 import { StresstestComponent } from '../tools/stresstest/stresstest.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslocoModule } from '@ngneat/transloco';
+import { TranslocoModule } from '@jsverse/transloco';
 import { AppSharedModule } from '../../app.shared.module';
 import { MaintenanceModule } from '../component/maintenance/maintenance.module';
 import { RouterModule } from '@angular/router';
 import { BrowserTestComponent } from './browser-test';
-import {ModalsModule} from '../modals/modals.module';
+import { ModalsModule } from '../modals/modals.module';
 
 @NgModule({
   declarations: [

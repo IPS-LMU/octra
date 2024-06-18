@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { AppInfo } from '../../../../app.info';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { SessionFile } from '../../../obj/SessionFile';

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { AppInfo } from '../../../app.info';
 import { ASRLanguage, ASRSettings } from '../../obj/Settings';
 import { AlertService } from '../../shared/service';

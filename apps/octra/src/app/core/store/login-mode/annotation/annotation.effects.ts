@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   catchError,
   exhaustMap,

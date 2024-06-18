@@ -1,6 +1,6 @@
 import { Component, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { AppInfo } from '../../../app.info';
 import { navigateTo } from '@octra/ngx-utilities';
 import { AudioService, SettingsService } from '../../shared/service';

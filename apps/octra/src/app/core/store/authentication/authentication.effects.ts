@@ -4,7 +4,7 @@ import { Action, Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SessionStorageService } from 'ngx-webstorage';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   catchError,
   exhaustMap,

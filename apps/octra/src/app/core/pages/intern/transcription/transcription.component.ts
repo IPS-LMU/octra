@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { hasProperty } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
 import { editorComponents } from '../../../../editors/components';

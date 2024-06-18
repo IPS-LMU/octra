@@ -18,7 +18,7 @@ import {
 } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { APIActions } from '../api';
-import { getBrowserLang, TranslocoService } from '@ngneat/transloco';
+import { getBrowserLang, TranslocoService } from '@jsverse/transloco';
 import { uniqueHTTPRequest } from '@octra/ngx-utilities';
 import { ConfigurationService } from '../../shared/service/configuration.service';
 import { AppConfigSchema } from '../../schemata/appconfig.schema';

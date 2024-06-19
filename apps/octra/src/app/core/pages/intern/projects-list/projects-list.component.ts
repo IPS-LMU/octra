@@ -60,7 +60,6 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       }),
       {
         next: (projects) => {
-          console.log(projects);
           this.projects = {
             ...projects,
             list: projects.list?.filter((a: any) => {

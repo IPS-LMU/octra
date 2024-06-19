@@ -561,7 +561,10 @@ export class ApplicationEffects {
           if (state.application.initialized) {
             if (!state.application.mode) {
               // no mode active
-              if (state.authentication.authenticated) {
+              if (
+                state.authentication.authenticated &&
+                !this.routerService.staticQueryParams.audio_url
+              ) {
                 this.store.dispatch(
                   AuthenticationActions.logout.do({
                     message: 'logout due undefined mode',
@@ -579,17 +582,45 @@ export class ApplicationEffects {
               }
               return;
             }
+            const modeState = getModeState(state)!;
 
-            if (!state.application.loggedIn) {
-              this.store.dispatch(
-                ApplicationActions.redirectToLastPage.do({
-                  mode: state.application.mode!,
-                })
-              );
+            if (!this.routerService.staticQueryParams.audio_url) {
+              if (!state.application.loggedIn) {
+                this.store.dispatch(
+                  ApplicationActions.redirectToLastPage.do({
+                    mode: state.application.mode!,
+                  })
+                );
+              } else {
+                // logged in
+
+                if (
+                  modeState.currentSession.currentProject &&
+                  modeState.currentSession.task
+                ) {
+                  this.store.dispatch(
+                    AnnotationActions.prepareTaskDataForAnnotation.do({
+                      currentProject: modeState.currentSession.currentProject,
+                      mode: state.application.mode,
+                      task: modeState.currentSession.task,
+                    })
+                  );
+                } else if (
+                  this.sessionStorage.retrieve('last_page_path') !==
+                  '/help-tools'
+                ) {
+                  this.store.dispatch(
+                    AuthenticationActions.redirectToProjects.do()
+                  );
+                } else {
+                  this.store.dispatch(
+                    ApplicationActions.redirectToLastPage.do({
+                      mode: state.application.mode!,
+                    })
+                  );
+                }
+              }
             } else {
-              // logged in
-              const modeState = getModeState(state)!;
-
               if (
                 modeState.currentSession.currentProject &&
                 modeState.currentSession.task
@@ -601,18 +632,8 @@ export class ApplicationEffects {
                     task: modeState.currentSession.task,
                   })
                 );
-              } else if (
-                this.sessionStorage.retrieve('last_page_path') !== '/help-tools'
-              ) {
-                this.store.dispatch(
-                  AuthenticationActions.redirectToProjects.do()
-                );
               } else {
-                this.store.dispatch(
-                  ApplicationActions.redirectToLastPage.do({
-                    mode: state.application.mode!,
-                  })
-                );
+                this.store.dispatch(ApplicationActions.waitForEffects.do());
               }
             }
           }
@@ -643,34 +664,35 @@ export class ApplicationEffects {
         tap((a) => {
           if (a.mode !== LoginMode.URL) {
             const lastPagePath = this.sessStr.retrieve('last_page_path');
-            console.log(`last page ${lastPagePath}`);
             let queryParams: any = undefined;
 
-            if (lastPagePath.indexOf('?') > -1) {
-              queryParams = {};
-              const splitted = lastPagePath
-                .substring(lastPagePath.indexOf('?') + 1)
-                .split('&')
-                .map((str: string) => {
-                  const matched = /([^&]+)=([^&]+)/g.exec(str);
+            if (lastPagePath) {
+              if (lastPagePath.indexOf('?') > -1) {
+                queryParams = {};
+                const splitted = lastPagePath
+                  .substring(lastPagePath.indexOf('?') + 1)
+                  .split('&')
+                  .map((str: string) => {
+                    const matched = /([^&]+)=([^&]+)/g.exec(str);
 
-                  return {
-                    key: matched![1],
-                    value: matched![2],
-                  };
-                });
+                    return {
+                      key: matched![1],
+                      value: matched![2],
+                    };
+                  });
 
-              for (const splittedElement of splitted) {
-                queryParams[splittedElement.key] = splittedElement.value;
+                for (const splittedElement of splitted) {
+                  queryParams[splittedElement.key] = splittedElement.value;
+                }
               }
-            }
 
-            if (lastPagePath && !['', '/'].includes(lastPagePath)) {
-              this.routerService.navigate('last page', [lastPagePath], {
-                queryParams,
-              });
-            } else {
-              this.routerService.navigate('no last page', ['/login']);
+              if (lastPagePath && !['', '/'].includes(lastPagePath)) {
+                this.routerService.navigate('last page', [lastPagePath], {
+                  queryParams,
+                });
+              } else {
+                this.routerService.navigate('no last page', ['/login']);
+              }
             }
           }
         })

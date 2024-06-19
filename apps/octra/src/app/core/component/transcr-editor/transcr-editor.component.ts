@@ -712,7 +712,6 @@ export class TranscrEditorComponent
       obj['transcript'].currentValue !== undefined &&
       !obj['transcript'].firstChange
     ) {
-      console.log('set transcript');
       await this.setTranscript(obj['transcript'].currentValue);
     }
 

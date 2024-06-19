@@ -51,23 +51,27 @@ export class AnnotJSONConverter extends Converter {
         try {
           result = JSON.parse(content);
 
-          if (
-            result.annotates === audiofile.name &&
-            result.sampleRate === audiofile.sampleRate
-          ) {
-            return {
-              annotjson: result,
-              audiofile: undefined,
-              error: '',
-            };
-          } else {
+          if (result.annotates !== audiofile.name) {
             return {
               annotjson: undefined,
               audiofile: undefined,
-              error:
-                'Either the "annotates" field or the sample rate are not equal to the audio file.',
+              error: 'The "annotates" field is not equal to the audio file.',
             };
           }
+
+          if (result.sampleRate !== audiofile.sampleRate) {
+            return {
+              annotjson: undefined,
+              audiofile: undefined,
+              error: 'Sample rate is not equal to the audio file.',
+            };
+          }
+
+          return {
+            annotjson: result,
+            audiofile: undefined,
+            error: '',
+          };
         } catch (e) {
           return {
             annotjson: undefined,

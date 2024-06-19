@@ -616,6 +616,18 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
+  initTranscriptService$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.initTranscriptionService.fail),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          this.modalsService.openErrorModal(action.error);
+        })
+      ),
+    { dispatch: false }
+  );
+
   onAudioLoadSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.loadAudio.success),
@@ -1459,47 +1471,75 @@ export class AnnotationEffects {
   }
 
   private loadSegments(modeState: AnnotationState, rootState: RootState) {
-    let feedback: FeedBackForm | undefined = undefined;
-    if (
-      modeState.transcript.levels === undefined ||
-      modeState.transcript.levels.length === 0
-    ) {
-      // create new annotation
-      let newAnnotation = new OctraAnnotation();
-
+    try {
+      let feedback: FeedBackForm | undefined = undefined;
       if (
-        rootState.application.mode === LoginMode.ONLINE ||
-        rootState.application.mode === LoginMode.URL
+        modeState.transcript.levels === undefined ||
+        modeState.transcript.levels.length === 0
       ) {
-        let annotResult: ImportResult | undefined;
-        const task: TaskDto | undefined = modeState.currentSession?.task;
+        // create new annotation
+        let newAnnotation = new OctraAnnotation();
 
-        // import logs
-        this.store.dispatch(
-          AnnotationActions.saveLogs.do({
-            logs:
-              modeState.logging.logs && modeState.logging.logs.length > 0
-                ? modeState.logging.logs
-                : task?.log ?? [],
-            mode: rootState.application.mode,
-          })
-        );
+        if (
+          rootState.application.mode === LoginMode.ONLINE ||
+          rootState.application.mode === LoginMode.URL
+        ) {
+          let annotResult: ImportResult | undefined;
+          const task: TaskDto | undefined = modeState.currentSession?.task;
 
-        const serverTranscript = task
-          ? getAnnotationFromTask(
-              task,
-              AppInfo.converters,
-              this.audio.audioManager.resource.name,
-              this.audio.audioManager.resource.getOAudioFile()
-            )
-          : undefined;
+          // import logs
+          this.store.dispatch(
+            AnnotationActions.saveLogs.do({
+              logs:
+                modeState.logging.logs && modeState.logging.logs.length > 0
+                  ? modeState.logging.logs
+                  : task?.log ?? [],
+              mode: rootState.application.mode,
+            })
+          );
 
-        if (serverTranscript) {
-          // import server transcript
-          newAnnotation = OctraAnnotation.deserialize(serverTranscript);
-        }
+          const serverTranscript = task
+            ? getAnnotationFromTask(
+                task,
+                AppInfo.converters,
+                this.audio.audioManager.resource.name,
+                this.audio.audioManager.resource.getOAudioFile()
+              )
+            : undefined;
 
-        if (newAnnotation.levels.length === 0) {
+          if (serverTranscript) {
+            // import server transcript
+            newAnnotation = OctraAnnotation.deserialize(serverTranscript);
+          }
+
+          if (newAnnotation.levels.length === 0) {
+            const level = newAnnotation.createSegmentLevel('OCTRA_1');
+            level.items.push(
+              newAnnotation.createSegment(
+                this.audio.audioManager.resource.info.duration,
+                [
+                  new OLabel('OCTRA_1', ''), // empty transcript
+                ]
+              )
+            );
+            newAnnotation.addLevel(level);
+            newAnnotation.changeLevelIndex(0);
+          } else {
+            const currentLevelIndex =
+              modeState.previousCurrentLevel === undefined ||
+              modeState.previousCurrentLevel === null ||
+              modeState.previousCurrentLevel >= newAnnotation.levels.length
+                ? Math.max(
+                    0,
+                    newAnnotation.levels.findIndex((a) => a.type === 'SEGMENT')
+                  )
+                : modeState.previousCurrentLevel;
+
+            newAnnotation.changeCurrentLevelIndex(currentLevelIndex);
+          }
+        } else {
+          // not URL oder ONLINE MODE, Annotation is null
+
           const level = newAnnotation.createSegmentLevel('OCTRA_1');
           level.items.push(
             newAnnotation.createSegment(
@@ -1511,69 +1551,75 @@ export class AnnotationEffects {
           );
           newAnnotation.addLevel(level);
           newAnnotation.changeLevelIndex(0);
-        } else {
-          const currentLevelIndex =
-            modeState.previousCurrentLevel === undefined ||
-            modeState.previousCurrentLevel === null ||
-            modeState.previousCurrentLevel >= newAnnotation.levels.length
-              ? Math.max(
-                  0,
-                  newAnnotation.levels.findIndex((a) => a.type === 'SEGMENT')
-                )
-              : modeState.previousCurrentLevel;
 
-          newAnnotation.changeCurrentLevelIndex(currentLevelIndex);
-        }
-      } else {
-        // not URL oder ONLINE MODE, Annotation is null
+          const projectSettings =
+            getModeState(rootState)!.currentSession.task!.tool_configuration!
+              .value;
+          if (projectSettings) {
+            feedback = FeedBackForm.fromAny(
+              projectSettings.feedback_form,
+              modeState.currentSession.comment ?? ''
+            );
+          }
+          if (feedback) {
+            feedback?.importData(feedback);
 
-        const level = newAnnotation.createSegmentLevel('OCTRA_1');
-        level.items.push(
-          newAnnotation.createSegment(
-            this.audio.audioManager.resource.info.duration,
-            [
-              new OLabel('OCTRA_1', ''), // empty transcript
-            ]
-          )
-        );
-        newAnnotation.addLevel(level);
-        newAnnotation.changeLevelIndex(0);
+            if (modeState.currentSession.comment !== undefined) {
+              feedback.comment = modeState.currentSession.comment;
+            }
+          }
 
-        const projectSettings =
-          getModeState(rootState)!.currentSession.task!.tool_configuration!
-            .value;
-        if (projectSettings) {
-          feedback = FeedBackForm.fromAny(
-            projectSettings.feedback_form,
-            modeState.currentSession.comment ?? ''
+          if (this.appStorage.logs === undefined) {
+            this.appStorage.clearLoggingDataPermanently();
+            this.uiService.elements = [];
+          } else if (Array.isArray(this.appStorage.logs)) {
+            this.uiService.fromAnyArray(this.appStorage.logs);
+          }
+
+          this.uiService.addElementFromEvent(
+            'octra',
+            { value: BUILD.version },
+            Date.now(),
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            'version'
           );
         }
-        if (feedback) {
-          feedback?.importData(feedback);
 
-          if (modeState.currentSession.comment !== undefined) {
-            feedback.comment = modeState.currentSession.comment;
-          }
+        if (
+          rootState.application.options.showFeedbackNotice &&
+          this.apiService.appProperties?.send_feedback
+        ) {
+          this.modalsService.openFeedbackModal();
         }
 
-        if (this.appStorage.logs === undefined) {
-          this.appStorage.clearLoggingDataPermanently();
-          this.uiService.elements = [];
-        } else if (Array.isArray(this.appStorage.logs)) {
-          this.uiService.fromAnyArray(this.appStorage.logs);
-        }
-
-        this.uiService.addElementFromEvent(
-          'octra',
-          { value: BUILD.version },
-          Date.now(),
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          'version'
+        // new annotation set
+        return of(
+          AnnotationActions.initTranscriptionService.success({
+            mode: rootState.application.mode!,
+            transcript: newAnnotation,
+            feedback,
+            saveToDB: true,
+          })
         );
       }
+
+      const transcript = modeState.transcript.changeSampleRate(
+        this.audio.audioManager.resource.info.sampleRate
+      );
+
+      const currentLevelIndex =
+        modeState.previousCurrentLevel === undefined ||
+        modeState.previousCurrentLevel === null ||
+        modeState.previousCurrentLevel >= transcript.levels.length
+          ? Math.max(
+              0,
+              transcript.levels.findIndex((a) => a.type === 'SEGMENT')
+            )
+          : modeState.previousCurrentLevel;
+      transcript.changeCurrentLevelIndex(currentLevelIndex);
 
       if (
         rootState.application.options.showFeedbackNotice &&
@@ -1582,47 +1628,21 @@ export class AnnotationEffects {
         this.modalsService.openFeedbackModal();
       }
 
-      // new annotation set
       return of(
         AnnotationActions.initTranscriptionService.success({
           mode: rootState.application.mode!,
-          transcript: newAnnotation,
           feedback,
-          saveToDB: true,
+          transcript,
+          saveToDB: false,
+        })
+      );
+    } catch (e: any) {
+      return of(
+        AnnotationActions.initTranscriptionService.fail({
+          error: typeof e === 'string' ? e : e?.message,
         })
       );
     }
-
-    const transcript = modeState.transcript.changeSampleRate(
-      this.audio.audioManager.resource.info.sampleRate
-    );
-
-    const currentLevelIndex =
-      modeState.previousCurrentLevel === undefined ||
-      modeState.previousCurrentLevel === null ||
-      modeState.previousCurrentLevel >= transcript.levels.length
-        ? Math.max(
-            0,
-            transcript.levels.findIndex((a) => a.type === 'SEGMENT')
-          )
-        : modeState.previousCurrentLevel;
-    transcript.changeCurrentLevelIndex(currentLevelIndex);
-
-    if (
-      rootState.application.options.showFeedbackNotice &&
-      this.apiService.appProperties?.send_feedback
-    ) {
-      this.modalsService.openFeedbackModal();
-    }
-
-    return of(
-      AnnotationActions.initTranscriptionService.success({
-        mode: rootState.application.mode!,
-        feedback,
-        transcript,
-        saveToDB: false,
-      })
-    );
   }
 
   levelIndexChange$ = createEffect(

@@ -142,6 +142,8 @@ export class BundleJSONConverter extends Converter {
     };
      */
 
-    throw new Error('not implemented');
+    return {
+      error: "not implemented"
+    };
   }
 }

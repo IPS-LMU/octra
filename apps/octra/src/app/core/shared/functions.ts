@@ -131,26 +131,28 @@ export function getAnnotationFromTask(
     for (const converter of converters) {
       for (const io of ios) {
         if (
-          !io.fileType!.includes('audio') &&
-          !io.fileType!.includes('video') &&
-          !io.fileType!.includes('image')
+          !io.fileType ||
+          (!io.fileType.includes('audio') &&
+            !io.fileType.includes('video') &&
+            !io.fileType.includes('image'))
         ) {
-          try {
-            const result = converter.import(
-              {
-                name: io.filename,
-                content: io.content,
-                type: io.fileType!,
-                encoding: 'utf-8',
-              },
-              audiofile
-            );
+          const result = converter.import(
+            {
+              name: io.filename,
+              content: io.content,
+              type: io.fileType!,
+              encoding: 'utf-8',
+            },
+            audiofile
+          );
 
-            if (result?.annotjson) {
-              return result.annotjson;
-            }
-          } catch (e) {
-            // ignore
+          if (result?.annotjson) {
+            return result.annotjson;
+          } else if (
+            converter.name === 'AnnotJSON' &&
+            /_annot\.json$/g.exec(io.filename) !== null
+          ) {
+            throw new Error(`Can't read AnnotJSON file: ${result.error}`);
           }
         }
       }

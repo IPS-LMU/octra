@@ -41,6 +41,7 @@ import { hasProperty } from '@octra/utilities';
 import { AuthenticationActions } from '../authentication';
 import { AnnotationState } from '../login-mode/annotation';
 import { AudioService } from '../../shared/service';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Injectable({
   providedIn: 'root',
@@ -131,7 +132,10 @@ export class IDBEffects {
         ]).pipe(
           map(([onlineModeLogs, localModeLogs, demoModeLogs, urlModeLogs]) => {
             if (this.sessStr.retrieve('last_page_path') !== '/help-tools') {
-              if (state.application.mode === LoginMode.ONLINE) {
+              if (
+                state.application.mode === LoginMode.ONLINE &&
+                !this.routingService.staticQueryParams.audio_url
+              ) {
                 this.store.dispatch(
                   LoginModeActions.loadProjectAndTaskInformation.do({
                     projectID: action.onlineOptions.project?.id,
@@ -145,7 +149,9 @@ export class IDBEffects {
                   LoginModeActions.loadProjectAndTaskInformation.do({
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
-                    mode: state.application.mode!,
+                    mode: this.routingService.staticQueryParams.audio_url
+                      ? LoginMode.URL
+                      : state.application.mode!,
                   })
                 );
               }
@@ -912,6 +918,7 @@ export class IDBEffects {
     private actions$: Actions,
     private idbService: IDBService,
     private sessStr: SessionStorageService,
+    private routingService: RoutingService,
     private store: Store<RootState>,
     private audio: AudioService
   ) {

@@ -8,7 +8,6 @@ import {
   catchError,
   exhaustMap,
   forkJoin,
-  from,
   interval,
   map,
   of,
@@ -68,7 +67,6 @@ import { DateTime } from 'luxon';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { FileInfo } from '@octra/web-media';
 import { ASRQueueItemType } from '../../asr';
-import { TranscriptionBackupEndModalComponent } from '../../../modals/transcription-backup-end/transcription-backup-end-modal.component';
 
 declare const BUILD: {
   version: string;
@@ -193,14 +191,64 @@ export class AnnotationEffects {
           }
         }
 
-        return AnnotationActions.startAnnotation.success({
+        return AnnotationActions.prepareTaskDataForAnnotation.success({
           task,
-          project: currentProject,
           mode,
-          projectSettings: task.tool_configuration.value,
+          currentProject,
           guidelines,
           selectedGuidelines,
         });
+      })
+    )
+  );
+
+  prepareTaskSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.prepareTaskDataForAnnotation.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        let audioFile: TaskInputOutputDto | undefined = a.task.inputs.find(
+          (b) => b.fileType && b.fileType!.indexOf('audio') > -1
+        );
+
+        if (!audioFile && a.task.use_outputs_from_task) {
+          console.log(
+            'No audio file found, look for audio in outputs from use_outputs_from_task...'
+          );
+          audioFile = (a.task.use_outputs_from_task as any).outputs.find(
+            (b: TaskInputOutputDto) =>
+              b.fileType && b.fileType!.indexOf('audio') > -1
+          );
+        }
+
+        if (!audioFile && a.task.use_outputs_from_task) {
+          console.log(
+            'No audio file found in use_outputs_from_task outputs, look for audio in outputs from use_outputs_from_task...'
+          );
+          audioFile = (a.task.use_outputs_from_task as any).inputs.find(
+            (b: TaskInputOutputDto) =>
+              b.fileType && b.fileType.indexOf('audio') > -1
+          );
+        }
+
+        if (audioFile) {
+          return of(
+            AnnotationActions.loadAudio.do({
+              audioFile,
+              task: a.task,
+              currentProject: a.currentProject,
+              guidelines: a.guidelines,
+              selectedGuidelines: a.selectedGuidelines,
+              mode: a.mode,
+            })
+          );
+        } else {
+          return of(
+            AnnotationActions.loadAudio.fail({
+              error: `No audio file found in given IO.`,
+            })
+          );
+        }
       })
     )
   );
@@ -253,45 +301,9 @@ export class AnnotationEffects {
             );
           }
 
-          this.routingService.navigate('start annotation', ['/load/']);
-          let audioFile: TaskInputOutputDto | undefined = a.task.inputs.find(
-            (b) => b.fileType && b.fileType!.indexOf('audio') > -1
+          this.store.dispatch(
+            AnnotationActions.initTranscriptionService.do({ mode: a.mode })
           );
-
-          if (!audioFile && a.task.use_outputs_from_task) {
-            console.log(
-              'No audio file found, look for audio in outputs from use_outputs_from_task...'
-            );
-            audioFile = (a.task.use_outputs_from_task as any).outputs.find(
-              (b: TaskInputOutputDto) =>
-                b.fileType && b.fileType!.indexOf('audio') > -1
-            );
-          }
-
-          if (!audioFile && a.task.use_outputs_from_task) {
-            console.log(
-              'No audio file found in use_outputs_from_task outputs, look for audio in outputs from use_outputs_from_task...'
-            );
-            audioFile = (a.task.use_outputs_from_task as any).inputs.find(
-              (b: TaskInputOutputDto) =>
-                b.fileType && b.fileType.indexOf('audio') > -1
-            );
-          }
-
-          if (audioFile) {
-            this.store.dispatch(
-              AnnotationActions.loadAudio.do({
-                audioFile,
-                mode: a.mode,
-              })
-            );
-          } else {
-            this.store.dispatch(
-              AnnotationActions.loadAudio.fail({
-                error: `No audio file found in given IO.`,
-              })
-            );
-          }
         })
       ),
     { dispatch: false }
@@ -362,6 +374,10 @@ export class AnnotationEffects {
                     this.store.dispatch(
                       AnnotationActions.loadAudio.success({
                         mode: state.application.mode!,
+                        task: a.task,
+                        guidelines: a.guidelines,
+                        selectedGuidelines: a.selectedGuidelines,
+                        currentProject: a.currentProject,
                         audioFile: a.audioFile,
                       })
                     );
@@ -391,6 +407,10 @@ export class AnnotationEffects {
                 this.store.dispatch(
                   AnnotationActions.loadAudio.success({
                     mode: LoginMode.LOCAL,
+                    guidelines: a.guidelines,
+                    selectedGuidelines: a.selectedGuidelines,
+                    task: a.task,
+                    currentProject: a.currentProject,
                     audioFile: a.audioFile,
                   })
                 );
@@ -509,28 +529,19 @@ export class AnnotationEffects {
               this.store.dispatch(ApplicationActions.waitForEffects.do());
               return of(AnnotationActions.redirectToProjects.do());
             } else {
-              return from(
-                this.modalsService.openModal(
-                  TranscriptionBackupEndModalComponent,
-                  TranscriptionBackupEndModalComponent.options
-                )
-              ).pipe(
-                exhaustMap((action) => {
-                  this.store.dispatch(ApplicationActions.waitForEffects.do());
-                  return this.saveTaskToServer(state, TaskStatus.paused).pipe(
-                    map(() => {
-                      return AuthenticationActions.logout.do({
-                        clearSession: a.clearSession,
-                        mode: state.application.mode,
-                      });
-                    }),
-                    catchError(() => {
-                      return of(
-                        AuthenticationActions.logout.do({
-                          clearSession: a.clearSession,
-                          mode: state.application.mode,
-                        })
-                      );
+              this.store.dispatch(ApplicationActions.waitForEffects.do());
+              return this.saveTaskToServer(state, TaskStatus.paused).pipe(
+                map(() => {
+                  return AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode,
+                  });
+                }),
+                catchError(() => {
+                  return of(
+                    AuthenticationActions.logout.do({
+                      clearSession: a.clearSession,
+                      mode: state.application.mode,
                     })
                   );
                 })
@@ -605,23 +616,23 @@ export class AnnotationEffects {
     { dispatch: false }
   );
 
-  // TODO implement startAnnotation as Startingpoint
-  //
-
-  onAudioLoadSuccess$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(AnnotationActions.loadAudio.success),
-        withLatestFrom(this.store),
-        tap(([a, state]) => {
-          this.store.dispatch(
-            AnnotationActions.initTranscriptionService.do({
-              mode: state.application.mode!,
-            })
-          );
-        })
-      ),
-    { dispatch: false }
+  onAudioLoadSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.loadAudio.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) =>
+        of(
+          AnnotationActions.startAnnotation.success({
+            task: a.task,
+            project: a.currentProject,
+            mode: a.mode,
+            projectSettings: a.task.tool_configuration?.value,
+            guidelines: a.guidelines,
+            selectedGuidelines: a.selectedGuidelines,
+          })
+        )
+      )
+    )
   );
 
   onLoadOnlineInfo$ = createEffect(() =>
@@ -854,7 +865,7 @@ export class AnnotationEffects {
                       task.inputs.push({
                         id: Date.now().toString(),
                         filename: audioName + fileInfoTranscript.extension,
-                        fileType: 'text/plain',
+                        fileType: fileInfoTranscript.type,
                         type: 'input',
                         creator_type: TaskInputOutputCreatorType.user,
                         content,
@@ -869,6 +880,15 @@ export class AnnotationEffects {
                           task,
                         })
                       );
+                    }),
+                    catchError((e) => {
+                      if (e instanceof HttpErrorResponse) {
+                        alert(`Can't load transcript file: ${e.message}`);
+                        return of(
+                          LoginModeActions.loadProjectAndTaskInformation.fail(e)
+                        );
+                      }
+                      return of();
                     })
                   );
               }

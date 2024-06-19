@@ -133,6 +133,8 @@ export class FileInfo extends DataInfo {
       //document
       case 'pdf':
         return 'application/pdf';
+      case 'json':
+        return 'application/json';
     }
     return 'text/plain';
   }

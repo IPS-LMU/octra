@@ -571,13 +571,21 @@ export class ApplicationEffects {
                   })
                 );
               } else {
-                this.store.dispatch(ApplicationActions.redirectToLastPage.do());
+                this.store.dispatch(
+                  ApplicationActions.redirectToLastPage.do({
+                    mode: state.application.mode!,
+                  })
+                );
               }
               return;
             }
 
             if (!state.application.loggedIn) {
-              this.store.dispatch(ApplicationActions.redirectToLastPage.do());
+              this.store.dispatch(
+                ApplicationActions.redirectToLastPage.do({
+                  mode: state.application.mode!,
+                })
+              );
             } else {
               // logged in
               const modeState = getModeState(state)!;
@@ -600,7 +608,11 @@ export class ApplicationEffects {
                   AuthenticationActions.redirectToProjects.do()
                 );
               } else {
-                this.store.dispatch(ApplicationActions.redirectToLastPage.do());
+                this.store.dispatch(
+                  ApplicationActions.redirectToLastPage.do({
+                    mode: state.application.mode!,
+                  })
+                );
               }
             }
           }
@@ -612,10 +624,7 @@ export class ApplicationEffects {
   onProjectAndTaskInfoLoaded$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(
-          LoginModeActions.loadProjectAndTaskInformation.fail,
-          LoginModeActions.loadProjectAndTaskInformation.success
-        ),
+        ofType(LoginModeActions.loadProjectAndTaskInformation.success),
         withLatestFrom(this.store),
         tap(([action, state]) => {
           if (!state.application.initialized) {
@@ -632,11 +641,37 @@ export class ApplicationEffects {
       this.actions$.pipe(
         ofType(ApplicationActions.redirectToLastPage.do),
         tap((a) => {
-          const lastPagePath = this.sessStr.retrieve('last_page_path');
-          if (lastPagePath && !['', '/'].includes(lastPagePath)) {
-            this.routerService.navigate('last page', [lastPagePath]);
-          } else {
-            this.routerService.navigate('no last page', ['/login']);
+          if (a.mode !== LoginMode.URL) {
+            const lastPagePath = this.sessStr.retrieve('last_page_path');
+            console.log(`last page ${lastPagePath}`);
+            let queryParams: any = undefined;
+
+            if (lastPagePath.indexOf('?') > -1) {
+              queryParams = {};
+              const splitted = lastPagePath
+                .substring(lastPagePath.indexOf('?') + 1)
+                .split('&')
+                .map((str: string) => {
+                  const matched = /([^&]+)=([^&]+)/g.exec(str);
+
+                  return {
+                    key: matched![1],
+                    value: matched![2],
+                  };
+                });
+
+              for (const splittedElement of splitted) {
+                queryParams[splittedElement.key] = splittedElement.value;
+              }
+            }
+
+            if (lastPagePath && !['', '/'].includes(lastPagePath)) {
+              this.routerService.navigate('last page', [lastPagePath], {
+                queryParams,
+              });
+            } else {
+              this.routerService.navigate('no last page', ['/login']);
+            }
           }
         })
       ),

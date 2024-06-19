@@ -209,7 +209,7 @@ export class AuthenticationEffects {
     this.actions$.pipe(
       ofType(AuthenticationActions.loginURL.do),
       exhaustMap(() => {
-        this.routingService.navigate('login url', ['/load']);
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
         return of(
           AuthenticationActions.loginURL.success({
             mode: LoginMode.URL,

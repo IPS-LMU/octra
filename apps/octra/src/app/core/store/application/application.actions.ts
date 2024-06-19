@@ -11,6 +11,7 @@ import {
 import { AppSettings, ASRSettings } from '../../obj';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
+import { LoginMode } from '../index';
 
 const context = 'Application';
 
@@ -30,7 +31,9 @@ export class ApplicationActions {
   static redirectToLastPage = createActionGroup({
     source: 'app/redirect to last page',
     events: {
-      do: emptyProps()
+      do: props<{
+        mode: LoginMode
+      }>()
     }
   });
 

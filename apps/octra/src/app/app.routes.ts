@@ -62,5 +62,4 @@ export const APP_ROUTES: Routes = [
     component: StresstestComponent,
     canActivate: [APP_INITIALIZED_GUARD, CONFIG_LOADED_GUARD],
   },
-  { path: '**', redirectTo: '/404', pathMatch: 'full' },
 ];

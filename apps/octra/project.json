@@ -43,6 +43,8 @@
       },
       "configurations": {
         "production": {
+          "optimization": true,
+          "buildOptimizer": true,
           "budgets": [
             {
               "type": "initial",
@@ -64,6 +66,8 @@
           "outputHashing": "all"
         },
         "beta": {
+          "buildOptimizer": true,
+          "optimization": true,
           "budgets": [
             {
               "type": "initial",

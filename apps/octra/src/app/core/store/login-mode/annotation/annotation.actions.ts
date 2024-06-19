@@ -24,6 +24,10 @@ export class AnnotationActions {
     events: {
       do: props<{
         audioFile?: TaskInputOutputDto;
+        task: TaskDto;
+        currentProject: ProjectDto;
+        guidelines: GuidelinesItem[];
+        selectedGuidelines?: GuidelinesItem;
         mode: LoginMode;
       }>(),
       progress: props<{
@@ -32,6 +36,10 @@ export class AnnotationActions {
       }>(),
       success: props<{
         audioFile?: TaskInputOutputDto;
+        task: TaskDto;
+        currentProject: ProjectDto;
+        guidelines: GuidelinesItem[];
+        selectedGuidelines?: GuidelinesItem;
         mode: LoginMode;
       }>(),
       fail: props<{
@@ -55,7 +63,13 @@ export class AnnotationActions {
         currentProject: ProjectDto;
         task: TaskDto;
       }>(),
-      success: emptyProps(),
+      success: props<{
+        mode: LoginMode;
+        currentProject: ProjectDto;
+        guidelines: GuidelinesItem[];
+        selectedGuidelines?: GuidelinesItem;
+        task: TaskDto;
+      }>(),
       fail: emptyProps(),
     },
   });

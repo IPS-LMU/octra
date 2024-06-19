@@ -138,7 +138,7 @@ export function getAnnotationFromTask(
           try {
             const result = converter.import(
               {
-                name: `${audiofileName}_annot.json`,
+                name: io.filename,
                 content: io.content,
                 type: io.fileType!,
                 encoding: 'utf-8',

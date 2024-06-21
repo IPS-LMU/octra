@@ -15,6 +15,7 @@ import {
 } from '../annotjson';
 import { contains } from '../functions';
 import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 
 export class PraatTextgridConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'TextGrid';
@@ -130,7 +131,7 @@ export class PraatTextgridConverter extends Converter {
     }
 
     const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
-    const fileName = this.getFileName(file.name);
+    const fileName = FileInfo.extractFileName(file.name).name;
     if (name === fileName) {
       const result = new OAnnotJSON(
         audiofile.name,

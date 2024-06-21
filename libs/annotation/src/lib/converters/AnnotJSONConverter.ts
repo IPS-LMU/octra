@@ -7,6 +7,7 @@ import {
 } from './Converter';
 import { OAnnotJSON } from '../annotjson';
 import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 
 export class AnnotJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'AnnotJSON';
@@ -42,7 +43,7 @@ export class AnnotJSONConverter extends Converter {
     if (audiofile) {
       let result = new OAnnotJSON(
         audiofile.name,
-        this.getFileName(file.name),
+        FileInfo.extractFileName(file.name).name,
         audiofile.sampleRate
       );
       const content = file.content;
@@ -51,7 +52,10 @@ export class AnnotJSONConverter extends Converter {
         try {
           result = JSON.parse(content);
 
-          if (result.annotates !== audiofile.name) {
+          if (
+            result.annotates !== audiofile.name &&
+            result.annotates !== FileInfo.extractFileName(audiofile.name).name
+          ) {
             return {
               annotjson: undefined,
               audiofile: undefined,

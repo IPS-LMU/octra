@@ -56,6 +56,7 @@ export class ApplicationEffects {
 
         const queryParams = {
           audio_url: this.getParameterByName('audio_url'),
+          annotationExportType: this.getParameterByName('aType'),
           audio_name: this.getParameterByName('audio_name'),
           host: this.getParameterByName('host'),
           transcript: this.getParameterByName('transcript'),

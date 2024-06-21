@@ -14,6 +14,7 @@ import {
 } from '../annotjson';
 import { contains } from '../functions';
 import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 
 export class PraatTableConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'PraatTextTable';
@@ -102,7 +103,7 @@ export class PraatTableConverter extends Converter {
     const lines: string[] = content.split('\n');
 
     // check if filename is equal with audio file
-    const filename = this.getFileName(file.name);
+    const filename = FileInfo.extractFileName(file.name).name;
 
     if (contains(audiofile.name, filename)) {
       const tiers: string[] = [];

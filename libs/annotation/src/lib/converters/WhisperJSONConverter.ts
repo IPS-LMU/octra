@@ -14,6 +14,7 @@ import {
 } from '../annotjson';
 import { OAudiofile } from '@octra/media';
 import { last } from '@octra/utilities';
+import { FileInfo } from '@octra/web-media';
 
 export class WhisperJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'WhisperJSON';
@@ -54,7 +55,7 @@ export class WhisperJSONConverter extends Converter {
 
     result.annotjson = new OAnnotJSON(
       audiofile.name,
-      this.getFileName(file.name),
+      FileInfo.extractFileName(file.name).name,
       audiofile.sampleRate
     );
 

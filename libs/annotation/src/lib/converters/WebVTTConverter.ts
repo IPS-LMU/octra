@@ -13,6 +13,7 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 
 export class WebVTTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'WebVTT';
@@ -121,7 +122,7 @@ export class WebVTTConverter extends Converter {
     }
     const result = new OAnnotJSON(
       audiofile.name,
-      this.getFileName(file.name),
+      FileInfo.extractFileName(file.name).name,
       audiofile.sampleRate
     );
     result.levels.push(new OSegmentLevel(`OCTRA_1`));

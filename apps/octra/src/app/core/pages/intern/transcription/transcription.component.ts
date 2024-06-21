@@ -54,12 +54,12 @@ import {
   Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
-import { PartiturConverter } from '@octra/annotation';
-import X2JS from 'x2js';
 import { ApplicationStoreService } from '../../../store/application/application-store.service';
 import { ShortcutService } from '../../../shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
 import { RoutingService } from '../../../shared/service/routing.service';
+import { AppInfo } from '../../../../app.info';
+import { AnnotJSONConverter, Converter } from '@octra/annotation';
 
 @Component({
   selector: 'octra-transcription',
@@ -826,9 +826,28 @@ export class TranscriptionComponent
   }
 
   public onSaveTranscriptionButtonClicked() {
-    const converter = new PartiturConverter();
+    const aType = this.routingService.staticQueryParams.annotationExportType;
+    let converter: Converter | undefined = undefined;
+
+    if (!aType || aType === 'AnnotJSON') {
+      converter = new AnnotJSONConverter();
+    } else {
+      converter = AppInfo.converters.find((a) => a.name === aType);
+
+      if (!converter) {
+        window.parent.postMessage(
+          {
+            error: `Export Type ${aType} is not supported.`,
+            status: 'error',
+          },
+          '*'
+        );
+        return;
+      }
+    }
+
     const oannotjson = this.annotationStoreService.transcript!.serialize(
-      this.audio.audioManager.resource.name,
+      this.audio.audioManager.resource.info.fullname,
       this.audio.audioManager.resource.info.sampleRate,
       this.audio.audioManager.resource.info.duration
     );
@@ -839,78 +858,25 @@ export class TranscriptionComponent
     );
 
     if (!result.error && result.file) {
-      result.file.name = result.file.name.replace(
-        '-' + oannotjson.levels[0].name,
-        ''
+      // send result to iframe owner
+      window.parent.postMessage(
+        {
+          data: {
+            annotation: result.file,
+          },
+          status: 'success',
+        },
+        '*'
       );
-
-      // upload transcript
-      const form: FormData = new FormData();
-      let host =
-        'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
-
-      if (this.routingService.staticQueryParams?.host) {
-        host = this.routingService.staticQueryParams.host;
-      }
-
-      const url = `${host}uploadFileMulti`;
-
-      form.append(
-        'file0',
-        new File([result.file.content], result.file.name, {
-          type: 'text/plain',
-        })
-      );
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', url);
-
-      xhr.onloadstart = () => {};
-
-      xhr.onerror = (e) => {
-        console.error(e);
-      };
-
-      xhr.onloadend = (e) => {
-        const result2 = (e.currentTarget as any).responseText;
-
-        const x2js = new X2JS();
-        let json: any = x2js.xml2js(result2);
-        json = json.UploadFileMultiResponse;
-
-        if (json.success === 'true') {
-          // TODO set urls to results only
-          let resulturl = '';
-          if (Array.isArray(json.fileList.entry)) {
-            resulturl = json.fileList.entry[0].value;
-          } else {
-            // json attribute entry is an object
-            resulturl = json.fileList.entry.value;
-          }
-
-          // send upload url to iframe owner
-          window.parent.postMessage(
-            {
-              data: {
-                transcript_url: resulturl,
-              },
-              status: 'success',
-            },
-            '*'
-          );
-        } else {
-          window.parent.postMessage(
-            {
-              status: 'error',
-              error: json.message,
-            },
-            '*'
-          );
-        }
-      };
-      xhr.send(form);
     } else {
-      alert(`Annotation conversion failed: ${result.error}`);
+      console.error(`Annotation conversion failed: ${result.error}`);
+      window.parent.postMessage(
+        {
+          error: `Annotation conversion failed: ${result.error}`,
+          status: 'error',
+        },
+        '*'
+      );
     }
   }
 

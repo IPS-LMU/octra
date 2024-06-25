@@ -44,7 +44,7 @@
       {{ 'projects-list.introduction' | transloco }}
     </p>
     <div class="table-wrapper flex overflow-y-scroll h-100">
-      <table class="table table-striped table-hover" *ngIf="projects?.list !== undefined; else showSpinner;">
+      <table class="table table-striped table-hover" *ngIf="projects?.list; else showSpinner;">
         <thead>
         <tr>
           <th></th>
@@ -90,7 +90,7 @@
       </table>
       <ng-template #showSpinner>
         <div class="text-center mt-5">
-          <div class="spinner-border" role="status" style="width:3rem; height: 3rem;">
+          <div class="spinner-border" role="status" style="width:6rem; height: 6rem; color: lightgrey">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>

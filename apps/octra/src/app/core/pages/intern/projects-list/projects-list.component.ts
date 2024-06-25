@@ -51,6 +51,8 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   private loadProjects() {
+    this.projects = undefined;
+
     this.subscribe(
       this.api.listProjects({
         manageable: false,

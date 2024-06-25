@@ -139,7 +139,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
       } else {
         // the latest dropped file is a format file
         if (!(audioFile === undefined)) {
-          const extension = audioFile.file.name.substr(
+          const extension = audioFile.file.name.substring(
             audioFile.file.name.lastIndexOf('.')
           );
           this.loadImportFileData(extension);
@@ -171,123 +171,123 @@ export class OctraDropzoneComponent extends DefaultComponent {
                   encoding: converter.encoding,
                 };
 
-                const audioName = this._oaudiofile!.name.substr(
+                const audioName = this._oaudiofile!.name.substring(
                   0,
                   this._oaudiofile!.name.lastIndexOf('.')
                 );
-                if (
-                  file.file.name ===
-                    audioName + AppInfo.converters[i].extension ||
-                  file.file.name ===
-                    audioName + AppInfo.converters[i].extension.toLowerCase()
-                ) {
-                  const importResult: ImportResult | undefined =
-                    converter.import(ofile, this._oaudiofile!);
 
-                  const setAnnotation = () => {
+                const importResult: ImportResult | undefined = converter.import(
+                  ofile,
+                  this._oaudiofile!
+                );
+
+                const setAnnotation = () => {
+                  if (
+                    this._oaudiofile !== undefined &&
+                    importResult !== undefined &&
+                    importResult.annotjson !== undefined &&
+                    importResult.error === ''
+                  ) {
+                    file.status = 'valid';
                     if (
-                      this._oaudiofile !== undefined &&
-                      importResult !== undefined &&
-                      importResult.annotjson !== undefined &&
-                      importResult.error === ''
+                      file.file.name !==
+                        audioName + AppInfo.converters[i].extension &&
+                      file.file.name !==
+                        audioName +
+                          AppInfo.converters[i].extension.toLowerCase()
                     ) {
-                      file.status = 'valid';
-                      for (const lvl of importResult.annotjson.levels) {
-                        if (lvl.type === AnnotationLevelType.SEGMENT) {
-                          const level = lvl as OSegmentLevel<OSegment>;
+                      file.warning = 'File names are not the same.';
+                    }
+                    for (const lvl of importResult.annotjson.levels) {
+                      if (lvl.type === AnnotationLevelType.SEGMENT) {
+                        const level = lvl as OSegmentLevel<OSegment>;
 
-                          if (level.items[0].sampleStart !== 0) {
-                            let temp = [];
-                            temp.push(
-                              new OSegment(0, 0, level.items[0].sampleStart!, [
-                                new OLabel(level.name, ''),
-                              ])
-                            );
-                            temp = temp.concat(
-                              level.items.map(
-                                (a) =>
-                                  new OSegment(
-                                    a.id,
-                                    a.sampleStart!,
-                                    a.sampleDur!,
-                                    a.labels
-                                  )
-                              )
-                            );
-                            level.items = temp;
+                        if (level.items[0].sampleStart !== 0) {
+                          let temp = [];
+                          temp.push(
+                            new OSegment(0, 0, level.items[0].sampleStart!, [
+                              new OLabel(level.name, ''),
+                            ])
+                          );
+                          temp = temp.concat(
+                            level.items.map(
+                              (a) =>
+                                new OSegment(
+                                  a.id,
+                                  a.sampleStart!,
+                                  a.sampleDur!,
+                                  a.labels
+                                )
+                            )
+                          );
+                          level.items = temp;
 
-                            for (let j = 1; j < level.items.length + 1; j++) {
-                              level.items[j - 1].id = j;
-                            }
-                            i++;
+                          for (let j = 1; j < level.items.length + 1; j++) {
+                            level.items[j - 1].id = j;
                           }
+                          i++;
+                        }
 
-                          const last = level.items[level.items.length - 1];
-                          if (
-                            last.sampleStart! + last.sampleDur! !==
-                            this._oaudiofile.duration
-                          ) {
-                            level.items.push(
-                              new OSegment(
-                                last.id + 1,
-                                last.sampleStart! + last.sampleDur!,
-                                this._oaudiofile.duration! *
-                                  this._oaudiofile.sampleRate -
-                                  (last.sampleStart! + last.sampleDur!),
-                                [new OLabel(level.name, '')]
-                              )
-                            );
-                          } else {
-                            console.error(
-                              `Import Error, last sample of result is bigger than the audio file's duration`
-                            );
-                          }
+                        const last = level.items[level.items.length - 1];
+                        if (
+                          last.sampleStart! + last.sampleDur! !==
+                          this._oaudiofile.duration
+                        ) {
+                          level.items.push(
+                            new OSegment(
+                              last.id + 1,
+                              last.sampleStart! + last.sampleDur!,
+                              this._oaudiofile.duration! *
+                                this._oaudiofile.sampleRate -
+                                (last.sampleStart! + last.sampleDur!),
+                              [new OLabel(level.name, '')]
+                            )
+                          );
+                        } else {
+                          console.error(
+                            `Import Error, last sample of result is bigger than the audio file's duration`
+                          );
                         }
                       }
-                      this._oannotation = importResult.annotjson;
-                      this.checkState();
-                    } else {
-                      if (
-                        file.checked_converters >= AppInfo.converters.length ||
-                        converter.name === 'BundleJSON'
-                      ) {
-                        // last converter to check
-                        file.status = 'invalid';
-                        file.error = importResult!.error!;
-                        this._oannotation = undefined;
-                        this.checkState();
-                      }
                     }
-                  };
-
-                  if (
-                    importResult !== undefined &&
-                    importResult.audiofile !== undefined
-                  ) {
-                    // is bundle file
-                    this.dropFile('_bndl.json', true, true);
-                    const audioProcess: FileProgress = {
-                      status: 'progress',
-                      file: new File(
-                        [importResult.audiofile.arraybuffer!],
-                        importResult.audiofile.name
-                      ),
-                      checked_converters: 0,
-                      progress: 0,
-                      error: '',
-                    };
-                    this._files.push(audioProcess);
+                    this._oannotation = importResult.annotjson;
+                    this.checkState();
                   } else {
-                    setAnnotation();
+                    if (
+                      file.checked_converters >= AppInfo.converters.length ||
+                      converter.name === 'BundleJSON'
+                    ) {
+                      // last converter to check
+                      file.status = 'invalid';
+                      file.error = importResult!.error!;
+                      this._oannotation = undefined;
+                      this.checkState();
+                    }
                   }
+                };
 
-                  file.checked_converters++;
+                if (
+                  importResult !== undefined &&
+                  importResult.audiofile !== undefined
+                ) {
+                  // is bundle file
+                  this.dropFile('_bndl.json', true, true);
+                  const audioProcess: FileProgress = {
+                    status: 'progress',
+                    file: new File(
+                      [importResult.audiofile.arraybuffer!],
+                      importResult.audiofile.name
+                    ),
+                    checked_converters: 0,
+                    progress: 0,
+                    error: '',
+                  };
+                  this._files.push(audioProcess);
                 } else {
-                  file.status = 'invalid';
-                  file.error = `format file must have the same name as the audio file.`;
-                  this._oannotation = undefined;
-                  this.checkState();
+                  setAnnotation();
                 }
+
+                file.checked_converters++;
               }
             };
 
@@ -350,7 +350,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
     for (const importfile of files) {
       if (extension === undefined) {
-        extension = importfile.name.substr(importfile.name.lastIndexOf('.'));
+        extension = importfile.name.substring(importfile.name.lastIndexOf('.'));
       }
 
       this.dropFile(extension, true, true);
@@ -405,7 +405,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
     const fileProcess = this._files[fileProcessIndex];
     fileProcess.progress = 0.5;
     this.checkState();
-    const extension = fileProcess.file.name.substr(
+    const extension = fileProcess.file.name.substring(
       fileProcess.file.name.lastIndexOf('.')
     );
 

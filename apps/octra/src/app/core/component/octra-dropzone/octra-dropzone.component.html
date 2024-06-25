@@ -1,5 +1,5 @@
 <octra-drop-zone #dropzone (afterdrop)="afterDrop()" [height]="height">
-  <table [hidden]="files.length === 0" class="dropzone-table">
+  <table [hidden]="files.length === 0" class="dropzone-table position-relative">
     <tr *ngFor="let file of files">
       <td>
         <i
@@ -9,26 +9,35 @@
         ></i>
       </td>
       <td>{{ getDropzoneFileString(file.file) }}</td>
-      <td>
+      <td class="text-center">
         <i
           class="bi bi-x-lg icon-invalid"
           *ngIf="file.status === 'invalid'"
           [popoverTitle]="'Validation Error'"
           [ngbPopover]="file.error"
+          [triggers]="'hover'"
           style="font-size: 16px"
           placement="top"
         ></i>
         <i
-          class="bi bi-check"
-          *ngIf="file.status === 'valid'"
+          class="bi bi-check-lg"
+          *ngIf="file.status === 'valid' && !file.warning"
           style="font-size: 16px"
+        ></i>
+        <i
+          class="bi bi-exclamation-triangle-fill"
+          *ngIf="file.status === 'valid' && file.warning"
+          [popoverTitle]="'Validation Warning'"
+          [triggers]="'hover'"
+          [ngbPopover]="file.warning"
+          style="font-size: 16px; color: orange"
         ></i>
         <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
           <div
             class="spinner-border icon-wait"
             role="status"
             *ngIf="file.status === 'progress'"
-            style="font-size: 16px"
+            style="width:16px; height:16px; border-width:2px; color: gray;"
           >
             <span class="visually-hidden">Loading...</span>
           </div>
@@ -55,10 +64,9 @@
       </td>
     </tr>
   </table>
-  <span *ngIf="files.length === 0">{{
+  <span *ngIf="files.length === 0" class="position-relative">{{
     'dropzone.drag&drop here' | transloco
-  }}</span
-  ><br />
+  }}</span>
 </octra-drop-zone>
 <div
   (click)="showSupported()"

@@ -9,9 +9,9 @@
     }"
     class="dropzone"
   >
-    <div class="inner" style="margin: auto 0">
+    <div class="inner postion-relative" style="margin: auto 0">
+      <i class="bi bi-folder2-open dragndrop position-absolute top-50 start-50 translate-middle"></i>
       <ng-content></ng-content>
-      <i class="bi bi-folder2-open dragndrop"></i>
       <input
         #fileinput
         (change)="onFileChange($event)"

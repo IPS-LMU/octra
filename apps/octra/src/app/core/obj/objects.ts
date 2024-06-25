@@ -3,5 +3,6 @@ export interface FileProgress {
   file: File;
   checked_converters: number;
   progress: number;
-  error: string;
+  error?: string;
+  warning?: string;
 }

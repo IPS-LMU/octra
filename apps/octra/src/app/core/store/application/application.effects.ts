@@ -594,7 +594,6 @@ export class ApplicationEffects {
                 );
               } else {
                 // logged in
-
                 if (
                   modeState.currentSession.currentProject &&
                   modeState.currentSession.task

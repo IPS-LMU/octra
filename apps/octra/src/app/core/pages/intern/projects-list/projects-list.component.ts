@@ -102,7 +102,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
           if (error.status === 401) {
             this.store.dispatch(
               AuthenticationActions.needReAuthentication.do({
-                actionAfterSuccess: undefined,
+                actionAfterSuccess: AuthenticationActions.redirectToProjects.do,
                 forceLogout: true,
               })
             );

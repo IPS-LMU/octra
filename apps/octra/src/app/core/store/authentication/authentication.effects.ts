@@ -519,12 +519,7 @@ export class AuthenticationEffects {
         ofType(AuthenticationActions.needReAuthentication.do),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          if (
-            !this.reauthenticationRef &&
-            !['/login', '/', ''].includes(
-              this.sessionStorageService.retrieve('last_page_path')
-            )
-          ) {
+          if (!this.reauthenticationRef) {
             this.reauthenticationRef =
               this.modalsService.openReAuthenticationModal(
                 a.forceAuthentication ?? state.authentication.type!,

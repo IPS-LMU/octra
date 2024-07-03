@@ -77,6 +77,13 @@ export class BundleJSONConverter extends Converter {
     };
   }
 
+  override needsOptionsForImport(
+    file: IFile,
+    audiofile: OAudiofile
+  ): any | undefined {
+    return undefined;
+  }
+
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     /*
 

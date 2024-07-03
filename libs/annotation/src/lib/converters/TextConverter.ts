@@ -120,6 +120,13 @@ export class TextConverter extends Converter {
     };
   }
 
+  override needsOptionsForImport(
+    file: IFile,
+    audiofile: OAudiofile
+  ): any | undefined {
+    return undefined;
+  }
+
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (!audiofile?.sampleRate) {
       return {

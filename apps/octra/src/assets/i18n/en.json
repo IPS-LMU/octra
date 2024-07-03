@@ -124,7 +124,8 @@
     "locale": "Language",
     "timezone": "Timezone",
     "free quota": "Free Quota",
-    "ignore": "Ignore"
+    "ignore": "Ignore",
+    "apply": "Apply"
   },
   "p": {
     "username or email": "Username or E-Mail",
@@ -491,6 +492,20 @@
     "success": {
       "email_verification": "We'll send you an E-Mail. Please click on the link provided in the email to confirm your E-Mail address.\n  After that you can sign in with your credentials.<br/><br/>\n  You didn't receive any E-Mail? Please check your spam/junk folder. If you don't get any E-Mail after 10 minutes, contact an administrator.",
       "login": "Your registration was successful. You can now sign in with your credentials."
+    }
+  },
+  "converters": {
+    "SRT": {
+      "options": {
+        "sortSpeakerSegments": {
+          "title": "Move units with speaker label to separate levels",
+          "description": "Moves all units with label \"SPEAKER_<NUM>\" to separate levels. Units without speaker are going to be moved to OCTRA_1."
+        },
+        "combineSegmentsWithSameSpeakerThreshold": {
+          "title": "Combine empty units between the same speaker",
+          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms)."
+        }
+      }
     }
   }
 }

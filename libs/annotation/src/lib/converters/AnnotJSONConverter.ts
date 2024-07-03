@@ -39,6 +39,10 @@ export class AnnotJSONConverter extends Converter {
     };
   }
 
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any {
+    return undefined;
+  }
+
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
       let result = new OAnnotJSON(

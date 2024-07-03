@@ -28,7 +28,10 @@ import {
 } from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
 import { AppSharedModule } from '../../app.shared.module';
-import { OctraComponentsModule } from '@octra/ngx-components';
+import {
+  OctraComponentsModule,
+  OctraFormGeneratorModule,
+} from '@octra/ngx-components';
 import { FormsModule } from '@angular/forms';
 import { NamingDragAndDropComponent } from '../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { ShortcutComponent } from '../shortcut/shortcut.component';
@@ -48,6 +51,7 @@ import { AboutModalComponent } from './about-modal/about-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { TranscriptionBackupEndModalComponent } from './transcription-backup-end/transcription-backup-end-modal.component';
+import { ImportOptionsModalComponent } from './import-options-modal/import-options-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -88,7 +92,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     AuthenticationComponent,
     AboutModalComponent,
     FeedbackNoticeModalComponent,
-    TranscriptionBackupEndModalComponent
+    TranscriptionBackupEndModalComponent,
+    ImportOptionsModalComponent,
   ],
   imports: [
     CommonModule,
@@ -104,6 +109,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     OctraUtilitiesModule,
     NgbAccordionCollapse,
     NgxJoditComponent,
+    OctraFormGeneratorModule,
   ],
   exports: [
     BugreportModalComponent,
@@ -129,7 +135,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ProtectedModalComponent,
     AuthenticationComponent,
     AboutModalComponent,
-    TranscriptionBackupEndModalComponent
+    ImportOptionsModalComponent,
+    TranscriptionBackupEndModalComponent,
   ],
 })
 export class ModalsModule {}

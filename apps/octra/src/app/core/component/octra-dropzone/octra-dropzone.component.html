@@ -14,7 +14,7 @@
           class="bi bi-x-lg icon-invalid"
           *ngIf="file.status === 'invalid'"
           [popoverTitle]="'Validation Error'"
-          [ngbPopover]="file.error"
+          [ngbPopover]="file.error ?? ''"
           [triggers]="'hover'"
           style="font-size: 16px"
           placement="top"

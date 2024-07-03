@@ -44,6 +44,8 @@ export abstract class Converter {
 
   protected _application = '';
 
+  public defaultImportOptions: any;
+
   get application(): string {
     return this._application;
   }
@@ -113,5 +115,19 @@ export abstract class Converter {
    * @param audiofile information about the audio file.
    * returns object with an annotjson or an error.
    */
-  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
+  public abstract import(
+    file: IFile,
+    audiofile: OAudiofile,
+    options?: any
+  ): ImportResult;
+
+  /**
+   * checks if the converter needs further options to import the file.
+   * @param file the transcript file
+   * @param audiofile information about the audio file.
+   */
+  public abstract needsOptionsForImport(
+    file: IFile,
+    audiofile: OAudiofile
+  ): any | undefined;
 }

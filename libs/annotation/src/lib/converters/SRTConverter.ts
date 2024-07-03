@@ -9,8 +9,19 @@ import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { OAudiofile } from '@octra/media';
 import { FileInfo } from '@octra/web-media';
 
+export class SRTConverterImportOptions {
+  sortSpeakerSegments = false;
+  combineSegmentsWithSameSpeakerThreshold?: number;
+
+  constructor(partial?: Partial<SRTConverterImportOptions>) {
+    if (partial) Object.assign(this, partial);
+  }
+}
+
 export class SRTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'SRT';
+
+  override defaultImportOptions = new SRTConverterImportOptions();
 
   public constructor() {
     super();
@@ -124,7 +135,39 @@ export class SRTConverter extends Converter {
     };
   }
 
-  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+  override needsOptionsForImport(
+    file: IFile,
+    audiofile: OAudiofile
+  ): any | undefined {
+    if (/\[SPEAKER_[0-9]+]:/g.exec(file.content)) {
+      return {
+        $gui_support: true,
+        type: 'object',
+        properties: {
+          sortSpeakerSegments: {
+            title: 'sortSpeakerSegments',
+            type: 'boolean',
+            default: false,
+            description:
+              'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+          },
+          combineSegmentsWithSameSpeakerThreshold: {
+            title: 'combineSegmentsWithSameSpeakerThreshold',
+            type: 'number',
+            default: undefined,
+            description:
+              'Defines max. duration an empty segment between two segments may have to be combined together.',
+          },
+        },
+      };
+    }
+  }
+
+  public import(
+    file: IFile,
+    audiofile: OAudiofile,
+    options: SRTConverterImportOptions = new SRTConverterImportOptions()
+  ): ImportResult {
     if (!audiofile?.sampleRate) {
       return {
         error: 'Missing sample rate',
@@ -149,18 +192,28 @@ export class SRTConverter extends Converter {
       );
 
       const content = file.content;
-      const olevel = new OSegmentLevel('OCTRA_1');
+      let levels: OSegmentLevel<OSegment>[] = [];
 
       let counterID = 1;
       let lastEnd = 0;
 
+      let defaultLevel: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
+        'OCTRA_1'
+      );
+
       if (content !== '') {
         const regex =
-          /([0-9]+)[\n\r]*([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})[\n\r]*((?:(?:(?![0-9]).+)?[\n\r]*)+)/g;
+          /([0-9]+)[\n\r]*([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\r?\n\r?(?:(?:\[(SPEAKER_[0-9]+)] *: *)?(.*))\r?\n\r?/g;
 
         let matches = regex.exec(content);
         while (matches !== null) {
-          const timeStart = SRTConverter.getSamplesFromTimeString(
+          let olevel: OSegmentLevel<OSegment> = defaultLevel;
+
+          if (!options.sortSpeakerSegments && matches[4]) {
+            matches[5] = `[${matches[4]}]: ${matches[5] ?? ''}`;
+          }
+
+          let timeStart = SRTConverter.getSamplesFromTimeString(
             matches[2],
             audiofile.sampleRate
           );
@@ -168,36 +221,160 @@ export class SRTConverter extends Converter {
             matches[3],
             audiofile.sampleRate
           );
-          const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
+          let segmentContent: string = '';
+          segmentContent = matches[5].replace(/(\n|\s)+$/g, '');
 
           if (timeStart > -1 && timeEnd > -1) {
             if (timeStart > lastEnd) {
               // add additional segment
               olevel.items.push(
                 new OSegment(counterID++, lastEnd, timeStart - lastEnd, [
-                  new OLabel('OCTRA_1', ''),
+                  ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
+                  new OLabel(olevel.name, ''),
                 ])
               );
             }
 
-            olevel.items.push(
-              new OSegment(counterID++, timeStart, timeEnd - timeStart, [
-                new OLabel('OCTRA_1', segmentContent),
-              ])
-            );
+            if (timeEnd >= timeStart) {
+              olevel.items.push(
+                new OSegment(counterID++, timeStart, timeEnd - timeStart, [
+                  ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
+                  new OLabel(olevel.name, segmentContent),
+                ])
+              );
+            } else {
+              return {
+                error: `Invalid timestamps in line: ${matches[0]}`,
+              };
+            }
           }
           matches = regex.exec(content);
           lastEnd = timeEnd;
         }
       }
 
-      if (olevel.items.length > 0) {
-        // set last segment duration to fit last sample
-        const lastItem = olevel.items[olevel.items.length - 1] as OSegment;
-        lastItem.sampleDur =
-          Number(audiofile.duration) - Number(lastItem.sampleStart);
+      if (defaultLevel.items.length > 0) {
+        if (options.combineSegmentsWithSameSpeakerThreshold) {
+          for (let i = 0; i < defaultLevel.items.length; i++) {
+            const previousItem = i > 0 ? defaultLevel.items[i] : undefined;
+            const item = defaultLevel.items[i];
+            const nextItem =
+              i < defaultLevel.items.length - 1
+                ? defaultLevel.items[i + 1]
+                : undefined;
 
-        result.levels.push(olevel);
+            const duration = (item.sampleDur * 1000) / audiofile.sampleRate;
+            const text = item.getFirstLabelWithoutName('Speaker')?.value;
+            const text2 = nextItem?.getFirstLabelWithoutName('Speaker')?.value;
+
+            console.log(`${i}: if (
+              ${nextItem} &&
+              ${previousItem} &&
+              ${nextItem?.labels[0].name === 'Speaker'} &&
+              ${previousItem?.labels[0].name === 'Speaker'} &&
+              ${nextItem?.labels[0].name === previousItem?.labels[0].name} &&
+              ${!text} &&
+              ${duration <= options.combineSegmentsWithSameSpeakerThreshold}
+            )`);
+
+            if (
+              nextItem &&
+              previousItem &&
+              nextItem.labels[0].name === 'Speaker' &&
+              previousItem.labels[0].name === 'Speaker' &&
+              nextItem.labels[0].name === previousItem.labels[0].name &&
+              !text &&
+              duration <= options.combineSegmentsWithSameSpeakerThreshold
+            ) {
+              // remove segment
+              defaultLevel.items.splice(i, 1);
+              nextItem.sampleDur += item.sampleDur;
+              nextItem.sampleStart = item.sampleStart;
+              i--;
+            }
+          }
+        }
+
+        if (options.sortSpeakerSegments) {
+          for (let i = 0; i < defaultLevel.items.length; i++) {
+            const item = defaultLevel.items[i];
+            const speaker = item.labels.find(
+              (a) => a.name === 'Speaker'
+            )?.value;
+            let olevel: OSegmentLevel<OSegment>;
+
+            if (speaker) {
+              const found = levels.find((a) => a.name === speaker);
+              if (found) {
+                olevel = found;
+              } else {
+                olevel = new OSegmentLevel<OSegment>(speaker);
+                levels.push(olevel);
+              }
+
+              item.labels = item.labels
+                .filter((a) => a.name !== 'Speaker')
+                .map(
+                  (a) =>
+                    new OLabel(
+                      speaker,
+                      item.getFirstLabelWithoutName('Speaker')?.value ?? ''
+                    )
+                );
+              olevel.items.push(item);
+              defaultLevel.items.splice(i, 1);
+              i--;
+            }
+          }
+        }
+        levels.sort((a, b) => {
+          if (a.name > b.name) return 1;
+          else if (a.name === b.name) return 0;
+          return -1;
+        });
+
+        if (defaultLevel.items.length > 0) {
+          levels.push(defaultLevel);
+        }
+
+        levels = levels.map((a, i) => {
+          let lastEnd = 0;
+          for (let j = 0; j < a.items.length; j++) {
+            const item = a.items[j];
+            if (item.sampleStart > lastEnd + 1) {
+              a.items = [
+                ...a.items.slice(0, j),
+                new OSegment(counterID++, lastEnd, item.sampleStart - lastEnd, [
+                  new OLabel(a.name, ''),
+                ]),
+                ...a.items.slice(j),
+              ];
+            }
+
+            lastEnd = item.sampleStart + item.sampleDur;
+
+            const nextItem =
+              j < a.items.length - 1
+                ? a.items[j + 1]
+                : undefined;
+            if (
+              !nextItem &&
+              item.sampleStart + item.sampleDur < Number(audiofile.duration)
+            ) {
+              a.items.push(
+                new OSegment(
+                  counterID++,
+                  item.sampleStart + item.sampleDur,
+                  Number(audiofile.duration) - (item.sampleStart + item.sampleDur)
+                )
+              );
+            }
+          }
+          return a;
+        });
+
+        result.levels = levels;
+        console.log(result);
         return {
           annotjson: result,
           error: '',

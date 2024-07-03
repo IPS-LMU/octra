@@ -1,0 +1,12 @@
+<i
+  class="bi bi-question-circle-fill"
+  [ngbPopover]="popContent"
+  container="body"
+  placement="left"
+  [triggers]="'mouseenter:mouseleave'"
+  [animation]="true"
+  popoverClass="ocbs-question-mark-popover"
+></i>
+<ng-template #popContent>
+  <div [innerHTML]="text"></div>
+</ng-template>

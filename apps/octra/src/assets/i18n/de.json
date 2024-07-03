@@ -124,7 +124,8 @@
     "locale": "Sprache",
     "timezone": "Zeitzone",
     "free quota": "Kostenloses Kontingent",
-    "ignore": "Ignorieren"
+    "ignore": "Ignorieren",
+    "apply": "Übernehmen"
   },
   "p": {
     "username or email": "Nutzername oder E-Mail",
@@ -492,6 +493,20 @@
     "success": {
       "email_verification": "Wir senden Dir eine E-Mail zu. Klicke bitte auf den darin enthaltenen Link, um deine E-Mail Adresse zu bestätigen.\n  Danach kannst Du dich anmelden.<br/><br/>\n  Du hast keine Email erhalten? Prüfe bitte deinen Spam/Junk-Ordner. Solltest Du auch nach 10 Minuten keine E-Mail\n  erhalten haben, wende dich bitte an einen Administrator.",
       "login": "Deine Registrierung wurde erfolgreich abgeschlossen. Du kannst Dich nun mit deinen Zugangsdaten anmelden."
+    }
+  },
+  "converters": {
+    "SRT": {
+      "options" : {
+        "sortSpeakerSegments": {
+          "title": "Sprecher Einheiten auf eigene Ebenen verschieben",
+          "description": "Verschiebt alle Einheiten mit der Markierung \"SPEAKER_<NUM>\" auf eigene Ebenen. Einheiten ohne Sprecher werden auf die Ebene OCTRA_1 verschoben."
+        },
+        "combineSegmentsWithSameSpeakerThreshold": {
+          "title": "Leere Segmente vom gleichen Sprecher zusammenführen",
+          "description": "Führt eine leere Einheit zwischen zwei Einheiten des gleichen Sprechers zusammen, wenn diese eine maximale Dauer (ms) besitzt."
+        }
+      }
     }
   }
 }

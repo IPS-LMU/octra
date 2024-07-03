@@ -37,6 +37,13 @@ export class WhisperJSONConverter extends Converter {
     throw new Error('not implemented');
   }
 
+  override needsOptionsForImport(
+    file: IFile,
+    audiofile: OAudiofile
+  ): any | undefined {
+    return undefined;
+  }
+
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (!audiofile?.sampleRate) {
       return {

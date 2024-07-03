@@ -1,0 +1,20 @@
+:host {
+  display: inline-block;
+}
+
+.array-item {
+  user-focus: none;
+  user-select: none;
+  display: inline-block;
+  padding: 5px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  margin-bottom: 3px;
+  margin-right: 3px;
+  font-size: 0.9rem;
+  border: 2px solid white;
+}
+
+.array-item.selected {
+  border: 2px solid cornflowerblue;
+}

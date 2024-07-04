@@ -17,6 +17,7 @@ import { getProperties } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../../core/component';
 
 import {
+  AlertService,
   AudioService,
   SettingsService,
   UserInteractionsService,
@@ -29,6 +30,7 @@ import {
   ASRQueueItemType,
   getSegmentBySamplePosition,
   OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
 } from '@octra/annotation';
 import {
   AudioViewerComponent,
@@ -51,6 +53,8 @@ import {
 import { HotkeysEvent } from 'hotkeys-js';
 import { ShortcutService } from '../../../core/shared/service/shortcut.service';
 import { ApplicationStoreService } from '../../../core/store/application/application-store.service';
+import { TranslocoService } from '@jsverse/transloco';
+import { NavbarService } from '../../../core/component/navbar/navbar.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -319,7 +323,10 @@ export class TranscrWindowComponent
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
     public appStoreService: ApplicationStoreService,
-    public cd: ChangeDetectorRef
+    public cd: ChangeDetectorRef,
+    private langService: TranslocoService,
+    private alertService: AlertService,
+    private navbarService: NavbarService
   ) {
     super();
 
@@ -1300,5 +1307,156 @@ export class TranscrWindowComponent
 
   onFontChange(fontName: string) {
     this.appStoreService.changeApplicationOption('editorFont', fontName);
+  }
+
+  startASRForThisSegment() {
+    if (
+      this.asrStoreService.asrOptions?.selectedASRLanguage &&
+      this.asrStoreService.asrOptions?.selectedService
+    ) {
+      if (this.audiochunk!.time.duration.seconds > 600) {
+        // trigger alert, too big audio duration
+        this.alertService
+          .showAlert(
+            'danger',
+            this.langService.translate('asr.file too big').toString()
+          )
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        if (
+          this.annotationStoreService.currentLevel instanceof
+          OctraAnnotationSegmentLevel
+        ) {
+          const time = this.audiochunk!.time.start.add(
+            this.audiochunk!.time.duration
+          );
+          const segNumber =
+            this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
+              time
+            );
+
+          if (segNumber > -1) {
+            const segment = this.annotationStoreService.currentLevel!.items[
+              segNumber
+            ] as OctraAnnotationSegment;
+
+            if (segment !== undefined) {
+              this.asrStoreService.addToQueue(
+                {
+                  sampleStart: this.audiochunk!.time.start.samples,
+                  sampleLength: this.audiochunk!.time.duration.samples,
+                },
+                ASRQueueItemType.ASR
+              );
+              this.asrStoreService.startProcessing();
+            } else {
+              console.error(`could not find segment for doing ASR.`);
+            }
+          } else {
+            console.error(
+              `could not start ASR because segment number was not found.`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  startASRForAllSegmentsNext() {
+    const segNumber =
+      this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
+        this.audiochunk!.time.start.add(this.audiochunk!.time.duration)
+      );
+
+    if (
+      segNumber > -1 &&
+      this.annotationStoreService.transcript?.currentLevel &&
+      this.annotationStoreService.transcript?.currentLevel instanceof
+        OctraAnnotationSegmentLevel
+    ) {
+      for (
+        let i = segNumber;
+        i < this.annotationStoreService.transcript.currentLevel.items.length;
+        i++
+      ) {
+        const segment =
+          this.annotationStoreService.transcript.currentLevel.items[i];
+
+        if (segment !== undefined) {
+          const sampleStart =
+            i > 0
+              ? this.annotationStoreService.transcript.currentLevel.items[
+                  i - 1
+                ]!.time.samples
+              : 0;
+          const sampleLength = segment.time.samples - sampleStart;
+
+          if (
+            sampleLength /
+              this.audiochunk?.audioManager!.resource!.info!.sampleRate! >
+            600
+          ) {
+            this.alertService
+              .showAlert(
+                'danger',
+                this.langService.translate('asr.file too big')
+              )
+              .catch((error) => {
+                console.error(error);
+              });
+            this.asrStoreService.stopItemProcessing({
+              sampleStart,
+              sampleLength,
+            });
+          } else {
+            if (
+              segment.getFirstLabelWithoutName('Speaker')?.value !==
+                undefined &&
+              segment.getFirstLabelWithoutName('Speaker')!.value.trim() ===
+                '' &&
+              this.annotationStoreService.breakMarker?.code !== undefined &&
+              segment
+                .getFirstLabelWithoutName('Speaker')!
+                .value.indexOf(this.annotationStoreService.breakMarker.code) < 0
+            ) {
+              // segment is empty and contains not a break
+              this.asrStoreService.addToQueue(
+                {
+                  sampleStart,
+                  sampleLength,
+                },
+                ASRQueueItemType.ASR
+              );
+            }
+          }
+        } else {
+          console.error(
+            `could not find segment in startASRForAllSegmentsNext()`
+          );
+        }
+      }
+      this.asrStoreService.startProcessing();
+    } else {
+      console.error(
+        `could not start ASR for all next because segment number was not found.`
+      );
+    }
+  }
+
+  stopASRForAll() {
+    this.asrStoreService.stopProcessing();
+  }
+
+  stopASRForThisSegment() {
+    this.asrStoreService.stopItemProcessing({
+      sampleStart: this.audiochunk!.time.start.samples,
+      sampleLength: this.audiochunk!.time.duration.samples,
+    });
+  }
+
+  openSettings() {
+    this.navbarService.openSettings.emit();
   }
 }

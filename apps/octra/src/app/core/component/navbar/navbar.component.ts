@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoService } from '@jsverse/transloco';
 import { environment } from '../../../../environments/environment';
@@ -28,7 +28,7 @@ import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.compon
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { BugreportModalComponent } from '../../modals/bugreport-modal/bugreport-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../default.component';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
@@ -38,6 +38,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
 import { DateTime } from 'luxon';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
+import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 
 declare const BUILD: {
   version: string;
@@ -58,8 +59,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   public get BUILD() {
     return BUILD;
   }
-
-  public test = 'ok';
 
   isCollapsed = true;
 
@@ -93,6 +92,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   get annotJSONType() {
     return AnnotationLevelType;
   }
+
+  @ViewChild('canvasContent') canvasContent?: TemplateRef<any>;
 
   public get errorsFound(): boolean {
     let beginCheck = false;
@@ -140,7 +141,9 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public annotationStoreService: AnnotationStoreService,
     public authStoreService: AuthenticationStoreService,
     public audio: AudioService,
-    public api: OctraAPIService
+    public api: OctraAPIService,
+    private offcanvasService: NgbOffcanvas,
+    protected asrStoreService: AsrStoreService
   ) {
     super();
   }
@@ -163,6 +166,12 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
           );
           break;
       }
+    });
+
+    this.subscribe(this.navbarServ.openSettings, {
+      next: () => {
+        this.openEnd();
+      },
     });
   }
 
@@ -300,6 +309,23 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     this.modalService.openModalRef(
       AboutModalComponent,
       AboutModalComponent.options
+    );
+  }
+
+  openEnd() {
+    this.appStoreService.setShortcutsEnabled(false);
+    const ref = this.offcanvasService.open(this.canvasContent, {
+      position: 'end',
+    });
+    this.subscribe(
+      ref.dismissed,
+      {
+        next: () => {
+          this.appStoreService.setShortcutsEnabled(true);
+          this.subscriptionManager.removeByTag('canvasDismissed');
+        },
+      },
+      'canvasDismissed'
     );
   }
 }

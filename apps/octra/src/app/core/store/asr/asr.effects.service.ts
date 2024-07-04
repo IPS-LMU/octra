@@ -28,7 +28,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ASRLanguage, ASRSettings, ProjectSettings } from '../../obj';
+import { ASRService, ASRSettings, ProjectSettings } from '../../obj';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
@@ -65,16 +65,10 @@ export class AsrEffects {
           );
         }
 
-        const asrInfo = asrSettings.services.find(
-          (a) => state.asr.settings?.selectedService === a.provider
-        );
-        const asrLanguage = asrSettings.languages.find(
-          (a) =>
-            a.code === state.asr.settings?.selectedLanguage &&
-            a.asr === asrInfo?.provider
-        );
-
-        if (!asrInfo || !asrLanguage) {
+        if (
+          !state.asr.settings?.selectedService ||
+          !state.asr.settings?.selectedASRLanguage
+        ) {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr info or language`,
@@ -82,7 +76,7 @@ export class AsrEffects {
           );
         }
 
-        if (!state.asr.settings?.selectedLanguage) {
+        if (!state.asr.settings?.selectedASRLanguage) {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr language`,
@@ -94,8 +88,8 @@ export class AsrEffects {
           ASRActions.addToQueue.success({
             item: {
               id: state.asr.queue.idCounter + 1,
-              selectedASRInfo: asrInfo,
-              selectedLanguage: asrLanguage,
+              selectedASRService: state.asr.settings.selectedService!,
+              selectedASRLanguage: state.asr.settings.selectedASRLanguage!,
               selectedMausLanguage: state.asr.settings?.selectedMausLanguage,
               status: ASRProcessStatus.IDLE,
               progress: 0,
@@ -305,7 +299,7 @@ export class AsrEffects {
 
                 return this.uploadFiles(
                   filesForUpload,
-                  action.item.selectedLanguage
+                  action.item.selectedASRService
                 ).pipe(
                   exhaustMap(([audioURL, transcriptURL]) => {
                     return of(
@@ -494,8 +488,9 @@ export class AsrEffects {
       withLatestFrom(this.store),
       mergeMap(([{ item, audioURL, transcriptURL }, state]) => {
         return this.callMAUS(
+          item.selectedASRLanguage,
           item.selectedMausLanguage,
-          item.selectedLanguage,
+          item.selectedASRService.host,
           audioURL,
           transcriptURL,
           state.application.appConfiguration!.octra!.plugins!.asr!
@@ -864,17 +859,17 @@ export class AsrEffects {
   }
 
   private fitsServiceRequirements(file: File, item: ASRStateQueueItem): string {
-    if (item.selectedASRInfo) {
-      if (item.selectedASRInfo.maxSignalDuration && item.sampleRate) {
+    if (item.selectedASRService) {
+      if (item.selectedASRService.maxSignalDuration && item.sampleRate) {
         if (
           item.time.sampleLength / item.sampleRate >
-          item.selectedASRInfo.maxSignalDuration
+          item.selectedASRService.maxSignalDuration
         ) {
           return '[Error] max duration exceeded';
         }
       }
-      if (item.selectedASRInfo.maxSignalSize !== undefined) {
-        if (file.size / 1000 / 1000 > item.selectedASRInfo.maxSignalSize) {
+      if (item.selectedASRService.maxSignalSize !== undefined) {
+        if (file.size / 1000 / 1000 > item.selectedASRService.maxSignalSize) {
           return '[Error] max signal size exceeded';
         }
       }
@@ -894,7 +889,8 @@ export class AsrEffects {
     url: string;
   }> {
     return this.callASR(
-      item.selectedLanguage,
+      item.selectedASRLanguage,
+      item.selectedASRService,
       audioURL,
       outFormat,
       asrSettings
@@ -902,7 +898,8 @@ export class AsrEffects {
   }
 
   private callASR(
-    languageObject: ASRLanguage,
+    language: string,
+    service: ASRService,
     audioURL: string,
     outFormat: string,
     asrSettings: ASRSettings
@@ -912,10 +909,10 @@ export class AsrEffects {
     url: string;
   }> {
     const asrUrl = asrSettings.calls[0]
-      .replace('{{host}}', languageObject.host)
+      .replace('{{host}}', service.host)
       .replace('{{audioURL}}', audioURL)
-      .replace('{{asrType}}', languageObject.asr)
-      .replace('{{language}}', languageObject.code)
+      .replace('{{asrType}}', `call${service.provider}${service.type}`)
+      .replace('{{language}}', language)
       .replace('{{outFormat}}', outFormat);
 
     const info = FileInfo.fromURL(asrUrl);
@@ -978,7 +975,7 @@ export class AsrEffects {
 
   private uploadFiles(
     files: File[],
-    selectedLanguage: ASRLanguage
+    selectedLanguage: ASRService
   ): Observable<string[]> {
     const formData = new FormData();
 
@@ -1015,8 +1012,9 @@ export class AsrEffects {
   }
 
   private callMAUS(
+    asrLanguage: string,
     mausLanguage: string | undefined,
-    languageObject: ASRLanguage,
+    host: string,
     audioURL: string,
     transcriptURL: string,
     asrSettings: ASRSettings
@@ -1025,11 +1023,10 @@ export class AsrEffects {
     url: string;
   }> {
     const mausURL = asrSettings.calls[1]
-      .replace('{{host}}', languageObject.host)
+      .replace('{{host}}', host)
       .replace('{{audioURL}}', audioURL)
       .replace('{{transcriptURL}}', transcriptURL)
-      .replace('{{asrType}}', languageObject.asr)
-      .replace('{{language}}', mausLanguage ?? languageObject.code);
+      .replace('{{language}}', mausLanguage ?? asrLanguage);
 
     const info = FileInfo.fromURL(audioURL);
     return this.http

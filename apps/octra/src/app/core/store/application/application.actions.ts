@@ -46,6 +46,11 @@ export class ApplicationActions {
       }>(),
       success: props<{
         languageSettings: ASRSettings;
+        asrLanguages: {
+          value: string;
+          providersOnly?: string[];
+          description: string;
+        }[];
         mausLanguages: {
           value: string;
           description: string;

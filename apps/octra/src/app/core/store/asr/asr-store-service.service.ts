@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ASRActions } from './asr.actions';
 import { RootState } from '../index';
 import { Store } from '@ngrx/store';
-import { ASRLanguage } from '../../obj';
 import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
 import { SubscriptionManager } from '@octra/utilities';
 import { Actions, ofType } from '@ngrx/effects';
@@ -23,6 +22,7 @@ export class AsrStoreService {
   queue$ = this.store.select((state) => state.asr.queue);
   languageSettings$ = this.store.select((state) => state.asr.languageSettings);
   mausLanguages$ = this.store.select((state) => state.asr.mausLanguages);
+  asrLanguages$ = this.store.select((state) => state.asr.asrLanguages);
   asrEnabled$ = this.store.select((state) => state.asr.isEnabled);
   itemChange$ = this.actions$.pipe(
     ofType(
@@ -32,10 +32,18 @@ export class AsrStoreService {
     map((action) => action.item)
   );
 
-  changeASRService(asrInfo?: ASRLanguage) {
+  changeASRService(asrService?: string) {
     this.store.dispatch(
-      ASRActions.setSelectedASRInformation.do({
-        asrInfo,
+      ASRActions.setSelectedASRService.do({
+        asrService,
+      })
+    );
+  }
+
+  changeASRSelectedLanguage(selectedASRLanguage?: string) {
+    this.store.dispatch(
+      ASRActions.setASRLanguage.do({
+        selectedASRLanguage,
       })
     );
   }

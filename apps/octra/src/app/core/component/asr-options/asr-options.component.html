@@ -1,281 +1,166 @@
-<div class="row justify-items-center align-middle align-items-center g-0">
-  <div class="col-auto justify-items-center align-middle align-items-center pe-2">
-    <span style="margin-top: 3px; display: inline-block; margin-right: 5px;">ASR-{{ 'g.Language' | transloco }}:</span>
-    <div #dropdown="ngbDropdown" ngbDropdown class="btn-group dropend" style="float:right;" (mousemove)="onMouseMove()"
-         (mouseleave)="onMouseOut();">
-      <button
-        class="btn btn-outline-secondary btn-sm dropdown-toggle"
-        type="button"
-        id="dropdownMenuButton"
-        aria-expanded="false"
-        ngbDropdownToggle
-      >
-        <ng-container
-          *ngIf="(asrStoreService.asrOptions$|async)?.selectedLanguage === null || (asrStoreService.asrOptions$|async)?.selectedLanguage === undefined || (asrStoreService.asrOptions$|async)?.selectedLanguage === ''; else asrAllSet"
-        >
-          {{ 'asr.without asr' | transloco }}
-        </ng-container>
-        <ng-template #asrAllSet>
-          {{ (asrStoreService.asrOptions$|async)?.selectedService }} ({{
-          (asrStoreService.asrOptions$|async)?.selectedLanguage
-          }})
-        </ng-template>
-      </button>
-      <div
-        ngbDropdownMenu
-        class="dropdown-menu"
-        aria-labelledby="dropdownMenuButton"
-        style="padding: 5px; height: 300px; overflow-y: scroll"
-        (scroll)="onScroll()"
-      >
-        <p style="font-size: 0.85rem; text-align: center">
-          {{ 'asr.click on logo' | transloco }}
-        </p>
-        <table class="table table-hover languageTable">
-          <thead class="text-secondary">
-          <tr>
-            <th>{{ 'g.Language' | transloco }}</th>
-            <th>{{ 'g.Service Provider' | transloco }}</th>
-            <th>{{ 'g.free quota' | transloco }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr [ngClass]="{
-              'selected': (asrStoreService.asrOptions$|async)?.selectedLanguage === undefined || (asrStoreService.asrOptions$|async)?.selectedLanguage === ''
-            }">
-            <td (click)="onASRLangChanged()" colspan="3" class="text-center">
-              {{ 'asr.without asr' | transloco }}
-            </td>
-          </tr>
-          <ng-container *ngIf="languageSettings !== undefined">
-            <tr *ngFor="let lang of languageSettings!.languages; let i = index" [ngClass]="{
-              selected:
-                (asrStoreService.asrOptions$|async)?.selectedLanguage === lang.code &&
-                (asrStoreService.asrOptions$|async)?.selectedService === lang.asr,
-                'inactive': lang.state === 'inactive'
-            }"
-            >
-              <td (click)="onASRLangChanged(lang)" class="col-language">
-                <ng-container
-                  *ngIf="lang !== undefined && lang.state === 'active'"
-                >
-                  {{ lang.name }} ({{ getShortCode(lang.code) }}) [{{
-                  lang.asr
-                  }}]
-                </ng-container>
-                <ng-container
-                  *ngIf="lang !== undefined && lang.state === 'inactive'"
-                >
-                  {{ lang.name }} ({{ getShortCode(lang.code) }}) [{{
-                  lang.asr
-                  }}] (currently not available)
-                </ng-container>
-              </td>
-              <td class="col-asr">
-                <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
-                     [ngbPopover]="asrDescription" [container]="'body'" [autoClose]="true"
-                     [disablePopover]="disablePopovers || lang.state !== 'active'" popoverTitle="Service information" />
-
-                <ng-template #asrDescription>
-                  <table class="table table-sm table-borderless">
-                    <tbody>
-                    <tr>
-                      <td>
-                        <i class="bi bi-database-fill"></i>
-                      </td>
-                      <td>
-                        {{ serviceProviders[lang.asr]?.dataStoragePolicy }}
-                      </td>
-                    </tr>
-                    <tr
-                      *ngIf="
-                                  serviceProviders[lang.asr].maxSignalDuration !==
-                                  undefined
-                                "
-                    >
-                      <td>
-                        <i class="bi bi-exclamation-triangle"></i>
-                      </td>
-                      <td>
-                        max audio duration:
-                        {{ serviceProviders[lang.asr].maxSignalDuration }}
-                        seconds
-                      </td>
-                    </tr>
-                    <tr
-                      *ngIf="
-                                  serviceProviders[lang.asr].maxSignalSize !== undefined
-                                "
-                    >
-                      <td>
-                        <i class="bi bi-exclamation-triangle"></i>
-                      </td>
-                      <td>
-                        max file size:
-                        {{ serviceProviders[lang.asr].maxSignalSize }} MB
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <i class="bi bi-person-check"></i>
-                      </td>
-                      <td>
-                        <a
-                          [href]="serviceProviders[lang.asr]?.termsURL"
-                          target="_blank"
-                        >Terms &amp; Conditions</a
-                        >
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <i class="bi bi-globe-americas"></i>
-                      </td>
-                      <td>
-                        <a
-                          [href]="serviceProviders[lang.asr]?.homepageURL"
-                          target="_blank"
-                        >Homepage</a
-                        >
-                      </td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </ng-template>
-              </td>
-              <td style="width:100px">
-                <div class="progress h-100">
-                  <ng-template #popTemplate>
-                    <div id="quota-tooltip"
-                         [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(lang.asr) + '</div>'"></div>
-                  </ng-template>
-                  <!-- [popover]="popTemplate" -->
-                  <div class="progress-bar bg-success" role="progressbar" [ngbPopover]="popTemplate" [disablePopover]="disablePopovers || lang.state !== 'active'"
-                       triggers="mouseenter:mouseleave"
-                       [ngStyle]="{
-                                    width: (100 - getQuotaPercentage(lang.asr)) + '%'
+<div class="row g-0">
+  <div class="col-4">
+    <div class="d-inline-block" ngbDropdown #dropdown="ngbDropdown" placement="bottom-left" container="body"
+         (openChange)="onLanguageDropdownOpenChange($event, 'asr')">
+      <input type="text" class="form-control" id="languageDropdown" ngbDropdownToggle placeholder="ASR Language"
+             autocomplete="off" autocapitalize="off" name="language" [(ngModel)]="fields.asr.selected" #languageInput
+             data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
+             (keyup)="filterLanguages(languageInput.value, 'asr', dropdown)" />
+      <div ngbDropdownMenu aria-labelledby="languageDropdown" style="max-height:150px;" class="overflow-y-auto"
+           id="languageDropdownMenu">
+        <span class="d-block mb-2 ms-2"><b>ASR Language</b></span>
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-action p-1" ngbDropdownItem
+              *ngFor="let language of fields.asr.filtered" (click)="selectLanguage(language.value, 'asr')"><a
+            class="dropdown-item"
+          >{{ language.description }}</a>
+          </li>
+          <li class="text-center" *ngIf="fields.asr.filtered.length === 0">Nothing found</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
+         (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown3="ngbDropdown" [autoClose]="false">
+      <input type="text" class="form-control" id="providerDropdown" ngbDropdownToggle placeholder="Provider"
+             autocomplete="off" autocapitalize="off" name="provider" [(ngModel)]="fields.provider.selected"
+             #providerInput
+             data-bs-toggle="dropdown" aria-expanded="false"
+             (keyup)="filterProviders(providerInput.value, dropdown3)" />
+      <div ngbDropdownMenu aria-labelledby="mausDropdown" style="max-height:150px;max-width:300px;"
+           class="overflow-y-auto"
+           id="providerDropdownMenu">
+        <span class="d-block mb-2 ms-2"><b>ASR Provider</b></span>
+        <ul class="list-group">
+          <li class="list-group-item p-1 pointer"
+              *ngFor="let provider of fields.provider.filtered">
+            <div class="px-1 py-2">
+              <div class="row g-1 px-0 justify-items-center align-items-center">
+                <div class="col-8 text-start" (click)="selectProvider(provider.provider, dropdown3)">
+                  <img [src]="provider.logoURL" [alt]="provider.provider + ' logo'"
+                       style="max-height:50px;max-width:100%;" />
+                </div>
+                <div class="col" (click)="selectProvider(provider.provider, dropdown3)">
+                  <div class="progress">
+                    <ng-template #popTemplate>
+                      <div id="quota-tooltip"
+                           [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(provider) + '</div>'"></div>
+                    </ng-template>
+                    <!-- [popover]="popTemplate" -->
+                    <div class="progress-bar bg-success" role="progressbar" [ngbPopover]="popTemplate" container="body"
+                         triggers="mouseenter:mouseleave"
+                         [ngStyle]="{
+                                    width: (100 - getQuotaPercentage(provider)) + '%'
                                   }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                    {{(100 - getQuotaPercentage(lang.asr)) + '%'}}
-                  </div>
-                  <div class="progress-bar bg-danger" role="progressbar" *ngIf="getQuotaPercentage(lang.asr) > 0"
-                       [ngStyle]="{
-                                    width: getQuotaPercentage(lang.asr) + '%'
+                      {{ (100 - getQuotaPercentage(provider)) + '%' }}
+                    </div>
+                    <div class="progress-bar bg-danger" role="progressbar" *ngIf="getQuotaPercentage(provider) > 0"
+                         [ngStyle]="{
+                                    width: getQuotaPercentage(provider) + '%'
                                   }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
-                    <ng-container
-                      *ngIf="getQuotaPercentage(lang.asr) > 90">{{(100 - getQuotaPercentage(lang.asr)) + '%'}}</ng-container>
+                      <ng-container
+                        *ngIf="getQuotaPercentage(provider) > 90">{{ (100 - getQuotaPercentage(provider)) + '%' }}
+                      </ng-container>
+                    </div>
                   </div>
                 </div>
-              </td>
-            </tr>
-          </ng-container>
-          </tbody>
-        </table>
+                <div class="col-auto">
+                  <i class="bi bi-info-circle-fill pointer" style="color: cornflowerblue" [ngbPopover]="asrDescription"
+                     popoverTitle="Service information" [container]="'body'" [autoClose]="true"></i>
+                  <ng-template #asrDescription>
+                    <table class="table table-sm table-borderless">
+                      <tbody>
+                      <tr>
+                        <td>
+                          <i class="bi bi-database-fill"></i>
+                        </td>
+                        <td>
+                          {{ provider.dataStoragePolicy }}
+                        </td>
+                      </tr>
+                      <tr
+                        *ngIf="
+                                  provider.maxSignalDuration !==
+                                  undefined
+                                "
+                      >
+                        <td>
+                          <i class="bi bi-exclamation-triangle"></i>
+                        </td>
+                        <td>
+                          max audio duration:
+                          {{ provider.maxSignalDuration }}
+                          seconds
+                        </td>
+                      </tr>
+                      <tr
+                        *ngIf="
+                                  provider.maxSignalSize !== undefined
+                                "
+                      >
+                        <td>
+                          <i class="bi bi-exclamation-triangle"></i>
+                        </td>
+                        <td>
+                          max file size:
+                          {{ provider.maxSignalSize }} MB
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <i class="bi bi-person-check"></i>
+                        </td>
+                        <td>
+                          <a
+                            [href]="provider?.termsURL"
+                            target="_blank"
+                          >Terms &amp; Conditions</a
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <i class="bi bi-globe-americas"></i>
+                        </td>
+                        <td>
+                          <a
+                            [href]="provider?.homepageURL"
+                            target="_blank"
+                          >Homepage</a
+                          >
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="text-center" *ngIf="fields.provider.filtered.length === 0">Nothing found</li>
+        </ul>
       </div>
     </div>
   </div>
-  <div class="col-auto ps-2 justify-content-center justify-items-center align-middle"
-       style="border-left:1px solid rgb(128,128,128);">
-    <span for="dropdownMenuButton3" style="float:left; margin-top:3px;">MAUS
-      - {{"g.Language" | transloco}}
-      : </span>
-    <div
-      #dropdown3
-      ngbDropdown
-      class="btn-group dropend"
-      style="margin-left: 10px; float:left;"
-      (mousemove)="onMouseMove()"
-      (mouseleave)="onMouseOut();"
-    >
-      <button
-        [disabled]="!(asrStoreService.asrOptions$|async)?.selectedLanguage"
-        class="btn btn-outline-secondary btn-sm dropdown-toggle"
-        type="button"
-        id="dropdownMenuButton3"
-        aria-expanded="false"
-        ngbDropdownToggle
-      >
-        <ng-container *ngIf="asrStoreService.asrOptions?.selectedMausLanguage === null; else mausAllSet">
-          Nothing selected
-        </ng-container>
-        <ng-template #mausAllSet>
-          {{asrStoreService.asrOptions?.selectedMausLanguage}}
-        </ng-template>
-      </button>
-      <div
-        ngbDropdownMenu
-        class="dropdown-menu"
-        aria-labelledby="dropdownMenuButton"
-        style="padding: 5px; max-height:400px;overflow-y: auto;"
-      >
-        <li *ngFor="let language of asrStoreService.mausLanguages$ | async"
-            (click)="onMAUSLangChanged(language.description, language.value)">
-        <span class="dropdown-item"
-              style="padding:5px 5px; min-height: 0.85rem; font-size:0.8rem; cursor: pointer;">
-          {{language.description}}
-        </span>
-        </li>
-      </div>
-    </div>
-    <a [href]="manualURL + 'using-asr'" style="margin-left: 10px; float: left;" target="_blank">
-      <i class="bi bi-question-circle-fill fs-5"></i>
-    </a>
-  </div>
-
-  <div class="col-auto align-middle justify-items-center ps-2">
-    <div
-      #dropdown2
-      ngbDropdown
-      class="btn-group dropend"
-      style="margin-left: 10px"
-      (mousemove)="onMouseMove()"
-      (mouseleave)="onMouseOut();" style="margin-left:10px;"
-    >
-      <button
-        [disabled]="!(asrStoreService.asrOptions$|async)?.selectedLanguage"
-        class="btn btn-primary btn-sm dropdown-toggle"
-        type="button"
-        id="dropdownMenuButton2"
-        aria-expanded="false"
-        ngbDropdownToggle
-      >
-        {{ 'g.SELECT ACTION' | transloco }}
-      </button>
-      <div
-        ngbDropdownMenu
-        class="dropdown-menu"
-        aria-labelledby="dropdownMenuButton"
-        style="padding: 5px"
-      >
-        <ng-container *ngIf="(asrStoreService
-      .queue$ |async)?.status !== 'STARTED'">
-          <li role="menuitem">
-            <button (click)="startASRForThisSegment()" class="dropdown-item">
-              {{ 'asr.start this segment' | transloco }}
-            </button>
+  <div class="col-4">
+    <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
+         (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown2="ngbDropdown">
+      <input type="text" class="form-control" id="mausDropdown" ngbDropdownToggle placeholder="MAUS Language"
+             autocomplete="off" autocapitalize="off" name="provider" [(ngModel)]="fields.maus.selected" #mausInput
+             data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
+             (keyup)="filterLanguages(mausInput.value, 'maus', dropdown2)" />
+      <div ngbDropdownMenu aria-labelledby="mausDropdown" style="max-height:150px;" class="overflow-y-auto"
+           id="mausDropdownMenu">
+        <span class="d-block mb-2 ms-2"><b>MAUS Language</b></span>
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-action p-1" ngbDropdownItem
+              *ngFor="let language of fields.maus.filtered" (click)="selectLanguage(language.value, 'maus')"><a
+            class="dropdown-item"
+          >{{ language.description }}</a>
           </li>
-          <li role="menuitem">
-            <button (click)="startASRForAllSegmentsNext()" class="dropdown-item">
-              {{ 'asr.start for all next' | transloco }}
-            </button>
-          </li>
-        </ng-container>
-        <ng-container *ngIf="(asrStoreService.queue$ | async)?.status === 'STARTED'">
-          <li role="menuitem">
-            <button (click)="stopASRForThisSegment()" class="dropdown-item">
-              {{ 'asr.stop this segment' | transloco }}
-            </button>
-          </li>
-          <li role="menuitem">
-            <button class="dropdown-item">
-              {{ 'asr.stop for all next' | transloco }}
-            </button>
-          </li>
-          <li role="menuitem">
-            <button (click)="stopASRForAll()" class="dropdown-item">
-              {{ 'asr.stop all' | transloco }}
-            </button>
-          </li>
-        </ng-container>
+          <li class="text-center" *ngIf="fields.maus.filtered.length === 0">Nothing found</li>
+        </ul>
       </div>
     </div>
   </div>

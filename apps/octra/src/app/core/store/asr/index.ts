@@ -1,8 +1,8 @@
-import { ASRLanguage, ASRService, ASRSettings } from '../../obj';
+import { ASRService, ASRSettings } from '../../obj';
 
 export interface ASRStateSettings {
-  selectedLanguage?: string | null;
-  selectedService?: string;
+  selectedService?: ASRService;
+  selectedASRLanguage?: string;
   selectedMausLanguage?: string;
   accessCode?: string;
 }
@@ -32,8 +32,8 @@ export interface ASRStateQueueItem {
   id: number;
   time: ASRTimeInterval;
   selectedMausLanguage?: string;
-  selectedLanguage: ASRLanguage;
-  selectedASRInfo: ASRService;
+  selectedASRLanguage: string;
+  selectedASRService: ASRService;
   type: ASRQueueItemType;
   progress: number;
   status: ASRProcessStatus;
@@ -59,6 +59,11 @@ export interface ASRStateQueue {
 export interface ASRState {
   settings?: ASRStateSettings;
   languageSettings?: ASRSettings;
+  asrLanguages?: {
+    value: string;
+    providersOnly?: string[],
+    description: string;
+  }[];
   mausLanguages?: {
     value: string;
     description: string;

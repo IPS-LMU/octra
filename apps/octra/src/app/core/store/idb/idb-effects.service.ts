@@ -676,7 +676,8 @@ export class IDBEffects {
   saveASRSettings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        ASRActions.setSelectedASRInformation.do,
+        ASRActions.setSelectedASRService.do,
+        ASRActions.setASRLanguage.do,
         ASRActions.setASRMausLanguage.do
       ),
       withLatestFrom(this.store),

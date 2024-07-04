@@ -62,10 +62,11 @@ export const reducer = createReducer(
   initialState,
   on(
     ApplicationActions.loadASRSettings.success,
-    (state: ASRState, { languageSettings, mausLanguages }) => ({
+    (state: ASRState, { languageSettings, mausLanguages, asrLanguages }) => ({
       ...state,
       languageSettings,
-      mausLanguages
+      asrLanguages,
+      mausLanguages,
     })
   ),
   on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
@@ -82,6 +83,16 @@ export const reducer = createReducer(
       },
     })
   ),
+  on(
+    ASRActions.setASRLanguage.do,
+    (state: ASRState, { selectedASRLanguage }) => ({
+      ...state,
+      settings: {
+        ...state.settings,
+        selectedASRLanguage,
+      },
+    })
+  ),
   on(ASRActions.initQueue.do, (state: ASRState) => ({
     ...state,
     queue: initialState.queue,
@@ -94,14 +105,15 @@ export const reducer = createReducer(
     })
   ),
   on(
-    ASRActions.setSelectedASRInformation.do,
-    (state: ASRState, { asrInfo }) => ({
+    ASRActions.setSelectedASRService.do,
+    (state: ASRState, { asrService }) => ({
       ...state,
       queue: initialState.queue,
       settings: {
         ...state.settings,
-        selectedService: asrInfo?.asr,
-        selectedLanguage: asrInfo?.code,
+        selectedService: state.languageSettings?.services.find(
+          (a) => a.provider === asrService
+        ),
       },
     })
   ),

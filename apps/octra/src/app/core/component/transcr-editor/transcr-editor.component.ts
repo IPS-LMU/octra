@@ -1207,7 +1207,7 @@ export class TranscrEditorComponent
   }
 
   public onASROverlayClick() {
-    if (this.asrStoreService.asrOptions?.selectedLanguage !== undefined) {
+    if (this.asrStoreService.asrOptions?.selectedASRLanguage !== undefined) {
       this.asrStoreService.stopItemProcessing({
         sampleStart: this.audiochunk!.time.start.samples,
         sampleLength: this.audiochunk!.time.duration.samples,

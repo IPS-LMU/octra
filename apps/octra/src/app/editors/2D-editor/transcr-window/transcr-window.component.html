@@ -22,11 +22,65 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-    <octra-asr-options
-      *ngIf="asrStoreService.asrEnabled$ | async"
-      [audioChunk]="audiochunk"
-      [enabled]="editor.rawText === ''"
-    ></octra-asr-options>
+    <div class="container-fluid" *ngIf="asrStoreService.asrEnabled$ | async">
+      <div class="row py-2" style="background-color:whitesmoke">
+        <div class="col">
+          <div class="d-inline-block me-1">
+            ASR:
+          </div>
+          <div ngbDropdown class="btn-group dropend">
+            <button
+              [disabled]="!((asrStoreService.asrOptions$|async)?.selectedASRLanguage) || !((asrStoreService.asrOptions$|async)?.selectedService)"
+              class="btn btn-primary btn-sm dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton2"
+              aria-expanded="false"
+              ngbDropdownToggle
+            >
+              {{ 'g.SELECT ACTION' | transloco }}
+            </button>
+            <div
+              ngbDropdownMenu
+              class="dropdown-menu"
+              aria-labelledby="dropdownMenuButton"
+              style="padding: 5px"
+            >
+              <ng-container *ngIf="(asrStoreService
+      .queue$ |async)?.status !== 'STARTED'">
+                <li role="menuitem">
+                  <button (click)="startASRForThisSegment()" class="dropdown-item">
+                    {{ 'asr.start this segment' | transloco }}
+                  </button>
+                </li>
+                <li role="menuitem">
+                  <button (click)="startASRForAllSegmentsNext()" class="dropdown-item">
+                    {{ 'asr.start for all next' | transloco }}
+                  </button>
+                </li>
+              </ng-container>
+              <ng-container *ngIf="(asrStoreService.queue$ | async)?.status === 'STARTED'">
+                <li role="menuitem">
+                  <button (click)="stopASRForThisSegment()" class="dropdown-item">
+                    {{ 'asr.stop this segment' | transloco }}
+                  </button>
+                </li>
+                <li role="menuitem">
+                  <button class="dropdown-item">
+                    {{ 'asr.stop for all next' | transloco }}
+                  </button>
+                </li>
+                <li role="menuitem">
+                  <button (click)="stopASRForAll()" class="dropdown-item">
+                    {{ 'asr.stop all' | transloco }}
+                  </button>
+                </li>
+              </ng-container>
+            </div>
+          </div>
+          <i class="bi bi-gear-fill ms-2 pointer" style="color: gray" (click)="openSettings()"></i>
+        </div>
+      </div>
+    </div>
     <octra-audio-navigation
       #audionav
       (afterPlaybackRateChange)="afterSpeedChange($event)"

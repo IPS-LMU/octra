@@ -50,6 +50,7 @@ import { AnnotationStoreService } from '../../core/store/login-mode/annotation/a
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
 import { OctraModalService } from '../../core/modals/octra-modal.service';
+import { NavbarService } from '../../core/component/navbar/navbar.service';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -344,7 +345,8 @@ export class TwoDEditorComponent
     private langService: TranslocoService,
     private asrStoreService: AsrStoreService,
     private modalService: OctraModalService,
-    private shortcutService: ShortcutService
+    private shortcutService: ShortcutService,
+    private navbarService: NavbarService
   ) {
     super();
     this.initialized = new EventEmitter<void>();
@@ -750,7 +752,10 @@ export class TwoDEditorComponent
       );
 
       if (segmentNumber > -1) {
-        if (this.appStorage.snapshot.asr.settings?.selectedLanguage) {
+        if (
+          this.appStorage.snapshot.asr.settings?.selectedASRLanguage &&
+          this.appStorage.snapshot.asr.settings?.selectedService
+        ) {
           const segment = currentLevel!.items[
             segmentNumber
           ].clone() as OctraAnnotationSegment;
@@ -840,7 +845,7 @@ export class TwoDEditorComponent
           }
         } else {
           // open transcr window
-          this.openSegment(segmentNumber);
+          this.navbarService.openSettings.emit();
           this.alertService
             .showAlert(
               'warning',

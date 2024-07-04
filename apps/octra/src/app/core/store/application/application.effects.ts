@@ -308,35 +308,114 @@ export class ApplicationEffects {
                 return forkJoin([
                   from(this.updateASRQuotaInfo(asrSettings)),
                   this.getMAUSLanguages(asrSettings),
+                  this.getASRLanguages(asrSettings),
                   this.getActiveASRProviders(asrSettings),
                 ]).pipe(
-                  exhaustMap(([setttings, mausLanguages, activeProviders]) => {
-                    return of(
-                      ApplicationActions.loadASRSettings.success({
-                        languageSettings: {
-                          ...setttings,
-                          languages: setttings.languages.map((a) => {
-                            return {
-                              ...a,
-                              state:
-                                activeProviders.find(
+                  exhaustMap(
+                    ([
+                      setttings,
+                      mausLanguages,
+                      asrLanguages,
+                      activeProviders,
+                    ]) => {
+                      return of(
+                        ApplicationActions.loadASRSettings.success({
+                          languageSettings: {
+                            ...setttings,
+                            services: setttings.services.map((a) => {
+                              return {
+                                ...a,
+                                state: activeProviders.find(
                                   (b) =>
-                                    b.ParameterValue.Value === `call${a.asr}ASR`
-                                ) && a.state === 'active'
-                                  ? 'active'
-                                  : 'inactive',
-                            };
-                          }),
-                        },
-                        mausLanguages: mausLanguages
-                          ?.filter((a) => a.ParameterValue.Description !== '')
-                          .map((a) => ({
-                            value: a.ParameterValue.Value,
-                            description: a.ParameterValue.Description,
-                          })),
-                      })
-                    );
-                  })
+                                    b.ParameterValue.Value ===
+                                    `call${a.basName}ASR`
+                                ),
+                              };
+                            }),
+                          },
+                          asrLanguages: asrLanguages
+                            ?.filter((a) => a.ParameterValue.Description !== '')
+                            .map((a) => {
+                              const result: {
+                                value: string;
+                                providersOnly?: string[];
+                                description: string;
+                              } = {
+                                value: a.ParameterValue.Value,
+                                description:
+                                  a.ParameterValue.Description.replace(
+                                    / *\([^)]*\) *$/g,
+                                    ''
+                                  ),
+                              };
+
+                              const matches = / *\(([^)]*)\) *$/g.exec(
+                                a.ParameterValue.Description
+                              );
+
+                              if (matches) {
+                                const splitted = matches[1].split('/');
+                                result.providersOnly = splitted.map((b) => {
+                                  switch (b) {
+                                    case 'whisp':
+                                      return 'WhisperX';
+                                    case 'amber':
+                                      return 'Amber';
+                                    case 'google':
+                                      return 'Google';
+                                    case 'lst':
+                                      return 'LST';
+                                    case 'fraunh':
+                                      return 'Fraunhofer';
+                                    case 'uweb':
+                                      return 'Web';
+                                    case 'eml':
+                                      return 'EML';
+                                    case 'watson':
+                                      return 'Watson';
+                                  }
+                                  return b;
+                                });
+
+                                const lstIndex =
+                                  result.providersOnly.indexOf('LST');
+
+                                if (lstIndex > -1) {
+                                  if (/^nl/g.exec(a.ParameterValue.Value)) {
+                                    result.providersOnly[lstIndex] = 'LSTDutch';
+                                  } else if (
+                                    /^en/g.exec(a.ParameterValue.Value)
+                                  ) {
+                                    result.providersOnly[lstIndex] =
+                                      'LSTEnglish';
+                                  } else {
+                                    result.providersOnly = [
+                                      ...result.providersOnly.slice(
+                                        0,
+                                        lstIndex - 1
+                                      ),
+                                      'LSTDutch',
+                                      'LSTEnglish',
+                                      ...result.providersOnly.slice(lstIndex),
+                                    ];
+                                  }
+                                }
+                              } else {
+                                result.providersOnly = undefined;
+                              }
+
+                              return result;
+                            }),
+                          mausLanguages: mausLanguages
+                            ?.filter((a) => a.ParameterValue.Description !== '')
+                            .map((a) => ({
+                              value: a.ParameterValue.Value,
+                              description: a.ParameterValue.Description,
+                            })),
+                        })
+                      );
+                    }
+                  )
                 );
               }),
               catchError((error) => {
@@ -459,6 +538,25 @@ export class ApplicationEffects {
         }[]
       >(
         `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runPipeline/Input/LANGUAGE/Values/`,
+        { responseType: 'json' }
+      );
+    } else {
+      return of([]);
+    }
+  }
+
+  public getASRLanguages(asrSettings?: ASRSettings): Observable<
+    {
+      ParameterValue: { Value: string; Description: string };
+    }[]
+  > {
+    if (asrSettings?.basConfigURL) {
+      return this.http.get<
+        {
+          ParameterValue: { Value: string; Description: string };
+        }[]
+      >(
+        `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runASR/Input/LANGUAGE/Values`,
         { responseType: 'json' }
       );
     } else {

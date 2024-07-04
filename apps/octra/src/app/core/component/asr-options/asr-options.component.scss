@@ -48,8 +48,6 @@
 :host {
   background-color: whitesmoke;
   border: 3px;
-  flex: auto;
-  flex-direction: column;
   display: flex;
   padding: 5px;
   margin-bottom: 5px;
@@ -77,4 +75,18 @@ table thead th {
 
 .inactive {
   opacity: 0.5;
+}
+
+
+.dropdown-menu * {
+  font-size: 0.85rem;
+}
+
+input,
+input::placeholder {
+  font-size: 0.85rem;
+}
+
+.progress {
+  height: 20px !important;
 }

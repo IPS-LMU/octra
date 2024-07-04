@@ -65,14 +65,6 @@ export interface AppSettings {
   };
 }
 
-export interface ASRLanguage {
-  code: string;
-  name: string;
-  asr: string;
-  state: string;
-  host: string;
-}
-
 export interface ASRService {
   provider: string;
   basName?: string;
@@ -86,6 +78,7 @@ export interface ASRService {
   dataStoragePolicy: string;
   homepageURL: string;
   logoURL: string;
+  host: string;
 }
 
 export interface ASRSettings {
@@ -93,7 +86,6 @@ export interface ASRSettings {
   shibbolethURL: string;
   calls: string[];
   services: ASRService[];
-  languages: ASRLanguage[];
   asrInfoURL?: string;
   basConfigURL?: string;
   asrQuotaInfoURL?: string;

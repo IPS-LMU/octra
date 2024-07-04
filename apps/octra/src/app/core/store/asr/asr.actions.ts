@@ -6,14 +6,13 @@ import {
   ASRStateQueueItem,
   ASRTimeInterval,
 } from './index';
-import { ASRLanguage } from '../../obj';
 
 export class ASRActions {
-  static setSelectedASRInformation = createActionGroup({
+  static setSelectedASRService = createActionGroup({
     source: 'asr/set selected asr',
     events: {
       do: props<{
-        asrInfo?: ASRLanguage;
+        asrService?: string;
       }>(),
       success: emptyProps(),
       fail: props<{
@@ -26,6 +25,19 @@ export class ASRActions {
     source: 'asr/stop processing',
     events: {
       do: emptyProps(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static setASRLanguage = createActionGroup({
+    source: 'asr/set asr language',
+    events: {
+      do: props<{
+        selectedASRLanguage?: string;
+      }>(),
       success: emptyProps(),
       fail: props<{
         error: string;

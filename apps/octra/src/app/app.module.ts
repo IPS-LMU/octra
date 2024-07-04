@@ -52,6 +52,7 @@ import {
   NgbDropdownModule,
   NgbModalModule,
   NgbNavModule,
+  NgbOffcanvasModule,
   NgbPopoverModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
@@ -122,6 +123,7 @@ import { RouterModule } from '@angular/router';
     NgxOctraApiModule,
     OctraComponentsModule,
     OctraUtilitiesModule,
+    NgbOffcanvasModule,
   ],
   providers: [
     ALoginGuard,

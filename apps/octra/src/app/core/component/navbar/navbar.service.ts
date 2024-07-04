@@ -6,6 +6,7 @@ import { FileSize, getFileSize } from '@octra/utilities';
 export class NavbarService {
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();
+  public openSettings = new EventEmitter<void>();
 
   public dataloaded = false;
   public showNavbar = true;

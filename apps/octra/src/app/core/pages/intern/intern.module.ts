@@ -35,6 +35,11 @@ import { EffectsModule } from '@ngrx/effects';
 import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AuthSuccessPageComponent } from './auth-success/auth-success.page.component';
+import {
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];
 
@@ -95,6 +100,9 @@ export const EDITORS: any[] = [
     ),
     EffectsModule.forFeature([AnnotationEffects]),
     OctraUtilitiesModule,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
   ],
   exports: [
     AuthComponent,

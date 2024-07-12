@@ -354,9 +354,7 @@ export class SRTConverter extends Converter {
             lastEnd = item.sampleStart + item.sampleDur;
 
             const nextItem =
-              j < a.items.length - 1
-                ? a.items[j + 1]
-                : undefined;
+              j < a.items.length - 1 ? a.items[j + 1] : undefined;
             if (
               !nextItem &&
               item.sampleStart + item.sampleDur < Number(audiofile.duration)
@@ -365,7 +363,9 @@ export class SRTConverter extends Converter {
                 new OSegment(
                   counterID++,
                   item.sampleStart + item.sampleDur,
-                  Number(audiofile.duration) - (item.sampleStart + item.sampleDur)
+                  Number(audiofile.duration) -
+                    (item.sampleStart + item.sampleDur),
+                  [new OLabel(a.name, '')]
                 )
               );
             }

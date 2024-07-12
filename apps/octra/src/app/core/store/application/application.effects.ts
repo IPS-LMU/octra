@@ -129,6 +129,7 @@ export class ApplicationEffects {
       ofType(ApplicationActions.loadASRSettings.do),
       exhaustMap(({ settings }) => {
         // load information from BASWebservices ASR page
+
         if (
           settings.octra.plugins?.asr?.asrInfoURL !== undefined &&
           typeof settings.octra.plugins.asr.asrInfoURL === 'string' &&
@@ -595,11 +596,13 @@ export class ApplicationEffects {
           language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en'
         );
 
-        this.store.dispatch(
-          ApplicationActions.loadASRSettings.do({
-            settings: a.settings,
-          })
-        );
+        if (a.settings.octra.plugins?.asr?.enabled) {
+          this.store.dispatch(
+            ApplicationActions.loadASRSettings.do({
+              settings: a.settings,
+            })
+          );
+        }
 
         const webToken = this.sessStr.retrieve('webToken');
         const authType = this.sessStr.retrieve('authType');
@@ -784,7 +787,11 @@ export class ApplicationEffects {
                 }
               }
 
-              if (lastPagePath && !['', '/'].includes(lastPagePath)) {
+              if (
+                lastPagePath &&
+                !['', '/', '/load'].includes(lastPagePath) &&
+                !/^\/http/g.exec(lastPagePath)
+              ) {
                 this.routerService.navigate('last page', [lastPagePath], {
                   queryParams,
                 });

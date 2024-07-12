@@ -846,13 +846,12 @@ export class AnnotationStoreService {
     if (this.currentLevel instanceof OctraAnnotationSegmentLevel) {
       for (let i = 0; i < this.currentLevel!.items.length; i++) {
         const segment = this.currentLevel!.items[i];
+        const valueLabel = segment.getFirstLabelWithoutName('Speaker');
 
         if (segment.getFirstLabelWithoutName('Speaker')?.value !== '') {
           if (
             this.breakMarker !== undefined &&
-            segment
-              .getFirstLabelWithoutName('Speaker')!
-              .value.indexOf(this.breakMarker.code) > -1
+            valueLabel!.value.indexOf(this.breakMarker.code) > -1
           ) {
             this._statistics.pause++;
           } else {

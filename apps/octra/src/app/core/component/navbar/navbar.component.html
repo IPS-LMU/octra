@@ -637,11 +637,13 @@
                 </button>
               </div>
 
-              <ng-container *ngIf="asrStoreService.asrEnabled$ | async">
+              <ng-container>
                 <br /><br />
-                <label style="font-size: 1rem">ASR Options:</label>
+                <hr/>
+                <label style="font-size: 1rem" class="mb-2">{{"g.asr options" | transloco}}</label>
                 <octra-asr-options
                 ></octra-asr-options>
+                <hr/>
               </ng-container>
             </ng-container>
           </div>

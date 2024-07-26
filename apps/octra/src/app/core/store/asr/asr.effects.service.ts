@@ -91,6 +91,7 @@ export class AsrEffects {
               selectedASRService: state.asr.settings.selectedService!,
               selectedASRLanguage: state.asr.settings.selectedASRLanguage!,
               selectedMausLanguage: state.asr.settings?.selectedMausLanguage,
+              accessCode: state.asr.settings?.accessCode,
               status: ASRProcessStatus.IDLE,
               progress: 0,
               time: action.item.timeInterval,
@@ -893,7 +894,8 @@ export class AsrEffects {
       item.selectedASRService,
       audioURL,
       outFormat,
-      asrSettings
+      asrSettings,
+      item.accessCode
     );
   }
 
@@ -902,18 +904,23 @@ export class AsrEffects {
     service: ASRService,
     audioURL: string,
     outFormat: string,
-    asrSettings: ASRSettings
+    asrSettings: ASRSettings,
+    accessCode?: string
   ): Observable<{
     file: File;
     text: string;
     url: string;
   }> {
-    const asrUrl = asrSettings.calls[0]
+    let asrUrl = asrSettings.calls[0]
       .replace('{{host}}', service.host)
       .replace('{{audioURL}}', audioURL)
       .replace('{{asrType}}', `call${service.provider}${service.type}`)
       .replace('{{language}}', language)
       .replace('{{outFormat}}', outFormat);
+
+    if (accessCode && accessCode !== '') {
+      asrUrl += `&ACCESSCODE=${accessCode}`;
+    }
 
     const info = FileInfo.fromURL(asrUrl);
 

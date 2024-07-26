@@ -34,6 +34,7 @@ export interface ASRStateQueueItem {
   selectedMausLanguage?: string;
   selectedASRLanguage: string;
   selectedASRService: ASRService;
+  accessCode?: string;
   type: ASRQueueItemType;
   progress: number;
   status: ASRProcessStatus;
@@ -68,6 +69,7 @@ export interface ASRState {
     value: string;
     description: string;
   }[];
+  asrAuthCode?: string;
   isEnabled?: boolean;
   queue?: ASRStateQueue;
 }

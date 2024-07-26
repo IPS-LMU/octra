@@ -24,9 +24,11 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
   @ViewChild('popTemplate', { static: true }) popTemplate!: NgbPopover;
 
   languageSettings?: ASRSettings;
+  protected accessCodeVisible = false;
 
   fields: {
     asr: {
+      accessCode?: string;
       languages: {
         value: string;
         providersOnly?: string[];
@@ -113,6 +115,7 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
       this.asrStoreService.asrOptions$,
       {
         next: (state) => {
+          this.fields.asr.accessCode = state?.accessCode ?? '';
           this.fields.asr.selected = state?.selectedASRLanguage ?? '';
           this.fields.maus.selected = state?.selectedMausLanguage ?? '';
           this.fields.provider.selected =
@@ -286,5 +289,9 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
       this.fields[type].selected = '';
       this.fields[type].filtered = this.fields[type].languages;
     }
+  }
+
+  onAccessCodeChange(accessCode: string) {
+    this.asrStoreService.changeASRAccessCode(accessCode);
   }
 }

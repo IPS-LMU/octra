@@ -83,6 +83,13 @@ export const reducer = createReducer(
       },
     })
   ),
+  on(ASRActions.setASRAccessCode.do, (state: ASRState, { accessCode }) => ({
+    ...state,
+    settings: {
+      ...state.settings,
+      accessCode,
+    },
+  })),
   on(
     ASRActions.setASRLanguage.do,
     (state: ASRState, { selectedASRLanguage }) => ({

@@ -4,10 +4,6 @@
   vertical-align: middle;
 }
 
-.languageTable .selected td {
-  background-color: #d1f4f9;
-}
-
 .languageTable tr td {
   font-size: 0.8em;
   cursor: pointer;
@@ -43,14 +39,6 @@
   float: left;
   display: block;
   margin: 0 1px;
-}
-
-:host {
-  background-color: whitesmoke;
-  border: 3px;
-  display: flex;
-  padding: 5px;
-  margin-bottom: 5px;
 }
 
 .asr-label {
@@ -89,4 +77,11 @@ input::placeholder {
 
 .progress {
   height: 20px !important;
+}
+
+.asr-language-options {
+  background-color: whitesmoke;
+  border: 3px;
+  display: flex;
+  padding: 5px;
 }

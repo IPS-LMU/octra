@@ -1,9 +1,13 @@
+<form autocomplete="one-time-code">
 <div class="row g-0">
+  <label for="languageDropdown" class="form-label">{{ "p.language and provider" | transloco }}:</label>
+</div>
+<div class="row g-0 asr-language-options mb-3">
   <div class="col-4">
     <div class="d-inline-block" ngbDropdown #dropdown="ngbDropdown" placement="bottom-left" container="body"
          (openChange)="onLanguageDropdownOpenChange($event, 'asr')">
       <input type="text" class="form-control" id="languageDropdown" ngbDropdownToggle placeholder="ASR Language"
-             autocomplete="off" autocapitalize="off" name="language" [(ngModel)]="fields.asr.selected" #languageInput
+             autocomplete="one-time-code" autocapitalize="off" name="language" [(ngModel)]="fields.asr.selected" #languageInput
              data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
              (keyup)="filterLanguages(languageInput.value, 'asr', dropdown)" />
       <div ngbDropdownMenu aria-labelledby="languageDropdown" style="max-height:150px;" class="overflow-y-auto"
@@ -24,7 +28,7 @@
     <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
          (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown3="ngbDropdown" [autoClose]="false">
       <input type="text" class="form-control" id="providerDropdown" ngbDropdownToggle placeholder="Provider"
-             autocomplete="off" autocapitalize="off" name="provider" [(ngModel)]="fields.provider.selected"
+             autocomplete="one-time-code" autocapitalize="off" name="provider" [(ngModel)]="fields.provider.selected"
              #providerInput
              data-bs-toggle="dropdown" aria-expanded="false"
              (keyup)="filterProviders(providerInput.value, dropdown3)" />
@@ -147,7 +151,7 @@
     <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
          (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown2="ngbDropdown">
       <input type="text" class="form-control" id="mausDropdown" ngbDropdownToggle placeholder="MAUS Language"
-             autocomplete="off" autocapitalize="off" name="provider" [(ngModel)]="fields.maus.selected" #mausInput
+             autocomplete="one-time-code" autocapitalize="off" name="maus" [(ngModel)]="fields.maus.selected" #mausInput
              data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
              (keyup)="filterLanguages(mausInput.value, 'maus', dropdown2)" />
       <div ngbDropdownMenu aria-labelledby="mausDropdown" style="max-height:150px;" class="overflow-y-auto"
@@ -165,3 +169,23 @@
     </div>
   </div>
 </div>
+
+<div class="row g-0">
+  <div class="col">
+    <div class="mb-3">
+      <label for="asrAccessCode" class="form-label">{{ "g.access code" | transloco }}:</label>
+      <div class="input-group">
+        <input [type]="accessCodeVisible ? 'text': 'password'" class="form-control" id="asrAccessCode" autocomplete="one-time-code" name="asrAccessCode"
+               [(ngModel)]="fields.asr.accessCode" (ngModelChange)="onAccessCodeChange($event)">
+        <div class="input-group-text pointer" (click)="accessCodeVisible = !accessCodeVisible">
+          <i class="bi" [ngClass]="{
+            'bi-eye-slash': !accessCodeVisible,
+            'bi-eye-fill': accessCodeVisible
+          }"></i>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</form>

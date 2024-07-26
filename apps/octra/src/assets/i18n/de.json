@@ -125,7 +125,9 @@
     "timezone": "Zeitzone",
     "free quota": "Kostenloses Kontingent",
     "ignore": "Ignorieren",
-    "apply": "Übernehmen"
+    "apply": "Übernehmen",
+    "access code": "Zugangscode",
+    "asr options": "ASR Optionen"
   },
   "p": {
     "username or email": "Nutzername oder E-Mail",
@@ -140,7 +142,8 @@
     "select locale": "Sprache wählen",
     "select timezone": "Zeitzone wählen",
     "back to login": "Zurück zur Anmeldung",
-    "contribute translations": "Übersetzungen hinzufügen"
+    "contribute translations": "Übersetzungen hinzufügen",
+    "language and provider": "Sprache und Dienstleister"
   },
   "bug report": {
     "give feedback": "Feedback geben",

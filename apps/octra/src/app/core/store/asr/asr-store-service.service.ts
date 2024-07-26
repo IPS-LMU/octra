@@ -48,6 +48,14 @@ export class AsrStoreService {
     );
   }
 
+  changeASRAccessCode(accessCode?: string) {
+    this.store.dispatch(
+      ASRActions.setASRAccessCode.do({
+        accessCode,
+      })
+    );
+  }
+
   startProcessing() {
     this.store.dispatch(ASRActions.startProcessing.do());
   }

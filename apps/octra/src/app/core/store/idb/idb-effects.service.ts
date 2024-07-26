@@ -678,7 +678,8 @@ export class IDBEffects {
       ofType(
         ASRActions.setSelectedASRService.do,
         ASRActions.setASRLanguage.do,
-        ASRActions.setASRMausLanguage.do
+        ASRActions.setASRMausLanguage.do,
+        ASRActions.setASRAccessCode.do
       ),
       withLatestFrom(this.store),
       mergeMap(([, state]) =>

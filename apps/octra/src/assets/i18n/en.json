@@ -125,7 +125,9 @@
     "timezone": "Timezone",
     "free quota": "Free Quota",
     "ignore": "Ignore",
-    "apply": "Apply"
+    "apply": "Apply",
+    "access code": "Access Code",
+    "asr options": "ASR Options"
   },
   "p": {
     "username or email": "Username or E-Mail",
@@ -140,7 +142,8 @@
     "select locale": "Select a language",
     "select timezone": "Select a timezone",
     "back to login": "Back to login",
-    "contribute translations": "Contribute translations"
+    "contribute translations": "Contribute translations",
+    "language and provider": "Language and Provider"
   },
   "bug report": {
     "give feedback": "Give feedback",

@@ -45,6 +45,19 @@ export class ASRActions {
     },
   });
 
+  static setASRAccessCode = createActionGroup({
+    source: 'asr/set asr access code',
+    events: {
+      do: props<{
+        accessCode?: string;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static setASRMausLanguage = createActionGroup({
     source: 'asr/set maus language',
     events: {

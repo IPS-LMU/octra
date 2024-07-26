@@ -304,6 +304,10 @@
       "header": "Backup Notice",
       "body": "Your progress is going to be saved on the server. Due to a known issue, it is recommended that you also download a local backup. This measure is temporarily necessary. Click on 'Download backup' to download the backup file and then on 'Continue'.<br/><br/>You can delete the backup files after the task has been completed.",
       "button": "Download backup"
+    },
+    "import options": {
+      "title": "Import Options",
+      "introduction": "The selected converter allows you to set additional options. Click on the checkbox to the left of an option to activate or deactivate it. Options that are not activated are not set."
     }
   },
   "login": {
@@ -497,13 +501,17 @@
   "converters": {
     "SRT": {
       "options": {
+        "speakerIdentifierPattern": {
+          "title": "Regular expression for speaker identification",
+          "description": "Regular expression with which the speaker of a transcription unit can be recognized."
+        },
         "sortSpeakerSegments": {
           "title": "Move units with speaker label to separate levels",
           "description": "Moves all units with label \"SPEAKER_<NUM>\" to separate levels. Units without speaker are going to be moved to OCTRA_1."
         },
         "combineSegmentsWithSameSpeakerThreshold": {
-          "title": "Combine empty units between the same speaker",
-          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms)."
+          "title": "Combine empty units with max duration (ms) between units of the same speaker",
+          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms). Set empty to deactivate it."
         }
       }
     }

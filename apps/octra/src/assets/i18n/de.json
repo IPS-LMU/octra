@@ -305,6 +305,10 @@
       "header": "Backup Erinnerung",
       "body": "Dein Fortschritt wird auf dem Server gespeichert. Wegen eines bekannten Problems wird empfohlen zusätzlich eine lokale Sicherung herunterzuladen. Diese Maßnahme ist vorübergehend notwendig. Klicke auf 'Sicherung herunterladen', um die Sicherungsdatei herunterzuladen und anschließend auf 'Weiter'.<br/><br/>Die Sicherungsdateien kannst Du löschen, nachdem die Aufgabe fertiggestellt wurde.",
       "button": "Sicherung herunterladen"
+    },
+    "import options": {
+      "title": "Optionen für das Importieren",
+      "introduction": "Der ausgewählte Konverter erlaubt das Setzen zusätzlicher Optionen. Klicke links neben einer Option auf die Checkbox, um diese zu aktivieren bzw. deaktivieren. Nicht aktivierte Optionen gelten als nicht gesetzt."
     }
   },
   "login": {
@@ -498,12 +502,16 @@
   "converters": {
     "SRT": {
       "options" : {
+        "speakerIdentifierPattern": {
+          "title": "Regulärer Ausdruck für Sprecheridentifikation",
+          "description": "Regulärer Ausdruck, mit dem der Sprecher einer Transkriptionseinheit erkannt werden kann."
+        },
         "sortSpeakerSegments": {
-          "title": "Sprecher Einheiten auf eigene Ebenen verschieben",
-          "description": "Verschiebt alle Einheiten mit der Markierung \"SPEAKER_<NUM>\" auf eigene Ebenen. Einheiten ohne Sprecher werden auf die Ebene OCTRA_1 verschoben."
+          "title": "Pro Sprecher eine eigene Transkriptionsspur",
+          "description": "Verschiebt alle Einheiten mit der festgelegten Sprechermarkierung auf eigene Ebenen. Einheiten ohne Sprecher werden auf die Ebene OCTRA_1 verschoben."
         },
         "combineSegmentsWithSameSpeakerThreshold": {
-          "title": "Leere Segmente vom gleichen Sprecher zusammenführen",
+          "title": "Leere Segmente mit max. Dauer (ms) vom gleichen Sprecher zusammenführen",
           "description": "Führt eine leere Einheit zwischen zwei Einheiten des gleichen Sprechers zusammen, wenn diese eine maximale Dauer (ms) besitzt."
         }
       }

@@ -12,6 +12,7 @@ import { FileInfo } from '@octra/web-media';
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
   combineSegmentsWithSameSpeakerThreshold?: number;
+  speakerIdentifierPattern?: string;
 
   constructor(partial?: Partial<SRTConverterImportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -139,28 +140,37 @@ export class SRTConverter extends Converter {
     file: IFile,
     audiofile: OAudiofile
   ): any | undefined {
-    if (/\[SPEAKER_[0-9]+]:/g.exec(file.content)) {
-      return {
-        $gui_support: true,
-        type: 'object',
-        properties: {
-          sortSpeakerSegments: {
-            title: 'sortSpeakerSegments',
-            type: 'boolean',
-            default: false,
-            description:
-              'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-          },
-          combineSegmentsWithSameSpeakerThreshold: {
-            title: 'combineSegmentsWithSameSpeakerThreshold',
-            type: 'number',
-            default: undefined,
-            description:
-              'Defines max. duration an empty segment between two segments may have to be combined together.',
-          },
+    return {
+      $gui_support: true,
+      type: 'object',
+      properties: {
+        speakerIdentifierPattern: {
+          title: 'speakerIdentifierPattern',
+          toggleable: true,
+          type: 'string',
+          default: '\\[(SPEAKER_[0-9]+)] *: *',
+          description:
+            'Defines the pattern to recognize the speaker from a given transcript text.',
         },
-      };
-    }
+        sortSpeakerSegments: {
+          title: 'sortSpeakerSegments',
+          dependsOn: ['speakerIdentifierPattern'],
+          type: 'boolean',
+          default: false,
+          description:
+            'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+        },
+        combineSegmentsWithSameSpeakerThreshold: {
+          title: 'combineSegmentsWithSameSpeakerThreshold',
+          dependsOn: ['speakerIdentifierPattern'],
+          toggleable: true,
+          type: 'number',
+          default: 2000,
+          description:
+            'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
+        },
+      },
+    };
   }
 
   public import(
@@ -256,41 +266,52 @@ export class SRTConverter extends Converter {
       if (defaultLevel.items.length > 0) {
         if (options.combineSegmentsWithSameSpeakerThreshold) {
           for (let i = 0; i < defaultLevel.items.length; i++) {
-            const previousItem = i > 0 ? defaultLevel.items[i] : undefined;
+            const previousItem = i > 0 ? defaultLevel.items[i - 1] : undefined;
             const item = defaultLevel.items[i];
             const nextItem =
               i < defaultLevel.items.length - 1
                 ? defaultLevel.items[i + 1]
                 : undefined;
-
             const duration = (item.sampleDur * 1000) / audiofile.sampleRate;
             const text = item.getFirstLabelWithoutName('Speaker')?.value;
-            const text2 = nextItem?.getFirstLabelWithoutName('Speaker')?.value;
-
-            console.log(`${i}: if (
-              ${nextItem} &&
-              ${previousItem} &&
-              ${nextItem?.labels[0].name === 'Speaker'} &&
-              ${previousItem?.labels[0].name === 'Speaker'} &&
-              ${nextItem?.labels[0].name === previousItem?.labels[0].name} &&
-              ${!text} &&
-              ${duration <= options.combineSegmentsWithSameSpeakerThreshold}
-            )`);
 
             if (
               nextItem &&
               previousItem &&
-              nextItem.labels[0].name === 'Speaker' &&
-              previousItem.labels[0].name === 'Speaker' &&
-              nextItem.labels[0].name === previousItem.labels[0].name &&
               !text &&
               duration <= options.combineSegmentsWithSameSpeakerThreshold
             ) {
               // remove segment
               defaultLevel.items.splice(i, 1);
-              nextItem.sampleDur += item.sampleDur;
-              nextItem.sampleStart = item.sampleStart;
+              previousItem.sampleDur += item.sampleDur;
               i--;
+
+              if (
+                nextItem.labels[0].name === 'Speaker' &&
+                previousItem.labels[0].name === 'Speaker' &&
+                nextItem.labels[0].value === previousItem.labels[0].value
+              ) {
+                defaultLevel.items.splice(i + 1, 1);
+                nextItem.sampleDur += item.sampleDur;
+                nextItem.sampleStart = item.sampleStart;
+                i--;
+              }
+
+              const label = previousItem.getFirstLabelWithoutName('Speaker');
+              if (label) {
+                const speakerRegex =
+                  options.speakerIdentifierPattern &&
+                  options.speakerIdentifierPattern !== ''
+                    ? options.speakerIdentifierPattern
+                    : '\\[SPEAKER_[0-9]+] *: *';
+                label.value +=
+                  nextItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
+                label.value = label.value.replace(
+                  new RegExp(`(?!^) *${speakerRegex}`),
+                  ' '
+                );
+              }
+              previousItem.sampleDur += nextItem.sampleDur;
             }
           }
         }

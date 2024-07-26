@@ -1,11 +1,15 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      Import options
+      {{ "modal.import options.title" | transloco }}
     </h5>
   </div>
   <div class="modal-body">
-      <octra-form-configurator *ngIf="schema" [jsonSchema]="schema" [jsonText]="jsonText" (jsonTextChange)="onJsonTextChange($event)"></octra-form-configurator>
+    <p class="mb-3">
+      {{ "modal.import options.introduction" | transloco }}
+    </p>
+    <octra-form-configurator *ngIf="schema" [jsonSchema]="schema" [jsonText]="jsonText"
+                             (jsonTextChange)="onJsonTextChange($event)"></octra-form-configurator>
   </div>
   <div class="modal-footer">
     <div class="row">

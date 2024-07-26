@@ -9,7 +9,7 @@ import { SubscriberComponent } from '@octra/ngx-utilities';
 })
 export class ToolconfigGroupComponent extends SubscriberComponent {
   @Input() group?: ConfigurationControlGroup;
-  @Output() somethingChanged = new EventEmitter<boolean>();
+  @Output() somethingChanged = new EventEmitter<void>();
 
   onArrayItemDelete(control: any, i: number) {
     control.value = [

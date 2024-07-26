@@ -6,6 +6,7 @@ import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.co
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ToolConfigArrayAdderComponent } from './array-adder/toolconfig-array-adder.component';
 import { QuestionMarkComponent } from '../question-mark/question-mark.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,13 @@ import { QuestionMarkComponent } from '../question-mark/question-mark.component'
     ToolconfigGroupComponent,
     ToolConfigArrayAdderComponent,
   ],
-  imports: [CommonModule, FormsModule, NgbPopover, QuestionMarkComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgbPopover,
+    QuestionMarkComponent,
+    TranslocoPipe,
+  ],
   exports: [
     ToolConfiguratorComponent,
     ToolconfigGroupComponent,

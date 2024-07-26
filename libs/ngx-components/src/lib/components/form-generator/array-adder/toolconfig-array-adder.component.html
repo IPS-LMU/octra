@@ -23,7 +23,9 @@
 </ng-template>
 <span class="rounded-circle d-inline-block text-center pointer" [ngbPopover]="popContent" [triggers]="'manual'"
       #p=ngbPopover
-      (click)="open()" autoClose="outside" placement="left-bottom"
+      (click)="open()" autoClose="outside" placement="left-bottom" [ngClass]="{
+        'opacity-50': disabled
+      }"
       style="background-color: cornflowerblue; margin-top:7px; height: 20px; width:20px;font-size:0.85rem;padding:0px 3px">
                   <i class="bi bi-plus-lg text-light"></i>
 </span>

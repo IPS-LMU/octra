@@ -23,6 +23,7 @@ export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   @Input() values: any[] = [];
   @Output() itemsAdd = new EventEmitter<any[]>();
   @Input() type?: 'text' | 'number' | 'integer';
+  @Input() disabled = false;
 
   @ViewChild('p') popover!: NgbPopover;
   inputValue: any;
@@ -41,7 +42,9 @@ export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   }
 
   open() {
-    this._items = this.items?.map((a: any) => new PreparedItem(a));
-    this.popover.open();
+    if (!this.disabled) {
+      this._items = this.items?.map((a: any) => new PreparedItem(a));
+      this.popover.open();
+    }
   }
 }

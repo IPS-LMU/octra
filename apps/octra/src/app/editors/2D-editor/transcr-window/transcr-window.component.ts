@@ -79,6 +79,7 @@ export class TranscrWindowComponent
   private showWindow = false;
   private tempSegments!: OctraAnnotationSegment[];
   private oldRaw = '';
+  protected showOverviewButton = false;
 
   private get currentLevel() {
     return this.annotationStoreService.currentLevel;
@@ -434,6 +435,7 @@ export class TranscrWindowComponent
       },
     });
 
+    this.updateOverviewButtonVisibility();
     this._loading = false;
     this.setValidationEnabledToDefault();
 
@@ -755,6 +757,7 @@ export class TranscrWindowComponent
             ) {
               segment = tempSegment;
               this.segmentIndex = i;
+              this.updateOverviewButtonVisibility();
               break;
             }
           }
@@ -1171,11 +1174,15 @@ export class TranscrWindowComponent
     }
 
     if (status === 'stopped') {
-      if (this.oldRaw === this.editor.rawText) {
-        // this.appStorage.savingNeeded = false;
+      if (
+        this.editor.html.indexOf(
+          '<img src="assets/img/components/transcr-editor/boundary.png"'
+        ) > -1
+      ) {
+        this.showOverviewButton = false;
+      } else {
+        this.updateOverviewButtonVisibility();
       }
-
-      // this.highlight();
     }
   }
 
@@ -1458,5 +1465,12 @@ export class TranscrWindowComponent
 
   openSettings() {
     this.navbarService.openSettings.emit();
+  }
+
+  private updateOverviewButtonVisibility() {
+    this.showOverviewButton =
+      this.segmentIndex ===
+        this.annotationStoreService.currentLevel!.items.length - 1 ||
+      this.isNextSegmentLastAndBreak(this.segmentIndex);
   }
 }

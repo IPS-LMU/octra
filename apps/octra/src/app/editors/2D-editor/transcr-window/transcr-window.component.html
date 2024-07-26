@@ -159,7 +159,7 @@
           </button>
         </div>
         <div class="col-md-4 d-flex"
-             *ngIf="segmentIndex < annotationStoreService.currentLevel!.items.length - 1 && !isNextSegmentLastAndBreak(segmentIndex)"
+             *ngIf="!showOverviewButton"
         >
           <button
             class="btn btn-info w-100 rounded-0"
@@ -183,7 +183,7 @@
         </div>
         <div
           class="col-md-4 d-flex"
-          *ngIf="segmentIndex === annotationStoreService.currentLevel!.items.length - 1 || isNextSegmentLastAndBreak(segmentIndex)"
+          *ngIf="showOverviewButton"
         >
           <!-- check if last segment ord if the next segment is a break -->
           <button

@@ -2,6 +2,25 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/IPS-LMU/octra/compare/ngx-components-0.1.0...ngx-components-0.1.1) (2024-07-29)
+
+
+### Bug Fixes
+
+* **audio:** audio playback doesn't start at exact position ([3864696](https://github.com/IPS-LMU/octra/commit/3864696296a70c8fc4bd7c9bee768ff8a781a4c4))
+* **ngx-components:** boundaries not updated after switching levels ([d0acbc6](https://github.com/IPS-LMU/octra/commit/d0acbc6de142285097e2661953249c3436b34ab6))
+* **ngx-components:** boundaries visible in audio signal from other level ([1052b4e](https://github.com/IPS-LMU/octra/commit/1052b4ee7b0a6f08cb004bfd2a1af616e3e42613))
+* **ngx-components:** switching between annotation levels leads to malfunctions in audio-viewer ([09ff3f8](https://github.com/IPS-LMU/octra/commit/09ff3f8151aee701899411164629240a4d97c278))
+* **octra:** new options toggleable and dependsOn for form-generator ([588bf77](https://github.com/IPS-LMU/octra/commit/588bf779a37be776bc3bb93f5a9860ed725db250))
+
+
+### Features
+
+* **octra:** new settings section with asr options included ([b64fb15](https://github.com/IPS-LMU/octra/commit/b64fb15e282411137787f2abd03c2468686a6e3a))
+* **octra:** SRT import with special import options ([8bd4111](https://github.com/IPS-LMU/octra/commit/8bd4111373784735ad0b7d19be016a908afea060))
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/ngx-components-0.0.8...ngx-components-0.1.0) (2024-03-25)
 
 

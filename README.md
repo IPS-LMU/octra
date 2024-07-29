@@ -32,7 +32,7 @@ Octra supports different editors that you can choose according to your preferenc
 
 ## User Manual
 
-You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/)
+You can find the manual for users here: [OCTRA Manual](https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/)
 
 ## Features
 

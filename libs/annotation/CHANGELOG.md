@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.14](https://github.com/IPS-LMU/octra/compare/annotation-0.1.13...annotation-0.1.14) (2024-07-29)
+
+
+### Bug Fixes
+
+* **annotation:** srt import doesn't combine units of same speaker correctly ([2f41036](https://github.com/IPS-LMU/octra/commit/2f41036a90eb756872ccc4118729f989c9910243))
+* **octra:** overview can not be opened after srt import ([679fec1](https://github.com/IPS-LMU/octra/commit/679fec11d298a2998d584ed83c82fed83059f242))
+* **octra:** url mode loads wrong data if logged-in in other tab ([efaa5ad](https://github.com/IPS-LMU/octra/commit/efaa5ad3fe64308f78363fd078a8d214663912a3))
+
+
+### Features
+
+* **octra:** new query param for url mode "aType" for export type ([69a9fa1](https://github.com/IPS-LMU/octra/commit/69a9fa15314e5bc304d73010693559dc605aa405))
+* **octra:** SRT import with special import options ([8bd4111](https://github.com/IPS-LMU/octra/commit/8bd4111373784735ad0b7d19be016a908afea060))
+
+
+
 ## [0.1.13](https://github.com/IPS-LMU/octra/compare/annotation-0.1.12...annotation-0.1.13) (2024-03-25)
 
 

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.4.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.3.1...ngx-utilities-0.4.0) (2024-07-29)
+
+
+### Features
+
+* **ngx-utilities:** subscribe() method returns subscription id ([4747606](https://github.com/IPS-LMU/octra/commit/47476062e5c808e37c7f575eedb92b98b97b9646))
+
+
+
 ## [0.3.1](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.3.0...ngx-utilities-0.3.1) (2024-01-31)
 
 

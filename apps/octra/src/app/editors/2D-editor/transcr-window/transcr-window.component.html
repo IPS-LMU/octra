@@ -25,9 +25,9 @@
     <div class="container-fluid" *ngIf="asrStoreService.asrEnabled$ | async">
       <div class="row py-2" style="background-color:whitesmoke">
         <div class="col">
-          <div class="d-inline-block me-1">
+          <span class=" me-1">
             ASR:
-          </div>
+          </span>
           <div ngbDropdown class="btn-group dropend">
             <button
               [disabled]="!((asrStoreService.asrOptions$|async)?.selectedASRLanguage) || !((asrStoreService.asrOptions$|async)?.selectedService)"
@@ -77,7 +77,9 @@
               </ng-container>
             </div>
           </div>
-          <i class="bi bi-gear-fill ms-2 pointer" style="color: gray" (click)="openSettings()"></i>
+          <span>
+             <i class="bi bi-gear-fill ms-2 pointer" style="color: gray" (click)="openSettings()"></i>
+          </span>
         </div>
       </div>
     </div>

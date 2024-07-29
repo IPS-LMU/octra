@@ -867,26 +867,24 @@ export class IDBEffects {
     )
   );
 
-  saveConsoleEntries$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ApplicationActions.setConsoleEntries),
-      exhaustMap((action) => {
-        const subject = new Subject<Action>();
-
-        if (this.idbService.isReady) {
-          this.idbService
-            .saveConsoleEntries(action.consoleEntries)
-            .then(() => {
-              subject.next(IDBActions.saveConsoleEntries.success());
-            })
-            .catch((error) => {
-              subject.next(IDBActions.saveConsoleEntries.success());
-            });
-        }
-
-        return subject;
-      })
-    )
+  saveConsoleEntries$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ApplicationActions.setConsoleEntries),
+        tap((action) => {
+          if (this.idbService.isReady) {
+            this.idbService
+              .saveConsoleEntries(action.consoleEntries)
+              .then(() => {
+                this.store.dispatch(IDBActions.saveConsoleEntries.success());
+              })
+              .catch((error) => {
+                this.store.dispatch(IDBActions.saveConsoleEntries.success());
+              });
+          }
+        })
+      ),
+    { dispatch: false }
   );
 
   saveModeBeforeURLRedirection$ = createEffect(

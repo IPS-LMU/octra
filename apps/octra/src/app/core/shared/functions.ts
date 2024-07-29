@@ -9,6 +9,13 @@ import {
 } from '@octra/api-types';
 import { Converter } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
+import { AnnotationActions } from '../store/login-mode/annotation/annotation.actions';
+import { ApplicationActions } from '../store/application/application.actions';
+import { IDBActions } from '../store/idb/idb.actions';
+import { APIActions } from '../store/api';
+import { LoginModeActions } from '../store/login-mode';
+import { ASRActions } from '../store/asr/asr.actions';
+import { UserActions } from '../store/user/user.actions';
 
 export function createSampleProjectDto(
   projectID: string,
@@ -171,4 +178,38 @@ export function getAnnotationFromTask(
   }
 
   return found;
+}
+
+export function isIgnoredAction(type: string) {
+  // IMPORTANT: MAKE SURE TO ADD ".type"
+  return (
+    [
+      AnnotationActions.loadAudio.progress.type,
+      AnnotationActions.addLog.do.type,
+      IDBActions.loadConsoleEntries.success.type,
+      IDBActions.loadOptions.success.type,
+      ApplicationActions.loadSettings.success.type,
+      APIActions.init.do.type,
+      IDBActions.loadLogs.success.type,
+      LoginModeActions.changeComment.do.type,
+      AnnotationActions.setSavingNeeded.do.type,
+      AnnotationActions.overwriteTranscript.do.type,
+      ASRActions.processQueueItem.do.type,
+      ApplicationActions.loadASRSettings.do.type,
+      ApplicationActions.loadASRSettings.success.type,
+      IDBActions.saveUserProfile.success.type,
+      UserActions.setUserProfile.type,
+    ] as string[]
+  ).includes(type) || isIgnoredConsoleAction(type);
+}
+
+export function isIgnoredConsoleAction(type: string) {
+  // IMPORTANT: MAKE SURE TO ADD ".type"
+  return (
+    [
+      ApplicationActions.setConsoleEntries.type,
+      IDBActions.saveConsoleEntries.success.type,
+      IDBActions.saveConsoleEntries.fail.type
+    ] as string[]
+  ).includes(type);
 }

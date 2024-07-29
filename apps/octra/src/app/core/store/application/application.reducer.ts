@@ -143,6 +143,13 @@ export const reducer = createReducer(
     })
   ),
   on(
+    IDBActions.loadConsoleEntries.success,
+    (state: ApplicationState, { consoleEntries }) => ({
+      ...state,
+      consoleEntries,
+    })
+  ),
+  on(
     IDBActions.loadOptions.success,
     (state: ApplicationState, { applicationOptions }) => ({
       ...state,

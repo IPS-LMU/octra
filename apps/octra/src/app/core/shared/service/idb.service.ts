@@ -32,7 +32,6 @@ export class IDBService {
     this.database = new OctraDatabase(dbName);
     return from(this.database.open()).pipe(
       map((a) => {
-        this._isReady = true;
         this._isOpened = true;
       })
     );
@@ -74,6 +73,7 @@ export class IDBService {
       this.database.app_options
         .get('console')
         .then((entry) => {
+          this._isReady = true;
           if (entry !== undefined) {
             resolve(entry.value as ConsoleEntry[]);
           } else {

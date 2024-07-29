@@ -39,6 +39,7 @@ declare const BUILD: {
 @Injectable()
 export class BugReportService {
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
+  private readonly MAX_LOG_ENTRIES = 100;
 
   pkgText = '';
 
@@ -64,8 +65,11 @@ export class BugReportService {
     };
 
     if (this._console !== undefined) {
-      if(!this.startedGroup) {
+      if (!this.startedGroup) {
         this._console = [...this._console, consoleItem];
+        if (this._console.length > this.MAX_LOG_ENTRIES) {
+          this._console.splice(0, this._console.length - this.MAX_LOG_ENTRIES);
+        }
         this.appStorage.consoleEntries = this._console;
       } else {
         this.addToGroup(type, message);
@@ -92,6 +96,10 @@ export class BugReportService {
   public endGroup() {
     if (this._console && this.startedGroup) {
       this._console = [...this._console, this.startedGroup];
+      this.startedGroup = undefined;
+      if (this._console.length > this.MAX_LOG_ENTRIES) {
+        this._console.splice(0, this._console.length - this.MAX_LOG_ENTRIES);
+      }
       this.appStorage.consoleEntries = this._console;
     }
     this.startedGroup = undefined;
@@ -103,11 +111,6 @@ export class BugReportService {
 
   public addEntriesFromDB(entries: (ConsoleEntry | ConsoleGroupEntry)[]) {
     if (entries !== undefined && Array.isArray(entries) && entries.length > 0) {
-      if (entries.length > 50) {
-        // crop down to 100 items
-        entries = entries.slice(-50);
-      }
-
       this._console = entries.concat(
         [
           {
@@ -120,6 +123,10 @@ export class BugReportService {
         ],
         this._console
       );
+    }
+
+    if (this._console.length > this.MAX_LOG_ENTRIES) {
+      this._console.splice(0, this._console.length - this.MAX_LOG_ENTRIES);
     }
     this.appStorage.consoleEntries = this._console;
   }

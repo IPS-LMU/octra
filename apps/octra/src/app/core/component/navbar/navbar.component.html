@@ -637,7 +637,7 @@
                 </button>
               </div>
 
-              <ng-container>
+              <ng-container *ngIf="asrStoreService.asrEnabled$ | async">
                 <br /><br />
                 <hr/>
                 <label style="font-size: 1rem" class="mb-2">{{"g.asr options" | transloco}}</label>

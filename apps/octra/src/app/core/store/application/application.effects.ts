@@ -41,8 +41,7 @@ import { environment } from '../../../../environments/environment';
 import { findElements, getAttr } from '@octra/web-media';
 import X2JS from 'x2js';
 import { isNumber } from '@octra/utilities';
-import { ASRActions } from '../asr/asr.actions';
-import { UserActions } from '../user/user.actions';
+import { isIgnoredAction, isIgnoredConsoleAction } from '../../shared';
 
 @Injectable({
   providedIn: 'root',
@@ -969,10 +968,11 @@ export class ApplicationEffects {
       this.actions$.pipe(
         tap((action) => {
           if (
+            !isIgnoredConsoleAction(action.type) &&
             environment.debugging.enabled &&
             environment.debugging.logging.actions &&
             action.type.indexOf('Set Console Entries') < 0 &&
-            (!environment.production || !this.isIgnoredAction(action.type))
+            (!environment.production || !isIgnoredAction(action.type))
           ) {
             console.groupCollapsed(`ACTION ${action.type} ---`);
             console.log(action);
@@ -1031,6 +1031,11 @@ export class ApplicationEffects {
       (() => {
         // tslint:disable-next-line:only-arrow-functions
         console.log = function (...args) {
+          if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
+            if (isIgnoredAction(args[0].type)) {
+              return;
+            }
+          }
           serv.addEntry(ConsoleType.LOG, args[0]);
           // eslint-disable-next-line prefer-rest-params
           oldLog.apply(console, args);
@@ -1092,6 +1097,12 @@ export class ApplicationEffects {
       (() => {
         // tslint:disable-next-line:only-arrow-functions
         console.warn = function (...args) {
+          if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
+            if (isIgnoredAction(args[0].type)) {
+              return;
+            }
+          }
+
           serv.addEntry(ConsoleType.WARN, args[0]);
           // eslint-disable-next-line prefer-rest-params
           oldWarn.apply(console, args);
@@ -1186,27 +1197,5 @@ export class ApplicationEffects {
       return '';
     }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
-  }
-
-  private isIgnoredAction(type: string) {
-    return (
-      [
-        AnnotationActions.loadAudio.progress.type,
-        AnnotationActions.addLog.do.type,
-        IDBActions.loadConsoleEntries.success.type,
-        IDBActions.loadOptions.success.type,
-        ApplicationActions.loadSettings.success.type,
-        APIActions.init.do.type,
-        IDBActions.loadLogs.success.type,
-        LoginModeActions.changeComment.do.type,
-        AnnotationActions.setSavingNeeded.do.type,
-        AnnotationActions.overwriteTranscript.do.type,
-        ASRActions.processQueueItem.do.type,
-        ApplicationActions.loadASRSettings.do.type,
-        ApplicationActions.loadASRSettings.success.type,
-        IDBActions.saveUserProfile.success.type,
-        UserActions.setUserProfile.type,
-      ] as string[]
-    ).includes(type);
   }
 }

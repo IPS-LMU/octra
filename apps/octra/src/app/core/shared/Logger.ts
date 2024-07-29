@@ -33,6 +33,6 @@ export class Logger {
           break;
       }
     }
-    console.groupEnd();
+    // console.groupEnd();
   }
 }

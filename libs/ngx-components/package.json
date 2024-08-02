@@ -23,7 +23,7 @@
     "@octra/annotation": "~0.1.13",
     "@octra/media": "~0.0.14",
     "@octra/web-media": "~0.0.11",
-    "@octra/ngx-utilities": "~0.3.1",
+    "@octra/ngx-utilities": "~0.4.0",
     "konva": "^9.0.0",
     "rxjs": ">=7.5.0"
   },

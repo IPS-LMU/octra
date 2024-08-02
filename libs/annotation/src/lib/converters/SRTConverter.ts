@@ -42,7 +42,7 @@ export class SRTConverter extends Converter {
     sampleRate: number
   ) {
     if (sampleRate > 0) {
-      const regex = new RegExp(/([0-9]+):([0-9]+):([0-9]+),([0-9]+)/g);
+      const regex = new RegExp(/([0-9]+):([0-9]+):([0-9]+)(?:,([0-9]+))?/g);
 
       const matches = regex.exec(timeString);
 
@@ -50,7 +50,7 @@ export class SRTConverter extends Converter {
         const hours = Number(matches[1]);
         const minutes = Number(matches[2]);
         const seconds = Number(matches[3]);
-        const miliseconds = Number(matches[4]);
+        const miliseconds = matches.length > 5 ? Number(matches[4]): 0;
 
         let totalMiliSeconds = hours * 60 * 60;
         totalMiliSeconds += minutes * 60;
@@ -210,10 +210,14 @@ export class SRTConverter extends Converter {
       let defaultLevel: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
         'OCTRA_1'
       );
+      let regexStr = `([0-9]+)[\\n\\r]*([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?)\\r?\\n\\r?`;
+      if (options.speakerIdentifierPattern) {
+        regexStr += `(?:${options.speakerIdentifierPattern})?`;
+      }
+      regexStr += '(.*)\\r?\\n\\r?';
 
       if (content !== '') {
-        const regex =
-          /([0-9]+)[\n\r]*([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\r?\n\r?(?:(?:\[(SPEAKER_[0-9]+)] *: *)?(.*))\r?\n\r?/g;
+        const regex = new RegExp(regexStr, 'g');
 
         let matches = regex.exec(content);
         while (matches !== null) {

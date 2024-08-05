@@ -40,59 +40,63 @@ export class ToolConfiguratorComponent
       const defaultValue = schema['default'];
       if (typeof items === 'object') {
         if (items['type'] === 'string') {
-          result.push(
-            new ConfigurationArrayControl(
-              name!,
-              {
-                title: schema['title'] ?? name,
-                type: 'text',
-                value: jsonValue ?? defaultValue,
-                defaultValue,
-                description: schema['description'],
-                ignore: false,
-                context: items['enum'],
-                dependsOn: schema['dependsOn'],
-                toggleable: schema['toggleable'],
-              },
-              this.form
-            )
+          const control = new ConfigurationArrayControl(
+            name!,
+            {
+              title: schema['title'] ?? name,
+              type: 'text',
+              value: jsonValue ?? defaultValue,
+              defaultValue,
+              description: schema['description'],
+              ignore: false,
+              context: items['enum'],
+              dependsOn: schema['dependsOn'],
+              toggleable: schema['toggleable'],
+            },
+            this.form
           );
+
+          control.toggled =
+            json && name !== undefined && Object.keys(json).includes(name);
+          result.push(control);
         } else if (items['type'] === 'number') {
-          result.push(
-            new ConfigurationArrayControl(
-              name!,
-              {
-                title: schema['title'] ?? name,
-                type: 'number',
-                value: jsonValue ?? defaultValue,
-                defaultValue,
-                description: schema['description'],
-                ignore: false,
-                context: items['enum'],
-                dependsOn: schema['dependsOn'],
-                toggleable: schema['toggleable'],
-              },
-              this.form
-            )
+          const control = new ConfigurationArrayControl(
+            name!,
+            {
+              title: schema['title'] ?? name,
+              type: 'number',
+              value: jsonValue ?? defaultValue,
+              defaultValue,
+              description: schema['description'],
+              ignore: false,
+              context: items['enum'],
+              dependsOn: schema['dependsOn'],
+              toggleable: schema['toggleable'],
+            },
+            this.form
           );
+          control.toggled =
+            json && name !== undefined && Object.keys(json).includes(name);
+          result.push(control);
         } else if (items['type'] === 'integer') {
-          result.push(
-            new ConfigurationArrayControl(
-              name!,
-              {
-                title: schema['title'] ?? name,
-                toggleable: schema['toggleable'],
-                type: 'integer',
-                value: jsonValue ?? defaultValue,
-                defaultValue,
-                description: schema['description'],
-                dependsOn: schema['dependsOn'],
-                ignore: false,
-                context: items['enum'],
-              },
-              this.form
-            )
+          const control = new ConfigurationArrayControl(
+            name!,
+            {
+              title: schema['title'] ?? name,
+              toggleable: schema['toggleable'],
+              type: 'integer',
+              value: jsonValue ?? defaultValue,
+              defaultValue,
+              description: schema['description'],
+              dependsOn: schema['dependsOn'],
+              ignore: false,
+              context: items['enum'],
+            },
+            this.form
           );
+          control.toggled =
+            json && name !== undefined && Object.keys(json).includes(name);
+          result.push(control);
         }
       } else {
         // TODO add
@@ -124,93 +128,99 @@ export class ToolConfiguratorComponent
       const ignore = ['version', '$schema'].includes(name);
 
       if (schema['type'] === 'boolean') {
-        result.push(
-          new ConfigurationSwitchControl(
-            name,
-            {
-              title: title ?? name,
-              value: jsonValue ?? defaultValue,
-              defaultValue,
-              description,
-              ignore,
-              dependsOn,
-              toggleable,
-            },
-            this.form
-          )
+        const control = new ConfigurationSwitchControl(
+          name,
+          {
+            title: title ?? name,
+            value: jsonValue ?? defaultValue,
+            defaultValue,
+            description,
+            ignore,
+            dependsOn,
+            toggleable,
+          },
+          this.form
         );
+        control.toggled =
+          json && name !== undefined && Object.keys(json).includes(name);
+        result.push(control);
       } else if (schema['type'] === 'number') {
-        result.push(
-          new ConfigurationNumberControl(
-            name,
-            {
-              title: title ?? name,
-              type: 'number',
-              value: jsonValue ?? defaultValue,
-              defaultValue,
-              description,
-              dependsOn,
-              toggleable,
-              ignore,
-            },
-            this.form
-          )
+        const control = new ConfigurationNumberControl(
+          name,
+          {
+            title: title ?? name,
+            type: 'number',
+            value: jsonValue ?? defaultValue,
+            defaultValue,
+            description,
+            dependsOn,
+            toggleable,
+            ignore,
+          },
+          this.form
         );
+        control.toggled =
+          json && name !== undefined && Object.keys(json).includes(name);
+        result.push(control);
       } else if (schema['type'] === 'integer') {
-        result.push(
-          new ConfigurationNumberControl(
-            name,
-            {
-              title: title ?? name,
-              type: 'integer',
-              value: jsonValue ?? defaultValue,
-              defaultValue,
-              description,
-              ignore,
-              toggleable,
-              dependsOn,
-            },
-            this.form
-          )
+        const control = new ConfigurationNumberControl(
+          name,
+          {
+            title: title ?? name,
+            type: 'integer',
+            value: jsonValue ?? defaultValue,
+            defaultValue,
+            description,
+            ignore,
+            toggleable,
+            dependsOn,
+          },
+          this.form
         );
+        control.toggled =
+          json && name !== undefined && Object.keys(json).includes(name);
+        result.push(control);
       } else if (schema['type'] === 'string') {
+        let control: ConfigurationControl = new ConfigurationSelectControl(
+          name,
+          {
+            title: title ?? name,
+            value: jsonValue ?? defaultValue,
+            defaultValue,
+            description,
+            ignore,
+            toggleable,
+            dependsOn,
+            context: enumValues?.map((a) => ({
+              label: a,
+              value: a,
+            })),
+          },
+          this.form
+        );
+        control.toggled =
+          json && name !== undefined && Object.keys(json).includes(name);
+
         if (enumValues) {
           // select
-          result.push(
-            new ConfigurationSelectControl(
-              name,
-              {
-                title: title ?? name,
-                value: jsonValue ?? defaultValue,
-                defaultValue,
-                description,
-                ignore,
-                toggleable,
-                dependsOn,
-                context: enumValues.map((a) => ({
-                  label: a,
-                  value: a,
-                })),
-              },
-              this.form
-            )
-          );
+          result.push(control);
         } else {
-          result.push(
-            new ConfigurationTextControl(
-              name,
-              {
-                title: title ?? name,
-                value: jsonValue ?? defaultValue,
-                defaultValue,
-                description,
-                ignore,
-                toggleable,
-                dependsOn,
-              },
-              this.form
-            )
+          control = new ConfigurationTextControl(
+            name,
+            {
+              title: title ?? name,
+              value: jsonValue ?? defaultValue,
+              defaultValue,
+              description,
+              ignore,
+              toggleable,
+              dependsOn,
+            },
+            this.form
           );
+          control.toggled =
+            json && name !== undefined && Object.keys(json).includes(name);
+          result.push(control);
         }
       }
     }

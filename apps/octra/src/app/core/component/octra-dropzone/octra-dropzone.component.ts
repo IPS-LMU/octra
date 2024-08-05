@@ -110,7 +110,6 @@ export class OctraDropzoneComponent extends DefaultComponent {
         );
         break;
       } else {
-        const extension = file.name.substring(file.name.lastIndexOf('.'));
         this.dropFiles('transcript');
         this._files.push(fileProcess);
 
@@ -153,27 +152,24 @@ export class OctraDropzoneComponent extends DefaultComponent {
               this._oaudiofile!.name.lastIndexOf('.')
             );
 
-            let options: any = undefined;
             const optionsSchema: any = converter.needsOptionsForImport(
               ofile,
               this._oaudiofile!
             );
+            fileProgress.needsOptions = optionsSchema;
+            fileProgress.converter = converter;
 
             if (optionsSchema) {
-              options = await this.openImportOptionsModal(
-                optionsSchema,
-                converter.defaultImportOptions,
-                converter
-              );
+              await this.openImportOptionsModal(fileProgress);
             }
 
             const importResult: ImportResult | undefined = converter.import(
               ofile,
               this._oaudiofile!,
-              options
+              fileProgress.options
             );
 
-            const setAnnotation = () => {
+            const setAnnotation = async () => {
               if (
                 this._oaudiofile !== undefined &&
                 importResult !== undefined &&
@@ -181,6 +177,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
                 !importResult.error
               ) {
                 fileProgress.status = 'valid';
+
                 if (
                   fileProgress.name !==
                     audioName + AppInfo.converters[i].extension &&
@@ -278,7 +275,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
               };
               this._files.push(audioProcess);
             } else {
-              setAnnotation();
+              await setAnnotation();
             }
 
             fileProgress.checked_converters++;
@@ -442,23 +439,26 @@ export class OctraDropzoneComponent extends DefaultComponent {
     });
   }
 
-  private async openImportOptionsModal(
-    needsOptions: any,
-    value: any,
-    converter: Converter
-  ): Promise<any> {
+  protected async openImportOptionsModal(
+    fileProgress: FileProgress
+  ): Promise<void> {
+    this.dropzone.clicklocked = true;
+    // make sure, that event click does not trigger
+
+    this.subscribe(timer(300), () => {
+      this.dropzone.clicklocked = false;
+    });
     const result = await this.modService.openModal<
       typeof ImportOptionsModalComponent,
       any
     >(ImportOptionsModalComponent, ImportOptionsModalComponent.options, {
-      schema: needsOptions,
-      value,
-      converter,
+      schema: fileProgress.needsOptions,
+      value: fileProgress.options,
+      converter: fileProgress.converter,
     });
 
     if (result.action === 'apply') {
-      return result.result;
+      fileProgress.options = result.result;
     }
-    return value;
   }
 }

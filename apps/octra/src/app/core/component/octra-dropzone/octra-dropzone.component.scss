@@ -1,7 +1,3 @@
-.icon-success {
-  color: green;
-}
-
 .icon-invalid {
   color: red;
 }
@@ -27,10 +23,6 @@
   padding-right: 5px;
 }
 
-.icon-delete {
-  cursor: pointer;
-}
-
 .dropzone-table tbody td {
 }
 
@@ -46,4 +38,13 @@
 
 .progress-bar {
   font-size: 0.7rem;
+}
+
+.bi-check-lg {
+  color: green;
+  font-weight: bold;
+}
+
+.bi-trash3-fill {
+  color: red;
 }

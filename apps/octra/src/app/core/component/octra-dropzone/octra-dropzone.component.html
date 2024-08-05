@@ -1,14 +1,6 @@
 <octra-drop-zone #dropzone (afterdrop)="afterDrop()" [height]="height">
   <table [hidden]="files.length === 0" class="dropzone-table position-relative">
     <tr *ngFor="let file of files">
-      <td>
-        <i
-          class="bi bi-trash3-fill icon-delete"
-          (click)="onDeleteEntry(file.name)"
-          style="font-size: 14px; color: dimgray"
-        ></i>
-      </td>
-      <td>{{ getDropzoneFileString(file) }}</td>
       <td class="text-center">
         <i
           class="bi bi-x-lg icon-invalid"
@@ -62,11 +54,28 @@
           </div>
         </ng-container>
       </td>
+      <td>{{ getDropzoneFileString(file) }}</td>
+      <td>
+        <i
+          class="bi bi-trash3-fill icon-delete"
+          (click)="onDeleteEntry(file.name)"
+          style="font-size: 14px; color: dimgray"
+        ></i>
+      </td>
+      <td>
+        <i [ngStyle]="{
+          'visibility': file.needsOptions ? 'visible': 'hidden'
+        }"
+           class="bi bi-gear-fill ms-1"
+           (click)="openImportOptionsModal(file)"
+           style="font-size: 14px; color: dimgray"
+        ></i>
+      </td>
     </tr>
   </table>
   <span *ngIf="files.length === 0" class="position-relative">{{
-    'dropzone.drag&drop here' | transloco
-  }}</span>
+      'dropzone.drag&drop here' | transloco
+    }}</span>
 </octra-drop-zone>
 <div
   (click)="showSupported()"

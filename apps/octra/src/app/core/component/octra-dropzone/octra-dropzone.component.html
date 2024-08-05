@@ -4,11 +4,11 @@
       <td>
         <i
           class="bi bi-trash3-fill icon-delete"
-          (click)="onDeleteEntry(file.file.name)"
+          (click)="onDeleteEntry(file.name)"
           style="font-size: 14px; color: dimgray"
         ></i>
       </td>
-      <td>{{ getDropzoneFileString(file.file) }}</td>
+      <td>{{ getDropzoneFileString(file) }}</td>
       <td class="text-center">
         <i
           class="bi bi-x-lg icon-invalid"
@@ -32,7 +32,7 @@
           [ngbPopover]="file.warning"
           style="font-size: 16px; color: orange"
         ></i>
-        <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
+        <ng-container *ngIf="file.name.indexOf('.wav') < 0">
           <div
             class="spinner-border icon-wait"
             role="status"
@@ -44,7 +44,7 @@
         </ng-container>
         <ng-container
           *ngIf="
-            file.file.name.indexOf('.wav') > -1 && file.status === 'progress'
+            file.name.indexOf('.wav') > -1 && file.status === 'progress'
           "
         >
           <div class="progress">

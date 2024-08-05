@@ -1,6 +1,7 @@
 import { getProperties } from '@octra/utilities';
 import { AudioFormat } from './audio/AudioFormats';
 import { AudioInfo } from './audio/audio-info';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export async function readFileContents<T>(
   file: File,
@@ -21,13 +22,67 @@ export async function readFileContents<T>(
         reader.readAsText(file, encoding);
         break;
       case 'binary':
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
         break;
       case 'arraybuffer':
         reader.readAsArrayBuffer(file);
         break;
     }
   });
+}
+
+export interface ReadFileEvent<T> {
+  status: 'initialized' | 'reading' | 'success';
+  progress: number;
+  result?: T;
+}
+
+export function readFile<T>(
+  file: File,
+  method: 'text' | 'binary' | 'arraybuffer',
+  encoding?: string
+): Observable<ReadFileEvent<T>> {
+  const subj = new BehaviorSubject<ReadFileEvent<T>>({
+    status: 'initialized',
+    progress: 0,
+  });
+
+  const reader = new FileReader();
+
+  reader.addEventListener('loadend', () => {
+    subj.next({
+      status: 'success',
+      progress: 1,
+      result: reader.result as T,
+    });
+    subj.complete();
+  });
+
+  reader.onprogress = (e) => {
+    subj.next({
+      status: 'reading',
+      progress: e.loaded / e.total / 2,
+      result: reader.result as T,
+    });
+  };
+
+  reader.addEventListener('error', (e) => {
+    subj.error(e);
+  });
+
+  switch (method) {
+    case 'text':
+      reader.readAsText(file, encoding);
+      break;
+    case 'binary':
+      reader.readAsArrayBuffer(file);
+      break;
+    case 'arraybuffer':
+      reader.readAsArrayBuffer(file);
+      break;
+  }
+
+  return subj;
 }
 
 export function renameFile(

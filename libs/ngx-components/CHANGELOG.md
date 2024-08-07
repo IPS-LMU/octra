@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.2](https://github.com/IPS-LMU/octra/compare/ngx-components-0.1.1...ngx-components-0.1.2) (2024-08-07)
+
+
+### Bug Fixes
+
+* **annotation:** speaker pattern matching not working with SRT converter ([e92e72b](https://github.com/IPS-LMU/octra/commit/e92e72b6ad38258d1717fdb4225d9cfbce964eb0))
+
+
+### Features
+
+* **octra:** gear icon next to file name allows to change import options ([32afe7b](https://github.com/IPS-LMU/octra/commit/32afe7b3af1c2b8825115dc00c58ad25153b0f6f))
+
+
+
 ## [0.1.1](https://github.com/IPS-LMU/octra/compare/ngx-components-0.1.0...ngx-components-0.1.1) (2024-07-29)
 
 

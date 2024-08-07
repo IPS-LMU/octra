@@ -107,7 +107,7 @@ const OCTRA = {
     await run(`npm run build:web-components`);
     await JSONValidator.build();
     await buildLibrary('utilities');
-    await this.buildAssets();
+    await OCTRA.buildAssets();
     await buildLibrary('annotation');
     await buildLibrary('media');
     await buildLibrary('web-media');

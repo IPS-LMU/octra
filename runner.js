@@ -102,9 +102,17 @@ const OCTRA = {
     await OCTRA.prepareExtern();
   },
   buildLibs: async function () {
-    await run('nx build ngx-components');
-    await run('nx build ngx-utilities');
-    await run(`npm run build:web-components`);
+    await buildLibrary('ngx-components');
+    await buildLibrary('ngx-utilities');
+    await run(`node prepare_web-components.js`);
+    await fs.copyFile(
+      `apps/web-components/src/README.md`,
+      `dist/libs/web-components/README.md`
+    );
+    await fs.copyFile(
+      `apps/web-components/CHANGELOG.md`,
+      `dist/libs/web-components/CHANGELOG.md`
+    );
     await JSONValidator.build();
     await buildLibrary('utilities');
     await OCTRA.buildAssets();

@@ -20,7 +20,7 @@
     "@angular/core": ">15.0.0",
     "@angular/forms": ">15.0.0",
     "@octra/utilities": "~0.0.12",
-    "@octra/annotation": "~0.1.13",
+    "@octra/annotation": "~0.1.14",
     "@octra/media": "~0.0.14",
     "@octra/web-media": "~0.0.11",
     "@octra/ngx-utilities": "~0.4.0",

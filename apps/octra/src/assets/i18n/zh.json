@@ -1,154 +1,270 @@
 {
-  "translation": {
-    "language name": "英文"
+  "alerts": {
+    "authentication needed": "请认证，以便使用自动语音识别/词对齐功能。在点击“认证”之后，会出现新窗口。如果没有新窗口，请确保浏览器开启了弹窗功能。",
+    "need playback": "在提交标注之前，至少需要播放一次。"
   },
-  "g": {
-    "name": "用户名",
-    "abort": "取消",
-    "continue": "继续",
-    "close": "关闭",
-    "open": "打开 {{value}}",
-    "delete": "删除",
-    "save": "保存",
-    "send now": "立即发送",
-    "back": "后退",
-    "OK": "好的",
-    "quit": "退出",
-    "login": "登陆账号",
-    "logout": "退出账号",
-    "play": "播放",
-    "pause": "暂停",
-    "stop": "停止",
-    "backward": "后退（到起始位置）",
-    "backwardtime": "后退（0.5秒前）",
-    "replay": "再次播放",
-    "shortcuts": "快捷键",
-    "guidelines": "指南",
-    "overview": "概览",
-    "help": "帮助中心",
-    "on focus only": "仅当光标停留在波形图时",
-    "wanted": "需要的文件",
-    "unknown": "未知",
-    "please wait": "请等待",
-    "logout successful": "成功退出",
-    "export data": "导出数据",
-    "export": "导出",
-    "text file": "文本文件",
-    "statistics": "标注数据信息",
-    "transcript": "标注",
-    "transcription": "标注文件",
-    "timespan": "时间跨度（秒）",
-    "validation": "认证",
-    "search": "搜索",
-    "project": "项目",
-    "authors": "作者",
-    "no guidelines found": "未找到指南",
-    "example": "示例",
-    "select database": "选择数据库",
-    "agreement": "条款",
-    "agreement read": "我已读完所有条款，并接受其内容",
-    "yes": "是",
-    "no": "不是",
-    "errors found": "出现错误({{errors}}) ",
-    "no errors found": "未出现错误",
-    "segment": "标注单元",
-    "job number": "任务编号",
-    "free jobs": "剩余标注单元数量",
-    "email": "电子邮箱",
-    "description": "描述",
-    "bug report": "错误报告",
-    "protocol": "协议",
-    "submission success": "成功传送",
-    "duration": "时长",
-    "samplerate": "采样率",
-    "bitspersecond": "每秒比特数",
-    "filesize": "文件大小",
-    "id": "项目编号",
-    "download": "下载",
-    "application": "应用",
-    "website": "网站",
-    "news": "更新提示",
-    "faq": "常见问题",
-    "features": "特点",
-    "transcription window": "标注窗口",
-    "supported files": "支持文件",
-    "select one tier": "选择一层",
-    "prompt": "提示文本",
-    "feedback": "反馈",
-    "skip silence": "跳过静音部分",
-    "good": "好",
-    "bad": "不好",
-    "middle": "中间",
-    "insert comment": "在此处插入注释... （可选）",
-    "password": "密码",
-    "preview": "预览",
-    "screenshots": "截屏",
-    "Language": "语言",
-    "Speech Recognition": "语音识别",
-    "Service Provider": "服务提供者",
-    "SELECT ACTION": "选择操作",
-    "Format": "格式",
-    "Type": "类型",
-    "File extension": "文件后缀",
-    "tools": "工具",
-    "custom formats": "自定义格式",
-    "meta data": "元数据",
-    "manual": "使用手册",
-    "authenticate": "认证",
-    "im authenticated": "已认证！",
-    "dismissed": "在{{value}}秒内消失",
-    "Send feedback": "发送反馈",
-    "reload": "重新加载",
-    "Options": "选项"
+  "asr": {
+    "asr running": "自动语音识别ASR正在运行中，如果你想停止这个标注单元的ASR，请点击此处。",
+    "click on logo": "更多信息，请点击服务提供商的图标。",
+    "error": "出现错误。请简略告诉我们这个错误的情况，以便我们修复它。",
+    "file too big": "自动语音识别仅对最长10分钟的音频有效。超过的标注单位已被跳过。",
+    "maus empty text": "被选中的标注单元为空或内容小于两个词。",
+    "no asr selected": "在使用快捷键前，请选择自动语音识别ASR选项。",
+    "no auth": "更多标注需要您进行身份认证。",
+    "no quota": "服务额度不足。请选择另一个ASR提供商。",
+    "start for all next": "对这个以及所有后续标注单元启动",
+    "start this segment": "仅对本标注单元启动",
+    "stop all": "对所有标注单元停止",
+    "stop for all next": "对这个以及所有后续标注单元停止",
+    "stop this segment": "仅对本标注单元停止",
+    "without asr": "无自动语音识别ASR"
+  },
+  "authentication": {
+    "description": "关闭此窗口，点击OCTRA中的“认证成功！”按钮来完成认证。之后自动进程会继续。",
+    "window closed": "此窗口将在{{seconds}}秒内关闭。",
+    "you are authenticated": "认证成功！"
+  },
+  "boundary cannot delete": "无法删除边界，因为临近标注单元已经被标注过。",
+  "boundary cannot set": "无法在已标注的标注单元内设置边界。",
+  "browser": {
+    "invalid": "<b>你的浏览器不兼容</b>。 请使用以下浏览器之一：",
+    "small window width": "<b>窗口宽度太小。</b> 请拉宽窗口，直到提示消失。"
   },
   "bug report": {
-    "give feedback": "给予反馈",
     "description": "你认为有需要改进的地方吗？有发现bug吗？请告诉我们你对OCTRA的评价。",
-    "sent": "你的反馈已被收到 🙂",
     "error": "很抱歉，你的反馈没有发送成功。请将反馈内容通过邮件发送给我们： {{email}}",
-    "send protocol": "添加协议（推荐）"
+    "give feedback": "给予反馈",
+    "send protocol": "添加协议（推荐）",
+    "sent": "你的反馈已被收到 🙂"
   },
-  "transcription": {
-    "start": "继续标注",
-    "new": "新建标注",
-    "finish": "完成标注",
-    "stop": "停止标注",
-    "check": "检查标注",
-    "send": "发送标注",
-    "complete": "完成标注",
-    "invalid": "只接受有效标注。请更正你的标注内容。",
-    "no prompttext": "提示文本的格式错误，无法显示。 "
+  "custom": {
+    "table configurator": {
+      "add column": "添加列",
+      "add header": "在表格中添加头行",
+      "description": "你可以使用此工具创建自己想要导出的表格模式。",
+      "divider": "分隔符",
+      "generate table": "生成表格",
+      "include line numbers": "包括行号",
+      "name": "自定义表格",
+      "time format": "时间格式"
+    }
   },
-  "segments": {
-    "total": "全部标注单位",
-    "transcribed": "标注单位",
-    "with breaks": "静音的标注单位",
-    "not transcribed": "空的标注单位",
-    "previous": "前一个标注单位",
-    "next": "在一个标注单位"
+  "dropzone": {
+    "drag&drop here": "拖拽音频文件(*.wav)（+ 其他可选文件导入）到此处，或点击此处。",
+    "file selected": "{{file_label}} 已选中"
+  },
+  "export": {
+    "meta data": {
+      "description": "下载记录的标注过程元数据。（仅在设置中“记录”被打开的情况下可用）"
+    },
+    "options": {
+      "add samplepoints": "按样本点分隔转录单元（例如 123456）",
+      "add timestamps": "通过可读时间戳分割标注单元（HH:MM:SS.s）",
+      "timestamp notice": "如果同时选择两个选项，两种时间格式都会被插入："
+    }
   },
   "feedback": {
-    "unintelligible": "完全听不清",
-    "less intelligible": "几乎听不清",
-    "intelligible": "能听清",
-    "very good intelligible": "听得很清楚",
-    "quality of signal": "声音信号的质量",
     "a lot of noises": "信号的噪音很大",
     "few noises": "信号有噪音",
+    "intelligible": "能听清",
+    "less intelligible": "几乎听不清",
+    "no noises": "信号佳",
+    "quality of signal": "声音信号的质量",
+    "unintelligible": "完全听不清",
     "very few noises": "信号噪音很小",
-    "no noises": "信号佳"
+    "very good intelligible": "听得很清楚"
+  },
+  "g": {
+    "File extension": "文件后缀",
+    "Format": "格式",
+    "Language": "语言",
+    "OK": "好的",
+    "Options": "选项",
+    "SELECT ACTION": "选择操作",
+    "Send feedback": "发送反馈",
+    "Service Provider": "服务提供者",
+    "Speech Recognition": "语音识别",
+    "Type": "类型",
+    "abort": "取消",
+    "agreement": "条款",
+    "agreement read": "我已读完所有条款，并接受其内容",
+    "application": "应用",
+    "authenticate": "认证",
+    "authors": "作者",
+    "back": "后退",
+    "backward": "后退（到起始位置）",
+    "backwardtime": "后退（0.5秒前）",
+    "bad": "不好",
+    "bitspersecond": "每秒比特数",
+    "bug report": "错误报告",
+    "close": "关闭",
+    "continue": "继续",
+    "custom formats": "自定义格式",
+    "delete": "删除",
+    "description": "描述",
+    "dismissed": "在{{value}}秒内消失",
+    "download": "下载",
+    "duration": "时长",
+    "email": "电子邮箱",
+    "errors found": "出现错误({{errors}}) ",
+    "example": "示例",
+    "export": "导出",
+    "export data": "导出数据",
+    "faq": "常见问题",
+    "features": "特点",
+    "feedback": "反馈",
+    "filesize": "文件大小",
+    "free jobs": "剩余标注单元数量",
+    "good": "好",
+    "guidelines": "指南",
+    "help": "帮助中心",
+    "id": "项目编号",
+    "im authenticated": "已认证！",
+    "insert comment": "在此处插入注释... （可选）",
+    "job number": "任务编号",
+    "login": "登陆账号",
+    "logout": "退出账号",
+    "logout successful": "成功退出",
+    "manual": "使用手册",
+    "meta data": "元数据",
+    "middle": "中间",
+    "name": "用户名",
+    "news": "更新提示",
+    "no": "不是",
+    "no errors found": "未出现错误",
+    "no guidelines found": "未找到指南",
+    "on focus only": "仅当光标停留在波形图时",
+    "open": "打开 {{value}}",
+    "overview": "概览",
+    "password": "密码",
+    "pause": "暂停",
+    "play": "播放",
+    "please wait": "请等待",
+    "preview": "预览",
+    "project": "项目",
+    "prompt": "提示文本",
+    "protocol": "协议",
+    "quit": "退出",
+    "reload": "重新加载",
+    "replay": "再次播放",
+    "samplerate": "采样率",
+    "save": "保存",
+    "screenshots": "截屏",
+    "search": "搜索",
+    "segment": "标注单元",
+    "select database": "选择数据库",
+    "select one tier": "选择一层",
+    "send now": "立即发送",
+    "shortcuts": "快捷键",
+    "skip silence": "跳过静音部分",
+    "statistics": "标注数据信息",
+    "stop": "停止",
+    "submission success": "成功传送",
+    "supported files": "支持文件",
+    "text file": "文本文件",
+    "timespan": "时间跨度（秒）",
+    "tools": "工具",
+    "transcript": "标注",
+    "transcription": "标注文件",
+    "transcription window": "标注窗口",
+    "unknown": "未知",
+    "validation": "认证",
+    "wanted": "需要的文件",
+    "website": "网站",
+    "yes": "是"
   },
   "interfaces": {
-    "simple editor": "听写式编辑器",
+    "2D editor": "全景信号编辑器",
     "linear editor": "放大镜式编辑器",
-    "2D editor": "全景信号编辑器"
+    "simple editor": "听写式编辑器"
+  },
+  "login": {
+    "api not available": "服务器暂时不可用。请稍后再试。如果服务器不可用超过了4小时，请使用反馈表格告知我们。",
+    "demo": "点击此处使用OCTRO的默认音频（演示）",
+    "last used": "最近使用",
+    "local and remove": "移除在线模式的数据并且继续",
+    "local mode": "本地模式",
+    "local mode description": "本地模式中，你可以通过你的电脑标注音频文件。你的数据将不会被上传到服务器。",
+    "login and remove": "移除本地模式的数据并且登录",
+    "offline mode data warning": "此处有使用在线模式创建的本地数据。如果你想使用本地模式继续，此处的数据会被覆盖。",
+    "old file found": "此处有之前标注的可用数据。如果你想要继续之前的标注，请拖拽以下文件至灰色方框中：<br/><br/>{{file_label}}",
+    "online mode": "在线模式",
+    "online mode continue": "发现旧数据！如果继续的话，请确保你使用以下账号资料登录：{{member_id}} , {{member_project}}, {{member_jobno}}",
+    "online mode data warning": "此处有使用本地模式穿件的本地数据。如果你想使用在线模式继续，此处的数据会被覆盖。",
+    "online mode description": "在线模式中，你自动获取要标注的音频文件。",
+    "online mode disabled": "在线模式当前不可用。请使用本地OCTRA。"
+  },
+  "logout": {
+    "login again": "再次登录",
+    "successful text": "你已成功退出。"
+  },
+  "maintenance": {
+    "banner": "从 <b>{{start}}</b> 到 <b>{{end}}</b> (预期) 系统将进行维护 <br/>这期间OCTRA服务不可用。请确保这期间不要使用OCTRA。",
+    "in app": "从 <b>{{start}}</b> 到 <b>{{end}}</b> (预期) 系统将进行维护 <b>请在维护之前15分钟退出OCTRA。</b>"
   },
   "modal": {
+    "inactivity": {
+      "body": "检测到你未完成OCTRA，并且已经至少{{value}}分钟没有操作。如果继续不操作，建议退出OCTRA。如果你现在不想继续标注，退出OCTRA即可。你想怎么做？",
+      "continue": "继续标注",
+      "header": "检测到长时间无操作",
+      "new": "新建标注",
+      "quit": "退出OCTRA"
+    },
+    "login": {
+      "header": "登录失败",
+      "text": "请检查你的用户名和密码。"
+    },
+    "missing permissions": {
+      "description": "OCTRA未被允许播放音频。若要继续，请允许OCTRA播放音频。按照以下三步操作，并且点击网页底部的“重新加载”按钮。",
+      "header": "缺少权限",
+      "step1": "点击地址栏左边的“禁止自动播放”按钮。",
+      "step2": "点击“自动播放”旁边的按钮。",
+      "step3": "点击“允许音频和视频”。",
+      "step4": "点击下面的“重新加载”。"
+    },
+    "shortcuts": {
+      "2D-Editor": "全景信号编辑器的快捷键",
+      "audioplayer": "音频播放器快捷键",
+      "close_save": "保存并关闭窗口",
+      "delete boundaries": "删除已选边界，合并标注单元",
+      "do asr": "在选择的标注单元上应用自动语音识别ASR",
+      "do asr maus": "在选择的标注单元上应用自动语音识别ASR和语音切分工具MAUS",
+      "do maus only": "在选择的标注单元上用语音切分工具MAUS词对齐",
+      "down signaldisplay": "信号显示在底部快捷键",
+      "feedback and send 1": "发送标注文件（一星）：跳过此部分，稍后再做",
+      "feedback and send 2": "发送标注文件（二星）：已完成此部分，一般",
+      "feedback and send 3": "发送标注文件（三星）：已完成此部分，完美",
+      "general shortcuts": "一般快捷键",
+      "jump_last_segment": "保存并跳转至前一个标注单元",
+      "jump_next_segment": "保存并跳转至后一个标注单元",
+      "move cursor left": "移动光标到左边",
+      "move cursor right": "移动光标到右边",
+      "play audio on hover": "悬停时播放音频",
+      "play pause": "播放/暂停",
+      "play selection": "播放选择的部分",
+      "set break": "将标注单元标记成静音",
+      "set segment": "打开标注窗口",
+      "step backward": "跳转至上一个位置",
+      "step backward time": "跳转回时间点",
+      "stop playback": "停止播放",
+      "top signaldisplay": "信号显示在顶部快捷键",
+      "transcribe segment": "标注单元"
+    },
+    "supported": {
+      "audio files": "音频文件",
+      "file formats for import": "导入的文件类型",
+      "header": "本地模式支持的文件格式"
+    },
     "transcription": {
       "delete": {
+        "delete old": "删除之前的标注",
         "header": "要新建标注吗？",
-        "text": "你确定要删除已标注的内容，重新创建一个吗？<br><br>你之前的标注记录会被完全删除。此操作不可恢复。",
-        "delete old": "删除之前的标注"
+        "text": "你确定要删除已标注的内容，重新创建一个吗？<br><br>你之前的标注记录会被完全删除。此操作不可恢复。"
+      },
+      "demoEnd": {
+        "exportText": "你可以点击“后退”，然后点击“导出”，来导出标注：",
+        "header": "演示模式",
+        "text": "你正在使用演示模式。<br/><br/>点击。。。<ul><li>“继续”，重载当前声音文件。你的输入会被删除，标注文件开始传输</li><li>“退出”，退出OCTRA应用。你的输入会被删除。</li><li>“后退”，来继续标注。</li></ul>"
       },
       "send": {
         "header": "发送标注内容",
@@ -157,208 +273,92 @@
       "sending": {
         "header": "发送标注中。。。",
         "text": "你的结果正在被发送到服务器。。。请等待直至传输完全成功。"
-      },
-      "demoEnd": {
-        "header": "演示模式",
-        "text": "你正在使用演示模式。<br/><br/>点击。。。<ul><li>“继续”，重载当前声音文件。你的输入会被删除，标注文件开始传输</li><li>“退出”，退出OCTRA应用。你的输入会被删除。</li><li>“后退”，来继续标注。</li></ul>",
-        "exportText": "你可以点击“后退”，然后点击“导出”，来导出标注："
       }
-    },
-    "login": {
-      "header": "登录失败",
-      "text": "请检查你的用户名和密码。"
-    },
-    "supported": {
-      "header": "本地模式支持的文件格式",
-      "audio files": "音频文件",
-      "file formats for import": "导入的文件类型"
-    },
-    "shortcuts": {
-      "play pause": "播放/暂停",
-      "stop playback": "停止播放",
-      "step backward": "跳转至上一个位置",
-      "step backward time": "跳转回时间点",
-      "set segment": "打开标注窗口",
-      "set break": "将标注单元标记成静音",
-      "play selection": "播放选择的部分",
-      "transcribe segment": "标注单元",
-      "move cursor left": "移动光标到左边",
-      "move cursor right": "移动光标到右边",
-      "audioplayer": "音频播放器快捷键",
-      "top signaldisplay": "信号显示在顶部快捷键",
-      "down signaldisplay": "信号显示在底部快捷键",
-      "2D-Editor": "全景信号编辑器的快捷键",
-      "play audio on hover": "悬停时播放音频",
-      "jump_last_segment": "保存并跳转至前一个标注单元",
-      "jump_next_segment": "保存并跳转至后一个标注单元",
-      "close_save": "保存并关闭窗口",
-      "delete boundaries": "删除已选边界，合并标注单元",
-      "general shortcuts": "一般快捷键",
-      "feedback and send 1": "发送标注文件（一星）：跳过此部分，稍后再做",
-      "feedback and send 2": "发送标注文件（二星）：已完成此部分，一般",
-      "feedback and send 3": "发送标注文件（三星）：已完成此部分，完美",
-      "do asr": "在选择的标注单元上应用自动语音识别ASR",
-      "do asr maus": "在选择的标注单元上应用自动语音识别ASR和语音切分工具MAUS",
-      "do maus only": "在选择的标注单元上用语音切分工具MAUS词对齐"
-    },
-    "inactivity": {
-      "header": "检测到长时间无操作",
-      "body": "检测到你未完成OCTRA，并且已经至少{{value}}分钟没有操作。如果继续不操作，建议退出OCTRA。如果你现在不想继续标注，退出OCTRA即可。你想怎么做？",
-      "new": "新建标注",
-      "continue": "继续标注",
-      "quit": "退出OCTRA"
-    },
-    "missing permissions": {
-      "header": "缺少权限",
-      "description": "OCTRA未被允许播放音频。若要继续，请允许OCTRA播放音频。按照以下三步操作，并且点击网页底部的“重新加载”按钮。",
-      "step1": "点击地址栏左边的“禁止自动播放”按钮。",
-      "step2": "点击“自动播放”旁边的按钮。",
-      "step3": "点击“允许音频和视频”。",
-      "step4": "点击下面的“重新加载”。"
     }
   },
-  "login": {
-    "online mode": "在线模式",
-    "online mode disabled": "在线模式当前不可用。请使用本地OCTRA。",
-    "online mode description": "在线模式中，你自动获取要标注的音频文件。",
-    "local mode": "本地模式",
-    "local mode description": "本地模式中，你可以通过你的电脑标注音频文件。你的数据将不会被上传到服务器。",
-    "old file found": "此处有之前标注的可用数据。如果你想要继续之前的标注，请拖拽以下文件至灰色方框中：<br/><br/>{{file_label}}",
-    "online mode data warning": "此处有使用本地模式穿件的本地数据。如果你想使用在线模式继续，此处的数据会被覆盖。",
-    "offline mode data warning": "此处有使用在线模式创建的本地数据。如果你想使用本地模式继续，此处的数据会被覆盖。",
-    "online mode continue": "发现旧数据！如果继续的话，请确保你使用以下账号资料登录：{{member_id}} , {{member_project}}, {{member_jobno}}",
-    "last used": "最近使用",
-    "login and remove": "移除本地模式的数据并且登录",
-    "local and remove": "移除在线模式的数据并且继续",
-    "demo": "点击此处使用OCTRO的默认音频（演示）",
-    "api not available": "服务器暂时不可用。请稍后再试。如果服务器不可用超过了4小时，请使用反馈表格告知我们。"
-  },
-  "dropzone": {
-    "drag&drop here": "拖拽音频文件(*.wav)（+ 其他可选文件导入）到此处，或点击此处。",
-    "file selected": "{{file_label}} 已选中"
-  },
-  "browser": {
-    "invalid": "<b>你的浏览器不兼容</b>。 请使用以下浏览器之一：",
-    "small window width": "<b>窗口宽度太小。</b> 请拉宽窗口，直到提示消失。"
-  },
   "reload-file": {
-    "header": "重新加载音频文件",
-    "text": "此应用已经被关闭或更新。请再次选择相同的音频文件。之后你就可以继续你的工作了。",
+    "another file selected": "已选中另一个文件。请选择与之前相同的文件，或者开始新的标注。需要：'{{file}}'",
     "file not supported": "文件类型不受支持：'{{type}}' 。",
-    "another file selected": "已选中另一个文件。请选择与之前相同的文件，或者开始新的标注。需要：'{{file}}'"
-  },
-  "logout": {
-    "successful text": "你已成功退出。",
-    "login again": "再次登录"
-  },
-  "signal-gui": {
-    "selection text": "请用鼠标选择部分声音信号：左键点击起始点，不放手，拖拉至结束点。",
-    "segment enter text": "请将鼠标悬停在其上，并按 {{value}} 键来选择标注单元。"
-  },
-  "transcription-submit": {
-    "overview": "下表格显示了标注单元的概览：",
-    "form fill out": "请填写此表格",
-    "intelligibility of the speaker": "说话者的易懂性",
-    "comment description": "简短评论（关于工作流、等待时间、遇到的问题等的注释）"
+    "header": "重新加载音频文件",
+    "text": "此应用已经被关闭或更新。请再次选择相同的音频文件。之后你就可以继续你的工作了。"
   },
   "segment invisible": "转录单元必须可见，才能播放其中包含的音频",
-  "boundary cannot delete": "无法删除边界，因为临近标注单元已经被标注过。",
-  "boundary cannot set": "无法在已标注的标注单元内设置边界。",
+  "segments": {
+    "next": "在一个标注单位",
+    "not transcribed": "空的标注单位",
+    "previous": "前一个标注单位",
+    "total": "全部标注单位",
+    "transcribed": "标注单位",
+    "with breaks": "静音的标注单位"
+  },
   "send error": "出现错误。请重新加载此页面，并重试！",
-  "transcription submitted": {
-    "no jobs left": "无可用任务",
-    "transcription sent": "标注已发送",
-    "transcription sent successfully": "你的标注已成功发送",
-    "want to do": "你想要做什么？",
-    "quit": "退出并退出登录",
-    "next transcription": "得到下一个标注"
+  "settings": {
+    "easy mode": "仅显示图标",
+    "follow playcursor": "页面随播放位置移动",
+    "logging": "记录用户操作",
+    "play on hover": "悬停播放",
+    "seconds per line": "每行秒数",
+    "show loupe": "显示放大镜"
+  },
+  "signal-gui": {
+    "segment enter text": "请将鼠标悬停在其上，并按 {{value}} 键来选择标注单元。",
+    "selection text": "请用鼠标选择部分声音信号：左键点击起始点，不放手，拖拉至结束点。"
   },
   "special_markers": {
     "boundary": {
-      "insert": "裁剪标记",
-      "description": "在音频播放器或信号显示器中设置播放位置后，您可以在文本位置插入裁剪标记。"
-    }
-  },
-  "settings": {
-    "easy mode": "仅显示图标",
-    "play on hover": "悬停播放",
-    "follow playcursor": "页面随播放位置移动",
-    "logging": "记录用户操作",
-    "show loupe": "显示放大镜",
-    "seconds per line": "每行秒数"
-  },
-  "custom": {
-    "table configurator": {
-      "name": "自定义表格",
-      "description": "你可以使用此工具创建自己想要导出的表格模式。",
-      "add column": "添加列",
-      "divider": "分隔符",
-      "add header": "在表格中添加头行",
-      "generate table": "生成表格",
-      "include line numbers": "包括行号",
-      "time format": "时间格式"
+      "description": "在音频播放器或信号显示器中设置播放位置后，您可以在文本位置插入裁剪标记。",
+      "insert": "裁剪标记"
     }
   },
   "tools": {
-    "cut audio": {
-      "name": "切分音频文件",
-      "description": "这个工具将音频文件以标注单元为边界进行切分",
-      "append meta files": "添加原始信息",
-      "add placeholder": "添加字段",
-      "hide configurator": "隐藏配置",
-      "show configurator": "显示配置"
-    },
-    "combine phrases": {
-      "name": "合并词语和短语",
-      "description": "使用此工具，将短语之间的静音去掉，以减少短标注单元。 如果相邻标注单元之间的静音时长短于给定值，则此静音段被合并。",
-      "hide settings": "隐藏设置",
-      "show settings": "显示设置",
-      "minimal silence desc": "如果其包括的静音时长超过这个值，则此标注单元将被忽略。",
-      "minimal silence": "最小静音时长",
-      "maximal words": "最大词数目",
-      "maximal words desc": "在合并之后，所有标注单元内的最大词数目。（仅在每个段内只包含一个词时有效）。0表示没有最大词数目限制。"
-    },
     "alerts": {
       "done": "工具 '{{value}}' 成功被应用"
-    }
-  },
-  "asr": {
-    "without asr": "无自动语音识别ASR",
-    "file too big": "自动语音识别仅对最长10分钟的音频有效。超过的标注单位已被跳过。",
-    "click on logo": "更多信息，请点击服务提供商的图标。",
-    "start this segment": "仅对本标注单元启动",
-    "start for all next": "对这个以及所有后续标注单元启动",
-    "stop this segment": "仅对本标注单元停止",
-    "stop for all next": "对这个以及所有后续标注单元停止",
-    "stop all": "对所有标注单元停止",
-    "asr running": "自动语音识别ASR正在运行中，如果你想停止这个标注单元的ASR，请点击此处。",
-    "no asr selected": "在使用快捷键前，请选择自动语音识别ASR选项。",
-    "no quota": "服务额度不足。请选择另一个ASR提供商。",
-    "no auth": "更多标注需要您进行身份认证。",
-    "maus empty text": "被选中的标注单元为空或内容小于两个词。",
-    "error": "出现错误。请简略告诉我们这个错误的情况，以便我们修复它。"
-  },
-  "alerts": {
-    "authentication needed": "请认证，以便使用自动语音识别/词对齐功能。在点击“认证”之后，会出现新窗口。如果没有新窗口，请确保浏览器开启了弹窗功能。",
-    "need playback": "在提交标注之前，至少需要播放一次。"
-  },
-  "authentication": {
-    "you are authenticated": "认证成功！",
-    "window closed": "此窗口将在{{seconds}}秒内关闭。",
-    "description": "关闭此窗口，点击OCTRA中的“认证成功！”按钮来完成认证。之后自动进程会继续。"
-  },
-  "export": {
-    "meta data": {
-      "description": "下载记录的标注过程元数据。（仅在设置中“记录”被打开的情况下可用）"
     },
-    "options": {
-      "add timestamps": "通过可读时间戳分割标注单元（HH:MM:SS.s）",
-      "add samplepoints": "按样本点分隔转录单元（例如 123456）",
-      "timestamp notice": "如果同时选择两个选项，两种时间格式都会被插入："
+    "combine phrases": {
+      "description": "使用此工具，将短语之间的静音去掉，以减少短标注单元。 如果相邻标注单元之间的静音时长短于给定值，则此静音段被合并。",
+      "hide settings": "隐藏设置",
+      "maximal words": "最大词数目",
+      "maximal words desc": "在合并之后，所有标注单元内的最大词数目。（仅在每个段内只包含一个词时有效）。0表示没有最大词数目限制。",
+      "minimal silence": "最小静音时长",
+      "minimal silence desc": "如果其包括的静音时长超过这个值，则此标注单元将被忽略。",
+      "name": "合并词语和短语",
+      "show settings": "显示设置"
+    },
+    "cut audio": {
+      "add placeholder": "添加字段",
+      "append meta files": "添加原始信息",
+      "description": "这个工具将音频文件以标注单元为边界进行切分",
+      "hide configurator": "隐藏配置",
+      "name": "切分音频文件",
+      "show configurator": "显示配置"
     }
   },
-  "maintenance": {
-    "banner": "从 <b>{{start}}</b> 到 <b>{{end}}</b> (预期) 系统将进行维护 <br/>这期间OCTRA服务不可用。请确保这期间不要使用OCTRA。",
-    "in app": "从 <b>{{start}}</b> 到 <b>{{end}}</b> (预期) 系统将进行维护 <b>请在维护之前15分钟退出OCTRA。</b>"
+  "transcription": {
+    "check": "检查标注",
+    "complete": "完成标注",
+    "finish": "完成标注",
+    "invalid": "只接受有效标注。请更正你的标注内容。",
+    "new": "新建标注",
+    "no prompttext": "提示文本的格式错误，无法显示。 ",
+    "send": "发送标注",
+    "start": "继续标注",
+    "stop": "停止标注"
+  },
+  "transcription submitted": {
+    "next transcription": "得到下一个标注",
+    "no jobs left": "无可用任务",
+    "quit": "退出并退出登录",
+    "transcription sent": "标注已发送",
+    "transcription sent successfully": "你的标注已成功发送",
+    "want to do": "你想要做什么？"
+  },
+  "transcription-submit": {
+    "comment description": "简短评论（关于工作流、等待时间、遇到的问题等的注释）",
+    "form fill out": "请填写此表格",
+    "intelligibility of the speaker": "说话者的易懂性",
+    "overview": "下表格显示了标注单元的概览："
+  },
+  "translation": {
+    "language name": "英文"
   }
 }

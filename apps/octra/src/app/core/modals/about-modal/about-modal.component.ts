@@ -4,6 +4,7 @@ import { AppInfo } from '../../../app.info';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-about-modal',
@@ -17,6 +18,11 @@ export class AboutModalComponent extends OctraModal implements OnDestroy {
     backdrop: true,
   };
   public visible = false;
+  legalsExist = false;
+  legals: {
+    label: string;
+    url: string;
+  }[] = [];
 
   @ViewChild('modal', { static: true }) modal: any;
   @ViewChild('content', { static: false }) contentElement?: ElementRef;
@@ -32,9 +38,36 @@ export class AboutModalComponent extends OctraModal implements OnDestroy {
 
   constructor(
     private sanitizer: DomSanitizer,
+    private api: OctraAPIService,
     protected override activeModal: NgbActiveModal
   ) {
     super('octraModal', activeModal);
+
+    this.legalsExist =
+      this.api.appProperties?.legals.imprint_url !== undefined &&
+      this.api.appProperties?.legals.privacy_url !== undefined &&
+      this.api.appProperties?.legals.tos_url !== undefined;
+
+    if (this.api.appProperties?.legals?.imprint_url) {
+      this.legals.push({
+        label: 'imprint',
+        url: this.api.appProperties?.legals?.imprint_url,
+      });
+    }
+
+    if (this.api.appProperties?.legals?.privacy_url) {
+      this.legals.push({
+        label: 'privacy',
+        url: this.api.appProperties?.legals?.privacy_url,
+      });
+    }
+
+    if (this.api.appProperties?.legals?.tos_url) {
+      this.legals.push({
+        label: 'terms and conditions',
+        url: this.api.appProperties?.legals?.tos_url,
+      });
+    }
 
     const bibtex = new File(
       [

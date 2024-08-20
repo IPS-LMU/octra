@@ -84,7 +84,7 @@
       </tbody>
     </table>
 
-    <ng-container>
+    <ng-container *ngIf="legalsExist">
       <h5>{{"g.legals" | transloco}}</h5>
       <ul>
         <li *ngFor="let legal of legals">

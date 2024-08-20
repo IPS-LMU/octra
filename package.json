@@ -78,7 +78,7 @@
     "@ngrx/store": "18.0.1",
     "@ngrx/store-devtools": "18.0.1",
     "@nx/angular": "19.5.3",
-    "@octra/api-types": "^0.2.0",
+    "@octra/api-types": "^0.2.1",
     "@octra/ngx-octra-api": "^0.2.0",
     "@popperjs/core": "^2.11.6",
     "@swc/helpers": "0.5.11",

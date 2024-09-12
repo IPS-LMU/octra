@@ -91,8 +91,10 @@ export class SignupComponent extends DefaultComponent implements OnInit {
   sendSignup() {
     this.api
       .registerAccount({
+        country: "", // TODO add country
         username: this.signUpForm.username,
         first_name: this.signUpForm.firstName,
+        gender: "male", // TODO ADD GENDER
         last_name: this.signUpForm.lastName,
         email: this.signUpForm.email,
         password: this.signUpForm.password1,
@@ -100,7 +102,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
         timezone: this.signUpForm.timezone,
         acceptedPolicyTranslationIDs: this.signUpForm.policies
           .map((a) => this.getTranslationPolicy(a)?.id)
-          .filter((a) => a !== undefined) as number[],
+          .filter((a) => a !== undefined) as number[]
       })
       .subscribe({
         next: (response) => {

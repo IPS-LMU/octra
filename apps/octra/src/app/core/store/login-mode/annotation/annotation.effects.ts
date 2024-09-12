@@ -30,6 +30,7 @@ import {
   AnnotJSONConverter,
   ImportResult,
   ISegment,
+  OAnnotJSON,
   OctraAnnotation,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
@@ -56,7 +57,8 @@ import {
   createSampleProjectDto,
   createSampleTask,
   createSampleUser,
-  getAnnotationFromTask,
+  findCompatibleFileFromIO,
+  isValidAnnotation,
   StatisticElem,
 } from '../../../shared';
 import { checkAndThrowError } from '../../error.handlers';
@@ -207,29 +209,17 @@ export class AnnotationEffects {
       ofType(AnnotationActions.prepareTaskDataForAnnotation.success),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        let audioFile: TaskInputOutputDto | undefined = a.task.inputs.find(
-          (b) => b.fileType && b.fileType!.indexOf('audio') > -1
-        );
-
-        if (!audioFile && a.task.use_outputs_from_task) {
-          console.log(
-            'No audio file found, look for audio in outputs from use_outputs_from_task...'
+        const audioFile: TaskInputOutputDto | undefined =
+          findCompatibleFileFromIO<TaskInputOutputDto>(
+            a.task,
+            'audio',
+            (io: TaskInputOutputDto) => {
+              if (io.fileType && io.fileType.includes('audio')) {
+                return io;
+              }
+              return undefined;
+            }
           );
-          audioFile = (a.task.use_outputs_from_task as any).outputs.find(
-            (b: TaskInputOutputDto) =>
-              b.fileType && b.fileType!.indexOf('audio') > -1
-          );
-        }
-
-        if (!audioFile && a.task.use_outputs_from_task) {
-          console.log(
-            'No audio file found in use_outputs_from_task outputs, look for audio in outputs from use_outputs_from_task...'
-          );
-          audioFile = (a.task.use_outputs_from_task as any).inputs.find(
-            (b: TaskInputOutputDto) =>
-              b.fileType && b.fileType.indexOf('audio') > -1
-          );
-        }
 
         if (audioFile) {
           return of(
@@ -783,7 +773,7 @@ export class AnnotationEffects {
                       content_type: '',
                     };
                   })
-                  .slice(0, 1); // TODO select audio
+                  .slice(0, 1);
               } else if (state.application.mode === LoginMode.LOCAL) {
                 inputs = [
                   {
@@ -1499,11 +1489,15 @@ export class AnnotationEffects {
           );
 
           const serverTranscript = task
-            ? getAnnotationFromTask(
+            ? findCompatibleFileFromIO<OAnnotJSON>(
                 task,
-                AppInfo.converters,
-                this.audio.audioManager.resource.name,
-                this.audio.audioManager.resource.getOAudioFile()
+                'transcript',
+                (io: TaskInputOutputDto) => {
+                  return isValidAnnotation(
+                    io,
+                    this.audio.audioManager.resource.getOAudioFile()
+                  );
+                }
               )
             : undefined;
 

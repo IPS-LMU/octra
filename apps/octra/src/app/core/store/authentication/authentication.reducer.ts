@@ -43,6 +43,7 @@ export const authenticationReducer = createReducer(
         ...state,
         me: {
           id: '12345',
+          loginmethod: AccountLoginMethod.local,
           username: 'demoUser',
           projectRoles: [],
           systemRole: {

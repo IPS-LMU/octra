@@ -1,4 +1,5 @@
 import {
+  AccountLoginMethod,
   AccountRole,
   CurrentAccountDto,
   ProjectDto,
@@ -7,8 +8,6 @@ import {
   TaskInputOutputDto,
   TaskStatus,
 } from '@octra/api-types';
-import { Converter } from '@octra/annotation';
-import { OAudiofile } from '@octra/media';
 import { AnnotationActions } from '../store/login-mode/annotation/annotation.actions';
 import { ApplicationActions } from '../store/application/application.actions';
 import { IDBActions } from '../store/idb/idb.actions';
@@ -16,6 +15,7 @@ import { APIActions } from '../store/api';
 import { LoginModeActions } from '../store/login-mode';
 import { ASRActions } from '../store/asr/asr.actions';
 import { UserActions } from '../store/user/user.actions';
+import { AppInfo } from '../../app.info';
 
 export function createSampleProjectDto(
   projectID: string,
@@ -28,6 +28,7 @@ export function createSampleProjectDto(
     roles: [],
     statistics: {
       status: {
+        draft: 12,
         free: 1234567,
         paused: 34,
         busy: 12,
@@ -39,6 +40,7 @@ export function createSampleProjectDto(
         {
           type: 'annotation',
           status: {
+            draft: 12,
             free: 1234567,
             paused: 34,
             busy: 12,
@@ -112,6 +114,7 @@ export function createSampleUser(): CurrentAccountDto {
   return {
     id: '12345',
     username: 'demoUser',
+    loginmethod: AccountLoginMethod.local,
     projectRoles: [],
     systemRole: {
       label: AccountRole.user,
@@ -128,79 +131,61 @@ export function createSampleUser(): CurrentAccountDto {
   };
 }
 
-export function getAnnotationFromTask(
-  task: TaskDto,
-  converters: Converter[],
-  audiofileName: string,
-  audiofile: OAudiofile
-): any | undefined {
-  const getValidAnnotation = (ios: TaskInputOutputDto[]) => {
-    for (const converter of converters) {
-      for (const io of ios) {
-        if (
-          !io.fileType ||
-          (!io.fileType.includes('audio') &&
-            !io.fileType.includes('video') &&
-            !io.fileType.includes('image'))
-        ) {
-          const result = converter.import(
-            {
-              name: io.filename,
-              content: io.content,
-              type: io.fileType!,
-              encoding: 'utf-8',
-            },
-            audiofile
-          );
+export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
+  for (const converter of AppInfo.converters) {
+    if (
+      !io.fileType ||
+      (!io.fileType.includes('audio') &&
+        !io.fileType.includes('video') &&
+        !io.fileType.includes('image'))
+    ) {
+      const result = converter.import(
+        {
+          name: io.filename,
+          content: io.content,
+          type: io.fileType!,
+          encoding: 'utf-8',
+        },
+        audiofile
+      );
 
-          if (result?.annotjson) {
-            return result.annotjson;
-          } else if (
-            converter.name === 'AnnotJSON' &&
-            /_annot\.json$/g.exec(io.filename) !== null
-          ) {
-            throw new Error(`Can't read AnnotJSON file: ${result.error}`);
-          }
-        }
+      if (result?.annotjson) {
+        return result.annotjson;
+      } else if (
+        converter.name === 'AnnotJSON' &&
+        /_annot\.json$/g.exec(io.filename) !== null
+      ) {
+        throw new Error(`Can't read AnnotJSON file: ${result.error}`);
       }
     }
-
-    return undefined;
-  };
-
-  // check if this task has given annotation in its outputs field.
-  let found = getValidAnnotation(task.outputs);
-  if (!found) {
-    found = getValidAnnotation(task.inputs);
-  }
-  if (!found && task.use_outputs_from_task) {
-    found = getValidAnnotation((task.use_outputs_from_task as any).outputs);
   }
 
-  return found;
-}
+  return undefined;
+};
 
 export function isIgnoredAction(type: string) {
   // IMPORTANT: MAKE SURE TO ADD ".type"
   return (
-    [
-      AnnotationActions.loadAudio.progress.type,
-      AnnotationActions.addLog.do.type,
-      IDBActions.loadConsoleEntries.success.type,
-      IDBActions.loadOptions.success.type,
-      ApplicationActions.loadSettings.success.type,
-      APIActions.init.do.type,
-      IDBActions.loadLogs.success.type,
-      LoginModeActions.changeComment.do.type,
-      AnnotationActions.setSavingNeeded.do.type,
-      AnnotationActions.overwriteTranscript.do.type,
-      ASRActions.processQueueItem.do.type,
-      ApplicationActions.loadASRSettings.do.type,
-      ApplicationActions.loadASRSettings.success.type,
-      IDBActions.saveUserProfile.success.type,
-      UserActions.setUserProfile.type,
-    ] as string[]
-  ).includes(type) || isIgnoredConsoleAction(type);
+    (
+      [
+        AnnotationActions.loadAudio.progress.type,
+        AnnotationActions.addLog.do.type,
+        IDBActions.loadConsoleEntries.success.type,
+        IDBActions.loadOptions.success.type,
+        ApplicationActions.loadSettings.success.type,
+        APIActions.init.do.type,
+        IDBActions.loadLogs.success.type,
+        LoginModeActions.changeComment.do.type,
+        AnnotationActions.setSavingNeeded.do.type,
+        AnnotationActions.overwriteTranscript.do.type,
+        ASRActions.processQueueItem.do.type,
+        ApplicationActions.loadASRSettings.do.type,
+        ApplicationActions.loadASRSettings.success.type,
+        IDBActions.saveUserProfile.success.type,
+        UserActions.setUserProfile.type,
+      ] as string[]
+    ).includes(type) || isIgnoredConsoleAction(type)
+  );
 }
 
 export function isIgnoredConsoleAction(type: string) {
@@ -209,7 +194,66 @@ export function isIgnoredConsoleAction(type: string) {
     [
       ApplicationActions.setConsoleEntries.type,
       IDBActions.saveConsoleEntries.success.type,
-      IDBActions.saveConsoleEntries.fail.type
+      IDBActions.saveConsoleEntries.fail.type,
     ] as string[]
   ).includes(type);
+}
+
+export function findCompatibleFileFromIO<T>(
+  task: TaskDto,
+  type: 'audio' | 'transcript',
+  validation: (io: TaskInputOutputDto) => T | undefined
+): T | undefined {
+  let i = 0;
+  let inputs = [...task.inputs];
+  let outputs = [...task.outputs];
+
+  const lookForValidFile = (filteredIO: TaskInputOutputDto[]) => {
+    for (const io of filteredIO) {
+      const result = validation(io);
+      if (result) {
+        return result;
+      }
+    }
+    return undefined;
+  };
+
+  while (inputs.length > 0 || outputs.length > 0) {
+    const filteredInputs = inputs.filter((a) => a.chain_position === i);
+    inputs = inputs.filter((a) => !filteredInputs.find((b) => b.id === a.id));
+    const filteredOutputs = outputs.filter((a) => a.chain_position === i);
+    outputs = outputs.filter(
+      (a) => !filteredOutputs.find((b) => b.id === a.id)
+    );
+    let result: T | undefined;
+
+    if (i === 0) {
+      if (type === 'transcript') {
+        result = lookForValidFile(filteredOutputs);
+        if (result) {
+          return result;
+        }
+      }
+
+      result = lookForValidFile(filteredInputs);
+      if (result) {
+        return result;
+      }
+    } else {
+      // apply "zick-zack algorithm"
+      // first look for outputs, then inputs
+      result = lookForValidFile(filteredOutputs);
+      if (result) {
+        return result;
+      }
+
+      result = lookForValidFile(filteredInputs);
+      if (result) {
+        return result;
+      }
+    }
+    i--;
+  }
+
+  return undefined;
 }

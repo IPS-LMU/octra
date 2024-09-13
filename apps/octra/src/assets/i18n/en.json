@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "English"
+  },
   "alerts": {
     "authentication needed": "Please authenticate in order to use features like ASR or word-alignment. After you clicked on \"Authenticate\" a separate window opens. If no window opens, make sure to have popups enabled in your browser.",
     "combine segments ignore speakerlabel successful": "Segments were combined successfully regardless of speaker labels.",
@@ -135,10 +138,12 @@
     "close": "Close",
     "continue": "Continue",
     "continue transcription": "Continue transcription now",
+    "country": "Country",
     "custom formats": "Custom formats",
     "delete": "Delete",
     "description": "Description",
     "dismissed": "dismissed in {{value}}s",
+    "divers": "Divers",
     "download": "Download",
     "duration": "Duration",
     "e-mail": "Email",
@@ -150,11 +155,13 @@
     "faq": "FAQ",
     "features": "Features",
     "feedback": "Feedback",
+    "female": "Female",
     "filesize": "File Size",
     "first name": "First name",
     "free jobs": "Free Jobs",
     "free quota": "Free Quota",
     "free tasks": "Free Tasks",
+    "gender": "Gender",
     "good": "Good",
     "guidelines": "Guidelines",
     "help": "Help",
@@ -171,6 +178,7 @@
     "login": "Login",
     "logout": "Logout",
     "logout successful": "Logout successful",
+    "male": "Male",
     "manual": "Manual",
     "meta data": "Meta data",
     "middle": "Middle",
@@ -397,6 +405,8 @@
     "manage account": "Manage account",
     "repeat password": "Repeat password",
     "reset password": "Reset password",
+    "select country": "Select country",
+    "select gender": "Select gender",
     "select locale": "Select a language",
     "select timezone": "Select a timezone",
     "selected level": "Selected level",
@@ -503,9 +513,6 @@
     "form fill out": "Please fill out the form",
     "intelligibility of the speaker": "Intelligibility of the speaker",
     "overview": "The next table shows an overview of the transcription units:"
-  },
-  "translation": {
-    "language name": "English"
   },
   "trn-editor": {
     "context menu": {

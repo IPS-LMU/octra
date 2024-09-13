@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "Nederlands"
+  },
   "alerts": {
     "authentication needed": "Verifieer alstublieft om functies zoals ASR of woorduitlijning te gebruiken. Nadat u op \"Authenticeren\" heeft geklikt, wordt een apart venster geopend. Als er geen venster wordt geopend, zorg er dan voor dat pop-ups zijn ingeschakeld in uw browser.",
     "need playback": "U moet het afspelen minstens één keer starten voordat u het transcript verzendt."
@@ -357,8 +360,5 @@
     "form fill out": "Vul het formulier in",
     "intelligibility of the speaker": "Verstaanbaarheid van de spreker",
     "overview": "De volgende tabel toont een overzicht van de transcriptie-eenheden:"
-  },
-  "translation": {
-    "language name": "Nederlands"
   }
 }

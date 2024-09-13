@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "Deutsch"
+  },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
     "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich.",
@@ -135,10 +138,12 @@
     "close": "Schließen",
     "continue": "Weiter",
     "continue transcription": "Transkription jetzt fortsetzen",
+    "country": "Land",
     "custom formats": "Eigene Formate",
     "delete": "Löschen",
     "description": "Beschreibung",
     "dismissed": "verschwindet in {{value}}s",
+    "divers": "Divers",
     "download": "Herunterladen",
     "duration": "Dauer",
     "e-mail": "Email",
@@ -150,11 +155,13 @@
     "faq": "FAQ",
     "features": "Features",
     "feedback": "Feedback",
+    "female": "Weiblich",
     "filesize": "Dateigröße",
     "first name": "Vorname",
     "free jobs": "Freie Aufgaben",
     "free quota": "Kostenloses Kontingent",
     "free tasks": "Freie Aufgaben",
+    "gender": "Geschlecht",
     "good": "Gut",
     "guidelines": "Regeln",
     "help": "Hilfe",
@@ -171,6 +178,7 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "logout successful": "Abmeldung erfolgreich",
+    "male": "Männlich",
     "manual": "Handbuch",
     "meta data": "Metadaten",
     "middle": "Mittel",
@@ -397,6 +405,8 @@
     "manage account": "Account verwalten",
     "repeat password": "Passwort wiederholen",
     "reset password": "Passwort zurücksetzen",
+    "select country": "Land wählen",
+    "select gender": "Geschlecht wählen",
     "select locale": "Sprache wählen",
     "select timezone": "Zeitzone wählen",
     "selected level": "Ausgewähltes level",
@@ -503,9 +513,6 @@
     "form fill out": "Bitte fülle kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Deine definierten Transkriptionseinheiten:"
-  },
-  "translation": {
-    "language name": "Deutsch"
   },
   "trn-editor": {
     "context menu": {

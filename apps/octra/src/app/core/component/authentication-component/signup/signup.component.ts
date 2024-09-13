@@ -1,5 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { LANGUAGES, PolicyListItemDto, TIMEZONE_NAMES } from '@octra/api-types';
+import {
+  AccountPersonGender,
+  COUNTRYSTATES,
+  LANGUAGES,
+  PolicyListItemDto,
+  TIMEZONE_NAMES,
+} from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../default.component';
@@ -37,6 +43,8 @@ export class SignupComponent extends DefaultComponent implements OnInit {
     password2: '',
     locale: '',
     timezone: '',
+    country: '',
+    gender: '',
     policies: [] as PreparedPolicyListItemDto[],
     dataCorrect: false,
   };
@@ -91,10 +99,10 @@ export class SignupComponent extends DefaultComponent implements OnInit {
   sendSignup() {
     this.api
       .registerAccount({
-        country: "", // TODO add country
+        country: this.signUpForm.country,
         username: this.signUpForm.username,
         first_name: this.signUpForm.firstName,
-        gender: "male", // TODO ADD GENDER
+        gender: this.signUpForm.gender as AccountPersonGender,
         last_name: this.signUpForm.lastName,
         email: this.signUpForm.email,
         password: this.signUpForm.password1,
@@ -102,7 +110,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
         timezone: this.signUpForm.timezone,
         acceptedPolicyTranslationIDs: this.signUpForm.policies
           .map((a) => this.getTranslationPolicy(a)?.id)
-          .filter((a) => a !== undefined) as number[]
+          .filter((a) => a !== undefined) as number[],
       })
       .subscribe({
         next: (response) => {
@@ -123,4 +131,6 @@ export class SignupComponent extends DefaultComponent implements OnInit {
   override ngOnDestroy() {
     super.ngOnDestroy();
   }
+
+  protected readonly COUNTRYSTATES = COUNTRYSTATES;
 }

@@ -51,12 +51,44 @@
   <div class="row">
     <div class="col-md">
       <div class="mb-3">
+        <label for="gender" class="form-label">{{ 'g.gender' | transloco }}</label>
+        <select class="form-select form-select-sm" name="gender" [(ngModel)]="signUpForm.gender" required id="gender"
+                aria-describedby="gender">
+          <option value="">{{ 'p.select gender' | transloco }}</option>
+          <option value="female">
+            {{ "g.female" | transloco }}
+          </option>
+          <option value="male">
+            {{ "g.male" | transloco }}
+          </option>
+          <option value="divers">
+            {{ "g.divers" | transloco }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md">
+      <div class="mb-3">
         <label for="locale" class="form-label">{{"g.locale" | transloco}}</label>
         <select class="form-select form-select-sm" name="locale" [(ngModel)]="signUpForm.locale"
                 required id="locale"
                 aria-describedby="timezone">
           <option value="">{{"p.select locale" | transloco}}</option>
           <option *ngFor="let locale of LANGUAGES" [value]="locale.code">{{locale.language}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md">
+      <div class="mb-3">
+        <label for="country" class="form-label">{{ 'g.country' | transloco }}</label>
+        <select class="form-select form-select-sm" name="country" [(ngModel)]="signUpForm.country" required id="country"
+                aria-describedby="country">
+          <option value="">{{ 'p.select country' | transloco }}</option>
+          <option *ngFor="let country of COUNTRYSTATES" [value]="country.country">
+            {{ country.country }}
+          </option>
         </select>
       </div>
     </div>

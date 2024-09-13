@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "Italiano"
+  },
   "alerts": {
     "authentication needed": "Per favore autenticati in modo da usare funzionalità come l'ASR o l'allineamento per parola. Dopo aver cliccato su \"Autenticati\" si aprirà una finestra separata. Se non si apre alcuna finestra, assicurati di avere i popup attivati nel tuo browser.",
     "need playback": "Devi attivare il playback almeno una volta prima di sottoporre la trascrizione."
@@ -357,8 +360,5 @@
     "form fill out": "Per favore, riempi il modulo",
     "intelligibility of the speaker": "Incomprensibilità del parlante",
     "overview": "La prossima tabella mostra un'anteprima delle unità di trascrizione."
-  },
-  "translation": {
-    "language name": "Italiano"
   }
 }

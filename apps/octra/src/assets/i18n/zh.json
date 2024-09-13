@@ -1,4 +1,7 @@
 {
+  "translation": {
+    "language name": "英文"
+  },
   "alerts": {
     "authentication needed": "请认证，以便使用自动语音识别/词对齐功能。在点击“认证”之后，会出现新窗口。如果没有新窗口，请确保浏览器开启了弹窗功能。",
     "need playback": "在提交标注之前，至少需要播放一次。"
@@ -357,8 +360,5 @@
     "form fill out": "请填写此表格",
     "intelligibility of the speaker": "说话者的易懂性",
     "overview": "下表格显示了标注单元的概览："
-  },
-  "translation": {
-    "language name": "英文"
   }
 }

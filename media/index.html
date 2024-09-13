@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Components DEMO</title>
+  <script type="application/javascript" src="../../extern/libs/utilities/index.umd.js"></script>
+  <script type="application/javascript" src="../../extern/libs/media/index.umd.js"></script>
+  <script type="application/javascript" src="../../extern/libs/web-media/index.umd.js"></script>
+  <script type="application/javascript" src="../../extern/libs/annotation/index.umd.js"></script>
+  <script type="application/javascript" src="../../extern/libs/web-components/web-components.js"></script>
+</head>
+<body>
+<h2>Audioplayer</h2>
+<div id="audioplayer-wrapper"></div>
+<button onclick="playAudioPlayer()">PLAY</button>
+<button onclick="pauseAudioPlayer()">PAUSE</button>
+
+<h2 style="margin-top:30px;">AudioViewer</h2>
+<div id="audioviewer-wrapper"></div>
+<button onclick="playAudioViewer()">PLAY</button>
+<button onclick="pauseAudioViewer()">PAUSE</button>
+<script type="module" src="./index.mjs"></script>
+</body>
+</html>

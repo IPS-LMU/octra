@@ -219,9 +219,9 @@ export function findCompatibleFileFromIO<T>(
   };
 
   while (inputs.length > 0 || outputs.length > 0) {
-    const filteredInputs = inputs.filter((a) => a.chain_position === i);
+    const filteredInputs = inputs.filter((a) => a.chain_position === undefined || a.chain_position === i);
     inputs = inputs.filter((a) => !filteredInputs.find((b) => b.id === a.id));
-    const filteredOutputs = outputs.filter((a) => a.chain_position === i);
+    const filteredOutputs = outputs.filter((a) => a.chain_position === undefined || a.chain_position === i);
     outputs = outputs.filter(
       (a) => !filteredOutputs.find((b) => b.id === a.id)
     );

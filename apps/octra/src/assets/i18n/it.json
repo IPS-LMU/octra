@@ -182,7 +182,7 @@
     "simple editor": "Editor del Dittafono"
   },
   "login": {
-    "api not available": "Il server non è al momento disponibile. Per favore, prova di nuovo più tardi. Se questo messaggio appare ancora dopo 4 ore invia una segnalazione tramite il modulo feedback.",
+    "api not available": "",
     "demo": "Clicca qui per usare OCTRA su un file audio di default (demo)",
     "last used": "usato di recente",
     "local and remove": "Rimuovi dati della modalità online & continua",

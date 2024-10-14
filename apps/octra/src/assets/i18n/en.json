@@ -247,7 +247,7 @@
     "simple editor": "Dictaphone Editor"
   },
   "login": {
-    "api not available": "The server is currently not available. Please try it again later. If this message is still visible after 4 hours please send us a message via the feedback form.",
+    "api not available": "The server is currently unavailable. Please try again later. If this error message is still visible after 15 minutes, please send an e-mail to {{email_link}}.",
     "demo": "Open demo",
     "last used": "recently used",
     "local and remove": "Remove online mode data & continue",

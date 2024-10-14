@@ -182,7 +182,7 @@
     "simple editor": "Dictafoon-editor"
   },
   "login": {
-    "api not available": "De server is momenteel niet beschikbaar. Probeer het later nog eens. Als dit bericht na 4 uur nog steeds zichtbaar is, stuur ons dan een bericht via het feedbackformulier.",
+    "api not available": "",
     "demo": "Klik hier om OCTRA te gebruiken op een standaard audiobestand (demo)",
     "last used": "laatst gebruikt",
     "local and remove": "Gegevens online modus verwijderen & doorgaan",

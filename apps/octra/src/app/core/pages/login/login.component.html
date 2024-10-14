@@ -54,9 +54,13 @@
             </div>
             <ng-template #showServerOffline>
               <div
-                class="text-center justify-content-center d-flex flex-column flex-fill h-100 bg-warning p-3 opacity-75"
+                class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75"
               >
-                {{ 'login.api not available' | transloco }}
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
+                <div [innerHTML]="'login.api not available' | transloco : {
+                   email_link: email_link
+                }">
+                </div>
               </div>
             </ng-template>
             <br />
@@ -68,8 +72,8 @@
       <div class="card login-card position-relative" #localmode>
         <p style="position: absolute; top: 0; right: 0; text-align: right; margin-top:10px; margin-right:10px;">
           <a (click)="startDemo()" class="link pointer">{{
-            'login.demo' | transloco
-          }}</a>
+              'login.demo' | transloco
+            }}</a>
         </p>
         <div class="card-body">
           <section>

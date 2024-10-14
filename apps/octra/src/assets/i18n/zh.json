@@ -182,7 +182,7 @@
     "simple editor": "听写式编辑器"
   },
   "login": {
-    "api not available": "服务器暂时不可用。请稍后再试。如果服务器不可用超过了4小时，请使用反馈表格告知我们。",
+    "api not available": "",
     "demo": "点击此处使用OCTRO的默认音频（演示）",
     "last used": "最近使用",
     "local and remove": "移除在线模式的数据并且继续",

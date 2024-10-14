@@ -38,6 +38,8 @@ export class LoginComponent
   @ViewChild('localmode', { static: true }) localmode!: ElementRef;
   @ViewChild('onlinemode', { static: true }) onlinemode!: ElementRef;
 
+  email_link = '';
+
   state: {
     online: {
       apiStatus: 'init' | 'available' | 'unavailable';
@@ -91,6 +93,20 @@ export class LoginComponent
     public authStoreService: AuthenticationStoreService
   ) {
     super();
+
+    const subject = 'Octra Server is offline';
+    const body = `Hello,
+
+I just want to let you know, that the OCTRA server is currently offline.
+
+ Best,
+ an OCTRA user
+ `;
+    const url = `mailto:octra@phonetik.uni-muenchen.de?subject=${encodeURI(
+      subject
+    )}&body=${encodeURI(body)}`;
+
+    this.email_link = `<br/><a href="${url}">octra@phonetik.uni-muenchen.de</a>`;
   }
 
   onOfflineSubmit = (removeData: boolean) => {

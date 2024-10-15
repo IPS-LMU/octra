@@ -1,15 +1,17 @@
-<ng-container *ngIf="group !== undefined">
-  <h4 *ngIf="group!.title">{{ group!.title }}
-  </h4>
-  <ng-container *ngFor="let control of group?.controls">
-    <ng-container *ngIf="control.type === 'switch' && !control.ignore">
+@if (group !== undefined) {
+  @if (group!.title) {
+    <h4>{{ group!.title }}
+    </h4>
+  }
+  @for (control of group?.controls; track control) {
+    @if (control.type === 'switch' && !control.ignore) {
       <div class="row align-items-center mt-2 mb-2">
         <div class="col-auto">
           <div class="form-check mb-0" [ngStyle]="{
           visibility: control.toggleable ? 'inherit' : 'hidden'
         }">
             <input class="form-check-input" type="checkbox" [id]="'check_toggleable_' + control.id"
-                   [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
+              [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
           </div>
         </div>
         <div class="col-md">
@@ -18,39 +20,39 @@
           }">{{ control.title }}</label>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" [id]="'switch-' + control.id"
-                   [disabled]="!control.checkToggleStateOfControl()"
-                   [name]="'switch_' + control.id" (focusin)="control.focused = true"
-                   (focusout)="control.focused = false"
-                   [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
-
+              [disabled]="!control.checkToggleStateOfControl()"
+              [name]="'switch_' + control.id" (focusin)="control.focused = true"
+              (focusout)="control.focused = false"
+              [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
             <label class="form-check-label mb-0" [for]="'switch-' + control.id" [ngClass]="{
             'opacity-50': !control.checkToggleStateOfControl()
           }">
-              <ng-container *ngIf="control.value; else showNo">
+              @if (control.value) {
                 {{ "g.yes" | transloco }}
-              </ng-container>
-              <ng-template #showNo>
+              } @else {
                 {{ "g.no" | transloco }}
-              </ng-template>
+              }
             </label>
           </div>
         </div>
         <div class="col-md-auto">
-          <octra-question-mark *ngIf="control.description" [text]="control.description" [ngStyle]="{
+          @if (control.description) {
+<octra-question-mark [text]="control.description" [ngStyle]="{
              visibility: control.description ? 'visible' : 'hidden'
           }"></octra-question-mark>
+          }
         </div>
       </div>
       <hr/>
-    </ng-container>
-    <ng-container *ngIf="(control.type === 'number' || control.type === 'integer') && !control.ignore">
+    }
+    @if ((control.type === 'number' || control.type === 'integer') && !control.ignore) {
       <div class="row align-items-center mb-1">
         <div class="col-auto">
           <div class="form-check mb-0" [ngStyle]="{
           visibility: control.toggleable ? 'inherit' : 'hidden'
         }">
             <input class="form-check-input" type="checkbox" [id]="'check_toggleable_' + control.id"
-                   [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
+              [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
           </div>
         </div>
         <div class="col-md">
@@ -59,29 +61,30 @@
           }">
             <label [for]="'number-' + control.id" class="form-label m-0">{{ control.title }}</label>
           </div>
-
           <input type="number" class="form-control" [id]="'number-' + control.id"
-                 [name]="'number_' + control.id" [step]="control.type === 'integer' ? 1 : 0.1"
-                 [disabled]="!control.checkToggleStateOfControl()"
-                 (focusin)="control.focused = true" (focusout)="control.focused = false"
-                 [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
+            [name]="'number_' + control.id" [step]="control.type === 'integer' ? 1 : 0.1"
+            [disabled]="!control.checkToggleStateOfControl()"
+            (focusin)="control.focused = true" (focusout)="control.focused = false"
+            [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
         </div>
         <div class="col-md-auto">
-          <octra-question-mark *ngIf="control.description" [text]="control.description" [ngStyle]="{
+          @if (control.description) {
+<octra-question-mark [text]="control.description" [ngStyle]="{
              visibility: control.description ? 'visible' : 'hidden'
           }"></octra-question-mark>
+          }
         </div>
       </div>
       <hr/>
-    </ng-container>
-    <ng-container *ngIf="control.type === 'text' && !control.ignore">
+    }
+    @if (control.type === 'text' && !control.ignore) {
       <div class="row align-items-center mb-1">
         <div class="col-auto">
           <div class="form-check mb-0" [ngStyle]="{
           visibility: control.toggleable ? 'inherit' : 'hidden'
         }">
             <input class="form-check-input" type="checkbox" [id]="'check_toggleable_' + control.id"
-                   [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
+              [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
           </div>
         </div>
         <div class="col-md">
@@ -90,29 +93,30 @@
           }">
             <label [for]="'text-' + control.id" class="form-label m-0">{{ control.title }}</label>
           </div>
-
           <input type="text" class="form-control" [id]="'text-' + control.id"
-                 [name]="'text_' + control.id"
-                 [disabled]="!control.checkToggleStateOfControl()"
-                 (focusin)="control.focused = true" (focusout)="control.focused = false"
-                 [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
+            [name]="'text_' + control.id"
+            [disabled]="!control.checkToggleStateOfControl()"
+            (focusin)="control.focused = true" (focusout)="control.focused = false"
+            [(ngModel)]="control.value" (ngModelChange)="somethingChanged.emit()">
         </div>
         <div class="col-md-auto">
-          <octra-question-mark *ngIf="control.description" [text]="control.description" [ngStyle]="{
+          @if (control.description) {
+<octra-question-mark [text]="control.description" [ngStyle]="{
              visibility: control.description ? 'visible' : 'hidden'
           }"></octra-question-mark>
+          }
         </div>
       </div>
       <hr/>
-    </ng-container>
-    <ng-container *ngIf="control.type === 'select' && !control.ignore">
+    }
+    @if (control.type === 'select' && !control.ignore) {
       <div class="row align-items-center mb-1">
         <div class="col-auto">
           <div class="form-check mb-0" [ngStyle]="{
           visibility: control.toggleable ? 'inherit' : 'hidden'
         }">
             <input class="form-check-input" type="checkbox" [id]="'check_toggleable_' + control.id"
-                   [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
+              [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
           </div>
         </div>
         <div class="col-md">
@@ -121,30 +125,33 @@
           }">
             <label [for]="'select-' + control.id" class="form-label mb-0">{{ control.title }}</label>
           </div>
-
           <select [id]="'select-' + control.id" class="form-select" [(ngModel)]="control.value"
-                  (ngModelChange)="somethingChanged.emit()"
-                  [disabled]="!control.checkToggleStateOfControl()"
-                  [name]="'select-' + control.id" (focusin)="control.focused = true"
-                  (focusout)="control.focused = false">
-            <option *ngFor="let option of control.context" [value]="option.value">{{ option.label }}</option>
+            (ngModelChange)="somethingChanged.emit()"
+            [disabled]="!control.checkToggleStateOfControl()"
+            [name]="'select-' + control.id" (focusin)="control.focused = true"
+            (focusout)="control.focused = false">
+            @for (option of control.context; track option) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
           </select>
         </div>
         <div class="col-md-auto">
-          <octra-question-mark *ngIf="control.description" [text]="control.description" [ngStyle]="{
+          @if (control.description) {
+<octra-question-mark [text]="control.description" [ngStyle]="{
              visibility: control.description ? 'visible' : 'hidden'
           }"></octra-question-mark>
+          }
         </div>
       </div>
       <hr/>
-    </ng-container>
-    <ng-container *ngIf="control.type === 'array' && !control.ignore">
+    }
+    @if (control.type === 'array' && !control.ignore) {
       <div class="col-auto">
         <div class="form-check mb-0" [ngStyle]="{
           visibility: control.toggleable ? 'inherit' : 'hidden'
         }">
           <input class="form-check-input" type="checkbox" [id]="'check_toggleable_' + control.id"
-                 [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
+            [name]="'check_toggleable_' + control.id" [(ngModel)]="control.toggled" (ngModelChange)="somethingChanged.emit()">
         </div>
       </div>
       <div class="row align-items-center mb-1">
@@ -154,38 +161,40 @@
           }">
             <label [for]="'array-' + control.id" class="form-label mb-0">{{ control.title }}</label>
           </div>
-
           <div class="border border-1 p-1 border-rounded border-radius-2">
             <div class="row p-0">
               <div class="col" (focusin)="control.focused = true" (focusout)="control.focused = false">
-                <ng-container *ngIf="control.value !== undefined && control.value.length > 0">
-                  <ng-container
-                    *ngIf="control.itemsType === 'text' || control.itemsType === 'number' || control.itemsType === 'integer'">
-                    <div class="array-item" *ngFor="let item of control.value; let i = index">{{ item }} <i
+                @if (control.value !== undefined && control.value.length > 0) {
+                  @if (control.itemsType === 'text' || control.itemsType === 'number' || control.itemsType === 'integer') {
+                    @for (item of control.value; track item; let i = $index) {
+                      <div class="array-item">{{ item }} <i
                       class="bi bi-x-lg pointer" (click)="onArrayItemDelete(control, i)"></i></div>
-                  </ng-container>
-                </ng-container>
+                    }
+                  }
+                }
               </div>
               <div class="col-auto">
                 <octra-toolconfig-array-adder (itemsAdd)="onArrayItemAdd(control, $event)"
-                                              [type]="control.itemsType"
-                                              [disabled]="!control.checkToggleStateOfControl()"
-                                              [items]="control.context"></octra-toolconfig-array-adder>
+                  [type]="control.itemsType"
+                  [disabled]="!control.checkToggleStateOfControl()"
+                [items]="control.context"></octra-toolconfig-array-adder>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-auto">
-          <octra-question-mark *ngIf="control.description" [text]="control.description" [ngStyle]="{
+          @if (control.description) {
+<octra-question-mark [text]="control.description" [ngStyle]="{
              visibility: control.description ? 'visible' : 'hidden'
           }"></octra-question-mark>
+          }
         </div>
       </div>
       <hr/>
-    </ng-container>
-    <ng-container *ngIf="control.type === 'group'">
+    }
+    @if (control.type === 'group') {
       <octra-toolconfig-group [group]="control" class="mt-4 mb-4"
-                              (somethingChanged)="somethingChanged.emit()"></octra-toolconfig-group>
-    </ng-container>
-  </ng-container>
-</ng-container>
+      (somethingChanged)="somethingChanged.emit()"></octra-toolconfig-group>
+    }
+  }
+}

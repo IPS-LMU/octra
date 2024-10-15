@@ -1,8 +1,9 @@
 <div class="container-fluid p-3">
-  <form *ngIf="jsonSchema.$gui_support; else guiNotSupported">
-    <octra-toolconfig-group [group]="form" (somethingChanged)="onSomethingChanged()"></octra-toolconfig-group>
-  </form>
-  <ng-template #guiNotSupported>
+  @if (jsonSchema.$gui_support) {
+    <form>
+      <octra-toolconfig-group [group]="form" (somethingChanged)="onSomethingChanged()"></octra-toolconfig-group>
+    </form>
+  } @else {
     <p class="text-center">Form not supported by tool.</p>
-  </ng-template>
+  }
 </div>

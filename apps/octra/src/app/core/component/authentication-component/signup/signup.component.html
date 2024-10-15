@@ -1,153 +1,175 @@
-<div *ngIf="signUpLoading" class="justify-items-center justify-content-center">
-  <div class="spinner-border text-secondary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-<div class="border border-success border-2 p-2 text-center text-success mt-3" *ngIf="nextAction === 'email_verification'">
-  <i class="bi bi-envelope-at fs-2"></i><br/>
-  <p [innerHTML]="'signup.success.email_verification' | transloco"></p>
-</div>
-<div class="border border-success border-2 p-2 text-center text-success mt-3" *ngIf="nextAction === 'login'">
-  <i class="bi bi-check-circle fs-2"></i><br/>
-  <p [innerHTML]="'signup.success.login' | transloco"></p>
-</div>
-<form #form=ngForm class="text-start" id="signup-form" *ngIf="!signUpLoading && nextAction === ''">
-  <div class="row">
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="firstName" class="form-label">{{"g.first name" | transloco}}</label>
-        <input type="text" class="form-control form-control-sm" name="firstName" [(ngModel)]="signUpForm.firstName"
-               [required]="true" id="firstName" minlength="3"
-               aria-describedby="firstName" [placeholder]="'g.first name' | transloco">
-      </div>
-    </div>
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="lastName" class="form-label">{{"g.last name" | transloco}}</label>
-        <input type="text" class="form-control form-control-sm" name="lastName" [(ngModel)]="signUpForm.lastName"
-               required id="lastName"
-               aria-describedby="lastName" [placeholder]="'g.last name' | transloco">
-      </div>
+@if (signUpLoading) {
+  <div class="justify-items-center justify-content-center">
+    <div class="spinner-border text-secondary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="userName" class="form-label">{{"g.username" | transloco}}</label>
-        <input type="text" class="form-control form-control-sm" name="userName" [(ngModel)]="signUpForm.username"
-               required id="userName" [autocomplete]="'one-time-code'"
-               aria-describedby="userName" minlength="6" [placeholder]="'g.username' | transloco">
-      </div>
-    </div>
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="email" class="form-label">{{"g.e-mail" | transloco}}</label>
-        <input type="email" class="form-control form-control-sm" id="email" name="email"
-               [(ngModel)]="signUpForm.email" [autocomplete]="'one-time-code'" required
-               placeholder="email@example.com" minlength="6" email>
-      </div>
-    </div>
+}
+@if (nextAction === 'email_verification') {
+  <div class="border border-success border-2 p-2 text-center text-success mt-3">
+    <i class="bi bi-envelope-at fs-2"></i><br/>
+    <p [innerHTML]="'signup.success.email_verification' | transloco"></p>
   </div>
-  <div class="row">
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="gender" class="form-label">{{ 'g.gender' | transloco }}</label>
-        <select class="form-select form-select-sm" name="gender" [(ngModel)]="signUpForm.gender" required id="gender"
-                aria-describedby="gender">
-          <option value="">{{ 'p.select gender' | transloco }}</option>
-          <option value="female">
-            {{ "g.female" | transloco }}
-          </option>
-          <option value="male">
-            {{ "g.male" | transloco }}
-          </option>
-          <option value="divers">
-            {{ "g.divers" | transloco }}
-          </option>
-        </select>
+}
+@if (nextAction === 'login') {
+  <div class="border border-success border-2 p-2 text-center text-success mt-3">
+    <i class="bi bi-check-circle fs-2"></i><br/>
+    <p [innerHTML]="'signup.success.login' | transloco"></p>
+  </div>
+}
+@if (!signUpLoading && nextAction === '') {
+  <form #form=ngForm class="text-start" id="signup-form">
+    <div class="row">
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="firstName" class="form-label">{{"g.first name" | transloco}}</label>
+          <input type="text" class="form-control form-control-sm" name="firstName" [(ngModel)]="signUpForm.firstName"
+            [required]="true" id="firstName" minlength="3"
+            aria-describedby="firstName" [placeholder]="'g.first name' | transloco">
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="lastName" class="form-label">{{"g.last name" | transloco}}</label>
+          <input type="text" class="form-control form-control-sm" name="lastName" [(ngModel)]="signUpForm.lastName"
+            required id="lastName"
+            aria-describedby="lastName" [placeholder]="'g.last name' | transloco">
+        </div>
       </div>
     </div>
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="locale" class="form-label">{{"g.locale" | transloco}}</label>
-        <select class="form-select form-select-sm" name="locale" [(ngModel)]="signUpForm.locale"
-                required id="locale"
-                aria-describedby="timezone">
-          <option value="">{{"p.select locale" | transloco}}</option>
-          <option *ngFor="let locale of LANGUAGES" [value]="locale.code">{{locale.language}}</option>
-        </select>
+    <div class="row">
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="userName" class="form-label">{{"g.username" | transloco}}</label>
+          <input type="text" class="form-control form-control-sm" name="userName" [(ngModel)]="signUpForm.username"
+            required id="userName" [autocomplete]="'one-time-code'"
+            aria-describedby="userName" minlength="6" [placeholder]="'g.username' | transloco">
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="email" class="form-label">{{"g.e-mail" | transloco}}</label>
+          <input type="email" class="form-control form-control-sm" id="email" name="email"
+            [(ngModel)]="signUpForm.email" [autocomplete]="'one-time-code'" required
+            placeholder="email@example.com" minlength="6" email>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="country" class="form-label">{{ 'g.country' | transloco }}</label>
-        <select class="form-select form-select-sm" name="country" [(ngModel)]="signUpForm.country" required id="country"
-                aria-describedby="country">
-          <option value="">{{ 'p.select country' | transloco }}</option>
-          <option *ngFor="let country of COUNTRYSTATES" [value]="country.country">
-            {{ country.country }}
-          </option>
-        </select>
+    <div class="row">
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="gender" class="form-label">{{ 'g.gender' | transloco }}</label>
+          <select class="form-select form-select-sm" name="gender" [(ngModel)]="signUpForm.gender" required id="gender"
+            aria-describedby="gender">
+            <option value="">{{ 'p.select gender' | transloco }}</option>
+            <option value="female">
+              {{ "g.female" | transloco }}
+            </option>
+            <option value="male">
+              {{ "g.male" | transloco }}
+            </option>
+            <option value="divers">
+              {{ "g.divers" | transloco }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="locale" class="form-label">{{"g.locale" | transloco}}</label>
+          <select class="form-select form-select-sm" name="locale" [(ngModel)]="signUpForm.locale"
+            required id="locale"
+            aria-describedby="timezone">
+            <option value="">{{"p.select locale" | transloco}}</option>
+            @for (locale of LANGUAGES; track locale) {
+              <option [value]="locale.code">{{locale.language}}</option>
+            }
+          </select>
+        </div>
       </div>
     </div>
-    <div class="col-md">
-      <div class="mb-3">
-        <label for="timezone" class="form-label">{{"g.timezone" | transloco}}</label>
-        <select class="form-select form-select-sm" name="timezone" [(ngModel)]="signUpForm.timezone"
-                required id="timezone"
-                aria-describedby="timezone">
-          <option value="">{{"p.select timezone" | transloco}}</option>
-          <option *ngFor="let timezone of TIMEZONE_NAMES" [value]="timezone">{{timezone}}</option>
-        </select>
+    <div class="row">
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="country" class="form-label">{{ 'g.country' | transloco }}</label>
+          <select class="form-select form-select-sm" name="country" [(ngModel)]="signUpForm.country" required id="country"
+            aria-describedby="country">
+            <option value="">{{ 'p.select country' | transloco }}</option>
+            @for (country of COUNTRYSTATES; track country) {
+              <option [value]="country.country">
+                {{ country.country }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="mb-3">
+          <label for="timezone" class="form-label">{{"g.timezone" | transloco}}</label>
+          <select class="form-select form-select-sm" name="timezone" [(ngModel)]="signUpForm.timezone"
+            required id="timezone"
+            aria-describedby="timezone">
+            <option value="">{{"p.select timezone" | transloco}}</option>
+            @for (timezone of TIMEZONE_NAMES; track timezone) {
+              <option [value]="timezone">{{timezone}}</option>
+            }
+          </select>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">{{"g.password" | transloco}}</label>
-    <input type="password" class="form-control form-control-sm" [required]="true" name="password1"
-           [(ngModel)]="signUpForm.password1" [autocomplete]="'one-time-code'" id="password"
-           [placeholder]="'g.password' | transloco">
-  </div>
-  <div class="mb-3">
-    <label for="passwordRepeat" class="form-label">{{"p.repeat password" | transloco}}</label>
-    <input type="password" class="form-control form-control-sm" [required]="true" name="password2"
-           [(ngModel)]="signUpForm.password2" [autocomplete]="'one-time-code'" id="passwordRepeat"
-           [placeholder]="'p.repeat password' | transloco">
-  </div>
-  <table class="w-100">
-    <tbody>
-    <tr>
-      <td class="align-middle" style="width:25px;"><input type="checkbox" class="form-check-input"
-                                                          [(ngModel)]="signUpForm.dataCorrect" name="dataCorrectness"
-                                                          required="true" id="dataCorrectness"></td>
-      <td>
-        <label for="dataCorrectness" class="pointer" [innerHTML]="'signup.data correctness' | transloco"></label>
-      </td>
-    </tr>
-    <tr *ngFor="let policy of signUpForm.policies">
-      <td class="align-middle" style="width:25px;"><input type="checkbox" class="form-check-input"
-                                                          [value]="policy.translations[0].id"
-                                                          [(ngModel)]="policy.checked" [name]="policy.type"
-                                                          [required]="policy.required" [id]="policy.type"></td>
-      <td class="align-middle">
-        <label class="pointer" [for]="policy.type" *ngIf="policy.type === 'privacy'" [innerHTML]="'signup.data policy' | transloco: {
+    <div class="mb-3">
+      <label for="password" class="form-label">{{"g.password" | transloco}}</label>
+      <input type="password" class="form-control form-control-sm" [required]="true" name="password1"
+        [(ngModel)]="signUpForm.password1" [autocomplete]="'one-time-code'" id="password"
+        [placeholder]="'g.password' | transloco">
+    </div>
+    <div class="mb-3">
+      <label for="passwordRepeat" class="form-label">{{"p.repeat password" | transloco}}</label>
+      <input type="password" class="form-control form-control-sm" [required]="true" name="password2"
+        [(ngModel)]="signUpForm.password2" [autocomplete]="'one-time-code'" id="passwordRepeat"
+        [placeholder]="'p.repeat password' | transloco">
+    </div>
+    <table class="w-100">
+      <tbody>
+        <tr>
+          <td class="align-middle" style="width:25px;"><input type="checkbox" class="form-check-input"
+            [(ngModel)]="signUpForm.dataCorrect" name="dataCorrectness"
+          required="true" id="dataCorrectness"></td>
+          <td>
+            <label for="dataCorrectness" class="pointer" [innerHTML]="'signup.data correctness' | transloco"></label>
+          </td>
+        </tr>
+        @for (policy of signUpForm.policies; track policy) {
+          <tr>
+            <td class="align-middle" style="width:25px;"><input type="checkbox" class="form-check-input"
+              [value]="policy.translations[0].id"
+              [(ngModel)]="policy.checked" [name]="policy.type"
+            [required]="policy.required" [id]="policy.type"></td>
+            <td class="align-middle">
+              @if (policy.type === 'privacy') {
+<label class="pointer" [for]="policy.type" [innerHTML]="'signup.data policy' | transloco: {
             dataPolicyURL: getTranslationPolicy(policy)?.url
             }">
-        </label>
-        <label class="pointer" [for]="policy.type" *ngIf="policy.type === 'terms_and_conditions'" [innerHTML]="'signup.terms of service' | transloco:{
+                </label>
+              }
+              @if (policy.type === 'terms_and_conditions') {
+<label class="pointer" [for]="policy.type" [innerHTML]="'signup.terms of service' | transloco:{
               termsConditionsURL: getTranslationPolicy(policy)?.url
               }">
-        </label>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <p class="text-danger" *ngIf="errorMessage !== ''">
-    {{errorMessage}}
-  </p>
-  <button type="submit" [disabled]="!form.valid || (signUpForm.password1 !== signUpForm.password2)"
-          (click)="sendSignup()"
-          class="btn btn-primary btn-sm w-100 mt-3">{{"p.sign up" | transloco}}</button>
-</form>
+                </label>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (errorMessage !== '') {
+      <p class="text-danger">
+        {{errorMessage}}
+      </p>
+    }
+    <button type="submit" [disabled]="!form.valid || (signUpForm.password1 !== signUpForm.password2)"
+      (click)="sendSignup()"
+    class="btn btn-primary btn-sm w-100 mt-3">{{"p.sign up" | transloco}}</button>
+  </form>
+}

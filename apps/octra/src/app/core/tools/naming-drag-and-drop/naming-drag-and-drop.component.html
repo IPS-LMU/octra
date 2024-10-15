@@ -8,7 +8,7 @@
         id="button-basic"
         style="background-color: gray"
         type="button"
-      >
+        >
         {{ 'tools.cut audio.add placeholder' | transloco }}
         <i class="bi bi-plus-lg"></i>
       </button>
@@ -18,15 +18,16 @@
         class="dropdown-menu"
         id="dropdown-basic"
         role="menu"
-      >
+        >
         <li role="menuitem">
-          <a
-            (click)="addItem(item)"
-            *ngFor="let item of namingConventionArray; let i = index"
-            class="dropdown-item"
-          >
-            {{ item }}
-          </a>
+          @for (item of namingConventionArray; track item; let i = $index) {
+            <a
+              (click)="addItem(item)"
+              class="dropdown-item"
+              >
+              {{ item }}
+            </a>
+          }
         </li>
       </ul>
     </div>
@@ -37,36 +38,41 @@
     cdkDropListOrientation="horizontal"
     class="namingConventionDragDrop"
     (cdkDropListDropped)="onDrop($event)"
-  >
-    <div
-      cdkDrag
-      (mouseup)="onItemClick($event, i)"
-      *ngFor="let item of resultConvention; let i = index"
+    >
+    @for (item of resultConvention; track item; let i = $index) {
+      <div
+        cdkDrag
+        (mouseup)="onItemClick($event, i)"
       [ngClass]="{
         'naming-placeholder': item.type === 'placeholder',
         'naming-text': item.type === 'text',
         deactivated: item.type === 'extension',
         clicked: item.type === 'clicked'
       }"
-      class="naming-item"
-    >
-      <div *ngIf="i !== clicked" class="naming-content">
-        <span class="value">{{ item.value }}</span>
-        <i class="bi bi-x-circle" (click)="remove(i)"></i>
-      </div>
-      <div *ngIf="i === clicked" class="naming-content">
-        <span
-          #text
-          (keydown)="onKeyDown($event, text)"
-          class="value"
-          contenteditable="true"
-          style="min-width: 10px"
+        class="naming-item"
         >
-          {{ item.value }}
-        </span>
-        <i class="bi bi-x-circle" (click)="remove(i)"></i>
+        @if (i !== clicked) {
+          <div class="naming-content">
+            <span class="value">{{ item.value }}</span>
+            <i class="bi bi-x-circle" (click)="remove(i)"></i>
+          </div>
+        }
+        @if (i === clicked) {
+          <div class="naming-content">
+            <span
+              #text
+              (keydown)="onKeyDown($event, text)"
+              class="value"
+              contenteditable="true"
+              style="min-width: 10px"
+              >
+              {{ item.value }}
+            </span>
+            <i class="bi bi-x-circle" (click)="remove(i)"></i>
+          </div>
+        }
       </div>
-    </div>
+    }
   </div>
   <div class="naming-item deactivated">
     <div class="naming-content">

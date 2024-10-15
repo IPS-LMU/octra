@@ -7,7 +7,7 @@
           <button
             class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
             type="button"
-          >
+            >
             1
           </button>
           Refresh App
@@ -20,7 +20,7 @@
           <button
             (click)="refreshApp()"
             class="btn btn-raised btn-primary col-12"
-          >
+            >
             Refresh app
           </button>
         </div>
@@ -32,7 +32,7 @@
           <button
             class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
             type="button"
-          >
+            >
             2
           </button>
           Clear all Storage Data
@@ -45,7 +45,7 @@
           <button
             (click)="clearAllData()"
             class="btn btn-raised btn-danger col-12"
-          >
+            >
             Clear all data permanently
           </button>
         </div>
@@ -57,7 +57,7 @@
           <button
             class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
             type="button"
-          >
+            >
             3
           </button>
           Stresstest
@@ -68,7 +68,7 @@
             [routerLink]="['/stresstest']"
             [target]="'_blank'"
             class="btn btn-raised btn-info w-100"
-          >
+            >
             Open Stresstest
           </a>
         </div>
@@ -80,7 +80,7 @@
           <button
             class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
             type="button"
-          >
+            >
             4
           </button>
           Backup local data
@@ -90,12 +90,14 @@
           <a
             class="btn btn-raised text-light w-100" style="background-color:purple"
             (click)="backupLocalData()"
-          >
+            >
             Backup local data
           </a>
-          <p *ngIf="localBackup" class="p-2 text-center">
-            <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
-          </p>
+          @if (localBackup) {
+            <p class="p-2 text-center">
+              <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
+            </p>
+          }
         </div>
       </div>
     </div>
@@ -105,7 +107,7 @@
           <button
             class="btn btn-success bmd-btn-fab bmd-btn-fab-sm"
             type="button"
-          >
+            >
             5
           </button>
           Restore local backup
@@ -120,12 +122,14 @@
           <button [disabled]="!backupFiles || backupFiles.length === 0"
             class="btn btn-raised text-light w-100" style="background-color:darkorange"
             (click)="importBackup(backupFiles![0])"
-          >
+            >
             Backup local data
           </button>
-          <p *ngIf="localBackup" class="p-2 text-center">
-            <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
-          </p>
+          @if (localBackup) {
+            <p class="p-2 text-center">
+              <a [href]="localBackup.url" target="_blank" [download]="localBackup.name"><i class="bi bi-floppy-fill"></i> Download Backup</a>
+            </p>
+          }
         </div>
       </div>
     </div>

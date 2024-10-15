@@ -1,18 +1,19 @@
 <div class="section" id="login">
   <div class="row">
     <div class="col-12" style="text-align: center">
-      <octra-maint-banner
-        *ngIf="
-          settingsService.appSettings.octra.maintenanceNotification !==
-            undefined &&
-          settingsService.appSettings.octra.maintenanceNotification.active ===
-            'active'
-        "
+      @if (
+        settingsService.appSettings.octra.maintenanceNotification !==
+        undefined &&
+        settingsService.appSettings.octra.maintenanceNotification.active ===
+        'active'
+        ) {
+        <octra-maint-banner
         [serverURL]="
           settingsService.appSettings.octra.maintenanceNotification.apiURL
         "
-        [language]="appStorage.language"
-      ></octra-maint-banner>
+          [language]="appStorage.language"
+        ></octra-maint-banner>
+      }
     </div>
   </div>
   <div class="row" id="loginrow">
@@ -20,49 +21,50 @@
       <div
         class="card login-card d-flex flex-column flex-fill h-100"
         #onlinemode
-      >
+        >
         <div class="card-body">
-          <p
-            *ngIf="!apc.octra.responsive.enabled && !state.local.validSize"
-            [innerHTML]="'browser.small window width' | transloco"
-            class="warning"
-          ></p>
+          @if (!apc.octra.responsive.enabled && !state.local.validSize) {
+            <p
+              [innerHTML]="'browser.small window width' | transloco"
+              class="warning"
+            ></p>
+          }
           <section class="d-flex flex-column flex-fill h-100">
             <h4>{{ 'login.online mode' | transloco }}</h4>
             <p style="text-align: center">
               {{ 'login.online mode description' | transloco }}
             </p>
-            <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
-              {{ 'login.online mode disabled' | transloco }}
-            </div>
-            <div
-              *ngIf="
-                (authStoreService.serverOnline$ | async) === undefined
-                  ? true
-                  : (authStoreService.serverOnline$ | async);
-                else showServerOffline
-              "
-              class="form-horizontal"
-            >
-              <octra-authentication-component
-                [showTitle]="false"
-                (submitClick)="onOnlineSubmit($event)"
-                [authentications]="api.appProperties?.authentications"
-                [passwordReset]="api.appProperties?.reset_password"
-                [registrations]="api.appProperties?.registrations"
-              ></octra-authentication-component>
-            </div>
-            <ng-template #showServerOffline>
+            @if (!apc.octra.login.enabled) {
+              <div id="login-disabled">
+                {{ 'login.online mode disabled' | transloco }}
+              </div>
+            }
+            @if (
+              (authStoreService.serverOnline$ | async) === undefined
+              ? true
+              : (authStoreService.serverOnline$ | async)) {
+              <div
+                class="form-horizontal"
+                >
+                <octra-authentication-component
+                  [showTitle]="false"
+                  (submitClick)="onOnlineSubmit($event)"
+                  [authentications]="api.appProperties?.authentications"
+                  [passwordReset]="api.appProperties?.reset_password"
+                  [registrations]="api.appProperties?.registrations"
+                ></octra-authentication-component>
+              </div>
+            } @else {
               <div
                 class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75"
-              >
+                >
                 <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
                 <div [innerHTML]="'login.api not available' | transloco : {
                    email_link: email_link
                 }">
                 </div>
               </div>
-            </ng-template>
+            }
             <br />
           </section>
         </div>
@@ -72,8 +74,8 @@
       <div class="card login-card position-relative" #localmode>
         <p style="position: absolute; top: 0; right: 0; text-align: right; margin-top:10px; margin-right:10px;">
           <a (click)="startDemo()" class="link pointer">{{
-              'login.demo' | transloco
-            }}</a>
+            'login.demo' | transloco
+          }}</a>
         </p>
         <div class="card-body">
           <section>
@@ -82,35 +84,38 @@
               {{ 'login.local mode description' | transloco }}
             </p>
             <div>
-              <div
-                *ngIf="appStorage.sessionfile !== undefined"
+              @if (appStorage.sessionfile !== undefined) {
+                <div
                 [innerHTML]="
                   'login.old file found'
                     | transloco
                       : { file_label: getDropzoneFileString(sessionfile) }
                 "
-                class="alert alert-warning"
-              ></div>
+                  class="alert alert-warning"
+                ></div>
+              }
               <div style="margin-top: 40px">
                 <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
               </div>
-              <button
-                (click)="onOfflineSubmit(false)"
-                *ngIf="getFileStatus() !== 'new'"
-                [disabled]="getFileStatus() !== 'start'"
-                class="btn btn-raised btn-primary"
-                id="offline-submit"
-                type="submit"
-              >
-                {{ 'transcription.start' | transloco }}
-              </button>
-              <button
-                (click)="onOfflineSubmit(true)"
-                *ngIf="getFileStatus() !== 'unknown'"
-                class="btn btn-raised btn-danger offline-delete-btn"
-              >
-                {{ 'transcription.new' | transloco }}
-              </button>
+              @if (getFileStatus() !== 'new') {
+                <button
+                  (click)="onOfflineSubmit(false)"
+                  [disabled]="getFileStatus() !== 'start'"
+                  class="btn btn-raised btn-primary"
+                  id="offline-submit"
+                  type="submit"
+                  >
+                  {{ 'transcription.start' | transloco }}
+                </button>
+              }
+              @if (getFileStatus() !== 'unknown') {
+                <button
+                  (click)="onOfflineSubmit(true)"
+                  class="btn btn-raised btn-danger offline-delete-btn"
+                  >
+                  {{ 'transcription.new' | transloco }}
+                </button>
+              }
             </div>
           </section>
         </div>
@@ -127,14 +132,14 @@
             alt="IPS LMU Munich"
             class="logo"
             src="./assets/img/ipsx60.png"
-          />
+            />
         </a>
       </div>
       <div class="col-md-4">
         <a
           href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html"
           target="_blank"
-        >
+          >
           <img alt="BAS" class="logo" src="./assets/img/bas.png" />
         </a>
       </div>

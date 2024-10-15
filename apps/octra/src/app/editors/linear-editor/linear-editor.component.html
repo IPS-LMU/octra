@@ -1,11 +1,11 @@
-<octra-audio-viewer
-  #miniloupeComponent
-  *ngIf="appStorage.showLoupe"
-  [audioChunk]="audioChunkLoupe"
-  [silencePlaceholder]="'<P>'"
-  [isMultiLine]="false"
-  [refreshOnInternChanges]="false"
-  [name]="'loupe'"
+@if (appStorage.showLoupe) {
+  <octra-audio-viewer
+    #miniloupeComponent
+    [audioChunk]="audioChunkLoupe"
+    [silencePlaceholder]="'<P>'"
+    [isMultiLine]="false"
+    [refreshOnInternChanges]="false"
+    [name]="'loupe'"
   [ngStyle]="{
     position: 'absolute',
     'margin-left': miniloupe.location.x + 'px',
@@ -18,10 +18,11 @@
     flex: 'auto',
     'flex-direction': 'column'
   }"
-  [settings]="miniLoupeSettings"
-  [annotation]="annotationStoreService.transcript!"
->
-</octra-audio-viewer>
+    [settings]="miniLoupeSettings"
+    [annotation]="annotationStoreService.transcript!"
+    >
+  </octra-audio-viewer>
+}
 <octra-audio-navigation
   #nav
   (afterPlaybackRateChange)="afterSpeedChange($event)"
@@ -32,7 +33,7 @@
   [playbackRate]="appStorage.audioSpeed"
   [responsive]="settingsService.responsive.enabled"
   [volume]="appStorage.audioVolume"
->
+  >
 </octra-audio-navigation>
 <div id="viewer">
   <octra-audio-viewer
@@ -55,46 +56,49 @@
     [annotation]="annotationStoreService.transcript!"
     (currentLevelChange)="onCurrentLevelChange($event)"
     style="height: 80px"
-  >
+    >
   </octra-audio-viewer>
 </div>
 
-<octra-audio-viewer
-  #signalDisplayDown
-  [refreshOnInternChanges]="false"
-  (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
-  (alert)="onAlertTriggered($event)"
-  (click)="onLoupeClick()"
-  (mousedown)="onViewerMouseDown()"
-  (segmententer)="onLoupeSegmentEnter($event)"
-  (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
-  (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
-  *ngIf="audioChunkDown !== undefined"
-  [audioChunk]="audioChunkDown"
-  [silencePlaceholder]="'<P>'"
-  [name]="'downLoupe'"
-  [settings]="loupeSettings"
-  [annotation]="annotationStoreService.transcript!"
-  (currentLevelChange)="onCurrentLevelChange($event)"
->
-</octra-audio-viewer>
+@if (audioChunkDown !== undefined) {
+  <octra-audio-viewer
+    #signalDisplayDown
+    [refreshOnInternChanges]="false"
+    (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+    (alert)="onAlertTriggered($event)"
+    (click)="onLoupeClick()"
+    (mousedown)="onViewerMouseDown()"
+    (segmententer)="onLoupeSegmentEnter($event)"
+    (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
+    (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
+    [audioChunk]="audioChunkDown"
+    [silencePlaceholder]="'<P>'"
+    [name]="'downLoupe'"
+    [settings]="loupeSettings"
+    [annotation]="annotationStoreService.transcript!"
+    (currentLevelChange)="onCurrentLevelChange($event)"
+    >
+  </octra-audio-viewer>
+}
 <div [hidden]="segmentselected" id="editor-placeholder">
-  <div
-    *ngIf="
-      !segmentselected &&
-      audioChunkDown !== undefined
-    "
+  @if (
+    !segmentselected &&
+    audioChunkDown !== undefined
+    ) {
+    <div
     [innerHTML]="
       'signal-gui.segment enter text'
         | transloco : { value: segmententer_shortc }
     "
-    class="inner"
-  ></div>
-  <div
-    *ngIf="audioChunkDown === undefined"
-    [innerHTML]="'signal-gui.selection text' | transloco"
-    class="inner"
-  ></div>
+      class="inner"
+    ></div>
+  }
+  @if (audioChunkDown === undefined) {
+    <div
+      [innerHTML]="'signal-gui.selection text' | transloco"
+      class="inner"
+    ></div>
+  }
 </div>
 <octra-transcr-editor
   [ngClass]="{
@@ -116,5 +120,5 @@
       settingsService.projectsettings?.octra?.validationEnabled  === true)
   "
   [settings]="editorSettings"
->
+  >
 </octra-transcr-editor>

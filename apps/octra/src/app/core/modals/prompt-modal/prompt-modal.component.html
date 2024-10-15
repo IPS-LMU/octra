@@ -11,16 +11,12 @@
     ></button>
   </div>
   <div class="modal-body">
-    <ng-container
-      *ngIf="formatConverter === undefined || formatConverter === undefined"
-    >
+    @if (formatConverter === undefined || formatConverter === undefined) {
       {{ (annotationStoreService.textInput$ | async)?.content }}
-    </ng-container>
-    <ng-container
-      *ngIf="formatConverter !== undefined && formatConverter !== undefined"
-    >
+    }
+    @if (formatConverter !== undefined && formatConverter !== undefined) {
       {{ 'transcription.no prompttext' | transloco }}
-    </ng-container>
+    }
   </div>
   <div class="modal-footer">
     <button
@@ -28,7 +24,7 @@
       class="btn btn-primary"
       data-dismiss="modal"
       type="button"
-    >
+      >
       {{ 'g.close' | transloco }}
     </button>
   </div>

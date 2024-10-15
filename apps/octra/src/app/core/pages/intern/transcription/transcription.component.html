@@ -1,10 +1,10 @@
-<div
-        *ngIf="useMode === 'online' || useMode === 'demo'"
-        class="panel"
-        id="subnav"
->
+@if (useMode === 'online' || useMode === 'demo') {
+  <div
+    class="panel"
+    id="subnav"
+    >
     <div class="row">
-        <div
+      <div
                 [ngClass]="{
         'col-12 col-sm-9':
           (annotationStoreService.textInput$ | async) !== undefined &&
@@ -13,179 +13,188 @@
           (annotationStoreService.textInput$ | async) !== undefined &&
           (annotationStoreService.textInput$ | async)?.content === ''
       }"
-                class="col-12 col-sm-9"
-                style="text-align: left; padding-left: 20px"
+        class="col-12 col-sm-9"
+        style="text-align: left; padding-left: 20px"
         >
-            {{ audio.audioManager.resource.info!.fullname }}:
-            <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
-        </div>
+        {{ audio.audioManager.resource.info!.fullname }}:
+        <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
+      </div>
+      @if ((annotationStoreService.textInput$ | async) !== undefined) {
         <div
-                *ngIf="(annotationStoreService.textInput$ | async) !== undefined"
-                class="col-12 col-sm-3"
-                style="text-align: right; padding-right: 20px"
-        >
-            <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
-                {{ 'g.prompt' | transloco }}
-            </a>
+          class="col-12 col-sm-3"
+          style="text-align: right; padding-right: 20px"
+          >
+          <a (click)="openPromptModal()" style="cursor: pointer; color: #009688">
+            {{ 'g.prompt' | transloco }}
+          </a>
         </div>
+      }
     </div>
-</div>
+  </div>
+}
 
 <div class="flex">
   <span id="saving">
-    <i
-            class="bi bi-save-fill"
-            style="color: #333333"
-            *ngIf="saving === 'saving'"
-    ></i>
-    <i
-            class="bi bi-save-fill"
-            style="color: red"
-            *ngIf="saving === 'error'"
-    ></i>
+    @if (saving === 'saving') {
+      <i
+        class="bi bi-save-fill"
+        style="color: #333333"
+      ></i>
+    }
+    @if (saving === 'error') {
+      <i
+        class="bi bi-save-fill"
+        style="color: red"
+      ></i>
+    }
   </span>
-    <octra-fastbar
-            (guidelinesbtnclicked)="openGuidelines()"
-            (overviewbtnclicked)="openOverview()"
-            (shortcutbtnclicked)="openShortcutsModal()"
+  <octra-fastbar
+    (guidelinesbtnclicked)="openGuidelines()"
+    (overviewbtnclicked)="openOverview()"
+    (shortcutbtnclicked)="openShortcutsModal()"
             [buttonLabels]="{
       shortcuts: 'g.shortcuts' | transloco,
       guidelines: 'g.guidelines' | transloco,
       overview: 'g.overview' | transloco,
       help: 'g.help' | transloco
     }"
-            [responsive]="responsive"
-    ></octra-fastbar>
+    [responsive]="responsive"
+  ></octra-fastbar>
 
-    <div class="flex">
-        <div
-                *ngIf="
-        !editorloaded || (annotationStoreService.status$ | async) === 'sending' || projectsettings === undefined;
-        else showEditor
-      "
-                id="editor-loading"
-                class="w-100 h-100 flex justify-content-center align-items-center"
+  <div class="flex">
+    @if (
+      !editorloaded || (annotationStoreService.status$ | async) === 'sending' || projectsettings === undefined) {
+      <div
+        id="editor-loading"
+        class="w-100 h-100 flex justify-content-center align-items-center"
         >
-            <div
-                    class="spinner-border"
-                    role="status"
-                    *ngIf="true"
-                    style="color: lightgray; height: 150px; width: 150px"
+        @if (true) {
+          <div
+            class="spinner-border"
+            role="status"
+            style="color: lightgray; height: 150px; width: 150px"
             >
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <ng-template octraLoadeditor #showEditor></ng-template>
-    </div>
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        }
+      </div>
+    }
+    <ng-container octraLoadeditor #showEditor></ng-container>
+  </div>
 
-    <div *ngIf="showCommentSection" class="row">
-    <textarea
-            [ngModel]="annotationStoreService.comment"
-            (ngModelChange)="annotationStoreService.changeComment($event)"
-            class="w-100 d-flex"
-            name="comment"
-            placeholder="{{ 'g.insert comment' | transloco }}"
-            style="resize: none; background-color:lightyellow; height:40px;"
-    ></textarea>
+  @if (showCommentSection) {
+    <div class="row">
+      <textarea
+        [ngModel]="annotationStoreService.comment"
+        (ngModelChange)="annotationStoreService.changeComment($event)"
+        class="w-100 d-flex"
+        name="comment"
+        placeholder="{{ 'g.insert comment' | transloco }}"
+        style="resize: none; background-color:lightyellow; height:40px;"
+      ></textarea>
     </div>
-    <div class="row" id="bottom-navigation" role="group">
-        <div class="btn-group w-100">
-            <ng-container
-                    *ngIf="
-          selectedTheme === 'shortAudioFiles' &&
-            (useMode === 'online' || useMode === 'demo'); else defaultBottom;
-        "
-            >
-                <button
-                        (click)="abortTranscription()"
-                        class="col-md-3 btn btn-secondary"
-                        type="button"
-                >
-                    <i class="bi bi-x-circle"></i>
-                    <span>
+  }
+  <div class="row" id="bottom-navigation" role="group">
+    <div class="btn-group w-100">
+      @if (
+        selectedTheme === 'shortAudioFiles' &&
+        (useMode === 'online' || useMode === 'demo')) {
+        <button
+          (click)="abortTranscription()"
+          class="col-md-3 btn btn-secondary"
+          type="button"
+          >
+          <i class="bi bi-x-circle"></i>
+          <span>
             {{ 'g.quit' | transloco }}
           </span>
-                </button>
-                <button
-                        (click)="sendTranscriptionForShortAudioFiles('bad')"
-                        class="col-md-3 btn btn-danger"
-                        type="button"
-                >
-                    <i class="bi bi-star-fill"></i>
-                </button>
-                <button
-                        (click)="sendTranscriptionForShortAudioFiles('middle')"
-                        class="btn btn-raised btn-warning col-md-3 btn btn-warning"
-                        type="button"
-                        style="background-color: orange"
-                >
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                </button>
-                <button
-                        (click)="sendTranscriptionForShortAudioFiles('good')"
-                        class="col-md-3 btn btn-primary"
-                        type="button"
-                >
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                </button>
-            </ng-container>
-
-        <ng-template #defaultBottom>
-            <button
-                    (click)="abortTranscription()"
-                    *ngIf="useMode !== 'url'"
-                    type="button"
-                    class="col-md-6 btn btn-secondary"
+        </button>
+        <button
+          (click)="sendTranscriptionForShortAudioFiles('bad')"
+          class="col-md-3 btn btn-danger"
+          type="button"
+          >
+          <i class="bi bi-star-fill"></i>
+        </button>
+        <button
+          (click)="sendTranscriptionForShortAudioFiles('middle')"
+          class="btn btn-raised btn-warning col-md-3 btn btn-warning"
+          type="button"
+          style="background-color: orange"
+          >
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </button>
+        <button
+          (click)="sendTranscriptionForShortAudioFiles('good')"
+          class="col-md-3 btn btn-primary"
+          type="button"
+          >
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </button>
+      } @else {
+        @if (useMode !== 'url') {
+          <button
+            (click)="abortTranscription()"
+            type="button"
+            class="col-md-6 btn btn-secondary"
             >
-                <i class="bi bi-x-circle"></i>
-                <span
-                        *ngIf="!appStorage.easyMode"
-                        [ngClass]="{ ' d-none d-md-inline': appc.octra.responsive.enabled }"
+            <i class="bi bi-x-circle"></i>
+            @if (!appStorage.easyMode) {
+              <span
+                [ngClass]="{ ' d-none d-md-inline': appc.octra.responsive.enabled }"
                 >
-          {{ 'g.quit' | transloco }}
-        </span>
-            </button>
-            <button
-                    (click)="navbarServ.doclick('export')"
-                    *ngIf="useMode === 'local'"
-                    class="col-md-6 btn btn-primary"
-                    type="button"
+                {{ 'g.quit' | transloco }}
+              </span>
+            }
+          </button>
+        }
+        @if (useMode === 'local') {
+          <button
+            (click)="navbarServ.doclick('export')"
+            class="col-md-6 btn btn-primary"
+            type="button"
             >
-                <i class="bi bi-download"></i>
-                <span
-                        *ngIf="!appStorage.easyMode"
-                        [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
-                >
-          {{ 'g.export data' | transloco }}</span
-                >
-            </button>
-            <button
-                    (click)="onSendButtonClick()"
-                    *ngIf="useMode === 'online' || useMode === 'demo'"
-                    class="col-md-6 btn btn-primary"
-                    type="button"
-            >
-        <span
-                *ngIf="!appStorage.easyMode"
+            <i class="bi bi-download"></i>
+            @if (!appStorage.easyMode) {
+              <span
                 [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
-        >
-          {{ 'transcription.send' | transloco }}
-        </span>
-                <i class="bi bi-send-fill"></i>
+                >
+                {{ 'g.export data' | transloco }}</span
+                >
+              }
             </button>
+          }
+          @if (useMode === 'online' || useMode === 'demo') {
             <button
-                    (click)="onSaveTranscriptionButtonClicked()"
-                    *ngIf="useMode === 'url' && !routingService.staticQueryParams.readonly"
-                    class="btn btn-primary"
-                    type="button"
-            >
-                <i class="bi bi-floppy-fill"></i>
-                <span> {{ 'g.save' | transloco }} </span>
+              (click)="onSendButtonClick()"
+              class="col-md-6 btn btn-primary"
+              type="button"
+              >
+              @if (!appStorage.easyMode) {
+                <span
+                  [ngClass]="{ 'd-none d-md-inline': appc.octra.responsive.enabled }"
+                  >
+                  {{ 'transcription.send' | transloco }}
+                </span>
+              }
+              <i class="bi bi-send-fill"></i>
             </button>
-        </ng-template>
-        </div>
+          }
+          @if (useMode === 'url' && !routingService.staticQueryParams.readonly) {
+            <button
+              (click)="onSaveTranscriptionButtonClicked()"
+              class="btn btn-primary"
+              type="button"
+              >
+              <i class="bi bi-floppy-fill"></i>
+              <span> {{ 'g.save' | transloco }} </span>
+            </button>
+          }
+        }
+
+      </div>
     </div>
-</div>
+  </div>

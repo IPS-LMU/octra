@@ -1,99 +1,110 @@
-<ng-container *ngIf="showForgetPassword || showSignup; else showAuthentication">
+@if (showForgetPassword || showSignup) {
   <a
     class="d-block text-start pointer"
     (click)="goBack()"
     style="font-size: 0.8rem; text-decoration: none"
-  >< {{ 'p.back to login' | transloco }}</a
-  >
-
-  <ng-container *ngIf="showForgetPassword; else showSignupContainer">
-    <ng-container *ngIf="!passwordResetRequested; else showRequestSent">
-      <form #form="ngForm" (ngSubmit)="resetPassword()">
-        <div class="form-floating mb-3">
-          <input
-            type="email"
-            id="email"
-            class="form-control form-control-sm"
-            [placeholder]="'g.e-mail' | transloco"
-            name="email"
-            [(ngModel)]="email"
-            [required]="true"
-            autofocus
-            email="true"
-          />
-          <label for="email">{{ 'g.e-mail' | transloco }}</label>
-        </div>
-
-        <button class="w-100 btn btn-sm btn-primary mt-3" type="submit" [disabled]="!form.valid">
-          {{ 'p.reset password' | transloco }}
-        </button>
-      </form>
-    </ng-container>
-    <ng-template #showRequestSent>
-      <p class="text-center">
-        {{ 'authentication.password reset success' | transloco }}
-      </p>
-    </ng-template>
-  </ng-container>
-  <ng-template #showSignupContainer>
-    <octra-signup *ngIf="showSignup"></octra-signup>
-  </ng-template>
-</ng-container>
-<ng-template #showAuthentication>
-  <h1 class="h3 mb-4 fw-normal" style="text-align: center" *ngIf="showTitle">
-    {{ 'authentication.signin' | transloco }}
-  </h1>
-  <form *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && (type === undefined || type === 'shibboleth')"
+    >< {{ 'p.back to login' | transloco }}</a
+    >
+    @if (showForgetPassword) {
+      @if (!passwordResetRequested) {
+        <form #form="ngForm" (ngSubmit)="resetPassword()">
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              id="email"
+              class="form-control form-control-sm"
+              [placeholder]="'g.e-mail' | transloco"
+              name="email"
+              [(ngModel)]="email"
+              [required]="true"
+              autofocus
+              email="true"
+              />
+            <label for="email">{{ 'g.e-mail' | transloco }}</label>
+          </div>
+          <button class="w-100 btn btn-sm btn-primary mt-3" type="submit" [disabled]="!form.valid">
+            {{ 'p.reset password' | transloco }}
+          </button>
+        </form>
+      } @else {
+        <p class="text-center">
+          {{ 'authentication.password reset success' | transloco }}
+        </p>
+      }
+    } @else {
+      @if (showSignup) {
+        <octra-signup></octra-signup>
+      }
+    }
+  } @else {
+    @if (showTitle) {
+      <h1 class="h3 mb-4 fw-normal" style="text-align: center">
+        {{ 'authentication.signin' | transloco }}
+      </h1>
+    }
+    @if (isAuthAllowed(AccountLoginMethod.shibboleth) && (type === undefined || type === 'shibboleth')) {
+      <form
         id="signin-form">
-    <button
-      class="w-100 btn btn-secondary"
+        <button
+          class="w-100 btn btn-secondary"
       (click)="
         submitClick.emit({
           type: AccountLoginMethod.shibboleth
         })
       "
-    >
-      <i class="bi bi-bank"></i>
-      {{ 'authentication.signin university' | transloco }}
-    </button>
-  </form>
-  <div class="separator my-4 text-center"
-       *ngIf="isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined">{{ 'g.or' | transloco }}</div>
-  <form *ngIf="isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')" #form="ngForm">
-    <div class="form-floating mb-3">
-      <input type="text" id="inputName" class="form-control" [placeholder]="'p.username or email' | transloco" [(ngModel)]="credentials.usernameEmail"
-             name="name" required autofocus/>
-      <label for="inputName">{{ 'p.username or email' | transloco }}</label>
-    </div>
-    <div class="form-floating mb-3">
-      <input type="password" id="inputPassword" class="form-control" [placeholder]="'g.password' | transloco" [(ngModel)]="credentials.password"
-             name="password" required/>
-      <label for="inputPassword">{{ 'g.password' | transloco }}</label>
-    </div>
-    <button
-      class="w-100 btn btn-primary mt-3"
-      [disabled]="form.invalid"
-      type="submit"
+          >
+          <i class="bi bi-bank"></i>
+          {{ 'authentication.signin university' | transloco }}
+        </button>
+      </form>
+    }
+    @if (isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined) {
+      <div class="separator my-4 text-center"
+      >{{ 'g.or' | transloco }}</div>
+    }
+    @if (isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')) {
+      <form #form="ngForm">
+        <div class="form-floating mb-3">
+          <input type="text" id="inputName" class="form-control" [placeholder]="'p.username or email' | transloco" [(ngModel)]="credentials.usernameEmail"
+            name="name" required autofocus/>
+          <label for="inputName">{{ 'p.username or email' | transloco }}</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="password" id="inputPassword" class="form-control" [placeholder]="'g.password' | transloco" [(ngModel)]="credentials.password"
+            name="password" required/>
+          <label for="inputPassword">{{ 'g.password' | transloco }}</label>
+        </div>
+        <button
+          class="w-100 btn btn-primary mt-3"
+          [disabled]="form.invalid"
+          type="submit"
       (click)="
         submitClick.emit({
           type: AccountLoginMethod.local,
           credentials
         })
       "
-    >
-      <i class="bi bi-person-circle"></i>
-      {{ 'authentication.signin credentials' | transloco }}
-    </button>
-    <div class="d-block mt-2 text-center">
-      <a class="pointer" style="font-size: 0.8rem; text-decoration: none" *ngIf="passwordReset"
-         (click)="showForgetPassword = true">
-        {{ 'p.forgot password' | transloco }}
-      </a>
-      <a *ngIf="passwordReset && registrations"> | </a>
-      <a class="pointer" style="font-size: 0.8rem; text-decoration: none" *ngIf="registrations"
-         (click)="showSignUpForm()">
-        {{ 'p.sign up' | transloco }}
-      </a>
-    </div>
-  </form>
-</ng-template>
+          >
+          <i class="bi bi-person-circle"></i>
+          {{ 'authentication.signin credentials' | transloco }}
+        </button>
+        <div class="d-block mt-2 text-center">
+          @if (passwordReset) {
+            <a class="pointer" style="font-size: 0.8rem; text-decoration: none"
+              (click)="showForgetPassword = true">
+              {{ 'p.forgot password' | transloco }}
+            </a>
+          }
+          @if (passwordReset && registrations) {
+            <a> | </a>
+          }
+          @if (registrations) {
+            <a class="pointer" style="font-size: 0.8rem; text-decoration: none"
+              (click)="showSignUpForm()">
+              {{ 'p.sign up' | transloco }}
+            </a>
+          }
+        </div>
+      </form>
+    }
+  }

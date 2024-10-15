@@ -3,86 +3,89 @@
     <i class="bi bi-x-lg close pointer" (click)="close()"></i>
   </div>
   <div #main>
-    <div
-      *ngIf="loading"
+    @if (loading) {
+      <div
       [ngStyle]="{
         width: mainSize.width + 'px',
         height: mainSize.height + 'px'
       }"
-      class="tw-loading"
-    >
-      <div
+        class="tw-loading"
+        >
+        <div
         [ngStyle]="{
           width: mainSize.width + 'px',
           height: mainSize.height + 'px'
         }"
-        class="background"
-      ></div>
-      <div class="spinner-border fs-4" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-    <div class="container-fluid" *ngIf="asrStoreService.asrEnabled$ | async">
-      <div class="row py-2" style="background-color:whitesmoke">
-        <div class="col">
-          <span class=" me-1">
-            ASR:
-          </span>
-          <div ngbDropdown class="btn-group dropend">
-            <button
-              [disabled]="!((asrStoreService.asrOptions$|async)?.selectedASRLanguage) || !((asrStoreService.asrOptions$|async)?.selectedService)"
-              class="btn btn-primary btn-sm dropdown-toggle"
-              type="button"
-              id="dropdownMenuButton2"
-              aria-expanded="false"
-              ngbDropdownToggle
-            >
-              {{ 'g.SELECT ACTION' | transloco }}
-            </button>
-            <div
-              ngbDropdownMenu
-              class="dropdown-menu"
-              aria-labelledby="dropdownMenuButton"
-              style="padding: 5px"
-            >
-              <ng-container *ngIf="(asrStoreService
-      .queue$ |async)?.status !== 'STARTED'">
-                <li role="menuitem">
-                  <button (click)="startASRForThisSegment()" class="dropdown-item">
-                    {{ 'asr.start this segment' | transloco }}
-                  </button>
-                </li>
-                <li role="menuitem">
-                  <button (click)="startASRForAllSegmentsNext()" class="dropdown-item">
-                    {{ 'asr.start for all next' | transloco }}
-                  </button>
-                </li>
-              </ng-container>
-              <ng-container *ngIf="(asrStoreService.queue$ | async)?.status === 'STARTED'">
-                <li role="menuitem">
-                  <button (click)="stopASRForThisSegment()" class="dropdown-item">
-                    {{ 'asr.stop this segment' | transloco }}
-                  </button>
-                </li>
-                <li role="menuitem">
-                  <button class="dropdown-item">
-                    {{ 'asr.stop for all next' | transloco }}
-                  </button>
-                </li>
-                <li role="menuitem">
-                  <button (click)="stopASRForAll()" class="dropdown-item">
-                    {{ 'asr.stop all' | transloco }}
-                  </button>
-                </li>
-              </ng-container>
-            </div>
-          </div>
-          <span>
-             <i class="bi bi-gear-fill ms-2 pointer" style="color: gray" (click)="openSettings()"></i>
-          </span>
+          class="background"
+        ></div>
+        <div class="spinner-border fs-4" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-    </div>
+    }
+    @if (asrStoreService.asrEnabled$ | async) {
+      <div class="container-fluid">
+        <div class="row py-2" style="background-color:whitesmoke">
+          <div class="col">
+            <span class=" me-1">
+              ASR:
+            </span>
+            <div ngbDropdown class="btn-group dropend">
+              <button
+                [disabled]="!((asrStoreService.asrOptions$|async)?.selectedASRLanguage) || !((asrStoreService.asrOptions$|async)?.selectedService)"
+                class="btn btn-primary btn-sm dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton2"
+                aria-expanded="false"
+                ngbDropdownToggle
+                >
+                {{ 'g.SELECT ACTION' | transloco }}
+              </button>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu"
+                aria-labelledby="dropdownMenuButton"
+                style="padding: 5px"
+                >
+                @if ((asrStoreService
+                  .queue$ |async)?.status !== 'STARTED') {
+                  <li role="menuitem">
+                    <button (click)="startASRForThisSegment()" class="dropdown-item">
+                      {{ 'asr.start this segment' | transloco }}
+                    </button>
+                  </li>
+                  <li role="menuitem">
+                    <button (click)="startASRForAllSegmentsNext()" class="dropdown-item">
+                      {{ 'asr.start for all next' | transloco }}
+                    </button>
+                  </li>
+                }
+                @if ((asrStoreService.queue$ | async)?.status === 'STARTED') {
+                  <li role="menuitem">
+                    <button (click)="stopASRForThisSegment()" class="dropdown-item">
+                      {{ 'asr.stop this segment' | transloco }}
+                    </button>
+                  </li>
+                  <li role="menuitem">
+                    <button class="dropdown-item">
+                      {{ 'asr.stop for all next' | transloco }}
+                    </button>
+                  </li>
+                  <li role="menuitem">
+                    <button (click)="stopASRForAll()" class="dropdown-item">
+                      {{ 'asr.stop all' | transloco }}
+                    </button>
+                  </li>
+                }
+              </div>
+            </div>
+            <span>
+              <i class="bi bi-gear-fill ms-2 pointer" style="color: gray" (click)="openSettings()"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    }
     <octra-audio-navigation
       #audionav
       (afterPlaybackRateChange)="afterSpeedChange($event)"
@@ -127,86 +130,96 @@
           <button
             class="btn btn-info w-100 rounded-0"
             (click)="save(); doDirectionAction('left')"
-          >
-            <span
-              *ngIf="responsive || easyMode"
-              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
             >
-              <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
-            </span>
-            <span
-              *ngIf="!easyMode"
-              [ngClass]="{ 'd-none d-lg-inline': responsive }"
-            >
-              {{ 'g.save' | transloco }} &
-              {{ 'segments.previous' | transloco }}
-            </span>
+            @if (responsive || easyMode) {
+              <span
+                [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
+                >
+                <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
+              </span>
+            }
+            @if (!easyMode) {
+              <span
+                [ngClass]="{ 'd-none d-lg-inline': responsive }"
+                >
+                {{ 'g.save' | transloco }} &
+                {{ 'segments.previous' | transloco }}
+              </span>
+            }
           </button>
         </div>
         <div class="col-md-4 d-flex">
           <button (click)="save(); close()" class="btn btn-info w-100 rounded-0">
-            <span
-              *ngIf="responsive || easyMode"
-              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
-            >
-              <i class="bi bi-save-fill"></i>
-            </span>
-            <span
-              *ngIf="!easyMode"
-              [ngClass]="{ 'd-none d-lg-inline': responsive }"
-            >
-              {{ 'g.save' | transloco }} &
-              {{ 'g.close' | transloco }}
-            </span>
+            @if (responsive || easyMode) {
+              <span
+                [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
+                >
+                <i class="bi bi-save-fill"></i>
+              </span>
+            }
+            @if (!easyMode) {
+              <span
+                [ngClass]="{ 'd-none d-lg-inline': responsive }"
+                >
+                {{ 'g.save' | transloco }} &
+                {{ 'g.close' | transloco }}
+              </span>
+            }
           </button>
         </div>
-        <div class="col-md-4 d-flex"
-             *ngIf="!showOverviewButton"
-        >
-          <button
-            class="btn btn-info w-100 rounded-0"
-            (click)="save(); doDirectionAction('right')"
-          >
-            <span
-              *ngIf="responsive || easyMode"
-              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
+        @if (!showOverviewButton) {
+          <div class="col-md-4 d-flex"
             >
-              <i class="bi bi-save-fill"></i> &
-              <i class="bi bi-arrow-right"></i>
-            </span>
-            <span
-              *ngIf="!easyMode"
-              [ngClass]="{ 'd-none d-lg-inline': responsive }"
+            <button
+              class="btn btn-info w-100 rounded-0"
+              (click)="save(); doDirectionAction('right')"
+              >
+              @if (responsive || easyMode) {
+                <span
+                  [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
+                  >
+                  <i class="bi bi-save-fill"></i> &
+                  <i class="bi bi-arrow-right"></i>
+                </span>
+              }
+              @if (!easyMode) {
+                <span
+                  [ngClass]="{ 'd-none d-lg-inline': responsive }"
+                  >
+                  {{ 'g.save' | transloco }} &
+                  {{ 'segments.next' | transloco }}
+                </span>
+              }
+            </button>
+          </div>
+        }
+        @if (showOverviewButton) {
+          <div
+            class="col-md-4 d-flex"
             >
-              {{ 'g.save' | transloco }} &
-              {{ 'segments.next' | transloco }}
-            </span>
-          </button>
-        </div>
-        <div
-          class="col-md-4 d-flex"
-          *ngIf="showOverviewButton"
-        >
-          <!-- check if last segment ord if the next segment is a break -->
-          <button
-            (click)="save(); close(); openOverview()"
-            class="btn btn-info w-100 rounded-0"
-          >
-            <span
-              *ngIf="responsive || easyMode"
-              [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
-            >
-              <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
-            </span>
-            <span
-              *ngIf="!easyMode"
-              [ngClass]="{ 'd-none d-lg-inline': responsive }"
-            >
-              {{ 'g.save' | transloco }} &
-              {{ 'g.overview' | transloco }}
-            </span>
-          </button>
-        </div>
+            <!-- check if last segment ord if the next segment is a break -->
+            <button
+              (click)="save(); close(); openOverview()"
+              class="btn btn-info w-100 rounded-0"
+              >
+              @if (responsive || easyMode) {
+                <span
+                  [ngClass]="{ 'd-lg-none': responsive && !easyMode }"
+                  >
+                  <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
+                </span>
+              }
+              @if (!easyMode) {
+                <span
+                  [ngClass]="{ 'd-none d-lg-inline': responsive }"
+                  >
+                  {{ 'g.save' | transloco }} &
+                  {{ 'g.overview' | transloco }}
+                </span>
+              }
+            </button>
+          </div>
+        }
       </div>
     </div>
   </div>

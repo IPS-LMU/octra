@@ -8,8 +8,10 @@
     <p class="mb-3">
       {{ "modal.import options.introduction" | transloco }}
     </p>
-    <octra-form-configurator *ngIf="schema" [jsonSchema]="schema" [jsonText]="jsonText"
-                             (jsonTextChange)="onJsonTextChange($event)"></octra-form-configurator>
+    @if (schema) {
+      <octra-form-configurator [jsonSchema]="schema" [jsonText]="jsonText"
+      (jsonTextChange)="onJsonTextChange($event)"></octra-form-configurator>
+    }
   </div>
   <div class="modal-footer">
     <div class="row">
@@ -19,7 +21,7 @@
           class="btn btn-secondary"
           data-dismiss="modal"
           type="button"
-        >
+          >
           {{ 'g.abort' | transloco }}
         </button>
       </div>
@@ -29,7 +31,7 @@
           class="btn btn-secondary"
           data-dismiss="modal"
           type="button"
-        >
+          >
           {{ 'g.apply' | transloco }}
         </button>
       </div>

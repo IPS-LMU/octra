@@ -26,89 +26,86 @@
           max-height: 1200px;
           border-right: 1px solid lightgray;
         "
-      >
+        >
         <octra-transcr-overview
           #overview
           [currentLevel]="annotationStoreService.currentLevel"
           (segmentclicked)="onSegmentInOverviewClicked($event)">
         </octra-transcr-overview>
       </div>
-      <div
-        *ngIf="
-          appStorage.useMode === 'online' || appStorage.useMode === 'demo'
-        "
-        class="col-md-4 col-lg-3"
-        style="overflow: auto; max-height: 1200px"
-      >
-        <h4>Feedback</h4>
-        <octra-transcription-feedback
-          #feedback
-          [feedbackData]="annotationStoreService.feedback$ | async"
+      @if (
+        appStorage.useMode === 'online' || appStorage.useMode === 'demo'
+        ) {
+        <div
+          class="col-md-4 col-lg-3"
+          style="overflow: auto; max-height: 1200px"
+          >
+          <h4>Feedback</h4>
+          <octra-transcription-feedback
+            #feedback
+            [feedbackData]="annotationStoreService.feedback$ | async"
           [showCommentFieldOnly]="
             settingsService.isTheme('shortAudioFiles')
           "
-        >
-        </octra-transcription-feedback>
-
-        <p
-          *ngIf="sendValidTranscriptOnly && !annotationStoreService.transcriptValid"
-          style="color: red; text-align: center"
-        >
-          {{ 'transcription.invalid' | transloco }}
-        </p>
-        <ng-container
-          *ngIf="
-            settingsService.isTheme('default');
-            else isShortAudioFilesTheme
-          "
-        >
-          <button
-            (click)="sendTranscription()"
+            >
+          </octra-transcription-feedback>
+          @if (sendValidTranscriptOnly && !annotationStoreService.transcriptValid) {
+            <p
+              style="color: red; text-align: center"
+              >
+              {{ 'transcription.invalid' | transloco }}
+            </p>
+          }
+          @if (
+            settingsService.isTheme('default')) {
+            <button
+              (click)="sendTranscription()"
             [disabled]="
               !feedback.valid ||
               (sendValidTranscriptOnly && !annotationStoreService.transcriptValid)
             "
-            class="btn btn-primary btn-outline btn-success"
-            id="transcr-send-btn"
-          >
-            <i class="bi bi-send-fill"></i>
-            {{ 'transcription.send' | transloco }}
-          </button>
-        </ng-container>
-        <ng-template #isShortAudioFilesTheme>
-          <div
-            *ngIf="
+              class="btn btn-primary btn-outline btn-success"
+              id="transcr-send-btn"
+              >
+              <i class="bi bi-send-fill"></i>
+              {{ 'transcription.send' | transloco }}
+            </button>
+          } @else {
+            @if (
               settingsService.isTheme('shortAudioFiles');
-            "
-            class="row"
-            id="bottom-navigation1"
-            role="group"
-          >
-            <button
-              (click)="sendTranscriptionForShortAudioFiles('good')"
-              class="btn btn-raised btn-primary w-100"
-            >
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-            </button>
-            <button
-              (click)="sendTranscriptionForShortAudioFiles('middle')"
-              class="btn btn-raised btn-warning w-100"
-              style="background-color: orange"
-            >
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-            </button>
-            <button
-              (click)="sendTranscriptionForShortAudioFiles('bad')"
-              class="btn btn-raised btn-danger w-100"
-            >
-              <i class="bi bi-star-fill"></i>
-            </button>
-          </div>
-        </ng-template>
-      </div>
+              ) {
+              <div
+                class="row"
+                id="bottom-navigation1"
+                role="group"
+                >
+                <button
+                  (click)="sendTranscriptionForShortAudioFiles('good')"
+                  class="btn btn-raised btn-primary w-100"
+                  >
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </button>
+                <button
+                  (click)="sendTranscriptionForShortAudioFiles('middle')"
+                  class="btn btn-raised btn-warning w-100"
+                  style="background-color: orange"
+                  >
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </button>
+                <button
+                  (click)="sendTranscriptionForShortAudioFiles('bad')"
+                  class="btn btn-raised btn-danger w-100"
+                  >
+                  <i class="bi bi-star-fill"></i>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
     </div>
   </div>
   <div class="modal-footer">

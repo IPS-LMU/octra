@@ -44,14 +44,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let elem of UIElements!">
-            <td>{{ elem.timestamp | date : 'dd.MM.yy HH:mm:ss' }}</td>
-            <td>{{ elem.type }}</td>
-            <td>{{ elem.context }}</td>
-            <td>
-              {{ elem.value }}
-            </td>
-          </tr>
+          @for (elem of UIElements!; track elem) {
+            <tr>
+              <td>{{ elem.timestamp | date : 'dd.MM.yy HH:mm:ss' }}</td>
+              <td>{{ elem.type }}</td>
+              <td>{{ elem.context }}</td>
+              <td>
+                {{ elem.value }}
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
@@ -67,7 +69,7 @@
       class="btn btn-primary"
       data-dismiss="modal"
       type="button"
-    >
+      >
       {{ 'g.close' | transloco }}
     </button>
   </div>

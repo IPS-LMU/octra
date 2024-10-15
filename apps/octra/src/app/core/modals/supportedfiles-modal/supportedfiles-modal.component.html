@@ -16,10 +16,12 @@
       <table>
         <tr>
           <td>
-            <span *ngFor="let elem of AppInfo.audioformats; let i = index">
-              *{{ elem.extension
-              }}{{ i < AppInfo.audioformats.length - 1 ? ',' : '' }}
-            </span>
+            @for (elem of AppInfo.audioformats; track elem; let i = $index) {
+              <span>
+                *{{ elem.extension
+                }}{{ i < AppInfo.audioformats.length - 1 ? ',' : '' }}
+              </span>
+            }
           </td>
         </tr>
       </table>
@@ -28,20 +30,23 @@
 
     <table class="table table-striped">
       <tbody>
-        <ng-container *ngFor="let elem of AppInfo.converters">
-          <tr *ngIf="elem.conversion.import">
-            <td>{{ elem.name }}</td>
-            <td>{{ elem.application }}</td>
-            <td>*{{ elem.extension }}</td>
-            <td>
-              <i
-                class="bi bi-info-circle"
-                *ngIf="elem.notice !== ''"
-                [ngbTooltip]="elem.notice"
-              ></i>
-            </td>
-          </tr>
-        </ng-container>
+        @for (elem of AppInfo.converters; track elem) {
+          @if (elem.conversion.import) {
+            <tr>
+              <td>{{ elem.name }}</td>
+              <td>{{ elem.application }}</td>
+              <td>*{{ elem.extension }}</td>
+              <td>
+                @if (elem.notice !== '') {
+                  <i
+                    class="bi bi-info-circle"
+                    [ngbTooltip]="elem.notice"
+                  ></i>
+                }
+              </td>
+            </tr>
+          }
+        }
       </tbody>
     </table>
   </div>

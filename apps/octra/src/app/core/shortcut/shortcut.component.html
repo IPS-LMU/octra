@@ -1,4 +1,4 @@
-<ng-container *ngFor="let part of parts">
+@for (part of parts; track part) {
   <div
     [ngClass]="{
       key: part.type === 'key',
@@ -6,6 +6,6 @@
       light: theme === 'light',
       separator: part.type === 'separator'
     }"
-   [innerHTML]="part.content">
+    [innerHTML]="part.content">
   </div>
-</ng-container>
+}

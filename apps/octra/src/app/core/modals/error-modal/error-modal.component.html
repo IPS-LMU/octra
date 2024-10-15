@@ -1,21 +1,23 @@
 <div class="modal-content border-0">
   <div
     class="modal-header bg-danger text-light text-left justify-content-start"
-  >
+    >
     <i class="bi bi-exclamation-triangle me-1"></i>
     {{ 'g.error' | transloco }}
   </div>
   <div class="modal-body">
     <p [innerHTML]="text ? text : ''"></p>
   </div>
-  <div class="modal-footer" *ngIf="showOKButton">
-    <button
-      (click)="close()"
-      class="btn btn-default"
-      data-dismiss="modal"
-      type="button"
-    >
-      {{ 'g.OK' | transloco }}
-    </button>
-  </div>
+  @if (showOKButton) {
+    <div class="modal-footer">
+      <button
+        (click)="close()"
+        class="btn btn-default"
+        data-dismiss="modal"
+        type="button"
+        >
+        {{ 'g.OK' | transloco }}
+      </button>
+    </div>
+  }
 </div>

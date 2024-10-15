@@ -5,18 +5,20 @@
     <octra-navigation #navigation></octra-navigation>
   </header>
   <main style="margin-top: 40px">
-    <div
-      *ngIf="environment.dev_version"
-      class="d-none d-md-block beta_mark text-outline-white"
-    >
-      in development
-    </div>
-    <div
-      *ngIf="environment.beta_version"
-      class="d-none d-md-block beta_mark text-outline-white"
-    >
-      beta
-    </div>
+    @if (environment.dev_version) {
+      <div
+        class="d-none d-md-block beta_mark text-outline-white"
+        >
+        in development
+      </div>
+    }
+    @if (environment.beta_version) {
+      <div
+        class="d-none d-md-block beta_mark text-outline-white"
+        >
+        beta
+      </div>
+    }
     <div class="container-fluid flex">
       <router-outlet></router-outlet>
     </div>

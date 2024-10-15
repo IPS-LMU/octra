@@ -14,8 +14,8 @@
     <p>
       {{ 'bug report.description' | transloco }}
     </p>
-    <div
-      *ngIf="sendStatus === 'error'"
+    @if (sendStatus === 'error') {
+      <div
       [innerHTML]="
         'bug report.error'
           | transloco
@@ -26,109 +26,117 @@
                   '\'>octra@phonetik.uni-muenchen.de</a>'
               }
       "
-      class="alert alert-danger bugsent"
-    ></div>
-    <div *ngIf="sendStatus === 'success'" class="alert alert-success bugsent">
-      {{ 'bug report.sent' | transloco }}
+    class="alert alert-danger bugsent"
+  ></div>
+}
+@if (sendStatus === 'success') {
+  <div class="alert alert-success bugsent">
+    {{ 'bug report.sent' | transloco }}
+  </div>
+}
+
+<form>
+  @if (appStorage.useMode !== 'online' || !appStorage.loggedIn) {
+    <div class="row">
+      <div class="col-6">
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="inputName"
+            name="name"
+            aria-describedby="name"
+            [placeholder]="'g.name' | transloco"
+            [(ngModel)]="profileName"
+            />
+          <label for="inputName" class="form-label">{{
+            'g.name' | transloco
+          }}</label>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-floating mb-3">
+          <input
+            type="email"
+            class="form-control"
+            id="inputEmail"
+            name="email"
+            aria-describedby="email"
+            [(ngModel)]="profileEmail"
+            placeholder="email@example.com"
+            />
+          <label for="inputEmail" class="form-label">{{
+            'g.e-mail' | transloco
+          }}</label>
+        </div>
+      </div>
     </div>
-
-    <form>
-      <div class="row" *ngIf="appStorage.useMode !== 'online' || !appStorage.loggedIn">
-        <div class="col-6">
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="inputName"
-              name="name"
-              aria-describedby="name"
-              [placeholder]="'g.name' | transloco"
-              [(ngModel)]="profileName"
-            />
-            <label for="inputName" class="form-label">{{
-                'g.name' | transloco
-              }}</label>
-          </div>
-        </div>
-        <div class="col-6">
-          <div class="form-floating mb-3">
-            <input
-              type="email"
-              class="form-control"
-              id="inputEmail"
-              name="email"
-              aria-describedby="email"
-              [(ngModel)]="profileEmail"
-              placeholder="email@example.com"
-            />
-            <label for="inputEmail" class="form-label">{{
-                'g.e-mail' | transloco
-              }}</label>
-          </div>
-        </div>
+  }
+  <div class="row">
+    <div class="col-12">
+      <div class="d-block mb-3">
+        <label for="bgDescr">{{ 'g.description' | transloco }}:</label>
+        <ngx-jodit
+          [(ngModel)]="bgdescr"
+          [options]="joditOptions"
+          #editor
+          class="w-100"
+          style="display: flex !important; flex-direction: column; flex: auto; height: 100% !important;"
+          aria-describedby="bgDescr"
+          id="bgDescr"
+          maxlength="1000"
+          name="bgdescr"
+        ></ngx-jodit>
+        <div id="emailHelp" class="form-text">German or English</div>
       </div>
-      <div class="row">
-        <div class="col-12">
-          <div class="d-block mb-3">
-            <label for="bgDescr">{{ 'g.description' | transloco }}:</label>
-            <ngx-jodit
-              [(ngModel)]="bgdescr"
-              [options]="joditOptions"
-              #editor
-              class="w-100"
-              style="display: flex !important; flex-direction: column; flex: auto; height: 100% !important;"
-              aria-describedby="bgDescr"
-              id="bgDescr"
-              maxlength="1000"
-              name="bgdescr"
-            ></ngx-jodit>
-            <div id="emailHelp" class="form-text">German or English</div>
-          </div>
-        </div>
-      </div>
+    </div>
+  </div>
 
-      <div class="form-row">
-        <div class="col-12">
-          <div class="form-group" style="margin-bottom: 20px">
-            <label>{{ 'g.screenshots' | transloco }} (optional):</label
-            ><br />
-            <div class="preview-images">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="form-group" style="margin-bottom: 20px">
+        <label>{{ 'g.screenshots' | transloco }} (optional):</label
+          ><br />
+          <div class="preview-images">
+            @for (screenshot of screenshots; track screenshot; let i = $index) {
               <div
                 (click)="selectFileForUpload(uploadInput2)"
-                *ngFor="let screenshot of screenshots; let i = index"
                 class="upload-screenshot"
-              >
-                <span (click)="removeScreenshot(i)" class="cross rounded-circle"
-                >X</span
                 >
-                <input
-                  #uploadInput2
-                  (change)="onFileChange($event)"
-                  accept=".jpg, .png, .jpeg|image/*"
-                  name="upload"
-                  style="display: none"
-                  type="file"
-                />
-                <img
-                  *ngIf="screenshot.previewURL !== ''"
-                  [src]="screenshot.previewURL"
-                  class="preview-image"
-                />
-              </div>
-              <div
-                (click)="selectFileForUpload(uploadInput)"
-                *ngIf="screenshots.length < 4"
-                class="upload-screenshot"
-              >
-                <input
-                  #uploadInput
-                  (change)="onFileChange($event)"
-                  name="upload"
-                  style="display: none"
-                  type="file"
-                />
-                <i class="bi bi-plus-lg"></i>
-              </div>
+                <span (click)="removeScreenshot(i)" class="cross rounded-circle"
+                  >X</span
+                  >
+                  <input
+                    #uploadInput2
+                    (change)="onFileChange($event)"
+                    accept=".jpg, .png, .jpeg|image/*"
+                    name="upload"
+                    style="display: none"
+                    type="file"
+                    />
+                  @if (screenshot.previewURL !== '') {
+                    <img
+                      [src]="screenshot.previewURL"
+                      class="preview-image"
+                      />
+                  }
+                </div>
+              }
+              @if (screenshots.length < 4) {
+                <div
+                  (click)="selectFileForUpload(uploadInput)"
+                  class="upload-screenshot"
+                  >
+                  <input
+                    #uploadInput
+                    (change)="onFileChange($event)"
+                    name="upload"
+                    style="display: none"
+                    type="file"
+                    />
+                  <i class="bi bi-plus-lg"></i>
+                </div>
+              }
             </div>
             <div class="clearfix"></div>
           </div>
@@ -146,7 +154,7 @@
                   checked
                   name="sendpro"
                   type="checkbox"
-                />
+                  />
                 {{ 'bug report.send protocol' | transloco }}
               </label>
             </div>
@@ -155,7 +163,7 @@
             [hidden]="!sendpro.checked"
             class="form-group"
             style="padding-top: 0; margin-top: 0"
-          >
+            >
             <span>{{ 'g.protocol' | transloco }}:</span>
             <textarea
               #bgProtocol
@@ -163,7 +171,7 @@
               class="form-control"
               disabled
               id="bgProtocol"
-            >
+              >
             </textarea>
           </div>
         </div>
@@ -179,7 +187,7 @@
       [disabled]="!isvalid || sendStatus === 'sending'"
       class="btn btn-primary"
       type="button"
-    >
+      >
       {{ 'bug report.give feedback' | transloco }}
     </button>
   </div>

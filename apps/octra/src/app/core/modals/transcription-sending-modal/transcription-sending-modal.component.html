@@ -13,12 +13,13 @@
   <div class="modal-body">
     {{ 'modal.transcription.sending.text' | transloco }}<br /><br />
     <div style="color: red">{{ error }}</div>
-    <div
-      *ngIf="error === ''"
-      class="text-success"
-      style="text-align: center; display: block"
-    >
-      {{ 'g.submission success' | transloco }}
-    </div>
+    @if (error === '') {
+      <div
+        class="text-success"
+        style="text-align: center; display: block"
+        >
+        {{ 'g.submission success' | transloco }}
+      </div>
+    }
   </div>
 </div>

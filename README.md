@@ -6,12 +6,12 @@
     Octra is a web-application for the <b>o</b>rthographi<b>c</b> <b>tra</b>nscription of audiofiles. It allows you to transcribe your files from the computer or from a project created by the octra-backend software we are currently working at.
   </p>
   <p style="padding-bottom:20px;">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor1.png" alt="Dictaphone Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor1.png" alt="Dictaphone Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
   <br/>
   <a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/features" style="font-weight:bold;">
 <br/>
@@ -65,7 +65,7 @@ The libraries are still in development. If you want to use them you find more in
 
 ### OCTRA website
 
-If you don't want to install OCTRA, you can use the latest release [here](https://www.phonetik.uni-muenchen.de/apps/octra/octra/).
+If you don't want to install OCTRA, you can use the latest release [here](https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/).
 
 ### Installation
 
@@ -117,7 +117,7 @@ Then you can install OCTRA:
 
 ## Documentation
 
-* For users: [OCTRA manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
+* For users: [OCTRA manual](https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
 * For project leaders/administrators: [Github Wiki](https://github.com/IPS-LMU/octra/wiki).
 
 ## Contribution
@@ -130,7 +130,7 @@ For creating changelog automatically, <a href="https://github.com/conventional-c
 
 ### Translation
 
-To translate OCTRA to a new language please visit https://www.phonetik.uni-muenchen.de/apps/octra/translation/start.php
+To translate OCTRA to a new language please visit https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php
 
 If the language you would like translate to does not exist please send us an email to octra@phonetik.uni-muenchen.de
 

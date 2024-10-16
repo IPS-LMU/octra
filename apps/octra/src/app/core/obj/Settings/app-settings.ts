@@ -13,6 +13,7 @@ export interface AppSettings {
     database: {
       name: string;
     };
+    supportEmail: string;
     login: {
       enabled: boolean;
     };
@@ -21,12 +22,6 @@ export interface AppSettings {
       enabled: boolean;
       fixedwidth: number;
     };
-    bugreport: {
-      enabled: boolean;
-      name: string;
-      auth_token: string;
-      url: string;
-    };
     plugins?: {
       audioCutter?: {
         enabled: boolean;
@@ -34,10 +29,6 @@ export interface AppSettings {
       asr?: ASRSettings;
     };
     allowed_browsers: any[];
-    allowed_projects: {
-      name: string;
-      password: string;
-    }[];
     languages: string[];
     tracking: {
       active: string;

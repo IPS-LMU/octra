@@ -12,15 +12,10 @@
       "enabled": true
     },
     "showdetails": true,
+    "supportEmail": "no-email-provided@email.com",
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200
-    },
-    "bugreport": {
-      "enabled": false,
-      "name": "Email",
-      "auth_token": "",
-      "url": ""
     },
     "plugins": {
     },
@@ -54,7 +49,6 @@
         "version": ""
       }
     ],
-    "allowed_projects": [],
     "languages": ["en", "de", "nl", "it", "ko", "zh"],
     "audioExamples": [
       {

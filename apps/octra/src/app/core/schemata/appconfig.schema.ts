@@ -11,7 +11,7 @@ export const AppConfigSchema = {
         },
         appToken: {
           type: 'string',
-        }
+        },
       },
       type: 'object',
     },
@@ -25,6 +25,9 @@ export const AppConfigSchema = {
           },
           type: 'object',
           required: ['name'],
+        },
+        supportEmail: {
+          type: 'string',
         },
         login: {
           properties: {
@@ -49,23 +52,6 @@ export const AppConfigSchema = {
           },
           type: 'object',
         },
-        bugreport: {
-          properties: {
-            enabled: {
-              type: 'boolean',
-            },
-            name: {
-              type: 'string',
-            },
-            auth_token: {
-              type: 'string',
-            },
-            url: {
-              type: 'string',
-            },
-          },
-          type: 'object',
-        },
         allowed_browsers: {
           items: {
             properties: {
@@ -73,17 +59,6 @@ export const AppConfigSchema = {
                 type: 'string',
               },
               version: {
-                type: 'string',
-              },
-            },
-            type: 'object',
-          },
-          type: 'array',
-        },
-        allowed_projects: {
-          items: {
-            properties: {
-              name: {
                 type: 'string',
               },
             },
@@ -99,7 +74,7 @@ export const AppConfigSchema = {
         },
       },
       type: 'object',
-      required: ['database'],
+      required: ['database', "supportEmail"],
     },
     octraBackend: {
       required: ['enabled', 'url'],
@@ -115,5 +90,5 @@ export const AppConfigSchema = {
     },
   },
   type: 'object',
-  required: ['version', 'api', 'octra']
+  required: ['version', 'api', 'octra'],
 };

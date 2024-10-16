@@ -102,11 +102,11 @@ I just want to let you know, that the OCTRA server is currently offline.
  Best,
  an OCTRA user
  `;
-    const url = `mailto:octra@phonetik.uni-muenchen.de?subject=${encodeURI(
-      subject
-    )}&body=${encodeURI(body)}`;
+    const url = `mailto:${
+      this.settingsService.appSettings.octra.supportEmail
+    }?subject=${encodeURI(subject)}&body=${encodeURI(body)}`;
 
-    this.email_link = `<br/><a href="${url}">octra@phonetik.uni-muenchen.de</a>`;
+    this.email_link = `<br/><a href="${url}">${this.settingsService.appSettings.octra.supportEmail}</a>`;
   }
 
   onOfflineSubmit = (removeData: boolean) => {
@@ -119,7 +119,7 @@ I just want to let you know, that the OCTRA server is currently offline.
   };
 
   ngOnInit() {
-    if (this.settingsService.responsive.enabled === false) {
+    if (!this.settingsService.responsive.enabled) {
       this.state.local.validSize =
         window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {

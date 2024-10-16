@@ -10,6 +10,7 @@ import {
   forkJoin,
   interval,
   map,
+  Observable,
   of,
   Subscription,
   tap,
@@ -1067,7 +1068,7 @@ export class AnnotationEffects {
             map((a) => {
               return AnnotationActions.sendOnlineAnnotation.success({
                 mode: state.application.mode!,
-                task: a,
+                task: a!,
               });
             }),
             catchError((error: HttpErrorResponse) => {
@@ -1728,7 +1729,14 @@ export class AnnotationEffects {
     }
   }
 
-  private saveTaskToServer(state: RootState, status: TaskStatus) {
+  private saveTaskToServer(
+    state: RootState,
+    status: TaskStatus
+  ): Observable<TaskDto | undefined> {
+    if (!this.audio.audioManager?.resource) {
+      return of(undefined);
+    }
+
     const result = new AnnotJSONConverter().export(
       state.onlineMode.transcript
         .clone()

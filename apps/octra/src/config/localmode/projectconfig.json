@@ -6,7 +6,7 @@
   "navigation": {
     "export": true,
     "interfaces": true,
-    "help_url": "https://www.phonetik.uni-muenchen.de/apps/octra/manual/"
+    "help_url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/"
   },
   "responsive": {
     "enabled": true,
@@ -20,7 +20,7 @@
   },
   "plugins": {
     "pdfexport": {
-      "url": "https://www.phonetik.uni-muenchen.de/apps/octra/pdfconverter/"
+      "url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/pdfconverter/"
     }
   },
   "languages": ["de", "en"],

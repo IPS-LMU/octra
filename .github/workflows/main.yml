@@ -27,11 +27,11 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Create the docs directory locally in CI
-        run: npx typedoc && node runner.js prepare:docs
+        run: npx typedoc --out typedocs && node runner.js prepare:docs
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
-          folder: docs
+          folder: typedocs
 

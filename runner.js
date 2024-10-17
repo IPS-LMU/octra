@@ -45,14 +45,14 @@ const Project = {
     await fs.copyFile(`./LICENSE.txt`, `./libs/ngx-utilities/LICENSE.txt`);
   },
   prepareDocs: async function () {
-    let content = await fs.readFile(`./docs/index.html`, 'utf-8');
+    let content = await fs.readFile(`./typedocs/index.html`, 'utf-8');
     content = content.replace(/\.\/([^/]+)\/src\//g, (g0, g1) => {
       return `modules/_octra_${g1.replace(/-/g, '_')}.html`;
     });
     content = content.replace(/apps\/([^/]+)\/src\//g, (g0, g1) => {
       return `modules/_octra_${g1.replace(/-/g, '_')}.html`;
     });
-    await fs.writeFile(`./docs/index.html`, content, {
+    await fs.writeFile(`./typedocs/index.html`, content, {
       encoding: 'utf-8',
     });
   },

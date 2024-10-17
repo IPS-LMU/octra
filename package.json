@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nx serve octra",
     "build": "nx build octra",
-    "build:docs": "typedoc && node runner.js prepare:docs",
+    "build:docs": "typedoc --out typedocs && node runner.js prepare:docs",
     "build:release": "node runner.js build:release",
     "build:dev": "node runner.js build:dev",
     "build:beta": "node runner.js build:beta",

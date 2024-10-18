@@ -95,12 +95,14 @@ import { RouterModule } from '@angular/router';
         },
       }
     ),
-    StoreDevtoolsModule.instrument({
-      trace: true,
-      maxAge: 50,
-      logOnly: !environment.production,
-      connectInZone: true,
-    }),
+    !environment.production
+      ? StoreDevtoolsModule.instrument({
+          trace: !environment.production,
+          maxAge: 50,
+          logOnly: !environment.production,
+          connectInZone: true,
+        })
+      : [],
     EffectsModule.forRoot([
       IDBEffects,
       ApplicationEffects,
@@ -108,9 +110,6 @@ import { RouterModule } from '@angular/router';
       APIEffects,
       AuthenticationEffects,
     ]),
-    !environment.production
-      ? StoreDevtoolsModule.instrument({ connectInZone: true })
-      : [],
     EffectsModule.forFeature([]),
     NgbDropdownModule,
     NgbNavModule,

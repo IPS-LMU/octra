@@ -27,6 +27,10 @@ if (process.argv[2] === "beta=true") {
   dev = "--configuration=beta";
 }
 
+if (process.argv[2] === "beta=dev") {
+  dev = "--configuration=beta-dev";
+}
+
 if (process.argv[3] === "isUpdate=true") {
   isUpdate = true;
 }
@@ -35,7 +39,7 @@ if (process.argv[4].indexOf("url=") > -1) {
   baseHref = process.argv[4].replace("url=", "");
 }
 
-console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
+console.log(`Building OCTRA with ${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
 let command = ["./node_modules/nx/bin/nx.js", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`];

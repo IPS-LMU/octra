@@ -88,6 +88,29 @@
           ],
           "outputHashing": "all"
         },
+        "beta-dev": {
+          "buildOptimizer": true,
+          "optimization": true,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "6mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "10kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/octra/src/environments/environment.ts",
+              "with": "apps/octra/src/environments/environment.beta-dev.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
         "development": {
           "buildOptimizer": false,
           "optimization": false,

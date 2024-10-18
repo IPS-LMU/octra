@@ -7,8 +7,8 @@ export const environment = {
     enabled: true,
     logging: {
       console: true,
-      actions: false,
-      routes: false
+      actions: true,
+      routes: true
     }
   }
 };

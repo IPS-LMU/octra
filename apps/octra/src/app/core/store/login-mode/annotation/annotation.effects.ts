@@ -93,6 +93,8 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (a.mode === LoginMode.ONLINE) {
+          this.store.dispatch(ApplicationActions.waitForEffects.do());
+
           return this.apiService
             .startTask(a.project.id, {
               task_type: 'annotation',

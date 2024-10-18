@@ -14,6 +14,7 @@ import { RootState } from '../../../store';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, ofType } from '@ngrx/effects';
+import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 
 @Component({
   selector: 'octra-projects-list',
@@ -22,7 +23,7 @@ import { Actions, ofType } from '@ngrx/effects';
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects?: ProjectListDto;
-  selectedFile?: File;
+  projectStarting = false;
 
   constructor(
     private api: OctraAPIService,
@@ -34,6 +35,19 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     private actions$: Actions
   ) {
     super();
+    this.subscribe(
+      this.actions$.pipe(
+        ofType(
+          AnnotationActions.startAnnotation.fail,
+          AnnotationActions.startAnnotation.success
+        )
+      ),
+      {
+        next: () => {
+          this.projectStarting = false;
+        },
+      }
+    );
   }
 
   async ngOnInit() {
@@ -121,6 +135,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   onProjectClick(project: ProjectDto) {
+    this.projectStarting = true;
     this.appStorage.startOnlineAnnotation(project);
   }
 

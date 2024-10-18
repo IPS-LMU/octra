@@ -52,6 +52,7 @@ import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-n
 import { NgxJoditComponent } from 'ngx-jodit';
 import { TranscriptionBackupEndModalComponent } from './transcription-backup-end/transcription-backup-end-modal.component';
 import { ImportOptionsModalComponent } from './import-options-modal/import-options-modal.component';
+import { WaitingModalComponent } from './waiting-modal/waiting-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -94,6 +95,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     FeedbackNoticeModalComponent,
     TranscriptionBackupEndModalComponent,
     ImportOptionsModalComponent,
+    WaitingModalComponent
   ],
   imports: [
     CommonModule,

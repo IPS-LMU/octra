@@ -81,6 +81,7 @@
               <button
                 class="btn btn-primary btn-sm"
                 size="sm"
+                [disabled]="projectStarting"
                 (click)="onProjectClick(project)"
                 >
                 {{ 'g.start' | transloco }}

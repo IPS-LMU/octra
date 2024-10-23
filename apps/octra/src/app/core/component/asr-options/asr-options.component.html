@@ -1,207 +1,315 @@
 <form autocomplete="one-time-code">
   <div class="row g-0">
-    <label for="languageDropdown" class="form-label">{{ "p.language and provider" | transloco }}:</label>
+    <label for="languageDropdown" class="form-label"
+      >{{ 'p.language and provider' | transloco }}:</label
+    >
   </div>
   <div class="row g-0 asr-language-options mb-3">
     <div class="col-4">
-      <div class="d-inline-block" ngbDropdown #dropdown="ngbDropdown" placement="bottom-left" container="body"
-        (openChange)="onLanguageDropdownOpenChange($event, 'asr')">
-        <input type="text" class="form-control" id="languageDropdown" ngbDropdownToggle placeholder="ASR Language"
-          autocomplete="one-time-code" autocapitalize="off" name="language" [(ngModel)]="fields.asr.selected" #languageInput
-          data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
-          (keyup)="filterLanguages(languageInput.value, 'asr', dropdown)" />
-        <div ngbDropdownMenu aria-labelledby="languageDropdown" style="max-height:150px;" class="overflow-y-auto"
-          id="languageDropdownMenu">
+      <div
+        class="d-inline-block"
+        ngbDropdown
+        #dropdown="ngbDropdown"
+        placement="bottom-left"
+        container="body"
+        (openChange)="onLanguageDropdownOpenChange($event, 'asr')"
+      >
+        <input
+          type="text"
+          class="form-control"
+          id="languageDropdown"
+          ngbDropdownToggle
+          placeholder="ASR Language"
+          autocomplete="one-time-code"
+          autocapitalize="off"
+          name="language"
+          [(ngModel)]="fields.asr.selected"
+          #languageInput
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          (focus)="dropdown3.close()"
+          (keyup)="filterLanguages(languageInput.value, 'asr', dropdown)"
+        />
+        <div
+          ngbDropdownMenu
+          aria-labelledby="languageDropdown"
+          style="max-height: 150px"
+          class="overflow-y-auto"
+          id="languageDropdownMenu"
+        >
           <span class="d-block mb-2 ms-2"><b>ASR Language</b></span>
           <ul class="list-group">
             @for (language of fields.asr.filtered; track language) {
-              <li class="list-group-item list-group-item-action p-1" ngbDropdownItem
-                (click)="selectLanguage(language.value, 'asr')"><a
-                class="dropdown-item"
-              >{{ language.description }}</a>
+            <li
+              class="list-group-item list-group-item-action p-1"
+              ngbDropdownItem
+              (click)="selectLanguage(language.value, 'asr')"
+            >
+              <a class="dropdown-item">{{ language.description }}</a>
             </li>
-          }
-          @if (fields.asr.filtered.length === 0) {
+            } @if (fields.asr.filtered.length === 0) {
             <li class="text-center">Nothing found</li>
-          }
-        </ul>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div
+        class="d-inline-block"
+        ngbDropdown
+        placement="bottom-right"
+        container="body"
+        (openChange)="onLanguageDropdownOpenChange($event, 'maus')"
+        #dropdown3="ngbDropdown"
+        [autoClose]="false"
+      >
+        <input
+          type="text"
+          class="form-control"
+          id="providerDropdown"
+          ngbDropdownToggle
+          placeholder="Provider"
+          autocomplete="one-time-code"
+          autocapitalize="off"
+          name="provider"
+          [(ngModel)]="fields.provider.selected"
+          #providerInput
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          (keyup)="filterProviders(providerInput.value, dropdown3)"
+        />
+        <div
+          ngbDropdownMenu
+          aria-labelledby="mausDropdown"
+          style="max-height: 150px; max-width: 300px"
+          class="overflow-y-auto"
+          id="providerDropdownMenu"
+        >
+          <span class="d-block mb-2 ms-2"><b>ASR Provider</b></span>
+          <ul class="list-group">
+            @for (provider of fields.provider.filtered; track provider) {
+            <li class="list-group-item p-1 pointer">
+              <div class="px-1 py-2">
+                <div
+                  class="row g-1 px-0 justify-items-center align-items-center"
+                >
+                  <div
+                    class="col-8 text-start"
+                    (click)="selectProvider(provider.provider, dropdown3)"
+                  >
+                    <img
+                      [src]="provider.logoURL"
+                      [alt]="provider.provider + ' logo'"
+                      style="max-height: 50px; max-width: 100%"
+                    />
+                  </div>
+                  <div
+                    class="col"
+                    (click)="selectProvider(provider.provider, dropdown3)"
+                  >
+                    <div class="progress">
+                      <ng-template #popTemplate>
+                        <div
+                          id="quota-tooltip"
+                          [innerHtml]="
+                            '<div class=\'text-center\'>' +
+                            getQuotaLabel(provider) +
+                            '</div>'
+                          "
+                        ></div>
+                      </ng-template>
+                      <!-- [popover]="popTemplate" -->
+                      <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        [ngbPopover]="popTemplate"
+                        container="body"
+                        triggers="mouseenter:mouseleave"
+                        [ngStyle]="{
+                          width: 100 - getQuotaPercentage(provider) + '%'
+                        }"
+                        aria-valuenow="30"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        {{ 100 - getQuotaPercentage(provider) + '%' }}
+                      </div>
+                      @if (getQuotaPercentage(provider) > 0) {
+                      <div
+                        class="progress-bar bg-danger"
+                        role="progressbar"
+                        [ngStyle]="{
+                          width: getQuotaPercentage(provider) + '%'
+                        }"
+                        aria-valuenow="20"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        @if (getQuotaPercentage(provider) > 90) {
+                        {{ 100 - getQuotaPercentage(provider) + '%' }}
+                        }
+                      </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i
+                      class="bi bi-info-circle-fill pointer"
+                      style="color: cornflowerblue"
+                      [ngbPopover]="asrDescription"
+                      popoverTitle="Service information"
+                      [container]="'body'"
+                      [autoClose]="true"
+                    ></i>
+                    <ng-template #asrDescription>
+                      <table class="table table-sm table-borderless">
+                        <tbody>
+                          <tr>
+                            <td>
+                              <i class="bi bi-database-fill"></i>
+                            </td>
+                            <td>
+                              {{ provider.dataStoragePolicy }}
+                            </td>
+                          </tr>
+                          @if ( provider.maxSignalDuration !== undefined ) {
+                          <tr>
+                            <td>
+                              <i class="bi bi-exclamation-triangle"></i>
+                            </td>
+                            <td>
+                              max audio duration:
+                              {{ provider.maxSignalDuration }}
+                              seconds
+                            </td>
+                          </tr>
+                          } @if ( provider.maxSignalSize !== undefined ) {
+                          <tr>
+                            <td>
+                              <i class="bi bi-exclamation-triangle"></i>
+                            </td>
+                            <td>
+                              max file size:
+                              {{ provider.maxSignalSize }} MB
+                            </td>
+                          </tr>
+                          }
+                          <tr>
+                            <td>
+                              <i class="bi bi-person-check"></i>
+                            </td>
+                            <td>
+                              <a [href]="provider?.termsURL" target="_blank"
+                                >Terms &amp; Conditions</a
+                              >
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <i class="bi bi-globe-americas"></i>
+                            </td>
+                            <td>
+                              <a [href]="provider?.homepageURL" target="_blank"
+                                >Homepage</a
+                              >
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </li>
+            } @if (fields.provider.filtered.length === 0) {
+            <li class="text-center">Nothing found</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div
+        class="d-inline-block"
+        ngbDropdown
+        placement="bottom-right"
+        container="body"
+        (openChange)="onLanguageDropdownOpenChange($event, 'maus')"
+        #dropdown2="ngbDropdown"
+      >
+        <input
+          type="text"
+          class="form-control"
+          id="mausDropdown"
+          ngbDropdownToggle
+          placeholder="MAUS Language"
+          autocomplete="one-time-code"
+          autocapitalize="off"
+          name="maus"
+          [(ngModel)]="fields.maus.selected"
+          #mausInput
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          (focus)="dropdown3.close()"
+          (keyup)="filterLanguages(mausInput.value, 'maus', dropdown2)"
+        />
+        <div
+          ngbDropdownMenu
+          aria-labelledby="mausDropdown"
+          style="max-height: 150px"
+          class="overflow-y-auto"
+          id="mausDropdownMenu"
+        >
+          <span class="d-block mb-2 ms-2"><b>MAUS Language</b></span>
+          <ul class="list-group">
+            @for (language of fields.maus.filtered; track language) {
+            <li
+              class="list-group-item list-group-item-action p-1"
+              ngbDropdownItem
+              (click)="selectLanguage(language.value, 'maus')"
+            >
+              <a class="dropdown-item">{{ language.description }}</a>
+            </li>
+            } @if (fields.maus.filtered.length === 0) {
+            <li class="text-center">Nothing found</li>
+            }
+          </ul>
+        </div>
       </div>
     </div>
   </div>
-  <div class="col-4">
-    <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
-      (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown3="ngbDropdown" [autoClose]="false">
-      <input type="text" class="form-control" id="providerDropdown" ngbDropdownToggle placeholder="Provider"
-        autocomplete="one-time-code" autocapitalize="off" name="provider" [(ngModel)]="fields.provider.selected"
-        #providerInput
-        data-bs-toggle="dropdown" aria-expanded="false"
-        (keyup)="filterProviders(providerInput.value, dropdown3)" />
-      <div ngbDropdownMenu aria-labelledby="mausDropdown" style="max-height:150px;max-width:300px;"
-        class="overflow-y-auto"
-        id="providerDropdownMenu">
-        <span class="d-block mb-2 ms-2"><b>ASR Provider</b></span>
-        <ul class="list-group">
-          @for (provider of fields.provider.filtered; track provider) {
-            <li class="list-group-item p-1 pointer"
-              >
-              <div class="px-1 py-2">
-                <div class="row g-1 px-0 justify-items-center align-items-center">
-                  <div class="col-8 text-start" (click)="selectProvider(provider.provider, dropdown3)">
-                    <img [src]="provider.logoURL" [alt]="provider.provider + ' logo'"
-                      style="max-height:50px;max-width:100%;" />
-                  </div>
-                  <div class="col" (click)="selectProvider(provider.provider, dropdown3)">
-                    <div class="progress">
-                      <ng-template #popTemplate>
-                        <div id="quota-tooltip"
-                          [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(provider) + '</div>'"></div>
-                        </ng-template>
-                        <!-- [popover]="popTemplate" -->
-                        <div class="progress-bar bg-success" role="progressbar" [ngbPopover]="popTemplate" container="body"
-                          triggers="mouseenter:mouseleave"
-                         [ngStyle]="{
-                                    width: (100 - getQuotaPercentage(provider)) + '%'
-                                  }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                          {{ (100 - getQuotaPercentage(provider)) + '%' }}
-                        </div>
-                        @if (getQuotaPercentage(provider) > 0) {
-                          <div class="progress-bar bg-danger" role="progressbar"
-                         [ngStyle]="{
-                                    width: getQuotaPercentage(provider) + '%'
-                                  }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
-                            @if (getQuotaPercentage(provider) > 90) {
-                              {{ (100 - getQuotaPercentage(provider)) + '%' }}
-                            }
-                          </div>
-                        }
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="bi bi-info-circle-fill pointer" style="color: cornflowerblue" [ngbPopover]="asrDescription"
-                      popoverTitle="Service information" [container]="'body'" [autoClose]="true"></i>
-                      <ng-template #asrDescription>
-                        <table class="table table-sm table-borderless">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <i class="bi bi-database-fill"></i>
-                              </td>
-                              <td>
-                                {{ provider.dataStoragePolicy }}
-                              </td>
-                            </tr>
-                            @if (
-                              provider.maxSignalDuration !==
-                              undefined
-                              ) {
-                              <tr
-                                >
-                                <td>
-                                  <i class="bi bi-exclamation-triangle"></i>
-                                </td>
-                                <td>
-                                  max audio duration:
-                                  {{ provider.maxSignalDuration }}
-                                  seconds
-                                </td>
-                              </tr>
-                            }
-                            @if (
-                              provider.maxSignalSize !== undefined
-                              ) {
-                              <tr
-                                >
-                                <td>
-                                  <i class="bi bi-exclamation-triangle"></i>
-                                </td>
-                                <td>
-                                  max file size:
-                                  {{ provider.maxSignalSize }} MB
-                                </td>
-                              </tr>
-                            }
-                            <tr>
-                              <td>
-                                <i class="bi bi-person-check"></i>
-                              </td>
-                              <td>
-                                <a
-                                  [href]="provider?.termsURL"
-                                  target="_blank"
-                                  >Terms &amp; Conditions</a
-                                  >
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="bi bi-globe-americas"></i>
-                                </td>
-                                <td>
-                                  <a
-                                    [href]="provider?.homepageURL"
-                                    target="_blank"
-                                    >Homepage</a
-                                    >
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </ng-template>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                }
-                @if (fields.provider.filtered.length === 0) {
-                  <li class="text-center">Nothing found</li>
-                }
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="d-inline-block" ngbDropdown placement="bottom-right" container="body"
-            (openChange)="onLanguageDropdownOpenChange($event, 'maus')" #dropdown2="ngbDropdown">
-            <input type="text" class="form-control" id="mausDropdown" ngbDropdownToggle placeholder="MAUS Language"
-              autocomplete="one-time-code" autocapitalize="off" name="maus" [(ngModel)]="fields.maus.selected" #mausInput
-              data-bs-toggle="dropdown" aria-expanded="false" (focus)="dropdown3.close()"
-              (keyup)="filterLanguages(mausInput.value, 'maus', dropdown2)" />
-            <div ngbDropdownMenu aria-labelledby="mausDropdown" style="max-height:150px;" class="overflow-y-auto"
-              id="mausDropdownMenu">
-              <span class="d-block mb-2 ms-2"><b>MAUS Language</b></span>
-              <ul class="list-group">
-                @for (language of fields.maus.filtered; track language) {
-                  <li class="list-group-item list-group-item-action p-1" ngbDropdownItem
-                    (click)="selectLanguage(language.value, 'maus')"><a
-                    class="dropdown-item"
-                  >{{ language.description }}</a>
-                </li>
-              }
-              @if (fields.maus.filtered.length === 0) {
-                <li class="text-center">Nothing found</li>
-              }
-            </ul>
+
+  <div class="row g-0">
+    <div class="col">
+      <div class="mb-3">
+        <label for="asrAccessCode" class="form-label"
+          >{{ 'g.access code' | transloco }}:</label
+        >
+        <div class="input-group">
+          <input
+            [type]="accessCodeVisible ? 'text' : 'password'"
+            class="form-control"
+            id="asrAccessCode"
+            autocomplete="one-time-code"
+            name="asrAccessCode"
+            [(ngModel)]="fields.asr.accessCode"
+            (ngModelChange)="onAccessCodeChange($event)"
+          />
+          <div
+            class="input-group-text pointer"
+            (click)="accessCodeVisible = !accessCodeVisible"
+          >
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-eye-slash': !accessCodeVisible,
+                'bi-eye-fill': accessCodeVisible
+              }"
+            ></i>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="row g-0">
-      <div class="col">
-        <div class="mb-3">
-          <label for="asrAccessCode" class="form-label">{{ "g.access code" | transloco }}:</label>
-          <div class="input-group">
-            <input [type]="accessCodeVisible ? 'text': 'password'" class="form-control" id="asrAccessCode" autocomplete="one-time-code" name="asrAccessCode"
-              [(ngModel)]="fields.asr.accessCode" (ngModelChange)="onAccessCodeChange($event)">
-            <div class="input-group-text pointer" (click)="accessCodeVisible = !accessCodeVisible">
-          <i class="bi" [ngClass]="{
-            'bi-eye-slash': !accessCodeVisible,
-            'bi-eye-fill': accessCodeVisible
-          }"></i>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </form>
+  </div>
+</form>

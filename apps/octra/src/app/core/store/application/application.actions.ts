@@ -32,11 +32,10 @@ export class ApplicationActions {
     source: 'app/redirect to last page',
     events: {
       do: props<{
-        mode: LoginMode
-      }>()
-    }
+        mode: LoginMode;
+      }>(),
+    },
   });
-
 
   static loadASRSettings = createActionGroup({
     source: 'app/load asr settings',
@@ -107,15 +106,14 @@ export class ApplicationActions {
   });
 
   static showErrorModal = createActionGroup({
-      source: 'app/show error modal',
-      events: {
-        do: props<{
-          error: string;
-          showOKButton: boolean;
-        }>()
-      }
+    source: 'app/show error modal',
+    events: {
+      do: props<{
+        error: string;
+        showOKButton: boolean;
+      }>(),
+    },
   });
-
 
   public static undo = createAction(`UNDO`);
 
@@ -215,30 +213,29 @@ export class ApplicationActions {
   );
 
   static changeApplicationOption = createActionGroup({
-      source: `app/change option`,
-      events: {
-        do: props<{
-          name: IDBApplicationOptionName;
-          value: boolean | string | number;
-        }>(),
-        success: emptyProps(),
-        fail: props<{
-          error: string;
-        }>(),
-      }
+    source: `app/change option`,
+    events: {
+      do: props<{
+        name: IDBApplicationOptionName;
+        value: boolean | string | number;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
   });
 
   static setShortcutsEnabled = createActionGroup({
-      source: 'app/set shortcuts enabled',
-      events: {
-        do: props<{
-          shortcutsEnabled: boolean;
-        }>(),
-        success: emptyProps(),
-        fail: props<{
-          error: string;
-        }>(),
-      }
+    source: 'app/set shortcuts enabled',
+    events: {
+      do: props<{
+        shortcutsEnabled: boolean;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
   });
-
 }

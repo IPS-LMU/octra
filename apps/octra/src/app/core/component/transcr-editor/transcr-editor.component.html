@@ -2,7 +2,7 @@
   #transcrEditor
   (change)="updateTextField()"
   class="transcr-editor flex h-100 position-relative"
-  >
+>
   <octra-validation-popover
     #validationPopover
     [ngStyle]="{
@@ -11,17 +11,15 @@
     }"
   ></octra-validation-popover>
   @if (asr.status === 'active') {
-    <div
-      id="asrOverlay"
-      class="asr-running h-100 w-100 d-flex flex-column justify-content-center justify-items-center"
-      (click)="onASROverlayClick()"
-      >
-      <p
-        style="margin-top: 50px; text-align: center"
-        >
-        {{ 'asr.asr running' | transloco }}
-      </p>
-    </div>
+  <div
+    id="asrOverlay"
+    class="asr-running h-100 w-100 d-flex flex-column justify-content-center justify-items-center"
+    (click)="onASROverlayClick()"
+  >
+    <p style="margin-top: 50px; text-align: center">
+      {{ 'asr.asr running' | transloco }}
+    </p>
+  </div>
   }
   <ngx-jodit
     #jodit
@@ -32,6 +30,6 @@
     (joditChange)="onChange()"
     (joditPaste)="onPaste($event)"
     class="flex"
-    style="height:100px;"
+    style="height: 100px"
   ></ngx-jodit>
 </div>

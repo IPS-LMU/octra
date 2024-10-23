@@ -28,7 +28,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
         fallbackLang: 'en',
         missingHandler: {
           // It will use the first language set in the `fallbackLang` property
-          useFallbackTranslation: true
+          useFallbackTranslation: true,
         },
         prodMode: environment.production,
         reRenderOnLangChange: true,

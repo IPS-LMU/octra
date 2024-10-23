@@ -1,79 +1,79 @@
 .red {
-    background-color: #ff899d;
+  background-color: #ff899d;
 }
 
 .segment-number {
-    padding: 3px;
-    width: 50px;
-    vertical-align: middle;
+  padding: 3px;
+  width: 50px;
+  vertical-align: middle;
 }
 
 .segment-warning {
-    color: red;
+  color: red;
 }
 
 .segment-transcript {
-    vertical-align: middle;
-    cursor: pointer;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .segment-transcript {
 }
 
 .found-errors {
-    padding: 5px;
-    display: block;
-    text-align: center;
+  padding: 5px;
+  display: block;
+  text-align: center;
 }
 
 #statistics td {
-    text-align: center;
+  text-align: center;
 }
 
 .table thead th {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .table .last-column {
-    text-align: center;
-    vertical-align: middle;
-    width: 100px;
+  text-align: center;
+  vertical-align: middle;
+  width: 100px;
 }
 
 .table fa-icon {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #skip-silence-checkbox {
-    margin-left: 5px;
-    display: inline-flex;
-    margin-right: 3px;
+  margin-left: 5px;
+  display: inline-flex;
+  margin-right: 3px;
 }
 
 .ripple-container {
-    display: none;
+  display: none;
 }
 
 .bg-danger {
-    background-color: #ffd4dc !important;
-    border: 1px solid #fc9dac !important;
-    color: black !important;
+  background-color: #ffd4dc !important;
+  border: 1px solid #fc9dac !important;
+  color: black !important;
 }
 
 .bg-info {
-    background-color: lightblue !important;
-    border: 1px solid #64aabd !important;
-    color: black !important;
+  background-color: lightblue !important;
+  border: 1px solid #64aabd !important;
+  color: black !important;
 }
 
 .bg-success {
-    background-color: #9ad09a !important;
-    border: 1px solid #51a451 !important;
-    color: black !important;
+  background-color: #9ad09a !important;
+  border: 1px solid #51a451 !important;
+  color: black !important;
 }
 
-.bg-highlight{
+.bg-highlight {
   background-color: yellow !important;
   border: 1px solid #ffdd00 !important;
   color: black;

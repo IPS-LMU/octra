@@ -45,8 +45,8 @@ export abstract class OCTRAEditor extends DefaultComponent {
     }
   }
 
-  abstract enableAllShortcuts():void;
-  abstract disableAllShortcuts():void;
+  abstract enableAllShortcuts(): void;
+  abstract disableAllShortcuts(): void;
 
   protected changeArea(
     loupe: AudioViewerComponent,

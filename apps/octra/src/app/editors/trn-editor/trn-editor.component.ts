@@ -60,7 +60,9 @@ export class TrnEditorComponent
     return this._textEditor;
   }
 
-  private currentLevel!: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
+  private currentLevel!: OctraAnnotationAnyLevel<
+    OctraAnnotationSegment<ASRContext>
+  >;
   private guidelines!: OctraGuidelines;
   private breakMarkerCode?: string;
   private idCounter = 1;
@@ -294,7 +296,9 @@ export class TrnEditorComponent
 
     for (let i = 1; i < this.currentLevel.items.length; i++) {
       const segment = this.currentLevel.items[i] as OctraAnnotationSegment;
-      const previousSegment = this.currentLevel.items[i - 1] as OctraAnnotationSegment;
+      const previousSegment = this.currentLevel.items[
+        i - 1
+      ] as OctraAnnotationSegment;
 
       if (segment.getLabel('Speaker') === previousSegment.getLabel('Speaker')) {
         intervals[intervalCounter].length++;
@@ -343,27 +347,25 @@ export class TrnEditorComponent
   };
 
   ngOnInit() {
-    this.subscribe(
-      this.annotationStoreService.transcript$,{
-        next: (trasncriptState) => {
-          this.currentLevel =
-            trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
-          this.tempSegments = [...(this.currentLevel.items as OctraAnnotationSegment[])];
-          this.idCounter = trasncriptState?.idCounters.item ?? 1;
-        },
-      }
-    );
-    this.subscribe(
-      this.annotationStoreService.guidelines$,{
-        next: (guidelines) => {
-          this.guidelines = guidelines!.selected!.json;
-          this.breakMarkerCode = guidelines?.selected?.json.markers.find(
-            (a) => a.type === 'break'
-          )?.code;
-        },
-      }
-    );
-/*
+    this.subscribe(this.annotationStoreService.transcript$, {
+      next: (trasncriptState) => {
+        this.currentLevel =
+          trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
+        this.tempSegments = [
+          ...(this.currentLevel.items as OctraAnnotationSegment[]),
+        ];
+        this.idCounter = trasncriptState?.idCounters.item ?? 1;
+      },
+    });
+    this.subscribe(this.annotationStoreService.guidelines$, {
+      next: (guidelines) => {
+        this.guidelines = guidelines!.selected!.json;
+        this.breakMarkerCode = guidelines?.selected?.json.markers.find(
+          (a) => a.type === 'break'
+        )?.code;
+      },
+    });
+    /*
     this.keyMap.register(this.shortcuts);
     this.keyMap.register(this.tableShortcuts);
     this.keyMap.register(this.audioShortcuts);
@@ -557,9 +559,12 @@ export class TrnEditorComponent
   disableAllShortcuts() {}
 
   getStartPoint(index: number) {
-    return index > 0 &&
-      this.currentLevel.type === AnnotationLevelType.SEGMENT
-      ? (this.currentLevel.items[index - 1] as OctraAnnotationSegment<ASRContext>).time.unix
+    return index > 0 && this.currentLevel.type === AnnotationLevelType.SEGMENT
+      ? (
+          this.currentLevel.items[
+            index - 1
+          ] as OctraAnnotationSegment<ASRContext>
+        ).time.unix
       : 0;
   }
 
@@ -744,7 +749,11 @@ export class TrnEditorComponent
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  getShownSegment(startSamples: number, segment: OctraAnnotationSegment, i: number) {
+  getShownSegment(
+    startSamples: number,
+    segment: OctraAnnotationSegment,
+    i: number
+  ) {
     /* TODO implement
     const obj: ShownSegment = {
       start: startSamples,
@@ -812,11 +821,9 @@ export class TrnEditorComponent
     } else if ($event.code === 'Escape') {
       // close without saving
       this._textEditor.audiochunk.stopPlayback();
-      this.subscribe(
-        timer(1000),() => {
-          this.closeTextEditor();
-        }
-      );
+      this.subscribe(timer(1000), () => {
+        this.closeTextEditor();
+      });
     }
   }
 
@@ -969,15 +976,13 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
       this.cd.detectChanges();
     }
 
-    this.subscribe(
-      timer(60),() => {
-        if (Date.now() - this.lastResizing > 50) {
-          this.showSignalDisplay = false;
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-        }
+    this.subscribe(timer(60), () => {
+      if (Date.now() - this.lastResizing > 50) {
+        this.showSignalDisplay = false;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       }
-    );
+    });
     this.lastResizing = Date.now();
   }
 
@@ -1322,7 +1327,10 @@ segments=${isNull}, ${this.currentLevel.items.length}`);
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (shortcutObj: any, textSelection?: {start?: number; end?: number}) => {
+    const triggerUIAction = (
+      shortcutObj: any,
+      textSelection?: { start?: number; end?: number }
+    ) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',

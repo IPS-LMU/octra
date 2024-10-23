@@ -90,7 +90,8 @@
     "options": {
       "add samplepoints": "Separate transcription units by sample points (e.g. 123456)",
       "add timestamps": "Separate transcription units by readable timestamps (HH:MM:SS.s)",
-      "timestamp notice": "If you check both options, both time formats will be inserted:"
+      "timestamp notice": "If you check both options, both time formats will be inserted:",
+      "add newline": "Add a line break after each transcription unit."
     }
   },
   "feedback": {

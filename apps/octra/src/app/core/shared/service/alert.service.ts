@@ -71,7 +71,7 @@ export class AlertService {
         };
 
         this.queue.push(entry);
-        }
+      }
     });
   }
 

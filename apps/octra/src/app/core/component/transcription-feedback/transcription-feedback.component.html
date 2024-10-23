@@ -1,96 +1,77 @@
 <form #fo="ngForm" class="form-inline">
   <fieldset>
-    @if (
-      (annotationStoreService.feedback$ |async) !== undefined && feedbackData !== undefined
-      ) {
-      @if (!showCommentFieldOnly) {
-        @for (group of (annotationStoreService.feedback$ | async).groups; track group) {
-          <span>{{ translate(group.title, langService.getActiveLang()) }}</span>
-          @if (group?.controls[0].required) {
-            <span class="required_marker">
-              *</span
-              >
-              }<br />
-              <div class="form-group" style="padding-top: 0">
-                @for (control of group.controls; track control) {
-                  @if (control.type.type === 'radiobutton') {
-                    <div class="radio">
-                      <label>
-                        <input
-                          [(ngModel)]="control.value"
-                          [checked]="control.custom.checked"
-                          [required]="control.required"
-                          name="{{ group.name }}"
-                          type="radio"
-                          value="{{ control.value }}"
-                          />{{
-                          translate(
-                          control.label.languages,
-                          langService.getActiveLang()
-                          )
-                          }}
-                        </label>
-                      </div>
-                    }
-                    @if (control.type.type === 'checkbox') {
-                      <div class="checkbox">
-                        <label>
-                          <input
-                            #checkb
-                            (change)="checkBoxChanged(group.name, control.value)"
-                            [checked]="control.custom.checked"
-                            [required]="control.required"
-                            name="{{ control.value }}"
-                            type="checkbox"
-                            value="true"
-                            />
-                          @if (control.required) {
-                            <span class="required_marker"
-                              >*</span
-                              >
-                            }
-                            {{
-                            translate(
-                            control.label.languages,
-                            langService.getActiveLang()
-                            )
-                            }}
-                          </label>
-                        </div>
-                      }
-                      <div class="form-group">
-                        @if (control.type.type === 'textarea') {
-                          <div>
-                            <label>{{
-                              translate(
-                              control.label.languages,
-                              langService.getActiveLang()
-                              )
-                            }}</label>
-                            <textarea
-                              [required]="control.required"
-                              class="form-control"
-                              name="{{ group.name }}"
-                              value="{{ control.value }}"
-                            ></textarea>
-                            [(ngModel)]="feedbackData[group.name]"
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-                }
-              }
-              <div class="form-group">
-                <label>{{
-                  'transcription-submit.comment description' | transloco
-                }}</label>
-                <textarea
-                  [(ngModel)]="comment"
-                  class="form-control"
-                  name="comment"
-                ></textarea>
-              </div>
-            }
-          </fieldset>
-        </form>
+    @if ( (annotationStoreService.feedback$ |async) !== undefined &&
+    feedbackData !== undefined ) { @if (!showCommentFieldOnly) { @for (group of
+    (annotationStoreService.feedback$ | async).groups; track group) {
+    <span>{{ translate(group.title, langService.getActiveLang()) }}</span>
+    @if (group?.controls[0].required) {
+    <span class="required_marker"> *</span>
+    }<br />
+    <div class="form-group" style="padding-top: 0">
+      @for (control of group.controls; track control) { @if (control.type.type
+      === 'radiobutton') {
+      <div class="radio">
+        <label>
+          <input
+            [(ngModel)]="control.value"
+            [checked]="control.custom.checked"
+            [required]="control.required"
+            name="{{ group.name }}"
+            type="radio"
+            value="{{ control.value }}"
+          />{{
+            translate(control.label.languages, langService.getActiveLang())
+          }}
+        </label>
+      </div>
+      } @if (control.type.type === 'checkbox') {
+      <div class="checkbox">
+        <label>
+          <input
+            #checkb
+            (change)="checkBoxChanged(group.name, control.value)"
+            [checked]="control.custom.checked"
+            [required]="control.required"
+            name="{{ control.value }}"
+            type="checkbox"
+            value="true"
+          />
+          @if (control.required) {
+          <span class="required_marker">*</span>
+          }
+          {{ translate(control.label.languages, langService.getActiveLang()) }}
+        </label>
+      </div>
+      }
+      <div class="form-group">
+        @if (control.type.type === 'textarea') {
+        <div>
+          <label>{{
+            translate(control.label.languages, langService.getActiveLang())
+          }}</label>
+          <textarea
+            [required]="control.required"
+            class="form-control"
+            name="{{ group.name }}"
+            value="{{ control.value }}"
+          ></textarea>
+          [(ngModel)]="feedbackData[group.name]"
+        </div>
+        }
+      </div>
+      }
+    </div>
+    } }
+    <div class="form-group">
+      <label>{{
+        'transcription-submit.comment description' | transloco
+      }}</label>
+      <textarea
+        [(ngModel)]="comment"
+        class="form-control"
+        name="comment"
+      ></textarea>
+    </div>
+    }
+  </fieldset>
+</form>

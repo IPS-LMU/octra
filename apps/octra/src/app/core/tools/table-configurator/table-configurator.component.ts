@@ -45,7 +45,10 @@ export class TableConfiguratorComponent implements OnInit {
       }[];
     };
   }[] = [];
-  @Input() annotation!: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
+  @Input() annotation!: OctraAnnotation<
+    ASRContext,
+    OctraAnnotationSegment<ASRContext>
+  >;
   @Input() options = {};
   @Input() currentLevelID!: number;
   @Input() view: 'expert' | 'easy' = 'easy';
@@ -295,9 +298,10 @@ export class TableConfiguratorComponent implements OnInit {
           ) => {
             if (level instanceof OctraAnnotationSegmentLevel) {
               // the value must be a unix timestamp
-              return level.items[segmentNumber]!.getFirstLabelWithoutName(
-                'Speaker'
-              )?.value ?? '';
+              return (
+                level.items[segmentNumber]!.getFirstLabelWithoutName('Speaker')
+                  ?.value ?? ''
+              );
             }
             return '-1';
           },

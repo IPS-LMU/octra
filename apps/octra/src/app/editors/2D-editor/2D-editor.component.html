@@ -1,12 +1,12 @@
 <div id="overlay-transcr" style="position: relative">
   @if (showWindow) {
-    <octra-transcr-window
-      #window
-      (act)="onWindowAction($event)"
-      [audiochunk]="audioChunkWindow"
-      [easyMode]="appStorage.easyMode"
-      [segmentIndex]="selectedIndex"
-    ></octra-transcr-window>
+  <octra-transcr-window
+    #window
+    (act)="onWindowAction($event)"
+    [audiochunk]="audioChunkWindow"
+    [easyMode]="appStorage.easyMode"
+    [segmentIndex]="selectedIndex"
+  ></octra-transcr-window>
   }
   <octra-audio-navigation
     #audionav
@@ -18,18 +18,18 @@
     [playbackRate]="appStorage.audioSpeed"
     [responsive]="settingsService.responsive.enabled"
     [volume]="appStorage.audioVolume"
-    >
+  >
   </octra-audio-navigation>
   @if (appStorage.showLoupe) {
-    <div>
-      <octra-audio-viewer
-        #loupe
-        (mousemove)="onCircleLoupeMouseOver()"
-        [audioChunk]="audioChunkLoupe"
-        [silencePlaceholder]="'<P>'"
-        [isMultiLine]="false"
-        [refreshOnInternChanges]="false"
-        [name]="'loupe'"
+  <div>
+    <octra-audio-viewer
+      #loupe
+      (mousemove)="onCircleLoupeMouseOver()"
+      [audioChunk]="audioChunkLoupe"
+      [silencePlaceholder]="'<P>'"
+      [isMultiLine]="false"
+      [refreshOnInternChanges]="false"
+      [name]="'loupe'"
       [ngStyle]="{
         width: miniloupe.size.width + 'px',
         height: miniloupe.size.height + 'px',
@@ -42,10 +42,10 @@
         flex: 'auto',
         'flex-direction': 'column'
       }"
-        [settings]="miniLoupeSettings"
-        [annotation]="annotationStoreService.transcript!"
-      ></octra-audio-viewer>
-    </div>
+      [settings]="miniLoupeSettings"
+      [annotation]="annotationStoreService.transcript!"
+    ></octra-audio-viewer>
+  </div>
   }
   <octra-audio-viewer
     #viewer
@@ -60,6 +60,6 @@
     (currentLevelChange)="onCurrentLevelChange($event)"
     id="special"
     style="height: 400px; display: flex; flex: auto; flex-direction: column"
-    >
+  >
   </octra-audio-viewer>
 </div>

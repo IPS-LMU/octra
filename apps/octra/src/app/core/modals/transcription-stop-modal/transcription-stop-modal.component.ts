@@ -17,7 +17,7 @@ export class TranscriptionStopModalComponent extends DefaultComponent {
   @ViewChild('modal', { static: true }) modal: any;
 
   static options: NgbModalOptions = {
-    size: "lg",
+    size: 'lg',
     keyboard: false,
     backdrop: 'static',
   };

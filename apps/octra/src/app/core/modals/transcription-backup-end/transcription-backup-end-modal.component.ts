@@ -31,7 +31,7 @@ export class TranscriptionBackupEndModalComponent
 
   public static options: NgbModalOptions = {
     keyboard: false,
-    backdrop: "static"
+    backdrop: 'static',
   };
 
   constructor(
@@ -57,18 +57,32 @@ export class TranscriptionBackupEndModalComponent
         audioInfo.sampleRate,
         audioInfo.duration
       );
-      const time = DateTime.now().toFormat("yyyy-LL-dd_HH-mm-ss");
+      const time = DateTime.now().toFormat('yyyy-LL-dd_HH-mm-ss');
       const name = `octra_backup_t${this.annotationStore.task?.id}_${time}.json`;
       this.downloadFile = {
         url: URL.createObjectURL(
-          new File([JSON.stringify({
-            annotation,
-            logs: this.appStorageService.snapshot.onlineMode.logging.logs,
-            comment: this.appStorageService.snapshot.onlineMode.currentSession?.comment,
-            feedback: this.appStorageService.snapshot.onlineMode.currentSession?.assessment
-          }, null, 2)], name, {
-            type: 'application/json',
-          })
+          new File(
+            [
+              JSON.stringify(
+                {
+                  annotation,
+                  logs: this.appStorageService.snapshot.onlineMode.logging.logs,
+                  comment:
+                    this.appStorageService.snapshot.onlineMode.currentSession
+                      ?.comment,
+                  feedback:
+                    this.appStorageService.snapshot.onlineMode.currentSession
+                      ?.assessment,
+                },
+                null,
+                2
+              ),
+            ],
+            name,
+            {
+              type: 'application/json',
+            }
+          )
         ),
         name,
       };

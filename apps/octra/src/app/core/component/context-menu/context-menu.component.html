@@ -1,31 +1,28 @@
 @if (isVisible) {
-  <div
-    id="context-menu"
-    [@fadeInOnEnter]
-    [@fadeOutOnLeave]
+<div
+  id="context-menu"
+  [@fadeInOnEnter]
+  [@fadeOutOnLeave]
   [ngStyle]="{
     'margin-left': x + 'px',
     'margin-top': y + 'px'
   }"
-    (mouseleave)="onMouseLeave()"
-    >
-    <table>
-      <tbody>
-        @for (action of actions; track action; let i = $index) {
-          @if (action.status !== 'inactive') {
-            <tr
-              (click)="doAction(action.func)"
-              >
-              <td class="icon-column">
-                <i [classList]="['bi', action.icon]"></i>
-              </td>
-              <td class="action-column">
-                {{ action.label }}
-              </td>
-            </tr>
-          }
-        }
-      </tbody>
-    </table>
-  </div>
+  (mouseleave)="onMouseLeave()"
+>
+  <table>
+    <tbody>
+      @for (action of actions; track action; let i = $index) { @if
+      (action.status !== 'inactive') {
+      <tr (click)="doAction(action.func)">
+        <td class="icon-column">
+          <i [classList]="['bi', action.icon]"></i>
+        </td>
+        <td class="action-column">
+          {{ action.label }}
+        </td>
+      </tr>
+      } }
+    </tbody>
+  </table>
+</div>
 }

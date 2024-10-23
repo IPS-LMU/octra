@@ -1,5 +1,5 @@
 @if (!loaded) {
-  <div
+<div
   style="
     text-align: center;
     margin-top: 40px;
@@ -8,13 +8,13 @@
     font-size: 60px;
     font-weight: 100;
   "
-    >
-    <i class="fa fa-spinner fa-spin"></i>
-  </div>
+>
+  <i class="fa fa-spinner fa-spin"></i>
+</div>
 }
 <iframe
   (load)="onLoad()"
   [ngStyle]="{ visibility: loaded ? 'visible' : 'hidden' }"
   src="https://clarin.phonetik.uni-muenchen.de/apps/octra/contents/1.2/features.html"
-  >
+>
 </iframe>

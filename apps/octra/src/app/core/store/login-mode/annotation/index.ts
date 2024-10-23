@@ -22,7 +22,9 @@ export interface GuidelinesItem {
   type?: string;
 }
 
-export class AnnotationStateSegment<T extends ASRContext> extends OctraAnnotationSegment<T> {
+export class AnnotationStateSegment<
+  T extends ASRContext
+> extends OctraAnnotationSegment<T> {
   static override deserialize<T extends ASRContext>(
     jsonObject: SegmentWithContext<T>
   ): AnnotationStateSegment<T> {
@@ -85,7 +87,7 @@ export interface AnnotationState extends UndoRedoState {
 }
 
 export interface AnnotationSessionState {
-  status?: "processing" | "sending";
+  status?: 'processing' | 'sending';
   loadFromServer?: boolean;
   currentProject?: ProjectDto;
   task?: TaskDto;

@@ -23,7 +23,15 @@ export class KeyStatisticElem extends StatisticElem {
     audioSelection?: SampleInterval,
     transcriptionUnit?: SampleInterval
   ) {
-    super(type, name, value, timestamp, playpos, audioSelection, transcriptionUnit);
+    super(
+      type,
+      name,
+      value,
+      timestamp,
+      playpos,
+      audioSelection,
+      transcriptionUnit
+    );
     this.data = {
       timestamp,
       type,

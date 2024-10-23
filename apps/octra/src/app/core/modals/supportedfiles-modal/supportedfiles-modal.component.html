@@ -17,10 +17,10 @@
         <tr>
           <td>
             @for (elem of AppInfo.audioformats; track elem; let i = $index) {
-              <span>
-                *{{ elem.extension
-                }}{{ i < AppInfo.audioformats.length - 1 ? ',' : '' }}
-              </span>
+            <span>
+              *{{ elem.extension
+              }}{{ i < AppInfo.audioformats.length - 1 ? ',' : '' }}
+            </span>
             }
           </td>
         </tr>
@@ -30,23 +30,19 @@
 
     <table class="table table-striped">
       <tbody>
-        @for (elem of AppInfo.converters; track elem) {
-          @if (elem.conversion.import) {
-            <tr>
-              <td>{{ elem.name }}</td>
-              <td>{{ elem.application }}</td>
-              <td>*{{ elem.extension }}</td>
-              <td>
-                @if (elem.notice !== '') {
-                  <i
-                    class="bi bi-info-circle"
-                    [ngbTooltip]="elem.notice"
-                  ></i>
-                }
-              </td>
-            </tr>
-          }
-        }
+        @for (elem of AppInfo.converters; track elem) { @if
+        (elem.conversion.import) {
+        <tr>
+          <td>{{ elem.name }}</td>
+          <td>{{ elem.application }}</td>
+          <td>*{{ elem.extension }}</td>
+          <td>
+            @if (elem.notice !== '') {
+            <i class="bi bi-info-circle" [ngbTooltip]="elem.notice"></i>
+            }
+          </td>
+        </tr>
+        } }
       </tbody>
     </table>
   </div>

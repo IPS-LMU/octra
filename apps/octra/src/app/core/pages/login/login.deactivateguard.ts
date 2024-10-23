@@ -4,7 +4,7 @@ export interface ComponentCanDeactivate {
   canDeactivate: () => boolean | Observable<boolean>;
 }
 
-export class DeALoginGuard  {
+export class DeALoginGuard {
   canDeactivate(
     component: ComponentCanDeactivate
   ): Observable<boolean> | boolean {

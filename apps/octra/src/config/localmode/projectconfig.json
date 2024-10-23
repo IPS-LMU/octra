@@ -130,9 +130,7 @@
   ],
   "octra": {
     "validationEnabled": true,
-    "tools": [
-      "combine-phrases", "cut-audio"
-    ],
+    "tools": ["combine-phrases", "cut-audio"],
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": false,
     "theme": "shortAudioFiles",

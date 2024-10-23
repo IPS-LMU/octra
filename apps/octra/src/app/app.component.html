@@ -6,18 +6,11 @@
   </header>
   <main style="margin-top: 40px">
     @if (environment.dev_version) {
-      <div
-        class="d-none d-md-block beta_mark text-outline-white"
-        >
-        in development
-      </div>
-    }
-    @if (environment.beta_version) {
-      <div
-        class="d-none d-md-block beta_mark text-outline-white"
-        >
-        beta
-      </div>
+    <div class="d-none d-md-block beta_mark text-outline-white">
+      in development
+    </div>
+    } @if (environment.beta_version) {
+    <div class="d-none d-md-block beta_mark text-outline-white">beta</div>
     }
     <div class="container-fluid flex">
       <router-outlet></router-outlet>

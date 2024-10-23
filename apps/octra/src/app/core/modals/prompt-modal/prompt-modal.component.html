@@ -12,10 +12,9 @@
   </div>
   <div class="modal-body">
     @if (formatConverter === undefined || formatConverter === undefined) {
-      {{ (annotationStoreService.textInput$ | async)?.content }}
-    }
-    @if (formatConverter !== undefined && formatConverter !== undefined) {
-      {{ 'transcription.no prompttext' | transloco }}
+    {{ (annotationStoreService.textInput$ | async)?.content }}
+    } @if (formatConverter !== undefined && formatConverter !== undefined) {
+    {{ 'transcription.no prompttext' | transloco }}
     }
   </div>
   <div class="modal-footer">
@@ -24,7 +23,7 @@
       class="btn btn-primary"
       data-dismiss="modal"
       type="button"
-      >
+    >
       {{ 'g.close' | transloco }}
     </button>
   </div>

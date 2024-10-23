@@ -22,7 +22,12 @@ progressbar {
 }
 
 .options table tbody tr td {
+  padding: 3px;
   border: none;
+}
+
+.options .option {
+  line-height: 0.9;
 }
 
 .options .option td {
@@ -31,4 +36,8 @@ progressbar {
 
 .options .option label {
   font-size: 0.9em;
+}
+
+.options .option input {
+  margin-top: 2px;
 }

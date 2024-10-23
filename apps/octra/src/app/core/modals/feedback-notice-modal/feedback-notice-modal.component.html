@@ -1,13 +1,19 @@
 <div class="modal-content border-0">
-  <div
-    class="modal-header text-left justify-content-start"
-  >
-    <h4>{{"modal.feedback-notice.header" | transloco}}</h4>
+  <div class="modal-header text-left justify-content-start">
+    <h4>{{ 'modal.feedback-notice.header' | transloco }}</h4>
   </div>
   <div class="modal-body">
-    <p style="text-align: justify;" [innerHTML]="'modal.feedback-notice.body' | transloco"></p>
+    <p
+      style="text-align: justify"
+      [innerHTML]="'modal.feedback-notice.body' | transloco"
+    ></p>
     <div class="text-center">
-      <img class="w-100" style="max-width:700px;" src="assets/img/giving-feedback.png" alt="giving-feedback-screenshot"/>
+      <img
+        class="w-100"
+        style="max-width: 700px"
+        src="assets/img/giving-feedback.png"
+        alt="giving-feedback-screenshot"
+      />
     </div>
   </div>
   <div class="modal-footer">

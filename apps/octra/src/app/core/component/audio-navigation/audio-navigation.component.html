@@ -2,32 +2,31 @@
   <div class="row g-0">
     <div role="group" class="btn-group col-lg-7">
       @if (!isAudioPlaying) {
-        <button
-          (mousedown)="onButtonClick('play')"
-          class="waves-light btn btn-info"
-          [disabled]="!isReady"
-          name="play"
-          [title]="'g.play' | transloco"
-          >
-          <i class="bi bi-play-fill"></i>
-        </button>
-      }
-      @if (isAudioPlaying) {
-        <button
-          (mousedown)="onButtonClick('pause')"
-          class="btn btn-info"
-          name="pause"
-          [title]="'g.pause' | transloco"
-          >
-          <i class="bi bi-pause-fill"></i>
-        </button>
+      <button
+        (mousedown)="onButtonClick('play')"
+        class="waves-light btn btn-info"
+        [disabled]="!isReady"
+        name="play"
+        [title]="'g.play' | transloco"
+      >
+        <i class="bi bi-play-fill"></i>
+      </button>
+      } @if (isAudioPlaying) {
+      <button
+        (mousedown)="onButtonClick('pause')"
+        class="btn btn-info"
+        name="pause"
+        [title]="'g.pause' | transloco"
+      >
+        <i class="bi bi-pause-fill"></i>
+      </button>
       }
       <button
         (mousedown)="onButtonClick('stop')"
         class="btn btn-info"
         name="stop"
         [title]="'g.stop' | transloco"
-        >
+      >
         <i class="bi bi-stop-fill"></i>
       </button>
       <button
@@ -36,7 +35,7 @@
         class="btn btn-info"
         name="replay"
         [title]="'g.replay' | transloco"
-        >
+      >
         <i class="bi bi-rewind-fill"></i>
       </button>
       <button
@@ -44,7 +43,7 @@
         (mousedown)="onButtonClick('backward')"
         name="step_back"
         [title]="'g.backward' | transloco"
-        >
+      >
         <i class="bi bi-reply-fill"></i>
       </button>
       <button
@@ -52,7 +51,7 @@
         (mousedown)="onButtonClick('backward time')"
         name="step_back"
         [title]="'g.backwardtime' | transloco"
-        >
+      >
         <i class="bi bi-arrow-counterclockwise"></i> - 2s
       </button>
     </div>
@@ -74,14 +73,14 @@
               step="0.2"
               type="range"
               value="1"
-              />
+            />
           </div>
           <div class="col-1 col-sm-4 col-md-3">
             <i class="bi bi-volume-up"></i>
             <div
               [ngClass]="{ 'd-none d-sm-inline': responsive }"
               class="slider-descr"
-              >
+            >
               {{ volume | procent }}%
             </div>
           </div>
@@ -94,11 +93,11 @@
               alt="fast"
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAATFJREFUeNrcl4ENgyAQRUsnYARHYIO6QR2BERzBDTpCRzCdgBHsBh2BbkAhOZILxYr1DtNeYox4+F/C/QMPh51DbJnsnFP+JuHxKYS4V6H2wq2/Hu49wljLLd655dBc4tJftgAg5DQl3zyuZNBozT+FhFxygPOK3BMHAHn8HMCNKZfFBZLLimoBwtZoRgHCZMQNtOc6gYTb0sbDArC7DT3DFPo/W+HNuMHMFOHICgPiUyLaZ8YiTEcp3iAhm9YAvM/BhNye0v8WnmeLEGAu6OCitwJE8Smub6kLAFZuBdBYnMqGW4sxhqwtrpP9YKoCAYVlEmGLTsSKU3xIXDCgAsPWVNTCKvG1STeeTHPSVEU2lDYTyB9xd6T4+8EtVRbOu6J5imLduy/m9Wx/R38XLwEGAKZi2t3OLNkSAAAAAElFTkSuQmCC"
               style="height: 16px; position: inherit"
-              />
+            />
           </div>
           <div
             class="col-10 col-sm-4 col-md-6 align-items-center justify-content-center"
-            >
+          >
             <input
               (change)="afterPlaybackRateChanged()"
               [(ngModel)]="playbackRate"
@@ -111,7 +110,7 @@
               step="0.25"
               type="range"
               value="1"
-              />
+            />
           </div>
           <div class="col-1 col-sm-4 col-md-3" style="position: relative">
             <img
@@ -119,11 +118,11 @@
               class="d-inline position-relative"
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAedJREFUeNrMV+1RwzAMTTj+kw0wE9QbkE5AmICMUCZomAA2yAjpBukGaSegTNBuYCRO4hTXcWyuSdGdzq6rRM/P+nCS5MqSTvlyY4yGIaOfpzRNd7PsChznoJ/mXHAtn9p5YcalnMp5BnoMAIA2Cp+5uTCGUpy5TzKyTW4FesWLGDCgvYCBANoGvPgpAuxjDwBIAbr20MvTZSCYIJEAcMdvNL8HVRZlWtj9TwGWViZcVlMAUIHOMQuyKbKgCLDBAH+GODr9xgCh0aQ4vxNnjrGg4IGQsv1C4wc9b1c9DN7Xs5JMpdMrkfRnYi0nVYNZgGkFBluiZy+i/RTRRDiFN0wvjAcYDkFpCMbLiA6niOIFjco644tGdgnagnYRKdYRUF/P0KEAKkdLbWm9pPOt6b/WakbVgPOO7HQIAG6vnceGnWpy0LjYEM5NDIDcB4BY+GHGAbzHRrRz8bLBVBS7HaK7cVRBPRrpnMsSgFwTDljUyDEeY2hn6hqimIMts46mHouPschPXRUNhkaUYs7tDc219V9itXTULyq7Oy5Kf+1s1cDtltMRGXr32PCZt0NHlEZUvzWVaefOrIa2cDD1QKV5tsuJFiw0c9+MlAjkem7nstp1durO9VnW+/i4xuW0mPwb8FLyLcAAJSFwRgtuxhcAAAAASUVORK5CYII="
               style="height: 16px"
-              />
+            />
             <div
               [ngClass]="{ 'd-none d-sm-inline': responsive }"
               class="slider-descr d-inline"
-              >
+            >
               {{ playbackRate }}x
             </div>
           </div>

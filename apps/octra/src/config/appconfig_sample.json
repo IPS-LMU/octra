@@ -17,8 +17,7 @@
       "enabled": true,
       "fixedwidth": 1200
     },
-    "plugins": {
-    },
+    "plugins": {},
     "allowed_browsers": [
       {
         "name": "Chrome",

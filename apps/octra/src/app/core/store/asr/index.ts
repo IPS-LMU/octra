@@ -44,10 +44,10 @@ export interface ASRStateQueueItem {
 }
 
 export interface ASRStateQueueStatistics {
-  running: number,
-  stopped: number,
-  failed: number,
-  finished: number,
+  running: number;
+  stopped: number;
+  failed: number;
+  finished: number;
 }
 
 export interface ASRStateQueue {
@@ -62,7 +62,7 @@ export interface ASRState {
   languageSettings?: ASRSettings;
   asrLanguages?: {
     value: string;
-    providersOnly?: string[],
+    providersOnly?: string[];
     description: string;
   }[];
   mausLanguages?: {

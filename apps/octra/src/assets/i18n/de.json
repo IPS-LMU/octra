@@ -90,7 +90,8 @@
     "options": {
       "add samplepoints": "Trenne Transkriptionseinheiten durch Zeitstempel im Sample-Format (z.B. 123456)",
       "add timestamps": "Trenne Transkriptionseinheiten durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
-      "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
+      "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:",
+      "add newline": "Nach jeder Transkriptionseinheit einen Zeilenumbruch hinzufügen."
     }
   },
   "feedback": {

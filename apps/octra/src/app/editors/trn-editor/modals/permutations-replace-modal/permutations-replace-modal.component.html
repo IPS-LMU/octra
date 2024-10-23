@@ -1,7 +1,7 @@
 <div class="modal-header">
   <h5 class="modal-title">
     {{
-    'trn-editor.modals.permutations replace.replace permutations' | transloco
+      'trn-editor.modals.permutations replace.replace permutations' | transloco
     }}
   </h5>
   <button type="button" class="btn-close" aria-label="Close" (click)="close()">
@@ -16,45 +16,43 @@
   <table class="table table-striped table-sm w-100">
     <tbody>
       @for (speaker of listOfSpeakers; track speaker; let i = $index) {
-        <tr>
-          <td class="leftcolumn">{{ speaker.name }}</td>
-          <td style="width: 60px">
-            <i class="bi bi-arrow-right"></i>
-          </td>
-          <td class="rightcolumn">
-            <div ngbDropdown class="dropdown">
-              <button
-                class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton"
-                aria-expanded="false"
-                ngbDropdownToggle
-                >
-                {{ speaker.replaceWith }} <span class="caret"></span>
-              </button>
-              <ul
-                ngbDropdownMenu
-                class="dropdown-menu"
-                aria-labelledby="dropdownMenuButton"
-                >
-                @for (
-                  otherSpeaker of getSpeakerListWithout(speaker.replaceWith)
-                  ; track
-                  otherSpeaker) {
-                  <li
-                    role="menuitem"
-                    (click)="setReplacement(i, otherSpeaker.name)"
-                    style="cursor: pointer"
-                    >
-                    <span class="dropdown-item" href="#">{{
-                      otherSpeaker.name
-                    }}</span>
-                  </li>
-                }
-              </ul>
-            </div>
-          </td>
-        </tr>
+      <tr>
+        <td class="leftcolumn">{{ speaker.name }}</td>
+        <td style="width: 60px">
+          <i class="bi bi-arrow-right"></i>
+        </td>
+        <td class="rightcolumn">
+          <div ngbDropdown class="dropdown">
+            <button
+              class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              aria-expanded="false"
+              ngbDropdownToggle
+            >
+              {{ speaker.replaceWith }} <span class="caret"></span>
+            </button>
+            <ul
+              ngbDropdownMenu
+              class="dropdown-menu"
+              aria-labelledby="dropdownMenuButton"
+            >
+              @for ( otherSpeaker of getSpeakerListWithout(speaker.replaceWith)
+              ; track otherSpeaker) {
+              <li
+                role="menuitem"
+                (click)="setReplacement(i, otherSpeaker.name)"
+                style="cursor: pointer"
+              >
+                <span class="dropdown-item" href="#">{{
+                  otherSpeaker.name
+                }}</span>
+              </li>
+              }
+            </ul>
+          </div>
+        </td>
+      </tr>
       }
     </tbody>
   </table>
@@ -65,7 +63,7 @@
   </button>
   <button type="button" class="btn btn-primary" (click)="replaceSpeakers()">
     {{
-    'trn-editor.modals.permutations replace.replace permutations' | transloco
+      'trn-editor.modals.permutations replace.replace permutations' | transloco
     }}
   </button>
 </div>

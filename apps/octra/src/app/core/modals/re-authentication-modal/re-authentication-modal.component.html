@@ -1,20 +1,40 @@
 <div class="modal-body position-relative">
-  @if (appStorage.snapshot.application.mode === LoginMode.ONLINE && forceLogout) {
-    <a (click)="abort()" class="position-absolute end-0 top-0 mt-2 me-3 link" style="font-size:0.85rem;">{{"g.logout" | transloco}}</a>
-  }
-  @if (appStorage.snapshot.application.mode !== LoginMode.ONLINE || !forceLogout) {
-    <a (click)="abort()" class="position-absolute end-0 top-0 mt-2 me-3 link" style="font-size:0.85rem;">{{"g.abort" | transloco}}</a>
+  @if (appStorage.snapshot.application.mode === LoginMode.ONLINE && forceLogout)
+  {
+  <a
+    (click)="abort()"
+    class="position-absolute end-0 top-0 mt-2 me-3 link"
+    style="font-size: 0.85rem"
+    >{{ 'g.logout' | transloco }}</a
+  >
+  } @if (appStorage.snapshot.application.mode !== LoginMode.ONLINE ||
+  !forceLogout) {
+  <a
+    (click)="abort()"
+    class="position-absolute end-0 top-0 mt-2 me-3 link"
+    style="font-size: 0.85rem"
+    >{{ 'g.abort' | transloco }}</a
+  >
   }
   <div class="container-fluid">
     <div class="row mt-3">
       <div class="col"></div>
       <div class="col-sm-12 col-md-8 col-lg-5">
         @if (authenticationRunning) {
-          <button class="btn btn-success w-100 mb-5" (click)="onAuthenticatedClick()">
-            {{ 'p.authenticated' | transloco }}
-          </button>
+        <button
+          class="btn btn-success w-100 mb-5"
+          (click)="onAuthenticatedClick()"
+        >
+          {{ 'p.authenticated' | transloco }}
+        </button>
         }
-        <octra-authentication-component [type]="type" (submitClick)="onSubmit($event)" [authentications]="apiService.appProperties?.authentications" [passwordReset]="apiService.appProperties?.reset_password" [registrations]="false"></octra-authentication-component>
+        <octra-authentication-component
+          [type]="type"
+          (submitClick)="onSubmit($event)"
+          [authentications]="apiService.appProperties?.authentications"
+          [passwordReset]="apiService.appProperties?.reset_password"
+          [registrations]="false"
+        ></octra-authentication-component>
       </div>
       <div class="col"></div>
     </div>

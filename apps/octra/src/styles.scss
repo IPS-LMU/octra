@@ -485,7 +485,8 @@ ngx-jodit {
 }
 
 .text-outline-white {
-  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white !important;
+  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white,
+    1px 1px 0 white !important;
 }
 
 .beta_mark {
@@ -499,7 +500,6 @@ ngx-jodit {
   font-weight: 600;
   letter-spacing: 1px;
 }
-
 
 #editor-change-font-btn {
   border: 1px solid gray;

@@ -1,12 +1,12 @@
-<h4>{{ "g.statistics" | transloco }}</h4>
+<h4>{{ 'g.statistics' | transloco }}</h4>
 
 <table id="statistics" class="table table-bordered">
   <thead>
     <tr>
-      <th>{{ "segments.total" | transloco }}</th>
-      <th>{{ "segments.transcribed" | transloco }}</th>
-      <th>{{ "segments.with breaks" | transloco }}</th>
-      <th>{{ "segments.not transcribed" | transloco }}</th>
+      <th>{{ 'segments.total' | transloco }}</th>
+      <th>{{ 'segments.transcribed' | transloco }}</th>
+      <th>{{ 'segments.with breaks' | transloco }}</th>
+      <th>{{ 'segments.not transcribed' | transloco }}</th>
     </tr>
   </thead>
   <tbody>
@@ -14,128 +14,211 @@
       <td>{{ numberOfSegments }}</td>
       <td class="bg-success">{{ transcrSegments }}</td>
       <td class="bg-info">{{ pauseSegments }}</td>
-      <td class="bg-danger"><b><u>{{ emptySegments }}</u></b></td>
+      <td class="bg-danger">
+        <b
+          ><u>{{ emptySegments }}</u></b
+        >
+      </td>
     </tr>
   </tbody>
 </table>
 <p [hidden]="shownSegments.length === 0" style="text-align: center">
-  @if (validationFound) {
-    @if (foundErrors === 0) {
-      <span
-      class="text-success found-errors">{{ "g.no errors found" | transloco }}</span>
-    }
-    @if (foundErrors > 0) {
-      <span
-      class="text-danger found-errors">{{ "g.errors found" | transloco : { errors: foundErrors + '' } }}</span>
-    }
-  }
-  @if (!validationFound) {
-    <span>No validation methods found</span>
+  @if (validationFound) { @if (foundErrors === 0) {
+  <span class="text-success found-errors">{{
+    'g.no errors found' | transloco
+  }}</span>
+  } @if (foundErrors > 0) {
+  <span class="text-danger found-errors">{{
+    'g.errors found' | transloco : { errors: foundErrors + '' }
+  }}</span>
+  } } @if (!validationFound) {
+  <span>No validation methods found</span>
   }
 </p>
-<h4 [hidden]="!showTranscriptionTable">{{ "g.transcript" | transloco }}</h4>
+<h4 [hidden]="!showTranscriptionTable">{{ 'g.transcript' | transloco }}</h4>
 <div [hidden]="!showLoading">
-  <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
-    <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
+  <div
+    style="
+      display: block;
+      text-align: center;
+      margin-top: -10px;
+      position: absolute;
+      width: 100%;
+    "
+  >
+    <i class="fa fa-spinner fa-spin" style="font-size: 32px"></i>
   </div>
 </div>
 @if (shownSegments.length > 0) {
-  <table id="transcription-table" class="table table-bordered"
-    [hidden]="!showTranscriptionTable">
-    <thead id="table-head">
-      <tr>
-        <th id="table-first-column"></th>
-        <th id="table-second-column">{{ "g.segment" | transloco }}</th>
-        <th id="table-third-column">{{ "g.transcription" | transloco }}</th>
-        <th class="last-column">
-          <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
-            [checked]="playAllState.skipSilence">
-          <label for="skip-silence-checkbox">{{ "g.skip silence" | transloco }}</label>
-          <i [class]="playAllState.icon" (click)="togglePlayAll()" style="font-size:1.2rem;"></i>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (segment of shownSegments; track segment; let i = $index) {
-        <tr #row
-          class="segment-row"
+<table
+  id="transcription-table"
+  class="table table-bordered"
+  [hidden]="!showTranscriptionTable"
+>
+  <thead id="table-head">
+    <tr>
+      <th id="table-first-column"></th>
+      <th id="table-second-column">{{ 'g.segment' | transloco }}</th>
+      <th id="table-third-column">{{ 'g.transcription' | transloco }}</th>
+      <th class="last-column">
+        <input
+          type="checkbox"
+          id="skip-silence-checkbox"
+          (click)="toggleSkipCheckbox()"
+          [checked]="playAllState.skipSilence"
+        />
+        <label for="skip-silence-checkbox">{{
+          'g.skip silence' | transloco
+        }}</label>
+        <i
+          [class]="playAllState.icon"
+          (click)="togglePlayAll()"
+          style="font-size: 1.2rem"
+        ></i>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (segment of shownSegments; track segment; let i = $index) {
+    <tr
+      #row
+      class="segment-row"
       [ngClass]="{
-      'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-      'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-      'bg-danger': (segment.transcription.text === ''),
-      'bg-highlight': playAllState.currentSegment === i
-      }">
-          <td style="width:25px;vertical-align:middle;"
-        [ngClass]="
-        {
-        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-        'bg-danger': (segment.transcription.text === ''),
+        'bg-success':
+          segment.transcription.text !== '' &&
+          segment.transcription.text !==
+            annotationStoreService.breakMarker!.code,
+        'bg-info':
+          segment.transcription.text ===
+          annotationStoreService.breakMarker!.code,
+        'bg-danger': segment.transcription.text === '',
         'bg-highlight': playAllState.currentSegment === i
-        }">
-      <i class="bi bi-exclamation-triangle segment-warning" [ngStyle]="{
-                  'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"></i>
-    </td>
-    <td class="segment-number"
+      }"
+    >
+      <td
+        style="width: 25px; vertical-align: middle"
         [ngClass]="{
-        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-        'bg-danger': (segment.transcription.text === ''),
-        'bg-highlight': playAllState.currentSegment === i
-        }">
-              <span class="link"
-              (click)="onSegmentClicked(i)"># {{ i + 1 | leadingnull: shownSegments.length }}</span>
-            </td>
-            @if (textEditor.state === 'active' && textEditor.selectedSegment === i) {
-              <td
-        [ngClass]="{
-        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-        'bg-danger': (segment.transcription.text === ''),
-        'bg-highlight': playAllState.currentSegment === i
-        }"
-                (mouseleave)="onTextEditorLeave(i)">
-                <div>
-                  <octra-transcr-editor #transcrEditor
-                    [height]="60"
-                    [markers]="(annotationStoreService.guidelines !== undefined) ? annotationStoreService.guidelines.markers : undefined"
-                    [easymode]="true"
-                    [audiochunk]="textEditor.audioChunk"
-                    [(font)]="appStorage.editorFont"
-                    (enterKeyPressed)="onEnterPressed(i)"
-                  ></octra-transcr-editor>
-                </div>
-              </td>
-            } @else {
-              <td
-                style="position:relative"
-        [ngClass]="{
-          'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-          'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-          'bg-danger': (segment.transcription.text === ''),
+          'bg-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !==
+              annotationStoreService.breakMarker!.code,
+          'bg-info':
+            segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
+          'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
-          }" class="segment-transcript" (mousedown)="onMouseDown(i);"
-                (mouseover)="onMouseOver($event, i, row, validationPopover);">
-                <octra-validation-popover #validationPopover
-                  style="position:absolute;"
-                                  [ngStyle]="{
-                                'margin-left': popovers.validation.location.x + 'px',
-                                'margin-top': popovers.validation.location.y + 'px'
-                            }"></octra-validation-popover>
-                <p [innerHTML]="sanitizeHTML(segment.transcription.html)"></p>
-              </td>
-            }
-            <td class="last-column"
+        }"
+      >
+        <i
+          class="bi bi-exclamation-triangle segment-warning"
+          [ngStyle]="{
+            display:
+              segment.transcription.html.indexOf('<span class=\'val-error\'') >
+              -1
+                ? 'normal'
+                : 'none'
+          }"
+        ></i>
+      </td>
+      <td
+        class="segment-number"
         [ngClass]="{
-        'bg-success': (segment.transcription.text !== '' && segment.transcription.text !== annotationStoreService.breakMarker!.code),
-        'bg-info': (segment.transcription.text === annotationStoreService.breakMarker!.code),
-        'bg-danger': (segment.transcription.text === ''),
-        'bg-highlight': playAllState.currentSegment === i
-        }">
-              <i [class]="playStateSegments[i]?.icon" (click)="playSelectedSegment(i)"></i>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  }
+          'bg-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !==
+              annotationStoreService.breakMarker!.code,
+          'bg-info':
+            segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
+          'bg-danger': segment.transcription.text === '',
+          'bg-highlight': playAllState.currentSegment === i
+        }"
+      >
+        <span class="link" (click)="onSegmentClicked(i)"
+          ># {{ i + 1 | leadingnull : shownSegments.length }}</span
+        >
+      </td>
+      @if (textEditor.state === 'active' && textEditor.selectedSegment === i) {
+      <td
+        [ngClass]="{
+          'bg-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !==
+              annotationStoreService.breakMarker!.code,
+          'bg-info':
+            segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
+          'bg-danger': segment.transcription.text === '',
+          'bg-highlight': playAllState.currentSegment === i
+        }"
+        (mouseleave)="onTextEditorLeave(i)"
+      >
+        <div>
+          <octra-transcr-editor
+            #transcrEditor
+            [height]="60"
+            [markers]="
+              annotationStoreService.guidelines !== undefined
+                ? annotationStoreService.guidelines.markers
+                : undefined
+            "
+            [easymode]="true"
+            [audiochunk]="textEditor.audioChunk"
+            [(font)]="appStorage.editorFont"
+            (enterKeyPressed)="onEnterPressed(i)"
+          ></octra-transcr-editor>
+        </div>
+      </td>
+      } @else {
+      <td
+        style="position: relative"
+        [ngClass]="{
+          'bg-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !==
+              annotationStoreService.breakMarker!.code,
+          'bg-info':
+            segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
+          'bg-danger': segment.transcription.text === '',
+          'bg-highlight': playAllState.currentSegment === i
+        }"
+        class="segment-transcript"
+        (mousedown)="onMouseDown(i)"
+        (mouseover)="onMouseOver($event, i, row, validationPopover)"
+      >
+        <octra-validation-popover
+          #validationPopover
+          style="position: absolute"
+          [ngStyle]="{
+            'margin-left': popovers.validation.location.x + 'px',
+            'margin-top': popovers.validation.location.y + 'px'
+          }"
+        ></octra-validation-popover>
+        <p [innerHTML]="sanitizeHTML(segment.transcription.html)"></p>
+      </td>
+      }
+      <td
+        class="last-column"
+        [ngClass]="{
+          'bg-success':
+            segment.transcription.text !== '' &&
+            segment.transcription.text !==
+              annotationStoreService.breakMarker!.code,
+          'bg-info':
+            segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
+          'bg-danger': segment.transcription.text === '',
+          'bg-highlight': playAllState.currentSegment === i
+        }"
+      >
+        <i
+          [class]="playStateSegments[i]?.icon"
+          (click)="playSelectedSegment(i)"
+        ></i>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+}

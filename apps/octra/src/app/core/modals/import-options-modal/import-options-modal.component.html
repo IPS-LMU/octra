@@ -1,16 +1,19 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      {{ "modal.import options.title" | transloco }}
+      {{ 'modal.import options.title' | transloco }}
     </h5>
   </div>
   <div class="modal-body">
     <p class="mb-3">
-      {{ "modal.import options.introduction" | transloco }}
+      {{ 'modal.import options.introduction' | transloco }}
     </p>
     @if (schema) {
-      <octra-form-configurator [jsonSchema]="schema" [jsonText]="jsonText"
-      (jsonTextChange)="onJsonTextChange($event)"></octra-form-configurator>
+    <octra-form-configurator
+      [jsonSchema]="schema"
+      [jsonText]="jsonText"
+      (jsonTextChange)="onJsonTextChange($event)"
+    ></octra-form-configurator>
     }
   </div>
   <div class="modal-footer">
@@ -21,7 +24,7 @@
           class="btn btn-secondary"
           data-dismiss="modal"
           type="button"
-          >
+        >
           {{ 'g.abort' | transloco }}
         </button>
       </div>
@@ -31,7 +34,7 @@
           class="btn btn-secondary"
           data-dismiss="modal"
           type="button"
-          >
+        >
           {{ 'g.apply' | transloco }}
         </button>
       </div>

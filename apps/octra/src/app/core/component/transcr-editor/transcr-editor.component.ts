@@ -1705,7 +1705,10 @@ export class TranscrEditorComponent
       .replace(new RegExp(/\[\|/, 'g'), '{')
       .replace(new RegExp(/\|]/, 'g'), '}');
     html = unEscapeHtml(html);
-    html = '<span>' + await this.annotationStoreService.rawToHTML(html) + '</span>';
+    html =
+      '<span>' +
+      (await this.annotationStoreService.rawToHTML(html)) +
+      '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
     const htmlObj = document.createElement('span');
     htmlObj.innerHTML = html;

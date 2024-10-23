@@ -20,7 +20,7 @@ export interface ILog {
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
   playpos?: number; // Samples
-  textSelection?: {start?: number; end?: number}; // Position des Cursors im// Text (wird Caret genannt)
+  textSelection?: { start?: number; end?: number }; // Position des Cursors im// Text (wird Caret genannt)
   audioSelection?: SampleInterval;
   transcriptionUnit?: SampleInterval;
 }
@@ -66,7 +66,7 @@ export class OLog implements ILog {
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
   playpos?: number; // Samples
-  textSelection?: {start?: number; end?: number}; // Position des Cursors im Text (wird Caret genannt)
+  textSelection?: { start?: number; end?: number }; // Position des Cursors im Text (wird Caret genannt)
   audioSelection?: SampleInterval;
   transcriptionUnit?: SampleInterval;
 
@@ -76,7 +76,7 @@ export class OLog implements ILog {
     context: string,
     value: any,
     playpos?: number,
-    textSelection?: {start?: number; end?: number},
+    textSelection?: { start?: number; end?: number },
     audioSelection?: SampleInterval,
     transcriptionUnit?: SampleInterval
   ) {

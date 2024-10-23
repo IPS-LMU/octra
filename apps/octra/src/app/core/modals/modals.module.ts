@@ -95,7 +95,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     FeedbackNoticeModalComponent,
     TranscriptionBackupEndModalComponent,
     ImportOptionsModalComponent,
-    WaitingModalComponent
+    WaitingModalComponent,
   ],
   imports: [
     CommonModule,

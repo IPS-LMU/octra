@@ -3,68 +3,42 @@
     <a (click)="shortcutbtnclicked.emit()" class="w-100">
       <i class="bi bi-keyboard align-middle"></i>
       @if (!appStorage.easyMode) {
-        <span
-          [ngClass]="{ 'd-none d-md-inline': responsive }"
-          >
-          {{ buttonLabels.shortcuts }}</span
-          >
-        }
-        @if (!appStorage.easyMode) {
-          <span
-            [ngClass]="{ 'd-none d-lg-inline': responsive }"
-            >
-            [ALT + 8]</span
-            >
-            }</a
-            >
-            @if (appStorage.useMode !== 'url') {
-              <a
-                (click)="guidelinesbtnclicked.emit()"
-                class="w-100"
-                >
-                <i class="bi bi-card-list"></i>
-                @if (!appStorage.easyMode) {
-                  <span
-                    [ngClass]="{ 'd-none d-md-inline': responsive }"
-                    >
-                    {{ buttonLabels.guidelines }}</span
-                    >
-                  }
-                  @if (!appStorage.easyMode) {
-                    <span
-                      [ngClass]="{ 'd-none d-lg-inline': responsive }"
-                      >
-                      [ALT + 9]</span
-                      >
-                    }
-                  </a>
-                }
-                <a (click)="overviewbtnclicked.emit()" class="w-100">
-                  <i class="bi bi-eye-fill"></i>
-                  @if (!appStorage.easyMode) {
-                    <span
-                      [ngClass]="{ 'd-none d-md-inline': responsive }"
-                      >
-                      {{ buttonLabels.overview }}</span
-                      >
-                    }
-                    @if (!appStorage.easyMode) {
-                      <span
-                        [ngClass]="{ 'd-none d-lg-inline': responsive }"
-                        >
-                        [ALT + 0]</span
-                        >
-                      }
-                    </a>
-                    <a (click)="openHelpModal()" class="w-100">
-                      <i class="bi bi-question-circle-fill"></i>
-                      @if (!appStorage.easyMode) {
-                        <span
-                          [ngClass]="{ 'd-none d-md-inline': responsive }"
-                          >
-                          {{ buttonLabels.help }}</span
-                          >
-                        }
-                      </a>
-                    </div>
-                  </div>
+      <span [ngClass]="{ 'd-none d-md-inline': responsive }">
+        {{ buttonLabels.shortcuts }}</span
+      >
+      } @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-lg-inline': responsive }"> [ALT + 8]</span>
+      }</a
+    >
+    @if (appStorage.useMode !== 'url') {
+    <a (click)="guidelinesbtnclicked.emit()" class="w-100">
+      <i class="bi bi-card-list"></i>
+      @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-md-inline': responsive }">
+        {{ buttonLabels.guidelines }}</span
+      >
+      } @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-lg-inline': responsive }"> [ALT + 9]</span>
+      }
+    </a>
+    }
+    <a (click)="overviewbtnclicked.emit()" class="w-100">
+      <i class="bi bi-eye-fill"></i>
+      @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-md-inline': responsive }">
+        {{ buttonLabels.overview }}</span
+      >
+      } @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-lg-inline': responsive }"> [ALT + 0]</span>
+      }
+    </a>
+    <a (click)="openHelpModal()" class="w-100">
+      <i class="bi bi-question-circle-fill"></i>
+      @if (!appStorage.easyMode) {
+      <span [ngClass]="{ 'd-none d-md-inline': responsive }">
+        {{ buttonLabels.help }}</span
+      >
+      }
+    </a>
+  </div>
+</div>

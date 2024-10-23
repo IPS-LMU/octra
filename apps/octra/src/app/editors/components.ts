@@ -1,7 +1,6 @@
 import { TwoDEditorComponent } from './2D-editor';
 import { DictaphoneEditorComponent } from './dictaphone-editor';
 import { LinearEditorComponent } from './linear-editor';
-import { TrnEditorComponent } from './trn-editor';
 
 export const editorComponents: {
   name: string;
@@ -27,7 +26,7 @@ export const editorComponents: {
     translate: 'interfaces.2D editor',
     icon: 'bi bi-justify',
   },
-    /* TODO fix TRN editor
+  /* TODO fix TRN editor
   {
     name: TrnEditorComponent.editorname,
     editor: TrnEditorComponent,

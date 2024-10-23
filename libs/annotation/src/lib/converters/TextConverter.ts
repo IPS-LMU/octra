@@ -15,6 +15,7 @@ export class TextConverter extends Converter {
   public override options = {
     showTimestampSamples: false,
     showTimestampString: false,
+    addNewLineString: false,
   };
 
   public constructor() {
@@ -76,26 +77,31 @@ export class TextConverter extends Converter {
               (sampleEnd * 1000) / audiofile.sampleRate
             );
 
-            if (
-              this.options &&
-              (this.options.showTimestampString ||
-                this.options.showTimestampSamples)
-            ) {
-              result += ` <`;
-              if (this.options.showTimestampString) {
-                const endTime = this.convertToTimeString(unixTimestamp, {
-                  showHour: true,
-                  showMilliSeconds: true,
-                });
-                result += `ts="${endTime}"`;
+            if (this.options) {
+              if (
+                this.options.showTimestampString ||
+                this.options.showTimestampSamples
+              ) {
+                result += ` <`;
+                if (this.options.showTimestampString) {
+                  const endTime = this.convertToTimeString(unixTimestamp, {
+                    showHour: true,
+                    showMilliSeconds: true,
+                  });
+                  result += `ts="${endTime}"`;
+                }
+                if (this.options.showTimestampSamples) {
+                  result += this.options.showTimestampString ? ' ' : '';
+                  result += `sp="${sampleEnd}"`;
+                }
+                result += `/>`;
               }
-              if (this.options.showTimestampSamples) {
-                result += this.options.showTimestampString ? ' ' : '';
-                result += `sp="${sampleEnd}"`;
+
+              if (this.options.addNewLineString) {
+                result += '\n';
+              } else {
+                result += ' ';
               }
-              result += `/> `;
-            } else {
-              result += ' ';
             }
           }
         }
@@ -109,7 +115,7 @@ export class TextConverter extends Converter {
       filename += `${this._extension}`;
     }
 
-    result = result.replace(/\s+/g, ' ');
+    result = result.replace(/ +/g, ' ');
     return {
       file: {
         name: filename,

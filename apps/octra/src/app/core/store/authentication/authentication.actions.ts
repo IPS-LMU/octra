@@ -177,8 +177,8 @@ export class AuthenticationActions {
     source: 'auth/need re-authentication',
     events: {
       do: props<{
-        forceAuthentication?: AccountLoginMethod,
-        forceLogout: boolean,
+        forceAuthentication?: AccountLoginMethod;
+        forceLogout: boolean;
         actionAfterSuccess?: Action;
       }>(),
       success: props<{

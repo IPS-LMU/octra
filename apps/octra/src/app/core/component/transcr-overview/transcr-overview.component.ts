@@ -219,32 +219,36 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  async onMouseOver($event: MouseEvent, rowNumber: number, row: HTMLDivElement, validationPopover: ValidationPopoverComponent) {
+  async onMouseOver(
+    $event: MouseEvent,
+    rowNumber: number,
+    row: HTMLDivElement,
+    validationPopover: ValidationPopoverComponent
+  ) {
     if (validationPopover) {
       if (this.textEditor.state === 'inactive') {
         let target = $event.target as HTMLElement;
         if (
-          target.getAttribute("class") === 'val-error' ||
-          target.parentElement!.getAttribute("class") === 'val-error'
+          target.getAttribute('class') === 'val-error' ||
+          target.parentElement!.getAttribute('class') === 'val-error'
         ) {
           if (!this.popovers.validation.mouse.enter) {
-            if (target.getAttribute("class") !== 'val-error') {
+            if (target.getAttribute('class') !== 'val-error') {
               target = target.parentElement!;
             }
 
             const errorcode = target.getAttribute('data-errorcode')!;
             this.selectedError =
-             await this.annotationStoreService.getErrorDetails(errorcode);
+              await this.annotationStoreService.getErrorDetails(errorcode);
 
             if (this.selectedError !== null) {
               validationPopover.show();
-              validationPopover.description =
-                this.selectedError.description;
+              validationPopover.description = this.selectedError.description;
               validationPopover.title = this.selectedError.title;
               this.cd.markForCheck();
               this.cd.detectChanges();
 
-              this.popovers.validation.location.y = - validationPopover.height;
+              this.popovers.validation.location.y = -validationPopover.height;
               this.popovers.validation.location.x = 0;
               this.popovers.validation.mouse.enter = true;
               this.cd.markForCheck();
@@ -398,8 +402,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             startTime,
             segment.time.samples,
             i,
-            this.annotationStoreService.validationArray.filter(a => a.level === level.id),
-            segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
+            this.annotationStoreService.validationArray.filter(
+              (a) => a.level === level.id
+            ),
+            segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
           );
 
           result.push(obj);
@@ -433,7 +439,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     endSamples: number,
     i: number,
     validation: any[],
-    rawText?: string,
+    rawText?: string
   ): Promise<{
     start: number;
     end: number;

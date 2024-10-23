@@ -1,6 +1,6 @@
 <h2>{{ 'g.news' | transloco }}</h2>
 @if (!loaded) {
-  <div
+<div
   style="
     text-align: center;
     margin-top: 80px;
@@ -9,9 +9,9 @@
     font-size: 60px;
     font-weight: 100;
   "
-    >
-    <i class="fa fa-spinner fa-spin"></i>
-  </div>
+>
+  <i class="fa fa-spinner fa-spin"></i>
+</div>
 }
 <iframe
   (load)="onLoad()"

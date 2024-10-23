@@ -74,7 +74,7 @@ export const AppConfigSchema = {
         },
       },
       type: 'object',
-      required: ['database', "supportEmail"],
+      required: ['database', 'supportEmail'],
     },
     octraBackend: {
       required: ['enabled', 'url'],

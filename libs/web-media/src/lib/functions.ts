@@ -224,11 +224,11 @@ export function getAudioInfo(
       type,
       buffer.byteLength,
       format.sampleRate,
-      format.duration,
+      format.duration.samples,
       format.channels,
       format.bitsPerSample
     );
   } else {
-    throw new Error(`Audio file is not a valid ${format.extension} file.`);
+    throw new Error(`Audio file is not a valid file.`);
   }
 }

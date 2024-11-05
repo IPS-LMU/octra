@@ -11,6 +11,7 @@ import {
   AudioManager,
   AudioResource,
   getAudioInfo,
+  MusicMetadataFormat,
   WavFormat,
 } from '@octra/web-media';
 import { SourceType } from '../types';
@@ -22,7 +23,10 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
   private callBacksAfterEnded: (() => void)[] = [];
 
-  private audioFormats: AudioFormat[] = [new WavFormat()];
+  private audioFormats: AudioFormat[] = [
+    new WavFormat(),
+    new MusicMetadataFormat(),
+  ];
   private decoder?: AudioDecoder;
 
   get playPosition(): SampleUnit | undefined {
@@ -63,6 +67,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
       this.prepareAudioChannel(options).pipe(
         map(({ decodeProgress }) => {
           if (decodeProgress === 1) {
+            const buffer = this._resource!.arraybuffer!;
             this.prepareAudioPlayback({
               ...options,
               url: URL.createObjectURL(
@@ -115,93 +120,166 @@ export class HtmlAudioMechanism extends AudioMechanism {
       this.audioFormats
     );
 
-    if (!audioformat) {
-      subj.error(
-        `audio format not supported: ${filename.substring(
-          filename.lastIndexOf('.')
-        )} from ${filename}`
-      );
-    } else if (!buffer) {
+    if (!buffer) {
       subj.error(`buffer is undefined`);
     } else {
-      audioformat.init(filename, buffer);
+      if (audioformat) {
+        audioformat
+          .init(filename, type, buffer)
+          .then(() => {
+            // audio format contains required information
 
-      try {
-        let audioInfo = getAudioInfo(audioformat, filename, type, buffer);
+            let audioInfo = getAudioInfo(audioformat, filename, type, buffer);
+            const bufferLength = buffer.byteLength;
 
-        const bufferLength = buffer.byteLength;
-        // decode first 10 seconds
-        const sampleDur = new SampleUnit(
-          Math.min(audioformat.sampleRate * 30, audioformat.duration),
-          audioformat.sampleRate
-        );
+            audioInfo = new AudioInfo(
+              filename,
+              type,
+              bufferLength,
+              audioformat.sampleRate,
+              audioformat.duration.samples,
+              audioformat.channels,
+              audioInfo.bitrate
+            );
 
-        audioInfo = new AudioInfo(
-          filename,
-          type,
-          bufferLength,
-          audioformat.sampleRate,
-          (audioformat.sampleRate * audioformat.duration) /
-            audioformat.sampleRate,
-          audioformat.channels,
-          audioInfo.bitrate
-        );
-        audioInfo.file = new File([buffer], filename, { type: 'audio/wav' });
+            audioInfo.file = new File([buffer], filename, {
+              type,
+            });
 
-        this.playPosition = new SampleUnit(0, audioInfo.sampleRate);
-        this._resource = new AudioResource(
-          filename,
-          SourceType.ArrayBuffer,
-          audioInfo,
-          buffer,
-          bufferLength,
-          url
-        );
+            this.playPosition = new SampleUnit(0, audioInfo.sampleRate);
+            this._resource = new AudioResource(
+              filename,
+              SourceType.ArrayBuffer,
+              audioInfo,
+              buffer,
+              bufferLength,
+              url
+            );
 
-        this.afterDecoded.next(this._resource);
+            this.afterDecoded.next(this._resource!);
 
-        this.statistics.decoding.started = Date.now();
-        const subscr = this.decodeAudio(this._resource).subscribe({
-          next: (statusItem) => {
-            if (statusItem.progress === 1) {
-              this.statistics.decoding.duration =
-                Date.now() - this.statistics.decoding.started;
-
-              this.changeStatus(PlayBackStatus.INITIALIZED);
-
-              setTimeout(() => {
-                subj.next({
-                  decodeProgress: 1,
-                });
-                subj.complete();
-              }, 0);
-            } else {
-              subj.next({
-                decodeProgress: statusItem.progress,
-              });
+            if (audioformat.decoder === 'octra') {
+              this.decodeAudioWithOctraDecoder(subj);
+            } else if (audioformat.decoder === 'web-audio') {
+              this.decodeAudioWithWebAPIDecoder(subj);
             }
-          },
-          error: (error) => {
-            console.error(error);
-            subscr.unsubscribe();
-          },
-          complete: () => {
-            subscr.unsubscribe();
-          },
-        });
-      } catch (err: any) {
-        subj.error(err!.message);
+          })
+          .catch((e) => {
+            subj.error(e.message);
+          });
+      } else {
+        subj.error(`Audio format is not supported.`);
       }
     }
 
     return subj;
   }
 
+  private decodeAudioWithOctraDecoder(
+    subj: Subject<{
+      decodeProgress: number;
+    }>
+  ) {
+    try {
+      if (!this._resource) {
+        subj.error('Missing resource');
+        return;
+      }
+
+      this.statistics.decoding.started = Date.now();
+      const subscr = this.decodeAudio(this._resource!).subscribe({
+        next: (statusItem) => {
+          if (statusItem.progress === 1) {
+            this.statistics.decoding.duration =
+              Date.now() - this.statistics.decoding.started;
+
+            this.changeStatus(PlayBackStatus.INITIALIZED);
+
+            setTimeout(() => {
+              subj.next({
+                decodeProgress: 1,
+              });
+              subj.complete();
+            }, 0);
+          } else {
+            subj.next({
+              decodeProgress: statusItem.progress,
+            });
+          }
+        },
+        error: (error) => {
+          console.error(error);
+          subscr.unsubscribe();
+        },
+        complete: () => {
+          subscr.unsubscribe();
+        },
+      });
+    } catch (err: any) {
+      subj.error(err.message);
+    }
+  }
+
+  private decodeAudioWithWebAPIDecoder(
+    subj: Subject<{
+      decodeProgress: number;
+    }>
+  ) {
+    try {
+      if (!this._resource) {
+        subj.error('Missing resource');
+        return;
+      }
+
+      this.statistics.decoding.started = Date.now();
+      this.initAudioContext();
+      this._audioContext!.decodeAudioData(this._resource.arraybuffer?.slice(0)!)
+        .then((audioBuffer) => {
+          const info = this._resource?.info!;
+
+          info.audioBufferInfo = {
+            sampleRate: audioBuffer.sampleRate,
+            samples: audioBuffer.getChannelData(0).length,
+          };
+
+          if (['.mp3', '.m4a'].includes(info.extension)) {
+            // fix number of samples. web value by web audio api is more exact.
+            info.duration = new SampleUnit(
+              Math.ceil(audioBuffer.duration * info.sampleRate),
+              info.sampleRate
+            );
+          }
+
+          this._channel = audioBuffer.getChannelData(0);
+          this.onChannelDataChange.next();
+          this.onChannelDataChange.complete();
+          this.statistics.decoding.duration =
+            Date.now() - this.statistics.decoding.started;
+          this._channelDataFactor =
+            this._resource?.info.sampleRate! /
+            (this._resource?.info.audioBufferInfo!.sampleRate ??
+              this._resource?.info.sampleRate!);
+
+          this.changeStatus(PlayBackStatus.INITIALIZED);
+
+          setTimeout(() => {
+            subj.next({
+              decodeProgress: 1,
+            });
+            subj.complete();
+          }, 0);
+        })
+        .catch((e) => {
+          subj.error(e);
+        });
+    } catch (e) {}
+  }
+
   override decodeAudio(resource: AudioResource) {
     const result = new Subject<{ progress: number }>();
 
     const format = new WavFormat();
-    format.init(resource.info.name, resource.arraybuffer!);
+    format.init(resource.info.name, resource.info.type, resource.arraybuffer!);
     this.decoder = new AudioDecoder(
       format,
       resource.info,

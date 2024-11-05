@@ -1,14 +1,27 @@
 export type IntArray = Uint8Array | Int16Array | Int32Array;
 
+export interface SupportedAudioFormat {
+  extension: string;
+  maxFileSize: number;
+  variableNumberOfSamples?: boolean;
+  warning?: string;
+  info?: string;
+}
+
 export abstract class AudioFormat {
-  protected _extension!: string;
+  get mimeType(): string {
+    return this._mimeType;
+  }
   public formatConstructor!:
     | Uint8ArrayConstructor
     | Int16ArrayConstructor
     | Int32ArrayConstructor;
 
-  get extension(): string {
-    return this._extension;
+  get supportedFormats(): SupportedAudioFormat[] {
+    return this._supportedFormats;
+  }
+  get decoder(): "web-audio" | "octra" {
+    return this._decoder;
   }
 
   protected _filename!: string;
@@ -41,38 +54,28 @@ export abstract class AudioFormat {
     return this._bitsPerSample;
   }
 
-  protected _duration!: number;
+  protected _duration!: {
+    samples: number;
+    seconds: number;
+  };
 
-  get duration(): number {
+  get duration(): {
+    samples: number;
+    seconds: number;
+  } {
     return this._duration;
   }
 
-  public init(filename: string, buffer: ArrayBuffer) {
-    this._filename = filename;
-    this.setSampleRate(buffer);
-    this.setChannels(buffer);
-    this.setBitsPerSample(buffer);
-    this.setByteRate(buffer);
-    this.setDuration(buffer);
+  protected _supportedFormats!: SupportedAudioFormat[];
+  protected _mimeType!: string;
+  protected _decoder: "web-audio" | "octra" = "web-audio";
 
-    if (this.bitsPerSample === 32) {
-      this.formatConstructor = Int32Array;
-    } else if (this.bitsPerSample === 16) {
-      this.formatConstructor = Int16Array;
-    } else if (this.bitsPerSample === 8) {
-      this.formatConstructor = Uint8Array;
-    }
+  public async init(filename: string, mimeType: string, buffer: ArrayBuffer) {
+    this._filename = filename;
+    this._mimeType = mimeType;
+    await this.readAudioInformation(buffer);
   }
 
   public abstract isValid(buffer: ArrayBuffer): boolean;
-
-  protected abstract setSampleRate(buffer: ArrayBuffer): void;
-
-  protected abstract setChannels(buffer: ArrayBuffer): void;
-
-  protected abstract setBitsPerSample(buffer: ArrayBuffer): void;
-
-  protected abstract setByteRate(buffer: ArrayBuffer): void;
-
-  protected abstract setDuration(buffer: ArrayBuffer): void;
+  protected abstract readAudioInformation(buffer: ArrayBuffer): Promise<void>;
 }

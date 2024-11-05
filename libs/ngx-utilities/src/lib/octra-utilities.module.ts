@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   CapitalLetterPipe,
+  FileSizePipe,
   JoinPipe,
   LeadingNullPipe,
   MapPipe,
@@ -21,6 +22,7 @@ import { SubscriberComponent } from './components';
     MapPipe,
     UnixDurationPipe,
     SubscriberComponent,
+    FileSizePipe,
   ],
   imports: [CommonModule],
   exports: [
@@ -32,6 +34,7 @@ import { SubscriberComponent } from './components';
     MapPipe,
     UnixDurationPipe,
     SubscriberComponent,
+    FileSizePipe,
   ],
 })
 export class OctraUtilitiesModule {}

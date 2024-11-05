@@ -1,4 +1,4 @@
-import { AudioInfo } from './audio-info';
+import { AudioInfo, calculateChannelDataFactor } from './audio-info';
 import { SubscriptionManager } from '@octra/utilities';
 import { Subject, timer } from 'rxjs';
 import { SampleUnit } from '@octra/media';
@@ -51,17 +51,7 @@ export class AudioDecoder {
   private afterChannelDataFinished?: Subject<void>;
 
   get channelDataFactor() {
-    let factor: number;
-    if (this.audioInfo.sampleRate === 48000) {
-      factor = 3;
-      // sampleRate = 16000
-    } else if (this.audioInfo.sampleRate === 44100) {
-      factor = 2;
-    } else {
-      // sampleRate = 22050
-      factor = 1;
-    }
-    return factor;
+    return calculateChannelDataFactor(this.audioInfo.sampleRate);
   }
 
   constructor(
@@ -141,6 +131,11 @@ export class AudioDecoder {
     }
   }
 
+  /**
+   * decodes a WAVE audio file and minimizes according to calculated channel data factor.
+   * @param sampleStart
+   * @param sampleDur
+   */
   async getChunkedChannelData(sampleStart: SampleUnit, sampleDur: SampleUnit) {
     if (this.format instanceof WavFormat) {
       // cut the audio file into 10 parts:

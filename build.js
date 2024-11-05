@@ -42,7 +42,7 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Building OCTRA with ${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 console.log(`Remove dist...`);
 execSync(`rm -rf "./${buildDir}"`);
-let command = ["./node_modules/nx/bin/nx.js", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`];
+let command = ["./node_modules/nx/bin/nx.js", "build",  "octra", "--prod", dev, `--base-href=${baseHref}`, `--deploy-url=assets/`, "--skip-nx-cache"];
 
 if (dev !== "") {
   command.splice(3, 1);
@@ -66,30 +66,6 @@ node.on("error", function(data) {
 
 node.on("exit", function(code) {
   console.log("child process exited with code " + code.toString());
-  console.log(`Change index.html...`);
-  let indexHTML = fs.readFileSync(`${buildDir}index.html`, {
-    encoding: "utf8"
-  });
-
-  indexHTML = indexHTML.replace(/(scripts\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(polyfills-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(polyfills-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(polyfills\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(src=")(-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$2`);
-  indexHTML = indexHTML.replace(/(src=")(-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$2`);
-  indexHTML = indexHTML.replace(/(main-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(main-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(main\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(runtime-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(runtime-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(runtime\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(styles\.[0-9a-z]*\.css)/g, `${targetFolder}/$1`);
-  indexHTML = indexHTML.replace(/(vendor\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
-
-  fs.writeFileSync(`${buildDir}index.html`, indexHTML, {
-    encoding: "utf8"
-  });
-  console.log(`indexed html changed! ${buildDir}`);
 
   if (isUpdate) {
     execSync(`rm -rf "./${buildDir}config" "./${buildDir}media" "./${buildDir}.htaccess"`);

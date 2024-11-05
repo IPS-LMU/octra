@@ -379,7 +379,7 @@ export class AnnotationEffects {
                 error: (err) => {
                   this.store.dispatch(
                     AnnotationActions.loadAudio.fail({
-                      error: 'Loading audio file failed<br/>',
+                      error: 'Loading audio file failed',
                     })
                   );
                   console.error(err);

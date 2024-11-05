@@ -2228,14 +2228,19 @@ export class AudioViewerService {
           this.computeWholeDisplayData(
             this.AudioPxWidth / 2,
             this._settings.lineheight,
-            this.audioManager.channel as any,
+            this.audioManager.channel!,
             {
-              start:
+              start: Math.ceil(
                 this.audioChunk.time.start.samples /
-                this.audioManager.channelDataFactor,
-              end:
-                this.audioChunk.time.end.samples /
-                this.audioManager.channelDataFactor,
+                  this.audioManager.channelDataFactor
+              ),
+              end: Math.min(
+                this.audioManager.channel!.length,
+                Math.ceil(
+                  this.audioChunk.time.end.samples /
+                    this.audioManager.channelDataFactor
+                )
+              ),
             }
           )
             .then((result) => {

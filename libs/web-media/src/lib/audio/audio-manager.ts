@@ -5,6 +5,7 @@ import { AudioFormat } from "./AudioFormats";
 import { AudioResource } from "./audio-resource";
 import { AudioMechanism } from "./audio-mechanism";
 import { HtmlAudioMechanism } from "./html-audio-mechanism";
+import { normalizeMimeType } from "./audio-info";
 
 /**
  * AudioManager controls the audio file and all of its chunk. Each audio file should have exactly one manager. The AudioManager uses HTML Audio for playback.
@@ -105,7 +106,7 @@ export class AudioManager {
     audioformats: AudioFormat[]
   ): AudioFormat | undefined {
     return audioformats.find((a) => {
-      return a.extension === extension;
+      return a.supportedFormats.findIndex((a) => a.extension === extension) > -1;
     });
   }
 
@@ -127,6 +128,7 @@ export class AudioManager {
     audioManager: AudioManager;
     progress: number;
   }> => {
+    type = normalizeMimeType(type);
     // get result;
     const result = new AudioManager(audioMechanism);
     return result

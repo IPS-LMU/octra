@@ -31,7 +31,12 @@ import { SessionFile } from '../../obj/SessionFile';
 import { joinURL } from '@octra/utilities';
 import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
-import { AudioManager, getBaseHrefURL, popupCenter } from '@octra/web-media';
+import {
+  AudioManager,
+  getBaseHrefURL,
+  normalizeMimeType,
+  popupCenter,
+} from '@octra/web-media';
 import { ApplicationActions } from '../application/application.actions';
 import { IDBActions } from '../idb/idb.actions';
 
@@ -591,7 +596,7 @@ export class AuthenticationEffects {
       file.name,
       file.size,
       new Date(file.lastModified),
-      file.type
+      normalizeMimeType(file.type)
     );
   };
 

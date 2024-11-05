@@ -21,7 +21,7 @@ import {
   ASRStateQueue,
   ASRStateQueueItem,
 } from './index';
-import { FileInfo, readFileContents, WavFormat } from '@octra/web-media';
+import { AudioCutter, FileInfo, readFileContents } from '@octra/web-media';
 import {
   AlertService,
   AudioService,
@@ -244,16 +244,12 @@ export class AsrEffects {
         }
 
         // 1) cut signal
-        const format = new WavFormat();
-        format.init(
-          audioManager.resource.info.fullname,
-          audioManager.resource.arraybuffer
-        );
+        const cutter = new AudioCutter(audioManager.resource.info);
 
         return from(
-          format.cutAudioFile(
+          cutter.cutAudioFileFromChannelData(
             `OCTRA_ASRqueueItem_${action.item.id}.wav`,
-            audioManager.resource.arraybuffer,
+            audioManager.channel,
             {
               number: 1,
               sampleStart: action.item.time.sampleStart,

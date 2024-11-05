@@ -28,7 +28,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
-import { IntArray, WavFormat } from '@octra/web-media';
+import { AudioCutter, IntArray } from '@octra/web-media';
 import { OctraModal } from '../types';
 import { strToU8, zip, zipSync } from 'fflate';
 import { OctraModalService } from '../octra-modal.service';
@@ -87,7 +87,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       cuttingSpeed: number;
       cuttingTimeLeft: number;
       timeLeft: number;
-      wavFormat?: any;
+      cutter?: AudioCutter;
     };
     combinePhrases: {
       opened: boolean;
@@ -130,7 +130,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       cuttingSpeed: -1,
       cuttingTimeLeft: 0,
       timeLeft: 0,
-      wavFormat: undefined,
+      cutter: undefined,
     },
     combinePhrases: {
       opened: false,
@@ -188,7 +188,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.subscriptionManager.destroy();
 
     if (this.tools.audioCutting.result.url !== undefined) {
-      window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
+      window.URL.revokeObjectURL(this.tools.audioCutting.result.url as string);
     }
 
     if (this.parentformat.uri !== undefined) {
@@ -258,17 +258,15 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     }
 
     // start cutting
-    this.tools.audioCutting.wavFormat = new WavFormat();
-    this.tools.audioCutting.wavFormat.init(
-      this.audio.audioManager.resource.info.fullname,
-      this.audio.audioManager.resource.arraybuffer!
+    this.tools.audioCutting.cutter = new AudioCutter(
+      this.audio.audioManager.resource.info
     );
 
     let totalSize = 0;
     let cuttingStarted = 0;
 
     this.tools.audioCutting.subscriptionIDs[1] = this.subscribe(
-      this.tools.audioCutting.wavFormat.onaudiocut,
+      this.tools.audioCutting.cutter.onaudiocut,
       {
         next: (status: {
           finishedSegments: number;
@@ -464,7 +462,6 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     );
 
     this.tools.audioCutting.status = 'running';
-    this.tools.audioCutting.wavFormat.status = 'running';
     this.tools.audioCutting.progressbarType = 'info';
 
     this.getDurationFactorForZipping()
@@ -472,9 +469,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         this.tools.audioCutting.zippingSpeed = zipFactor;
 
         cuttingStarted = Date.now();
-        this.tools.audioCutting.wavFormat.cutAudioFileSequentially(
+        this.tools.audioCutting.cutter.cutChannelDataSequentially(
           this.namingConvention.namingConvention,
-          this.audio.audioManager.resource.arraybuffer,
+          this.audio.audioManager.channel,
           cutList
         );
       })
@@ -504,8 +501,8 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     this.tools.audioCutting.cuttingSpeed = -1;
     this.tools.audioCutting.zippingSpeed = -1;
 
-    if (this.tools.audioCutting.wavFormat !== undefined) {
-      (this.tools.audioCutting.wavFormat as WavFormat).stopAudioSplitting();
+    if (this.tools.audioCutting.cutter !== undefined) {
+      this.tools.audioCutting.cutter.stopAudioSplitting();
     }
   }
 

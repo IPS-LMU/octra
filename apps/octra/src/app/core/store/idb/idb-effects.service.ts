@@ -507,7 +507,7 @@ export class IDBEffects {
           catchError((error: Error) =>
             of(
               ApplicationActions.changeApplicationOption.fail({
-                error: error?.message ?? error,
+                error: error?.message ?? error.toString(),
               })
             )
           )

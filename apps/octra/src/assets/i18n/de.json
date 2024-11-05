@@ -80,7 +80,7 @@
     }
   },
   "dropzone": {
-    "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",
+    "drag&drop here": "Eine Audiodatei + eine Transkript Datei (optional) hier hineinziehen oder hier klicken.",
     "file selected": "{{file_label}} ausgewählt"
   },
   "export": {
@@ -481,6 +481,7 @@
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat mit \"CMD + Z (MacOS) or CTRL + Z (PC)\" rückgängig gemacht werden."
     },
     "cut audio": {
+      "warning non wav": "Da die Audiodatei nicht im WAVE Format vorliegt, wird sie beim Schneiden in WAVE PCM 16Bit konvertiert.",
       "add placeholder": "Platzhalter hinzufügen",
       "append meta files": "Meta Dateien hinzufügen",
       "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Grenzen geschnitten werden.",

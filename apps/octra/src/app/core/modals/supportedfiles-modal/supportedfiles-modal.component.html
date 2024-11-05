@@ -11,24 +11,31 @@
     ></button>
   </div>
   <div class="modal-body">
-    <h4>{{ 'modal.supported.audio files' | transloco }} (max. 1,9 GB):</h4>
-    <table class="table table-responsive table-striped">
-      <table>
-        <tr>
-          <td>
-            @for (elem of AppInfo.audioformats; track elem; let i = $index) {
-            <span>
-              *{{ elem.extension
-              }}{{ i < AppInfo.audioformats.length - 1 ? ',' : '' }}
-            </span>
-            }
-          </td>
-        </tr>
-      </table>
+    <h4>{{ 'modal.supported.audio files' | transloco }}:</h4>
+    <table class="w-100 table table-sm table-striped">
+      <tbody>
+        @for (format of supportedFormats; track format) {
+          @for (extension of format.supportedFormats; track extension) {
+            <tr>
+              <td>
+                *{{extension.extension}}
+              </td>
+              <td>
+                max. {{extension.maxFileSize | filesize}}
+              </td>
+              <td>
+                @if (extension.info) {
+                  <i class="bi bi-info-circle" [ngbTooltip]="extension.info"></i>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
     </table>
     <h4>{{ 'modal.supported.file formats for import' | transloco }}:</h4>
 
-    <table class="table table-striped">
+    <table class="table table-sm table-striped">
       <tbody>
         @for (elem of AppInfo.converters; track elem) { @if
         (elem.conversion.import) {

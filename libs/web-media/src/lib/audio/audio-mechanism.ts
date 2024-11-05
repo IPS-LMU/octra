@@ -64,7 +64,6 @@ export abstract class AudioMechanism {
 
   abstract get playPosition(): SampleUnit | undefined;
   abstract set playPosition(value: SampleUnit | undefined);
-
   abstract get playBackRate(): number;
   abstract set playBackRate(value: number);
 

@@ -53,7 +53,6 @@
     }
   },
   "dropzone": {
-    "drag&drop here": "拖拽音频文件(*.wav)（+ 其他可选文件导入）到此处，或点击此处。",
     "file selected": "{{file_label}} 已选中"
   },
   "export": {

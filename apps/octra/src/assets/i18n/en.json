@@ -80,7 +80,7 @@
     }
   },
   "dropzone": {
-    "drag&drop here": "Drag & Drop audio file (*.wav) (+ optional file for import) here or click here.",
+    "drag&drop here": "Drag & Drop one audio file (+ one optional transcript file) here or click here.",
     "file selected": "{{file_label}} selected"
   },
   "export": {
@@ -481,6 +481,7 @@
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After running this tool you can revert the changes with hotkeys \"CMD + Z (MacOS) or CTRL + Z (PC)\"."
     },
     "cut audio": {
+      "warning non wav": "As the audio file is not in WAVE format, it is going to be converted to WAVE PCM 16Bit during cutting.",
       "add placeholder": "Add placeholder",
       "append meta files": "Append meta files",
       "description": "This tool offers to cut the audio file to sequences from the transcription units.",

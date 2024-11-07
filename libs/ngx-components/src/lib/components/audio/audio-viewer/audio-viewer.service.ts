@@ -563,7 +563,7 @@ export class AudioViewerService {
           }
           this.drawnSelection = drawnSelection;
         }
-        this.scrollToAbsY(viewport?.y!);
+        this.scrollToAbsY(viewport!.y!);
         this.bringToFront('#timeStamps');
         this.bringToFront('.line-selections');
 
@@ -660,6 +660,8 @@ export class AudioViewerService {
               this.layers.background.add(line);
               this.canvasElements.lastLine = line;
             }
+          } else {
+            addSingleLineOnly();
           }
         } else {
           addSingleLineOnly();

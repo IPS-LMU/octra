@@ -47,6 +47,9 @@
       ],
       "@octra/web-media": [
         "libs/web-media/src/index.ts"
+      ],
+      "music-metadata-remastered": [
+        "node_modules/music-metadata-remastered"
       ]
     }
   },

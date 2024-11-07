@@ -1,5 +1,5 @@
 import { AudioFormat } from './audio-format';
-import { parseBlob } from 'music-metadata';
+import { MpegParser, parseBlob } from 'music-metadata-remastered';
 
 export class MusicMetadataFormat extends AudioFormat {
   protected override _decoder: 'web-audio' | 'octra' = 'web-audio';
@@ -35,7 +35,8 @@ export class MusicMetadataFormat extends AudioFormat {
 
   override async readAudioInformation(buffer: ArrayBuffer) {
     const parsed = await parseBlob(
-      new File([buffer], this._filename, { type: this._mimeType })
+      new File([buffer], this._filename, { type: this._mimeType }),
+      MpegParser
     );
     const format = parsed.format;
 

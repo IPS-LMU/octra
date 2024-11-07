@@ -91,6 +91,7 @@
         "beta-dev": {
           "buildOptimizer": true,
           "optimization": true,
+          "sourceMap": true,
           "budgets": [
             {
               "type": "initial",
@@ -109,7 +110,7 @@
               "with": "apps/octra/src/environments/environment.beta-dev.ts"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "none"
         },
         "development": {
           "buildOptimizer": false,

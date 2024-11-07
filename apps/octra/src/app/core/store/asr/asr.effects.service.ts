@@ -246,14 +246,23 @@ export class AsrEffects {
         // 1) cut signal
         const cutter = new AudioCutter(audioManager.resource.info);
 
+        const channelDataFactor =
+          (audioManager.resource.info.audioBufferInfo?.sampleRate ??
+            audioManager.resource.info.sampleRate) /
+          audioManager.resource.info.sampleRate;
+
         return from(
           cutter.cutAudioFileFromChannelData(
             `OCTRA_ASRqueueItem_${action.item.id}.wav`,
             audioManager.channel,
             {
               number: 1,
-              sampleStart: action.item.time.sampleStart,
-              sampleDur: action.item.time.sampleLength,
+              sampleStart: Math.ceil(
+                action.item.time.sampleStart * channelDataFactor
+              ),
+              sampleDur: Math.ceil(
+                action.item.time.sampleLength * channelDataFactor
+              ),
             }
           )
         ).pipe(

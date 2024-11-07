@@ -1272,6 +1272,11 @@ export class AnnotationEffects {
       ofType(AnnotationActions.updateASRSegmentInformation.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
+        console.log(
+        );
+        console.log(
+          `GOT RESULT FOR ${action.timeInterval.sampleStart} with DUR ${action.timeInterval.sampleLength}`
+        );
         if (
           (action.itemType === ASRQueueItemType.ASRMAUS ||
             action.itemType === ASRQueueItemType.MAUS) &&
@@ -1330,22 +1335,26 @@ export class AnnotationEffects {
 
                   let itemCounter =
                     getModeState(state)?.transcript.idCounters.item ?? 1;
+
                   for (const wordItem of wordsTier.items as ISegment[]) {
                     const itemEnd =
                       action.timeInterval.sampleStart +
                       action.timeInterval.sampleLength;
-                    if (
+                    let wordItemEnd =
                       action.timeInterval.sampleStart +
-                        wordItem.sampleStart +
-                        wordItem.sampleDur <=
-                      itemEnd
-                    ) {
+                      Math.ceil(wordItem.sampleStart + wordItem.sampleDur);
+                    wordItemEnd = Math.min(itemEnd, wordItemEnd);
+                    console.log(
+                      `Word item end is ${wordItemEnd}; ${Math.ceil(
+                        wordItem.sampleStart + wordItem.sampleDur
+                      )}`
+                    );
+
+                    if (wordItemEnd >= action.timeInterval.sampleStart) {
                       const readSegment = new OctraAnnotationSegment(
                         itemCounter++,
                         new SampleUnit(
-                          action.timeInterval.sampleStart +
-                            wordItem.sampleStart +
-                            wordItem.sampleDur,
+                          wordItemEnd,
                           this.audio.audioManager.resource.info.sampleRate
                         ),
                         wordItem.labels.map((a) =>
@@ -1378,7 +1387,7 @@ export class AnnotationEffects {
                     } else {
                       // tslint:disable-next-line:max-line-length
                       console.error(
-                        `${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${action.timeInterval.sampleStart} + ${action.timeInterval.sampleLength}`
+                        `Invalid word item boundary:! ${wordItemEnd} <= ${action.timeInterval.sampleStart}`
                       );
                       return of(
                         AnnotationActions.addMultipleASRSegments.fail({

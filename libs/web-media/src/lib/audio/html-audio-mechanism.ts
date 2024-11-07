@@ -292,6 +292,11 @@ export class HtmlAudioMechanism extends AudioMechanism {
           this.decoder!.destroy();
           this._channel = status.result;
           this._channelDataFactor = this.decoder!.channelDataFactor;
+          this._resource!.info.audioBufferInfo = {
+            sampleRate:
+              this._resource!.info.sampleRate / this._channelDataFactor,
+            samples: status.result.length,
+          };
           this.onChannelDataChange.next();
           this.onChannelDataChange.complete();
 

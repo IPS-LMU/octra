@@ -30,6 +30,11 @@
           "codeCoverage": true
         }
       }
+    },
+    "@nx/angular:ng-packagr-lite": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
@@ -64,7 +69,8 @@
   "useInferencePlugins": false,
   "pluginsConfig": {
     "@nx/js": {
-      "analyzeSourceFiles": false
+      "analyzeSourceFiles": true
     }
-  }
+  },
+  "useLegacyCache": true
 }

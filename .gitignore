@@ -54,3 +54,5 @@ deploy
 .nx/workspace-data
 /deploy.sh
 /typedocs
+
+vite.config.*.timestamp*

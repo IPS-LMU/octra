@@ -75,11 +75,11 @@ async function main() {
 
   // read arraybuffer
   const arrayBuffer = await OctraWebMedia.readFileContents(file, "arraybuffer");
-  OctraWebMedia.AudioManager.decodeAudio(file.name, file.type, arrayBuffer, [new OctraWebMedia.WavFormat()]).subscribe({
+  OctraWebMedia.AudioManager.create(file.name, file.type, arrayBuffer, [new OctraWebMedia.WavFormat()]).subscribe({
     next: (status) => {
       console.log(status)
 
-      if (status.decodeProgress === 1) {
+      if (status.progress === 1) {
         // audio was decoded, init audioplayer and audioviewer
         initAudioPlayer(status.audioManager);
         initAudioViewer(status.audioManager);

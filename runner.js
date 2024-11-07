@@ -3,7 +3,6 @@ const path = require('path');
 const fs = require('fs-extra');
 const process = require('node:child_process');
 const { exec } = require('node:child_process');
-const { pathExists } = require('@nx/eslint-plugin/src/utils/graph-utils');
 const crypto = require('crypto');
 
 const JSONValidator = {
@@ -13,7 +12,7 @@ const JSONValidator = {
 };
 
 async function buildLibrary(libraryName) {
-  if (await pathExists(`dist/libs/${libraryName}`)) {
+  if (await fs.pathExists(`dist/libs/${libraryName}`)) {
     await fs.rm(`dist/libs/${libraryName}`, {
       recursive: true
     })

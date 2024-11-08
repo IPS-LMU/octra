@@ -67,7 +67,6 @@ export class HtmlAudioMechanism extends AudioMechanism {
       this.prepareAudioChannel(options).pipe(
         map(({ decodeProgress }) => {
           if (decodeProgress === 1) {
-            const buffer = this._resource!.arraybuffer!;
             this.prepareAudioPlayback({
               ...options,
               url: URL.createObjectURL(

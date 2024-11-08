@@ -1,7 +1,7 @@
 {
   "name": "@octra/assets",
   "description": "This library contains assets like JSON schema definitions related to OCTRA.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "private": false,
   "author": {

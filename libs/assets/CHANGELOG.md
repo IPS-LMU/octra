@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.2](https://github.com/IPS-LMU/octra/compare/assets-0.1.1...assets-0.1.2) (2024-11-08)
+
+
+### Features
+
+* **octra:** support for .mp3, .flac, .m4a audio files ([c3fb966](https://github.com/IPS-LMU/octra/commit/c3fb9667b8f83aba8a8bd6da52382a5b00c01f71))
+
+
+
 ## [0.1.1](https://github.com/IPS-LMU/octra/compare/assets-0.1.0...assets-0.1.1) (2024-04-09)
 
 

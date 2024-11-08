@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.15](https://github.com/IPS-LMU/octra/compare/annotation-0.1.14...annotation-0.1.15) (2024-11-08)
+
+
+### Bug Fixes
+
+* **annotation:** speaker pattern matching not working with SRT converter ([e92e72b](https://github.com/IPS-LMU/octra/commit/e92e72b6ad38258d1717fdb4225d9cfbce964eb0))
+
+
+### Features
+
+* **octra:** new line option for text converter ([e670ad9](https://github.com/IPS-LMU/octra/commit/e670ad91fbe0414c515d34585ff2625cf2cec114))
+
+
+
 ## [0.1.14](https://github.com/IPS-LMU/octra/compare/annotation-0.1.13...annotation-0.1.14) (2024-07-29)
 
 

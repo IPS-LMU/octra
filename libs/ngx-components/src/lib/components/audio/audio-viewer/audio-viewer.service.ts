@@ -2,7 +2,7 @@ import { EventEmitter, Injectable, Renderer2 } from '@angular/core';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioviewerConfig } from './audio-viewer.config';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { SubscriptionManager } from '@octra/utilities';
+import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
 import {
   AnnotationAnySegment,
   AnnotationLevelType,
@@ -30,7 +30,6 @@ import {
   AudioTimeCalculator,
   ShortcutGroup,
   ShortcutManager,
-  TsWorkerJob,
 } from '@octra/web-media';
 import Konva from 'konva';
 import { TimespanPipe } from '@octra/ngx-utilities';
@@ -3077,7 +3076,21 @@ export class AudioViewerService {
           piece = Math.round(width - piece * (numberOfPieces - 1));
           end = Math.ceil(_interval.end);
         }
-        const tsJob = new TsWorkerJob(this.computeDisplayData, [
+        const tsJob = new TsWorkerJob<
+          [
+            width: number,
+            height: number,
+            channel: Float32Array,
+            interval: {
+              start: number;
+              end: number;
+            },
+            roundValues: boolean,
+            xZoom: number
+          ],
+          number[]
+        >(
+          this.computeDisplayData,
           piece,
           height,
           cha.slice(start, end),
@@ -3086,8 +3099,8 @@ export class AudioViewerService {
             end,
           },
           this._settings.roundValues,
-          xZoom,
-        ]);
+          xZoom
+        );
 
         promises.push(this.multiThreadingService.run<number[]>(tsJob));
       }
@@ -3505,7 +3518,7 @@ export class AudioViewerService {
     roundValues: boolean,
     xZoom: number
   ) => {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<number[]>((resolve, reject) => {
       if (
         interval.start !== undefined &&
         interval.end !== undefined &&

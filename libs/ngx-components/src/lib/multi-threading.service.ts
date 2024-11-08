@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { SubscriptionManager } from '@octra/utilities';
-import { TsWorker, TsWorkerJob, TsWorkerStatus } from '@octra/web-media';
+import { TsWorker, TsWorkerJob, TsWorkerStatus } from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root',

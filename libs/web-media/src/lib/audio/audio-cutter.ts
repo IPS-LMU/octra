@@ -1,7 +1,8 @@
 import { NumeratedSegment } from '@octra/media';
-import { AudioInfo, IntArray } from '@octra/web-media';
 import { Subject } from 'rxjs';
 import { WavWriter } from './binary';
+import { IntArray } from './AudioFormats';
+import { AudioInfo } from './audio-info';
 
 export class AudioCutter {
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
@@ -10,6 +11,7 @@ export class AudioCutter {
     fileName: string;
     intArray: Uint8Array;
   }>();
+  private wavWriter?: WavWriter;
 
   public formatConstructor!:
     | Uint8ArrayConstructor
@@ -26,41 +28,30 @@ export class AudioCutter {
     }
   }
 
-  public cutAudioFileFromChannelData(
-    namingConvention: string,
+  cutAudioFileFromChannelData = async (
+    audioInfo: AudioInfo,
+    fileName: string,
     buffer: Float32Array,
     segment: NumeratedSegment
-  ): Promise<{
-    fileName: string;
-    uint8Array: Uint8Array;
-  }> {
-    return new Promise<{
-      fileName: string;
-      uint8Array: Uint8Array;
-    }>((resolve, reject) => {
-      const fileName = this.getNewFileName(
-        namingConvention,
-        this.audioInfo.fullname,
-        segment
-      );
+  ) => {
+    const data = buffer.slice(
+      segment.sampleStart,
+      segment.sampleDur ? segment.sampleStart + segment.sampleDur : undefined
+    );
 
-      const data = this.extractDataFromChannelData(
-        segment.sampleStart,
-        segment.sampleDur,
-        buffer
-      );
+    if (!this.wavWriter) {
+      this.wavWriter = new WavWriter();
+    }
 
-      const wavWriter = new WavWriter();
-      resolve({
-        fileName,
-        uint8Array: wavWriter.write(
-          [data],
-          this.audioInfo.audioBufferInfo?.sampleRate ??
-            this.audioInfo.sampleRate
-        ),
-      });
-    });
-  }
+    const uint8Array = await this.wavWriter.writeAsync(
+      [data],
+      audioInfo.audioBufferInfo?.sampleRate ?? audioInfo.sampleRate
+    );
+    return {
+      fileName,
+      uint8Array,
+    };
+  };
 
   public getFileDataView(data: Int16Array, channels: number): ArrayBuffer {
     // creates a mono data view
@@ -115,17 +106,6 @@ export class AudioCutter {
     for (let i = 0; i < str.length; i++) {
       view.setUint8(offset + i, str.charCodeAt(i));
     }
-  }
-
-  public extractDataFromChannelData(
-    sampleStart: number,
-    sampleDur: number | undefined,
-    channelData: Float32Array
-  ): Float32Array {
-    return channelData.slice(
-      sampleStart,
-      sampleDur ? sampleStart + sampleDur : undefined
-    );
   }
 
   getNewFileName(
@@ -196,7 +176,17 @@ export class AudioCutter {
             : Math.ceil(segment.sampleDur! * channelDataFactor),
       };
 
-      this.cutAudioFileFromChannelData(namingConvention, buffer, segment)
+      const fileName = this.getNewFileName(
+        namingConvention,
+        this.audioInfo.fullname,
+        segment
+      );
+      this.cutAudioFileFromChannelData(
+        this.audioInfo,
+        fileName,
+        buffer,
+        segment
+      )
         .then(({ fileName, uint8Array }) => {
           this.onaudiocut.next({
             finishedSegments: pointer + 1,

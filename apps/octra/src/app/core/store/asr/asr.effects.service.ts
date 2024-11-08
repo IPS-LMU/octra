@@ -253,6 +253,7 @@ export class AsrEffects {
 
         return from(
           cutter.cutAudioFileFromChannelData(
+            this.audio.audioManager.resource.info,
             `OCTRA_ASRqueueItem_${action.item.id}.wav`,
             audioManager.channel,
             {

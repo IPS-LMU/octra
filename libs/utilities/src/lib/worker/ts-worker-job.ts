@@ -9,9 +9,9 @@ export enum TsWorkerStatus {
 /**
  * This class defines a task with given function and parameters.
  */
-export class TsWorkerJob {
+export class TsWorkerJob<I extends Array<any> = Array<any>, O = unknown> {
   private static jobIDCounter = 0;
-  args: any[] = [];
+  args: I;
   private readonly _id: number;
 
   /**
@@ -63,10 +63,7 @@ export class TsWorkerJob {
     return this._status;
   }
 
-  constructor(
-    doFunction: ((...args: any[]) => Promise<any>) | string,
-    args: any[]
-  ) {
+  constructor(doFunction: ((...args: I) => Promise<O>) | string, ...args: I) {
     this._id = ++TsWorkerJob.jobIDCounter;
     this.doFunction = doFunction;
     this.args = args;
@@ -75,8 +72,8 @@ export class TsWorkerJob {
   /**
    * this function will be run in the web worker
    */
-  doFunction: ((args: any[]) => Promise<any>) | string = (args: any[]) => {
-    return new Promise<any>((resolve, reject) => {
+  doFunction: ((...args: I) => Promise<O>) | string = (...args: I) => {
+    return new Promise<O>((resolve, reject) => {
       reject('not implemented');
     });
   };

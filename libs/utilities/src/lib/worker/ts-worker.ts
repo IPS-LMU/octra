@@ -22,18 +22,18 @@ export class TsWorker {
     this.worker = new Worker(this.blobURL);
   }
 
-  private _jobstatuschange = new Subject<TsWorkerJob>();
+  private _jobstatuschange = new Subject<TsWorkerJob<any, any>>();
 
   /**
    * triggers whenever a job changed its status
    */
-  get jobstatuschange(): Subject<TsWorkerJob> {
+  get jobstatuschange(): Subject<TsWorkerJob<any, any>> {
     return this._jobstatuschange;
   }
 
-  private _queue: TsWorkerJob[] = [];
+  private _queue: TsWorkerJob<any, any>[] = [];
 
-  get queue(): TsWorkerJob[] {
+  get queue(): TsWorkerJob<any, any>[] {
     return this._queue;
   }
 
@@ -44,7 +44,7 @@ export class TsWorker {
   /**
    * converts a job to an JSON object
    */
-  private static convertJobToObj(job: TsWorkerJob) {
+  private static convertJobToObj(job: TsWorkerJob<any, any>) {
     let scriptString =
       typeof job.doFunction === 'string'
         ? job.doFunction
@@ -126,7 +126,7 @@ onmessage = (msg) => {
    * adds a job to the worker's queue and starts it automatically
    * @param job the job to run
    */
-  public addJob(job: TsWorkerJob) {
+  public async addJob(job: TsWorkerJob<any, any>) {
     if (!this.hasJob(job)) {
       this._queue.push(job);
       this.checkBeforeStart();
@@ -188,7 +188,7 @@ onmessage = (msg) => {
   /**
    * returns the first free job
    */
-  public getFirstFreeJob(): TsWorkerJob | undefined {
+  public getFirstFreeJob(): TsWorkerJob<any, any> | undefined {
     const index = this._queue.findIndex((a) => {
       return a !== undefined && a.status === TsWorkerStatus.INITIALIZED;
     });
@@ -212,7 +212,7 @@ onmessage = (msg) => {
    * checks if job is already in the queue
    * @param job job to check
    */
-  public hasJob(job: TsWorkerJob) {
+  public hasJob(job: TsWorkerJob<any, any>) {
     return (
       this._queue.findIndex((a) => {
         return a !== undefined && a.id === job.id;
@@ -231,7 +231,7 @@ onmessage = (msg) => {
    * runs a job. This function is called automatically
    * @param job the job to run
    */
-  private run = (job: TsWorkerJob): Promise<any> => {
+  private run = (job: TsWorkerJob<any, any>): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       this.worker.onmessage = (ev: MessageEvent) => {
         job.statistics.ended = Date.now();

@@ -33,7 +33,7 @@ import { ApplicationStoreService } from '../../application/application-store.ser
 import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { ApplicationActions } from '../../application/application.actions';
 import { MultiThreadingService } from '@octra/ngx-components';
-import { TsWorkerJob } from '@octra/web-media';
+import { TsWorkerJob } from '@octra/utilities';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -495,8 +495,8 @@ export class AnnotationStoreService {
    * converts raw text of markers to html
    */
   public async rawToHTML(rawtext: string): Promise<string> {
-    const job = new TsWorkerJob(
-      function (rawtext, guidelines) {
+    const job = new TsWorkerJob<[rawtext: string, guidelines: any], string>(
+      (rawtext: string, guidelines: any) => {
         return new Promise<string>((resolve, reject) => {
           try {
             let result: string = rawtext;
@@ -630,7 +630,8 @@ export class AnnotationStoreService {
           }
         });
       },
-      [rawtext, this.guidelines]
+      rawtext,
+      this.guidelines
     );
 
     return this.multiThreading.run(job);

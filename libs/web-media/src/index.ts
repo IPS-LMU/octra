@@ -1,5 +1,4 @@
 export * from './lib/audio';
-export * from './lib/worker';
 export * from './lib/browser-info';
 export * from './lib/shortcut-manager';
 export * from './lib/functions';

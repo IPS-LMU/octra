@@ -2,7 +2,7 @@ import { AudioInfo, calculateChannelDataFactor } from './audio-info';
 import { SubscriptionManager } from '@octra/utilities';
 import { Subject, timer } from 'rxjs';
 import { SampleUnit } from '@octra/media';
-import { TsWorker, TsWorkerJob, TsWorkerStatus } from '../worker';
+import { TsWorker, TsWorkerJob, TsWorkerStatus } from '@octra/utilities';
 import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
 
 declare let window: unknown;
@@ -167,11 +167,15 @@ export class AudioDecoder {
             this.uint8Array!,
             0
           );
-          const job = new TsWorkerJob(this.getChannelData, [
+          const job = new TsWorkerJob<
+            [data: IntArray, sampleDuration: number, bitsPerSample: number],
+            Float32Array
+          >(
+            this.getChannelData,
             data,
             sampleDur.samples,
-            this.format.bitsPerSample,
-          ]);
+            this.format.bitsPerSample
+          );
           this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
         } else {
           // decode chunked
@@ -181,11 +185,15 @@ export class AudioDecoder {
             this.uint8Array!,
             0
           );
-          const job = new TsWorkerJob(this.getChannelData, [
+          const job = new TsWorkerJob<
+            [data: IntArray, sampleDuration: number, bitsPerSample: number],
+            Float32Array
+          >(
+            this.getChannelData,
             result,
             sampleDur.samples,
-            this.format.bitsPerSample,
-          ]);
+            this.format.bitsPerSample
+          );
           this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
 
           if (

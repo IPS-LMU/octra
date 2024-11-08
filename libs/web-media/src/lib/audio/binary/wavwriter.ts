@@ -7,57 +7,7 @@
 
 import { WavFileFormat } from './wavformat';
 import { BinaryByteWriter } from './BinaryWriter';
-
-declare function postMessage(message: any, transfer: Array<any>): void;
-
-class WorkerHelper {
-  static DEBUG = false;
-
-  static buildWorkerBlobURL(workerFct: Function): string {
-    if (!(workerFct instanceof Function)) {
-      throw new Error('Parameter workerFct is not a function! (XSS attack?).');
-    }
-    let woFctNm = workerFct.name;
-    if (WorkerHelper.DEBUG) {
-      console.info('Worker method name: ' + woFctNm);
-    }
-
-    let woFctStr = workerFct.toString();
-    if (WorkerHelper.DEBUG) {
-      console.info('Worker method string:');
-      console.info(woFctStr);
-    }
-
-    // Make sure code starts with "function()"
-
-    // Chrome, Firefox: "[wofctNm](){...}", Safari: "function [wofctNm](){...}"
-    // we need an anonymous function: "function() {...}"
-    let piWoFctStr = woFctStr.replace(/^function +/, '');
-
-    if (WorkerHelper.DEBUG) {
-      console.info('Worker platform independent function string:');
-      console.info(piWoFctStr);
-    }
-
-    // Convert to anonymous function
-    let anonWoFctStr = piWoFctStr.replace(woFctNm + '()', 'function()');
-    if (WorkerHelper.DEBUG) {
-      console.info('Worker anonymous function string:');
-      console.info(piWoFctStr);
-    }
-    // Self executing
-    let ws = '(' + anonWoFctStr + ')();';
-    if (WorkerHelper.DEBUG) {
-      console.info('Worker self executing anonymous function string:');
-      console.info(anonWoFctStr);
-    }
-    // Build the worker blob
-    let wb = new Blob([ws], { type: 'text/javascript' });
-
-    let workerBlobUrl = window.URL.createObjectURL(wb);
-    return workerBlobUrl;
-  }
-}
+import { TsWorker, TsWorkerJob } from '@octra/utilities';
 
 export enum SampleSize {
   INT16 = 16,
@@ -72,7 +22,7 @@ export class WavWriter {
   private sampleSize = WavWriter.DEFAULT_SAMPLE_SIZE;
   private sampleSizeInBits = this.sampleSize.valueOf();
   private bw: BinaryByteWriter;
-  private workerURL: string | null = null;
+  private worker?: TsWorker;
 
   constructor(encodingFloat?: boolean, sampleSize?: SampleSize) {
     //console.debug("WavWriter: "+encodingFloat+", "+sampleSize);
@@ -97,24 +47,32 @@ export class WavWriter {
   /*
    *  Method used as worker code.
    */
-  workerFunction() {
-    self.onmessage = function (msg: MessageEvent) {
-      const valView = new DataView(msg.data.buf, msg.data.bufPos);
-      const sampleSizeInbytes = Math.round(msg.data.sampleSizeInBits / 8);
+  workerFunction = (
+    encodingFloat: boolean,
+    sampleSizeInBits: number,
+    chs: number,
+    frameLength: number,
+    audioData: Float32Array,
+    buf: ArrayBuffer,
+    buffPos: number
+  ) => {
+    return new Promise<ArrayBuffer>((resolve, reject) => {
+      const valView = new DataView(buf, buffPos);
+      const sampleSizeInbytes = Math.round(sampleSizeInBits / 8);
       let bufPos = 0;
-      const hDynIntRange = 1 << (msg.data.sampleSizeInBits - 1);
-      for (let s = 0; s < msg.data.frameLength; s++) {
+      const hDynIntRange = 1 << (sampleSizeInBits - 1);
+      for (let s = 0; s < frameLength; s++) {
         // interleaved channel data
 
-        for (let ch = 0; ch < msg.data.chs; ch++) {
-          const srcPos = ch * msg.data.frameLength + s;
-          const valFlt = msg.data.audioData[srcPos];
-          if (msg.data.encodingFloat === true) {
+        for (let ch = 0; ch < chs; ch++) {
+          const srcPos = ch * frameLength + s;
+          const valFlt = audioData[srcPos];
+          if (encodingFloat === true) {
             valView.setFloat32(bufPos, valFlt, true);
             bufPos += 4;
           } else {
             const valInt = Math.round(valFlt * hDynIntRange);
-            if (msg.data.sampleSizeInBits === 32) {
+            if (sampleSizeInBits === 32) {
               valView.setInt32(bufPos, valInt, true);
             } else {
               valView.setInt16(bufPos, valInt, true);
@@ -123,10 +81,9 @@ export class WavWriter {
           }
         }
       }
-      postMessage({ buf: msg.data.buf }, [msg.data.buf]);
-      //self.close()
-    };
-  }
+      resolve(buf);
+    });
+  };
 
   writeFmtChunk(channelData: Float32Array[], sampleRate: number) {
     if (this.encodingFloat) {
@@ -189,43 +146,52 @@ export class WavWriter {
     this.bw.writeUint32(chkLen, true);
   }
 
-  writeAsync(
-    channelData: Float32Array[],
-    numberOfChannels: number,
-    sampleRate: number,
-    callback: (wavFileData: Uint8Array) => any
-  ) {
-    const dataChkByteLen = this.writeHeader(channelData, sampleRate);
-    if (!this.workerURL) {
-      this.workerURL = WorkerHelper.buildWorkerBlobURL(this.workerFunction);
-    }
-    const wo = new Worker(this.workerURL);
+  async writeAsync(channelData: Float32Array[], sampleRate: number) {
+    return new Promise<Uint8Array>((resolve) => {
+      const numberOfChannels = channelData.length;
+      const dataChkByteLen = this.writeHeader(channelData, sampleRate);
+      if (!this.worker) {
+        this.worker = new TsWorker();
+      }
 
-    const chs = numberOfChannels;
-    const frameLength = channelData[0].length;
-    const ad = new Float32Array(chs * frameLength);
-    for (let ch = 0; ch < chs; ch++) {
-      ad.set(channelData[ch], ch * frameLength);
-    }
-    // ensureCapacity blocks !!!
-    this.bw.ensureCapacity(dataChkByteLen);
-    wo.onmessage = (me) => {
-      callback(me.data.buf);
-      wo.terminate();
-    };
-
-    wo.postMessage(
-      {
-        encodingFloat: this.encodingFloat,
-        sampleSizeInBits: this.sampleSizeInBits,
-        chs: chs,
-        frameLength: frameLength,
-        audioData: ad,
-        buf: this.bw.buf,
-        bufPos: this.bw.pos,
-      },
-      [ad.buffer, this.bw.buf]
-    );
+      const chs = numberOfChannels;
+      const frameLength = channelData[0].length;
+      const ad = new Float32Array(chs * frameLength);
+      for (let ch = 0; ch < chs; ch++) {
+        ad.set(channelData[ch], ch * frameLength);
+      }
+      // ensureCapacity blocks !!!
+      this.bw.ensureCapacity(dataChkByteLen);
+      const job = new TsWorkerJob<
+        [
+          encodingFloat: boolean,
+          sampleSizeInBits: number,
+          chs: number,
+          frameLength: number,
+          audioData: Float32Array,
+          buf: ArrayBuffer,
+          buffPos: number
+        ],
+        ArrayBuffer
+      >(
+        this.workerFunction,
+        this.encodingFloat,
+        this.sampleSizeInBits,
+        chs,
+        frameLength,
+        ad,
+        this.bw.buf,
+        this.bw.pos
+      );
+      this.worker.addJob(job);
+      this.worker.jobstatuschange.subscribe({
+        next: (job) => {
+          if (job.status === 'finished') {
+            resolve(new Uint8Array(job.result));
+          }
+        },
+      });
+    });
   }
 
   write(channelData: Float32Array[], sampleRate: number): Uint8Array {

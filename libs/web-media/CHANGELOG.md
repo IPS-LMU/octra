@@ -2,6 +2,26 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.1.0](https://github.com/IPS-LMU/octra/compare/web-media-0.0.11...web-media-0.1.0) (2024-11-08)
+
+
+### Bug Fixes
+
+* **audio:** audio playback doesn't start at exact position ([3864696](https://github.com/IPS-LMU/octra/commit/3864696296a70c8fc4bd7c9bee768ff8a781a4c4))
+* **octra:** can't import files one after the other on dropzone ([76a32f2](https://github.com/IPS-LMU/octra/commit/76a32f268588a5bc60f119c8b5e3eb56a65332a7))
+* **octra:** detail window does not load on navigation ([9b0b366](https://github.com/IPS-LMU/octra/commit/9b0b366d86323668ffae70a7e735ce1703e0a7c1))
+* **octra:** url mode sometimes does not load ([bcd4baa](https://github.com/IPS-LMU/octra/commit/bcd4baae17a57ed6ae2271266eb535770a716909))
+* **octra:** word alignment on unit does not have correct boundaries ([30445ba](https://github.com/IPS-LMU/octra/commit/30445ba1892b71bf1e259905e5e9a08a57106c6c))
+* **web-media:** audio context can't be closed twice ([ca5b4a3](https://github.com/IPS-LMU/octra/commit/ca5b4a3c626001a88637e51b27a0fb82bdd51bfc))
+* **web-media:** audio.pause before audio play abort error ([62ad842](https://github.com/IPS-LMU/octra/commit/62ad8426359e5cc43fb4476549d91b971bd472cc))
+
+
+### Features
+
+* **octra:** support for .mp3, .flac, .m4a audio files ([c3fb966](https://github.com/IPS-LMU/octra/commit/c3fb9667b8f83aba8a8bd6da52382a5b00c01f71))
+
+
+
 ## [0.0.11](https://github.com/IPS-LMU/octra/compare/web-media-0.0.10...web-media-0.0.11) (2024-02-17)
 
 

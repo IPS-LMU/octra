@@ -19,7 +19,11 @@ const build = async () => {
     'dist/libs/web-components/3rdpartylicenses.txt'
   );
   await fs.copyFile(
-    'tmp/web-components/LICENSE.txt',
+    'apps/web-components/README.md',
+    'dist/libs/web-components/README.md'
+  );
+  await fs.copyFile(
+    'apps/web-components/LICENSE.txt',
     'dist/libs/web-components/LICENSE.txt'
   );
 

@@ -15,7 +15,7 @@ This sections shows an overview of all custom libraries used by OCTRA. All Angul
 <tbody>
 <tr>
 <td>
-<a href="./utilities/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Futilities?label=utilities"></a>
+<a href="./utilities"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Futilities?label=utilities"></a>
 </td>
 <td>
 Browser, NodeJS
@@ -26,7 +26,7 @@ library with custom functions used in the  other libraries or apps like OCTRA
 </tr>
 <tr>
 <td>
-<a href="./media/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fmedia?label=media"></a>
+<a href="./media"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fmedia?label=media"></a>
 </td>
 <td>
 Browser, NodeJS
@@ -37,7 +37,7 @@ all media related classes without dependencies to dom library
 </tr>
 <tr>
 <td>
-<a href="./web-media/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fweb-media?label=web-media"></a>
+<a href="./web-media"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fweb-media?label=web-media"></a>
 </td>
 <td>
 Browser
@@ -48,7 +48,7 @@ all media related classes (for now audio only: audio playback a.s.o)
 </tr>
 <tr>
 <td>
-<a href="./assets/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fassets?label=assets"></a>
+<a href="./assets"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fassets?label=assets"></a>
 </td>
 <td>
 Browser, NodeJS
@@ -59,7 +59,7 @@ library with shared assets in octra applications e.g. JSON schemata
 </tr>
 <tr>
 <td>
-<a href="./json-sets/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fjson-sets?label=json-sets"></a>
+<a href="./json-sets"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fjson-sets?label=json-sets"></a>
 </td>
 <td>
 Browser, NodeJS
@@ -70,7 +70,7 @@ This library allows to define a set of valid objects using JSON and valid these.
 </tr>
 <tr>
 <td>
-<a href="./annotation/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fannotation?label=annotation"></a>
+<a href="./annotation"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fannotation?label=annotation"></a>
 </td>
 <td>
 Browser, NodeJS
@@ -81,7 +81,7 @@ Objects and other classes used to handle annotation tasks
 </tr>
 <tr>
 <td>
-<a href="./ngx-components/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-components?label=ngx-components"></a>
+<a href="./ngx-components"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-components?label=ngx-components"></a>
 </td>
 <td>
 Angular
@@ -92,7 +92,7 @@ Angular components e.g. for the signal displays
 </tr>
 <tr>
 <td>
-<a href="./ngx-utilities/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-utilities?label=ngx-utilities"></a>
+<a href="./ngx-utilities"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-utilities?label=ngx-utilities"></a>
 </td>
 <td>
 Angular
@@ -103,7 +103,7 @@ library with custom functions used in angular projects
 </tr>
 <tr>
 <td>
-<a href="../apps/web-components/">web-components</a>
+<a href="../apps/web-components">web-components</a>
 </td>
 <td>
 Browser

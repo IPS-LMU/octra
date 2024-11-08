@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.4.1](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.4.0...ngx-utilities-0.4.1) (2024-11-08)
+
+
+### Features
+
+* **octra:** support for .mp3, .flac, .m4a audio files ([c3fb966](https://github.com/IPS-LMU/octra/commit/c3fb9667b8f83aba8a8bd6da52382a5b00c01f71))
+
+
+
 # [0.4.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.3.1...ngx-utilities-0.4.0) (2024-07-29)
 
 

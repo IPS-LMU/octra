@@ -22,7 +22,7 @@ export class WavWriter {
   private sampleSize = WavWriter.DEFAULT_SAMPLE_SIZE;
   private sampleSizeInBits = this.sampleSize.valueOf();
   private bw: BinaryByteWriter;
-  private worker?: TsWorker;
+  private static worker?: TsWorker;
 
   constructor(encodingFloat?: boolean, sampleSize?: SampleSize) {
     //console.debug("WavWriter: "+encodingFloat+", "+sampleSize);
@@ -67,7 +67,7 @@ export class WavWriter {
         for (let ch = 0; ch < chs; ch++) {
           const srcPos = ch * frameLength + s;
           const valFlt = audioData[srcPos];
-          if (encodingFloat === true) {
+          if (encodingFloat) {
             valView.setFloat32(bufPos, valFlt, true);
             bufPos += 4;
           } else {
@@ -150,8 +150,8 @@ export class WavWriter {
     return new Promise<Uint8Array>((resolve) => {
       const numberOfChannels = channelData.length;
       const dataChkByteLen = this.writeHeader(channelData, sampleRate);
-      if (!this.worker) {
-        this.worker = new TsWorker();
+      if (!WavWriter.worker) {
+        WavWriter.worker = new TsWorker();
       }
 
       const chs = numberOfChannels;
@@ -183,8 +183,8 @@ export class WavWriter {
         this.bw.buf,
         this.bw.pos
       );
-      this.worker.addJob(job);
-      this.worker.jobstatuschange.subscribe({
+      WavWriter.worker.addJob(job);
+      WavWriter.worker.jobstatuschange.subscribe({
         next: (job) => {
           if (job.status === 'finished') {
             resolve(new Uint8Array(job.result));

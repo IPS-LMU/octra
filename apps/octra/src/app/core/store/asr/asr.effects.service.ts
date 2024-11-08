@@ -158,9 +158,6 @@ export class AsrEffects {
           );
         }
 
-        console.log(
-          `________-----> ${queue.statistics.running} < ${this.MAX_PARALLEL_ITEMS}`
-        );
         if (queue.status === ASRProcessStatus.STARTED) {
           if (queue.statistics.running < this.MAX_PARALLEL_ITEMS) {
             const item = this.getFirstFreeItem(queue);

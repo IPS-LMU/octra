@@ -1272,11 +1272,6 @@ export class AnnotationEffects {
       ofType(AnnotationActions.updateASRSegmentInformation.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
-        console.log(
-        );
-        console.log(
-          `GOT RESULT FOR ${action.timeInterval.sampleStart} with DUR ${action.timeInterval.sampleLength}`
-        );
         if (
           (action.itemType === ASRQueueItemType.ASRMAUS ||
             action.itemType === ASRQueueItemType.MAUS) &&
@@ -1344,11 +1339,6 @@ export class AnnotationEffects {
                       action.timeInterval.sampleStart +
                       Math.ceil(wordItem.sampleStart + wordItem.sampleDur);
                     wordItemEnd = Math.min(itemEnd, wordItemEnd);
-                    console.log(
-                      `Word item end is ${wordItemEnd}; ${Math.ceil(
-                        wordItem.sampleStart + wordItem.sampleDur
-                      )}`
-                    );
 
                     if (wordItemEnd >= action.timeInterval.sampleStart) {
                       const readSegment = new OctraAnnotationSegment(

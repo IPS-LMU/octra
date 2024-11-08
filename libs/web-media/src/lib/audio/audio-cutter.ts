@@ -11,7 +11,6 @@ export class AudioCutter {
     fileName: string;
     intArray: Uint8Array;
   }>();
-  private wavWriter?: WavWriter;
 
   public formatConstructor!:
     | Uint8ArrayConstructor
@@ -39,11 +38,8 @@ export class AudioCutter {
       segment.sampleDur ? segment.sampleStart + segment.sampleDur : undefined
     );
 
-    if (!this.wavWriter) {
-      this.wavWriter = new WavWriter();
-    }
-
-    const uint8Array = await this.wavWriter.writeAsync(
+    const wavWriter = new WavWriter();
+    const uint8Array = wavWriter.write(
       [data],
       audioInfo.audioBufferInfo?.sampleRate ?? audioInfo.sampleRate
     );

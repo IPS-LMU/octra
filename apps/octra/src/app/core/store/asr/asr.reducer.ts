@@ -224,8 +224,6 @@ export const reducer = createReducer(
           ...state.queue,
           status: ASRProcessStatus.STARTED,
           items: state.queue.items.map((a) => {
-            console.log('________');
-            console.log(a);
             if (a.status === ASRProcessStatus.NOAUTH) {
               return {
                 ...a,

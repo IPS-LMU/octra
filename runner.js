@@ -45,11 +45,11 @@ const Project = {
   },
   prepareDocs: async function () {
     let content = await fs.readFile(`./typedocs/index.html`, 'utf-8');
-    content = content.replace(/\.\/([^/]+)\/src\//g, (g0, g1) => {
+    content = content.replace(/\.\/(?!apps)([^/]+)/g, (g0, g1) => {
       return `modules/_octra_${g1.replace(/-/g, '_')}.html`;
     });
-    content = content.replace(/apps\/([^/]+)\/src\//g, (g0, g1) => {
-      return `modules/_octra_${g1.replace(/-/g, '_')}.html`;
+    content = content.replace(/".*apps\/([^/]+)/g, (g0, g1) => {
+      return `"modules/_octra_${g1.replace(/-/g, '_')}.html`;
     });
     await fs.writeFile(`./typedocs/index.html`, content, {
       encoding: 'utf-8',

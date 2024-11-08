@@ -81,7 +81,7 @@ Objects and other classes used to handle annotation tasks
 </tr>
 <tr>
 <td>
-<a href="./ngx-components"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-components?label=ngx-components"></a>
+<a href="./ngx-components/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-components?label=ngx-components"></a>
 </td>
 <td>
 Angular
@@ -92,7 +92,7 @@ Angular components e.g. for the signal displays
 </tr>
 <tr>
 <td>
-<a href="./ngx-utilities"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-utilities?label=ngx-utilities"></a>
+<a href="./ngx-utilities/"><img alt="NPM Version" src="https://img.shields.io/npm/v/%40octra%2Fngx-utilities?label=ngx-utilities"></a>
 </td>
 <td>
 Angular

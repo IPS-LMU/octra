@@ -39,7 +39,7 @@ export class AudioCutter {
     );
 
     const wavWriter = new WavWriter();
-    const uint8Array = wavWriter.write(
+    const uint8Array = await wavWriter.writeAsync(
       [data],
       audioInfo.audioBufferInfo?.sampleRate ?? audioInfo.sampleRate
     );

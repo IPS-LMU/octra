@@ -9,14 +9,25 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { OctraAnnotationSegment, OEvent, OItem } from '@octra/annotation';
-import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DefaultComponent } from '../../component/default.component';
+import { NgbDropdownItem, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
+  standalone: true,
   templateUrl: './naming-drag-and-drop.component.html',
   styleUrls: ['./naming-drag-and-drop.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    NgbDropdownModule,
+    TranslocoPipe,
+    NgbDropdownItem,
+    CdkDropList,
+    NgClass,
+    CdkDrag,
+  ],
 })
 export class NamingDragAndDropComponent extends DefaultComponent {
   public namingConventionArray = [
@@ -145,7 +156,9 @@ export class NamingDragAndDropComponent extends DefaultComponent {
   onKeyDown($event: any, text: HTMLElement) {
     if ($event.code === 'Enter') {
       $event.preventDefault();
+      $event.stopPropagation();
       this.deselect();
+      console.log(`keydown text: "${text.innerText}"`);
       this.resultConvention[this.clicked].value = text.innerText;
       this.clicked = -1;
     }

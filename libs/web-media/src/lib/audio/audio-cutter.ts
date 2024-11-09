@@ -129,7 +129,7 @@ export class AudioCutter {
         case 'sampleStart':
           return segment.sampleStart;
         case 'sampleDur':
-          return segment.sampleDur;
+          return segment.sampleDur ?? (this.audioInfo.audioBufferInfo?.samples ?? this.audioInfo.duration.samples) - segment.sampleStart;
         case 'secondsStart':
           return (
             Math.round(
@@ -139,7 +139,7 @@ export class AudioCutter {
         case 'secondsDur':
           return (
             Math.round(
-              (segment.sampleStart / this.audioInfo.sampleRate) * 1000
+              (((this.audioInfo.audioBufferInfo?.samples ?? this.audioInfo.duration.samples) - segment.sampleStart) / this.audioInfo.sampleRate) * 1000
             ) / 1000
           );
       }

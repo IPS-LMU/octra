@@ -1,10 +1,9 @@
 <div class="namingConventionSelection">
-  <div class="namingConvention-dropdown">
-    <div class="btn-group" dropdown>
+  <div class="d-inline-block">
+    <div class="d-inline-block" ngbDropdown>
       <button
-        aria-controls="dropdown-basic"
         class="btn btn-secondary btn-sm btn-raised"
-        dropdownToggle
+        ngbDropdownToggle
         id="button-basic"
         style="background-color: gray"
         type="button"
@@ -12,21 +11,16 @@
         {{ 'tools.cut audio.add placeholder' | transloco }}
         <i class="bi bi-plus-lg"></i>
       </button>
-      <ul
-        *dropdownMenu
+      <div
+        ngbDropdownMenu
         aria-labelledby="button-basic"
-        class="dropdown-menu"
-        id="dropdown-basic"
-        role="menu"
       >
-        <li role="menuitem">
-          @for (item of namingConventionArray; track item; let i = $index) {
-          <a (click)="addItem(item)" class="dropdown-item">
-            {{ item }}
-          </a>
-          }
-        </li>
-      </ul>
+        @for (item of namingConventionArray; track item; let i = $index) {
+        <button (click)="addItem(item)" ngbDropdownItem>
+          {{ item }}
+        </button>
+        }
+      </div>
     </div>
   </div>
   <div
@@ -39,6 +33,7 @@
     @for (item of resultConvention; track item; let i = $index) {
     <div
       cdkDrag
+      [cdkDragDisabled]="clicked > -1"
       (mouseup)="onItemClick($event, i)"
       [ngClass]="{
         'naming-placeholder': item.type === 'placeholder',
@@ -60,10 +55,9 @@
           (keydown)="onKeyDown($event, text)"
           class="value"
           contenteditable="true"
-          style="min-width: 10px"
-        >
-          {{ item.value }}
-        </span>
+          style="min-width: 10px; user-select: text;"
+          [innerText]="item.value"
+        ></span>
         <i class="bi bi-x-circle" (click)="remove(i)"></i>
       </div>
       }

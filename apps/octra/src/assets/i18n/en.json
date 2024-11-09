@@ -481,7 +481,7 @@
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After running this tool you can revert the changes with hotkeys \"CMD + Z (MacOS) or CTRL + Z (PC)\"."
     },
     "cut audio": {
-      "warning non wav": "As the audio file is not in WAVE format, it is going to be converted to WAVE PCM 16Bit during cutting.",
+      "warning wav": "The audio file is going to be converted to WAVE PCM 16Bit, mono, {{sampleRate}} Hz during cutting.",
       "add placeholder": "Add placeholder",
       "append meta files": "Append meta files",
       "description": "This tool offers to cut the audio file to sequences from the transcription units.",

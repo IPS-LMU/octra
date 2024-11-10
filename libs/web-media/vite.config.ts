@@ -43,6 +43,7 @@ export default defineConfig({
           '@octra/utilities': 'OctraUtilities',
           '@octra/media': 'OctraMedia',
         },
+        inlineDynamicImports: true
       },
       // External packages that should not be bundled into your library.
       external: ['@octra/utilities', '@octra/media'],

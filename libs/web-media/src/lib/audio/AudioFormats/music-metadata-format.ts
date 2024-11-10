@@ -1,5 +1,5 @@
 import { AudioFormat } from './audio-format';
-import { MpegParser, parseBlob, OggParser, MP4Parser, FlacParser} from 'music-metadata-remastered';
+import { parseBlob } from 'music-metadata';
 
 export class MusicMetadataFormat extends AudioFormat {
   protected override _decoder: 'web-audio' | 'octra' = 'web-audio';
@@ -34,42 +34,25 @@ export class MusicMetadataFormat extends AudioFormat {
   }
 
   override async readAudioInformation(buffer: ArrayBuffer) {
-    let parser: any | undefined;
-    const ext = this._filename.substring(this._filename.lastIndexOf("."));
-
-    switch (ext) {
-      case ".mp3":
-        parser = MpegParser;
-        break;
-      case ".ogg":
-        parser = OggParser;
-        break;
-      case ".m4a":
-        parser = MP4Parser;
-        break;
-      case ".flac":
-        parser = FlacParser;
-        break;
-    }
-
     const parsed = await parseBlob(
-      new File([buffer], this._filename, { type: this._mimeType }),
-      parser
+      new File([buffer], this._filename, { type: this._mimeType })
     );
     const format = parsed.format;
 
     if (
       !format.sampleRate ||
-      !format.numberOfSamples ||
+      !(format.numberOfSamples || format.duration) ||
       !format.numberOfChannels
     ) {
       throw new Error(
         "Can't read one of the following audio information: sampleRate, numberOfSamples, numberOfChannels."
       );
     } else {
+      const numberOfSamples =
+        format.numberOfSamples ?? Math.ceil(format.duration! * format.sampleRate);
       this._sampleRate = format.sampleRate;
       this._duration = {
-        samples: format.numberOfSamples,
+        samples: numberOfSamples,
         seconds: format.duration!,
       };
       this._channels = format.numberOfChannels;

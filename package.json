@@ -160,7 +160,7 @@
     "jest-environment-jsdom": "29.7.0",
     "jest-preset-angular": "14.1.0",
     "jsonc-eslint-parser": "^2.1.0",
-    "music-metadata-remastered": "file:music-metadata-remastered-0.0.1.tgz",
+    "music-metadata": "^10.5.1",
     "ng-packagr": "18.2.1",
     "ngx-deploy-npm": "8.2.0",
     "nx": "20.0.11",

@@ -1,7 +1,7 @@
 {
   "inputs": {
-    "name": "One audio file (*.wav / *.ogg / *.mp3 / *.flac / *.m4a) and one optional transcript file.",
-    "description": "Needs an audio file (.wav <= 1.9 GB) and an optional supported transcript file",
+    "name": "audio with optional transcript",
+    "description": "One audio file (*.wav / *.ogg / *.mp3 / *.flac / *.m4a) and one optional transcript file.",
     "combine": {
       "type": "and",
       "expressions": [
@@ -16,8 +16,8 @@
               "extension": [".wav"]
             },
             {
-              "size": "<= 300MB",
-              "extension": [".mp3", ".m4a", ".flac", ".ogg"]
+              "size": "<= 100MB",
+              "extension": [".mp3", ".m4a", ".mp3", ".flac"]
             }
           ]
         },

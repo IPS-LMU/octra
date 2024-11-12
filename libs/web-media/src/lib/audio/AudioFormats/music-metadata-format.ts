@@ -9,21 +9,21 @@ export class MusicMetadataFormat extends AudioFormat {
     this._supportedFormats = [
       {
         extension: '.flac',
-        maxFileSize: 300000000, // 300 MB,
+        maxFileSize: 100000000, // 300 MB,
         info: 'The duration in samples is going to be estimated and may differ with the used application.',
       },
       {
         extension: '.ogg',
-        maxFileSize: 300000000, // 300 MB
+        maxFileSize: 100000000, // 300 MB
       },
       {
         extension: '.mp3',
-        maxFileSize: 300000000, // 300 MB,
+        maxFileSize: 100000000, // 300 MB,
         info: 'The duration in samples is going to be estimated and may differ with the used application.',
       },
       {
         extension: '.m4a',
-        maxFileSize: 300000000, // 300 MB,
+        maxFileSize: 100000000, // 300 MB,
         info: 'The duration in samples is going to be estimated and may differ with the used application.',
       },
     ];

@@ -22,8 +22,7 @@
           [ngbPopover]="file.warning"
           style="font-size: 16px; color: orange"
         ></i>
-        } @if (file.name.indexOf('.wav') < 0) { @if (file.status === 'progress')
-        {
+        } @if (file.status === 'waiting') {
         <div
           class="spinner-border icon-wait"
           role="status"
@@ -31,8 +30,10 @@
         >
           <span class="visually-hidden">Loading...</span>
         </div>
-        } } @if ( file.name.indexOf('.wav') > -1 && file.status === 'progress' )
+        } @else if (file.name.indexOf(".wav") < 0 && file.status === "progress")
         {
+        <i class="bi bi-building-gear"></i>
+        } @if ( file.name.indexOf('.wav') > -1 && file.status === 'progress' ) {
         <div class="progress">
           <div
             class="progress-bar"

@@ -239,7 +239,8 @@
     "validation": "Validierung",
     "wanted": "Gesucht wird",
     "website": "Webseite",
-    "yes": "Ja"
+    "yes": "Ja",
+    "recommended": "empfohlen"
   },
   "interfaces": {
     "2D editor": "2D-Editor",

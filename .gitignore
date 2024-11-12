@@ -56,3 +56,4 @@ deploy
 /typedocs
 
 vite.config.*.timestamp*
+/tests/testfiles

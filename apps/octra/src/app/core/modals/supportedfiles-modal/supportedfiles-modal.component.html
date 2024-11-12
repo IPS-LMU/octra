@@ -18,7 +18,9 @@
           @for (extension of format.supportedFormats; track extension) {
             <tr>
               <td>
-                *{{extension.extension}}
+                *{{extension.extension}} @if(extension.extension === ".wav") {
+                <span class="pill rounded-pill bg-success text-light px-2 py-1" style="font-size: 0.85rem;">{{"g.recommended" | transloco}}</span>
+              }
               </td>
               <td>
                 max. {{extension.maxFileSize | filesize}}

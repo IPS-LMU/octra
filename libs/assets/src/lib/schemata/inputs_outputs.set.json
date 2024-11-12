@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "name": "audio with optional transcript",
+    "name": "one audio file and one optional transcript",
     "description": "One audio file (*.wav / *.ogg / *.mp3 / *.flac / *.m4a) and one optional transcript file.",
     "combine": {
       "type": "and",
@@ -17,7 +17,7 @@
             },
             {
               "size": "<= 100MB",
-              "extension": [".mp3", ".m4a", ".mp3", ".flac"]
+              "extension": [".mp3", ".m4a", ".flac", ".ogg"]
             }
           ]
         },

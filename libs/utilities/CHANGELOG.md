@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [0.1.0](https://github.com/IPS-LMU/octra/compare/utilities-0.0.12...utilities-0.1.0) (2024-11-13)
+
+
+### Features
+
+* **utilities:** moved TsWorker classed to utilities package ([5ba6838](https://github.com/IPS-LMU/octra/commit/5ba68383aafa88cf9077f83e09cfdeff541fa66a))
+* **utilities:** new stringifyQueryParams() function ([f38ce61](https://github.com/IPS-LMU/octra/commit/f38ce612a7155e1c65ecd5b70706be7bb15f87b6))
+
+
+
 ## [0.0.12](https://github.com/IPS-LMU/octra/compare/utilities-0.0.11...utilities-0.0.12) (2024-03-25)
 
 

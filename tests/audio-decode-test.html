@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <script type="application/javascript">
+      const FILES_FOR_TESTTING = [
+        //"TestBig100.mp3",
+        "TestBig133.flac",
+        //"TestBig124.m4a",
+        "TestBig150.ogg",
+        "TestBig150.wav",
+        //"TestBig153.m4a",
+        // "TestBig187.m4a",
+        //"TestBig200.mp3",
+        "TestBig181.flac",
+        "TestBig200.ogg",
+        "TestBig267.flac",
+        "TestBig292.ogg",
+        //"TestBig300.mp3",
+        "TestBig321.wav"
+      ];
+      pointer = -1;
+
+      console.log(document.location.href);
+      const matches = /(https?:\/\/.*\/)([^?]+)(\?.*)*/g.exec(
+        document.location.href
+      );
+      const baseHref = matches[1];
+      const htmlFile = matches[2];
+      const query = matches[3];
+
+      let testButton;
+      window.addEventListener('load', async () => {
+        console.log('LOADED');
+        testButton = document.getElementById("testButton");
+        testButton.addEventListener("click", onTestButtonClick);
+      });
+
+      async function onTestButtonClick(ev) {
+        for (let i = 0; i < FILES_FOR_TESTTING.length; i++) {
+          const file = FILES_FOR_TESTTING[i];
+          console.log(`Test file ${file}`);
+          let arrayBuffer = await fetch(`${baseHref}testfiles/${file}`);
+          arrayBuffer = await arrayBuffer.arrayBuffer();
+          console.log(`-> File has size of ${arrayBuffer.byteLength}...`);
+          let t = Date.now();
+
+          try {
+            console.log("-> Decode...");
+            const audiobuffer = await new AudioContext().decodeAudioData(arrayBuffer);
+            console.log(`-> SUCCESS with ${audiobuffer.length} samples after ${(Date.now() - t) / 1000} seconds`);
+          } catch (e) {
+            console.log("-> ERROR");
+            console.error(e);
+          }
+        }
+
+        console.log("FINISHED ALL!");
+      }
+    </script>
+  </head>
+  <body>
+    <button id="testButton">TEST</button>
+  </body>
+</html>

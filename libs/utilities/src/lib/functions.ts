@@ -418,3 +418,23 @@ export function extractFileNameFromURL(url: string): {
     extension: matches[2],
   };
 }
+
+/**
+ * returns a string representing query parameters and their values without empty values.
+ * @param params
+ */
+export function stringifyQueryParams(params: Record<string, any>) {
+  if (!params) {
+    return '';
+  }
+
+  const strArray: string[] = [];
+
+  for (const key of Object.keys(params)) {
+    if (params[key] !== undefined) {
+      strArray.push(`${key}=${params[key]}`);
+    }
+  }
+
+  return strArray.length > 0 ? `?${strArray.join('&')}` : '';
+}

@@ -145,7 +145,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
   public async isValidImportData(fileProgress: FileProgress) {
     if (this._oaudiofile !== undefined) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
-        const converter: Converter = AppInfo.converters[i];
+        let converter: Converter = AppInfo.converters[i];
         if (
           new RegExp(`${escapeRegex(converter.extension)}$`).exec(
             fileProgress.name.toLowerCase()
@@ -298,10 +298,11 @@ export class OctraDropzoneComponent extends DefaultComponent {
             fileProgress.checked_converters++;
           }
         } else {
+          converter = undefined;
           fileProgress.checked_converters++;
         }
 
-        if (converter.name === 'AnnotJSON') {
+        if (converter?.name === 'AnnotJSON') {
           // stop because there is only one file format with ending "_annot.json"
           break;
         }

@@ -13,10 +13,6 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import Konva from 'konva';
-import { AudioviewerConfig } from './audio-viewer.config';
-import { AnnotationChange, AudioViewerService } from './audio-viewer.service';
-import { SubscriptionManager } from '@octra/utilities';
 import {
   AnnotationAnySegment,
   ASRContext,
@@ -24,8 +20,12 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { Subject, Subscription, timer } from 'rxjs';
+import { SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
+import Konva from 'konva';
+import { Subject, Subscription, timer } from 'rxjs';
+import { AudioviewerConfig } from './audio-viewer.config';
+import { AnnotationChange, AudioViewerService } from './audio-viewer.service';
 import Vector2d = Konva.Vector2d;
 
 export interface CurrentLevelChangeEvent {
@@ -275,7 +275,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         annotation.previousValue,
         annotation.currentValue
       );
-      console.log(`getChanges took ${Date.now()-t}ms, ${parsedChanges.length} changed`);
       if (annotation.previousValue && annotation.currentValue) {
         if (
           annotation.previousValue.selectedLevelIndex !==

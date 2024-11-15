@@ -498,7 +498,9 @@ export class AudioViewerService {
           const oldLeft = oldLevel.getLeftSibling(
             getIndexOfSegmentID(oldLevel, change!.item!.old!.id!)
           )! as OctraAnnotationSegment;
-          checkNeighbours(oldLeft);
+          if(oldLeft) {
+            checkNeighbours(oldLeft);
+          }
         }
       }
     }

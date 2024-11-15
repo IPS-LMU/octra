@@ -481,7 +481,7 @@
       "maximal words desc": "Die Transkriptionseinheiten werden so zusammengeführt, dass eine Einheit eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert.",
       "minimal silence": "Minimale Pausenlänge (ms)",
       "minimal silence desc": "Alle Pausen, deren Länge größer oder gleich dem angegebenen Wert sind, werden nicht zusammengeführt.",
-      "name": "Kombiniere Phrasen",
+      "name": "Kombiniere Transkriptionseinheiten",
       "show settings": "Zeige die Einstellungen",
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat mit \"CMD + Z (MacOS) or CTRL + Z (PC)\" rückgängig gemacht werden."
     },

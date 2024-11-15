@@ -323,7 +323,6 @@
       "maximal words desc": "Na de samenvoeging zullen alle transcriptie-eenheden een maximaal aantal woorden bevatten. (Werkt alleen als elk segment slechts één woord bevat). Een waarde van 0 betekent dat er geen beperking is.",
       "minimal silence": "Minimale stilteduur",
       "minimal silence desc": "Alle transcriptie-eenheden die stilte bevatten, worden genegeerd als hun duur langer is dan deze waarde.",
-      "name": "Combineren van zinnen",
       "show settings": "Toon instellingen"
     },
     "cut audio": {

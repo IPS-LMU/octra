@@ -481,7 +481,7 @@
       "maximal words desc": "After the merge all transcription units will contain a maximal number of words. (Works only if each segment contains only one word). A value of 0 means that there is no limitation.",
       "minimal silence": "Minimal length of silence",
       "minimal silence desc": "All transcription units containing silence are ignored if their duration is longer than this value.",
-      "name": "Combine Phrases",
+      "name": "Combine Transcription Units",
       "show settings": "Show settings",
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After running this tool you can revert the changes with hotkeys \"CMD + Z (MacOS) or CTRL + Z (PC)\"."
     },

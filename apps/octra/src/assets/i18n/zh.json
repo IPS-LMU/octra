@@ -323,7 +323,6 @@
       "maximal words desc": "在合并之后，所有标注单元内的最大词数目。（仅在每个段内只包含一个词时有效）。0表示没有最大词数目限制。",
       "minimal silence": "最小静音时长",
       "minimal silence desc": "如果其包括的静音时长超过这个值，则此标注单元将被忽略。",
-      "name": "合并词语和短语",
       "show settings": "显示设置"
     },
     "cut audio": {

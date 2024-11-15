@@ -323,7 +323,6 @@
       "maximal words desc": "Dopo la fusione tutte le unità di trascrizione conterranno un numero massimo di parole. (Funziona solo se ogni segmento contiene solo una parola). Un valore di 0 significa che non è impostato alcun limite.",
       "minimal silence": "Durata minima del silenzio.",
       "minimal silence desc": "Tutte le unità di trascrizione contenenti silenzio sono ignorate se la loro durata è più lunga di questo valore.",
-      "name": "Combina Frasi",
       "show settings": "Mostra impostazioni"
     },
     "cut audio": {

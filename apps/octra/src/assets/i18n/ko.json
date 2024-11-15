@@ -323,7 +323,6 @@
       "maximal words desc": "병합 후 모든 전사 단위에는 최대 단어 수가 포함됩니다. (각 세그먼트에 하나의 단어만 포함된 경우에만 작동). 값이 0이면 제한이 없음을 의미합니다.",
       "minimal silence": "최소 무음 ㅅ간",
       "minimal silence desc": "무음이 포함된 모든 전사 단위는 지속 시간이 이 값보다 길 경우 무시됩니다.",
-      "name": "구문 결합",
       "show settings": "설정 표시"
     },
     "cut audio": {

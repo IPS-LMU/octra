@@ -96,7 +96,7 @@
                 >
                   <div
                     class="col-8 text-start"
-                    (click)="selectProvider(provider.provider, dropdown3)"
+                    (click)="selectProvider(provider.provider, dropdown3, true)"
                   >
                     <img
                       [src]="provider.logoURL"
@@ -106,7 +106,7 @@
                   </div>
                   <div
                     class="col"
-                    (click)="selectProvider(provider.provider, dropdown3)"
+                    (click)="selectProvider(provider.provider, dropdown3, true)"
                   >
                     <div class="progress">
                       <ng-template #popTemplate>
@@ -267,7 +267,7 @@
             <li
               class="list-group-item list-group-item-action p-1"
               ngbDropdownItem
-              (click)="selectLanguage(language.value, 'maus')"
+              (click)="selectLanguage(language.value, 'maus', true)"
             >
               <a class="dropdown-item">{{ language.description }}</a>
             </li>
@@ -280,6 +280,7 @@
     </div>
   </div>
 
+  @if(showAccessCode) {
   <div class="row g-0">
     <div class="col">
       <div class="mb-3">
@@ -294,7 +295,7 @@
             autocomplete="one-time-code"
             name="asrAccessCode"
             [(ngModel)]="fields.asr.accessCode"
-            (ngModelChange)="onAccessCodeChange($event)"
+            (ngModelChange)="onAccessCodeChange($event, true)"
           />
           <div
             class="input-group-text pointer"
@@ -312,4 +313,5 @@
       </div>
     </div>
   </div>
+  }
 </form>

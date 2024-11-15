@@ -754,7 +754,7 @@ export class TwoDEditorComponent
       if (segmentNumber > -1) {
         if (
           this.appStorage.snapshot.asr.settings?.selectedASRLanguage &&
-          this.appStorage.snapshot.asr.settings?.selectedService
+          this.appStorage.snapshot.asr.settings?.selectedServiceProvider
         ) {
           const segment = currentLevel!.items[
             segmentNumber

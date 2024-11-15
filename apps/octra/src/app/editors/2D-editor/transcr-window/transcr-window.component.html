@@ -31,7 +31,7 @@
             <button
               [disabled]="
                 !(asrStoreService.asrOptions$ | async)?.selectedASRLanguage ||
-                !(asrStoreService.asrOptions$ | async)?.selectedService
+                !(asrStoreService.asrOptions$ | async)?.selectedServiceProvider
               "
               class="btn btn-primary btn-sm dropdown-toggle"
               type="button"

@@ -676,10 +676,7 @@ export class IDBEffects {
   saveASRSettings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        ASRActions.setSelectedASRService.do,
-        ASRActions.setASRLanguage.do,
-        ASRActions.setASRMausLanguage.do,
-        ASRActions.setASRAccessCode.do
+        ASRActions.setASRSettings.do
       ),
       withLatestFrom(this.store),
       mergeMap(([, state]) =>

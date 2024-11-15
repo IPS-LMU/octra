@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AsrOptionsComponent } from './core/component/asr-options/asr-options.component';
 import { TranscriptionFeedbackComponent } from './core/component/transcription-feedback/transcription-feedback.component';
 import { ClipTextPipe } from './core/shared/clip-text.pipe';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +16,7 @@ import {
   DropZoneComponent,
   TranscrEditorComponent,
 } from './core/component';
-import { OctraComponentsModule } from '@octra/ngx-components';
+import { AsrOptionsComponent, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { SignupComponent } from './core/component/authentication-component/signup/signup.component';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -27,7 +26,6 @@ import { ValidationPopoverComponent } from './core/component/transcr-editor/vali
 
 @NgModule({
   declarations: [
-    AsrOptionsComponent,
     TranscriptionFeedbackComponent,
     ClipTextPipe,
     OctraDropzoneComponent,
@@ -52,7 +50,6 @@ import { ValidationPopoverComponent } from './core/component/transcr-editor/vali
     NgxJoditComponent,
   ],
   exports: [
-    AsrOptionsComponent,
     TranscriptionFeedbackComponent,
     ClipTextPipe,
     OctraDropzoneComponent,

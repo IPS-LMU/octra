@@ -603,7 +603,15 @@
             <label style="font-size: 1rem" class="mb-2">{{
               'g.asr options' | transloco
             }}</label>
-            <octra-asr-options></octra-asr-options>
+            <octra-asr-options
+              [options]="asrStoreService.asrOptions$ | async"
+              (optionsChange)="asrStoreService.setASRSettings($event)"
+              [languageSettings]="asrStoreService.languageSettings$ | async"
+              [manualURL]="api.appProperties?.support?.manual_url"
+              [mausLanguages]="asrStoreService.mausLanguages$ | async"
+              [asrLanguages]="asrStoreService.asrLanguages$ | async"
+              [showAccessCode]="true"
+            ></octra-asr-options>
             <hr />
             } }
           </div>

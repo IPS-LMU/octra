@@ -29,24 +29,15 @@ import { ALoginGuard, DeALoginGuard } from './core/shared/guard';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AudioService, SettingsService } from './core/shared/service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { BugReportService } from './core/shared/service/bug-report.service';
 import { CompatibilityService } from './core/shared/service/compatibility.service';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import * as fromApplication from './core/store/application/application.reducer';
-import * as fromASR from './core/store/asr/asr.reducer';
-import * as fromUser from './core/store/user/user.reducer';
-import { IDBEffects } from './core/store/idb/idb-effects.service';
-import { IDBService } from './core/shared/service/idb.service';
-import { ApplicationEffects } from './core/store/application/application.effects';
-import { ModalsModule } from './core/modals/modals.module';
-import { AppSharedModule } from './app.shared.module';
-import { OctraComponentsModule } from '@octra/ngx-components';
-import { NgxOctraApiModule } from '@octra/ngx-octra-api';
+import { RouterModule } from '@angular/router';
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -56,16 +47,25 @@ import {
   NgbPopoverModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AsrOptionsComponent, OctraComponentsModule } from '@octra/ngx-components';
+import { NgxOctraApiModule } from '@octra/ngx-octra-api';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
+import { AppSharedModule } from './app.shared.module';
+import { TranslocoRootModule } from './app.transloco';
+import { ModalsModule } from './core/modals/modals.module';
+import { PagesModule } from './core/pages/pages.module';
+import { IDBService } from './core/shared/service/idb.service';
+import { APIEffects } from './core/store/api';
+import { ApplicationEffects } from './core/store/application/application.effects';
+import * as fromApplication from './core/store/application/application.reducer';
+import { AsrEffects } from './core/store/asr/asr.effects.service';
+import * as fromASR from './core/store/asr/asr.reducer';
 import {
   AuthenticationEffects,
   authenticationReducer,
 } from './core/store/authentication';
-import { APIEffects } from './core/store/api';
-import { PagesModule } from './core/pages/pages.module';
-import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import { AsrEffects } from './core/store/asr/asr.effects.service';
-import { TranslocoRootModule } from './app.transloco';
-import { RouterModule } from '@angular/router';
+import { IDBEffects } from './core/store/idb/idb-effects.service';
+import * as fromUser from './core/store/user/user.reducer';
 
 @NgModule({
   declarations: [AppComponent, NavigationComponent],
@@ -123,6 +123,7 @@ import { RouterModule } from '@angular/router';
     OctraComponentsModule,
     OctraUtilitiesModule,
     NgbOffcanvasModule,
+    AsrOptionsComponent,
   ],
   providers: [
     ALoginGuard,

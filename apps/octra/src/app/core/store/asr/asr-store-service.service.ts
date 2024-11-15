@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ASRActions } from './asr.actions';
-import { RootState } from '../index';
-import { Store } from '@ngrx/store';
-import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
-import { SubscriptionManager } from '@octra/utilities';
 import { Actions, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { SubscriptionManager } from '@octra/utilities';
 import { map } from 'rxjs';
+import { RootState } from '../index';
+import { ASRActions } from './asr.actions';
+import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -32,30 +32,6 @@ export class AsrStoreService {
     map((action) => action.item)
   );
 
-  changeASRService(asrService?: string) {
-    this.store.dispatch(
-      ASRActions.setSelectedASRService.do({
-        asrService,
-      })
-    );
-  }
-
-  changeASRSelectedLanguage(selectedASRLanguage?: string) {
-    this.store.dispatch(
-      ASRActions.setASRLanguage.do({
-        selectedASRLanguage,
-      })
-    );
-  }
-
-  changeASRAccessCode(accessCode?: string) {
-    this.store.dispatch(
-      ASRActions.setASRAccessCode.do({
-        accessCode,
-      })
-    );
-  }
-
   startProcessing() {
     this.store.dispatch(ASRActions.startProcessing.do());
   }
@@ -64,14 +40,6 @@ export class AsrStoreService {
     this.store.dispatch(
       ASRActions.stopItemProcessing.do({
         time,
-      })
-    );
-  }
-
-  changeASRSelectedMausLanguage(value: string) {
-    this.store.dispatch(
-      ASRActions.setASRMausLanguage.do({
-        selectedMausLanguage: value,
       })
     );
   }
@@ -94,6 +62,10 @@ export class AsrStoreService {
 
   stopProcessing() {
     this.store.dispatch(ASRActions.stopProcessing.do());
+  }
+
+  setASRSettings(settings: ASRStateSettings) {
+    this.store.dispatch(ASRActions.setASRSettings.do({ settings }));
   }
 
   constructor(private store: Store<RootState>, private actions$: Actions) {

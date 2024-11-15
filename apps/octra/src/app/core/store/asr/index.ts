@@ -1,7 +1,7 @@
 import { ASRService, ASRSettings } from '../../obj';
 
 export interface ASRStateSettings {
-  selectedService?: ASRService;
+  selectedServiceProvider?: ASRService;
   selectedASRLanguage?: string;
   selectedMausLanguage?: string;
   accessCode?: string;

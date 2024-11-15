@@ -1,29 +1,84 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { AppInfo } from '../../../app.info';
-import { ASRService, ASRSettings } from '../../obj/Settings';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { AsrStoreService } from '../../store/asr/asr-store-service.service';
+import { NgClass, NgStyle } from '@angular/common';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
+import {
+  NgbDropdown,
+  NgbDropdownItem,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+  NgbPopover,
+} from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { ASRService, ASRSettings } from './types';
 
 @Component({
   selector: 'octra-asr-options',
+  standalone: true,
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss'],
+  imports: [
+    NgbDropdown,
+    FormsModule,
+    NgbPopover,
+    NgStyle,
+    TranslocoPipe,
+    NgClass,
+    NgbDropdownMenu,
+    NgbDropdownItem,
+    NgbDropdownToggle,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
-  public serviceProviders: any = {};
+export class AsrOptionsComponent
+  extends SubscriberComponent
+  implements OnChanges
+{
   public settings = {
     onlyForThisOne: false,
     allSegmentsNext: false,
   };
 
-  @Input() enabled = true;
+  @Input() manualURL = '';
+  @Input() languageSettings?: ASRSettings;
+  @Input() asrLanguages?: {
+    value: string;
+    providersOnly?: string[];
+    description: string;
+  }[];
+  @Input() mausLanguages?: {
+    value: string;
+    providersOnly?: string[];
+    description: string;
+  }[];
+  @Input() options?: {
+    accessCode?: string;
+    selectedMausLanguage?: string;
+    selectedASRLanguage?: string;
+    selectedServiceProvider?: ASRService;
+  };
+  @Output() optionsChange = new EventEmitter<{
+    accessCode?: string;
+    selectedMausLanguage?: string;
+    selectedASRLanguage?: string;
+    selectedServiceProvider?: ASRService;
+  }>();
+
+  @Input() showAccessCode = false;
+
   @ViewChild('dropdown', { static: false }) dropdown?: NgbDropdown;
   @ViewChild('dropdown2', { static: false }) dropdown2?: NgbDropdown;
   @ViewChild('popTemplate', { static: true }) popTemplate!: NgbPopover;
 
-  languageSettings?: ASRSettings;
   protected accessCodeVisible = false;
 
   fields: {
@@ -77,60 +132,44 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
     },
   };
 
-  public get manualURL(): string {
-    return AppInfo.manualURL;
-  }
-
-  constructor(
-    public appStorage: AppStorageService,
-    public asrStoreService: AsrStoreService
-  ) {
+  constructor(private cd: ChangeDetectorRef) {
     super();
   }
 
-  ngOnInit() {
-    this.subscribe(this.asrStoreService.languageSettings$, {
-      next: (settings) => {
-        this.languageSettings = settings;
-        this.fields.provider.services = settings?.services ?? [];
-        this.fields.provider.filtered = settings?.services ?? [];
-      },
-    });
+  ngOnChanges(changes: SimpleChanges) {
+    const languageSettings = changes['languageSettings']?.currentValue;
+    if (languageSettings) {
+      this.fields.provider.services = languageSettings.services ?? [];
+      this.fields.provider.filtered = languageSettings.services ?? [];
+    }
 
-    this.subscribe(this.asrStoreService.asrLanguages$, {
-      next: (asrLanguages) => {
-        this.fields.asr.languages = asrLanguages ?? [];
-        this.fields.asr.filtered = asrLanguages ?? [];
-      },
-    });
+    const asrLanguages = changes['asrLanguages']?.currentValue;
+    if (asrLanguages) {
+      this.fields.asr.languages = asrLanguages ?? [];
+      this.fields.asr.filtered = asrLanguages ?? [];
+    }
 
-    this.subscribe(this.asrStoreService.mausLanguages$, {
-      next: (asrLanguages) => {
-        this.fields.maus.languages = asrLanguages ?? [];
-        this.fields.maus.filtered = asrLanguages ?? [];
-      },
-    });
+    const mausLanguages = changes['mausLanguages']?.currentValue;
+    if (mausLanguages) {
+      this.fields.maus.languages = mausLanguages ?? [];
+      this.fields.maus.filtered = mausLanguages ?? [];
+    }
 
-    this.subscribe(
-      this.asrStoreService.asrOptions$,
-      {
-        next: (state) => {
-          this.fields.asr.accessCode = state?.accessCode ?? '';
-          this.fields.asr.selected = state?.selectedASRLanguage ?? '';
-          this.fields.maus.selected = state?.selectedMausLanguage ?? '';
-          this.fields.provider.selected =
-            state?.selectedService?.provider ?? '';
-          this.subscriptionManager.removeByTag('storeASRLanguages');
+    const options = changes['options']?.currentValue;
+    if (options) {
+      this.fields.asr.accessCode = options?.accessCode ?? '';
+      this.fields.asr.selected = options?.selectedASRLanguage ?? '';
+      this.fields.maus.selected = options?.selectedMausLanguage ?? '';
+      this.fields.provider.selected =
+        options?.selectedServiceProvider?.provider ?? '';
 
-          setTimeout(() => {
-            this.filterLanguages(this.fields.asr.selected, 'asr');
-            this.filterLanguages(this.fields.maus.selected, 'maus');
-            this.filterProviders(this.fields.provider.selected);
-          }, 0);
-        },
-      },
-      'storeASRLanguages'
-    );
+      setTimeout(() => {
+        this.filterLanguages(this.fields.asr.selected, 'asr');
+        this.filterLanguages(this.fields.maus.selected, 'maus');
+        this.filterProviders(this.fields.provider.selected);
+        this.cd.markForCheck();
+      }, 0);
+    }
   }
 
   getQuotaPercentage(provider: ASRService) {
@@ -163,7 +202,7 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
     return '';
   }
 
-  filterProviders(value: string, dropdown?: NgbDropdown) {
+  filterProviders(value: string, dropdown?: NgbDropdown, emit?: boolean) {
     const langItem = this.fields.asr.languages.find(
       (a) => a.value === this.fields.asr.selected
     );
@@ -192,22 +231,46 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
           a.provider.toLowerCase() === value.toLowerCase()
       )
     ) {
-      this.asrStoreService.changeASRService(value);
+      this.options = {
+        ...this.options,
+        selectedServiceProvider: this.fields.provider.services.find(
+          (a) => a.provider === value
+        ),
+      };
+      if (emit) {
+        this.optionsChange.emit(this.options);
+      }
     }
 
     dropdown?.open();
+    this.cd.markForCheck();
   }
 
-  selectProvider(provider: string, dropdown: NgbDropdown) {
+  selectProvider(provider: string, dropdown: NgbDropdown, emit?: boolean) {
     this.fields.provider.selected = provider;
-    this.asrStoreService.changeASRService(provider);
+    this.options = {
+      ...this.options,
+      selectedServiceProvider: this.languageSettings?.services.find(
+        (a) => a.provider === provider
+      ),
+    };
+
+    if (emit) {
+      this.optionsChange.emit(this.options);
+    }
     this.popTemplate?.close();
     setTimeout(() => {
       dropdown.close();
     }, 200);
+    this.cd.markForCheck();
   }
 
-  filterLanguages(value: string, type: 'asr' | 'maus', dropdown?: NgbDropdown) {
+  filterLanguages(
+    value: string,
+    type: 'asr' | 'maus',
+    dropdown?: NgbDropdown,
+    emit?: boolean
+  ) {
     this.fields[type].filtered = this.fields[type].languages.filter(
       (a) =>
         a.description.toLowerCase().includes(value.toLowerCase()) ||
@@ -222,18 +285,31 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
       value === ''
     ) {
       if (type === 'asr') {
-        this.asrStoreService.changeASRSelectedLanguage(value ?? undefined);
+        this.options = {
+          ...this.options,
+          selectedASRLanguage: value ?? undefined,
+        };
+        if (emit) {
+          this.optionsChange.emit(this.options);
+        }
       } else {
-        this.asrStoreService.changeASRSelectedMausLanguage(value ?? undefined);
+        this.options = {
+          ...this.options,
+          selectedMausLanguage: value ?? undefined,
+        };
+        if (emit) {
+          this.optionsChange.emit(this.options);
+        }
       }
     }
 
     if (type === 'asr') {
-      this.selectLanguage(value, 'maus');
+      this.selectLanguage(value, 'maus', emit);
     }
+    this.cd.markForCheck();
   }
 
-  selectLanguage(language: string, type: 'asr' | 'maus') {
+  selectLanguage(language: string, type: 'asr' | 'maus', emit?: boolean) {
     this.popTemplate?.close();
     const langItem = this.fields[type].languages.find(
       (a) => a.value === language
@@ -263,19 +339,26 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
         this.fields.provider.selected = '';
       }
 
-      this.asrStoreService.changeASRSelectedLanguage(language ?? undefined);
+      this.options = {
+        ...this.options,
+        selectedASRLanguage: language ?? undefined,
+      };
+      this.optionsChange.emit(this.options);
     } else {
-      this.asrStoreService.changeASRSelectedMausLanguage(language ?? undefined);
+      this.options = {
+        ...this.options,
+        selectedMausLanguage: language ?? undefined,
+      };
+      if (emit) {
+        this.optionsChange.emit(this.options);
+      }
     }
 
     if (type === 'asr') {
-      this.selectLanguage(language, 'maus');
-      this.filterLanguages(language, 'maus');
+      this.selectLanguage(language, 'maus', emit);
+      this.filterLanguages(language, 'maus', undefined, emit);
     }
-  }
-
-  onDropdownClose() {
-    alert('close');
+    this.cd.markForCheck();
   }
 
   onLanguageDropdownOpenChange(opened: boolean, type: 'asr' | 'maus') {
@@ -291,7 +374,13 @@ export class AsrOptionsComponent extends SubscriberComponent implements OnInit {
     }
   }
 
-  onAccessCodeChange(accessCode: string) {
-    this.asrStoreService.changeASRAccessCode(accessCode);
+  onAccessCodeChange(accessCode: string, emit?: boolean) {
+    this.options = {
+      ...this.options,
+      accessCode,
+    };
+    if (emit) {
+      this.optionsChange.emit(this.options);
+    }
   }
 }

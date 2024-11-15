@@ -1319,7 +1319,7 @@ export class TranscrWindowComponent
   startASRForThisSegment() {
     if (
       this.asrStoreService.asrOptions?.selectedASRLanguage &&
-      this.asrStoreService.asrOptions?.selectedService
+      this.asrStoreService.asrOptions?.selectedServiceProvider
     ) {
       if (this.audiochunk!.time.duration.seconds > 600) {
         // trigger alert, too big audio duration

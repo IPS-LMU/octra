@@ -66,7 +66,7 @@ export class AsrEffects {
         }
 
         if (
-          !state.asr.settings?.selectedService ||
+          !state.asr.settings?.selectedServiceProvider ||
           !state.asr.settings?.selectedASRLanguage
         ) {
           return of(
@@ -88,7 +88,7 @@ export class AsrEffects {
           ASRActions.addToQueue.success({
             item: {
               id: state.asr.queue.idCounter + 1,
-              selectedASRService: state.asr.settings.selectedService!,
+              selectedASRService: state.asr.settings.selectedServiceProvider!,
               selectedASRLanguage: state.asr.settings.selectedASRLanguage!,
               selectedMausLanguage: state.asr.settings?.selectedMausLanguage,
               accessCode: state.asr.settings?.accessCode,

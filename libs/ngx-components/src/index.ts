@@ -7,3 +7,4 @@ export * from './lib/components/form-generator/array-adder/toolconfig-array-adde
 export * from './lib/components/form-generator/toolconfig-group/toolconfig-group.component';
 export * from './lib/obj';
 export * from './lib/multi-threading.service';
+export * from './lib/components/asr-options/asr-options.component';

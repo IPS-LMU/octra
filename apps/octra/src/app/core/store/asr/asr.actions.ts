@@ -4,23 +4,11 @@ import {
   ASRQueueItemType,
   ASRStateProcessOptions,
   ASRStateQueueItem,
+  ASRStateSettings,
   ASRTimeInterval,
 } from './index';
 
 export class ASRActions {
-  static setSelectedASRService = createActionGroup({
-    source: 'asr/set selected asr',
-    events: {
-      do: props<{
-        asrService?: string;
-      }>(),
-      success: emptyProps(),
-      fail: props<{
-        error: string;
-      }>(),
-    },
-  });
-
   static stopProcessing = createActionGroup({
     source: 'asr/stop processing',
     events: {
@@ -32,37 +20,11 @@ export class ASRActions {
     },
   });
 
-  static setASRLanguage = createActionGroup({
-    source: 'asr/set asr language',
+  static setASRSettings = createActionGroup({
+    source: 'asr/set settings',
     events: {
       do: props<{
-        selectedASRLanguage?: string;
-      }>(),
-      success: emptyProps(),
-      fail: props<{
-        error: string;
-      }>(),
-    },
-  });
-
-  static setASRAccessCode = createActionGroup({
-    source: 'asr/set asr access code',
-    events: {
-      do: props<{
-        accessCode?: string;
-      }>(),
-      success: emptyProps(),
-      fail: props<{
-        error: string;
-      }>(),
-    },
-  });
-
-  static setASRMausLanguage = createActionGroup({
-    source: 'asr/set maus language',
-    events: {
-      do: props<{
-        selectedMausLanguage?: string;
+        settings: ASRStateSettings;
       }>(),
       success: emptyProps(),
       fail: props<{

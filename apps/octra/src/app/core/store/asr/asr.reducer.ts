@@ -1,4 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
+import { ApplicationActions } from '../application/application.actions';
+import { AuthenticationActions } from '../authentication';
+import { IDBActions } from '../idb/idb.actions';
 import { ASRActions } from './asr.actions';
 import {
   ASRProcessStatus,
@@ -6,9 +9,6 @@ import {
   ASRStateQueue,
   ASRStateQueueStatistics,
 } from './index';
-import { IDBActions } from '../idb/idb.actions';
-import { AuthenticationActions } from '../authentication';
-import { ApplicationActions } from '../application/application.actions';
 
 export const initialState: ASRState = {
   queue: {
@@ -73,33 +73,10 @@ export const reducer = createReducer(
     ...state,
     isEnabled,
   })),
-  on(
-    ASRActions.setASRMausLanguage.do,
-    (state: ASRState, { selectedMausLanguage }) => ({
-      ...state,
-      settings: {
-        ...state.settings,
-        selectedMausLanguage,
-      },
-    })
-  ),
-  on(ASRActions.setASRAccessCode.do, (state: ASRState, { accessCode }) => ({
+  on(ASRActions.setASRSettings.do, (state: ASRState, { settings }) => ({
     ...state,
-    settings: {
-      ...state.settings,
-      accessCode,
-    },
+    settings,
   })),
-  on(
-    ASRActions.setASRLanguage.do,
-    (state: ASRState, { selectedASRLanguage }) => ({
-      ...state,
-      settings: {
-        ...state.settings,
-        selectedASRLanguage,
-      },
-    })
-  ),
   on(ASRActions.initQueue.do, (state: ASRState) => ({
     ...state,
     queue: initialState.queue,
@@ -109,19 +86,6 @@ export const reducer = createReducer(
     (state: ASRState, { applicationOptions }) => ({
       ...state,
       settings: applicationOptions.asr ?? undefined,
-    })
-  ),
-  on(
-    ASRActions.setSelectedASRService.do,
-    (state: ASRState, { asrService }) => ({
-      ...state,
-      queue: initialState.queue,
-      settings: {
-        ...state.settings,
-        selectedService: state.languageSettings?.services.find(
-          (a) => a.provider === asrService
-        ),
-      },
     })
   ),
   on(ASRActions.addToQueue.success, (state: ASRState, { item }) => ({

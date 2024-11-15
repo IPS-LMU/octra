@@ -1,16 +1,16 @@
 import { NgClass, NgStyle } from '@angular/common';
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbDropdown,
   NgbDropdownItem,
@@ -19,7 +19,16 @@ import {
   NgbPopover,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
-import { ASRService, ASRSettings } from './types';
+import { ASROptionsTranslations, ASRService, ASRSettings } from './types';
+
+const defaultI18n: ASROptionsTranslations = {
+  header: 'Language and Provider',
+  asrLanguage: 'ASR Language',
+  mausLanguage: "MAUS Language",
+  nothingFound: 'Nothing found',
+  asrProvider: 'Provider',
+  accessCode: 'Access Code',
+};
 
 @Component({
   selector: 'octra-asr-options',
@@ -31,7 +40,6 @@ import { ASRService, ASRSettings } from './types';
     FormsModule,
     NgbPopover,
     NgStyle,
-    TranslocoPipe,
     NgClass,
     NgbDropdownMenu,
     NgbDropdownItem,
@@ -72,6 +80,7 @@ export class AsrOptionsComponent
     selectedASRLanguage?: string;
     selectedServiceProvider?: ASRService;
   }>();
+  @Input() i18n: ASROptionsTranslations = defaultI18n;
 
   @Input() showAccessCode = false;
 
@@ -169,6 +178,14 @@ export class AsrOptionsComponent
         this.filterProviders(this.fields.provider.selected);
         this.cd.markForCheck();
       }, 0);
+
+      const i18n = changes['i18n']?.currentValue;
+      if (i18n) {
+        this.i18n = {
+          ...defaultI18n,
+          ...i18n,
+        };
+      }
     }
   }
 

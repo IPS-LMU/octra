@@ -611,6 +611,14 @@
               [mausLanguages]="asrStoreService.mausLanguages$ | async"
               [asrLanguages]="asrStoreService.asrLanguages$ | async"
               [showAccessCode]="true"
+              [i18n]="{
+                header: 'p.language and provider' | transloco,
+                asrLanguage: 'asr.asr language' | transloco,
+                mausLanguage: 'asr.maus language' | transloco,
+                nothingFound: 'p.nothing found' | transloco,
+                asrProvider: 'asr.asr provider' | transloco,
+                accessCode: 'g.access code' | transloco
+              }"
             ></octra-asr-options>
             <hr />
             } }

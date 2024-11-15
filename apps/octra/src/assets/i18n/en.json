@@ -25,7 +25,10 @@
     "stop all": "Stop it for all transcription units",
     "stop for all next": "Stop it for this one and all transcription unit coming next",
     "stop this segment": "Stop it for this transcription unit only",
-    "without asr": "No ASR"
+    "without asr": "No ASR",
+    "asr provider": "ASR Provider",
+    "asr language": "ASR Language",
+    "maus language": "MAUS Language"
   },
   "authentication": {
     "description": "Close this window and click in OCTRA on the \"I'm authenticated!\" button in order to confirm authentication. After that the automated processing continues.",
@@ -413,7 +416,8 @@
     "select timezone": "Select a timezone",
     "selected level": "Selected level",
     "sign up": "Sign up",
-    "username or email": "Username or E-Mail"
+    "username or email": "Username or E-Mail",
+    "nothing found": "Nothing found"
   },
   "projects-list": {
     "introduction": "Please select a project that you want to transcribe and click on \"START\".",

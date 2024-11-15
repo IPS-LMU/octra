@@ -25,7 +25,10 @@
     "stop all": "Beende Verarbeitung für alle Einheiten",
     "stop for all next": "Beende Verarbeitung für dieses und für alle folgenden Einheiten",
     "stop this segment": "Beende Verarbeitung für diese Einheit",
-    "without asr": "Ohne ASR"
+    "without asr": "Ohne ASR",
+    "asr provider": "Dienstleister",
+    "asr language": "ASR Sprache",
+    "maus language": "MAUS Sprache"
   },
   "authentication": {
     "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt.",
@@ -413,7 +416,8 @@
     "select timezone": "Zeitzone wählen",
     "selected level": "Ausgewähltes level",
     "sign up": "Neu registrieren",
-    "username or email": "Nutzername oder E-Mail"
+    "username or email": "Nutzername oder E-Mail",
+    "nothing found": "Nicht gefunden"
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",

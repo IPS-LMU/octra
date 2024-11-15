@@ -1,8 +1,6 @@
 <form autocomplete="one-time-code">
   <div class="row g-0">
-    <label for="languageDropdown" class="form-label"
-      >{{ 'p.language and provider' | transloco }}:</label
-    >
+    <label for="languageDropdown" class="form-label">{{ i18n.header }}:</label>
   </div>
   <div class="row g-0 asr-language-options mb-3">
     <div class="col-4">
@@ -19,7 +17,7 @@
           class="form-control"
           id="languageDropdown"
           ngbDropdownToggle
-          placeholder="ASR Language"
+          [placeholder]="i18n.asrLanguage"
           autocomplete="one-time-code"
           autocapitalize="off"
           name="language"
@@ -37,7 +35,9 @@
           class="overflow-y-auto"
           id="languageDropdownMenu"
         >
-          <span class="d-block mb-2 ms-2"><b>ASR Language</b></span>
+          <span class="d-block mb-2 ms-2"
+            ><b>{{ i18n.asrLanguage }}</b></span
+          >
           <ul class="list-group">
             @for (language of fields.asr.filtered; track language) {
             <li
@@ -48,7 +48,7 @@
               <a class="dropdown-item">{{ language.description }}</a>
             </li>
             } @if (fields.asr.filtered.length === 0) {
-            <li class="text-center">Nothing found</li>
+            <li class="text-center">{{ i18n.nothingFound }}</li>
             }
           </ul>
         </div>
@@ -69,7 +69,7 @@
           class="form-control"
           id="providerDropdown"
           ngbDropdownToggle
-          placeholder="Provider"
+          [placeholder]="i18n.asrProvider"
           autocomplete="one-time-code"
           autocapitalize="off"
           name="provider"
@@ -86,7 +86,9 @@
           class="overflow-y-auto"
           id="providerDropdownMenu"
         >
-          <span class="d-block mb-2 ms-2"><b>ASR Provider</b></span>
+          <span class="d-block mb-2 ms-2"
+            ><b>{{ i18n.asrProvider }}</b></span
+          >
           <ul class="list-group">
             @for (provider of fields.provider.filtered; track provider) {
             <li class="list-group-item p-1 pointer">
@@ -223,7 +225,7 @@
               </div>
             </li>
             } @if (fields.provider.filtered.length === 0) {
-            <li class="text-center">Nothing found</li>
+            <li class="text-center">{{ i18n.nothingFound }}</li>
             }
           </ul>
         </div>
@@ -243,7 +245,7 @@
           class="form-control"
           id="mausDropdown"
           ngbDropdownToggle
-          placeholder="MAUS Language"
+          [placeholder]="i18n.mausLanguage"
           autocomplete="one-time-code"
           autocapitalize="off"
           name="maus"
@@ -272,7 +274,7 @@
               <a class="dropdown-item">{{ language.description }}</a>
             </li>
             } @if (fields.maus.filtered.length === 0) {
-            <li class="text-center">Nothing found</li>
+            <li class="text-center">{{ i18n.nothingFound }}</li>
             }
           </ul>
         </div>
@@ -285,7 +287,7 @@
     <div class="col">
       <div class="mb-3">
         <label for="asrAccessCode" class="form-label"
-          >{{ 'g.access code' | transloco }}:</label
+          >{{ i18n.accessCode }}:</label
         >
         <div class="input-group">
           <input

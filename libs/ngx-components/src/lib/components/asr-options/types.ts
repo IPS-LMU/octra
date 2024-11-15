@@ -23,3 +23,12 @@ export interface ASRSettings {
   basConfigURL?: string;
   asrQuotaInfoURL?: string;
 }
+
+export interface ASROptionsTranslations{
+  header?: string;
+  asrLanguage?: string;
+  mausLanguage?: string;
+  nothingFound?: string;
+  asrProvider?: string;
+  accessCode?: string;
+}

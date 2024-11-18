@@ -27,7 +27,6 @@ export class TranscriptionGuidelinesModalComponent
   public static options: NgbModalOptions = {
     size: 'xl',
     backdrop: true,
-    keyboard: false,
     scrollable: true,
   };
 

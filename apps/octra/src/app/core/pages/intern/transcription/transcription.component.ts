@@ -33,6 +33,20 @@ import { ProjectSettings } from '../../../obj/Settings';
 
 import { LoadeditorDirective } from '../../../shared/directive/loadeditor.directive';
 
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AnnotJSONConverter, Converter } from '@octra/annotation';
+import {
+  AudioManager,
+  BrowserInfo,
+  Shortcut,
+  ShortcutGroup,
+} from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
+import { AppInfo } from '../../../../app.info';
+import { DefaultComponent } from '../../../component/default.component';
+import { NavbarService } from '../../../component/navbar/navbar.service';
+import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
+import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import {
   AlertService,
   AudioService,
@@ -40,26 +54,12 @@ import {
   UserInteractionsService,
 } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { NavbarService } from '../../../component/navbar/navbar.service';
-import { LoginMode } from '../../../store';
-import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
-import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { DefaultComponent } from '../../../component/default.component';
-import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
-import { AuthenticationStoreService } from '../../../store/authentication';
-import {
-  AudioManager,
-  BrowserInfo,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
-import { ApplicationStoreService } from '../../../store/application/application-store.service';
-import { ShortcutService } from '../../../shared/service/shortcut.service';
-import { HotkeysEvent } from 'hotkeys-js';
 import { RoutingService } from '../../../shared/service/routing.service';
-import { AppInfo } from '../../../../app.info';
-import { AnnotJSONConverter, Converter } from '@octra/annotation';
+import { ShortcutService } from '../../../shared/service/shortcut.service';
+import { LoginMode } from '../../../store';
+import { ApplicationStoreService } from '../../../store/application/application-store.service';
+import { AuthenticationStoreService } from '../../../store/authentication';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription',
@@ -449,8 +449,9 @@ export class TranscriptionComponent
 
     this.subscribe(this.appStoreService.shortcutsEnabled$, {
       next: (shortcutsEnabled) => {
-        console.log('shortcutsEnabled changed');
-        if (this._currentEditor) {
+        console.log(`shortcutsEnabled changed to ${shortcutsEnabled}`);
+
+        if (this._currentEditor?.instance) {
           console.log(
             `set shortcuts to ${shortcutsEnabled} for editor ${
               (this._currentEditor.instance as any).name
@@ -663,9 +664,7 @@ export class TranscriptionComponent
                   this.subscribe(
                     this.modalOverview.componentInstance.transcriptionSend,
                     () => {
-                      const editor = this._currentEditor
-                        .instance as OctraEditorRequirements;
-                      editor.enableAllShortcuts();
+                      this.appStoreService.setShortcutsEnabled(true);
                       this.modalOverview?.close();
                       this.modalVisiblities.overview = false;
                       this.onSendNowClick();
@@ -675,10 +674,10 @@ export class TranscriptionComponent
 
                   this.modalOverview.result
                     .then(() => {
-                      (this.currentEditor.instance as any).enableAllShortcuts();
+                      this.appStoreService.setShortcutsEnabled(true);
                     })
                     .catch(() => {
-                      (this.currentEditor.instance as any).enableAllShortcuts();
+                      this.appStoreService.setShortcutsEnabled(true);
                     });
                 }
               );
@@ -788,9 +787,7 @@ export class TranscriptionComponent
       this.subscribe(
         this.modalOverview.componentInstance.transcriptionSend,
         () => {
-          const editor = this._currentEditor
-            .instance as OctraEditorRequirements;
-          editor.enableAllShortcuts();
+          this.appStoreService.setShortcutsEnabled(true);
           this.modalOverview?.close();
           this.modalVisiblities.overview = false;
           this.onSendNowClick();
@@ -902,9 +899,15 @@ export class TranscriptionComponent
       TranscriptionGuidelinesModalComponent,
       TranscriptionGuidelinesModalComponent.options
     );
-    this.modalGuidelines.result.then(() => {
-      this.modalVisiblities.guidelines = false;
-    });
+    this.appStoreService.setShortcutsEnabled(false);
+    this.modalGuidelines.result
+      .then(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+        this.modalVisiblities.guidelines = false;
+      })
+      .catch(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      });
     this.modalVisiblities.guidelines = true;
   }
 
@@ -915,12 +918,13 @@ export class TranscriptionComponent
       OverviewModalComponent.options
     );
 
+    this.appStoreService.setShortcutsEnabled(false);
     this.subscriptionManager.removeByTag('overview modal transcr send');
     this.subscribe(
       this.modalOverview.componentInstance.transcriptionSend,
       () => {
         const editor = this._currentEditor.instance as OctraEditorRequirements;
-        editor.enableAllShortcuts();
+        this.appStoreService.setShortcutsEnabled(true);
         this.modalOverview?.close();
         this.modalVisiblities.overview = false;
         this.onSendNowClick();
@@ -930,13 +934,11 @@ export class TranscriptionComponent
 
     this.modalOverview.result
       .then(() => {
-        const editor = this._currentEditor.instance as OctraEditorRequirements;
-        editor.enableAllShortcuts();
+        this.appStoreService.setShortcutsEnabled(true);
         this.modalVisiblities.overview = false;
       })
       .catch((err) => {
-        const editor = this._currentEditor.instance as OctraEditorRequirements;
-        editor.enableAllShortcuts();
+        this.appStoreService.setShortcutsEnabled(true);
         this.modalVisiblities.overview = false;
       });
     this.modalVisiblities.overview = true;
@@ -947,9 +949,15 @@ export class TranscriptionComponent
       ShortcutsModalComponent,
       ShortcutsModalComponent.options
     );
-    this.modalShortcutsDialogue.result.then(() => {
-      this.modalVisiblities.shortcuts = false;
-    });
+    this.appStoreService.setShortcutsEnabled(false);
+    this.modalShortcutsDialogue.result
+      .then(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+        this.modalVisiblities.shortcuts = false;
+      })
+      .catch(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      });
     this.modalVisiblities.shortcuts = true;
   }
 

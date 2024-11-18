@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
 
 @Component({
   selector: 'octra-fastbar',
@@ -23,10 +24,16 @@ export class FastbarComponent {
 
   constructor(
     public appStorage: AppStorageService,
+    private appStoreService: ApplicationStoreService,
     private modalService: OctraModalService
   ) {}
 
   openHelpModal() {
-    this.modalService.openModal(HelpModalComponent, HelpModalComponent.options);
+    this.appStoreService.setShortcutsEnabled(false);
+    this.modalService.openModal(HelpModalComponent, HelpModalComponent.options).then(() => {
+      this.appStoreService.setShortcutsEnabled(true);
+    }).catch(()=> {
+      this.appStoreService.setShortcutsEnabled(true);
+    })
   }
 }

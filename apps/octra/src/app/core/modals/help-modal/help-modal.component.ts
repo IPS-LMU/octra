@@ -10,7 +10,7 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class HelpModalComponent extends OctraModal {
   public static options: NgbModalOptions = {
     size: 'xl',
-    backdrop: true,
+    backdrop: true
   };
   public visible = false;
 

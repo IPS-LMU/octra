@@ -8,14 +8,14 @@ import {
   TaskInputOutputDto,
   TaskStatus,
 } from '@octra/api-types';
-import { AnnotationActions } from '../store/login-mode/annotation/annotation.actions';
-import { ApplicationActions } from '../store/application/application.actions';
-import { IDBActions } from '../store/idb/idb.actions';
-import { APIActions } from '../store/api';
-import { LoginModeActions } from '../store/login-mode';
-import { ASRActions } from '../store/asr/asr.actions';
-import { UserActions } from '../store/user/user.actions';
 import { AppInfo } from '../../app.info';
+import { APIActions } from '../store/api';
+import { ApplicationActions } from '../store/application/application.actions';
+import { ASRActions } from '../store/asr/asr.actions';
+import { IDBActions } from '../store/idb/idb.actions';
+import { LoginModeActions } from '../store/login-mode';
+import { AnnotationActions } from '../store/login-mode/annotation/annotation.actions';
+import { UserActions } from '../store/user/user.actions';
 
 export function createSampleProjectDto(
   projectID: string,

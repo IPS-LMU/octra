@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.4.2](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.4.1...ngx-utilities-0.4.2) (2024-11-18)
+
+
+### Features
+
+* **ngx-components:** asr-options is now available in @octra/components ([bd68b3a](https://github.com/IPS-LMU/octra/commit/bd68b3aad6be0ef9d9db4e90778c410ea1bf0699))
+
+
+
 ## [0.4.1](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.4.0...ngx-utilities-0.4.1) (2024-11-08)
 
 

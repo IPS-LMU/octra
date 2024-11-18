@@ -453,8 +453,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         break;
       case PlayBackStatus.PREPARE:
         break;
-      case PlayBackStatus.STARTED:
-        break;
       case PlayBackStatus.PLAYING:
         this.av.onPlaybackStarted();
         break;

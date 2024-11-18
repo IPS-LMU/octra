@@ -65,6 +65,7 @@
             <input
               (change)="afterVolumeChanged()"
               [(ngModel)]="volume"
+              [disabled]="isAudioPlaying"
               class="slider"
               id="volume-slider"
               max="3"

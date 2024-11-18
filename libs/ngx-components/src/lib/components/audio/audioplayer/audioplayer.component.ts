@@ -9,12 +9,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import Konva from 'konva';
-import { AudioplayerSettings } from './audioplayer-settings';
-import { SubscriptionManager } from '@octra/utilities';
 import { PlayBackStatus, SampleUnit } from '@octra/media';
-import { Subscription, timer } from 'rxjs';
+import { SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
+import Konva from 'konva';
+import { Subscription, timer } from 'rxjs';
+import { AudioplayerSettings } from './audioplayer-settings';
 import KonvaEventObject = Konva.KonvaEventObject;
 
 @Component({
@@ -392,10 +392,8 @@ export class AudioplayerComponent
         break;
       case PlayBackStatus.PREPARE:
         break;
-      case PlayBackStatus.STARTED:
-        this.onPlaybackStarted();
-        break;
       case PlayBackStatus.PLAYING:
+        this.onPlaybackStarted();
         break;
       case PlayBackStatus.PAUSED:
         this.onPlaybackPaused();

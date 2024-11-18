@@ -1,6 +1,5 @@
 import { Injectable, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BugreportModalComponent } from './bugreport-modal/bugreport-modal.component';
 import { ErrorModalComponent } from './error-modal/error-modal.component';
 import { ExportFilesModalComponent } from './export-files-modal/export-files-modal.component';
 import { HelpModalComponent } from './help-modal/help-modal.component';
@@ -29,8 +28,9 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { AppSharedModule } from '../../app.shared.module';
 import {
+  BugreportModalComponent,
   OctraComponentsModule,
-  OctraFormGeneratorModule,
+  OctraFormGeneratorModule
 } from '@octra/ngx-components';
 import { FormsModule } from '@angular/forms';
 import { NamingDragAndDropComponent } from '../tools/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -65,7 +65,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 
 @NgModule({
   declarations: [
-    BugreportModalComponent,
     ErrorModalComponent,
     ExportFilesModalComponent,
     HelpModalComponent,
@@ -112,9 +111,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NgbAccordionCollapse,
     NgxJoditComponent,
     OctraFormGeneratorModule,
+    BugreportModalComponent
   ],
   exports: [
-    BugreportModalComponent,
     ErrorModalComponent,
     ExportFilesModalComponent,
     HelpModalComponent,

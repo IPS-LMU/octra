@@ -1,11 +1,24 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoService } from '@jsverse/transloco';
+import { NgbModalRef, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import {
+  AnnotationLevelType,
+  OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
+import { AccountRole, ProjectDto } from '@octra/api-types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
+import { DateTime } from 'luxon';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
+import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
+import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
+import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
+import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
 import {
   AudioService,
   SettingsService,
@@ -18,27 +31,13 @@ import {
   ConsoleGroupEntry,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
-import { NavbarService } from './navbar.service';
-import {
-  AnnotationLevelType,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
-import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
-import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
-import { BugreportModalComponent } from '../../modals/bugreport-modal/bugreport-modal.component';
-import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
-import { NgbModalRef, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { DefaultComponent } from '../default.component';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { LoginMode } from '../../store';
-import { AccountRole, ProjectDto } from '@octra/api-types';
-import { AuthenticationStoreService } from '../../store/authentication';
-import { OctraAPIService } from '@octra/ngx-octra-api';
-import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
-import { DateTime } from 'luxon';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
+import { AuthenticationStoreService } from '../../store/authentication';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { DefaultComponent } from '../default.component';
+import { NavbarService } from './navbar.service';
 
 declare const BUILD: {
   version: string;
@@ -202,7 +201,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     this.appStorage.disableUndoRedo();
     this.appStoreService.setShortcutsEnabled(false);
     this.modalService
-      .openModal(BugreportModalComponent, BugreportModalComponent.options)
+      .openBugreportModal()
       .then(() => {
         this.appStorage.enableUndoRedo();
         this.appStoreService.setShortcutsEnabled(true);

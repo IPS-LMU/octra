@@ -49,8 +49,9 @@
     "description": "Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?",
     "error": "Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.",
     "give feedback": "Give feedback",
-    "send protocol": "Add Protocol (recommended)",
-    "sent": "Your feedback was successfully reported \uD83D\uDE42"
+    "add protocol": "Add Protocol (recommended)",
+    "sent": "Your feedback was successfully reported \uD83D\uDE42",
+    "sending": "Please wait for octra sending your feedback..."
   },
   "converters": {
     "SRT": {

@@ -1,32 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { AppInfo } from '../../../app.info';
 import { hasProperty } from '@octra/utilities';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
-import { OctraModalService } from '../octra-modal.service';
-import { YesNoModalComponent } from '../yes-no-modal/yes-no-modal.component';
+import { AppInfo } from '../../../app.info';
+import { DefaultComponent } from '../../component/default.component';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 import { LoginInvalidModalComponent } from '../login-invalid-modal/login-invalid-modal.component';
+import { OctraModalService } from '../octra-modal.service';
+import { SupportedFilesModalComponent } from '../supportedfiles-modal/supportedfiles-modal.component';
 import { TranscriptionDeleteModalComponent } from '../transcription-delete-modal/transcription-delete-modal.component';
 import { TranscriptionStopModalComponent } from '../transcription-stop-modal/transcription-stop-modal.component';
-import { ErrorModalComponent } from '../error-modal/error-modal.component';
-import { BugreportModalComponent } from '../bugreport-modal/bugreport-modal.component';
-import { SupportedFilesModalComponent } from '../supportedfiles-modal/supportedfiles-modal.component';
-import { DefaultComponent } from '../../component/default.component';
+import { YesNoModalComponent } from '../yes-no-modal/yes-no-modal.component';
 
 @Component({
   selector: 'octra-modal',
   templateUrl: './octra-modal.component.html',
   styleUrls: ['./octra-modal.component.scss'],
 })
-export class OctraModalComponent extends DefaultComponent implements OnInit {
+export class OctraModalComponent extends DefaultComponent {
   modals: any = {
     error: {
       visible: false,
       type: ErrorModalComponent,
-    },
-    bugreport: {
-      visible: false,
-      type: BugreportModalComponent,
     },
     supportedfiles: {
       visible: false,
@@ -50,29 +43,14 @@ export class OctraModalComponent extends DefaultComponent implements OnInit {
     },
   };
 
-  public bgdescr = '';
-  public bgemail = '';
-  public sendproObj = true;
-  public bugsent = false;
   public data: any;
 
   public get AppInfo(): any {
     return AppInfo;
   }
 
-  constructor(
-    private modService: OctraModalService,
-    public bugService: BugReportService,
-    private appStorage: AppStorageService
-  ) {
+  constructor(private modService: OctraModalService) {
     super();
-  }
-
-  ngOnInit() {
-    this.bgemail =
-      this.appStorage.snapshot.authentication.me?.email !== undefined
-        ? this.appStorage.snapshot.authentication.me?.email
-        : '';
   }
 
   openModal(name: string, data?: any): Promise<any> {

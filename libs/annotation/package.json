@@ -12,8 +12,8 @@
   },
   "homepage": "https://github.com/IPS-LMU/octra",
   "peerDependencies": {
-    "@octra/media": "~0.0.11",
-    "@octra/utilities": "~0.0.3"
+    "@octra/media": "~0.1.0",
+    "@octra/utilities": "~0.1.0"
   },
   "repository": {
     "type": "git",

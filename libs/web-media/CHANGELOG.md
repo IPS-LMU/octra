@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/IPS-LMU/octra/compare/web-media-0.1.0...web-media-0.1.1) (2024-11-18)
+
+
+### Bug Fixes
+
+* **octra:** audiocutter configurator not working properly ([dcef0b2](https://github.com/IPS-LMU/octra/commit/dcef0b24719eaff53ad1a0620fc6cb3cb87cdc8e))
+* **web-media:** audio parsers not loaded ([8d9db39](https://github.com/IPS-LMU/octra/commit/8d9db39bc8039a76b3719433ed9190cc3be45a34))
+* **web-media:** cutting audio does not work correctly ([05a9658](https://github.com/IPS-LMU/octra/commit/05a965874dd7785f311ef7f41f194daec1f0c09b))
+* **web-media:** cutting audio is not async ([667adaf](https://github.com/IPS-LMU/octra/commit/667adaf84cf9885e095c736120d122403fc47d70))
+
+
+### Features
+
+* **utilities:** moved TsWorker classed to utilities package ([5ba6838](https://github.com/IPS-LMU/octra/commit/5ba68383aafa88cf9077f83e09cfdeff541fa66a))
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/web-media-0.0.11...web-media-0.1.0) (2024-11-08)
 
 

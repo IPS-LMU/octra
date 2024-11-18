@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.1](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.0...ngx-components-0.2.1) (2024-11-18)
+
+
+### Bug Fixes
+
+* **ngx-components:** error on combine phrases ([55c957a](https://github.com/IPS-LMU/octra/commit/55c957a889de4cd227bdb2dc953d2871b65f276b))
+
+
+### Features
+
+* **ngx-components:** add i18n input for asr-options ([896c686](https://github.com/IPS-LMU/octra/commit/896c686596f0732443861c200986f4e665ece56a))
+* **ngx-components:** asr-options is now available in @octra/components ([bd68b3a](https://github.com/IPS-LMU/octra/commit/bd68b3aad6be0ef9d9db4e90778c410ea1bf0699))
+* **ngx-components:** move bugreport modal to ngx-components ([be01517](https://github.com/IPS-LMU/octra/commit/be0151749a89a5c20ee7994bd362f014c699894f))
+* **utilities:** moved TsWorker classed to utilities package ([5ba6838](https://github.com/IPS-LMU/octra/commit/5ba68383aafa88cf9077f83e09cfdeff541fa66a))
+
+
+
 # [0.2.0](https://github.com/IPS-LMU/octra/compare/ngx-components-0.1.2...ngx-components-0.2.0) (2024-11-08)
 
 

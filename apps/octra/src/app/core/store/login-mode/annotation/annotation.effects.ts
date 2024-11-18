@@ -1592,7 +1592,7 @@ export class AnnotationEffects {
           rootState.application.options.showFeedbackNotice &&
           this.apiService.appProperties?.send_feedback
         ) {
-          this.modalsService.openFeedbackModal();
+          this.modalsService.openFeedbackNoticeModal();
         }
 
         // new annotation set
@@ -1625,7 +1625,7 @@ export class AnnotationEffects {
         rootState.application.options.showFeedbackNotice &&
         this.apiService.appProperties?.send_feedback
       ) {
-        this.modalsService.openFeedbackModal();
+        this.modalsService.openFeedbackNoticeModal();
       }
 
       return of(

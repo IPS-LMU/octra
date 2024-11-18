@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
-      {{ 'bug report.give feedback' | transloco }}
+      {{ i18n.giveFeedback }}
     </h5>
     <button
       type="button"
@@ -12,30 +12,29 @@
   </div>
   <div class="modal-body">
     <p>
-      {{ 'bug report.description' | transloco }}
+      {{ i18n.introduction }}
     </p>
     @if (sendStatus === 'error') {
-    <div
-      [innerHTML]="
-        'bug report.error'
-          | transloco
-            : {
+    <div [innerHTML]="i18n.error" class="alert alert-danger bugsent">
+      <!-- {
                 email:
                   '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' +
                   bgdescr +
                   '\'>octra@phonetik.uni-muenchen.de</a>'
-              }
-      "
-      class="alert alert-danger bugsent"
-    ></div>
-    } @if (sendStatus === 'success') {
-    <div class="alert alert-success bugsent">
-      {{ 'bug report.sent' | transloco }}
+              }  -->
     </div>
+    } @else if (sendStatus === 'success') {
+    <div class="alert alert-success bugsent">
+      {{ i18n.bugReportSent }}
+    </div>
+    } @else if (sendStatus === 'sending') {
+      <div class="alert alert-info bugsent">
+        {{ i18n.sending }}
+      </div>
     }
 
     <form>
-      @if (appStorage.useMode !== 'online' || !appStorage.loggedIn) {
+      @if (showSenderFields) {
       <div class="row">
         <div class="col-6">
           <div class="form-floating mb-3">
@@ -45,12 +44,10 @@
               id="inputName"
               name="name"
               aria-describedby="name"
-              [placeholder]="'g.name' | transloco"
-              [(ngModel)]="profileName"
+              [placeholder]="i18n.name"
+              [(ngModel)]="name"
             />
-            <label for="inputName" class="form-label">{{
-              'g.name' | transloco
-            }}</label>
+            <label for="inputName" class="form-label">{{ i18n.name }}</label>
           </div>
         </div>
         <div class="col-6">
@@ -61,11 +58,11 @@
               id="inputEmail"
               name="email"
               aria-describedby="email"
-              [(ngModel)]="profileEmail"
+              [(ngModel)]="email"
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{
-              'g.e-mail' | transloco
+              i18n.eMail
             }}</label>
           </div>
         </div>
@@ -74,7 +71,7 @@
       <div class="row">
         <div class="col-12">
           <div class="d-block mb-3">
-            <label for="bgDescr">{{ 'g.description' | transloco }}:</label>
+            <label for="bgDescr">{{i18n.description}}:</label>
             <ngx-jodit
               [(ngModel)]="bgdescr"
               [options]="joditOptions"
@@ -99,7 +96,7 @@
       <div class="form-row">
         <div class="col-12">
           <div class="form-group" style="margin-bottom: 20px">
-            <label>{{ 'g.screenshots' | transloco }} (optional):</label><br />
+            <label>{{ i18n.screenshots }} (optional):</label><br />
             <div class="preview-images">
               @for (screenshot of screenshots; track screenshot; let i = $index)
               {
@@ -155,7 +152,7 @@
                   name="sendpro"
                   type="checkbox"
                 />
-                {{ 'bug report.send protocol' | transloco }}
+                {{ i18n.addProtocol }}
               </label>
             </div>
           </div>
@@ -164,10 +161,10 @@
             class="form-group"
             style="padding-top: 0; margin-top: 0"
           >
-            <span>{{ 'g.protocol' | transloco }}:</span>
+            <span>{{ i18n.protocol }}:</span>
             <textarea
               #bgProtocol
-              [innerHTML]="bugService.pkgText"
+              [innerHTML]="pkgText"
               class="form-control"
               disabled
               id="bgProtocol"
@@ -180,15 +177,15 @@
   </div>
   <div class="modal-footer">
     <button (click)="close()" class="btn btn-secondary" type="button">
-      {{ 'g.abort' | transloco }}
+      {{ i18n.abort }}
     </button>
     <button
       (click)="sendBugReport()"
-      [disabled]="!isvalid || sendStatus === 'sending'"
+      [disabled]="!isvalid || sendStatus === 'sending' || sendStatus === 'success'"
       class="btn btn-primary"
       type="button"
     >
-      {{ 'bug report.give feedback' | transloco }}
+      {{ i18n.sendFeedback }}
     </button>
   </div>
 </div>

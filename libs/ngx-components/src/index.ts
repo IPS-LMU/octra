@@ -8,3 +8,4 @@ export * from './lib/components/form-generator/toolconfig-group/toolconfig-group
 export * from './lib/obj';
 export * from './lib/multi-threading.service';
 export * from './lib/components/asr-options/asr-options.component';
+export * from './lib/components/bugreport-modal/bugreport-modal.component';

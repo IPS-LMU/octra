@@ -2,37 +2,46 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { timer } from 'rxjs';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
-import { OctraModal } from '../types';
+import { FormsModule } from '@angular/forms';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { AuthenticationStoreService } from '../../store/authentication';
+import { SubscriberComponent } from '@octra/ngx-utilities';
 import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
-import { RootState } from '../../store';
-import { Store } from '@ngrx/store';
-import { UserActions } from '../../store/user/user.actions';
+import { Observable, Subject, timer } from 'rxjs';
+import { BugReportTranslations } from './types';
+
+const defaultTranslations: BugReportTranslations = {
+  giveFeedback: 'Give Feedback',
+  error:
+    'Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.',
+  introduction:
+    'Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?',
+  bugReportSent: 'Your feedback was successfully reported \uD83D\uDE42',
+  addProtocol: 'Add Protocol (recommended)',
+  eMail: 'E-Mail',
+  name: 'Name',
+  description: 'Description',
+  screenshots: 'Screenshots',
+  protocol: 'Protocol',
+  abort: 'Abort',
+  sendFeedback: 'Send Feedback',
+  sending: "Please wait for octra sending your feedback..."
+};
 
 @Component({
   selector: 'octra-bugreport-modal',
+  standalone: true,
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.scss'],
+  imports: [FormsModule, NgxJoditComponent],
 })
 export class BugreportModalComponent
-  extends OctraModal
+  extends SubscriberComponent
   implements OnInit, AfterViewInit
 {
-  get profileEmail(): string {
-    return this._profileEmail;
-  }
-
-  get profileName(): string {
-    return this._profileName;
-  }
-
   @ViewChild('editor') editor?: NgxJoditComponent;
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -60,66 +69,94 @@ export class BugreportModalComponent
   public sendProObj = true;
   public bugsent = false;
   public sendStatus: 'pending' | 'success' | 'error' | 'sending' = 'pending';
+  public action: Subject<unknown> = new Subject<unknown>();
   public screenshots: {
     blob: Blob;
     previewURL: string;
   }[] = [];
   protected data = undefined;
 
-  _profile = {
-    email: '',
-    name: '',
-  };
-  private _profileEmail = '';
-  private _profileName = '';
+  public _profile: {
+    email?: string;
+    name?: string;
+  } = {};
 
-  set profileEmail(value: string) {
-    this._profileEmail = value;
-    this.store.dispatch(
-      UserActions.setUserProfile({
-        email: this._profileEmail,
-        name: this._profileName,
-      })
-    );
+  protected set email(email: string) {
+    this._profile = email ? { ...this._profile, email } : {};
+    this.profileChange.emit(this._profile);
   }
 
-  set profileName(value: string) {
-    this._profileName = value;
-    this.store.dispatch(
-      UserActions.setUserProfile({
-        email: this._profileEmail,
-        name: this._profileName,
-      })
-    );
+  protected get email(): string | undefined {
+    return this._profile.email;
+  }
+
+  protected set name(name: string | undefined) {
+    this._profile = name ? { ...this._profile, name } : {};
+    this.profileChange.emit(this._profile);
+  }
+
+  protected get name(): string | undefined {
+    return this._profile.name;
+  }
+
+  protected get profile(): { email?: string; name?: string } {
+    return this._profile;
+  }
+
+  profileChange: EventEmitter<{
+    email?: string;
+    name?: string;
+  }> = new EventEmitter();
+
+  pkgText = "";
+
+  showSenderFields = true;
+
+  send = new EventEmitter<{
+    name?: string;
+    email?: string;
+    message: string;
+    sendProtocol: boolean;
+    screenshots: any[];
+  }>();
+
+  private _i18n: BugReportTranslations = defaultTranslations;
+
+  get i18n() {
+    return this._i18n;
+  }
+
+  set i18n(value: BugReportTranslations) {
+    this._i18n = value;
   }
 
   public get isvalid(): boolean {
     return this.sendProObj || this.bgdescr !== '';
   }
 
+  public close(action?: unknown) {
+    this.activeModal.close(action);
+  }
+
+  public applyAction(action: any) {
+    this.action.next(action);
+  }
+
   ngAfterViewInit() {
-    if (
-      this.appStorage.useMode === 'online' ||
-      (this.profileEmail && this.profileName)
-    ) {
-      setTimeout(() => {
-        this.editor?.jodit?.focus();
-      }, 0);
-    }
+    setTimeout(() => {
+      this.editor?.jodit?.focus();
+    }, 0);
   }
 
   constructor(
-    public appStorage: AppStorageService,
-    public bugService: BugReportService,
-    public authStoreService: AuthenticationStoreService,
-    public store: Store<RootState>,
     private cd: ChangeDetectorRef,
-    protected override activeModal: NgbActiveModal
+    protected activeModal: NgbActiveModal
   ) {
-    super('bugreportModal', activeModal);
+    super();
   }
 
   ngOnInit() {
+    /*
     if (this.appStorage.useMode !== 'online') {
       this._profileName = this.appStorage.snapshot.user.name ?? '';
       this._profileEmail = this.appStorage.snapshot.user.email ?? '';
@@ -133,8 +170,7 @@ export class BugreportModalComponent
     setTimeout(() => {
       this.bugService.getPackage();
     }, 1000);
-    this.cd.markForCheck();
-    this.cd.detectChanges();
+     */
   }
 
   onHidden() {
@@ -155,31 +191,32 @@ export class BugreportModalComponent
     }
 
     this.sendStatus = 'sending';
-    this.subscribe(
-      this.bugService.sendReport(
-        this.profileName,
-        this.profileEmail,
-        this.bgdescr,
-        this.sendProObj,
-        this.screenshots
-      ),
-      {
-        next: () => {
-          this.sendStatus = 'success';
-          this.bugsent = true;
-          this.update();
-          this.subscribe(timer(2000), () => {
-            this.bgdescr = '';
-            this.close();
-          });
-        },
-        error: (error) => {
-          console.error(error);
-          this.sendStatus = 'error';
-          this.update();
-        },
-      }
-    );
+    this.send.emit({
+      name: this.profile.name,
+      email: this.profile.email,
+      message: this.bgdescr,
+      sendProtocol: this.sendProObj,
+      screenshots: this.screenshots,
+    });
+  }
+
+  waitForSendResponse(obervable: Observable<void>) {
+    this.subscribe(obervable, {
+      next: () => {
+        this.sendStatus = 'success';
+        this.bugsent = true;
+        this.update();
+        this.subscribe(timer(2000), () => {
+          this.bgdescr = '';
+          this.close();
+        });
+      },
+      error: (error) => {
+        console.error(error);
+        this.sendStatus = 'error';
+        this.update();
+      },
+    });
   }
 
   public selectFileForUpload(input: HTMLInputElement) {

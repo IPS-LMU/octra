@@ -1,25 +1,41 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import {
   NgbModal,
   NgbModalOptions,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalWrapper } from './ng-modal-wrapper';
+import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
-import { Action } from '@ngrx/store';
-import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
+import { BugreportModalComponent } from '@octra/ngx-components';
+import { SubscriptionManager } from '@octra/utilities';
+import { AppStorageService } from '../shared/service/appstorage.service';
+import { BugReportService } from '../shared/service/bug-report.service';
+import { LoginMode, RootState } from '../store';
+import { UserActions } from '../store/user/user.actions';
 import { ErrorModalComponent } from './error-modal/error-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
+import { NgbModalWrapper } from './ng-modal-wrapper';
+import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 
 @Injectable()
-export class OctraModalService {
+export class OctraModalService implements OnDestroy {
   onModalAction = new EventEmitter<{
     name: string;
     type: 'open' | 'close';
     result?: any;
   }>();
+  private subscrManager = new SubscriptionManager();
 
-  constructor(private modalService: NgbModal) {}
+  constructor(
+    private modalService: NgbModal,
+    private bugService: BugReportService,
+    private appStorage: AppStorageService,
+    private store: Store<RootState>
+  ) {}
+
+  ngOnDestroy(): void {
+    this.subscrManager.destroy();
+  }
 
   public openModal<T, R>(modal: T, config: NgbModalOptions, data?: any) {
     const modalRef = this.modalService.open(modal, {
@@ -112,7 +128,7 @@ export class OctraModalService {
     });
   }
 
-  openFeedbackModal() {
+  openFeedbackNoticeModal() {
     const ref = this.openModalRef<FeedbackNoticeModalComponent>(
       FeedbackNoticeModalComponent,
       FeedbackNoticeModalComponent.options
@@ -129,5 +145,54 @@ export class OctraModalService {
         result,
       });
     });
+  }
+
+  openBugreportModal() {
+    this.bugService.getPackage();
+    const ref = this.openModalRef<BugreportModalComponent>(
+      BugreportModalComponent,
+      BugreportModalComponent.options,
+      {
+        pkgText: this.bugService.pkgText,
+        showSenderFields:
+          this.appStorage.useMode !== LoginMode.ONLINE ||
+          !this.appStorage.loggedIn,
+        _profile: {
+          ...((this.appStorage.useMode !== LoginMode.ONLINE
+            ? this.appStorage.snapshot.user
+            : {
+                email: this.appStorage.snapshot.authentication?.me.email,
+                name: `${this.appStorage.snapshot.authentication?.me.first_name} ${this.appStorage.snapshot.authentication?.me.last_name}`,
+              }) ?? {}),
+        },
+      }
+    );
+    this.subscrManager.add(
+      ref.componentInstance.profileChange.subscribe({
+        next: ({ email, name }) => {
+          this.store.dispatch(UserActions.setUserProfile({ email, name }));
+        },
+      })
+    );
+
+    this.subscrManager.add(
+      ref.componentInstance.send.subscribe({
+        next: ({ name, email, message, sendProtocol, screenshots }) => {
+          console.log('Sending...');
+          ref.componentInstance.sendStatus = 'sending';
+          ref.componentInstance.waitForSendResponse(
+            this.bugService.sendReport(
+              name,
+              email,
+              message,
+              sendProtocol,
+              screenshots
+            )
+          );
+        },
+      })
+    );
+
+    return ref.result;
   }
 }

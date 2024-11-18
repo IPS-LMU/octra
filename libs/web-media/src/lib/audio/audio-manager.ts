@@ -405,10 +405,6 @@ export class AudioChunk {
     return this._status === PlayBackStatus.ENDED;
   }
 
-  public get isPlaybackStarted(): boolean {
-    return this._status === PlayBackStatus.STARTED;
-  }
-
   public get isPlaying(): boolean {
     return this._status === PlayBackStatus.PLAYING;
   }

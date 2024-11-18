@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.2](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.1...ngx-components-0.2.2) (2024-11-18)
+
+
+### Bug Fixes
+
+* **ngx-components:** audio player does not update UI while playing ([5caf2f8](https://github.com/IPS-LMU/octra/commit/5caf2f87aa595f80c605fdeda76c73315ecb54fd))
+* **ngx-components:** can't access i18n property od BugReportModal component ([572b75c](https://github.com/IPS-LMU/octra/commit/572b75c9dda87dea3d37507c904d4c78c2b67082))
+
+
+
 ## [0.2.1](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.0...ngx-components-0.2.1) (2024-11-18)
 
 

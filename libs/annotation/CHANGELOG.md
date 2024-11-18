@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.16](https://github.com/IPS-LMU/octra/compare/annotation-0.1.15...annotation-0.1.16) (2024-11-18)
+
+
+
 ## [0.1.15](https://github.com/IPS-LMU/octra/compare/annotation-0.1.14...annotation-0.1.15) (2024-11-08)
 
 

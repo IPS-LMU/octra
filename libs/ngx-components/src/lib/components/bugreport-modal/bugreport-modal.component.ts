@@ -76,7 +76,7 @@ export class BugreportModalComponent
   }[] = [];
   protected data = undefined;
 
-  public _profile: {
+  _profile: {
     email?: string;
     name?: string;
   } = {};
@@ -120,7 +120,7 @@ export class BugreportModalComponent
     screenshots: any[];
   }>();
 
-  private _i18n: BugReportTranslations = defaultTranslations;
+  _i18n: BugReportTranslations = defaultTranslations;
 
   get i18n() {
     return this._i18n;

@@ -111,7 +111,7 @@ const OCTRA = {
     await buildLibrary('ngx-utilities');
     await run(`node prepare_web-components.js`);
     await fs.copyFile(
-      `apps/web-components/src/README.md`,
+      `apps/web-components/README.md`,
       `dist/libs/web-components/README.md`
     );
     await fs.copyFile(

@@ -1,8 +1,9 @@
 import { NumeratedSegment } from '@octra/media';
 import { Subject } from 'rxjs';
-import { WavWriter } from './binary';
+import { FileInfo } from '../data-info';
 import { IntArray } from './AudioFormats';
 import { AudioInfo } from './audio-info';
+import { WavWriter } from './binary';
 
 export class AudioCutter {
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
@@ -129,7 +130,11 @@ export class AudioCutter {
         case 'sampleStart':
           return segment.sampleStart;
         case 'sampleDur':
-          return segment.sampleDur ?? (this.audioInfo.audioBufferInfo?.samples ?? this.audioInfo.duration.samples) - segment.sampleStart;
+          return (
+            segment.sampleDur ??
+            (this.audioInfo.audioBufferInfo?.samples ??
+              this.audioInfo.duration.samples) - segment.sampleStart
+          );
         case 'secondsStart':
           return (
             Math.round(
@@ -139,7 +144,11 @@ export class AudioCutter {
         case 'secondsDur':
           return (
             Math.round(
-              (((this.audioInfo.audioBufferInfo?.samples ?? this.audioInfo.duration.samples) - segment.sampleStart) / this.audioInfo.sampleRate) * 1000
+              (((this.audioInfo.audioBufferInfo?.samples ??
+                this.audioInfo.duration.samples) -
+                segment.sampleStart) /
+                this.audioInfo.sampleRate) *
+                1000
             ) / 1000
           );
       }
@@ -223,71 +232,113 @@ export class AudioCutter {
 
   public splitChannelsToFiles(
     filename: string,
-    type: string,
-    buffer: ArrayBuffer
+    selectedChannels: number[],
+    buffer: ArrayBuffer,
+    channelData?: Float32Array[]
   ): Promise<File[]> {
     return new Promise<File[]>((resolve, reject) => {
       const result: File[] = [];
+      const promises2: Promise<Uint8Array>[] = [];
+      const sampleRate =
+        this.audioInfo.audioBufferInfo?.sampleRate ?? this.audioInfo.sampleRate;
+      const { name, extension } = FileInfo.extractFileName(filename);
 
       if (this.audioInfo.channels > 1) {
-        const wavWriter = new WavWriter();
-        const u8array = new Uint8Array(buffer);
+        if (extension === '.wav') {
+          // cut wave file
+          const promises: Promise<IntArray>[] = [];
+          const u8array = new Uint8Array(buffer);
 
-        const promises: Promise<IntArray>[] = [];
-        promises.push(
-          this.extractDataFromArray(
-            0,
-            this.audioInfo.duration.samples,
-            u8array,
-            0
-          )
-        );
-        promises.push(
-          this.extractDataFromArray(
-            0,
-            this.audioInfo.duration.samples,
-            u8array,
-            1
-          )
-        );
-
-        Promise.all(promises)
-          .then((extracts) => {
-            for (let i = 0; i < extracts.length; i++) {
-              const extract = extracts[i];
-              result.push(
-                this.getFileFromBufferPart(
-                  extract as any,
-                  1,
-                  `${filename}_${i + 1}`
+          for (const selectedChannel of selectedChannels) {
+            promises.push(
+              this.extractDataFromArray(
+                0,
+                this.audioInfo.duration.samples,
+                u8array,
+                selectedChannel
+              )
+            );
+          }
+          Promise.all(promises)
+            .then((extracts) => {
+              resolve(
+                selectedChannels.map((a, i) =>
+                  this.getFileFromBufferPart(
+                    extracts[i],
+                    1,
+                    `${name}_${a + 1}.wav`
+                  )
                 )
               );
-            }
-            resolve(result);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+            })
+            .catch((error) => {
+              console.error(error);
+              reject(error);
+            });
+        } else {
+          // not wave
+          if (!channelData) {
+            // decode audio and return each channelData
+            const context = new AudioContext();
+            context
+              .decodeAudioData(buffer)
+              .then((audioBuffer) => {
+                channelData = selectedChannels.map((i) =>
+                  audioBuffer.getChannelData(i)
+                );
+                const wavWriter = new WavWriter();
+                return selectedChannels.map((i) =>
+                  wavWriter.writeAsync([channelData![i]], sampleRate)
+                );
+              })
+              .then((promises) => {
+                Promise.all(promises)
+                  .then((files) => {
+                    resolve(
+                      selectedChannels.map(
+                        (a, i) =>
+                          new File([files[i]], `${name}_${a + 1}.wav`, {
+                            type: 'audio/wav',
+                          })
+                      )
+                    );
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
+              });
+          } else {
+            const wavWriter = new WavWriter();
+            promises2.push(
+              ...selectedChannels.map(( i) =>
+                wavWriter.writeAsync([channelData![i]], sampleRate)
+              )
+            );
+          }
+        }
+
+        if (promises2.length > 0) {
+          Promise.all(promises2)
+            .then((files) => {
+              resolve(
+                selectedChannels.map(
+                  (a, i) =>
+                    new File([files[i]], `${name}_${a + 1}.wav`, {
+                      type: 'audio/wav',
+                    })
+                )
+              );
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        }
       } else {
         reject(`can't split audio file because it contains one channel only.`);
       }
 
       return result;
     });
-  }
-
-  private getFileFromBufferPart(
-    data: IntArray,
-    channels: number,
-    filename: string
-  ): File {
-    return new File(
-      [this.getFileDataView(data as any, channels)],
-      `${filename}.wav`,
-      {
-        type: 'audio/wav',
-      }
-    );
   }
 
   /***
@@ -378,5 +429,15 @@ export class AudioCutter {
     if (this.status === 'running') {
       this.status = 'stopRequested';
     }
+  }
+
+  private getFileFromBufferPart(
+    data: IntArray,
+    channels: number,
+    filename: string
+  ): File {
+    return new File([this.getFileDataView(data as any, channels)], filename, {
+      type: 'audio/wav',
+    });
   }
 }

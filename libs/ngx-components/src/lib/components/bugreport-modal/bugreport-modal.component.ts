@@ -3,7 +3,6 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +17,7 @@ const defaultTranslations: BugReportTranslations = {
   error:
     'Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.',
   introduction:
-    'Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?',
+    'Please tell us what you think about this web application. What can we do better? Did you find any bugs?',
   bugReportSent: 'Your feedback was successfully reported \uD83D\uDE42',
   addProtocol: 'Add Protocol (recommended)',
   eMail: 'E-Mail',
@@ -28,7 +27,7 @@ const defaultTranslations: BugReportTranslations = {
   protocol: 'Protocol',
   abort: 'Abort',
   sendFeedback: 'Send Feedback',
-  sending: "Please wait for octra sending your feedback..."
+  sending: 'Please wait while sending your feedback...',
 };
 
 @Component({
@@ -40,7 +39,7 @@ const defaultTranslations: BugReportTranslations = {
 })
 export class BugreportModalComponent
   extends SubscriberComponent
-  implements OnInit, AfterViewInit
+  implements AfterViewInit
 {
   @ViewChild('editor') editor?: NgxJoditComponent;
   public static options: NgbModalOptions = {
@@ -76,30 +75,30 @@ export class BugreportModalComponent
   }[] = [];
   protected data = undefined;
 
-  _profile: {
+  _profile?: {
     email?: string;
     name?: string;
   } = {};
 
   protected set email(email: string) {
-    this._profile = email ? { ...this._profile, email } : {};
+    this._profile = { ...(this._profile ?? {}), ...(email ? { email } : {}) };
     this.profileChange.emit(this._profile);
   }
 
   protected get email(): string | undefined {
-    return this._profile.email;
+    return this._profile?.email;
   }
 
   protected set name(name: string | undefined) {
-    this._profile = name ? { ...this._profile, name } : {};
+    this._profile = { ...(this._profile ?? {}), ...(name ? { name } : {}) };
     this.profileChange.emit(this._profile);
   }
 
   protected get name(): string | undefined {
-    return this._profile.name;
+    return this._profile?.name;
   }
 
-  protected get profile(): { email?: string; name?: string } {
+  protected get profile(): { email?: string; name?: string } | undefined {
     return this._profile;
   }
 
@@ -108,7 +107,7 @@ export class BugreportModalComponent
     name?: string;
   }> = new EventEmitter();
 
-  pkgText = "";
+  pkgText = '';
 
   showSenderFields = true;
 
@@ -155,24 +154,6 @@ export class BugreportModalComponent
     super();
   }
 
-  ngOnInit() {
-    /*
-    if (this.appStorage.useMode !== 'online') {
-      this._profileName = this.appStorage.snapshot.user.name ?? '';
-      this._profileEmail = this.appStorage.snapshot.user.email ?? '';
-    } else {
-      this._profileName =
-        this.appStorage.snapshot.authentication.me?.username ?? '';
-      this._profileEmail =
-        this.appStorage.snapshot.authentication.me?.email ?? '';
-    }
-
-    setTimeout(() => {
-      this.bugService.getPackage();
-    }, 1000);
-     */
-  }
-
   onHidden() {
     this.visible = false;
     this.bugsent = false;
@@ -192,8 +173,8 @@ export class BugreportModalComponent
 
     this.sendStatus = 'sending';
     this.send.emit({
-      name: this.profile.name,
-      email: this.profile.email,
+      name: this.profile!.name,
+      email: this.profile!.email,
       message: this.bgdescr,
       sendProtocol: this.sendProObj,
       screenshots: this.screenshots,

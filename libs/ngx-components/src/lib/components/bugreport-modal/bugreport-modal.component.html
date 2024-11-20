@@ -16,12 +16,6 @@
     </p>
     @if (sendStatus === 'error') {
     <div [innerHTML]="i18n.error" class="alert alert-danger bugsent">
-      <!-- {
-                email:
-                  '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' +
-                  bgdescr +
-                  '\'>octra@phonetik.uni-muenchen.de</a>'
-              }  -->
     </div>
     } @else if (sendStatus === 'success') {
     <div class="alert alert-success bugsent">
@@ -33,7 +27,7 @@
       </div>
     }
 
-    <form>
+    <form #form=ngForm>
       @if (showSenderFields) {
       <div class="row">
         <div class="col-6">
@@ -44,6 +38,7 @@
               id="inputName"
               name="name"
               aria-describedby="name"
+              [required]="true"
               [placeholder]="i18n.name"
               [(ngModel)]="name"
             />
@@ -58,7 +53,9 @@
               id="inputEmail"
               name="email"
               aria-describedby="email"
+              [pattern]="'[^@]+\\@.+\\.[^.]+$'"
               [(ngModel)]="email"
+              [required]="true"
               placeholder="email@example.com"
             />
             <label for="inputEmail" class="form-label">{{
@@ -181,7 +178,7 @@
     </button>
     <button
       (click)="sendBugReport()"
-      [disabled]="!isvalid || sendStatus === 'sending' || sendStatus === 'success'"
+      [disabled]="!form.valid || !isvalid || sendStatus === 'sending' || sendStatus === 'success'"
       class="btn btn-primary"
       type="button"
     >

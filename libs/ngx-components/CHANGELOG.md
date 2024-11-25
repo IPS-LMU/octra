@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.3](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.2...ngx-components-0.2.3) (2024-11-25)
+
+
+### Bug Fixes
+
+* **ngx-components:** asr-options not exported correctly ([ddb08cd](https://github.com/IPS-LMU/octra/commit/ddb08cd6138334476e7ec2bcf935652f9f025050))
+* **ngx-components:** missing validation, profile is undefined error, i18n ([32d4997](https://github.com/IPS-LMU/octra/commit/32d4997a337a3ccb30fc85680a98ddbbd2df430e))
+
+
+### Features
+
+* **project:** openModal() function with wrapper for NgbModalRef ([7299a37](https://github.com/IPS-LMU/octra/commit/7299a37904393afd5f1ee65a83da6045a658ed04))
+
+
+
 ## [0.2.2](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.1...ngx-components-0.2.2) (2024-11-18)
 
 

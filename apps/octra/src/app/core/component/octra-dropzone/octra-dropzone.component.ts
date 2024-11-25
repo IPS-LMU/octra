@@ -17,7 +17,7 @@ import {
 import { timer } from 'rxjs';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { DefaultComponent } from '../default.component';
-import { AudioManager, fileListToArray, readFile } from '@octra/web-media';
+import { AudioManager, readFile } from '@octra/web-media';
 import { OAudiofile } from '@octra/media';
 import { ImportOptionsModalComponent } from '../../modals/import-options-modal/import-options-modal.component';
 
@@ -69,7 +69,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   public afterDrop = async () => {
     this._oannotation = undefined;
-    const files = fileListToArray(this.dropzone.files!);
+    const files = this.dropzone.files!
     for (const file of files) {
       const fileProcess: FileProgress = {
         status: 'waiting',

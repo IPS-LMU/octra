@@ -19,14 +19,13 @@ export class DropZoneComponent implements OnInit {
   innerhtml = '';
   @Input() height = 'auto';
   public clicklocked = false;
-  @Output() public afterdrop: EventEmitter<FileList> =
-    new EventEmitter<FileList>();
+  @Output() public afterdrop: EventEmitter<File[]> = new EventEmitter<File[]>();
   @ViewChild('fileinput', { static: true }) fileinput!: ElementRef;
   private fileAPIsupported = false;
 
-  private _files?: FileList;
+  private _files?: File[];
 
-  get files(): FileList | undefined {
+  get files(): File[] | undefined {
     return this._files;
   }
 
@@ -43,19 +42,19 @@ export class DropZoneComponent implements OnInit {
     }
   }
 
-  onDragOver($event: any) {
+  onDragOver($event: DragEvent) {
     $event.stopPropagation();
     $event.preventDefault();
     $event.dataTransfer.dropEffect = 'copy';
   }
 
-  onFileDrop($event: any) {
+  onFileDrop($event: DragEvent) {
     $event.stopPropagation();
     $event.preventDefault();
 
     if (this.fileAPIsupported) {
-      this._files = $event.dataTransfer.files;
-      this.afterdrop.emit(this._files);
+      this._files = this.filterFiles($event.dataTransfer.files);
+      this.afterdrop.emit(Array.from(this._files));
     }
   }
 
@@ -66,7 +65,11 @@ export class DropZoneComponent implements OnInit {
   }
 
   onFileChange($event: any) {
-    this._files = $event.target.files;
+    this._files = this.filterFiles($event.target.files);
     this.afterdrop.emit(this._files);
+  }
+
+  private filterFiles(files: FileList): File[] {
+    return Array.from(files).filter((a) => /.*zip.*/g.exec(a.type) === null);
   }
 }

@@ -1,4 +1,4 @@
-export interface ASRService {
+export interface ServiceProvider {
   provider: string;
   basName?: string;
   maxSignalDuration?: number;
@@ -18,7 +18,7 @@ export interface ASRSettings {
   enabled: boolean;
   shibbolethURL: string;
   calls: string[];
-  services: ASRService[];
+  services: ServiceProvider[];
   asrInfoURL?: string;
   basConfigURL?: string;
   asrQuotaInfoURL?: string;

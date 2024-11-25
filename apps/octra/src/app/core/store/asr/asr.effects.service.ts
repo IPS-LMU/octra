@@ -28,7 +28,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ASRService, ASRSettings, ProjectSettings } from '../../obj';
+import { ServiceProvider, ASRSettings, ProjectSettings } from '../../obj';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { AccountLoginMethod } from '@octra/api-types';
 import { AuthenticationActions } from '../authentication';
@@ -904,7 +904,7 @@ export class AsrEffects {
 
   private callASR(
     language: string,
-    service: ASRService,
+    service: ServiceProvider,
     audioURL: string,
     outFormat: string,
     asrSettings: ASRSettings,
@@ -985,7 +985,7 @@ export class AsrEffects {
 
   private uploadFiles(
     files: File[],
-    selectedLanguage: ASRService
+    selectedLanguage: ServiceProvider
   ): Observable<string[]> {
     const formData = new FormData();
 

@@ -1,7 +1,7 @@
-import { ASRService, ASRSettings } from '../../obj';
+import { ServiceProvider, ASRSettings } from '../../obj';
 
 export interface ASRStateSettings {
-  selectedServiceProvider?: ASRService;
+  selectedServiceProvider?: ServiceProvider;
   selectedASRLanguage?: string;
   selectedMausLanguage?: string;
   accessCode?: string;
@@ -33,7 +33,7 @@ export interface ASRStateQueueItem {
   time: ASRTimeInterval;
   selectedMausLanguage?: string;
   selectedASRLanguage: string;
-  selectedASRService: ASRService;
+  selectedASRService: ServiceProvider;
   accessCode?: string;
   type: ASRQueueItemType;
   progress: number;

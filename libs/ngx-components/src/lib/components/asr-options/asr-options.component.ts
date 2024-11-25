@@ -1,7 +1,6 @@
 import { NgClass, NgStyle } from '@angular/common';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -19,12 +18,12 @@ import {
   NgbPopover,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
-import { ASROptionsTranslations, ASRService, ASRSettings } from './types';
+import { ASROptionsTranslations, ServiceProvider } from './types';
 
 const defaultI18n: ASROptionsTranslations = {
   header: 'Language and Provider',
   asrLanguage: 'ASR Language',
-  mausLanguage: "MAUS Language",
+  mausLanguage: 'MAUS Language',
   nothingFound: 'Nothing found',
   asrProvider: 'Provider',
   accessCode: 'Access Code',
@@ -57,7 +56,9 @@ export class AsrOptionsComponent
   };
 
   @Input() manualURL = '';
-  @Input() languageSettings?: ASRSettings;
+  @Input() languageSettings?: {
+    services: ServiceProvider[];
+  };
   @Input() asrLanguages?: {
     value: string;
     providersOnly?: string[];
@@ -72,13 +73,13 @@ export class AsrOptionsComponent
     accessCode?: string;
     selectedMausLanguage?: string;
     selectedASRLanguage?: string;
-    selectedServiceProvider?: ASRService;
+    selectedServiceProvider?: ServiceProvider;
   };
   @Output() optionsChange = new EventEmitter<{
     accessCode?: string;
     selectedMausLanguage?: string;
     selectedASRLanguage?: string;
-    selectedServiceProvider?: ASRService;
+    selectedServiceProvider?: ServiceProvider;
   }>();
   @Input() i18n: ASROptionsTranslations = defaultI18n;
 
@@ -119,8 +120,8 @@ export class AsrOptionsComponent
       selected: string;
     };
     provider: {
-      services: ASRService[];
-      filtered: ASRService[];
+      services: ServiceProvider[];
+      filtered: ServiceProvider[];
       selected: string;
     };
   } = {
@@ -141,7 +142,7 @@ export class AsrOptionsComponent
     },
   };
 
-  constructor(private cd: ChangeDetectorRef) {
+  constructor() {
     super();
   }
 
@@ -176,7 +177,6 @@ export class AsrOptionsComponent
         this.filterLanguages(this.fields.asr.selected, 'asr');
         this.filterLanguages(this.fields.maus.selected, 'maus');
         this.filterProviders(this.fields.provider.selected);
-        this.cd.markForCheck();
       }, 0);
 
       const i18n = changes['i18n']?.currentValue;
@@ -189,7 +189,7 @@ export class AsrOptionsComponent
     }
   }
 
-  getQuotaPercentage(provider: ASRService) {
+  getQuotaPercentage(provider: ServiceProvider) {
     if (provider) {
       if (provider.usedQuota && provider.quotaPerMonth) {
         return Math.round((provider.usedQuota / provider.quotaPerMonth) * 100);
@@ -198,7 +198,7 @@ export class AsrOptionsComponent
     return 0;
   }
 
-  getQuotaLabel(provider: ASRService) {
+  getQuotaLabel(provider: ServiceProvider) {
     if (provider) {
       const ohService = provider;
       if (ohService.usedQuota && ohService.quotaPerMonth) {
@@ -260,7 +260,6 @@ export class AsrOptionsComponent
     }
 
     dropdown?.open();
-    this.cd.markForCheck();
   }
 
   selectProvider(provider: string, dropdown: NgbDropdown, emit?: boolean) {
@@ -279,7 +278,6 @@ export class AsrOptionsComponent
     setTimeout(() => {
       dropdown.close();
     }, 200);
-    this.cd.markForCheck();
   }
 
   filterLanguages(
@@ -323,7 +321,6 @@ export class AsrOptionsComponent
     if (type === 'asr') {
       this.selectLanguage(value, 'maus', emit);
     }
-    this.cd.markForCheck();
   }
 
   selectLanguage(language: string, type: 'asr' | 'maus', emit?: boolean) {
@@ -375,7 +372,6 @@ export class AsrOptionsComponent
       this.selectLanguage(language, 'maus', emit);
       this.filterLanguages(language, 'maus', undefined, emit);
     }
-    this.cd.markForCheck();
   }
 
   onLanguageDropdownOpenChange(opened: boolean, type: 'asr' | 'maus') {

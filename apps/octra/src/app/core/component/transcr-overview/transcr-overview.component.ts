@@ -22,7 +22,7 @@ import {
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { isFunction, SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
-import { Subscription } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import {
   AudioService,
   SettingsService,
@@ -181,8 +181,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy() {
-    this.audio.audiomanagers[0].stopPlayback();
     this.subscrmanager.destroy();
+    this.playAllState.state = 'stopped';
+    this.audio.audioManager.stopPlayback().catch((err) => {
+      console.error(err);
+    });
   }
 
   ngOnInit() {
@@ -515,7 +518,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
     if (
       nextSegment < this._internLevel.items.length &&
-      this.playAllState.state === 'stopped'
+      this.playAllState.state !== 'stopped'
     ) {
       if (
         !this.playAllState.skipSilence ||
@@ -573,6 +576,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             'overview'
           );
+          this.playAllState.state = 'started';
           this.playAll(0);
         })
         .catch((err) => {
@@ -652,12 +656,16 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             this.cd.markForCheck();
             this.cd.detectChanges();
 
-            setTimeout(() => {
-              this.cd.markForCheck();
-              this.cd.detectChanges();
+            this.subscrmanager.add(
+              timer(100).subscribe({
+                next: () => {
+                  this.cd.markForCheck();
+                  this.cd.detectChanges();
 
-              resolve();
-            }, 100);
+                  resolve();
+                },
+              })
+            );
           })
           .catch((error) => {
             console.error(error);

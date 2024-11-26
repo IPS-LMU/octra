@@ -1,3 +1,6 @@
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -5,9 +8,6 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
 
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -50,7 +50,7 @@ export class SRTConverter extends Converter {
         const hours = Number(matches[1]);
         const minutes = Number(matches[2]);
         const seconds = Number(matches[3]);
-        const miliseconds = matches.length > 5 ? Number(matches[4]): 0;
+        const miliseconds = matches.length > 5 ? Number(matches[4]) : 0;
 
         let totalMiliSeconds = hours * 60 * 60;
         totalMiliSeconds += minutes * 60;
@@ -212,7 +212,9 @@ export class SRTConverter extends Converter {
       );
       let regexStr = `([0-9]+)[\\n\\r]*([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?)\\r?\\n\\r?`;
       if (options.speakerIdentifierPattern) {
-        regexStr += `(?:${options.speakerIdentifierPattern})?`;
+        regexStr += `(?:${options.speakerIdentifierPattern ?? ''})`;
+      } else {
+        regexStr += '()';
       }
       regexStr += '(.*)\\r?\\n\\r?';
 

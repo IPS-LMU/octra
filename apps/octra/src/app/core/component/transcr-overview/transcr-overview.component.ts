@@ -12,26 +12,26 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { AudioChunk } from '@octra/web-media';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
 } from '@octra/annotation';
-import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
-import { TranscrEditorComponent } from '../transcr-editor';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { isFunction, SubscriptionManager } from '@octra/utilities';
+import { AudioChunk } from '@octra/web-media';
 import { Subscription } from 'rxjs';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import {
   AudioService,
   SettingsService,
   UserInteractionsService,
 } from '../../shared/service';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { TranscrEditorComponent } from '../transcr-editor';
+import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 
 declare const validateAnnotation: (transcript: string, guidelines: any) => any;
 declare const tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -181,6 +181,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy() {
+    this.audio.audiomanagers[0].stopPlayback();
     this.subscrmanager.destroy();
   }
 

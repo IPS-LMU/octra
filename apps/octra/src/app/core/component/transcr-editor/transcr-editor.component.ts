@@ -15,26 +15,17 @@ import {
   ViewChild,
 } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
-import { TranscrEditorConfig } from './config';
-import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
+import { OctraAnnotationSegment } from '@octra/annotation';
+import { OctraGuidelines } from '@octra/assets';
+import { SampleUnit } from '@octra/media';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import {
+  escapeHtml,
   escapeRegex,
   insertString,
   isNumber,
   unEscapeHtml,
 } from '@octra/utilities';
-import { SampleUnit } from '@octra/media';
-import { TimespanPipe } from '@octra/ngx-utilities';
-import { timer } from 'rxjs';
-import { NgxJoditComponent } from 'ngx-jodit';
-import { DefaultComponent } from '../default.component';
-import { Config } from 'jodit/types/config';
-import { IControlType, IJodit, IToolbarButton } from 'jodit/types/types';
-import { OctraAnnotationSegment } from '@octra/annotation';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { OctraGuidelines } from '@octra/assets';
-import { AsrStoreService } from '../../store/asr/asr-store-service.service';
-import { ASRProcessStatus, ASRStateQueue } from '../../store/asr';
 import {
   AudioChunk,
   AudioManager,
@@ -46,8 +37,17 @@ import {
   ShortcutGroup,
   ShortcutManager,
 } from '@octra/web-media';
-import { ShortcutService } from '../../shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
+import { IControlType, IJodit, IToolbarButton } from 'jodit/types/types';
+import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
+import { timer } from 'rxjs';
+import { ShortcutService } from '../../shared/service/shortcut.service';
+import { ASRProcessStatus, ASRStateQueue } from '../../store/asr';
+import { AsrStoreService } from '../../store/asr/asr-store-service.service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { DefaultComponent } from '../default.component';
+import { TranscrEditorConfig } from './config';
+import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
 
@@ -110,10 +110,10 @@ export class TranscrEditorComponent
   @ViewChild('jodit', { static: false }) joditComponent?: NgxJoditComponent;
   public focused = false;
 
-  public joditOptions: Partial<Config> = {};
+  public joditOptions: JoditConfig = {};
   private guidelines?: OctraGuidelines;
 
-  private joditDefaultOptions: Partial<Config> = {
+  private joditDefaultOptions: JoditConfig = {
     statusbar: false,
   };
 
@@ -572,10 +572,10 @@ export class TranscrEditorComponent
    */
   insertMarker = (markerCode: string, icon: string) => {
     const editor = this.joditComponent?.jodit;
+    markerCode = escapeHtml(markerCode);
 
     if (icon === undefined || icon === '') {
       // text only
-
       editor!.selection.insertHTML(markerCode + ' ');
     } else {
       if (
@@ -584,13 +584,6 @@ export class TranscrEditorComponent
         icon.indexOf('.gif') > -1
       ) {
         // it's an icon
-        markerCode = markerCode.replace(/(<)|(>)/g, (g0, g1, g2) => {
-          if (g2 === undefined && g1 !== undefined) {
-            return '&lt;';
-          } else {
-            return '&gt;';
-          }
-        });
 
         const element = document.createElement('img');
         element.setAttribute('src', icon);
@@ -769,29 +762,30 @@ export class TranscrEditorComponent
         active: false,
       },
       getContent: (a: IJodit, b: IToolbarButton) => {
-        const content = getContent();
+        const parent: HTMLElement = (b as any).button;
+        const btn = parent.querySelector(".octra-marker-btn");
+        if (!btn) {
+          const content = getContent();
 
-        const button = document.createElement('span');
-        button.setAttribute('class', 'me-2 align-items-center px-1 h-100');
-        if (typeof content === 'string') {
-          button.innerHTML = getContent();
-          if (events?.onClick) {
-            button.addEventListener('click', (event: MouseEvent) => {
-              events!.onClick!(event, button);
-            });
+          const button = document.createElement('span');
+          button.setAttribute('class', 'me-2 align-items-center px-1 h-100 octra-marker-btn');
+          if (typeof content === 'string') {
+            button.innerHTML = getContent();
+            if (events?.onClick) {
+              button.addEventListener('click', (event: MouseEvent) => {
+                events!.onClick!(event, button);
+              });
+            }
+          } else {
+            button.appendChild(content);
           }
-        } else {
-          button.appendChild(content);
-        }
 
-        return button;
-      },
-      /* isActive: function (editor, btn) {
-        if (btn.data) {
-          return btn.data['active'];
+          button.setAttribute('octra-initialized', 'true');
+          return button;
+        } else {
+          return btn;
         }
-        return false;
-      },*/
+      },
       tooltip,
       hotkeys,
     };

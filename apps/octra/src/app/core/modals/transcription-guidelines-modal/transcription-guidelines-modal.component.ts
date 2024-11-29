@@ -6,13 +6,13 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoService } from '@jsverse/transloco';
-import { timer } from 'rxjs';
-import { SettingsService } from '../../shared/service';
-import { OctraModal } from '../types';
-import videojs from 'video.js';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraGuidelines } from '@octra/assets';
+import { timer } from 'rxjs';
+import videojs from 'video.js';
+import { SettingsService } from '../../shared/service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-transcription-guidelines-modal',
@@ -79,10 +79,12 @@ export class TranscriptionGuidelinesModalComponent
           )) as string,
         };
 
-        for (const example of result.instructions[i].entries[j].examples) {
-          example.annotation = (await this.getGuidelineHTML(
-            example.annotation
-          )) as string;
+        if (result.instructions[i].entries[j].examples) {
+          for (const example of result.instructions[i].entries[j].examples) {
+            example.annotation = (await this.getGuidelineHTML(
+              example.annotation
+            )) as string;
+          }
         }
       }
     }
@@ -106,25 +108,27 @@ export class TranscriptionGuidelinesModalComponent
           i < this.guidelines.instructions[g].entries.length;
           i++
         ) {
-          for (
-            let e = 0;
-            e < this.guidelines.instructions[g].entries[i].examples.length;
-            e++
-          ) {
-            const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
-            if (document.getElementById(idV)) {
-              const oldPlayer = this.videoplayerExists(idV);
+          if (this.guidelines.instructions[g].entries[i].examples) {
+            for (
+              let e = 0;
+              e < this.guidelines.instructions[g].entries[i].examples.length;
+              e++
+            ) {
+              const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
+              if (document.getElementById(idV)) {
+                const oldPlayer = this.videoplayerExists(idV);
 
-              if (oldPlayer > -1) {
-                // videojs(document.getElementById(id_v)).dispose();
-              } else {
-                const player = videojs(idV, {
-                  fluid: true,
-                  autoplay: false,
-                  preload: 'auto',
-                });
+                if (oldPlayer > -1) {
+                  // videojs(document.getElementById(id_v)).dispose();
+                } else {
+                  const player = videojs(idV, {
+                    fluid: true,
+                    autoplay: false,
+                    preload: 'auto',
+                  });
 
-                this.videoPlayers.push(player);
+                  this.videoPlayers.push(player);
+                }
               }
             }
           }

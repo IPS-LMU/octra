@@ -13,6 +13,31 @@ import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
+  ASRContext,
+  ASRQueueItemType,
+  getSegmentBySamplePosition,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import {
+  AudioViewerComponent,
+  AudioviewerConfig,
+  AudioViewerShortcutEvent,
+  CurrentLevelChangeEvent,
+} from '@octra/ngx-components';
+import {
+  AudioChunk,
+  AudioManager,
+  Shortcut,
+  ShortcutGroup,
+} from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
+import { interval, Subscription, timer } from 'rxjs';
+import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { NavbarService } from '../../core/component/navbar/navbar.service';
+import { OctraModalService } from '../../core/modals/octra-modal.service';
+import {
   AlertService,
   AlertType,
   AudioService,
@@ -20,37 +45,12 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { TranscrWindowComponent } from './transcr-window';
-import {
-  AudioViewerComponent,
-  AudioviewerConfig,
-  AudioViewerShortcutEvent,
-  CurrentLevelChangeEvent,
-} from '@octra/ngx-components';
-import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import {
-  ASRContext,
-  ASRQueueItemType,
-  getSegmentBySamplePosition,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
-import { interval, Subscription, timer } from 'rxjs';
-import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
-import {
-  AudioChunk,
-  AudioManager,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { ShortcutService } from '../../core/shared/service/shortcut.service';
-import { HotkeysEvent } from 'hotkeys-js';
-import { OctraModalService } from '../../core/modals/octra-modal.service';
-import { NavbarService } from '../../core/component/navbar/navbar.service';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+import { TranscrWindowComponent } from './transcr-window';
 
 @Component({
   selector: 'octra-overlay-gui',

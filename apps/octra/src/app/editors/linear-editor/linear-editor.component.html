@@ -2,7 +2,7 @@
 <octra-audio-viewer
   #miniloupeComponent
   [audioChunk]="audioChunkLoupe"
-  [silencePlaceholder]="'<P>'"
+  [silencePlaceholder]="annotationStoreService.silencePlaceholder"
   [isMultiLine]="false"
   [refreshOnInternChanges]="false"
   [name]="'loupe'"
@@ -52,7 +52,7 @@
     (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
     [audioChunk]="audioChunkTop"
     [refreshOnInternChanges]="false"
-    [silencePlaceholder]="'<P>'"
+    [silencePlaceholder]="annotationStoreService.silencePlaceholder"
     [annotation]="annotationStoreService.transcript!"
     (currentLevelChange)="onCurrentLevelChange($event)"
     style="height: 80px"
@@ -72,7 +72,7 @@
   (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
   (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
   [audioChunk]="audioChunkDown"
-  [silencePlaceholder]="'<P>'"
+  [silencePlaceholder]="annotationStoreService.silencePlaceholder"
   [name]="'downLoupe'"
   [settings]="loupeSettings"
   [annotation]="annotationStoreService.transcript!"

@@ -763,12 +763,20 @@ export class TranscrEditorComponent
       },
       getContent: (a: IJodit, b: IToolbarButton) => {
         const parent: HTMLElement = (b as any).button;
-        const btn = parent.querySelector(".octra-marker-btn");
+        const btn = parent.querySelector('.octra-marker-btn');
         if (!btn) {
           const content = getContent();
 
           const button = document.createElement('span');
-          button.setAttribute('class', 'me-2 align-items-center px-1 h-100 octra-marker-btn');
+
+          if (tooltip) {
+            button.setAttribute('title', tooltip);
+          }
+
+          button.setAttribute(
+            'class',
+            'me-2 align-items-center px-1 h-100 octra-marker-btn btn-description'
+          );
           if (typeof content === 'string') {
             button.innerHTML = getContent();
             if (events?.onClick) {

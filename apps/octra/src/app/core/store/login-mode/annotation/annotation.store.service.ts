@@ -1,14 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { getModeState, LoginMode, RootState } from '../../index';
 import { Store } from '@ngrx/store';
-import { AnnotationActions } from './annotation.actions';
-import { LoginModeActions } from '../login-mode.actions';
-import {
-  escapeRegex,
-  getTranscriptFromIO,
-  insertString,
-  SubscriptionManager,
-} from '@octra/utilities';
 import {
   AnnotationAnySegment,
   AnnotationLevelType,
@@ -21,19 +12,28 @@ import {
   OItem,
   TextConverter,
 } from '@octra/annotation';
+import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
+import { OctraGuidelines } from '@octra/assets';
+import { MultiThreadingService } from '@octra/ngx-components';
+import {
+  escapeRegex,
+  getTranscriptFromIO,
+  insertString,
+  SubscriptionManager,
+  TsWorkerJob,
+} from '@octra/utilities';
+import { map, Observable } from 'rxjs';
+import { OLog, OLogging } from '../../../obj/Settings/logging';
+import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
+import { MouseStatisticElem } from '../../../obj/statistics/MouseStatisticElem';
+import { StatisticElem } from '../../../obj/statistics/StatisticElement';
 import { AudioService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { StatisticElem } from '../../../obj/statistics/StatisticElement';
-import { OLog, OLogging } from '../../../obj/Settings/logging';
-import { MouseStatisticElem } from '../../../obj/statistics/MouseStatisticElem';
-import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
-import { map, Observable } from 'rxjs';
-import { OctraGuidelines } from '@octra/assets';
 import { ApplicationStoreService } from '../../application/application-store.service';
-import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { ApplicationActions } from '../../application/application.actions';
-import { MultiThreadingService } from '@octra/ngx-components';
-import { TsWorkerJob } from '@octra/utilities';
+import { getModeState, LoginMode, RootState } from '../../index';
+import { LoginModeActions } from '../login-mode.actions';
+import { AnnotationActions } from './annotation.actions';
 
 declare let validateAnnotation: (transcript: string, guidelines: any) => any;
 declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -46,6 +46,15 @@ export class AnnotationStoreService {
 
   get feedback(): any {
     return this._feedback;
+  }
+
+  get silencePlaceholder(): string {
+    if (this.guidelines?.markers) {
+      return (
+        this.guidelines.markers.find((a) => a.type === 'break')?.code ?? '<P>'
+      );
+    }
+    return '<P>';
   }
 
   get transcript():

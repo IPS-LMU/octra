@@ -93,7 +93,7 @@
                     class="guidelines-descr"
                   ></div>
                   <div class="row entry-row">
-                    @if (entry.examples.length > 0) {
+                    @if (entry.examples && entry.examples.length > 0) {
                     <div class="col-md-12">
                       @for (example of entry.examples; track example; let i =
                       $index) {

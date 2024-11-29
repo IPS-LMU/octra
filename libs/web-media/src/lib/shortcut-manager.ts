@@ -1,5 +1,5 @@
-import {BrowserInfo} from './browser-info';
-import {HotkeysEvent} from "hotkeys-js";
+import { HotkeysEvent } from 'hotkeys-js';
+import { BrowserInfo } from './browser-info';
 
 /**
  * wrapper containing KeyboardEvent information with additional data
@@ -175,9 +175,9 @@ export class ShortcutManager {
   }
 
   public unregisterItemFromGroup(groupName: string, itemName: string) {
-    this._shortcuts = this._shortcuts.map(a => {
-      if(a.name === groupName) {
-        a.items = a.items.filter(b => b.name !== itemName);
+    this._shortcuts = this._shortcuts.map((a) => {
+      if (a.name === groupName) {
+        a.items = a.items.filter((b) => b.name !== itemName);
       }
       return a;
     });
@@ -314,10 +314,10 @@ export class ShortcutManager {
 
   public getShorcutCombination(event: KeyboardEvent) {
     const keyCode = this.getKeyCode(event);
-    const alt = this._pressedKeys.alt;
-    const ctrl = this._pressedKeys.ctrl;
+    const alt = event.altKey;
+    const ctrl = event.ctrlKey;
     const cmd = this._pressedKeys.cmd;
-    const shift = this._pressedKeys.shift;
+    const shift = event.shiftKey;
 
     let name = this.getNameByEvent(event);
     if (name === '' && keyCode > -1) {

@@ -8,6 +8,7 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Renderer2,
@@ -57,12 +58,12 @@ declare let document: any;
   selector: 'octra-transcr-editor',
   templateUrl: './transcr-editor.component.html',
   styleUrls: ['./transcr-editor.component.scss'],
-  providers: [TranscrEditorConfig],
+  providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranscrEditorComponent
   extends DefaultComponent
-  implements OnChanges, AfterViewInit, OnInit
+  implements OnChanges, AfterViewInit, OnInit, OnDestroy
 {
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
@@ -654,10 +655,10 @@ export class TranscrEditorComponent
     this.subscriptionManager.removeByTag('typing_change');
     this.subscribe(
       this.internalTyping,
-      (status) => {
+      async (status) => {
         if (status === 'stopped') {
-          this.validate();
-          this.initPopover();
+          await this.validate();
+          await this.initPopover();
         }
 
         this.typing.emit(status);
@@ -667,11 +668,16 @@ export class TranscrEditorComponent
   }
 
   ngOnInit() {
+    this.subscriptionManager.removeByTag('afterInit');
     this.subscribe(this.annotationStoreService.guidelines$, {
       next: (guidelines) => {
         this.guidelines = guidelines?.selected?.json;
       },
     });
+  }
+
+  override ngOnDestroy() {
+    super.ngOnDestroy();
   }
 
   async ngOnChanges(obj: SimpleChanges) {
@@ -705,7 +711,7 @@ export class TranscrEditorComponent
       obj['transcript'].currentValue !== undefined &&
       !obj['transcript'].firstChange
     ) {
-      await this.setTranscript(obj['transcript'].currentValue);
+      //await this.setTranscript(obj['transcript'].currentValue);
     }
 
     if (
@@ -1134,8 +1140,8 @@ export class TranscrEditorComponent
           let code = this._rawText;
           // insert selection placeholders
           if (!focusAtEnd) {
-            const startMarker = '[[[sel-start]]][[[/sel-start]]]';
-            const endMarker = '[[[sel-end]]][[[/sel-end]]]';
+            const startMarker = '[[[sel-start/]]]';
+            const endMarker = '[[[sel-end/]]]';
             code =
               this.lastCursorPosition!.endMarker !== undefined &&
               this._textSelection.end >= this._textSelection.start
@@ -1148,23 +1154,21 @@ export class TranscrEditorComponent
             code = insertString(code, this._textSelection.start, startMarker);
           }
 
-          code = this.annotationStoreService.underlineTextRed(
-            code,
-            this.annotationStoreService.validate(code)
-          );
+          const validation = this.annotationStoreService.validate(code);
+          code = this.annotationStoreService.underlineTextRed(code, validation);
           code = await this.annotationStoreService.rawToHTML(code);
 
           if (!focusAtEnd) {
             code = code.replace(
-              /([\s ]+)(<sel-start><\/sel-start><sel-end><\/sel-end><\/p>)?$/g,
+              /([\s ]+)(<sel-start \/?><sel-end \/?><\/p>)?$/g,
               '&nbsp;$2'
             );
             code = code.replace(
-              /<sel-start><\/sel-start>/g,
+              /<sel-start ?\/?>/g,
               this.lastCursorPosition!.startMarker
             );
             code = code.replace(
-              /<sel-end><\/sel-end>/g,
+              /<sel-end ?\/?>/g,
               this.lastCursorPosition!.endMarker
                 ? this.lastCursorPosition!.endMarker
                 : ''
@@ -1435,8 +1439,12 @@ export class TranscrEditorComponent
 
       this.joditComponent.jodit.value =
         await this.annotationStoreService.rawToHTML(rawText);
-      this.validate();
-      this.initPopover();
+      this.subscribe(timer(500), {
+        next: async () => {
+          await this.validate();
+          await this.initPopover();
+        },
+      });
 
       this.asr = {
         status: 'inactive',
@@ -1726,7 +1734,6 @@ export class TranscrEditorComponent
   }
 
   onAfterInit = () => {
-    this.subscriptionManager.removeByTag('afterInit');
     this.subscribe(
       timer(200),
       () => {

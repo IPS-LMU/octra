@@ -19,4 +19,10 @@ export class TranscrEditorConfig {
     boundary: false,
   };
   public highlightingEnabled = false;
+
+  constructor(partial?: Partial<TranscrEditorConfig>) {
+    if (partial) {
+      Object.assign(partial);
+    }
+  }
 }

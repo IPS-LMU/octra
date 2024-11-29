@@ -30,7 +30,7 @@ import {
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { TranscrEditorComponent } from '../transcr-editor';
+import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 
 declare const validateAnnotation: (transcript: string, guidelines: any) => any;
@@ -51,6 +51,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     return this._textEditor;
   }
 
+  editorConfig: TranscrEditorConfig = new TranscrEditorConfig({
+    btnPopover: false
+  });
+
+  @ViewChild('transcrEditor', { static: false })
+  transcrEditor?: TranscrEditorComponent;
+
   public selectedError: any = '';
   public shownSegments: {
     transcription: {
@@ -58,6 +65,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       text: string;
     };
   }[] = [];
+  public transcript = "";
 
   @Input() currentLevel?: OctraAnnotationAnyLevel<
     OctraAnnotationSegment<ASRContext>
@@ -68,9 +76,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   public showLoading = true;
 
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
-
-  @ViewChild('transcrEditor', { static: false })
-  transcrEditor?: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager<Subscription>;
 
@@ -150,9 +155,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       let resultStr = '';
       for (let i = 0; i < this.shownSegments.length; i++) {
         resultStr += this.shownSegments[i].transcription.html;
+        found += (this.shownSegments[i].transcription.html.match(/<span class='val-error'/) || []).length;
       }
-
-      found = (resultStr.match(/<span class='val-error'/) || []).length;
     }
 
     return found;
@@ -172,10 +176,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     public audio: AudioService,
     public sanitizer: DomSanitizer,
     private cd: ChangeDetectorRef,
-    public appStorage: AppStorageService,
-    private settingsService: SettingsService,
-    private uiService: UserInteractionsService,
-    private elementRef: ElementRef
+    protected appStorage: AppStorageService,
+    protected settingsService: SettingsService,
+    private uiService: UserInteractionsService
   ) {
     this.subscrmanager = new SubscriptionManager();
   }
@@ -289,24 +292,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.audio.audiomanagers[0].addChunk(audiochunk);
         this.textEditor.audioChunk = audiochunk;
 
-        this.cd.markForCheck();
-        this.cd.detectChanges();
-
-        if (!this.transcrEditor) {
-          return;
-        }
-
-        this.transcrEditor.settings.btnPopover = false;
-        this.transcrEditor.validationEnabled =
-          this.appStorage.useMode !== 'url' &&
-          (this.appStorage.useMode! === 'demo' ||
-            this.settingsService.projectsettings?.octra?.validationEnabled ===
-              true);
-        this.transcrEditor.initialize();
-
-        this.transcrEditor.transcript =
+        this.transcript =
           segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
-        this.transcrEditor.focus();
+        // this.transcrEditor.focus();
       }
     }
   }
@@ -325,7 +313,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.annotationStoreService.validateAll();
 
       this.cd.markForCheck();
-      this.cd.detectChanges();
 
       await this.updateSegments();
 
@@ -334,7 +321,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.textEditor.selectedSegment = -1;
       this.audio.audiomanagers[0].removeChunk(this.textEditor.audioChunk!);
       this.cd.markForCheck();
-      this.cd.detectChanges();
 
       const startSample =
         i > 0
@@ -544,7 +530,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.playAllState.icon = 'bi bi-play-fill';
 
       this.cd.markForCheck();
-      this.cd.detectChanges();
     } else {
       console.log(`playAll failed`);
     }
@@ -556,7 +541,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         ? 'bi bi-stop-fill'
         : 'bi bi-play-fill';
     this.cd.markForCheck();
-    this.cd.detectChanges();
 
     const playpos = this.audio.audioManager.createSampleUnit(0);
 
@@ -593,7 +577,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             'bi bi-play-fill';
 
           this.cd.markForCheck();
-          this.cd.detectChanges();
 
           this.uiService.addElementFromEvent(
             'mouseclick',
@@ -629,7 +612,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.playStateSegments[segmentNumber].state = 'started';
         this.playStateSegments[segmentNumber].icon = 'bi bi-stop-fill';
         this.cd.markForCheck();
-        this.cd.detectChanges();
 
         const startSample =
           segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
@@ -637,7 +619,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.playAllState.currentSegment = segmentNumber;
 
         this.cd.markForCheck();
-        this.cd.detectChanges();
         this.audio.audiomanagers[0].playPosition =
           this.audio.audiomanagers[0].createSampleUnit(startSample);
         this.audio.audiomanagers[0]
@@ -654,13 +635,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
             this.playAllState.currentSegment = -1;
             this.cd.markForCheck();
-            this.cd.detectChanges();
 
             this.subscrmanager.add(
               timer(100).subscribe({
                 next: () => {
                   this.cd.markForCheck();
-                  this.cd.detectChanges();
 
                   resolve();
                 },
@@ -680,7 +659,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             this.playAllState.currentSegment = -1;
 
             this.cd.markForCheck();
-            this.cd.detectChanges();
 
             resolve();
           })
@@ -701,7 +679,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.stopPlayback()
         .then(() => {
           this.cd.markForCheck();
-          this.cd.detectChanges();
 
           const startSample =
             segmentNumber > 0
@@ -735,7 +712,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           this.playSegment(segmentNumber)
             .then(() => {
               this.cd.markForCheck();
-              this.cd.detectChanges();
             })
             .catch((error) => {
               console.error(error);
@@ -779,7 +755,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           this.playAllState.icon = 'bi bi-play-fill';
           this.playAllState.currentSegment = -1;
           this.cd.markForCheck();
-          this.cd.detectChanges();
           this.playAllState.currentSegment = -1;
         })
         .catch((error) => {
@@ -796,7 +771,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     this.annotationStoreService.validateAll();
     await this.updateSegments();
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   toggleSkipCheckbox() {
@@ -811,7 +785,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.playStateSegments[this.playAllState.currentSegment].icon =
           'bi bi-play-fill';
         this.cd.markForCheck();
-        this.cd.detectChanges();
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
     });

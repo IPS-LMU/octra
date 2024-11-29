@@ -156,13 +156,16 @@
         <div>
           <octra-transcr-editor
             #transcrEditor
+            [settings]="editorConfig"
             [height]="60"
+            [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode! === 'demo' || settingsService.projectsettings?.octra?.validationEnabled)"
             [markers]="
               annotationStoreService.guidelines !== undefined
                 ? annotationStoreService.guidelines.markers
                 : undefined
             "
             [easymode]="true"
+            [transcript]="transcript"
             [audiochunk]="textEditor.audioChunk"
             [(font)]="appStorage.editorFont"
             (enterKeyPressed)="onEnterPressed(i)"

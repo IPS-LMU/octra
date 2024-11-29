@@ -649,82 +649,92 @@ export class AnnotationStoreService {
   public underlineTextRed(rawtext: string, validation: any[]) {
     let result = rawtext;
 
-    interface Pos {
-      start: number;
-      puffer: string;
-    }
+    try {
+      const sPos = rawtext.indexOf('[[[sel-start/]]]');
+      const sLen = '[[[sel-start/]]]'.length;
 
-    const markerPositions = this.getMarkerPositions(rawtext, this.guidelines);
+      interface Pos {
+        start: number;
+        puffer: string;
+      }
 
-    let insertions: Pos[] = [];
+      const markerPositions = this.getMarkerPositions(rawtext, this.guidelines);
 
-    if (validation.length > 0) {
-      // prepare insertions
-      for (const validationElement of validation) {
-        const foundMarker = markerPositions.find((a) => {
-          return (
-            validationElement.start > a.start &&
-            validationElement.start + validationElement.length < a.end
-          );
-        });
+      let insertions: Pos[] = [];
 
-        if (foundMarker === undefined) {
-          let insertStart = insertions.find((val) => {
-            return val.start === validationElement.start;
-          });
-
-          if (insertStart === undefined) {
-            insertStart = {
-              start: validationElement.start,
-              puffer:
-                "[[[span class='val-error' data-errorcode='" +
-                validationElement.code +
-                "']]]",
-            };
-            insertions.push(insertStart);
-          } else {
-            insertStart.puffer +=
-              "[[[span class='val-error' data-errorcode='" +
-              validationElement.code +
-              "']]]";
-          }
-
-          let insertEnd = insertions.find((val) => {
+      if (validation.length > 0) {
+        // prepare insertions
+        for (const validationElement of validation) {
+          const foundMarker = markerPositions.find((a) => {
             return (
-              val.start === validationElement.start + validationElement.length
+              validationElement.start > a.start &&
+              validationElement.start + validationElement.length < a.end
             );
           });
 
-          if (insertEnd === undefined) {
-            insertEnd = {
-              start: insertStart.start + validationElement.length,
-              puffer: '',
-            };
-            insertEnd.puffer = '[[[/span]]]';
-            insertions.push(insertEnd);
-          } else {
-            insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
+          if (foundMarker === undefined) {
+            let insertStart = insertions.find((val) => {
+              return val.start === validationElement.start;
+            });
+
+            if (insertStart === undefined) {
+              insertStart = {
+                start:
+                  sPos < 0 || validationElement.start < sPos
+                    ? validationElement.start
+                    : sPos + sLen + validationElement.start,
+                puffer:
+                  "[[[span class='val-error' data-errorcode='" +
+                  validationElement.code +
+                  "']]]",
+              };
+              insertions.push(insertStart);
+            } else {
+              insertStart.puffer +=
+                "[[[span class='val-error' data-errorcode='" +
+                validationElement.code +
+                "']]]";
+            }
+
+            let insertEnd = insertions.find((val) => {
+              return (
+                val.start === validationElement.start + validationElement.length
+              );
+            });
+
+            if (insertEnd === undefined) {
+              insertEnd = {
+                start: insertStart.start + validationElement.length,
+                puffer: '',
+              };
+              insertEnd.puffer = '[[[/span]]]';
+              insertions.push(insertEnd);
+            } else {
+              insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
+            }
           }
         }
-      }
 
-      insertions = insertions.sort((a: Pos, b: Pos) => {
-        if (a.start === b.start) {
-          return 0;
-        } else if (a.start < b.start) {
-          return -1;
+        insertions = insertions.sort((a: Pos, b: Pos) => {
+          if (a.start === b.start) {
+            return 0;
+          } else if (a.start < b.start) {
+            return -1;
+          }
+          return 1;
+        });
+
+        let puffer = '';
+        for (const insertion of insertions) {
+          const offset = puffer.length;
+          const pos = insertion.start;
+
+          result = insertString(result, pos + offset, insertion.puffer);
+          puffer += insertion.puffer;
         }
-        return 1;
-      });
-
-      let puffer = '';
-      for (const insertion of insertions) {
-        const offset = puffer.length;
-        const pos = insertion.start;
-
-        result = insertString(result, pos + offset, insertion.puffer);
-        puffer += insertion.puffer;
       }
+    } catch (e) {
+      console.error(e);
     }
     return result;
   }

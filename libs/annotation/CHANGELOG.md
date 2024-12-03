@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.17](https://github.com/IPS-LMU/octra/compare/annotation-0.1.16...annotation-0.1.17) (2024-12-03)
+
+
+### Bug Fixes
+
+* **annotation:** srt converter identifies speaker if pattern is undefined on import ([33839c1](https://github.com/IPS-LMU/octra/commit/33839c13787881e727475e45bf0bc29d5bb476c5))
+* **annotation:** SRTConverter ignores milliseconds on import ([67a1b68](https://github.com/IPS-LMU/octra/commit/67a1b6828b637046982c904b3247555b46242319))
+
+
+
 ## [0.1.16](https://github.com/IPS-LMU/octra/compare/annotation-0.1.15...annotation-0.1.16) (2024-11-18)
 
 

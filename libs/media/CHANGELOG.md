@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/IPS-LMU/octra/compare/media-0.1.0...media-0.1.1) (2024-12-03)
+
+
+### Bug Fixes
+
+* **media:** remove limitations for valid sample rates ([0f31c3f](https://github.com/IPS-LMU/octra/commit/0f31c3f490947e878901712fdee5e585e550ae7a))
+
+
+
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/media-0.0.15...media-0.1.0) (2024-11-18)
 
 

@@ -50,7 +50,7 @@ export class SRTConverter extends Converter {
         const hours = Number(matches[1]);
         const minutes = Number(matches[2]);
         const seconds = Number(matches[3]);
-        const miliseconds = matches.length > 5 ? Number(matches[4]) : 0;
+        const miliseconds = matches.length > 4 ? Number(matches[4]) : 0;
 
         let totalMiliSeconds = hours * 60 * 60;
         totalMiliSeconds += minutes * 60;

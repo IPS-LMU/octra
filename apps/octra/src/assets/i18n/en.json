@@ -110,6 +110,8 @@
     "very good intelligible": "very good intelligibility"
   },
   "g": {
+    "errors": "Errors",
+    "level": "Level",
     "File extension": "File extension",
     "Format": "Format",
     "Language": "Language",

@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -32,6 +31,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
+import { sum } from '@octra/api-types';
 
 declare const validateAnnotation: (transcript: string, guidelines: any) => any;
 declare const tidyUpAnnotation: (transcript: string, guidelines: any) => any;
@@ -52,7 +52,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   editorConfig: TranscrEditorConfig = new TranscrEditorConfig({
-    btnPopover: false
+    btnPopover: false,
   });
 
   @ViewChild('transcrEditor', { static: false })
@@ -65,7 +65,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       text: string;
     };
   }[] = [];
-  public transcript = "";
+  public transcript = '';
 
   @Input() currentLevel?: OctraAnnotationAnyLevel<
     OctraAnnotationSegment<ASRContext>
@@ -149,18 +149,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public get foundErrors(): number {
-    let found = 0;
-
-    if (this.shownSegments.length > 0) {
-      let resultStr = '';
-      for (let i = 0; i < this.shownSegments.length; i++) {
-        resultStr += this.shownSegments[i].transcription.html;
-        found += (this.shownSegments[i].transcription.html.match(/<span class='val-error'/) || []).length;
-      }
-    }
-
-    return found;
+    return sum(this.validationErrors.map(a => a.errors));
   }
+
+  validationErrors: {
+    id: number;
+    level: string;
+    errors: number;
+  }[] = [];
 
   public get validationFound() {
     return (
@@ -412,6 +408,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
       this.shownSegments = result;
       this.showLoading = false;
+      this.validationErrors = this.readValidationErrors();
     }
   }
 
@@ -788,5 +785,33 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
     });
+  }
+
+  private readValidationErrors() {
+    const result: {
+      id: number;
+      level: string;
+      errors: number;
+    }[] = [];
+
+    for (const validationArrayElement of this.annotationStoreService
+      .validationArray) {
+      const index = result.findIndex(
+        (a) => a.id === validationArrayElement.level
+      );
+      if (index < 0) {
+        result.push({
+          id: validationArrayElement.level,
+          level: this.annotationStoreService.transcript.levels.find(
+            (a) => a.id === validationArrayElement.level
+          )!.name,
+          errors: validationArrayElement.validation.length,
+        });
+      } else {
+        result[index].errors += validationArrayElement.validation.length;
+      }
+    }
+
+    return result;
   }
 }

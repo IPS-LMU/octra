@@ -667,7 +667,11 @@ export class TranscriptionComponent
                       this.appStoreService.setShortcutsEnabled(true);
                       this.modalOverview?.close();
                       this.modalVisiblities.overview = false;
-                      this.onSendNowClick();
+                      timer(1000).subscribe({
+                        next: () => {
+                          this.onSendNowClick();
+                        },
+                      });
                     },
                     'overview modal transcr send'
                   );
@@ -790,7 +794,11 @@ export class TranscriptionComponent
           this.appStoreService.setShortcutsEnabled(true);
           this.modalOverview?.close();
           this.modalVisiblities.overview = false;
-          this.onSendNowClick();
+          timer(1000).subscribe({
+            next: () => {
+              this.onSendNowClick();
+            },
+          });
         },
         'overview modal transcr send'
       );
@@ -927,7 +935,11 @@ export class TranscriptionComponent
         this.appStoreService.setShortcutsEnabled(true);
         this.modalOverview?.close();
         this.modalVisiblities.overview = false;
-        this.onSendNowClick();
+        timer(1000).subscribe({
+          next: () => {
+            this.onSendNowClick();
+          },
+        });
       },
       'overview modal transcr send'
     );

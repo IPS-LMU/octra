@@ -14,37 +14,61 @@
     <h4>{{ 'modal.supported.audio files' | transloco }}:</h4>
     <table class="w-100 table table-sm table-striped">
       <tbody>
-        @for (format of supportedFormats; track format) {
-          @for (extension of format.supportedFormats; track extension) {
-            <tr>
-              <td>
-                *{{extension.extension}} @if(extension.extension === ".wav") {
-                <span class="pill rounded-pill bg-success text-light px-2 py-1" style="font-size: 0.85rem;">{{"g.recommended" | transloco}}</span>
-              }
-              </td>
-              <td>
-                max. {{extension.maxFileSize | filesize}}
-              </td>
-              <td>
-                @if (extension.info) {
-                  <i class="bi bi-info-circle" [ngbTooltip]="extension.info"></i>
-                }
-              </td>
-            </tr>
-          }
-        }
+        @for (format of supportedFormats; track format) { @for (extension of
+        format.supportedFormats; track extension) {
+        <tr>
+          <td>
+            *{{ extension.extension }} @if(extension.extension === ".wav") {
+            <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            }
+          </td>
+          <td>max. {{ extension.maxFileSize | filesize }}</td>
+          <td>
+            @if (extension.info) {
+            <i class="bi bi-info-circle" [ngbTooltip]="extension.info"></i>
+            }
+          </td>
+        </tr>
+        } }
       </tbody>
     </table>
     <h4>{{ 'modal.supported.file formats for import' | transloco }}:</h4>
 
     <table class="table table-sm table-striped">
+      <thead>
+      <tr>
+        <th>Extension</th>
+        <th>Name</th>
+        <th>Supported applications</th>
+      </tr>
+      </thead>
       <tbody>
-        @for (elem of AppInfo.converters; track elem) { @if
+        @for (elem of converters; track elem) { @if
         (elem.conversion.import) {
         <tr>
+          <td>
+            @for (ext of elem.extensions; track ext;) { *{{ ext }}
+            @if($index < elem.extensions.length - 1) {
+            <span>, </span>
+            } }
+          </td>
           <td>{{ elem.name }}</td>
-          <td>{{ elem.application }}</td>
-          <td>*{{ elem.extension }}</td>
+          <td>
+            @for (app of elem.applications; track app;){
+            @if(app.application.homepage) {
+            <a [href]="app.application.homepage" target="_blank">{{
+              app.application.name
+            }}</a>
+            @if (app.recommended) {
+              <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            } } @else {
+            <span>{{ app.application.name }}</span>
+            @if (app.recommended) {
+              <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            } } @if($index < elem.applications.length - 1) {
+            <span>, </span>
+            } }
+          </td>
           <td>
             @if (elem.notice !== '') {
             <i class="bi bi-info-circle" [ngbTooltip]="elem.notice"></i>

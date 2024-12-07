@@ -1,9 +1,4 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import { AppInfo } from '../../../app.info';
-import { DropZoneComponent } from '../drop-zone';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { contains, escapeRegex, FileSize, getFileSize } from '@octra/utilities';
-import { FileProgress } from '../../obj/objects';
 import {
   AnnotationLevelType,
   Converter,
@@ -14,12 +9,17 @@ import {
   OSegment,
   OSegmentLevel,
 } from '@octra/annotation';
-import { timer } from 'rxjs';
-import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
-import { DefaultComponent } from '../default.component';
-import { AudioManager, readFile } from '@octra/web-media';
 import { OAudiofile } from '@octra/media';
+import { contains, escapeRegex, FileSize, getFileSize } from '@octra/utilities';
+import { AudioManager, readFile } from '@octra/web-media';
+import { timer } from 'rxjs';
+import { AppInfo } from '../../../app.info';
 import { ImportOptionsModalComponent } from '../../modals/import-options-modal/import-options-modal.component';
+import { OctraModalService } from '../../modals/octra-modal.service';
+import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
+import { FileProgress } from '../../obj/objects';
+import { DefaultComponent } from '../default.component';
+import { DropZoneComponent } from '../drop-zone';
 
 @Component({
   selector: 'octra-dropzone',
@@ -69,7 +69,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   public afterDrop = async () => {
     this._oannotation = undefined;
-    const files = this.dropzone.files!
+    const files = this.dropzone.files!;
     for (const file of files) {
       const fileProcess: FileProgress = {
         status: 'waiting',
@@ -147,9 +147,11 @@ export class OctraDropzoneComponent extends DefaultComponent {
       for (let i = 0; i < AppInfo.converters.length; i++) {
         let converter: Converter = AppInfo.converters[i];
         if (
-          new RegExp(`${escapeRegex(converter.extension)}$`).exec(
-            fileProgress.name.toLowerCase()
-          ) !== null
+          new RegExp(
+            `${converter.extensions
+              .map((a) => `(?:${escapeRegex(a)})`)
+              .join('|')}$`
+          ).exec(fileProgress.name.toLowerCase()) !== null
         ) {
           if (converter.conversion.import) {
             const ofile: IFile = {
@@ -191,10 +193,16 @@ export class OctraDropzoneComponent extends DefaultComponent {
                 fileProgress.status = 'valid';
 
                 if (
-                  fileProgress.name !==
-                    audioName + AppInfo.converters[i].extension &&
-                  fileProgress.name !==
-                    audioName + AppInfo.converters[i].extension.toLowerCase()
+                  new RegExp(
+                    `${escapeRegex(audioName)}${AppInfo.converters[i].extensions
+                      .map((a) => `(?:${escapeRegex(a)})`)
+                      .join('|')}$`
+                  ).exec(fileProgress.name) === null &&
+                  new RegExp(
+                    `${escapeRegex(audioName)}${AppInfo.converters[i].extensions
+                      .map((a) => `(?:${escapeRegex(a.toLowerCase())})`)
+                      .join('|')}$`
+                  ).exec(fileProgress.name) === null
                 ) {
                   fileProgress.warning = 'File names are not the same.';
                 }

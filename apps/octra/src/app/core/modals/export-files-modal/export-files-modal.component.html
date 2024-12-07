@@ -18,7 +18,6 @@
           <th></th>
           <th>{{ 'g.download' | transloco }}</th>
           <th>{{ 'g.application' | transloco }}</th>
-          <th>{{ 'g.website' | transloco }}</th>
         </tr>
       </thead>
       <tbody>
@@ -36,7 +35,13 @@
             ></i>
           </td>
           <td (click)="onLineClick(converter, i)">
-            <a #a> {{ converter.name }} (*{{ converter.extension }})</a>
+            <a>
+              {{ converter.name }} (@for (ext of converter.extensions; track
+              ext;) {*{{ ext }}
+              @if($index < converter.extensions.length - 1) {
+              <span>, </span>
+              }})
+            </a>
             @if (preparing.name === converter.name && preparing.preparing) {
             <div
               class="spinner-border"
@@ -53,12 +58,28 @@
             }
           </td>
           <td (click)="onLineClick(converter, i)">
-            {{ converter.application }}
-          </td>
-          <td (click)="onLineClick(converter, i)">
-            <a href="{{ converter.website.url }}" target="_blank">
-              {{ converter.website.title }}
-            </a>
+            @for (app of converter.applications; track app;){
+            @if(app.application.homepage) {
+            <a [href]="app.application.homepage" target="_blank">{{
+              app.application.name
+            }}</a>
+            @if (app.recommended) {
+            <i
+              class="bi bi-patch-check-fill text-success recommended"
+              [ngbPopover]="'g.recommended' | transloco"
+              triggers="mouseenter:mouseleave"
+            ></i>
+            } } @else {
+            <span>{{ app.application.name }}</span>
+            @if (app.recommended) {
+            <i
+              class="bi bi-patch-check-fill text-success recommended"
+              [ngbPopover]="'g.recommended' | transloco"
+              triggers="mouseenter:mouseleave"
+            ></i>
+            } } @if($index < converter.applications.length - 1) {
+            <span>, </span>
+            } }
           </td>
           <td (click)="onLineClick(converter, i)">
             @if (converter.notice !== '') {
@@ -113,11 +134,9 @@
                           [(ngModel)]="converter.options.addNewLineString"
                         />
                       </td>
-                      <td style="vertical-align: top;">
+                      <td style="vertical-align: top">
                         <label for="add-new-line-option">
-                          {{
-                            'export.options.add newline' | transloco
-                          }}</label
+                          {{ 'export.options.add newline' | transloco }}</label
                         >
                       </td>
                     </tr>
@@ -133,7 +152,7 @@
                           [(ngModel)]="converter.options.showTimestampString"
                         />
                       </td>
-                      <td style="vertical-align: top;">
+                      <td style="vertical-align: top">
                         <label for="timestamp-option-string">
                           {{
                             'export.options.add timestamps' | transloco
@@ -157,7 +176,7 @@
                           "
                         />
                       </td>
-                      <td style="vertical-align: top;">
+                      <td style="vertical-align: top">
                         <label for="timestamp-option-samples">
                           {{
                             'export.options.add samplepoints' | transloco

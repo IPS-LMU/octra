@@ -41,8 +41,8 @@ import {
   NgbAccordionCollapse,
   NgbCollapseModule,
   NgbDropdownModule,
-  NgbModalModule,
-  NgbTooltipModule,
+  NgbModalModule, NgbPopover,
+  NgbTooltipModule
 } from '@ng-bootstrap/ng-bootstrap';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
@@ -111,7 +111,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NgbAccordionCollapse,
     NgxJoditComponent,
     OctraFormGeneratorModule,
-    BugreportModalComponent
+    BugreportModalComponent,
+    NgbPopover,
   ],
   exports: [
     ErrorModalComponent,

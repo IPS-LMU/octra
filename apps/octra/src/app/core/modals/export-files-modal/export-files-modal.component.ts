@@ -45,7 +45,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     download: '',
     uri: '',
   };
-  public converters = AppInfo.converters;
 
   public tools = {
     audioCutting: {
@@ -101,6 +100,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   public selectedLevel = 0;
 
+  converters: Converter[] = [];
+
   constructor(
     private sanitizer: DomSanitizer,
     private audio: AudioService,
@@ -108,6 +109,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     protected override activeModal: NgbActiveModal
   ) {
     super('ExportFilesModalComponent', activeModal);
+    this.converters = AppInfo.converters;
   }
 
   ngOnInit() {
@@ -124,7 +126,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       'modals'
     );
 
-    for (const converter of AppInfo.converters) {
+    for (const converter of this.converters) {
       this.exportStates.push('close');
     }
 

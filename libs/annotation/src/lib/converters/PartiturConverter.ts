@@ -1,10 +1,5 @@
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 import {
   OAnnotJSON,
   OItem,
@@ -13,18 +8,29 @@ import {
   OSegment,
   OSegmentLevel,
 } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
+import {
+  BASWebservicesApplication,
+  OctraApplication,
+} from './SupportedApplications';
 
+// http://www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html
 export class PartiturConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'BASPartitur';
 
   public constructor() {
     super();
-    this._application = '';
-    this._extension = '.par';
-    this._website.title = 'BAS Partitur Format';
-    this._website.url = 'http://www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html';
+    this._applications = [
+      { application: new BASWebservicesApplication(), recommended: true },
+      { application: new OctraApplication() },
+    ];
+    this._extensions = ['.par'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -54,7 +60,7 @@ export class PartiturConverter extends Converter {
     if (levelnum !== undefined && levelnum > -1) {
       const result: ExportResult = {
         file: {
-          name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
+          name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extensions[0]}`,
           content: 'SAM ' + audiofile.sampleRate,
           encoding: 'UTF-8',
           type: 'text',

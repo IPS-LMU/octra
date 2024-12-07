@@ -1,10 +1,5 @@
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 import {
   OAnnotJSON,
   OAnyLevel,
@@ -13,18 +8,38 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { contains } from '../functions';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
+import {
+  BASWebservicesApplication,
+  OctraApplication,
+  PraatApplication,
+} from './SupportedApplications';
 
 export class PraatTableConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'PraatTextTable';
 
   public constructor() {
     super();
-    this._application = 'Praat';
-    this._extension = '.Table';
-    this._website.title = 'Praat';
-    this._website.url = 'http://www.fon.hum.uva.nl/praat/';
+    this._applications = [];
+    this._extensions = ['.Table'];
+    this._applications = [
+      {
+        application: new PraatApplication(),
+        recommended: true,
+      },
+      {
+        application: new OctraApplication(),
+      },
+      {
+        application: new BASWebservicesApplication(),
+      },
+    ];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -69,7 +84,7 @@ export class PraatTableConverter extends Converter {
       }
     }
 
-    filename = annotation.name + this._extension;
+    filename = annotation.name + this._extensions[0];
 
     return {
       file: {

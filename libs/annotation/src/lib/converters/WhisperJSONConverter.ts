@@ -1,10 +1,6 @@
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { OAudiofile } from '@octra/media';
+import { last } from '@octra/utilities';
+import { FileInfo } from '@octra/web-media';
 import {
   OAnnotJSON,
   OLabel,
@@ -12,19 +8,29 @@ import {
   OSegment,
   OSegmentLevel,
 } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { last } from '@octra/utilities';
-import { FileInfo } from '@octra/web-media';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
+import { OctraApplication, WhisperXApplication } from './SupportedApplications';
 
 export class WhisperJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'WhisperJSON';
 
   public constructor() {
     super();
-    this._application = 'Whisper, WhisperX';
-    this._extension = '.json';
-    this._website.title = 'WhisperJSON';
-    this._website.url = 'https://github.com/openai/whisper';
+    this._applications = [
+      {
+        application: new WhisperXApplication(),
+      },
+      {
+        application: new OctraApplication(),
+      },
+    ];
+    this._extensions = ['.json'];
     this._conversion.export = false;
     this._conversion.import = true;
     this._encoding = 'UTF-8';

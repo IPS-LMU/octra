@@ -1,3 +1,6 @@
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -5,10 +8,13 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+import {
+  AnyTextEditor,
+  BASWebservicesApplication,
+  OctraApplication, WordApplication
+} from './SupportedApplications';
 
+// https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic
 export class TextConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'PlainText';
 
@@ -20,11 +26,21 @@ export class TextConverter extends Converter {
 
   public constructor() {
     super();
-    this._application = 'Text Editor';
-    this._extension = '.txt';
-    this._website.title = 'WebMaus';
-    this._website.url =
-      'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';
+    this._applications = [
+      {
+        application: new OctraApplication(),
+      },
+      {
+        application: new BASWebservicesApplication(),
+      },
+      {
+        application: new AnyTextEditor(),
+      },
+      {
+        application: new WordApplication(),
+      },
+    ];
+    this._extensions = ['.txt'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -112,7 +128,7 @@ export class TextConverter extends Converter {
       if (annotation.levels.length > 1) {
         filename += `-${level.name}`;
       }
-      filename += `${this._extension}`;
+      filename += `${this._extensions[0]}`;
     }
 
     result = result.replace(/ +/g, ' ');

@@ -1,3 +1,6 @@
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
+import { OAnnotJSON } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -5,19 +8,32 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+import {
+  BASWebservicesApplication,
+  EMUWebAppApplication,
+  OctraApplication
+} from './SupportedApplications';
 
 export class AnnotJSONConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'AnnotJSON';
 
   public constructor() {
     super();
-    this._application = 'Emu-WebApp';
-    this._website.title = 'Emu-WebApp';
-    this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
-    this._extension = '_annot.json';
+    this._applications = [
+      {
+        application: new OctraApplication(),
+        recommended: true,
+      },
+      {
+        application: new EMUWebAppApplication(),
+        recommended: true,
+      },
+      {
+        application: new BASWebservicesApplication(),
+        recommended: true,
+      },
+    ];
+    this._extensions = ['_annot.json'];
     this._conversion.export = true;
     this._conversion.import = true;
   }
@@ -26,7 +42,7 @@ export class AnnotJSONConverter extends Converter {
     if (annotation) {
       return {
         file: {
-          name: annotation.name + this._extension,
+          name: annotation.name + this._extensions[0],
           content: JSON.stringify(annotation, undefined, 2),
           encoding: 'UTF-8',
           type: 'application/json',

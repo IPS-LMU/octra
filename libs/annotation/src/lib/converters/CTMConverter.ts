@@ -9,6 +9,7 @@ import { contains } from '@octra/utilities';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { OAudiofile } from '@octra/media';
 import { FileInfo } from '@octra/web-media';
+import { OctraApplication } from './SupportedApplications';
 
 export class CTMConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'CTM';
@@ -17,11 +18,10 @@ export class CTMConverter extends Converter {
 
   public constructor() {
     super();
-    this._application = 'CTM';
-    this._extension = '.ctm';
-    this._website.title = 'CTM Format';
-    this._website.url =
-      'http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm';
+    this._applications = [{
+      application: new OctraApplication()
+    }];
+    this._extensions = ['.ctm'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -73,7 +73,7 @@ export class CTMConverter extends Converter {
       result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
     }
 
-    filename = annotation.name + this._extension;
+    filename = annotation.name + this._extensions[0];
 
     return {
       file: {

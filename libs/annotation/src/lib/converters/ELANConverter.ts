@@ -1,4 +1,8 @@
+import { OAudiofile } from '@octra/media';
+import { last } from '@octra/utilities';
+import { FileInfo } from '@octra/web-media';
 import X2JS from 'x2js';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -6,20 +10,26 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { last } from '@octra/utilities';
-import { FileInfo } from '@octra/web-media';
+import { BASWebservicesApplication, ELANApplication, OctraApplication } from './SupportedApplications';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';
 
   public constructor() {
     super();
-    this._application = 'ELAN';
-    this._extension = '.eaf';
-    this._website.title = 'ELAN';
-    this._website.url = 'https://tla.mpi.nl/tools/tla-tools/elan/';
+    this._applications = [
+      {
+        application: new ELANApplication(),
+        recommended: true,
+      },
+      {
+        application: new OctraApplication()
+      },
+      {
+        application: new BASWebservicesApplication()
+      }
+    ];
+    this._extensions = ['.eaf'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -124,7 +134,7 @@ export class ELANConverter extends Converter {
       }
     }
 
-    filename = `${annotation.name}${this._extension}`;
+    filename = `${annotation.name}${this._extensions[0]}`;
     const result = x2js.js2xml(jsonObj);
 
     return {

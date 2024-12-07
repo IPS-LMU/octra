@@ -8,6 +8,7 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
+import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
 
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -18,7 +19,7 @@ export class SRTConverterImportOptions {
     if (partial) Object.assign(this, partial);
   }
 }
-
+// https://matroska.org/technical/specs/subtitles/srt.html
 export class SRTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'SRT';
 
@@ -26,11 +27,21 @@ export class SRTConverter extends Converter {
 
   public constructor() {
     super();
-    this._application = 'Video';
-    this._extension = '.srt';
-    this._website.title = 'SRT Subtitles';
-    this._website.url =
-      'https://matroska.org/technical/specs/subtitles/srt.html';
+    this._applications = [
+      {
+        application: new OctraApplication(),
+      },
+      {
+        application: new AnyVideoPlayer(),
+      },
+      {
+        application: new WordApplication(),
+      },
+      {
+        application: new AnyTextEditor(),
+      },
+    ];
+    this._extensions = ['.srt'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -123,7 +134,7 @@ export class SRTConverter extends Converter {
       if (annotation.levels.length > 1) {
         filename += `-${level.name}`;
       }
-      filename += `${this._extension}`;
+      filename += `${this._extensions[0]}`;
     }
 
     return {

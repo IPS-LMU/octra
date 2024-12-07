@@ -1,3 +1,5 @@
+import { OAudiofile } from '@octra/media';
+import { IAnnotJSON, OAnnotJSON } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -5,8 +7,7 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { IAnnotJSON, OAnnotJSON } from '../annotjson';
-import { OAudiofile } from '@octra/media';
+import { OctraApplication } from './SupportedApplications';
 
 export interface Bundle {
   ssffFiles: {
@@ -26,10 +27,8 @@ export class BundleJSONConverter extends Converter {
 
   public constructor() {
     super();
-    this._application = '';
-    this._extension = '_bndl.json';
-    this._website.title = '';
-    this._website.url = '';
+    this._applications = [];
+    this._extensions = ['_bndl.json'];
     this._conversion.export = false;
     this._conversion.import = false;
     this._encoding = 'UTF-8';
@@ -65,7 +64,7 @@ export class BundleJSONConverter extends Converter {
       annotation,
     };
     result = JSON.stringify(bundle, undefined, 2);
-    filename = annotation.name + this._extension;
+    filename = annotation.name + this._extensions[0];
 
     return {
       file: {
@@ -150,7 +149,7 @@ export class BundleJSONConverter extends Converter {
      */
 
     return {
-      error: "not implemented"
+      error: 'not implemented',
     };
   }
 }

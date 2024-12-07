@@ -1,3 +1,12 @@
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
+import {
+  OAnnotJSON,
+  OAnyLevel,
+  OLabel,
+  OSegment,
+  OSegmentLevel,
+} from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -6,25 +15,32 @@ import {
   OctraAnnotationFormatType,
 } from './Converter';
 import {
-  OAnnotJSON,
-  OAnyLevel,
-  OLabel,
-  OSegment,
-  OSegmentLevel,
-} from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+  AnyTextEditor,
+  AnyVideoPlayer,
+  OctraApplication, WordApplication
+} from './SupportedApplications';
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
 export class WebVTTConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'WebVTT';
 
   public constructor() {
     super();
-    this._application = 'Videoplayer';
-    this._extension = '.vtt';
-    this._website.title = 'Web Video Text Tracks Format (WebVTT)\n';
-    this._website.url =
-      'https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API';
+    this._applications = [
+      {
+        application: new OctraApplication(),
+      },
+      {
+        application: new AnyVideoPlayer(),
+      },
+      {
+        application: new WordApplication(),
+      },
+      {
+        application: new AnyTextEditor(),
+      },
+    ];
+    this._extensions = ['.vtt'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -91,7 +107,7 @@ export class WebVTTConverter extends Converter {
       if (annotation.levels.length > 1) {
         filename += `-${level.name}`;
       }
-      filename += `${this._extension}`;
+      filename += `${this._extensions[0]}`;
     }
 
     return {

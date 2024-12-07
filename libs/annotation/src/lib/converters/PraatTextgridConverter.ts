@@ -1,10 +1,5 @@
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { OAudiofile } from '@octra/media';
+import { FileInfo } from '@octra/web-media';
 import {
   OAnnotJSON,
   OEvent,
@@ -14,18 +9,35 @@ import {
   OSegmentLevel,
 } from '../annotjson';
 import { contains } from '../functions';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
+import {
+  BASWebservicesApplication,
+  EMUWebAppApplication,
+  OctraApplication,
+  PraatApplication,
+} from './SupportedApplications';
 
 export class PraatTextgridConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'TextGrid';
 
   public constructor() {
     super();
-    this._application = 'Praat';
-    this._extension = '.TextGrid';
-    this._website.title = 'Praat';
-    this._website.url = 'http://www.fon.hum.uva.nl/praat/';
+    this._applications = [
+      {
+        application: new PraatApplication(),
+        recommended: true,
+      },
+      { application: new OctraApplication(), recommended: true },
+      { application: new BASWebservicesApplication() },
+      { application: new EMUWebAppApplication() },
+    ];
+    this._extensions = ['.TextGrid'];
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
@@ -106,7 +118,7 @@ export class PraatTextgridConverter extends Converter {
       }
     }
 
-    const filename = annotation.name + this._extension;
+    const filename = annotation.name + this._extensions[0];
 
     return {
       file: {

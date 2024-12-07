@@ -1,5 +1,6 @@
-import { OAnnotJSON } from '../annotjson';
 import { OAudiofile } from '@octra/media';
+import { OAnnotJSON } from '../annotjson';
+import { SupportedApplication } from './SupportedApplications';
 
 export type OctraAnnotationFormatType =
   | 'AnnotJSON'
@@ -42,12 +43,18 @@ export abstract class Converter {
     return this._conversion;
   }
 
-  protected _application = '';
+  protected _applications: {
+    application: SupportedApplication;
+    recommended?: boolean;
+  }[] = [];
 
   public defaultImportOptions: any;
 
-  get application(): string {
-    return this._application;
+  get applications(): {
+    application: SupportedApplication;
+    recommended?: boolean;
+  }[] {
+    return this._applications;
   }
 
   protected _name!: OctraAnnotationFormatType;
@@ -56,31 +63,16 @@ export abstract class Converter {
     return this._name;
   }
 
-  protected _extension = '';
+  protected _extensions: string[] = [];
 
-  get extension(): string {
-    return this._extension;
+  get extensions(): string[] {
+    return this._extensions;
   }
 
   protected _encoding = '';
 
   get encoding(): string {
     return this._encoding;
-  }
-
-  protected _website: {
-    title: string;
-    url: string;
-  } = {
-    title: '',
-    url: '',
-  };
-
-  get website(): {
-    title: string;
-    url: string;
-  } {
-    return this._website;
   }
 
   protected _notice = '';

@@ -1152,6 +1152,7 @@ export class TranscrEditorComponent
                   )
                 : this._rawText;
             code = insertString(code, this._textSelection.start, startMarker);
+            code = this.tidyUpRaw(code);
           }
 
           const validation = this.annotationStoreService.validate(code);
@@ -1740,7 +1741,7 @@ export class TranscrEditorComponent
   onAfterInit = () => {
     this.subscriptionManager.removeByTag('initialization');
     this.subscribe(
-      timer(0),
+      timer(200),
       () => {
         if (this.workplace?.parentNode) {
           if (!this.popovers.segmentBoundary) {

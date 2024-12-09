@@ -11,7 +11,8 @@ import {
 import {
   AnyTextEditor,
   BASWebservicesApplication,
-  OctraApplication, WordApplication
+  OctraApplication,
+  WordApplication,
 } from './SupportedApplications';
 
 // https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic
@@ -34,10 +35,10 @@ export class TextConverter extends Converter {
         application: new BASWebservicesApplication(),
       },
       {
-        application: new AnyTextEditor(),
+        application: new WordApplication(),
       },
       {
-        application: new WordApplication(),
+        application: new AnyTextEditor(),
       },
     ];
     this._extensions = ['.txt'];

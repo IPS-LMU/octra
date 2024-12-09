@@ -8,7 +8,12 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
+import {
+  AnyTextEditor,
+  AnyVideoPlayer,
+  OctraApplication,
+  WordApplication,
+} from './SupportedApplications';
 
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -298,37 +303,39 @@ export class SRTConverter extends Converter {
               !text &&
               duration <= options.combineSegmentsWithSameSpeakerThreshold
             ) {
-              // remove segment
+              // current unit is empty, previous and next is set
+              // remove empty unit
               defaultLevel.items.splice(i, 1);
+              // extend previousItem
               previousItem.sampleDur += item.sampleDur;
-              i--;
+              i--; // i = position of previous item
 
               if (
                 nextItem.labels[0].name === 'Speaker' &&
                 previousItem.labels[0].name === 'Speaker' &&
                 nextItem.labels[0].value === previousItem.labels[0].value
               ) {
+                // left and right neighbours have the same speaker
+                // remove nextItem
                 defaultLevel.items.splice(i + 1, 1);
-                nextItem.sampleDur += item.sampleDur;
-                nextItem.sampleStart = item.sampleStart;
-                i--;
-              }
+                // extend previousItem
+                previousItem.sampleDur += nextItem.sampleDur;
 
-              const label = previousItem.getFirstLabelWithoutName('Speaker');
-              if (label) {
-                const speakerRegex =
-                  options.speakerIdentifierPattern &&
-                  options.speakerIdentifierPattern !== ''
-                    ? options.speakerIdentifierPattern
-                    : '\\[SPEAKER_[0-9]+] *: *';
-                label.value +=
-                  nextItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
-                label.value = label.value.replace(
-                  new RegExp(`(?!^) *${speakerRegex}`),
-                  ' '
-                );
+                const label = previousItem.getFirstLabelWithoutName('Speaker');
+                if (label) {
+                  const speakerRegex =
+                    options.speakerIdentifierPattern &&
+                    options.speakerIdentifierPattern !== ''
+                      ? options.speakerIdentifierPattern
+                      : '\\[SPEAKER_[0-9]+] *: *';
+                  label.value +=
+                    nextItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
+                  label.value = label.value.replace(
+                    new RegExp(`(?!^) *${speakerRegex}`),
+                    ' '
+                  );
+                }
               }
-              previousItem.sampleDur += nextItem.sampleDur;
             }
           }
         }

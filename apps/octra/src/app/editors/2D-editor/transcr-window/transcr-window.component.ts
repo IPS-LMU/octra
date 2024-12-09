@@ -231,7 +231,7 @@ export class TranscrWindowComponent
     });
   };
 
-  onJumpRight = (
+  onJumpRight = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
     hotkeyEvent: HotkeysEvent
@@ -242,7 +242,7 @@ export class TranscrWindowComponent
         this.segmentIndex <
           this.annotationStoreService.currentLevel!.items.length - 1)
     ) {
-      this.doDirectionAction('right');
+      await this.doDirectionAction('right');
     } else {
       this.save();
       this.close();
@@ -250,20 +250,20 @@ export class TranscrWindowComponent
     }
   };
 
-  onJumpLeft = (
+  onJumpLeft = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
     hotkeyEvent: HotkeysEvent
   ) => {
-    this.doDirectionAction('left');
+    await this.doDirectionAction('left');
   };
 
-  onClose = (
+  onClose = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
     hotkeyEvent: HotkeysEvent
   ) => {
-    this.doDirectionAction('down');
+    await this.doDirectionAction('down');
   };
 
   private audioShortcuts: ShortcutGroup = {
@@ -366,55 +366,57 @@ export class TranscrWindowComponent
   }
 
   public doDirectionAction = async (direction: string) => {
-    this._loading = true;
-    this.cd.markForCheck();
-    this.cd.detectChanges();
+    if(!this._loading) {
+      this._loading = true;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
 
-    const doFunc = async () => {
-      try {
-        this._validationEnabled = false;
-        this.editor.updateRawText();
-        this.save();
-        this.setValidationEnabledToDefault();
-      } catch (e) {
-        console.error(e);
-      }
-
-      if (this.audioManager.isPlaying) {
+      const doFunc = async () => {
         try {
-          await this.audiochunk.stopPlayback();
+          this._validationEnabled = false;
+          this.editor.updateRawText();
+          this.save();
+          this.setValidationEnabledToDefault();
         } catch (e) {
           console.error(e);
         }
-      }
 
-      if (direction !== 'down') {
-        try {
-          await this.goToSegment(direction);
-          const currentLevel = this.annotationStoreService.currentLevel;
-          const segment = currentLevel!.items[
-            this.segmentIndex
-          ] as OctraAnnotationSegment;
-
-          if (!segment?.context?.asr?.isBlockedBy) {
-            await this.audiochunk.startPlayback();
+        if (this.audioManager.isPlaying) {
+          try {
+            await this.audiochunk.stopPlayback();
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          // ignore
-          console.error(e);
-        } finally {
-          this._loading = false;
-          this.cd.markForCheck();
-          this.cd.detectChanges();
         }
-      } else {
-        this.close();
-      }
-    };
 
-    this.subscribe(timer(0), {
-      next: doFunc,
-    });
+        if (direction !== 'down') {
+          try {
+            await this.goToSegment(direction);
+            const currentLevel = this.annotationStoreService.currentLevel;
+            const segment = currentLevel!.items[
+              this.segmentIndex
+              ] as OctraAnnotationSegment;
+
+            if (!segment?.context?.asr?.isBlockedBy) {
+              await this.audiochunk.startPlayback();
+            }
+          } catch (e) {
+            // ignore
+            console.error(e);
+          } finally {
+            this._loading = false;
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          }
+        } else {
+          this.close();
+        }
+      };
+
+      this.subscribe(timer(0), {
+        next: doFunc,
+      });
+    }
   };
 
   ngOnInit() {

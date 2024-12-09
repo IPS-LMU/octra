@@ -668,7 +668,7 @@ export class TranscrEditorComponent
   }
 
   ngOnInit() {
-    this.subscriptionManager.removeByTag('afterInit');
+    this.subscriptionManager.removeByTag('initialization');
     this.subscribe(this.annotationStoreService.guidelines$, {
       next: (guidelines) => {
         this.guidelines = guidelines?.selected?.json;
@@ -1439,12 +1439,16 @@ export class TranscrEditorComponent
 
       this.joditComponent.jodit.value =
         await this.annotationStoreService.rawToHTML(rawText);
-      this.subscribe(timer(500), {
-        next: async () => {
-          await this.validate();
-          await this.initPopover();
+      this.subscribe(
+        timer(500),
+        {
+          next: async () => {
+            await this.validate();
+            await this.initPopover();
+          },
         },
-      });
+        'initialization'
+      );
 
       this.asr = {
         status: 'inactive',
@@ -1734,8 +1738,9 @@ export class TranscrEditorComponent
   }
 
   onAfterInit = () => {
+    this.subscriptionManager.removeByTag('initialization');
     this.subscribe(
-      timer(200),
+      timer(0),
       () => {
         if (this.workplace?.parentNode) {
           if (!this.popovers.segmentBoundary) {
@@ -1768,7 +1773,7 @@ export class TranscrEditorComponent
             console.error(error);
           });
       },
-      'afterInit'
+      'initialization'
     );
   };
 

@@ -244,4 +244,6 @@ export class AudioviewerConfig {
   public showTimePerLine = false;
   public showTranscripts = false;
   public showProgressBars = false;
+
+  speakerPattern?: string;
 }

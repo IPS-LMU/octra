@@ -24,7 +24,7 @@
               {{ 'modal.shortcuts.' + entry.title | transloco }}
             </td>
             } @if (entry.label !== undefined) {
-            <td>{{ entry.label }}</td>
+            <td [innerHTML]="entry.label"></td>
             }
             <td>
               <octra-shortcut

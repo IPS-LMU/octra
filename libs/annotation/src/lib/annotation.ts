@@ -391,8 +391,6 @@ export class OctraAnnotation<
     ) {
       if (
         index < this.currentLevel.items.length - 1 &&
-        silenceValue !== undefined &&
-        silenceValue !== '' &&
         this.currentLevel.type === 'SEGMENT'
       ) {
         const nextSegment = this.currentLevel.items[
@@ -403,11 +401,11 @@ export class OctraAnnotation<
         ).getFirstLabelWithoutName('Speaker')?.value;
 
         if (
-          silenceValue !== undefined &&
-          nextSegment.getFirstLabelWithoutName('Speaker')?.value !==
+          !silenceValue ||
+          (nextSegment.getFirstLabelWithoutName('Speaker')?.value !==
             silenceValue &&
-          transcription !== silenceValue &&
-          mergeTranscripts
+            transcription !== silenceValue &&
+            mergeTranscripts)
         ) {
           // concat transcripts
           if (
@@ -430,8 +428,9 @@ export class OctraAnnotation<
             );
           }
         } else if (
+          silenceValue &&
           nextSegment.getFirstLabelWithoutName('Speaker')?.value ===
-          silenceValue
+            silenceValue
         ) {
           // delete pause
           nextSegment.changeFirstLabelWithoutName(

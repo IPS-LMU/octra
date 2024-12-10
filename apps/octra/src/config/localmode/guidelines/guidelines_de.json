@@ -1,11 +1,12 @@
 {
+  "$schema": "guidelines.schema.json",
   "meta": {
     "object_language": "deu",
     "language": "de",
-    "project": "Sprecherinnen",
-    "authors": "Test Person (testperson@email.de)",
+    "project": "ESSV_Radio",
+    "authors": "Christoph Draxler",
     "version": "1.0",
-    "date": "2017-04-10",
+    "date": "2024-11-28",
     "encoding": "UTF-8",
     "validation_url": "config/localmode/functions.js"
   },
@@ -78,11 +79,11 @@
         {
           "code": "R06",
           "priority": 100,
-          "title": "Keine Satzzeichen",
-          "description": "Keine Satzzeichen verwenden.",
+          "title": "Ziffern ausschreiben",
+          "description": "Ziffern und Zahlen sind nicht erlaubt, sondern müssen ausgeschrieben werden.",
           "examples": [
             {
-              "annotation": "Kein (.,!?;-)",
+              "annotation": "\"zwei\" statt \"2\"",
               "url": ""
             }
           ]
@@ -95,82 +96,37 @@
         {
           "code": "M01",
           "priority": 100,
-          "title": "Marker sparsam verwenden!",
-          "description": "Marker nur setzen, wenn sie den Sprachfluss stark beeinträchtigen.",
-          "examples": []
+          "title": "Verfügbare Marken",
+          "description": "Folgende Marken stehen zur Verwendung:<br/><table class=\"table table-sm table-striped\"><tbody><tr><td>&lt;TIM&gt;</td><td>Zeitansage</td></tr><tr><td>&lt;LOC&gt;</td><td>Ortsangabe („Berlin.“) oder Thema („Bundeshaushalt“, „Sport.“, „Fußball.“)</td></tr><tr><td>&lt;COR&gt;</td><td>Meldung, klass. Nachricht, Core-News</td></tr><tr><td>&lt;REP&gt;</td><td>Bericht, Report (oft vorproduzierter Einspieler)</td></tr><tr><td>&lt;INT&gt;</td><td>Anmoderation/Intro (zu einem nachfolgenden Bericht/Einspieler)</td></tr><tr><td>&lt;OUT&gt;</td><td>Abmoderation/Outro („Das war Anne Seiler aus Bonn“ nach dem Bericht etc)</td></tr><tr><td>&lt;OTO&gt;</td><td>O-Ton (Bericht oder Interviewausschnitt mit Atmo-Hintergrund)</td></tr><tr><td>&lt;SPO&gt;</td><td>Sport</td></tr><tr><td>&lt;WET&gt;</td><td>Wetterbericht/-vohersage/-interview</td></tr><tr><td>&lt;TRA&gt;</td><td>Verkehr</td></tr><tr><td>&lt;STO&gt;</td><td>Börsennachrichten (oft mit Atmo)</td></tr><tr><td>&lt;TOP&gt;</td><td>Übersicht (DLF: „Die Themen....“)</td></tr><tr><td>&lt;PAC&gt;</td><td>Jingle/Senderkennung, akustische Trenner, Pausenzeichen, Zeitzeichen, akustische Verpackung</td></tr></tbody></table>"
         },
         {
           "code": "M02",
           "priority": 100,
-          "title": "Nonverbale Sprechergeräusche",
-          "description": "Nonverbale Sprechergeräusche wie Husten, Lachen, Schmatzen usw. werden mit {{<usb>}} und Leerzeichen vor jedem betroffenen Wort markiert. ",
-          "examples": []
-        },
-        {
-          "code": "M02",
-          "priority": 100,
-          "title": "Andere Geräusche",
-          "description": "Geräusche, die nicht vom Sprecher stammen, z.B. Türschlagen, Klopfen, Motoren, werden mit {{<nib>}} und Leerzeichen vor dem betroffenen Wort markiert. ",
-          "examples": []
+          "title": "Jede nicht-leere Transkriptionseinheit beginnt mit einer Marke",
+          "description": "Eine Transkriptionseinheit muss mit einer Marke beginnen",
+          "examples": [
+            {
+              "annotation": "&lt;TIM&gt; 11 Uhr "
+            },
+            {
+              "annotation": "&lt;PAC&gt;"
+            },
+            {
+              "annotation": "&lt;INT&gt; Die Nachrichten von SR1"
+            },
+            {
+              "annotation": "&lt;LOC&gt; Zum Fußball"
+            },
+            {
+              "annotation": "&lt;SPO&gt; Der 1. FC Köln sucht einen neuen Trainer…"
+            }
+          ]
         },
         {
           "code": "M03",
           "priority": 100,
-          "title": "Weitere Sprecher",
-          "description": "Sprache eines dritten Sprechers wird mit {{**}} (mit Leerzeichen von den benachbarten Wörtern getrennt) markiert, ebenso unverständliche Passagen.",
-          "examples": []
-        },
-        {
-          "code": "M04",
-          "priority": 100,
-          "title": "Versprecher",
-          "description": "Versprecher werden soweit möglich transkribiert und mit * am Wortanfang markiert. ",
-          "examples": [
-            {
-              "annotation": "am *drit nein vierten April",
-              "url": ""
-            }
-          ]
-        },
-        {
-          "code": "M05",
-          "priority": 100,
-          "title": "Phrasengrenzen",
-          "description": "Markieren Sie Phrasengrenzen (möglichst in Sprechpausen) mit einem senkrechten Strich.",
-          "examples": []
-        }
-      ]
-    },
-    {
-      "group": "Häsitationen",
-      "entries": [
-        {
-          "code": "H01",
-          "priority": 100,
-          "title": "Häsitationsmarker",
-          "description": "Häsitationsphänomene wie 'äh', 'öh', 'ähm' oder 'mhm' werden unabhängig vom produzierten Vokal mit standardisierten Wörtern transkribiert:",
-          "examples": [
-            {
-              "annotation": "äh - wenn kein Nasal zu hören ist",
-              "url": ""
-            },
-            {
-              "annotation": "ähm - wenn ein Vokal und ein Nasal zu hören sind",
-              "url": ""
-            },
-            {
-              "annotation": "mhm - wenn zwei Nasale zu hören sind",
-              "url": ""
-            },
-            {
-              "annotation": "ach - wenn ein Frikativ zu hören ist",
-              "url": ""
-            },
-            {
-              "annotation": "ne, nee - bei initialem Nasal",
-              "url": ""
-            }
-          ]
+          "title": "Je Transkriptionseinheit nur eine Marke",
+          "description": "Eine Transkriptionseinheit darf nur einem Marke enthalten."
         }
       ]
     }
@@ -178,12 +134,11 @@
   "markers": [
     {
       "id": 1,
-      "name": "truncation marker start",
-      "code": "[~abc]",
+      "name": "<TIM>",
+      "code": "<TIM>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
-      "button_text": "~abc",
-      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
+      "button_text": "&lt;TIM&gt;",
+      "description": "Zeitansage",
       "shortcut": {
         "mac": "ALT + 1",
         "pc": "ALT + 1"
@@ -191,12 +146,11 @@
     },
     {
       "id": 2,
-      "name": "filled pause",
-      "code": "<nib>",
+      "name": "&lt;LOC&gt;",
+      "code": "<LOC>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/fil.png",
-      "button_text": "Gefüllte Pause",
-      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
+      "button_text": "&lt;LOC&gt;",
+      "description": "Ortsangabe („Berlin.“) oder Thema („Bundeshaushalt“, „Sport.“, „Fußball.“)",
       "shortcut": {
         "mac": "ALT + 2",
         "pc": "ALT + 2"
@@ -204,12 +158,11 @@
     },
     {
       "id": 3,
-      "name": "intermittent noise",
-      "code": "[int]",
+      "name": "&lt;COR&gt;",
+      "code": "<COR>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/int.png",
-      "button_text": "unterbrechendes Geräusch",
-      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
+      "button_text": "&lt;COR&gt;",
+      "description": "Meldung, klass. Nachricht, Core-News",
       "shortcut": {
         "mac": "ALT + 3",
         "pc": "ALT + 3"
@@ -217,12 +170,11 @@
     },
     {
       "id": 4,
-      "name": "speaker noise",
-      "code": "<usb>",
+      "name": "&lt;REP&gt;",
+      "code": "<REP>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/spk.png",
-      "button_text": "Sprechergeräusch",
-      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
+      "button_text": "&lt;REP&gt;",
+      "description": "Bericht, Report (oft vorproduzierter Einspieler)",
       "shortcut": {
         "mac": "ALT + 4",
         "pc": "ALT + 4"
@@ -230,12 +182,11 @@
     },
     {
       "id": 5,
-      "name": "stationary noise",
-      "code": "[sta]",
+      "name": "&lt;INT&gt;",
+      "code": "<INT>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/sta.png",
-      "button_text": "Andauerndes Geräusch",
-      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
+      "button_text": "&lt;INT&gt;",
+      "description": "Anmoderation/Intro (zu einem nachfolgenden Bericht/Einspieler)",
       "shortcut": {
         "mac": "ALT + 5",
         "pc": "ALT + 5"
@@ -243,12 +194,11 @@
     },
     {
       "id": 6,
-      "name": "unclear word",
-      "code": "**",
+      "name": "&lt;OUT&gt;",
+      "code": "<OUT>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/stars.png",
-      "button_text": "**",
-      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
+      "button_text": "&lt;OUT&gt;",
+      "description": "Abmoderation/Outro („Das war Anne Seiler aus Bonn“ nach dem Bericht etc)",
       "shortcut": {
         "mac": "ALT + 6",
         "pc": "ALT + 6"
@@ -256,12 +206,11 @@
     },
     {
       "id": 7,
-      "name": "truncation marker end",
-      "code": "[abc~]",
+      "name": "&lt;OTO&gt;",
+      "code": "<OTO>",
       "type": "normal",
-      "icon": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
-      "button_text": "abc~",
-      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
+      "button_text": "&lt;OTO&gt;",
+      "description": "O-Ton (Bericht oder Interviewausschnitt mit Atmo-Hintergrund)",
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"
@@ -269,15 +218,74 @@
     },
     {
       "id": 8,
-      "name": "break",
-      "code": "<P>",
-      "type": "break",
-      "icon": "assets/img/components/transcr-editor/default_markers/break.png",
-      "button_text": "Pause",
-      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
+      "name": "&lt;SPO&gt;",
+      "code": "<SPO>",
+      "type": "normal",
+      "button_text": "&lt;SPO&gt;",
+      "description": "Sport",
       "shortcut": {
-        "mac": "ALT + P",
-        "pc": "ALT + P"
+        "mac": "ALT + W",
+        "pc": "ALT + W"
+      }
+    },
+    {
+      "id": 9,
+      "name": "&lt;WET&gt;",
+      "code": "<WET>",
+      "type": "normal",
+      "button_text": "&lt;WET&gt;",
+      "description": "Wetterbericht/-vohersage/-interview",
+      "shortcut": {
+        "mac": "ALT + E",
+        "pc": "ALT + E"
+      }
+    },
+    {
+      "id": 10,
+      "name": "&lt;TRA&gt;",
+      "code": "<TRA>",
+      "type": "normal",
+      "button_text": "&lt;TRA&gt;",
+      "description": "Verkehr",
+      "shortcut": {
+        "mac": "ALT + R",
+        "pc": "ALT + R"
+      }
+    },
+    {
+      "id": 11,
+      "name": "&lt;STO&gt;",
+      "code": "<STO>",
+      "type": "normal",
+      "button_text": "&lt;STO&gt;",
+      "description": "Börsennachrichten (oft mit Atmo)",
+      "shortcut": {
+        "mac": "ALT + T",
+        "pc": "ALT + T"
+      }
+    },
+    {
+      "id": 12,
+      "name": "&lt;TOP&gt;",
+      "code": "<TOP>",
+      "type": "normal",
+      "button_text": "&lt;TOP&gt;",
+      "description": "Übersicht (DLF: „Die Themen....“)",
+      "shortcut": {
+        "mac": "ALT + Z",
+        "pc": "ALT + Z"
+      }
+    },
+    {
+      "id": 13,
+      "name": "&lt;PAC&gt;",
+      "code": "<PAC>",
+      "type": "normal",
+      "button_text": "&lt;PAC&gt;",
+      "description": "Jingle/Senderkennung, akustische Trenner, Pausenzeichen, Zeitzeichen, akustische Verpackung",
+      "shortcut": {
+        "mac": "ALT + A",
+        "pc": "ALT + A"
       }
     }
   ]

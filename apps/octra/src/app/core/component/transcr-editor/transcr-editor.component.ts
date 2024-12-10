@@ -1803,9 +1803,9 @@ export class TranscrEditorComponent
     shortcutInfo: Shortcut
   ) => {
     if (shortcutInfo.name === 'undo') {
-      this.joditComponent?.jodit?.history.undo();
+      this.joditComponent?.jodit?.history?.undo();
     } else {
-      this.joditComponent?.jodit?.history.redo();
+      this.joditComponent?.jodit?.history?.redo();
     }
     this.triggerTyping();
   };

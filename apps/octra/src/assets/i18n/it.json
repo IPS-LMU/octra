@@ -30,8 +30,7 @@
   "boundary cannot delete": "Impossibile eliminare il confine perché vi sono unità di trascrizione confinanti che sono già trascritte.",
   "boundary cannot set": "Impossibile selezionare un confine in un'unità di trascrizione già trascritta.",
   "browser": {
-    "invalid": "<b>Il tuo browser non è compatibile</b>. Per favore, usa uno di questi browser:",
-    "small window width": "<b>La larghezza della finestra è troppo piccola.</b> Per favore, aumenta la larghezza della finestra per risolvere questo messaggio."
+    "invalid": "<b>Il tuo browser non è compatibile</b>. Per favore, usa uno di questi browser:"
   },
   "bug report": {
     "description": "Per favore, dicci cosa pensi di OCTRA. Cosa potrebbe essere migliorato? Hai riscontrato problemi?",

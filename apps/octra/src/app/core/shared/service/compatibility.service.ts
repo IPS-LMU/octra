@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { SettingsService } from './index';
 import { BrowserInfo } from '@octra/web-media';
+import { SettingsService } from './index';
 
 declare let Modernizr: any;
 
@@ -19,7 +19,7 @@ export class CompatibilityService {
       description: 'Browser is supported.',
       state: 'processing',
       help: `Please make sure, that you are using the latest version of your browser. It is recommended using Chrome.
-<br/>Supported Browsers:<br/>`,
+<br/>Supported Browsers: `,
     },
     {
       name: 'cookies',
@@ -71,6 +71,8 @@ export class CompatibilityService {
     },
   ];
 
+  supportedBrowsers = '';
+
   constructor(private settingsService: SettingsService) {}
 
   public isValidBrowser(allowedBrowsers: any[]): boolean {
@@ -85,7 +87,7 @@ export class CompatibilityService {
 
   testCompability(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this.rules[0].help += this.getValidBrowsers();
+      this.supportedBrowsers = this.getValidBrowsers();
       let valid = true;
 
       const promises = [];

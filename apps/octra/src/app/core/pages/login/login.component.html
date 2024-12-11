@@ -14,6 +14,7 @@
       }
     </div>
   </div>
+  @if (compatibleBrowser === true) {
   <div class="row" id="loginrow">
     <div class="col-md-6">
       <div
@@ -21,12 +22,6 @@
         #onlinemode
       >
         <div class="card-body">
-          @if (!apc.octra.responsive.enabled && !state.local.validSize) {
-          <p
-            [innerHTML]="'browser.small window width' | transloco"
-            class="warning"
-          ></p>
-          }
           <section class="d-flex flex-column flex-fill h-100">
             <h4>{{ 'login.online mode' | transloco }}</h4>
             <p style="text-align: center">
@@ -106,19 +101,19 @@
               ></div>
               }
               <div style="margin-top: 40px">
-                <octra-dropzone #dropzone [height]="'147px'"></octra-dropzone>
+                <octra-dropzone #dropzone [height]="'147px'" (filesAdded)="afterFilesAdded()"></octra-dropzone>
               </div>
-              @if (getFileStatus() !== 'new') {
+              @if (fileStatus !== 'new') {
               <button
                 (click)="onOfflineSubmit(false)"
-                [disabled]="getFileStatus() !== 'start'"
+                [disabled]="fileStatus !== 'start'"
                 class="btn btn-raised btn-primary"
                 id="offline-submit"
                 type="submit"
               >
                 {{ 'transcription.start' | transloco }}
               </button>
-              } @if (getFileStatus() !== 'unknown') {
+              } @if (fileStatus !== 'unknown') {
               <button
                 (click)="onOfflineSubmit(true)"
                 class="btn btn-raised btn-danger offline-delete-btn"
@@ -132,6 +127,9 @@
       </div>
     </div>
   </div>
+  } @else if(compatibleBrowser === false) {
+  <octra-browser-test></octra-browser-test>
+  }
 </div>
 <div class="section">
   <footer class="footer">

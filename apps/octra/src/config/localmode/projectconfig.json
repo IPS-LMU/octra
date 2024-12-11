@@ -6,11 +6,7 @@
   "navigation": {
     "export": true,
     "interfaces": true,
-    "help_url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/"
-  },
-  "responsive": {
-    "enabled": true,
-    "fixedwidth": 1200
+    "help_url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra"
   },
   "agreement": {
     "enabled": false,

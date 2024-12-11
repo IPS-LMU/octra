@@ -15,17 +15,17 @@ export class BrowserTestComponent {
 
   constructor(
     private router: Router,
-    public compatibility: CompatibilityService
+    public compatibilityService: CompatibilityService
   ) {}
 
-  getStateIcon(rule: any): 'spinner' | 'times' | 'check' {
+  getStateIcon(rule: any) {
     switch (rule.state) {
       case 'processing':
-        return 'spinner';
+        return 'bi bi-spinner';
       case 'failed':
-        return 'times';
+        return 'bi bi-x-lg';
       case 'ok':
-        return 'check';
+        return 'bi bi-check-lg';
     }
     return 'spinner';
   }

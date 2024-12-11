@@ -1,26 +1,19 @@
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AccountLoginMethod } from '@octra/api-types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 import { FileSize, getFileSize } from '@octra/utilities';
-import { navigateTo } from '@octra/ngx-utilities';
-import { AppInfo } from '../../../app.info';
+import { Observable } from 'rxjs';
+import { DefaultComponent } from '../../component/default.component';
+import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
+import { CompatibilityService } from '../../shared/service/compatibility.service';
+import { AuthenticationStoreService } from '../../store/authentication';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
-import { Observable } from 'rxjs';
-import { DefaultComponent } from '../../component/default.component';
-import { AuthenticationStoreService } from '../../store/authentication';
-import { AccountLoginMethod } from '@octra/api-types';
-import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-login',
@@ -30,15 +23,17 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 })
 export class LoginComponent
   extends DefaultComponent
-  implements OnInit, ComponentCanDeactivate
+  implements ComponentCanDeactivate
 {
-  @ViewChild('f', { static: false }) loginform!: NgForm;
-  @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;
-  @ViewChild('agreement', { static: false }) agreement!: ElementRef;
-  @ViewChild('localmode', { static: true }) localmode!: ElementRef;
-  @ViewChild('onlinemode', { static: true }) onlinemode!: ElementRef;
+  @ViewChild('f', { static: false }) loginform?: NgForm;
+  @ViewChild('dropzone', { static: false }) dropzone?: OctraDropzoneComponent;
+  @ViewChild('agreement', { static: false }) agreement?: ElementRef;
+  @ViewChild('localmode', { static: true }) localmode?: ElementRef;
+  @ViewChild('onlinemode', { static: true }) onlinemode?: ElementRef;
 
   email_link = '';
+
+  fileStatus = '';
 
   state: {
     online: {
@@ -52,9 +47,6 @@ export class LoginComponent
         err: string;
       };
     };
-    local: {
-      validSize: boolean;
-    };
   } = {
     online: {
       apiStatus: 'available',
@@ -66,9 +58,6 @@ export class LoginComponent
         valid: false,
         err: '',
       },
-    },
-    local: {
-      validSize: false,
     },
   };
 
@@ -84,15 +73,22 @@ export class LoginComponent
     return Math;
   }
 
+  compatibleBrowser?: boolean;
+
   constructor(
     private router: Router,
     public appStorage: AppStorageService,
     public api: OctraAPIService,
     public settingsService: SettingsService,
     private audioService: AudioService,
-    public authStoreService: AuthenticationStoreService
+    public authStoreService: AuthenticationStoreService,
+    protected compatibilityService: CompatibilityService
   ) {
     super();
+    this.compatibilityService.testCompability().then((result) => {
+      this.compatibleBrowser = result;
+      this.readFileStatus();
+    });
 
     const subject = 'Octra Server is offline';
     const body = `Hello,
@@ -117,15 +113,6 @@ I just want to let you know, that the OCTRA server is currently offline.
       removeData
     );
   };
-
-  ngOnInit() {
-    if (!this.settingsService.responsive.enabled) {
-      this.state.local.validSize =
-        window.innerWidth >= this.settingsService.responsive.fixedwidth;
-    } else {
-      this.state.local.validSize = true;
-    }
-  }
 
   onOnlineSubmit($event: {
     type: AccountLoginMethod;
@@ -153,16 +140,6 @@ I just want to let you know, that the OCTRA server is currently offline.
     return this.state.online.form.valid;
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    if (!this.settingsService.responsive.enabled) {
-      this.state.local.validSize =
-        window.innerWidth >= this.settingsService.responsive.fixedwidth;
-    } else {
-      this.state.local.validSize = true;
-    }
-  }
-
   getDropzoneFileString(file: File | SessionFile) {
     if (file !== undefined) {
       const fsize: FileSize = getFileSize(file.size);
@@ -173,36 +150,34 @@ I just want to let you know, that the OCTRA server is currently offline.
     return '';
   }
 
-  getFileStatus(): string {
+  readFileStatus = () => {
     if (
-      !(this.dropzone.files === undefined) &&
+      this.dropzone?.files &&
       this.dropzone.files.length > 0 &&
-      !(this.dropzone.oaudiofile === undefined)
+      this.dropzone.oaudiofile
     ) {
       // check conditions
       if (
-        this.appStorage.sessionfile === undefined ||
+        !this.appStorage.sessionfile ||
         (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name &&
-          this.dropzone.oannotation === undefined)
+          !this.dropzone.oannotation)
       ) {
-        return 'start';
+        this.fileStatus = 'start';
+        return;
       } else {
-        return 'new';
+        this.fileStatus = 'new';
+        return;
       }
     }
 
-    return 'unknown';
+    this.fileStatus = 'unknown';
+  };
+
+  afterFilesAdded() {
+    this.readFileStatus();
   }
 
   public startDemo() {
     this.authStoreService.loginDemo();
   }
-
-  private navigate = (): void => {
-    navigateTo(this.router, ['/intern'], AppInfo.queryParamsHandling).catch(
-      (error) => {
-        console.error(error);
-      }
-    );
-  };
 }

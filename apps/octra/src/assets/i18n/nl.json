@@ -30,8 +30,7 @@
   "boundary cannot delete": "Kan grens niet verwijderen omdat er aangrenzende transcriptie-eenheden zijn die al zijn getranscribeerd.",
   "boundary cannot set": "Kan geen grens instellen in een transcriptie-eenheid die al is getranscribeerd.",
   "browser": {
-    "invalid": "<b>Uw browser is niet compatibel</b>. Gebruik een van de volgende browsers:",
-    "small window width": "<b>De breedte van dit venster is te klein.</b> Vergroot dit venster om dit bericht te verbergen."
+    "invalid": "<b>Uw browser is niet compatibel</b>. Gebruik een van de volgende browsers:"
   },
   "bug report": {
     "description": "Vertel ons wat u vindt van OCTRA. Wat kunnen we beter doen? Hebt u bugs gevonden?    ",

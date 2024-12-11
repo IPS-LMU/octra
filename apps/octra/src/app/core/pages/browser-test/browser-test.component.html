@@ -1,59 +1,61 @@
-<div class="container">
+<div class="container mt-5">
   <h2>Browser compatibility check</h2>
 
   <table class="table table-striped">
-    @for (rule of compatibility.rules; track rule) {
-      <tr>
-        <td style="width: 40px; text-align: center">
-          <i
-            [classList]="['bi', getStateIcon(rule)]"
-            [ngStyle]="{ color: getStateColor(rule) }"
-          ></i>
-          <!-- spin this using animations -->
-        </td>
-        <td>
-          {{ rule.description }}
-          @if (rule.state === 'failed' && rule.help !== '') {
-            <p
-              [innerHTML]="rule.help"
-              style="color: red"
-            ></p>
-          }
-          @if (rule.name === 'cookies') {
-            <p style="color: red">
-              @if (browserName === 'Chrome') {
-                To use OCTRA with this browser please follow the instructions:
-                <ul>
-                  <li>Open a new tab.</li>
-                  <li>
-                    Type in "chrome://settings/content/cookies" in the address bar.
-                  </li>
-                  <li>Enable "Cookies".</li>
-                  <li>Reload this page.</li>
-                </ul>
-              }
-              @if (browserName === 'Firefox') {
-                To use OCTRA with this browser please follow the instructions:
-                <ul>
-                  <li>Open a new tab.</li>
-                  <li>Type in "about:preferences#privacy" in the address bar.</li>
-                  <li>Scroll to chronicle. Disable the "private mode"</li>
-                  <li>
-                    Scroll to "Cookies and web data". Check the first radio box to
-                    enable Cookies.
-                  </li>
-                  <li>Reload this page.</li>
-                </ul>
-              }
-            </p>
-          }
-        </td>
-      </tr>
-    }
+    <tbody>
+      @for (rule of compatibilityService.rules; track rule) {
+        <tr>
+          <td style="width: 40px; text-align: center">
+            <i
+              [class]="getStateIcon(rule)"
+              [ngStyle]="{ color: getStateColor(rule) }"
+            ></i>
+            <!-- spin this using animations -->
+          </td>
+          <td>
+            {{ rule.description }}
+            @if (rule.state === 'failed' && rule.help !== '') {
+              <p
+                [innerHTML]="$index === 0 ? rule.help + compatibilityService.supportedBrowsers : rule.help"
+                style="color: red"
+              ></p>
+            }
+            @if (rule.name === 'cookies') {
+              <p style="color: red">
+                @if (browserName === 'Chrome') {
+                  To use OCTRA with this browser please follow the instructions:
+                  <ul>
+                    <li>Open a new tab.</li>
+                    <li>
+                      Type in "chrome://settings/content/cookies" in the address bar.
+                    </li>
+                    <li>Enable "Cookies".</li>
+                    <li>Reload this page.</li>
+                  </ul>
+                }
+                @if (browserName === 'Firefox') {
+                  To use OCTRA with this browser please follow the instructions:
+                  <ul>
+                    <li>Open a new tab.</li>
+                    <li>Type in "about:preferences#privacy" in the address bar.</li>
+                    <li>Scroll to chronicle. Disable the "private mode"</li>
+                    <li>
+                      Scroll to "Cookies and web data". Check the first radio box to
+                      enable Cookies.
+                    </li>
+                    <li>Reload this page.</li>
+                  </ul>
+                }
+              </p>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
   </table>
   <div style="text-align: right">
     <a
-      [routerLink]="['/test']"
+      [routerLink]="['/login']"
       class="btn btn-raised btn-primary"
       fragment="feedback"
       >I need help</a

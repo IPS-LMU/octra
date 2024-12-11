@@ -30,8 +30,7 @@
   "boundary cannot delete": "无法删除边界，因为临近标注单元已经被标注过。",
   "boundary cannot set": "无法在已标注的标注单元内设置边界。",
   "browser": {
-    "invalid": "<b>你的浏览器不兼容</b>。 请使用以下浏览器之一：",
-    "small window width": "<b>窗口宽度太小。</b> 请拉宽窗口，直到提示消失。"
+    "invalid": "<b>你的浏览器不兼容</b>。 请使用以下浏览器之一："
   },
   "bug report": {
     "description": "你认为有需要改进的地方吗？有发现bug吗？请告诉我们你对OCTRA的评价。",

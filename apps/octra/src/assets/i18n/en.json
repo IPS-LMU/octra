@@ -42,8 +42,7 @@
   "boundary cannot delete": "Cannot delete boundary because there are neighboring transcription units that are already transcribed.",
   "boundary cannot set": "Cannot set boundary in a transcription unit that is already transcribed.",
   "browser": {
-    "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:",
-    "small window width": "<b>The width of this window is too small.</b> Please widen this window to hide this message."
+    "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:"
   },
   "bug report": {
     "description": "Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?",

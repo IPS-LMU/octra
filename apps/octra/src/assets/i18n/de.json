@@ -42,8 +42,7 @@
   "boundary cannot delete": "Die Grenze kann nicht gelöscht werden, da daran angrenzende Transkriptionseinheiten bereits transkribiert wurden",
   "boundary cannot set": "Die Grenze kann nicht innerhalb einer trankribierten Transkriptioneinheit gesetzt werden",
   "browser": {
-    "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:",
-    "small window width": "<b>Die Fensterbreite ist zu klein.</b> Bitte vergrößere dieses Fenster bis die Meldung verschwindet."
+    "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:"
   },
   "bug report": {
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",

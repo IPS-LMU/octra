@@ -311,10 +311,6 @@ export class TranscriptionComponent
     return this.settingsService.projectsettings!;
   }
 
-  get responsive(): boolean {
-    return this.settingsService.responsive.enabled;
-  }
-
   private _currentEditor!: ComponentRef<any>;
 
   get currentEditor(): ComponentRef<any> {
@@ -467,19 +463,9 @@ export class TranscriptionComponent
         }
       },
     });
-    /*
-    this.subscribe(
-      this.transcrService.alertTriggered,(alertConfig) => {
-        this.alertService.showAlert(
-          alertConfig.type,
-          alertConfig.data,
-          alertConfig.unique,
-          alertConfig.duration
-        );
-      })
-    );
 
-     */
+
+    this.annotationStoreService.overwriteTidyUpAnnotation();
 
     this.navbarServ.interfaces = this.projectsettings.interfaces;
     this.shortcutService.registerGeneralShortcutGroup(

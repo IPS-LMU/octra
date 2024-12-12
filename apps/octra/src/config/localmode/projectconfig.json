@@ -21,9 +21,9 @@
   },
   "languages": ["de", "en"],
   "interfaces": [
+    "2D-Editor",
     "Dictaphone Editor",
     "Linear Editor",
-    "2D-Editor",
     "TRN-Editor"
   ],
   "feedback_form": [

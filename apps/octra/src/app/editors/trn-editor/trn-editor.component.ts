@@ -7,34 +7,17 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {
-  AlertService,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
-import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { TranscrEditorComponent } from '../../core/component/transcr-editor';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
+import { TranslocoService } from '@jsverse/transloco';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   AnnotationLevelType,
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
 } from '@octra/annotation';
-import {
-  ContextMenuAction,
-  ContextMenuComponent,
-} from '../../core/component/context-menu/context-menu.component';
-import { TranslocoService } from '@jsverse/transloco';
-import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
-import { timer } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraGuidelines } from '@octra/assets';
-import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
 import {
   AudioChunk,
   AudioManager,
@@ -43,8 +26,23 @@ import {
   ShortcutEvent,
   ShortcutGroup,
 } from '@octra/web-media';
-
-declare let validateAnnotation: any;
+import { timer } from 'rxjs';
+import {
+  ContextMenuAction,
+  ContextMenuComponent,
+} from '../../core/component/context-menu/context-menu.component';
+import { TranscrEditorComponent } from '../../core/component/transcr-editor';
+import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
+import {
+  AlertService,
+  AudioService,
+  SettingsService,
+  UserInteractionsService,
+} from '../../core/shared/service';
+import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
 
 @Component({
   selector: 'octra-trn-editor',
@@ -745,79 +743,9 @@ export class TrnEditorComponent
     sel?.addRange(range);
   }
 
-  sanitizeHTML(str: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(str);
-  }
-
-  getShownSegment(
-    startSamples: number,
-    segment: OctraAnnotationSegment,
-    i: number
-  ) {
-    /* TODO implement
-    const obj: ShownSegment = {
-      start: startSamples,
-      end: segment.time.samples,
-      label: segment.getLabel('Speaker')!.value,
-      id: segment.id,
-      isSelected: false,
-      transcription: {
-        text: segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
-        safeHTML: undefined as any,
-      },
-      validation: '',
-    };
-
-    let html = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
-    if (this.appStorage.useMode !== LoginMode.URL) {
-      if (
-        typeof validateAnnotation !== 'undefined' &&
-        typeof validateAnnotation === 'function' &&
-        this.transcrService.validationArray[i] !== undefined
-      ) {
-        if (obj.transcription.text !== '') {
-          html = this.transcrService.underlineTextRed(
-            obj.transcription.text,
-            this.transcrService.validationArray[i].validation
-          );
-        }
-      }
-
-      html = this.transcrService.rawToHTML(html);
-      html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 === '[[[') {
-          return '<';
-        }
-        return '>';
-      });
-    } else {
-      html = this.transcrService.rawToHTML(html);
-      html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 === '[[[') {
-          return '<';
-        }
-        return '>';
-      });
-    }
-
-    html = html.replace(/(<p>)|(<\/p>)/g, '');
-    obj.transcription.safeHTML = this.sanitizeHTML(html);
-
-    return obj;
-     */
-  }
-
   onKeyUp($event: KeyboardEvent, i: number) {
     if ($event.code === 'Enter') {
-      this.saveAndCloseTranscrEditor().then(() => {
-        /*
-        this.uiService.addElementFromEvent('segment', {
-          value: 'updated'
-        }, Date.now(), undefined, undefined, undefined, {
-          start: startSample,
-          length: segment.time.samples - startSample
-        }, 'overview'); */
-      });
+      this.saveAndCloseTranscrEditor();
     } else if ($event.code === 'Escape') {
       // close without saving
       this._textEditor.audiochunk.stopPlayback();

@@ -1,8 +1,14 @@
-import { AnnotationActions } from './annotation/annotation.actions';
-import { Action, createAction, createActionGroup, props } from '@ngrx/store';
-import { LoginMode } from '../index';
-import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
 import { HttpErrorResponse } from '@angular/common/http';
+import {
+  Action,
+  createAction,
+  createActionGroup,
+  emptyProps,
+  props,
+} from '@ngrx/store';
+import { CurrentAccountDto, ProjectDto, TaskDto } from '@octra/api-types';
+import { LoginMode } from '../index';
+import { AnnotationActions } from './annotation/annotation.actions';
 
 export class LoginModeActions extends AnnotationActions {
   public static setFeedback = createAction(
@@ -25,6 +31,21 @@ export class LoginModeActions extends AnnotationActions {
       }>(),
     },
   });
+
+  static setImportConverter = createActionGroup({
+      source: 'annotation/set import converter',
+      events: {
+        do: props<{
+          mode: LoginMode;
+          importConverter: string;
+        }>(),
+        success: emptyProps(),
+        fail: props<{
+          error: string;
+        }>(),
+      }
+  });
+
 
   static clearOnlineSession = createActionGroup({
     source: `annotation/ clear online session`,
@@ -85,6 +106,20 @@ export class LoginModeActions extends AnnotationActions {
     source: 'annotation/ redirect to transcription end',
     events: {
       do: props<{ clearSession: boolean; mode: LoginMode }>(),
+    },
+  });
+
+  static changeImportOptions = createActionGroup({
+    source: 'annotation/change converter options',
+    events: {
+      do: props<{
+        mode: LoginMode;
+        importOptions?: Record<string, any>;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
     },
   });
 }

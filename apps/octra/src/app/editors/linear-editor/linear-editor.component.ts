@@ -505,7 +505,7 @@ export class LinearEditorComponent
 
     this.editorSettings.markers =
       this.annotationStoreService.guidelines?.markers ?? [];
-    this.editorSettings.responsive = this.settingsService.responsive.enabled;
+    this.editorSettings.responsive = true;
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
     this.subscribe(this.annotationStoreService.currentLevel$, ($event) => {

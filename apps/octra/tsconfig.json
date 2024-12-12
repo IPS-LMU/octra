@@ -9,7 +9,8 @@
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["./src/types"]
   },
   "files": [],
   "include": [],

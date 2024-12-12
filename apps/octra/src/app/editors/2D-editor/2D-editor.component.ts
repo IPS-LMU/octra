@@ -539,6 +539,14 @@ export class TwoDEditorComponent
         this.openSegment(segnumber);
       }
     );
+
+    this.subscribe(this.annotationStoreService.importOptions$, {
+      next: (importOptions) => {
+        if (importOptions && Object.keys(importOptions).includes("SRT")) {
+          this.viewer.settings.speakerPattern = importOptions["SRT"]["speakerIdentifierPattern"];
+        }
+      },
+    });
   }
 
   override ngOnDestroy() {

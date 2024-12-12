@@ -14,7 +14,7 @@
       }
     </div>
   </div>
-  @if (compatibleBrowser === true) {
+  @if (compatibleBrowser !== false) {
   <div class="row" id="loginrow">
     <div class="col-md-6">
       <div
@@ -127,7 +127,7 @@
       </div>
     </div>
   </div>
-  } @else if(compatibleBrowser === false) {
+  } @else {
   <octra-browser-test></octra-browser-test>
   }
 </div>

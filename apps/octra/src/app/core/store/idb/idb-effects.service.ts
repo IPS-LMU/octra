@@ -1,10 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
+import {
+  ASRContext,
+  IAnnotJSON,
+  OAnnotJSON,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
+import { hasProperty } from '@octra/utilities';
+import { SessionStorageService } from 'ngx-webstorage';
 import {
   catchError,
   exhaustMap,
   filter,
   forkJoin,
+  from,
   map,
   mergeAll,
   mergeMap,
@@ -15,33 +26,23 @@ import {
   timer,
   withLatestFrom,
 } from 'rxjs';
-import { Action, Store } from '@ngrx/store';
-import { IDBService } from '../../shared/service/idb.service';
-import { getModeState, LoginMode, RootState } from '../index';
-import {
-  ASRContext,
-  IAnnotJSON,
-  OAnnotJSON,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
-import { SessionStorageService } from 'ngx-webstorage';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { IDBActions } from './idb.actions';
-import { ApplicationActions } from '../application/application.actions';
-import { ASRActions } from '../asr/asr.actions';
-import { UserActions } from '../user/user.actions';
-import { LoginModeActions } from '../login-mode/login-mode.actions';
 import {
   IIDBApplicationOptions,
   IIDBModeOptions,
 } from '../../shared/octra-database';
-import { hasProperty } from '@octra/utilities';
-import { AuthenticationActions } from '../authentication';
-import { AnnotationState } from '../login-mode/annotation';
 import { AudioService } from '../../shared/service';
+import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import { IDBService } from '../../shared/service/idb.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { ApplicationActions } from '../application/application.actions';
+import { ASRActions } from '../asr/asr.actions';
+import { AuthenticationActions } from '../authentication';
+import { getModeState, LoginMode, RootState } from '../index';
+import { AnnotationState } from '../login-mode/annotation';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
+import { UserActions } from '../user/user.actions';
+import { IDBActions } from './idb.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -56,6 +57,26 @@ export class IDBEffects {
           .initialize(state.application.appConfiguration!.octra.database.name)
           .pipe(
             map(() => {
+              this.store.dispatch(
+                IDBActions.loadImportOptions.do({
+                  mode: LoginMode.LOCAL,
+                })
+              );
+              this.store.dispatch(
+                IDBActions.loadImportOptions.do({
+                  mode: LoginMode.ONLINE,
+                })
+              );
+              this.store.dispatch(
+                IDBActions.loadImportOptions.do({
+                  mode: LoginMode.DEMO,
+                })
+              );
+              this.store.dispatch(
+                IDBActions.loadImportOptions.do({
+                  mode: LoginMode.URL,
+                })
+              );
               return forkJoin<
                 [
                   IIDBApplicationOptions,
@@ -436,23 +457,26 @@ export class IDBEffects {
         LoginModeActions.startAnnotation.success,
         ApplicationActions.changeApplicationOption.do,
         LoginModeActions.endTranscription.do,
-        AnnotationActions.setLevelIndex.do
+        AnnotationActions.setLevelIndex.do,
+        LoginModeActions.setImportConverter.do
       ),
       withLatestFrom(this.store),
-      exhaustMap(([action, appState]) => {
+      mergeMap(([action, appState]) => {
         const modeState = this.getModeStateFromString(
           appState,
           (action as any).mode
         );
+
         if (modeState) {
+
           return this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile:
-                modeState &&
-                modeState.sessionFile &&
+                modeState?.sessionFile &&
                 Object.keys(modeState.sessionFile).length > 0
                   ? modeState.sessionFile.toAny()
                   : null,
+              importConverter: modeState.importConverter,
               currentEditor: modeState.currentEditor ?? null,
               currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
               logging: modeState.logging.enabled ?? null,
@@ -675,9 +699,7 @@ export class IDBEffects {
 
   saveASRSettings$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(
-        ASRActions.setASRSettings.do
-      ),
+      ofType(ASRActions.setASRSettings.do),
       withLatestFrom(this.store),
       mergeMap(([, state]) =>
         this.idbService.saveOption('asr', state.asr.settings).pipe(
@@ -864,6 +886,22 @@ export class IDBEffects {
     )
   );
 
+  loadImportOptions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.loadImportOptions.do),
+      mergeMap((action) => {
+        return from(this.idbService.loadImportOptions(action.mode)).pipe(
+          map((importOptions) =>
+            IDBActions.loadImportOptions.success({
+              mode: action.mode,
+              importOptions,
+            })
+          )
+        );
+      })
+    )
+  );
+
   saveConsoleEntries$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -894,6 +932,17 @@ export class IDBEffects {
         })
       ),
     { dispatch: false }
+  );
+
+  saveImportOptions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LoginModeActions.changeImportOptions.do),
+      exhaustMap((action) =>
+        this.idbService
+          .saveImportOptions(action.mode, action.importOptions)
+          .pipe(map(() => IDBActions.saveImportOptions.success()))
+      )
+    )
   );
 
   clearAllData$ = createEffect(

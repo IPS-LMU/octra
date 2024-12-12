@@ -10,10 +10,6 @@ export interface ProjectSettings {
     interfaces: boolean;
     help_url: string;
   };
-  responsive: {
-    enabled: boolean;
-    fixedwidth: number;
-  };
   agreement: {
     enabled: boolean;
     text: any;
@@ -33,6 +29,7 @@ export interface ProjectSettings {
     sendValidatedTranscriptionOnly?: boolean;
     showOverviewIfTranscriptNotValid?: boolean;
     theme?: string;
+    importOptions?: Record<string, any>;
   };
   guidelines: any;
 }

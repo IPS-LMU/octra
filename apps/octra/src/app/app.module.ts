@@ -98,7 +98,7 @@ import * as fromUser from './core/store/user/user.reducer';
     !environment.production
       ? StoreDevtoolsModule.instrument({
           trace: !environment.production,
-          maxAge: 50,
+          maxAge: 200,
           logOnly: !environment.production,
           connectInZone: true,
         })

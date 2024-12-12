@@ -1,9 +1,29 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
+import {
+  AnnotJSONConverter,
+  ImportResult,
+  ISegment,
+  OAnnotJSON,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
+  OLabel,
+  PraatTextgridConverter,
+} from '@octra/annotation';
+import {
+  TaskDto,
+  TaskInputOutputCreatorType,
+  TaskInputOutputDto,
+  TaskStatus,
+  ToolConfigurationAssetDto,
+} from '@octra/api-types';
+import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { TranslocoService } from '@jsverse/transloco';
+import { hasProperty, SubscriptionManager } from '@octra/utilities';
 import {
   catchError,
   exhaustMap,
@@ -17,43 +37,11 @@ import {
   timer,
   withLatestFrom,
 } from 'rxjs';
-import { getModeState, LoginMode, RootState } from '../../index';
-import { OctraModalService } from '../../../modals/octra-modal.service';
-import { RoutingService } from '../../../shared/service/routing.service';
-import { AnnotationActions } from './annotation.actions';
-import {
-  AlertService,
-  AudioService,
-  UserInteractionsService,
-} from '../../../shared/service';
 import { AppInfo } from '../../../../app.info';
-import {
-  AnnotJSONConverter,
-  ImportResult,
-  ISegment,
-  OAnnotJSON,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-  OLabel,
-  PraatTextgridConverter,
-} from '@octra/annotation';
-import { AppStorageService } from '../../../shared/service/appstorage.service';
-import {
-  TaskDto,
-  TaskInputOutputCreatorType,
-  TaskInputOutputDto,
-  TaskStatus,
-  ToolConfigurationAssetDto,
-} from '@octra/api-types';
-import { AnnotationState, GuidelinesItem } from './index';
-import { LoginModeActions } from '../login-mode.actions';
-import { AuthenticationActions } from '../../authentication';
-import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
-import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
-import { ApplicationActions } from '../../application/application.actions';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
-import { hasProperty, SubscriptionManager } from '@octra/utilities';
+import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
+import { OctraModalService } from '../../../modals/octra-modal.service';
+import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   createSampleProjectDto,
   createSampleTask,
@@ -62,13 +50,25 @@ import {
   isValidAnnotation,
   StatisticElem,
 } from '../../../shared';
+import {
+  AlertService,
+  AudioService,
+  UserInteractionsService,
+} from '../../../shared/service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { RoutingService } from '../../../shared/service/routing.service';
+import { ApplicationActions } from '../../application/application.actions';
+import { AuthenticationActions } from '../../authentication';
 import { checkAndThrowError } from '../../error.handlers';
-import { SampleUnit } from '@octra/media';
+import { getModeState, LoginMode, RootState } from '../../index';
+import { LoginModeActions } from '../login-mode.actions';
+import { AnnotationActions } from './annotation.actions';
+import { AnnotationState, GuidelinesItem } from './index';
 
-import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
-import { DateTime } from 'luxon';
-import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { FileInfo } from '@octra/web-media';
+import { DateTime } from 'luxon';
+import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
+import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
 
 declare const BUILD: {
@@ -291,6 +291,15 @@ export class AnnotationEffects {
                 },
               }),
               'uiService'
+            );
+          }
+
+          if (a.mode !== LoginMode.LOCAL) {
+            this.store.dispatch(
+              LoginModeActions.changeImportOptions.do({
+                mode: a.mode,
+                importOptions: a.projectSettings.octra.importOptions,
+              })
             );
           }
 
@@ -782,8 +791,8 @@ export class AnnotationEffects {
                 inputs = [
                   {
                     id: Date.now().toString(),
-                    filename: state.localMode.sessionFile!.name,
-                    fileType: state.localMode.sessionFile!.type,
+                    filename: state.localMode.sessionFile?.name,
+                    fileType: state.localMode.sessionFile?.type,
                     chain_position: 0,
                     type: 'input',
                     creator_type: TaskInputOutputCreatorType.user,
@@ -1011,7 +1020,13 @@ export class AnnotationEffects {
                     transcript = transcript!.removeItemByIndex(
                       i - 1,
                       '',
-                      false
+                      false,
+                      (transcript: string) => {
+                        return tidyUpAnnotation(
+                          transcript,
+                          modeState.guidelines.selected.json
+                        );
+                      }
                     );
                     currentLevel = transcript.currentLevel as any;
                     i--;
@@ -1494,22 +1509,32 @@ export class AnnotationEffects {
             })
           );
 
-          const serverTranscript = task
-            ? findCompatibleFileFromIO<OAnnotJSON>(
-                task,
-                'transcript',
-                (io: TaskInputOutputDto) => {
-                  return isValidAnnotation(
-                    io,
-                    this.audio.audioManager.resource.getOAudioFile()
-                  );
-                }
-              )
+          const importResult = task
+            ? findCompatibleFileFromIO<
+                | {
+                    annotjson: OAnnotJSON;
+                    converter?: string;
+                  }
+                | undefined
+              >(task, 'transcript', (io: TaskInputOutputDto) => {
+                return isValidAnnotation(
+                  io,
+                  this.audio.audioManager.resource.getOAudioFile()
+                );
+              })
             : undefined;
 
-          if (serverTranscript) {
+          if (importResult?.annotjson) {
             // import server transcript
-            newAnnotation = OctraAnnotation.deserialize(serverTranscript);
+            this.store.dispatch(
+              LoginModeActions.setImportConverter.do({
+                mode: rootState.application.mode,
+                importConverter: importResult?.converter,
+              })
+            );
+            newAnnotation = OctraAnnotation.deserialize(
+              importResult?.annotjson
+            );
           }
 
           if (newAnnotation.levels.length === 0) {

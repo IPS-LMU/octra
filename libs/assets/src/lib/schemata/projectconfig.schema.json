@@ -1,9 +1,7 @@
 {
   "$id": "v0.0.2",
   "type": "object",
-  "required": [
-    "version"
-  ],
+  "required": ["version"],
   "properties": {
     "version": {
       "type": "string",
@@ -19,17 +17,6 @@
         },
         "help_url": {
           "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "responsive": {
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "fixedwidth": {
-          "type": "number"
         }
       },
       "type": "object"
@@ -110,26 +97,11 @@
         "showdetails": {
           "type": "boolean"
         },
-        "responsive": {
-          "$id": "/properties/octra/responsive",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            },
-            "fixedwidth": {
-              "type": "number"
-            }
-          },
-          "type": "object"
-        },
         "tools": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "cut-audio",
-              "combine-phrases"
-            ]
+            "enum": ["cut-audio", "combine-phrases"]
           }
         },
         "bugreport": {
@@ -169,6 +141,9 @@
           },
           "type": "array"
         }
+      },
+      "importOptions": {
+        "type": "object"
       },
       "type": "object"
     }

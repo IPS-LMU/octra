@@ -20,9 +20,6 @@ import {
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { ShortcutService } from '../../shared/service/shortcut.service';
 
-declare let validateAnnotation: (transcript: string, guidelines: any) => any;
-declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
-
 @Component({
   selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',

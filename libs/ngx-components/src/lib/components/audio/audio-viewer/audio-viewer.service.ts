@@ -3799,10 +3799,11 @@ export class AudioViewerService {
     index: number,
     silenceCode: string | undefined,
     mergeTranscripts: boolean,
-    triggerChange = true
+    triggerChange = true,
+    changeTranscript?: (transcript: string) => string
   ) {
     if (this.annotation?.currentLevel) {
-      this.annotation?.removeItemByIndex(index, silenceCode, mergeTranscripts);
+      this.annotation?.removeItemByIndex(index, silenceCode, mergeTranscripts, changeTranscript);
       if (triggerChange) {
         this.currentLevelChange.emit({
           type: 'remove',

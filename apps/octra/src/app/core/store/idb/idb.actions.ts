@@ -1,14 +1,15 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
-import {
-  IIDBApplicationOptions,
-  IIDBModeOptions,
-} from '../../shared/octra-database';
 import {
   ASRContext,
   OctraAnnotation,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import {
+  IIDBApplicationOptions,
+  IIDBModeOptions,
+} from '../../shared/octra-database';
+import { ConsoleEntry } from '../../shared/service/bug-report.service';
+import { LoginMode } from '../index';
 
 export class IDBActions {
   static loadOptions = createActionGroup({
@@ -20,6 +21,7 @@ export class IDBActions {
         onlineOptions: IIDBModeOptions;
         demoOptions: IIDBModeOptions;
         urlOptions: IIDBModeOptions;
+        importOptions?: Record<string, any>;
       }>(),
       fail: props<{
         error: string;
@@ -427,6 +429,32 @@ export class IDBActions {
     events: {
       do: emptyProps(),
       success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static saveImportOptions = createActionGroup({
+    source: 'IDB/save import options',
+    events: {
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static loadImportOptions = createActionGroup({
+    source: 'IDB/load import options',
+    events: {
+      do: props<{
+        mode: LoginMode;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        importOptions?: Record<string, any>;
+      }>(),
       fail: props<{
         error: string;
       }>(),

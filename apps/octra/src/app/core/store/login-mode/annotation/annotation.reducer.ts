@@ -346,7 +346,13 @@ export class AnnotationStateReducers {
                     .removeItemById(
                       item.id,
                       removeOptions?.silenceCode,
-                      removeOptions?.mergeTranscripts
+                      removeOptions?.mergeTranscripts,
+                      (transcript: string) => {
+                        return tidyUpAnnotation(
+                          transcript,
+                          state.guidelines?.selected?.json
+                        );
+                      }
                     );
                 } else if (item.index !== undefined && item.index !== null) {
                   state.transcript = state.transcript
@@ -354,7 +360,13 @@ export class AnnotationStateReducers {
                     .removeItemByIndex(
                       item.index,
                       removeOptions?.silenceCode,
-                      removeOptions?.mergeTranscripts
+                      removeOptions?.mergeTranscripts,
+                      (transcript: string) => {
+                        return tidyUpAnnotation(
+                          transcript,
+                          state.guidelines?.selected?.json
+                        );
+                      }
                     );
                 } else {
                   console.error(

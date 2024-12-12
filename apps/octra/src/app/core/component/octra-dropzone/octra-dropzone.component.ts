@@ -1,4 +1,11 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { Store } from '@ngrx/store';
 import {
   AnnotationLevelType,
   Converter,
@@ -18,6 +25,8 @@ import { ImportOptionsModalComponent } from '../../modals/import-options-modal/i
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { SupportedFilesModalComponent } from '../../modals/supportedfiles-modal/supportedfiles-modal.component';
 import { FileProgress } from '../../obj/objects';
+import { LoginMode, RootState } from '../../store';
+import { LoginModeActions } from '../../store/login-mode';
 import { DefaultComponent } from '../default.component';
 import { DropZoneComponent } from '../drop-zone';
 
@@ -29,6 +38,8 @@ import { DropZoneComponent } from '../drop-zone';
 export class OctraDropzoneComponent extends DefaultComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
   @Input() height = '250px';
+  @Output() filesAdded = new EventEmitter<File[]>();
+
   private _audioManager?: AudioManager;
 
   get AppInfo(): AppInfo {
@@ -63,7 +74,10 @@ export class OctraDropzoneComponent extends DefaultComponent {
     return this._status;
   }
 
-  constructor(private modService: OctraModalService) {
+  constructor(
+    private modService: OctraModalService,
+    private store: Store<RootState>
+  ) {
     super();
   }
 
@@ -359,6 +373,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
         this.dropzone.clicklocked = false;
       });
     }
+    this.filesAdded.emit(this.dropzone.files);
   }
 
   private resetFormatFileProgresses() {
@@ -389,6 +404,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
         this._status = 'invalid';
       }
     }
+    this.filesAdded.emit(this.dropzone.files);
   }
 
   private decodeArrayBuffer(
@@ -489,5 +505,21 @@ export class OctraDropzoneComponent extends DefaultComponent {
     if (result.action === 'apply') {
       fileProgress.options = result.result;
     }
+
+    const importOptions = {};
+    importOptions[fileProgress.converter.name] = fileProgress.options;
+
+    this.store.dispatch(
+      LoginModeActions.setImportConverter.do({
+        mode: LoginMode.LOCAL,
+        importConverter: fileProgress.converter.name
+      })
+    );
+    this.store.dispatch(
+      LoginModeActions.changeImportOptions.do({
+        mode: LoginMode.LOCAL,
+        importOptions,
+      })
+    );
   }
 }

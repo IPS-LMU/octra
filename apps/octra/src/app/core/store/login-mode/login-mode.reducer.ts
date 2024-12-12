@@ -1,26 +1,26 @@
 import { Action, ActionReducer, on } from '@ngrx/store';
-import * as fromAnnotation from './annotation/annotation.reducer';
-import { AnnotationStateReducers } from './annotation/annotation.reducer';
-import { undoRedo } from 'ngrx-wieder';
-import { AnnotationActions } from './annotation/annotation.actions';
-import { LoginModeActions } from './login-mode.actions';
-import { IDBActions } from '../idb/idb.actions';
-import {
-  DefaultModeOptions,
-  IIDBModeOptions,
-} from '../../shared/octra-database';
-import { getProperties } from '@octra/utilities';
-import { AuthenticationActions } from '../authentication';
-import { LoginMode } from '../index';
-import { ProjectSettings } from '../../obj';
-import { ApplicationActions } from '../application/application.actions';
-import { AnnotationState } from './annotation';
 import {
   ASRContext,
   OctraAnnotation,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import { getProperties } from '@octra/utilities';
+import { undoRedo } from 'ngrx-wieder';
+import { ProjectSettings } from '../../obj';
 import { SessionFile } from '../../obj/SessionFile';
+import {
+  DefaultModeOptions,
+  IIDBModeOptions,
+} from '../../shared/octra-database';
+import { ApplicationActions } from '../application/application.actions';
+import { AuthenticationActions } from '../authentication';
+import { IDBActions } from '../idb/idb.actions';
+import { LoginMode } from '../index';
+import { AnnotationState } from './annotation';
+import { AnnotationActions } from './annotation/annotation.actions';
+import * as fromAnnotation from './annotation/annotation.reducer';
+import { AnnotationStateReducers } from './annotation/annotation.reducer';
+import { LoginModeActions } from './login-mode.actions';
 
 export const initialState: AnnotationState = {
   ...fromAnnotation.initialState,
@@ -101,7 +101,7 @@ export class LoginModeReducers {
       on(
         LoginModeActions.setFeedback,
         (state: AnnotationState, { feedback, mode }) => {
-          if (mode === mode) {
+          if (mode === this.mode) {
             return {
               ...state,
               currentSession: {
@@ -314,6 +314,34 @@ export class LoginModeReducers {
         }
       ),
       on(
+        LoginModeActions.changeImportOptions.do,
+        IDBActions.loadImportOptions.success,
+        (state: AnnotationState, { mode, importOptions }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              importOptions,
+            };
+          }
+          return state;
+        }
+      ),
+      on(
+        LoginModeActions.setImportConverter.do,
+        (state: AnnotationState, { mode, importConverter }) => {
+          if (mode === this.mode) {
+            return {
+              ...state,
+              importConverter,
+              currentSession: {
+                ...state.currentSession
+              },
+            };
+          }
+          return state;
+        }
+      ),
+      on(
         ApplicationActions.setAppLanguage,
         (state: AnnotationState, { language }) => {
           if (state.guidelines?.list && state.guidelines?.list.length > 0) {
@@ -381,6 +409,12 @@ export class LoginModeReducers {
         state = {
           ...state,
           sessionFile: SessionFile.fromAny(value),
+        };
+        break;
+      case 'importConverter':
+        state = {
+          ...state,
+          importConverter: value,
         };
         break;
     }

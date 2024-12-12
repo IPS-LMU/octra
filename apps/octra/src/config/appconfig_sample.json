@@ -13,10 +13,6 @@
     },
     "showdetails": true,
     "supportEmail": "no-email-provided@email.com",
-    "responsive": {
-      "enabled": true,
-      "fixedwidth": 1200
-    },
     "plugins": {},
     "allowed_browsers": [
       {
@@ -24,15 +20,7 @@
         "version": ""
       },
       {
-        "name": "Chrome Mobile",
-        "version": ""
-      },
-      {
         "name": "Firefox",
-        "version": ""
-      },
-      {
-        "name": "Firefox Mobile",
         "version": ""
       },
       {
@@ -40,11 +28,7 @@
         "version": ""
       },
       {
-        "name": "Opera Mini",
-        "version": ""
-      },
-      {
-        "name": "Opera Mobile",
+        "name": "Microsoft Edge",
         "version": ""
       }
     ],

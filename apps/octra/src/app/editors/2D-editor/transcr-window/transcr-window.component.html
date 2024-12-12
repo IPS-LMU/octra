@@ -103,7 +103,7 @@
       [audioChunk]="audiochunk"
       [easyMode]="easyMode"
       [playbackRate]="appStorage.audioSpeed"
-      [responsive]="settingsService.responsive.enabled"
+      [responsive]="true"
       [volume]="appStorage.audioVolume"
     ></octra-audio-navigation>
     <octra-audio-viewer
@@ -139,12 +139,12 @@
             class="btn btn-info w-100 rounded-0"
             (click)="save(); doDirectionAction('left')"
           >
-            @if (responsive || easyMode) {
-            <span [ngClass]="{ 'd-lg-none': responsive && !easyMode }">
+            @if (easyMode) {
+            <span [ngClass]="{ 'd-lg-none': !easyMode }">
               <i class="bi bi-save-fill"></i> & <i class="bi bi-arrow-left"></i>
             </span>
             } @if (!easyMode) {
-            <span [ngClass]="{ 'd-none d-lg-inline': responsive }">
+            <span class="d-none d-lg-inline">
               {{ 'g.save' | transloco }} &
               {{ 'segments.previous' | transloco }}
             </span>
@@ -156,12 +156,12 @@
             (click)="save(); close()"
             class="btn btn-info w-100 rounded-0"
           >
-            @if (responsive || easyMode) {
-            <span [ngClass]="{ 'd-lg-none': responsive && !easyMode }">
+            @if (easyMode) {
+            <span [ngClass]="{ 'd-lg-none': !easyMode }">
               <i class="bi bi-save-fill"></i>
             </span>
             } @if (!easyMode) {
-            <span [ngClass]="{ 'd-none d-lg-inline': responsive }">
+            <span class="d-none d-lg-inline">
               {{ 'g.save' | transloco }} &
               {{ 'g.close' | transloco }}
             </span>
@@ -174,13 +174,13 @@
             class="btn btn-info w-100 rounded-0"
             (click)="save(); doDirectionAction('right')"
           >
-            @if (responsive || easyMode) {
-            <span [ngClass]="{ 'd-lg-none': responsive && !easyMode }">
+            @if (easyMode) {
+            <span [ngClass]="{ 'd-lg-none': !easyMode }">
               <i class="bi bi-save-fill"></i> &
               <i class="bi bi-arrow-right"></i>
             </span>
             } @if (!easyMode) {
-            <span [ngClass]="{ 'd-none d-lg-inline': responsive }">
+            <span class="d-none d-lg-inline">
               {{ 'g.save' | transloco }} &
               {{ 'segments.next' | transloco }}
             </span>
@@ -194,12 +194,12 @@
             (click)="save(); close(); openOverview()"
             class="btn btn-info w-100 rounded-0"
           >
-            @if (responsive || easyMode) {
-            <span [ngClass]="{ 'd-lg-none': responsive && !easyMode }">
+            @if (easyMode) {
+            <span [ngClass]="{ 'd-lg-none': !easyMode }">
               <i class="bi bi-save-fill"></i> & <i class="bi bi-eye-fill"></i>
             </span>
             } @if (!easyMode) {
-            <span [ngClass]="{ 'd-none d-lg-inline': responsive }">
+            <span class="d-none d-lg-inline">
               {{ 'g.save' | transloco }} &
               {{ 'g.overview' | transloco }}
             </span>

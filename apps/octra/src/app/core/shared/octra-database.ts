@@ -466,6 +466,7 @@ export interface IIDBModeOptions {
   transcriptID?: string | null;
   feedback?: any;
   sessionfile?: any;
+  importConverter?: string;
   currentEditor?: string | null;
   currentLevel?: number | null;
   logging?: boolean | null;

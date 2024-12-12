@@ -1,9 +1,12 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { getBrowserLang, TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
+import { uniqueHTTPRequest } from '@octra/ngx-utilities';
+import { isNumber } from '@octra/utilities';
+import { findElements, getAttr } from '@octra/web-media';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
-import { ApplicationActions } from '../application/application.actions';
-import { LoginModeActions } from '../login-mode';
 import {
   catchError,
   exhaustMap,
@@ -16,32 +19,29 @@ import {
   tap,
   withLatestFrom,
 } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { APIActions } from '../api';
-import { getBrowserLang, TranslocoService } from '@jsverse/transloco';
-import { uniqueHTTPRequest } from '@octra/ngx-utilities';
-import { ConfigurationService } from '../../shared/service/configuration.service';
-import { AppConfigSchema } from '../../schemata/appconfig.schema';
+import X2JS from 'x2js';
+import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
+import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
+import { OctraModalService } from '../../modals/octra-modal.service';
+import { AppSettings, ASRSettings } from '../../obj';
+import { AppConfigSchema } from '../../schemata/appconfig.schema';
+import { isIgnoredAction, isIgnoredConsoleAction } from '../../shared';
+import { SettingsService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
   BugReportService,
   ConsoleType,
 } from '../../shared/service/bug-report.service';
-import { AppSettings, ASRSettings } from '../../obj';
-import { IDBActions } from '../idb/idb.actions';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { SettingsService } from '../../shared/service';
-import { getModeState, LoginMode, RootState } from '../index';
-import { AuthenticationActions } from '../authentication';
+import { ConfigurationService } from '../../shared/service/configuration.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { APIActions } from '../api';
+import { ApplicationActions } from '../application/application.actions';
+import { AuthenticationActions } from '../authentication';
+import { IDBActions } from '../idb/idb.actions';
+import { getModeState, LoginMode, RootState } from '../index';
+import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { environment } from '../../../../environments/environment';
-import { findElements, getAttr } from '@octra/web-media';
-import X2JS from 'x2js';
-import { isNumber } from '@octra/utilities';
-import { isIgnoredAction, isIgnoredConsoleAction } from '../../shared';
 
 @Injectable({
   providedIn: 'root',
@@ -825,10 +825,6 @@ export class ApplicationEffects {
         tap(([a, state]: [Action, RootState]) => {
           this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
 
-          if (!this.settingsService.responsive.enabled) {
-            this.setFixedWidth();
-          }
-
           // define languages
           const languages = state.application.appConfiguration!.octra.languages;
           const browserLang =
@@ -1171,16 +1167,6 @@ export class ApplicationEffects {
     } else {
       console.error(`tracking type ${type} is not supported.`);
     }
-  }
-
-  private setFixedWidth() {
-    // set fixed width
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerText =
-      '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
-    head.appendChild(style);
   }
 
   private getParameterByName(name: string, url?: string) {

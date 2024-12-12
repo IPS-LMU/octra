@@ -22,7 +22,7 @@ import {
   SubscriptionManager,
   TsWorkerJob,
 } from '@octra/utilities';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { OLog, OLogging } from '../../../obj/Settings/logging';
 import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
 import { MouseStatisticElem } from '../../../obj/statistics/MouseStatisticElem';
@@ -35,9 +35,6 @@ import { getModeState, LoginMode, RootState } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
 
-declare let validateAnnotation: (transcript: string, guidelines: any) => any;
-declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
-
 @Injectable({
   providedIn: 'root',
 })
@@ -48,13 +45,11 @@ export class AnnotationStoreService {
     return this._feedback;
   }
 
-  get silencePlaceholder(): string {
+  get silencePlaceholder(): string | undefined {
     if (this.guidelines?.markers) {
-      return (
-        this.guidelines.markers.find((a) => a.type === 'break')?.code ?? '<P>'
-      );
+      return this.guidelines.markers.find((a) => a.type === 'break')?.code;
     }
-    return '<P>';
+    return undefined;
   }
 
   get transcript():
@@ -239,6 +234,13 @@ export class AnnotationStoreService {
     )
   );
 
+  importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(
+    undefined
+  );
+  importConverter$ = new BehaviorSubject<string>(
+    undefined
+  );
+
   public set comment(value: string | undefined) {
     this.changeComment(value ?? '');
   }
@@ -303,6 +305,18 @@ export class AnnotationStoreService {
         },
       })
     );
+
+    this.store
+      .select((state: RootState) => {
+        return getModeState(state)?.importOptions;
+      })
+      .subscribe(this.importOptions$);
+
+    this.store
+      .select((state: RootState) => {
+        return getModeState(state)?.importConverter;
+      })
+      .subscribe(this.importConverter$);
   }
 
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
@@ -391,10 +405,10 @@ export class AnnotationStoreService {
     const results = validateAnnotation(rawText, this.guidelines);
 
     // check if selection is in the raw text
-    const sPos = rawText.indexOf('[[[sel-start/]]]');
-    const sLen = '[[[sel-start/]]]'.length;
-    const ePos = rawText.indexOf('[[[sel-end/]]]');
-    const eLen = '[[[sel-end/]]]'.length;
+    const sPos = rawText.indexOf('✉✉✉sel-start/📩📩📩');
+    const sLen = '✉✉✉sel-start/✉✉✉'.length;
+    const ePos = rawText.indexOf('✉✉✉sel-end/📩📩📩');
+    const eLen = '✉✉✉sel-end/📩📩📩'.length;
 
     // look for segment boundaries like {23423424}
     const segRegex = new RegExp(/{[0-9]+}/g);
@@ -436,7 +450,7 @@ export class AnnotationStoreService {
 
   public replaceSingleTags(html: string) {
     html = html.replace(/(<)([^<>]+)(>)/g, (g0, g1, g2) => {
-      return `[[[${g2}]]]`;
+      return `✉✉✉${g2}📩📩📩`;
     });
 
     html = html.replace(/([<>])/g, (g0, g1) => {
@@ -446,8 +460,8 @@ export class AnnotationStoreService {
       return '&gt;';
     });
 
-    html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-      if (g1 === '[[[') {
+    html = html.replace(/((?:✉✉✉)|(?:📩📩📩))/g, (g0, g1) => {
+      if (g1 === '✉✉✉') {
         return '<';
       }
 
@@ -537,13 +551,13 @@ export class AnnotationStoreService {
                     g2 === 'u' &&
                     g2 === 's'
                   ) {
-                    return `[[[${g2}]]]`;
+                    return `✉✉✉${g2}📩📩📩`;
                   }
 
                   // check if it's a marker
                   for (const marker of markers) {
                     if (`${g1}${g2}${g3}` === marker.code) {
-                      return `[[[${g2}]]]`;
+                      return `✉✉✉${g2}📩📩📩`;
                     }
                   }
 
@@ -560,7 +574,7 @@ export class AnnotationStoreService {
                 return '&gt;';
               });
 
-              result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
+              result = result.replace(/(✉✉✉)|(📩📩📩)/g, (g0, g1, g2) => {
                 if (g2 === undefined && g1 !== undefined) {
                   return '<';
                 } else {
@@ -650,8 +664,8 @@ export class AnnotationStoreService {
     let result = rawtext;
 
     try {
-      const sPos = rawtext.indexOf('[[[sel-start/]]]');
-      const sLen = '[[[sel-start/]]]'.length;
+      const sPos = rawtext.indexOf('✉✉✉sel-start/📩📩📩');
+      const sLen = '✉✉✉sel-start/📩📩📩'.length;
 
       interface Pos {
         start: number;
@@ -684,16 +698,16 @@ export class AnnotationStoreService {
                     ? validationElement.start
                     : sPos + sLen + validationElement.start,
                 puffer:
-                  "[[[span class='val-error' data-errorcode='" +
+                  "✉✉✉span class='val-error' data-errorcode='" +
                   validationElement.code +
-                  "']]]",
+                  "'📩📩📩",
               };
               insertions.push(insertStart);
             } else {
               insertStart.puffer +=
-                "[[[span class='val-error' data-errorcode='" +
+                "✉✉✉span class='val-error' data-errorcode='" +
                 validationElement.code +
-                "']]]";
+                "'📩📩📩";
             }
 
             let insertEnd = insertions.find((val) => {
@@ -707,10 +721,10 @@ export class AnnotationStoreService {
                 start: insertStart.start + validationElement.length,
                 puffer: '',
               };
-              insertEnd.puffer = '[[[/span]]]';
+              insertEnd.puffer = '✉✉✉/span📩📩📩';
               insertions.push(insertEnd);
             } else {
-              insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
+              insertEnd.puffer = '✉✉✉/span📩📩📩' + insertEnd.puffer;
             }
           }
         }
@@ -950,6 +964,46 @@ export class AnnotationStoreService {
         options,
         mode: this.appStorage.useMode!,
       })
+    );
+  }
+
+  overwriteTidyUpAnnotation() {
+    const tidyUp = (window as any).tidyUpAnnotation;
+
+    (window as any).tidyUpAnnotation = (transcript, guidelines) => {
+      transcript = tidyUp(transcript, guidelines);
+
+      // make sure there is only one speaker label for each unit if exists
+      if (
+        this.importOptions$.value && this.importConverter$.value === "SRT" &&
+        this.importOptions$.value['SRT']?.speakerIdentifierPattern
+      ) {
+        const pattern =
+          this.importOptions$.value['SRT'].speakerIdentifierPattern;
+        const regex = new RegExp(pattern, 'g');
+        const matches: RegExpExecArray[] = [];
+        let match = regex.exec(transcript);
+
+        while (match) {
+          matches.push(match);
+          match = regex.exec(transcript);
+        }
+
+        for (let i = matches.length - 1; i > 0; i--) {
+          match = matches[i];
+          transcript =
+            transcript.substring(0, match.index) +
+            transcript.substring(match.index + match[0].length);
+          match = regex.exec(transcript);
+        }
+      }
+      return transcript;
+    };
+  }
+
+  setImportConverter(mode: LoginMode, importConverter: string) {
+    this.store.dispatch(
+      LoginModeActions.setImportConverter.do({ mode, importConverter })
     );
   }
 }

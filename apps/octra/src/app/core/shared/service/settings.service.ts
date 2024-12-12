@@ -13,25 +13,6 @@ import { Subscription } from 'rxjs';
 export class SettingsService {
   private subscrmanager: SubscriptionManager<Subscription>;
 
-  get responsive(): {
-    enabled: boolean;
-    fixedwidth: number;
-  } {
-    if (
-      this.projectsettings !== undefined &&
-      this.projectsettings.responsive !== undefined
-    ) {
-      return this.projectsettings.responsive;
-    } else {
-      return this.appSettings?.octra.responsive !== undefined
-        ? this.appSettings?.octra.responsive
-        : {
-            enabled: true,
-            fixedwidth: 1079,
-          };
-    }
-  }
-
   get projectsettings(): ProjectSettings | undefined {
     return getModeState(this.appStorage.snapshot)?.projectConfig;
   }

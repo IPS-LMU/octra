@@ -150,7 +150,10 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
       );
 
       if (result?.annotjson) {
-        return result.annotjson;
+        return {
+          annotjson: result.annotjson,
+          converter: converter.name
+        };
       } else if (
         converter.name === 'AnnotJSON' &&
         /_annot\.json$/g.exec(io.filename) !== null

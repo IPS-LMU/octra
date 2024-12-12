@@ -112,10 +112,6 @@ export class TranscrWindowComponent
     return this.settingsService.projectsettings;
   }
 
-  get responsive(): boolean {
-    return this.settingsService.responsive.enabled;
-  }
-
   get audioManager(): AudioManager {
     return this.audiochunk.audioManager;
   }
@@ -443,7 +439,7 @@ export class TranscrWindowComponent
 
     this.editor.settings.markers =
       this.annotationStoreService.guidelines?.markers ?? [];
-    this.editor.settings.responsive = this.settingsService.responsive.enabled;
+    this.editor.settings.responsive = true;
     this.editor.settings.specialMarkers.boundary = true;
     this.loupe.name = 'transcr-window viewer';
     this.loupe.settings.margin.top = 5;

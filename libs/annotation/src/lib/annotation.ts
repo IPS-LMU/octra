@@ -196,18 +196,6 @@ export class OctraAnnotation<
     }
   }
 
-  combineSegments(
-    segmentIndexStart: number,
-    segmentIndexEnd: number,
-    breakMarker: string
-  ) {
-    for (let i = segmentIndexStart; i < segmentIndexEnd; i++) {
-      this.removeItemByIndex(i);
-      i--;
-      segmentIndexEnd--;
-    }
-  }
-
   removeLevel(id: number) {
     const index = this.levels.findIndex((a) => a.id === id);
 
@@ -377,7 +365,8 @@ export class OctraAnnotation<
   removeItemByIndex(
     index: number,
     silenceValue?: string,
-    mergeTranscripts?: boolean
+    mergeTranscripts?: boolean,
+    changeTranscript?: (transcript: string) => string
   ) {
     if (!this.currentLevel) {
       throw new Error('Current level is undefined');
@@ -396,7 +385,7 @@ export class OctraAnnotation<
         const nextSegment = this.currentLevel.items[
           index + 1
         ] as OctraAnnotationSegment;
-        const transcription = (
+        let transcript = (
           this.currentLevel.items[index] as OctraAnnotationSegment
         ).getFirstLabelWithoutName('Speaker')?.value;
 
@@ -404,28 +393,35 @@ export class OctraAnnotation<
           !silenceValue ||
           (nextSegment.getFirstLabelWithoutName('Speaker')?.value !==
             silenceValue &&
-            transcription !== silenceValue &&
+            transcript !== silenceValue &&
             mergeTranscripts)
         ) {
           // concat transcripts
           if (
             nextSegment.getFirstLabelWithoutName('Speaker') &&
-            transcription !== ''
+            transcript !== ''
           ) {
-            nextSegment.changeFirstLabelWithoutName(
-              'Speaker',
-              transcription +
-                ' ' +
-                nextSegment.getFirstLabelWithoutName('Speaker')?.value
-            );
+            transcript =
+              transcript +
+              ' ' +
+              nextSegment.getFirstLabelWithoutName('Speaker')?.value;
+
+            if (changeTranscript) {
+              transcript = changeTranscript(transcript);
+            }
+
+            nextSegment.changeFirstLabelWithoutName('Speaker', transcript);
           } else if (
             !nextSegment.getFirstLabelWithoutName('Speaker') &&
-            transcription !== ''
+            transcript !== ''
           ) {
-            nextSegment.changeFirstLabelWithoutName(
-              'Speaker',
-              transcription ?? ''
-            );
+            transcript = transcript ?? '';
+
+            if (changeTranscript) {
+              transcript = changeTranscript(transcript);
+            }
+
+            nextSegment.changeFirstLabelWithoutName('Speaker', transcript);
           }
         } else if (
           silenceValue &&
@@ -433,10 +429,12 @@ export class OctraAnnotation<
             silenceValue
         ) {
           // delete pause
-          nextSegment.changeFirstLabelWithoutName(
-            'Speaker',
-            transcription ?? ''
-          );
+          transcript = transcript ?? '';
+
+          if (changeTranscript) {
+            transcript = changeTranscript(transcript);
+          }
+          nextSegment.changeFirstLabelWithoutName('Speaker', transcript);
         }
         this.currentLevel.changeItem(nextSegment as any);
       }
@@ -445,16 +443,25 @@ export class OctraAnnotation<
         ...this.currentLevel.items.slice(0, index),
         ...this.currentLevel.items.slice(index + 1),
       ] as any);
-      const t = '';
     }
 
     return this;
   }
 
-  removeItemById(id: number, silenceCode?: string, mergeTranscripts?: boolean) {
+  removeItemById(
+    id: number,
+    silenceCode?: string,
+    mergeTranscripts?: boolean,
+    changeTranscript?: (transcript: string) => string
+  ) {
     const index = this.currentLevel?.items.findIndex((a) => a.id === id);
     if (index !== undefined && index > -1) {
-      return this.removeItemByIndex(index, silenceCode, mergeTranscripts);
+      return this.removeItemByIndex(
+        index,
+        silenceCode,
+        mergeTranscripts,
+        changeTranscript
+      );
     } else {
       throw new Error(`Can't find item with id ${id}`);
     }

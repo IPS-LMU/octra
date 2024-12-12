@@ -169,6 +169,9 @@ export const OctraProjectConfigJSONSchema = {
           type: 'array',
         },
       },
+      importOptions: {
+        type: "object",
+      },
       type: 'object',
     },
   },

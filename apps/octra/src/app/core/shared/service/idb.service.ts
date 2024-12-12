@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
+import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
+import { from, map, Observable, throwError } from 'rxjs';
+import { LoginMode } from '../../store';
 import {
   DefaultModeOptions,
   IDBApplicationOptionName,
@@ -7,9 +9,7 @@ import {
   IIDBModeOptions,
   OctraDatabase,
 } from '../octra-database';
-import { LoginMode } from '../../store';
-import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
-import { from, map, Observable, throwError } from 'rxjs';
+import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
 
 @Injectable({
   providedIn: 'root',
@@ -163,6 +163,14 @@ export class IDBService {
     );
   }
 
+  public loadImportOptions(mode: LoginMode): Observable<IIDBModeOptions> {
+    return this.database.loadDataOfMode<IIDBModeOptions>(
+      mode,
+      'importOptions',
+      undefined
+    );
+  }
+
   /**
    * save one log item.
    */
@@ -175,6 +183,13 @@ export class IDBService {
    */
   public saveAnnotation(mode: LoginMode, annotation: OAnnotJSON) {
     return this.database.saveModeData(mode, 'annotation', annotation, true);
+  }
+
+  /**
+   * save converter options.
+   */
+  public saveImportOptions(mode: LoginMode, options: Record<string, any>) {
+    return this.database.saveModeData(mode, 'importOptions', options, true);
   }
 
   /**

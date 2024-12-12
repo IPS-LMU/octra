@@ -1,9 +1,3 @@
-import { pipe } from 'rxjs';
-import { getModeState, RootState } from '../../index';
-import { Histories, UndoRedoState } from 'ngrx-wieder';
-import { ILog } from '../../../obj/Settings/logging';
-import { ProjectSettings } from '../../../obj';
-import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import {
   ASRContext,
   OctraAnnotation,
@@ -11,9 +5,15 @@ import {
   OSegment,
   SegmentWithContext,
 } from '@octra/annotation';
+import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { OctraGuidelines } from '@octra/assets';
+import { Histories, UndoRedoState } from 'ngrx-wieder';
+import { pipe } from 'rxjs';
+import { ProjectSettings } from '../../../obj';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { SessionFile } from '../../../obj/SessionFile';
+import { ILog } from '../../../obj/Settings/logging';
+import { getModeState, RootState } from '../../index';
 
 export interface GuidelinesItem {
   filename: string;
@@ -50,6 +50,8 @@ export interface AnnotationState extends UndoRedoState {
   savingNeeded: boolean;
   isSaving: boolean;
   currentEditor?: string;
+  importOptions?: Record<string, any>;
+  importConverter?: string;
   previousCurrentLevel?: number;
   audio: {
     loaded: boolean;

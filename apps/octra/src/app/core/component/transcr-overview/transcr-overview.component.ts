@@ -33,9 +33,6 @@ import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 import { sum } from '@octra/api-types';
 
-declare const validateAnnotation: (transcript: string, guidelines: any) => any;
-declare const tidyUpAnnotation: (transcript: string, guidelines: any) => any;
-
 @Component({
   selector: 'octra-transcr-overview',
   templateUrl: './transcr-overview.component.html',
@@ -462,9 +459,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
-        /((?:\[\[\[)|(?:]]]))/,
+        /((?:✉✉✉)|(?:📩📩📩))/,
         (g0, g1) => {
-          if (g1 === '[[[') {
+          if (g1 === '✉✉✉') {
             return '<';
           }
           return '>';
@@ -475,9 +472,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         obj.transcription.html
       );
       obj.transcription.html = obj.transcription.html.replace(
-        /((?:\[\[\[)|(?:]]]))/g,
+        /((?:✉✉✉)|(?:📩📩📩))/g,
         (g0, g1) => {
-          if (g1 === '[[[') {
+          if (g1 === '✉✉✉') {
             return '<';
           }
           return '>';

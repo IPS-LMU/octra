@@ -50,8 +50,6 @@ import { DefaultComponent } from '../default.component';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 
-declare let tidyUpAnnotation: (transcript: string, guidelines: any) => any;
-
 declare let document: any;
 
 @Component({
@@ -838,14 +836,9 @@ export class TranscrEditorComponent
               : '';
 
           if (!this.easymode) {
-            content +=
-              `${marker.button_text}<span class="btn-shortcut"> ` +
+            content =
+              `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
               `[${marker.shortcut[platform]}]</span>`;
-            if (this.settings.responsive) {
-              content =
-                `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
-                `[${marker.shortcut[platform]}]</span>`;
-            }
           } else {
             content += ' ' + marker.button_text;
           }
@@ -853,14 +846,8 @@ export class TranscrEditorComponent
           if (!this.easymode) {
             content =
               `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
-              `<span class="btn-description"> ${marker.button_text}</span><span class="btn-shortcut"> ` +
-              `[${marker.shortcut[platform]}]</span>`;
-            if (this.settings.responsive) {
-              content =
-                `<img src="${marker.icon}" class="btn-icon me-1" alt="${marker.button_text}"/>` +
-                `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
-                `</span><span class="btn-shortcut d-none d-lg-inline"> [${marker.shortcut[platform]}]</span>`;
-            }
+              `<span class="btn-description d-none d-lg-inline"> ${marker.button_text}` +
+              `</span><span class="btn-shortcut d-none d-lg-inline"> [${marker.shortcut[platform]}]</span>`;
           } else {
             content = `<img src="${marker.icon}" class="btn-icon" alt="${marker.button_text}"/>`;
           }
@@ -1140,8 +1127,8 @@ export class TranscrEditorComponent
           let code = this._rawText;
           // insert selection placeholders
           if (!focusAtEnd) {
-            const startMarker = '[[[sel-start/]]]';
-            const endMarker = '[[[sel-end/]]]';
+            const startMarker = '✉✉✉sel-start/📩📩📩';
+            const endMarker = '✉✉✉sel-end/📩📩📩';
             code =
               this.lastCursorPosition!.endMarker !== undefined &&
               this._textSelection.end >= this._textSelection.start
@@ -1401,15 +1388,9 @@ export class TranscrEditorComponent
         if (!this.easymode) {
           content =
             `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
-            `<span class="btn-description">${boundaryLabel}</span><span class="btn-shortcut"> ` +
+            `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
+            `<span class="btn-shortcut d-none d-lg-inline"> ` +
             `[ALT + S]</span>`;
-          if (this.settings.responsive) {
-            content =
-              `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
-              `<span class="btn-description d-none d-md-inline">${boundaryLabel}</span>` +
-              `<span class="btn-shortcut d-none d-lg-inline"> ` +
-              `[ALT + S]</span>`;
-          }
         } else {
           content = `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon" alt="boundary_img"/>`;
         }

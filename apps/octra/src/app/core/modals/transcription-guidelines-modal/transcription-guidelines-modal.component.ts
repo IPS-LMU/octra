@@ -1,3 +1,4 @@
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import {
   Component,
   OnInit,
@@ -5,8 +6,12 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
-import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import {
+  NgbActiveModal,
+  NgbCollapse,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 import { OctraGuidelines } from '@octra/assets';
 import { timer } from 'rxjs';
 import videojs from 'video.js';
@@ -19,6 +24,7 @@ import { OctraModal } from '../types';
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  imports: [TranslocoPipe, NgClass, NgbCollapse, NgOptimizedImage],
 })
 export class TranscriptionGuidelinesModalComponent
   extends OctraModal

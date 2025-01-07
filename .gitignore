@@ -55,5 +55,7 @@ deploy
 /deploy.sh
 /typedocs
 
-vite.config.*.timestamp*
 /tests/testfiles
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*

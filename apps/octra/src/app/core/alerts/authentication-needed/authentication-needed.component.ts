@@ -5,11 +5,13 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'octra-authentication-needed',
   templateUrl: './authentication-needed.component.html',
   styleUrls: ['./authentication-needed.component.scss'],
+  imports: [TranslocoPipe],
 })
 export class AuthenticationNeededComponent implements OnInit, OnDestroy {
   public static componentName = 'AuthenticationNeededComponent';

@@ -1,5 +1,4 @@
 import { NavigationExtras } from '@angular/router';
-import { MusicMetadataFormat, WavFormat } from '@octra/web-media';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -14,6 +13,7 @@ import {
   WebVTTConverter,
   WhisperJSONConverter,
 } from '@octra/annotation';
+import { MusicMetadataFormat, WavFormat } from '@octra/web-media';
 
 export class AppInfo {
   public static readonly audioformats = [

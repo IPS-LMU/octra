@@ -170,7 +170,7 @@ export const OctraProjectConfigJSONSchema = {
         },
       },
       importOptions: {
-        type: "object",
+        type: 'object',
       },
       type: 'object',
     },

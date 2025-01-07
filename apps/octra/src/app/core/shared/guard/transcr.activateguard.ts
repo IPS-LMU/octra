@@ -5,14 +5,16 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { navigateTo } from '@octra/ngx-utilities';
 import { map, Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { LoadingStatus, RootState } from '../../store';
-import { navigateTo } from '@octra/ngx-utilities';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
-import { Store } from '@ngrx/store';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TranscActivateGuard {
   constructor(
     private appStoreService: ApplicationStoreService,

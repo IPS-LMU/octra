@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SubscriptionManager } from '@octra/utilities';
 
-import { AppSettings, ProjectSettings } from '../../obj/Settings';
-import { AppStorageService } from './appstorage.service';
-import { getModeState } from '../../store';
 import { Subscription } from 'rxjs';
+import { AppSettings, ProjectSettings } from '../../obj/Settings';
+import { getModeState } from '../../store';
+import { AppStorageService } from './appstorage.service';
 
 @Injectable({
   providedIn: 'root',

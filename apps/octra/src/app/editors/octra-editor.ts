@@ -1,13 +1,13 @@
-import { AudioSelection, SampleUnit } from '@octra/media';
-import { AudioViewerComponent } from '@octra/ngx-components';
-import { DefaultComponent } from '../core/component/default.component';
 import { EventEmitter } from '@angular/core';
-import { AudioChunk, AudioManager } from '@octra/web-media';
 import {
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import { AudioSelection, SampleUnit } from '@octra/media';
+import { AudioViewerComponent } from '@octra/ngx-components';
+import { AudioChunk, AudioManager } from '@octra/web-media';
+import { DefaultComponent } from '../core/component/default.component';
 
 export interface OctraEditorRequirements {
   afterFirstInitialization(): void;

@@ -1,19 +1,22 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { AccountLoginMethod } from '@octra/api-types';
-import { AuthenticationStoreService } from '../../store/authentication';
-import { timer } from 'rxjs';
-import { OctraAPIService } from '@octra/ngx-octra-api';
 import { Action } from '@ngrx/store';
+import { AccountLoginMethod } from '@octra/api-types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
+import { timer } from 'rxjs';
+import { AuthenticationComponent } from '../../component/authentication-component/authentication-component.component';
 import { DefaultComponent } from '../../component/default.component';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { LoginMode } from '../../store';
+import { AuthenticationStoreService } from '../../store/authentication';
 
 @Component({
   selector: 'octra-re-authentication-modal',
   templateUrl: './re-authentication-modal.component.html',
   styleUrls: ['./re-authentication-modal.component.scss'],
+  imports: [TranslocoPipe, AuthenticationComponent],
 })
 export class ReAuthenticationModalComponent
   extends DefaultComponent

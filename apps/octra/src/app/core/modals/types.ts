@@ -1,5 +1,5 @@
-import { Subject } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
 import { DefaultComponent } from '../component/default.component';
 
 export class OctraModal extends DefaultComponent {

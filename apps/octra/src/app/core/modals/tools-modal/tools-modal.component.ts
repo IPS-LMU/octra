@@ -1,3 +1,4 @@
+import { DecimalPipe, NgClass, NgStyle } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -5,19 +6,28 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   DomSanitizer,
   SafeResourceUrl,
   SafeUrl,
 } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import {
+  NgbActiveModal,
+  NgbModalOptions,
+  NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
+import { OctraAnnotationSegmentLevel } from '@octra/annotation';
+import { TimespanPipe } from '@octra/ngx-utilities';
+import { AudioCutter, IntArray } from '@octra/web-media';
 import {
   fadeInExpandOnEnterAnimation,
   fadeOutCollapseOnLeaveAnimation,
 } from 'angular-animations';
+import { strToU8, zip, zipSync } from 'fflate';
 import { interval } from 'rxjs';
 import { AppInfo } from '../../../app.info';
-import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {
   JSONConverter,
   TextTableConverter,
@@ -27,14 +37,11 @@ import {
   SettingsService,
   UserInteractionsService,
 } from '../../shared/service';
-import { OctraAnnotationSegmentLevel } from '@octra/annotation';
-import { AudioCutter, IntArray } from '@octra/web-media';
-import { OctraModal } from '../types';
-import { strToU8, zip, zipSync } from 'fflate';
-import { OctraModalService } from '../octra-modal.service';
-import { ErrorModalComponent } from '../error-modal/error-modal.component';
-import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { OctraModalService } from '../octra-modal.service';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-tools-modal',
@@ -43,6 +50,16 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
   animations: [
     fadeOutCollapseOnLeaveAnimation(),
     fadeInExpandOnEnterAnimation(),
+  ],
+  imports: [
+    TranslocoPipe,
+    NgClass,
+    FormsModule,
+    NgbTooltip,
+    NamingDragAndDropComponent,
+    NgStyle,
+    DecimalPipe,
+    TimespanPipe,
   ],
 })
 export class ToolsModalComponent extends OctraModal implements OnDestroy {

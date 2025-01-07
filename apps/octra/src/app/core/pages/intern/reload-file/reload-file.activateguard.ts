@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { AppInfo } from '../../../../app.info';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { RoutingService } from '../../../shared/service/routing.service';
 
 @Injectable()

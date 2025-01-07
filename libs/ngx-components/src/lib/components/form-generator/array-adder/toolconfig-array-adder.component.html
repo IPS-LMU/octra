@@ -1,38 +1,63 @@
 <ng-template #popContent>
   @if (items !== undefined) {
+  <div>
     <div>
-      <div>
-        @for (elem of _items; track elem) {
-<span class="array-item pointer" [ngClass]="{
-        'selected': elem.selected
-      }" (click)="elem.selected = !elem.selected">{{ elem.value }}</span>
-        }
-      </div>
-      <div class="text-end mt-3">
-        <button class="btn btn-primary btn-sm" (click)="add(); p.close()">apply</button>
-      </div>
+      @for (elem of _items; track elem) {
+      <span
+        class="array-item pointer"
+        [ngClass]="{
+          selected: elem.selected
+        }"
+        (click)="elem.selected = !elem.selected"
+        >{{ elem.value }}</span
+      >
+      }
     </div>
-  } @else {
-    @if (type === 'text') {
-      <div>
-        <input type="text" class="form-control" #a/>
-      </div>
-    }
-    @if (type === 'number' || type === 'integer') {
-      <div>
-        <input type="number" class="form-control" [step]="type === 'integer' ? 1 : 0.1" name="89zuas" [(ngModel)]="inputValue"/>
-      </div>
-    }
     <div class="text-end mt-3">
-      <button class="btn btn-primary btn-sm" (click)="add();">add</button>
+      <button class="btn btn-primary btn-sm" (click)="add(); p.close()">
+        apply
+      </button>
     </div>
+  </div>
+  } @else { @if (type === 'text') {
+  <div>
+    <input type="text" class="form-control" #a />
+  </div>
+  } @if (type === 'number' || type === 'integer') {
+  <div>
+    <input
+      type="number"
+      class="form-control"
+      [step]="type === 'integer' ? 1 : 0.1"
+      name="89zuas"
+      [(ngModel)]="inputValue"
+    />
+  </div>
+  }
+  <div class="text-end mt-3">
+    <button class="btn btn-primary btn-sm" (click)="add()">add</button>
+  </div>
   }
 </ng-template>
-<span class="rounded-circle d-inline-block text-center pointer" [ngbPopover]="popContent" [triggers]="'manual'"
-  #p=ngbPopover
-      (click)="open()" autoClose="outside" placement="left-bottom" [ngClass]="{
-        'opacity-50': disabled
-      }"
-  style="background-color: cornflowerblue; margin-top:7px; height: 20px; width:20px;font-size:0.85rem;padding:0px 3px">
+<span
+  class="rounded-circle d-inline-block text-center pointer"
+  [ngbPopover]="popContent"
+  [triggers]="'manual'"
+  #p="ngbPopover"
+  (click)="open()"
+  autoClose="outside"
+  placement="left-bottom"
+  [ngClass]="{
+    'opacity-50': disabled
+  }"
+  style="
+    background-color: cornflowerblue;
+    margin-top: 7px;
+    height: 20px;
+    width: 20px;
+    font-size: 0.85rem;
+    padding: 0px 3px;
+  "
+>
   <i class="bi bi-plus-lg text-light"></i>
 </span>

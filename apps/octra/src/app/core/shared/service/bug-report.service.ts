@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
-import { Observable } from 'rxjs';
-import { AppStorageService } from './appstorage.service';
-import { getFileSize } from '@octra/utilities';
-import { LoginMode } from '../../store';
-import { DateTime } from 'luxon';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { AudioService } from './audio.service';
-import { BrowserInfo } from '@octra/web-media';
-import { OctraAPIService, removeProperties } from '@octra/ngx-octra-api';
 import { FeedbackRequestPropertiesDto } from '@octra/api-types';
+import { OctraAPIService, removeProperties } from '@octra/ngx-octra-api';
+import { getFileSize } from '@octra/utilities';
+import { BrowserInfo } from '@octra/web-media';
+import { DateTime } from 'luxon';
+import { Observable } from 'rxjs';
+import { LoginMode } from '../../store';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AppStorageService } from './appstorage.service';
+import { AudioService } from './audio.service';
 
 export enum ConsoleType {
   LOG,
@@ -36,7 +36,9 @@ declare const BUILD: {
   timestamp: string;
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class BugReportService {
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
   private readonly MAX_LOG_ENTRIES = 100;

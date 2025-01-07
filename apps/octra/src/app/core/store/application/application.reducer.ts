@@ -1,10 +1,10 @@
 import { createReducer, on } from '@ngrx/store';
-import { LoadingStatus, LoginMode } from '../index';
-import { ApplicationActions } from './application.actions';
-import { IDBActions } from '../idb/idb.actions';
-import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { ApplicationState } from './index';
 import { AuthenticationActions } from '../authentication';
+import { IDBActions } from '../idb/idb.actions';
+import { LoadingStatus, LoginMode } from '../index';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
+import { ApplicationActions } from './application.actions';
+import { ApplicationState } from './index';
 
 export const initialState: ApplicationState = {
   initialized: false,

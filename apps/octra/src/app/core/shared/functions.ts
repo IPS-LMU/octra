@@ -74,6 +74,7 @@ export function createSampleTask(
   return {
     id: taskID,
     inputs,
+    position: 1,
     outputs,
     status: TaskStatus.free,
     creationdate: new Date().toISOString(),
@@ -82,10 +83,7 @@ export function createSampleTask(
       id: '345',
       tool_id: 565,
       name: 'localConfig',
-      task_type: {
-        name: 'annotation',
-        style: {},
-      },
+      task_type: 'annotation',
       value: projectConfig,
       assets: [
         {
@@ -152,7 +150,7 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
       if (result?.annotjson) {
         return {
           annotjson: result.annotjson,
-          converter: converter.name
+          converter: converter.name,
         };
       } else if (
         converter.name === 'AnnotJSON' &&

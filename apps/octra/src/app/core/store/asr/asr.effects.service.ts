@@ -1,7 +1,10 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LoginMode, RootState } from '../index';
-import { Action, Store } from '@ngrx/store';
+import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
+import { AccountLoginMethod } from '@octra/api-types';
+import { AudioCutter, FileInfo, readFileContents } from '@octra/web-media';
 import {
   catchError,
   exhaustMap,
@@ -14,6 +17,16 @@ import {
   throwError,
   withLatestFrom,
 } from 'rxjs';
+import X2JS from 'x2js';
+import { ASRSettings, ProjectSettings, ServiceProvider } from '../../obj';
+import {
+  AlertService,
+  AudioService,
+  UserInteractionsService,
+} from '../../shared/service';
+import { AuthenticationActions } from '../authentication';
+import { LoginMode, RootState } from '../index';
+import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ASRActions } from './asr.actions';
 import {
   ASRProcessStatus,
@@ -21,19 +34,6 @@ import {
   ASRStateQueue,
   ASRStateQueueItem,
 } from './index';
-import { AudioCutter, FileInfo, readFileContents } from '@octra/web-media';
-import {
-  AlertService,
-  AudioService,
-  UserInteractionsService,
-} from '../../shared/service';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ServiceProvider, ASRSettings, ProjectSettings } from '../../obj';
-import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { AccountLoginMethod } from '@octra/api-types';
-import { AuthenticationActions } from '../authentication';
-import { TranslocoService } from '@jsverse/transloco';
-import X2JS from 'x2js';
 
 @Injectable({
   providedIn: 'root',

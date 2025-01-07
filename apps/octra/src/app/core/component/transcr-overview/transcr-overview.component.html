@@ -24,7 +24,7 @@
   </tbody>
 </table>
 <div [hidden]="shownSegments.length === 0" style="text-align: center">
-  <h4 class="text-start mt-5">{{"g.validation" | transloco}}</h4>
+  <h4 class="text-start mt-5">{{ 'g.validation' | transloco }}</h4>
 
   @if (validationFound) {
   <table class="table table-sm table-striped w-100">
@@ -57,7 +57,9 @@
   <span>No validation methods found</span>
   }
 </div>
-<h4 [hidden]="!showTranscriptionTable" class="mt-5">{{ 'g.transcript' | transloco }}</h4>
+<h4 [hidden]="!showTranscriptionTable" class="mt-5">
+  {{ 'g.transcript' | transloco }}
+</h4>
 <div [hidden]="!showLoading">
   <div
     style="
@@ -108,11 +110,13 @@
       [ngClass]="{
         'bg-success':
           segment.transcription.text !== '' &&
-          (!annotationStoreService?.breakMarker || segment.transcription.text !==
+          (!annotationStoreService?.breakMarker ||
+            segment.transcription.text !==
               annotationStoreService.breakMarker!.code),
         'bg-info':
-          (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+          annotationStoreService?.breakMarker &&
+          segment.transcription.text ===
+            annotationStoreService.breakMarker!.code,
         'bg-danger': segment.transcription.text === '',
         'bg-highlight': playAllState.currentSegment === i
       }"
@@ -122,11 +126,13 @@
         [ngClass]="{
           'bg-success':
             segment.transcription.text !== '' &&
-            (!annotationStoreService?.breakMarker || segment.transcription.text !==
-              annotationStoreService.breakMarker!.code),
+            (!annotationStoreService?.breakMarker ||
+              segment.transcription.text !==
+                annotationStoreService.breakMarker!.code),
           'bg-info':
-            (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+            annotationStoreService?.breakMarker &&
+            segment.transcription.text ===
+              annotationStoreService.breakMarker!.code,
           'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
         }"
@@ -147,11 +153,13 @@
         [ngClass]="{
           'bg-success':
             segment.transcription.text !== '' &&
-            (!annotationStoreService?.breakMarker || segment.transcription.text !==
-              annotationStoreService.breakMarker!.code),
+            (!annotationStoreService?.breakMarker ||
+              segment.transcription.text !==
+                annotationStoreService.breakMarker!.code),
           'bg-info':
-            (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+            annotationStoreService?.breakMarker &&
+            segment.transcription.text ===
+              annotationStoreService.breakMarker!.code,
           'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
         }"
@@ -165,11 +173,13 @@
         [ngClass]="{
           'bg-success':
             segment.transcription.text !== '' &&
-            (!annotationStoreService?.breakMarker || segment.transcription.text !==
-              annotationStoreService.breakMarker!.code),
+            (!annotationStoreService?.breakMarker ||
+              segment.transcription.text !==
+                annotationStoreService.breakMarker!.code),
           'bg-info':
-            (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+            annotationStoreService?.breakMarker &&
+            segment.transcription.text ===
+              annotationStoreService.breakMarker!.code,
           'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
         }"
@@ -202,13 +212,15 @@
       <td
         style="position: relative"
         [ngClass]="{
-        'bg-success':
-          segment.transcription.text !== '' &&
-          (!annotationStoreService?.breakMarker || segment.transcription.text !==
-              annotationStoreService.breakMarker!.code),
-        'bg-info':
-          (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+          'bg-success':
+            segment.transcription.text !== '' &&
+            (!annotationStoreService?.breakMarker ||
+              segment.transcription.text !==
+                annotationStoreService.breakMarker!.code),
+          'bg-info':
+            annotationStoreService?.breakMarker &&
+            segment.transcription.text ===
+              annotationStoreService.breakMarker!.code,
           'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
         }"
@@ -230,13 +242,15 @@
       <td
         class="last-column"
         [ngClass]="{
-        'bg-success':
-          segment.transcription.text !== '' &&
-          (!annotationStoreService?.breakMarker || segment.transcription.text !==
-              annotationStoreService.breakMarker!.code),
-        'bg-info':
-          (annotationStoreService?.breakMarker && segment.transcription.text ===
-              annotationStoreService.breakMarker!.code),
+          'bg-success':
+            segment.transcription.text !== '' &&
+            (!annotationStoreService?.breakMarker ||
+              segment.transcription.text !==
+                annotationStoreService.breakMarker!.code),
+          'bg-info':
+            annotationStoreService?.breakMarker &&
+            segment.transcription.text ===
+              annotationStoreService.breakMarker!.code,
           'bg-danger': segment.transcription.text === '',
           'bg-highlight': playAllState.currentSegment === i
         }"
@@ -250,5 +264,4 @@
     }
   </tbody>
 </table>
-}
-}
+} }

@@ -1,31 +1,31 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { SessionFile } from '../../obj/SessionFile';
+import { Actions } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
+import {
+  OctraAnnotationAnyLevel,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
+import { ProjectDto, TaskDto } from '@octra/api-types';
 import {
   getBaseHrefURL,
   SubscriptionManager,
   waitTillResultRetrieved,
 } from '@octra/utilities';
+import { SessionStorageService } from 'ngx-webstorage';
+import { asapScheduler, Observable, Subject, Subscription } from 'rxjs';
+import { SessionFile } from '../../obj/SessionFile';
 import { getModeState, LoginMode, RootState } from '../../store';
-import { Action, Store } from '@ngrx/store';
-import { Actions } from '@ngrx/effects';
-import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
-import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 import { ApplicationActions } from '../../store/application/application.actions';
+import { AuthenticationActions } from '../../store/authentication';
 import { IDBActions } from '../../store/idb/idb.actions';
+import { LoginModeActions } from '../../store/login-mode';
 import * as fromAnnotation from '../../store/login-mode/annotation';
 import {
   AnnotationSessionState,
   AnnotationState,
 } from '../../store/login-mode/annotation';
-import { LoginModeActions } from '../../store/login-mode';
-import { asapScheduler, Observable, Subject, Subscription } from 'rxjs';
-import { ProjectDto, TaskDto } from '@octra/api-types';
-import { AuthenticationActions } from '../../store/authentication';
-import {
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
-import { SessionStorageService } from 'ngx-webstorage';
+import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
+import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
 
 @Injectable({
   providedIn: 'root',

@@ -4,9 +4,9 @@
  * Extracted: 2024-11-04
  */
 
-import { WavFileFormat } from './wavformat';
-import { PCMAudioFormat } from './format';
 import { BinaryByteReader } from './BinaryReader';
+import { PCMAudioFormat } from './format';
+import { WavFileFormat } from './wavformat';
 
 export class WavReader {
   private br: BinaryByteReader;
@@ -181,7 +181,3 @@ export class WavReader {
     return chsArr;
   }
 }
-
-
-
-

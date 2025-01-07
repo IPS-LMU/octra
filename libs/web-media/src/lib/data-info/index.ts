@@ -1,3 +1,3 @@
-export * from "./data-info";
-export * from "./directory-info";
-export * from "./file-info";
+export * from './data-info';
+export * from './directory-info';
+export * from './file-info';

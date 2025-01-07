@@ -7,11 +7,13 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
 
 @Component({
   selector: 'octra-form-configurator',
   templateUrl: './tool-configurator.component.html',
   styleUrls: ['./tool-configurator.component.scss'],
+  imports: [ToolconfigGroupComponent],
 })
 export class ToolConfiguratorComponent
   extends SubscriberComponent
@@ -300,7 +302,7 @@ export class FixedConfigurationControlOptions<
   R,
   S = any
 > extends ConfigurationControlOptions<R, S> {
-  override type!:
+  declare type:
     | 'switch'
     | 'select'
     | 'number'
@@ -309,6 +311,10 @@ export class FixedConfigurationControlOptions<
     | 'text'
     | 'textarea'
     | 'array';
+
+  constructor() {
+    super();
+  }
 }
 
 export class ConfigurationControl<R = any, S = any> {

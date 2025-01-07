@@ -101,7 +101,11 @@
               ></div>
               }
               <div style="margin-top: 40px">
-                <octra-dropzone #dropzone [height]="'147px'" (filesAdded)="afterFilesAdded()"></octra-dropzone>
+                <octra-dropzone
+                  #dropzone
+                  [height]="'147px'"
+                  (filesAdded)="afterFilesAdded()"
+                ></octra-dropzone>
               </div>
               @if (fileStatus !== 'new') {
               <button
@@ -164,7 +168,7 @@
     <hr />
     <div class="text-center mb-3 p-3" style="background-color: #279440">
       <img
-        src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp"
+        src="./assets/img/socialmedia/Octra2_thumbnail_github2x.webp"
         alt="octra logo"
         class="img-fluid"
         style="max-height: 200px"

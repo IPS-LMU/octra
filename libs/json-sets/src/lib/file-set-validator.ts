@@ -3,8 +3,8 @@ import {
   JSONSetResult,
   PossibleSolution,
 } from './decision-tree';
-import { JsonSetValidator } from './json-set-validator';
 import { JSONSet } from './interfaces';
+import { JsonSetValidator } from './json-set-validator';
 
 export class IFile {
   name!: string;
@@ -47,7 +47,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       this.validateContent,
       this.validateFileSize,
       this.validateExtension,
-      this.validateNamePattern
+      this.validateNamePattern,
     ];
   }
 

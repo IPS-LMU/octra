@@ -1,10 +1,10 @@
 import { createReducer, on } from '@ngrx/store';
+import { AccountLoginMethod, AccountRole } from '@octra/api-types';
+import { APIActions } from '../api';
+import { IDBActions } from '../idb/idb.actions';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { AuthenticationActions } from './authentication.actions';
 import { AuthenticationState } from './index';
-import { APIActions } from '../api';
-import { LoginModeActions } from '../login-mode/login-mode.actions';
-import { AccountLoginMethod, AccountRole } from '@octra/api-types';
-import { IDBActions } from '../idb/idb.actions';
 
 export const initialState: AuthenticationState = {
   authenticated: false,

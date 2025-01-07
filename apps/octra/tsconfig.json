@@ -1,28 +1,26 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "useDefineForClassFields": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": false,
     "strict": false,
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "typeRoots": ["./src/types"]
+    "useDefineForClassFields": false
   },
   "files": [],
   "include": [],
   "references": [
     {
+      "path": "./tsconfig.editor.json"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {
       "path": "./tsconfig.spec.json"
-    },
-    {
-      "path": "./tsconfig.editor.json"
     }
   ],
   "extends": "../../tsconfig.base.json",
@@ -31,6 +29,7 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
-    "commonChunk": false
+    "ssr": false,
+    "prerender": false
   }
 }

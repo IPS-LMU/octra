@@ -9,35 +9,40 @@ import {
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
-import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+  ASRContext,
+  OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
+  OLabel,
+} from '@octra/annotation';
+import { SampleUnit } from '@octra/media';
+import { AudioplayerComponent } from '@octra/ngx-components';
 import {
   AudioChunk,
   AudioManager,
   Shortcut,
   ShortcutGroup,
 } from '@octra/web-media';
-import {
-  ASRContext,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-  OLabel,
-} from '@octra/annotation';
-import { AudioplayerComponent } from '@octra/ngx-components';
-import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { SampleUnit } from '@octra/media';
-import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { HotkeysEvent } from 'hotkeys-js';
+import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import {
+  AudioService,
+  SettingsService,
+  UserInteractionsService,
+} from '../../core/shared/service';
+import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 
 @Component({
   selector: 'octra-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.scss'],
+  imports: [
+    AudioNavigationComponent,
+    AudioplayerComponent,
+    TranscrEditorComponent,
+  ],
 })
 export class DictaphoneEditorComponent
   extends OCTRAEditor

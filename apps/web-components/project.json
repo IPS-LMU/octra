@@ -7,17 +7,18 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "extractLicenses": true,
         "outputPath": "tmp/web-components",
         "index": "apps/web-components/src/index.html",
-        "main": "apps/web-components/src/main.ts",
+        "browser": "apps/web-components/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/web-components/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
         "assets": [],
-        "styles": ["apps/web-components/styles.css"],
+        "styles": ["apps/web-components/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -81,14 +82,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "executor": "@nx/eslint:lint"
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+    "serve-static": {
+      "executor": "@nx/web:file-server",
       "options": {
-        "jestConfig": "apps/web-components/jest.config.ts"
+        "buildTarget": "web-components:build",
+        "staticFilePath": "dist/apps/web-components/browser",
+        "spa": true
       }
     },
     "version": {

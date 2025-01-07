@@ -10,6 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { PlayBackStatus, SampleUnit } from '@octra/media';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import Konva from 'konva';
@@ -21,6 +22,7 @@ import KonvaEventObject = Konva.KonvaEventObject;
   selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
   styleUrls: ['./audioplayer.component.css'],
+  imports: [TimespanPipe],
 })
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy

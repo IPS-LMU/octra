@@ -20,7 +20,7 @@ export abstract class AudioFormat {
   get supportedFormats(): SupportedAudioFormat[] {
     return this._supportedFormats;
   }
-  get decoder(): "web-audio" | "octra" {
+  get decoder(): 'web-audio' | 'octra' {
     return this._decoder;
   }
 
@@ -68,7 +68,7 @@ export abstract class AudioFormat {
 
   protected _supportedFormats!: SupportedAudioFormat[];
   protected _mimeType!: string;
-  protected _decoder: "web-audio" | "octra" = "web-audio";
+  protected _decoder: 'web-audio' | 'octra' = 'web-audio';
 
   public async init(filename: string, mimeType: string, buffer: ArrayBuffer) {
     this._filename = filename;

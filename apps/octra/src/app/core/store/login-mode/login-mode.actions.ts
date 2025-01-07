@@ -33,19 +33,18 @@ export class LoginModeActions extends AnnotationActions {
   });
 
   static setImportConverter = createActionGroup({
-      source: 'annotation/set import converter',
-      events: {
-        do: props<{
-          mode: LoginMode;
-          importConverter: string;
-        }>(),
-        success: emptyProps(),
-        fail: props<{
-          error: string;
-        }>(),
-      }
+    source: 'annotation/set import converter',
+    events: {
+      do: props<{
+        mode: LoginMode;
+        importConverter: string;
+      }>(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
   });
-
 
   static clearOnlineSession = createActionGroup({
     source: `annotation/ clear online session`,

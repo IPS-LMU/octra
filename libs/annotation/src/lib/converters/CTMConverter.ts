@@ -1,3 +1,7 @@
+import { OAudiofile } from '@octra/media';
+import { contains } from '@octra/utilities';
+import { FileInfo } from '@octra/web-media';
+import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import {
   Converter,
   ExportResult,
@@ -5,10 +9,6 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { contains } from '@octra/utilities';
-import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { OAudiofile } from '@octra/media';
-import { FileInfo } from '@octra/web-media';
 import { OctraApplication } from './SupportedApplications';
 
 export class CTMConverter extends Converter {
@@ -18,9 +18,11 @@ export class CTMConverter extends Converter {
 
   public constructor() {
     super();
-    this._applications = [{
-      application: new OctraApplication()
-    }];
+    this._applications = [
+      {
+        application: new OctraApplication(),
+      },
+    ];
     this._extensions = ['.ctm'];
     this._conversion.export = true;
     this._conversion.import = true;

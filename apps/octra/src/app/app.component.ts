@@ -1,29 +1,29 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MultiThreadingService } from '@octra/ngx-components';
 import { environment } from '../environments/environment';
-import { NavigationComponent } from './core/component';
-import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
-import { AppStorageService } from './core/shared/service/appstorage.service';
+import { AlertComponent, NavigationComponent } from './core/component';
 import { DefaultComponent } from './core/component/default.component';
+import { OctraModalComponent } from './core/modals/octra-modal';
+import { AppStorageService } from './core/shared/service/appstorage.service';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
+  imports: [
+    RouterModule,
+    AlertComponent,
+    OctraModalComponent,
+    NavigationComponent,
+  ],
   selector: 'octra-app',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss'],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
 })
-export class AppComponent
-  extends DefaultComponent
-  implements OnInit, OnDestroy
-{
+export class AppComponent extends DefaultComponent {
   @ViewChild('navigation', { static: true }) navigation:
     | NavigationComponent
     | undefined;
-
-  public get environment(): any {
-    return environment;
-  }
 
   constructor(
     public appStorage: AppStorageService,
@@ -60,7 +60,7 @@ export class AppComponent
     });
   }
 
-  override ngOnDestroy() {
+  ngOnDestroy() {
     super.ngOnDestroy();
     this.multiThreading.destroy();
     this.annotationStoreService.destroy();
@@ -71,4 +71,6 @@ export class AppComponent
     const params = this.route.snapshot.queryParams;
     return params['audio_url'] && params['embedded'];
   }
+
+  protected readonly environment = environment;
 }

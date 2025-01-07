@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   AccountLoginMethod,
   AppPropertiesDtoAuthenticationsEnum,
@@ -7,12 +9,13 @@ import {
 } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../default.component';
-import { TranslocoService } from '@jsverse/transloco';
+import { SignupComponent } from './signup/signup.component';
 
 @Component({
   selector: 'octra-authentication-component',
   templateUrl: './authentication-component.component.html',
   styleUrls: ['./authentication-component.component.scss'],
+  imports: [TranslocoPipe, FormsModule, SignupComponent],
 })
 export class AuthenticationComponent extends DefaultComponent {
   @Output() submitClick = new EventEmitter<{

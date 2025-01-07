@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
-import { AccountLoginMethod } from '@octra/api-types';
-import { AuthenticationActions } from './authentication.actions';
-import { LoginMode, RootState } from '../index';
 import { OAnnotJSON } from '@octra/annotation';
+import { AccountLoginMethod } from '@octra/api-types';
+import { LoginMode, RootState } from '../index';
+import { AuthenticationActions } from './authentication.actions';
 
 @Injectable({
   providedIn: 'root',

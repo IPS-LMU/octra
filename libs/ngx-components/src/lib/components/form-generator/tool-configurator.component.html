@@ -1,9 +1,12 @@
 <div class="container-fluid p-3">
   @if (jsonSchema.$gui_support) {
-    <form>
-      <octra-toolconfig-group [group]="form" (somethingChanged)="onSomethingChanged()"></octra-toolconfig-group>
-    </form>
+  <form>
+    <octra-toolconfig-group
+      [group]="form"
+      (somethingChanged)="onSomethingChanged()"
+    ></octra-toolconfig-group>
+  </form>
   } @else {
-    <p class="text-center">Form not supported by tool.</p>
+  <p class="text-center">Form not supported by tool.</p>
   }
 </div>

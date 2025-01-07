@@ -1,7 +1,7 @@
 {
   "name": "assets",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "assets/src",
+  "sourceRoot": "libs/assets/src",
   "projectType": "library",
   "targets": {
     "build": {
@@ -12,7 +12,11 @@
         "outputPath": "dist/libs/assets",
         "tsConfig": "libs/assets/tsconfig.lib.json",
         "assets": [
-          { "glob": "inputs_outputs.set.json", "input": "./libsass/assets/src/lib/schemata/", "output": "./asas" }
+          {
+            "glob": "inputs_outputs.set.json",
+            "input": "./libsass/assets/src/lib/schemata/",
+            "output": "./asas"
+          }
         ]
       }
     },

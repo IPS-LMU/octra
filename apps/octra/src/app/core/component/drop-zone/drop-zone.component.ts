@@ -1,3 +1,4 @@
+import { NgStyle } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -13,6 +14,7 @@ import { SessionFile } from '../../obj/SessionFile';
   selector: 'octra-drop-zone',
   templateUrl: './drop-zone.component.html',
   styleUrls: ['./drop-zone.component.scss'],
+  imports: [NgStyle],
 })
 export class DropZoneComponent implements OnInit {
   @Input()

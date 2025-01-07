@@ -6,23 +6,25 @@ This library offers JS functions and classes to make some parts of app developme
 
 ### ESM, CJS, TS definitions & UMD (optional)
 
-````shell
+```shell
 npm install --save @octra/utilities
-````
+```
 
 ### UMD Bundle (for Vanilla JS)
 
 You have two options to install this package und use it as UMD:
 
 a) Install via NPM and reference local files (no internet connection needed on production).
-````html
-<script type="application/javascript" src="node_modules/@octra/utilities/index.umd.js"></script>
-````
 
-b) Reference remote file  (internet connection needed on production).
-````html
+```html
+<script type="application/javascript" src="node_modules/@octra/utilities/index.umd.js"></script>
+```
+
+b) Reference remote file (internet connection needed on production).
+
+```html
 <script type="application/javascript" src="https://unpkg.com/@octra/utilities/index.umd.js"></script>
-````
+```
 
 [See full example here](https://github.com/IPS-LMU/octra/blob/main/apps/web-components-demo/index.html)
 
@@ -34,9 +36,9 @@ b) Reference remote file  (internet connection needed on production).
 
 Import the classes and functions from `@octra/utilities`. For example
 
-````typescript
-import {getFileSize} from "@octra/utilities";
-````
+```typescript
+import { getFileSize } from '@octra/utilities';
+```
 
 #### UMD Bundle
 
@@ -46,7 +48,7 @@ All functions and classes are available via global scope `OctraUtilities`. For e
 /*
 make sure that you have injected the umd bundle as described before.
  */
-const bytes = 738246364782
+const bytes = 738246364782;
 const sizeInMb = OctraUtilities.getFileSize(bytes);
 ```
 

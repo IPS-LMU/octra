@@ -1,6 +1,6 @@
+import { OAudiofile, SampleUnit } from '@octra/media';
 import { OLabel, OSegment } from './annotjson';
 import { Converter, IFile } from './converters';
-import { OAudiofile, SampleUnit } from '@octra/media';
 import { OctraAnnotationSegment } from './octraAnnotationSegment';
 
 export function convertFromSupportedConverters(
@@ -73,19 +73,19 @@ export function getSegmentsOfRange(
     const segment = entries[i];
 
     if (
-      (segment.time!.samples >= startSamples.samples &&
-        segment.time!.samples <= endSamples.samples)
+      segment.time!.samples >= startSamples.samples &&
+      segment.time!.samples <= endSamples.samples
     ) {
       if (startIndex < 0) {
         startIndex = i;
       }
       endIndex = i;
-    } else if(segment.time.samples > endSamples.samples){
+    } else if (segment.time.samples > endSamples.samples) {
       break;
     }
   }
 
-  return {startIndex, endIndex};
+  return { startIndex, endIndex };
 }
 
 /***

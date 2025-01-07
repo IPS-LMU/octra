@@ -17,7 +17,9 @@ import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-n
 import { NgbModalWrapper } from './ng-modal-wrapper';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class OctraModalService implements OnDestroy {
   onModalAction = new EventEmitter<{
     name: string;

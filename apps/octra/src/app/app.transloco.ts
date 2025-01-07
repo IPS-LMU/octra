@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import {
   provideTransloco,
@@ -5,7 +6,6 @@ import {
   TranslocoLoader,
   TranslocoModule,
 } from '@jsverse/transloco';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })

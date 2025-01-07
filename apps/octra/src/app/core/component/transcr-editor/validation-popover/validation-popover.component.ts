@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
@@ -12,6 +13,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   selector: 'octra-validation-popover',
   templateUrl: './validation-popover.component.html',
   styleUrls: ['./validation-popover.component.scss'],
+  imports: [NgClass],
 })
 export class ValidationPopoverComponent {
   @ViewChild('validationContainer', { static: true })

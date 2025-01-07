@@ -1,12 +1,13 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
-import { OctraModal } from '../types';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   NgbActiveModal,
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { OctraModal } from '../types';
 
 export enum ModalEndAnswer {
   CANCEL = 'CANCEL',
@@ -18,6 +19,7 @@ export enum ModalEndAnswer {
   selector: 'octra-transcription-demo-end-modal',
   templateUrl: './transcription-demo-end-modal.component.html',
   styleUrls: ['./transcription-demo-end-modal.component.scss'],
+  imports: [TranslocoPipe, NgOptimizedImage],
 })
 export class TranscriptionDemoEndModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

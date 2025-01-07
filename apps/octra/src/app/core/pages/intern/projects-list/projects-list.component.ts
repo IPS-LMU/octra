@@ -1,25 +1,28 @@
+import { AsyncPipe, NgClass } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { OctraAPIService } from '@octra/ngx-octra-api';
-import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { Actions, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { ProjectDto, ProjectListDto } from '@octra/api-types';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../../component/default.component';
-import { OctraModalService } from '../../../modals/octra-modal.service';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
+import { OctraModalService } from '../../../modals/octra-modal.service';
+import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { RootState } from '../../../store';
 import {
   AuthenticationActions,
   AuthenticationStoreService,
 } from '../../../store/authentication';
-import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
-import { RootState } from '../../../store';
-import { Store } from '@ngrx/store';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, ofType } from '@ngrx/effects';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
+import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
+  imports: [AsyncPipe, TranslocoPipe, NgClass],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects?: ProjectListDto;

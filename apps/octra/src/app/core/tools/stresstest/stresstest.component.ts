@@ -3,9 +3,9 @@ import {
   ChangeDetectorRef,
   Component,
 } from '@angular/core';
-import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
 import { getFileSize } from '@octra/utilities';
 import { BrowserInfo } from '@octra/web-media';
+import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
 
 @Component({
   selector: 'octra-stresstest',

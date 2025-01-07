@@ -1,3 +1,4 @@
+import { NgClass, NgStyle } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -12,13 +13,16 @@ import {
   ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
 } from '@octra/annotation';
+import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { LeadingNullPipe } from '@octra/ngx-utilities';
 import { isFunction, SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import { Subscription, timer } from 'rxjs';
@@ -31,13 +35,20 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
-import { sum } from '@octra/api-types';
 
 @Component({
   selector: 'octra-transcr-overview',
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    TranslocoPipe,
+    NgClass,
+    NgStyle,
+    LeadingNullPipe,
+    TranscrEditorComponent,
+    ValidationPopoverComponent,
+  ],
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   get textEditor(): {
@@ -146,7 +157,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public get foundErrors(): number {
-    return sum(this.validationErrors.map(a => a.errors));
+    return sum(this.validationErrors.map((a) => a.errors));
   }
 
   validationErrors: {

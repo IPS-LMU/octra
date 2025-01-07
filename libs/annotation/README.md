@@ -7,23 +7,25 @@ model. Here you can also find all Annotation converters used by [Octra](https://
 
 ### ESM, CJS, TS definitions & UMD (optional)
 
-````shell
+```shell
 npm install --save @octra/annotation
-````
+```
 
 ### UMD Bundle (for Vanilla JS)
 
 You have two options to install this package und use it as UMD:
 
 a) Install via NPM and reference local files (no internet connection needed om production).
-````html
-<script type="application/javascript" src="node_modules/@octra/annotation/index.umd.js"></script>
-````
 
-b) Reference remote file  (internet connection needed on production).
-````html
+```html
+<script type="application/javascript" src="node_modules/@octra/annotation/index.umd.js"></script>
+```
+
+b) Reference remote file (internet connection needed on production).
+
+```html
 <script type="application/javascript" src="https://unpkg.com/@octra/annotation/index.umd.js"></script>
-````
+```
 
 [See full example here](https://github.com/IPS-LMU/octra/blob/main/apps/web-components-demo/index.html)
 
@@ -35,18 +37,13 @@ b) Reference remote file  (internet connection needed on production).
 
 Import the classes and functions from `@octra/annotation`. For example
 
-````typescript
-import { Level } from "@octra/annotation";
+```typescript
+import { Level } from '@octra/annotation';
 
 const annotation = new OctraAnnotation();
-const level = annotation.addLevel(new OctraAnnotation.createSegmentLevel("OCTRA_1"));
-annotation.addItemToCurrentLevel(new SampleUnit(123456, 22050), [
-  new OLabel(
-    "OCTRA_1",
-    "hello world"
-  )
-]);
-````
+const level = annotation.addLevel(new OctraAnnotation.createSegmentLevel('OCTRA_1'));
+annotation.addItemToCurrentLevel(new SampleUnit(123456, 22050), [new OLabel('OCTRA_1', 'hello world')]);
+```
 
 #### UMD Bundle
 
@@ -57,13 +54,8 @@ All functions and classes are available via global scope `OctraAnnotation`. For 
 make sure that you have injected the umd bundle as described before.
  */
 const annotation = new OctraAnnotation.OctraAnnotation();
-const level = annotation.addLevel(new OctraAnnotation.OctraAnnotation.createSegmentLevel("OCTRA_1"));
-annotation.addItemToCurrentLevel(new OctraAnnotation.SampleUnit(123456, 22050), [
-  new OctraAnnotation.OLabel(
-    "OCTRA_1",
-    "hello world"
-  )
-]);
+const level = annotation.addLevel(new OctraAnnotation.OctraAnnotation.createSegmentLevel('OCTRA_1'));
+annotation.addItemToCurrentLevel(new OctraAnnotation.SampleUnit(123456, 22050), [new OctraAnnotation.OLabel('OCTRA_1', 'hello world')]);
 ```
 
 ### API

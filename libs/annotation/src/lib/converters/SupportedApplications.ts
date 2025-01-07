@@ -73,7 +73,8 @@ export class AnyTextEditor implements SupportedApplication {
 
 export class WhisperXApplication implements SupportedApplication {
   name = 'WhisperX';
-  description = 'Automatic Speech Recognition with Word-level Timestamps (& Diarization) ';
+  description =
+    'Automatic Speech Recognition with Word-level Timestamps (& Diarization) ';
   homepage = 'https://github.com/m-bain/whisperX';
 }
 

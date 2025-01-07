@@ -12,10 +12,7 @@
       "properties": {
         "type": {
           "type": "enum",
-          "enum": [
-            "and",
-            "or"
-          ]
+          "enum": ["and", "or"]
         },
         "expressions": {
           "type": "array",
@@ -23,10 +20,7 @@
             "oneOf": [
               {
                 "type": "object",
-                "required": [
-                  "select",
-                  "with"
-                ],
+                "required": ["select", "with"],
                 "properties": {
                   "select": {
                     "type": "string"

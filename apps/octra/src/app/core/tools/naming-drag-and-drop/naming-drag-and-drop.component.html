@@ -11,10 +11,7 @@
         {{ 'tools.cut audio.add placeholder' | transloco }}
         <i class="bi bi-plus-lg"></i>
       </button>
-      <div
-        ngbDropdownMenu
-        aria-labelledby="button-basic"
-      >
+      <div ngbDropdownMenu aria-labelledby="button-basic">
         @for (item of namingConventionArray; track item; let i = $index) {
         <button (click)="addItem(item)" ngbDropdownItem>
           {{ item }}
@@ -55,7 +52,7 @@
           (keydown)="onKeyDown($event, text)"
           class="value"
           contenteditable="true"
-          style="min-width: 10px; user-select: text;"
+          style="min-width: 10px; user-select: text"
           [innerText]="item.value"
         ></span>
         <i class="bi bi-x-circle" (click)="remove(i)"></i>

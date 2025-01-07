@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -48,7 +49,9 @@ export interface CurrentLevelChangeEvent {
   providers: [AudioViewerService],
   encapsulation: ViewEncapsulation.ShadowDom,
 })
-export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
+export class AudioViewerComponent
+  implements OnInit, OnChanges, OnDestroy, AfterViewInit
+{
   /**
    * annotation of type OctraAnnotation
    * @param value
@@ -238,7 +241,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     return this.av.boundaryDragging;
   }
 
-  @ViewChild('konvaContainer', { static: true }) konvaContainer:
+  @ViewChild('konvaContainer', { static: false }) konvaContainer:
     | ElementRef
     | undefined;
 
@@ -341,31 +344,39 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
           console.log(`Channel data computation took ${Date.now() - time}ms`);
           time = Date.now();
           // channel data is ready
-          if (
-            this.width &&
-            audioChunk &&
-            this.av.annotation?.currentLevel &&
-            this.av.annotation.currentLevel.items.length > 0
-          ) {
-            this.av.initialize(
-              this.width,
-              this.height,
-              this.konvaContainer?.nativeElement,
-              audioChunk
-            );
 
-            this.av
-              .initializeSettings()
-              .then(() => {
-                this.av.initializeView();
-                console.log(`Initializing view took ${Date.now() - time}ms`);
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          } else {
-            // ignore
-          }
+          timer(0).subscribe({
+            next: () => {
+              if (
+                this.width &&
+                this.height &&
+                audioChunk &&
+                this.av.annotation?.currentLevel &&
+                this.av.annotation.currentLevel.items.length > 0
+              ) {
+                this.av.initialize(
+                  this.width,
+                  this.height,
+                  this.konvaContainer?.nativeElement,
+                  audioChunk
+                );
+
+                this.av
+                  .initializeSettings()
+                  .then(() => {
+                    this.av.initializeView();
+                    console.log(
+                      `Initializing view took ${Date.now() - time}ms`
+                    );
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+              } else {
+                // ignore
+              }
+            },
+          });
         })
         .catch((error) => {
           console.error(error);
@@ -467,6 +478,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         break;
     }
   };
+
+  ngAfterViewInit() {}
 }
 
 export interface AudioViewerShortcutEvent {

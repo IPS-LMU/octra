@@ -1,3 +1,4 @@
+import { NgClass, NgStyle } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -8,7 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   AnnotationLevelType,
@@ -18,6 +19,7 @@ import {
 } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import {
   AudioChunk,
   AudioManager,
@@ -27,6 +29,7 @@ import {
   ShortcutGroup,
 } from '@octra/web-media';
 import { timer } from 'rxjs';
+import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import {
   ContextMenuAction,
   ContextMenuComponent,
@@ -49,6 +52,17 @@ import { PermutationsReplaceModalComponent } from './modals/permutations-replace
   templateUrl: './trn-editor.component.html',
   styleUrls: ['./trn-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    ContextMenuComponent,
+    ValidationPopoverComponent,
+    NgStyle,
+    TranslocoPipe,
+    AudioNavigationComponent,
+    AudioViewerComponent,
+    TranscrEditorComponent,
+    TimespanPipe,
+    NgClass,
+  ],
 })
 export class TrnEditorComponent
   extends OCTRAEditor

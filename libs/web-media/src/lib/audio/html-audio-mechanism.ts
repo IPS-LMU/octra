@@ -1,9 +1,4 @@
-import {
-  AudioMechanism,
-  AudioMechanismPrepareOptions,
-} from './audio-mechanism';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
 import {
   AudioDecoder,
   AudioFormat,
@@ -14,7 +9,12 @@ import {
   MusicMetadataFormat,
   WavFormat,
 } from '@octra/web-media';
+import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
 import { SourceType } from '../types';
+import {
+  AudioMechanism,
+  AudioMechanismPrepareOptions,
+} from './audio-mechanism';
 
 export class HtmlAudioMechanism extends AudioMechanism {
   private _audio?: HTMLAudioElement;

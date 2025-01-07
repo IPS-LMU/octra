@@ -192,7 +192,7 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
         parsedSelectStatement.selectNumber,
         result
       );
-    } else if(parsedSelectStatement.type === "max"){
+    } else if (parsedSelectStatement.type === 'max') {
       this._possibleSelections.push([]);
     }
 
@@ -415,7 +415,9 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       if (product.length === 0) {
         this._errors.push(
           new JSONSetValidationError(
-            this.description ?? `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
+            this.description ??
+              `Logical "${this.combination}" failed for condition "${this.path}."`,
+            this.path
           )
         );
         product = [];
@@ -428,7 +430,9 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
     if (this._possibleSelections.length === 0) {
       this._errors.push(
         new JSONSetValidationError(
-          this.description ?? `Logical "${this.combination}" failed for condition "${this.path}."`, this.path
+          this.description ??
+            `Logical "${this.combination}" failed for condition "${this.path}."`,
+          this.path
         )
       );
       this._possibleSelections = [];

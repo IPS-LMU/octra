@@ -468,7 +468,6 @@ export class IDBEffects {
         );
 
         if (modeState) {
-
           return this.idbService
             .saveModeOptions((action as any).mode, {
               sessionfile:

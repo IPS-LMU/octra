@@ -1,16 +1,16 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   createAction,
   createActionGroup,
   emptyProps,
   props,
 } from '@ngrx/store';
+import { AppSettings, ASRSettings } from '../../obj';
+import { IDBApplicationOptionName } from '../../shared/octra-database';
 import {
   ConsoleEntry,
   ConsoleGroupEntry,
 } from '../../shared/service/bug-report.service';
-import { AppSettings, ASRSettings } from '../../obj';
-import { HttpErrorResponse } from '@angular/common/http';
-import { IDBApplicationOptionName } from '../../shared/octra-database';
 import { LoginMode } from '../index';
 
 const context = 'Application';

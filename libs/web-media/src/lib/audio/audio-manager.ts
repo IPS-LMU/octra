@@ -1,11 +1,11 @@
-import { SubscriptionManager } from "@octra/utilities";
-import { map, Observable, Subject, Subscription, timer } from "rxjs";
-import { AudioSelection, PlayBackStatus, SampleUnit } from "@octra/media";
-import { AudioFormat } from "./AudioFormats";
-import { AudioResource } from "./audio-resource";
-import { AudioMechanism } from "./audio-mechanism";
-import { HtmlAudioMechanism } from "./html-audio-mechanism";
-import { normalizeMimeType } from "./audio-info";
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { SubscriptionManager } from '@octra/utilities';
+import { map, Observable, Subject, Subscription, timer } from 'rxjs';
+import { AudioFormat } from './AudioFormats';
+import { normalizeMimeType } from './audio-info';
+import { AudioMechanism } from './audio-mechanism';
+import { AudioResource } from './audio-resource';
+import { HtmlAudioMechanism } from './html-audio-mechanism';
 
 /**
  * AudioManager controls the audio file and all of its chunk. Each audio file should have exactly one manager. The AudioManager uses HTML Audio for playback.
@@ -106,7 +106,9 @@ export class AudioManager {
     audioformats: AudioFormat[]
   ): AudioFormat | undefined {
     return audioformats.find((a) => {
-      return a.supportedFormats.findIndex((a) => a.extension === extension) > -1;
+      return (
+        a.supportedFormats.findIndex((a) => a.extension === extension) > -1
+      );
     });
   }
 

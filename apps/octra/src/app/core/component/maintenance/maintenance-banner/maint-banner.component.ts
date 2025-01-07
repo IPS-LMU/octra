@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import {
   Component,
   ElementRef,
@@ -6,16 +7,17 @@ import {
   Renderer2,
   SimpleChanges,
 } from '@angular/core';
-import { MaintenanceAPI, MaintenanceNotification } from '../maintenance-api';
-import { HttpClient } from '@angular/common/http';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { hasProperty } from '@octra/utilities';
 import { DateTime } from 'luxon';
+import { MaintenanceAPI, MaintenanceNotification } from '../maintenance-api';
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'octra-maint-banner',
   templateUrl: './maint-banner.component.html',
   styleUrls: ['./maint-banner.component.scss'],
+  imports: [TranslocoPipe],
 })
 export class MaintenanceBannerComponent implements OnChanges {
   @Input() serverURL!: string;

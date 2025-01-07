@@ -17,7 +17,8 @@ import {
 import {
   AnyTextEditor,
   AnyVideoPlayer,
-  OctraApplication, WordApplication
+  OctraApplication,
+  WordApplication,
 } from './SupportedApplications';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API

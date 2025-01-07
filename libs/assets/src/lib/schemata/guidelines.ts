@@ -139,8 +139,8 @@ export interface OctraGuidelines {
     validation_url: string;
     pdf: {
       url: string;
-    }
-  },
+    };
+  };
   instructions: {
     group: string;
     entries: {
@@ -151,9 +151,9 @@ export interface OctraGuidelines {
       examples: {
         annotation: string;
         url: string;
-      }[]
-    }[]
-  }[],
+      }[];
+    }[];
+  }[];
   markers: {
     id: number;
     name: string;
@@ -163,8 +163,8 @@ export interface OctraGuidelines {
     button_text: string;
     description: string;
     shortcuts: {
-      mac: string,
+      mac: string;
       pc: string;
-    }[]
-  }[]
+    }[];
+  }[];
 }

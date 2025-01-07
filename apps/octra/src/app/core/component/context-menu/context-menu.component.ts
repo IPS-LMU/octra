@@ -1,3 +1,4 @@
+import { NgStyle } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import {
   fadeInOnEnterAnimation,
@@ -16,6 +17,7 @@ import {
       duration: 100,
     }),
   ],
+  imports: [NgStyle],
 })
 export class ContextMenuComponent {
   isVisible = false;

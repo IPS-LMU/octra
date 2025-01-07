@@ -7,7 +7,6 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { OctraApplication } from './SupportedApplications';
 
 export interface Bundle {
   ssffFiles: {

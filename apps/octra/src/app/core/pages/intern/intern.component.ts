@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { SettingsService, UserInteractionsService } from '../../shared/service';
+import { Router, RouterOutlet } from '@angular/router';
 import { DefaultComponent } from '../../component/default.component';
+import { SettingsService, UserInteractionsService } from '../../shared/service';
 
 @Component({
   selector: 'octra-members-area',
   templateUrl: './intern.component.html',
   styleUrls: ['./intern.component.scss'],
   providers: [UserInteractionsService],
+  imports: [RouterOutlet],
 })
 export class InternComponent extends DefaultComponent {
   constructor(private router: Router, private settService: SettingsService) {

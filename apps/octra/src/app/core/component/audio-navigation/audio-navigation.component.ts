@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -10,9 +11,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PlayBackStatus } from '@octra/media';
-import { DefaultComponent } from '../default.component';
+import { ProcentPipe } from '@octra/ngx-utilities';
 import { AudioChunk } from '@octra/web-media';
+import { DefaultComponent } from '../default.component';
 
 export interface Buttons {
   play: {
@@ -46,6 +50,7 @@ export interface Buttons {
   templateUrl: './audio-navigation.component.html',
   styleUrls: ['./audio-navigation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslocoPipe, NgClass, FormsModule, ProcentPipe],
 })
 export class AudioNavigationComponent
   extends DefaultComponent

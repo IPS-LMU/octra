@@ -1,17 +1,22 @@
+import { AsyncPipe, NgOptimizedImage } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { Observable } from 'rxjs';
+import { AuthenticationComponent } from '../../component/authentication-component/authentication-component.component';
 import { DefaultComponent } from '../../component/default.component';
+import { MaintenanceBannerComponent } from '../../component/maintenance/maintenance-banner/maint-banner.component';
 import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { CompatibilityService } from '../../shared/service/compatibility.service';
 import { AuthenticationStoreService } from '../../store/authentication';
+import { BrowserTestComponent } from '../browser-test';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
 
@@ -20,6 +25,15 @@ import { LoginService } from './login.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   providers: [LoginService],
+  imports: [
+    MaintenanceBannerComponent,
+    TranslocoPipe,
+    AsyncPipe,
+    AuthenticationComponent,
+    OctraDropzoneComponent,
+    BrowserTestComponent,
+    NgOptimizedImage,
+  ],
 })
 export class LoginComponent
   extends DefaultComponent

@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,6 +11,7 @@ import {
   templateUrl: './shortcut.component.html',
   styleUrls: ['./shortcut.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgClass],
 })
 export class ShortcutComponent implements OnInit {
   parts: {

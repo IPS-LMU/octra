@@ -1,0 +1,148 @@
+{
+  "version": "2.0.0",
+  "api": {
+    "url": "http://localhost:8080/v1",
+    "appToken": "Q/5urIK+O95jg1/KfmllkPYmYlzFOD"
+  },
+  "octra": {
+    "supportEmail": "octra@phonetik.uni-muenchen.de",
+    "database": {
+      "name": "local2"
+    },
+    "login": {
+      "enabled": true
+    },
+    "showdetails": true,
+    "responsive": {
+      "enabled": true,
+      "fixedwidth": 1200
+    },
+    "plugins": {
+      "asr": {
+        "enabled": true,
+        "calls": [
+          "{{host}}runASRWebLink?SIGNAL={{audioURL}}&ASRType=call{{asrType}}ASR&LANGUAGE={{language}}&OUTFORMAT={{outFormat}}",
+          "{{host}}runPipelineWebLink?TEXT={{transcriptURL}}&SIGNAL={{audioURL}}&PIPE=G2P_CHUNKER_MAUS&LANGUAGE={{language}}&OUTFORMAT=TextGrid"
+        ],
+        "services": [
+          {
+            "provider": "Google",
+            "basName": "Google",
+            "type": "ASR",
+            "termsURL": "https://cloud.google.com/terms",
+            "dataStoragePolicy": "User data are not stored, 'data logging' disabled",
+            "homepageURL": "https://cloud.google.com/speech/",
+            "logoURL": "assets/img/asr/google-cloud-platform-logo.png",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          },
+          {
+            "provider": "Watson",
+            "basName": "IBM Watson",
+            "type": "ASR",
+            "termsURL": "https://www-03.ibm.com/software/sla/sladb.nsf/sla/bm",
+            "dataStoragePolicy": "User data are stored for improvement of service",
+            "homepageURL": "https://www.ibm.com/watson/services/speech-to-text/",
+            "logoURL": "assets/img/asr/ibm_PNG19655.png",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          },
+          {
+            "provider": "EML",
+            "basName": "European Media Lab (EML)",
+            "type": "ASR",
+            "termsURL": "https://start.eml.org/quickstart/data-protection-policy",
+            "dataStoragePolicy": "User data are stored for improvement of service (anonymised)",
+            "homepageURL": "https://www.eml.org/english/application-areas/",
+            "logoURL": "assets/img/asr/emlLogoRedBG.png",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          },
+          {
+            "provider": "LSTDutch",
+            "basName": "CLST Radboud University",
+            "type": "ASR",
+            "termsURL": "https://clarin.phonetik.uni-muenchen.de/Bas/BasLSTRadboutUniDisclaimer.txt",
+            "dataStoragePolicy": "User data are not stored, see terms",
+            "homepageURL": "https://webservices-lst.science.ru.nl/portal/",
+            "logoURL": "assets/img/asr/RUlogoA5plusCLSTENG.jpg"
+          },
+          {
+            "provider": "LSTEnglish",
+            "basName": "CLST Radboud University",
+            "type": "ASR",
+            "termsURL": "https://clarin.phonetik.uni-muenchen.de/Bas/BasLSTRadboutUniDisclaimer.txt",
+            "dataStoragePolicy": "User data are not stored, see terms",
+            "homepageURL": "https://webservices-lst.science.ru.nl/portal/",
+            "logoURL": "assets/img/asr/RUlogoA5plusCLSTENG.jpg",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          },
+          {
+            "provider": "Web",
+            "basName": "WebASR Sheffield University",
+            "type": "ASR",
+            "termsURL": "http://www.webasr.org/conditions",
+            "dataStoragePolicy": "User data are stored for improvement of service (completeley anonymised)",
+            "homepageURL": "http://www.webasr.org/",
+            "logoURL": "assets/img/asr/webASRLogo.png",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          },
+          {
+            "provider": "BAS",
+            "type": "Others",
+            "termsURL": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/help/termsOfUsage#termsofusage",
+            "dataStoragePolicy": "User data are stored for 24h remotely. Additionally the results are stored in the user's browser until the data are deleted.",
+            "homepageURL": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/interface",
+            "logoURL": "assets/img/asr/BASLogo.jpg",
+            "host": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/"
+          }
+        ],
+        "asrInfoURL": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/views/partials/ASR.html",
+        "asrQuotaInfoURL": "https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/runASRGetQuota",
+        "basConfigURL": "https://clarin.phonetik.uni-muenchen.de/apps/octra/BASWebservicesJSON.php"
+      }
+    },
+    "allowed_browsers": [
+      {
+        "name": "Chrome",
+        "version": ""
+      },
+      {
+        "name": "Firefox",
+        "version": ""
+      },
+      {
+        "name": "Opera",
+        "version": ""
+      },
+      {
+        "name": "Microsoft Edge",
+        "version": ""
+      }
+    ],
+    "languages": ["en", "de", "nl", "it", "ko", "zh"],
+    "audioExamples": [
+      {
+        "language": "de",
+        "url": "http://localhost:5321/media/Bahnauskunft.wav",
+        "description": "Individuelle Beschreibung der Audiosequenz"
+      },
+      {
+        "language": "en",
+        "url": "http://localhost:5321/media/Bahnauskunft.wav",
+        "description": "Description for the audio sequence"
+      }
+    ],
+    "tracking": {
+      "active": "",
+      "matomo": {
+        "host": "https://stats.clarin.eu/",
+        "siteID": 30
+      }
+    },
+    "inactivityNotice": {
+      "showAfter": 60
+    },
+    "maintenanceNotification": {
+      "active": "inactive",
+      "apiURL": "https://clarin.phonetik.uni-muenchen.de/admin/public/api/availability/next_outage.php"
+    }
+  }
+}

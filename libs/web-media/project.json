@@ -1,7 +1,7 @@
 {
   "name": "web-media",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "web-media/src",
+  "sourceRoot": "libs/web-media/src",
   "projectType": "library",
   "targets": {
     "build": {

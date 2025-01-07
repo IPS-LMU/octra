@@ -3,9 +3,9 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { catchError, exhaustMap, map, of } from 'rxjs';
-import { APIActions } from './api.actions';
-import { RootState } from '../index';
 import { environment } from '../../../../environments/environment';
+import { RootState } from '../index';
+import { APIActions } from './api.actions';
 
 @Injectable()
 export class APIEffects {

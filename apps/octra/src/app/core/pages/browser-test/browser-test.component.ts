@@ -1,12 +1,14 @@
+import { NgStyle } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { CompatibilityService } from '../../shared/service/compatibility.service';
+import { Router, RouterLink } from '@angular/router';
 import { BrowserInfo } from '@octra/web-media';
+import { CompatibilityService } from '../../shared/service/compatibility.service';
 
 @Component({
   selector: 'octra-browser-test',
   templateUrl: './browser-test.component.html',
   styleUrls: ['./browser-test.component.scss'],
+  imports: [NgStyle, RouterLink],
 })
 export class BrowserTestComponent {
   public get browserName(): string {

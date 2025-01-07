@@ -1,7 +1,7 @@
 import { getProperties } from '@octra/utilities';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AudioFormat } from './audio/AudioFormats';
 import { AudioInfo } from './audio/audio-info';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 export async function readFileContents<T>(
   file: File,

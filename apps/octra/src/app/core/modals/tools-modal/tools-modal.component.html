@@ -175,14 +175,12 @@
         <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
           <td></td>
           <td colspan="4" style="padding-left: 20px">
-            <div
-              class="alert alert-warning my-3"
-            >
+            <div class="alert alert-warning my-3">
               {{
                 'tools.cut audio.warning wav'
                   | transloco
                     : {
-                      sampleRate:
+                        sampleRate:
                           audio.audioManager.resource.info.audioBufferInfo
                             .sampleRate
                       }

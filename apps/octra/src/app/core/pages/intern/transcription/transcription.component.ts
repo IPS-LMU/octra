@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { hasProperty } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
 import { editorComponents } from '../../../../editors/components';
@@ -33,6 +33,8 @@ import { ProjectSettings } from '../../../obj/Settings';
 
 import { LoadeditorDirective } from '../../../shared/directive/loadeditor.directive';
 
+import { AsyncPipe, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AnnotJSONConverter, Converter } from '@octra/annotation';
 import {
@@ -43,6 +45,7 @@ import {
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { AppInfo } from '../../../../app.info';
+import { FastbarComponent } from '../../../component';
 import { DefaultComponent } from '../../../component/default.component';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
@@ -65,6 +68,14 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.scss'],
+  imports: [
+    NgClass,
+    AsyncPipe,
+    TranslocoPipe,
+    FastbarComponent,
+    FormsModule,
+    LoadeditorDirective,
+  ],
 })
 export class TranscriptionComponent
   extends DefaultComponent
@@ -463,7 +474,6 @@ export class TranscriptionComponent
         }
       },
     });
-
 
     this.annotationStoreService.overwriteTidyUpAnnotation();
 

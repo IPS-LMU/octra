@@ -1,5 +1,6 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { SubscriberComponent } from './components';
 import {
   CapitalLetterPipe,
   FileSizePipe,
@@ -10,10 +11,11 @@ import {
   TimespanPipe,
   UnixDurationPipe,
 } from './pipes';
-import { SubscriberComponent } from './components';
 
 @NgModule({
-  declarations: [
+  declarations: [],
+  imports: [
+    CommonModule,
     TimespanPipe,
     LeadingNullPipe,
     ProcentPipe,
@@ -24,7 +26,6 @@ import { SubscriberComponent } from './components';
     SubscriberComponent,
     FileSizePipe,
   ],
-  imports: [CommonModule],
   exports: [
     TimespanPipe,
     LeadingNullPipe,

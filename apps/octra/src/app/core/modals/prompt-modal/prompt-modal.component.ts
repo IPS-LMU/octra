@@ -1,22 +1,25 @@
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
 } from '@angular/core';
-import { SettingsService } from '../../shared/service';
-import { OctraModal } from '../types';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbActiveModal,
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
+import { SettingsService } from '../../shared/service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-prompt-modal',
   templateUrl: './prompt-modal.component.html',
   styleUrls: ['./prompt-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslocoPipe, AsyncPipe],
 })
 export class PromptModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

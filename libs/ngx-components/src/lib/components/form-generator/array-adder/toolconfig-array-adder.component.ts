@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -5,6 +6,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
@@ -16,6 +18,7 @@ export class PreparedItem {
   selector: 'octra-toolconfig-array-adder',
   templateUrl: './toolconfig-array-adder.component.html',
   styleUrls: ['./toolconfig-array-adder.component.scss'],
+  imports: [FormsModule, NgbPopover, NgClass],
 })
 export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   @Input() items: any[] = [];

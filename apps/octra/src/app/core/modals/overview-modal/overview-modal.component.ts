@@ -1,3 +1,4 @@
+import { AsyncPipe, NgClass } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -7,23 +8,32 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
-import { SettingsService, UserInteractionsService } from '../../shared/service';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { LoginMode } from '../../store';
-import { OctraModal } from '../types';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbActiveModal,
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { TranscrOverviewComponent } from '../../component/transcr-overview';
+import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
+import { SettingsService, UserInteractionsService } from '../../shared/service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
 import { ShortcutService } from '../../shared/service/shortcut.service';
+import { LoginMode } from '../../store';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
+  imports: [
+    TranslocoPipe,
+    NgClass,
+    TranscrOverviewComponent,
+    TranscriptionFeedbackComponent,
+    AsyncPipe,
+  ],
 })
 export class OverviewModalComponent
   extends OctraModal

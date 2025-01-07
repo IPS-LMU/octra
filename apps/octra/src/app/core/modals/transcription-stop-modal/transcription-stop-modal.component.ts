@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../component/default.component';
 
@@ -12,6 +13,7 @@ export enum TranscriptionStopModalAnswer {
   selector: 'octra-transcription-stop-modal',
   templateUrl: './transcription-stop-modal.component.html',
   styleUrls: ['./transcription-stop-modal.component.scss'],
+  imports: [TranslocoPipe],
 })
 export class TranscriptionStopModalComponent extends DefaultComponent {
   @ViewChild('modal', { static: true }) modal: any;

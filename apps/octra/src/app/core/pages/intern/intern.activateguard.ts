@@ -1,13 +1,13 @@
+import { inject } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivateFn,
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { inject } from '@angular/core';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { AppInfo } from '../../../app.info';
 import { navigateTo } from '@octra/ngx-utilities';
+import { AppInfo } from '../../../app.info';
+import { AppStorageService } from '../../shared/service/appstorage.service';
 
 export const AUTHENTICATED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,

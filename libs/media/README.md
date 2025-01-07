@@ -7,23 +7,25 @@ If you are looking for decoding and playback of audio files see @octra/web-media
 
 ### ESM, CJS, TS definitions & UMD (optional)
 
-````shell
+```shell
 npm install --save @octra/media
-````
+```
 
 ### UMD Bundle (for Vanilla JS)
 
 You have two options to install this package und use it as UMD:
 
 a) Install via NPM and reference local files (no internet connection needed om production).
-````html
-<script type="application/javascript" src="node_modules/@octra/media/index.umd.js"></script>
-````
 
-b) Reference remote file  (internet connection needed on production).
-````html
+```html
+<script type="application/javascript" src="node_modules/@octra/media/index.umd.js"></script>
+```
+
+b) Reference remote file (internet connection needed on production).
+
+```html
 <script type="application/javascript" src="https://unpkg.com/@octra/media/index.umd.js"></script>
-````
+```
 
 [See full example here](https://github.com/IPS-LMU/octra/blob/main/apps/web-components-demo/index.html)
 
@@ -35,11 +37,11 @@ b) Reference remote file  (internet connection needed on production).
 
 Import the classes and functions from `@octra/media`. For example
 
-````typescript
-import {SampleUnit} from "@octra/media";
+```typescript
+import { SampleUnit } from '@octra/media';
 
 const unit = new SampleUnit(123123, 22100);
-````
+```
 
 #### UMD Bundle
 

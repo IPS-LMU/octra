@@ -1,3 +1,3 @@
+export * from './audio-file';
 export * from './audio-selection';
 export * from './audio-time';
-export * from './audio-file';

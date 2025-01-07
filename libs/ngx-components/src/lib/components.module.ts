@@ -5,18 +5,20 @@ import {
 } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AudioplayerComponent } from './components/audio/audioplayer';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioViewerComponent } from './components/audio/audio-viewer';
+import { AudioplayerComponent } from './components/audio/audioplayer';
 
 @NgModule({
-  declarations: [AudioplayerComponent, AudioViewerComponent],
+  declarations: [],
   exports: [AudioplayerComponent, AudioViewerComponent],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     OctraUtilitiesModule,
+    AudioplayerComponent,
+    AudioViewerComponent,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })

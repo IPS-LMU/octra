@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
-import { UserActions } from './user.actions';
-import { UserState } from './index';
 import { IDBActions } from '../idb/idb.actions';
+import { UserState } from './index';
+import { UserActions } from './user.actions';
 
 export const initialState: UserState = {
   name: '',

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { LoginMode, RootState } from '../index';
 import { Store } from '@ngrx/store';
-import { ApplicationActions } from './application.actions';
 import { SubscriptionManager } from '@octra/utilities';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
+import { LoginMode, RootState } from '../index';
+import { ApplicationActions } from './application.actions';
 
 @Injectable({
   providedIn: 'root',

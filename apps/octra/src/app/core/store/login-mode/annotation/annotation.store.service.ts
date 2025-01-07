@@ -136,6 +136,32 @@ export class AnnotationStoreService {
     return this._transcriptValid;
   }
 
+  private _guidelines?: OctraGuidelines;
+
+  get guidelines(): OctraGuidelines | undefined {
+    return this._guidelines;
+  }
+  private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
+
+  get currentLevel():
+    | OctraAnnotationAnyLevel<OctraAnnotationSegment>
+    | undefined {
+    return this._currentLevel;
+  }
+  private _currentLevelIndex = 0;
+
+  get currentLevelIndex(): number {
+    return this._currentLevelIndex;
+  }
+
+  currentLevel$ = this.store.select((state: RootState) => {
+    const transcriptState = getModeState(state)?.transcript;
+    if (transcriptState) {
+      return transcriptState.currentLevel;
+    }
+    return undefined;
+  });
+
   task$ = this.store.select(
     (state: RootState) => getModeState(state)?.currentSession?.task
   );
@@ -156,21 +182,6 @@ export class AnnotationStoreService {
     return result;
   });
 
-  currentLevel$ = this.store.select((state: RootState) => {
-    const transcriptState = getModeState(state)?.transcript;
-    if (transcriptState) {
-      return transcriptState.currentLevel;
-    }
-    return undefined;
-  });
-  private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
-
-  get currentLevel():
-    | OctraAnnotationAnyLevel<OctraAnnotationSegment>
-    | undefined {
-    return this._currentLevel;
-  }
-
   currentLevelIndex$ = this.store.select((state: RootState) => {
     const transcriptState = getModeState(state)?.transcript;
     if (transcriptState) {
@@ -178,11 +189,6 @@ export class AnnotationStoreService {
     }
     return 0;
   });
-  private _currentLevelIndex = 0;
-
-  get currentLevelIndex(): number {
-    return this._currentLevelIndex;
-  }
 
   transcript$ = this.store.select(
     (state: RootState) => getModeState(state)?.transcript
@@ -192,54 +198,7 @@ export class AnnotationStoreService {
   );
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   private _task?: TaskDto;
-
-  transcriptString$ = this.transcript$.pipe(
-    map((transcript) => {
-      if (transcript) {
-        const annotation = transcript.serialize(
-          this.audio.audioManager.resource.name,
-          this.audio.audioManager.resource.info.sampleRate,
-          this.audio.audioManager.resource.info.duration.clone()
-        );
-
-        const result = new TextConverter().export(
-          annotation,
-          this.audio.audioManager.resource.getOAudioFile(),
-          transcript.selectedLevelIndex!
-        )!.file!;
-
-        return result.content;
-      }
-      return '';
-    })
-  );
-
-  guidelines$ = this.store.select(
-    (state: RootState) => getModeState(state)?.guidelines
-  );
-  private _guidelines?: OctraGuidelines;
-
-  get guidelines(): OctraGuidelines | undefined {
-    return this._guidelines;
-  }
-
-  feedback$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession.assessment
-  );
   private _feedback: any; // TODO check feedback
-
-  breakMarker$ = this.store.select((state: RootState) =>
-    getModeState(state)?.guidelines?.selected?.json?.markers?.find(
-      (a) => a.type === 'break'
-    )
-  );
-
-  importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(
-    undefined
-  );
-  importConverter$ = new BehaviorSubject<string>(
-    undefined
-  );
 
   public set comment(value: string | undefined) {
     this.changeComment(value ?? '');
@@ -318,6 +277,46 @@ export class AnnotationStoreService {
       })
       .subscribe(this.importConverter$);
   }
+
+  transcriptString$ = this.transcript$.pipe(
+    map((transcript) => {
+      if (transcript) {
+        const annotation = transcript.serialize(
+          this.audio.audioManager.resource.name,
+          this.audio.audioManager.resource.info.sampleRate,
+          this.audio.audioManager.resource.info.duration.clone()
+        );
+
+        const result = new TextConverter().export(
+          annotation,
+          this.audio.audioManager.resource.getOAudioFile(),
+          transcript.selectedLevelIndex!
+        )!.file!;
+
+        return result.content;
+      }
+      return '';
+    })
+  );
+
+  guidelines$ = this.store.select(
+    (state: RootState) => getModeState(state)?.guidelines
+  );
+
+  feedback$ = this.store.select(
+    (state: RootState) => getModeState(state)?.currentSession.assessment
+  );
+
+  breakMarker$ = this.store.select((state: RootState) =>
+    getModeState(state)?.guidelines?.selected?.json?.markers?.find(
+      (a) => a.type === 'break'
+    )
+  );
+
+  importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(
+    undefined
+  );
+  importConverter$ = new BehaviorSubject<string>(undefined);
 
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
     this.store.dispatch(
@@ -975,7 +974,8 @@ export class AnnotationStoreService {
 
       // make sure there is only one speaker label for each unit if exists
       if (
-        this.importOptions$.value && this.importConverter$.value === "SRT" &&
+        this.importOptions$.value &&
+        this.importConverter$.value === 'SRT' &&
         this.importOptions$.value['SRT']?.speakerIdentifierPattern
       ) {
         const pattern =

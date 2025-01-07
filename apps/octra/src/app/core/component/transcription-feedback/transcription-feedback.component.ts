@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import {
   Component,
   Input,
@@ -6,17 +7,18 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslocoService } from '@jsverse/transloco';
+import { FormsModule, NgForm } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { getProperties } from '@octra/utilities';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { getProperties } from '@octra/utilities';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcription-feedback',
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.scss'],
+  imports: [AsyncPipe, FormsModule, TranslocoPipe],
 })
 export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
   @Input() feedbackData = {};

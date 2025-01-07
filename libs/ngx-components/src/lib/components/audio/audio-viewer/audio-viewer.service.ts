@@ -1,8 +1,4 @@
 import { EventEmitter, Injectable, Renderer2 } from '@angular/core';
-import { PlayCursor } from '../../../obj/play-cursor';
-import { AudioviewerConfig } from './audio-viewer.config';
-import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
 import {
   AnnotationAnySegment,
   AnnotationLevelType,
@@ -21,9 +17,9 @@ import {
   OItem,
   OLabel,
 } from '@octra/annotation';
-import { Subject, timer } from 'rxjs';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { MultiThreadingService } from '../../../multi-threading.service';
+import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { TimespanPipe } from '@octra/ngx-utilities';
+import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
 import {
   AudioChunk,
   AudioManager,
@@ -32,9 +28,13 @@ import {
   ShortcutManager,
 } from '@octra/web-media';
 import Konva from 'konva';
-import { TimespanPipe } from '@octra/ngx-utilities';
+import { Subject, timer } from 'rxjs';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { MultiThreadingService } from '../../../multi-threading.service';
 import { Position, Size } from '../../../obj';
+import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioViewerShortcutEvent } from './audio-viewer.component';
+import { AudioviewerConfig } from './audio-viewer.config';
 import Vector2d = Konva.Vector2d;
 import Group = Konva.Group;
 import Layer = Konva.Layer;
@@ -498,7 +498,7 @@ export class AudioViewerService {
           const oldLeft = oldLevel.getLeftSibling(
             getIndexOfSegmentID(oldLevel, change!.item!.old!.id!)
           )! as OctraAnnotationSegment;
-          if(oldLeft) {
+          if (oldLeft) {
             checkNeighbours(oldLeft);
           }
         }
@@ -3803,7 +3803,12 @@ export class AudioViewerService {
     changeTranscript?: (transcript: string) => string
   ) {
     if (this.annotation?.currentLevel) {
-      this.annotation?.removeItemByIndex(index, silenceCode, mergeTranscripts, changeTranscript);
+      this.annotation?.removeItemByIndex(
+        index,
+        silenceCode,
+        mergeTranscripts,
+        changeTranscript
+      );
       if (triggerChange) {
         this.currentLevelChange.emit({
           type: 'remove',

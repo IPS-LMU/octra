@@ -1,4 +1,4 @@
-import { ServiceProvider, ASRSettings } from '../../obj';
+import { ASRSettings, ServiceProvider } from '../../obj';
 
 export interface ASRStateSettings {
   selectedServiceProvider?: ServiceProvider;

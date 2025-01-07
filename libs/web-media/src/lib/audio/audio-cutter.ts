@@ -310,7 +310,7 @@ export class AudioCutter {
           } else {
             const wavWriter = new WavWriter();
             promises2.push(
-              ...selectedChannels.map(( i) =>
+              ...selectedChannels.map((i) =>
                 wavWriter.writeAsync([channelData![i]], sampleRate)
               )
             );

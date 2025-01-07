@@ -1,2 +1,2 @@
-export * from './objects';
 export * from './functions';
+export * from './objects';

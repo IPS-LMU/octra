@@ -58,7 +58,7 @@ export function downloadFile<T>(
     next: (event: any) => {
       if (event.type === HttpEventType.DownloadProgress) {
         subj.next({
-          progress: event.total ? event.loaded / event.total : 0
+          progress: event.total ? event.loaded / event.total : 0,
         });
       } else if (event instanceof HttpResponse) {
         subj.next({

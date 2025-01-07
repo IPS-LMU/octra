@@ -1,11 +1,18 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { TranslocoPipe } from '@jsverse/transloco';
+import {
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 import { SubscriptionManager } from '@octra/utilities';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'octra-permutations-replace',
   templateUrl: './permutations-replace-modal.component.html',
   styleUrls: ['./permutations-replace-modal.component.scss'],
+  imports: [TranslocoPipe, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu],
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
   public visible = false;

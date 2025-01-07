@@ -1,3 +1,4 @@
+import { NgStyle } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -15,7 +16,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { OctraAnnotationSegment } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { SampleUnit } from '@octra/media';
@@ -58,6 +59,12 @@ declare let document: any;
   styleUrls: ['./transcr-editor.component.scss'],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    ValidationPopoverComponent,
+    NgStyle,
+    TranslocoPipe,
+    NgxJoditComponent,
+  ],
 })
 export class TranscrEditorComponent
   extends DefaultComponent

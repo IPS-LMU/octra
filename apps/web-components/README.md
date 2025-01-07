@@ -5,6 +5,7 @@ This library offers the same components from @octra/ngx-components without the l
 ## Installation
 
 ### Vanilla JS (plain Javascript)
+
 Currently, the libraries are not published on npm because Octra 2.0 and the libraries are still in development. If you
 want to use the libraries in your project you have to manually install.
 
@@ -17,13 +18,13 @@ git checkout static
 
 3. Add to HTML file ([see full example here](../../../apps/web-components-demo/index.html)).
 
-````html
-    <head>
-        <!-- ... -->
-        <script type="application/javascript" src="../octra/libs/web-components/web-components.js"></script>
-        <!-- ... -->
-    </head>
-````
+```html
+<head>
+  <!-- ... -->
+  <script type="application/javascript" src="../octra/libs/web-components/web-components.js"></script>
+  <!-- ... -->
+</head>
+```
 
 ## Update
 

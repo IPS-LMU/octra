@@ -1,10 +1,4 @@
 import { ActionCreator, on, ReducerTypes } from '@ngrx/store';
-import { LoginMode } from '../../index';
-import { AnnotationActions } from './annotation.actions';
-import { IDBActions } from '../../idb/idb.actions';
-import { IIDBModeOptions } from '../../../shared/octra-database';
-import { getProperties } from '@octra/utilities';
-import { SampleUnit } from '@octra/media';
 import {
   AnnotationLevelType,
   ASRContext,
@@ -14,9 +8,15 @@ import {
   OctraAnnotationSegmentLevel,
   OLabel,
 } from '@octra/annotation';
-import { AnnotationState } from './index';
-import { LoginModeActions } from '../login-mode.actions';
+import { SampleUnit } from '@octra/media';
+import { getProperties } from '@octra/utilities';
+import { IIDBModeOptions } from '../../../shared/octra-database';
 import { AuthenticationActions } from '../../authentication';
+import { IDBActions } from '../../idb/idb.actions';
+import { LoginMode } from '../../index';
+import { LoginModeActions } from '../login-mode.actions';
+import { AnnotationActions } from './annotation.actions';
+import { AnnotationState } from './index';
 
 export const initialState: AnnotationState = {
   transcript: new OctraAnnotation<

@@ -1,5 +1,5 @@
-import {Subject} from 'rxjs';
-import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
+import { Subject } from 'rxjs';
+import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
 
 /**
  * Inline web worker that runs jobs asynchronously.

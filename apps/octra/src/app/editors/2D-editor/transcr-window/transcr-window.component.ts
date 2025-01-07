@@ -16,14 +16,13 @@ import {
 import { getProperties } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../../core/component';
 
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
-  AlertService,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../../core/shared/service';
-import { AppStorageService } from '../../../core/shared/service/appstorage.service';
-import { AudioSelection, SampleUnit } from '@octra/media';
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
   addSegment,
   ASRContext,
@@ -32,17 +31,12 @@ import {
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
 } from '@octra/annotation';
+import { OctraGuidelines } from '@octra/assets';
+import { AudioSelection, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
   AudioViewerShortcutEvent,
 } from '@octra/ngx-components';
-import { timer } from 'rxjs';
-import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
-import { DefaultComponent } from '../../../core/component/default.component';
-import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
-import { AnnotationStoreService } from '../../../core/store/login-mode/annotation/annotation.store.service';
-import { OctraGuidelines } from '@octra/assets';
-import { ASRProcessStatus } from '../../../core/store/asr';
 import {
   AudioChunk,
   AudioManager,
@@ -51,16 +45,40 @@ import {
   ShortcutGroup,
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
+import { timer } from 'rxjs';
+import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
+import { DefaultComponent } from '../../../core/component/default.component';
+import { NavbarService } from '../../../core/component/navbar/navbar.service';
+import {
+  AlertService,
+  AudioService,
+  SettingsService,
+  UserInteractionsService,
+} from '../../../core/shared/service';
+import { AppStorageService } from '../../../core/shared/service/appstorage.service';
 import { ShortcutService } from '../../../core/shared/service/shortcut.service';
 import { ApplicationStoreService } from '../../../core/store/application/application-store.service';
-import { TranslocoService } from '@jsverse/transloco';
-import { NavbarService } from '../../../core/component/navbar/navbar.service';
+import { ASRProcessStatus } from '../../../core/store/asr';
+import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
+import { AnnotationStoreService } from '../../../core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-transcr-window',
   templateUrl: './transcr-window.component.html',
   styleUrls: ['./transcr-window.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    NgStyle,
+    AsyncPipe,
+    TranslocoPipe,
+    AudioNavigationComponent,
+    AudioViewerComponent,
+    TranscrEditorComponent,
+    NgClass,
+    NgbDropdownToggle,
+    NgbDropdown,
+    NgbDropdownMenu,
+  ],
 })
 export class TranscrWindowComponent
   extends DefaultComponent
@@ -362,7 +380,7 @@ export class TranscrWindowComponent
   }
 
   public doDirectionAction = async (direction: string) => {
-    if(!this._loading) {
+    if (!this._loading) {
       this._loading = true;
       this.cd.markForCheck();
       this.cd.detectChanges();
@@ -391,7 +409,7 @@ export class TranscrWindowComponent
             const currentLevel = this.annotationStoreService.currentLevel;
             const segment = currentLevel!.items[
               this.segmentIndex
-              ] as OctraAnnotationSegment;
+            ] as OctraAnnotationSegment;
 
             if (!segment?.context?.asr?.isBlockedBy) {
               await this.audiochunk.startPlayback();

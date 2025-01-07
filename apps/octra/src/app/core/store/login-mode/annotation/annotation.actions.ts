@@ -1,5 +1,4 @@
 import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
-import { LoginMode } from '../../index';
 import {
   AnnotationAnySegment,
   AnnotationLevelType,
@@ -10,13 +9,14 @@ import {
   OEvent,
   OItem,
 } from '@octra/annotation';
-import { ILog } from '../../../obj/Settings/logging';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
-import { ProjectSettings } from '../../../obj';
-import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
 import { SampleUnit } from '@octra/media';
-import { GuidelinesItem } from './index';
+import { ProjectSettings } from '../../../obj';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
+import { ILog } from '../../../obj/Settings/logging';
+import { ASRQueueItemType, ASRTimeInterval } from '../../asr';
+import { LoginMode } from '../../index';
+import { GuidelinesItem } from './index';
 
 export class AnnotationActions {
   static loadAudio = createActionGroup({

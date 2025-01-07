@@ -1,6 +1,14 @@
+import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NgStyle } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { TranslocoPipe } from '@jsverse/transloco';
+import {
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
   ASRContext,
   OctraAnnotation,
@@ -8,6 +16,7 @@ import {
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
 } from '@octra/annotation';
+import { ClipTextPipe } from '../../shared/clip-text.pipe';
 
 export interface ColumnDefinition {
   type: string;
@@ -30,6 +39,17 @@ export interface ColumnFormat {
   templateUrl: './table-configurator.component.html',
   styleUrls: ['./table-configurator.component.scss'],
   providers: [],
+  imports: [
+    TranslocoPipe,
+    FormsModule,
+    NgStyle,
+    CdkDropList,
+    ClipTextPipe,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    CdkDrag,
+  ],
 })
 export class TableConfiguratorComponent implements OnInit {
   @Input() columns: {

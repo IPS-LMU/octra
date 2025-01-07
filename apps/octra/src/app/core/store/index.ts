@@ -1,8 +1,8 @@
-import { AuthenticationState } from './authentication';
 import { ApplicationState } from './application';
 import { ASRState } from './asr';
-import { UserState } from './user';
+import { AuthenticationState } from './authentication';
 import { AnnotationState } from './login-mode/annotation';
+import { UserState } from './user';
 
 export enum LoginMode {
   URL = 'url',

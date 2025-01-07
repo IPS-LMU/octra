@@ -11,7 +11,7 @@ import {
 import {
   BASWebservicesApplication,
   EMUWebAppApplication,
-  OctraApplication
+  OctraApplication,
 } from './SupportedApplications';
 
 export class AnnotJSONConverter extends Converter {

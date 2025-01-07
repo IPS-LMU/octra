@@ -1,13 +1,16 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { interval } from 'rxjs';
-import { NavbarService } from '../../../component/navbar/navbar.service';
 import { DefaultComponent } from '../../../component/default.component';
+import { NavbarService } from '../../../component/navbar/navbar.service';
 
 @Component({
   selector: 'octra-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
+  imports: [TranslocoPipe, NgOptimizedImage],
 })
 export class AuthComponent extends DefaultComponent implements OnInit {
   private _secondsToClose = 10;

@@ -67,7 +67,6 @@ export class AudioInfo extends FileInfo {
   }
 }
 
-
 /**
  * calculates the channel data factor by a given sample rate. The channel data factor is needed for reducing channel data to draw audio signal
  * @param sampleRate
@@ -86,9 +85,10 @@ export function calculateChannelDataFactor(sampleRate: number) {
   return factor;
 }
 
-export function normalizeMimeType(type: string){
+export function normalizeMimeType(type: string) {
   switch (type) {
-    case "video/ogg": return "audio/ogg";
+    case 'video/ogg':
+      return 'audio/ogg';
   }
 
   return type;

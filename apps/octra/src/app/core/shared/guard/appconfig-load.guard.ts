@@ -1,13 +1,13 @@
+import { inject } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivateFn,
   RouterStateSnapshot,
 } from '@angular/router';
-import { inject } from '@angular/core';
-import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { map, take } from 'rxjs';
-import { RoutingService } from '../service/routing.service';
 import { AppInfo } from '../../../app.info';
+import { ApplicationStoreService } from '../../store/application/application-store.service';
+import { RoutingService } from '../service/routing.service';
 
 export const CONFIG_LOADED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,

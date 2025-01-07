@@ -1,3 +1,4 @@
+import { NgStyle } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -5,6 +6,8 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
   AnnotationLevelType,
@@ -17,6 +20,7 @@ import {
   OSegmentLevel,
 } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
+import { ProcentPipe } from '@octra/ngx-utilities';
 import { contains, escapeRegex, FileSize, getFileSize } from '@octra/utilities';
 import { AudioManager, readFile } from '@octra/web-media';
 import { timer } from 'rxjs';
@@ -34,6 +38,7 @@ import { DropZoneComponent } from '../drop-zone';
   selector: 'octra-dropzone',
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.scss'],
+  imports: [DropZoneComponent, NgbPopover, ProcentPipe, NgStyle, TranslocoPipe],
 })
 export class OctraDropzoneComponent extends DefaultComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
@@ -512,7 +517,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
     this.store.dispatch(
       LoginModeActions.setImportConverter.do({
         mode: LoginMode.LOCAL,
-        importConverter: fileProgress.converter.name
+        importConverter: fileProgress.converter.name,
       })
     );
     this.store.dispatch(

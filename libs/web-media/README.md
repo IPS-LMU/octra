@@ -6,23 +6,25 @@ This library offers classes and functions for handling audio files in web browse
 
 ### ESM, CJS, TS definitions & UMD (optional)
 
-````shell
+```shell
 npm install --save @octra/web-media
-````
+```
 
 ### UMD Bundle (for Vanilla JS)
 
 You have two options to install this package und use it as UMD:
 
 a) Install via NPM and reference local files (no internet connection needed om production).
-````html
-<script type="application/javascript" src="node_modules/@octra/web-media/index.js"></script>
-````
 
-b) Reference remote file  (internet connection needed on production).
-````html
+```html
+<script type="application/javascript" src="node_modules/@octra/web-media/index.js"></script>
+```
+
+b) Reference remote file (internet connection needed on production).
+
+```html
 <script type="application/javascript" src="https://unpkg.com/@octra/web-media/index.umd.js"></script>
-````
+```
 
 [See full example here](https://github.com/IPS-LMU/octra/blob/main/apps/web-components-demo/index.html)
 
@@ -34,11 +36,11 @@ b) Reference remote file  (internet connection needed on production).
 
 Import the classes and functions from `@octra/web-media`. For example
 
-````typescript
-import {SampleUnit} from "@octra/web-media";
+```typescript
+import { SampleUnit } from '@octra/web-media';
 
 const unit = new SampleUnit(123123, 22100);
-````
+```
 
 #### UMD Bundle
 

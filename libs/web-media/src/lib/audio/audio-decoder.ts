@@ -1,8 +1,12 @@
-import { AudioInfo, calculateChannelDataFactor } from './audio-info';
-import { SubscriptionManager } from '@octra/utilities';
-import { Subject, timer } from 'rxjs';
 import { SampleUnit } from '@octra/media';
-import { TsWorker, TsWorkerJob, TsWorkerStatus } from '@octra/utilities';
+import {
+  SubscriptionManager,
+  TsWorker,
+  TsWorkerJob,
+  TsWorkerStatus,
+} from '@octra/utilities';
+import { Subject, timer } from 'rxjs';
+import { AudioInfo, calculateChannelDataFactor } from './audio-info';
 import { AudioFormat, IntArray, WavFormat } from './AudioFormats';
 
 declare let window: unknown;

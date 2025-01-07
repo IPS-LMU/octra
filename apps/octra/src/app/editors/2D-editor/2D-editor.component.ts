@@ -12,6 +12,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
+import { NgStyle } from '@angular/common';
 import {
   ASRContext,
   ASRQueueItemType,
@@ -56,6 +57,12 @@ import { TranscrWindowComponent } from './transcr-window';
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.scss'],
+  imports: [
+    TranscrWindowComponent,
+    AudioNavigationComponent,
+    AudioViewerComponent,
+    NgStyle,
+  ],
 })
 export class TwoDEditorComponent
   extends OCTRAEditor
@@ -542,8 +549,9 @@ export class TwoDEditorComponent
 
     this.subscribe(this.annotationStoreService.importOptions$, {
       next: (importOptions) => {
-        if (importOptions && Object.keys(importOptions).includes("SRT")) {
-          this.viewer.settings.speakerPattern = importOptions["SRT"]["speakerIdentifierPattern"];
+        if (importOptions && Object.keys(importOptions).includes('SRT')) {
+          this.viewer.settings.speakerPattern =
+            importOptions['SRT']['speakerIdentifierPattern'];
         }
       },
     });

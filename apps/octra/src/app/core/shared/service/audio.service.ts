@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { SubscriptionManager } from '@octra/utilities';
-import { downloadFile } from '@octra/ngx-utilities';
-import { Subject, Subscription } from 'rxjs';
 import { TaskInputOutputDto } from '@octra/api-types';
+import { downloadFile } from '@octra/ngx-utilities';
+import { SubscriptionManager } from '@octra/utilities';
 import { AudioManager } from '@octra/web-media';
+import { Subject, Subscription } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AudioService {
   public missingPermission = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager<Subscription> =

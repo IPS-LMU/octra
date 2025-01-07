@@ -15,19 +15,18 @@
       {{ i18n.introduction }}
     </p>
     @if (sendStatus === 'error') {
-    <div [innerHTML]="i18n.error" class="alert alert-danger bugsent">
-    </div>
+    <div [innerHTML]="i18n.error" class="alert alert-danger bugsent"></div>
     } @else if (sendStatus === 'success') {
     <div class="alert alert-success bugsent">
       {{ i18n.bugReportSent }}
     </div>
     } @else if (sendStatus === 'sending') {
-      <div class="alert alert-info bugsent">
-        {{ i18n.sending }}
-      </div>
+    <div class="alert alert-info bugsent">
+      {{ i18n.sending }}
+    </div>
     }
 
-    <form #form=ngForm>
+    <form #form="ngForm">
       @if (showSenderFields) {
       <div class="row">
         <div class="col-6">
@@ -58,9 +57,7 @@
               [required]="true"
               placeholder="email@example.com"
             />
-            <label for="inputEmail" class="form-label">{{
-              i18n.eMail
-            }}</label>
+            <label for="inputEmail" class="form-label">{{ i18n.eMail }}</label>
           </div>
         </div>
       </div>
@@ -68,7 +65,7 @@
       <div class="row">
         <div class="col-12">
           <div class="d-block mb-3">
-            <label for="bgDescr">{{i18n.description}}:</label>
+            <label for="bgDescr">{{ i18n.description }}:</label>
             <ngx-jodit
               [(ngModel)]="bgdescr"
               [options]="joditOptions"
@@ -178,7 +175,12 @@
     </button>
     <button
       (click)="sendBugReport()"
-      [disabled]="!form.valid || !isvalid || sendStatus === 'sending' || sendStatus === 'success'"
+      [disabled]="
+        !form.valid ||
+        !isvalid ||
+        sendStatus === 'sending' ||
+        sendStatus === 'success'
+      "
       class="btn btn-primary"
       type="button"
     >

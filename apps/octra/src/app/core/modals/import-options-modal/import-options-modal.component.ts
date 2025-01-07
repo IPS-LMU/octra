@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { OctraModal } from '../types';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { TranslocoService } from '@jsverse/transloco';
 import { Converter } from '@octra/annotation';
+import { ToolConfiguratorComponent } from '@octra/ngx-components';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-import-options-modal',
   templateUrl: './import-options-modal.component.html',
   styleUrls: ['./import-options-modal.component.scss'],
+  imports: [TranslocoPipe, ToolConfiguratorComponent],
 })
 export class ImportOptionsModalComponent extends OctraModal implements OnInit {
   public static options: NgbModalOptions = {

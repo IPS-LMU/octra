@@ -1,15 +1,15 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { navigateTo } from '@octra/ngx-utilities';
+import { FileSize, getFileSize } from '@octra/utilities';
 import { AppInfo } from '../../../../app.info';
+import { OctraDropzoneComponent } from '../../../component/octra-dropzone/octra-dropzone.component';
+import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
 import { SessionFile } from '../../../obj/SessionFile';
 import { AudioService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
-import { OctraDropzoneComponent } from '../../../component/octra-dropzone/octra-dropzone.component';
-import { FileSize, getFileSize } from '@octra/utilities';
-import { navigateTo } from '@octra/ngx-utilities';
-import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { AuthenticationStoreService } from '../../../store/authentication';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
@@ -17,6 +17,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.scss'],
+  imports: [TranslocoPipe, OctraDropzoneComponent],
 })
 export class ReloadFileComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;

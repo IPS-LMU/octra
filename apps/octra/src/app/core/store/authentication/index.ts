@@ -1,9 +1,9 @@
 import { AccountLoginMethod, AuthDtoMe } from '@octra/api-types';
 
-export * from './authentication.actions';
-export * from './authentication.reducer';
-export * from './authentication.effects';
 export * from './authentication-store.service';
+export * from './authentication.actions';
+export * from './authentication.effects';
+export * from './authentication.reducer';
 
 export interface AuthenticationState {
   serverOnline?: boolean;

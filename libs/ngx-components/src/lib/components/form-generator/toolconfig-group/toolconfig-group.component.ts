@@ -1,11 +1,24 @@
+import { NgClass, NgStyle } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ConfigurationControlGroup } from '../tool-configurator.component';
+import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { QuestionMarkComponent } from '../../question-mark/question-mark.component';
+import { ToolConfigArrayAdderComponent } from '../array-adder/toolconfig-array-adder.component';
+import { ConfigurationControlGroup } from '../tool-configurator.component';
 
 @Component({
   selector: 'octra-toolconfig-group',
   templateUrl: './toolconfig-group.component.html',
   styleUrls: ['./toolconfig-group.component.scss'],
+  imports: [
+    QuestionMarkComponent,
+    NgStyle,
+    FormsModule,
+    NgClass,
+    TranslocoPipe,
+    ToolConfigArrayAdderComponent,
+  ],
 })
 export class ToolconfigGroupComponent extends SubscriberComponent {
   @Input() group?: ConfigurationControlGroup;

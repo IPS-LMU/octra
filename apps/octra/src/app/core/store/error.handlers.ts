@@ -1,7 +1,7 @@
 import { Action, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { AuthenticationActions } from './authentication';
 import { ApplicationActions } from './application/application.actions';
+import { AuthenticationActions } from './authentication';
 
 export interface ActionError {
   statusCode?: number;

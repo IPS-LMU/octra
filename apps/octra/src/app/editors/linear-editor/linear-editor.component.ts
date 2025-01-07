@@ -12,6 +12,32 @@ import {
   TranscrEditorConfig,
 } from '../../core/component';
 
+import { NgClass, NgStyle } from '@angular/common';
+import { TranslocoPipe } from '@jsverse/transloco';
+import {
+  ASRContext,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+  OctraAnnotationSegmentLevel,
+} from '@octra/annotation';
+import { AudioSelection, SampleUnit } from '@octra/media';
+import {
+  AudioViewerComponent,
+  AudioviewerConfig,
+  AudioViewerShortcutEvent,
+  CurrentLevelChangeEvent,
+} from '@octra/ngx-components';
+import {
+  AudioChunk,
+  AudioManager,
+  BrowserInfo,
+  Shortcut,
+  ShortcutGroup,
+} from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
+import { timer } from 'rxjs';
+import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { SampleInterval } from '../../core/obj/Settings/logging';
 import {
   AlertService,
   AlertType,
@@ -20,38 +46,22 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import {
-  AudioViewerComponent,
-  AudioviewerConfig,
-  AudioViewerShortcutEvent,
-  CurrentLevelChangeEvent,
-} from '@octra/ngx-components';
-import { AudioSelection, SampleUnit } from '@octra/media';
-import { timer } from 'rxjs';
-import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import {
-  ASRContext,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-} from '@octra/annotation';
-import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import {
-  AudioChunk,
-  AudioManager,
-  BrowserInfo,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
-import { HotkeysEvent } from 'hotkeys-js';
-import { SampleInterval } from '../../core/obj/Settings/logging';
+import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
+import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 
 @Component({
   selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.scss'],
+  imports: [
+    AudioViewerComponent,
+    AudioNavigationComponent,
+    TranscrEditorComponent,
+    NgClass,
+    NgStyle,
+    TranslocoPipe,
+  ],
 })
 export class LinearEditorComponent
   extends OCTRAEditor

@@ -1,4 +1,8 @@
-import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 
 export class NgbModalWrapper<T> extends NgbModalRef {
   override get componentInstance(): T {

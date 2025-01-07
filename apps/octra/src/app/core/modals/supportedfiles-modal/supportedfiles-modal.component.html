@@ -19,7 +19,11 @@
         <tr>
           <td>
             *{{ extension.extension }} @if(extension.extension === ".wav") {
-            <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            <i
+              class="bi bi-patch-check-fill text-success recommended"
+              [ngbPopover]="'g.recommended' | transloco"
+              triggers="mouseenter:mouseleave"
+            ></i>
             }
           </td>
           <td>max. {{ extension.maxFileSize | filesize }}</td>
@@ -36,15 +40,14 @@
 
     <table class="table table-sm table-striped">
       <thead>
-      <tr>
-        <th>Extension</th>
-        <th>Name</th>
-        <th>Supported applications</th>
-      </tr>
+        <tr>
+          <th>Extension</th>
+          <th>Name</th>
+          <th>Supported applications</th>
+        </tr>
       </thead>
       <tbody>
-        @for (elem of converters; track elem) { @if
-        (elem.conversion.import) {
+        @for (elem of converters; track elem) { @if (elem.conversion.import) {
         <tr>
           <td>
             @for (ext of elem.extensions; track ext;) { *{{ ext }}
@@ -60,11 +63,19 @@
               app.application.name
             }}</a>
             @if (app.recommended) {
-              <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            <i
+              class="bi bi-patch-check-fill text-success recommended"
+              [ngbPopover]="'g.recommended' | transloco"
+              triggers="mouseenter:mouseleave"
+            ></i>
             } } @else {
             <span>{{ app.application.name }}</span>
             @if (app.recommended) {
-              <i class="bi bi-patch-check-fill text-success recommended" [ngbPopover]="'g.recommended' | transloco" triggers="mouseenter:mouseleave"></i>
+            <i
+              class="bi bi-patch-check-fill text-success recommended"
+              [ngbPopover]="'g.recommended' | transloco"
+              triggers="mouseenter:mouseleave"
+            ></i>
             } } @if($index < elem.applications.length - 1) {
             <span>, </span>
             } }

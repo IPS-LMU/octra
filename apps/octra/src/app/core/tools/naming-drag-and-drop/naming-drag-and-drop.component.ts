@@ -1,5 +1,6 @@
+import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NgClass } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -7,13 +8,11 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { Subject } from 'rxjs';
-import { OctraAnnotationSegment, OEvent, OItem } from '@octra/annotation';
-import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { DefaultComponent } from '../../component/default.component';
-import { NgbDropdownItem, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { NgClass } from '@angular/common';
+import { NgbDropdownItem, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { OctraAnnotationSegment, OEvent, OItem } from '@octra/annotation';
+import { Subject } from 'rxjs';
+import { DefaultComponent } from '../../component/default.component';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',

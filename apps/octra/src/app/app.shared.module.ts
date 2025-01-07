@@ -1,41 +1,31 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TranscriptionFeedbackComponent } from './core/component/transcription-feedback/transcription-feedback.component';
-import { ClipTextPipe } from './core/shared/clip-text.pipe';
-import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 import {
   NgbDropdownModule,
   NgbPopoverModule,
   NgbToast,
 } from '@ng-bootstrap/ng-bootstrap';
-import { RouterModule } from '@angular/router';
-import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
+import { OctraComponentsModule } from '@octra/ngx-components';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
+import { NgxJoditComponent } from 'ngx-jodit';
 import {
   AlertComponent,
   DropZoneComponent,
   TranscrEditorComponent,
 } from './core/component';
-import { AsrOptionsComponent, OctraComponentsModule } from '@octra/ngx-components';
-import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { SignupComponent } from './core/component/authentication-component/signup/signup.component';
-import { TranslocoModule } from '@jsverse/transloco';
-import { TranscrOverviewComponent } from './core/component/transcr-overview';
-import { NgxJoditComponent } from 'ngx-jodit';
+import { OctraDropzoneComponent } from './core/component/octra-dropzone/octra-dropzone.component';
 import { ValidationPopoverComponent } from './core/component/transcr-editor/validation-popover/validation-popover.component';
+import { TranscrOverviewComponent } from './core/component/transcr-overview';
+import { TranscriptionFeedbackComponent } from './core/component/transcription-feedback/transcription-feedback.component';
+import { ClipTextPipe } from './core/shared/clip-text.pipe';
 
 @NgModule({
-  declarations: [
-    TranscriptionFeedbackComponent,
-    ClipTextPipe,
-    OctraDropzoneComponent,
-    DropZoneComponent,
-    AlertComponent,
-    SignupComponent,
-    TranscrOverviewComponent,
-    TranscrEditorComponent,
-    ValidationPopoverComponent,
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     FormsModule,
@@ -48,6 +38,15 @@ import { ValidationPopoverComponent } from './core/component/transcr-editor/vali
     TranslocoModule,
     NgbToast,
     NgxJoditComponent,
+    TranscriptionFeedbackComponent,
+    ClipTextPipe,
+    OctraDropzoneComponent,
+    DropZoneComponent,
+    AlertComponent,
+    SignupComponent,
+    TranscrOverviewComponent,
+    TranscrEditorComponent,
+    ValidationPopoverComponent,
   ],
   exports: [
     TranscriptionFeedbackComponent,

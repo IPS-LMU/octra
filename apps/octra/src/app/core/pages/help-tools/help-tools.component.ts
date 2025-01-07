@@ -1,15 +1,17 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AppStorageService } from '../../shared/service/appstorage.service';
-import { DefaultComponent } from '../../component/default.component';
-import { getBaseHrefURL, joinURL } from '@octra/utilities';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { IDBService } from '../../shared/service/idb.service';
+import { RouterLink } from '@angular/router';
+import { getBaseHrefURL, joinURL } from '@octra/utilities';
+import { DefaultComponent } from '../../component/default.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
+import { IDBService } from '../../shared/service/idb.service';
 
 @Component({
   selector: 'octra-help-tools',
   templateUrl: './help-tools.component.html',
   styleUrls: ['./help-tools.component.scss'],
+  imports: [RouterLink],
 })
 export class HelpToolsComponent extends DefaultComponent {
   @ViewChild('canvas', { static: false }) canvas!: ElementRef;

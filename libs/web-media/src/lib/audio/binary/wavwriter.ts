@@ -5,9 +5,9 @@
  * Extracted: 2024-11-04
  */
 
-import { WavFileFormat } from './wavformat';
-import { BinaryByteWriter } from './BinaryWriter';
 import { TsWorker, TsWorkerJob } from '@octra/utilities';
+import { BinaryByteWriter } from './BinaryWriter';
+import { WavFileFormat } from './wavformat';
 
 export enum SampleSize {
   INT16 = 16,

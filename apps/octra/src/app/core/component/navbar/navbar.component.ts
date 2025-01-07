@@ -1,14 +1,26 @@
+import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
-import { NgbModalRef, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import {
+  NgbCollapse,
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+  NgbModalRef,
+  NgbOffcanvas,
+  NgbPopover,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
   AnnotationLevelType,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
+import { AsrOptionsComponent } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import { DateTime } from 'luxon';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
@@ -49,6 +61,22 @@ declare const BUILD: {
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
+  imports: [
+    NgbPopover,
+    NgbCollapse,
+    RouterLinkActive,
+    RouterLink,
+    TranslocoPipe,
+    NgClass,
+    NgStyle,
+    NgbDropdown,
+    AsyncPipe,
+    AsrOptionsComponent,
+    UpperCasePipe,
+    TimespanPipe,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+  ],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {
   modalexport?: NgbModalRef;

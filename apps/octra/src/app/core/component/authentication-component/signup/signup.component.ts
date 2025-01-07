@@ -1,4 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   AccountPersonGender,
   COUNTRYSTATES,
@@ -6,10 +9,8 @@ import {
   PolicyListItemDto,
   TIMEZONE_NAMES,
 } from '@octra/api-types';
-import { HttpErrorResponse } from '@angular/common/http';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../default.component';
-import { TranslocoService } from '@jsverse/transloco';
 
 export class PreparedPolicyListItemDto extends PolicyListItemDto {
   checked = false;
@@ -24,6 +25,7 @@ export class PreparedPolicyListItemDto extends PolicyListItemDto {
   selector: 'octra-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
+  imports: [TranslocoPipe, FormsModule],
 })
 export class SignupComponent extends DefaultComponent implements OnInit {
   protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;

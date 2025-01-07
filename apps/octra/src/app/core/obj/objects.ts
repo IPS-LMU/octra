@@ -1,7 +1,7 @@
 import { Converter } from '@octra/annotation';
 
 export interface FileProgress {
-  status: 'progress' | 'valid' | 'invalid' | "waiting";
+  status: 'progress' | 'valid' | 'invalid' | 'waiting';
   name: string;
   type: string;
   size: number;

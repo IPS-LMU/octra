@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
-import { OctraModal } from '../types';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { OctraModal } from '../types';
 
 @Component({
   selector: 'octra-waiting-modal',
   templateUrl: './waiting-modal.component.html',
   styleUrls: ['./waiting-modal.component.scss'],
+  imports: [TranslocoPipe],
 })
 export class WaitingModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

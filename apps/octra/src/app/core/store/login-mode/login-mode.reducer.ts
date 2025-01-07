@@ -334,7 +334,7 @@ export class LoginModeReducers {
               ...state,
               importConverter,
               currentSession: {
-                ...state.currentSession
+                ...state.currentSession,
               },
             };
           }

@@ -1,10 +1,18 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { HttpErrorResponse } from '@angular/common/http';
+import { joinURL } from '@octra/utilities';
+import {
+  AudioManager,
+  getBaseHrefURL,
+  normalizeMimeType,
+  popupCenter,
+} from '@octra/web-media';
 import { SessionStorageService } from 'ngx-webstorage';
-import { TranslocoService } from '@jsverse/transloco';
 import {
   catchError,
   exhaustMap,
@@ -15,30 +23,22 @@ import {
   tap,
   withLatestFrom,
 } from 'rxjs';
-import { AuthenticationActions } from './authentication.actions';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { LoginMode, RootState } from '../index';
-import { OctraModalService } from '../../modals/octra-modal.service';
-import { RoutingService } from '../../shared/service/routing.service';
+import { AppInfo } from '../../../app.info';
 import { ErrorModalComponent } from '../../modals/error-modal/error-modal.component';
-import { LoginModeActions } from '../login-mode/login-mode.actions';
+import { OctraModalService } from '../../modals/octra-modal.service';
 import {
   ModalDeleteAnswer,
   TranscriptionDeleteModalComponent,
 } from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import { AppInfo } from '../../../app.info';
 import { SessionFile } from '../../obj/SessionFile';
-import { joinURL } from '@octra/utilities';
-import { checkAndThrowError } from '../error.handlers';
 import { AlertService } from '../../shared/service';
-import {
-  AudioManager,
-  getBaseHrefURL,
-  normalizeMimeType,
-  popupCenter,
-} from '@octra/web-media';
+import { RoutingService } from '../../shared/service/routing.service';
 import { ApplicationActions } from '../application/application.actions';
+import { checkAndThrowError } from '../error.handlers';
 import { IDBActions } from '../idb/idb.actions';
+import { LoginMode, RootState } from '../index';
+import { LoginModeActions } from '../login-mode/login-mode.actions';
+import { AuthenticationActions } from './authentication.actions';
 
 @Injectable()
 export class AuthenticationEffects {

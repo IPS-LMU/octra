@@ -1,13 +1,15 @@
+import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppStorageService } from '../../shared/service/appstorage.service';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
+import { AppStorageService } from '../../shared/service/appstorage.service';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 
 @Component({
   selector: 'octra-fastbar',
   templateUrl: './taskbar.component.html',
   styleUrls: ['./taskbar.component.scss'],
+  imports: [NgClass],
 })
 export class FastbarComponent {
   @Input() responsive = false;
@@ -30,10 +32,13 @@ export class FastbarComponent {
 
   openHelpModal() {
     this.appStoreService.setShortcutsEnabled(false);
-    this.modalService.openModal(HelpModalComponent, HelpModalComponent.options).then(() => {
-      this.appStoreService.setShortcutsEnabled(true);
-    }).catch(()=> {
-      this.appStoreService.setShortcutsEnabled(true);
-    })
+    this.modalService
+      .openModal(HelpModalComponent, HelpModalComponent.options)
+      .then(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      })
+      .catch(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      });
   }
 }

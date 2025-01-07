@@ -1,19 +1,27 @@
+import { NgClass } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AudioService, UserInteractionsService } from '../../shared/service';
-import { AppInfo } from '../../../app.info';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { timer } from 'rxjs';
+import { TranslocoPipe } from '@jsverse/transloco';
+import {
+  NgbActiveModal,
+  NgbModalOptions,
+  NgbPopover,
+  NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
+import { Converter, ExportResult } from '@octra/annotation';
 import {
   fadeInExpandOnEnterAnimation,
   fadeOutCollapseOnLeaveAnimation,
 } from 'angular-animations';
+import { timer } from 'rxjs';
+import { AppInfo } from '../../../app.info';
+import { NavbarService } from '../../component/navbar/navbar.service';
+import { AudioService, UserInteractionsService } from '../../shared/service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
-import { NavbarService } from '../../component/navbar/navbar.service';
 import { OctraModal } from '../types';
-import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
-import { Converter, ExportResult } from '@octra/annotation';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -22,6 +30,14 @@ import { Converter, ExportResult } from '@octra/annotation';
   animations: [
     fadeInExpandOnEnterAnimation(),
     fadeOutCollapseOnLeaveAnimation(),
+  ],
+  imports: [
+    TranslocoPipe,
+    NgClass,
+    NgbPopover,
+    NgbTooltip,
+    FormsModule,
+    TableConfiguratorComponent,
   ],
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {

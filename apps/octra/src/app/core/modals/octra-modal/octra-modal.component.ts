@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { hasProperty } from '@octra/utilities';
 import { AppInfo } from '../../../app.info';
 import { DefaultComponent } from '../../component/default.component';

@@ -1,15 +1,18 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { OctraAPIService } from '@octra/ngx-octra-api';
 import { Subject } from 'rxjs';
 import { AppInfo } from '../../../app.info';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
-import { OctraAPIService } from '@octra/ngx-octra-api';
 
 @Component({
   selector: 'octra-about-modal',
   templateUrl: './about-modal.component.html',
   styleUrls: ['./about-modal.component.scss'],
+  imports: [TranslocoPipe, NgOptimizedImage],
 })
 export class AboutModalComponent extends OctraModal implements OnDestroy {
   public static options: NgbModalOptions = {

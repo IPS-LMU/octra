@@ -24,7 +24,7 @@ export interface ASRSettings {
   asrQuotaInfoURL?: string;
 }
 
-export interface ASROptionsTranslations{
+export interface ASROptionsTranslations {
   header?: string;
   asrLanguage?: string;
   mausLanguage?: string;

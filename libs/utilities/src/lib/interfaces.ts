@@ -5,7 +5,10 @@ export interface Serializable<S, T> {
 }
 
 export abstract class SerializableClass<S, T> {
-  static deserializable<S, T>(jsonObject: S, sampleRate: number): T | undefined {
+  static deserializable<S, T>(
+    jsonObject: S,
+    sampleRate: number
+  ): T | undefined {
     throw new Error('not implemented');
   }
 }

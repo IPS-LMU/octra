@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import hotkeys, { HotkeysEvent } from 'hotkeys-js';
 import { Shortcut, ShortcutGroup } from '@octra/web-media';
+import hotkeys, { HotkeysEvent } from 'hotkeys-js';
 
 @Injectable({
   providedIn: 'root',

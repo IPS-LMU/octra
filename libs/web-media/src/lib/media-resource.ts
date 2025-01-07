@@ -1,4 +1,4 @@
-import {SourceType} from './types';
+import { SourceType } from './types';
 
 /***
  * this class represents a media file

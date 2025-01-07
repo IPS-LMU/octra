@@ -10,7 +10,11 @@ import {
   ImportResult,
   OctraAnnotationFormatType,
 } from './Converter';
-import { BASWebservicesApplication, ELANApplication, OctraApplication } from './SupportedApplications';
+import {
+  BASWebservicesApplication,
+  ELANApplication,
+  OctraApplication,
+} from './SupportedApplications';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';
@@ -23,11 +27,11 @@ export class ELANConverter extends Converter {
         recommended: true,
       },
       {
-        application: new OctraApplication()
+        application: new OctraApplication(),
       },
       {
-        application: new BASWebservicesApplication()
-      }
+        application: new BASWebservicesApplication(),
+      },
     ];
     this._extensions = ['.eaf'];
     this._conversion.export = true;

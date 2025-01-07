@@ -18,7 +18,6 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@angular/*": ["node_modules/@angular/*"],
       "@octra/annotation": ["libs/annotation/src/index.ts"],
       "@octra/assets": ["libs/assets/src/index.ts"],
       "@octra/json-sets": ["libs/json-sets/src/index.ts"],
@@ -26,8 +25,7 @@
       "@octra/ngx-components": ["libs/ngx-components/src/index.ts"],
       "@octra/ngx-utilities": ["libs/ngx-utilities/src/index.ts"],
       "@octra/utilities": ["libs/utilities/src/index.ts"],
-      "@octra/web-media": ["libs/web-media/src/index.ts"],
-      "music-metadata-remastered": ["node_modules/music-metadata-remastered"]
+      "@octra/web-media": ["libs/web-media/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "doc"]

@@ -1,3 +1,4 @@
+import { NgStyle } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -8,14 +9,16 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { SettingsService } from '../../shared/service';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NavbarService } from '../../component/navbar/navbar.service';
+import { SettingsService } from '../../shared/service';
 
 @Component({
   selector: 'octra-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslocoPipe, NgStyle],
 })
 export class NewsComponent implements OnInit, OnChanges {
   @Input() url = '';

@@ -1,6 +1,6 @@
-import { ISegment, OItem, OLabel, OSegment } from './annotjson';
 import { SampleUnit } from '@octra/media';
 import { Serializable } from '@octra/utilities';
+import { ISegment, OItem, OLabel, OSegment } from './annotjson';
 import { ASRQueueItemType } from './asr';
 
 export interface SegmentWithContext<T extends ASRContext> {

@@ -5,10 +5,12 @@ model. Here you can also find all Annotation converters used by [Octra](https://
 
 ## Installation
 
-1. Install @octra/ngx-components with dependencies 
-````shell
-npm install --save @octra/ngx-components 
-````
+1. Install @octra/ngx-components with dependencies
+
+```shell
+npm install --save @octra/ngx-components
+```
+
 2. Add OctraComponentsModule to imports of your app.module.
 
 ### Changelog

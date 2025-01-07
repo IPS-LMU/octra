@@ -1,10 +1,10 @@
-import Dexie, { Transaction } from 'dexie';
-import 'dexie-export-import';
 import { IAnnotJSON } from '@octra/annotation';
-import { LoginMode } from '../store';
-import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
 import { ProjectDto } from '@octra/api-types';
 import { removeEmptyProperties } from '@octra/utilities';
+import Dexie, { Transaction } from 'dexie';
+import 'dexie-export-import';
+import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
+import { LoginMode } from '../store';
 import { ASRStateSettings } from '../store/asr';
 
 export class OctraDatabase extends Dexie {

@@ -15,12 +15,15 @@
         "main": "apps/octra/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/octra/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
         "allowedCommonJsDependencies": [
           "jodit-angular",
           "ajv",
           "x2js",
           "konva",
-          "platform"
+          "platform",
+          "music-metadata",
+          "video.js"
         ],
         "assets": [
           "apps/octra/src/assets",
@@ -43,8 +46,6 @@
       },
       "configurations": {
         "production": {
-          "optimization": true,
-          "buildOptimizer": true,
           "budgets": [
             {
               "type": "initial",
@@ -66,7 +67,6 @@
           "outputHashing": "all"
         },
         "beta": {
-          "buildOptimizer": true,
           "optimization": true,
           "budgets": [
             {
@@ -89,7 +89,6 @@
           "outputHashing": "all"
         },
         "beta-dev": {
-          "buildOptimizer": true,
           "optimization": true,
           "sourceMap": true,
           "budgets": [
@@ -113,12 +112,10 @@
           "outputHashing": "none"
         },
         "development": {
-          "buildOptimizer": false,
-          "optimization": false,
-          "vendorChunk": true,
-          "extractLicenses": false,
+          "optimization": true,
+          "extractLicenses": true,
           "sourceMap": true,
-          "namedChunks": true,
+          "namedChunks": false,
           "fileReplacements": [
             {
               "replace": "apps/octra/src/environments/environment.ts",
@@ -128,9 +125,7 @@
         },
         "public-development": {
           "outputHashing": "none",
-          "buildOptimizer": false,
           "optimization": false,
-          "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true,
@@ -165,8 +160,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "executor": "@nx/eslint:lint"
     },
     "test": {
       "executor": "@nx/jest:jest",

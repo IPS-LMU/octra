@@ -1,5 +1,5 @@
-import { AudioFormat } from './audio-format';
 import { parseBlob } from 'music-metadata';
+import { AudioFormat } from './audio-format';
 
 export class MusicMetadataFormat extends AudioFormat {
   protected override _decoder: 'web-audio' | 'octra' = 'web-audio';
@@ -49,7 +49,8 @@ export class MusicMetadataFormat extends AudioFormat {
       );
     } else {
       const numberOfSamples =
-        format.numberOfSamples ?? Math.ceil(format.duration! * format.sampleRate);
+        format.numberOfSamples ??
+        Math.ceil(format.duration! * format.sampleRate);
       this._sampleRate = format.sampleRate;
       this._duration = {
         samples: numberOfSamples,

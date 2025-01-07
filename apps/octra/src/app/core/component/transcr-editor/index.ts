@@ -1,2 +1,2 @@
-export * from './transcr-editor.component';
 export * from './config';
+export * from './transcr-editor.component';

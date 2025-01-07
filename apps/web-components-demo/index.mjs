@@ -4,12 +4,12 @@ let annotation = undefined;
 
 function initAudioPlayer(audioManager) {
   // <oc-audioplayer> is a web component from web-components library
-  audioplayer = document.createElement("octra-audioplayer");
+  audioplayer = document.createElement('octra-audioplayer');
   // connect audiochunk with audioplayer
   audioplayer.audioChunk = audioManager.mainchunk;
 
   // add audio player to DOM
-  const wrapper = document.getElementById("audioplayer-wrapper");
+  const wrapper = document.getElementById('audioplayer-wrapper');
   wrapper.appendChild(audioplayer);
 }
 
@@ -22,23 +22,28 @@ function initAudioViewer(audioManager) {
     size: audioManager.resource.info.size,
     sampleRate: audioManager.resource.info.sampleRate,
     duration: audioManager.resource.info.duration.samples,
-    type: audioManager.resource.info.type
+    type: audioManager.resource.info.type,
   };
 
-  const importResult = new OctraAnnotation.AnnotJSONConverter().import({
-    name: "Bahnauskunft_annot.json",
-    content: annotationSample,
-    type: "application/json",
-    encoding: "utf-8"
-  }, oAudioFile);
+  const importResult = new OctraAnnotation.AnnotJSONConverter().import(
+    {
+      name: 'Bahnauskunft_annot.json',
+      content: annotationSample,
+      type: 'application/json',
+      encoding: 'utf-8',
+    },
+    oAudioFile
+  );
 
   // retrieve first level object from importResult
-  const annotation = OctraAnnotation.OctraAnnotation.deserialize(importResult.annotjson);
+  const annotation = OctraAnnotation.OctraAnnotation.deserialize(
+    importResult.annotjson
+  );
   annotation.changeCurrentLevelIndex(0);
 
   // <octra-audioplayer> is a web component from web-components library
-  audioViewer = document.createElement("octra-audioviewer");
-  const wrapper = document.getElementById("audioviewer-wrapper");
+  audioViewer = document.createElement('octra-audioviewer');
+  const wrapper = document.getElementById('audioviewer-wrapper');
   wrapper.appendChild(audioViewer);
 
   // first set audiochunk before applying any settings
@@ -46,38 +51,38 @@ function initAudioViewer(audioManager) {
   audioViewer.audioChunk = audioManager.mainchunk;
 
   // settings
-  audioViewer.style.height = "600px";
+  audioViewer.style.height = '600px';
   audioViewer.refreshOnInternChanges = true;
   audioViewer.isMultiLine = true;
-  audioViewer.breakMarker = "<P>";
+  audioViewer.breakMarker = '<P>';
   audioViewer.settings.showTranscripts = true;
   audioViewer.settings.scrollbar.enabled = true;
   audioViewer.enableShortcuts();
 
   // events
-  audioViewer.addEventListener("entriesChange", (event) => {
+  audioViewer.addEventListener('entriesChange', (event) => {
     const segments = event.detail;
     // annotation.levels[0] is referenced in audioviewer, so it the changes are automatically available.
   });
-
 }
 
 async function main() {
   // download audio file
-  const downloadedBlob = await OctraWebMedia.downloadFile("../../apps/octra/src/media/Bahnauskunft.wav", "blob");
-  const file = new File(
-    [downloadedBlob],
-    "Bahnauskunft.wav",
-    {
-      type: "audio/wave"
-    }
+  const downloadedBlob = await OctraWebMedia.downloadFile(
+    '../../apps/octra/src/media/Bahnauskunft.wav',
+    'blob'
   );
+  const file = new File([downloadedBlob], 'Bahnauskunft.wav', {
+    type: 'audio/wave',
+  });
 
   // read arraybuffer
-  const arrayBuffer = await OctraWebMedia.readFileContents(file, "arraybuffer");
-  OctraWebMedia.AudioManager.create(file.name, file.type, arrayBuffer, [new OctraWebMedia.WavFormat()]).subscribe({
+  const arrayBuffer = await OctraWebMedia.readFileContents(file, 'arraybuffer');
+  OctraWebMedia.AudioManager.create(file.name, file.type, arrayBuffer, [
+    new OctraWebMedia.WavFormat(),
+  ]).subscribe({
     next: (status) => {
-      console.log(status)
+      console.log(status);
 
       if (status.progress === 1) {
         // audio was decoded, init audioplayer and audioviewer
@@ -89,46 +94,46 @@ async function main() {
           next: (event) => {
             console.log(`Audio status change!`);
             console.log(event);
-          }
-        })
+          },
+        });
       }
-    }
+    },
   });
 
   window.playAudioPlayer = function play() {
     if (!audioplayer) {
-      alert("Audio noch nicht geladen!");
+      alert('Audio noch nicht geladen!');
     } else {
       audioplayer.audioChunk.startPlayback();
     }
-  }
+  };
 
   window.pauseAudioPlayer = function pause() {
     if (!audioplayer) {
-      alert("Audio noch nicht geladen!");
+      alert('Audio noch nicht geladen!');
     } else {
       audioplayer.audioChunk.pausePlayback();
     }
-  }
+  };
 
   window.playAudioViewer = function play() {
     if (!audioViewer) {
-      alert("Audio noch nicht geladen!");
+      alert('Audio noch nicht geladen!');
     } else {
       audioViewer.audioChunk.startPlayback();
     }
-  }
+  };
 
   window.pauseAudioViewer = function pause() {
     if (!audioViewer) {
-      alert("Audio noch nicht geladen!");
+      alert('Audio noch nicht geladen!');
     } else {
       audioViewer.audioChunk.pausePlayback();
     }
-  }
+  };
 }
 
-window.addEventListener("load", main);
+window.addEventListener('load', main);
 
 const annotationSample = `{
   "name": "Bahnauskunft",
@@ -2964,4 +2969,3 @@ const annotationSample = `{
   "links": [],
   "sampleRate": 22050
 }`;
-

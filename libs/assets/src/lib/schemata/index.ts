@@ -6,5 +6,5 @@ export * from './projectconfig.schema';
 
 export const IO_SETS = {
   inputs: io.inputs,
-  outputs: io.outputs
+  outputs: io.outputs,
 };

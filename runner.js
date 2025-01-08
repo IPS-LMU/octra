@@ -256,13 +256,13 @@ async function setBuildVariable() {
 
   let hash = crypto.randomUUID();
 
-  content = content.replace(/(var BUILD =)([^;]*)(;)/gs, (g0, g1, g2, g3) => {
-    const build = JSON.parse(g2);
+  content = content.replace(/(\/\*)\s*(var BUILD =)([^;]*)(;)\s?(\*\/)\s*/gs, (g0, g1, g2, g3, g4) => {
+    const build = JSON.parse(g3);
     build.version = pkg.version;
     build.timestamp = new Date().toISOString();
     build.hash = hash;
 
-    return `${g1} ${JSON.stringify(build)}${g3}`;
+    return `${g2} ${JSON.stringify(build)}${g4}`;
   });
 
   await fs.writeFile('./dist/apps/octra/index.html', content, {

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.0.0](https://github.com/IPS-LMU/octra/compare/media-0.1.1...media-1.0.0) (2025-01-13)
+
+
+### Features
+
+* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
+
+
+
 ## [0.1.1](https://github.com/IPS-LMU/octra/compare/media-0.1.0...media-0.1.1) (2024-12-03)
 
 ### Bug Fixes

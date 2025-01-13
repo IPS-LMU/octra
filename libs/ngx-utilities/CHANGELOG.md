@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.0.0](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.4.2...ngx-utilities-1.0.0) (2025-01-13)
+
+
+### Features
+
+* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
+
+
+
 ## [0.4.2](https://github.com/IPS-LMU/octra/compare/ngx-utilities-0.4.1...ngx-utilities-0.4.2) (2024-11-18)
 
 ### Features

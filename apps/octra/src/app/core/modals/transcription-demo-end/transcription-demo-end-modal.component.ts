@@ -1,4 +1,3 @@
-import { NgOptimizedImage } from '@angular/common';
 import { Component, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -19,7 +18,7 @@ export enum ModalEndAnswer {
   selector: 'octra-transcription-demo-end-modal',
   templateUrl: './transcription-demo-end-modal.component.html',
   styleUrls: ['./transcription-demo-end-modal.component.scss'],
-  imports: [TranslocoPipe, NgOptimizedImage],
+  imports: [TranslocoPipe],
 })
 export class TranscriptionDemoEndModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

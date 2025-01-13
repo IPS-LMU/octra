@@ -36,6 +36,7 @@ import { AudioSelection, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
   AudioViewerShortcutEvent,
+  OctraComponentsModule,
 } from '@octra/ngx-components';
 import {
   AudioChunk,
@@ -47,8 +48,10 @@ import {
 import { HotkeysEvent } from 'hotkeys-js';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
+import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../../core/component/audio-navigation/audio-navigation.component';
 import { DefaultComponent } from '../../../core/component/default.component';
 import { NavbarService } from '../../../core/component/navbar/navbar.service';
+import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../../core/component/transcr-editor/transcr-editor.component';
 import {
   AlertService,
   AudioService,
@@ -69,15 +72,15 @@ import { AnnotationStoreService } from '../../../core/store/login-mode/annotatio
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgStyle,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    AudioNavigationComponent_1,
+    OctraComponentsModule,
+    TranscrEditorComponent_1,
+    NgClass,
     AsyncPipe,
     TranslocoPipe,
-    AudioNavigationComponent,
-    AudioViewerComponent,
-    TranscrEditorComponent,
-    NgClass,
-    NgbDropdownToggle,
-    NgbDropdown,
-    NgbDropdownMenu,
   ],
 })
 export class TranscrWindowComponent

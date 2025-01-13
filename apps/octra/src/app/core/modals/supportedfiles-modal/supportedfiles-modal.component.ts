@@ -7,7 +7,7 @@ import {
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Converter } from '@octra/annotation';
-import { FileSizePipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioFormat } from '@octra/web-media';
 import { AppInfo } from '../../../app.info';
 import { OctraModal } from '../types';
@@ -16,7 +16,7 @@ import { OctraModal } from '../types';
   selector: 'octra-supportedfiles-modal',
   templateUrl: './supportedfiles-modal.component.html',
   styleUrls: ['./supportedfiles-modal.component.scss'],
-  imports: [TranslocoPipe, NgbPopover, FileSizePipe, NgbTooltip],
+  imports: [NgbPopover, NgbTooltip, TranslocoPipe, OctraUtilitiesModule],
 })
 export class SupportedFilesModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

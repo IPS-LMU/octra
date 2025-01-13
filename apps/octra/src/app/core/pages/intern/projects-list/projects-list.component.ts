@@ -22,7 +22,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
-  imports: [AsyncPipe, TranslocoPipe, NgClass],
+  imports: [NgClass, AsyncPipe, TranslocoPipe],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects?: ProjectListDto;

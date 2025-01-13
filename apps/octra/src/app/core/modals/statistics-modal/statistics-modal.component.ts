@@ -13,7 +13,7 @@ import { OctraModal } from '../types';
   selector: 'octra-statistics-modal',
   templateUrl: './statistics-modal.component.html',
   styleUrls: ['./statistics-modal.component.scss'],
-  imports: [TranslocoPipe, AsyncPipe, DatePipe],
+  imports: [AsyncPipe, DatePipe, TranslocoPipe],
 })
 export class StatisticsModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

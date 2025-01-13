@@ -11,7 +11,7 @@ import { OctraModal } from '../types';
   selector: 'octra-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
   styleUrls: ['./shortcuts-modal.component.scss'],
-  imports: [TranslocoPipe, ShortcutComponent],
+  imports: [ShortcutComponent, TranslocoPipe],
 })
 export class ShortcutsModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

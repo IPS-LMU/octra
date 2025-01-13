@@ -1,8 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-  name: 'cliptext',
-})
+@Pipe({ name: 'cliptext' })
 export class ClipTextPipe implements PipeTransform {
   transform(value: string, ...args: any[]): any {
     if (value.length > 30) {

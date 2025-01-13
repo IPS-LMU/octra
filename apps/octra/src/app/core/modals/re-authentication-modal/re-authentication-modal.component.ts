@@ -16,7 +16,7 @@ import { AuthenticationStoreService } from '../../store/authentication';
   selector: 'octra-re-authentication-modal',
   templateUrl: './re-authentication-modal.component.html',
   styleUrls: ['./re-authentication-modal.component.scss'],
-  imports: [TranslocoPipe, AuthenticationComponent],
+  imports: [AuthenticationComponent, TranslocoPipe],
 })
 export class ReAuthenticationModalComponent
   extends DefaultComponent

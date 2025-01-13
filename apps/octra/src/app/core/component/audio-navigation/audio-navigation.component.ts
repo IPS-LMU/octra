@@ -14,7 +14,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PlayBackStatus } from '@octra/media';
-import { ProcentPipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioChunk } from '@octra/web-media';
 import { DefaultComponent } from '../default.component';
 
@@ -50,7 +50,7 @@ export interface Buttons {
   templateUrl: './audio-navigation.component.html',
   styleUrls: ['./audio-navigation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoPipe, NgClass, FormsModule, ProcentPipe],
+  imports: [NgClass, FormsModule, TranslocoPipe, OctraUtilitiesModule],
 })
 export class AudioNavigationComponent
   extends DefaultComponent

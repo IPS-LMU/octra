@@ -62,8 +62,8 @@ declare let document: any;
   imports: [
     ValidationPopoverComponent,
     NgStyle,
-    TranslocoPipe,
     NgxJoditComponent,
+    TranslocoPipe,
   ],
 })
 export class TranscrEditorComponent

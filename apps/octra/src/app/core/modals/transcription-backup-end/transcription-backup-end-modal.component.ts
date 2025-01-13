@@ -1,6 +1,6 @@
 import { Component, OnInit, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { DateTime } from 'luxon';
 import { AudioService } from '../../shared/service';
@@ -18,6 +18,7 @@ export enum ModalEndAnswer {
   selector: 'octra-transcription-backup-end-modal',
   templateUrl: './transcription-backup-end-modal.component.html',
   styleUrls: ['./transcription-backup-end-modal.component.scss'],
+  imports: [TranslocoPipe],
 })
 export class TranscriptionBackupEndModalComponent
   extends OctraModal

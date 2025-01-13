@@ -1,4 +1,4 @@
-import { AsyncPipe, NgOptimizedImage } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { CompatibilityService } from '../../shared/service/compatibility.service';
 import { AuthenticationStoreService } from '../../store/authentication';
-import { BrowserTestComponent } from '../browser-test';
+import { BrowserTestComponent } from '../browser-test/browser-test.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
 
@@ -27,12 +27,11 @@ import { LoginService } from './login.service';
   providers: [LoginService],
   imports: [
     MaintenanceBannerComponent,
-    TranslocoPipe,
-    AsyncPipe,
     AuthenticationComponent,
     OctraDropzoneComponent,
     BrowserTestComponent,
-    NgOptimizedImage,
+    AsyncPipe,
+    TranslocoPipe,
   ],
 })
 export class LoginComponent

@@ -18,7 +18,7 @@ import { SettingsService } from '../../shared/service';
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoPipe, NgStyle],
+  imports: [NgStyle, TranslocoPipe],
 })
 export class NewsComponent implements OnInit, OnChanges {
   @Input() url = '';

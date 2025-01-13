@@ -20,7 +20,7 @@ import {
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import { AsrOptionsComponent } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { TimespanPipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { DateTime } from 'luxon';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
@@ -66,16 +66,16 @@ declare const BUILD: {
     NgbCollapse,
     RouterLinkActive,
     RouterLink,
-    TranslocoPipe,
     NgClass,
-    NgStyle,
     NgbDropdown,
-    AsyncPipe,
-    AsrOptionsComponent,
-    UpperCasePipe,
-    TimespanPipe,
+    NgStyle,
     NgbDropdownToggle,
     NgbDropdownMenu,
+    AsrOptionsComponent,
+    AsyncPipe,
+    UpperCasePipe,
+    TranslocoPipe,
+    OctraUtilitiesModule,
   ],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {

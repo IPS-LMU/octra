@@ -1,4 +1,4 @@
-import { NgClass, NgOptimizedImage } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
   Component,
   OnInit,
@@ -24,7 +24,7 @@ import { OctraModal } from '../types';
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [TranslocoPipe, NgClass, NgbCollapse, NgOptimizedImage],
+  imports: [NgClass, NgbCollapse, TranslocoPipe],
 })
 export class TranscriptionGuidelinesModalComponent
   extends OctraModal

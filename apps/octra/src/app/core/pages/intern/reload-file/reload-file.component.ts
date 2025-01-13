@@ -17,7 +17,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.scss'],
-  imports: [TranslocoPipe, OctraDropzoneComponent],
+  imports: [OctraDropzoneComponent, TranslocoPipe],
 })
 export class ReloadFileComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;

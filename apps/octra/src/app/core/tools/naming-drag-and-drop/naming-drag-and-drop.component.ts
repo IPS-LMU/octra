@@ -16,7 +16,6 @@ import { DefaultComponent } from '../../component/default.component';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
-  standalone: true,
   templateUrl: './naming-drag-and-drop.component.html',
   styleUrls: ['./naming-drag-and-drop.component.scss'],
   imports: [

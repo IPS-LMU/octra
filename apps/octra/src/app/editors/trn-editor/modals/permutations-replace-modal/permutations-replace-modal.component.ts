@@ -12,7 +12,7 @@ import { Subject, Subscription } from 'rxjs';
   selector: 'octra-permutations-replace',
   templateUrl: './permutations-replace-modal.component.html',
   styleUrls: ['./permutations-replace-modal.component.scss'],
-  imports: [TranslocoPipe, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TranslocoPipe],
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {
   public visible = false;

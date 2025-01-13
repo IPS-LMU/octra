@@ -18,8 +18,12 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
-import { AudioViewerComponent, AudioviewerConfig } from '@octra/ngx-components';
-import { TimespanPipe } from '@octra/ngx-utilities';
+import {
+  AudioViewerComponent,
+  AudioviewerConfig,
+  OctraComponentsModule,
+} from '@octra/ngx-components';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import {
   AudioChunk,
   AudioManager,
@@ -35,6 +39,7 @@ import {
   ContextMenuComponent,
 } from '../../core/component/context-menu/context-menu.component';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
+import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
 import {
   AlertService,
@@ -56,12 +61,12 @@ import { PermutationsReplaceModalComponent } from './modals/permutations-replace
     ContextMenuComponent,
     ValidationPopoverComponent,
     NgStyle,
-    TranslocoPipe,
-    AudioNavigationComponent,
-    AudioViewerComponent,
-    TranscrEditorComponent,
-    TimespanPipe,
     NgClass,
+    AudioNavigationComponent,
+    OctraComponentsModule,
+    TranscrEditorComponent_1,
+    TranslocoPipe,
+    OctraUtilitiesModule,
   ],
 })
 export class TrnEditorComponent

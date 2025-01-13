@@ -18,7 +18,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
   selector: 'octra-transcription-feedback',
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.scss'],
-  imports: [AsyncPipe, FormsModule, TranslocoPipe],
+  imports: [FormsModule, AsyncPipe, TranslocoPipe],
 })
 export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
   @Input() feedbackData = {};

@@ -15,7 +15,10 @@ import {
   OLabel,
 } from '@octra/annotation';
 import { SampleUnit } from '@octra/media';
-import { AudioplayerComponent } from '@octra/ngx-components';
+import {
+  AudioplayerComponent,
+  OctraComponentsModule,
+} from '@octra/ngx-components';
 import {
   AudioChunk,
   AudioManager,
@@ -24,6 +27,8 @@ import {
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
+import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
 import {
   AudioService,
   SettingsService,
@@ -39,9 +44,9 @@ import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.scss'],
   imports: [
-    AudioNavigationComponent,
-    AudioplayerComponent,
-    TranscrEditorComponent,
+    AudioNavigationComponent_1,
+    OctraComponentsModule,
+    TranscrEditorComponent_1,
   ],
 })
 export class DictaphoneEditorComponent

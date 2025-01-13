@@ -20,7 +20,7 @@ import {
   OSegmentLevel,
 } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
-import { ProcentPipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { contains, escapeRegex, FileSize, getFileSize } from '@octra/utilities';
 import { AudioManager, readFile } from '@octra/web-media';
 import { timer } from 'rxjs';
@@ -33,12 +33,19 @@ import { LoginMode, RootState } from '../../store';
 import { LoginModeActions } from '../../store/login-mode';
 import { DefaultComponent } from '../default.component';
 import { DropZoneComponent } from '../drop-zone';
+import { DropZoneComponent as DropZoneComponent_1 } from '../drop-zone/drop-zone.component';
 
 @Component({
   selector: 'octra-dropzone',
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.scss'],
-  imports: [DropZoneComponent, NgbPopover, ProcentPipe, NgStyle, TranslocoPipe],
+  imports: [
+    DropZoneComponent_1,
+    NgbPopover,
+    NgStyle,
+    OctraUtilitiesModule,
+    TranslocoPipe,
+  ],
 })
 export class OctraDropzoneComponent extends DefaultComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;

@@ -1,4 +1,4 @@
-import { Route } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import {
   ALoginGuard,
@@ -18,7 +18,7 @@ import {
 import { IDB_LOADED_GUARD } from './core/shared/guard/idb.activateguard';
 import { StresstestComponent } from './core/tools/stresstest/stresstest.component';
 
-export const appRoutes: Route[] = [
+export const APP_ROUTES: Routes = [
   { path: 'load', component: LoadingComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {

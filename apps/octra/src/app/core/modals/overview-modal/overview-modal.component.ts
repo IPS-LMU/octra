@@ -14,7 +14,7 @@ import {
   NgbModal,
   NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
-import { TranscrOverviewComponent } from '../../component/transcr-overview';
+import { TranscrOverviewComponent } from '../../component/transcr-overview/transcr-overview.component';
 import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
 import { SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -28,11 +28,11 @@ import { OctraModal } from '../types';
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
   imports: [
-    TranslocoPipe,
     NgClass,
     TranscrOverviewComponent,
     TranscriptionFeedbackComponent,
     AsyncPipe,
+    TranslocoPipe,
   ],
 })
 export class OverviewModalComponent

@@ -65,7 +65,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 }
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
     AppSharedModule,

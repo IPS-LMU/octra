@@ -7,6 +7,8 @@ import {
   NgbDropdownMenu,
   NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AppSharedModule } from '../../../app.shared.module';
@@ -26,6 +28,9 @@ import { AudioNavigationComponent } from '../../component/audio-navigation';
 import { ContextMenuComponent } from '../../component/context-menu/context-menu.component';
 import { DynComponentDirective } from '../../shared/directive/dyn-component.directive';
 import { LoadeditorDirective } from '../../shared/directive/loadeditor.directive';
+import { LoginMode } from '../../store';
+import { LoginModeReducers } from '../../store/login-mode';
+import { AnnotationEffects } from '../../store/login-mode/annotation/annotation.effects';
 import { LoadingComponent } from '../loading';
 import { AuthComponent } from './auth';
 import { AuthSuccessPageComponent } from './auth-success/auth-success.page.component';
@@ -46,7 +51,6 @@ export const EDITORS: any[] = [
 ];
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
     FormsModule,
@@ -54,6 +58,23 @@ export const EDITORS: any[] = [
     InternRoutingModule,
     AppSharedModule,
     TranslocoModule,
+    StoreModule.forFeature(
+      'onlineMode',
+      new LoginModeReducers(LoginMode.ONLINE).create()
+    ),
+    StoreModule.forFeature(
+      'demoMode',
+      new LoginModeReducers(LoginMode.DEMO).create()
+    ),
+    StoreModule.forFeature(
+      'localMode',
+      new LoginModeReducers(LoginMode.LOCAL).create()
+    ),
+    StoreModule.forFeature(
+      'urlMode',
+      new LoginModeReducers(LoginMode.URL).create()
+    ),
+    EffectsModule.forFeature([AnnotationEffects]),
     OctraUtilitiesModule,
     NgbDropdown,
     NgbDropdownToggle,

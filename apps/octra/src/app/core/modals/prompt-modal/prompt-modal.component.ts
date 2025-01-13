@@ -19,7 +19,7 @@ import { OctraModal } from '../types';
   templateUrl: './prompt-modal.component.html',
   styleUrls: ['./prompt-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoPipe, AsyncPipe],
+  imports: [AsyncPipe, TranslocoPipe],
 })
 export class PromptModalComponent extends OctraModal {
   public static options: NgbModalOptions = {

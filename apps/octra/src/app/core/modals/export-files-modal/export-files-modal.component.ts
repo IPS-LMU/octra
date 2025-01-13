@@ -32,12 +32,12 @@ import { OctraModal } from '../types';
     fadeOutCollapseOnLeaveAnimation(),
   ],
   imports: [
-    TranslocoPipe,
     NgClass,
     NgbPopover,
     NgbTooltip,
     FormsModule,
     TableConfiguratorComponent,
+    TranslocoPipe,
   ],
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {

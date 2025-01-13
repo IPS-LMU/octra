@@ -6,9 +6,7 @@ import { SubscriptionManager } from '@octra/utilities';
 import { AudioManager } from '@octra/web-media';
 import { Subject, Subscription } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class AudioService {
   public missingPermission = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager<Subscription> =

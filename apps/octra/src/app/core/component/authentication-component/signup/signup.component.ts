@@ -25,7 +25,7 @@ export class PreparedPolicyListItemDto extends PolicyListItemDto {
   selector: 'octra-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
-  imports: [TranslocoPipe, FormsModule],
+  imports: [FormsModule, TranslocoPipe],
 })
 export class SignupComponent extends DefaultComponent implements OnInit {
   protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;

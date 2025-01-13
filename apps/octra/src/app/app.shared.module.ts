@@ -25,7 +25,6 @@ import { TranscriptionFeedbackComponent } from './core/component/transcription-f
 import { ClipTextPipe } from './core/shared/clip-text.pipe';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
     FormsModule,

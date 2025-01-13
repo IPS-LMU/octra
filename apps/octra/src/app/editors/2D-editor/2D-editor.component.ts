@@ -26,6 +26,7 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
+  OctraComponentsModule,
 } from '@octra/ngx-components';
 import {
   AudioChunk,
@@ -36,6 +37,7 @@ import {
 import { HotkeysEvent } from 'hotkeys-js';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
 import { NavbarService } from '../../core/component/navbar/navbar.service';
 import { OctraModalService } from '../../core/modals/octra-modal.service';
 import {
@@ -52,15 +54,16 @@ import { AsrStoreService } from '../../core/store/asr/asr-store-service.service'
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
+import { TranscrWindowComponent as TranscrWindowComponent_1 } from './transcr-window/transcr-window.component';
 
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.scss'],
   imports: [
-    TranscrWindowComponent,
-    AudioNavigationComponent,
-    AudioViewerComponent,
+    TranscrWindowComponent_1,
+    AudioNavigationComponent_1,
+    OctraComponentsModule,
     NgStyle,
   ],
 })

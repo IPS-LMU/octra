@@ -45,9 +45,9 @@ import {
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { AppInfo } from '../../../../app.info';
-import { FastbarComponent } from '../../../component';
 import { DefaultComponent } from '../../../component/default.component';
 import { NavbarService } from '../../../component/navbar/navbar.service';
+import { FastbarComponent } from '../../../component/taskbar/taskbar.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
 import {
@@ -70,11 +70,11 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   styleUrls: ['./transcription.component.scss'],
   imports: [
     NgClass,
+    FastbarComponent,
+    LoadeditorDirective,
+    FormsModule,
     AsyncPipe,
     TranslocoPipe,
-    FastbarComponent,
-    FormsModule,
-    LoadeditorDirective,
   ],
 })
 export class TranscriptionComponent

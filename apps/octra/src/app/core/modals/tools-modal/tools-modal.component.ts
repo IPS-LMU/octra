@@ -19,7 +19,7 @@ import {
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
-import { TimespanPipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioCutter, IntArray } from '@octra/web-media';
 import {
   fadeInExpandOnEnterAnimation,
@@ -52,14 +52,14 @@ import { OctraModal } from '../types';
     fadeInExpandOnEnterAnimation(),
   ],
   imports: [
-    TranslocoPipe,
     NgClass,
     FormsModule,
     NgbTooltip,
     NamingDragAndDropComponent,
     NgStyle,
     DecimalPipe,
-    TimespanPipe,
+    TranslocoPipe,
+    OctraUtilitiesModule,
   ],
 })
 export class ToolsModalComponent extends OctraModal implements OnDestroy {

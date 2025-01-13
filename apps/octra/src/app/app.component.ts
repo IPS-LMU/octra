@@ -1,29 +1,38 @@
-import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MultiThreadingService } from '@octra/ngx-components';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { environment } from '../environments/environment';
-import { AlertComponent, NavigationComponent } from './core/component';
+import { NavigationComponent } from './core/component';
+import { AlertComponent } from './core/component/alert/alert.component';
 import { DefaultComponent } from './core/component/default.component';
-import { OctraModalComponent } from './core/modals/octra-modal';
+import { NavigationComponent as NavigationComponent_1 } from './core/component/navbar/navbar.component';
+import { OctraModalComponent } from './core/modals/octra-modal/octra-modal.component';
+import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
 
 @Component({
+  selector: 'octra-app',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
   imports: [
-    RouterModule,
     AlertComponent,
     OctraModalComponent,
-    NavigationComponent,
+    NavigationComponent_1,
+    RouterOutlet,
   ],
-  selector: 'octra-app',
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
 })
-export class AppComponent extends DefaultComponent {
+export class AppComponent
+  extends DefaultComponent
+  implements OnInit, OnDestroy
+{
   @ViewChild('navigation', { static: true }) navigation:
     | NavigationComponent
     | undefined;
+
+  public get environment(): any {
+    return environment;
+  }
 
   constructor(
     public appStorage: AppStorageService,
@@ -60,7 +69,7 @@ export class AppComponent extends DefaultComponent {
     });
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
     super.ngOnDestroy();
     this.multiThreading.destroy();
     this.annotationStoreService.destroy();
@@ -71,6 +80,4 @@ export class AppComponent extends DefaultComponent {
     const params = this.route.snapshot.queryParams;
     return params['audio_url'] && params['embedded'];
   }
-
-  protected readonly environment = environment;
 }

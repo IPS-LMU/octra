@@ -2,9 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class NavbarService {
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();

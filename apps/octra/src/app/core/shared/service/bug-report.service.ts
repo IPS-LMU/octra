@@ -36,9 +36,7 @@ declare const BUILD: {
   timestamp: string;
 };
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class BugReportService {
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
   private readonly MAX_LOG_ENTRIES = 100;

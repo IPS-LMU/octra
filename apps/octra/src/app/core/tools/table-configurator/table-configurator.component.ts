@@ -40,15 +40,15 @@ export interface ColumnFormat {
   styleUrls: ['./table-configurator.component.scss'],
   providers: [],
   imports: [
-    TranslocoPipe,
-    FormsModule,
-    NgStyle,
-    CdkDropList,
-    ClipTextPipe,
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
+    FormsModule,
+    NgStyle,
+    CdkDropList,
     CdkDrag,
+    ClipTextPipe,
+    TranslocoPipe,
   ],
 })
 export class TableConfiguratorComponent implements OnInit {

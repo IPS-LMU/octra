@@ -12,9 +12,7 @@ import { AppInfo } from '../../../app.info';
 import { LoadingStatus, RootState } from '../../store';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class TranscActivateGuard {
   constructor(
     private appStoreService: ApplicationStoreService,

@@ -73,8 +73,8 @@ export function createSampleTask(
 ): TaskDto {
   return {
     id: taskID,
+    position: 0,
     inputs,
-    position: 1,
     outputs,
     status: TaskStatus.free,
     creationdate: new Date().toISOString(),

@@ -6,9 +6,7 @@ import { AppInfo } from '../../../app.info';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class ALoginGuard {
   constructor(
     private appStoreService: ApplicationStoreService,

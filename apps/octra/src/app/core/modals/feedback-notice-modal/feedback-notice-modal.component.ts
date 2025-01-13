@@ -1,4 +1,3 @@
-import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -8,7 +7,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
   selector: 'octra-feedback-notice-modal',
   templateUrl: './feedback-notice-modal.component.html',
   styleUrls: ['./feedback-notice-modal.component.css'],
-  imports: [TranslocoPipe, NgOptimizedImage],
+  imports: [TranslocoPipe],
 })
 export class FeedbackNoticeModalComponent implements OnInit {
   public static options: NgbModalOptions = {

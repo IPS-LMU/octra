@@ -26,6 +26,7 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
+  OctraComponentsModule,
 } from '@octra/ngx-components';
 import {
   AudioChunk,
@@ -37,6 +38,8 @@ import {
 import { HotkeysEvent } from 'hotkeys-js';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
+import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
+import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
 import { SampleInterval } from '../../core/obj/Settings/logging';
 import {
   AlertService,
@@ -55,11 +58,11 @@ import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.scss'],
   imports: [
-    AudioViewerComponent,
-    AudioNavigationComponent,
-    TranscrEditorComponent,
-    NgClass,
+    OctraComponentsModule,
     NgStyle,
+    AudioNavigationComponent_1,
+    TranscrEditorComponent_1,
+    NgClass,
     TranslocoPipe,
   ],
 })

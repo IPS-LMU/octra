@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
 @Component({
-  template: '',
-  standalone: true,
+  template: ''
 })
-export class DefaultComponent extends SubscriberComponent {}
+export class DefaultComponent
+  extends SubscriberComponent
+  implements OnDestroy {}

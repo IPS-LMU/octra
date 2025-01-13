@@ -6,7 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   selector: 'octra-error-occurred',
   templateUrl: './error-occurred.component.html',
   styleUrls: ['./error-occurred.component.scss'],
-  imports: [TranslocoPipe, RouterLink],
+  imports: [RouterLink, TranslocoPipe],
 })
 export class ErrorOccurredComponent {
   public static componentName = 'ErrorOccurredComponent';

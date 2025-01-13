@@ -15,7 +15,7 @@ import { SignupComponent } from './signup/signup.component';
   selector: 'octra-authentication-component',
   templateUrl: './authentication-component.component.html',
   styleUrls: ['./authentication-component.component.scss'],
-  imports: [TranslocoPipe, FormsModule, SignupComponent],
+  imports: [FormsModule, SignupComponent, TranslocoPipe],
 })
 export class AuthenticationComponent extends DefaultComponent {
   @Output() submitClick = new EventEmitter<{

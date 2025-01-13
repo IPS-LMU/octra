@@ -22,7 +22,7 @@ import {
 } from '@octra/annotation';
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { LeadingNullPipe } from '@octra/ngx-utilities';
+import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { isFunction, SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import { Subscription, timer } from 'rxjs';
@@ -34,6 +34,7 @@ import {
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
+import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../transcr-editor/transcr-editor.component';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 
 @Component({
@@ -42,12 +43,12 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TranslocoPipe,
     NgClass,
     NgStyle,
-    LeadingNullPipe,
-    TranscrEditorComponent,
+    TranscrEditorComponent_1,
     ValidationPopoverComponent,
+    OctraUtilitiesModule,
+    TranslocoPipe,
   ],
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {

@@ -12,9 +12,7 @@ import {
 import { SubscriptionManager } from '@octra/utilities';
 import { Subscription } from 'rxjs';
 
-@Directive({
-  selector: '[octraDynComponent]',
-})
+@Directive({ selector: '[octraDynComponent]' })
 export class DynComponentDirective implements OnInit, OnDestroy {
   @Input() component!: {
     id: number;

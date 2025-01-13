@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.0.0](https://github.com/IPS-LMU/octra/compare/annotation-0.1.17...annotation-1.0.0) (2025-01-13)
+
+
+### Bug Fixes
+
+* **annotation:** SRT converter combines same speaker units incorrectly ([16806e1](https://github.com/IPS-LMU/octra/commit/16806e1138c714b8bfd26305cabd2e1da4b16120))
+* **octra:** visible escape codes on shortcuts modal ([e7a63fb](https://github.com/IPS-LMU/octra/commit/e7a63fb542ee0841e21ffae1cdf9704a22525b1c))
+
+
+### Features
+
+* **annotation:** more information about supported apps foreach annotation format ([1a6e192](https://github.com/IPS-LMU/octra/commit/1a6e192d30d31af4820bbbe02ebfe252c23e9bc7))
+* **octra:** import options can be set in projectconfig.json for each converter ([f1addb2](https://github.com/IPS-LMU/octra/commit/f1addb2e762a5f37ab02b371dde1103168074fe6))
+* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
+
+
+
 ## [0.1.17](https://github.com/IPS-LMU/octra/compare/annotation-0.1.16...annotation-0.1.17) (2024-12-03)
 
 ### Bug Fixes

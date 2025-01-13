@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.0.0](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.3...ngx-components-1.0.0) (2025-01-13)
+
+
+### Bug Fixes
+
+* **octra:** visible escape codes on shortcuts modal ([e7a63fb](https://github.com/IPS-LMU/octra/commit/e7a63fb542ee0841e21ffae1cdf9704a22525b1c))
+
+
+### Features
+
+* **octra:** import options can be set in projectconfig.json for each converter ([f1addb2](https://github.com/IPS-LMU/octra/commit/f1addb2e762a5f37ab02b371dde1103168074fe6))
+* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
+
+
+
 ## [0.2.3](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.2...ngx-components-0.2.3) (2024-11-25)
 
 ### Bug Fixes

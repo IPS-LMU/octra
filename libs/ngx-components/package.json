@@ -16,14 +16,14 @@
     "url": "https://github.com/IPS-LMU/octra"
   },
   "peerDependencies": {
-    "@angular/common": ">15.0.0",
-    "@angular/core": ">15.0.0",
-    "@angular/forms": ">15.0.0",
-    "@octra/utilities": "~0.1.0",
-    "@octra/annotation": "~0.1.16",
-    "@octra/media": "~0.1.0",
-    "@octra/web-media": "~0.1.1",
-    "@octra/ngx-utilities": "~0.4.2",
+    "@angular/common": ">18.0.0",
+    "@angular/core": ">18.0.0",
+    "@angular/forms": ">18.0.0",
+    "@octra/utilities": "~1.0.0",
+    "@octra/annotation": "~1.0.0",
+    "@octra/media": "~1.0.0",
+    "@octra/web-media": "~1.0.0",
+    "@octra/ngx-utilities": "~1.0.0",
     "konva": "^9.0.0",
     "rxjs": ">=7.5.0"
   },

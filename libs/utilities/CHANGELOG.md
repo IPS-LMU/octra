@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.1](https://github.com/IPS-LMU/octra/compare/utilities-1.0.0...utilities-1.0.1) (2025-01-14)
+
+
+### Bug Fixes
+
+* **utilities:** extractFileNameFromURL can't parse on available query params ([4587ba3](https://github.com/IPS-LMU/octra/commit/4587ba36092b7d7f2aeddfac3cb438a1d335ed22))
+
+
+
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/utilities-0.1.0...utilities-1.0.0) (2025-01-13)
 
 

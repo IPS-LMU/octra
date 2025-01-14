@@ -407,10 +407,19 @@ export function extractFileNameFromURL(url: string): {
   name: string;
   extension: string;
 } {
-  const matches = /\/([^/?]*)(\.[^/?]+)(?:\?|$)/g.exec(url);
+  if (url.includes('?')) {
+    url = url.split('?')[0];
+  }
+  let matches = /\/([^/?]*)$/g.exec(url);
 
-  if (matches === null || matches.length < 3) {
-    throw new Error("Can't read file from URL.");
+  if (matches === null || matches.length < 2) {
+    throw new Error("Can't read file from URL 1.");
+  }
+
+  matches = /([^.]+)(\.[^.]+)?$/g.exec(matches[1]);
+
+  if (matches === null || matches.length < 2) {
+    throw new Error("Can't read file from URL 2.");
   }
 
   return {

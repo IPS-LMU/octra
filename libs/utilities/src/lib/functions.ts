@@ -447,3 +447,13 @@ export function stringifyQueryParams(params: Record<string, any>) {
 
   return strArray.length > 0 ? `?${strArray.join('&')}` : '';
 }
+
+/**
+ * waits a given time asynchronously
+ * @param seconds
+ */
+export async function wait(seconds: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, seconds * 1000);
+  });
+}

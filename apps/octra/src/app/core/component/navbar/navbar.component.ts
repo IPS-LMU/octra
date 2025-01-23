@@ -51,12 +51,6 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
 
-declare const BUILD: {
-  version: string;
-  hash: string;
-  timestamp: string;
-};
-
 @Component({
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
@@ -82,10 +76,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   modalexport?: NgbModalRef;
   modalTools?: NgbModalRef;
   modalStatistics?: NgbModalRef;
-
-  public get BUILD() {
-    return BUILD;
-  }
 
   isCollapsed = true;
 
@@ -176,10 +166,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   }
 
   ngOnInit() {
-    BUILD.timestamp = DateTime.fromISO(BUILD.timestamp).toLocaleString(
-      DateTime.DATETIME_SHORT_WITH_SECONDS
-    );
-
     this.subscribe(this.navbarServ.onclick, (name) => {
       switch (name) {
         case 'export':

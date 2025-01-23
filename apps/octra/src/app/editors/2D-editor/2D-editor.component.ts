@@ -721,7 +721,7 @@ export class TwoDEditorComponent
       newPosition.y = offsetY + 30;
     } else {
       // magnifier out of the bottom border of view rectangle
-      newPosition.y = offsetY + 20 - this.minimagnifier.size.height;
+      newPosition.y = offsetY - 20 - this.minimagnifier.size.height;
     }
     newPosition.x = x;
 

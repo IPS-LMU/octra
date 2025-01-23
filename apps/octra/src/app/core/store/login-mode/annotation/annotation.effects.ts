@@ -71,12 +71,6 @@ import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
 
-declare const BUILD: {
-  version: string;
-  hash: string;
-  timestamp: string;
-};
-
 @Injectable()
 export class AnnotationEffects {
   transcrSendingModal: {
@@ -270,7 +264,7 @@ export class AnnotationEffects {
             }
             this.uiService.addElementFromEvent(
               'octra',
-              { value: BUILD.version },
+              { value: AppInfo.BUILD.version },
               Date.now(),
               undefined,
               undefined,
@@ -1603,7 +1597,7 @@ export class AnnotationEffects {
 
           this.uiService.addElementFromEvent(
             'octra',
-            { value: BUILD.version },
+            { value: AppInfo.BUILD.version },
             Date.now(),
             undefined,
             undefined,

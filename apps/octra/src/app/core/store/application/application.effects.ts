@@ -42,6 +42,7 @@ import { IDBActions } from '../idb/idb.actions';
 import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
+import { DateTime } from 'luxon';
 
 @Injectable({
   providedIn: 'root',
@@ -51,6 +52,10 @@ export class ApplicationEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
+        AppInfo.BUILD = (window as any).BUILD ?? AppInfo.BUILD;
+        AppInfo.BUILD.timestamp = DateTime.fromISO(AppInfo.BUILD.timestamp).toLocaleString(
+          DateTime.DATETIME_SHORT_WITH_SECONDS
+        );
         this.appStorage.saveCurrentPageAsLastPage();
 
         const queryParams = {

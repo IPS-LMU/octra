@@ -10,6 +10,7 @@ import { LoginMode } from '../../store';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AppStorageService } from './appstorage.service';
 import { AudioService } from './audio.service';
+import { AppInfo } from '../../../app.info';
 
 export enum ConsoleType {
   LOG,
@@ -29,12 +30,6 @@ export interface ConsoleGroupEntry {
   timestamp: string;
   entries: ConsoleEntry[];
 }
-
-declare const BUILD: {
-  version: string;
-  hash: string;
-  timestamp: string;
-};
 
 @Injectable()
 export class BugReportService {
@@ -137,12 +132,12 @@ export class BugReportService {
   } {
     const protocol: any = {
       tool: {
-        version: BUILD.version,
+        version: AppInfo.BUILD.version,
         language: this.langService.getActiveLang(),
         signed_in: this.appStorage.loggedIn,
         useMode: this.appStorage.useMode,
         url: window.location.href,
-        lastUpdated: BUILD.timestamp,
+        lastUpdated: AppInfo.BUILD.timestamp,
         project: undefined,
         user: undefined,
         jobID: undefined,

@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const process = require('node:child_process');
 const { exec } = require('node:child_process');
 const crypto = require('crypto');
+const { readFile, writeFile } = require('node:fs/promises');
 
 const JSONValidator = {
   build: async function () {
@@ -14,8 +15,8 @@ const JSONValidator = {
 async function buildLibrary(libraryName) {
   if (await fs.pathExists(`dist/libs/${libraryName}`)) {
     await fs.rm(`dist/libs/${libraryName}`, {
-      recursive: true
-    })
+      recursive: true,
+    });
   }
   await run(`nx build ${libraryName} --skip-nx-cache`);
   await fs.copyFile(
@@ -246,26 +247,28 @@ async function run(scriptPath, showOutput = true, returnAfterExit = true) {
 }
 
 async function setBuildVariable() {
-  let content = await fs.readFile('./dist/apps/octra/index.html', {
+  let content = await readFile('./dist/apps/octra/index.html', {
     encoding: 'utf-8',
   });
 
-  const pkg = await fs.readJSON('./package.json', {
+  let pkg = await readFile('./package.json', {
     encoding: 'utf-8',
   });
+  pkg = JSON.parse(pkg);
+  const hash = crypto.randomUUID();
 
-  let hash = crypto.randomUUID();
-
-  content = content.replace(/(\/\*)\s*(var BUILD =)([^;]*)(;)\s?(\*\/)\s*/gs, (g0, g1, g2, g3, g4) => {
-    const build = JSON.parse(g3);
+  content = content.replace(/\/\*.*var BUILD = ({[^}]+}).*\*\//gs, (g0, g1) => {
+    const build = JSON.parse(g1);
     build.version = pkg.version;
     build.timestamp = new Date().toISOString();
     build.hash = hash;
 
-    return `${g2} ${JSON.stringify(build)}${g4}`;
+    console.log(build);
+
+    return `var BUILD = ${JSON.stringify(build)};`;
   });
 
-  await fs.writeFile('./dist/apps/octra/index.html', content, {
+  await writeFile('./dist/apps/octra/index.html', content, {
     encoding: 'utf-8',
   });
 

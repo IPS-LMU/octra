@@ -299,7 +299,7 @@
     "logging": "Azioni utenti registrati",
     "play on hover": "Riproduci sul cursore",
     "seconds per line": "Secondi per riga",
-    "show loupe": "Mostra lente di ingrandimento"
+    "show magnifier": "Mostra lente di ingrandimento"
   },
   "signal-gui": {
     "segment enter text": "Per favore seleziona un'unità di trascrizione spostando il cursore su di essa e premendo il tasto {{value}}.",

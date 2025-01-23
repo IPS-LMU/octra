@@ -299,7 +299,7 @@
     "logging": "记录用户操作",
     "play on hover": "悬停播放",
     "seconds per line": "每行秒数",
-    "show loupe": "显示放大镜"
+    "show magnifier": "显示放大镜"
   },
   "signal-gui": {
     "segment enter text": "请将鼠标悬停在其上，并按 {{value}} 键来选择标注单元。",

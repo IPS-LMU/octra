@@ -25,7 +25,7 @@ export const initialState: ApplicationState = {
   options: {
     playOnHover: false,
     followPlayCursor: false,
-    showLoupe: false,
+    showMagnifier: false,
     audioSettings: {
       volume: 1,
       speed: 1,
@@ -157,7 +157,7 @@ export const reducer = createReducer(
       language: applicationOptions.language ?? 'en',
       options: {
         ...state.options,
-        showLoupe: applicationOptions.showLoupe ?? false,
+        showMagnifier: applicationOptions.showMagnifier ?? false,
         playOnHover: applicationOptions.playOnHover ?? false,
         followPlayCursor: applicationOptions.followPlayCursor ?? false,
         secondsPerLine: applicationOptions.secondsPerLine ?? 5,
@@ -223,12 +223,12 @@ export const reducer = createReducer(
     },
   })),
   on(
-    ApplicationActions.setShowLoupe,
-    (state: ApplicationState, { showLoupe }) => ({
+    ApplicationActions.setShowMagnifier,
+    (state: ApplicationState, { showMagnifier }) => ({
       ...state,
       options: {
         ...state.options,
-        showLoupe,
+        showMagnifier,
       },
     })
   ),

@@ -184,10 +184,10 @@ export class ApplicationActions {
     }>()
   );
 
-  public static setShowLoupe = createAction(
-    `[${context}] Set showLoupe`,
+  public static setShowMagnifier = createAction(
+    `[${context}] Set showMagnifier`,
     props<{
-      showLoupe: boolean;
+      showMagnifier: boolean;
     }>()
   );
 

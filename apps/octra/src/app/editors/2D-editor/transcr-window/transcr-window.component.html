@@ -107,12 +107,12 @@
       [volume]="appStorage.audioVolume"
     ></octra-audio-navigation>
     <octra-audio-viewer
-      #loupe
+      #magnifier
       [audioChunk]="audiochunk"
       [refreshOnInternChanges]="false"
       [annotation]="annotationStoreService.transcript!"
       (shortcut)="triggerUIAction($event)"
-      id="loupe"
+      id="magnifier"
     ></octra-audio-viewer>
     <octra-transcr-editor
       #editor

@@ -20,46 +20,45 @@
     [volume]="appStorage.audioVolume"
   >
   </octra-audio-navigation>
-  @if (appStorage.showLoupe) {
-  <div>
+  <div class="d-flex flex-column h-100">
+    @if (appStorage.showMagnifier) {
+      <octra-audio-viewer
+        #magnifier
+        [audioChunk]="audioChunkMagnifier"
+        [silencePlaceholder]="annotationStoreService.silencePlaceholder"
+        [isMultiLine]="false"
+        [refreshOnInternChanges]="false"
+        [name]="'magnifier'"
+        [ngStyle]="{
+      width: minimagnifier.size.width + 'px',
+      height: minimagnifier.size.height + 'px',
+      position: 'fixed',
+      'margin-left': minimagnifier.location.x + 'px',
+      'margin-top': minimagnifier.location.y + 'px',
+      'z-index': '90',
+      display: 'flex',
+      visibility: magnifierHidden ? 'hidden' : 'inherit',
+      flex: 'auto',
+      'flex-direction': 'column'
+    }"
+        [settings]="miniMagnifierSettings"
+        [annotation]="annotationStoreService.transcript!"
+      ></octra-audio-viewer>
+    }
     <octra-audio-viewer
-      #loupe
-      (mousemove)="onCircleLoupeMouseOver()"
-      [audioChunk]="audioChunkLoupe"
+      #viewer
+      (mousecursorchange)="onMouseOver($event)"
+      (segmententer)="onSegmentEntered($event)"
+      (shortcut)="onShortCutViewerTriggered($event)"
+      [audioChunk]="audioChunkLines"
       [silencePlaceholder]="annotationStoreService.silencePlaceholder"
-      [isMultiLine]="false"
+      [isMultiLine]="true"
       [refreshOnInternChanges]="false"
-      [name]="'loupe'"
-      [ngStyle]="{
-        width: miniloupe.size.width + 'px',
-        height: miniloupe.size.height + 'px',
-        position: 'absolute',
-        'margin-left': miniloupe.location.x + 'px',
-        'margin-top': miniloupe.location.y + 'px',
-        'z-index': '90',
-        display: 'flex',
-        visibility: loupeHidden ? 'hidden' : 'inherit',
-        flex: 'auto',
-        'flex-direction': 'column'
-      }"
-      [settings]="miniLoupeSettings"
       [annotation]="annotationStoreService.transcript!"
-    ></octra-audio-viewer>
+      (currentLevelChange)="onCurrentLevelChange($event)"
+      id="special"
+      style="height: 400px; display: flex; flex: auto; flex-direction: column"
+    >
+    </octra-audio-viewer>
   </div>
-  }
-  <octra-audio-viewer
-    #viewer
-    (mousecursorchange)="onMouseOver($event)"
-    (segmententer)="onSegmentEntered($event)"
-    (shortcut)="onShortCutViewerTriggered($event)"
-    [audioChunk]="audioChunkLines"
-    [silencePlaceholder]="annotationStoreService.silencePlaceholder"
-    [isMultiLine]="true"
-    [refreshOnInternChanges]="false"
-    [annotation]="annotationStoreService.transcript!"
-    (currentLevelChange)="onCurrentLevelChange($event)"
-    id="special"
-    style="height: 400px; display: flex; flex: auto; flex-direction: column"
-  >
-  </octra-audio-viewer>
 </div>

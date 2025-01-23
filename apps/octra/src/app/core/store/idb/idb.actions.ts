@@ -152,8 +152,8 @@ export class IDBActions {
     },
   });
 
-  static saveShowLoupe = createActionGroup({
-    source: `IDB/save show loupe`,
+  static saveShowMagnifier = createActionGroup({
+    source: `IDB/save show magnifier`,
     events: {
       success: emptyProps(),
       fail: props<{

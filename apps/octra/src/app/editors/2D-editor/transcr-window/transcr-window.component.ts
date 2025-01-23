@@ -87,7 +87,7 @@ export class TranscrWindowComponent
   extends DefaultComponent
   implements OnInit, AfterContentInit, AfterViewInit, OnChanges
 {
-  @ViewChild('loupe', { static: true }) loupe!: AudioViewerComponent;
+  @ViewChild('magnifier', { static: true }) magnifier!: AudioViewerComponent;
   @ViewChild('editor', { static: true }) editor!: TranscrEditorComponent;
   @ViewChild('audionav', { static: true }) audionav!: AudioNavigationComponent;
   @ViewChild('window', { static: true }) window!: ElementRef;
@@ -112,7 +112,7 @@ export class TranscrWindowComponent
 
   @Output()
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
-    return this.loupe.shortcut;
+    return this.magnifier.shortcut;
   }
 
   @Output()
@@ -370,7 +370,7 @@ export class TranscrWindowComponent
             console.log(`Can't set transcript, ${item.status}, ${item.result}`);
           }
 
-          this.loupe.redraw();
+          this.magnifier.redraw();
 
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -462,20 +462,20 @@ export class TranscrWindowComponent
       this.annotationStoreService.guidelines?.markers ?? [];
     this.editor.settings.responsive = true;
     this.editor.settings.specialMarkers.boundary = true;
-    this.loupe.name = 'transcr-window viewer';
-    this.loupe.settings.margin.top = 5;
-    this.loupe.settings.margin.bottom = 0;
-    this.loupe.settings.lineheight = 200;
-    this.loupe.settings.justifySignalHeight = true;
-    this.loupe.settings.boundaries.enabled = false;
-    this.loupe.settings.boundaries.readonly = true;
-    this.loupe.settings.selection.enabled = true;
-    this.loupe.settings.frame.color = '#222222';
-    this.loupe.settings.roundValues = false;
-    this.loupe.settings.showTimePerLine = true;
-    this.loupe.settings.showProgressBars = true;
-    this.loupe.settings.multiLine = false;
-    this.loupe.av.drawnSelection = undefined;
+    this.magnifier.name = 'transcr-window viewer';
+    this.magnifier.settings.margin.top = 5;
+    this.magnifier.settings.margin.bottom = 0;
+    this.magnifier.settings.lineheight = 200;
+    this.magnifier.settings.justifySignalHeight = true;
+    this.magnifier.settings.boundaries.enabled = false;
+    this.magnifier.settings.boundaries.readonly = true;
+    this.magnifier.settings.selection.enabled = true;
+    this.magnifier.settings.frame.color = '#222222';
+    this.magnifier.settings.roundValues = false;
+    this.magnifier.settings.showTimePerLine = true;
+    this.magnifier.settings.showProgressBars = true;
+    this.magnifier.settings.multiLine = false;
+    this.magnifier.av.drawnSelection = undefined;
 
     this.subscriptionManager.removeByTag('editor');
     if (
@@ -566,9 +566,9 @@ export class TranscrWindowComponent
     );
     this.shortcutsService.enableGroup('transcription window');
 
-    this.loupe.av.zoomY = 6;
+    this.magnifier.av.zoomY = 6;
     this.audiochunk.startpos = this.audiochunk.time.start.clone();
-    this.loupe.av.drawnSelection = new AudioSelection(
+    this.magnifier.av.drawnSelection = new AudioSelection(
       this.audioManager.createSampleUnit(0),
       this.audioManager.createSampleUnit(0)
     );
@@ -612,7 +612,7 @@ export class TranscrWindowComponent
         value: 'exited',
       },
       Date.now(),
-      this.loupe.av.PlayCursor!.timePos,
+      this.magnifier.av.PlayCursor!.timePos,
       undefined,
       undefined,
       {
@@ -702,13 +702,13 @@ export class TranscrWindowComponent
 
       let selection = undefined;
       if (
-        this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-        this.loupe.av.drawnSelection!.end.samples <=
+        this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+        this.magnifier.av.drawnSelection!.end.samples <=
           segment.start + segment.length
       ) {
         selection = {
-          start: this.loupe.av.drawnSelection!.start.samples,
-          length: this.loupe.av.drawnSelection!.duration.samples,
+          start: this.magnifier.av.drawnSelection!.start.samples,
+          length: this.magnifier.av.drawnSelection!.duration.samples,
         };
       }
 
@@ -837,7 +837,7 @@ export class TranscrWindowComponent
               // resolve only after the audio viewer is ready
               this.subscriptionManager.removeByTag('oninitialized');
               this.subscribe(
-                this.loupe.onInitialized,
+                this.magnifier.onInitialized,
                 {
                   next: () => {
                     this.subscriptionManager.removeByTag('oninitialized');
@@ -893,19 +893,19 @@ export class TranscrWindowComponent
     let selection = undefined;
     if (
       segment &&
-      this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-      this.loupe.av.drawnSelection!.end.samples <=
+      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
       selection =
-        this.loupe.av.drawnSelection!.duration.samples > 0
+        this.magnifier.av.drawnSelection!.duration.samples > 0
           ? {
-              start: this.loupe.av.drawnSelection!.start.samples,
-              length: this.loupe.av.drawnSelection!.duration.samples,
+              start: this.magnifier.av.drawnSelection!.start.samples,
+              length: this.magnifier.av.drawnSelection!.duration.samples,
             }
           : {
-              start: this.loupe.audioChunk!.selection!.start.samples,
-              length: this.loupe.audioChunk!.selection!.end.samples,
+              start: this.magnifier.audioChunk!.selection!.start.samples,
+              length: this.magnifier.audioChunk!.selection!.end.samples,
             };
     }
 
@@ -917,7 +917,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'loupe'
+      'magnifier'
     );
   }
 
@@ -948,13 +948,13 @@ export class TranscrWindowComponent
 
     let selection = undefined;
     if (
-      this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-      this.loupe.av.drawnSelection!.end.samples <=
+      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
       selection = {
-        start: this.loupe.av.drawnSelection!.start.samples,
-        length: this.loupe.av.drawnSelection!.duration.samples,
+        start: this.magnifier.av.drawnSelection!.start.samples,
+        length: this.magnifier.av.drawnSelection!.duration.samples,
       };
     }
 
@@ -997,13 +997,13 @@ export class TranscrWindowComponent
 
     let selection = undefined;
     if (
-      this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-      this.loupe.av.drawnSelection!.end.samples <=
+      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
       selection = {
-        start: this.loupe.av.drawnSelection!.start.samples,
-        length: this.loupe.av.drawnSelection!.duration.samples,
+        start: this.magnifier.av.drawnSelection!.start.samples,
+        length: this.magnifier.av.drawnSelection!.duration.samples,
       };
     }
 
@@ -1074,13 +1074,13 @@ export class TranscrWindowComponent
 
     let selection = undefined;
     if (
-      this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-      this.loupe.av.drawnSelection!.end.samples <=
+      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
       selection = {
-        start: this.loupe.av.drawnSelection!.start.samples,
-        length: this.loupe.av.drawnSelection!.duration.samples,
+        start: this.magnifier.av.drawnSelection!.start.samples,
+        length: this.magnifier.av.drawnSelection!.duration.samples,
       };
     }
 
@@ -1132,13 +1132,13 @@ export class TranscrWindowComponent
 
     let selection = undefined;
     if (
-      this.loupe.av.drawnSelection!.start.samples >= segment.start &&
-      this.loupe.av.drawnSelection!.end.samples <=
+      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection!.end.samples <=
         segment.start + segment.length
     ) {
       selection = {
-        start: this.loupe.av.drawnSelection!.start.samples,
-        length: this.loupe.av.drawnSelection!.duration.samples,
+        start: this.magnifier.av.drawnSelection!.start.samples,
+        length: this.magnifier.av.drawnSelection!.duration.samples,
       };
     }
 
@@ -1166,7 +1166,7 @@ export class TranscrWindowComponent
           ? this.tempSegments[i - 1].time.clone()
           : this.audioManager.createSampleUnit(0);
       this.audiochunk.selection.end = this.tempSegments[i]!.time.clone();
-      this.loupe.av.drawnSelection = this.audiochunk.selection;
+      this.magnifier.av.drawnSelection = this.audiochunk.selection;
 
       this.audiochunk.startPlayback().catch((error) => {
         console.error(error);

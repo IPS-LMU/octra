@@ -137,14 +137,14 @@ export class AppStorageService {
     );
   }
 
-  get showLoupe(): boolean | undefined | null {
-    return this._snapshot.application.options.showLoupe;
+  get showMagnifier(): boolean | undefined | null {
+    return this._snapshot.application.options.showMagnifier;
   }
 
-  set showLoupe(value: boolean) {
+  set showMagnifier(value: boolean) {
     this.store.dispatch(
       ApplicationActions.changeApplicationOption.do({
-        name: 'showLoupe',
+        name: 'showMagnifier',
         value,
       })
     );

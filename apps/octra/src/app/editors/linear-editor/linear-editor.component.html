@@ -1,24 +1,24 @@
-@if (appStorage.showLoupe) {
+@if (appStorage.showMagnifier) {
 <octra-audio-viewer
-  #miniloupeComponent
-  [audioChunk]="audioChunkLoupe"
+  #minimagnifierComponent
+  [audioChunk]="audioChunkMagnifier"
   [silencePlaceholder]="annotationStoreService.silencePlaceholder"
   [isMultiLine]="false"
   [refreshOnInternChanges]="false"
-  [name]="'loupe'"
+  [name]="'magnifier'"
   [ngStyle]="{
     position: 'absolute',
-    'margin-left': miniloupe.location.x + 'px',
-    'margin-top': miniloupe.location.y + 'px',
+    'margin-left': minimagnifier.location.x + 'px',
+    'margin-top': minimagnifier.location.y + 'px',
     width: '160px',
     height: '160px',
     display: 'flex',
     'z-index': '900',
-    visibility: miniloupe.isHidden ? 'hidden' : 'inherit',
+    visibility: minimagnifier.isHidden ? 'hidden' : 'inherit',
     flex: 'auto',
     'flex-direction': 'column'
   }"
-  [settings]="miniLoupeSettings"
+  [settings]="miniMagnifierSettings"
   [annotation]="annotationStoreService.transcript!"
 >
 </octra-audio-viewer>
@@ -38,14 +38,14 @@
 <div id="viewer">
   <octra-audio-viewer
     #signalDisplayTop
-    [name]="'top loupe'"
+    [name]="'top magnifier'"
     (mousecursorchange)="onMouseOver($event)"
     (mousedown)="onViewerMouseDown()"
     (mouseenter)="
-      miniloupe.isHidden = false; onAudioViewerMouseEnter('signaldisplay_top')
+      minimagnifier.isHidden = false; onAudioViewerMouseEnter('signaldisplay_top')
     "
     (mouseleave)="
-      miniloupe.isHidden = true; onAudioViewerMouseLeave('signaldisplay_top')
+      minimagnifier.isHidden = true; onAudioViewerMouseLeave('signaldisplay_top')
     "
     (segmententer)="onSegmentEnter($event)"
     (selchange)="onSelectionChanged($event)"
@@ -66,15 +66,15 @@
   [refreshOnInternChanges]="false"
   (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
   (alert)="onAlertTriggered($event)"
-  (click)="onLoupeClick()"
+  (click)="onMagnifierClick()"
   (mousedown)="onViewerMouseDown()"
-  (segmententer)="onLoupeSegmentEnter($event)"
+  (segmententer)="onMagnifierSegmentEnter($event)"
   (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
   (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
   [audioChunk]="audioChunkDown"
   [silencePlaceholder]="annotationStoreService.silencePlaceholder"
-  [name]="'downLoupe'"
-  [settings]="loupeSettings"
+  [name]="'downMagnifier'"
+  [settings]="magnifierSettings"
   [annotation]="annotationStoreService.transcript!"
   (currentLevelChange)="onCurrentLevelChange($event)"
 >

@@ -91,7 +91,7 @@ export class IDBEffects {
                   'easyMode',
                   'language',
                   'useMode',
-                  'showLoupe',
+                  'showMagnifier',
                   'secondsPerLine',
                   'audioSettings',
                   'highlightingEnabled',

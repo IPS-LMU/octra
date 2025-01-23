@@ -504,8 +504,8 @@
               </tr>
               <tr>
                 <td>
-                  <label for="showLoupe"
-                    >{{ 'settings.show loupe' | transloco }}:</label
+                  <label for="showMagnifier"
+                    >{{ 'settings.show magnifier' | transloco }}:</label
                   >
                 </td>
                 <td>
@@ -516,9 +516,9 @@
                       class="form-check-input"
                       type="checkbox"
                       role="switch"
-                      (click)="toggleSettings('showLoupe')"
-                      [checked]="appStorage.showLoupe"
-                      id="showLoupe"
+                      (click)="toggleSettings('showMagnifier')"
+                      [checked]="appStorage.showMagnifier"
+                      id="showMagnifier"
                     />
                   </div>
                 </td>

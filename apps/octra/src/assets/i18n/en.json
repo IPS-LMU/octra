@@ -450,7 +450,7 @@
     "logging": "Log user actions",
     "play on hover": "Play on hover",
     "seconds per line": "Seconds per line",
-    "show loupe": "Show loupe"
+    "show magnifier": "Show magnifier"
   },
   "signal-gui": {
     "segment enter text": "Please select a transcription unit by hovering over it and pressing the {{value}} key.",

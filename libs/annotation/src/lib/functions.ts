@@ -73,16 +73,21 @@ export function getSegmentsOfRange(
     const segment = entries[i];
 
     if (
-      segment.time!.samples >= startSamples.samples &&
-      segment.time!.samples <= endSamples.samples
+      // segment end is in chunk
+      (segment.time!.samples >= startSamples.samples &&
+      segment.time!.samples <= endSamples.samples) ||
+      // segment end is not in chunk, start is
+      (start.samples >= startSamples.samples &&
+        start.samples <= endSamples.samples) ||
+      (start.samples <= startSamples.samples && segment.time!.samples >= endSamples.samples)
     ) {
       if (startIndex < 0) {
         startIndex = i;
       }
       endIndex = i;
-    } else if (segment.time.samples > endSamples.samples) {
-      break;
     }
+
+    start = segment.time.clone();
   }
 
   return { startIndex, endIndex };

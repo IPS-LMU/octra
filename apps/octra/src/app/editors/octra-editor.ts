@@ -49,10 +49,10 @@ export abstract class OCTRAEditor extends DefaultComponent {
   abstract disableAllShortcuts(): void;
 
   protected changeArea(
-    loupe: AudioViewerComponent,
+    magnifier: AudioViewerComponent,
     signalDisplay: AudioViewerComponent,
     audioManager: AudioManager,
-    audioChunkLoupe: AudioChunk,
+    audioChunkMagnifier: AudioChunk,
     cursorTime: SampleUnit,
     factor: number
   ): Promise<AudioChunk | undefined> {
@@ -71,9 +71,9 @@ export abstract class OCTRAEditor extends DefaultComponent {
             ? audioManager.createSampleUnit(cursorTime.samples + halfRate)
             : audioManager.resource.info.duration.clone();
 
-        loupe.av.zoomY = factor;
+        magnifier.av.zoomY = factor;
         if (start && end) {
-          audioChunkLoupe.destroy();
+          audioChunkMagnifier.destroy();
           resolve(new AudioChunk(new AudioSelection(start, end), audioManager));
         } else {
           resolve(undefined);

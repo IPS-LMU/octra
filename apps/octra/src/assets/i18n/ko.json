@@ -299,7 +299,7 @@
     "logging": "사용자 작업 기록",
     "play on hover": "호버에서 재생",
     "seconds per line": "줄당 초",
-    "show loupe": "루프 표시"
+    "show magnifier": "루프 표시"
   },
   "signal-gui": {
     "segment enter text": "커서를 옮겨 기록 유닛을 선택한 뒤 {{value}} 키를 눌러 선택하십시오.",

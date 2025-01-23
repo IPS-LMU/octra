@@ -69,7 +69,7 @@ export class OctraDatabase extends Dexie {
       value: true,
     },
     {
-      name: 'showLoupe',
+      name: 'showMagnifier',
       value: false,
     },
     {
@@ -406,7 +406,7 @@ export class OctraDatabase extends Dexie {
           value: undefined,
         },
         {
-          name: 'showLoupe',
+          name: 'showMagnifier',
           value: false,
         },
         {
@@ -491,7 +491,7 @@ export interface IIDBApplicationOptions {
   interface?: string | null;
   language?: string | null;
   secondsPerLine?: number | null;
-  showLoupe?: boolean | null;
+  showMagnifier?: boolean | null;
   useMode?: LoginMode | null;
   version?: number | null;
   editorFont?: string | null;
@@ -513,7 +513,7 @@ export type IDBApplicationOptionName =
   | 'interface'
   | 'language'
   | 'secondsPerLine'
-  | 'showLoupe'
+  | 'showMagnifier'
   | 'useMode'
   | 'userProfile'
   | 'version'

@@ -450,7 +450,7 @@
     "logging": "Aktionen protkollieren",
     "play on hover": "Audiowiedergabe bei Mausbewegung",
     "seconds per line": "Sekunden je Zeile",
-    "show loupe": "Lupe anzeigen"
+    "show magnifier": "Lupe anzeigen"
   },
   "signal-gui": {
     "segment enter text": "Bitte wähle eine Transkriptionseinheit aus, indem Du mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen.",

@@ -76,14 +76,14 @@ export class TwoDEditorComponent
 
   @ViewChild('viewer', { static: true }) viewer!: AudioViewerComponent;
   @ViewChild('window', { static: false }) window!: TranscrWindowComponent;
-  @ViewChild('loupe', { static: false }) loupe!: AudioViewerComponent;
+  @ViewChild('magnifier', { static: false }) magnifier!: AudioViewerComponent;
   @ViewChild('audionav', { static: true }) audionav!: AudioNavigationComponent;
   @Output() public openModal = new EventEmitter();
 
   public showWindow = false;
-  public loupeHidden = true;
+  public magnifierHidden = true;
   public selectedIndex!: number;
-  public miniloupe = {
+  public minimagnifier = {
     size: {
       width: 160,
       height: 160,
@@ -97,8 +97,8 @@ export class TwoDEditorComponent
   public audioManager!: AudioManager;
   public audioChunkLines!: any;
   public audioChunkWindow!: AudioChunk;
-  public audioChunkLoupe!: AudioChunk;
-  public miniLoupeSettings!: AudioviewerConfig;
+  public audioChunkMagnifier!: AudioChunk;
+  public miniMagnifierSettings!: AudioviewerConfig;
   private mousestate = 'initiliazied';
   private intervalID = undefined;
   private factor = 8;
@@ -186,7 +186,7 @@ export class TwoDEditorComponent
     hotkeyEvent: HotkeysEvent
   ) => {
     if (this.shortcutsEnabled) {
-      if (this.appStorage.showLoupe) {
+      if (this.appStorage.showMagnifier) {
         if (hotkeyEvent.key === '.' || hotkeyEvent.key === ',') {
           if (hotkeyEvent.key === '.') {
             this.factor = Math.min(20, this.factor + 1);
@@ -197,15 +197,15 @@ export class TwoDEditorComponent
           }
 
           this.changeArea(
-            this.loupe,
+            this.magnifier,
             this.viewer,
             this.audioManager,
-            this.audioChunkLoupe,
+            this.audioChunkMagnifier,
             this.viewer.av.mouseCursor!,
             this.factor
-          ).then((newLoupeChunk) => {
-            if (newLoupeChunk !== undefined) {
-              this.audioChunkLoupe = newLoupeChunk;
+          ).then((newMagnifierChunk) => {
+            if (newMagnifierChunk !== undefined) {
+              this.audioChunkMagnifier = newMagnifierChunk;
               this.cd.detectChanges();
             }
           });
@@ -296,8 +296,8 @@ export class TwoDEditorComponent
     ],
   };
 
-  private miniLoupeShortcuts: ShortcutGroup = {
-    name: 'mini loupe',
+  private miniMagnifierShortcuts: ShortcutGroup = {
+    name: 'mini magnifier',
     enabled: true,
     items: [
       /** TODO fix shortcut on focus
@@ -360,7 +360,7 @@ export class TwoDEditorComponent
   ) {
     super();
     this.initialized = new EventEmitter<void>();
-    this.miniLoupeSettings = new AudioviewerConfig();
+    this.miniMagnifierSettings = new AudioviewerConfig();
     this.subscribe(this.modalService.onModalAction, {
       next: this.onModalAction,
     });
@@ -381,7 +381,7 @@ export class TwoDEditorComponent
       enabled: true,
       items: this.audioShortcuts.items,
     });
-    this.shortcutService.registerShortcutGroup(this.miniLoupeShortcuts);
+    this.shortcutService.registerShortcutGroup(this.miniMagnifierShortcuts);
     this.shortcutService.registerShortcutGroup(this.windowShortcuts);
 
     this.viewer.settings.multiLine = true;
@@ -401,15 +401,15 @@ export class TwoDEditorComponent
 
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine ?? 5;
 
-    this.miniLoupeSettings.roundValues = false;
-    this.miniLoupeSettings.shortcutsEnabled = false;
-    this.miniLoupeSettings.selection.enabled = false;
-    this.miniLoupeSettings.boundaries.readonly = true;
-    this.miniLoupeSettings.asr.enabled = false;
-    this.miniLoupeSettings.cropping = 'circle';
-    this.miniLoupeSettings.cursor.fixed = true;
+    this.miniMagnifierSettings.roundValues = false;
+    this.miniMagnifierSettings.shortcutsEnabled = true;
+    this.miniMagnifierSettings.selection.enabled = false;
+    this.miniMagnifierSettings.boundaries.readonly = true;
+    this.miniMagnifierSettings.asr.enabled = false;
+    this.miniMagnifierSettings.cropping = 'circle';
+    this.miniMagnifierSettings.cursor.fixed = true;
 
-    this.audioChunkLoupe = this.audioManager.mainchunk.clone();
+    this.audioChunkMagnifier = this.audioManager.mainchunk.clone();
 
     this.subscribe(this.asrStoreService.asrEnabled$, {
       next: (enabled) => {
@@ -575,8 +575,8 @@ export class TwoDEditorComponent
   }
 
   ngAfterViewInit() {
-    if (this.appStorage.showLoupe) {
-      this.loupe.av.zoomY = this.factor;
+    if (this.appStorage.showMagnifier) {
+      this.magnifier.av.zoomY = this.factor;
     }
     const subscr = this.viewer.onInitialized.subscribe(() => {
       subscr.unsubscribe();
@@ -681,53 +681,65 @@ export class TwoDEditorComponent
       this.viewer.av.mouseCursor!
     );
 
-    if (this.appStorage.showLoupe) {
+    if (this.appStorage.showMagnifier) {
       if (
         this.viewer.audioChunk!.time.duration.seconds !==
         this.viewer.av.mouseCursor!.seconds
       ) {
-        this.loupeHidden = false;
+        this.magnifierHidden = false;
         this.subscribe(
-          timer(20),
+          timer(0),
           () => {
-            this.changeLoupePosition($event.event!, $event.time!);
+            this.changeMagnifierPosition($event.event!, $event.time!);
             this.mousestate = 'ended';
           },
           'mouseTimer'
         );
       } else {
-        this.loupeHidden = true;
+        this.magnifierHidden = false;
       }
+    } else {
+      this.magnifierHidden = true;
     }
   }
 
-  public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
-    const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
-    const x = mouseEvent.offsetX - (this.miniloupe.size.width - 10) / 2 - 2;
+  public changeMagnifierPosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+    const offsetX =
+      mouseEvent.clientX -
+      (mouseEvent.target as HTMLElement).getBoundingClientRect().left;
+    const offsetY =
+      mouseEvent.clientY -
+      (mouseEvent.target as HTMLElement).getBoundingClientRect().top;
+
+    const fullY = offsetY + 30 + this.minimagnifier.size.height;
+    const x = offsetX - (this.minimagnifier.size.width - 10) / 2 - 2;
+
+    const newPosition = { ...this.minimagnifier.location };
 
     if (fullY < this.viewer.height!) {
-      // loupe is fully visible
-      this.miniloupe.location.y = mouseEvent.offsetY + 20;
+      // magnifier is fully visible
+      newPosition.y = offsetY + 30;
     } else {
-      // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y =
-        mouseEvent.offsetY - 20 - this.miniloupe.size.height;
+      // magnifier out of the bottom border of view rectangle
+      newPosition.y = offsetY + 20 - this.minimagnifier.size.height;
     }
-    this.miniloupe.location.x = x;
+    newPosition.x = x;
 
-    this.loupeHidden = false;
+    this.magnifierHidden = false;
     this.changeArea(
-      this.loupe,
+      this.magnifier,
       this.viewer,
       this.audioManager,
-      this.audioChunkLoupe,
+      this.audioChunkMagnifier,
       cursorTime,
       this.factor
-    ).then((newLoupeChunk) => {
-      if (newLoupeChunk !== undefined) {
-        this.audioChunkLoupe = newLoupeChunk;
+    ).then((newMagnifierChunk) => {
+      if (newMagnifierChunk !== undefined) {
+        this.audioChunkMagnifier = newMagnifierChunk;
+        this.minimagnifier.location = newPosition;
+        this.viewer.av.focus();
+        this.cd.detectChanges();
       }
-      this.cd.detectChanges();
     });
   }
 
@@ -1003,25 +1015,13 @@ export class TwoDEditorComponent
 
   onScrollbarMouse(event: any) {
     if (event.state === 'mousemove') {
-      this.loupeHidden = true;
+      this.magnifierHidden = true;
     }
   }
 
   onScrolling(event: any) {
     if (event.state === 'scrolling') {
-      this.loupeHidden = true;
-    }
-  }
-
-  onCircleLoupeMouseOver() {
-    const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
-    if (fullY < this.viewer.height!) {
-      // loupe is fully visible
-      this.miniloupe.location.y = this.miniloupe.location.y + 20;
-    } else {
-      // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y =
-        this.miniloupe.location.y - 20 - this.miniloupe.size.height;
+      this.magnifierHidden = true;
     }
   }
 
@@ -1068,16 +1068,16 @@ export class TwoDEditorComponent
   public enableAllShortcuts() {
     this.shortcutsEnabled = true;
     this.viewer.enableShortcuts();
-    if (this.window !== undefined && this.window.loupe !== undefined) {
-      this.window.loupe.enableShortcuts();
+    if (this.window !== undefined && this.window.magnifier !== undefined) {
+      this.window.magnifier.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.shortcutsEnabled = false;
     this.viewer.disableShortcuts();
-    if (this.window !== undefined && this.window.loupe !== undefined) {
-      this.window.loupe.disableShortcuts();
+    if (this.window !== undefined && this.window.magnifier !== undefined) {
+      this.window.magnifier.disableShortcuts();
     }
   }
 

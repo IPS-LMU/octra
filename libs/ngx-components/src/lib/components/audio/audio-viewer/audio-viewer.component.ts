@@ -21,7 +21,7 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import { SubscriptionManager } from '@octra/utilities';
+import { SubscriptionManager, wait } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import Konva from 'konva';
 import { Subject, Subscription, timer } from 'rxjs';
@@ -307,10 +307,11 @@ export class AudioViewerComponent
     this.av.destroy();
   }
 
-  afterChunkUpdated(audioChunk?: AudioChunk) {
+  async afterChunkUpdated(audioChunk?: AudioChunk) {
     if (audioChunk) {
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
+      this.subscrManager.removeByTag('initializeAVAfterChunkChange');
 
       this.subscrManager.add(
         audioChunk.statuschange.subscribe({
@@ -322,65 +323,50 @@ export class AudioViewerComponent
         'audioChunkStatusChange'
       );
 
-      let time = Date.now();
-      new Promise<void>((resolve, reject) => {
-        if (audioChunk && !audioChunk.audioManager.channel) {
-          this.subscrManager.add(
-            audioChunk.audioManager.onChannelDataChange.subscribe({
-              next: () => {
-                resolve();
-              },
-              error: (error: any) => {
-                reject(error);
-              },
-            }),
-            'audioChunkChannelFinished'
-          );
-        } else {
-          resolve();
-        }
-      })
-        .then(() => {
-          console.log(`Channel data computation took ${Date.now() - time}ms`);
-          time = Date.now();
-          // channel data is ready
-
-          timer(0).subscribe({
-            next: () => {
-              if (
-                this.width &&
-                this.height &&
-                audioChunk &&
-                this.av.annotation?.currentLevel &&
-                this.av.annotation.currentLevel.items.length > 0
-              ) {
-                this.av.initialize(
-                  this.width,
-                  this.height,
-                  this.konvaContainer?.nativeElement,
-                  audioChunk
-                );
-
-                this.av
-                  .initializeSettings()
-                  .then(() => {
-                    this.av.initializeView();
-                    console.log(
-                      `Initializing view took ${Date.now() - time}ms`
-                    );
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                  });
-              } else {
-                // ignore
-              }
-            },
-          });
-        })
-        .catch((error) => {
-          console.error(error);
+      try {
+        await new Promise<void>((resolve, reject) => {
+          if (audioChunk && !audioChunk.audioManager.channel) {
+            this.subscrManager.add(
+              audioChunk.audioManager.onChannelDataChange.subscribe({
+                next: () => {
+                  resolve();
+                },
+                error: (error: any) => {
+                  reject(error);
+                },
+              }),
+              'audioChunkChannelFinished'
+            );
+          } else {
+            resolve();
+          }
         });
+
+        // channel data is ready
+        await wait(0);
+
+        if (
+          this.width &&
+          this.height &&
+          audioChunk &&
+          this.av.annotation?.currentLevel &&
+          this.av.annotation.currentLevel.items.length > 0
+        ) {
+          this.av.initialize(
+            this.width,
+            this.height,
+            this.konvaContainer?.nativeElement,
+            audioChunk
+          );
+
+          await this.av.initializeSettings();
+          this.av.initializeView();
+        } else {
+          // ignore
+        }
+      } catch (e) {
+        console.error(e);
+      }
     } else {
       console.error(`AudioViewer: chunk is undefined.`);
     }
@@ -426,23 +412,17 @@ export class AudioViewerComponent
     this.subscrManager.removeByTag('resize');
     this.subscrManager.add(
       timer(wait).subscribe({
-        next: () => {
+        next: async () => {
           if (Date.now() - this.lastResize >= wait && !this.resizing) {
             this.resizing = true;
-            const old = Date.now();
-            this.av
-              .onResize(this.width, this.height)
-              .then(() => {
-                this.lastResize = Date.now();
-                this.resizing = false;
-                console.log(
-                  `resizing took ${Date.now() - old}ms for viewer ${this.name}`
-                );
-              })
-              .catch((error) => {
-                console.error(error);
-                this.resizing = false;
-              });
+            try {
+              this.lastResize = Date.now();
+              await this.av.onResize(this.width, this.height);
+              this.resizing = false;
+            } catch (e) {
+              console.error(e);
+              this.resizing = false;
+            }
           }
         },
       }),

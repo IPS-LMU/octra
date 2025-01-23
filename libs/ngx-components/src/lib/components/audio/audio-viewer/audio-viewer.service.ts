@@ -404,22 +404,27 @@ export class AudioViewerService {
           this.settings.margin.bottom;
       }
 
-      this.stage = new Konva.Stage({
-        container, // id of container <div>,
-        width: this.size!.width,
-        height: this.size!.height,
-      });
+      if (!this.stage) {
+        this.stage = new Konva.Stage({
+          container, // id of container <div>,
+          width: this.size!.width,
+          height: this.size!.height,
+        });
+        this.initializeLayers();
 
-      this.initializeLayers();
+        if (this.layers) {
+          for (const [, layer] of Object.entries(this.layers)) {
+            this.stage.add(layer);
+          }
+        }
+      } else {
+        this.stage.width(this.size!.width);
+        this.stage.height(this.size!.height);
+      }
+
       this.updateViewPort();
       this.removeEventListenersFromContainer(container);
       this.addEventListenersForContainer(container);
-
-      if (this.layers) {
-        for (const [, layer] of Object.entries(this.layers)) {
-          this.stage.add(layer);
-        }
-      }
 
       this.initializeStageContainer();
 
@@ -635,7 +640,6 @@ export class AudioViewerService {
                 i
               );
               line.listening(false);
-              const t = [line.x(), line.y(), line.width(), line.height()];
               line.visible(
                 this.isVisibleInView(
                   line.x(),
@@ -820,16 +824,15 @@ export class AudioViewerService {
     }
   }
 
-  onSecondsPerLineChanged(secondsPerLine: number) {
-    this.secondsPerLine = secondsPerLine;
-    this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
-    this.initializeSettings()
-      .then(() => {
-        this.initializeView();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  async onSecondsPerLineChanged(secondsPerLine: number) {
+    try {
+      this.secondsPerLine = secondsPerLine;
+      this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+      await this.initializeSettings();
+      this.initializeView();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private createCropContainer(id?: string): Group {
@@ -1062,12 +1065,12 @@ export class AudioViewerService {
       this.croppingData !== undefined
     ) {
       const shadowCircle = new Konva.Circle({
-        stroke: 'black',
+        stroke: '#555555',
         strokeWidth: 1,
         x: this.croppingData.x,
         y: this.croppingData.y,
         radius: this.croppingData.radius,
-        shadowColor: 'black',
+        shadowColor: 'gray',
         shadowEnabled: true,
         shadowBlur: 5,
         shadowOffset: { x: 2.5, y: 0 },
@@ -1076,8 +1079,8 @@ export class AudioViewerService {
       result.add(shadowCircle);
       result.add(lineGroup);
       const borderedCircle = new Konva.Circle({
-        stroke: 'black',
-        strokeWidth: 2,
+        stroke: '#555555',
+        strokeWidth: 1,
         x: this.croppingData.x,
         y: this.croppingData.y,
         radius: this.croppingData.radius,
@@ -1115,12 +1118,12 @@ export class AudioViewerService {
       this.croppingData !== undefined
     ) {
       const shadowCircle = new Konva.Circle({
-        stroke: 'black',
+        stroke: '#555555',
         strokeWidth: 1,
         x: this.croppingData.x,
         y: this.croppingData.y,
         radius: this.croppingData.radius,
-        shadowColor: 'black',
+        shadowColor: 'gray',
         shadowEnabled: true,
         shadowBlur: 5,
         shadowOffset: { x: 2.5, y: 0 },
@@ -1129,8 +1132,8 @@ export class AudioViewerService {
       result.add(shadowCircle);
       result.add(lineGroup);
       const borderedCircle = new Konva.Circle({
-        stroke: 'black',
-        strokeWidth: 2,
+        stroke: '#555555',
+        strokeWidth: 1,
         x: this.croppingData.x,
         y: this.croppingData.y,
         radius: this.croppingData.radius,
@@ -1641,12 +1644,15 @@ export class AudioViewerService {
           let overlayGroup: Konva.Group | undefined = undefined;
 
           if (
-            (segmentEnd.samples >= audioChunkStart.samples &&
-              segmentEnd.samples <= audioChunkEnd.samples) ||
+            // segment start is in chunk
             (beginTime.samples >= audioChunkStart.samples &&
               beginTime.samples <= audioChunkEnd.samples) ||
-            (beginTime.samples < audioChunkStart.samples &&
-              segmentEnd.samples > audioChunkEnd.samples)
+            // segment end is in chunk
+            (segmentEnd.samples >= audioChunkStart.samples &&
+              segmentEnd.samples <= audioChunkEnd.samples) ||
+            // segment start and end are out of chunk
+            (beginTime.samples <= audioChunkStart.samples &&
+              segmentEnd.samples >= audioChunkEnd.samples)
           ) {
             let lastI: number | undefined = 0;
             this.removeSegmentFromCanvas(segment.id); // TODO hier werden segmente entfernt
@@ -1785,6 +1791,8 @@ export class AudioViewerService {
           }
         }
       }
+    } else {
+      console.log("no segment created");
     }
 
     return undefined;
@@ -1874,116 +1882,114 @@ export class AudioViewerService {
   /**
    * saves mouse click position
    */
-  public setMouseClickPosition(
+  public async setMouseClickPosition(
     absX: number,
     lineNum: number,
     $event: Event
-  ): Promise<number> {
-    return new Promise<number>((resolve) => {
-      if (this.audioChunk !== undefined) {
-        const absXInTime = this.audioTCalculator?.absXChunktoSampleUnit(
-          absX,
-          this.audioChunk
-        );
+  ): Promise<number | undefined> {
+    if (this.audioChunk !== undefined) {
+      const absXInTime = this.audioTCalculator?.absXChunktoSampleUnit(
+        absX,
+        this.audioChunk
+      );
 
-        if (
-          absXInTime !== undefined &&
-          this.audioManager !== undefined &&
-          this.audioChunk !== undefined &&
-          this.annotation?.currentLevel !== undefined &&
-          this.annotation.currentLevel.items.length > 0 &&
-          this.audioTCalculator !== undefined &&
-          this.PlayCursor !== undefined
-        ) {
-          this._mouseCursor = absXInTime.clone();
+      if (
+        absXInTime !== undefined &&
+        this.audioManager !== undefined &&
+        this.audioChunk !== undefined &&
+        this.annotation?.currentLevel !== undefined &&
+        this.annotation.currentLevel.items.length > 0 &&
+        this.audioTCalculator !== undefined &&
+        this.PlayCursor !== undefined
+      ) {
+        this._mouseCursor = absXInTime.clone();
 
-          if (!this.audioManager.isPlaying) {
-            // same line
-            // fix margin settings
-            if ($event.type === 'mousedown') {
-              // no line defined or same line
-              this.mouseClickPos = absXInTime.clone();
-              this.audioChunk.startpos = this.mouseClickPos.clone();
-              this.audioChunk.selection.start = absXInTime.clone();
-              this.audioChunk.selection.end = absXInTime.clone();
-              if (!this.shiftPressed) {
-                this._drawnSelection = this.audioChunk.selection.clone();
-              }
-
-              if (this._dragableBoundaryID > -1) {
-                const currentLevel = this
-                  .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
-                const index = this.annotation.currentLevel.items.findIndex(
-                  (a) => a.id === this._dragableBoundaryID
-                );
-
-                const segmentBefore = currentLevel!.getLeftSibling(index);
-                const segment = this.annotation.currentLevel.items[
-                  index
-                ] as OctraAnnotationSegment<ASRContext>;
-                const segmentAfter = currentLevel!.getRightSibling(index);
-
-                if (
-                  segment?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR ||
-                  segmentBefore?.context?.asr?.isBlockedBy ===
-                    ASRQueueItemType.ASR ||
-                  segmentAfter?.context?.asr?.isBlockedBy ===
-                    ASRQueueItemType.ASR
-                ) {
-                  // prevent dragging boundary of blocked segment
-                  this._dragableBoundaryID = -1;
-                }
-              }
-              this._mouseDown = true;
-            } else if ($event.type === 'mouseup') {
-              this.handleBoundaryDragging(absX, absXInTime, true);
-
-              this.overboundary = false;
-              this._mouseDown = false;
-
-              this._boundaryDragging.next({
-                shiftPressed: this.shiftPressed,
-                id: this._dragableBoundaryID,
-                status: 'stopped',
-              });
-              this._dragableBoundaryID = -1;
-              this.updateAllSegments();
+        if (!this.audioManager.isPlaying) {
+          // same line
+          // fix margin settings
+          if ($event.type === 'mousedown') {
+            // no line defined or same line
+            this.mouseClickPos = absXInTime.clone();
+            this.audioChunk.startpos = this.mouseClickPos.clone();
+            this.audioChunk.selection.start = absXInTime.clone();
+            this.audioChunk.selection.end = absXInTime.clone();
+            if (!this.shiftPressed) {
+              this._drawnSelection = this.audioChunk.selection.clone();
             }
 
-            resolve(lineNum);
-          } else if (
-            this.audioManager.state === PlayBackStatus.PLAYING &&
-            $event.type === 'mouseup'
-          ) {
-            this.audioChunk
-              .stopPlayback()
-              .then(() => {
-                if (
-                  this.audioChunk !== undefined &&
-                  this.audioTCalculator !== undefined
-                ) {
-                  this.audioChunk.startpos = absXInTime.clone();
-                  this.audioChunk.selection.end = absXInTime.clone();
-                  this._drawnSelection = this.audioChunk.selection.clone();
-                  this.PlayCursor?.changeSamples(
-                    absXInTime,
-                    this.audioTCalculator,
-                    this.audioChunk
-                  );
+            if (this._dragableBoundaryID > -1) {
+              const currentLevel = this
+                .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+              const index = this.annotation.currentLevel.items.findIndex(
+                (a) => a.id === this._dragableBoundaryID
+              );
 
-                  this._mouseDown = false;
-                  this._dragableBoundaryID = -1;
-                }
+              const segmentBefore = currentLevel!.getLeftSibling(index);
+              const segment = this.annotation.currentLevel.items[
+                index
+              ] as OctraAnnotationSegment<ASRContext>;
+              const segmentAfter = currentLevel!.getRightSibling(index);
 
-                resolve(lineNum);
-              })
-              .catch((error: any) => {
-                console.error(error);
-              });
+              if (
+                segment?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR ||
+                segmentBefore?.context?.asr?.isBlockedBy ===
+                  ASRQueueItemType.ASR ||
+                segmentAfter?.context?.asr?.isBlockedBy === ASRQueueItemType.ASR
+              ) {
+                // prevent dragging boundary of blocked segment
+                this._dragableBoundaryID = -1;
+              }
+            }
+            this._mouseDown = true;
+          } else if ($event.type === 'mouseup') {
+            this.handleBoundaryDragging(absX, absXInTime, true);
+
+            this.overboundary = false;
+            this._mouseDown = false;
+
+            this._boundaryDragging.next({
+              shiftPressed: this.shiftPressed,
+              id: this._dragableBoundaryID,
+              status: 'stopped',
+            });
+            this._dragableBoundaryID = -1;
+            this.updateAllSegments();
+          }
+
+          return lineNum;
+        } else if (
+          this.audioManager.state === PlayBackStatus.PLAYING &&
+          $event.type === 'mouseup'
+        ) {
+          try {
+            await this.audioChunk.stopPlayback();
+
+            if (
+              this.audioChunk !== undefined &&
+              this.audioTCalculator !== undefined
+            ) {
+              this.audioChunk.startpos = absXInTime.clone();
+              this.audioChunk.selection.end = absXInTime.clone();
+              this._drawnSelection = this.audioChunk.selection.clone();
+              this.PlayCursor?.changeSamples(
+                absXInTime,
+                this.audioTCalculator,
+                this.audioChunk
+              );
+
+              this._mouseDown = false;
+              this._dragableBoundaryID = -1;
+            }
+
+            return lineNum;
+          } catch (e) {
+            console.error(e);
           }
         }
       }
-    });
+    }
+
+    return undefined;
   }
 
   handleBoundaryDragging(absX: number, absXInTime: SampleUnit, emit = false) {
@@ -2221,46 +2227,32 @@ export class AudioViewerService {
     this._drawnSelection = this.audioChunk.selection.clone();
     this._drawnSelection.end = this._drawnSelection.start.clone();
 
-    return this.afterChannelInititialized();
+    return this.afterChannelInitialized();
   };
 
-  public refreshComputedData(): Promise<any> {
-    return new Promise<void>((resolve, reject) => {
-      try {
-        if (this.audioManager !== undefined && this.audioChunk !== undefined) {
-          this.computeWholeDisplayData(
-            this.AudioPxWidth / 2,
-            this._settings.lineheight,
-            this.audioManager.channel!,
-            {
-              start: Math.ceil(
-                this.audioChunk.time.start.samples /
-                  this.audioManager.channelDataFactor
-              ),
-              end: Math.min(
-                this.audioManager.channel!.length,
-                Math.ceil(
-                  this.audioChunk.time.end.samples /
-                    this.audioManager.channelDataFactor
-                )
-              ),
-            }
-          )
-            .then((result) => {
-              this._minmaxarray = result;
-
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
-            });
-        } else {
-          reject(new Error('audioManager or audioChunk is undefined'));
+  public async refreshComputedData(): Promise<void> {
+    if (this.audioManager !== undefined && this.audioChunk !== undefined) {
+      this._minmaxarray = await this.computeWholeDisplayData(
+        this.AudioPxWidth / 2,
+        this._settings.lineheight,
+        this.audioManager.channel!,
+        {
+          start: Math.ceil(
+            this.audioChunk.time.start.samples /
+              this.audioManager.channelDataFactor
+          ),
+          end: Math.min(
+            this.audioManager.channel!.length,
+            Math.ceil(
+              this.audioChunk.time.end.samples /
+                this.audioManager.channelDataFactor
+            )
+          ),
         }
-      } catch (err) {
-        reject(err);
-      }
-    });
+      );
+    } else {
+      throw new Error('audioManager or audioChunk is undefined');
+    }
   }
 
   private isVisibleInView(x: number, y: number, width: number, height: number) {
@@ -2409,6 +2401,12 @@ export class AudioViewerService {
                       const segment = this.currentLevel.items[
                         segmentI
                       ] as OctraAnnotationSegment<ASRContext>;
+                      console.log("set break");
+                      console.log(`
+                      ${segmentI > -1} &&
+                        ${segment.context?.asr?.isBlockedBy} === undefined &&
+                        ${this.silencePlaceholder !== undefined}
+`);
                       if (
                         segmentI > -1 &&
                         segment.context?.asr?.isBlockedBy === undefined &&
@@ -2935,91 +2933,90 @@ export class AudioViewerService {
       });
   };
 
-  public selectSegment(
+  public async selectSegment(
     segIndex: number
   ): Promise<{ posY1: number; posY2: number }> {
-    return new Promise<{ posY1: number; posY2: number }>((resolve, reject) => {
-      if (
-        segIndex > -1 &&
-        this.currentLevel &&
-        this.currentLevel.items.length > 0 &&
-        this.audioChunk !== undefined &&
-        this.audioManager !== undefined
-      ) {
-        const segment = this.currentLevel.items[
-          segIndex
-        ] as OctraAnnotationSegment;
-        if (segment.type !== 'segment') {
-          reject();
-          return;
-        }
-        const items = this.currentLevel.items as OctraAnnotationSegment[];
-
-        const startTime = getStartTimeBySegmentID(items, segment.id);
-
-        // make shure, that segments boundaries are visible
-        if (
-          segment?.time?.samples !== undefined &&
-          this.audioTCalculator !== undefined &&
-          (startTime as any).samples >= this.audioChunk.time.start.samples &&
-          segment.time.samples <= this.audioChunk.time.end.samples + 1 &&
-          this.innerWidth !== undefined
-        ) {
-          const absX = this.audioTCalculator.samplestoAbsX(segment.time);
-          let begin: OctraAnnotationSegment;
-
-          if (segIndex > 0) {
-            begin = items[segIndex - 1];
-          } else {
-            begin = new OctraAnnotationSegment(
-              this.getNextItemID(),
-              this.audioManager.createSampleUnit(0),
-              []
-            );
-          }
-
-          const beginX = this.audioTCalculator.samplestoAbsX(begin.time);
-          const posY1 =
-            this.innerWidth < this.AudioPxWidth
-              ? Math.floor(beginX / this.innerWidth + 1) *
-                  (this.settings.lineheight + this.settings.margin.bottom) -
-                this.settings.margin.bottom
-              : 0;
-
-          let posY2 = 0;
-
-          if (this.innerWidth < this.AudioPxWidth) {
-            posY2 =
-              Math.floor(absX / this.innerWidth + 1) *
-                (this.settings.lineheight + this.settings.margin.bottom) -
-              this.settings.margin.bottom;
-          }
-
-          const boundarySelect = this.getSegmentSelection(
-            segment.time.samples - 1
-          );
-          if (boundarySelect) {
-            this.audioChunk.selection = boundarySelect;
-            this.drawnSelection = boundarySelect.clone();
-            this.settings.selection.color = 'gray';
-            this.audioChunk.absolutePlayposition =
-              this.audioChunk.selection.start.clone();
-            this.changePlayCursorSamples(this.audioChunk.selection.start);
-            this.updatePlayCursor();
-
-            if (this.audioManager.isPlaying) {
-              this.audioManager.stopPlayback().catch((error: any) => {
-                console.error(error);
-              });
-            }
-          }
-
-          resolve({ posY1, posY2 });
-        }
-      } else {
-        reject();
+    if (
+      segIndex > -1 &&
+      this.currentLevel &&
+      this.currentLevel.items.length > 0 &&
+      this.audioChunk !== undefined &&
+      this.audioManager !== undefined
+    ) {
+      const segment = this.currentLevel.items[
+        segIndex
+      ] as OctraAnnotationSegment;
+      if (segment.type !== 'segment') {
+        throw new Error("Segment is not of type 'segment'");
       }
-    });
+      const items = this.currentLevel.items as OctraAnnotationSegment[];
+
+      const startTime = getStartTimeBySegmentID(items, segment.id);
+
+      // make shure, that segments boundaries are visible
+      if (
+        segment?.time?.samples !== undefined &&
+        this.audioTCalculator !== undefined &&
+        (startTime as any).samples >= this.audioChunk.time.start.samples &&
+        segment.time.samples <= this.audioChunk.time.end.samples + 1 &&
+        this.innerWidth !== undefined
+      ) {
+        const absX = this.audioTCalculator.samplestoAbsX(segment.time);
+        let begin: OctraAnnotationSegment;
+
+        if (segIndex > 0) {
+          begin = items[segIndex - 1];
+        } else {
+          begin = new OctraAnnotationSegment(
+            this.getNextItemID(),
+            this.audioManager.createSampleUnit(0),
+            []
+          );
+        }
+
+        const beginX = this.audioTCalculator.samplestoAbsX(begin.time);
+        const posY1 =
+          this.innerWidth < this.AudioPxWidth
+            ? Math.floor(beginX / this.innerWidth + 1) *
+                (this.settings.lineheight + this.settings.margin.bottom) -
+              this.settings.margin.bottom
+            : 0;
+
+        let posY2 = 0;
+
+        if (this.innerWidth < this.AudioPxWidth) {
+          posY2 =
+            Math.floor(absX / this.innerWidth + 1) *
+              (this.settings.lineheight + this.settings.margin.bottom) -
+            this.settings.margin.bottom;
+        }
+
+        const boundarySelect = this.getSegmentSelection(
+          segment.time.samples - 1
+        );
+        if (boundarySelect) {
+          this.audioChunk.selection = boundarySelect;
+          this.drawnSelection = boundarySelect.clone();
+          this.settings.selection.color = 'gray';
+          this.audioChunk.absolutePlayposition =
+            this.audioChunk.selection.start.clone();
+          this.changePlayCursorSamples(this.audioChunk.selection.start);
+          this.updatePlayCursor();
+
+          if (this.audioManager.isPlaying) {
+            this.audioManager.stopPlayback().catch((error: any) => {
+              console.error(error);
+            });
+          }
+        }
+
+        return { posY1, posY2 };
+      } else {
+        throw new Error('Segment not selected.');
+      }
+    } else {
+      throw new Error('Invalid segment');
+    }
   }
 
   /**
@@ -3052,7 +3049,7 @@ export class AudioViewerService {
    * computeDisplayData() generates an array of min-max pairs representing the
    * audio signal. The values of the array are float in the range -1 .. 1.
    */
-  computeWholeDisplayData(
+  async computeWholeDisplayData(
     width: number,
     height: number,
     cha: Float32Array,
@@ -3509,6 +3506,17 @@ export class AudioViewerService {
     }
   }
 
+  /**
+   *
+   * IMPORTANT! DON'T make async from this method, because it's not working with async in a web worker!
+   *
+   * @param width
+   * @param height
+   * @param channel
+   * @param interval
+   * @param roundValues
+   * @param xZoom
+   */
   private computeDisplayData = (
     width: number,
     height: number,
@@ -3615,35 +3623,29 @@ export class AudioViewerService {
   }
 
   /**
-   * after Channel was initialzed
+   * after Channel was initialized
    */
-  private afterChannelInititialized(
-    calculateZoom: boolean = true
-  ): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.refreshComputedData()
-        .then(() => {
-          if (calculateZoom) {
-            this.calculateZoom(
-              this._settings.lineheight,
-              this.AudioPxWidth,
-              this._minmaxarray
-            );
-          }
-          if (this.audioChunk !== undefined) {
-            this.audioChunk.absolutePlayposition =
-              this.audioChunk.time.start.clone();
-          }
-          this.channelInitialized.next();
-          this.channelInitialized.complete();
-          resolve();
-        })
-        .catch((err) => {
-          console.error(err);
-          this.channelInitialized.error(err);
-          reject(err);
-        });
-    });
+  private async afterChannelInitialized(calculateZoom = true): Promise<void> {
+    try {
+      await this.refreshComputedData();
+
+      if (calculateZoom) {
+        this.calculateZoom(
+          this._settings.lineheight,
+          this.AudioPxWidth,
+          this._minmaxarray
+        );
+      }
+      if (this.audioChunk !== undefined) {
+        this.audioChunk.absolutePlayposition =
+          this.audioChunk.time.start.clone();
+      }
+      this.channelInitialized.next();
+      this.channelInitialized.complete();
+    } catch (e) {
+      console.error(e);
+      this.channelInitialized.error(e);
+    }
   }
 
   private addNewSegmentOnCanvas(id: number) {
@@ -5014,7 +5016,6 @@ export class AudioViewerService {
 
       // focus it
       // also stage will be in focus on its click
-      stageContainer.focus();
       stageContainer.removeEventListener('keydown', this.onKeyDown);
       stageContainer.addEventListener('keydown', this.onKeyDown);
       stageContainer.removeEventListener('keyup', this.onKeyUp);
@@ -5137,7 +5138,7 @@ export class AudioViewerService {
     container.removeEventListener('mouseup', this.mouseChange);
   }
 
-  private mouseChange = (event: any) => {
+  private mouseChange = async (event: any) => {
     if (this.innerWidth) {
       const absXPos = this.hoveredLine * this.innerWidth + event.layerX;
 
@@ -5157,14 +5158,12 @@ export class AudioViewerService {
             this.audioChunk.absolutePlayposition.clone();
         }
 
-        this.setMouseClickPosition(absXPos, this.hoveredLine, event).then(
-          () => {
-            if (this.layers !== undefined) {
-              this.updatePlayCursor();
-              this.layers.playhead.draw();
-            }
-          }
-        );
+        await this.setMouseClickPosition(absXPos, this.hoveredLine, event);
+
+        if (this.layers !== undefined) {
+          this.updatePlayCursor();
+          this.layers.playhead.draw();
+        }
 
         if (event.type !== 'mousedown') {
           this.selchange.emit(this.audioChunk.selection);
@@ -5227,7 +5226,6 @@ export class AudioViewerService {
         }
       }
       this.setMouseMovePosition(absXPos);
-
       this.mousecursorchange.emit({
         event,
         time: this.mouseCursor,
@@ -5241,6 +5239,11 @@ export class AudioViewerService {
     container.addEventListener('mousemove', this.onMouseMove);
     container.addEventListener('mousedown', this.mouseChange);
     container.addEventListener('mouseup', this.mouseChange);
+  }
+
+  focus(){
+    this.stage?.container().focus();
+    this._focused = true;
   }
 }
 

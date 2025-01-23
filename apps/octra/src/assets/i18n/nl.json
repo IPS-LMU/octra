@@ -299,7 +299,7 @@
     "logging": "Gebruikersacties loggen",
     "play on hover": "Play on hover",
     "seconds per line": "Seconden per regel",
-    "show loupe": "Vergrootglas weergeven"
+    "show magnifier": "Vergrootglas weergeven"
   },
   "signal-gui": {
     "segment enter text": "Selecteer een transcriptie-eenheid door er met de muis over te gaan en op de {{value}}-toets te drukken.",

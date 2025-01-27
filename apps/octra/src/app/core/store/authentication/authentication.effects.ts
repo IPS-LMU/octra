@@ -131,7 +131,7 @@ export class AuthenticationEffects {
                     'intern',
                     'projects'
                   )
-                )}`;
+                )}&uuid=${this.apiService.appProperties.server.uuid}`;
 
                 if (auth.agreementToken) {
                   url = `${url}&t=${auth.agreementToken}`;

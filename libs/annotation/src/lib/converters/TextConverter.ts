@@ -111,7 +111,7 @@ export class TextConverter extends Converter {
                   result += this.options.showTimestampString ? ' ' : '';
                   result += `sp="${sampleEnd}"`;
                 }
-                result += `/>`;
+                result += `>`;
               }
 
               if (this.options.addNewLineString) {
@@ -185,9 +185,9 @@ export class TextConverter extends Converter {
     if (file.content.indexOf('<ts') > -1 || file.content.indexOf('<sp') > -1) {
       // segments available
       const regexSplit =
-        /<(?:(?:(?:(?:ts)|(?:sp))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:(?:(?:ts)|(?:sp)))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/>))/g;
+        /<(?:(?:(?:(?:ts)|(?:sp))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:(?:(?:ts)|(?:sp)))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?\/?>)/g;
       const regexExtract = new RegExp(
-        /<(?:(?:((?:ts)|(?:sp))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:((?:ts)|(?:sp)))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/>))/g
+        /<(?:(?:((?:ts)|(?:sp))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:((?:ts)|(?:sp)))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/?>))/g
       );
       const transcripts = file.content.split(regexSplit);
       let match = regexExtract.exec(file.content);
@@ -343,8 +343,6 @@ export class TextConverter extends Converter {
 
     args = { ...defaultArgs, ...args };
 
-    const forceHours = Math.floor(args.maxDuration! / 1000 / 60 / 60) > 0;
-
     let result = '';
 
     const milliSeconds: string = this.formatNumber(
@@ -354,7 +352,7 @@ export class TextConverter extends Converter {
     const minutes: string = this.formatNumber(this.getMinutes(timespan), 2);
     const seconds: string = this.formatNumber(this.getSeconds(timespan), 2);
     const hours: string =
-      args.showHour && (forceHours || this.getHours(timespan) > 0)
+      args.showHour
         ? this.formatNumber(this.getHours(timespan), 2) + ':'
         : '';
 

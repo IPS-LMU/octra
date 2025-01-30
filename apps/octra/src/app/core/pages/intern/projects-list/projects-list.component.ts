@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -9,6 +9,7 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../../component/default.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
+import { LuxonShortDateTimePipe } from '../../../shared';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { RootState } from '../../../store';
 import {
@@ -17,16 +18,24 @@ import {
 } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
-  imports: [NgClass, AsyncPipe, TranslocoPipe],
+  imports: [AsyncPipe, TranslocoPipe, LuxonShortDateTimePipe, NgbPagination],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projects?: ProjectListDto;
+  shownProjects?: ProjectDto[];
+
   projectStarting = false;
+  itemsPerPage = 20;
+  currentPage?: {
+    page: number;
+    collectionSize: number;
+  };
 
   constructor(
     private api: OctraAPIService,
@@ -60,22 +69,23 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       ),
       {
         next: () => {
-          this.loadProjects();
+          this.loadProjects(1);
         },
       }
     );
-    this.loadProjects();
+    this.loadProjects(1);
   }
 
-  private loadProjects() {
+  loadProjects(page: number) {
     this.projects = undefined;
 
     this.subscribe(
       this.api.listProjects({
         manageable: false,
-        start: 1,
+        start: page,
         representation: 'page',
-        length: 3,
+        order: "asc",
+        order_by: "name"
       }),
       {
         next: (projects) => {
@@ -95,27 +105,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
               return false;
             }),
           };
-
-          this.projects?.list?.sort((a, b) => {
-            if (a.active && !b.active) {
-              return 1;
-            } else if (a.active && b.active) {
-              const annotationStatisticsA =
-                a.statistics!.tasks.find((c) => c.type === 'annotation')?.status
-                  .free ?? 0;
-              const annotationStatisticsB =
-                b.statistics!.tasks.find((c) => c.type === 'annotation')?.status
-                  .free ?? 0;
-
-              if (annotationStatisticsA > annotationStatisticsB) {
-                return 1;
-              } else if (annotationStatisticsA < annotationStatisticsB) {
-                return annotationStatisticsA === 0 ? -1 : 1;
-              }
-              return 0;
-            }
-            return -1;
-          });
+          this.showProjects(page);
         },
         error: (error: HttpErrorResponse) => {
           if (error.status === 401) {
@@ -135,6 +125,14 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         },
       }
     );
+  }
+
+  showProjects(page: number) {
+    this.shownProjects = this.projects.list.slice((page - 1) * this.itemsPerPage, page * this.itemsPerPage);
+    this.currentPage = {
+      page,
+      collectionSize: this.projects.list.length
+    };
   }
 
   onProjectClick(project: ProjectDto) {

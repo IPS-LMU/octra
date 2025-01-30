@@ -419,7 +419,8 @@
     "selected level": "Ausgewähltes level",
     "sign up": "Neu registrieren",
     "username or email": "Nutzername oder E-Mail",
-    "nothing found": "Nicht gefunden"
+    "nothing found": "Nicht gefunden",
+    "available until": "Verfügbar bis"
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",

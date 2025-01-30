@@ -419,7 +419,8 @@
     "selected level": "Selected level",
     "sign up": "Sign up",
     "username or email": "Username or E-Mail",
-    "nothing found": "Nothing found"
+    "nothing found": "Nothing found",
+    "available until": "Available until"
   },
   "projects-list": {
     "introduction": "Please select a project that you want to transcribe and click on \"START\".",

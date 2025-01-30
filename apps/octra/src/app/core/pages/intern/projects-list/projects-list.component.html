@@ -38,48 +38,85 @@
       {{ 'projects-list.introduction' | transloco }}
     </p>
     <div class="table-wrapper flex overflow-y-auto h-100">
-      @if (projects?.list) {
-      <table class="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{{ 'g.name' | transloco }}</th>
-            <th>{{ 'g.description' | transloco }}</th>
-            <th class="text-center">{{ 'g.free tasks' | transloco }}</th>
-            <th class="text-center">{{ 'g.action' | transloco }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (project of projects?.list; track project) {
-          <tr
-            [ngClass]="{
-              deactivated: getFreeAnnotationTasks(project) < 1
-            }"
+      @if (shownProjects) {
+      <div class="list-group">
+        <div class="list-group-item">
+         <div class="row g-0">
+           <div class="col"></div>
+           <div class="col-auto text-right">
+             <ngb-pagination
+               [size]="'sm'"
+               [page]="currentPage.page"
+               [collectionSize]="currentPage.collectionSize"
+               [pageSize]="itemsPerPage"
+               (pageChange)="showProjects($event)"
+             ></ngb-pagination>
+           </div>
+         </div>
+        </div>
+        @for (project of shownProjects; track project) {
+        <div class="list-group-item list-group-item-action">
+          <div
+            class="row g-1 align-items-center justify-items-center justify-content-center"
           >
-            <td>
+            <div class="col-auto project-name">
               @if (project.active) {
               <i class="bi bi-check-circle" style="color: green"></i>
               } @if (!project.active) {
               <i class="bi bi-dash-circle" style="color: red"></i>
               }
-            </td>
-            <td>{{ project.name }}</td>
-            <td class="description">{{ project.public_description }}</td>
-            <td class="text-center">{{ getFreeAnnotationTasks(project) }}</td>
-            <td class="text-center">
+            </div>
+            <div
+              class="col align-items-center justify-items-center justify-content-center"
+            >
+              <span class="project-name"
+                >{{ project.name }} ({{ project.shortname }})</span
+              >
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-muted project-description">
+              {{ project.public_description }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mb-2">
+              <span
+                class="rounded-pill text-white property-pill me-1"
+                style="background-color: purple"
+              >
+                <i class="bi bi-list-ol"></i> {{ 'g.free tasks' | transloco }}:
+                {{ getFreeAnnotationTasks(project) }}
+              </span>
+
+              @if (project.enddate) {
+                <span class="rounded-pill text-white property-pill me-1 bg-info">
+                <i class="bi bi-calendar-day"></i>
+                  {{ 'p.available until' | transloco }}:
+                  {{
+                    project.enddate
+                      | luxonShortDateTime
+                      : {
+                        locale: (authStoreService.me$ | async).locale
+                      }
+                  }}
+              </span>
+              }
+            </div>
+            <div class="col-md-2">
               <button
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm w-100"
                 size="sm"
                 [disabled]="projectStarting"
                 (click)="onProjectClick(project)"
               >
                 {{ 'g.start' | transloco }}
               </button>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
       } @else {
       <div class="text-center mt-5">
         <div

@@ -19,7 +19,6 @@
   flex-direction: column;
   overflow-y: auto;
   height: 100%;
-  border: 1px solid lightgray;
 }
 
 table tbody tr td {
@@ -36,4 +35,19 @@ table tbody tr {
 
 .description {
   font-size: 0.9em;
+}
+
+.project-name {
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.project-description {
+  color: gray;
+  font-size: 0.85em;
+}
+
+.property-pill {
+  font-size: 0.7rem;
+  padding: 3px 10px;
 }

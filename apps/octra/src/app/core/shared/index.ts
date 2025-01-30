@@ -5,4 +5,5 @@ export * from '../obj/statistics/KeyStatisticElem';
 export * from '../obj/statistics/MouseStatisticElem';
 export * from '../obj/statistics/StatisticElement';
 export * from './functions';
+export * from './luxon-date.pipe';
 export * from './Logger';

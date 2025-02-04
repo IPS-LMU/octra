@@ -175,7 +175,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
         if (
           new RegExp(
             `${converter.extensions
-              .map((a) => `(?:${escapeRegex(a)})`)
+              .map((a) => `(?:${escapeRegex(a.toLowerCase())})`)
               .join('|')}$`
           ).exec(fileProgress.name.toLowerCase()) !== null
         ) {
@@ -218,18 +218,12 @@ export class OctraDropzoneComponent extends DefaultComponent {
               ) {
                 fileProgress.status = 'valid';
 
-                if (
-                  new RegExp(
-                    `${escapeRegex(audioName)}${AppInfo.converters[i].extensions
-                      .map((a) => `(?:${escapeRegex(a)})`)
-                      .join('|')}$`
-                  ).exec(fileProgress.name) === null &&
-                  new RegExp(
-                    `${escapeRegex(audioName)}${AppInfo.converters[i].extensions
-                      .map((a) => `(?:${escapeRegex(a.toLowerCase())})`)
-                      .join('|')}$`
-                  ).exec(fileProgress.name) === null
-                ) {
+                const regexStr = `${escapeRegex(audioName)}${AppInfo.converters[
+                  i
+                ].extensions
+                  .map((a) => `(?:${escapeRegex(a)})|((?:${escapeRegex(a.toLowerCase())}))`)
+                  .join('|')}$`;
+                if (new RegExp(regexStr).exec(fileProgress.name) === null) {
                   fileProgress.warning = 'File names are not the same.';
                 }
                 for (const lvl of importResult.annotjson.levels) {

@@ -14,7 +14,18 @@
       }
     </div>
   </div>
-  @if (compatibleBrowser !== false) {
+  @if (settingsService.appSettings.octra.oldVersion?.url) {
+  <div class="row">
+    <div class="col">
+      <div class="alert mb-0 py-1" style="font-size: 0.8rem">
+        <i class="bi bi-info-circle"></i> {{ "login.old version.notice" | transloco }}
+        <a [href]="settingsService.appSettings.octra.oldVersion?.url"
+          >{{ "login.old version.click here" | transloco }}</a
+        >
+      </div>
+    </div>
+  </div>
+  } @if (compatibleBrowser !== false) {
   <div class="row" id="loginrow">
     <div class="col-md-6">
       <div

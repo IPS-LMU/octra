@@ -49,6 +49,9 @@ export interface AppSettings {
       active: string;
       apiURL: string;
     };
+    oldVersion?: {
+      url?: string;
+    };
   };
   octraBackend?: {
     enabled: boolean;

@@ -72,6 +72,14 @@ export const AppConfigSchema = {
           },
           type: 'array',
         },
+        oldVersion: {
+          type: 'object',
+          properties: {
+            url: {
+              type: 'string',
+            },
+          },
+        },
       },
       type: 'object',
       required: ['database', 'supportEmail'],

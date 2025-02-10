@@ -255,6 +255,10 @@
   },
   "login": {
     "api not available": "Der Server ist aktuell nicht erreichbar. Bitte versuche es später erneut. Sollte diese Fehlermeldung nach 15 Minuten weiterhin sichtbar sein, schreibe bitte eine E-Mail an {{email_link}}.",
+    "old version": {
+      "notice": "Du nutzt gerade die neueste Version von OCTRA. Du möchtest zur vorherigen Version zurück?",
+      "click here": "Klicke hier, um zur vorherigen Version zu gelangen."
+    },
     "demo": "Öffne Demo",
     "last used": "zuletzt genutzt",
     "local and remove": "Daten des online Modus löschen & weiter",

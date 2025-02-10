@@ -3,7 +3,7 @@ import { ProjectDto } from '@octra/api-types';
 import { removeEmptyProperties } from '@octra/utilities';
 import Dexie, { Transaction } from 'dexie';
 import 'dexie-export-import';
-import { forkJoin, from, map, Observable, of, Subject, take } from 'rxjs';
+import { firstValueFrom, from, map, Observable, of, Subject } from 'rxjs';
 import { LoginMode } from '../store';
 import { ASRStateSettings } from '../store/asr';
 
@@ -23,18 +23,24 @@ export class OctraDatabase extends Dexie {
   }
 
   public async init() {
-    let db = await this.open();
-    let currentVersion = db.verno;
-    db.close();
+    let currentVersion = 0;
 
-    if (currentVersion < 0.4) {
+    try {
+      const db = await this.open();
+      currentVersion = db.verno;
+      db.close();
+    } catch (error: any) {
+      // ignore
+    }
+
+    if (currentVersion > 0 && currentVersion < 0.4) {
       await this.backupCurrentDatabase();
     }
 
     this.version(0.2)
       .stores({
         annotation_levels: 'id',
-        annotation_links: 'id, link, sortorder',
+        annotation_links: 'id',
         logs: 'timestamp',
         options: 'name, value',
       })
@@ -50,24 +56,19 @@ export class OctraDatabase extends Dexie {
       .upgrade(this.upgradeToDatabaseV3);
 
     // INTRODUCTION OF OCTRA 2
-    this.version(0.4).stores({
-      annotation_levels: 'id',
-      annotation_links: 'id',
-      logs: 'timestamp',
-      options: 'name, value',
-      demo_data: '&name, value',
-      online_data: '&name, value',
-      local_data: '&name, value',
-      url_data: '&name, value',
-      app_options: '&name, value',
-    });
-
-    db = await this.open();
-    currentVersion = db.verno;
-    if (currentVersion === 0.4) {
-      await this.upgradeToDatabaseV4(db);
-    }
-    db.close();
+    this.version(0.4)
+      .stores({
+        annotation_levels: 'id',
+        annotation_links: 'id',
+        logs: 'timestamp',
+        options: 'name, value',
+        demo_data: '&name, value',
+        online_data: '&name, value',
+        local_data: '&name, value',
+        url_data: '&name, value',
+        app_options: '&name, value',
+      })
+      .upgrade(this.upgradeToDatabaseV4);
 
     this.version(0.5)
       .stores({
@@ -90,21 +91,14 @@ export class OctraDatabase extends Dexie {
 
     this.app_options = this.table('app_options');
 
-    this.on('ready', () => {
-      this.checkAndFillPopulation()
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.onReady.next();
-            this.onReady.complete();
-          },
-          error: (error) => {
-            this.onReady.error(error);
-          },
-        });
-    });
-
     await this.open();
+    try {
+      await this.checkAndFillPopulation();
+      this.onReady.next();
+      this.onReady.complete();
+    } catch (e) {
+      this.onReady.error(e);
+    }
   }
 
   private upgradeToDatabaseV2(transaction: Transaction) {
@@ -200,7 +194,7 @@ export class OctraDatabase extends Dexie {
     ]);
   }
 
-  private upgradeToDatabaseV3(transaction: Transaction) {
+  private async upgradeToDatabaseV3(transaction: Transaction) {
     console.log('upgrade to V3');
     return transaction
       .table('options')
@@ -217,7 +211,7 @@ export class OctraDatabase extends Dexie {
       });
   }
 
-  private async upgradeToDatabaseV4(db: Dexie) {
+  private async upgradeToDatabaseV4(tr: Transaction) {
     console.log('Upgrade to V4...');
 
     console.log('-> Copy all new options to app_options table...');
@@ -237,7 +231,7 @@ export class OctraDatabase extends Dexie {
       'userProfile',
       'version',
     ];
-    const options = (await db.table('options').bulkGet(optionKeys)).filter(
+    const options = (await tr.table('options').bulkGet(optionKeys)).filter(
       (a) => a !== undefined
     );
 
@@ -247,29 +241,29 @@ export class OctraDatabase extends Dexie {
       const option = options[i];
 
       if (option.name === 'audioSettings') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'easymode') {
-        await db.table('app_options').put({
+        await tr.table('app_options').put({
           name: 'easyMode',
           value: option.value,
         });
       } else if (option.name === 'interface') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'secondsPerLine') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'showFeedbackNotice') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'showLoupe') {
-        await db.table('app_options').put({
+        await tr.table('app_options').put({
           name: 'showMagnifier',
           value: option.value,
         });
       } else if (option.name === 'usemode') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'userProfile') {
-        await db.table('app_options').put(option);
+        await tr.table('app_options').put(option);
       } else if (option.name === 'version') {
-        await db.table('app_options').put({
+        await tr.table('app_options').put({
           name: 'version',
           value: '2.0.0',
         });
@@ -313,14 +307,14 @@ export class OctraDatabase extends Dexie {
       selectedMausLanguage: oldMausSettings?.value?.selectedCode,
       selectedServiceProvider: oldASRSettings?.value?.selectedService,
     };
-    await db.table('app_options').put({
+    await tr.table('app_options').put({
       name: 'asr',
       value: newASRSettings,
     });
 
     // if usemode is local, copy all data to new tables for online mode
     // before v4 only one active mode with data was valid. So we only need to check for local mode
-    const usemode = (await db.table('options').get('usemode'))?.value;
+    const usemode = (await tr.table('options').get('usemode'))?.value;
     if (usemode === 'local') {
       console.log('-> usemode is local.');
 
@@ -334,14 +328,14 @@ export class OctraDatabase extends Dexie {
               size: number;
             };
           }
-        | undefined = await db.table('options').get('sessionfile');
+        | undefined = await tr.table('options').get('sessionfile');
       const oldLogging: { name: 'logging'; value: boolean } | undefined =
-        await db.table('options').get('logging');
+        await tr.table('options').get('logging');
       const newLocalModeOptions: IIDBModeOptions = {
         sessionfile: oldSessionFile?.value,
         logging: oldLogging?.value,
       };
-      await db.table('local_data').put({
+      await tr.table('local_data').put({
         name: 'options',
         value: newLocalModeOptions,
       });
@@ -352,13 +346,13 @@ export class OctraDatabase extends Dexie {
             id: number;
             level: ILevel;
           }[]
-        | undefined = await db.table('annotation_levels').toArray();
+        | undefined = await tr.table('annotation_levels').toArray();
       const oldAnnotationLinks:
         | {
             id: number;
             link: ILink;
           }[]
-        | undefined = await db.table('annotation_links').toArray();
+        | undefined = await tr.table('annotation_links').toArray();
 
       if (
         oldSessionFile?.value?.name &&
@@ -377,13 +371,13 @@ export class OctraDatabase extends Dexie {
                 oldAnnotationLevels?.map((a) => a.level),
                 oldAnnotationLinks?.map((a) => a.link)
               );
-        await db.table('local_data').put({
+        await tr.table('local_data').put({
           name: 'annotation',
           value: newAnnotation,
         });
 
         console.log('-> Migrate logs to v4...');
-        let oldLogs = await db.table('logs').toArray();
+        let oldLogs = await tr.table('logs').toArray();
         oldLogs.sort((a, b) => {
           if (a.timestamp > b.timestamp) {
             return 1;
@@ -399,7 +393,7 @@ export class OctraDatabase extends Dexie {
           }));
         }
 
-        await db.table('local_data').put({
+        await tr.table('local_data').put({
           name: 'logs',
           value: oldLogs,
         });
@@ -453,32 +447,33 @@ export class OctraDatabase extends Dexie {
     return table;
   }
 
-  private checkAndFillPopulation(): Observable<void> {
+  private async checkAndFillPopulation(): Promise<void> {
     const subj = new Subject<void>();
+    let optionsLength = (await this.app_options.toArray())?.length ?? 0;
+    if (optionsLength === 0) {
+      this.populateOptions();
+    }
 
-    this.countEntries(this.app_options)
-      .pipe(take(1))
-      .subscribe({
-        next: (count) => {
-          if (count === 0) {
-            forkJoin([
-              this.populateOptions(),
-              this.populateModeOptions(LoginMode.DEMO),
-              this.populateModeOptions(LoginMode.ONLINE),
-              this.populateModeOptions(LoginMode.LOCAL),
-              this.populateModeOptions(LoginMode.URL),
-            ]).subscribe(() => {
-              subj.next();
-              subj.complete();
-            });
-          } else {
-            subj.next();
-            subj.complete();
-          }
-        },
-      });
-
-    return subj;
+    optionsLength =
+      (await this.demoData.get('options'))?.value === undefined ? 0 : 1;
+    if (optionsLength === 0) {
+      await firstValueFrom(this.populateModeOptions(LoginMode.DEMO));
+    }
+    optionsLength =
+      (await this.onlineData.get('options'))?.value === undefined ? 0 : 1;
+    if (optionsLength === 0) {
+      await firstValueFrom(this.populateModeOptions(LoginMode.ONLINE));
+    }
+    optionsLength =
+      (await this.localData.get('options'))?.value === undefined ? 0 : 1;
+    if (optionsLength === 0) {
+      await firstValueFrom(this.populateModeOptions(LoginMode.LOCAL));
+    }
+    optionsLength =
+      (await this.urlData.get('options'))?.value === undefined ? 0 : 1;
+    if (optionsLength === 0) {
+      await firstValueFrom(this.populateModeOptions(LoginMode.URL));
+    }
   }
 
   private countEntries(

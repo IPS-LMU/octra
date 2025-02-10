@@ -255,6 +255,10 @@
   },
   "login": {
     "api not available": "The server is currently unavailable. Please try again later. If this error message is still visible after 15 minutes, please send an e-mail to {{email_link}}.",
+    "old version": {
+      "notice": "You are currently using the latest version of OCTRA. Would you like to go back to the previous version?",
+      "click here": "Click here to go to the previous version."
+    },
     "demo": "Open demo",
     "last used": "recently used",
     "local and remove": "Remove online mode data & continue",

@@ -1,4 +1,4 @@
-import { IAnnotJSON } from '@octra/annotation';
+import { IAnnotJSON, ILevel, ILink, OAnnotJSON } from '@octra/annotation';
 import { ProjectDto } from '@octra/api-types';
 import { removeEmptyProperties } from '@octra/utilities';
 import Dexie, { Transaction } from 'dexie';
@@ -15,137 +15,59 @@ export class OctraDatabase extends Dexie {
   public app_options!: Dexie.Table<IIDBEntry, string>;
   public onReady: Subject<void>;
 
-  private defaultOptions: IIDBEntry[] = [
-    {
-      name: 'submitted',
-      value: false,
-    },
-    {
-      name: 'version',
-      value: 3,
-    },
-    {
-      name: 'easymode',
-      value: false,
-    },
-    {
-      name: 'audioURL',
-      value: undefined,
-    },
-    {
-      name: 'comment',
-      value: '',
-    },
-    {
-      name: 'dataID',
-      value: undefined,
-    },
-    {
-      name: 'feedback',
-      value: undefined,
-    },
-    {
-      name: 'language',
-      value: undefined,
-    },
-    {
-      name: 'sessionfile',
-      value: undefined,
-    },
-    {
-      name: 'usemode',
-      value: undefined,
-    },
-    {
-      name: 'user',
-      value: undefined,
-    },
-    {
-      name: 'interface',
-      value: undefined,
-    },
-    {
-      name: 'logging',
-      value: true,
-    },
-    {
-      name: 'showMagnifier',
-      value: false,
-    },
-    {
-      name: 'prompttext',
-      value: '',
-    },
-    {
-      name: 'servercomment',
-      value: '',
-    },
-    {
-      name: 'secondsPerLine',
-      value: 5,
-    },
-    {
-      name: 'audioSettings',
-      value: {
-        volume: 1,
-        speed: 1,
-      },
-    },
-    {
-      name: 'asr',
-      value: undefined,
-    },
-    {
-      name: 'highlightingEnabled',
-      value: false,
-    },
-    {
-      name: 'console',
-      value: [],
-    },
-  ];
-
   //...other tables goes here...
 
   constructor(dbName: string) {
     super(dbName);
     this.onReady = new Subject<void>();
-
-    this.init();
   }
 
-  private init() {
+  public async init() {
+    let db = await this.open();
+    let currentVersion = db.verno;
+    db.close();
+
+    if (currentVersion < 0.4) {
+      await this.backupCurrentDatabase();
+    }
+
     this.version(0.2)
       .stores({
-        annotation_levels: '++id',
-        annotation_links: '++id',
+        annotation_levels: 'id',
+        annotation_links: 'id, link, sortorder',
         logs: 'timestamp',
-        options: 'name',
+        options: 'name, value',
       })
       .upgrade(this.upgradeToDatabaseV2);
 
     this.version(0.3)
       .stores({
-        annotation_levels: '++id',
-        annotation_links: '++id',
+        annotation_levels: 'id',
+        annotation_links: 'id',
         logs: 'timestamp',
-        options: 'name',
+        options: 'name, value',
       })
       .upgrade(this.upgradeToDatabaseV3);
 
-    this.version(0.4)
-      .stores({
-        annotation_levels: null,
-        annotation_links: null,
-        logs: null,
-        options: null,
-        demo_data: 'name',
-        online_data: 'name',
-        local_data: 'name',
-        url_data: 'name',
-        app_options: 'name',
-      })
-      .upgrade(this.upgradeToDatabaseV4);
+    // INTRODUCTION OF OCTRA 2
+    this.version(0.4).stores({
+      annotation_levels: 'id',
+      annotation_links: 'id',
+      logs: 'timestamp',
+      options: 'name, value',
+      demo_data: '&name, value',
+      online_data: '&name, value',
+      local_data: '&name, value',
+      url_data: '&name, value',
+      app_options: '&name, value',
+    });
+
+    db = await this.open();
+    currentVersion = db.verno;
+    if (currentVersion === 0.4) {
+      await this.upgradeToDatabaseV4(db);
+    }
+    db.close();
 
     this.version(0.5)
       .stores({
@@ -153,11 +75,11 @@ export class OctraDatabase extends Dexie {
         annotation_links: null,
         logs: null,
         options: null,
-        demo_data: 'name',
-        online_data: 'name',
-        local_data: 'name',
-        url_data: 'name',
-        app_options: 'name',
+        demo_data: '&name, value',
+        online_data: '&name, value',
+        local_data: '&name, value',
+        url_data: '&name, value',
+        app_options: '&name, value',
       })
       .upgrade(this.upgradeToDatabaseV5);
 
@@ -181,17 +103,107 @@ export class OctraDatabase extends Dexie {
           },
         });
     });
+
+    await this.open();
   }
 
   private upgradeToDatabaseV2(transaction: Transaction) {
     console.log('upgrade to V2');
-    return transaction.table('app_options').bulkPut(this.defaultOptions);
+    return transaction.table('options').bulkPut([
+      {
+        name: 'submitted',
+        value: false,
+      },
+      {
+        name: 'version',
+        value: 3,
+      },
+      {
+        name: 'easyMode',
+        value: false,
+      },
+      {
+        name: 'audioURL',
+        value: undefined,
+      },
+      {
+        name: 'comment',
+        value: '',
+      },
+      {
+        name: 'dataID',
+        value: undefined,
+      },
+      {
+        name: 'feedback',
+        value: undefined,
+      },
+      {
+        name: 'language',
+        value: undefined,
+      },
+      {
+        name: 'sessionfile',
+        value: undefined,
+      },
+      {
+        name: 'usemode',
+        value: undefined,
+      },
+      {
+        name: 'user',
+        value: undefined,
+      },
+      {
+        name: 'interface',
+        value: undefined,
+      },
+      {
+        name: 'logging',
+        value: true,
+      },
+      {
+        name: 'showMagnifier',
+        value: false,
+      },
+      {
+        name: 'prompttext',
+        value: '',
+      },
+      {
+        name: 'servercomment',
+        value: '',
+      },
+      {
+        name: 'secondsPerLine',
+        value: 5,
+      },
+      {
+        name: 'audioSettings',
+        value: {
+          volume: 1,
+          speed: 1,
+        },
+      },
+      {
+        name: 'asr',
+        value: undefined,
+      },
+      {
+        name: 'highlightingEnabled',
+        value: false,
+      },
+      {
+        name: 'console',
+        value: [],
+      },
+    ]);
   }
 
   private upgradeToDatabaseV3(transaction: Transaction) {
     console.log('upgrade to V3');
     return transaction
-      .table('app_options')
+      .table('options')
       .toCollection()
       .modify((option: IIDBEntry) => {
         if (option.name === 'uselocalmode') {
@@ -205,9 +217,220 @@ export class OctraDatabase extends Dexie {
       });
   }
 
-  private async upgradeToDatabaseV4(transaction: Transaction) {}
+  private async upgradeToDatabaseV4(db: Dexie) {
+    console.log('Upgrade to V4...');
 
-  private async upgradeToDatabaseV5(transaction: Transaction) {}
+    console.log('-> Copy all new options to app_options table...');
+    const optionKeys = [
+      'accessCode',
+      'audioSettings',
+      'easymode',
+      'interface',
+      'logging',
+      'maus',
+      'secondsPerLine',
+      'sessionfile',
+      'showFeedbackNotice',
+      'showLoupe',
+      'usemode',
+      'user',
+      'userProfile',
+      'version',
+    ];
+    const options = (await db.table('options').bulkGet(optionKeys)).filter(
+      (a) => a !== undefined
+    );
+
+    console.log(`-> Migrate ${options.length} options from v3 to v4...`);
+
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+
+      if (option.name === 'audioSettings') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'easymode') {
+        await db.table('app_options').put({
+          name: 'easyMode',
+          value: option.value,
+        });
+      } else if (option.name === 'interface') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'secondsPerLine') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'showFeedbackNotice') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'showLoupe') {
+        await db.table('app_options').put({
+          name: 'showMagnifier',
+          value: option.value,
+        });
+      } else if (option.name === 'usemode') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'userProfile') {
+        await db.table('app_options').put(option);
+      } else if (option.name === 'version') {
+        await db.table('app_options').put({
+          name: 'version',
+          value: '2.0.0',
+        });
+      }
+    }
+
+    console.log('-> Migrate ASR settings to v4...');
+    const oldASRSettings:
+      | {
+          name: 'asr';
+          value: {
+            selectedLanguage: string;
+            selectedService: string;
+          };
+        }
+      | undefined = options.find((a) => a.name === 'asr');
+    const oldAccessCode:
+      | {
+          name: 'accessCode';
+          value: string;
+        }
+      | undefined = options.find((a) => a.name === 'accessCode');
+    const oldMausSettings:
+      | {
+          name: 'maus';
+          value: {
+            selectedLanguage: string;
+            selectedCode: string;
+          };
+        }
+      | undefined = options.find((a) => a.name === 'maus');
+
+    const newASRSettings: {
+      selectedMausLanguage?: string;
+      selectedASRLanguage?: string;
+      selectedServiceProvider?: string;
+      accessCode?: string;
+    } = {
+      selectedASRLanguage: oldASRSettings?.value?.selectedLanguage,
+      accessCode: oldAccessCode?.value,
+      selectedMausLanguage: oldMausSettings?.value?.selectedCode,
+      selectedServiceProvider: oldASRSettings?.value?.selectedService,
+    };
+    await db.table('app_options').put({
+      name: 'asr',
+      value: newASRSettings,
+    });
+
+    // if usemode is local, copy all data to new tables for online mode
+    // before v4 only one active mode with data was valid. So we only need to check for local mode
+    const usemode = (await db.table('options').get('usemode'))?.value;
+    if (usemode === 'local') {
+      console.log('-> usemode is local.');
+
+      console.log('-> Migrate Local mode settings to v4...');
+      const oldSessionFile:
+        | {
+            name: 'sessionfile';
+            value: {
+              name: string;
+              type: string;
+              size: number;
+            };
+          }
+        | undefined = await db.table('options').get('sessionfile');
+      const oldLogging: { name: 'logging'; value: boolean } | undefined =
+        await db.table('options').get('logging');
+      const newLocalModeOptions: IIDBModeOptions = {
+        sessionfile: oldSessionFile?.value,
+        logging: oldLogging?.value,
+      };
+      await db.table('local_data').put({
+        name: 'options',
+        value: newLocalModeOptions,
+      });
+
+      console.log('-> Migrate annotation data of local mode to v4...');
+      const oldAnnotationLevels:
+        | {
+            id: number;
+            level: ILevel;
+          }[]
+        | undefined = await db.table('annotation_levels').toArray();
+      const oldAnnotationLinks:
+        | {
+            id: number;
+            link: ILink;
+          }[]
+        | undefined = await db.table('annotation_links').toArray();
+
+      if (
+        oldSessionFile?.value?.name &&
+        ((oldAnnotationLevels && oldAnnotationLevels.length > 0) ||
+          (oldAnnotationLinks && oldAnnotationLinks.length > 0))
+      ) {
+        const audioFileName = oldSessionFile.value.name;
+        const newAnnotation: OAnnotJSON | undefined =
+          !oldSessionFile?.value?.name ||
+          (!oldAnnotationLevels && !oldAnnotationLinks)
+            ? undefined
+            : new OAnnotJSON(
+                audioFileName,
+                audioFileName.replace(/\.wav$/g, ''),
+                -1,
+                oldAnnotationLevels?.map((a) => a.level),
+                oldAnnotationLinks?.map((a) => a.link)
+              );
+        await db.table('local_data').put({
+          name: 'annotation',
+          value: newAnnotation,
+        });
+
+        console.log('-> Migrate logs to v4...');
+        let oldLogs = await db.table('logs').toArray();
+        oldLogs.sort((a, b) => {
+          if (a.timestamp > b.timestamp) {
+            return 1;
+          }
+          return a.timestamp < b.timestamp ? -1 : 0;
+        });
+
+        if (oldLogs.length > 0) {
+          const firstTimeStamp = oldLogs[0].timestamp;
+          oldLogs = oldLogs.map((a) => ({
+            ...a,
+            timestamp: a.timestamp - firstTimeStamp,
+          }));
+        }
+
+        await db.table('local_data').put({
+          name: 'logs',
+          value: oldLogs,
+        });
+
+        console.log('-> Migration to v4 successful.');
+      }
+    }
+  }
+
+  private async upgradeToDatabaseV5(transaction: Transaction) {
+    console.log('upgrade to V5');
+  }
+
+  private async backupCurrentDatabase() {
+    await this.open();
+    const backup = await this.export({ prettyJson: true });
+    const backupFile = new File(
+      [await backup.arrayBuffer()],
+      `${this.name}.json`,
+      {
+        type: 'application/json',
+      }
+    );
+    console.log(`BACKUP URL: ${URL.createObjectURL(backupFile)}`);
+    this.close();
+    const dexie = await Dexie.import(backup, {
+      name: `${this.name}_backup_${Date.now()}`,
+    });
+    await dexie.open();
+    dexie.close();
+  }
 
   private getTableFromString(mode: LoginMode): Dexie.Table<IIDBEntry, string> {
     let table: Dexie.Table<IIDBEntry, string> = undefined as any;
@@ -386,7 +609,7 @@ export class OctraDatabase extends Dexie {
           value: 3,
         },
         {
-          name: 'easymode',
+          name: 'easyMode',
           value: false,
         },
         {
@@ -398,7 +621,7 @@ export class OctraDatabase extends Dexie {
           value: undefined,
         },
         {
-          name: 'user',
+          name: 'userProfile',
           value: undefined,
         },
         {

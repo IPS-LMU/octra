@@ -129,6 +129,8 @@ export class IDBEffects {
               }
             ),
             catchError((err: string) => {
+              console.error(err);
+
               return of(
                 IDBActions.loadOptions.fail({
                   error: err,

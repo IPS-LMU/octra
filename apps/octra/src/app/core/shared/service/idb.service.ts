@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
-import { from, map, Observable, throwError } from 'rxjs';
+import { catchError, from, map, Observable, throwError } from 'rxjs';
 import { LoginMode } from '../../store';
 import {
   DefaultModeOptions,
@@ -30,7 +30,7 @@ export class IDBService {
    */
   public initialize(dbName: string): Observable<void> {
     this.database = new OctraDatabase(dbName);
-    return from(this.database.open()).pipe(
+    return from(this.database.init()).pipe(
       map((a) => {
         this._isOpened = true;
       })

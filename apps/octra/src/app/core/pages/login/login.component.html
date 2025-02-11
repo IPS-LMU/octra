@@ -128,7 +128,8 @@
               >
                 {{ 'transcription.start' | transloco }}
               </button>
-              } @if (fileStatus !== 'unknown') {
+              }
+              @if (fileStatus === 'new') {
               <button
                 (click)="onOfflineSubmit(true)"
                 class="btn btn-raised btn-danger offline-delete-btn"

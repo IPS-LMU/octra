@@ -32,7 +32,13 @@
         </div>
         } @else if (file.name.indexOf(".wav") < 0 && file.status === "progress")
         {
-        <i class="bi bi-building-gear"></i>
+          <div
+            class="spinner-border icon-wait"
+            role="status"
+            style="width: 16px; height: 16px; border-width: 2px; color: gray"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
         } @if ( file.name.indexOf('.wav') > -1 && file.status === 'progress' ) {
         <div class="progress">
           <div
@@ -62,7 +68,7 @@
           [ngStyle]="{
             visibility: file.needsOptions ? 'visible' : 'hidden'
           }"
-          class="bi bi-gear-fill ms-1"
+          class="bi bi-gear-wide-connected ms-1"
           (click)="openImportOptionsModal(file)"
           style="font-size: 14px; color: dimgray"
         ></i>

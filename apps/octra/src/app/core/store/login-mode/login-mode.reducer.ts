@@ -218,9 +218,16 @@ export class LoginModeReducers {
         ) => {
           if (this.mode === mode) {
             if (removeData || annotation) {
+              // remove or overwrite data
               if (!annotation) {
                 return {
                   ...state,
+                  logging: {
+                    ...state.logging,
+                    startTime: undefined,
+                    startReference: undefined,
+                    logs: []
+                  },
                   transcript: new OctraAnnotation<
                     ASRContext,
                     OctraAnnotationSegment<ASRContext>
@@ -232,6 +239,12 @@ export class LoginModeReducers {
                 const deserialized = OctraAnnotation.deserialize(annotation);
                 return {
                   ...state,
+                  logging: {
+                    ...state.logging,
+                    startTime: undefined,
+                    startReference: undefined,
+                    logs: []
+                  },
                   transcript: deserialized,
                   currentSession: {},
                   sessionFile,

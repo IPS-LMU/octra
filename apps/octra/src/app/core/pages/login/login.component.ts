@@ -11,6 +11,7 @@ import { AuthenticationComponent } from '../../component/authentication-componen
 import { DefaultComponent } from '../../component/default.component';
 import { MaintenanceBannerComponent } from '../../component/maintenance/maintenance-banner/maint-banner.component';
 import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
+import { DropzoneStatistics } from '../../component/octra-dropzone/octra-dropzone.service';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -45,8 +46,6 @@ export class LoginComponent
   @ViewChild('onlinemode', { static: true }) onlinemode?: ElementRef;
 
   email_link = '';
-
-  fileStatus = '';
 
   state: {
     online: {
@@ -100,7 +99,6 @@ export class LoginComponent
     super();
     this.compatibilityService.testCompability().then((result) => {
       this.compatibleBrowser = result;
-      this.readFileStatus();
     });
 
     const subject = 'Octra Server is offline';
@@ -121,7 +119,7 @@ I just want to let you know, that the OCTRA server is currently offline.
   onOfflineSubmit = (removeData: boolean) => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
-      this.dropzone.files.map((a) => a.file),
+      this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
       removeData
     );
@@ -161,33 +159,6 @@ I just want to let you know, that the OCTRA server is currently offline.
       })`;
     }
     return '';
-  }
-
-  readFileStatus = () => {
-    if (
-      this.dropzone?.files &&
-      this.dropzone.files.length > 0 &&
-      this.dropzone.oaudiofile
-    ) {
-      // check conditions
-      if (
-        !this.appStorage.sessionfile ||
-        (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name &&
-          !this.dropzone.oannotation)
-      ) {
-        this.fileStatus = 'start';
-        return;
-      } else {
-        this.fileStatus = 'new';
-        return;
-      }
-    }
-
-    this.fileStatus = 'unknown';
-  };
-
-  afterFilesAdded() {
-    this.readFileStatus();
   }
 
   public startDemo() {

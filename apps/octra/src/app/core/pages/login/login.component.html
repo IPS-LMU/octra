@@ -115,23 +115,23 @@
                 <octra-dropzone
                   #dropzone
                   [height]="'147px'"
-                  (filesAdded)="afterFilesAdded()"
+                  [oldFiles]="sessionfile ? [sessionfile] : []"
                 ></octra-dropzone>
               </div>
-              @if (fileStatus !== 'new') {
+              @if (dropzone.statistics && dropzone.statistics.new === 0) {
               <button
                 (click)="onOfflineSubmit(false)"
-                [disabled]="fileStatus !== 'start'"
+                [disabled]="dropzone.files.length === 0 || !dropzone.statistics || dropzone.statistics.invalid > 0 || dropzone.statistics.progress > 0 || dropzone.statistics.waiting > 0"
                 class="btn btn-raised btn-primary"
                 id="offline-submit"
                 type="submit"
               >
                 {{ 'transcription.start' | transloco }}
               </button>
-              }
-              @if (fileStatus === 'new') {
+              } @else {
               <button
                 (click)="onOfflineSubmit(true)"
+                [disabled]="dropzone.files.length === 0 || !dropzone.statistics || dropzone.statistics.invalid > 0 || dropzone.statistics.progress > 0 || dropzone.statistics.waiting > 0"
                 class="btn btn-raised btn-danger offline-delete-btn"
               >
                 {{ 'transcription.new' | transloco }}

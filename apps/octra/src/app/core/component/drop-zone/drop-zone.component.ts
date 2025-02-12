@@ -20,7 +20,6 @@ export class DropZoneComponent implements OnInit {
   @Input()
   innerhtml = '';
   @Input() height = 'auto';
-  public clicklocked = false;
   @Output() public afterdrop: EventEmitter<File[]> = new EventEmitter<File[]>();
   @ViewChild('fileinput', { static: true }) fileinput!: ElementRef;
   private fileAPIsupported = false;
@@ -61,9 +60,7 @@ export class DropZoneComponent implements OnInit {
   }
 
   onClick() {
-    if (!this.clicklocked) {
-      this.fileinput.nativeElement.click();
-    }
+    this.fileinput.nativeElement.click();
   }
 
   onFileChange($event: any) {

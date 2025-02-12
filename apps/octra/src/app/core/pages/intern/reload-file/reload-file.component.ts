@@ -17,7 +17,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.scss'],
-  imports: [OctraDropzoneComponent, TranslocoPipe],
+  imports: [OctraDropzoneComponent, TranslocoPipe, OctraDropzoneComponent],
 })
 export class ReloadFileComponent {
   @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;
@@ -45,7 +45,7 @@ export class ReloadFileComponent {
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
-      this.dropzone.files.map((a) => a.file),
+      this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
       true
     );
@@ -54,7 +54,7 @@ export class ReloadFileComponent {
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
-      this.dropzone.files.map((a) => a.file),
+      this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
       false
     );

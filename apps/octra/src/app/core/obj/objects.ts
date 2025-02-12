@@ -1,11 +1,10 @@
 import { Converter } from '@octra/annotation';
+import { FileInfo } from '@octra/web-media';
 
 export interface FileProgress {
+  id: number;
   status: 'progress' | 'valid' | 'invalid' | 'waiting';
-  name: string;
-  type: string;
-  size: number;
-  file: File;
+  file: FileInfo;
   needsOptions?: any;
   options?: any;
   converter?: Converter;

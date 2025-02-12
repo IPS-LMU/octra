@@ -7,7 +7,10 @@
     <b>{{ 'g.wanted' | transloco }}: {{ getDropzoneFileString(sessionfile) }}</b
     ><br /><br />
   </p>
-  <octra-dropzone #dropzone></octra-dropzone>
+  <octra-dropzone
+    #dropzone
+    [oldFiles]="sessionfile ? [sessionfile] : []"
+  ></octra-dropzone>
 
   <div class="btn-group w-100" role="group">
     <button (click)="askForAbort()" class="btn btn-secondary">
@@ -16,9 +19,16 @@
         {{ 'transcription.stop' | transloco }}</span
       >
     </button>
+    @if(dropzone.statistics.new > 0) {
     <button
       (click)="newTranscription()"
-      [disabled]="!(dropzone.status === 'valid')"
+      [disabled]="
+        dropzone.files.length === 0 ||
+        !dropzone.statistics ||
+        dropzone.statistics.invalid > 0 ||
+        dropzone.statistics.progress > 0 ||
+        dropzone.statistics.waiting > 0
+      "
       class="btn btn-danger"
     >
       <i class="bi bi-file-fill"></i>
@@ -26,15 +36,15 @@
         {{ 'transcription.new' | transloco }}</span
       >
     </button>
+    } @else {
     <button
       (click)="onOfflineSubmit()"
       [disabled]="
-        !(
-          !isN(dropzone.oaudiofile) &&
-          sessionfile !== undefined &&
-          dropzone.oaudiofile?.name === sessionfile.name &&
-          isN(dropzone.oannotation)
-        )
+        dropzone.files.length === 0 ||
+        !dropzone.statistics ||
+        dropzone.statistics.invalid > 0 ||
+        dropzone.statistics.progress > 0 ||
+        dropzone.statistics.waiting > 0
       "
       class="btn btn-primary"
       type="button"
@@ -44,5 +54,6 @@
         {{ 'transcription.start' | transloco }}</span
       >
     </button>
+    }
   </div>
 </div>

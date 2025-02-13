@@ -421,7 +421,7 @@ export class TranscriptionComponent
   }
 
   abortTranscription = () => {
-    if (this.appStorage.useMode === LoginMode.ONLINE) {
+    if ([LoginMode.ONLINE, LoginMode.URL].includes(this.appStorage.useMode)) {
       this.modService
         .openModal(
           TranscriptionStopModalComponent,

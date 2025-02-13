@@ -6,6 +6,7 @@ import { Action, Store } from '@ngrx/store';
 import { uniqueHTTPRequest } from '@octra/ngx-utilities';
 import { isNumber } from '@octra/utilities';
 import { findElements, getAttr } from '@octra/web-media';
+import { DateTime } from 'luxon';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import {
   catchError,
@@ -42,7 +43,6 @@ import { IDBActions } from '../idb/idb.actions';
 import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { DateTime } from 'luxon';
 
 @Injectable({
   providedIn: 'root',
@@ -53,9 +53,9 @@ export class ApplicationEffects {
       ofType(ApplicationActions.initApplication.do),
       exhaustMap(() => {
         AppInfo.BUILD = (window as any).BUILD ?? AppInfo.BUILD;
-        AppInfo.BUILD.timestamp = DateTime.fromISO(AppInfo.BUILD.timestamp).toLocaleString(
-          DateTime.DATETIME_SHORT_WITH_SECONDS
-        );
+        AppInfo.BUILD.timestamp = DateTime.fromISO(
+          AppInfo.BUILD.timestamp
+        ).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
         this.appStorage.saveCurrentPageAsLastPage();
 
         const queryParams = {
@@ -66,6 +66,7 @@ export class ApplicationEffects {
           transcript: this.getParameterByName('transcript'),
           readonly: this.getParameterByName('readonly'),
           embedded: this.getParameterByName('embedded'),
+          bottomNav: this.getParameterByName('bottomNav'),
         };
 
         this.routerService.addStaticParams(queryParams);
@@ -679,7 +680,7 @@ export class ApplicationEffects {
                     clearSession: false,
                   })
                 );
-              } else {
+              } else if (!this.routerService.staticQueryParams.audio_url) {
                 this.store.dispatch(
                   ApplicationActions.redirectToLastPage.do({
                     mode: state.application.mode!,
@@ -866,6 +867,7 @@ export class ApplicationEffects {
             }
           }
 
+          console.log('CHECK AUDIO_URL PARAM');
           if (this.routerService.staticQueryParams?.audio_url) {
             this.store.dispatch(
               AuthenticationActions.loginURL.do({
@@ -913,11 +915,15 @@ export class ApplicationEffects {
         subject.next(LoginModeActions.clearSessionStorage.success());
         subject.complete();
 
+        this.routerService.clear();
         this.routerService
           .navigate(
             'after logout success',
             ['/login'],
-            AppInfo.queryParamsHandling
+            {
+              queryParams: {},
+            },
+            'replace'
           )
           .catch((error) => {
             console.error(error);

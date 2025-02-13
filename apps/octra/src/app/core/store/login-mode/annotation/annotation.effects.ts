@@ -23,7 +23,11 @@ import {
 } from '@octra/api-types';
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { hasProperty, SubscriptionManager } from '@octra/utilities';
+import {
+  extractFileNameFromURL,
+  hasProperty,
+  SubscriptionManager,
+} from '@octra/utilities';
 import {
   catchError,
   exhaustMap,
@@ -763,155 +767,210 @@ export class AnnotationEffects {
             exhaustMap(([projectConfig, guidelines, functions]) => {
               const currentProject = createSampleProjectDto('1234');
 
-              let inputs: TaskInputOutputDto[] = [];
+              const observables: Observable<{
+                inputs: TaskInputOutputDto[];
+              }>[] = [];
 
-              if (state.application.mode === LoginMode.DEMO) {
-                inputs = state.application
-                  .appConfiguration!.octra.audioExamples.map((a) => {
-                    return {
-                      id: Date.now().toString(),
-                      filename: FileInfo.fromURL(a.url).fullname,
-                      fileType: 'audio/wave',
-                      chain_position: 0,
-                      type: 'input',
-                      url: a.url,
-                      creator_type: TaskInputOutputCreatorType.user,
-                      content: '',
-                      content_type: '',
-                    };
+              if (a.mode === LoginMode.DEMO) {
+                observables.push(
+                  of({
+                    inputs: state.application
+                      .appConfiguration!.octra.audioExamples.map((a) => {
+                        return {
+                          id: Date.now().toString(),
+                          filename: FileInfo.fromURL(a.url).fullname,
+                          fileType: 'audio/wave',
+                          chain_position: 0,
+                          type: 'input',
+                          url: a.url,
+                          creator_type: TaskInputOutputCreatorType.user,
+                          content: '',
+                          content_type: '',
+                        };
+                      })
+                      .slice(0, 1),
                   })
-                  .slice(0, 1);
-              } else if (state.application.mode === LoginMode.LOCAL) {
-                inputs = [
-                  {
-                    id: Date.now().toString(),
-                    filename: state.localMode.sessionFile?.name,
-                    fileType: state.localMode.sessionFile?.type,
-                    chain_position: 0,
-                    type: 'input',
-                    creator_type: TaskInputOutputCreatorType.user,
-                    content: '',
-                    content_type: '',
-                  },
-                ];
-              } else if (state.application.mode === LoginMode.URL) {
-                // URL mode
-                if (
-                  Object.keys(this.routingService.staticQueryParams).includes(
-                    'audio_url'
-                  )
-                ) {
-                  const fileInfoAudio = FileInfo.fromURL(
-                    this.routingService.staticQueryParams['audio_url']
-                  );
-
-                  inputs = [
-                    {
-                      id: Date.now().toString(),
-                      filename:
-                        this.routingService.staticQueryParams['audio_name'] ??
-                        fileInfoAudio.fullname,
-                      fileType: 'audio/wave',
-                      chain_position: 0,
-                      type: 'input',
-                      url: this.routingService.staticQueryParams['audio_url'],
-                      creator_type: TaskInputOutputCreatorType.user,
-                      content: '',
-                      content_type: '',
-                    },
-                  ];
-                } else {
-                  return of(
-                    LoginModeActions.loadProjectAndTaskInformation.fail({
-                      error: new HttpErrorResponse({
-                        error: new Error('Missing query param "audio"'),
-                      }),
-                    })
-                  );
-                }
-              }
-
-              const task = createSampleTask(
-                a.taskID ?? '-1',
-                inputs,
-                [],
-                projectConfig,
-                functions,
-                guidelines,
-                {
-                  orgtext:
-                    LoginMode.DEMO === state.application.mode!
-                      ? state.application.appConfiguration!.octra
-                          .audioExamples[0].description
-                      : '',
-                }
-              );
-
-              if (
-                state.application.mode === LoginMode.URL &&
-                this.routingService.staticQueryParams?.transcript !== undefined
-              ) {
-                // load transcript file via URL
-                return this.http
-                  .get(this.routingService.staticQueryParams.transcript, {
-                    responseType: 'text',
-                  })
-                  .pipe(
-                    exhaustMap((content) => {
-                      const fileInfoTranscript = FileInfo.fromURL(
-                        this.routingService.staticQueryParams['transcript']
-                      );
-                      const fileInfoAudio = FileInfo.fromURL(
-                        this.routingService.staticQueryParams['audio_url']
-                      );
-                      let audioName =
-                        this.routingService.staticQueryParams.audio_name ??
-                        fileInfoAudio.fullname;
-
-                      audioName = audioName.substring(
-                        0,
-                        audioName.lastIndexOf('.')
-                      );
-
-                      task.inputs.push({
+                );
+              } else if (a.mode === LoginMode.LOCAL) {
+                observables.push(
+                  of({
+                    inputs: [
+                      {
                         id: Date.now().toString(),
-                        filename: audioName + fileInfoTranscript.extension,
-                        fileType: fileInfoTranscript.type,
+                        filename: state.localMode.sessionFile?.name,
+                        fileType: state.localMode.sessionFile?.type,
                         chain_position: 0,
                         type: 'input',
                         creator_type: TaskInputOutputCreatorType.user,
-                        content,
+                        content: '',
                         content_type: '',
-                      });
+                      },
+                    ],
+                  })
+                );
+              } else if (a.mode === LoginMode.URL) {
+                // URL mode
+                const urlInfo: {
+                  audio: {
+                    url?: string;
+                    fileInfo?: FileInfo;
+                  };
+                  transcript: {
+                    url?: string;
+                    fileInfo?: FileInfo;
+                  };
+                } = {
+                  audio: {
+                    url: undefined,
+                    fileInfo: undefined,
+                  },
+                  transcript: {
+                    url: undefined,
+                    fileInfo: undefined,
+                  },
+                };
+                urlInfo.audio.url = this.routingService.staticQueryParams
+                  .audio_url
+                  ? decodeURIComponent(
+                      this.routingService.staticQueryParams.audio_url
+                    )
+                  : undefined;
+                urlInfo.transcript.url = this.routingService.staticQueryParams
+                  .transcript
+                  ? decodeURIComponent(
+                      this.routingService.staticQueryParams.transcript
+                    )
+                  : undefined;
 
-                      return of(
-                        LoginModeActions.loadProjectAndTaskInformation.success({
-                          mode: a.mode,
-                          me: createSampleUser(),
-                          currentProject,
-                          task,
-                        })
-                      );
-                    }),
-                    catchError((e) => {
-                      if (e instanceof HttpErrorResponse) {
-                        alert(`Can't load transcript file: ${e.message}`);
-                        return of(
-                          LoginModeActions.loadProjectAndTaskInformation.fail(e)
-                        );
+                for (const key of Object.keys(urlInfo)) {
+                  if (urlInfo[key].url) {
+                    let mediaType: string | undefined;
+                    let decodedURL = decodeURIComponent(urlInfo[key].url);
+
+                    if (decodedURL.includes('?')) {
+                      const regex = /mediatype=([^&]+)/g;
+                      const matches = regex.exec(decodedURL);
+                      mediaType = matches ? matches[1] : undefined;
+                      decodedURL = decodedURL.replace(/\?.*$/g, '');
+                    }
+
+
+                    const nameFromURL = extractFileNameFromURL(decodedURL);
+
+                    let extension = '';
+                    if (nameFromURL.extension) {
+                      extension = nameFromURL.extension;
+                    } else {
+                      if (mediaType) {
+                        if (mediaType.includes('audio')) {
+                          extension = '.wav';
+                        } else if (mediaType.includes('text')) {
+                          extension = '.txt';
+                        } else if (mediaType.includes('json')) {
+                          extension = '_annot.json';
+                        }
                       }
-                      return of();
+                    }
+
+                    urlInfo[key].url = decodedURL;
+                    urlInfo[key].fileInfo = FileInfo.fromURL(
+                      decodedURL,
+                      mediaType,
+                      `${nameFromURL.name}${extension}`
+                    );
+                  }
+                }
+
+                observables.push(
+                  forkJoin<[{ progress: number; result?: string }]>([
+                    urlInfo.transcript.url
+                      ? this.http
+                          .get(urlInfo.transcript.url, {
+                            responseType: 'text',
+                          })
+                          .pipe(
+                            map((result) => ({
+                              progress: 1,
+                              result,
+                            }))
+                          )
+                      : of({ progress: 1, result: undefined }),
+                  ]).pipe(
+                    exhaustMap(([event]) => {
+                      const inputs: TaskInputOutputDto[] = [
+                        {
+                          id: Date.now().toString(),
+                          filename: urlInfo.audio.fileInfo.fullname,
+                          fileType: urlInfo.audio.fileInfo.type,
+                          chain_position: 0,
+                          type: 'input',
+                          url: urlInfo.audio.url,
+                          creator_type: TaskInputOutputCreatorType.user,
+                          content: undefined,
+                          content_type: undefined,
+                        },
+                      ];
+
+                      if (urlInfo.transcript.url) {
+                        inputs.push({
+                          id: Date.now().toString(),
+                          filename: urlInfo.transcript.fileInfo.fullname,
+                          fileType: urlInfo.transcript.fileInfo.type,
+                          chain_position: 0,
+                          type: 'input',
+                          url: urlInfo.transcript.url,
+                          creator_type: TaskInputOutputCreatorType.user,
+                          content: event.result ?? '',
+                          content_type: '',
+                        });
+                      }
+
+                      return of({
+                        inputs,
+                      });
                     })
-                  );
+                  )
+                );
               }
 
-              return of(
-                LoginModeActions.loadProjectAndTaskInformation.success({
-                  mode: a.mode,
-                  me: createSampleUser(),
-                  currentProject,
-                  task,
-                })
+              return forkJoin(observables).pipe(
+                map(
+                  ([event]) => {
+                    const task = createSampleTask(
+                      a.taskID ?? '-1',
+                      event.inputs,
+                      [],
+                      projectConfig,
+                      functions,
+                      guidelines,
+                      {
+                        orgtext:
+                          LoginMode.DEMO === state.application.mode!
+                            ? state.application.appConfiguration!.octra
+                                .audioExamples[0].description
+                            : '',
+                      }
+                    );
+
+                    return LoginModeActions.loadProjectAndTaskInformation.success(
+                      {
+                        mode: a.mode,
+                        me: createSampleUser(),
+                        currentProject,
+                        task,
+                      }
+                    );
+                  },
+                  catchError((e) => {
+                    if (e instanceof HttpErrorResponse) {
+                      alert(`Can't load transcript file: ${e.message}`);
+                      return of(
+                        LoginModeActions.loadProjectAndTaskInformation.fail(e)
+                      );
+                    }
+                    return of();
+                  })
+                )
               );
             })
           );

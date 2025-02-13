@@ -210,6 +210,7 @@
     "quit": "Quit",
     "quit and release": "Quit & release",
     "quit continue later": "Quit & continue later",
+    "quit discard": "Quit & discard annotation",
     "reload": "reload",
     "replay": "Replay",
     "sampleRate": "Sample Rate",
@@ -402,7 +403,8 @@
       },
       "stop": {
         "header": "Stop Transcription",
-        "text": "Do you really want to quit the transcription? During the transcription Octra saves your progress in a local storage of this web browser.<br><br>Decide on one of the following options:<ul class='mt-2'><li class='mt-1'><b>Quit & release</b><br/>Your progress will be discarded and the task offered to other transcribers if necessary.</li><li class='mt-1'><b>Quit & continue later</b><br/>Your current progress will be transferred to the server. You can log in later with the same credentials and continue transcribing. Important: Do not remove your web browser's data otherwise you will lose your progress.</li><li class='mt-1'><b>Continue transcription:</b><br/>Choose this option if you want to continue now.</li></ul>"
+        "text": "Do you really want to quit the transcription? During the transcription Octra saves your progress in a local storage of this web browser.<br><br>Decide on one of the following options:<ul class='mt-2'><li class='mt-1'><b>Quit & release</b><br/>Your progress will be discarded and the task offered to other transcribers if necessary.</li><li class='mt-1'><b>Quit & continue later</b><br/>Your current progress will be transferred to the server. You can log in later with the same credentials and continue transcribing. Important: Do not remove your web browser's data otherwise you will lose your progress.</li><li class='mt-1'><b>Continue transcription:</b><br/>Choose this option if you want to continue now.</li></ul>",
+        "url text": "Do you really want to finish the transcription? You are now using the URL mode. Your progress is not saved in this mode. <br/><br/><b>Make sure you export your annotation before you close Octra.</b>"
       }
     }
   },

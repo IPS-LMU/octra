@@ -116,7 +116,8 @@ export class TranscrEditorComponent
   @ViewChild('jodit', { static: false }) joditComponent?: NgxJoditComponent;
   public focused = false;
 
-  public joditOptions: JoditConfig = {};
+  public joditOptions: JoditConfig = {
+  };
   private guidelines?: OctraGuidelines;
 
   private joditDefaultOptions: JoditConfig = {

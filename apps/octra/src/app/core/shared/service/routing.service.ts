@@ -20,6 +20,10 @@ export class RoutingService {
     private sessionStorage: SessionStorageService
   ) {}
 
+  clear() {
+    this._staticQueryParams = {};
+  }
+
   public removeStaticParam(name: string) {
     if (Object.keys(this._staticQueryParams).includes(name)) {
       this.staticQueryParams[name] = undefined;

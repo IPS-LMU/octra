@@ -173,7 +173,7 @@ export class IDBEffects {
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
                     mode: this.routingService.staticQueryParams.audio_url
-                      ? LoginMode.URL
+                      ? undefined
                       : state.application.mode!,
                   })
                 );
@@ -201,7 +201,7 @@ export class IDBEffects {
         return forkJoin([
           this.idbService.loadAnnotation(LoginMode.ONLINE),
           this.idbService.loadAnnotation(LoginMode.LOCAL),
-          this.idbService.loadAnnotation(LoginMode.DEMO),
+          this.idbService.loadAnnotation(LoginMode.DEMO)
         ]).pipe(
           withLatestFrom(this.store),
           map(

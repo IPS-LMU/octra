@@ -210,6 +210,7 @@
     "quit": "Beenden",
     "quit and release": "Beenden & freigeben",
     "quit continue later": "Beenden & später fortsetzen",
+    "quit discard": "Beenden & Fortschritt löschen",
     "reload": "NEU LADEN",
     "replay": "Wiederholung",
     "sampleRate": "Abtastrate",
@@ -402,7 +403,8 @@
       },
       "stop": {
         "header": "Transkription beenden",
-        "text": "Möchtest Du die Transkription wirklich beenden? Während der Transkription sichert Octra deinen Fortschritt im Speicher dieses Webbrowsers.<br><br>Entscheide Dich für eine der folgenden Optionen:<ul class='mt-2'><li class='mt-1'><b>Beenden & freigeben</b><br/>Dein Fortschritt wird verworfen und die Aufgabe ggf. anderen TranskribiererInnen angeboten.</li><li class='mt-1'><b>Beenden & später fortsetzen</b><br/>Dein Fortschritt wird auf den Server übertragen. Du kannst dich später mit den gleichen Zugangsdaten an diesem Webbrowser anmelden und die Transkription fortsetzen. Wichtig: Entferne nicht die Browserdaten, da Du sonst nicht mit dem letzten Stand fortfahren kannst.</li><li class='mt-1'><b>Transkription fortsetzen:</b><br/>Wähle diese Option, wenn Du jetzt weitermachen möchtest.</li></ul>"
+        "text": "Möchtest Du die Transkription wirklich beenden? Während der Transkription sichert Octra deinen Fortschritt im Speicher dieses Webbrowsers.<br><br>Entscheide Dich für eine der folgenden Optionen:<ul class='mt-2'><li class='mt-1'><b>Beenden & freigeben</b><br/>Dein Fortschritt wird verworfen und die Aufgabe ggf. anderen TranskribiererInnen angeboten.</li><li class='mt-1'><b>Beenden & später fortsetzen</b><br/>Dein Fortschritt wird auf den Server übertragen. Du kannst dich später mit den gleichen Zugangsdaten an diesem Webbrowser anmelden und die Transkription fortsetzen. Wichtig: Entferne nicht die Browserdaten, da Du sonst nicht mit dem letzten Stand fortfahren kannst.</li><li class='mt-1'><b>Transkription fortsetzen:</b><br/>Wähle diese Option, wenn Du jetzt weitermachen möchtest.</li></ul>",
+        "url text": "Möchtest Du die Transkription wirklich beenden? Du befindest dich im URL Modus. In diesem Modus wird dein Fortschritt nicht gespeichert. <br/><br/><b>Stelle sicher, dass Du deine Annotation exportierst, bevor Du Octra schließt</b>. "
       }
     }
   },

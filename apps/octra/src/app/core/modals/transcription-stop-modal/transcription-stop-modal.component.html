@@ -5,9 +5,14 @@
     </h4>
   </div>
   <div class="modal-body">
+    @if(appStore.useMode !== "url"){
     <div [innerHTML]="'modal.transcription.stop.text' | transloco"></div>
+    } @else if(appStore.useMode === "url") {
+    <div [innerHTML]="'modal.transcription.stop.url text' | transloco"></div>
+    }
   </div>
   <div class="row p-3 g-1">
+    @if (appStore.useMode !== "url") {
     <div class="col-12 col-lg-auto order-3 order-lg-1">
       <button
         type="button"
@@ -17,13 +22,28 @@
         {{ 'g.quit and release' | transloco }}
       </button>
     </div>
-    <div class="col-12 col-lg-auto order-2 order-lg-2">
+    }
+    <div
+      class="col-12 order-2 order-lg-2"
+      [ngClass]="{
+        'col-lg-auto': appStore.useMode !== 'url',
+        'col-lg': appStore.useMode === 'url'
+      }"
+    >
       <button
         type="button"
-        class="btn btn-raised btn-secondary w-100"
+        class="btn btn-raised w-100"
+        [ngClass]="{
+          'btn-secondary': appStore.useMode !== 'url',
+          'btn-danger': appStore.useMode === 'url'
+        }"
         (click)="close('QUIT')"
       >
+        @if (appStore.useMode !== "url") {
         {{ 'g.quit continue later' | transloco }}
+        } @else {
+        {{ 'g.quit discard' | transloco }}
+        }
       </button>
     </div>
     <div class="col-12 col-lg order-1 order-lg-3">

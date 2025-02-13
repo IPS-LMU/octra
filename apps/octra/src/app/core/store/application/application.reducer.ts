@@ -153,7 +153,7 @@ export const reducer = createReducer(
     IDBActions.loadOptions.success,
     (state: ApplicationState, { applicationOptions }) => ({
       ...state,
-      mode: applicationOptions.useMode ?? undefined,
+      mode: applicationOptions.useMode ?? state.mode,
       language: applicationOptions.language ?? 'en',
       options: {
         ...state.options,

@@ -120,7 +120,8 @@
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
       </button>
-      } @else { @if (useMode !== 'url') {
+      } @else { @if (useMode !== 'url' ||
+      (routingService.staticQueryParams.bottomNav)) {
       <button
         (click)="abortTranscription()"
         type="button"
@@ -133,7 +134,8 @@
         </span>
         }
       </button>
-      } @if (useMode === 'local') {
+      } @if (useMode === 'local' || (useMode === "url" &&
+      routingService.staticQueryParams.bottomNav) ) {
       <button
         (click)="navbarServ.doclick('export')"
         class="col-md-6 btn btn-primary"
@@ -159,7 +161,8 @@
         }
         <i class="bi bi-send-fill"></i>
       </button>
-      } @if (useMode === 'url' && !routingService.staticQueryParams.readonly) {
+      } @if (useMode === 'url') {
+      @if(!routingService.staticQueryParams.readonly && routingService.staticQueryParams.embedded) {
       <button
         (click)="onSaveTranscriptionButtonClicked()"
         class="btn btn-primary"
@@ -168,7 +171,7 @@
         <i class="bi bi-floppy-fill"></i>
         <span> {{ 'g.save' | transloco }} </span>
       </button>
-      } }
+      } } }
     </div>
   </div>
 </div>

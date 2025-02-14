@@ -19,6 +19,7 @@ import {
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
 
 @Component({
   selector: 'octra-projects-list',
@@ -149,5 +150,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       project.statistics?.tasks.find((a) => a.type === 'annotation')?.status
         .free ?? 0
     );
+  }
+
+  openCreateProjectRequestModal(){
+      this.modalService.openModalRef<ProjectRequestModalComponent>(ProjectRequestModalComponent, ProjectRequestModalComponent.options);
   }
 }

@@ -37,6 +37,7 @@ import { AuthSuccessPageComponent } from './auth-success/auth-success.page.compo
 import { InternRoutingModule } from './intern-routing.module';
 import { InternComponent } from './intern.component';
 import { ProjectsListComponent } from './projects-list';
+import { ProjectRequestModalComponent } from './projects-list/project-request-modal/project-request-modal.component';
 import { ReloadFileComponent } from './reload-file';
 import { TranscriptionComponent } from './transcription';
 import { TranscriptionEndComponent } from './transcription-end';
@@ -100,6 +101,7 @@ export const EDITORS: any[] = [
     DynComponentDirective,
     PermutationsReplaceModalComponent,
     AuthSuccessPageComponent,
+    ProjectRequestModalComponent,
     ALERTS,
   ],
   exports: [

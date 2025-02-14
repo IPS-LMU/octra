@@ -426,14 +426,16 @@
     "sign up": "Neu registrieren",
     "username or email": "Nutzername oder E-Mail",
     "nothing found": "Nicht gefunden",
-    "available until": "Verfügbar bis"
+    "available until": "Verfügbar bis",
+    "send email": "E-Mail senden"
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",
     "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben.",
     "other user logged in": "Es sind Daten von einer Sitzung eines anderen Nutzers vorhanden (<b>{{username}}</b>). Wenn Du eine neue Aufgabe beginnst, werden diese Daten entfernt.",
     "resume transcription": "Transkription fortsetzen",
-    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>"
+    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>",
+    "project creation wanted": "I möchte ein neues Projekt erstellen"
   },
   "reload-file": {
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'",
@@ -545,6 +547,21 @@
     "speaker-actions": {
       "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen",
       "permutations replace": "Ersetze Permutationen"
+    }
+  },
+  "modals": {
+    "create project request": {
+      "title": "Anfrage auf Projekterstellung",
+      "introduction": "OCTRA nutzt für den Online-Modus das {{octraBackendURL}}. Neue Projekte können aus Sicherheitsgründen nur von Administratoren erstellt werden, die entsprechende Anfragen vorher prüfen.",
+      "description": "Wenn Du dein Projekt mit dem OCTRA-Backend verwalten und im Online-Modus hier in Octra von Transkribierern verarbeiten lassen möchtest, kannst Du gerne eine E-Mail an die Administratoren schreiben: {{adminEmail}}",
+      "needed data": {
+        "label": "Die Email sollte folgende Daten beinhalten:",
+        "list1": "Projektname, Kürzel, interne Beschreibung, externe Beschreibung (optional)",
+        "list2": "Verantwortliche Personen (Vor- und Nachnamen, E-Mail Adresse, ggf Institution)",
+        "list3": "Welche Personen dürfen das Projekt verwalten? (Vor- und Nachnamen, E-Mail Adresse) Jede dieser Personen sollte bereits registriert sein.",
+        "list4": "Sichtbarkeit: öffentlich (alle können teilnehmen) oder privat (nur zugewiesene Nutzer dürfen bearbeiten)",
+        "list5": "Laufzeit: Start und Endzeitpunkt der Sichtbarkeit"
+      }
     }
   }
 }

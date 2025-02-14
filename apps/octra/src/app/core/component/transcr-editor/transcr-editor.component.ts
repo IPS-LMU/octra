@@ -116,8 +116,7 @@ export class TranscrEditorComponent
   @ViewChild('jodit', { static: false }) joditComponent?: NgxJoditComponent;
   public focused = false;
 
-  public joditOptions: JoditConfig = {
-  };
+  public joditOptions: JoditConfig = {};
   private guidelines?: OctraGuidelines;
 
   private joditDefaultOptions: JoditConfig = {
@@ -1301,8 +1300,11 @@ export class TranscrEditorComponent
           }
         };
 
-        if (pointer.nodeType === 3) {
-          // text
+        if (
+          pointer.nodeType === 3 ||
+          (tagName && !['img', 'p', 'div'].includes(tagName.toLowerCase()))
+        ) {
+          // other content
           addElemToPuffer();
         } else if (tagName) {
           if (tagName.toLowerCase() === 'img') {
@@ -1327,12 +1329,15 @@ export class TranscrEditorComponent
                 pointer = pointer.nextSibling;
               }
             } else {
+              // skip pointer
               pointer = pointer.nextSibling;
             }
           } else {
+            // skip pointer
             pointer = pointer.nextSibling;
           }
         } else {
+          // skip pointer
           pointer = pointer.nextSibling;
         }
         //end of scan

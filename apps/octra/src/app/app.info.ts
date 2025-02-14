@@ -37,7 +37,7 @@ export class AppInfo {
 
   public static readonly themes: string[] = ['default', 'shortAudioFiles'];
   static readonly manualURL =
-    'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
+    'https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/';
 
   static readonly maxAudioFileSize = 3000;
 

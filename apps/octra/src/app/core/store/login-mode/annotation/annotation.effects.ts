@@ -876,7 +876,7 @@ export class AnnotationEffects {
                     urlInfo[key].fileInfo = FileInfo.fromURL(
                       decodedURL,
                       mediaType,
-                      `${nameFromURL.name}${extension}`
+                      key === "audio" && this.routingService.staticQueryParams.audio_name ? this.routingService.staticQueryParams.audio_name : `${nameFromURL.name}${extension}`
                     );
                   }
                 }

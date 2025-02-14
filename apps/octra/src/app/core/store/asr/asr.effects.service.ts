@@ -925,8 +925,6 @@ export class AsrEffects {
       asrUrl += `&ACCESSCODE=${accessCode}`;
     }
 
-    const info = FileInfo.fromURL(asrUrl);
-
     return this.http
       .post(
         asrUrl,
@@ -941,14 +939,13 @@ export class AsrEffects {
       .pipe(
         take(1),
         exhaustMap((result) => {
-          return from(this.extractResultData(result, info.fullname));
+          return from(this.extractResultData(result));
         })
       );
   }
 
   private extractResultData = (
-    result: string,
-    fileName: string
+    result: string
   ): Promise<{ file: File; text: string; url: string }> => {
     return new Promise<{ file: File; text: string; url: string }>(
       (resolve, reject) => {
@@ -958,11 +955,7 @@ export class AsrEffects {
         json = json.WebServiceResponseLink;
 
         if (json.success === 'true') {
-          const file = FileInfo.fromURL(
-            json.downloadLink,
-            'text/plain',
-            fileName
-          );
+          const file = FileInfo.fromURL(json.downloadLink, 'text/plain');
           file
             .updateContentFromURL(this.http)
             .then((text: any) => {
@@ -1038,7 +1031,6 @@ export class AsrEffects {
       .replace('{{transcriptURL}}', transcriptURL)
       .replace('{{language}}', mausLanguage ?? asrLanguage);
 
-    const info = FileInfo.fromURL(audioURL);
     return this.http
       .post(
         mausURL,
@@ -1052,7 +1044,7 @@ export class AsrEffects {
       )
       .pipe(
         exhaustMap((result) => {
-          return from(this.extractResultData(result, info.fullname));
+          return from(this.extractResultData(result));
         })
       );
   }

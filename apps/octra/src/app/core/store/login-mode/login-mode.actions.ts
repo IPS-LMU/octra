@@ -70,15 +70,18 @@ export class LoginModeActions extends AnnotationActions {
         projectID?: string;
         taskID?: string;
         mode: LoginMode;
+        startup?: boolean;
       }>(),
       success: props<{
         mode?: LoginMode;
         me?: CurrentAccountDto;
         currentProject?: ProjectDto;
         task?: TaskDto;
+        startup?: boolean;
       }>(),
       fail: props<{
         error: HttpErrorResponse;
+        startup?: boolean;
       }>(),
     },
   });

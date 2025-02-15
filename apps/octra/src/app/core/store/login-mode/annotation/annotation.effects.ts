@@ -661,6 +661,7 @@ export class AnnotationEffects {
                   LoginModeActions.loadProjectAndTaskInformation.success({
                     mode: LoginMode.ONLINE,
                     me: currentAccount,
+                    startup: a.startup,
                   })
                 );
               }
@@ -680,6 +681,7 @@ export class AnnotationEffects {
                       me: currentAccount,
                       currentProject: currentProject ?? undefined,
                       task: task ?? undefined,
+                      startup: a.startup,
                     }
                   );
                 }),
@@ -704,25 +706,34 @@ export class AnnotationEffects {
                 })
               );
             }),
-            catchError((error) =>
-              checkAndThrowError(
-                {
-                  statusCode: error.status,
-                  message: error.error?.message ?? error.message,
-                },
-                a,
-                LoginModeActions.loadProjectAndTaskInformation.fail({
-                  error,
-                }),
-                this.store,
-                () => {
-                  this.alertService.showAlert(
-                    'danger',
-                    error.error?.message ?? error.message
-                  );
-                }
-              )
-            )
+            catchError((error) => {
+              if (!a.startup) {
+                return checkAndThrowError(
+                  {
+                    statusCode: error.status,
+                    message: error.error?.message ?? error.message,
+                  },
+                  a,
+                  LoginModeActions.loadProjectAndTaskInformation.fail({
+                    error,
+                  }),
+                  this.store,
+                  () => {
+                    this.alertService.showAlert(
+                      'danger',
+                      error.error?.message ?? error.message
+                    );
+                  }
+                );
+              } else {
+                // ignore
+                return of(
+                  LoginModeActions.loadProjectAndTaskInformation.success({
+                    startup: true,
+                  })
+                );
+              }
+            })
           );
         } else if (
           [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
@@ -854,7 +865,6 @@ export class AnnotationEffects {
                       decodedURL = decodedURL.replace(/\?.*$/g, '');
                     }
 
-
                     const nameFromURL = extractFileNameFromURL(decodedURL);
 
                     let extension = '';
@@ -876,7 +886,10 @@ export class AnnotationEffects {
                     urlInfo[key].fileInfo = FileInfo.fromURL(
                       decodedURL,
                       mediaType,
-                      key === "audio" && this.routingService.staticQueryParams.audio_name ? this.routingService.staticQueryParams.audio_name : `${nameFromURL.name}${extension}`
+                      key === 'audio' &&
+                        this.routingService.staticQueryParams.audio_name
+                        ? this.routingService.staticQueryParams.audio_name
+                        : `${nameFromURL.name}${extension}`
                     );
                   }
                 }
@@ -958,6 +971,7 @@ export class AnnotationEffects {
                         me: createSampleUser(),
                         currentProject,
                         task,
+                        startup: a.startup,
                       }
                     );
                   },
@@ -977,7 +991,11 @@ export class AnnotationEffects {
         }
 
         // no mode set
-        return of(LoginModeActions.loadProjectAndTaskInformation.success({}));
+        return of(
+          LoginModeActions.loadProjectAndTaskInformation.success({
+            startup: true,
+          })
+        );
       })
     )
   );

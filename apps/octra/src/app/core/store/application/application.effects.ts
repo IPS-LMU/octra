@@ -665,7 +665,7 @@ export class ApplicationEffects {
         ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
-          if (state.application.initialized) {
+          if (state.application.initialized && !(a as any).startup) {
             if (!state.application.mode) {
               // no mode active
               if (
@@ -803,6 +803,8 @@ export class ApplicationEffects {
               } else {
                 this.routerService.navigate('no last page', ['/login']);
               }
+            } else {
+              this.routerService.navigate('no last page', ['/login']);
             }
           }
         })

@@ -164,6 +164,7 @@ export class IDBEffects {
                     projectID: action.onlineOptions.project?.id,
                     taskID: action.onlineOptions.transcriptID ?? undefined,
                     mode: LoginMode.ONLINE,
+                    startup: true,
                   })
                 );
               } else {
@@ -175,6 +176,7 @@ export class IDBEffects {
                     mode: this.routingService.staticQueryParams.audio_url
                       ? undefined
                       : state.application.mode!,
+                    startup: true,
                   })
                 );
               }
@@ -201,7 +203,7 @@ export class IDBEffects {
         return forkJoin([
           this.idbService.loadAnnotation(LoginMode.ONLINE),
           this.idbService.loadAnnotation(LoginMode.LOCAL),
-          this.idbService.loadAnnotation(LoginMode.DEMO)
+          this.idbService.loadAnnotation(LoginMode.DEMO),
         ]).pipe(
           withLatestFrom(this.store),
           map(

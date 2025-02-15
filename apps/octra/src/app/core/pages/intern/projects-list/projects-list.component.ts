@@ -2,9 +2,14 @@ import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { ProjectDto, ProjectListDto } from '@octra/api-types';
+import {
+  AccountProjectRoleDto,
+  ProjectDto,
+  ProjectListDto,
+} from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../../component/default.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
@@ -18,7 +23,6 @@ import {
 } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
 
 @Component({
@@ -37,6 +41,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     page: number;
     collectionSize: number;
   };
+
+  projectRoles: AccountProjectRoleDto[] = [];
+  istProjectAdmin = false;
 
   constructor(
     private api: OctraAPIService,
@@ -61,6 +68,14 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         },
       }
     );
+    this.subscribe(authStoreService.me$, {
+      next: (me) => {
+        this.projectRoles = me.projectRoles ?? [];
+        this.istProjectAdmin =
+          this.projectRoles.find((a) => a.role === 'project_admin') !==
+          undefined;
+      },
+    });
   }
 
   async ngOnInit() {
@@ -85,8 +100,8 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         manageable: false,
         start: page,
         representation: 'page',
-        order: "asc",
-        order_by: "name"
+        order: 'asc',
+        order_by: 'name',
       }),
       {
         next: (projects) => {
@@ -129,10 +144,13 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   showProjects(page: number) {
-    this.shownProjects = this.projects.list.slice((page - 1) * this.itemsPerPage, page * this.itemsPerPage);
+    this.shownProjects = this.projects.list.slice(
+      (page - 1) * this.itemsPerPage,
+      page * this.itemsPerPage
+    );
     this.currentPage = {
       page,
-      collectionSize: this.projects.list.length
+      collectionSize: this.projects.list.length,
     };
   }
 
@@ -152,7 +170,10 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     );
   }
 
-  openCreateProjectRequestModal(){
-      this.modalService.openModalRef<ProjectRequestModalComponent>(ProjectRequestModalComponent, ProjectRequestModalComponent.options);
+  openCreateProjectRequestModal() {
+    this.modalService.openModalRef<ProjectRequestModalComponent>(
+      ProjectRequestModalComponent,
+      ProjectRequestModalComponent.options
+    );
   }
 }

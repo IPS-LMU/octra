@@ -95,6 +95,7 @@
             class="nav-link"
             href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/"
             target="_blank"
+            (click)="isCollapsed = true"
           >
             {{ 'g.manual' | transloco }}
           </a>
@@ -104,13 +105,14 @@
             class="nav-link"
             href="https://github.com/IPS-LMU/octra"
             target="_blank"
+            (click)="isCollapsed = true"
           >
             <i class="bi bi-github"></i>
             Github
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" (click)="openAboutModal()">
+          <a class="nav-link" (click)="isCollapsed = true; openAboutModal()">
             {{ 'g.about' | transloco }}
           </a>
         </li>
@@ -138,7 +140,7 @@
         } } @if ( appStorage.loggedIn && navbarServ.showInterfaces &&
         isAdministrator ) {
         <li class="nav-item">
-          <a (mouseup)="openStatisticsModal()" class="nav-link">
+          <a (mouseup)="isCollapsed = true; openStatisticsModal()" class="nav-link">
             <i class="bi bi-pie-chart-fill"></i>
             <span class="d-md-none d-xxl-inline"> Statistics</span></a
           >
@@ -700,7 +702,7 @@
                                     -->
         @if (api.appProperties?.send_feedback) {
         <li class="nav-item">
-          <a (mouseup)="openBugReport()" class="nav-link">
+          <a (mouseup)="isCollapsed = true; openBugReport()" class="nav-link">
             <i
               class="bi bi-question-circle-fill navbar-icon"
               style="color: #fcffba"

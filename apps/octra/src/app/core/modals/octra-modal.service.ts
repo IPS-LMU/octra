@@ -158,11 +158,11 @@ export class OctraModalService implements OnDestroy {
           this.appStorage.useMode !== LoginMode.ONLINE ||
           !this.appStorage.loggedIn,
         _profile: {
-          ...((this.appStorage.useMode !== LoginMode.ONLINE
+          ...((this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn
             ? this.appStorage.snapshot.user
             : {
-                email: this.appStorage.snapshot.authentication?.me.email,
-                name: `${this.appStorage.snapshot.authentication?.me.first_name} ${this.appStorage.snapshot.authentication?.me.last_name}`,
+                email: this.appStorage.snapshot.authentication?.me?.email,
+                name: `${this.appStorage.snapshot.authentication?.me?.first_name} ${this.appStorage.snapshot.authentication?.me?.last_name}`,
               }) ?? {}),
         },
       }

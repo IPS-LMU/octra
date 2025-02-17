@@ -4,7 +4,7 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Action } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { timer } from 'rxjs';
+import { map, timer } from 'rxjs';
 import { AuthenticationComponent } from '../../component/authentication-component/authentication-component.component';
 import { DefaultComponent } from '../../component/default.component';
 import { SettingsService } from '../../shared/service';
@@ -79,14 +79,19 @@ export class ReAuthenticationModalComponent
   }
 
   onAuthenticatedClick() {
-    this.subscribe(this.apiService.getMyAccountInformation(), {
-      next: (account) => {
-        this.authService.setReAuthenticationSuccess(this.actionAfterSuccess);
-      },
-      error: (error) => {
-        this.authenticationRunning = true;
-      },
-    });
+    this.subscribe(
+      this.appStorage.useMode === 'online'
+        ? this.apiService.getMyAccountInformation()
+        : timer(500).pipe(map((a) => undefined)),
+      {
+        next: () => {
+          this.authService.setReAuthenticationSuccess(this.actionAfterSuccess);
+        },
+        error: (error) => {
+          this.authenticationRunning = true;
+        },
+      }
+    );
   }
 
   abort() {

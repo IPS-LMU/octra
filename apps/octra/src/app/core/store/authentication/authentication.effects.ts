@@ -5,7 +5,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { joinURL } from '@octra/utilities';
+import { appendURLQueryParams, joinURL } from '@octra/utilities';
 import {
   AudioManager,
   getBaseHrefURL,
@@ -53,8 +53,7 @@ export class AuthenticationEffects {
         const waitForWindowResponse = (
           actionAfterSuccess: Action | undefined,
           url: string,
-          cid: number,
-          appendings = ''
+          params: Record<string, string | number | undefined | null | boolean>
         ) => {
           const baseURL = getBaseHrefURL();
 
@@ -70,16 +69,14 @@ export class AuthenticationEffects {
             }
           });
 
-          console.log(
-            `Redirect to: ${url}?cid=${cid}&r=${encodeURIComponent(
-              joinURL(baseURL, 'auth-success')
-            )}${appendings}`
-          );
+          params = {
+            ...params,
+            r: joinURL(baseURL, 'auth-success'),
+          };
 
+          const newURL = appendURLQueryParams(url, params);
           popupCenter(
-            `${url}?cid=${cid}&r=${encodeURIComponent(
-              joinURL(baseURL, 'auth-success')
-            )}${appendings}`,
+            newURL,
             'Octra-Backend - Authenticate via Shibboleth',
             760,
             760
@@ -102,8 +99,10 @@ export class AuthenticationEffects {
                 a.actionAfterSuccess,
                 state.application.appConfiguration?.octra.plugins.asr
                   .shibbolethURL,
-                Date.now(),
-                '&nc=true'
+                {
+                  nc: true,
+                  cid: Date.now(),
+                }
               )
             );
           } else {
@@ -119,22 +118,25 @@ export class AuthenticationEffects {
           map((auth) => {
             if (auth.openURL !== undefined) {
               // need to open windowURL
-              const cid = Date.now();
-              let url = `${auth.openURL}`;
-              localStorage.setItem('cid', cid.toString());
-
-              if (a.type === AuthenticationActions.loginOnline.do.type) {
-                // redirect directly
-                url = `${url}?cid=${cid}&r=${encodeURIComponent(
+              const urlParams = {
+                cid: Date.now(),
+                r:
                   joinURL(
                     document.location.href.replace(/login\/?/g, ''),
                     'intern',
                     'projects'
-                  )
-                )}&uuid=${this.apiService.appProperties.server.uuid}`;
+                  ),
+                uuid: this.apiService.appProperties.server.uuid,
+                t: auth.agreementToken,
+              };
+              let url = `${auth.openURL}`;
+              localStorage.setItem('cid', urlParams.cid.toString());
+
+              if (a.type === AuthenticationActions.loginOnline.do.type) {
+                // redirect directly
+                url = appendURLQueryParams(url, urlParams);
 
                 if (auth.agreementToken) {
-                  url = `${url}&t=${auth.agreementToken}`;
                   this.sessionStorageService.store('authType', a.method);
                   this.sessionStorageService.store('authenticated', false);
                 }
@@ -145,7 +147,11 @@ export class AuthenticationEffects {
                 });
               } else {
                 // redirect to new window
-                return waitForWindowResponse(a.actionAfterSuccess, url, cid);
+                return waitForWindowResponse(
+                  a.actionAfterSuccess,
+                  url,
+                  urlParams
+                );
               }
             } else if (auth.me) {
               this.sessionStorageService.store('webToken', auth.accessToken);

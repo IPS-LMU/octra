@@ -156,7 +156,6 @@ export class NamingDragAndDropComponent extends DefaultComponent {
       $event.preventDefault();
       $event.stopPropagation();
       this.deselect();
-      console.log(`keydown text: "${text.innerText}"`);
       this.resultConvention[this.clicked].value = text.innerText;
       this.clicked = -1;
     }

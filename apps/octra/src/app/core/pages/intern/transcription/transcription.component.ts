@@ -456,14 +456,7 @@ export class TranscriptionComponent
 
     this.subscribe(this.appStoreService.shortcutsEnabled$, {
       next: (shortcutsEnabled) => {
-        console.log(`shortcutsEnabled changed to ${shortcutsEnabled}`);
-
         if (this._currentEditor?.instance) {
-          console.log(
-            `set shortcuts to ${shortcutsEnabled} for editor ${
-              (this._currentEditor.instance as any).name
-            }`
-          );
           if (shortcutsEnabled) {
             (this._currentEditor.instance as OCTRAEditor).enableAllShortcuts();
             this.shortcutService.enableAll();

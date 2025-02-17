@@ -824,10 +824,6 @@ export class AsrEffects {
           settings.octra.plugins.asr.calls[0] !== '' &&
           settings.octra.plugins.asr.calls[1] !== '';
 
-        console.log(
-          `ASR ENABLED: ${action.task.tool_configuration?.value?.octra?.asrEnabled}`
-        );
-
         return of(
           ASRActions.enableASR.do({
             isEnabled:
@@ -1060,7 +1056,6 @@ export class AsrEffects {
         : error instanceof HttpErrorResponse
         ? error.error?.message ?? error.message
         : error;
-    console.log('GOT ERROR');
     console.error(errorMessage);
 
     if (errorMessage.indexOf('quota') > -1) {

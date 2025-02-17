@@ -25,7 +25,6 @@ export class ReloadFileGuard {
         });
       return false;
     } else {
-      console.log(`reload file guard projectconfig set ok`);
       return true;
     }
   }

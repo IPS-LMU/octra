@@ -242,7 +242,6 @@ export class BugReportService {
       protocol = undefined;
     }
 
-    console.log('send feedback');
     return this.api.sendFeedback(
       body,
       protocol,

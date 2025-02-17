@@ -801,12 +801,6 @@ export class TrnEditorComponent
           started = Date.now();
           this.cd.markForCheck();
           this.cd.detectChanges();
-          console.log(
-            `detectChanges saveCloseeditor ended: ${Date.now() - started}ms`
-          );
-          console.log(
-            `saveAndCloseEditor ended: ${Date.now() - overallTime}ms`
-          );
           resolve();
         });
       }
@@ -903,10 +897,6 @@ export class TrnEditorComponent
         this.currentLevel.items[segmentIndex] = segment;
          */
       }
-    } else {
-      const isNull = this.currentLevel.items === undefined;
-      console.log(`could not save segment. segment index=${segmentIndex},
-segments=${isNull}, ${this.currentLevel.items.length}`);
     }
   }
 

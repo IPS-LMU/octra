@@ -354,7 +354,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   async updateView() {
-    console.log(`update View!`);
     await this.updateSegments();
     this.annotationStoreService.analyse();
 

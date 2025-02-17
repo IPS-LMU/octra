@@ -358,13 +358,11 @@ export class TranscrWindowComponent
             )
           : undefined;
 
-        console.log(queue?.items);
         if (item) {
           if (
             item.status === ASRProcessStatus.FINISHED &&
             item.result !== undefined
           ) {
-            console.log(`set transcript in window: ${item.result}`);
             this.transcript = item.result;
           } else {
             console.log(`Can't set transcript, ${item.status}, ${item.result}`);

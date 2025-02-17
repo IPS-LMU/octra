@@ -869,7 +869,6 @@ export class ApplicationEffects {
             }
           }
 
-          console.log('CHECK AUDIO_URL PARAM');
           if (this.routerService.staticQueryParams?.audio_url) {
             this.store.dispatch(
               AuthenticationActions.loginURL.do({

@@ -1,7 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
@@ -11,7 +10,6 @@ import { AuthenticationComponent } from '../../component/authentication-componen
 import { DefaultComponent } from '../../component/default.component';
 import { MaintenanceBannerComponent } from '../../component/maintenance/maintenance-banner/maint-banner.component';
 import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
-import { DropzoneStatistics } from '../../component/octra-dropzone/octra-dropzone.service';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -88,7 +86,6 @@ export class LoginComponent
   compatibleBrowser?: boolean;
 
   constructor(
-    private router: Router,
     public appStorage: AppStorageService,
     public api: OctraAPIService,
     public settingsService: SettingsService,
@@ -100,7 +97,6 @@ export class LoginComponent
     this.compatibilityService.testCompability().then((result) => {
       this.compatibleBrowser = result;
     });
-
     const subject = 'Octra Server is offline';
     const body = `Hello,
 

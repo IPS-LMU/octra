@@ -1,4 +1,4 @@
-import { JsonPipe, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import { Component, Input, Output, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -30,7 +30,6 @@ import {
     NgStyle,
     OctraUtilitiesModule,
     TranslocoPipe,
-    JsonPipe,
   ],
 })
 export class OctraDropzoneComponent extends DefaultComponent {

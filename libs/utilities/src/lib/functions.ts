@@ -457,3 +457,25 @@ export async function wait(seconds: number): Promise<void> {
     setTimeout(resolve, seconds * 1000);
   });
 }
+
+/**
+ * appends given query parameters to a given URL
+ * @param url
+ * @param params
+ */
+export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean>) {
+  let startingLetter = '?';
+  if (/[^/]*\?([^/]*)$/g.exec(url)) {
+    startingLetter = '&';
+  }
+  const array: string[] = [];
+
+  for (const attr in params) {
+    if (params[attr] !== undefined && params[attr] !== null) {
+      array.push(`${attr}=${encodeURI(params[attr].toString())}`);
+    }
+  }
+
+  const query = array.length > 0 ? `${startingLetter}${array.join('&')}` : '';
+  return `${url}${query}`;
+}

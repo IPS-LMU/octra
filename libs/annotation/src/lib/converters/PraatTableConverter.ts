@@ -123,6 +123,7 @@ export class PraatTableConverter extends Converter {
 
     const content = file.content;
     const lines: string[] = content.split('\n');
+    const startWithLine = /tmin\ttier\ttext\ttmax/g.exec(lines[0]) !== null ? 1 : 0;
 
     // check if filename is equal with audio file
     const filename = FileInfo.extractFileName(file.name).name;
@@ -130,7 +131,7 @@ export class PraatTableConverter extends Converter {
     if (contains(audiofile.name, filename)) {
       const tiers: string[] = [];
       // get tiers
-      for (let i = 1; i < lines.length; i++) {
+      for (let i = startWithLine; i < lines.length; i++) {
         if (lines[i] !== '') {
           const columns: string[] = lines[i].split('\t');
           const tier = columns[1];
@@ -147,7 +148,7 @@ export class PraatTableConverter extends Converter {
         let puffer = 0;
         let id = 1;
         // start at line 0
-        for (let i = 1; i < lines.length; i++) {
+        for (let i = startWithLine; i < lines.length; i++) {
           if (lines[i] !== '') {
             const columns: string[] = lines[i].split('\t');
             const tmin = Number(columns[0]);
@@ -155,14 +156,14 @@ export class PraatTableConverter extends Converter {
             const text = columns[2];
             const tmax = Number(columns[3]);
 
-            length = 0;
+            let rightBoundary = 0;
 
             if (isNaN(tmax)) {
               return {
                 error: `Parsing error at line ${i + 1} column 4: Not a number`,
               };
             } else {
-              length = Number(tmax - tmin);
+              rightBoundary = Number(tmax);
             }
             const sampleRate = audiofile.sampleRate;
 
@@ -184,9 +185,40 @@ export class PraatTableConverter extends Converter {
                     : undefined
                 ) as OSegment;
                 if (
-                  last !== undefined &&
-                  last.sampleStart + last.sampleDur === Math.round(Number(tmin))
+                  (last !== undefined &&
+                    Math.round(
+                      (last.sampleStart + last.sampleDur) / sampleRate
+                    ) < Math.round(Number(tmin))) ||
+                  (!last && tmin > start)
                 ) {
+                  if (last) {
+                    // add empty segment
+                    olevel.items.push(
+                      new OSegment(
+                        id++,
+                        last.sampleStart + last.sampleDur,
+                        Math.round(
+                          tmin * sampleRate -
+                            (last.sampleStart + last.sampleDur)
+                        ),
+                        [new OLabel(tier, '')]
+                      )
+                    );
+                  } else {
+                    // add empty segment
+                    olevel.items.push(
+                      new OSegment(
+                        id++,
+                        start * sampleRate,
+                        Math.round(
+                          tmin * sampleRate -
+                          (start * sampleRate) - (tmin * sampleRate)
+                        ),
+                        [new OLabel(tier, '')]
+                      )
+                    );
+                  }
+
                   start = tmin;
                 }
               }
@@ -209,15 +241,15 @@ export class PraatTableConverter extends Converter {
               const osegment = new OSegment(
                 id,
                 Math.round(start * sampleRate),
-                Math.round(length * sampleRate),
+                Math.round((rightBoundary - start) * sampleRate),
                 olabels
               );
 
               olevel.items.push(osegment);
-              start += length;
+              start += rightBoundary - start;
               id++;
             } else {
-              puffer += length;
+              puffer += rightBoundary - start;
             }
           }
         }

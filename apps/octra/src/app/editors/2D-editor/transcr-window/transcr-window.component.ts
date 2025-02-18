@@ -6,7 +6,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  Input,
+  HostListener,
   OnChanges,
   OnInit,
   Output,
@@ -19,9 +19,11 @@ import { TranscrEditorComponent } from '../../../core/component';
 import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
+  NgbActiveModal,
   NgbDropdown,
   NgbDropdownMenu,
   NgbDropdownToggle,
+  NgbModalOptions,
 } from '@ng-bootstrap/ng-bootstrap';
 import {
   addSegment,
@@ -87,15 +89,25 @@ export class TranscrWindowComponent
   extends DefaultComponent
   implements OnInit, AfterContentInit, AfterViewInit, OnChanges
 {
+  public static options: NgbModalOptions = {
+    size: 'xl',
+    fullscreen: 'xl',
+    backdrop: 'static',
+    windowClass: 'trancr-window',
+    modalDialogClass: 'transcr-window-dialog',
+    backdropClass: 'transcr-window-backdrop',
+  };
+
   @ViewChild('magnifier', { static: true }) magnifier!: AudioViewerComponent;
   @ViewChild('editor', { static: true }) editor!: TranscrEditorComponent;
   @ViewChild('audionav', { static: true }) audionav!: AudioNavigationComponent;
   @ViewChild('window', { static: true }) window!: ElementRef;
   @ViewChild('main', { static: true }) main!: ElementRef;
-  @Output() act: EventEmitter<string> = new EventEmitter<string>();
-  @Input() easyMode: boolean | undefined | null = false;
-  @Input() audiochunk!: AudioChunk;
-  @Input() segmentIndex!: number;
+
+  act: EventEmitter<string> = new EventEmitter<string>();
+  easyMode: boolean | undefined | null = false;
+  audiochunk!: AudioChunk;
+  segmentIndex!: number;
 
   private showWindow = false;
   private tempSegments!: OctraAnnotationSegment[];
@@ -344,7 +356,8 @@ export class TranscrWindowComponent
     public cd: ChangeDetectorRef,
     private langService: TranslocoService,
     private alertService: AlertService,
-    private navbarService: NavbarService
+    private navbarService: NavbarService,
+    private activeModal: NgbActiveModal
   ) {
     super();
 
@@ -463,7 +476,7 @@ export class TranscrWindowComponent
     this.magnifier.name = 'transcr-window viewer';
     this.magnifier.settings.margin.top = 5;
     this.magnifier.settings.margin.bottom = 0;
-    this.magnifier.settings.lineheight = 200;
+    this.magnifier.settings.lineheight = window.innerHeight > 760 ? 200 : 100;
     this.magnifier.settings.justifySignalHeight = true;
     this.magnifier.settings.boundaries.enabled = false;
     this.magnifier.settings.boundaries.readonly = true;
@@ -590,8 +603,6 @@ export class TranscrWindowComponent
   }
 
   close() {
-    this.showWindow = false;
-
     this.shortcutsService.enableGroup('2D-Editor audio');
     this.shortcutsService.disableGroup('transcription window');
 
@@ -624,10 +635,10 @@ export class TranscrWindowComponent
       },
       'transcription window'
     );
-
     this.audiochunk.stopPlayback();
+
+    this.activeModal.close();
     this.act.emit('close');
-    this.subscriptionManager.destroy();
   }
 
   public open() {
@@ -1489,5 +1500,19 @@ export class TranscrWindowComponent
       this.segmentIndex ===
         this.annotationStoreService.currentLevel!.items.length - 1 ||
       this.isNextSegmentLastAndBreak(this.segmentIndex);
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize($event: Event) {
+    if (this.magnifier) {
+      if (window.innerHeight <= 760) {
+        this.magnifier.settings.lineheight = 100;
+      } else {
+        this.magnifier.settings.lineheight = 200;
+      }
+
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    }
   }
 }

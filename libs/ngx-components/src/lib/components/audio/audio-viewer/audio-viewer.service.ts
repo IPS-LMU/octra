@@ -2677,6 +2677,7 @@ export class AudioViewerService {
                   this.stage !== undefined &&
                   this.mouseCursor !== undefined
                 ) {
+                  event.preventDefault();
                   this.shortcut.emit({
                     shortcut: comboKey,
                     shortcutName,

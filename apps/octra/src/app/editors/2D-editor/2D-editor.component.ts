@@ -26,6 +26,7 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
+  NgbModalWrapper,
   OctraComponentsModule,
 } from '@octra/ngx-components';
 import {
@@ -37,7 +38,6 @@ import {
 import { HotkeysEvent } from 'hotkeys-js';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
 import { NavbarService } from '../../core/component/navbar/navbar.service';
 import { OctraModalService } from '../../core/modals/octra-modal.service';
 import {
@@ -54,18 +54,12 @@ import { AsrStoreService } from '../../core/store/asr/asr-store-service.service'
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
-import { TranscrWindowComponent as TranscrWindowComponent_1 } from './transcr-window/transcr-window.component';
 
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.scss'],
-  imports: [
-    TranscrWindowComponent_1,
-    AudioNavigationComponent_1,
-    OctraComponentsModule,
-    NgStyle,
-  ],
+  imports: [OctraComponentsModule, NgStyle, AudioNavigationComponent],
 })
 export class TwoDEditorComponent
   extends OCTRAEditor
@@ -75,12 +69,11 @@ export class TwoDEditorComponent
   public initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer', { static: true }) viewer!: AudioViewerComponent;
-  @ViewChild('window', { static: false }) window!: TranscrWindowComponent;
+  window?: NgbModalWrapper<TranscrWindowComponent>;
   @ViewChild('magnifier', { static: false }) magnifier!: AudioViewerComponent;
   @ViewChild('audionav', { static: true }) audionav!: AudioNavigationComponent;
   @Output() public openModal = new EventEmitter();
 
-  public showWindow = false;
   public magnifierHidden = true;
   public selectedIndex!: number;
   public minimagnifier = {
@@ -326,10 +319,7 @@ export class TwoDEditorComponent
   };
 
   public get editor(): TranscrEditorComponent | undefined {
-    if (!this.window) {
-      return undefined;
-    }
-    return this.window.editor;
+    return this.window?.componentInstance?.editor;
   }
 
   public get getHeight(): number {
@@ -584,7 +574,7 @@ export class TwoDEditorComponent
     });
   }
 
-  onSegmentEntered(selected: any) {
+  async onSegmentEntered(selected: any) {
     const currentLevel = this.annotationStoreService.currentLevel;
 
     if (
@@ -616,7 +606,24 @@ export class TwoDEditorComponent
           this.shortcutsEnabled = false;
 
           this.viewer.disableShortcuts();
-          this.showWindow = true;
+
+          this.window = this.modalService.openModalRef(
+            TranscrWindowComponent,
+            TranscrWindowComponent.options,
+            {
+              audiochunk: this.audioChunkWindow,
+              easyMode: this.appStorage.easyMode,
+              segmentIndex: this.selectedIndex,
+            }
+          );
+          this.subscriptionManager.removeByTag('windowActions');
+          this.subscribe(
+            this.window.componentInstance.act,
+            {
+              next: this.onWindowAction,
+            },
+            'windowActions'
+          );
 
           this.uiService.addElementFromEvent(
             'segment',
@@ -654,12 +661,11 @@ export class TwoDEditorComponent
     }
   }
 
-  onWindowAction(state: string) {
+  onWindowAction = (state: string) => {
     if (state === 'close') {
-      this.showWindow = false;
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
-      this.selectedIndex = this.window.segmentIndex;
+      this.selectedIndex = this.window.componentInstance!.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
     } else if (state === 'overview') {
       this.shortcutsEnabled = false;
@@ -703,7 +709,10 @@ export class TwoDEditorComponent
     }
   }
 
-  public changeMagnifierPosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+  public changeMagnifierPosition(
+    mouseEvent: MouseEvent,
+    cursorTime: SampleUnit
+  ) {
     const offsetX =
       mouseEvent.clientX -
       (mouseEvent.target as HTMLElement).getBoundingClientRect().left;
@@ -1068,16 +1077,16 @@ export class TwoDEditorComponent
   public enableAllShortcuts() {
     this.shortcutsEnabled = true;
     this.viewer.enableShortcuts();
-    if (this.window !== undefined && this.window.magnifier !== undefined) {
-      this.window.magnifier.enableShortcuts();
+    if (this.window?.componentInstance?.magnifier !== undefined) {
+      this.window.componentInstance.magnifier.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.shortcutsEnabled = false;
     this.viewer.disableShortcuts();
-    if (this.window !== undefined && this.window.magnifier !== undefined) {
-      this.window.magnifier.disableShortcuts();
+    if (this.window?.componentInstance?.magnifier !== undefined) {
+      this.window.componentInstance.magnifier.disableShortcuts();
     }
   }
 

@@ -1,13 +1,4 @@
 <div id="overlay-transcr" style="position: relative">
-  @if (showWindow) {
-  <octra-transcr-window
-    #window
-    (act)="onWindowAction($event)"
-    [audiochunk]="audioChunkWindow"
-    [easyMode]="appStorage.easyMode"
-    [segmentIndex]="selectedIndex"
-  ></octra-transcr-window>
-  }
   <octra-audio-navigation
     #audionav
     (afterPlaybackRateChange)="afterSpeedChange($event)"
@@ -57,7 +48,7 @@
       [annotation]="annotationStoreService.transcript!"
       (currentLevelChange)="onCurrentLevelChange($event)"
       id="special"
-      style="height: 400px; display: flex; flex: auto; flex-direction: column"
+      style="height: 20px; display: flex; flex: auto; flex-direction: column"
     >
     </octra-audio-viewer>
   </div>

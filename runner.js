@@ -68,7 +68,8 @@ const OCTRA = {
     await setBuildVariable();
   },
   buildRelease: async function () {
-    await run('node ./build.js beta=false isUpdate=true url=/');
+    await run('node ./build.js beta=false isUpdate=false url=/');
+    await fs.remove("dist/apps/octra/config/appconfig.json");
     await setBuildVariable();
   },
   buildDev: async function () {

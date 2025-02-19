@@ -1,4 +1,4 @@
-<h1 align="center">OCTRA v2.x (still in development)</h1>
+<h1 align="center">OCTRA 2.0.0</h1>
 
 <div align="center" style="background-color:#e5efe5;">
   <img src="apps/octra/src/assets/img/socialmedia/Octra2_thumbnail_github.png"/>
@@ -26,9 +26,9 @@
 
 Octra supports different editors that you can choose according to your preferences. You can also switch between these easily while you are working on the same task.
 
+* 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 * Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
-* 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 
 ## User Manual
 
@@ -37,6 +37,7 @@ You can find the manual for users here: [OCTRA Manual](https://clarin.phonetik.u
 ## Features
 
 * Three different editors
+* NEW: Online Mode powered by Octra-Backend
 * Noise markers (placeholders) in the form of icons in text. Icons can be UTF-8 symbols, too.
 * Auto-saving of the transcription progress to prevent data loss
 * Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.
@@ -50,8 +51,10 @@ You can find the manual for users here: [OCTRA Manual](https://clarin.phonetik.u
 * Overview window to see the whole transcript
 * Cutting audio files up to 300 MB
 * Visible transcripts in 2D-Editor
-* **New:** Costum table generator
-* **New:** ASR support for transcription and segmentation
+* Costom table generator
+* ASR support for transcription and segmentation
+* NEW: Each mode saves its own application state to the browser
+* NEW: Redo & Undo for signal displays
 
 ## Remarks
 
@@ -71,7 +74,7 @@ If you don't want to install OCTRA, you can use the latest release [here](https:
 
 In a production environment you don't need to compile OCTRA again.
 
-1. Download the latest release from the releases page.``
+1. Download the latest release from the [releases page](https://github.com/IPS-LMU/octra/releases).
 
 2. Extract and Copy its content to your http-server. If you have already installed an older version of OCTRA, please notice to not override the old config folder. More information about upgrading can be found in the next section.
 

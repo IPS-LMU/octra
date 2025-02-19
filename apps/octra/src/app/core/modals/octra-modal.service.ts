@@ -178,7 +178,7 @@ export class OctraModalService implements OnDestroy {
     this.subscrManager.add(
       ref.componentInstance.send.subscribe({
         next: ({ name, email, message, sendProtocol, screenshots }) => {
-          console.log('Sending...');
+          console.log('Sending bug report...');
           ref.componentInstance.sendStatus = 'sending';
           ref.componentInstance.waitForSendResponse(
             this.bugService.sendReport(

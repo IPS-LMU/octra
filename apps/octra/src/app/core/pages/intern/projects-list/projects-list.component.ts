@@ -70,7 +70,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     );
     this.subscribe(authStoreService.me$, {
       next: (me) => {
-        this.projectRoles = me.projectRoles ?? [];
+        this.projectRoles = me?.projectRoles ?? [];
         this.istProjectAdmin =
           this.projectRoles.find((a) => a.role === 'project_admin') !==
           undefined;

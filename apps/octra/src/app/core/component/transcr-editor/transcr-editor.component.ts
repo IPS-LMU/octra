@@ -1171,11 +1171,14 @@ export class TranscrEditorComponent
           }
 
           this._rawText = this.tidyUpRaw(this._rawText);
-          this.wysiwyg.innerHTML = code;
-          if (focusAtEnd) {
-            this.placeAtEnd(this.wysiwyg.firstChild as HTMLElement);
-          } else {
-            this.restoreSelection();
+
+          if (this.wysiwyg) {
+            this.wysiwyg.innerHTML = code;
+            if (focusAtEnd) {
+              this.placeAtEnd(this.wysiwyg.firstChild as HTMLElement);
+            } else {
+              this.restoreSelection();
+            }
           }
 
           this.lastHighlightedSegment--;

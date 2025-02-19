@@ -11,7 +11,7 @@
     "login": {
       "enabled": true
     },
-    "showdetails": true,
+    "showdetails": false,
     "supportEmail": "no-email-provided@email.com",
     "plugins": {},
     "allowed_browsers": [

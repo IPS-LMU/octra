@@ -68,7 +68,7 @@ const OCTRA = {
     await setBuildVariable();
   },
   buildRelease: async function () {
-    await run('node ./build.js dev=false isUpdate=false url=/');
+    await run('node ./build.js beta=false isUpdate=true url=/');
     await setBuildVariable();
   },
   buildDev: async function () {
@@ -86,6 +86,12 @@ const OCTRA = {
   buildBetaProdUpdate: async function () {
     await run(
       'node ./build.js beta=true isUpdate=true url=/apps/octra/octra-2/'
+    );
+    await setBuildVariable();
+  },
+  buildProdUpdate: async function () {
+    await run(
+      'node ./build.js beta=false isUpdate=true url=/apps/octra/octra-2/'
     );
     await setBuildVariable();
   },
@@ -169,6 +175,11 @@ yargs
     'build:prod:update:beta',
     'Builds prod beta update version of OCTRA.',
     OCTRA.buildBetaProdUpdate
+  )
+  .command(
+    'build:prod:update',
+    'Builds prod update version of OCTRA.',
+    OCTRA.buildProdUpdate
   )
   .command(
     'build:dev:update:beta',

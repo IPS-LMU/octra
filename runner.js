@@ -86,13 +86,13 @@ const OCTRA = {
   },
   buildBetaProdUpdate: async function () {
     await run(
-      'node ./build.js beta=true isUpdate=true url=/apps/octra/octra-2/'
+      'node ./build.js beta=true isUpdate=true url=/apps/octra/octra/'
     );
     await setBuildVariable();
   },
   buildProdUpdate: async function () {
     await run(
-      'node ./build.js beta=false isUpdate=true url=/apps/octra/octra-2/'
+      'node ./build.js beta=false isUpdate=true url=/apps/octra/octra/'
     );
     await setBuildVariable();
   },

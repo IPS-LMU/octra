@@ -12,6 +12,9 @@ export class APIActions {
         authenticated?: boolean;
         authType?: AccountLoginMethod;
       }>(),
+      initWithoutAPI: props<{
+        authenticated?: boolean;
+      }>(),
       success: props<{
         serverOnline: boolean;
         url: string;

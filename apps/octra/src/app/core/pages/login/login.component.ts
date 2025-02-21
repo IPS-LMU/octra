@@ -18,6 +18,7 @@ import { AuthenticationStoreService } from '../../store/authentication';
 import { BrowserTestComponent } from '../browser-test/browser-test.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
+import { AppSettings } from '../../obj';
 
 @Component({
   selector: 'octra-login',
@@ -75,7 +76,7 @@ export class LoginComponent
     return this.appStorage.sessionfile;
   }
 
-  get apc(): any {
+  get apc(): AppSettings {
     return this.settingsService.appSettings;
   }
 

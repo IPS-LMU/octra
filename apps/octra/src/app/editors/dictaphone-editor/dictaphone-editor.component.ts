@@ -219,7 +219,6 @@ export class DictaphoneEditorComponent
     this.audiochunk = this.audioManager.mainchunk.clone();
     this.editor.settings.markers =
       this.annotationStoreService.guidelines?.markers ?? [];
-    this.editor.settings.responsive = true;
     this.editor.settings.specialMarkers.boundary = true;
     this.editor.settings.highlightingEnabled = true;
 

@@ -143,40 +143,6 @@ export class TranscriptionGuidelinesModalComponent
     }
   }
 
-  public exportPDF() {
-    if (
-      this.settService.projectsettings !== undefined &&
-      this.settService.projectsettings.plugins !== undefined &&
-      this.settService.projectsettings.plugins.pdfexport !== undefined &&
-      this.settService.projectsettings.plugins.pdfexport.url !== undefined
-    ) {
-      const form = document.createElement('form');
-      form.setAttribute('method', 'post');
-      form.setAttribute('target', 'blank');
-      form.style.display = 'none';
-      form.setAttribute(
-        'action',
-        this.settService.projectsettings.plugins.pdfexport.url
-      );
-
-      document.body.appendChild(form);
-
-      const jsonObj = {
-        translation: this.lang.translate('g'),
-        guidelines: this.guidelines,
-      };
-
-      const json = document.createElement('input');
-      json.setAttribute('name', 'json');
-      json.setAttribute('type', 'text');
-      json.setAttribute('value', JSON.stringify(jsonObj));
-
-      form.append(json);
-      form.submit();
-      form.remove();
-    }
-  }
-
   toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }

@@ -78,7 +78,6 @@ export class AudioNavigationComponent
     new_value: number;
     timestamp: number;
   }>();
-  @Input() responsive: boolean | undefined | null = false;
   @Input() easyMode: boolean | undefined | null = false;
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;

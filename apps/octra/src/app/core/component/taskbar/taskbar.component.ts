@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
@@ -9,13 +8,11 @@ import { ApplicationStoreService } from '../../store/application/application-sto
   selector: 'octra-fastbar',
   templateUrl: './taskbar.component.html',
   styleUrls: ['./taskbar.component.scss'],
-  imports: [NgClass],
 })
 export class FastbarComponent {
-  @Input() responsive = false;
   @Input() buttonLabels: any = {
     shortcuts: 'Shortcuts',
-    guidelines: 'Guidlines',
+    guidelines: 'Guidelines',
     overview: 'Overview',
     help: 'Help',
   };

@@ -5,124 +5,13 @@
   },
   "navigation": {
     "export": true,
-    "interfaces": true,
-    "help_url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra"
-  },
-  "agreement": {
-    "enabled": false,
-    "text": {
-      "de": "<p>Ich erkläre, dass ich die Probandeninformation zur Studie <b>'Optimale Webbasierte Transkription langer Audiodateien'</b> und diese Einverständniserklärung zur Studienteilnahme erhalten habe.</p><ul><li>Ich wurde für mich ausreichend mündlich und/oder schriftlich über die wissenschaftliche Untersuchunginformiert.</li><li>Ich erkläre mich bereit, dass ihm Rahmen der Studie Daten über mein Anwenderverhalten gesammelt unddiese anonymisiert aufgezeichnet werden. Es wird gewährleistet, dass meine personenbezogenen Daten nichtan Dritte außerhalb der LMU weitergegeben werden. In anonymisierter Form dürfen die Daten fürwissenschaftliche Untersuchungen, Publikationen und in der Lehre verwendet werden. Meine persönlichenDaten unterliegen dem Datenschutzgesetz.</li><li>Ich weiß, dass ich jederzeit meine Einverständniserklärung, ohne Angabe von Gründen, widerrufen kann,ohne dass dies für mich nachteilige Folgen hat.</li><li>Mit der vorstehend geschilderten Vorgehensweise bin ich einverstanden und bestätige dies mit dem Klick auf Akzeptieren'</li></ul>"
-    }
-  },
-  "plugins": {
-    "pdfexport": {
-      "url": "https://clarin.phonetik.uni-muenchen.de/apps/octra/pdfconverter/"
-    }
+    "interfaces": true
   },
   "languages": ["de", "en"],
   "interfaces": [
     "2D-Editor",
     "Dictaphone Editor",
-    "Linear Editor",
-    "TRN-Editor"
-  ],
-  "feedback_form": [
-    {
-      "title": {
-        "de": "Sprachverständlichkeit des Sprechers"
-      },
-      "name": "quality-speaker",
-      "controls": [
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "unverständlich",
-            "en": "incomprehensible"
-          },
-          "value": "incomprehensible",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "weniger verständlich",
-            "en": "unclear"
-          },
-          "value": "unclear",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "verständlich",
-            "en": "clear"
-          },
-          "value": "clear",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "keine Sprache",
-            "en": "no speech"
-          },
-          "value": "no speech",
-          "custom": {},
-          "required": true
-        }
-      ]
-    },
-    {
-      "title": {
-        "de": "Qualität des Audiosignals"
-      },
-      "name": "quality-audio",
-      "controls": [
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "starke Störgeräusche",
-            "en": "very noisy"
-          },
-          "value": "very noisy",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "leichte Störgeräusche",
-            "en": "some noise"
-          },
-          "value": "some noise",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "keine Störgeräusche",
-            "en": "no noise"
-          },
-          "value": "no noise",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "kein Signal",
-            "en": "no signal"
-          },
-          "value": "no signal",
-          "custom": {},
-          "required": true
-        }
-      ]
-    }
+    "Linear Editor"
   ],
   "octra": {
     "validationEnabled": true,
@@ -131,9 +20,5 @@
     "showOverviewIfTranscriptNotValid": false,
     "theme": "shortAudioFiles",
     "asrEnabled": true
-  },
-  "guidelines": {
-    "showExampleNumbers": false,
-    "showExampleHeader": false
   }
 }

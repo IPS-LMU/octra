@@ -252,7 +252,7 @@ export class AnnotationEffects {
         tap(([a, state]) => {
           // INIT UI SERVICE
           const modeState = getModeState(state)!;
-          if (a.projectSettings.logging || modeState.logging.enabled) {
+          if (a.projectSettings.logging?.forced || modeState.logging.enabled) {
             this.uiService.init(
               true,
               modeState.logging.startTime,
@@ -296,7 +296,7 @@ export class AnnotationEffects {
             this.store.dispatch(
               LoginModeActions.changeImportOptions.do({
                 mode: a.mode,
-                importOptions: a.projectSettings.octra.importOptions,
+                importOptions: a.projectSettings.octra?.importOptions,
               })
             );
           }
@@ -1651,7 +1651,7 @@ export class AnnotationEffects {
           const projectSettings =
             getModeState(rootState)!.currentSession.task!.tool_configuration!
               .value;
-          if (projectSettings) {
+          if (projectSettings?.feedback_form) {
             feedback = FeedBackForm.fromAny(
               projectSettings.feedback_form,
               modeState.currentSession.comment ?? ''

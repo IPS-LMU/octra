@@ -471,7 +471,6 @@ export class TranscrWindowComponent
 
     this.editor.settings.markers =
       this.annotationStoreService.guidelines?.markers ?? [];
-    this.editor.settings.responsive = true;
     this.editor.settings.specialMarkers.boundary = true;
     this.magnifier.name = 'transcr-window viewer';
     this.magnifier.settings.margin.top = 5;

@@ -615,15 +615,23 @@ export class ApplicationEffects {
 
         this.transloco.setAvailableLangs(a.settings.octra.languages);
 
-        return of(
-          APIActions.init.do({
-            url: a.settings.api.url,
-            appToken: a.settings.api.appToken,
-            authType,
-            authenticated,
-            webToken,
-          })
-        );
+        if (a.settings.api?.url && a.settings.api?.appToken) {
+          return of(
+            APIActions.init.do({
+              url: a.settings.api.url,
+              appToken: a.settings.api.appToken,
+              authType,
+              authenticated,
+              webToken,
+            })
+          );
+        } else {
+          return of(
+            APIActions.init.initWithoutAPI({
+              authenticated: false,
+            })
+          );
+        }
       })
     )
   );
@@ -631,7 +639,7 @@ export class ApplicationEffects {
   afterAPIInit$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(APIActions.init.success),
+        ofType(APIActions.init.success, APIActions.init.initWithoutAPI),
         withLatestFrom(this.store),
         tap(([a, state]) => {
           if (

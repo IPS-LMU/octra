@@ -39,7 +39,8 @@
             <p style="text-align: center">
               {{ 'login.online mode description' | transloco }}
             </p>
-            @if (!apc.octra.login.enabled) {
+            @if (!apc.octra.login?.enabled || !apc.api?.url ||
+            !apc.api?.appToken ) {
             <div
               id="login-disabled"
               style="display: table-cell; height: 100%; align-content: center"

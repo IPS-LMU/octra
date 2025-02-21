@@ -445,11 +445,9 @@ export class TranscriptionComponent
 
   ngOnInit() {
     this._useMode = this.appStorage.useMode;
-    this._selectedTheme =
-      this.projectsettings?.octra === undefined ||
-      this.projectsettings?.octra?.theme === undefined
-        ? 'default'
-        : this.projectsettings?.octra.theme;
+    this._selectedTheme = !this.projectsettings?.octra?.theme
+      ? 'default'
+      : this.projectsettings?.octra.theme;
     this.showCommentSection =
       this.settingsService.isTheme('shortAudioFiles') &&
       (this._useMode === 'online' || this._useMode === 'demo');
@@ -746,27 +744,17 @@ export class TranscriptionComponent
   }
 
   onSendButtonClick() {
-    let showOverview = true;
-    let validTranscriptOnly = false;
+    const showOverview =
+      this.projectsettings.octra?.showOverviewIfTranscriptNotValid === undefined
+        ? true
+        : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
+    const validTranscriptOnly =
+      this.projectsettings.octra?.sendValidatedTranscriptionOnly === undefined
+        ? false
+        : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
 
     this.annotationStoreService.validateAll();
     const validTranscript = this.annotationStoreService.transcriptValid;
-
-    if (
-      this.projectsettings.octra !== undefined &&
-      this.projectsettings.octra.showOverviewIfTranscriptNotValid !== undefined
-    ) {
-      showOverview =
-        this.projectsettings.octra.showOverviewIfTranscriptNotValid;
-    }
-
-    if (
-      this.projectsettings.octra !== undefined &&
-      this.projectsettings.octra.sendValidatedTranscriptionOnly !== undefined
-    ) {
-      validTranscriptOnly =
-        this.projectsettings.octra.sendValidatedTranscriptionOnly;
-    }
 
     if (
       (!validTranscript && showOverview) ||

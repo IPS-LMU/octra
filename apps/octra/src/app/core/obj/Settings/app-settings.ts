@@ -1,13 +1,8 @@
-import { AccountLoginMethod } from '@octra/api-types';
-
 export interface AppSettings {
   version: string;
   api: {
     url: string;
     appToken: string;
-    authentications?: AccountLoginMethod[];
-    passwordResetEnabled?: boolean;
-    registrationsEnabled?: boolean;
   };
   octra: {
     database: {
@@ -17,18 +12,13 @@ export interface AppSettings {
     login: {
       enabled: boolean;
     };
-    showdetails: boolean;
-    responsive: {
-      enabled: boolean;
-      fixedwidth: number;
-    };
     plugins?: {
-      audioCutter?: {
-        enabled: boolean;
-      };
       asr?: ASRSettings;
     };
-    allowed_browsers: any[];
+    allowed_browsers: {
+      name: string;
+      version: string;
+    }[];
     languages: string[];
     tracking: {
       active: string;

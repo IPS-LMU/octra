@@ -518,7 +518,6 @@ export class LinearEditorComponent
 
     this.editorSettings.markers =
       this.annotationStoreService.guidelines?.markers ?? [];
-    this.editorSettings.responsive = true;
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
     this.subscribe(this.annotationStoreService.currentLevel$, ($event) => {
@@ -898,7 +897,10 @@ export class LinearEditorComponent
     }
   }
 
-  public changeMagnifierPosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+  public changeMagnifierPosition(
+    mouseEvent: MouseEvent,
+    cursorTime: SampleUnit
+  ) {
     const x = mouseEvent.offsetX - (this.minimagnifier.size.width - 10) / 2 - 2;
 
     // magnifier is fully visible

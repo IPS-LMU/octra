@@ -2,26 +2,15 @@ import { Group } from '../FeedbackForm/Group';
 
 export interface ProjectSettings {
   version: string;
-  logging: {
-    forced: boolean;
+  logging?: {
+    forced?: boolean;
   };
   navigation: {
-    export: boolean;
+    export?: boolean;
     interfaces: boolean;
-    help_url: string;
   };
-  agreement: {
-    enabled: boolean;
-    text: any;
-  };
-  languages: string[];
   interfaces: string[];
-  plugins: {
-    pdfexport: {
-      url: string;
-    };
-  };
-  feedback_form: Group[];
+  feedback_form?: Group[]; // re-add feedback form generation later
   octra?: {
     asrEnabled?: boolean;
     tools?: ('combine-phrases' | 'cut-audio')[];
@@ -31,5 +20,8 @@ export interface ProjectSettings {
     theme?: string;
     importOptions?: Record<string, any>;
   };
-  guidelines: any;
+  guidelines?: {
+    showExampleNumbers?: boolean;
+    showExampleHeader?: boolean;
+  };
 }

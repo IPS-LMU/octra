@@ -13,7 +13,6 @@ export class TranscrEditorConfig {
     'ALT + 0',
   ];
   public height = 300;
-  public responsive = false;
   public btnPopover = true;
   public specialMarkers = {
     boundary: false,

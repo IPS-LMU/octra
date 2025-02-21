@@ -281,7 +281,7 @@ export class LoginModeReducers {
               logging: {
                 ...state.logging,
                 enabled:
-                  projectSettings.logging.forced === true
+                  projectSettings.logging?.forced === true
                     ? true
                     : state.logging.enabled,
                 startTime: Date.now(),

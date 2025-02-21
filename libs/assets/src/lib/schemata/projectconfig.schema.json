@@ -1,102 +1,46 @@
 {
-  "$id": "v0.0.2",
+  "$id": "v2.0.0",
   "type": "object",
-  "required": ["version"],
+  "required": ["version", "navigation", "languages", "interfaces"],
   "properties": {
     "version": {
+      "description": "The version shows which version of OCTRA is compatible with this configuration.",
       "type": "string",
       "readOnly": true
     },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "forced": {
+          "type": "boolean",
+          "description": "Set this to true if the user may not turn off logging interactions."
+        }
+      }
+    },
     "navigation": {
+      "required": ["interfaces", "export"],
       "properties": {
         "export": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Users can export their progress."
         },
         "interfaces": {
-          "type": "boolean"
-        },
-        "help_url": {
-          "type": "string"
+          "type": "boolean",
+          "description": "Users can switch the editor used for transcription."
         }
       },
       "type": "object"
-    },
-    "agreement": {
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "text": {
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
-    "plugins": {
-      "type": "object"
-    },
-    "languages": {
-      "items": {
-        "type": "string"
-      },
-      "type": "array"
     },
     "interfaces": {
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": ["Dictaphone Editor", "Linear Editor", "2D-Editor"]
       },
-      "type": "array"
-    },
-    "feedback_form": {
-      "items": {
-        "properties": {
-          "title": {
-            "type": "object"
-          },
-          "controls": {
-            "items": {
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "label": {
-                  "type": "object"
-                },
-                "value": {
-                  "type": "string"
-                },
-                "custom": {
-                  "type": "object"
-                },
-                "required": {
-                  "type": "boolean"
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "type": "array"
+      "type": "array",
+      "description": "Defines the names of editors that may be used for transcription. The user can only switch between these editors."
     },
     "octra": {
       "properties": {
-        "login": {
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            }
-          },
-          "type": "object"
-        },
-        "showdetails": {
-          "type": "boolean"
-        },
         "tools": {
           "type": "array",
           "items": {
@@ -104,48 +48,45 @@
             "enum": ["cut-audio", "combine-phrases"]
           }
         },
-        "bugreport": {
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            },
-            "name": {
-              "type": "string"
-            },
-            "auth_token": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            }
-          },
+        "asrEnabled": {
+          "type": "boolean",
+          "description": "Allow users to use ASR. Only working if ASR is enabled in `appconfig.json`. (ASR and word alignment only supported on the main installation by LMU Munich)."
+        },
+        "validationEnabled": {
+          "type": "boolean",
+          "description": "If you added a working functions.js you need to enable this in order to have validation enabled for your project."
+        },
+        "sendValidatedTranscriptionOnly": {
+          "type": "boolean",
+          "description": "Submitting the finished transcript is blocked as long as something is invalid."
+        },
+        "showOverviewIfTranscriptNotValid": {
+          "type": "boolean",
+          "description": "If the use tries to submit an invalid transcript the overview modal with errors will be opened."
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["shortAudioFiles"],
+          "description": "Theme for the project. For now only `shortAudioFiles` is allowed."
+        },
+        "importOptions": {
           "type": "object"
-        },
-        "allowed_browsers": {
-          "items": {
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "version": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "type": "array"
-        },
-        "languages": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         }
       },
-      "importOptions": {
-        "type": "object"
-      },
       "type": "object"
+    },
+    "guidelines": {
+      "type": "object",
+      "properties": {
+        "showExampleNumbers": {
+          "type": "boolean",
+          "description": "Shows example numbers in guidelines."
+        },
+        "showExampleHeader": {
+          "type": "boolean",
+          "description": "Shows header for each example in guidelines."
+        }
+      }
     }
   },
   "additionalProperties": true

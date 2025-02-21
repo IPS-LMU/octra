@@ -1,6 +1,6 @@
 export interface AppSettings {
   version: string;
-  api: {
+  api?: {
     url: string;
     appToken: string;
   };
@@ -9,7 +9,7 @@ export interface AppSettings {
       name: string;
     };
     supportEmail: string;
-    login: {
+    login?: {
       enabled: boolean;
     };
     plugins?: {
@@ -20,7 +20,7 @@ export interface AppSettings {
       version: string;
     }[];
     languages: string[];
-    tracking: {
+    tracking?: {
       active: string;
       matomo: {
         host: string;
@@ -32,7 +32,7 @@ export interface AppSettings {
       url: string;
       description: string;
     }[];
-    inactivityNotice: {
+    inactivityNotice?: {
       showAfter: number;
     };
     maintenanceNotification: {

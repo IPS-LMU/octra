@@ -1,9 +1,5 @@
 {
   "version": "2.0.0",
-  "api": {
-    "url": "",
-    "appToken": ""
-  },
   "octra": {
     "database": {
       "name": "octra"
@@ -12,7 +8,6 @@
       "enabled": true
     },
     "supportEmail": "no-email-provided@email.com",
-    "plugins": {},
     "allowed_browsers": [
       {
         "name": "Chrome",
@@ -44,19 +39,8 @@
         "description": "Description for the audio sequence"
       }
     ],
-    "tracking": {
-      "active": "inactive",
-      "matomo": {
-        "host": "",
-        "siteID": 0
-      }
-    },
     "inactivityNotice": {
       "showAfter": 60
-    },
-    "maintenanceNotification": {
-      "active": "inactive",
-      "apiURL": ""
     }
   }
 }

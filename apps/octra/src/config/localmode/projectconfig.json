@@ -1,18 +1,14 @@
 {
   "version": "2.0.0",
   "logging": {
-    "forced": false
+    "forced": true
   },
   "navigation": {
     "export": true,
     "interfaces": true
   },
-  "languages": ["de", "en"],
-  "interfaces": [
-    "2D-Editor",
-    "Dictaphone Editor",
-    "Linear Editor"
-  ],
+  "languages": ["de", "en", "it", "nl", "ko", "zh"],
+  "interfaces": ["2D-Editor", "Dictaphone Editor", "Linear Editor"],
   "octra": {
     "validationEnabled": true,
     "tools": ["combine-phrases", "cut-audio"],

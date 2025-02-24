@@ -1,4 +1,4 @@
-<div class="section" id="login">
+<div class="section order-2 order-md-1" id="login">
   <div class="row">
     <div class="col-12" style="text-align: center">
       @if (settingsService.appSettings.octra.maintenanceNotification !==
@@ -161,7 +161,7 @@
   <octra-browser-test></octra-browser-test>
   }
 </div>
-<div class="section">
+<div class="section order-3 order-md-2">
   <footer class="footer">
     <div class="row">
       <div class="col-md-4">
@@ -189,10 +189,10 @@
     </div>
   </footer>
 </div>
-<section>
-  <div class="container p-2">
-    <hr />
-    <div class="text-center mb-3 p-3" style="background-color: #279440">
+<section class="order-1 order-md-3">
+  <div class="container-md p-2">
+    <hr class="d-none d-md-block"/>
+    <div class="text-center mb-3 p-0 p-md-3" style="background-color: #279440">
       <img
         src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp"
         alt="octra logo"
@@ -206,7 +206,7 @@
       different needs. You can switch between these editors, they share the same
       transcript. Your proceedings are saved automatically to your browser. If
       your web browser or computer crashes just reopen your web browser and
-      continue your work.
+      continue your work. <a [routerLink]="['/features']">See features</a>
     </p>
     <p>Overall OCTRA supports following features:</p>
     <ul>

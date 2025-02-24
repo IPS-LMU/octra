@@ -19,6 +19,7 @@ import { BrowserTestComponent } from '../browser-test/browser-test.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
 import { AppSettings } from '../../obj';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'octra-login',
@@ -32,6 +33,7 @@ import { AppSettings } from '../../obj';
     BrowserTestComponent,
     AsyncPipe,
     TranslocoPipe,
+    RouterLink,
   ],
 })
 export class LoginComponent
@@ -87,6 +89,7 @@ export class LoginComponent
   compatibleBrowser?: boolean;
 
   constructor(
+    private elementRef: ElementRef,
     public appStorage: AppStorageService,
     public api: OctraAPIService,
     public settingsService: SettingsService,
@@ -97,6 +100,12 @@ export class LoginComponent
     super();
     this.compatibilityService.testCompability().then((result) => {
       this.compatibleBrowser = result;
+      setTimeout(() => {
+        elementRef.nativeElement.scroll({
+          top: 0,
+          left: 0,
+        });
+      }, 0);
     });
     const subject = 'Octra Server is offline';
     const body = `Hello,

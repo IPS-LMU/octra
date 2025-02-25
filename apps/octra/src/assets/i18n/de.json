@@ -10,11 +10,14 @@
     "undo deactivated": "Du kannst aktuell Aktionen nicht rückgängig machen oder wiederholen."
   },
   "asr": {
+    "asr language": "ASR Sprache",
+    "asr provider": "Dienstleister",
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für diese Transkriptionseinheit abbrechen möchtest, klicke hier.",
     "click on logo": "Klicke für weitere Informationen auf ein Logo.",
     "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback zu dem Fehler, damit er behoben werden kann.",
     "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Transkiptionseinheiten wurden übersprungen.",
     "maus empty text": "Die ausgewählte Transkriptionseinheit enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
+    "maus language": "MAUS Sprache",
     "max duration exceeded": "Um das Segment mit {{asrProvider}} verarbeiten zu lassen, muss es eine Länge von weniger als {{maxDuration}} Sekunden haben. Kürze das Segment oder wähle einen anderen ASR Provider.",
     "max signal size exceeded": "Die Dateigröße des gewählten Segments ist zu groß. Kürze das Segment oder wähle einen anderen ASR Provider.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
@@ -25,10 +28,7 @@
     "stop all": "Beende Verarbeitung für alle Einheiten",
     "stop for all next": "Beende Verarbeitung für dieses und für alle folgenden Einheiten",
     "stop this segment": "Beende Verarbeitung für diese Einheit",
-    "without asr": "Ohne ASR",
-    "asr provider": "Dienstleister",
-    "asr language": "ASR Sprache",
-    "maus language": "MAUS Sprache"
+    "without asr": "Ohne ASR"
   },
   "authentication": {
     "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt.",
@@ -45,12 +45,12 @@
     "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:"
   },
   "bug report": {
+    "add protocol": "Protokoll beifügen (empfohlen)",
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
     "error": "Dein Feedback konnte leider nicht gesendet werden. Bitte sende uns direkt eine E-Mail an {{email}}.",
     "give feedback": "Feedback geben",
-    "add protocol": "Protokoll beifügen (empfohlen)",
-    "sent": "Dein Feedback wurde erfolgreich gesendet \uD83D\uDE42",
-    "sending": "Bitte warte bis dein Feedback gesendet wurde..."
+    "sending": "Bitte warte bis dein Feedback gesendet wurde...",
+    "sent": "Dein Feedback wurde erfolgreich gesendet \uD83D\uDE42"
   },
   "converters": {
     "SRT": {
@@ -91,10 +91,10 @@
       "description": "Lade die Daten herunter, die während deiner Transkription aufgezeichnet wurden. (Nur verfügbar, wenn die Protokollierung in den Einstellungen aktiviert wurde)."
     },
     "options": {
+      "add newline": "Nach jeder Transkriptionseinheit einen Zeilenumbruch hinzufügen.",
       "add samplepoints": "Trenne Transkriptionseinheiten durch Zeitstempel im Sample-Format (z.B. 123456)",
       "add timestamps": "Trenne Transkriptionseinheiten durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
-      "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:",
-      "add newline": "Nach jeder Transkriptionseinheit einen Zeilenumbruch hinzufügen."
+      "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
     }
   },
   "feedback": {
@@ -109,8 +109,6 @@
     "very good intelligible": "sehr gut verständlich"
   },
   "g": {
-    "errors": "Fehler",
-    "level": "Ebene",
     "File extension": "Dateiendung",
     "Format": "Format",
     "Language": "Sprache",
@@ -154,6 +152,7 @@
     "duration": "Dauer",
     "e-mail": "Email",
     "error": "Fehler",
+    "errors": "Fehler",
     "errors found": "({{errors}}) Fehler gefunden",
     "example": "Beispiel",
     "export": "Exportieren",
@@ -180,6 +179,7 @@
     "job number": "Aufgabennummer",
     "last name": "Nachname",
     "legals": "Rechtliches",
+    "level": "Ebene",
     "locale": "Sprache",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -211,6 +211,7 @@
     "quit and release": "Beenden & freigeben",
     "quit continue later": "Beenden & später fortsetzen",
     "quit discard": "Beenden & Fortschritt löschen",
+    "recommended": "empfohlen",
     "reload": "NEU LADEN",
     "replay": "Wiederholung",
     "sampleRate": "Abtastrate",
@@ -245,8 +246,7 @@
     "validation": "Validierung",
     "wanted": "Gesucht wird",
     "website": "Webseite",
-    "yes": "Ja",
-    "recommended": "empfohlen"
+    "yes": "Ja"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -256,10 +256,6 @@
   },
   "login": {
     "api not available": "Der Server ist aktuell nicht erreichbar. Bitte versuche es später erneut. Sollte diese Fehlermeldung nach 15 Minuten weiterhin sichtbar sein, schreibe bitte eine E-Mail an {{email_link}}.",
-    "old version": {
-      "notice": "Du nutzt gerade die neueste Version von OCTRA. Du möchtest zur vorherigen Version zurück?",
-      "click here": "Klicke hier, um zur vorherigen Version zu gelangen."
-    },
     "demo": "Öffne Demo",
     "last used": "zuletzt genutzt",
     "local and remove": "Daten des online Modus löschen & weiter",
@@ -268,6 +264,10 @@
     "login and remove": "Daten des lokalen Modus löschen & anmelden",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehe die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
+    "old version": {
+      "click here": "Klicke hier, um zur vorherigen Version zu gelangen.",
+      "notice": "Du nutzt gerade die neueste Version von OCTRA. Du möchtest zur vorherigen Version zurück?"
+    },
     "online mode": "Online Modus",
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
@@ -409,14 +409,31 @@
       }
     }
   },
+  "modals": {
+    "create project request": {
+      "description": "Wenn Du dein Projekt mit dem OCTRA-Backend verwalten und im Online-Modus hier in Octra von Transkribierern verarbeiten lassen möchtest, kannst Du gerne eine E-Mail an die Administratoren schreiben: {{adminEmail}}",
+      "introduction": "OCTRA nutzt für den Online-Modus das {{octraBackendURL}}. Neue Projekte können aus Sicherheitsgründen nur von Administratoren erstellt werden, die entsprechende Anfragen vorher prüfen.",
+      "needed data": {
+        "label": "Die Email sollte folgende Daten beinhalten:",
+        "list1": "Projektname, Kürzel, interne Beschreibung, externe Beschreibung (optional)",
+        "list2": "Verantwortliche Personen (Vor- und Nachnamen, E-Mail Adresse, ggf Institution)",
+        "list3": "Welche Personen dürfen das Projekt verwalten? (Vor- und Nachnamen, E-Mail Adresse) Jede dieser Personen sollte bereits registriert sein.",
+        "list4": "Sichtbarkeit: öffentlich (alle können teilnehmen) oder privat (nur zugewiesene Nutzer dürfen bearbeiten)",
+        "list5": "Laufzeit: Start und Endzeitpunkt der Sichtbarkeit"
+      },
+      "title": "Anfrage auf Projekterstellung"
+    }
+  },
   "p": {
     "authenticated": "Ich bin authentifiziert.",
+    "available until": "Verfügbar bis",
     "back to login": "Zurück zur Anmeldung",
     "back to projects": "Zurück zu den Projekten",
     "contribute translations": "Übersetzungen hinzufügen",
     "forgot password": "Passwort vergessen",
     "language and provider": "Sprache und Dienstleister",
     "manage account": "Account verwalten",
+    "nothing found": "Nicht gefunden",
     "repeat password": "Passwort wiederholen",
     "reset password": "Passwort zurücksetzen",
     "select country": "Land wählen",
@@ -424,19 +441,17 @@
     "select locale": "Sprache wählen",
     "select timezone": "Zeitzone wählen",
     "selected level": "Ausgewähltes level",
+    "send email": "E-Mail senden",
     "sign up": "Neu registrieren",
-    "username or email": "Nutzername oder E-Mail",
-    "nothing found": "Nicht gefunden",
-    "available until": "Verfügbar bis",
-    "send email": "E-Mail senden"
+    "username or email": "Nutzername oder E-Mail"
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",
     "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben.",
     "other user logged in": "Es sind Daten von einer Sitzung eines anderen Nutzers vorhanden (<b>{{username}}</b>). Wenn Du eine neue Aufgabe beginnst, werden diese Daten entfernt.",
+    "project creation wanted": "I möchte ein neues Projekt erstellen",
     "resume transcription": "Transkription fortsetzen",
-    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>",
-    "project creation wanted": "I möchte ein neues Projekt erstellen"
+    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>"
   },
   "reload-file": {
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'",
@@ -498,13 +513,13 @@
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat mit \"CMD + Z (MacOS) or CTRL + Z (PC)\" rückgängig gemacht werden."
     },
     "cut audio": {
-      "warning wav": "Die Audiodatei wird beim Schneiden in WAVE PCM 16Bit, Mono, {{sampleRate}} Hz konvertiert.",
       "add placeholder": "Platzhalter hinzufügen",
       "append meta files": "Meta Dateien hinzufügen",
       "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Grenzen geschnitten werden.",
       "hide configurator": "Verstecke den Konfigurator",
       "name": "Audiodatei schneiden",
-      "show configurator": "Zeige den Konfigurator"
+      "show configurator": "Zeige den Konfigurator",
+      "warning wav": "Die Audiodatei wird beim Schneiden in WAVE PCM 16Bit, Mono, {{sampleRate}} Hz konvertiert."
     }
   },
   "transcription": {
@@ -548,21 +563,6 @@
     "speaker-actions": {
       "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen",
       "permutations replace": "Ersetze Permutationen"
-    }
-  },
-  "modals": {
-    "create project request": {
-      "title": "Anfrage auf Projekterstellung",
-      "introduction": "OCTRA nutzt für den Online-Modus das {{octraBackendURL}}. Neue Projekte können aus Sicherheitsgründen nur von Administratoren erstellt werden, die entsprechende Anfragen vorher prüfen.",
-      "description": "Wenn Du dein Projekt mit dem OCTRA-Backend verwalten und im Online-Modus hier in Octra von Transkribierern verarbeiten lassen möchtest, kannst Du gerne eine E-Mail an die Administratoren schreiben: {{adminEmail}}",
-      "needed data": {
-        "label": "Die Email sollte folgende Daten beinhalten:",
-        "list1": "Projektname, Kürzel, interne Beschreibung, externe Beschreibung (optional)",
-        "list2": "Verantwortliche Personen (Vor- und Nachnamen, E-Mail Adresse, ggf Institution)",
-        "list3": "Welche Personen dürfen das Projekt verwalten? (Vor- und Nachnamen, E-Mail Adresse) Jede dieser Personen sollte bereits registriert sein.",
-        "list4": "Sichtbarkeit: öffentlich (alle können teilnehmen) oder privat (nur zugewiesene Nutzer dürfen bearbeiten)",
-        "list5": "Laufzeit: Start und Endzeitpunkt der Sichtbarkeit"
-      }
     }
   }
 }

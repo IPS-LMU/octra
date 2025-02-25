@@ -10,11 +10,14 @@
     "undo deactivated": "You can't apply undo & redo at the moment."
   },
   "asr": {
+    "asr language": "ASR Language",
+    "asr provider": "ASR Provider",
     "asr running": "ASR is currently running. If you want to stop ASR for this transcription unit, click here.",
     "click on logo": "Click on a service logo for further information.",
     "error": "An error occurred. Please send us a short feedback for the error to be fixed.",
     "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes. Affected transcription units were skipped.",
     "maus empty text": "The selected transcription unit does not contain any text or less than two words.",
+    "maus language": "MAUS Language",
     "max duration exceeded": "In order to process transcription units with {{asrProvider}}, the duration of each transcription unit must be less than {{maxDuration}} seconds. Please make units smaller or choose another ASR Provider.",
     "max signal size exceeded": "The file size of the selected transcription unit is too big. Please make units smaller or choose another ASR Provider.",
     "no asr selected": "Please select ASR options before using the shortcut.",
@@ -25,10 +28,7 @@
     "stop all": "Stop it for all transcription units",
     "stop for all next": "Stop it for this one and all transcription unit coming next",
     "stop this segment": "Stop it for this transcription unit only",
-    "without asr": "No ASR",
-    "asr provider": "ASR Provider",
-    "asr language": "ASR Language",
-    "maus language": "MAUS Language"
+    "without asr": "No ASR"
   },
   "authentication": {
     "description": "Close this window and click in OCTRA on the \"I'm authenticated!\" button in order to confirm authentication. After that the automated processing continues.",
@@ -45,12 +45,12 @@
     "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:"
   },
   "bug report": {
+    "add protocol": "Add Protocol (recommended)",
     "description": "Please tell us what you think about OCTRA. What can we do better? Did you find any bugs?",
     "error": "Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.",
     "give feedback": "Give feedback",
-    "add protocol": "Add Protocol (recommended)",
-    "sent": "Your feedback was successfully reported \uD83D\uDE42",
-    "sending": "Please wait for octra sending your feedback..."
+    "sending": "Please wait for octra sending your feedback...",
+    "sent": "Your feedback was successfully reported \uD83D\uDE42"
   },
   "converters": {
     "SRT": {
@@ -91,10 +91,10 @@
       "description": "Download the meta data that was logged while your transcription progress. (Only available when logging was enabled in the settings menu)."
     },
     "options": {
+      "add newline": "Add a line break after each transcription unit.",
       "add samplepoints": "Separate transcription units by sample points (e.g. 123456)",
       "add timestamps": "Separate transcription units by readable timestamps (HH:MM:SS.s)",
-      "timestamp notice": "If you check both options, both time formats will be inserted:",
-      "add newline": "Add a line break after each transcription unit."
+      "timestamp notice": "If you check both options, both time formats will be inserted:"
     }
   },
   "feedback": {
@@ -109,8 +109,6 @@
     "very good intelligible": "very good intelligibility"
   },
   "g": {
-    "errors": "Errors",
-    "level": "Level",
     "File extension": "File extension",
     "Format": "Format",
     "Language": "Language",
@@ -154,6 +152,7 @@
     "duration": "Duration",
     "e-mail": "Email",
     "error": "Error",
+    "errors": "Errors",
     "errors found": "({{errors}}) errors found",
     "example": "Example",
     "export": "Export",
@@ -180,6 +179,7 @@
     "job number": "Job number",
     "last name": "Last name",
     "legals": "Legals",
+    "level": "Level",
     "locale": "Language",
     "login": "Login",
     "logout": "Logout",
@@ -211,6 +211,7 @@
     "quit and release": "Quit & release",
     "quit continue later": "Quit & continue later",
     "quit discard": "Quit & discard annotation",
+    "recommended": "recommended",
     "reload": "reload",
     "replay": "Replay",
     "sampleRate": "Sample Rate",
@@ -245,8 +246,7 @@
     "validation": "Validation",
     "wanted": "Wanted",
     "website": "Website",
-    "yes": "Yes",
-    "recommended": "recommended"
+    "yes": "Yes"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -256,10 +256,6 @@
   },
   "login": {
     "api not available": "The server is currently unavailable. Please try again later. If this error message is still visible after 15 minutes, please send an e-mail to {{email_link}}.",
-    "old version": {
-      "notice": "You are currently using the latest version of OCTRA. Would you like to go back to the previous version?",
-      "click here": "Click here to go to the previous version."
-    },
     "demo": "Open demo",
     "last used": "recently used",
     "local and remove": "Remove online mode data & continue",
@@ -268,6 +264,10 @@
     "login and remove": "Remove local mode data & login",
     "offline mode data warning": "There is local data available that was created in online mode. If you want to continue in local mode this data will be overwritten.",
     "old file found": "There is data from a previous transcription available. If you would like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}",
+    "old version": {
+      "click here": "Click here to go to the previous version.",
+      "notice": "You are currently using the latest version of OCTRA. Would you like to go back to the previous version?"
+    },
     "online mode": "Online Mode",
     "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}",
     "online mode data warning": "There is local data available that was created in local mode. If you want to continue in online mode this data will be overwritten.",
@@ -409,14 +409,31 @@
       }
     }
   },
+  "modals": {
+    "create project request": {
+      "description": "If you would like to manage your project with the OCTRA backend and have it processed by transcribers in online mode here in Octra, you are welcome to write an email to the administrators: {{adminEmail}}",
+      "introduction": "OCTRA uses the {{octraBackendURL}} for the online mode. For security reasons, new projects can only be created by administrators who check the corresponding requests beforehand.",
+      "needed data": {
+        "label": "The email should contain the following data:",
+        "list1": "Project name, abbreviation, internal description, external description (optional)",
+        "list2": "Responsible persons (first and last names, e-mail address, institution if applicable)",
+        "list3": "Who is authorized to manage the project? (First and last name, e-mail address) Each of these persons should already be registered.",
+        "list4": "Visibility: public (everyone can participate) or private (only assigned users can edit)",
+        "list5": "Runtime: Start and end time of visibility"
+      },
+      "title": "Request for project creation"
+    }
+  },
   "p": {
     "authenticated": "I'm authenticated.",
+    "available until": "Available until",
     "back to login": "Back to login",
     "back to projects": "Go back to list of projects",
     "contribute translations": "Contribute translations",
     "forgot password": "Forgot password",
     "language and provider": "Language and Provider",
     "manage account": "Manage account",
+    "nothing found": "Nothing found",
     "repeat password": "Repeat password",
     "reset password": "Reset password",
     "select country": "Select country",
@@ -424,19 +441,17 @@
     "select locale": "Select a language",
     "select timezone": "Select a timezone",
     "selected level": "Selected level",
+    "send email": "Send e-mail",
     "sign up": "Sign up",
-    "username or email": "Username or E-Mail",
-    "nothing found": "Nothing found",
-    "available until": "Available until",
-    "send email": "Send e-mail"
+    "username or email": "Username or E-Mail"
   },
   "projects-list": {
     "introduction": "Please select a project that you want to transcribe and click on \"START\".",
     "no remaining tasks": "This project does not have any free tasks.",
     "other user logged in": "There is some data locally saved by another user (<b>{{username}}</b>) from a previous session. If you start a new task the data from that previous session is going to be removed.",
+    "project creation wanted": "I want to create a new project",
     "resume transcription": "Continue transcription",
-    "same user free task": "There are remaining date from a previous unfinished session (project: {{project}}). Click on \"{{resumeTranscription}}\" in order to resume the previous transcription or start a new task. <b>Starting a new task removes data from that previous session</b>",
-    "project creation wanted": "I want to create a new project"
+    "same user free task": "There are remaining date from a previous unfinished session (project: {{project}}). Click on \"{{resumeTranscription}}\" in order to resume the previous transcription or start a new task. <b>Starting a new task removes data from that previous session</b>"
   },
   "reload-file": {
     "another file selected": "Another file selected. Please select the same file as before or start a new transcription.\n\nWanted: '{{file}}'",
@@ -498,13 +513,13 @@
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After running this tool you can revert the changes with hotkeys \"CMD + Z (MacOS) or CTRL + Z (PC)\"."
     },
     "cut audio": {
-      "warning wav": "The audio file is going to be converted to WAVE PCM 16Bit, mono, {{sampleRate}} Hz during cutting.",
       "add placeholder": "Add placeholder",
       "append meta files": "Append meta files",
       "description": "This tool offers to cut the audio file to sequences from the transcription units.",
       "hide configurator": "Hide configurator",
       "name": "Cut audio file",
-      "show configurator": "Show configurator"
+      "show configurator": "Show configurator",
+      "warning wav": "The audio file is going to be converted to WAVE PCM 16Bit, mono, {{sampleRate}} Hz during cutting."
     }
   },
   "transcription": {
@@ -548,21 +563,6 @@
     "speaker-actions": {
       "merge segments by speaker": "Merge segments with same speaker label",
       "permutations replace": "Replace Permutations"
-    }
-  },
-  "modals": {
-    "create project request": {
-      "title": "Request for project creation",
-      "introduction": "OCTRA uses the {{octraBackendURL}} for the online mode. For security reasons, new projects can only be created by administrators who check the corresponding requests beforehand.",
-      "description": "If you would like to manage your project with the OCTRA backend and have it processed by transcribers in online mode here in Octra, you are welcome to write an email to the administrators: {{adminEmail}}",
-      "needed data": {
-        "label": "The email should contain the following data:",
-        "list1": "Project name, abbreviation, internal description, external description (optional)",
-        "list2": "Responsible persons (first and last names, e-mail address, institution if applicable)",
-        "list3": "Who is authorized to manage the project? (First and last name, e-mail address) Each of these persons should already be registered.",
-        "list4": "Visibility: public (everyone can participate) or private (only assigned users can edit)",
-        "list5": "Runtime: Start and end time of visibility"
-      }
     }
   }
 }

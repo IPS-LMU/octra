@@ -49,7 +49,7 @@
           >
             <span>{{ 'tools.combine phrases.description' | transloco }} </span>
             <a
-              [href]="manualURL + 'the-editors-1.html#how-to-reduce-the-number-of-transcription-units'"
+              [href]="manualURL + 'using-tools.html#octra-combine-units'"
               target="_blank"
             >
               <i class="bi bi-question-circle text-info"></i>
@@ -187,13 +187,7 @@
               }}
             </div>
             <div class="card" style="padding: 10px">
-              <a
-                (click)="
-                  tools.audioCutting.showConfigurator =
-                    !tools.audioCutting.showConfigurator
-                "
-                class="show-configurator-link"
-              >
+              <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator" class="show-configurator-link">
                 @if (tools.audioCutting.showConfigurator) {
                 <i class="bi bi-chevron-up" style="color: gray"></i>
                 {{ 'tools.cut audio.hide configurator' | transloco }}

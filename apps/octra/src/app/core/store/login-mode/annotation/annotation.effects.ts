@@ -74,6 +74,7 @@ import { DateTime } from 'luxon';
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
+import mime from 'mime';
 
 @Injectable()
 export class AnnotationEffects {
@@ -855,13 +856,16 @@ export class AnnotationEffects {
 
                 for (const key of Object.keys(urlInfo)) {
                   if (urlInfo[key].url) {
-                    let mediaType: string | undefined;
+                    let mediaType: string | undefined =
+                      key === 'audio'
+                        ? this.routingService.staticQueryParams.audio_type
+                        : undefined;
                     let decodedURL = decodeURIComponent(urlInfo[key].url);
 
                     if (decodedURL.includes('?')) {
                       const regex = /mediatype=([^&]+)/g;
                       const matches = regex.exec(decodedURL);
-                      mediaType = matches ? matches[1] : undefined;
+                      mediaType = matches ? matches[1] : mediaType;
                       decodedURL = decodedURL.replace(/\?.*$/g, '');
                     }
 
@@ -880,6 +884,10 @@ export class AnnotationEffects {
                           extension = '_annot.json';
                         }
                       }
+                    }
+
+                    if (!mediaType) {
+                      mediaType = mime.getType(extension);
                     }
 
                     urlInfo[key].url = decodedURL;

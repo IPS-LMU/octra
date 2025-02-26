@@ -62,6 +62,7 @@ export class ApplicationEffects {
           audio_url: this.getParameterByName('audio_url'),
           annotationExportType: this.getParameterByName('aType'),
           audio_name: this.getParameterByName('audio_name'),
+          audio_type: this.getParameterByName('audio_type'),
           host: this.getParameterByName('host'),
           transcript: this.getParameterByName('transcript'),
           readonly: this.getParameterByName('readonly'),

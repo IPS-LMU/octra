@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.1.0](https://github.com/IPS-LMU/octra/compare/annotation-1.0.0...annotation-1.1.0) (2025-03-05)
+
+
+### Bug Fixes
+
+* **annotation:** PraatTableConverter does not import empty units properly ([41c1b96](https://github.com/IPS-LMU/octra/commit/41c1b96601b4cbb002f101a56ece4d7e0e51b007))
+* **annotation:** PraatTextgridConverter should not need equal file names ([4e4c2e4](https://github.com/IPS-LMU/octra/commit/4e4c2e40a62d29be9f53199a05902cfff5e3a080))
+* **ngx-components:** magnifier not working properly ([3d92813](https://github.com/IPS-LMU/octra/commit/3d928137a9afcb285477dc13e6b0310d17d7b01f))
+
+
+### Features
+
+* **annotation:** TextConverter imports/exports timestamps with ">" instead of "/>" ([0f58bd7](https://github.com/IPS-LMU/octra/commit/0f58bd7c2ea3a8dd8360e15f7333abd8791e9fa4))
+
+
+
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/annotation-0.1.17...annotation-1.0.0) (2025-01-13)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "@octra/annotation",
   "description": "library containing annotation related classes and functions used by OCTRA (e.g. file converters)",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "MIT",
   "private": false,
   "author": {

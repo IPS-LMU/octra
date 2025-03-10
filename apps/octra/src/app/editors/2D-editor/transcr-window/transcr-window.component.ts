@@ -104,7 +104,10 @@ export class TranscrWindowComponent
   @ViewChild('window', { static: true }) window!: ElementRef;
   @ViewChild('main', { static: true }) main!: ElementRef;
 
-  act: EventEmitter<string> = new EventEmitter<string>();
+  act = new EventEmitter<{
+    action: string;
+    segmentIndex: number;
+  }>();
   easyMode: boolean | undefined | null = false;
   audiochunk!: AudioChunk;
   segmentIndex!: number;
@@ -275,7 +278,10 @@ export class TranscrWindowComponent
     } else {
       this.save();
       this.close();
-      this.act.emit('overview');
+      this.act.emit({
+        action: 'overview',
+        segmentIndex: this.segmentIndex,
+      });
     }
   };
 
@@ -598,7 +604,10 @@ export class TranscrWindowComponent
   }
 
   ngAfterContentInit() {
-    this.act.emit('open');
+    this.act.emit({
+      action: 'open',
+      segmentIndex: this.segmentIndex,
+    });
   }
 
   close() {
@@ -637,7 +646,10 @@ export class TranscrWindowComponent
     this.audiochunk.stopPlayback();
 
     this.activeModal.close();
-    this.act.emit('close');
+    this.act.emit({
+      action: 'close',
+      segmentIndex: this.segmentIndex,
+    });
   }
 
   public open() {
@@ -645,7 +657,10 @@ export class TranscrWindowComponent
   }
 
   openOverview() {
-    this.act.emit('overview');
+    this.act.emit({
+      segmentIndex: this.segmentIndex,
+      action: 'overview',
+    });
   }
 
   save() {

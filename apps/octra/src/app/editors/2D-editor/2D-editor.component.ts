@@ -661,17 +661,23 @@ export class TwoDEditorComponent
     }
   }
 
-  onWindowAction = (state: string) => {
-    if (state === 'close') {
+  onWindowAction = ({
+    action,
+    segmentIndex,
+  }: {
+    action: string;
+    segmentIndex: number;
+  }) => {
+    if (action === 'close') {
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
-      this.selectedIndex = this.window.componentInstance!.segmentIndex;
+      this.selectedIndex = segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
-    } else if (state === 'overview') {
+    } else if (action === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');
     }
-  }
+  };
 
   onMouseOver($event: {
     event: MouseEvent | undefined;

@@ -18,7 +18,7 @@ export class JsonSetValidator<T, U> {
   protected parse(jsonSet: JSONSet<U>) {
     this._decisionTree = DecisionTreeNode.json2tree<T, U>(
       jsonSet,
-      this.blueprint
+      this.blueprint,
     );
   }
 

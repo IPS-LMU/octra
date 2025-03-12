@@ -53,7 +53,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.overwriteTranscript.do,
@@ -65,7 +65,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.initTranscriptionService.success,
@@ -81,7 +81,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.addMultipleASRSegments.success,
@@ -101,12 +101,12 @@ export class AnnotationStateReducers {
             };
             transcript = transcript.changeCurrentItemById(
               segmentID,
-              currentSegment
+              currentSegment,
             );
 
             // 2. ignore last segment from results
             const segments = newSegments.filter(
-              (a, i) => i < newSegments.length - 1
+              (a, i) => i < newSegments.length - 1,
             );
 
             // 3. add new segments
@@ -119,14 +119,14 @@ export class AnnotationStateReducers {
                     progressInfo: undefined,
                     isBlockedBy: undefined,
                   },
-                }
+                },
               );
             }
 
             state.transcript = transcript;
           }
           return state;
-        }
+        },
       ),
       on(AnnotationActions.loadAudio.do, (state: AnnotationState, { mode }) => {
         if (this.mode === mode) {
@@ -156,7 +156,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.changeAnnotationLevel.do,
@@ -176,7 +176,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AuthenticationActions.loginURL.success,
@@ -188,7 +188,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.combinePhrases.success,
@@ -198,7 +198,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.changeLevelName.do,
@@ -210,7 +210,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.addAnnotationLevel.do,
@@ -229,7 +229,7 @@ export class AnnotationStateReducers {
                     new OLabel(`OCTRA_${transcript.idCounters.level + 1}`, ''),
                     new OLabel(`Speaker`, ''),
                   ]),
-                ]
+                ],
               );
             } else {
               console.error(`Can't add other level types. not supported.`);
@@ -243,7 +243,7 @@ export class AnnotationStateReducers {
             }
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.removeAnnotationLevel.do,
@@ -260,7 +260,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         IDBActions.loadAnnotation.success,
@@ -269,14 +269,14 @@ export class AnnotationStateReducers {
             ...state,
             transcript: (annotations as any)[this.mode],
           };
-        }
+        },
       ),
       on(
         AnnotationActions.setSavingNeeded.do,
         (state: AnnotationState, { savingNeeded }) => ({
           ...state,
           savingNeeded,
-        })
+        }),
       ),
       on(
         AnnotationActions.changeCurrentLevelItems.do,
@@ -287,7 +287,7 @@ export class AnnotationStateReducers {
             if (currentLevel) {
               for (const item of items) {
                 const index = state.transcript.currentLevel?.items.findIndex(
-                  (a) => a.id === item.id
+                  (a) => a.id === item.id,
                 );
                 if (index !== undefined && index > -1) {
                   state.transcript = state.transcript
@@ -300,7 +300,7 @@ export class AnnotationStateReducers {
                     .addItemToCurrentLevel(
                       (item as any).time,
                       item.labels,
-                      (item as any).context
+                      (item as any).context,
                     );
                 }
               }
@@ -308,7 +308,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.addCurrentLevelItems.do,
@@ -323,14 +323,14 @@ export class AnnotationStateReducers {
                   .addItemToCurrentLevel(
                     (item as any).time,
                     item.labels,
-                    (item as any).context
+                    (item as any).context,
                   );
               }
             }
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.removeCurrentLevelItems.do,
@@ -350,9 +350,9 @@ export class AnnotationStateReducers {
                       (transcript: string) => {
                         return tidyUpAnnotation(
                           transcript,
-                          state.guidelines?.selected?.json
+                          state.guidelines?.selected?.json,
                         );
-                      }
+                      },
                     );
                 } else if (item.index !== undefined && item.index !== null) {
                   state.transcript = state.transcript
@@ -364,13 +364,13 @@ export class AnnotationStateReducers {
                       (transcript: string) => {
                         return tidyUpAnnotation(
                           transcript,
-                          state.guidelines?.selected?.json
+                          state.guidelines?.selected?.json,
                         );
-                      }
+                      },
                     );
                 } else {
                   console.error(
-                    `removeCurrentLevelItems: Can't remove item, missing index or ID.`
+                    `removeCurrentLevelItems: Can't remove item, missing index or ID.`,
                   );
                 }
               }
@@ -378,7 +378,7 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.changeCurrentItemById.do,
@@ -393,21 +393,21 @@ export class AnnotationStateReducers {
           }
 
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.setIsSaving.do,
         (state: AnnotationState, { isSaving }) => ({
           ...state,
           isSaving,
-        })
+        }),
       ),
       on(
         AnnotationActions.setCurrentEditor.do,
         (state: AnnotationState, { currentEditor }) => ({
           ...state,
           currentEditor,
-        })
+        }),
       ),
 
       on(
@@ -425,7 +425,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.saveLogs.do,
@@ -440,7 +440,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.setLogging.do,
@@ -455,7 +455,7 @@ export class AnnotationStateReducers {
                 ? state.logging.logs[state.logging.logs.length - 1]
                 : undefined,
           },
-        })
+        }),
       ),
       on(
         AnnotationActions.setLevelIndex.do,
@@ -469,7 +469,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.loadProjectAndTaskInformation.success,
@@ -485,7 +485,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(AnnotationActions.clearLogs.do, (state) => ({
         ...state,
@@ -519,7 +519,7 @@ export class AnnotationStateReducers {
         AnnotationActions.updateASRSegmentInformation.do,
         (
           state: AnnotationState,
-          { mode, timeInterval, progress, isBlockedBy, itemType, result }
+          { mode, timeInterval, progress, isBlockedBy, itemType, result },
         ) => {
           const currentLevel = state.transcript.currentLevel;
           if (
@@ -528,11 +528,11 @@ export class AnnotationStateReducers {
           ) {
             const segmentBoundary = new SampleUnit(
               timeInterval.sampleStart + timeInterval.sampleLength / 2,
-              state.audio.sampleRate
+              state.audio.sampleRate,
             );
             const segmentIndex =
               state.transcript.getCurrentSegmentIndexBySamplePosition(
-                segmentBoundary
+                segmentBoundary,
               );
 
             if (segmentIndex > -1) {
@@ -549,7 +549,7 @@ export class AnnotationStateReducers {
                     id: segment.id,
                     labels: result
                       ? segment.labels.map((a: OLabel) =>
-                          a.name !== 'Speaker' ? new OLabel(a.name, result) : a
+                          a.name !== 'Speaker' ? new OLabel(a.name, result) : a,
                         )
                       : segment.labels,
                     context: {
@@ -561,7 +561,7 @@ export class AnnotationStateReducers {
                         isBlockedBy,
                       },
                     },
-                  })
+                  }),
                 ),
               };
             } else {
@@ -570,13 +570,13 @@ export class AnnotationStateReducers {
             return state;
           }
           return state;
-        }
+        },
       ),
       on(
         IDBActions.loadOptions.success,
         (
           state: AnnotationState,
-          { demoOptions, localOptions, onlineOptions }
+          { demoOptions, localOptions, onlineOptions },
         ) => {
           let result = state;
 
@@ -594,7 +594,7 @@ export class AnnotationStateReducers {
           }
 
           return result;
-        }
+        },
       ),
       on(
         AnnotationActions.sendOnlineAnnotation.do,
@@ -606,7 +606,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.sendOnlineAnnotation.fail,
@@ -619,7 +619,7 @@ export class AnnotationStateReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AnnotationActions.duplicateLevel.do,
@@ -628,7 +628,7 @@ export class AnnotationStateReducers {
             state.transcript = state.transcript.clone().duplicateLevel(index);
           }
           return state;
-        }
+        },
       ),
     ];
   }
@@ -636,7 +636,7 @@ export class AnnotationStateReducers {
   writeOptionToStore(
     state: AnnotationState,
     attribute: string,
-    value: any
+    value: any,
   ): AnnotationState {
     switch (attribute) {
       case 'currentEditor':

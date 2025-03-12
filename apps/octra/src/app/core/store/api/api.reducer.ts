@@ -14,5 +14,5 @@ export const apiReducer = createReducer(
       url,
       initialized: true,
     };
-  })
+  }),
 );

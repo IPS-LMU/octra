@@ -33,7 +33,7 @@ export class TimespanPipe implements PipeTransform {
       showHour?: boolean;
       showMilliSeconds?: boolean;
       maxDuration?: number;
-    }
+    },
   ): any {
     if (value !== undefined) {
       this.timespan = Number(value);

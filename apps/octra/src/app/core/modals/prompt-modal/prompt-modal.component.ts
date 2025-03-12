@@ -37,7 +37,7 @@ export class PromptModalComponent extends OctraModal {
     public annotationStoreService: AnnotationStoreService,
     private settService: SettingsService,
     private cd: ChangeDetectorRef,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('promptModal', activeModal);
   }

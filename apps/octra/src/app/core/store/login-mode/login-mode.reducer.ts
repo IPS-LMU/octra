@@ -57,7 +57,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.clearOnlineSession.do,
@@ -72,7 +72,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AuthenticationActions.logout.success,
@@ -96,7 +96,7 @@ export class LoginModeReducers {
                 },
                 histories: {},
               };
-        }
+        },
       ),
       on(
         LoginModeActions.setFeedback,
@@ -111,7 +111,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.changeComment.do,
@@ -126,13 +126,13 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         IDBActions.loadOptions.success,
         (
           state: AnnotationState,
-          { onlineOptions, demoOptions, localOptions }
+          { onlineOptions, demoOptions, localOptions },
         ) => {
           let result = state;
 
@@ -152,7 +152,7 @@ export class LoginModeReducers {
           }
 
           return result;
-        }
+        },
       ),
       on(
         LoginModeActions.loadProjectAndTaskInformation.success,
@@ -177,7 +177,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.loadProjectAndTaskInformation.do,
@@ -192,7 +192,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.startAnnotation.do,
@@ -208,13 +208,13 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         AuthenticationActions.loginLocal.prepare,
         (
           state: AnnotationState,
-          { mode, sessionFile, removeData, files, annotation }
+          { mode, sessionFile, removeData, files, annotation },
         ) => {
           if (this.mode === mode) {
             if (removeData || annotation) {
@@ -226,7 +226,7 @@ export class LoginModeReducers {
                     ...state.logging,
                     startTime: undefined,
                     startReference: undefined,
-                    logs: []
+                    logs: [],
                   },
                   transcript: new OctraAnnotation<
                     ASRContext,
@@ -243,7 +243,7 @@ export class LoginModeReducers {
                     ...state.logging,
                     startTime: undefined,
                     startReference: undefined,
-                    logs: []
+                    logs: [],
                   },
                   transcript: deserialized,
                   currentSession: {},
@@ -259,7 +259,7 @@ export class LoginModeReducers {
             }
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.startAnnotation.success,
@@ -272,7 +272,7 @@ export class LoginModeReducers {
             projectSettings,
             guidelines,
             selectedGuidelines,
-          }
+          },
         ) => {
           if (this.mode === mode) {
             return {
@@ -324,7 +324,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.changeImportOptions.do,
@@ -337,7 +337,7 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         LoginModeActions.setImportConverter.do,
@@ -352,20 +352,20 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
+        },
       ),
       on(
         ApplicationActions.setAppLanguage,
         (state: AnnotationState, { language }) => {
           if (state.guidelines?.list && state.guidelines?.list.length > 0) {
             let guideline = state.guidelines.list.find(
-              (a) => a.filename === `guidelines_${language}.json`
+              (a) => a.filename === `guidelines_${language}.json`,
             );
             // fallback to english
             guideline =
               guideline ??
               state.guidelines.list.find(
-                (a) => a.filename === `guidelines_en.json`
+                (a) => a.filename === `guidelines_en.json`,
               );
             // fallback to first language
             guideline = guideline ?? state.guidelines.list[0];
@@ -379,15 +379,15 @@ export class LoginModeReducers {
             };
           }
           return state;
-        }
-      )
+        },
+      ),
     );
   }
 
   writeOptionToStore(
     state: AnnotationState,
     attribute: string,
-    value: any
+    value: any,
   ): AnnotationState {
     switch (attribute) {
       case 'comment':

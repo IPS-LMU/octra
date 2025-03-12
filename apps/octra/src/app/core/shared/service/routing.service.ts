@@ -17,7 +17,7 @@ export class RoutingService {
   // Observable exposing the breadcrumb hierarchy
   constructor(
     private router: Router,
-    private sessionStorage: SessionStorageService
+    private sessionStorage: SessionStorageService,
   ) {}
 
   clear() {
@@ -33,7 +33,7 @@ export class RoutingService {
   public addStaticParams(params: Record<string, string | undefined | null>) {
     this._staticQueryParams = {
       ...removeEmptyProperties<Record<string, string | undefined | null>>(
-        params
+        params,
       ),
       ...params,
     };
@@ -43,7 +43,7 @@ export class RoutingService {
     label: string,
     commands: any[],
     extras?: NavigationExtras,
-    queryParamsHandling: QueryParamsHandling | null | undefined = 'merge'
+    queryParamsHandling: QueryParamsHandling | null | undefined = 'merge',
   ) {
     try {
       if (

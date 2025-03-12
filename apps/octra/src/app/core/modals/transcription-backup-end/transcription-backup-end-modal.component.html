@@ -8,14 +8,14 @@
     <p [innerHTML]="'modal.backup-notice.body' | transloco"></p>
     <div class="text-center">
       @if (downloadFile) {
-      <a
-        class="btn btn-primary"
-        (click)="downloadClicked = true"
-        [download]="downloadFile.name"
-        [href]="downloadFile.url"
-        ><i class="bi bi-floppy-fill"></i>
-        {{ 'modal.backup-notice.button' | transloco }}
-      </a>
+        <a
+          class="btn btn-primary"
+          (click)="downloadClicked = true"
+          [download]="downloadFile.name"
+          [href]="downloadFile.url"
+          ><i class="bi bi-floppy-fill"></i>
+          {{ 'modal.backup-notice.button' | transloco }}
+        </a>
       }
     </div>
   </div>

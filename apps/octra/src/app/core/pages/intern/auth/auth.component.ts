@@ -18,7 +18,10 @@ export class AuthComponent extends DefaultComponent implements OnInit {
     return this._secondsToClose;
   }
 
-  constructor(private router: Router, private navbarService: NavbarService) {
+  constructor(
+    private router: Router,
+    private navbarService: NavbarService,
+  ) {
     super();
     this.navbarService.showNavbar = false;
     this.subscribe(interval(1000), {

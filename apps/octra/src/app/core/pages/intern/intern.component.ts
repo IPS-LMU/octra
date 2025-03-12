@@ -11,7 +11,10 @@ import { SettingsService, UserInteractionsService } from '../../shared/service';
   imports: [RouterOutlet],
 })
 export class InternComponent extends DefaultComponent {
-  constructor(private router: Router, private settService: SettingsService) {
+  constructor(
+    private router: Router,
+    private settService: SettingsService,
+  ) {
     super();
     document.body.setAttribute('style', 'overflow:hidden');
   }

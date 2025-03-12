@@ -29,7 +29,7 @@ export class SessionFile {
     private _name: string,
     private _size: number,
     private _timestamp: Date,
-    private _type: string
+    private _type: string,
   ) {}
 
   public static fromAny(element: any) {
@@ -46,11 +46,11 @@ export class SessionFile {
         element.name,
         element.size,
         element.timestamp,
-        element.type
+        element.type,
       );
     } else {
       console.error(
-        'Can not convert to SessionFile. Properties are not valid.'
+        'Can not convert to SessionFile. Properties are not valid.',
       );
     }
     return undefined;

@@ -53,7 +53,7 @@ export class WebVTTConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
+    levelnum: number,
   ): ExportResult {
     if (!annotation) {
       return {
@@ -88,11 +88,11 @@ export class WebVTTConverter extends Converter {
             .replace(/>/g, '&gt;');
           const start = this.getTimeStringFromSamples(
             item.sampleStart!,
-            annotation.sampleRate
+            annotation.sampleRate,
           );
           const end = this.getTimeStringFromSamples(
             item.sampleStart! + item.sampleDur!,
-            annotation.sampleRate
+            annotation.sampleRate,
           );
 
           if (transcript !== '') {
@@ -123,7 +123,7 @@ export class WebVTTConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -147,7 +147,7 @@ export class WebVTTConverter extends Converter {
     const result = new OAnnotJSON(
       audiofile.name,
       FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
     result.levels.push(new OSegmentLevel(`OCTRA_1`));
 
@@ -164,7 +164,7 @@ export class WebVTTConverter extends Converter {
         const findFirstCueRegex = new RegExp(
           '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) --> ' +
             '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
-          'g'
+          'g',
         );
 
         const firstCueMatch = findFirstCueRegex.exec(content);
@@ -177,14 +177,14 @@ export class WebVTTConverter extends Converter {
             const regex = new RegExp(
               '([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) -->' +
                 ' ([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}).*',
-              'g'
+              'g',
             );
             const matches = regex.exec(cue);
 
             let lastEnd = 0;
             if (matches !== null) {
               const cueWithoutTimestamp = cue.substring(
-                matches.index + matches[0].length
+                matches.index + matches[0].length,
               );
               const linesOfCue = cueWithoutTimestamp
                 .split(/\n/g)
@@ -192,11 +192,11 @@ export class WebVTTConverter extends Converter {
 
               const timeStart = this.getSamplesFromTimeString(
                 matches[1],
-                audiofile.sampleRate
+                audiofile.sampleRate,
               );
               const timeEnd = this.getSamplesFromTimeString(
                 matches[2],
-                audiofile.sampleRate
+                audiofile.sampleRate,
               );
               let escapedTranscript = '';
               if (
@@ -232,14 +232,14 @@ export class WebVTTConverter extends Converter {
                     (result.levels[0].items as OSegment[]).push(
                       new OSegment(counterID++, lastEnd, timeStart - lastEnd, [
                         new OLabel('OCTRA_1', ''),
-                      ])
+                      ]),
                     );
                   }
 
                   (result.levels[0].items as OSegment[]).push(
                     new OSegment(counterID++, timeStart, timeEnd - timeStart, [
                       new OLabel('OCTRA_1', escapedTranscript),
-                    ])
+                    ]),
                   );
 
                   lastEnd = timeEnd;
@@ -270,8 +270,8 @@ export class WebVTTConverter extends Converter {
                     counterID++,
                     lastItem.sampleStart + lastItem.sampleDur,
                     restSamples,
-                    [new OLabel(`OCTRA_${i + 1}`, '')]
-                  )
+                    [new OLabel(`OCTRA_${i + 1}`, '')],
+                  ),
                 );
               } else {
                 // set last segment duration to fit last sample

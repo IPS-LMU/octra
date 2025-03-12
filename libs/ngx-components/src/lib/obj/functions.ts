@@ -14,7 +14,7 @@ export function openModal<T>(
   service: NgbModal,
   content: any,
   options?: NgbModalOptions,
-  data?: Partial<T>
+  data?: Partial<T>,
 ): NgbModalWrapper<T> {
   const ref = service.open(content, options);
 

@@ -24,7 +24,7 @@ export class DirectoryInfo extends DataInfo {
   }
 
   public static async fromFolderObject(
-    folder: FileSystemEntry | null
+    folder: FileSystemEntry | null,
   ): Promise<DirectoryInfo> {
     if (folder) {
       const result = await this.traverseFileTree(folder, '');
@@ -60,7 +60,7 @@ export class DirectoryInfo extends DataInfo {
 
   private static async traverseFileTree(
     item: FileSystemEntry,
-    path?: string
+    path?: string,
   ): Promise<(FileInfo | DirectoryInfo)[]> {
     const getFile = async (webKitEntry: FileSystemFileEntry) => {
       return new Promise<FileInfo[]>((resolve) => {
@@ -70,7 +70,7 @@ export class DirectoryInfo extends DataInfo {
               file.name,
               file.type,
               file.size,
-              file
+              file,
             );
             resolve([fileInfo]);
           } else {
@@ -97,7 +97,7 @@ export class DirectoryInfo extends DataInfo {
               },
               (error: DOMException) => {
                 reject(error);
-              }
+              },
             );
           });
         };
@@ -115,7 +115,7 @@ export class DirectoryInfo extends DataInfo {
 
         for (const entry of entries) {
           values.push(
-            await this.traverseFileTree(entry, path + dirEntry.name + '/')
+            await this.traverseFileTree(entry, path + dirEntry.name + '/'),
           );
         }
 

@@ -66,7 +66,7 @@ export class APIData {
     priority: number,
     status: string,
     project: string,
-    jobno: number
+    jobno: number,
   ) {
     this._id = id;
     this._annotator = annotator;

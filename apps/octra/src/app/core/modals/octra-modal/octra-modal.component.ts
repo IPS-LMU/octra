@@ -62,7 +62,7 @@ export class OctraModalComponent extends DefaultComponent {
             .openModal(
               this.modals[name].type,
               this.modals[name].type.options,
-              data
+              data,
             )
             .then(() => {
               this.modals[name].visible = false;

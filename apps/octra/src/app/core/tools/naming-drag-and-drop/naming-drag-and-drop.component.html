@@ -13,9 +13,9 @@
       </button>
       <div ngbDropdownMenu aria-labelledby="button-basic">
         @for (item of namingConventionArray; track item; let i = $index) {
-        <button (click)="addItem(item)" ngbDropdownItem>
-          {{ item }}
-        </button>
+          <button (click)="addItem(item)" ngbDropdownItem>
+            {{ item }}
+          </button>
         }
       </div>
     </div>
@@ -28,37 +28,38 @@
     (cdkDropListDropped)="onDrop($event)"
   >
     @for (item of resultConvention; track item; let i = $index) {
-    <div
-      cdkDrag
-      [cdkDragDisabled]="clicked > -1"
-      (mouseup)="onItemClick($event, i)"
-      [ngClass]="{
-        'naming-placeholder': item.type === 'placeholder',
-        'naming-text': item.type === 'text',
-        deactivated: item.type === 'extension',
-        clicked: item.type === 'clicked'
-      }"
-      class="naming-item"
-    >
-      @if (i !== clicked) {
-      <div class="naming-content">
-        <span class="value">{{ item.value }}</span>
-        <i class="bi bi-x-circle" (click)="remove(i)"></i>
+      <div
+        cdkDrag
+        [cdkDragDisabled]="clicked > -1"
+        (mouseup)="onItemClick($event, i)"
+        [ngClass]="{
+          'naming-placeholder': item.type === 'placeholder',
+          'naming-text': item.type === 'text',
+          deactivated: item.type === 'extension',
+          clicked: item.type === 'clicked',
+        }"
+        class="naming-item"
+      >
+        @if (i !== clicked) {
+          <div class="naming-content">
+            <span class="value">{{ item.value }}</span>
+            <i class="bi bi-x-circle" (click)="remove(i)"></i>
+          </div>
+        }
+        @if (i === clicked) {
+          <div class="naming-content">
+            <span
+              #text
+              (keydown)="onKeyDown($event, text)"
+              class="value"
+              contenteditable="true"
+              style="min-width: 10px; user-select: text"
+              [innerText]="item.value"
+            ></span>
+            <i class="bi bi-x-circle" (click)="remove(i)"></i>
+          </div>
+        }
       </div>
-      } @if (i === clicked) {
-      <div class="naming-content">
-        <span
-          #text
-          (keydown)="onKeyDown($event, text)"
-          class="value"
-          contenteditable="true"
-          style="min-width: 10px; user-select: text"
-          [innerText]="item.value"
-        ></span>
-        <i class="bi bi-x-circle" (click)="remove(i)"></i>
-      </div>
-      }
-    </div>
     }
   </div>
   <div class="naming-item deactivated">

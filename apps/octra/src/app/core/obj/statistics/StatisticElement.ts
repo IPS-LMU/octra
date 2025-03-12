@@ -64,7 +64,7 @@ export class StatisticElem {
     timestamp: number,
     playpos?: number,
     audioSelection?: SampleInterval,
-    transcriptionUnit?: SampleInterval
+    transcriptionUnit?: SampleInterval,
   ) {
     this.data.type = type;
     this.data.context = context;
@@ -113,7 +113,7 @@ export class StatisticElem {
       result.timestamp!,
       result.playpos,
       result.audioSelection,
-      result.transcriptionUnit
+      result.transcriptionUnit,
     );
   }
 

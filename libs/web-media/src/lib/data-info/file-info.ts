@@ -71,7 +71,7 @@ export class FileInfo extends DataInfo {
     type: string,
     size: number,
     file?: File,
-    createdAt?: number
+    createdAt?: number,
   ) {
     const extraction = FileInfo.extractFileName(fullname);
     super(extraction.name, type, size);
@@ -97,7 +97,7 @@ export class FileInfo extends DataInfo {
     type?: string,
     name?: string,
     createdAt = 0,
-    size?: number
+    size?: number,
   ) {
     const extraction = extractFileNameFromURL(url);
     const result = new FileInfo(
@@ -105,7 +105,7 @@ export class FileInfo extends DataInfo {
       type ?? this.getMimeTypeByExtension(extraction.extension),
       size ?? 0,
       undefined,
-      createdAt
+      createdAt,
     );
     result.url = url;
 
@@ -164,7 +164,7 @@ export class FileInfo extends DataInfo {
   public static renameFile(
     file: File,
     newName: string,
-    attributes: any
+    attributes: any,
   ): Promise<File> {
     return new Promise<File>((resolve, reject) => {
       const reader = new FileReader();
@@ -217,7 +217,7 @@ export class FileInfo extends DataInfo {
         }
       } else {
         throw new Error(
-          'invalid fullname. Fullname must contain the file extension'
+          'invalid fullname. Fullname must contain the file extension',
         );
       }
 
@@ -237,7 +237,7 @@ export class FileInfo extends DataInfo {
       object.fullname,
       object.type,
       object.size,
-      file
+      file,
     );
     result.attributes = object.attributes;
     result.url = object.url;
@@ -257,7 +257,7 @@ export class FileInfo extends DataInfo {
   public static getFileFromContent(
     content: string,
     filename: string,
-    type?: string
+    type?: string,
   ): File {
     const properties: {
       type?: string;
@@ -310,7 +310,7 @@ export class FileInfo extends DataInfo {
             this._file = FileInfo.getFileFromContent(
               result,
               this.fullname,
-              this._type
+              this._type,
             );
             this._size = this._file.size;
             resolve(result);

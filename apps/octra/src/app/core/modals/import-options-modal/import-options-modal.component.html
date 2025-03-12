@@ -9,11 +9,11 @@
       {{ 'modal.import options.introduction' | transloco }}
     </p>
     @if (schema) {
-    <octra-form-configurator
-      [jsonSchema]="schema"
-      [jsonText]="jsonText"
-      (jsonTextChange)="onJsonTextChange($event)"
-    ></octra-form-configurator>
+      <octra-form-configurator
+        [jsonSchema]="schema"
+        [jsonText]="jsonText"
+        (jsonTextChange)="onJsonTextChange($event)"
+      ></octra-form-configurator>
     }
   </div>
   <div class="modal-footer">

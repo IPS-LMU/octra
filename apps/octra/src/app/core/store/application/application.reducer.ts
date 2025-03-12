@@ -44,7 +44,7 @@ export const reducer = createReducer(
       ...state,
       reloaded,
       loggedIn,
-    })
+    }),
   ),
   on(ApplicationActions.initApplication.finish, (state: ApplicationState) => ({
     ...state,
@@ -55,21 +55,21 @@ export const reducer = createReducer(
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: false,
-    })
+    }),
   ),
   on(
     AuthenticationActions.needReAuthentication.success,
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: true,
-    })
+    }),
   ),
   on(
     ApplicationActions.setShortcutsEnabled.do,
     (state: ApplicationState, { shortcutsEnabled }) => ({
       ...state,
       shortcutsEnabled,
-    })
+    }),
   ),
   on(
     AuthenticationActions.reauthenticate.success,
@@ -77,14 +77,14 @@ export const reducer = createReducer(
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: true,
-    })
+    }),
   ),
   on(
     AuthenticationActions.loginOnline.redirectToURL,
     (state: ApplicationState) => ({
       ...state,
       mode: LoginMode.ONLINE,
-    })
+    }),
   ),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
@@ -105,14 +105,14 @@ export const reducer = createReducer(
         status: LoadingStatus.LOADING,
         progress: 50,
       },
-    })
+    }),
   ),
   on(
     ApplicationActions.setReloaded,
     (state: ApplicationState, { reloaded }) => ({
       ...state,
       reloaded,
-    })
+    }),
   ),
   on(ApplicationActions.finishLoading, (state: ApplicationState) => ({
     ...state,
@@ -126,28 +126,28 @@ export const reducer = createReducer(
     (state: ApplicationState, { language }) => ({
       ...state,
       language,
-    })
+    }),
   ),
   on(
     ApplicationActions.setDBVersion,
     (state: ApplicationState, { version }) => ({
       ...state,
       version,
-    })
+    }),
   ),
   on(
     ApplicationActions.setConsoleEntries,
     (state: ApplicationState, { consoleEntries }) => ({
       ...state,
       consoleEntries,
-    })
+    }),
   ),
   on(
     IDBActions.loadConsoleEntries.success,
     (state: ApplicationState, { consoleEntries }) => ({
       ...state,
       consoleEntries,
-    })
+    }),
   ),
   on(
     IDBActions.loadOptions.success,
@@ -170,7 +170,7 @@ export const reducer = createReducer(
           speed: 1,
         },
       },
-    })
+    }),
   ),
   on(IDBActions.loadAnnotation.success, (state: ApplicationState) => ({
     ...state,
@@ -188,7 +188,7 @@ export const reducer = createReducer(
       ...state,
       mode,
       loggedIn: true,
-    })
+    }),
   ),
   on(AuthenticationActions.logout.success, (state: ApplicationState) => {
     return {
@@ -213,7 +213,7 @@ export const reducer = createReducer(
         ...state,
         options,
       };
-    }
+    },
   ),
   on(ApplicationActions.setAudioSettings, (state: ApplicationState, data) => ({
     ...state,
@@ -230,7 +230,7 @@ export const reducer = createReducer(
         ...state.options,
         showMagnifier,
       },
-    })
+    }),
   ),
   on(
     ApplicationActions.setEasyMode,
@@ -240,7 +240,7 @@ export const reducer = createReducer(
         ...state.options,
         easyMode,
       },
-    })
+    }),
   ),
   on(
     ApplicationActions.setSecondsPerLine,
@@ -250,7 +250,7 @@ export const reducer = createReducer(
         ...state.options,
         secondsPerLine,
       },
-    })
+    }),
   ),
   on(
     ApplicationActions.setHighlightingEnabled,
@@ -260,7 +260,7 @@ export const reducer = createReducer(
         ...state.options,
         highlightingEnabled,
       },
-    })
+    }),
   ),
   on(ApplicationActions.waitForEffects.do, (state: ApplicationState) => ({
     ...state,
@@ -292,7 +292,7 @@ export const reducer = createReducer(
           errors: [],
         },
       };
-    }
+    },
   ),
   on(
     AnnotationActions.loadAudio.success,
@@ -305,7 +305,7 @@ export const reducer = createReducer(
         progress: 100,
         errors: [],
       },
-    })
+    }),
   ),
   on(
     AnnotationActions.loadAudio.fail,
@@ -316,6 +316,6 @@ export const reducer = createReducer(
         status: LoadingStatus.FAILED,
         errors: [error],
       },
-    })
-  )
+    }),
+  ),
 );

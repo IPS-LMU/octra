@@ -11,7 +11,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 
 export const AUTHENTICATED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
+  state: RouterStateSnapshot,
 ) => {
   const appStorage = inject(AppStorageService);
   const router = inject(Router);

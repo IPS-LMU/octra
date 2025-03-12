@@ -103,7 +103,7 @@ export class AudioManager {
    */
   public static getFileFormat(
     extension: string,
-    audioformats: AudioFormat[]
+    audioformats: AudioFormat[],
   ): AudioFormat | undefined {
     return audioformats.find((a) => {
       return (
@@ -125,7 +125,7 @@ export class AudioManager {
     type: string,
     buffer: ArrayBuffer,
     url?: string,
-    audioMechanism: AudioMechanism = new HtmlAudioMechanism()
+    audioMechanism: AudioMechanism = new HtmlAudioMechanism(),
   ): Observable<{
     audioManager: AudioManager;
     progress: number;
@@ -154,7 +154,7 @@ export class AudioManager {
             // set duration is very important
             const selection = new AudioSelection(
               result.createSampleUnit(0),
-              result.resource.info.duration.clone()
+              result.resource.info.duration.clone(),
             );
             result._mainchunk = new AudioChunk(selection, result);
           }
@@ -163,7 +163,7 @@ export class AudioManager {
             progress,
             audioManager: result,
           };
-        })
+        }),
       );
   };
 
@@ -174,12 +174,12 @@ export class AudioManager {
    */
   public static isValidAudioFileName(
     filename: string,
-    audioFormats: AudioFormat[]
+    audioFormats: AudioFormat[],
   ): boolean {
     return (
       AudioManager.getFileFormat(
         filename.substring(filename.lastIndexOf('.')),
-        audioFormats
+        audioFormats,
       ) !== undefined
     );
   }
@@ -210,7 +210,7 @@ export class AudioManager {
     audioSelection: AudioSelection,
     volume: number,
     playbackRate: number,
-    playOnHover = false
+    playOnHover = false,
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this._audioMechanism) {
@@ -231,12 +231,12 @@ export class AudioManager {
           this.subscrManager.add(
             timer(0).subscribe(() => {
               resolve();
-            })
+            }),
           );
         },
         () => {
           reject();
-        }
+        },
       );
     });
   }
@@ -266,7 +266,7 @@ export class AudioManager {
    */
   public createNewAudioChunk(
     time: AudioSelection,
-    selection?: AudioSelection
+    selection?: AudioSelection,
   ): AudioChunk | undefined {
     if (
       time.start!.samples + time.duration.samples <=
@@ -347,7 +347,7 @@ export class AudioChunk {
     if (this.selection === undefined || this.selection === null) {
       this.selection = new AudioSelection(
         value.clone(),
-        this.time.end!.clone()
+        this.time.end!.clone(),
       );
     } else {
       this.selection.start = value.clone();
@@ -483,13 +483,13 @@ export class AudioChunk {
   constructor(
     time: AudioSelection,
     audioManager: AudioManager,
-    selection?: AudioSelection
+    selection?: AudioSelection,
   ) {
     if (time && time.start && time.end) {
       this.time = time.clone();
     } else {
       throw new Error(
-        'AudioChunk constructor needs two correct AudioTime objects'
+        'AudioChunk constructor needs two correct AudioTime objects',
       );
     }
 
@@ -522,7 +522,7 @@ export class AudioChunk {
               this.subscrManager.add(
                 timer(0).subscribe(() => {
                   resolve2();
-                })
+                }),
               );
             })
             .catch((error) => {
@@ -534,7 +534,7 @@ export class AudioChunk {
           if (this._selection === undefined) {
             this.selection = new AudioSelection(
               this.time.start.clone(),
-              this.time.end.clone()
+              this.time.end.clone(),
             );
           }
 
@@ -581,7 +581,7 @@ export class AudioChunk {
                               console.error(error);
                               reject2(error);
                             });
-                        })
+                        }),
                       );
                     });
                   } else {
@@ -596,7 +596,7 @@ export class AudioChunk {
               error: (error) => {
                 console.error(error);
               },
-            })
+            }),
           );
 
           this._audioManger
@@ -604,7 +604,7 @@ export class AudioChunk {
               this.selection,
               this._volume,
               this.playbackRate,
-              playOnHover
+              playOnHover,
             )
             .catch(reject);
         })
@@ -633,7 +633,7 @@ export class AudioChunk {
       this.status === PlayBackStatus.PLAYING
     ) {
       throw new Error(
-        `audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`
+        `audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`,
       );
     }
     this.afterPlaybackPaused();
@@ -676,11 +676,11 @@ export class AudioChunk {
       const backSamples = Math.max(
         0,
         this.absolutePlayposition.samples -
-          Math.round(backSec * this._audioManger.sampleRate)
+          Math.round(backSec * this._audioManger.sampleRate),
       );
       const backSample = new SampleUnit(
         backSamples,
-        this._audioManger.sampleRate
+        this._audioManger.sampleRate,
       );
 
       new Promise<void>((resolve2) => {

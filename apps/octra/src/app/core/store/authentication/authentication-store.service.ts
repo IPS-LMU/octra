@@ -13,23 +13,23 @@ export class AuthenticationStoreService {
 
   me$ = this.store.select((store: RootState) => store.authentication.me);
   serverOnline$ = this.store.select(
-    (store: RootState) => store.authentication.serverOnline
+    (store: RootState) => store.authentication.serverOnline,
   );
 
   authenticated$ = this.store.select(
-    (store: RootState) => store.authentication.authenticated
+    (store: RootState) => store.authentication.authenticated,
   );
   authType$ = this.store.select(
-    (store: RootState) => store.authentication.type
+    (store: RootState) => store.authentication.type,
   );
   logoutMessage$ = this.store.select(
-    (store: RootState) => store.authentication.logoutMessage
+    (store: RootState) => store.authentication.logoutMessage,
   );
   logoutMessageType$ = this.store.select(
-    (store: RootState) => store.authentication.logoutMessageType
+    (store: RootState) => store.authentication.logoutMessageType,
   );
   loginErrorMessage$ = this.store.select(
-    (store: RootState) => store.authentication.loginErrorMessage
+    (store: RootState) => store.authentication.loginErrorMessage,
   );
 
   otherUserLoggedIn$ = this.store.select((store: RootState) => {
@@ -52,7 +52,7 @@ export class AuthenticationStoreService {
   loginOnline(
     method: AccountLoginMethod,
     username?: string,
-    password?: string
+    password?: string,
   ) {
     this.store.dispatch(
       AuthenticationActions.loginOnline.do({
@@ -60,7 +60,7 @@ export class AuthenticationStoreService {
         username,
         password,
         mode: LoginMode.ONLINE,
-      })
+      }),
     );
   }
 
@@ -68,7 +68,7 @@ export class AuthenticationStoreService {
     this.store.dispatch(
       AuthenticationActions.loginDemo.do({
         mode: LoginMode.DEMO,
-      })
+      }),
     );
   }
 
@@ -79,7 +79,7 @@ export class AuthenticationStoreService {
         annotation,
         removeData,
         mode: LoginMode.LOCAL,
-      })
+      }),
     );
   }
 
@@ -91,7 +91,7 @@ export class AuthenticationStoreService {
     method: AccountLoginMethod,
     actionAfterSuccess?: Action,
     username?: string,
-    password?: string
+    password?: string,
   ) {
     this.store.dispatch(
       AuthenticationActions.reauthenticate.do({
@@ -99,13 +99,15 @@ export class AuthenticationStoreService {
         username,
         password,
         actionAfterSuccess,
-      })
+      }),
     );
   }
 
   setReAuthenticationSuccess(actionAfterSuccess?: Action) {
     this.store.dispatch(
-      AuthenticationActions.needReAuthentication.success({ actionAfterSuccess })
+      AuthenticationActions.needReAuthentication.success({
+        actionAfterSuccess,
+      }),
     );
   }
 

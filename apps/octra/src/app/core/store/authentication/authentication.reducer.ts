@@ -23,7 +23,7 @@ export const authenticationReducer = createReducer(
         type: method,
         webToken: auth.accessToken,
       };
-    }
+    },
   ),
   on(
     LoginModeActions.loadCurrentAccountInformation.success,
@@ -32,7 +32,7 @@ export const authenticationReducer = createReducer(
         ...state,
         me,
       };
-    }
+    },
   ),
   on(
     AuthenticationActions.loginDemo.success,
@@ -63,7 +63,7 @@ export const authenticationReducer = createReducer(
         type: AccountLoginMethod.local,
         webToken: 'faketoken',
       };
-    }
+    },
   ),
   on(
     IDBActions.loadOptions.success,
@@ -78,7 +78,7 @@ export const authenticationReducer = createReducer(
             }
           : undefined,
       };
-    }
+    },
   ),
   on(
     AuthenticationActions.loginOnline.fail,
@@ -94,9 +94,9 @@ export const authenticationReducer = createReducer(
         loginErrorMessage:
           typeof error === 'string'
             ? error
-            : error?.error?.message ?? error?.message,
+            : (error?.error?.message ?? error?.message),
       };
-    }
+    },
   ),
   on(
     AuthenticationActions.logout.success,
@@ -110,7 +110,7 @@ export const authenticationReducer = createReducer(
         logoutMessage: dto.message,
         logoutMessageType: dto.messageType,
       };
-    }
+    },
   ),
   on(
     AuthenticationActions.continueSessionAfterAgreement.success,
@@ -121,7 +121,7 @@ export const authenticationReducer = createReducer(
         type: data.method,
         authenticated: true,
       };
-    }
+    },
   ),
   on(APIActions.init.success, (state: AuthenticationState, data: any) => {
     return {
@@ -137,6 +137,6 @@ export const authenticationReducer = createReducer(
     (state: AuthenticationState, { me }) => ({
       ...state,
       me,
-    })
-  )
+    }),
+  ),
 );

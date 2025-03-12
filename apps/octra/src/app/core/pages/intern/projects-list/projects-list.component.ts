@@ -52,21 +52,21 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     public authStoreService: AuthenticationStoreService,
     private annotationStoreService: AnnotationStoreService,
     private store: Store<RootState>,
-    private actions$: Actions
+    private actions$: Actions,
   ) {
     super();
     this.subscribe(
       this.actions$.pipe(
         ofType(
           AnnotationActions.startAnnotation.fail,
-          AnnotationActions.startAnnotation.success
-        )
+          AnnotationActions.startAnnotation.success,
+        ),
       ),
       {
         next: () => {
           this.projectStarting = false;
         },
-      }
+      },
     );
     this.subscribe(authStoreService.me$, {
       next: (me) => {
@@ -81,13 +81,13 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   async ngOnInit() {
     this.subscribe(
       this.actions$.pipe(
-        ofType(AuthenticationActions.needReAuthentication.success.type)
+        ofType(AuthenticationActions.needReAuthentication.success.type),
       ),
       {
         next: () => {
           this.loadProjects(1);
         },
-      }
+      },
     );
     this.loadProjects(1);
   }
@@ -109,7 +109,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             ...projects,
             list: projects.list?.filter((a: any) => {
               const annotationStatistics = a.statistics?.tasks.find(
-                (a: any) => a.type === 'annotation'
+                (a: any) => a.type === 'annotation',
               );
 
               if (annotationStatistics) {
@@ -129,24 +129,24 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
               AuthenticationActions.needReAuthentication.do({
                 actionAfterSuccess: AuthenticationActions.redirectToProjects.do,
                 forceLogout: true,
-              })
+              }),
             );
           } else {
             const ref = this.modalService.openModalRef<ErrorModalComponent>(
               ErrorModalComponent,
-              ErrorModalComponent.options
+              ErrorModalComponent.options,
             );
             ref.componentInstance.text = error.message;
           }
         },
-      }
+      },
     );
   }
 
   showProjects(page: number) {
     this.shownProjects = this.projects.list.slice(
       (page - 1) * this.itemsPerPage,
-      page * this.itemsPerPage
+      page * this.itemsPerPage,
     );
     this.currentPage = {
       page,
@@ -173,7 +173,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   openCreateProjectRequestModal() {
     this.modalService.openModalRef<ProjectRequestModalComponent>(
       ProjectRequestModalComponent,
-      ProjectRequestModalComponent.options
+      ProjectRequestModalComponent.options,
     );
   }
 }

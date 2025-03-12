@@ -69,7 +69,7 @@ export class PermutationsReplaceModalComponent implements OnDestroy {
         },
         (err) => {
           reject(err);
-        }
+        },
       );
     });
   }

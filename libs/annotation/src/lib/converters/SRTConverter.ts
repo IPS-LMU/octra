@@ -55,7 +55,7 @@ export class SRTConverter extends Converter {
 
   public static getSamplesFromTimeString(
     timeString: string,
-    sampleRate: number
+    sampleRate: number,
   ) {
     if (sampleRate > 0) {
       const regex = new RegExp(/([0-9]+):([0-9]+):([0-9]+)(?:,([0-9]+))?/g);
@@ -88,7 +88,7 @@ export class SRTConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
+    levelnum: number,
   ): ExportResult {
     if (!annotation) {
       return {
@@ -119,11 +119,11 @@ export class SRTConverter extends Converter {
             item.getFirstLabelWithoutName('Speaker')?.value ?? '';
           const start = this.getTimeStringFromSamples(
             item.sampleStart,
-            annotation.sampleRate
+            annotation.sampleRate,
           );
           const end = this.getTimeStringFromSamples(
             item.sampleStart + item.sampleDur,
-            annotation.sampleRate
+            annotation.sampleRate,
           );
 
           if (transcript !== '') {
@@ -154,7 +154,7 @@ export class SRTConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return {
       $gui_support: true,
@@ -192,7 +192,7 @@ export class SRTConverter extends Converter {
   public import(
     file: IFile,
     audiofile: OAudiofile,
-    options: SRTConverterImportOptions = new SRTConverterImportOptions()
+    options: SRTConverterImportOptions = new SRTConverterImportOptions(),
   ): ImportResult {
     if (!audiofile?.sampleRate) {
       return {
@@ -214,7 +214,7 @@ export class SRTConverter extends Converter {
       const result = new OAnnotJSON(
         audiofile.name,
         FileInfo.extractFileName(file.name).name,
-        audiofile.sampleRate
+        audiofile.sampleRate,
       );
 
       const content = file.content;
@@ -224,7 +224,7 @@ export class SRTConverter extends Converter {
       let lastEnd = 0;
 
       let defaultLevel: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
-        'OCTRA_1'
+        'OCTRA_1',
       );
       let regexStr = `([0-9]+)[\\n\\r]*([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?)\\r?\\n\\r?`;
       if (options.speakerIdentifierPattern) {
@@ -247,11 +247,11 @@ export class SRTConverter extends Converter {
 
           let timeStart = SRTConverter.getSamplesFromTimeString(
             matches[2],
-            audiofile.sampleRate
+            audiofile.sampleRate,
           );
           const timeEnd = SRTConverter.getSamplesFromTimeString(
             matches[3],
-            audiofile.sampleRate
+            audiofile.sampleRate,
           );
           let segmentContent: string = '';
           segmentContent = matches[5].replace(/(\n|\s)+$/g, '');
@@ -263,7 +263,7 @@ export class SRTConverter extends Converter {
                 new OSegment(counterID++, lastEnd, timeStart - lastEnd, [
                   ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
                   new OLabel(olevel.name, ''),
-                ])
+                ]),
               );
             }
 
@@ -272,7 +272,7 @@ export class SRTConverter extends Converter {
                 new OSegment(counterID++, timeStart, timeEnd - timeStart, [
                   ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
                   new OLabel(olevel.name, segmentContent),
-                ])
+                ]),
               );
             } else {
               return {
@@ -332,7 +332,7 @@ export class SRTConverter extends Converter {
                     nextItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
                   label.value = label.value.replace(
                     new RegExp(`(?!^) *${speakerRegex}`),
-                    ' '
+                    ' ',
                   );
                 }
               }
@@ -344,7 +344,7 @@ export class SRTConverter extends Converter {
           for (let i = 0; i < defaultLevel.items.length; i++) {
             const item = defaultLevel.items[i];
             const speaker = item.labels.find(
-              (a) => a.name === 'Speaker'
+              (a) => a.name === 'Speaker',
             )?.value;
             let olevel: OSegmentLevel<OSegment>;
 
@@ -363,8 +363,8 @@ export class SRTConverter extends Converter {
                   (a) =>
                     new OLabel(
                       speaker,
-                      item.getFirstLabelWithoutName('Speaker')?.value ?? ''
-                    )
+                      item.getFirstLabelWithoutName('Speaker')?.value ?? '',
+                    ),
                 );
               olevel.items.push(item);
               defaultLevel.items.splice(i, 1);
@@ -410,8 +410,8 @@ export class SRTConverter extends Converter {
                   item.sampleStart + item.sampleDur,
                   Number(audiofile.duration) -
                     (item.sampleStart + item.sampleDur),
-                  [new OLabel(a.name, '')]
-                )
+                  [new OLabel(a.name, '')],
+                ),
               );
             }
           }

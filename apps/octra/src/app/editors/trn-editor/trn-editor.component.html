@@ -9,7 +9,7 @@
     #validationPopover
     [ngStyle]="{
       'margin-left': popovers.validation.location.x + 'px',
-      'margin-top': popovers.validation.location.y + 'px'
+      'margin-top': popovers.validation.location.y + 'px',
     }"
   >
   </octra-validation-popover>
@@ -97,132 +97,135 @@
     </thead>
     <tbody>
       @for (segment of shownSegments; track segment; let i = $index) {
-      <tr
-        class="segment-row"
-        [ngClass]="{
-          'segment-selected': segment.isSelected,
-          'table-success':
-            segment.transcription.text !== '' &&
-            segment.transcription.text !==
+        <tr
+          class="segment-row"
+          [ngClass]="{
+            'segment-selected': segment.isSelected,
+            'table-success':
+              segment.transcription.text !== '' &&
+              segment.transcription.text !==
+                annotationStoreService.breakMarker?.code,
+            'table-info':
+              segment.transcription.text ===
               annotationStoreService.breakMarker?.code,
-          'table-info':
-            segment.transcription.text ===
-            annotationStoreService.breakMarker?.code,
-          'table-danger': segment.transcription.text === '',
-          'active-playback': i === playAllState.currentSegment
-        }"
-      >
-        <td
-          class="active-column fitwidth"
-          (click)="onTableLineClick($event, i)"
+            'table-danger': segment.transcription.text === '',
+            'active-playback': i === playAllState.currentSegment,
+          }"
         >
-          @if (i === textEditor.selectedSegment) {
-          <i class="bi bi-circle" style="color: green; font-size: 10px"></i>
-          } @else {
-          <i
-            class="bi bi-exclamation-triangle segment-warning"
-            [ngStyle]="{
-              color: 'red',
-              display:
-                segment.transcription.safeHTML
-                  .toString()
-                  .indexOf('<span class=\'val-error\'') > -1
-                  ? 'normal'
-                  : 'none'
-            }"
-          ></i>
-          }
-        </td>
-        <td
-          class="time-column fitwidth"
-          (click)="onTimestampMouseDown($event, i)"
-          (contextmenu)="onContextMenuClick($event)"
-        >
-          {{
-            getStartPoint(i)
-              | timespan
-                : {
-                    showMilliSeconds: true,
-                    showHour: true
-                  }
-          }}
-        </td>
-        <td
-          class="alert label-column fitwidth"
-          #labelCol
-          (keyup)="onLabelKeyUp(labelCol)"
-          (keydown)="onLabelKeyDown($event, labelCol, i)"
-          (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)"
-        >
-          {{ segment.label }}
-        </td>
-        @if ( textEditor.state === 'active' && textEditor.selectedSegment === i)
-        {
-        <td class="alert transcript-column">
-          <div id="transcription-panel">
-            <octra-audio-navigation
-              [easyMode]="appStorage.easyMode"
-              [playbackRate]="appStorage.audioSpeed"
-              [audioChunk]="textEditor.audiochunk"
-              [volume]="appStorage.audioVolume"
-            ></octra-audio-navigation>
-            @if (!showSignalDisplay) {
-            <octra-audio-viewer
-              class="viewer"
-              #viewer
-              [settings]="audioViewerSettings"
-              [audioChunk]="textEditor.audiochunk"
-              [isMultiLine]="false"
-              [refreshOnInternChanges]="false"
-              [annotation]="annotationStoreService.transcript!"
-              style="height: 50px"
-            >
-            </octra-audio-viewer>
+          <td
+            class="active-column fitwidth"
+            (click)="onTableLineClick($event, i)"
+          >
+            @if (i === textEditor.selectedSegment) {
+              <i class="bi bi-circle" style="color: green; font-size: 10px"></i>
+            } @else {
+              <i
+                class="bi bi-exclamation-triangle segment-warning"
+                [ngStyle]="{
+                  color: 'red',
+                  display:
+                    segment.transcription.safeHTML
+                      .toString()
+                      .indexOf('<span class=\'val-error\'') > -1
+                      ? 'normal'
+                      : 'none',
+                }"
+              ></i>
             }
-            <octra-transcr-editor
-              #transcrEditor
-              (onkeyup)="onKeyUp($event, i)"
-              [transcript]="textEditor.transcript"
-              [audiochunk]="textEditor.audiochunk"
-              [height]="60"
-              [markers]="annotationStoreService.guidelines!.markers!"
-            ></octra-transcr-editor>
-            <button
-              class="btn btn-sm btn-primary btn-info btn-raised w-50"
-              (click)="navigateBetweenCells('up', i)"
-            >
-              <i class="bi bi-arrow-up"></i> SAVE & UP
-            </button>
-            <button
-              class="btn btn-sm btn-primary btn-info btn-raised w-50"
-              (click)="navigateBetweenCells('down', i)"
-            >
-              <i class="bi bi-arrow-down"></i> SAVE & DOWN
-            </button>
-          </div>
-        </td>
-        } @else {
-        <td
-          (mousedown)="
-            onTranscriptCellMouseOver($event, i, scrollContainer);
-            onTranscriptCellMouseDown($event, i)
-          "
-          (mousemove)="onTranscriptCellMouseOver($event, i, scrollContainer)"
-          [innerHTML]="segment.transcription.safeHTML"
-          class="transcript-column"
-        ></td>
-        }
-        <td
-          class="control-column"
-          style="width: 100px"
-          (click)="onTableLineClick($event, i)"
-        >
-          <i
-            [classList]="['bi', playStateSegments[i].icon]"
-            (click)="playSelectedSegment(i)"
-          ></i>
-        </td>
-      </tr>
+          </td>
+          <td
+            class="time-column fitwidth"
+            (click)="onTimestampMouseDown($event, i)"
+            (contextmenu)="onContextMenuClick($event)"
+          >
+            {{
+              getStartPoint(i)
+                | timespan
+                  : {
+                      showMilliSeconds: true,
+                      showHour: true,
+                    }
+            }}
+          </td>
+          <td
+            class="alert label-column fitwidth"
+            #labelCol
+            (keyup)="onLabelKeyUp(labelCol)"
+            (keydown)="onLabelKeyDown($event, labelCol, i)"
+            (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)"
+          >
+            {{ segment.label }}
+          </td>
+          @if (
+            textEditor.state === 'active' && textEditor.selectedSegment === i
+          ) {
+            <td class="alert transcript-column">
+              <div id="transcription-panel">
+                <octra-audio-navigation
+                  [easyMode]="appStorage.easyMode"
+                  [playbackRate]="appStorage.audioSpeed"
+                  [audioChunk]="textEditor.audiochunk"
+                  [volume]="appStorage.audioVolume"
+                ></octra-audio-navigation>
+                @if (!showSignalDisplay) {
+                  <octra-audio-viewer
+                    class="viewer"
+                    #viewer
+                    [settings]="audioViewerSettings"
+                    [audioChunk]="textEditor.audiochunk"
+                    [isMultiLine]="false"
+                    [refreshOnInternChanges]="false"
+                    [annotation]="annotationStoreService.transcript!"
+                    style="height: 50px"
+                  >
+                  </octra-audio-viewer>
+                }
+                <octra-transcr-editor
+                  #transcrEditor
+                  (onkeyup)="onKeyUp($event, i)"
+                  [transcript]="textEditor.transcript"
+                  [audiochunk]="textEditor.audiochunk"
+                  [height]="60"
+                  [markers]="annotationStoreService.guidelines!.markers!"
+                ></octra-transcr-editor>
+                <button
+                  class="btn btn-sm btn-primary btn-info btn-raised w-50"
+                  (click)="navigateBetweenCells('up', i)"
+                >
+                  <i class="bi bi-arrow-up"></i> SAVE & UP
+                </button>
+                <button
+                  class="btn btn-sm btn-primary btn-info btn-raised w-50"
+                  (click)="navigateBetweenCells('down', i)"
+                >
+                  <i class="bi bi-arrow-down"></i> SAVE & DOWN
+                </button>
+              </div>
+            </td>
+          } @else {
+            <td
+              (mousedown)="
+                onTranscriptCellMouseOver($event, i, scrollContainer);
+                onTranscriptCellMouseDown($event, i)
+              "
+              (mousemove)="
+                onTranscriptCellMouseOver($event, i, scrollContainer)
+              "
+              [innerHTML]="segment.transcription.safeHTML"
+              class="transcript-column"
+            ></td>
+          }
+          <td
+            class="control-column"
+            style="width: 100px"
+            (click)="onTableLineClick($event, i)"
+          >
+            <i
+              [classList]="['bi', playStateSegments[i].icon]"
+              (click)="playSelectedSegment(i)"
+            ></i>
+          </td>
+        </tr>
       }
       <tr>
         <td class="active-column fitwidth"></td>
@@ -232,7 +235,7 @@
               | timespan
                 : {
                     showMilliSeconds: true,
-                    showHour: true
+                    showHour: true,
                   }
           }}
         </td>

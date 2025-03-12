@@ -10,27 +10,27 @@ import { LoadingStatus, LoginMode, RootState } from '../index';
 export const selectApplication = (state: RootState) => state.application;
 export const selectLoadingStatus = pipe(
   selectApplication,
-  (state) => state.loading.status
+  (state) => state.loading.status,
 );
 export const selectReloaded = pipe(
   selectApplication,
-  (state) => state.reloaded
+  (state) => state.reloaded,
 );
 export const selectIDBLoaded = pipe(
   selectApplication,
-  (state) => state.idb.loaded
+  (state) => state.idb.loaded,
 );
 export const selectLoggedIn = pipe(
   selectApplication,
-  (state) => state.loggedIn
+  (state) => state.loggedIn,
 );
 export const selectApplicationLanguage = pipe(
   selectApplication,
-  (state) => state.language
+  (state) => state.language,
 );
 export const selectAppSettings = pipe(
   selectApplication,
-  (state) => state.appConfiguration
+  (state) => state.appConfiguration,
 );
 
 export interface URLParameters {

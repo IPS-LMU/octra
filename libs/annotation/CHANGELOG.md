@@ -4,36 +4,28 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 # [1.1.0](https://github.com/IPS-LMU/octra/compare/annotation-1.0.0...annotation-1.1.0) (2025-03-05)
 
-
 ### Bug Fixes
 
-* **annotation:** PraatTableConverter does not import empty units properly ([41c1b96](https://github.com/IPS-LMU/octra/commit/41c1b96601b4cbb002f101a56ece4d7e0e51b007))
-* **annotation:** PraatTextgridConverter should not need equal file names ([4e4c2e4](https://github.com/IPS-LMU/octra/commit/4e4c2e40a62d29be9f53199a05902cfff5e3a080))
-* **ngx-components:** magnifier not working properly ([3d92813](https://github.com/IPS-LMU/octra/commit/3d928137a9afcb285477dc13e6b0310d17d7b01f))
-
+- **annotation:** PraatTableConverter does not import empty units properly ([41c1b96](https://github.com/IPS-LMU/octra/commit/41c1b96601b4cbb002f101a56ece4d7e0e51b007))
+- **annotation:** PraatTextgridConverter should not need equal file names ([4e4c2e4](https://github.com/IPS-LMU/octra/commit/4e4c2e40a62d29be9f53199a05902cfff5e3a080))
+- **ngx-components:** magnifier not working properly ([3d92813](https://github.com/IPS-LMU/octra/commit/3d928137a9afcb285477dc13e6b0310d17d7b01f))
 
 ### Features
 
-* **annotation:** TextConverter imports/exports timestamps with ">" instead of "/>" ([0f58bd7](https://github.com/IPS-LMU/octra/commit/0f58bd7c2ea3a8dd8360e15f7333abd8791e9fa4))
-
-
+- **annotation:** TextConverter imports/exports timestamps with ">" instead of "/>" ([0f58bd7](https://github.com/IPS-LMU/octra/commit/0f58bd7c2ea3a8dd8360e15f7333abd8791e9fa4))
 
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/annotation-0.1.17...annotation-1.0.0) (2025-01-13)
 
-
 ### Bug Fixes
 
-* **annotation:** SRT converter combines same speaker units incorrectly ([16806e1](https://github.com/IPS-LMU/octra/commit/16806e1138c714b8bfd26305cabd2e1da4b16120))
-* **octra:** visible escape codes on shortcuts modal ([e7a63fb](https://github.com/IPS-LMU/octra/commit/e7a63fb542ee0841e21ffae1cdf9704a22525b1c))
-
+- **annotation:** SRT converter combines same speaker units incorrectly ([16806e1](https://github.com/IPS-LMU/octra/commit/16806e1138c714b8bfd26305cabd2e1da4b16120))
+- **octra:** visible escape codes on shortcuts modal ([e7a63fb](https://github.com/IPS-LMU/octra/commit/e7a63fb542ee0841e21ffae1cdf9704a22525b1c))
 
 ### Features
 
-* **annotation:** more information about supported apps foreach annotation format ([1a6e192](https://github.com/IPS-LMU/octra/commit/1a6e192d30d31af4820bbbe02ebfe252c23e9bc7))
-* **octra:** import options can be set in projectconfig.json for each converter ([f1addb2](https://github.com/IPS-LMU/octra/commit/f1addb2e762a5f37ab02b371dde1103168074fe6))
-* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
-
-
+- **annotation:** more information about supported apps foreach annotation format ([1a6e192](https://github.com/IPS-LMU/octra/commit/1a6e192d30d31af4820bbbe02ebfe252c23e9bc7))
+- **octra:** import options can be set in projectconfig.json for each converter ([f1addb2](https://github.com/IPS-LMU/octra/commit/f1addb2e762a5f37ab02b371dde1103168074fe6))
+- **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
 
 ## [0.1.17](https://github.com/IPS-LMU/octra/compare/annotation-0.1.16...annotation-0.1.17) (2024-12-03)
 

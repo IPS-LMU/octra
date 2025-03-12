@@ -64,7 +64,7 @@ export class AnnotJSONConverter extends Converter {
       let result = new OAnnotJSON(
         audiofile.name,
         FileInfo.extractFileName(file.name).name,
-        audiofile.sampleRate
+        audiofile.sampleRate,
       );
       const content = file.content;
 

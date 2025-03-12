@@ -21,6 +21,6 @@ export const reducer = createReducer(
     (state: UserState, { applicationOptions }) => ({
       ...state,
       ...(applicationOptions.userProfile ?? {}),
-    })
-  )
+    }),
+  ),
 );

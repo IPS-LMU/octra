@@ -6,7 +6,7 @@ export interface ComponentCanDeactivate {
 
 export class DeALoginGuard {
   canDeactivate(
-    component: ComponentCanDeactivate
+    component: ComponentCanDeactivate,
   ): Observable<boolean> | boolean {
     return component.canDeactivate ? component.canDeactivate() : true;
   }

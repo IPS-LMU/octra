@@ -12,7 +12,7 @@ export function uniqueHTTPRequest(
   post = false,
   requestOptions: any,
   url: string,
-  body: any
+  body: any,
 ): Observable<any> {
   if (!post) {
     const options = !(
@@ -42,7 +42,7 @@ export function uniqueHTTPRequest(
 export function downloadFile<T>(
   http: HttpClient,
   url: string,
-  responseType: 'arraybuffer' | 'blob' | 'json' | 'text'
+  responseType: 'arraybuffer' | 'blob' | 'json' | 'text',
 ): Subject<{
   progress: number;
   result?: T;
@@ -79,7 +79,7 @@ export function downloadFile<T>(
 export function navigateTo(
   router: Router,
   commands: any[],
-  navigationExtras?: NavigationExtras
+  navigationExtras?: NavigationExtras,
 ): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     setTimeout(() => {

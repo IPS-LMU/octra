@@ -62,7 +62,7 @@ export class PraatTableConverter extends Converter {
     const addEntry = (
       res: string,
       level: OAnyLevel<OSegment>,
-      segment: OSegment
+      segment: OSegment,
     ) => {
       const tmin = segment.sampleStart / annotation.sampleRate;
       const tmax =
@@ -98,7 +98,7 @@ export class PraatTableConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -118,12 +118,13 @@ export class PraatTableConverter extends Converter {
     const result = new OAnnotJSON(
       audiofile.name,
       file.name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
 
     const content = file.content;
     const lines: string[] = content.split('\n');
-    const startWithLine = /tmin\ttier\ttext\ttmax/g.exec(lines[0]) !== null ? 1 : 0;
+    const startWithLine =
+      /tmin\ttier\ttext\ttmax/g.exec(lines[0]) !== null ? 1 : 0;
 
     // check if filename is equal with audio file
     const filename = FileInfo.extractFileName(file.name).name;
@@ -187,7 +188,7 @@ export class PraatTableConverter extends Converter {
                 if (
                   (last !== undefined &&
                     Math.round(
-                      (last.sampleStart + last.sampleDur) / sampleRate
+                      (last.sampleStart + last.sampleDur) / sampleRate,
                     ) < Math.round(Number(tmin))) ||
                   (!last && tmin > start)
                 ) {
@@ -199,10 +200,10 @@ export class PraatTableConverter extends Converter {
                         last.sampleStart + last.sampleDur,
                         Math.round(
                           tmin * sampleRate -
-                            (last.sampleStart + last.sampleDur)
+                            (last.sampleStart + last.sampleDur),
                         ),
-                        [new OLabel(tier, '')]
-                      )
+                        [new OLabel(tier, '')],
+                      ),
                     );
                   } else {
                     // add empty segment
@@ -212,10 +213,11 @@ export class PraatTableConverter extends Converter {
                         start * sampleRate,
                         Math.round(
                           tmin * sampleRate -
-                          (start * sampleRate) - (tmin * sampleRate)
+                            start * sampleRate -
+                            tmin * sampleRate,
                         ),
-                        [new OLabel(tier, '')]
-                      )
+                        [new OLabel(tier, '')],
+                      ),
                     );
                   }
 
@@ -229,7 +231,7 @@ export class PraatTableConverter extends Converter {
                   id,
                   Math.round(start * sampleRate),
                   Math.round(puffer * sampleRate),
-                  [new OLabel(tier, '')]
+                  [new OLabel(tier, '')],
                 );
                 start = start + puffer;
                 olevel.items.push(pufferItem);
@@ -242,7 +244,7 @@ export class PraatTableConverter extends Converter {
                 id,
                 Math.round(start * sampleRate),
                 Math.round((rightBoundary - start) * sampleRate),
-                olabels
+                olabels,
               );
 
               olevel.items.push(osegment);

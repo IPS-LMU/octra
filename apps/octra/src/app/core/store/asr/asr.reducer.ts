@@ -67,7 +67,7 @@ export const reducer = createReducer(
       languageSettings,
       asrLanguages,
       mausLanguages,
-    })
+    }),
   ),
   on(ASRActions.enableASR.do, (state: ASRState, { isEnabled }) => ({
     ...state,
@@ -86,7 +86,7 @@ export const reducer = createReducer(
     (state: ASRState, { applicationOptions }) => ({
       ...state,
       settings: applicationOptions.asr ?? undefined,
-    })
+    }),
   ),
   on(ASRActions.addToQueue.success, (state: ASRState, { item }) => ({
     ...state,
@@ -119,7 +119,7 @@ export const reducer = createReducer(
       const index = getItemIndexByTime(
         time.sampleStart,
         time.sampleLength,
-        state.queue
+        state.queue,
       );
 
       if (index > -1) {
@@ -337,7 +337,7 @@ export const reducer = createReducer(
       }
 
       return state;
-    }
+    },
   ),
   on(
     ASRActions.cutAndUploadQueueItem.fail,
@@ -371,14 +371,14 @@ export const reducer = createReducer(
       }
 
       return state;
-    }
-  )
+    },
+  ),
 );
 
 function getItemIndexByTime(
   sampleStart: number,
   sampleLength: number,
-  queue: ASRStateQueue
+  queue: ASRStateQueue,
 ): number {
   return queue.items.findIndex((a) => {
     return (

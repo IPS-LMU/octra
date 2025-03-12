@@ -1,38 +1,40 @@
 <div class="card container my-0 my-lg-3">
   <div class="card-body flex h-100">
     @if (authStoreService.otherUserLoggedIn$ | async) {
-    <div
-      class="alert alert-warning text-center"
-      [innerHTML]="
-        'projects-list.other user logged in'
-          | transloco
-            : {
-                username: (authStoreService.otherUserLoggedIn$ | async)
-                  ?.username
-              }
-      "
-    ></div>
-    } @else { @if (authStoreService.sameUserWithOpenTask$ | async) {
-    <div class="alert alert-warning text-center">
-      <span
+      <div
+        class="alert alert-warning text-center"
         [innerHTML]="
-          'projects-list.same user free task'
+          'projects-list.other user logged in'
             | transloco
               : {
-                  project: (authStoreService.sameUserWithOpenTask$ | async)
-                    ?.currentProject?.name,
-                  resumeTranscription:
-                    'projects-list.resume transcription' | transloco
+                  username: (authStoreService.otherUserLoggedIn$ | async)
+                    ?.username,
                 }
         "
-      ></span>
-      <p>
-        <a class="link" (click)="resumeTaskManually()">{{
-          'projects-list.resume transcription' | transloco
-        }}</a>
-      </p>
-    </div>
-    } }
+      ></div>
+    } @else {
+      @if (authStoreService.sameUserWithOpenTask$ | async) {
+        <div class="alert alert-warning text-center">
+          <span
+            [innerHTML]="
+              'projects-list.same user free task'
+                | transloco
+                  : {
+                      project: (authStoreService.sameUserWithOpenTask$ | async)
+                        ?.currentProject?.name,
+                      resumeTranscription:
+                        'projects-list.resume transcription' | transloco,
+                    }
+            "
+          ></span>
+          <p>
+            <a class="link" (click)="resumeTaskManually()">{{
+              'projects-list.resume transcription' | transloco
+            }}</a>
+          </p>
+        </div>
+      }
+    }
     <div class="d-block">
       <h1>{{ 'g.projects' | transloco }}</h1>
       <p class="text-center">
@@ -41,109 +43,112 @@
     </div>
     <div class="flex" style="height: 100px">
       @if (shownProjects) {
-      <div
-        class="text-end link"
-        style="font-size: 0.8rem"
-        (click)="openCreateProjectRequestModal()"
-      >
-        {{ 'projects-list.project creation wanted' | transloco }}
-      </div>
-      <div class="list-group flex" style="height: 100px">
-        <div class="list-group-item">
-          <div class="row g-0">
-            <div class="col"></div>
-            <div class="col-auto text-right">
-              <ngb-pagination
-                [size]="'sm'"
-                [page]="currentPage.page"
-                [collectionSize]="currentPage.collectionSize"
-                [pageSize]="itemsPerPage"
-                (pageChange)="showProjects($event)"
-              ></ngb-pagination>
-            </div>
-          </div>
-        </div>
-        <div class="table-wrapper">
-          @for (project of shownProjects; track project) {
-          <div class="list-group-item list-group-item-action">
-            <div
-              class="row g-1 align-items-center justify-items-center justify-content-center"
-            >
-              @if ((authStoreService.me$ | async)?.systemRole?.label ===
-              "administrator" || istProjectAdmin) {
-              <div class="col-auto project-name">
-                @if (project.active) {
-                <i class="bi bi-check-circle" style="color: green"></i>
-                } @if (!project.active) {
-                <i class="bi bi-dash-circle" style="color: red"></i>
-                }
-              </div>
-              }
-              <div
-                class="col align-items-center justify-items-center justify-content-center"
-              >
-                <span class="project-name"
-                  >{{ project.name }} ({{ project.shortname }})</span
-                >
-              </div>
-            </div>
-            <div class="row">
-              <div class="col text-muted project-description">
-                {{ project.public_description }}
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-2">
-                <span
-                  class="rounded-pill text-white property-pill me-1"
-                  style="background-color: purple"
-                >
-                  <i class="bi bi-list-ol"></i>
-                  {{ 'g.free tasks' | transloco }}:
-                  {{ getFreeAnnotationTasks(project) }}
-                </span>
-
-                @if (project.enddate) {
-                <span
-                  class="rounded-pill text-white property-pill me-1 bg-info"
-                >
-                  <i class="bi bi-calendar-day"></i>
-                  {{ 'p.available until' | transloco }}:
-                  {{
-                    project.enddate
-                      | luxonShortDateTime
-                        : {
-                            locale: (authStoreService.me$ | async).locale
-                          }
-                  }}
-                </span>
-                }
-              </div>
-              <div class="col-md-2">
-                <button
-                  class="btn btn-primary btn-sm w-100"
-                  size="sm"
-                  [disabled]="projectStarting"
-                  (click)="onProjectClick(project)"
-                >
-                  {{ 'g.start' | transloco }}
-                </button>
-              </div>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      } @else {
-      <div class="text-center mt-5">
         <div
-          class="spinner-border"
-          role="status"
-          style="width: 6rem; height: 6rem; color: lightgrey"
+          class="text-end link"
+          style="font-size: 0.8rem"
+          (click)="openCreateProjectRequestModal()"
         >
-          <span class="visually-hidden">Loading...</span>
+          {{ 'projects-list.project creation wanted' | transloco }}
         </div>
-      </div>
+        <div class="list-group flex" style="height: 100px">
+          <div class="list-group-item">
+            <div class="row g-0">
+              <div class="col"></div>
+              <div class="col-auto text-right">
+                <ngb-pagination
+                  [size]="'sm'"
+                  [page]="currentPage.page"
+                  [collectionSize]="currentPage.collectionSize"
+                  [pageSize]="itemsPerPage"
+                  (pageChange)="showProjects($event)"
+                ></ngb-pagination>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            @for (project of shownProjects; track project) {
+              <div class="list-group-item list-group-item-action">
+                <div
+                  class="row g-1 align-items-center justify-items-center justify-content-center"
+                >
+                  @if (
+                    (authStoreService.me$ | async)?.systemRole?.label ===
+                      'administrator' || istProjectAdmin
+                  ) {
+                    <div class="col-auto project-name">
+                      @if (project.active) {
+                        <i class="bi bi-check-circle" style="color: green"></i>
+                      }
+                      @if (!project.active) {
+                        <i class="bi bi-dash-circle" style="color: red"></i>
+                      }
+                    </div>
+                  }
+                  <div
+                    class="col align-items-center justify-items-center justify-content-center"
+                  >
+                    <span class="project-name"
+                      >{{ project.name }} ({{ project.shortname }})</span
+                    >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col text-muted project-description">
+                    {{ project.public_description }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-2">
+                    <span
+                      class="rounded-pill text-white property-pill me-1"
+                      style="background-color: purple"
+                    >
+                      <i class="bi bi-list-ol"></i>
+                      {{ 'g.free tasks' | transloco }}:
+                      {{ getFreeAnnotationTasks(project) }}
+                    </span>
+
+                    @if (project.enddate) {
+                      <span
+                        class="rounded-pill text-white property-pill me-1 bg-info"
+                      >
+                        <i class="bi bi-calendar-day"></i>
+                        {{ 'p.available until' | transloco }}:
+                        {{
+                          project.enddate
+                            | luxonShortDateTime
+                              : {
+                                  locale: (authStoreService.me$ | async).locale,
+                                }
+                        }}
+                      </span>
+                    }
+                  </div>
+                  <div class="col-md-2">
+                    <button
+                      class="btn btn-primary btn-sm w-100"
+                      size="sm"
+                      [disabled]="projectStarting"
+                      (click)="onProjectClick(project)"
+                    >
+                      {{ 'g.start' | transloco }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="text-center mt-5">
+          <div
+            class="spinner-border"
+            role="status"
+            style="width: 6rem; height: 6rem; color: lightgrey"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
       }
     </div>
   </div>

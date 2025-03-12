@@ -60,22 +60,22 @@ export class IDBEffects {
               this.store.dispatch(
                 IDBActions.loadImportOptions.do({
                   mode: LoginMode.LOCAL,
-                })
+                }),
               );
               this.store.dispatch(
                 IDBActions.loadImportOptions.do({
                   mode: LoginMode.ONLINE,
-                })
+                }),
               );
               this.store.dispatch(
                 IDBActions.loadImportOptions.do({
                   mode: LoginMode.DEMO,
-                })
+                }),
               );
               this.store.dispatch(
                 IDBActions.loadImportOptions.do({
                   mode: LoginMode.URL,
-                })
+                }),
               );
               return forkJoin<
                 [
@@ -83,7 +83,7 @@ export class IDBEffects {
                   IIDBModeOptions,
                   IIDBModeOptions,
                   IIDBModeOptions,
-                  IIDBModeOptions
+                  IIDBModeOptions,
                 ]
               >([
                 this.idbService.loadOptions([
@@ -108,7 +108,7 @@ export class IDBEffects {
                 this.idbService.loadModeOptions(LoginMode.URL),
               ]);
             }),
-            mergeAll()
+            mergeAll(),
           )
           .pipe(
             map(
@@ -126,7 +126,7 @@ export class IDBEffects {
                   demoOptions,
                   urlOptions,
                 });
-              }
+              },
             ),
             catchError((err: string) => {
               console.error(err);
@@ -134,12 +134,12 @@ export class IDBEffects {
               return of(
                 IDBActions.loadOptions.fail({
                   error: err,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   afterOptionsSuccess$ = createEffect(() =>
@@ -165,7 +165,7 @@ export class IDBEffects {
                     taskID: action.onlineOptions.transcriptID ?? undefined,
                     mode: LoginMode.ONLINE,
                     startup: true,
-                  })
+                  }),
                 );
               } else {
                 // other modes
@@ -177,7 +177,7 @@ export class IDBEffects {
                       ? undefined
                       : state.application.mode!,
                     startup: true,
-                  })
+                  }),
                 );
               }
             } else {
@@ -190,10 +190,10 @@ export class IDBEffects {
               local: localModeLogs,
               url: urlModeLogs,
             });
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   loadAnnotation$ = createEffect(() =>
@@ -246,18 +246,18 @@ export class IDBEffects {
                   OctraAnnotationSegment<ASRContext>
                 >(), // IGNORE
               });
-            }
+            },
           ),
           catchError((error) => {
             return of(
               IDBActions.loadAnnotation.fail({
                 error: error?.message ?? error,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveAfterUndo$ = createEffect(() =>
@@ -277,8 +277,8 @@ export class IDBEffects {
               modeState.transcript.serialize(
                 this.audio.audioManager.resource.info.fullname,
                 this.audio.audioManager.resource.info.sampleRate,
-                this.audio.audioManager.resource.info.duration
-              )
+                this.audio.audioManager.resource.info.duration,
+              ),
             )
             .pipe(
               map(() => ApplicationActions.undoSuccess()),
@@ -286,19 +286,19 @@ export class IDBEffects {
                 return of(
                   ApplicationActions.undoFailed({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           return of(
             ApplicationActions.undoFailed({
               error: "Can't find modeState",
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   saveAfterRedo = createEffect(() =>
@@ -316,8 +316,8 @@ export class IDBEffects {
               modeState.transcript.serialize(
                 this.audio.audioManager.resource.info.fullname,
                 this.audio.audioManager.resource.info.sampleRate,
-                this.audio.audioManager.resource.info.duration
-              )
+                this.audio.audioManager.resource.info.duration,
+              ),
             )
             .pipe(
               map(() => ApplicationActions.redoSuccess()),
@@ -325,19 +325,19 @@ export class IDBEffects {
                 return of(
                   ApplicationActions.redoFailed({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           return of(
             ApplicationActions.undoFailed({
               error: "Can't find modeState",
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   clearLogs$ = createEffect(() =>
@@ -345,7 +345,7 @@ export class IDBEffects {
       filter(
         (a) =>
           a.type === AnnotationActions.clearLogs.do.type ||
-          a.type === LoginModeActions.clearOnlineSession.do.type
+          a.type === LoginModeActions.clearOnlineSession.do.type,
       ),
       exhaustMap((action) =>
         this.idbService.clearLoggingData((action as any).mode).pipe(
@@ -354,12 +354,12 @@ export class IDBEffects {
             return of(
               IDBActions.clearLogs.fail({
                 error,
-              })
+              }),
             );
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   clearAllOptions$ = createEffect(() =>
@@ -378,14 +378,14 @@ export class IDBEffects {
             subject.next(
               IDBActions.clearAllOptions.fail({
                 error,
-              })
+              }),
             );
             subject.complete();
           });
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   clearAnnotation$ = createEffect(() =>
@@ -395,7 +395,7 @@ export class IDBEffects {
           action.type === AnnotationActions.clearAnnotation.do.type ||
           action.type === LoginModeActions.clearOnlineSession.do.type ||
           action.type === AuthenticationActions.logout.success.type ||
-          action.type === LoginModeActions.endTranscription.do.type
+          action.type === LoginModeActions.endTranscription.do.type,
       ),
       exhaustMap((action) => {
         if (
@@ -407,7 +407,7 @@ export class IDBEffects {
             logs: Observable<void>;
           }>({
             annotation: this.idbService.clearAnnotationData(
-              (action as any).mode
+              (action as any).mode,
             ),
             logs: this.idbService.clearLoggingData((action as any).mode),
           }).pipe(
@@ -418,15 +418,15 @@ export class IDBEffects {
               return of(
                 IDBActions.clearAnnotation.fail({
                   error,
-                })
+                }),
               );
-            })
+            }),
           );
         } else {
           return of(IDBActions.clearAnnotation.success());
         }
-      })
-    )
+      }),
+    ),
   );
 
   logoutSession$ = createEffect(() =>
@@ -442,8 +442,8 @@ export class IDBEffects {
         });
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   savemodeOptions$ = createEffect(() =>
@@ -462,13 +462,13 @@ export class IDBEffects {
         ApplicationActions.changeApplicationOption.do,
         LoginModeActions.endTranscription.do,
         AnnotationActions.setLevelIndex.do,
-        LoginModeActions.setImportConverter.do
+        LoginModeActions.setImportConverter.do,
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {
         const modeState = this.getModeStateFromString(
           appState,
-          (action as any).mode
+          (action as any).mode,
         );
 
         if (modeState) {
@@ -484,10 +484,10 @@ export class IDBEffects {
               currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
               logging: modeState.logging.enabled ?? null,
               project: modeState.currentSession?.loadFromServer
-                ? modeState.currentSession?.currentProject ?? null
+                ? (modeState.currentSession?.currentProject ?? null)
                 : undefined,
               transcriptID: modeState.currentSession?.loadFromServer
-                ? modeState.currentSession?.task?.id ?? null
+                ? (modeState.currentSession?.task?.id ?? null)
                 : undefined,
               feedback: modeState.currentSession?.assessment ?? null,
               comment: modeState.currentSession?.comment ?? null,
@@ -509,19 +509,19 @@ export class IDBEffects {
                 return of(
                   IDBActions.saveModeOptions.fail({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           return of(
             IDBActions.saveModeOptions.success({
               mode: (action as any).mode,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   changeApplicationOption$ = createEffect(() =>
@@ -535,12 +535,12 @@ export class IDBEffects {
             of(
               ApplicationActions.changeApplicationOption.fail({
                 error: error?.message ?? error.toString(),
-              })
-            )
-          )
+              }),
+            ),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveUserProfile$ = createEffect(() =>
@@ -555,12 +555,12 @@ export class IDBEffects {
               return of(
                 IDBActions.saveUserProfile.fail({
                   error: error.message,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   saveAppLanguage$ = createEffect(() =>
@@ -573,12 +573,12 @@ export class IDBEffects {
             return of(
               IDBActions.saveAppLanguage.fail({
                 error: error.message,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveDBVersion = createEffect(() =>
@@ -591,12 +591,12 @@ export class IDBEffects {
             return of(
               IDBActions.saveIDBVersion.fail({
                 error: error.message,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveEasyMode$ = createEffect(() =>
@@ -609,12 +609,12 @@ export class IDBEffects {
             return of(
               IDBActions.saveEasyMode.fail({
                 error: error.message,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveHighlightingEnabled$ = createEffect(() =>
@@ -629,12 +629,12 @@ export class IDBEffects {
               return of(
                 IDBActions.saveHighlightingEnabled.fail({
                   error: error.message,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   saveLogin$ = createEffect(
@@ -643,14 +643,14 @@ export class IDBEffects {
         ofType(
           AuthenticationActions.loginLocal.success,
           AuthenticationActions.loginDemo.success,
-          AuthenticationActions.loginOnline.success
+          AuthenticationActions.loginOnline.success,
         ),
         tap(async (action) => {
           this.sessStr.store('loggedIn', true);
           await this.idbService.saveOption('useMode', action.mode);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   saveLogout$ = createEffect(() =>
@@ -664,12 +664,12 @@ export class IDBEffects {
             return of(
               IDBActions.saveLogout.fail({
                 error: error.message,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveReloaded$ = createEffect(() =>
@@ -689,15 +689,15 @@ export class IDBEffects {
             subject.next(
               IDBActions.saveAppReloaded.fail({
                 error: error as any,
-              })
+              }),
             );
             subject.complete();
           }, 200);
         }
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   saveASRSettings$ = createEffect(() =>
@@ -711,12 +711,12 @@ export class IDBEffects {
             of(
               IDBActions.saveASRSettings.fail({
                 error: error.message,
-              })
-            )
-          )
-        )
-      )
-    )
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 
   saveAudioSettings$ = createEffect(() =>
@@ -734,12 +734,12 @@ export class IDBEffects {
               return of(
                 IDBActions.saveAudioSettings.fail({
                   error: error.message,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   saveCurrentEditor$ = createEffect(() =>
@@ -754,12 +754,12 @@ export class IDBEffects {
               return of(
                 IDBActions.saveCurrentEditor.fail({
                   error: error.message,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   saveLogs$ = createEffect(() =>
@@ -769,7 +769,7 @@ export class IDBEffects {
       exhaustMap(([action, appState]: [Action, RootState]) => {
         const modeState = this.getModeStateFromString(
           appState,
-          (action as any).mode
+          (action as any).mode,
         );
 
         if (modeState) {
@@ -781,19 +781,19 @@ export class IDBEffects {
                 return of(
                   IDBActions.saveLogs.fail({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           return of(
             IDBActions.saveLogs.fail({
               error: "Can't find modeState",
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   saveAnnotation = createEffect(() =>
@@ -812,7 +812,7 @@ export class IDBEffects {
         AnnotationActions.duplicateLevel.do,
         AuthenticationActions.loginLocal.prepare,
         AnnotationActions.addMultipleASRSegments.success,
-        AnnotationActions.initTranscriptionService.success
+        AnnotationActions.initTranscriptionService.success,
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {
@@ -826,8 +826,8 @@ export class IDBEffects {
               modeState.transcript.serialize(
                 modeState.audio.fileName,
                 this.audio.audioManager.resource.info.sampleRate,
-                this.audio.audioManager.resource.info.duration
-              )
+                this.audio.audioManager.resource.info.duration,
+              ),
             )
             .pipe(
               map(() => IDBActions.saveAnnotation.success()),
@@ -835,22 +835,22 @@ export class IDBEffects {
                 return of(
                   IDBActions.saveAnnotation.fail({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           subject.next(
             IDBActions.saveAnnotation.fail({
               error: "Can't find modeState",
-            })
+            }),
           );
           subject.complete();
         }
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   loadConsoleEntries$ = createEffect(() =>
@@ -866,13 +866,13 @@ export class IDBEffects {
               subject.next(
                 IDBActions.loadConsoleEntries.success({
                   consoleEntries: dbEntries,
-                })
+                }),
               );
             } else {
               subject.next(
                 IDBActions.loadConsoleEntries.success({
                   consoleEntries: [],
-                })
+                }),
               );
             }
           })
@@ -880,13 +880,13 @@ export class IDBEffects {
             subject.next(
               IDBActions.loadConsoleEntries.success({
                 consoleEntries: [],
-              })
+              }),
             );
           });
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   loadImportOptions$ = createEffect(() =>
@@ -898,11 +898,11 @@ export class IDBEffects {
             IDBActions.loadImportOptions.success({
               mode: action.mode,
               importOptions,
-            })
-          )
+            }),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 
   saveConsoleEntries$ = createEffect(
@@ -920,9 +920,9 @@ export class IDBEffects {
                 this.store.dispatch(IDBActions.saveConsoleEntries.success());
               });
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   saveModeBeforeURLRedirection$ = createEffect(
@@ -932,9 +932,9 @@ export class IDBEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           this.idbService.saveOption('useMode', LoginMode.ONLINE);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   saveImportOptions$ = createEffect(() =>
@@ -943,9 +943,9 @@ export class IDBEffects {
       exhaustMap((action) =>
         this.idbService
           .saveImportOptions(action.mode, action.importOptions)
-          .pipe(map(() => IDBActions.saveImportOptions.success()))
-      )
-    )
+          .pipe(map(() => IDBActions.saveImportOptions.success())),
+      ),
+    ),
   );
 
   clearAllData$ = createEffect(
@@ -958,9 +958,9 @@ export class IDBEffects {
           this.idbService.clearAllData().then(() => {
             this.store.dispatch(IDBActions.clearAllData.success());
           });
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   constructor(
@@ -969,7 +969,7 @@ export class IDBEffects {
     private sessStr: SessionStorageService,
     private routingService: RoutingService,
     private store: Store<RootState>,
-    private audio: AudioService
+    private audio: AudioService,
   ) {
     actions$.subscribe((action) => {
       if (action.type.toLocaleLowerCase().indexOf('failed') > -1) {

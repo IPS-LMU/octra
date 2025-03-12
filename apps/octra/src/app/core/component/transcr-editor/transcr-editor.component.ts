@@ -188,7 +188,7 @@ export class TranscrEditorComponent
     private langService: TranslocoService,
     private annotationStoreService: AnnotationStoreService,
     private renderer: Renderer2,
-    private asrStoreService: AsrStoreService
+    private asrStoreService: AsrStoreService,
   ) {
     super();
     this._settings = new TranscrEditorConfig();
@@ -456,12 +456,12 @@ export class TranscrEditorComponent
         this.joditOptions.extraButtons.push(this.createBoundaryButton() as any);
         if (this._settings.highlightingEnabled) {
           this.joditOptions.extraButtons.push(
-            this.createHighlightingButton() as any
+            this.createHighlightingButton() as any,
           );
         }
       }
       this.joditOptions.extraButtons!.push(
-        this.createFontSelectionButton() as any
+        this.createFontSelectionButton() as any,
       );
 
       this.cd.markForCheck();
@@ -484,7 +484,7 @@ export class TranscrEditorComponent
       this.popovers.validationError = validationError;
       this.toolbar?.parentNode?.insertBefore(
         this.popovers.validationError!,
-        this.toolbar
+        this.toolbar,
       );
 
       this.asr.status = 'inactive';
@@ -517,7 +517,7 @@ export class TranscrEditorComponent
       const joditContainer = this.joditComponent.jodit
         .container as HTMLDivElement;
       const wysiwyg = joditContainer!.querySelector(
-        '.jodit-wysiwyg'
+        '.jodit-wysiwyg',
       ) as HTMLElement;
       wysiwyg!.style!.fontFamily = fontFamily;
 
@@ -548,7 +548,7 @@ export class TranscrEditorComponent
       const item = queue.items.find(
         (a) =>
           a.time.sampleStart === (this.audiochunk as any).time.start.samples &&
-          a.time.sampleLength === this.audiochunk!.time.duration.samples
+          a.time.sampleLength === this.audiochunk!.time.duration.samples,
       );
 
       if (item) {
@@ -668,7 +668,7 @@ export class TranscrEditorComponent
 
         this.typing.emit(status);
       },
-      'typing_change'
+      'typing_change',
     );
   }
 
@@ -749,7 +749,7 @@ export class TranscrEditorComponent
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
         this.joditOptions.extraButtons.push(
-          this.createMarkerButton(marker) as any
+          this.createMarkerButton(marker) as any,
         );
       }
     }
@@ -765,7 +765,7 @@ export class TranscrEditorComponent
     events?: {
       onClick?: (event: MouseEvent, button: HTMLElement) => void;
     },
-    hotkeys?: string
+    hotkeys?: string,
   ): IControlType<IJodit, IToolbarButton> {
     return {
       name,
@@ -786,7 +786,7 @@ export class TranscrEditorComponent
 
           button.setAttribute(
             'class',
-            'me-2 align-items-center px-1 h-100 octra-marker-btn btn-description'
+            'me-2 align-items-center px-1 h-100 octra-marker-btn btn-description',
           );
           if (typeof content === 'string') {
             button.innerHTML = getContent();
@@ -867,7 +867,7 @@ export class TranscrEditorComponent
           this.insertMarker(marker.code, marker.icon!);
           this.markerClick.emit(marker.name);
         },
-      }
+      },
     );
   }
 
@@ -883,17 +883,17 @@ export class TranscrEditorComponent
 
     const dataSampleDivs = findElements(
       this.wysiwyg,
-      '.btn-icon-text[data-samples]'
+      '.btn-icon-text[data-samples]',
     );
     for (const dataSampleDiv of dataSampleDivs) {
       dataSampleDiv.removeEventListener('click', this.onDataSampleClick);
       dataSampleDiv.removeEventListener(
         'mouseover',
-        this.onSegmentBoundaryMouseOver
+        this.onSegmentBoundaryMouseOver,
       );
       dataSampleDiv.removeEventListener(
         'mouseleave',
-        this.onSegmentBoundaryMouseLeave
+        this.onSegmentBoundaryMouseLeave,
       );
     }
 
@@ -902,11 +902,11 @@ export class TranscrEditorComponent
     for (const valErrorDiv of valErrorDivs) {
       valErrorDiv.removeEventListener(
         'mouseenter',
-        this.onValidationErrorMouseOver
+        this.onValidationErrorMouseOver,
       );
       valErrorDiv.removeEventListener(
         'mouseleave',
-        this.onSegmentBoundaryMouseLeave
+        this.onSegmentBoundaryMouseLeave,
       );
     }
 
@@ -914,11 +914,11 @@ export class TranscrEditorComponent
     for (const valErrorChild of valErrorChildren) {
       valErrorChild.removeEventListener(
         'mouseenter',
-        this.onValidationErrorMouseOver
+        this.onValidationErrorMouseOver,
       );
       valErrorChild.removeEventListener(
         'mouseleave',
-        this.onValidationErrorMouseLeave
+        this.onValidationErrorMouseLeave,
       );
     }
 
@@ -926,14 +926,14 @@ export class TranscrEditorComponent
 
     const dataSamples = findElements(
       this.wysiwyg,
-      '.btn-icon-text[data-samples]'
+      '.btn-icon-text[data-samples]',
     );
     for (const dataSample of dataSamples) {
       dataSample.addEventListener('click', this.onDataSampleClick);
       dataSample.addEventListener('mouseover', this.onSegmentBoundaryMouseOver);
       dataSample.addEventListener(
         'mouseleave',
-        this.onSegmentBoundaryMouseLeave
+        this.onSegmentBoundaryMouseLeave,
       );
     }
 
@@ -947,11 +947,11 @@ export class TranscrEditorComponent
     for (const valErrorsChild of valErrorsChildren) {
       valErrorsChild.addEventListener(
         'mouseenter',
-        this.onValidationErrorMouseOver
+        this.onValidationErrorMouseOver,
       );
       valErrorsChild.addEventListener(
         'mouseleave',
-        this.onValidationErrorMouseLeave
+        this.onValidationErrorMouseLeave,
       );
     }
   }
@@ -990,8 +990,8 @@ export class TranscrEditorComponent
       const currentFont = this.font
         ? this.font
         : BrowserInfo.platform === 'mac'
-        ? 'Helvetica'
-        : 'Arial';
+          ? 'Helvetica'
+          : 'Arial';
 
       const createOption = (fontName: string) => {
         const option = document.createElement('option');
@@ -1028,11 +1028,11 @@ export class TranscrEditorComponent
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute(
       'data-samples',
-      this.audiochunk!.absolutePlayposition.samples.toString()
+      this.audiochunk!.absolutePlayposition.samples.toString(),
     );
     element.setAttribute(
       'alt',
-      '[|' + this.audiochunk!.absolutePlayposition.samples.toString() + '|]'
+      '[|' + this.audiochunk!.absolutePlayposition.samples.toString() + '|]',
     );
 
     // timeout needed to fix summernote
@@ -1045,7 +1045,7 @@ export class TranscrEditorComponent
         element.addEventListener('mouseover', this.onSegmentBoundaryOver);
         element.addEventListener(
           'mouseleave',
-          this.onSegmentBoundaryMouseLeave
+          this.onSegmentBoundaryMouseLeave,
         );
       });
     });
@@ -1084,7 +1084,7 @@ export class TranscrEditorComponent
 
         const regex = new RegExp(
           '(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*',
-          'g'
+          'g',
         );
 
         rawtext = rawtext.replace(regex, replaceFunc);
@@ -1142,7 +1142,7 @@ export class TranscrEditorComponent
                 ? insertString(
                     this._rawText,
                     this._textSelection.end,
-                    endMarker
+                    endMarker,
                   )
                 : this._rawText;
             code = insertString(code, this._textSelection.start, startMarker);
@@ -1156,17 +1156,17 @@ export class TranscrEditorComponent
           if (!focusAtEnd) {
             code = code.replace(
               /([\s ]+)(<sel-start \/?><sel-end \/?><\/p>)?$/g,
-              '&nbsp;$2'
+              '&nbsp;$2',
             );
             code = code.replace(
               /<sel-start ?\/?>/g,
-              this.lastCursorPosition!.startMarker
+              this.lastCursorPosition!.startMarker,
             );
             code = code.replace(
               /<sel-end ?\/?>/g,
               this.lastCursorPosition!.endMarker
                 ? this.lastCursorPosition!.endMarker
-                : ''
+                : '',
             );
           }
 
@@ -1238,7 +1238,7 @@ export class TranscrEditorComponent
             () => {
               highlight();
             },
-            'highlight'
+            'highlight',
           );
         } else {
           this.removeHighlight();
@@ -1263,7 +1263,7 @@ export class TranscrEditorComponent
 
     const segIndexPlayposition =
       this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-        playPosition
+        playPosition,
       ) ?? -1;
 
     if (
@@ -1388,7 +1388,7 @@ export class TranscrEditorComponent
   private createBoundaryButton(): IControlType<IJodit, IToolbarButton> {
     const boundaryDescr = this.langService.translate(
       'special_markers.boundary.description',
-      { type: '' }
+      { type: '' },
     );
 
     return this.createButton(
@@ -1399,7 +1399,7 @@ export class TranscrEditorComponent
         // create boudary button
         const boundaryLabel = this.langService.translate(
           'special_markers.boundary.insert',
-          { type: '' }
+          { type: '' },
         );
         if (!this.easymode) {
           content =
@@ -1416,7 +1416,7 @@ export class TranscrEditorComponent
         onClick: () => {
           this.markerClick.emit('boundary');
           this.insertBoundary(
-            'assets/img/components/transcr-editor/boundary.png'
+            'assets/img/components/transcr-editor/boundary.png',
           );
           this.subscribe(timer(100), {
             next: () => {
@@ -1425,7 +1425,7 @@ export class TranscrEditorComponent
             },
           });
         },
-      }
+      },
     );
   }
 
@@ -1445,7 +1445,7 @@ export class TranscrEditorComponent
             await this.initPopover();
           },
         },
-        'initialization'
+        'initialization',
       );
 
       this.asr = {
@@ -1527,7 +1527,7 @@ export class TranscrEditorComponent
     }
     const target = event.target as HTMLElement;
     const segPopover = this.transcrEditor.nativeElement.querySelector(
-      '.seg-popover'
+      '.seg-popover',
     ) as HTMLDivElement;
 
     if (segPopover && this.workplace && this.wysiwyg) {
@@ -1568,7 +1568,7 @@ export class TranscrEditorComponent
 
     if (isNumber(samples)) {
       this.boundaryclicked.emit(
-        new SampleUnit(Number(samples), this.audioManager.sampleRate)
+        new SampleUnit(Number(samples), this.audioManager.sampleRate),
       );
     }
   };
@@ -1593,9 +1593,8 @@ export class TranscrEditorComponent
     const errorCode = getAttr(target, 'data-errorcode');
 
     if (errorCode !== undefined) {
-      const errorDetails = await this.annotationStoreService.getErrorDetails(
-        errorCode
-      );
+      const errorDetails =
+        await this.annotationStoreService.getErrorDetails(errorCode);
       if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
@@ -1619,7 +1618,7 @@ export class TranscrEditorComponent
 
         this.changeValidationPopoverLocation(
           marginLeft,
-          target.offsetTop - height + this.toolbar.offsetHeight
+          target.offsetTop - height + this.toolbar.offsetHeight,
         );
         this.cd.markForCheck();
         this.cd.detectChanges();
@@ -1643,7 +1642,7 @@ export class TranscrEditorComponent
         pointer.remove();
         (highlight.parentNode as HTMLElement)?.insertBefore(
           pointer.cloneNode(true),
-          highlight
+          highlight,
         );
         pointer = nextSibling;
       }
@@ -1749,12 +1748,12 @@ export class TranscrEditorComponent
 
             this.workplace?.parentNode?.insertBefore(
               this.popovers.segmentBoundary!,
-              this.workplace
+              this.workplace,
             );
           }
         } else {
           console.error(
-            "Can't set segment boundary because workplace or parentNode is undefined"
+            "Can't set segment boundary because workplace or parentNode is undefined",
           );
         }
 
@@ -1771,7 +1770,7 @@ export class TranscrEditorComponent
             console.error(error);
           });
       },
-      'initialization'
+      'initialization',
     );
   };
 
@@ -1782,7 +1781,7 @@ export class TranscrEditorComponent
       this.joditComponent?.jodit?.selection.focus();
       element.innerHTML = element.innerHTML.replace(
         /(<p>).*(<span[^>]+>[^<]+<\/span>)/g,
-        '$1$2'
+        '$1$2',
       );
       element.innerHTML = element.innerHTML.replace(/(<br\/?>)/g, '');
     }
@@ -1797,7 +1796,7 @@ export class TranscrEditorComponent
 
   private onRedoUndo = (
     keyboardEvent: KeyboardEvent,
-    shortcutInfo: Shortcut
+    shortcutInfo: Shortcut,
   ) => {
     if (shortcutInfo.name === 'undo') {
       this.joditComponent?.jodit?.history?.undo();
@@ -1810,7 +1809,7 @@ export class TranscrEditorComponent
   private onMarkerInsert = (
     $event: KeyboardEvent,
     shortcutInfo: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     if (this.markers) {
       for (const marker of this.markers) {

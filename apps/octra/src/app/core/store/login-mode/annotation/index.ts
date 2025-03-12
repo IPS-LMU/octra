@@ -23,16 +23,16 @@ export interface GuidelinesItem {
 }
 
 export class AnnotationStateSegment<
-  T extends ASRContext
+  T extends ASRContext,
 > extends OctraAnnotationSegment<T> {
   static override deserialize<T extends ASRContext>(
-    jsonObject: SegmentWithContext<T>
+    jsonObject: SegmentWithContext<T>,
   ): AnnotationStateSegment<T> {
     return new AnnotationStateSegment(
       jsonObject.id,
       jsonObject.time,
       jsonObject.labels,
-      jsonObject.context!
+      jsonObject.context!,
     );
   }
 
@@ -41,7 +41,7 @@ export class AnnotationStateSegment<
       this.id,
       sampleStart,
       this.time.samples - sampleStart,
-      this.labels
+      this.labels,
     );
   }
 }
@@ -108,22 +108,22 @@ export const selectAnnotation = (state: RootState) => {
 };
 export const selectAudioLoaded = pipe(
   selectAnnotation,
-  (state) => state?.audio.loaded
+  (state) => state?.audio.loaded,
 );
 export const selectProjectConfig = pipe(
   selectAnnotation,
-  (state) => state?.projectConfig
+  (state) => state?.projectConfig,
 );
 export const selectGuideLines = pipe(
   selectAnnotation,
-  (state) => state?.guidelines
+  (state) => state?.guidelines,
 );
 export const selectMethods = pipe(selectAnnotation, (state) => state?.methods);
 export const selectAnnotationLevels = pipe(
   selectAnnotation,
-  (state) => state?.transcript.levels
+  (state) => state?.transcript.levels,
 );
 export const selectAnnotationLinks = pipe(
   selectAnnotation,
-  (state) => state?.transcript.links
+  (state) => state?.transcript.links,
 );

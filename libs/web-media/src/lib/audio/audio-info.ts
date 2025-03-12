@@ -35,7 +35,7 @@ export class AudioInfo extends FileInfo {
   }
 
   set audioBufferInfo(
-    value: { samples: number; sampleRate: number } | undefined
+    value: { samples: number; sampleRate: number } | undefined,
   ) {
     this._audioBufferInfo = value;
   }
@@ -56,7 +56,7 @@ export class AudioInfo extends FileInfo {
     audioBufferInfo?: {
       samples: number;
       sampleRate: number;
-    }
+    },
   ) {
     super(filename, normalizeMimeType(type), size);
     this._sampleRate = sampleRate;

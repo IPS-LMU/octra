@@ -79,7 +79,7 @@ export class AnnotationStoreService {
           for (let i = 0; i < level.items.length; i++) {
             const item = level.items[i];
             const labelIndex = item.labels.findIndex(
-              (a) => a.name !== 'Speaker'
+              (a) => a.name !== 'Speaker',
             );
 
             if (labelIndex > -1 && item.labels[labelIndex].value !== '') {
@@ -98,7 +98,7 @@ export class AnnotationStoreService {
           }
         }
         return result;
-      })
+      }),
     );
   }
 
@@ -137,7 +137,7 @@ export class AnnotationStoreService {
   }
 
   task$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession?.task
+    (state: RootState) => getModeState(state)?.currentSession?.task,
   );
 
   textInput$ = this.store.select((state: RootState) => {
@@ -151,7 +151,7 @@ export class AnnotationStoreService {
 
     const mode = getModeState(state);
     const result = getTranscriptFromIO(
-      mode?.currentSession?.task?.inputs ?? []
+      mode?.currentSession?.task?.inputs ?? [],
     ) as TaskInputOutputDto;
     return result;
   });
@@ -185,10 +185,10 @@ export class AnnotationStoreService {
   }
 
   transcript$ = this.store.select(
-    (state: RootState) => getModeState(state)?.transcript
+    (state: RootState) => getModeState(state)?.transcript,
   );
   status$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession?.status
+    (state: RootState) => getModeState(state)?.currentSession?.status,
   );
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   private _task?: TaskDto;
@@ -199,23 +199,23 @@ export class AnnotationStoreService {
         const annotation = transcript.serialize(
           this.audio.audioManager.resource.name,
           this.audio.audioManager.resource.info.sampleRate,
-          this.audio.audioManager.resource.info.duration.clone()
+          this.audio.audioManager.resource.info.duration.clone(),
         );
 
         const result = new TextConverter().export(
           annotation,
           this.audio.audioManager.resource.getOAudioFile(),
-          transcript.selectedLevelIndex!
+          transcript.selectedLevelIndex!,
         )!.file!;
 
         return result.content;
       }
       return '';
-    })
+    }),
   );
 
   guidelines$ = this.store.select(
-    (state: RootState) => getModeState(state)?.guidelines
+    (state: RootState) => getModeState(state)?.guidelines,
   );
   private _guidelines?: OctraGuidelines;
 
@@ -224,18 +224,18 @@ export class AnnotationStoreService {
   }
 
   feedback$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession.assessment
+    (state: RootState) => getModeState(state)?.currentSession.assessment,
   );
   private _feedback: any; // TODO check feedback
 
   breakMarker$ = this.store.select((state: RootState) =>
     getModeState(state)?.guidelines?.selected?.json?.markers?.find(
-      (a) => a.type === 'break'
-    )
+      (a) => a.type === 'break',
+    ),
   );
 
   importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(
-    undefined
+    undefined,
   );
   importConverter$ = new BehaviorSubject<string>(undefined);
 
@@ -252,56 +252,56 @@ export class AnnotationStoreService {
     private audio: AudioService,
     private appStoreService: ApplicationStoreService,
     private appStorage: AppStorageService,
-    private multiThreading: MultiThreadingService
+    private multiThreading: MultiThreadingService,
   ) {
     this.subscrManager.add(
       this.transcript$.subscribe({
         next: (transcript) => {
           this._transcript = transcript;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.task$.subscribe({
         next: (task) => {
           this._task = task;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.guidelines$.subscribe({
         next: (guidelines) => {
           this._guidelines = guidelines?.selected?.json;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.currentLevel$.subscribe({
         next: (currentLevel) => {
           this._currentLevel = currentLevel;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.currentLevelIndex$.subscribe({
         next: (currentLevel) => {
           this._currentLevelIndex = currentLevel;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.feedback$.subscribe({
         next: (value) => {
           this._feedback = value;
         },
-      })
+      }),
     );
     this.subscrManager.add(
       this.statistics$.subscribe({
         next: (value) => {
           this._statistics = value;
         },
-      })
+      }),
     );
 
     this.store
@@ -323,7 +323,7 @@ export class AnnotationStoreService {
         clearSession,
         freeTask,
         redirectToProjects,
-      })
+      }),
     );
   }
 
@@ -331,7 +331,7 @@ export class AnnotationStoreService {
     this.store.dispatch(
       AnnotationActions.sendOnlineAnnotation.do({
         mode: this.appStorage.snapshot.application.mode!,
-      })
+      }),
     );
   }
 
@@ -340,7 +340,7 @@ export class AnnotationStoreService {
       LoginModeActions.changeComment.do({
         mode: this.appStoreService.useMode!,
         comment,
-      })
+      }),
     );
   }
 
@@ -350,7 +350,7 @@ export class AnnotationStoreService {
         mode: this.appStorage.snapshot.application.mode!,
         index,
         name,
-      })
+      }),
     );
   }
 
@@ -364,7 +364,7 @@ export class AnnotationStoreService {
         levelType,
         audioDuration: this.audio.audiomanagers[0].resource.info.duration,
         mode: this.appStorage.useMode,
-      })
+      }),
     );
   }
 
@@ -373,7 +373,7 @@ export class AnnotationStoreService {
       AnnotationActions.duplicateLevel.do({
         index,
         mode: this.appStorage.useMode,
-      })
+      }),
     );
   }
 
@@ -382,7 +382,7 @@ export class AnnotationStoreService {
       AnnotationActions.removeAnnotationLevel.do({
         id,
         mode: this.appStorage.useMode,
-      })
+      }),
     );
   }
 
@@ -481,7 +481,7 @@ export class AnnotationStoreService {
       this.audio.audioManager.resource.name,
       this.audio.audioManager.resource.info.sampleRate,
       this.audio.audioManager.resource.info.duration.samples,
-      []
+      [],
     );
 
     if (uiElements) {
@@ -494,7 +494,7 @@ export class AnnotationStoreService {
           elem.playpos,
           elem.textSelection,
           elem.audioSelection,
-          elem.transcriptionUnit
+          elem.transcriptionUnit,
         );
 
         if (elem instanceof MouseStatisticElem) {
@@ -560,7 +560,7 @@ export class AnnotationStoreService {
                   }
 
                   return `${g1}${g2}${g3}`;
-                }
+                },
               );
 
               // replace
@@ -597,7 +597,7 @@ export class AnnotationStoreService {
                 // replace markers
                 const regex = new RegExp(
                   '( )*(' + escapeRegex(marker.code) + ')( )*',
-                  'g'
+                  'g',
                 );
                 result = result.replace(regex, (x, g1, g2, g3) => {
                   const s1 = g1 ? g1 : '';
@@ -652,7 +652,7 @@ export class AnnotationStoreService {
         });
       },
       rawtext,
-      this.guidelines
+      this.guidelines,
     );
 
     return this.multiThreading.run(job);
@@ -767,7 +767,7 @@ export class AnnotationStoreService {
                 /{{([^{}]+)}}/g,
                 (g0: string, g1: string) => {
                   return ''; // (await this.rawToHTML(g1)).replace(/(<p>)|(<\/p>)/g, '');
-                }
+                },
               );
               return newEntry;
             }
@@ -785,7 +785,7 @@ export class AnnotationStoreService {
   public validateAll() {
     this._validationArray = [];
     const projectSettings = getModeState(
-      this.appStorage.snapshot
+      this.appStorage.snapshot,
     )?.projectConfig;
 
     if (
@@ -800,7 +800,7 @@ export class AnnotationStoreService {
 
           let segmentValidation = [];
           const labelIndex = segment.labels.findIndex(
-            (a) => a.name !== 'Speaker'
+            (a) => a.name !== 'Speaker',
           );
           if (labelIndex > -1 && segment.labels[labelIndex].value.length > 0) {
             segmentValidation = this.validate(segment.labels[labelIndex].value);
@@ -825,7 +825,7 @@ export class AnnotationStoreService {
 
   public getMarkerPositions(
     rawText: string,
-    guidelines: any
+    guidelines: any,
   ): { start: number; end: number }[] {
     const result = [];
     let regexStr = '';
@@ -856,7 +856,7 @@ export class AnnotationStoreService {
       AnnotationActions.setLevelIndex.do({
         currentLevelIndex,
         mode: this.appStoreService.useMode!,
-      })
+      }),
     );
   }
 
@@ -864,7 +864,7 @@ export class AnnotationStoreService {
     this.store.dispatch(
       AnnotationActions.changeFeedback.do({
         feedback,
-      })
+      }),
     );
   }
 
@@ -897,27 +897,27 @@ export class AnnotationStoreService {
   }
 
   overwriteTranscript(
-    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ) {
     this.store.dispatch(
       AnnotationActions.overwriteTranscript.do({
         transcript,
         mode: this.appStoreService.useMode!,
         saveToDB: true,
-      })
+      }),
     );
   }
 
   changeCurrentItemById(
     id: number,
-    item: OItem | OEvent | OctraAnnotationSegment
+    item: OItem | OEvent | OctraAnnotationSegment,
   ) {
     this.store.dispatch(
       AnnotationActions.changeCurrentItemById.do({
         id,
         item,
         mode: this.appStoreService.useMode!,
-      })
+      }),
     );
   }
 
@@ -926,14 +926,14 @@ export class AnnotationStoreService {
       AnnotationActions.changeCurrentLevelItems.do({
         items,
         mode: this.appStoreService.useMode!,
-      })
+      }),
     );
   }
 
   removeCurrentLevelItems(
     items: { index?: number; id?: number }[],
     silenceCode?: string,
-    mergeTranscripts?: boolean
+    mergeTranscripts?: boolean,
   ) {
     this.store.dispatch(
       AnnotationActions.removeCurrentLevelItems.do({
@@ -943,7 +943,7 @@ export class AnnotationStoreService {
           silenceCode,
           mergeTranscripts,
         },
-      })
+      }),
     );
   }
 
@@ -952,7 +952,7 @@ export class AnnotationStoreService {
       AnnotationActions.addCurrentLevelItems.do({
         items,
         mode: this.appStoreService.useMode!,
-      })
+      }),
     );
   }
 
@@ -961,7 +961,7 @@ export class AnnotationStoreService {
       AnnotationActions.combinePhrases.do({
         options,
         mode: this.appStorage.useMode!,
-      })
+      }),
     );
   }
 
@@ -1002,7 +1002,7 @@ export class AnnotationStoreService {
 
   setImportConverter(mode: LoginMode, importConverter: string) {
     this.store.dispatch(
-      LoginModeActions.setImportConverter.do({ mode, importConverter })
+      LoginModeActions.setImportConverter.do({ mode, importConverter }),
     );
   }
 }

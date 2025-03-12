@@ -11,10 +11,10 @@ export {};
 declare global {
   export const validateAnnotation: (
     transcript: string,
-    guidelines: OctraGuidelines
+    guidelines: OctraGuidelines,
   ) => OctraValidationItem[];
   export const tidyUpAnnotation: (
     transcript: string,
-    guidelines: OctraGuidelines
+    guidelines: OctraGuidelines,
   ) => string;
 }

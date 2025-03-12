@@ -18,7 +18,7 @@ export class ControlType {
         break;
       default:
         console.error(
-          "type '${type}' not valid control type for the feedback form"
+          "type '${type}' not valid control type for the feedback form",
         );
         break;
     }

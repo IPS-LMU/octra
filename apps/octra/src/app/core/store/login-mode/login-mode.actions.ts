@@ -16,7 +16,7 @@ export class LoginModeActions extends AnnotationActions {
     props<{
       feedback: any;
       mode: LoginMode;
-    }>()
+    }>(),
   );
 
   static changeComment = createActionGroup({

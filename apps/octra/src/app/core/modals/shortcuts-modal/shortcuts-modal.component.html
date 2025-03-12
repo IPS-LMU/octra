@@ -13,62 +13,65 @@
   <div class="modal-body">
     <h4>{{ 'modal.shortcuts.editor specific shortcuts' | transloco }}</h4>
     @for (shortcutGroup of shortcutService.groups; track shortcutGroup) {
-    <div class="shortcut-group">
-      <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
-      <table class="table table-striped table-bordered">
-        <tbody>
-          @for (entry of shortcutGroup!.items; track entry) {
-          <tr>
-            @if (entry.label === undefined) {
-            <td>
-              {{ 'modal.shortcuts.' + entry.title | transloco }}
-            </td>
-            } @if (entry.label !== undefined) {
-            <td [innerHTML]="entry.label"></td>
-            }
-            <td>
-              <octra-shortcut
-                [shortcut]="getShortcut(entry, platform)"
-              ></octra-shortcut>
-              @if (entry.focusonly) {
-              <span class="focus-info"
-                >({{ 'g.on focus only' | transloco }} )</span
-              >
-              }
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-    <div>
-      <hr />
-      <h4>{{ 'modal.shortcuts.general shortcuts' | transloco }}</h4>
-      @for (shortcutGroup of shortcutService.generalShortcuts; track
-      shortcutGroup) {
       <div class="shortcut-group">
         <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
         <table class="table table-striped table-bordered">
           <tbody>
             @for (entry of shortcutGroup!.items; track entry) {
-            <tr>
-              <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
-              <td>
-                <octra-shortcut
-                  [shortcut]="getShortcut(entry, platform)"
-                ></octra-shortcut>
-                @if (entry.focusonly) {
-                <span class="focus-info"
-                  >({{ 'g.on focus only' | transloco }} )</span
-                >
+              <tr>
+                @if (entry.label === undefined) {
+                  <td>
+                    {{ 'modal.shortcuts.' + entry.title | transloco }}
+                  </td>
                 }
-              </td>
-            </tr>
+                @if (entry.label !== undefined) {
+                  <td [innerHTML]="entry.label"></td>
+                }
+                <td>
+                  <octra-shortcut
+                    [shortcut]="getShortcut(entry, platform)"
+                  ></octra-shortcut>
+                  @if (entry.focusonly) {
+                    <span class="focus-info"
+                      >({{ 'g.on focus only' | transloco }} )</span
+                    >
+                  }
+                </td>
+              </tr>
             }
           </tbody>
         </table>
       </div>
+    }
+    <div>
+      <hr />
+      <h4>{{ 'modal.shortcuts.general shortcuts' | transloco }}</h4>
+      @for (
+        shortcutGroup of shortcutService.generalShortcuts;
+        track shortcutGroup
+      ) {
+        <div class="shortcut-group">
+          <h5>{{ 'modal.shortcuts.' + shortcutGroup!.name | transloco }}</h5>
+          <table class="table table-striped table-bordered">
+            <tbody>
+              @for (entry of shortcutGroup!.items; track entry) {
+                <tr>
+                  <td>{{ 'modal.shortcuts.' + entry.title | transloco }}</td>
+                  <td>
+                    <octra-shortcut
+                      [shortcut]="getShortcut(entry, platform)"
+                    ></octra-shortcut>
+                    @if (entry.focusonly) {
+                      <span class="focus-info"
+                        >({{ 'g.on focus only' | transloco }} )</span
+                      >
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   </div>

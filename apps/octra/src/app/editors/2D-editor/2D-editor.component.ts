@@ -102,7 +102,7 @@ export class TwoDEditorComponent
   onAudioPlayPause = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -125,7 +125,7 @@ export class TwoDEditorComponent
   onAudioStop = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -142,7 +142,7 @@ export class TwoDEditorComponent
   onStepBackward = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -159,7 +159,7 @@ export class TwoDEditorComponent
   onStepBackwardTime = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -176,7 +176,7 @@ export class TwoDEditorComponent
   onZoomInOut = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     if (this.shortcutsEnabled) {
       if (this.appStorage.showMagnifier) {
@@ -195,7 +195,7 @@ export class TwoDEditorComponent
             this.audioManager,
             this.audioChunkMagnifier,
             this.viewer.av.mouseCursor!,
-            this.factor
+            this.factor,
           ).then((newMagnifierChunk) => {
             if (newMagnifierChunk !== undefined) {
               this.audioChunkMagnifier = newMagnifierChunk;
@@ -346,7 +346,7 @@ export class TwoDEditorComponent
     private asrStoreService: AsrStoreService,
     private modalService: OctraModalService,
     private shortcutService: ShortcutService,
-    private navbarService: NavbarService
+    private navbarService: NavbarService,
   ) {
     super();
     this.initialized = new EventEmitter<void>();
@@ -407,15 +407,15 @@ export class TwoDEditorComponent
         if (!this.viewer.settings.asr.enabled) {
           this.shortcutService.unregisterItemFromGroup(
             '2D-Editor viewer',
-            'do_maus'
+            'do_maus',
           );
           this.shortcutService.unregisterItemFromGroup(
             '2D-Editor viewer',
-            'do_asr'
+            'do_asr',
           );
           this.shortcutService.unregisterItemFromGroup(
             '2D-Editor viewer',
-            'do_asr_maus'
+            'do_asr_maus',
           );
         }
       },
@@ -439,7 +439,7 @@ export class TwoDEditorComponent
 
             this.scrolltimer = interval(1000).subscribe(() => {
               const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
-                this.audioChunkLines.relativePlayposition!
+                this.audioChunkLines.relativePlayposition!,
               );
 
               const lines = Math.floor(absx / this.viewer.av.innerWidth!);
@@ -456,7 +456,7 @@ export class TwoDEditorComponent
             this.scrolltimer.unsubscribe();
           }
         }
-      }
+      },
     );
 
     this.subscribe(this.appStorage.settingschange, (event) => {
@@ -490,8 +490,8 @@ export class TwoDEditorComponent
         const segmentIndex =
           this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
             this.audio.audioManager.createSampleUnit(
-              item.time.sampleStart + item.time.sampleLength
-            )
+              item.time.sampleStart + item.time.sampleLength,
+            ),
           ) ?? -1;
 
         if (segmentIndex > -1) {
@@ -509,7 +509,7 @@ export class TwoDEditorComponent
                 start: item.time.sampleStart,
                 length: item.time.sampleLength,
               },
-              'automation'
+              'automation',
             );
           } else if (item.status === ASRProcessStatus.STARTED) {
             // item started
@@ -526,7 +526,7 @@ export class TwoDEditorComponent
                 start: item.time.sampleStart,
                 length: item.time.sampleLength,
               },
-              'automation'
+              'automation',
             );
           }
         }
@@ -537,7 +537,7 @@ export class TwoDEditorComponent
       this.annotationStoreService.segmentrequested,
       (segnumber: number) => {
         this.openSegment(segnumber);
-      }
+      },
     );
 
     this.subscribe(this.annotationStoreService.importOptions$, {
@@ -601,7 +601,7 @@ export class TwoDEditorComponent
           this.selectedIndex = selected.index;
           this.audioChunkWindow = new AudioChunk(
             new AudioSelection(start, segment.time.clone()),
-            this.audioManager
+            this.audioManager,
           );
           this.shortcutsEnabled = false;
 
@@ -614,7 +614,7 @@ export class TwoDEditorComponent
               audiochunk: this.audioChunkWindow,
               easyMode: this.appStorage.easyMode,
               segmentIndex: this.selectedIndex,
-            }
+            },
           );
           this.subscriptionManager.removeByTag('windowActions');
           this.subscribe(
@@ -622,7 +622,7 @@ export class TwoDEditorComponent
             {
               next: this.onWindowAction,
             },
-            'windowActions'
+            'windowActions',
           );
 
           this.uiService.addElementFromEvent(
@@ -640,7 +640,7 @@ export class TwoDEditorComponent
                 (currentLevel.items[selected.index] as OctraAnnotationSegment)
                   .time.samples - start.samples,
             },
-            TwoDEditorComponent.editorname
+            TwoDEditorComponent.editorname,
           );
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -649,7 +649,7 @@ export class TwoDEditorComponent
           this.alertService
             .showAlert(
               'danger',
-              "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first."
+              "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first.",
             )
             .catch((error) => {
               console.error(error);
@@ -690,7 +690,7 @@ export class TwoDEditorComponent
       this.audioManager,
       this.appStorage.playOnHover ?? false,
       this.audioChunkLines,
-      this.viewer.av.mouseCursor!
+      this.viewer.av.mouseCursor!,
     );
 
     if (this.appStorage.showMagnifier) {
@@ -705,7 +705,7 @@ export class TwoDEditorComponent
             this.changeMagnifierPosition($event.event!, $event.time!);
             this.mousestate = 'ended';
           },
-          'mouseTimer'
+          'mouseTimer',
         );
       } else {
         this.magnifierHidden = false;
@@ -717,7 +717,7 @@ export class TwoDEditorComponent
 
   public changeMagnifierPosition(
     mouseEvent: MouseEvent,
-    cursorTime: SampleUnit
+    cursorTime: SampleUnit,
   ) {
     const offsetX =
       mouseEvent.clientX -
@@ -747,7 +747,7 @@ export class TwoDEditorComponent
       this.audioManager,
       this.audioChunkMagnifier,
       cursorTime,
-      this.factor
+      this.factor,
     ).then((newMagnifierChunk) => {
       if (newMagnifierChunk !== undefined) {
         this.audioChunkMagnifier = newMagnifierChunk;
@@ -764,7 +764,7 @@ export class TwoDEditorComponent
       if (this.appStorage.undoRedoDisabled) {
         this.alertService.showAlert(
           'danger',
-          this.langService.translate('alerts.undo deactivated')
+          this.langService.translate('alerts.undo deactivated'),
         );
       }
       if ($event.shortcutName === 'undo') {
@@ -794,7 +794,7 @@ export class TwoDEditorComponent
 
       const segmentNumber = getSegmentBySamplePosition(
         currentLevel!.items as OctraAnnotationSegment[],
-        timePosition
+        timePosition,
       );
 
       if (segmentNumber > -1) {
@@ -827,7 +827,7 @@ export class TwoDEditorComponent
                 start: sampleStart,
                 length: segment.time.samples - sampleStart,
               },
-              'multi-lines-viewer'
+              'multi-lines-viewer',
             );
 
             const selection: ASRTimeInterval = {
@@ -846,12 +846,12 @@ export class TwoDEditorComponent
                 if ($event.value === 'do_asr') {
                   this.asrStoreService.addToQueue(
                     selection,
-                    ASRQueueItemType.ASR
+                    ASRQueueItemType.ASR,
                   );
                 } else if ($event.value === 'do_asr_maus') {
                   this.asrStoreService.addToQueue(
                     selection,
-                    ASRQueueItemType.ASRMAUS
+                    ASRQueueItemType.ASRMAUS,
                   );
                 } else if ($event.value === 'do_maus') {
                   if (
@@ -867,7 +867,7 @@ export class TwoDEditorComponent
                       .showAlert(
                         'danger',
                         this.langService.translate('asr.maus empty text'),
-                        false
+                        false,
                       )
                       .catch((error) => {
                         console.error(error);
@@ -876,7 +876,7 @@ export class TwoDEditorComponent
                     this.asrStoreService.addToQueue(
                       selection,
                       ASRQueueItemType.MAUS,
-                      segment.getFirstLabelWithoutName('Speaker')?.value
+                      segment.getFirstLabelWithoutName('Speaker')?.value,
                     );
                   }
                 }
@@ -895,7 +895,7 @@ export class TwoDEditorComponent
           this.alertService
             .showAlert(
               'warning',
-              this.langService.translate('asr.no asr selected').toString()
+              this.langService.translate('asr.no asr selected').toString(),
             )
             .catch((error) => {
               console.error(error);
@@ -951,7 +951,7 @@ export class TwoDEditorComponent
         textSelection,
         selection,
         undefined,
-        'multi-lines-viewer'
+        'multi-lines-viewer',
       );
     } else if (
       $event.value !== undefined &&
@@ -974,7 +974,7 @@ export class TwoDEditorComponent
         textSelection,
         undefined,
         undefined,
-        'audio_speed'
+        'audio_speed',
       );
     }
   }
@@ -992,7 +992,7 @@ export class TwoDEditorComponent
         textSelection,
         undefined,
         undefined,
-        'audio_volume'
+        'audio_volume',
       );
     }
   }
@@ -1015,7 +1015,7 @@ export class TwoDEditorComponent
         textSelection,
         audioSelection,
         undefined,
-        'audio_buttons'
+        'audio_buttons',
       );
     }
   }
@@ -1043,7 +1043,7 @@ export class TwoDEditorComponent
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkLines,
-      this.annotationStoreService.currentLevel!
+      this.annotationStoreService.currentLevel!,
     );
     this.cd.detectChanges();
   }
@@ -1059,7 +1059,7 @@ export class TwoDEditorComponent
       '_blank',
       'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' +
         left +
-        ',width=760,height=550'
+        ',width=760,height=550',
     );
 
     if (tempWindow !== undefined) {
@@ -1102,7 +1102,7 @@ export class TwoDEditorComponent
   }
 
   onEntriesChange(
-    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ) {
     // this.annotationStoreService.saveSegments();
     this.annotationStoreService.overwriteTranscript(annotation);
@@ -1111,7 +1111,7 @@ export class TwoDEditorComponent
   onCurrentLevelChange($event: CurrentLevelChangeEvent) {
     if ($event.type === 'change') {
       this.annotationStoreService.changeCurrentLevelItems(
-        $event.items.map((a) => a.instance!)
+        $event.items.map((a) => a.instance!),
       );
     }
 
@@ -1119,13 +1119,13 @@ export class TwoDEditorComponent
       this.annotationStoreService.removeCurrentLevelItems(
         $event.items,
         $event.removeOptions?.silenceCode,
-        $event.removeOptions?.mergeTranscripts
+        $event.removeOptions?.mergeTranscripts,
       );
     }
 
     if ($event.type === 'add') {
       this.annotationStoreService.addCurrentLevelItems(
-        $event.items.map((a) => a.instance!)
+        $event.items.map((a) => a.instance!),
       );
     }
   }

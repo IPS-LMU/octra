@@ -45,14 +45,14 @@
         </thead>
         <tbody>
           @for (elem of UIElements!; track elem) {
-          <tr>
-            <td>{{ elem.timestamp | date : 'dd.MM.yy HH:mm:ss' }}</td>
-            <td>{{ elem.type }}</td>
-            <td>{{ elem.context }}</td>
-            <td>
-              {{ elem.value }}
-            </td>
-          </tr>
+            <tr>
+              <td>{{ elem.timestamp | date: 'dd.MM.yy HH:mm:ss' }}</td>
+              <td>{{ elem.type }}</td>
+              <td>{{ elem.context }}</td>
+              <td>
+                {{ elem.value }}
+              </td>
+            </tr>
           }
         </tbody>
       </table>

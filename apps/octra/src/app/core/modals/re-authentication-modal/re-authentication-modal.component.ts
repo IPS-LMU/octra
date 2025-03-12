@@ -42,7 +42,7 @@ export class ReAuthenticationModalComponent
     public settingsService: SettingsService,
     public appStorage: AppStorageService,
     private authService: AuthenticationStoreService,
-    public apiService: OctraAPIService
+    public apiService: OctraAPIService,
   ) {
     super();
   }
@@ -74,7 +74,7 @@ export class ReAuthenticationModalComponent
       $event.type,
       this.actionAfterSuccess,
       $event.credentials?.usernameEmail,
-      $event.credentials?.password
+      $event.credentials?.password,
     );
   }
 
@@ -90,7 +90,7 @@ export class ReAuthenticationModalComponent
         error: (error) => {
           this.authenticationRunning = true;
         },
-      }
+      },
     );
   }
 

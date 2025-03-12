@@ -6,11 +6,11 @@ import { getFileSize } from '@octra/utilities';
 import { BrowserInfo } from '@octra/web-media';
 import { DateTime } from 'luxon';
 import { Observable } from 'rxjs';
+import { AppInfo } from '../../../app.info';
 import { LoginMode } from '../../store';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AppStorageService } from './appstorage.service';
 import { AudioService } from './audio.service';
-import { AppInfo } from '../../../app.info';
 
 export enum ConsoleType {
   LOG,
@@ -49,7 +49,7 @@ export class BugReportService {
     private appStorage: AppStorageService,
     private annotationStoreService: AnnotationStoreService,
     private audio: AudioService,
-    private api: OctraAPIService
+    private api: OctraAPIService,
   ) {}
 
   public addEntry(type: ConsoleType, message: any) {
@@ -116,7 +116,7 @@ export class BugReportService {
             message: '--- AFTER RELOAD ---',
           },
         ],
-        this._console
+        this._console,
       );
     }
 
@@ -204,7 +204,7 @@ export class BugReportService {
         protocol,
       },
       null,
-      2
+      2,
     );
 
     return {
@@ -214,7 +214,7 @@ export class BugReportService {
         `Octra_procotol_${Date.now()}.json`,
         {
           type: 'application/json',
-        }
+        },
       ),
     };
   }
@@ -224,7 +224,7 @@ export class BugReportService {
     email: string,
     message: string,
     sendProtocol: boolean,
-    screenshots: any[]
+    screenshots: any[],
   ): Observable<any> {
     const pkg = this.getPackage();
     let body: FeedbackRequestPropertiesDto = {
@@ -245,7 +245,7 @@ export class BugReportService {
     return this.api.sendFeedback(
       body,
       protocol,
-      screenshots?.map((a) => a.blob)
+      screenshots?.map((a) => a.blob),
     );
   }
 }

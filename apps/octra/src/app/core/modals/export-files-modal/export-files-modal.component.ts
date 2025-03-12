@@ -122,7 +122,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     private sanitizer: DomSanitizer,
     private audio: AudioService,
     public annotationStoreService: AnnotationStoreService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('ExportFilesModalComponent', activeModal);
     this.converters = AppInfo.converters;
@@ -139,7 +139,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       undefined,
       undefined,
       undefined,
-      'modals'
+      'modals',
     );
 
     for (const converter of this.converters) {
@@ -162,7 +162,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       undefined,
       undefined,
       undefined,
-      'modals'
+      'modals',
     );
 
     return super.close();
@@ -225,7 +225,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       const oannotjson = this.annotationStoreService.transcript?.serialize(
         this.audio.audioManager.resource.info.fullname,
         this.audio.audioManager.sampleRate,
-        this.audio.audioManager.resource.info.duration
+        this.audio.audioManager.resource.info.duration,
       );
       this.preparing = {
         name: converter.name,
@@ -244,7 +244,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         const result: ExportResult = converter.export(
           oannotjson,
           oAudioFile,
-          levelnum
+          levelnum,
         );
 
         if (!result.error && result.file) {
@@ -282,10 +282,10 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         JSON.stringify(
           this.annotationStoreService.extractUI(this.uiService.elements),
           undefined,
-          2
+          2,
         ),
       ],
-      this.parentformat.download
+      this.parentformat.download,
     );
     this.setParentFormatURI(window.URL.createObjectURL(json));
     this.preparing = {

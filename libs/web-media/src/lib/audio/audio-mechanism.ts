@@ -102,7 +102,7 @@ export abstract class AudioMechanism {
     playOnHover: boolean,
     onPlaying: () => void,
     onEnd: () => void,
-    onError: () => void
+    onError: () => void,
   ) {
     this.audioSelection = audioSelection;
     this.volume = volume;

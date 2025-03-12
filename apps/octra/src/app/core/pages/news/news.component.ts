@@ -29,7 +29,7 @@ export class NewsComponent implements OnInit, OnChanges {
     private sanitizer: DomSanitizer,
     private cd: ChangeDetectorRef,
     public settService: SettingsService,
-    private navService: NavbarService
+    private navService: NavbarService,
   ) {}
 
   ngOnInit() {

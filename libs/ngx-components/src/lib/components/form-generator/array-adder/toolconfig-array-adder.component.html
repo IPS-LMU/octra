@@ -1,42 +1,44 @@
 <ng-template #popContent>
   @if (items !== undefined) {
-  <div>
     <div>
-      @for (elem of _items; track elem) {
-      <span
-        class="array-item pointer"
-        [ngClass]="{
-          selected: elem.selected
-        }"
-        (click)="elem.selected = !elem.selected"
-        >{{ elem.value }}</span
-      >
-      }
+      <div>
+        @for (elem of _items; track elem) {
+          <span
+            class="array-item pointer"
+            [ngClass]="{
+              selected: elem.selected,
+            }"
+            (click)="elem.selected = !elem.selected"
+            >{{ elem.value }}</span
+          >
+        }
+      </div>
+      <div class="text-end mt-3">
+        <button class="btn btn-primary btn-sm" (click)="add(); p.close()">
+          apply
+        </button>
+      </div>
     </div>
+  } @else {
+    @if (type === 'text') {
+      <div>
+        <input type="text" class="form-control" #a />
+      </div>
+    }
+    @if (type === 'number' || type === 'integer') {
+      <div>
+        <input
+          type="number"
+          class="form-control"
+          [step]="type === 'integer' ? 1 : 0.1"
+          name="89zuas"
+          [(ngModel)]="inputValue"
+        />
+      </div>
+    }
     <div class="text-end mt-3">
-      <button class="btn btn-primary btn-sm" (click)="add(); p.close()">
-        apply
-      </button>
+      <button class="btn btn-primary btn-sm" (click)="add()">add</button>
     </div>
-  </div>
-  } @else { @if (type === 'text') {
-  <div>
-    <input type="text" class="form-control" #a />
-  </div>
-  } @if (type === 'number' || type === 'integer') {
-  <div>
-    <input
-      type="number"
-      class="form-control"
-      [step]="type === 'integer' ? 1 : 0.1"
-      name="89zuas"
-      [(ngModel)]="inputValue"
-    />
-  </div>
-  }
-  <div class="text-end mt-3">
-    <button class="btn btn-primary btn-sm" (click)="add()">add</button>
-  </div>
   }
 </ng-template>
 <span
@@ -48,7 +50,7 @@
   autoClose="outside"
   placement="left-bottom"
   [ngClass]="{
-    'opacity-50': disabled
+    'opacity-50': disabled,
   }"
   style="
     background-color: cornflowerblue;

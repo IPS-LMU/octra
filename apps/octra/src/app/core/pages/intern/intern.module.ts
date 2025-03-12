@@ -61,19 +61,19 @@ export const EDITORS: any[] = [
     TranslocoModule,
     StoreModule.forFeature(
       'onlineMode',
-      new LoginModeReducers(LoginMode.ONLINE).create()
+      new LoginModeReducers(LoginMode.ONLINE).create(),
     ),
     StoreModule.forFeature(
       'demoMode',
-      new LoginModeReducers(LoginMode.DEMO).create()
+      new LoginModeReducers(LoginMode.DEMO).create(),
     ),
     StoreModule.forFeature(
       'localMode',
-      new LoginModeReducers(LoginMode.LOCAL).create()
+      new LoginModeReducers(LoginMode.LOCAL).create(),
     ),
     StoreModule.forFeature(
       'urlMode',
-      new LoginModeReducers(LoginMode.URL).create()
+      new LoginModeReducers(LoginMode.URL).create(),
     ),
     EffectsModule.forFeature([AnnotationEffects]),
     OctraUtilitiesModule,

@@ -44,7 +44,7 @@ export class StatisticsModalComponent extends OctraModal {
     public annotationStore: AnnotationStoreService,
     private navbarService: NavbarService,
     private appStorage: AppStorageService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('statisticsModal', activeModal);
   }

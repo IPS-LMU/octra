@@ -115,7 +115,7 @@ export class LinearEditorComponent
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
     hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup
+    shortcutGroup: ShortcutGroup,
   ) => {
     const currentAudioChunk =
       shortcutGroup.name === 'signaldisplay_top_audio'
@@ -131,7 +131,7 @@ export class LinearEditorComponent
           value: shortcut.name,
         },
         controlName,
-        Date.now()
+        Date.now(),
       );
       if (currentAudioChunk.isPlaying) {
         currentAudioChunk.pausePlayback().catch((error) => {
@@ -149,7 +149,7 @@ export class LinearEditorComponent
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
     hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup
+    shortcutGroup: ShortcutGroup,
   ) => {
     const currentAudioChunk =
       shortcutGroup.name === 'signaldisplay_top_audio'
@@ -165,7 +165,7 @@ export class LinearEditorComponent
           value: shortcut.name,
         },
         controlName,
-        Date.now()
+        Date.now(),
       );
       currentAudioChunk.stopPlayback().catch((error) => {
         console.error(error);
@@ -177,7 +177,7 @@ export class LinearEditorComponent
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
     hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup
+    shortcutGroup: ShortcutGroup,
   ) => {
     const currentAudioChunk =
       shortcutGroup.name === 'signaldisplay_top_audio'
@@ -193,7 +193,7 @@ export class LinearEditorComponent
           value: shortcut.name,
         },
         controlName,
-        Date.now()
+        Date.now(),
       );
       currentAudioChunk.stepBackward().catch((error) => {
         console.error(error);
@@ -205,7 +205,7 @@ export class LinearEditorComponent
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
     hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup
+    shortcutGroup: ShortcutGroup,
   ) => {
     const currentAudioChunk =
       shortcutGroup.name === 'signaldisplay_top_audio'
@@ -221,7 +221,7 @@ export class LinearEditorComponent
           value: shortcut.name,
         },
         controlName,
-        Date.now()
+        Date.now(),
       );
       currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
         console.error(error);
@@ -232,7 +232,7 @@ export class LinearEditorComponent
   onZoomInOut = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     if (this.shortcutsEnabled) {
       if (this.appStorage.showMagnifier) {
@@ -254,7 +254,7 @@ export class LinearEditorComponent
               this.audioManager,
               this.audioChunkMagnifier,
               this.signalDisplayTop.av.mouseCursor!,
-              this.factor
+              this.factor,
             ).then((newMagnifierChunk) => {
               if (newMagnifierChunk !== undefined) {
                 this.audioChunkMagnifier = newMagnifierChunk;
@@ -402,7 +402,7 @@ export class LinearEditorComponent
   get segmententer_shortc(): string {
     const segmentEnterShortcut =
       this.signalDisplayTop.settings.shortcuts.items.find(
-        (a) => a.name === 'segment_enter'
+        (a) => a.name === 'segment_enter',
       );
     if (
       segmentEnterShortcut !== undefined &&
@@ -427,7 +427,7 @@ export class LinearEditorComponent
     public cd: ChangeDetectorRef,
     public uiService: UserInteractionsService,
     public settingsService: SettingsService,
-    public appStorage: AppStorageService
+    public appStorage: AppStorageService,
   ) {
     super();
   }
@@ -563,7 +563,7 @@ export class LinearEditorComponent
         length: this.signalDisplayTop.av.drawnSelection!.duration.samples,
       },
       undefined,
-      'audio_buttons'
+      'audio_buttons',
     );
   }
 
@@ -577,7 +577,7 @@ export class LinearEditorComponent
       this.annotationStoreService.segmentrequested,
       (segnumber: number) => {
         this.openSegment(segnumber);
-      }
+      },
     );
 
     this.subscribe(
@@ -586,7 +586,7 @@ export class LinearEditorComponent
         this.initialized.emit();
         this.subscriptionManager.removeByTag('topSignalInitialized');
       },
-      'topSignalInitialized'
+      'topSignalInitialized',
     );
   }
 
@@ -600,7 +600,7 @@ export class LinearEditorComponent
         }
         this.audioChunkDown = new AudioChunk(
           this.audioChunkTop.selection.clone(),
-          this.audioManager
+          this.audioManager,
         );
       } else {
         this.audioChunkDown = undefined;
@@ -631,7 +631,7 @@ export class LinearEditorComponent
       this.audioManager,
       this.appStorage.playOnHover ?? false,
       this.audioChunkTop,
-      this.signalDisplayTop.av.mouseCursor!
+      this.signalDisplayTop.av.mouseCursor!,
     );
 
     if (this.appStorage.showMagnifier) {
@@ -642,7 +642,7 @@ export class LinearEditorComponent
           this.changeMagnifierPosition($event.event!, $event.time!);
           this.mousestate = 'ended';
         },
-        'mouseTimer'
+        'mouseTimer',
       );
     }
   }
@@ -680,7 +680,7 @@ export class LinearEditorComponent
             this.annotationStoreService.currentLevel!.items[$event.index]!.time
               .samples - start,
         },
-        LinearEditorComponent.editorname
+        LinearEditorComponent.editorname,
       );
     }
   }
@@ -712,7 +712,7 @@ export class LinearEditorComponent
   private triggerUIActionAfterShortcut(
     $event: any,
     control: string,
-    timestamp: number
+    timestamp: number,
   ) {
     const component: AudioViewerComponent =
       control === 'signaldisplay_top'
@@ -780,7 +780,7 @@ export class LinearEditorComponent
           textSelection,
           audioSelection,
           segment,
-          control
+          control,
         );
       } else if (
         $event.value !== undefined &&
@@ -852,7 +852,7 @@ export class LinearEditorComponent
         this.editor.textSelection,
         undefined,
         segment,
-        'texteditor_markers'
+        'texteditor_markers',
       );
     }
   }
@@ -892,14 +892,14 @@ export class LinearEditorComponent
         this.editor.textSelection,
         undefined,
         segment,
-        'texteditor_toolbar'
+        'texteditor_toolbar',
       );
     }
   }
 
   public changeMagnifierPosition(
     mouseEvent: MouseEvent,
-    cursorTime: SampleUnit
+    cursorTime: SampleUnit,
   ) {
     const x = mouseEvent.offsetX - (this.minimagnifier.size.width - 10) / 2 - 2;
 
@@ -913,7 +913,7 @@ export class LinearEditorComponent
       this.audioManager,
       this.audioChunkMagnifier,
       cursorTime,
-      this.factor
+      this.factor,
     ).then((newMagnifierChunk) => {
       if (newMagnifierChunk !== undefined) {
         this.audioChunkMagnifier = newMagnifierChunk;
@@ -961,7 +961,7 @@ export class LinearEditorComponent
         this.editor.textSelection,
         undefined,
         segment,
-        'audio_speed'
+        'audio_speed',
       );
     }
   }
@@ -1000,7 +1000,7 @@ export class LinearEditorComponent
         this.editor.textSelection,
         undefined,
         segment,
-        'audio_volume'
+        'audio_volume',
       );
     }
   }
@@ -1018,7 +1018,7 @@ export class LinearEditorComponent
   afterFirstInitialization() {
     this.checkIfSmallAudioChunk(
       this.audioChunkTop,
-      this.annotationStoreService.currentLevel!
+      this.annotationStoreService.currentLevel!,
     );
   }
 
@@ -1075,32 +1075,32 @@ export class LinearEditorComponent
         const segment = this.annotationStoreService.currentLevel.items[
           this.selectedIndex
         ].clone(
-          this.annotationStoreService.currentLevel.items[this.selectedIndex].id
+          this.annotationStoreService.currentLevel.items[this.selectedIndex].id,
         );
         segment.changeFirstLabelWithoutName('Speaker', this.editor.rawText);
 
         this.annotationStoreService.changeCurrentItemById(
           this.annotationStoreService.currentLevel.items[this.selectedIndex].id,
-          segment
+          segment,
         );
       }
     }
   }
 
   public onAudioViewerMouseLeave(
-    keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
+    keyGroup: 'signaldisplay_top' | 'signaldisplay_down',
   ) {
     // this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
   }
 
   public onAudioViewerMouseEnter(
-    keyGroup: 'signaldisplay_top' | 'signaldisplay_down'
+    keyGroup: 'signaldisplay_top' | 'signaldisplay_down',
   ) {
     // this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 
   onEntriesChange(
-    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ) {
     this.annotationStoreService.overwriteTranscript(annotation);
   }
@@ -1108,7 +1108,7 @@ export class LinearEditorComponent
   onCurrentLevelChange($event: CurrentLevelChangeEvent) {
     if ($event.type === 'change') {
       this.annotationStoreService.changeCurrentLevelItems(
-        $event.items.map((a) => a.instance!)
+        $event.items.map((a) => a.instance!),
       );
     }
 
@@ -1116,13 +1116,13 @@ export class LinearEditorComponent
       this.annotationStoreService.removeCurrentLevelItems(
         $event.items,
         $event.removeOptions?.silenceCode,
-        $event.removeOptions?.mergeTranscripts
+        $event.removeOptions?.mergeTranscripts,
       );
     }
 
     if ($event.type === 'add') {
       this.annotationStoreService.addCurrentLevelItems(
-        $event.items.map((a) => a.instance!)
+        $event.items.map((a) => a.instance!),
       );
     }
   }

@@ -7,7 +7,10 @@ export interface IInterval {
 }
 
 export class Interval implements IInterval {
-  constructor(public start: number, public end: number) {}
+  constructor(
+    public start: number,
+    public end: number,
+  ) {}
 }
 
 /**
@@ -42,15 +45,24 @@ export interface IMargin {
 }
 
 export class Rectangle implements IRectangle {
-  constructor(public position: Position, public size: Size) {}
+  constructor(
+    public position: Position,
+    public size: Size,
+  ) {}
 }
 
 export class Position implements Position {
-  constructor(public x: number, public y: number) {}
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
 }
 
 export class Size implements ISize {
-  constructor(public width: number, public height: number) {}
+  constructor(
+    public width: number,
+    public height: number,
+  ) {}
 }
 
 export class Margin implements IMargin {
@@ -58,6 +70,6 @@ export class Margin implements IMargin {
     public top: number,
     public right: number,
     public bottom: number,
-    public left: number
+    public left: number,
   ) {}
 }

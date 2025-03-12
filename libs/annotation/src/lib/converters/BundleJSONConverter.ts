@@ -56,8 +56,8 @@ export class BundleJSONConverter extends Converter {
         data: btoa(
           new Uint8Array(audiofile.arraybuffer).reduce(
             (data, byte) => data + String.fromCharCode(byte),
-            ''
-          )
+            '',
+          ),
         ),
       },
       annotation,
@@ -77,7 +77,7 @@ export class BundleJSONConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }

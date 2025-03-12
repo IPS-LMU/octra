@@ -14,7 +14,7 @@ export class MouseStatisticElem extends StatisticElem {
     playpos?: number,
     textSelection?: { start?: number; end?: number },
     audioSelection?: SampleInterval,
-    transcriptionUnit?: SampleInterval
+    transcriptionUnit?: SampleInterval,
   ) {
     super(
       type,
@@ -23,7 +23,7 @@ export class MouseStatisticElem extends StatisticElem {
       timestamp,
       playpos,
       audioSelection,
-      transcriptionUnit
+      transcriptionUnit,
     );
 
     this.data = {
@@ -77,7 +77,7 @@ export class MouseStatisticElem extends StatisticElem {
       result.playpos,
       result.textSelection,
       result.audioSelection,
-      result.transcriptionUnit
+      result.transcriptionUnit,
     );
   }
 }

@@ -20,7 +20,7 @@ export class AudioResource extends MediaResource {
     info: AudioInfo,
     buffer?: ArrayBuffer,
     size?: number,
-    url?: string
+    url?: string,
   ) {
     super(fullname, source, buffer, size, url);
     if (
@@ -32,7 +32,7 @@ export class AudioResource extends MediaResource {
       this._info = info;
     } else {
       throw Error(
-        'AudioResource needs a correct instance of AudioInfo as parameter'
+        'AudioResource needs a correct instance of AudioInfo as parameter',
       );
     }
   }

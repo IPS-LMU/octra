@@ -50,7 +50,7 @@ export class AsrEffects {
           return of(
             ASRActions.addToQueue.fail({
               error: 'missing queue',
-            })
+            }),
           );
         }
 
@@ -61,7 +61,7 @@ export class AsrEffects {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr settings`,
-            })
+            }),
           );
         }
 
@@ -72,7 +72,7 @@ export class AsrEffects {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr info or language`,
-            })
+            }),
           );
         }
 
@@ -80,7 +80,7 @@ export class AsrEffects {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr language`,
-            })
+            }),
           );
         }
 
@@ -98,10 +98,10 @@ export class AsrEffects {
               transcriptInput: action.item.transcript,
               type: action.item.type,
             },
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   removeItemFromQueue$ = createEffect(() =>
@@ -113,29 +113,29 @@ export class AsrEffects {
           return of(
             ASRActions.removeItemFromQueue.fail({
               error: 'missing queue',
-            })
+            }),
           );
         }
 
         const index = state.asr.queue.items.findIndex(
-          (a) => a.id === action.id
+          (a) => a.id === action.id,
         );
 
         if (index > -1) {
           return of(
             ASRActions.removeItemFromQueue.success({
               index,
-            })
+            }),
           );
         } else {
           return of(
             ASRActions.removeItemFromQueue.fail({
               error: `queueItem with id ${action.id} does not exist and can't be removed.`,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   startProcessing$ = createEffect(() =>
@@ -145,7 +145,7 @@ export class AsrEffects {
         ASRActions.processQueueItem.do,
         ASRActions.processQueueItem.success,
         ASRActions.processQueueItem.fail,
-        ASRActions.stopItemProcessing.success
+        ASRActions.stopItemProcessing.success,
       ),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
@@ -154,7 +154,7 @@ export class AsrEffects {
           return of(
             ASRActions.startProcessing.fail({
               error: 'missing queue',
-            })
+            }),
           );
         }
 
@@ -166,7 +166,7 @@ export class AsrEffects {
               return of(
                 ASRActions.processQueueItem.do({
                   item,
-                })
+                }),
               );
             } else if (
               ![
@@ -179,7 +179,7 @@ export class AsrEffects {
                 return of(
                   ASRActions.setQueueStatus.do({
                     status: ASRProcessStatus.IDLE,
-                  })
+                  }),
                 );
               }
             }
@@ -189,12 +189,12 @@ export class AsrEffects {
           return of(
             ASRActions.setQueueStatus.do({
               status: ASRProcessStatus.STARTED,
-            })
+            }),
           );
         }
         return of();
-      })
-    )
+      }),
+    ),
   );
 
   processQueueItem$ = createEffect(() =>
@@ -215,7 +215,7 @@ export class AsrEffects {
                   item.type === ASRQueueItemType.ASRMAUS ||
                   item.type === ASRQueueItemType.MAUS,
               },
-            })
+            }),
           );
         }
         return of(
@@ -223,10 +223,10 @@ export class AsrEffects {
             item,
             error: `item already started`,
             newStatus: ASRProcessStatus.FAILED,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   cutAndUploadItem$ = createEffect(() =>
@@ -256,13 +256,13 @@ export class AsrEffects {
             {
               number: 1,
               sampleStart: Math.ceil(
-                action.item.time.sampleStart * channelDataFactor
+                action.item.time.sampleStart * channelDataFactor,
               ),
               sampleDur: Math.ceil(
-                action.item.time.sampleLength * channelDataFactor
+                action.item.time.sampleLength * channelDataFactor,
               ),
-            }
-          )
+            },
+          ),
         ).pipe(
           withLatestFrom(this.store),
           exhaustMap(([file, state]) => {
@@ -274,7 +274,7 @@ export class AsrEffects {
                 ASRActions.cutAndUploadQueueItem.fail({
                   error: 'item is undefined',
                   newStatus: ASRProcessStatus.FAILED,
-                })
+                }),
               );
             }
 
@@ -285,7 +285,7 @@ export class AsrEffects {
               });
               const serviceRequirementsError = this.fitsServiceRequirements(
                 fileBlob,
-                action.item
+                action.item,
               );
 
               if (serviceRequirementsError === '') {
@@ -296,14 +296,14 @@ export class AsrEffects {
                     new File(
                       [action.item.transcriptInput],
                       `OCTRA_ASRqueueItem_${action.item.id}.txt`,
-                      { type: 'text/plain' }
-                    )
+                      { type: 'text/plain' },
+                    ),
                   );
                 }
 
                 return this.uploadFiles(
                   filesForUpload,
-                  action.item.selectedASRService
+                  action.item.selectedASRService,
                 ).pipe(
                   exhaustMap(([audioURL, transcriptURL]) => {
                     return of(
@@ -316,9 +316,9 @@ export class AsrEffects {
                         transcriptURL,
                         audioURL,
                         outFormat: 'txt',
-                      })
+                      }),
                     );
-                  })
+                  }),
                 );
               } else {
                 return of(
@@ -326,7 +326,7 @@ export class AsrEffects {
                     error: serviceRequirementsError,
                     item: action.item,
                     newStatus: ASRProcessStatus.FAILED,
-                  })
+                  }),
                 );
               }
             }
@@ -335,7 +335,7 @@ export class AsrEffects {
             return of(
               ASRActions.stopItemProcessing.success({
                 item,
-              })
+              }),
             );
           }),
           catchError((error) =>
@@ -344,12 +344,12 @@ export class AsrEffects {
                 item: action.item,
                 error,
                 newStatus: ASRProcessStatus.FAILED,
-              })
-            )
-          )
+              }),
+            ),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 
   cutItemSuccess$ = createEffect(() =>
@@ -364,7 +364,7 @@ export class AsrEffects {
               options: action.options,
               outFormat: action.outFormat,
               audioURL: action.audioURL,
-            })
+            }),
           );
         } else if (action.options?.wordAlignment) {
           return of(
@@ -373,7 +373,7 @@ export class AsrEffects {
               outFormat: action.outFormat,
               audioURL: action.audioURL,
               transcriptURL: action.transcriptURL!,
-            })
+            }),
           );
         }
 
@@ -382,10 +382,10 @@ export class AsrEffects {
             item: action.item,
             error: `missing options`,
             newStatus: ASRProcessStatus.FAILED,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   runASROnItem$ = createEffect(() =>
@@ -397,12 +397,12 @@ export class AsrEffects {
           outFormat,
           item,
           audioURL,
-          state.application.appConfiguration!.octra.plugins!.asr!
+          state.application.appConfiguration!.octra.plugins!.asr!,
         ).pipe(
           withLatestFrom(this.store),
           exhaustMap(([result, state2]) => {
             const item2 = state2.asr.queue?.items?.find(
-              (a) => a.time === item.time
+              (a) => a.time === item.time,
             );
 
             if (item2) {
@@ -416,7 +416,7 @@ export class AsrEffects {
                       url: result.url,
                       text: result.text,
                     },
-                  })
+                  }),
                 );
               }
             }
@@ -424,7 +424,7 @@ export class AsrEffects {
             return of(
               ASRActions.stopItemProcessing.success({
                 item: item2 ?? item,
-              })
+              }),
             );
           }),
           catchError((error) => {
@@ -437,15 +437,15 @@ export class AsrEffects {
                   error instanceof Error
                     ? error.message
                     : error instanceof HttpErrorResponse
-                    ? error.error?.message ?? error.message
-                    : error,
+                      ? (error.error?.message ?? error.message)
+                      : error,
                 newStatus: ASRProcessStatus.FAILED,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   runASROnItemSuccess$ = createEffect(() =>
@@ -459,7 +459,7 @@ export class AsrEffects {
               item,
               error: `asr result is undefined`,
               newStatus: ASRProcessStatus.FAILED,
-            })
+            }),
           );
         }
 
@@ -469,7 +469,7 @@ export class AsrEffects {
             ASRActions.processQueueItem.success({
               item,
               result: result.text,
-            })
+            }),
           );
         } else {
           // continue with word alignment
@@ -479,11 +479,11 @@ export class AsrEffects {
               audioURL: audioURL,
               transcriptURL: result.url,
               outFormat: 'text',
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   runWordAlignment$ = createEffect(() =>
@@ -497,17 +497,17 @@ export class AsrEffects {
           item.selectedASRService.host,
           audioURL,
           transcriptURL,
-          state.application.appConfiguration!.octra!.plugins!.asr!
+          state.application.appConfiguration!.octra!.plugins!.asr!,
         ).pipe(
           exhaustMap((result) => {
             if (item.status !== ASRProcessStatus.STOPPED) {
               return from(
-                readFileContents<string>(result.file, 'text', 'utf-8')
+                readFileContents<string>(result.file, 'text', 'utf-8'),
               ).pipe(
                 withLatestFrom(this.store),
                 exhaustMap(([contents, state2]) => {
                   const item2 = state2.asr.queue?.items?.find(
-                    (a) => a.time === item.time
+                    (a) => a.time === item.time,
                   );
 
                   if (item2) {
@@ -517,7 +517,7 @@ export class AsrEffects {
                           item,
                           result: contents,
                           transcriptURL: result.url,
-                        })
+                        }),
                       );
                     }
                   }
@@ -525,16 +525,16 @@ export class AsrEffects {
                   return of(
                     ASRActions.stopItemProcessing.success({
                       item: item2 ?? item,
-                    })
+                    }),
                   );
-                })
+                }),
               );
             }
             // do nothing
             return of(
               ASRActions.stopItemProcessing.success({
                 item,
-              })
+              }),
             );
           }),
           catchError((error) =>
@@ -547,15 +547,15 @@ export class AsrEffects {
                   error instanceof Error
                     ? error.message
                     : error instanceof HttpErrorResponse
-                    ? error.error?.message ?? error.message
-                    : error,
+                      ? (error.error?.message ?? error.message)
+                      : error,
                 newStatus: ASRProcessStatus.FAILED,
-              })
-            )
-          )
+              }),
+            ),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 
   runWordAlignmentSuccess$ = createEffect(() =>
@@ -567,10 +567,10 @@ export class AsrEffects {
           ASRActions.processQueueItem.success({
             item: action.item,
             result: action.result,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   triggerAnnotationChange$ = createEffect(() =>
@@ -584,7 +584,7 @@ export class AsrEffects {
         ASRActions.runWordAlignmentOnItem.fail,
         ASRActions.processQueueItem.success,
         ASRActions.processQueueItem.fail,
-        ASRActions.stopItemProcessing.success
+        ASRActions.stopItemProcessing.success,
       ),
       withLatestFrom(this.store),
       mergeMap(([action, state]) => {
@@ -595,13 +595,13 @@ export class AsrEffects {
         if (item) {
           if (
             [ASRProcessStatus.FINISHED, ASRProcessStatus.FAILED].includes(
-              item.status
+              item.status,
             )
           ) {
             this.store.dispatch(
               ASRActions.removeItemFromQueue.do({
                 id: item.id,
-              })
+              }),
             );
           }
 
@@ -621,18 +621,18 @@ export class AsrEffects {
                 item.status !== ASRProcessStatus.FAILED
                   ? item.type
                   : undefined,
-            })
+            }),
           );
         } else {
           console.error(`can't find item in queue with id ${action.item.id}`);
           return of(
             AnnotationActions.updateASRSegmentInformation.fail({
               error: "can't find item in queue",
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   onProcessingFail$ = createEffect(
@@ -640,7 +640,7 @@ export class AsrEffects {
       this.actions$.pipe(
         ofType(
           ASRActions.runASROnItem.fail,
-          ASRActions.runWordAlignmentOnItem.fail
+          ASRActions.runWordAlignmentOnItem.fail,
         ),
         withLatestFrom(this.store),
         tap(([action, state]) => {
@@ -657,12 +657,12 @@ export class AsrEffects {
                   forceAuthentication: AccountLoginMethod.shibboleth,
                   actionAfterSuccess: ASRActions.startProcessing.do(),
                   forceLogout: false,
-                })
+                }),
               );
               this.alertService.showAlert(
                 'danger',
                 this.langService.translate('asr.no auth'),
-                true
+                true,
               );
             } else {
               this.store.dispatch(
@@ -670,7 +670,7 @@ export class AsrEffects {
                   forceAuthentication: AccountLoginMethod.shibboleth,
                   actionAfterSuccess: ASRActions.startProcessing.do(),
                   forceLogout: false,
-                })
+                }),
               );
             }
             this.uiService.addElementFromEvent(
@@ -686,7 +686,7 @@ export class AsrEffects {
                 start: action.item.time.sampleStart,
                 length: action.item.time.sampleLength,
               },
-              'automation'
+              'automation',
             );
           } else if (
             action.newStatus === ASRProcessStatus.NOQUOTA &&
@@ -695,7 +695,7 @@ export class AsrEffects {
             this.alertService.showAlert(
               'danger',
               this.langService.translate('asr.no quota'),
-              true
+              true,
             );
 
             this.uiService.addElementFromEvent(
@@ -711,14 +711,14 @@ export class AsrEffects {
                 start: action.item.time.sampleStart,
                 length: action.item.time.sampleLength,
               },
-              'automation'
+              'automation',
             );
           }
-        })
+        }),
       ),
     {
       dispatch: false,
-    }
+    },
   );
 
   reAuthenticationAborted$ = createEffect(
@@ -739,14 +739,14 @@ export class AsrEffects {
                     item,
                     error: '',
                     newStatus: ASRProcessStatus.FAILED,
-                  })
+                  }),
                 );
               }
             }
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   stopProcessing$ = createEffect(() =>
@@ -759,14 +759,14 @@ export class AsrEffects {
             this.store.dispatch(
               ASRActions.stopItemProcessing.do({
                 time: item.time,
-              })
+              }),
             );
           }
         }
 
         return of(ASRActions.stopProcessing.success());
-      })
-    )
+      }),
+    ),
   );
 
   stopItemProcessing$ = createEffect(
@@ -778,7 +778,7 @@ export class AsrEffects {
           const item = state.asr.queue?.items?.find(
             (a) =>
               a.time.sampleLength === action.time.sampleLength &&
-              a.time.sampleStart === action.time.sampleStart
+              a.time.sampleStart === action.time.sampleStart,
           );
 
           if (item) {
@@ -798,12 +798,12 @@ export class AsrEffects {
                   item.status !== ASRProcessStatus.FAILED
                     ? item.type
                     : undefined,
-              })
+              }),
             );
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   enableASR$ = createEffect(() =>
@@ -834,10 +834,10 @@ export class AsrEffects {
                 ((action.task.tool_configuration?.value as ProjectSettings)
                   ?.octra?.asrEnabled === true &&
                   localASRSettingsComplete)),
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   constructor(
@@ -847,11 +847,11 @@ export class AsrEffects {
     private http: HttpClient,
     private langService: TranslocoService,
     private alertService: AlertService,
-    private uiService: UserInteractionsService
+    private uiService: UserInteractionsService,
   ) {}
 
   private getFirstFreeItem(
-    queue: ASRStateQueue
+    queue: ASRStateQueue,
   ): ASRStateQueueItem | undefined {
     return queue.items.find((a) => {
       return a.status === ASRProcessStatus.IDLE;
@@ -882,7 +882,7 @@ export class AsrEffects {
     outFormat: string,
     item: ASRStateQueueItem,
     audioURL: string,
-    asrSettings: ASRSettings
+    asrSettings: ASRSettings,
   ): Observable<{
     file: File;
     text: string;
@@ -894,7 +894,7 @@ export class AsrEffects {
       audioURL,
       outFormat,
       asrSettings,
-      item.accessCode
+      item.accessCode,
     );
   }
 
@@ -904,7 +904,7 @@ export class AsrEffects {
     audioURL: string,
     outFormat: string,
     asrSettings: ASRSettings,
-    accessCode?: string
+    accessCode?: string,
   ): Observable<{
     file: File;
     text: string;
@@ -930,18 +930,18 @@ export class AsrEffects {
             'Content-Type': 'multipart/form-data',
           },
           responseType: 'text',
-        }
+        },
       )
       .pipe(
         take(1),
         exhaustMap((result) => {
           return from(this.extractResultData(result));
-        })
+        }),
       );
   }
 
   private extractResultData = (
-    result: string
+    result: string,
   ): Promise<{ file: File; text: string; url: string }> => {
     return new Promise<{ file: File; text: string; url: string }>(
       (resolve, reject) => {
@@ -968,13 +968,13 @@ export class AsrEffects {
         } else {
           reject(new Error(this.extractErrorMessage(json.output)));
         }
-      }
+      },
     );
   };
 
   private uploadFiles(
     files: File[],
-    selectedLanguage: ServiceProvider
+    selectedLanguage: ServiceProvider,
   ): Observable<string[]> {
     const formData = new FormData();
 
@@ -1006,7 +1006,7 @@ export class AsrEffects {
           }
 
           return throwError(() => new Error('server response with error'));
-        })
+        }),
       );
   }
 
@@ -1016,7 +1016,7 @@ export class AsrEffects {
     host: string,
     audioURL: string,
     transcriptURL: string,
-    asrSettings: ASRSettings
+    asrSettings: ASRSettings,
   ): Observable<{
     file: File;
     url: string;
@@ -1036,26 +1036,26 @@ export class AsrEffects {
             'Content-Type': 'multipart/form-data',
           },
           responseType: 'text',
-        }
+        },
       )
       .pipe(
         exhaustMap((result) => {
           return from(this.extractResultData(result));
-        })
+        }),
       );
   }
 
   handleShibbolethError(
     item: ASRStateQueueItem,
     error: HttpErrorResponse,
-    errorAction: Action
+    errorAction: Action,
   ): Observable<Action> {
     const errorMessage =
       error instanceof Error
         ? error.message
         : error instanceof HttpErrorResponse
-        ? error.error?.message ?? error.message
-        : error;
+          ? (error.error?.message ?? error.message)
+          : error;
     console.error(errorMessage);
 
     if (errorMessage.indexOf('quota') > -1) {

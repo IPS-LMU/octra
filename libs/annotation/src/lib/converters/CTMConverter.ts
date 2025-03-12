@@ -36,7 +36,7 @@ export class CTMConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
+    levelnum: number,
   ): ExportResult {
     let result = '';
     let filename = '';
@@ -89,7 +89,7 @@ export class CTMConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -114,7 +114,7 @@ export class CTMConverter extends Converter {
     const result = new OAnnotJSON(
       audiofile.name,
       FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
 
     const content = file.content;
@@ -164,7 +164,7 @@ export class CTMConverter extends Converter {
             i + 1,
             Math.round(start * sampleRate),
             Math.round(length * sampleRate),
-            olabels
+            olabels,
           );
 
           olevel.items.push(osegment);
@@ -175,9 +175,9 @@ export class CTMConverter extends Converter {
                 i + 2,
                 Math.round((start + length) * sampleRate),
                 Math.round(
-                  (audiofile.duration - (start + length)) * sampleRate
+                  (audiofile.duration - (start + length)) * sampleRate,
                 ),
-                [new OLabel('Tier_1', '')]
+                [new OLabel('Tier_1', '')],
               );
 
               olevel.items.push(osegmentEnd);

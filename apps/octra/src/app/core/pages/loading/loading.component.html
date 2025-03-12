@@ -9,43 +9,46 @@
     aria-valuemax="100"
   >
     @if (settService.log === '') {
-    <div
-      [ngStyle]="{
-        width: (loading.status === 'LOADING' ? loading!.progress : 0) + '%'
-      }"
-      class="progress-bar"
-    ></div>
-    } @if (settService.log !== '') {
-    <div
-      [ngStyle]="{
-        width: '100%',
-        'background-color': 'red'
-      }"
-      class="progress-bar"
-    ></div>
+      <div
+        [ngStyle]="{
+          width: (loading.status === 'LOADING' ? loading!.progress : 0) + '%',
+        }"
+        class="progress-bar"
+      ></div>
+    }
+    @if (settService.log !== '') {
+      <div
+        [ngStyle]="{
+          width: '100%',
+          'background-color': 'red',
+        }"
+        class="progress-bar"
+      ></div>
     }
   </div>
   @if (settService.log === '') {
-  <div class="description">
-    {{ text }}{{ state }}<br />
-    <div class="text-info">{{ warning }}</div>
-    @if (warning !== undefined && warning !== '') {
-    <div>
-      <span (click)="retry()" class="link">Retry </span>
-      @if (appStorage.useMode !== 'url') { or
-      <span (click)="goBack()" class="link"> Back</span>
+    <div class="description">
+      {{ text }}{{ state }}<br />
+      <div class="text-info">{{ warning }}</div>
+      @if (warning !== undefined && warning !== '') {
+        <div>
+          <span (click)="retry()" class="link">Retry </span>
+          @if (appStorage.useMode !== 'url') {
+            or
+            <span (click)="goBack()" class="link"> Back</span>
+          }
+        </div>
       }
     </div>
-    }
-  </div>
   }
   <div [innerHTML]="settService.log" class="log"></div>
   @if (settService.log !== '') {
-  <div>
-    <span (click)="retry()" class="link">Retry </span>
-    @if (appStorage.useMode !== 'url') { or
-    <span (click)="goBack()" class="link"> Back</span>
-    }
-  </div>
+    <div>
+      <span (click)="retry()" class="link">Retry </span>
+      @if (appStorage.useMode !== 'url') {
+        or
+        <span (click)="goBack()" class="link"> Back</span>
+      }
+    </div>
   }
 </div>

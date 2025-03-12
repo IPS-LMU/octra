@@ -52,7 +52,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'playOnHover',
         value,
-      })
+      }),
     );
   }
 
@@ -65,7 +65,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'editorFont',
         value,
-      })
+      }),
     );
   }
 
@@ -78,7 +78,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'showFeedbackNotice',
         value,
-      })
+      }),
     );
   }
 
@@ -103,7 +103,7 @@ export class AppStorageService {
     this.store.dispatch(
       ApplicationActions.setReloaded({
         reloaded: value,
-      })
+      }),
     );
   }
 
@@ -112,7 +112,7 @@ export class AppStorageService {
       LoginModeActions.setFeedback({
         feedback: value,
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -133,7 +133,7 @@ export class AppStorageService {
       AnnotationActions.setLogging.do({
         logging: value,
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -146,7 +146,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'showMagnifier',
         value,
-      })
+      }),
     );
   }
 
@@ -159,8 +159,8 @@ export class AppStorageService {
       this.store.dispatch(
         ApplicationActions.setConsoleEntries({
           consoleEntries,
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -172,7 +172,7 @@ export class AppStorageService {
     this.store.dispatch(
       ApplicationActions.setEasyMode({
         easyMode: value,
-      })
+      }),
     );
   }
 
@@ -189,7 +189,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'secondsPerLine',
         value,
-      })
+      }),
     );
     this.settingschange.next({
       key: 'secondsPerLine',
@@ -205,7 +205,7 @@ export class AppStorageService {
     this.store.dispatch(
       ApplicationActions.setHighlightingEnabled({
         highlightingEnabled: value,
-      })
+      }),
     );
   }
 
@@ -214,12 +214,12 @@ export class AppStorageService {
   constructor(
     private store: Store<RootState>,
     private actions: Actions,
-    private sessionStorage: SessionStorageService
+    private sessionStorage: SessionStorageService,
   ) {
     this.subscrManager.add(
       this.store.subscribe((state: RootState) => {
         this._snapshot = state;
-      })
+      }),
     );
   }
 
@@ -240,7 +240,7 @@ export class AppStorageService {
       AnnotationActions.setSavingNeeded.do({
         savingNeeded: value,
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -249,7 +249,7 @@ export class AppStorageService {
       ApplicationActions.changeApplicationOption.do({
         name: 'followPlayCursor',
         value,
-      })
+      }),
     );
   }
 
@@ -282,7 +282,7 @@ export class AppStorageService {
       ApplicationActions.setAudioSettings({
         volume: value,
         speed: this.audioSpeed ?? 1,
-      })
+      }),
     );
   }
 
@@ -295,7 +295,7 @@ export class AppStorageService {
       ApplicationActions.setAudioSettings({
         speed: value,
         volume: this.audioVolume ?? 1,
-      })
+      }),
     );
   }
 
@@ -307,7 +307,7 @@ export class AppStorageService {
     this.store.dispatch(
       AnnotationActions.setIsSaving.do({
         isSaving: value,
-      })
+      }),
     );
   }
 
@@ -328,7 +328,7 @@ export class AppStorageService {
       AnnotationActions.setCurrentEditor.do({
         currentEditor: newInterface!,
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -360,7 +360,7 @@ export class AppStorageService {
           waitTillResultRetrieved<Actions, Action, void>(
             this.actions,
             IDBActions.saveTranscriptionFeedback.success,
-            IDBActions.saveTranscriptionFeedback.fail
+            IDBActions.saveTranscriptionFeedback.fail,
           )
             .then(() => {
               this.isSaving = false;
@@ -377,7 +377,7 @@ export class AppStorageService {
             LoginModeActions.setFeedback({
               mode: LoginMode.ONLINE,
               feedback: value,
-            })
+            }),
           );
 
           break;
@@ -399,7 +399,7 @@ export class AppStorageService {
           (err) => {
             subscr.unsubscribe();
             reject(err);
-          }
+          },
         );
       } else {
         resolve();
@@ -409,7 +409,7 @@ export class AppStorageService {
 
   public changeAnnotationLevel(
     tiernum: number,
-    level: OctraAnnotationAnyLevel<OctraAnnotationSegment>
+    level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.annotationLevels !== undefined) {
@@ -418,7 +418,7 @@ export class AppStorageService {
             waitTillResultRetrieved<Actions, Action, void>(
               this.actions,
               IDBActions.saveAnnotation.success,
-              IDBActions.saveAnnotation.fail
+              IDBActions.saveAnnotation.fail,
             )
               .then(() => {
                 resolve();
@@ -431,7 +431,7 @@ export class AppStorageService {
               AnnotationActions.changeAnnotationLevel.do({
                 level,
                 mode: this.useMode,
-              })
+              }),
             );
           } else {
             reject('number of level that should be changed is invalid');
@@ -451,7 +451,7 @@ export class AppStorageService {
         AnnotationActions.removeAnnotationLevel.do({
           id,
           mode: this.useMode,
-        })
+        }),
       );
       return new Promise<void>((resolve) => {
         resolve();
@@ -467,7 +467,7 @@ export class AppStorageService {
     this.store.dispatch(
       AnnotationActions.clearLogs.do({
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -476,7 +476,7 @@ export class AppStorageService {
       AnnotationActions.startNewAnnotation.do({
         project,
         mode: LoginMode.ONLINE,
-      })
+      }),
     );
   }
 
@@ -486,7 +486,7 @@ export class AppStorageService {
         message: 'You were logged out',
         clearSession,
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -522,7 +522,7 @@ export class AppStorageService {
     this.store.dispatch(
       AnnotationActions.clearAnnotation.do({
         mode: this.useMode,
-      })
+      }),
     );
   }
 
@@ -532,7 +532,7 @@ export class AppStorageService {
     return waitTillResultRetrieved<Actions, Action, void>(
       this.actions,
       IDBActions.clearAllData.success,
-      IDBActions.clearAllData.fail
+      IDBActions.clearAllData.fail,
     );
   }
 

@@ -10,7 +10,7 @@ export class LuxonShortDateTimePipe implements PipeTransform {
 
   transform(
     value: string | Date | DateTime | number | undefined,
-    options: { locale: string | undefined }
+    options: { locale: string | undefined },
   ): unknown {
     if (!value) {
       return '';
@@ -41,7 +41,7 @@ export class LuxonShortDateTimePipe implements PipeTransform {
       },
       {
         locale: loc,
-      }
+      },
     );
   }
 }

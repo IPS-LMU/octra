@@ -47,7 +47,7 @@ export class OctraDropzoneService {
       name: string;
       type: string;
       size: number;
-    }[]
+    }[],
   ) {
     this._oldFiles = value;
   }
@@ -94,7 +94,7 @@ export class OctraDropzoneService {
 
   constructor(
     private modService: OctraModalService,
-    private store: Store<RootState>
+    private store: Store<RootState>,
   ) {}
 
   add(file: File) {
@@ -108,7 +108,7 @@ export class OctraDropzoneService {
 
     const isValidaAudioFile = AudioManager.isValidAudioFileName(
       progressFile.file.fullname,
-      AppInfo.audioformats
+      AppInfo.audioformats,
     );
 
     if (
@@ -131,7 +131,7 @@ export class OctraDropzoneService {
             this.updateStatistics();
           },
         }),
-        `fileProgress${progressFile.id}`
+        `fileProgress${progressFile.id}`,
       );
     } else {
       progressFile.status = 'invalid';
@@ -158,7 +158,7 @@ export class OctraDropzoneService {
     if (
       AudioManager.isValidAudioFileName(
         fileProgress.file.fullname,
-        AppInfo.audioformats
+        AppInfo.audioformats,
       )
     ) {
       // process as audio
@@ -199,7 +199,7 @@ export class OctraDropzoneService {
           (a) =>
             a.type === file.file.type &&
             a.name === file.file.fullname &&
-            a.size === file.file.size
+            a.size === file.file.size,
         )
       ) {
         result.new++;
@@ -220,7 +220,7 @@ export class OctraDropzoneService {
       ...AppInfo.audioformats.map((a) => a.supportedFormats),
     ].flat();
     const formatLimitation = supportedAudioFormats.find((a) =>
-      fileProgress.file.fullname.includes(a.extension)
+      fileProgress.file.fullname.includes(a.extension),
     );
 
     if (
@@ -235,7 +235,7 @@ export class OctraDropzoneService {
         map((a) => {
           fileProgress.progress = a.progress * 0.5;
           return a;
-        })
+        }),
       ),
     ]).pipe(
       exhaustMap(([reading]) => {
@@ -267,7 +267,7 @@ export class OctraDropzoneService {
                 fileProgress.status = 'valid';
                 this.checkForValidFiles();
               }
-            })
+            }),
           );
         } else {
           fileProgress.status = 'invalid';
@@ -276,11 +276,11 @@ export class OctraDropzoneService {
           return throwError(
             () =>
               new Error(
-                `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`
-              )
+                `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`,
+              ),
           );
         }
-      })
+      }),
     );
   }
 
@@ -290,7 +290,7 @@ export class OctraDropzoneService {
         map((a) => {
           fileProgress.progress = a.progress;
           return a;
-        })
+        }),
       ),
     ]).pipe(
       map(([a]) => {
@@ -299,7 +299,7 @@ export class OctraDropzoneService {
         fileProgress.status = 'waiting';
         fileProgress.content = a.result;
         this.checkForValidFiles();
-      })
+      }),
     );
   }
 
@@ -308,7 +308,7 @@ export class OctraDropzoneService {
     if (
       AudioManager.isValidAudioFileName(
         fileProgress.file.fullname,
-        AppInfo.audioformats
+        AppInfo.audioformats,
       )
     ) {
       this._oaudiofile = undefined;
@@ -323,7 +323,7 @@ export class OctraDropzoneService {
       if (fileProgress.status !== 'progress') {
         const isAudioFile = AudioManager.isValidAudioFileName(
           fileProgress.file.fullname,
-          AppInfo.audioformats
+          AppInfo.audioformats,
         );
         if (
           !isAudioFile &&
@@ -345,7 +345,7 @@ export class OctraDropzoneService {
               new RegExp(
                 `${converter.extensions
                   .map((a) => `(?:${escapeRegex(a.toLowerCase())})`)
-                  .join('|')}$`
+                  .join('|')}$`,
               ).exec(fileProgress.file.fullname.toLowerCase()) !== null
             ) {
               if (converter.conversion.import) {
@@ -358,7 +358,7 @@ export class OctraDropzoneService {
 
                 const optionsSchema: any = converter.needsOptionsForImport(
                   ofile,
-                  this._oaudiofile!
+                  this._oaudiofile!,
                 );
                 fileProgress.needsOptions = optionsSchema;
                 fileProgress.converter = converter;
@@ -370,7 +370,7 @@ export class OctraDropzoneService {
                 const importResult: ImportResult | undefined = converter.import(
                   ofile,
                   this._oaudiofile!,
-                  fileProgress.options
+                  fileProgress.options,
                 );
 
                 if (
@@ -397,7 +397,7 @@ export class OctraDropzoneService {
                   await this.setAnnotation(
                     fileProgress,
                     converter,
-                    importResult
+                    importResult,
                   );
                   if (this._oannotation) {
                     break;
@@ -436,7 +436,7 @@ export class OctraDropzoneService {
   private setAnnotation = async (
     fileProgress: FileProgress,
     converter: Converter,
-    importResult?: ImportResult
+    importResult?: ImportResult,
   ) => {
     if (
       this._oaudiofile !== undefined &&
@@ -448,7 +448,7 @@ export class OctraDropzoneService {
 
       const regexStr = `${escapeRegex(audioName)}${converter.extensions
         .map(
-          (a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`
+          (a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`,
         )
         .join('|')}$`;
       if (new RegExp(regexStr).exec(fileProgress.file.fullname) === null) {
@@ -463,13 +463,13 @@ export class OctraDropzoneService {
             temp.push(
               new OSegment(0, 0, level.items[0].sampleStart!, [
                 new OLabel(level.name, ''),
-              ])
+              ]),
             );
             temp = temp.concat(
               level.items.map(
                 (a) =>
-                  new OSegment(a.id, a.sampleStart!, a.sampleDur!, a.labels)
-              )
+                  new OSegment(a.id, a.sampleStart!, a.sampleDur!, a.labels),
+              ),
             );
             level.items = temp;
 
@@ -489,8 +489,8 @@ export class OctraDropzoneService {
                 last.sampleStart! + last.sampleDur!,
                 this._oaudiofile.duration! * this._oaudiofile.sampleRate -
                   (last.sampleStart! + last.sampleDur!),
-                [new OLabel(level.name, '')]
-              )
+                [new OLabel(level.name, '')],
+              ),
             );
           }
         }
@@ -528,7 +528,7 @@ export class OctraDropzoneService {
         type === 'transcript' &&
         !AudioManager.isValidAudioFileName(
           a.file.fullname,
-          AppInfo.audioformats
+          AppInfo.audioformats,
         )
       ) {
         return false;
@@ -543,12 +543,12 @@ export class OctraDropzoneService {
     return AudioManager.create(
       fileProgress.file.fullname,
       fileProgress.file.type,
-      buffer
+      buffer,
     ).pipe(
       map((result) => {
         fileProgress.progress = 0.5 + 0.5 * result.progress;
         return result;
-      })
+      }),
     );
   }
 
@@ -573,13 +573,13 @@ export class OctraDropzoneService {
       LoginModeActions.setImportConverter.do({
         mode: LoginMode.LOCAL,
         importConverter: fileProgress.converter.name,
-      })
+      }),
     );
     this.store.dispatch(
       LoginModeActions.changeImportOptions.do({
         mode: LoginMode.LOCAL,
         importOptions,
-      })
+      }),
     );
   }
 

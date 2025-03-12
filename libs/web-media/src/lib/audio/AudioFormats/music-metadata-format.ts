@@ -35,7 +35,7 @@ export class MusicMetadataFormat extends AudioFormat {
 
   override async readAudioInformation(buffer: ArrayBuffer) {
     const parsed = await parseBlob(
-      new File([buffer], this._filename, { type: this._mimeType })
+      new File([buffer], this._filename, { type: this._mimeType }),
     );
     const format = parsed.format;
 
@@ -45,7 +45,7 @@ export class MusicMetadataFormat extends AudioFormat {
       !format.numberOfChannels
     ) {
       throw new Error(
-        "Can't read one of the following audio information: sampleRate, numberOfSamples, numberOfChannels."
+        "Can't read one of the following audio information: sampleRate, numberOfSamples, numberOfChannels.",
       );
     } else {
       const numberOfSamples =

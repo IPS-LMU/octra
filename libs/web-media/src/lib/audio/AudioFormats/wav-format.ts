@@ -25,7 +25,7 @@ export class WavFormat extends AudioFormat {
   public override async init(
     filename: string,
     mimeType: string,
-    buffer: ArrayBuffer
+    buffer: ArrayBuffer,
   ) {
     this.setDataStart(buffer);
     await super.init(filename, mimeType, buffer);
@@ -55,13 +55,13 @@ export class WavFormat extends AudioFormat {
     let bufferPart = buffer.slice(0, 4);
     let test1 = String.fromCharCode.apply(
       undefined,
-      new Uint8Array(bufferPart) as any
+      new Uint8Array(bufferPart) as any,
     );
 
     bufferPart = buffer.slice(8, 12);
     let test2 = String.fromCharCode.apply(
       undefined,
-      new Uint8Array(bufferPart) as any
+      new Uint8Array(bufferPart) as any,
     );
     test1 = test1.slice(0, 4);
     test2 = test2.slice(0, 4);
@@ -82,7 +82,7 @@ export class WavFormat extends AudioFormat {
     sampleStart: number,
     sampleDur: number,
     uint8Array: Uint8Array,
-    selectedChannel?: number
+    selectedChannel?: number,
   ): Promise<IntArray> {
     return new Promise<IntArray>((resolve, reject) => {
       let convertedData: IntArray;
@@ -104,7 +104,7 @@ export class WavFormat extends AudioFormat {
         convertedData = new this.formatConstructor(
           uint8Array.buffer,
           uint8Array.byteOffset,
-          uint8Array.byteLength / divider
+          uint8Array.byteLength / divider,
         );
         start = Math.round(start / divider);
         startPos = 44 / divider + Math.round(start);
@@ -126,8 +126,8 @@ export class WavFormat extends AudioFormat {
           for (let i = 0; i < this._channels; i++) {
             channelData.push(
               new this.formatConstructor(
-                Math.round(dataStart + dataChunkLength)
-              )
+                Math.round(dataStart + dataChunkLength),
+              ),
             );
           }
 
@@ -230,7 +230,7 @@ export class WavFormat extends AudioFormat {
       if (result + 4 < buffer.byteLength) {
         const part = String.fromCharCode.apply(
           undefined,
-          new Uint8Array(buffer.slice(result, result + 4)) as any
+          new Uint8Array(buffer.slice(result, result + 4)) as any,
         );
         test = '' + part.slice(0, 4) + '';
       } else {

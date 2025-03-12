@@ -18,10 +18,8 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
-import { AsrOptionsComponent } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import { DateTime } from 'luxon';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
@@ -65,7 +63,6 @@ import { NavbarService } from './navbar.service';
     NgStyle,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    AsrOptionsComponent,
     AsyncPipe,
     UpperCasePipe,
     TranslocoPipe,
@@ -160,7 +157,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
     public audio: AudioService,
     public api: OctraAPIService,
     private offcanvasService: NgbOffcanvas,
-    protected asrStoreService: AsrStoreService
+    protected asrStoreService: AsrStoreService,
   ) {
     super();
   }
@@ -175,7 +172,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
             {
               navbarService: this,
               uiService: this.uiService,
-            }
+            },
           );
           break;
       }
@@ -274,21 +271,21 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       {
         navbarService: this,
         uiService: this.uiService,
-      }
+      },
     );
   }
 
   openToolsModal() {
     this.modalTools = this.modalService.openModalRef(
       ToolsModalComponent,
-      ToolsModalComponent.options
+      ToolsModalComponent.options,
     );
   }
 
   openStatisticsModal() {
     this.modalStatistics = this.modalService.openModalRef(
       StatisticsModalComponent,
-      StatisticsModalComponent.options
+      StatisticsModalComponent.options,
     );
   }
 
@@ -304,7 +301,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       this.annotationStoreService.quit(
         true,
         !redirectToProjects,
-        redirectToProjects
+        redirectToProjects,
       );
     } else {
       this.appStorage.logout(true);
@@ -321,7 +318,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   openAboutModal() {
     this.modalService.openModalRef(
       AboutModalComponent,
-      AboutModalComponent.options
+      AboutModalComponent.options,
     );
   }
 
@@ -338,7 +335,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
           this.subscriptionManager.removeByTag('canvasDismissed');
         },
       },
-      'canvasDismissed'
+      'canvasDismissed',
     );
   }
 }

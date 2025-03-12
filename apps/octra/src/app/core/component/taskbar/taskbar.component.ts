@@ -24,7 +24,7 @@ export class FastbarComponent {
   constructor(
     public appStorage: AppStorageService,
     private appStoreService: ApplicationStoreService,
-    private modalService: OctraModalService
+    private modalService: OctraModalService,
   ) {}
 
   openHelpModal() {

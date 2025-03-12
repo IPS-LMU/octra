@@ -12,12 +12,12 @@
     </button>
     <div ngbDropdownMenu style="cursor: pointer">
       @for (colDef of remainingColDefs; track colDef) {
-      <a
-        (click)="tableConfiguratorAddColumn(-1, colDef.type)"
-        class="dropdown-item"
-      >
-        {{ colDef.type }}
-      </a>
+        <a
+          (click)="tableConfiguratorAddColumn(-1, colDef.type)"
+          class="dropdown-item"
+        >
+          {{ colDef.type }}
+        </a>
       }
     </div>
   </div>
@@ -48,13 +48,13 @@
 
       <div ngbDropdownMenu style="cursor: pointer">
         @for (timeFormat of tableOptions.timeFormats; track timeFormat) {
-        <a
-          (click)="onTimeFormatChange(timeFormat)"
-          class="dropdown-item"
-          role="menuitem"
-        >
-          {{ timeFormat }}
-        </a>
+          <a
+            (click)="onTimeFormatChange(timeFormat)"
+            class="dropdown-item"
+            role="menuitem"
+          >
+            {{ timeFormat }}
+          </a>
         }
       </div>
     </div>
@@ -63,7 +63,7 @@
 
 <div
   [ngStyle]="{
-    width: tableWidth + 'px'
+    width: tableWidth + 'px',
   }"
   class="easy-table"
 >
@@ -74,32 +74,32 @@
     class="inner"
   >
     @for (column of columns; track column; let i = $index) {
-    <div class="column" cdkDrag>
-      <div class="grip">
-        <i class="bi bi-grip-vertical"></i>
-      </div>
-      <div (click)="onDeleteColumnClick(i)" class="delete-column">
-        <i class="bi bi-x-lg"></i>
-      </div>
-      <div class="header">
-        <div
-          #title
-          (keydown)="onTitleKeyDown($event)"
-          (keyup)="onTitleKeyUp($event, title, i)"
-          (mouseleave)="onTitleLeave(title, i)"
-          class="title"
-          contenteditable="true"
-          (mousedown)="$event.stopPropagation()"
-        >
-          {{ column.title }}
+      <div class="column" cdkDrag>
+        <div class="grip">
+          <i class="bi bi-grip-vertical"></i>
         </div>
+        <div (click)="onDeleteColumnClick(i)" class="delete-column">
+          <i class="bi bi-x-lg"></i>
+        </div>
+        <div class="header">
+          <div
+            #title
+            (keydown)="onTitleKeyDown($event)"
+            (keyup)="onTitleKeyUp($event, title, i)"
+            (mouseleave)="onTitleLeave(title, i)"
+            class="title"
+            contenteditable="true"
+            (mousedown)="$event.stopPropagation()"
+          >
+            {{ column.title }}
+          </div>
+        </div>
+        @for (cell of columns[i].columnDefinition.cells; track cell) {
+          <div class="cell">
+            {{ cell.text | cliptext }}
+          </div>
+        }
       </div>
-      @for (cell of columns[i].columnDefinition.cells; track cell) {
-      <div class="cell">
-        {{ cell.text | cliptext }}
-      </div>
-      }
-    </div>
     }
     <div class="clearfix"></div>
   </div>
@@ -131,13 +131,13 @@
               style="cursor: pointer"
             >
               @for (divider of tableOptions.selection.dividers; track divider) {
-              <li
-                (click)="onDividerClick(divider.value)"
-                class="dropdown-item"
-                role="menuitem"
-              >
-                {{ divider.name }} ({{ divider.value }})
-              </li>
+                <li
+                  (click)="onDividerClick(divider.value)"
+                  class="dropdown-item"
+                  role="menuitem"
+                >
+                  {{ divider.name }} ({{ divider.value }})
+                </li>
               }
             </ul>
           </div>
@@ -167,15 +167,17 @@
               role="menu"
               style="cursor: pointer"
             >
-              @for (extension of tableOptions.selection.extension; track
-              extension) {
-              <li
-                (click)="onExtensionClick(extension)"
-                class="dropdown-item"
-                role="menuitem"
-              >
-                {{ extension }}
-              </li>
+              @for (
+                extension of tableOptions.selection.extension;
+                track extension
+              ) {
+                <li
+                  (click)="onExtensionClick(extension)"
+                  class="dropdown-item"
+                  role="menuitem"
+                >
+                  {{ extension }}
+                </li>
               }
             </ul>
           </div>
@@ -214,12 +216,12 @@
           {{ 'custom.table configurator.generate table' | transloco }}
         </button>
         @if (this.resultURL !== undefined) {
-        <a
-          [download]="'test' + tableOptions.fileExtension"
-          [href]="this.resultURL"
-          style="margin-left: 10px"
-          >{{ 'g.download' | transloco }}</a
-        >
+          <a
+            [download]="'test' + tableOptions.fileExtension"
+            [href]="this.resultURL"
+            style="margin-left: 10px"
+            >{{ 'g.download' | transloco }}</a
+          >
         }
       </div>
     </div>

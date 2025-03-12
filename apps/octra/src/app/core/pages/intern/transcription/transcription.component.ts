@@ -121,7 +121,7 @@ export class TranscriptionComponent
   private onAltSend = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     if (
       this._useMode === LoginMode.ONLINE ||
@@ -129,7 +129,7 @@ export class TranscriptionComponent
     ) {
       if (
         ['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(
-          shortcut.keys.mac!
+          shortcut.keys.mac!,
         )
       ) {
         this.appStorage
@@ -147,7 +147,7 @@ export class TranscriptionComponent
                 undefined,
                 undefined,
                 undefined,
-                this.interface
+                this.interface,
               );
             } else if (shortcut.keys.mac! === 'SHIFT + ALT + 2') {
               this.sendTranscriptionForShortAudioFiles('middle');
@@ -161,7 +161,7 @@ export class TranscriptionComponent
                 undefined,
                 undefined,
                 undefined,
-                this.interface
+                this.interface,
               );
             } else if (shortcut.keys.mac! === 'SHIFT + ALT + 3') {
               this.sendTranscriptionForShortAudioFiles('good');
@@ -175,7 +175,7 @@ export class TranscriptionComponent
                 undefined,
                 undefined,
                 undefined,
-                this.interface
+                this.interface,
               );
             }
           })
@@ -189,7 +189,7 @@ export class TranscriptionComponent
   private onShortcutsModal = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     if (!this.modalVisiblities.shortcuts) {
       this.openShortcutsModal();
@@ -202,7 +202,7 @@ export class TranscriptionComponent
   private onGuidelinesModal = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     if (!this.modalVisiblities.guidelines) {
       this.openGuidelines();
@@ -215,7 +215,7 @@ export class TranscriptionComponent
   private onOverviewModal = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     if (!this.modalVisiblities.overview) {
       this.openOverview();
@@ -351,7 +351,7 @@ export class TranscriptionComponent
     private cd: ChangeDetectorRef,
     private alertService: AlertService,
     public annotationStoreService: AnnotationStoreService,
-    private authService: AuthenticationStoreService
+    private authService: AuthenticationStoreService,
   ) {
     super();
     this.audioManager = this.audio.audiomanagers[0];
@@ -379,7 +379,7 @@ export class TranscriptionComponent
               this.audioManager.playPosition,
               caretpos,
               undefined,
-              undefined
+              undefined,
             );
           }
         }
@@ -397,7 +397,7 @@ export class TranscriptionComponent
               'success',
               this.langService.translate('tools.alerts.done', {
                 value: toolName,
-              })
+              }),
             )
             .catch((error) => {
               console.error(error);
@@ -415,7 +415,7 @@ export class TranscriptionComponent
     this.subscribe(this.audio.missingPermission, () => {
       this.modService.openModal(
         MissingPermissionsModalComponent,
-        MissingPermissionsModalComponent.options
+        MissingPermissionsModalComponent.options,
       );
     });
   }
@@ -425,7 +425,7 @@ export class TranscriptionComponent
       this.modService
         .openModal(
           TranscriptionStopModalComponent,
-          TranscriptionStopModalComponent.options
+          TranscriptionStopModalComponent.options,
         )
         .then((answer: any) => {
           if (answer === TranscriptionStopModalAnswer.QUIT) {
@@ -470,7 +470,7 @@ export class TranscriptionComponent
 
     this.navbarServ.interfaces = this.projectsettings.interfaces;
     this.shortcutService.registerGeneralShortcutGroup(
-      this.transcriptionShortcuts
+      this.transcriptionShortcuts,
     );
 
     /**
@@ -553,7 +553,7 @@ export class TranscriptionComponent
               this.modService
                 .openModal(
                   InactivityModalComponent,
-                  InactivityModalComponent.options
+                  InactivityModalComponent.options,
                 )
                 .then((answer) => {
                   this.isInactivityModalVisible = false;
@@ -633,7 +633,7 @@ export class TranscriptionComponent
                 this.cd.detectChanges();
 
                 resolve();
-              }
+              },
             );
             if (hasProperty(this.currentEditor.instance as any, 'openModal')) {
               this.subscribe(
@@ -642,11 +642,11 @@ export class TranscriptionComponent
                   (this.currentEditor.instance as any).disableAllShortcuts();
 
                   this.subscriptionManager.removeByTag(
-                    'overview modal transcr send'
+                    'overview modal transcr send',
                   );
                   this.modalOverview = this.modService.openModalRef(
                     OverviewModalComponent,
-                    OverviewModalComponent.options
+                    OverviewModalComponent.options,
                   );
                   this.subscribe(
                     this.modalOverview.componentInstance.transcriptionSend,
@@ -660,7 +660,7 @@ export class TranscriptionComponent
                         },
                       });
                     },
-                    'overview modal transcr send'
+                    'overview modal transcr send',
                   );
 
                   this.modalOverview.result
@@ -670,7 +670,7 @@ export class TranscriptionComponent
                     .catch(() => {
                       this.appStoreService.setShortcutsEnabled(true);
                     });
-                }
+                },
               );
             }
 
@@ -682,7 +682,7 @@ export class TranscriptionComponent
               undefined,
               undefined,
               undefined,
-              'editors'
+              'editors',
             );
             this.cd.detectChanges();
           });
@@ -713,7 +713,7 @@ export class TranscriptionComponent
       this.modService
         .openModal(
           TranscriptionDemoEndModalComponent,
-          TranscriptionDemoEndModalComponent.options
+          TranscriptionDemoEndModalComponent.options,
         )
         .then((action: any) => {
           this.appStorage.savingNeeded = false;
@@ -727,7 +727,7 @@ export class TranscriptionComponent
             case ModalEndAnswer.CONTINUE:
               this.transcrSendingModal = this.modService.openModalRef(
                 TranscriptionSendingModalComponent,
-                TranscriptionSendingModalComponent.options
+                TranscriptionSendingModalComponent.options,
               );
               this.subscribe(timer(1000), () => {
                 // simulate nextTranscription
@@ -762,7 +762,7 @@ export class TranscriptionComponent
     ) {
       this.modalOverview = this.modService.openModalRef(
         OverviewModalComponent,
-        OverviewModalComponent.options
+        OverviewModalComponent.options,
       );
       this.subscriptionManager.removeByTag('overview modal transcr send');
       this.subscribe(
@@ -777,7 +777,7 @@ export class TranscriptionComponent
             },
           });
         },
-        'overview modal transcr send'
+        'overview modal transcr send',
       );
     } else {
       this.onSendNowClick();
@@ -822,7 +822,7 @@ export class TranscriptionComponent
             error: `Export Type ${aType} is not supported.`,
             status: 'error',
           },
-          '*'
+          '*',
         );
         return;
       }
@@ -831,12 +831,12 @@ export class TranscriptionComponent
     const oannotjson = this.annotationStoreService.transcript!.serialize(
       this.audio.audioManager.resource.info.fullname,
       this.audio.audioManager.resource.info.sampleRate,
-      this.audio.audioManager.resource.info.duration
+      this.audio.audioManager.resource.info.duration,
     );
     const result = converter.export(
       oannotjson,
       this.audio.audioManager.resource.getOAudioFile(),
-      0
+      0,
     );
 
     if (!result.error && result.file) {
@@ -848,7 +848,7 @@ export class TranscriptionComponent
           },
           status: 'success',
         },
-        '*'
+        '*',
       );
     } else {
       console.error(`Annotation conversion failed: ${result.error}`);
@@ -857,7 +857,7 @@ export class TranscriptionComponent
           error: `Annotation conversion failed: ${result.error}`,
           status: 'error',
         },
-        '*'
+        '*',
       );
     }
   }
@@ -882,7 +882,7 @@ export class TranscriptionComponent
   openGuidelines() {
     this.modalGuidelines = this.modService.openModalRef(
       TranscriptionGuidelinesModalComponent,
-      TranscriptionGuidelinesModalComponent.options
+      TranscriptionGuidelinesModalComponent.options,
     );
     this.appStoreService.setShortcutsEnabled(false);
     this.modalGuidelines.result
@@ -900,7 +900,7 @@ export class TranscriptionComponent
     this.annotationStoreService.analyse();
     this.modalOverview = this.modService.openModalRef(
       OverviewModalComponent,
-      OverviewModalComponent.options
+      OverviewModalComponent.options,
     );
 
     this.appStoreService.setShortcutsEnabled(false);
@@ -918,7 +918,7 @@ export class TranscriptionComponent
           },
         });
       },
-      'overview modal transcr send'
+      'overview modal transcr send',
     );
 
     this.modalOverview.result
@@ -936,7 +936,7 @@ export class TranscriptionComponent
   openShortcutsModal() {
     this.modalShortcutsDialogue = this.modService.openModalRef(
       ShortcutsModalComponent,
-      ShortcutsModalComponent.options
+      ShortcutsModalComponent.options,
     );
     this.appStoreService.setShortcutsEnabled(false);
     this.modalShortcutsDialogue.result
@@ -953,7 +953,7 @@ export class TranscriptionComponent
   openPromptModal() {
     this.modService.openModalRef(
       PromptModalComponent,
-      PromptModalComponent.options
+      PromptModalComponent.options,
     );
   }
 }

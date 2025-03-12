@@ -35,7 +35,7 @@ export class Control {
     private _label: Label,
     private _required: boolean,
     private _type: ControlType,
-    private _custom: any
+    private _custom: any,
   ) {}
 
   public static fromAny(control: any): Control {
@@ -44,7 +44,7 @@ export class Control {
       new Label(control.label),
       control.required,
       new ControlType(control.type),
-      control.custom
+      control.custom,
     );
   }
 

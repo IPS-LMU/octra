@@ -139,7 +139,7 @@ export function unEscapeHtml(text: string): string {
 export function insertString(
   input: string,
   pos: number,
-  insertion: string
+  insertion: string,
 ): string {
   let result = input;
 
@@ -160,7 +160,7 @@ export function waitTillResultRetrieved<
   A2 extends {
     type: string;
   },
-  T
+  T,
 >(actions: A1, success: A2, failure: A2) {
   return new Promise<T>((resolve, reject) => {
     const subscr = actions.subscribe((action: A2) => {
@@ -265,7 +265,7 @@ export function removeEmptyProperties<T>(
     removeEmptyStrings: true,
     removeNull: true,
     removeUndefined: true,
-  }
+  },
 ): T {
   if (Array.isArray(obj)) {
     const filtered = obj.filter(
@@ -274,7 +274,7 @@ export function removeEmptyProperties<T>(
         (!options.removeNull || a !== null) &&
         (!options.removeEmptyStrings ||
           typeof a !== 'string' ||
-          a.trim() !== '')
+          a.trim() !== ''),
     );
     return filtered.map((a) => removeEmptyProperties<T>(a, options)) as T;
   } else {
@@ -311,7 +311,7 @@ export function removeEmptyProperties<T>(
  */
 export function mapFnOnObject(
   obj: Record<string, any>,
-  fn: (key: string, value: any) => any
+  fn: (key: string, value: any) => any,
 ) {
   Object.keys(obj).forEach((key: string) => {
     obj[key] = fn(key, obj[key]);
@@ -324,7 +324,7 @@ export function getTranscriptFromIO(io: any[]): any | undefined {
     (a) =>
       !a.fileType!.includes('audio') &&
       !a.fileType!.includes('video') &&
-      !a.fileType!.includes('image')
+      !a.fileType!.includes('image'),
   );
 }
 
@@ -337,13 +337,13 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
   const width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
+      ? document.documentElement.clientWidth
+      : screen.width;
   const height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
+      ? document.documentElement.clientHeight
+      : screen.height;
 
   const systemZoom = width / window.screen.availWidth;
   const left = (width - w) / 2 / systemZoom + dualScreenLeft;
@@ -359,7 +359,7 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
       height=${h / systemZoom},
       top=${top},
       left=${left}
-      `
+      `,
   );
 
   if ((window as any).focus && newWindow) {
@@ -463,7 +463,10 @@ export async function wait(seconds: number): Promise<void> {
  * @param url
  * @param params
  */
-export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean>) {
+export function appendURLQueryParams(
+  url: string,
+  params: Record<string, string | number | boolean>,
+) {
   let startingLetter = '?';
   if (/[^/]*\?([^/]*)$/g.exec(url)) {
     startingLetter = '&';

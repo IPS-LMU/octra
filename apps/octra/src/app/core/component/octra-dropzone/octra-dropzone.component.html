@@ -8,91 +8,101 @@
 <octra-drop-zone #dropzone (afterdrop)="afterDrop()" [height]="height">
   <table [hidden]="files.length === 0" class="dropzone-table position-relative">
     @for (fileProgress of files; track fileProgress) {
-    <tr>
-      <td class="text-center">
-        @if (fileProgress.status === 'invalid') {
-        <i
-          class="bi bi-x-lg icon-invalid"
-          [popoverTitle]="'Validation Error'"
-          [ngbPopover]="fileProgress.error ?? ''"
-          [triggers]="'hover'"
-          style="font-size: 16px"
-          placement="top"
-        ></i>
-        } @if (fileProgress.status === 'valid' && !fileProgress.warning) {
-        <i class="bi bi-check-lg" style="font-size: 16px"></i>
-        } @if (fileProgress.status === 'valid' && fileProgress.warning) {
-        <i
-          class="bi bi-exclamation-triangle-fill"
-          [popoverTitle]="'Validation Warning'"
-          [triggers]="'hover'"
-          [ngbPopover]="fileProgress.warning"
-          style="font-size: 16px; color: orange"
-        ></i>
-        } @if (fileProgress.status === 'waiting') {
-        <div
-          class="spinner-border icon-wait"
-          role="status"
-          style="width: 16px; height: 16px; border-width: 2px; color: gray"
-        >
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        } @else if (!fileProgress.file.type.includes("audio") &&
-        fileProgress.status === "progress") {
-        <div
-          class="spinner-border icon-wait"
-          role="status"
-          style="width: 16px; height: 16px; border-width: 2px; color: gray"
-        >
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        } @if (fileProgress.file.type.includes("audio") && fileProgress.status
-        === 'progress' ) { @if(fileProgress.file.extension === ".wav") {
-        <div class="progress">
-          <div
-            class="progress-bar"
-            role="progressbar"
-            style="height: 13px"
-            [style.width]="(fileProgress.progress | procent) + '%'"
-            [attr.aria-valuenow]="fileProgress.progress | procent"
-            [attr.aria-valuemin]="0"
-            [attr.aria-valuemax]="100"
-          >
-            {{ fileProgress.progress | procent }}%
-          </div>
-        </div>
-        } @else {
-        <i class="bi bi-gear-fill spin"></i>
-        } }
-      </td>
-      <td>{{ getDropzoneFileString(fileProgress.file.file) }}</td>
-      <td>
-        <i
-          class="bi bi-trash3-fill icon-delete"
-          (click)="onDeleteEntry($event, fileProgress.id)"
-          style="font-size: 14px; color: dimgray"
-        ></i>
-      </td>
-      <td>
-        <i
-          [ngStyle]="{
-            visibility: fileProgress.needsOptions ? 'visible' : 'hidden'
-          }"
-          class="bi bi-gear-wide-connected ms-1"
-          (click)="
-            $event.stopImmediatePropagation();
-            $event.stopPropagation();
-            octraDropzoneService.openImportOptionsModal(fileProgress)
-          "
-          style="font-size: 14px; color: dimgray"
-        ></i>
-      </td>
-    </tr>
+      <tr>
+        <td class="text-center">
+          @if (fileProgress.status === 'invalid') {
+            <i
+              class="bi bi-x-lg icon-invalid"
+              [popoverTitle]="'Validation Error'"
+              [ngbPopover]="fileProgress.error ?? ''"
+              [triggers]="'hover'"
+              style="font-size: 16px"
+              placement="top"
+            ></i>
+          }
+          @if (fileProgress.status === 'valid' && !fileProgress.warning) {
+            <i class="bi bi-check-lg" style="font-size: 16px"></i>
+          }
+          @if (fileProgress.status === 'valid' && fileProgress.warning) {
+            <i
+              class="bi bi-exclamation-triangle-fill"
+              [popoverTitle]="'Validation Warning'"
+              [triggers]="'hover'"
+              [ngbPopover]="fileProgress.warning"
+              style="font-size: 16px; color: orange"
+            ></i>
+          }
+          @if (fileProgress.status === 'waiting') {
+            <div
+              class="spinner-border icon-wait"
+              role="status"
+              style="width: 16px; height: 16px; border-width: 2px; color: gray"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          } @else if (
+            !fileProgress.file.type.includes('audio') &&
+            fileProgress.status === 'progress'
+          ) {
+            <div
+              class="spinner-border icon-wait"
+              role="status"
+              style="width: 16px; height: 16px; border-width: 2px; color: gray"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          }
+          @if (
+            fileProgress.file.type.includes('audio') &&
+            fileProgress.status === 'progress'
+          ) {
+            @if (fileProgress.file.extension === '.wav') {
+              <div class="progress">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  style="height: 13px"
+                  [style.width]="(fileProgress.progress | procent) + '%'"
+                  [attr.aria-valuenow]="fileProgress.progress | procent"
+                  [attr.aria-valuemin]="0"
+                  [attr.aria-valuemax]="100"
+                >
+                  {{ fileProgress.progress | procent }}%
+                </div>
+              </div>
+            } @else {
+              <i class="bi bi-gear-fill spin"></i>
+            }
+          }
+        </td>
+        <td>{{ getDropzoneFileString(fileProgress.file.file) }}</td>
+        <td>
+          <i
+            class="bi bi-trash3-fill icon-delete"
+            (click)="onDeleteEntry($event, fileProgress.id)"
+            style="font-size: 14px; color: dimgray"
+          ></i>
+        </td>
+        <td>
+          <i
+            [ngStyle]="{
+              visibility: fileProgress.needsOptions ? 'visible' : 'hidden',
+            }"
+            class="bi bi-gear-wide-connected ms-1"
+            (click)="
+              $event.stopImmediatePropagation();
+              $event.stopPropagation();
+              octraDropzoneService.openImportOptionsModal(fileProgress)
+            "
+            style="font-size: 14px; color: dimgray"
+          ></i>
+        </td>
+      </tr>
     }
   </table>
   @if (files.length === 0) {
-  <span class="position-relative">{{
-    'dropzone.drag&drop here' | transloco
-  }}</span>
+    <span class="position-relative">{{
+      'dropzone.drag&drop here' | transloco
+    }}</span>
   }
 </octra-drop-zone>

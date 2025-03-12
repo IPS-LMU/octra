@@ -94,7 +94,7 @@ export class TrnEditorComponent
     private alertService: AlertService,
     private translocoService: TranslocoService,
     private modalService: NgbModal,
-    public annotationStoreService: AnnotationStoreService
+    public annotationStoreService: AnnotationStoreService,
   ) {
     super();
   }
@@ -359,7 +359,7 @@ export class TrnEditorComponent
 
     this.alertService.showAlert(
       'success',
-      this.translocoService.translate('alerts.combine segments successful')
+      this.translocoService.translate('alerts.combine segments successful'),
     );
   };
 
@@ -378,7 +378,7 @@ export class TrnEditorComponent
       next: (guidelines) => {
         this.guidelines = guidelines!.selected!.json;
         this.breakMarkerCode = guidelines?.selected?.json.markers.find(
-          (a) => a.type === 'break'
+          (a) => a.type === 'break',
         )?.code;
       },
     });
@@ -425,7 +425,7 @@ export class TrnEditorComponent
         status: 'active',
         icon: 'bi-intersect',
         label: this.translocoService.translate(
-          'trn-editor.context menu.merge selected lines'
+          'trn-editor.context menu.merge selected lines',
         ),
         func: this.mergeSelectedLinesContextMenu,
       },
@@ -434,7 +434,7 @@ export class TrnEditorComponent
         status: 'active',
         icon: 'bi-eraser-fill',
         label: this.translocoService.translate(
-          'trn-editor.context menu.remove transcripts of selected lines'
+          'trn-editor.context menu.remove transcripts of selected lines',
         ),
         func: this.removeTranscriptsOfSelectedLinesContextMenu,
       },
@@ -443,10 +443,10 @@ export class TrnEditorComponent
         status: 'active',
         icon: 'bi bi-trash',
         label: this.translocoService.translate(
-          'trn-editor.context menu.remove selected lines completely'
+          'trn-editor.context menu.remove selected lines completely',
         ),
         func: this.removeSelectedLines,
-      }
+      },
     );
   }
 
@@ -524,8 +524,8 @@ export class TrnEditorComponent
     this.alertService.showAlert(
       'success',
       this.translocoService.translate(
-        'alerts.combine segments ignore speakerlabel successful'
-      )
+        'alerts.combine segments ignore speakerlabel successful',
+      ),
     );
   };
 
@@ -592,7 +592,7 @@ export class TrnEditorComponent
   onLabelKeyDown(
     $event: KeyboardEvent,
     labelCol: HTMLTableCellElement,
-    index: number
+    index: number,
   ) {
     if ($event.code === 'Enter') {
       $event.preventDefault();
@@ -611,7 +611,7 @@ export class TrnEditorComponent
   onSpeakerLabelMouseDown(
     $event: any,
     labelCol: HTMLTableCellElement,
-    rowNumber: number
+    rowNumber: number,
   ) {
     /*
     if (!(this.keyMap.pressedKeys.ctrl || this.keyMap.pressedKeys.cmd)) {
@@ -654,7 +654,7 @@ export class TrnEditorComponent
   onTranscriptCellMouseOver(
     $event: any,
     rowNumber: number,
-    scrollContainer: HTMLDivElement
+    scrollContainer: HTMLDivElement,
   ) {
     this.lastMouseOver = Date.now();
     let target = $event.target as HTMLElement;
@@ -882,7 +882,7 @@ export class TrnEditorComponent
     ) {
       if (
         this.transcrEditor.html.indexOf(
-          '<img src="assets/img/components/transcr-editor/boundary.png"'
+          '<img src="assets/img/components/transcr-editor/boundary.png"',
         ) > -1
       ) {
         // boundaries were inserted
@@ -1071,7 +1071,7 @@ export class TrnEditorComponent
             undefined,
             undefined,
             undefined,
-            'overview'
+            'overview',
           );
           this.playAll(0);
         })
@@ -1097,7 +1097,7 @@ export class TrnEditorComponent
             undefined,
             undefined,
             undefined,
-            'overview'
+            'overview',
           );
         })
         .catch((error) => {
@@ -1194,7 +1194,7 @@ export class TrnEditorComponent
 
   navigateBetweenCells(
     direction: 'up' | 'right' | 'down' | 'left',
-    segmentNumber: number
+    segmentNumber: number,
   ) {
     if (!(direction === 'up' && segmentNumber === 0)) {
       this.saveAndCloseTranscrEditor().then(() => {
@@ -1266,7 +1266,7 @@ export class TrnEditorComponent
   onShortcutTriggered = ($event: ShortcutEvent) => {
     const triggerUIAction = (
       shortcutObj: any,
-      textSelection?: { start?: number; end?: number }
+      textSelection?: { start?: number; end?: number },
     ) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
@@ -1277,7 +1277,7 @@ export class TrnEditorComponent
         textSelection,
         undefined,
         undefined,
-        'texteditor'
+        'texteditor',
       );
     };
 
@@ -1299,7 +1299,7 @@ export class TrnEditorComponent
           $event.event.preventDefault();
           this.navigateBetweenCells(
             'down',
-            Math.min(this.currentLevel.items.length, this.selectedCell.row)
+            Math.min(this.currentLevel.items.length, this.selectedCell.row),
           );
           break;
         case 'left':

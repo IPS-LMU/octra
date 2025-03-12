@@ -54,7 +54,7 @@ export class WavWriter {
     frameLength: number,
     audioData: Float32Array,
     buf: ArrayBuffer,
-    buffPos: number
+    buffPos: number,
   ) => {
     return new Promise<ArrayBuffer>((resolve, reject) => {
       const valView = new DataView(buf, buffPos);
@@ -170,7 +170,7 @@ export class WavWriter {
           frameLength: number,
           audioData: Float32Array,
           buf: ArrayBuffer,
-          buffPos: number
+          buffPos: number,
         ],
         ArrayBuffer
       >(
@@ -181,7 +181,7 @@ export class WavWriter {
         frameLength,
         ad,
         this.bw.buf,
-        this.bw.pos
+        this.bw.pos,
       );
       WavWriter.worker.addJob(job);
       WavWriter.worker.jobstatuschange.subscribe({

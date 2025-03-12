@@ -42,7 +42,7 @@ export class AudioService {
    */
   public loadAudio: (
     url: string,
-    audioInput: TaskInputOutputDto
+    audioInput: TaskInputOutputDto,
   ) => Subject<any> = (url: string, audioInput: TaskInputOutputDto) => {
     this._loaded = false;
 
@@ -57,7 +57,7 @@ export class AudioService {
               audioInput.filename,
               audioInput.type,
               event.result,
-              url
+              url,
             ).subscribe({
               next: (result) => {
                 if (result.audioManager && result.progress === 1) {
@@ -75,7 +75,7 @@ export class AudioService {
               error: (error: any) => {
                 subj.error(error);
               },
-            })
+            }),
           );
         }
       },
@@ -100,7 +100,7 @@ export class AudioService {
           manager.audioMechanism!.missingPermission.subscribe(() => {
             this.missingPermission.emit();
             this.missingPermission.complete();
-          })
+          }),
         );
       }
     }

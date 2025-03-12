@@ -6,7 +6,7 @@ import { AudioInfo } from './audio/audio-info';
 export async function readFileContents<T>(
   file: File,
   method: 'text' | 'binary' | 'arraybuffer',
-  encoding?: string
+  encoding?: string,
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const reader = new FileReader();
@@ -40,7 +40,7 @@ export interface ReadFileEvent<T> {
 export function readFile<T>(
   file: File,
   method: 'text' | 'binary' | 'arraybuffer',
-  encoding?: string
+  encoding?: string,
 ): Observable<ReadFileEvent<T>> {
   const subj = new BehaviorSubject<ReadFileEvent<T>>({
     status: 'initialized',
@@ -88,7 +88,7 @@ export function readFile<T>(
 export function renameFile(
   file: File,
   newName: string,
-  attributes: any
+  attributes: any,
 ): Promise<File> {
   return new Promise<File>((resolve, reject) => {
     const reader = new FileReader();
@@ -125,7 +125,7 @@ export function fileListToArray(fileList: FileList): File[] {
 
 export async function downloadFile(
   url: string,
-  type: XMLHttpRequestResponseType = 'text'
+  type: XMLHttpRequestResponseType = 'text',
 ): Promise<File> {
   return new Promise<File>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -150,13 +150,13 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
   const width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
+      ? document.documentElement.clientWidth
+      : screen.width;
   const height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
+      ? document.documentElement.clientHeight
+      : screen.height;
 
   const systemZoom = width / window.screen.availWidth;
   const left = (width - w) / 2 / systemZoom + dualScreenLeft;
@@ -172,7 +172,7 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
       height=${h / systemZoom},
       top=${top},
       left=${left}
-      `
+      `,
   );
 
   if ((window as any).focus && newWindow) {
@@ -216,7 +216,7 @@ export function getAudioInfo(
   format: AudioFormat,
   filename: string,
   type: string,
-  buffer: ArrayBuffer
+  buffer: ArrayBuffer,
 ): AudioInfo {
   if (format.isValid(buffer)) {
     return new AudioInfo(
@@ -226,7 +226,7 @@ export function getAudioInfo(
       format.sampleRate,
       format.duration.samples,
       format.channels,
-      format.bitsPerSample
+      format.bitsPerSample,
     );
   } else {
     throw new Error(`Audio file is not a valid file.`);

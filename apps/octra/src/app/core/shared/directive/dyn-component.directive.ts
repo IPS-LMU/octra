@@ -27,13 +27,13 @@ export class DynComponentDirective implements OnInit, OnDestroy {
 
   constructor(
     public viewContainerRef: ViewContainerRef,
-    private _componentFactoryResolver: ComponentFactoryResolver
+    private _componentFactoryResolver: ComponentFactoryResolver,
   ) {}
 
   ngOnInit(): void {
     const componentFactory =
       this._componentFactoryResolver.resolveComponentFactory(
-        this.component!.class
+        this.component!.class,
       );
 
     const viewContainerRef = this.viewContainerRef;
@@ -53,18 +53,18 @@ export class DynComponentDirective implements OnInit, OnDestroy {
             id: this.component.id,
             instance: this.component.instance,
           });
-        })
+        }),
       );
       this.subscrManager.add(
         this.component.instance.destroyed.subscribe(() => {
           this.destroyed.emit({
             id: this.component.id,
           });
-        })
+        }),
       );
     } else {
       console.error(
-        `can't resolve component of alert: comp ${this.component.class}`
+        `can't resolve component of alert: comp ${this.component.class}`,
       );
     }
   }

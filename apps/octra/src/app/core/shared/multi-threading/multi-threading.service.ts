@@ -43,8 +43,8 @@ export class MultiThreadingService {
             },
             (error) => {
               reject(error);
-            }
-          )
+            },
+          ),
         );
 
         bestWorker.addJob(job);

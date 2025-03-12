@@ -303,7 +303,7 @@ export class AudioViewerService {
             this.drawAllBoundaries();
             this.drawWholeSelection();
           },
-        })
+        }),
       );
 
       if (this.refreshOnInternChanges) {
@@ -382,7 +382,7 @@ export class AudioViewerService {
     stageWidth: number | undefined,
     stageHeight: number | undefined,
     container: HTMLDivElement | undefined,
-    audioChunk: AudioChunk | undefined
+    audioChunk: AudioChunk | undefined,
   ) {
     if (stageWidth && stageHeight && container && this.renderer) {
       this.konvaContainer = container;
@@ -439,7 +439,7 @@ export class AudioViewerService {
       let i = 0;
       for (const line of lines) {
         line.visible(
-          this.isVisibleInView(line.x(), line.y(), line.width(), line.height())
+          this.isVisibleInView(line.x(), line.y(), line.width(), line.height()),
         );
         i++;
       }
@@ -453,11 +453,11 @@ export class AudioViewerService {
    */
   public applyChanges(
     changes: AnnotationChange[],
-    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ) {
     const getIndexOfSegmentID = (
       level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
-      id: number
+      id: number,
     ) => {
       return level.items.findIndex((a) => a.id === id);
     };
@@ -466,7 +466,7 @@ export class AudioViewerService {
       const currentLevel = (this
         .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>)!;
       const rightNeighbour = currentLevel.getRightSibling(
-        getIndexOfSegmentID(currentLevel, item.id)
+        getIndexOfSegmentID(currentLevel, item.id),
       );
       if (rightNeighbour) {
         this.removeSegmentFromCanvas(rightNeighbour.id);
@@ -474,7 +474,7 @@ export class AudioViewerService {
       }
 
       const leftNeighbour = currentLevel.getLeftSibling(
-        getIndexOfSegmentID(currentLevel, item.id)
+        getIndexOfSegmentID(currentLevel, item.id),
       );
       if (leftNeighbour) {
         this.removeSegmentFromCanvas(leftNeighbour.id);
@@ -501,7 +501,7 @@ export class AudioViewerService {
           const oldLevel =
             oldAnnotation.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
           const oldLeft = oldLevel.getLeftSibling(
-            getIndexOfSegmentID(oldLevel, change!.item!.old!.id!)
+            getIndexOfSegmentID(oldLevel, change!.item!.old!.id!),
           )! as OctraAnnotationSegment;
           if (oldLeft) {
             checkNeighbours(oldLeft);
@@ -557,7 +557,7 @@ export class AudioViewerService {
           newWidth,
           newHeight,
           this.konvaContainer,
-          this.audioChunk
+          this.audioChunk,
         );
         this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
         await this.initializeSettings();
@@ -615,7 +615,7 @@ export class AudioViewerService {
           const line = this.createLine(
             new Size(this.innerWidth, this.settings.lineheight),
             new Position(this.settings.margin.left, 0),
-            0
+            0,
           );
           this.layers?.background.add(line);
           this.canvasElements.lastLine = line;
@@ -637,7 +637,7 @@ export class AudioViewerService {
               const line = this.createLine(
                 new Size(lineWidth, this.settings.lineheight),
                 new Position(this.settings.margin.left, y),
-                i
+                i,
               );
               line.listening(false);
               line.visible(
@@ -645,8 +645,8 @@ export class AudioViewerService {
                   line.x(),
                   line.y(),
                   line.width(),
-                  line.height()
-                )
+                  line.height(),
+                ),
               );
 
               this.layers.background.add(line);
@@ -660,7 +660,7 @@ export class AudioViewerService {
               const line = this.createLine(
                 new Size(lineWidth, this.settings.lineheight),
                 new Position(this.settings.margin.left, y),
-                numOfLines - 1
+                numOfLines - 1,
               );
               this.layers.background.add(line);
               this.canvasElements.lastLine = line;
@@ -691,7 +691,7 @@ export class AudioViewerService {
         const selectElem = this.createLineSelectionGroup(
           new Size(lineWidth, this.settings.lineheight),
           new Position(this.settings.margin.left, y),
-          i
+          i,
         );
 
         selectionGroup.add(selectElem);
@@ -705,7 +705,7 @@ export class AudioViewerService {
         const selectElem = this.createLineSelectionGroup(
           new Size(lineWidth, this.settings.lineheight),
           new Position(this.settings.margin.left, y),
-          numOfLines - 1
+          numOfLines - 1,
         );
         selectionGroup.add(selectElem);
       }
@@ -786,8 +786,8 @@ export class AudioViewerService {
                 line.x(),
                 line.y(),
                 line.width(),
-                line.height()
-              )
+                line.height(),
+              ),
             );
           }
         }
@@ -846,7 +846,7 @@ export class AudioViewerService {
             this.croppingData.radius,
             0,
             Math.PI * 2,
-            false
+            false,
           );
         }
       },
@@ -939,9 +939,9 @@ export class AudioViewerService {
         this.audioTCalculator.samplestoAbsX(
           new SampleUnit(
             this.audioManager.sampleRate,
-            this.audioManager.sampleRate
-          )
-        )
+            this.audioManager.sampleRate,
+          ),
+        ),
       );
 
       if (pxPerSecond >= 5) {
@@ -950,7 +950,7 @@ export class AudioViewerService {
           : 0;
         const vZoom = Math.round(
           (this.settings.lineheight - timeLineHeight) /
-            this.grid.horizontalLines
+            this.grid.horizontalLines,
         );
 
         if (pxPerSecond > 0 && vZoom > 0) {
@@ -968,7 +968,7 @@ export class AudioViewerService {
               position.x +
                 shape.width() -
                 (this.settings.margin.left + this.settings.margin.right),
-              y + position.y
+              y + position.y,
             );
           }
           // set vertical lines
@@ -982,7 +982,7 @@ export class AudioViewerService {
             context.moveTo(position.x + x, position.y);
             context.lineTo(
               position.x + x,
-              position.y + this.settings.lineheight - timeLineHeight
+              position.y + this.settings.lineheight - timeLineHeight,
             );
           }
 
@@ -1027,7 +1027,7 @@ export class AudioViewerService {
     if (this.layers !== undefined) {
       this.animation.playHead = new Konva.Animation(
         this.doPlayHeadAnimation,
-        this.layers.playhead
+        this.layers.playhead,
       );
     }
 
@@ -1037,7 +1037,7 @@ export class AudioViewerService {
   private createLine(
     size: Size,
     position: Position,
-    lineNum: number
+    lineNum: number,
   ): Konva.Group {
     const result = new Konva.Group({
       name: 'line',
@@ -1094,7 +1094,7 @@ export class AudioViewerService {
   private createLineSelectionGroup(
     size: Size,
     position: Position,
-    lineNum: number
+    lineNum: number,
   ): Konva.Group {
     const result = new Konva.Group({
       name: 'line-selection',
@@ -1161,7 +1161,7 @@ export class AudioViewerService {
   private sceneFuncSignal = (
     context: Konva.Context,
     shape: Konva.Shape,
-    lineNum: number
+    lineNum: number,
   ) => {
     if (
       this.layers !== undefined &&
@@ -1172,7 +1172,7 @@ export class AudioViewerService {
         ? this.settings.timeline.height
         : 0;
       const midline = Math.round(
-        (this.settings.lineheight - timeLineHeight) / 2
+        (this.settings.lineheight - timeLineHeight) / 2,
       );
       const absXPos = lineNum * this.innerWidth;
 
@@ -1186,7 +1186,7 @@ export class AudioViewerService {
       context.beginPath();
       context.moveTo(
         position.x,
-        position.y + midline - this.minmaxarray[absXPos]
+        position.y + midline - this.minmaxarray[absXPos],
       );
 
       if (
@@ -1200,7 +1200,7 @@ export class AudioViewerService {
           const yDraw = !this.settings.roundValues
             ? position.y + midline - this.minmaxarray[x + absXPos] * zoomY
             : Math.round(
-                position.y + midline - this.minmaxarray[x + absXPos] * zoomY
+                position.y + midline - this.minmaxarray[x + absXPos] * zoomY,
               );
 
           if (!isNaN(yDraw) && !isNaN(xDraw)) {
@@ -1234,17 +1234,17 @@ export class AudioViewerService {
       this.PlayCursor
     ) {
       let currentAbsX = this.audioTCalculator.samplestoAbsX(
-        this.audioChunk.relativePlayposition
+        this.audioChunk.relativePlayposition,
       );
       const endAbsX = this.audioTCalculator.samplestoAbsX(
-        this.audioChunk.time.end.sub(this.audioChunk.time.start)
+        this.audioChunk.time.end.sub(this.audioChunk.time.start),
       );
       currentAbsX = Math.min(currentAbsX, endAbsX - 1);
       this.changePlayCursorAbsX(currentAbsX);
 
       // get line of PlayCursor
       const cursorPosition = this.getPlayCursorPositionOfLineByAbsX(
-        this.PlayCursor.absX
+        this.PlayCursor.absX,
       );
       this.canvasElements.playHead.position(cursorPosition);
     }
@@ -1260,7 +1260,7 @@ export class AudioViewerService {
         newValue,
         this.audioTCalculator,
         this.AudioPxWidth,
-        this.audioChunk
+        this.audioChunk,
       );
     }
   };
@@ -1312,7 +1312,7 @@ export class AudioViewerService {
                   this.croppingData.radius,
                   0,
                   Math.PI * 2,
-                  false
+                  false,
                 );
               }
             },
@@ -1325,7 +1325,7 @@ export class AudioViewerService {
         const { startIndex, endIndex } = getSegmentsOfRange(
           this.currentLevel.items as OctraAnnotationSegment[],
           this.audioChunk.time.start.clone(),
-          this.audioChunk.time.end.clone()
+          this.audioChunk.time.end.clone(),
         );
         const segments = this.currentLevel.items as OctraAnnotationSegment[];
 
@@ -1353,11 +1353,11 @@ export class AudioViewerService {
             const start = beginTime.sub(this.audioChunk.time.start.clone());
             const absXStart = this.audioTCalculator.samplestoAbsX(
               start,
-              this.audioChunk.time.duration
+              this.audioChunk.time.duration,
             );
             const absXEnd = this.audioTCalculator.samplestoAbsX(
               segment.time,
-              this.audioChunk.time.duration
+              this.audioChunk.time.duration,
             );
 
             const yStart =
@@ -1377,7 +1377,7 @@ export class AudioViewerService {
                 0,
                 yStart,
                 this._innerWidth!,
-                yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart
+                yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart,
               )
             ) {
               const createdShapes = this.createSegmentOnCanvas(
@@ -1386,7 +1386,7 @@ export class AudioViewerService {
                   index: i,
                   segment: segments[i],
                 },
-                { start: startIndex, end: endIndex }
+                { start: startIndex, end: endIndex },
               );
 
               if (createdShapes) {
@@ -1471,7 +1471,7 @@ export class AudioViewerService {
       const { startIndex, endIndex } = getSegmentsOfRange(
         this.currentLevel.items as OctraAnnotationSegment[],
         this.audioChunk.time.start.clone(),
-        this.audioChunk.time.end.clone()
+        this.audioChunk.time.end.clone(),
       );
       const segments = this.currentLevel.items as OctraAnnotationSegment[];
 
@@ -1488,7 +1488,7 @@ export class AudioViewerService {
           const start = segment.time.sub(this.audioChunk.time.start.clone());
           const absX = this.audioTCalculator.samplestoAbsX(
             start,
-            this.audioChunk.time.duration
+            this.audioChunk.time.duration,
           );
 
           y =
@@ -1535,7 +1535,7 @@ export class AudioViewerService {
       y: number;
       num: number;
       id: number;
-    }[]
+    }[],
   ) {
     if (this.layers) {
       let boundaryRoot: Group | Layer = this.layers.boundaries;
@@ -1552,7 +1552,7 @@ export class AudioViewerService {
         const h = this.settings.lineheight;
 
         const foundBoundary = this.layers.boundaries.findOne(
-          `#boundary_${boundary.id}`
+          `#boundary_${boundary.id}`,
         );
         if (foundBoundary !== undefined) {
           foundBoundary.remove();
@@ -1596,7 +1596,7 @@ export class AudioViewerService {
     segmentInterval: {
       start: number;
       end: number;
-    }
+    },
   ):
     | {
         overlayGroup: Konva.Group;
@@ -1618,7 +1618,7 @@ export class AudioViewerService {
           const start = segment.time.sub(this.audioChunk.time.start.clone());
           const absX = this.audioTCalculator.samplestoAbsX(
             start,
-            this.audioChunk.time.duration
+            this.audioChunk.time.duration,
           );
           let beginTime = this.audioManager.createSampleUnit(0);
           const previousSegment: OctraAnnotationSegment | undefined =
@@ -1685,7 +1685,7 @@ export class AudioViewerService {
                   {
                     start: lineNum1,
                     end: lineNum2,
-                  }
+                  },
                 );
               },
             });
@@ -1711,7 +1711,7 @@ export class AudioViewerService {
                       from: lineNum1,
                       to: lineNum2,
                     },
-                    numOfLines
+                    numOfLines,
                   );
                 },
               });
@@ -1732,7 +1732,7 @@ export class AudioViewerService {
                     this.audioManager
                   ) {
                     const segIndex = this.currentLevel.items.findIndex(
-                      (a) => a.id === segment.id
+                      (a) => a.id === segment.id,
                     );
                     const prevSeg =
                       segIndex > segmentInterval.start
@@ -1774,7 +1774,7 @@ export class AudioViewerService {
                         lastI,
                         numOfLines,
                         seg,
-                        segIndex === this.currentLevel.items.length - 1
+                        segIndex === this.currentLevel.items.length - 1,
                       );
                     }
                   }
@@ -1792,7 +1792,7 @@ export class AudioViewerService {
         }
       }
     } else {
-      console.log("no segment created");
+      console.log('no segment created');
     }
 
     return undefined;
@@ -1810,11 +1810,11 @@ export class AudioViewerService {
       from: number;
       to: number;
     },
-    numOfLines: number
+    numOfLines: number,
   ) => {
     if (this.currentLevel?.items && this.audioManager && this.innerWidth) {
       const segIndex = this.currentLevel.items.findIndex(
-        (a) => a.id === segment.id
+        (a) => a.id === segment.id,
       );
       const prevSeg =
         segIndex > segmentInterval.start
@@ -1829,7 +1829,7 @@ export class AudioViewerService {
         prevSeg ? prevSeg.time.clone() : this.audioManager.createSampleUnit(0),
         numOfLines,
         context,
-        shape
+        shape,
       );
     }
   };
@@ -1846,12 +1846,12 @@ export class AudioViewerService {
     lineInterval: {
       start: number;
       end: number;
-    }
+    },
   ) => {
     if (this.currentLevel?.items && this.audioManager && this.innerWidth) {
       // TODO perhaps there is a problem with segInterval if indices changes
       const segIndex = this.currentLevel.items.findIndex(
-        (a) => a.id === segment.id
+        (a) => a.id === segment.id,
       );
       const seg = this.currentLevel.items[segIndex] as OctraAnnotationSegment;
       const prevSeg =
@@ -1874,7 +1874,7 @@ export class AudioViewerService {
         prevSeg ? prevSeg.time.clone() : this.audioManager.createSampleUnit(0),
         numOfLines,
         context,
-        shape
+        shape,
       );
     }
   };
@@ -1885,12 +1885,12 @@ export class AudioViewerService {
   public async setMouseClickPosition(
     absX: number,
     lineNum: number,
-    $event: Event
+    $event: Event,
   ): Promise<number | undefined> {
     if (this.audioChunk !== undefined) {
       const absXInTime = this.audioTCalculator?.absXChunktoSampleUnit(
         absX,
-        this.audioChunk
+        this.audioChunk,
       );
 
       if (
@@ -1921,7 +1921,7 @@ export class AudioViewerService {
               const currentLevel = this
                 .currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
               const index = this.annotation.currentLevel.items.findIndex(
-                (a) => a.id === this._dragableBoundaryID
+                (a) => a.id === this._dragableBoundaryID,
               );
 
               const segmentBefore = currentLevel!.getLeftSibling(index);
@@ -1974,7 +1974,7 @@ export class AudioViewerService {
               this.PlayCursor?.changeSamples(
                 absXInTime,
                 this.audioTCalculator,
-                this.audioChunk
+                this.audioChunk,
               );
 
               this._mouseDown = false;
@@ -1999,7 +1999,7 @@ export class AudioViewerService {
     const limitPadding = 500;
 
     const index = currentLevel?.items.findIndex(
-      (a) => a.id === this._dragableBoundaryID
+      (a) => a.id === this._dragableBoundaryID,
     );
     if (
       annotation &&
@@ -2032,7 +2032,7 @@ export class AudioViewerService {
 
             let newTime = this.audioTCalculator.absXChunktoSampleUnit(
               absX,
-              this.audioChunk
+              this.audioChunk,
             )!;
 
             if (
@@ -2040,21 +2040,21 @@ export class AudioViewerService {
               newTime.samples < previousSegment.time.samples + limitPadding
             ) {
               newTime = previousSegment.time.add(
-                this.audioManager.createSampleUnit(limitPadding)
+                this.audioManager.createSampleUnit(limitPadding),
               );
             } else if (
               nextSegment &&
               newTime.samples > nextSegment.time.samples - limitPadding
             ) {
               newTime = nextSegment.time.sub(
-                this.audioManager.createSampleUnit(limitPadding)
+                this.audioManager.createSampleUnit(limitPadding),
               );
             }
 
             segment.time = newTime;
             annotation.changeCurrentSegmentBySamplePosition(
               segment.time,
-              segment
+              segment,
             );
 
             if (emit) {
@@ -2074,7 +2074,7 @@ export class AudioViewerService {
             const newSamplePosition =
               this.audioTCalculator.absXChunktoSampleUnit(
                 absX,
-                this.audioChunk
+                this.audioChunk,
               )?.samples;
             const diff = newSamplePosition! - oldSamplePosition;
             let changedItems: OctraAnnotationSegment[] = [];
@@ -2089,14 +2089,14 @@ export class AudioViewerService {
                     this.drawnSelection.end!.samples
                 ) {
                   const newItem = currentLevelElement.clone(
-                    currentLevelElement.id
+                    currentLevelElement.id,
                   );
                   newItem.time = currentLevelElement.time.add(
-                    this.audioManager.createSampleUnit(diff)
+                    this.audioManager.createSampleUnit(diff),
                   );
                   annotation = annotation.changeCurrentItemById(
                     currentLevelElement.id,
-                    newItem
+                    newItem,
                   );
                   changedItems.push(newItem);
                 }
@@ -2111,14 +2111,14 @@ export class AudioViewerService {
                     this.drawnSelection.start!.samples
                 ) {
                   const newItem = currentLevelElement.clone(
-                    currentLevelElement.id
+                    currentLevelElement.id,
                   );
                   newItem.time = currentLevelElement.time.add(
-                    this.audioManager.createSampleUnit(diff)
+                    this.audioManager.createSampleUnit(diff),
                   );
                   annotation = annotation.changeCurrentItemById(
                     currentLevelElement.id,
-                    newItem
+                    newItem,
                   );
                   changedItems.push(newItem);
                 } else if (currentLevelElement.time.samples - diff < 0) {
@@ -2147,7 +2147,7 @@ export class AudioViewerService {
         this.PlayCursor.changeSamples(
           this.audioChunk.absolutePlayposition.clone(),
           this.audioTCalculator,
-          this.audioChunk
+          this.audioChunk,
         );
       }
     }
@@ -2215,14 +2215,14 @@ export class AudioViewerService {
     // initialize the default values
     this.audioTCalculator = new AudioTimeCalculator(
       this.audioChunk.time.duration,
-      this.AudioPxWidth
+      this.AudioPxWidth,
     );
     this.MouseClickPos = this.audioManager.createSampleUnit(0);
     this._mouseCursor = this.audioManager.createSampleUnit(0);
     this.PlayCursor = new PlayCursor(
       0,
       new SampleUnit(0, this.audioChunk.sampleRate),
-      this._innerWidth
+      this._innerWidth,
     );
     this._drawnSelection = this.audioChunk.selection.clone();
     this._drawnSelection.end = this._drawnSelection.start.clone();
@@ -2239,16 +2239,16 @@ export class AudioViewerService {
         {
           start: Math.ceil(
             this.audioChunk.time.start.samples /
-              this.audioManager.channelDataFactor
+              this.audioManager.channelDataFactor,
           ),
           end: Math.min(
             this.audioManager.channel!.length,
             Math.ceil(
               this.audioChunk.time.end.samples /
-                this.audioManager.channelDataFactor
-            )
+                this.audioManager.channelDataFactor,
+            ),
           ),
-        }
+        },
       );
     } else {
       throw new Error('audioManager or audioChunk is undefined');
@@ -2289,7 +2289,7 @@ export class AudioViewerService {
           y: view.y,
           height: view.height,
           width: view.width,
-        }
+        },
       );
     }
     return false;
@@ -2370,7 +2370,7 @@ export class AudioViewerService {
                         value: result.type,
                         type: 'boundary',
                         timePosition: this.audioManager.createSampleUnit(
-                          result.seg_samples
+                          result.seg_samples,
                         ),
                         timestamp: shortcutInfo.timestamp,
                       });
@@ -2393,7 +2393,7 @@ export class AudioViewerService {
                   ) {
                     const segmentI = getSegmentBySamplePosition(
                       this.currentLevel.items as OctraAnnotationSegment[],
-                      xSamples
+                      xSamples,
                     );
                     if (
                       this.currentLevel.type === AnnotationLevelType.SEGMENT
@@ -2401,7 +2401,7 @@ export class AudioViewerService {
                       const segment = this.currentLevel.items[
                         segmentI
                       ] as OctraAnnotationSegment<ASRContext>;
-                      console.log("set break");
+                      console.log('set break');
                       console.log(`
                       ${segmentI > -1} &&
                         ${segment.context?.asr?.isBlockedBy} === undefined &&
@@ -2418,7 +2418,7 @@ export class AudioViewerService {
                         ) {
                           segment.changeFirstLabelWithoutName(
                             'Speaker',
-                            this.silencePlaceholder
+                            this.silencePlaceholder,
                           );
                           this.shortcut.emit({
                             shortcut: comboKey,
@@ -2458,13 +2458,13 @@ export class AudioViewerService {
                   const xSamples = this.mouseCursor.clone();
 
                   const boundarySelect = this.getSegmentSelection(
-                    this.mouseCursor.samples
+                    this.mouseCursor.samples,
                   );
                   if (boundarySelect) {
                     const segmentI = getSegmentBySamplePosition(
                       this.currentLevel
                         .items as OctraAnnotationSegment<ASRContext>[],
-                      xSamples
+                      xSamples,
                     );
                     if (segmentI > -1) {
                       if (
@@ -2478,7 +2478,7 @@ export class AudioViewerService {
 
                         const startTime = getStartTimeBySegmentID(
                           currentLevel.items as OctraAnnotationSegment<ASRContext>[],
-                          segment.id
+                          segment.id,
                         );
 
                         // make shure, that segments boundaries are visible
@@ -2491,7 +2491,7 @@ export class AudioViewerService {
                           this.audioTCalculator !== undefined
                         ) {
                           const absX = this.audioTCalculator.samplestoAbsX(
-                            segment.time
+                            segment.time,
                           );
                           this.audioChunk.selection = boundarySelect.clone();
                           this.drawnSelection = boundarySelect.clone();
@@ -2503,7 +2503,7 @@ export class AudioViewerService {
                               ? this.currentLevel.items[segmentI - 1]
                               : this.annotation!.createSegment(
                                   this.audioManager.createSampleUnit(0),
-                                  [new OLabel(this.currentLevel.name, '')]
+                                  [new OLabel(this.currentLevel.name, '')],
                                 )
                           ) as OctraAnnotationSegment<ASRContext>;
 
@@ -2512,7 +2512,7 @@ export class AudioViewerService {
                             this.innerWidth !== undefined
                           ) {
                             const beginX = this.audioTCalculator.samplestoAbsX(
-                              begin.time
+                              begin.time,
                             );
 
                             const posY1 =
@@ -2540,7 +2540,7 @@ export class AudioViewerService {
                               this.audioChunk.absolutePlayposition =
                                 this.audioChunk.selection.start.clone();
                               this.changePlayCursorSamples(
-                                this.audioChunk.selection.start
+                                this.audioChunk.selection.start,
                               );
                               this.updatePlayCursor();
 
@@ -2624,7 +2624,7 @@ export class AudioViewerService {
                             i,
                             this.silencePlaceholder,
                             true,
-                            false
+                            false,
                           );
                           removedIDs.push(segment.id);
                           i--;
@@ -2690,7 +2690,7 @@ export class AudioViewerService {
                   const segInde = getSegmentBySamplePosition(
                     this.currentLevel
                       .items as OctraAnnotationSegment<ASRContext>[],
-                    this.mouseCursor
+                    this.mouseCursor,
                   );
                   this.selectSegment(segInde)
                     .then(({ posY1, posY2 }) => {
@@ -2727,7 +2727,7 @@ export class AudioViewerService {
                   });
                   this.moveCursor(
                     'left',
-                    this.settings.stepWidthRatio * this.audioManager.sampleRate
+                    this.settings.stepWidthRatio * this.audioManager.sampleRate,
                   );
                   this.changeMouseCursorSamples(this.mouseCursor);
                   this.mousecursorchange.emit({
@@ -2754,7 +2754,7 @@ export class AudioViewerService {
 
                   this.moveCursor(
                     'right',
-                    this.settings.stepWidthRatio * this.audioManager.sampleRate
+                    this.settings.stepWidthRatio * this.audioManager.sampleRate,
                   );
                   this.changeMouseCursorSamples(this.mouseCursor);
                   this.mousecursorchange.emit({
@@ -2793,7 +2793,7 @@ export class AudioViewerService {
                   const segmentI = getSegmentBySamplePosition(
                     this.currentLevel
                       .items as OctraAnnotationSegment<ASRContext>[],
-                    this.mouseCursor
+                    this.mouseCursor,
                   );
                   const segment = this.currentLevel.items[
                     segmentI
@@ -2833,7 +2833,7 @@ export class AudioViewerService {
                   const segmentI = getSegmentBySamplePosition(
                     this.currentLevel
                       .items as OctraAnnotationSegment<ASRContext>[],
-                    this.mouseCursor
+                    this.mouseCursor,
                   );
                   const segment = this.currentLevel.items[
                     segmentI
@@ -2874,7 +2874,7 @@ export class AudioViewerService {
                   const segmentI = getSegmentBySamplePosition(
                     this.currentLevel
                       .items as OctraAnnotationSegment<ASRContext>[],
-                    this.mouseCursor
+                    this.mouseCursor,
                   );
                   const segment = this.currentLevel.items[
                     segmentI
@@ -2935,7 +2935,7 @@ export class AudioViewerService {
   };
 
   public async selectSegment(
-    segIndex: number
+    segIndex: number,
   ): Promise<{ posY1: number; posY2: number }> {
     if (
       segIndex > -1 &&
@@ -2971,7 +2971,7 @@ export class AudioViewerService {
           begin = new OctraAnnotationSegment(
             this.getNextItemID(),
             this.audioManager.createSampleUnit(0),
-            []
+            [],
           );
         }
 
@@ -2993,7 +2993,7 @@ export class AudioViewerService {
         }
 
         const boundarySelect = this.getSegmentSelection(
-          segment.time.samples - 1
+          segment.time.samples - 1,
         );
         if (boundarySelect) {
           this.audioChunk.selection = boundarySelect;
@@ -3038,7 +3038,7 @@ export class AudioViewerService {
    */
   public changePlayCursorSamples = (
     newValue: SampleUnit,
-    chunk?: AudioChunk
+    chunk?: AudioChunk,
   ) => {
     if (this.PlayCursor !== undefined && this.audioTCalculator !== undefined) {
       this.PlayCursor.changeSamples(newValue, this.audioTCalculator, chunk);
@@ -3054,7 +3054,7 @@ export class AudioViewerService {
     width: number,
     height: number,
     cha: Float32Array,
-    _interval: { start: number; end: number }
+    _interval: { start: number; end: number },
   ): Promise<number[]> {
     return new Promise<number[]>((resolve, reject) => {
       const promises = [];
@@ -3065,7 +3065,7 @@ export class AudioViewerService {
 
       let piece = Math.floor(width / numberOfPieces);
       const samplePiece = Math.floor(
-        (_interval.end - _interval.start) / numberOfPieces
+        (_interval.end - _interval.start) / numberOfPieces,
       );
 
       for (let i = 1; i <= numberOfPieces; i++) {
@@ -3086,7 +3086,7 @@ export class AudioViewerService {
               end: number;
             },
             roundValues: boolean,
-            xZoom: number
+            xZoom: number,
           ],
           number[]
         >(
@@ -3099,7 +3099,7 @@ export class AudioViewerService {
             end,
           },
           this._settings.roundValues,
-          xZoom
+          xZoom,
         );
 
         promises.push(this.multiThreadingService.run<number[]>(tsJob));
@@ -3154,16 +3154,16 @@ export class AudioViewerService {
     lineWidth: number,
     startSamples: SampleUnit,
     endSamples: SampleUnit,
-    innerWidth: number
+    innerWidth: number,
   ): { start: number; end: number } {
     if (this.audioTCalculator !== undefined && this.audioChunk !== undefined) {
       const absX = lineNum * innerWidth;
       const absEnd = absX + lineWidth;
       const selAbsStart = this.audioTCalculator.samplestoAbsX(
-        startSamples.sub(this.audioChunk.time.start)
+        startSamples.sub(this.audioChunk.time.start),
       );
       const selAbsEnd = this.audioTCalculator.samplestoAbsX(
-        endSamples.sub(this.audioChunk.time.start)
+        endSamples.sub(this.audioChunk.time.start),
       );
 
       const result = {
@@ -3215,7 +3215,7 @@ export class AudioViewerService {
     ) {
       const absXTime = this.audioTCalculator.absXChunktoSampleUnit(
         absX,
-        this.audioChunk
+        this.audioChunk,
       );
 
       if (absXTime !== undefined) {
@@ -3273,7 +3273,7 @@ export class AudioViewerService {
         : this.audioChunk.absolutePlayposition.samples;
       let bWidthTime = this.audioTCalculator.absXtoSamples2(
         this.settings.boundaries.width * 2,
-        this.audioChunk
+        this.audioChunk,
       );
       bWidthTime = Math.round(bWidthTime);
 
@@ -3322,12 +3322,12 @@ export class AudioViewerService {
         const segm1 = betweenWhichSegment(
           this.annotation.currentLevel
             .items as OctraAnnotationSegment<ASRContext>[],
-          this._drawnSelection.start.samples
+          this._drawnSelection.start.samples,
         );
         const segm2 = betweenWhichSegment(
           this.annotation.currentLevel
             .items as OctraAnnotationSegment<ASRContext>[],
-          this._drawnSelection.end.samples
+          this._drawnSelection.end.samples,
         );
 
         if (
@@ -3370,7 +3370,7 @@ export class AudioViewerService {
         // no selection
 
         this.addSegment(
-          this.audioManager!.createSampleUnit(Math.round(absXTime))
+          this.audioManager!.createSampleUnit(Math.round(absXTime)),
         );
 
         return {
@@ -3392,7 +3392,7 @@ export class AudioViewerService {
    * @returns AudioSelection
    */
   public getSegmentSelection(
-    positionSamples: number
+    positionSamples: number,
   ): AudioSelection | undefined {
     // complex decision needed because there are no segments at position 0 and the end of the file
     let result = undefined;
@@ -3418,14 +3418,14 @@ export class AudioViewerService {
             // select in first Boundary
             result = new AudioSelection(
               this.audioManager.createSampleUnit(0),
-              firstSegment.time
+              firstSegment.time,
             );
           } else if (positionSamples > lastSegment.time.samples) {
             // select in first Boundary
             const seg = lastSegment.time.clone();
             result = new AudioSelection(
               seg,
-              this.audioManager.resource.info.duration
+              this.audioManager.resource.info.duration,
             );
           } else {
             for (let i = 1; i < length; i++) {
@@ -3446,7 +3446,7 @@ export class AudioViewerService {
                 ) {
                   result = new AudioSelection(
                     previousSegment.time,
-                    currentSegment.time
+                    currentSegment.time,
                   );
                   return result;
                 }
@@ -3485,7 +3485,7 @@ export class AudioViewerService {
               this.audioChunk.time.start.samples + samples
             ) {
               this._mouseCursor = this._mouseCursor.sub(
-                this.audioManager.createSampleUnit(samples)
+                this.audioManager.createSampleUnit(samples),
               );
             }
           } else if (direction === 'right') {
@@ -3494,14 +3494,14 @@ export class AudioViewerService {
               this.audioChunk.time.end.samples - samples
             ) {
               this._mouseCursor = this._mouseCursor.add(
-                this.audioManager.createSampleUnit(samples)
+                this.audioManager.createSampleUnit(samples),
               );
             }
           }
         }
       } else {
         throw new Error(
-          'can not move cursor by given samples. Number of samples less than 0.'
+          'can not move cursor by given samples. Number of samples less than 0.',
         );
       }
     }
@@ -3527,7 +3527,7 @@ export class AudioViewerService {
       end: number;
     },
     roundValues: boolean,
-    xZoom: number
+    xZoom: number,
   ) => {
     return new Promise<number[]>((resolve, reject) => {
       if (
@@ -3634,7 +3634,7 @@ export class AudioViewerService {
         this.calculateZoom(
           this._settings.lineheight,
           this.AudioPxWidth,
-          this._minmaxarray
+          this._minmaxarray,
         );
       }
       if (this.audioChunk !== undefined) {
@@ -3672,7 +3672,7 @@ export class AudioViewerService {
         const start = segment.time.sub(this.audioChunk.time.start);
         const absX = this.audioTCalculator.samplestoAbsX(
           start,
-          this.audioChunk.time.duration
+          this.audioChunk.time.duration,
         );
         const y =
           (this.innerWidth < this.AudioPxWidth
@@ -3682,7 +3682,7 @@ export class AudioViewerService {
         const { startIndex, endIndex } = getSegmentsOfRange(
           this.currentLevel.items as OctraAnnotationSegment[],
           this.audioChunk.time.start,
-          this.audioChunk.time.end
+          this.audioChunk.time.end,
         );
         const root: Konva.Group | Konva.Layer = this.layers.overlay;
 
@@ -3699,7 +3699,7 @@ export class AudioViewerService {
             index: i,
             segment: segment,
           },
-          { start: startIndex, end: endIndex }
+          { start: startIndex, end: endIndex },
         );
 
         if (createdShapes) {
@@ -3737,7 +3737,7 @@ export class AudioViewerService {
     y: number,
     numOfLines: number,
     context: Konva.Context,
-    shape: Konva.Shape
+    shape: Konva.Shape,
   ) => {
     if (
       this.canvasElements?.lastLine !== undefined &&
@@ -3758,7 +3758,7 @@ export class AudioViewerService {
         if (numOfLines > 1) {
           endTime = Math.min(
             startTime + this.secondsPerLine * 1000,
-            this.audioChunk.time.duration.unix
+            this.audioChunk.time.duration.unix,
           );
           endTime = Math.ceil(endTime / 1000) * 1000;
           startTime = Math.floor(startTime / 1000) * 1000;
@@ -3792,7 +3792,7 @@ export class AudioViewerService {
             : this.canvasElements.lastLine.width()) -
             length -
             3,
-          y + 8
+          y + 8,
         );
       }
     }
@@ -3803,14 +3803,14 @@ export class AudioViewerService {
     silenceCode: string | undefined,
     mergeTranscripts: boolean,
     triggerChange = true,
-    changeTranscript?: (transcript: string) => string
+    changeTranscript?: (transcript: string) => string,
   ) {
     if (this.annotation?.currentLevel) {
       this.annotation?.removeItemByIndex(
         index,
         silenceCode,
         mergeTranscripts,
-        changeTranscript
+        changeTranscript,
       );
       if (triggerChange) {
         this.currentLevelChange.emit({
@@ -3829,7 +3829,7 @@ export class AudioViewerService {
       }
     } else {
       throw new Error(
-        "Can't remove segment by index: current level is undefined"
+        "Can't remove segment by index: current level is undefined",
       );
     }
   }
@@ -3837,7 +3837,7 @@ export class AudioViewerService {
   public addSegment(start: SampleUnit, value?: string) {
     const result = this.annotation!.addItemToCurrentLevel(
       start,
-      value ? [new OLabel(this.currentLevel!.name, value)] : undefined
+      value ? [new OLabel(this.currentLevel!.name, value)] : undefined,
     );
     this.currentLevelChange.emit({
       type: 'add',
@@ -3845,7 +3845,7 @@ export class AudioViewerService {
         {
           instance: this.annotation!.createSegment(
             start,
-            value ? [new OLabel(this.currentLevel!.name, value)] : undefined
+            value ? [new OLabel(this.currentLevel!.name, value)] : undefined,
           ),
         },
       ],
@@ -3856,7 +3856,7 @@ export class AudioViewerService {
   public changeSegment(start: SampleUnit, segment: OctraAnnotationSegment) {
     const result = this.annotation!.changeCurrentSegmentBySamplePosition(
       start,
-      segment
+      segment,
     );
     this.currentLevelChange.emit({
       type: 'change',
@@ -3871,7 +3871,7 @@ export class AudioViewerService {
 
   getChanges(
     oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-    newAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    newAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ): AnnotationChange[] {
     if (!oldAnnotation || !newAnnotation) {
       return [];
@@ -3904,7 +3904,7 @@ export class AudioViewerService {
 
     // first read all IDs
     const readIDs: (
-      annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+      annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
     ) => {
       levelIDs: number[];
       itemIDs: number[];
@@ -3942,7 +3942,7 @@ export class AudioViewerService {
     // iterate old annotation and compare with new annotation
     for (const oldAnnoLevel of oldAnnotation.levels) {
       const newLevel = newAnnotation.levels.find(
-        (a) => a.id === oldAnnoLevel.id
+        (a) => a.id === oldAnnoLevel.id,
       );
 
       if (!newLevel) {
@@ -3964,7 +3964,7 @@ export class AudioViewerService {
               if (item.type === 'segment' && found.type === 'segment') {
                 if (
                   !(item as OctraAnnotationSegment).isEqualWith(
-                    found as OctraAnnotationSegment
+                    found as OctraAnnotationSegment,
                   )
                 ) {
                   // changed
@@ -3981,15 +3981,15 @@ export class AudioViewerService {
                   });
                 }
                 state.old.itemIDs = state.old.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
                 state.new.itemIDs = state.new.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
               } else if (item.type === 'event' && found.type === 'event') {
                 if (
                   !(item as OctraAnnotationEvent).isEqualWith(
-                    found as OctraAnnotationEvent
+                    found as OctraAnnotationEvent,
                   )
                 ) {
                   // changed
@@ -4006,10 +4006,10 @@ export class AudioViewerService {
                   });
                 }
                 state.old.itemIDs = state.old.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
                 state.new.itemIDs = state.new.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
               } else if (item.type === 'item' && found.type === 'item') {
                 if (!(item as OItem).isEqualWith(found as OItem)) {
@@ -4027,10 +4027,10 @@ export class AudioViewerService {
                   });
                 }
                 state.old.itemIDs = state.old.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
                 state.new.itemIDs = state.new.itemIDs.filter(
-                  (a) => a !== item.id
+                  (a) => a !== item.id,
                 );
               } else {
                 throw new Error("Can't find correct item instance");
@@ -4049,10 +4049,10 @@ export class AudioViewerService {
                 },
               });
               state.old.itemIDs = state.old.itemIDs.filter(
-                (a) => a !== item.id
+                (a) => a !== item.id,
               );
               state.new.itemIDs = state.new.itemIDs.filter(
-                (a) => a !== item.id
+                (a) => a !== item.id,
               );
             }
           } else {
@@ -4069,10 +4069,10 @@ export class AudioViewerService {
           }
         }
         state.old.levelIDs = state.old.levelIDs.filter(
-          (a) => a !== oldAnnoLevel.id
+          (a) => a !== oldAnnoLevel.id,
         );
         state.new.levelIDs = state.new.levelIDs.filter(
-          (a) => a !== oldAnnoLevel.id
+          (a) => a !== oldAnnoLevel.id,
         );
       }
     }
@@ -4090,7 +4090,7 @@ export class AudioViewerService {
         });
 
         state.new.itemIDs = state.new.itemIDs.filter(
-          (a) => level.items.find((b) => b.id === a) === undefined
+          (a) => level.items.find((b) => b.id === a) === undefined,
         );
       }
     }
@@ -4151,7 +4151,7 @@ export class AudioViewerService {
     if (state.new.linkIDs.length > 0) {
       for (const id of state.new.linkIDs) {
         const link: OctraAnnotationLink = newAnnotation.links.find(
-          (a) => a.id === id
+          (a) => a.id === id,
         )!;
         result.push({
           type: 'add',
@@ -4176,7 +4176,7 @@ export class AudioViewerService {
     beginTime: SampleUnit,
     numOfLines: number,
     context: Context,
-    shape: Shape
+    shape: Shape,
   ) => {
     const viewY =
       lineInterval.from * (this.settings.lineheight + this.settings.margin.top);
@@ -4205,7 +4205,7 @@ export class AudioViewerService {
             lineWidth,
             beginTime,
             segment?.time,
-            this.innerWidth
+            this.innerWidth,
           );
 
           let w = 0;
@@ -4248,7 +4248,7 @@ export class AudioViewerService {
     beginTime: SampleUnit,
     numOfLines: number,
     context: Konva.Context,
-    shape: Shape
+    shape: Shape,
   ) => {
     if (
       this.currentLevel &&
@@ -4275,8 +4275,8 @@ export class AudioViewerService {
               endSecond = Math.ceil(
                 Math.min(
                   startSecond + this.secondsPerLine,
-                  this.audioChunk.time.duration.seconds
-                )
+                  this.audioChunk.time.duration.seconds,
+                ),
               );
             } else {
               endSecond = Math.ceil(this.audioChunk.time.duration.seconds);
@@ -4304,7 +4304,7 @@ export class AudioViewerService {
               lineWidth,
               beginTime,
               sceneSegment.time,
-              this.innerWidth
+              this.innerWidth,
             );
             let w = 0;
             let x = select.start;
@@ -4407,7 +4407,7 @@ export class AudioViewerService {
                   const progressStart = x + 10 + (x === 0 ? timestampWidth : 0);
                   const loadedPixels = Math.round(
                     progressWidth *
-                      (sceneSegment.context?.asr?.progressInfo.progress / 100)
+                      (sceneSegment.context?.asr?.progressInfo.progress / 100),
                   );
 
                   this.drawRoundedRect(
@@ -4418,7 +4418,7 @@ export class AudioViewerService {
                     progressWidth,
                     5,
                     'transparent',
-                    progressBarFillColor
+                    progressBarFillColor,
                   );
                   this.drawRoundedRect(
                     context,
@@ -4427,7 +4427,7 @@ export class AudioViewerService {
                     15,
                     loadedPixels,
                     5,
-                    progressBarFillColor
+                    progressBarFillColor,
                   );
 
                   if (progressWidth > 100) {
@@ -4435,7 +4435,7 @@ export class AudioViewerService {
                     const textLength =
                       context.measureText(progressString).width;
                     const textPosition = Math.round(
-                      progressStart + (progressWidth - textLength) / 2
+                      progressStart + (progressWidth - textLength) / 2,
                     );
                     context.fillStyle =
                       progressStart + loadedPixels > textPosition &&
@@ -4462,7 +4462,7 @@ export class AudioViewerService {
     width: number,
     radius: number,
     fillColor: string,
-    strokeColor?: string
+    strokeColor?: string,
   ) {
     if (height > 0 && width > 0) {
       context.fillStyle = fillColor;
@@ -4475,7 +4475,7 @@ export class AudioViewerService {
         x + width,
         y + height,
         x + width - radius,
-        y + height
+        y + height,
       );
       context.lineTo(x + radius, y + height);
       context.quadraticCurveTo(x, y + height, x, y + height - radius);
@@ -4536,7 +4536,7 @@ export class AudioViewerService {
             pos.x = this.innerWidth - (rest > 0 ? rest / 2 : 0);
             pos.y = Math.max(
               Math.min(pos.y, this.size.height - selector.height()),
-              0
+              0,
             );
             return pos;
           }
@@ -4579,7 +4579,7 @@ export class AudioViewerService {
         lineWidth,
         this.drawnSelection.start,
         this.drawnSelection.end,
-        this.innerWidth
+        this.innerWidth,
       );
 
       const selections = this.layers.overlay.find('.selection');
@@ -4641,10 +4641,10 @@ export class AudioViewerService {
       ) {
         this.drawnSelection.checkSelection();
         const selStart = this.audioTCalculator.samplestoAbsX(
-          this.drawnSelection.start
+          this.drawnSelection.start,
         );
         const selEnd = this.audioTCalculator.samplestoAbsX(
-          this.drawnSelection.end
+          this.drawnSelection.end,
         );
         const lineNum1 =
           this.innerWidth < this.AudioPxWidth && this.settings.multiLine
@@ -4717,14 +4717,14 @@ export class AudioViewerService {
 
   private removeSegmentFromCanvas(
     segmentID: number,
-    oldAnnotation?: OctraAnnotation<any, any>
+    oldAnnotation?: OctraAnnotation<any, any>,
   ) {
     if (segmentID > -1) {
       const overlayGroup = this.layers?.overlay.findOne(
-        `#segment_${segmentID}`
+        `#segment_${segmentID}`,
       );
       const boundary = this.layers?.boundaries.findOne(
-        `#boundary_${segmentID}`
+        `#boundary_${segmentID}`,
       );
 
       if (overlayGroup !== undefined) {
@@ -4739,10 +4739,10 @@ export class AudioViewerService {
   private redrawSegment(segmentID: number) {
     if (segmentID > -1) {
       const overlayGroup = this.layers?.overlay.findOne(
-        `#segment_${segmentID}`
+        `#segment_${segmentID}`,
       );
       const boundary = this.layers?.boundaries.findOne(
-        `#boundary_${segmentID}`
+        `#boundary_${segmentID}`,
       );
 
       if (overlayGroup !== undefined) {
@@ -4814,7 +4814,7 @@ export class AudioViewerService {
     lastI: number | undefined,
     numOfLines: number,
     segment: OctraAnnotationSegment,
-    isLastSegment: boolean
+    isLastSegment: boolean,
   ): number | undefined {
     const viewY =
       lineNum1 * (this.settings.lineheight + this.settings.margin.top);
@@ -4846,7 +4846,7 @@ export class AudioViewerService {
           lineWidth,
           beginTime,
           segment.time,
-          this.innerWidth
+          this.innerWidth,
         );
         let w = 0;
         let x = select.start;
@@ -4888,11 +4888,11 @@ export class AudioViewerService {
           context.fillText(
             newText,
             localX,
-            localY - 5 - this.settings.margin.top
+            localY - 5 - this.settings.margin.top,
           );
         } else {
           const totalWidth = this.audioTCalculator.samplestoAbsX(
-            segmentEnd.sub(beginTime)
+            segmentEnd.sub(beginTime),
           );
 
           if (j === lineNum1) {
@@ -4902,7 +4902,7 @@ export class AudioViewerService {
             // crop text
             let newText = text.substring(
               0,
-              Math.floor(text.length * ratio) - 2
+              Math.floor(text.length * ratio) - 2,
             );
             const textLength = context.measureText(newText).width;
 
@@ -4911,7 +4911,7 @@ export class AudioViewerService {
               const leftHalf = w / textLength;
               newText = newText.substring(
                 0,
-                Math.floor(newText.length * leftHalf) - 2
+                Math.floor(newText.length * leftHalf) - 2,
               );
             }
             lastI = newText.length;
@@ -4921,7 +4921,7 @@ export class AudioViewerService {
             context.fillText(
               newText,
               localX,
-              localY - 5 - this.settings.margin.top
+              localY - 5 - this.settings.margin.top,
             );
           } else if (j === lineNum2 && lastI !== undefined) {
             // crop text
@@ -4933,7 +4933,7 @@ export class AudioViewerService {
               const leftHalf = w / textLength;
               newText = newText.substring(
                 0,
-                Math.floor(newText.length * leftHalf) - 3
+                Math.floor(newText.length * leftHalf) - 3,
               );
               newText = '...' + newText + '...';
             } else if (text !== this.silencePlaceholder) {
@@ -4946,7 +4946,7 @@ export class AudioViewerService {
             context.fillText(
               newText,
               localX,
-              localY - 5 - this.settings.margin.top
+              localY - 5 - this.settings.margin.top,
             );
             lastI = 0;
           } else if (lastI !== undefined) {
@@ -4958,7 +4958,7 @@ export class AudioViewerService {
                 w,
                 beginTime,
                 segmentEnd,
-                this.innerWidth
+                this.innerWidth,
               );
 
               if (lastPart.start > -1 && lastPart.end > -1) {
@@ -4984,7 +4984,7 @@ export class AudioViewerService {
               const leftHalf = w / textLength;
               newText = newText.substring(
                 0,
-                Math.floor(newText.length * leftHalf) - 3
+                Math.floor(newText.length * leftHalf) - 3,
               );
             }
             lastI += newText.length;
@@ -4999,7 +4999,7 @@ export class AudioViewerService {
             context.fillText(
               newText,
               localX,
-              localY - 5 - this.settings.margin.top
+              localY - 5 - this.settings.margin.top,
             );
           }
         }
@@ -5079,15 +5079,15 @@ export class AudioViewerService {
         0,
         Math.min(
           this.canvasElements.scrollBar.height(),
-          this.canvasElements.scrollbarSelector.y() + event.evt.deltaY / 2
-        )
+          this.canvasElements.scrollbarSelector.y() + event.evt.deltaY / 2,
+        ),
       );
       newY = Math.max(
         Math.min(
           newY,
-          this.size.height - this.canvasElements.scrollbarSelector.height()
+          this.size.height - this.canvasElements.scrollbarSelector.height(),
         ),
-        0
+        0,
       );
       this.canvasElements.scrollbarSelector.y(newY);
       this.onScrollbarDragged();
@@ -5199,7 +5199,7 @@ export class AudioViewerService {
     ) {
       const tempLine = this.getLineNumber(
         event.layerX,
-        event.layerY + Math.abs(this.layers.background.y())
+        event.layerY + Math.abs(this.layers.background.y()),
       );
       this.hoveredLine = tempLine > -1 ? tempLine : this.hoveredLine;
       const maxLines = Math.ceil(this.AudioPxWidth / this.innerWidth);
@@ -5211,7 +5211,7 @@ export class AudioViewerService {
       const layerX = Math.min(event.layerX, lineWidth);
       const absXPos = Math.min(
         this.hoveredLine * this.innerWidth + layerX,
-        this.AudioPxWidth
+        this.AudioPxWidth,
       );
 
       if (!this.settings.cursor.fixed) {
@@ -5242,7 +5242,7 @@ export class AudioViewerService {
     container.addEventListener('mouseup', this.mouseChange);
   }
 
-  focus(){
+  focus() {
     this.stage?.container().focus();
     this._focused = true;
   }

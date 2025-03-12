@@ -1,17 +1,17 @@
 @for (toast of alertService.queue; track toast) {
-<ngb-toast
-  [ngClass]="{
-    'bg-danger text-light': toast.type === 'danger',
-    'bg-success text-light': toast.type === 'success',
-    'bg-warning text-dark': toast.type === 'warning'
-  }"
-  (mouseenter)="toast.autohide = false"
-  (mouseleave)="toast.autohide = true"
-  (hide)="toast.autohide = true"
-  [autohide]="toast.autohide"
-  [delay]="toast.duration"
-  (hidden)="alertService.closeAlert(toast.id)"
->
-  {{ toast.message }}
-</ngb-toast>
+  <ngb-toast
+    [ngClass]="{
+      'bg-danger text-light': toast.type === 'danger',
+      'bg-success text-light': toast.type === 'success',
+      'bg-warning text-dark': toast.type === 'warning',
+    }"
+    (mouseenter)="toast.autohide = false"
+    (mouseleave)="toast.autohide = true"
+    (hide)="toast.autohide = true"
+    [autohide]="toast.autohide"
+    [delay]="toast.duration"
+    (hidden)="alertService.closeAlert(toast.id)"
+  >
+    {{ toast.message }}
+  </ngb-toast>
 }

@@ -7,19 +7,19 @@
     #validationPopover
     [ngStyle]="{
       'margin-left': popoversNew.validation.location.x + 'px',
-      'margin-top': popoversNew.validation.location.y + 'px'
+      'margin-top': popoversNew.validation.location.y + 'px',
     }"
   ></octra-validation-popover>
   @if (asr.status === 'active') {
-  <div
-    id="asrOverlay"
-    class="asr-running h-100 w-100 d-flex flex-column justify-content-center justify-items-center"
-    (click)="onASROverlayClick()"
-  >
-    <p style="margin-top: 50px; text-align: center">
-      {{ 'asr.asr running' | transloco }}
-    </p>
-  </div>
+    <div
+      id="asrOverlay"
+      class="asr-running h-100 w-100 d-flex flex-column justify-content-center justify-items-center"
+      (click)="onASROverlayClick()"
+    >
+      <p style="margin-top: 50px; text-align: center">
+        {{ 'asr.asr running' | transloco }}
+      </p>
+    </div>
   }
   <ngx-jodit
     #jodit

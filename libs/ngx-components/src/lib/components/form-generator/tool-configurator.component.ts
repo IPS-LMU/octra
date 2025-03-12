@@ -30,7 +30,7 @@ export class ToolConfiguratorComponent
   private parse(
     schema: any,
     json?: any,
-    name?: string
+    name?: string,
   ): (ConfigurationControl | ConfigurationControlGroup)[] {
     const result: (ConfigurationControl | ConfigurationControlGroup)[] = [];
     const jsonValue = name ? (json ? json[name] : undefined) : undefined;
@@ -55,7 +55,7 @@ export class ToolConfiguratorComponent
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
             },
-            this.form
+            this.form,
           );
 
           control.toggled =
@@ -75,7 +75,7 @@ export class ToolConfiguratorComponent
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
             },
-            this.form
+            this.form,
           );
           control.toggled =
             json && name !== undefined && Object.keys(json).includes(name);
@@ -94,7 +94,7 @@ export class ToolConfiguratorComponent
               ignore: false,
               context: items['enum'],
             },
-            this.form
+            this.form,
           );
           control.toggled =
             json && name !== undefined && Object.keys(json).includes(name);
@@ -114,7 +114,7 @@ export class ToolConfiguratorComponent
         if (value['properties']) {
           const group = new ConfigurationControlGroup(
             value['title'] ?? key,
-            key
+            key,
           );
           group.controls = this.parse(value, json ? json[key] : undefined, key);
           result.push(group);
@@ -141,7 +141,7 @@ export class ToolConfiguratorComponent
             dependsOn,
             toggleable,
           },
-          this.form
+          this.form,
         );
         control.toggled =
           json && name !== undefined && Object.keys(json).includes(name);
@@ -159,7 +159,7 @@ export class ToolConfiguratorComponent
             toggleable,
             ignore,
           },
-          this.form
+          this.form,
         );
         control.toggled =
           json && name !== undefined && Object.keys(json).includes(name);
@@ -177,7 +177,7 @@ export class ToolConfiguratorComponent
             toggleable,
             dependsOn,
           },
-          this.form
+          this.form,
         );
         control.toggled =
           json && name !== undefined && Object.keys(json).includes(name);
@@ -198,7 +198,7 @@ export class ToolConfiguratorComponent
               value: a,
             })),
           },
-          this.form
+          this.form,
         );
         control.toggled =
           json && name !== undefined && Object.keys(json).includes(name);
@@ -218,7 +218,7 @@ export class ToolConfiguratorComponent
               toggleable,
               dependsOn,
             },
-            this.form
+            this.form,
           );
           control.toggled =
             json && name !== undefined && Object.keys(json).includes(name);
@@ -238,7 +238,7 @@ export class ToolConfiguratorComponent
       if (schema) {
         this.form = new ConfigurationControlGroup(
           schema['title'] ?? '',
-          schema['name'] ?? ''
+          schema['name'] ?? '',
         );
         this.form.controls = this.parse(schema, this.json, undefined);
       }
@@ -260,7 +260,7 @@ export class ToolConfiguratorComponent
       if (this.jsonSchema) {
         this.form = new ConfigurationControlGroup(
           this.jsonSchema['title'] ?? '',
-          this.jsonSchema['name'] ?? ''
+          this.jsonSchema['name'] ?? '',
         );
         this.form.controls = this.parse(this.jsonSchema, this.json, undefined);
       }
@@ -300,7 +300,7 @@ export class ConfigurationControlOptions<R, S = any> {
 
 export class FixedConfigurationControlOptions<
   R,
-  S = any
+  S = any,
 > extends ConfigurationControlOptions<R, S> {
   declare type:
     | 'switch'
@@ -372,7 +372,7 @@ export class ConfigurationControl<R = any, S = any> {
   constructor(
     protected _name: string,
     _options: ConfigurationControlOptions<any>,
-    protected _root?: ConfigurationControlGroup
+    protected _root?: ConfigurationControlGroup,
   ) {
     this._id = ConfigurationControl.idCounter++;
     this._options = _options as FixedConfigurationControlOptions<R, S>;
@@ -403,14 +403,14 @@ export class ConfigurationControl<R = any, S = any> {
   }
 
   private findControlOfAttributeName(
-    path: string
+    path: string,
   ): ConfigurationControl | ConfigurationControlGroup | undefined {
     const splitted = path.split('.').filter((a) => a !== '');
     let pointer: ConfigurationControlGroup = this._root as any;
     for (let i = 0; i < splitted.length; i++) {
       const searchPart = splitted[i];
       const index = (pointer?.controls ?? []).findIndex(
-        (a) => a.name === searchPart
+        (a) => a.name === searchPart,
       );
 
       if (index > -1) {
@@ -429,7 +429,7 @@ export class ConfigurationSwitchControl extends ConfigurationControl<boolean> {
   constructor(
     protected override _name: string,
     options: ConfigurationControlOptions<boolean>,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -437,7 +437,7 @@ export class ConfigurationSwitchControl extends ConfigurationControl<boolean> {
         ...options,
         type: 'switch',
       },
-      _root
+      _root,
     );
   }
 }
@@ -458,7 +458,7 @@ export class ConfigurationSelectControl extends ConfigurationControl<
         value: string;
       }[]
     >,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -466,7 +466,7 @@ export class ConfigurationSelectControl extends ConfigurationControl<
         ...options,
         type: 'select',
       },
-      _root
+      _root,
     );
   }
 }
@@ -487,7 +487,7 @@ export class ConfigurationMultipleChoiceControl extends ConfigurationControl<
         value: string;
       }
     >,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -495,7 +495,7 @@ export class ConfigurationMultipleChoiceControl extends ConfigurationControl<
         ...options,
         type: 'multiple-choice',
       },
-      _root
+      _root,
     );
   }
 }
@@ -504,7 +504,7 @@ export class ConfigurationTextControl extends ConfigurationControl<string> {
   constructor(
     protected override _name: string,
     options: ConfigurationControlOptions<string>,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -512,7 +512,7 @@ export class ConfigurationTextControl extends ConfigurationControl<string> {
         ...options,
         type: 'text',
       },
-      _root
+      _root,
     );
   }
 }
@@ -521,7 +521,7 @@ export class ConfigurationNumberControl extends ConfigurationControl<number> {
   constructor(
     protected override _name: string,
     options: ConfigurationControlOptions<number>,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -529,7 +529,7 @@ export class ConfigurationNumberControl extends ConfigurationControl<number> {
         ...options,
         type: options.type ?? 'number',
       },
-      _root
+      _root,
     );
   }
 }
@@ -538,7 +538,7 @@ export class ConfigurationArrayControl extends ConfigurationControl<any[]> {
   constructor(
     protected override _name: string,
     options: ConfigurationControlOptions<any[]>,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(_name, options, _root);
   }
@@ -548,7 +548,7 @@ export class ConfigurationTextareaControl extends ConfigurationControl<string> {
   constructor(
     protected override _name: string,
     options: ConfigurationControlOptions<string>,
-    protected override _root?: ConfigurationControlGroup
+    protected override _root?: ConfigurationControlGroup,
   ) {
     super(
       _name,
@@ -556,7 +556,7 @@ export class ConfigurationTextareaControl extends ConfigurationControl<string> {
         ...options,
         type: 'textarea',
       },
-      _root
+      _root,
     );
   }
 }
@@ -600,7 +600,7 @@ export class ConfigurationControlGroup {
     public controls: (ConfigurationControl | ConfigurationControlGroup)[] = [],
     protected _toggleable = false,
     protected _dependsOn: string[] = [],
-    public readonly root?: ConfigurationControlGroup
+    public readonly root?: ConfigurationControlGroup,
   ) {}
 
   toObj(): any {
@@ -638,14 +638,14 @@ export class ConfigurationControlGroup {
   }
 
   private findControlOfAttributeName(
-    path: string
+    path: string,
   ): ConfigurationControl | ConfigurationControlGroup | undefined {
     const splitted = path.split('.').filter((a) => a !== '');
     let pointer: ConfigurationControlGroup = this.root as any;
     for (let i = 0; i < splitted.length; i++) {
       const searchPart = splitted[i];
       const index = (pointer?.controls ?? []).findIndex(
-        (a) => a.name === searchPart
+        (a) => a.name === searchPart,
       );
 
       if (index > -1) {

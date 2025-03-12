@@ -98,7 +98,7 @@ export abstract class Converter {
   public abstract export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum?: number
+    levelnum?: number,
   ): ExportResult;
 
   /**
@@ -110,7 +110,7 @@ export abstract class Converter {
   public abstract import(
     file: IFile,
     audiofile: OAudiofile,
-    options?: any
+    options?: any,
   ): ImportResult;
 
   /**
@@ -120,6 +120,6 @@ export abstract class Converter {
    */
   public abstract needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined;
 }

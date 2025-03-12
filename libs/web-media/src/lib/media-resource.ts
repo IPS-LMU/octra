@@ -52,18 +52,18 @@ export class MediaResource {
     sourceType: SourceType,
     buffer?: ArrayBuffer,
     fileSize?: number,
-    url?: string
+    url?: string,
   ) {
     if (
       sourceType !== SourceType.URL &&
       (buffer === undefined || buffer === null)
     ) {
       throw new Error(
-        'MediaResource of type File or ArrayBuffer must have content'
+        'MediaResource of type File or ArrayBuffer must have content',
       );
     } else if (fullName.lastIndexOf('.') === -1) {
       throw new Error(
-        'fullName parameter needs to consist of an file extension'
+        'fullName parameter needs to consist of an file extension',
       );
     } else {
       const extensionStart = fullName.lastIndexOf('.');

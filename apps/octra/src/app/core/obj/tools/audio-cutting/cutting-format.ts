@@ -6,7 +6,7 @@ abstract class CuttingFormat {
     cutList: Segment[],
     audioInfo: AudioInfo,
     fileName: string,
-    nameConvention: string
+    nameConvention: string,
   ): any;
 }
 
@@ -25,7 +25,7 @@ export class JSONConverter extends CuttingFormat {
     cutList: Segment[],
     audioInfo: AudioInfo,
     fileName: string,
-    nameConvention: string
+    nameConvention: string,
   ) {
     const json = {
       meta: {
@@ -52,7 +52,7 @@ export class JSONConverter extends CuttingFormat {
           fileName,
           i,
           cutList,
-          audioInfo
+          audioInfo,
         ),
         sampleStart: segment.sampleStart,
         sampleDur: segment.sampleDur,
@@ -73,7 +73,7 @@ export class TextTableConverter extends CuttingFormat {
     cutList: Segment[],
     audioInfo: AudioInfo,
     fileName: string,
-    nameConvention: string
+    nameConvention: string,
   ) {
     let text =
       'Name\tFile\tSecondsStart\tSecondsDuration\tSampleStart\tSampleDuration\tSampleRate\tTranscript\n';
@@ -91,7 +91,7 @@ export class TextTableConverter extends CuttingFormat {
           fileName,
           i,
           cutList,
-          audioInfo
+          audioInfo,
         )}\t${fileName}\t${secondsStart}\t${secondsDuration}\t` +
         `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.sampleRate}` +
         `\t${segment.transcript}\n`;
@@ -106,7 +106,7 @@ export function getNewFileName(
   fileName: string,
   segmentNumber: number,
   cutList: Segment[],
-  audioInfo: AudioInfo
+  audioInfo: AudioInfo,
 ) {
   const name = fileName.substring(0, fileName.lastIndexOf('.'));
   const extension = fileName.substring(fileName.lastIndexOf('.'));
@@ -135,7 +135,7 @@ export function getNewFileName(
             Math.round(
               (cutList[segmentNumber].sampleStart /
                 audioInfo.duration.sampleRate) *
-                1000
+                1000,
             ) / 1000
           );
         case 'secondsDur':
@@ -143,7 +143,7 @@ export function getNewFileName(
             Math.round(
               (cutList[segmentNumber].sampleDur /
                 audioInfo.duration.sampleRate) *
-                1000
+                1000,
             ) / 1000
           );
       }

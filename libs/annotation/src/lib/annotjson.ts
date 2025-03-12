@@ -83,7 +83,7 @@ export class OAnnotJSON
       1,
       ...this.levels.map((a) => {
         return Math.max(1, ...a.items.map((a) => a.id));
-      })
+      }),
     );
   }
 
@@ -104,7 +104,7 @@ export class OAnnotJSON
     name: string,
     sampleRate: number,
     levels?: ILevel[],
-    links?: ILink[]
+    links?: ILink[],
   ) {
     this.annotates = annotates;
     this.name = name;
@@ -143,7 +143,7 @@ export class OAnnotJSON
         jsonObject.name,
         jsonObject.sampleRate,
         jsonObject.levels,
-        jsonObject.links
+        jsonObject.links,
       );
     }
     return undefined;
@@ -169,7 +169,7 @@ export class OLevel<T extends OItem> implements ILevel {
     return new OLevel(
       this.name,
       this.type,
-      this.items.map((a) => a.clone())
+      this.items.map((a) => a.clone()),
     );
   }
 
@@ -205,11 +205,11 @@ export class OSegmentLevel<T extends OSegment>
   }
 
   static deserialize<T extends OSegment>(
-    jsonObject: ISegmentLevel
+    jsonObject: ISegmentLevel,
   ): OSegmentLevel<T> {
     return new OSegmentLevel<T>(
       jsonObject.name,
-      jsonObject.items.map((a) => OSegment.deserialize(a) as T)
+      jsonObject.items.map((a) => OSegment.deserialize(a) as T),
     );
   }
 }
@@ -234,7 +234,7 @@ export class OItemLevel
   static deserialize(jsonObject: IItemLevel): OItemLevel {
     return new OItemLevel(
       jsonObject.name,
-      jsonObject.items.map((a) => OItem.deserialize(a))
+      jsonObject.items.map((a) => OItem.deserialize(a)),
     );
   }
 
@@ -255,7 +255,7 @@ export class OEventLevel
   static deserialize(jsonObject: IEventLevel): OEventLevel {
     return new OEventLevel(
       jsonObject.name,
-      jsonObject.items.map((a) => OEvent.deserialize(a))
+      jsonObject.items.map((a) => OEvent.deserialize(a)),
     );
   }
 
@@ -345,7 +345,7 @@ export class OSegment
     id: number,
     sampleStart: number,
     sampleDur: number,
-    labels?: OLabel[]
+    labels?: OLabel[],
   ) {
     super(id, labels);
     this.sampleStart = sampleStart;
@@ -367,13 +367,13 @@ export class OSegment
 
   static override deserialize(
     jsonObject: ISegment,
-    sampleRate?: number
+    sampleRate?: number,
   ): OSegment {
     return new OSegment(
       jsonObject.id,
       jsonObject.sampleStart,
       jsonObject.sampleDur,
-      jsonObject.labels.map((a) => OLabel.deserialize(a))
+      jsonObject.labels.map((a) => OLabel.deserialize(a)),
     );
   }
 

@@ -23,7 +23,7 @@ export class APIEffects {
                 webToken: this.apiService.webToken,
                 authType: a.authType || this.apiService.authType,
                 url: a.url,
-              })
+              }),
             ),
             catchError((error) => {
               // ignore error
@@ -34,17 +34,17 @@ export class APIEffects {
                   webToken: this.apiService.webToken,
                   authType: a.authType || this.apiService.authType,
                   url: a.url,
-                })
+                }),
               );
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   constructor(
     private actions$: Actions,
     private store: Store<RootState>,
-    private apiService: OctraAPIService
+    private apiService: OctraAPIService,
   ) {}
 }

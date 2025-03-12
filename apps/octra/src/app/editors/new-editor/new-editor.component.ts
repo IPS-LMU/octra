@@ -18,7 +18,7 @@ export class NewEditorComponent
   constructor(
     public audio: AudioService,
     public settingsService: SettingsService,
-    public appStorage: AppStorageService
+    public appStorage: AppStorageService,
   ) {
     super();
   }

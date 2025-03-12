@@ -51,7 +51,7 @@ export class TextConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum: number
+    levelnum: number,
   ): ExportResult {
     if (!annotation) {
       return {
@@ -91,7 +91,7 @@ export class TextConverter extends Converter {
           if (j < level.items.length - 1) {
             const sampleEnd = item.sampleStart + item.sampleDur;
             const unixTimestamp = Math.ceil(
-              (sampleEnd * 1000) / audiofile.sampleRate
+              (sampleEnd * 1000) / audiofile.sampleRate,
             );
 
             if (this.options) {
@@ -145,7 +145,7 @@ export class TextConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -178,7 +178,7 @@ export class TextConverter extends Converter {
       FileInfo.extractFileName(file.name).name,
       audiofile.sampleRate,
       [],
-      []
+      [],
     );
     const olevel = new OSegmentLevel('OCTRA_1');
 
@@ -187,7 +187,7 @@ export class TextConverter extends Converter {
       const regexSplit =
         /<(?:(?:(?:(?:ts)|(?:sp))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:(?:(?:ts)|(?:sp)))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?\/?>)/g;
       const regexExtract = new RegExp(
-        /<(?:(?:((?:ts)|(?:sp))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:((?:ts)|(?:sp)))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/?>))/g
+        /<(?:(?:((?:ts)|(?:sp))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:((?:ts)|(?:sp)))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/?>))/g,
       );
       const transcripts = file.content.split(regexSplit);
       let match = regexExtract.exec(file.content);
@@ -212,7 +212,7 @@ export class TextConverter extends Converter {
               const timeString = match[timeStringIndex + 1];
               samplePoint = this.timeStringToSamples(
                 timeString,
-                audiofile.sampleRate
+                audiofile.sampleRate,
               );
 
               if (samplePoint < 1) {
@@ -223,7 +223,7 @@ export class TextConverter extends Converter {
               }
             } else {
               console.error(
-                `can't convert time string to samples. Invalid format.`
+                `can't convert time string to samples. Invalid format.`,
               );
               return {
                 error: "`can't convert time string to samples. Invalid format.",
@@ -232,14 +232,14 @@ export class TextConverter extends Converter {
           }
 
           olabels.push(
-            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i]))
+            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])),
           );
           const sampleDuration = samplePoint - sampleStart;
           const osegment = new OSegment(
             1 + i,
             sampleStart,
             sampleDuration,
-            olabels
+            olabels,
           );
           olevel.items.push(osegment);
           sampleStart += sampleDuration;
@@ -251,13 +251,13 @@ export class TextConverter extends Converter {
         if (i < transcripts.length) {
           const olabels: OLabel[] = [];
           olabels.push(
-            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i]))
+            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])),
           );
           const osegment = new OSegment(
             1 + i,
             sampleStart,
             audiofile.duration - sampleStart,
-            olabels
+            olabels,
           );
           olevel.items.push(osegment);
         }
@@ -274,7 +274,7 @@ export class TextConverter extends Converter {
         1,
         0,
         Math.round(audiofile.duration),
-        olabels
+        olabels,
       );
 
       olevel.items.push(osegment);
@@ -328,7 +328,7 @@ export class TextConverter extends Converter {
       showHour?: boolean;
       showMilliSeconds?: boolean;
       maxDuration?: number;
-    }
+    },
   ) {
     let timespan = Number(value);
     if (timespan < 0) {
@@ -347,14 +347,13 @@ export class TextConverter extends Converter {
 
     const milliSeconds: string = this.formatNumber(
       this.getMilliSeconds(timespan),
-      3
+      3,
     );
     const minutes: string = this.formatNumber(this.getMinutes(timespan), 2);
     const seconds: string = this.formatNumber(this.getSeconds(timespan), 2);
-    const hours: string =
-      args.showHour
-        ? this.formatNumber(this.getHours(timespan), 2) + ':'
-        : '';
+    const hours: string = args.showHour
+      ? this.formatNumber(this.getHours(timespan), 2) + ':'
+      : '';
 
     result += hours + minutes + ':' + seconds;
     if (args.showMilliSeconds) {

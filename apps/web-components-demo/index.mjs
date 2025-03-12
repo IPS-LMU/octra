@@ -32,12 +32,12 @@ function initAudioViewer(audioManager) {
       type: 'application/json',
       encoding: 'utf-8',
     },
-    oAudioFile
+    oAudioFile,
   );
 
   // retrieve first level object from importResult
   const annotation = OctraAnnotation.OctraAnnotation.deserialize(
-    importResult.annotjson
+    importResult.annotjson,
   );
   annotation.changeCurrentLevelIndex(0);
 
@@ -70,7 +70,7 @@ async function main() {
   // download audio file
   const downloadedBlob = await OctraWebMedia.downloadFile(
     '../../apps/octra/src/media/Bahnauskunft.wav',
-    'blob'
+    'blob',
   );
   const file = new File([downloadedBlob], 'Bahnauskunft.wav', {
     type: 'audio/wave',

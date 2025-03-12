@@ -30,7 +30,7 @@ export class TranscriptionDemoEndModalComponent extends OctraModal {
     modalService: NgbModal,
     private sanitizer: DomSanitizer,
     public languageService: TranslocoService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('transcriptionDemoEnd', activeModal);
   }

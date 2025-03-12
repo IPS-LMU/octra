@@ -54,7 +54,7 @@ export class ApplicationEffects {
       exhaustMap(() => {
         AppInfo.BUILD = (window as any).BUILD ?? AppInfo.BUILD;
         AppInfo.BUILD.timestamp = DateTime.fromISO(
-          AppInfo.BUILD.timestamp
+          AppInfo.BUILD.timestamp,
         ).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
         this.appStorage.saveCurrentPageAsLastPage();
 
@@ -74,8 +74,8 @@ export class ApplicationEffects {
 
         this.initConsoleLogging();
         return of(ApplicationActions.loadLanguage.do());
-      })
-    )
+      }),
+    ),
   );
 
   loadSettings$ = createEffect(() =>
@@ -90,13 +90,13 @@ export class ApplicationEffects {
               responseType: 'json',
             },
             'config/appconfig.json',
-            undefined
+            undefined,
           ),
         ]).pipe(
           map(([appconfig]) => {
             const validation = this.configurationService.validateJSON(
               appconfig,
-              AppConfigSchema
+              AppConfigSchema,
             );
 
             if (validation.length === 0) {
@@ -112,7 +112,7 @@ export class ApplicationEffects {
                       v.instancePath +
                       '</b>:<br/>' +
                       v.message +
-                      '</li>'
+                      '</li>',
                   )
                   .join('<br/>')}</ul>`,
               });
@@ -122,12 +122,12 @@ export class ApplicationEffects {
             return of(
               ApplicationActions.loadSettings.fail({
                 error: err.error?.message ?? err.message,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   loadASRSettings$ = createEffect(() =>
@@ -149,18 +149,18 @@ export class ApplicationEffects {
               map((result) => {
                 if (!settings.octra.plugins?.asr?.services) {
                   throw new Error(
-                    'Missing asr.services property in application settings.'
+                    'Missing asr.services property in application settings.',
                   );
                 }
 
                 const doc = new DOMParser().parseFromString(
                   result,
-                  'text/html'
+                  'text/html',
                 );
                 const basTable = doc.getElementById('bas-asr-service-table');
                 const basASRInfoContainers = findElements(
                   basTable!,
-                  '.bas-asr-info-container'
+                  '.bas-asr-info-container',
                 );
 
                 const asrInfos: {
@@ -195,33 +195,33 @@ export class ApplicationEffects {
 
                   const maxSignalDurationSpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-max-signal-duration-seconds'
+                    '.bas-asr-info-max-signal-duration-seconds',
                   );
                   const maxSignalSizeSpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-max-signal-size-megabytes'
+                    '.bas-asr-info-max-signal-size-megabytes',
                   );
                   const quotaPerMonthSpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-quota-per-month-seconds'
+                    '.bas-asr-info-quota-per-month-seconds',
                   );
                   const termsURLSpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-eula-link'
+                    '.bas-asr-info-eula-link',
                   );
                   const dataStoragePolicySpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-data-storage-policy'
+                    '.bas-asr-info-data-storage-policy',
                   );
                   const knownIssuesSpans = findElements(
                     basASRInfoContainer,
-                    '.bas-asr-info-known-issues'
+                    '.bas-asr-info-known-issues',
                   );
 
                   const newElem: any = {
                     name: getAttr(
                       basASRInfoContainer,
-                      'data-bas-asr-info-provider-name'
+                      'data-bas-asr-info-provider-name',
                     ),
                     maxSignalDuration:
                       maxSignalDurationSpans.length > 0
@@ -264,7 +264,7 @@ export class ApplicationEffects {
 
                 // overwrite data of config
                 const asrSettings = JSON.parse(
-                  JSON.stringify(settings.octra.plugins.asr)
+                  JSON.stringify(settings.octra.plugins.asr),
                 );
 
                 for (let i = 0; i < asrSettings.services.length; i++) {
@@ -272,7 +272,7 @@ export class ApplicationEffects {
 
                   if (service.basName !== undefined) {
                     const basInfo = asrInfos.find(
-                      (a) => a.name === service.basName
+                      (a) => a.name === service.basName,
                     );
 
                     if (basInfo !== undefined) {
@@ -335,7 +335,7 @@ export class ApplicationEffects {
                                 state: activeProviders.find(
                                   (b) =>
                                     b.ParameterValue.Value ===
-                                    `call${a.basName}ASR`
+                                    `call${a.basName}ASR`,
                                 ),
                               };
                             }),
@@ -352,12 +352,12 @@ export class ApplicationEffects {
                                 description:
                                   a.ParameterValue.Description.replace(
                                     / *\([^)]*\) *$/g,
-                                    ''
+                                    '',
                                   ),
                               };
 
                               const matches = / *\(([^)]*)\) *$/g.exec(
-                                a.ParameterValue.Description
+                                a.ParameterValue.Description,
                               );
 
                               if (matches) {
@@ -399,7 +399,7 @@ export class ApplicationEffects {
                                     result.providersOnly = [
                                       ...result.providersOnly.slice(
                                         0,
-                                        lstIndex - 1
+                                        lstIndex - 1,
                                       ),
                                       'LSTDutch',
                                       'LSTEnglish',
@@ -419,10 +419,10 @@ export class ApplicationEffects {
                               value: a.ParameterValue.Value,
                               description: a.ParameterValue.Description,
                             })),
-                        })
+                        }),
                       );
-                    }
-                  )
+                    },
+                  ),
                 );
               }),
               catchError((error) => {
@@ -430,23 +430,23 @@ export class ApplicationEffects {
                 return of(
                   ApplicationActions.loadASRSettings.fail({
                     error,
-                  })
+                  }),
                 );
-              })
+              }),
             );
         } else {
           return of(
             ApplicationActions.loadASRSettings.fail({
               error: undefined as any,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   public async updateASRQuotaInfo(
-    asrSettings: ASRSettings
+    asrSettings: ASRSettings,
   ): Promise<ASRSettings> {
     const results = [];
     if (asrSettings?.services) {
@@ -455,15 +455,15 @@ export class ApplicationEffects {
           results.push(
             await this.getASRQuotaInfo(
               asrSettings.asrQuotaInfoURL,
-              service.provider
-            )
+              service.provider,
+            ),
           );
         }
       }
 
       for (const result of results) {
         const serviceIndex = asrSettings.services.findIndex(
-          (a) => a.provider === result.asrName
+          (a) => a.provider === result.asrName,
         );
 
         if (serviceIndex > -1) {
@@ -545,7 +545,7 @@ export class ApplicationEffects {
         }[]
       >(
         `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runPipeline/Input/LANGUAGE/Values/`,
-        { responseType: 'json' }
+        { responseType: 'json' },
       );
     } else {
       return of([]);
@@ -564,7 +564,7 @@ export class ApplicationEffects {
         }[]
       >(
         `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runASR/Input/LANGUAGE/Values`,
-        { responseType: 'json' }
+        { responseType: 'json' },
       );
     } else {
       return of([]);
@@ -583,7 +583,7 @@ export class ApplicationEffects {
         }[]
       >(
         `${asrSettings.basConfigURL}?path=CMD/Components/BASWebService/Service/Operations/runASR/Input/ASRType/Values/`,
-        { responseType: 'json' }
+        { responseType: 'json' },
       );
     } else {
       return of([]);
@@ -599,14 +599,14 @@ export class ApplicationEffects {
         this.transloco.setAvailableLangs(a.settings.octra.languages);
 
         this.transloco.setActiveLang(
-          language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en'
+          language?.replace(/-.*/g, '') ?? getBrowserLang() ?? 'en',
         );
 
         if (a.settings.octra.plugins?.asr?.enabled) {
           this.store.dispatch(
             ApplicationActions.loadASRSettings.do({
               settings: a.settings,
-            })
+            }),
           );
         }
 
@@ -624,17 +624,17 @@ export class ApplicationEffects {
               authType,
               authenticated,
               webToken,
-            })
+            }),
           );
         } else {
           return of(
             APIActions.init.initWithoutAPI({
               authenticated: false,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   afterAPIInit$ = createEffect(
@@ -649,7 +649,7 @@ export class ApplicationEffects {
           ) {
             this.appendTrackingCode(
               state.application.appConfiguration.octra.tracking.active,
-              state.application.appConfiguration
+              state.application.appConfiguration,
             );
           }
 
@@ -658,11 +658,11 @@ export class ApplicationEffects {
               loggedIn:
                 this.sessStr.retrieve('loggedIn') ?? a.authenticated ?? false,
               reloaded: this.sessStr.retrieve('reloaded') ?? false,
-            })
+            }),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   afterInitApplication$ = createEffect(
@@ -670,7 +670,7 @@ export class ApplicationEffects {
       this.actions$.pipe(
         ofType(
           ApplicationActions.initApplication.finish,
-          LoginModeActions.loadProjectAndTaskInformation.success
+          LoginModeActions.loadProjectAndTaskInformation.success,
         ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
@@ -687,13 +687,13 @@ export class ApplicationEffects {
                     messageType: 'error',
                     mode: undefined,
                     clearSession: false,
-                  })
+                  }),
                 );
               } else if (!this.routerService.staticQueryParams.audio_url) {
                 this.store.dispatch(
                   ApplicationActions.redirectToLastPage.do({
                     mode: state.application.mode!,
-                  })
+                  }),
                 );
               }
               return;
@@ -705,7 +705,7 @@ export class ApplicationEffects {
                 this.store.dispatch(
                   ApplicationActions.redirectToLastPage.do({
                     mode: state.application.mode!,
-                  })
+                  }),
                 );
               } else {
                 // logged in
@@ -718,20 +718,20 @@ export class ApplicationEffects {
                       currentProject: modeState.currentSession.currentProject,
                       mode: state.application.mode,
                       task: modeState.currentSession.task,
-                    })
+                    }),
                   );
                 } else if (
                   this.sessionStorage.retrieve('last_page_path') !==
                   '/help-tools'
                 ) {
                   this.store.dispatch(
-                    AuthenticationActions.redirectToProjects.do()
+                    AuthenticationActions.redirectToProjects.do(),
                   );
                 } else {
                   this.store.dispatch(
                     ApplicationActions.redirectToLastPage.do({
                       mode: state.application.mode!,
-                    })
+                    }),
                   );
                 }
               }
@@ -745,16 +745,16 @@ export class ApplicationEffects {
                     currentProject: modeState.currentSession.currentProject,
                     mode: state.application.mode,
                     task: modeState.currentSession.task,
-                  })
+                  }),
                 );
               } else {
                 this.store.dispatch(ApplicationActions.waitForEffects.do());
               }
             }
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onProjectAndTaskInfoLoaded$ = createEffect(
@@ -767,9 +767,9 @@ export class ApplicationEffects {
             // load on startup
             this.store.dispatch(IDBActions.loadAnnotation.do());
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   redirectToLastPage$ = createEffect(
@@ -816,9 +816,9 @@ export class ApplicationEffects {
               this.routerService.navigate('no last page', ['/login']);
             }
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   redirectTo$ = createEffect(
@@ -829,9 +829,9 @@ export class ApplicationEffects {
           if (a.needsRedirectionTo) {
             this.routerService.navigate('last page', [a.needsRedirectionTo]);
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   afterIDBLoaded$ = createEffect(
@@ -856,7 +856,7 @@ export class ApplicationEffects {
               state.application.appConfiguration!.octra.languages.find(
                 (value) => {
                   return value === browserLang;
-                }
+                },
               ) !== undefined
             ) {
               this.transloco.setActiveLang(browserLang);
@@ -869,7 +869,7 @@ export class ApplicationEffects {
               state.application.appConfiguration!.octra.languages.find(
                 (value) => {
                   return value === this.appStorage.language;
-                }
+                },
               ) !== undefined
             ) {
               this.transloco.setActiveLang(this.appStorage.language);
@@ -882,14 +882,14 @@ export class ApplicationEffects {
             this.store.dispatch(
               AuthenticationActions.loginURL.do({
                 mode: LoginMode.URL,
-              })
+              }),
             );
           }
 
           this.store.dispatch(ApplicationActions.initApplication.finish());
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   loadLanguage$ = createEffect(() =>
@@ -899,8 +899,8 @@ export class ApplicationEffects {
         this.transloco.setAvailableLangs(['en']);
         this.transloco.setActiveLang('en');
         return of(ApplicationActions.loadLanguage.success());
-      })
-    )
+      }),
+    ),
   );
 
   loadLanguageSuccess$ = createEffect(() =>
@@ -908,8 +908,8 @@ export class ApplicationEffects {
       ofType(ApplicationActions.loadLanguage.success),
       exhaustMap((a) => {
         return of(ApplicationActions.loadSettings.do());
-      })
-    )
+      }),
+    ),
   );
 
   logoutSession$ = createEffect(() =>
@@ -933,15 +933,15 @@ export class ApplicationEffects {
             {
               queryParams: {},
             },
-            'replace'
+            'replace',
           )
           .catch((error) => {
             console.error(error);
           });
 
         return subject;
-      })
-    )
+      }),
+    ),
   );
 
   wait$ = createEffect(
@@ -952,11 +952,11 @@ export class ApplicationEffects {
           this.routerService.navigate(
             'wait for effects',
             ['/load'],
-            AppInfo.queryParamsHandling
+            AppInfo.queryParamsHandling,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   showErrorMessage$ = createEffect(
@@ -973,11 +973,11 @@ export class ApplicationEffects {
             {
               text: a.error,
               showOKButton: a.showOKButton,
-            }
+            },
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   logActionsToConsole$ = createEffect(
@@ -995,11 +995,11 @@ export class ApplicationEffects {
             console.log(action);
             console.groupEnd();
           }
-        })
+        }),
       ),
     {
       dispatch: false,
-    }
+    },
   );
 
   appLoadingFail$ = createEffect(
@@ -1015,13 +1015,13 @@ export class ApplicationEffects {
             },
             {
               text: `Can't load application settings: ${a.error}`,
-            }
+            },
           );
 
           ref.componentInstance.showOKButton = false;
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   constructor(
@@ -1037,7 +1037,7 @@ export class ApplicationEffects {
     private settingsService: SettingsService,
     private routerService: RoutingService,
     private modalService: OctraModalService,
-    private sessionStorage: SessionStorageService
+    private sessionStorage: SessionStorageService,
   ) {}
 
   private initConsoleLogging() {
@@ -1100,7 +1100,7 @@ export class ApplicationEffects {
           if (debug !== '') {
             serv.addEntry(
               ConsoleType.ERROR,
-              `${debug}${stack !== '' ? ' ' + stack : ''}`
+              `${debug}${stack !== '' ? ' ' + stack : ''}`,
             );
           }
 
@@ -1180,7 +1180,7 @@ export class ApplicationEffects {
         document.body.appendChild(trackingCode);
       } else {
         console.error(
-          `attributes for piwik tracking in appconfig.json are invalid.`
+          `attributes for piwik tracking in appconfig.json are invalid.`,
         );
       }
     } else {

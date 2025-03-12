@@ -40,7 +40,7 @@ export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
     public annotationStoreService: AnnotationStoreService,
     public langService: TranslocoService,
     private appStorage: AppStorageService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
   ) {}
 
   translate(languages: any, lang: string): string {
@@ -59,7 +59,7 @@ export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
         ...this.annotationStoreService.feedback,
         comment: this.annotationStoreService.feedback.comment.replace(
           /(<)|(\/>)|(>)/g,
-          ' '
+          ' ',
         ),
       });
     }
@@ -72,7 +72,7 @@ export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
       }
       this.appStorage.save(
         'feedback',
-        this.annotationStoreService?.feedback?.exportData()
+        this.annotationStoreService?.feedback?.exportData(),
       );
     }
   }
@@ -80,10 +80,10 @@ export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
   changeValue(control: string, value: any) {
     const result = this.annotationStoreService.feedback.setValueForControl(
       control,
-      value.toString()
+      value.toString(),
     );
     this.annotationStoreService.changeFeedback(
-      this.annotationStoreService.feedback
+      this.annotationStoreService.feedback,
     );
     console.warn(result);
   }

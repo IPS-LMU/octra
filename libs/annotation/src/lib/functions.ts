@@ -6,7 +6,7 @@ import { OctraAnnotationSegment } from './octraAnnotationSegment';
 export function convertFromSupportedConverters(
   converters: Converter[],
   file: IFile,
-  audioFile: OAudiofile
+  audioFile: OAudiofile,
 ) {
   for (const converter of converters) {
     try {
@@ -36,7 +36,7 @@ export function contains(haystack: string, needle: string): boolean {
  */
 export function getSegmentBySamplePosition(
   segments: OctraAnnotationSegment[],
-  samples: SampleUnit
+  samples: SampleUnit,
 ): number {
   let begin = 0;
   for (let i = 0; i < segments.length; i++) {
@@ -56,7 +56,7 @@ export function getSegmentBySamplePosition(
 export function getSegmentsOfRange(
   entries: OctraAnnotationSegment[],
   startSamples: SampleUnit,
-  endSamples: SampleUnit
+  endSamples: SampleUnit,
 ): {
   startIndex: number;
   endIndex: number;
@@ -75,11 +75,12 @@ export function getSegmentsOfRange(
     if (
       // segment end is in chunk
       (segment.time!.samples >= startSamples.samples &&
-      segment.time!.samples <= endSamples.samples) ||
+        segment.time!.samples <= endSamples.samples) ||
       // segment end is not in chunk, start is
       (start.samples >= startSamples.samples &&
         start.samples <= endSamples.samples) ||
-      (start.samples <= startSamples.samples && segment.time!.samples >= endSamples.samples)
+      (start.samples <= startSamples.samples &&
+        segment.time!.samples >= endSamples.samples)
     ) {
       if (startIndex < 0) {
         startIndex = i;
@@ -104,7 +105,7 @@ export function removeSegmentByIndex(
   entries: OctraAnnotationSegment[],
   index: number,
   silenceValue: string | undefined,
-  mergeTranscripts = true
+  mergeTranscripts = true,
 ) {
   if (index > -1 && index < entries.length) {
     const segment = entries[index];
@@ -133,7 +134,7 @@ export function removeSegmentByIndex(
             'Speaker',
             transcription +
               ' ' +
-              nextSegment.getFirstLabelWithoutName('Speaker')?.value
+              nextSegment.getFirstLabelWithoutName('Speaker')?.value,
           );
         } else if (
           nextSegment.getFirstLabelWithoutName('Speaker')?.value === '' &&
@@ -141,7 +142,7 @@ export function removeSegmentByIndex(
         ) {
           nextSegment.changeFirstLabelWithoutName(
             'Speaker',
-            transcription ?? ''
+            transcription ?? '',
           );
         }
       } else if (
@@ -159,7 +160,7 @@ export function removeSegmentByIndex(
 
 export function betweenWhichSegment(
   entries: OctraAnnotationSegment[],
-  samples: number
+  samples: number,
 ): OctraAnnotationSegment | undefined {
   let start = 0;
 
@@ -181,7 +182,7 @@ export function addSegment(
   entries: OctraAnnotationSegment[],
   time: SampleUnit,
   label: string,
-  value: string | undefined = undefined
+  value: string | undefined = undefined,
 ): {
   entries: OctraAnnotationSegment[];
   itemIDCounter: number;
@@ -189,7 +190,7 @@ export function addSegment(
   const newSegment: OctraAnnotationSegment = new OctraAnnotationSegment(
     itemIDCounter,
     time,
-    [new OLabel(label, value ?? '')]
+    [new OLabel(label, value ?? '')],
   );
 
   if (
@@ -203,7 +204,7 @@ export function addSegment(
     return { entries, itemIDCounter: itemIDCounter + 1 };
   } else {
     console.error(
-      `segment with this timestamp ${time.seconds} already exists and can not be added.`
+      `segment with this timestamp ${time.seconds} already exists and can not be added.`,
     );
   }
   return { entries, itemIDCounter: itemIDCounter };
@@ -248,7 +249,7 @@ export function cleanup(entries: OctraAnnotationSegment[]) {
 
 export function getStartTimeBySegmentID(
   entries: OctraAnnotationSegment[],
-  id: number
+  id: number,
 ): SampleUnit | undefined {
   const segmentIndex = entries.findIndex((a) => a.id === id);
 
@@ -266,7 +267,7 @@ export function combineSegments(
   entries: OctraAnnotationSegment[],
   segmentIndexStart: number,
   segmentIndexEnd: number,
-  breakMarker: string
+  breakMarker: string,
 ) {
   for (let i = segmentIndexStart; i < segmentIndexEnd; i++) {
     entries = removeSegmentByIndex(entries, i, breakMarker, false);
@@ -279,19 +280,19 @@ export function combineSegments(
  * returns an array of normal segment objects with original values.
  */
 export function convertSegmentsToOSegments(
-  entries: OctraAnnotationSegment[]
+  entries: OctraAnnotationSegment[],
 ): OSegment[] {
   return entries.map((a, i) =>
-    a.serializeToOSegment(i > 0 ? entries[i - 1].time.samples : 0)
+    a.serializeToOSegment(i > 0 ? entries[i - 1].time.samples : 0),
   );
 }
 
 export function convertOSegmentsToSegments(
   entries: OSegment[],
-  sampleRate: number
+  sampleRate: number,
 ): OctraAnnotationSegment[] {
   return entries.map((a) =>
-    OctraAnnotationSegment.deserializeFromOSegment(a, sampleRate)
+    OctraAnnotationSegment.deserializeFromOSegment(a, sampleRate),
   );
 }
 
@@ -300,7 +301,7 @@ export function convertOSegmentsToSegments(
  */
 export function removeBySamples(
   entries: OctraAnnotationSegment[],
-  timeSamples: SampleUnit
+  timeSamples: SampleUnit,
 ) {
   for (let i = 0; i < entries.length; i++) {
     const segment = entries[i];

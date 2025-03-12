@@ -37,9 +37,9 @@ export class HtmlAudioMechanism extends AudioMechanism {
     return new SampleUnit(
       SampleUnit.calculateSamples(
         this._audio.currentTime,
-        this._resource.info.sampleRate
+        this._resource.info.sampleRate,
       ),
-      this._resource.info.sampleRate
+      this._resource.info.sampleRate,
     );
   }
 
@@ -75,16 +75,16 @@ export class HtmlAudioMechanism extends AudioMechanism {
                   this._resource!.info.fullname,
                   {
                     type: this._resource!.info.type,
-                  }
-                )
+                  },
+                ),
               ),
             });
           }
           return {
             progress: decodeProgress,
           };
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -116,7 +116,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
 
     const audioformat: AudioFormat | undefined = AudioManager.getFileFormat(
       filename.substring(filename.lastIndexOf('.')),
-      this.audioFormats
+      this.audioFormats,
     );
 
     if (!buffer) {
@@ -138,7 +138,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
               audioformat.sampleRate,
               audioformat.duration.samples,
               audioformat.channels,
-              audioInfo.bitrate
+              audioInfo.bitrate,
             );
 
             audioInfo.file = new File([buffer], filename, {
@@ -152,7 +152,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
               audioInfo,
               buffer,
               bufferLength,
-              url
+              url,
             );
 
             this.afterDecoded.next(this._resource!);
@@ -177,7 +177,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private decodeAudioWithOctraDecoder(
     subj: Subject<{
       decodeProgress: number;
-    }>
+    }>,
   ) {
     try {
       if (!this._resource) {
@@ -222,7 +222,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private decodeAudioWithWebAPIDecoder(
     subj: Subject<{
       decodeProgress: number;
-    }>
+    }>,
   ) {
     try {
       if (!this._resource) {
@@ -245,7 +245,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
             // fix number of samples. web value by web audio api is more exact.
             info.duration = new SampleUnit(
               Math.ceil(audioBuffer.duration * info.sampleRate),
-              info.sampleRate
+              info.sampleRate,
             );
           }
 
@@ -282,7 +282,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     this.decoder = new AudioDecoder(
       format,
       resource.info,
-      resource.arraybuffer!
+      resource.arraybuffer!,
     );
 
     const subj = this.decoder.onChannelDataCalculate.subscribe({
@@ -320,10 +320,10 @@ export class HtmlAudioMechanism extends AudioMechanism {
         new SampleUnit(
           Math.min(
             resource.info.sampleRate * 60, // chunk of 1 minute
-            resource.info.duration.samples
+            resource.info.duration.samples,
           ),
-          resource.info.sampleRate
-        )
+          resource.info.sampleRate,
+        ),
       )
       .catch((error) => {
         console.error(error);
@@ -339,7 +339,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     playOnHover: boolean,
     onPlaying: () => void,
     onEnd: () => void,
-    onError: () => void
+    onError: () => void,
   ) {
     this.onEnd = () => {
       this.endPlayBack();
@@ -352,7 +352,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
       playOnHover,
       onPlaying,
       onEnd,
-      onError
+      onError,
     );
 
     if (!this._audio) {
@@ -407,7 +407,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     this.changeStatus(PlayBackStatus.PLAYING);
 
     this._playbackEndChecker = timer(
-      Math.round(this.audioSelection.duration.unix / this._playbackRate)
+      Math.round(this.audioSelection.duration.unix / this._playbackRate),
     ).subscribe({
       next: this.onEnd,
     });

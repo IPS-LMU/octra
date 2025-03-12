@@ -27,7 +27,7 @@ export class JSONSetBlueprint<T, U> {
     item: T,
     conditions: U,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ) => JSONSetResult)[] {
     return this._validationMethods;
   }
@@ -36,7 +36,7 @@ export class JSONSetBlueprint<T, U> {
     item: T,
     conditions: U,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ) => JSONSetResult)[] = [];
 
   constructor(
@@ -44,15 +44,15 @@ export class JSONSetBlueprint<T, U> {
       item: T,
       conditions: U,
       combinationType: 'and' | 'or',
-      path: string
-    ) => JSONSetResult)[] = []
+      path: string,
+    ) => JSONSetResult)[] = [],
   ) {
     this._validationMethods = validationMethods;
   }
 
   areEqualArray(
     array: PossibleSolution<T, U>[],
-    array2: PossibleSolution<T, U>[]
+    array2: PossibleSolution<T, U>[],
   ): boolean {
     throw new Error(`JSONSetBlueprint: not implemented`);
   }
@@ -64,7 +64,7 @@ export class JSONSetBlueprint<T, U> {
   cleanUpSolutions(
     a: PossibleSolution<T, U>[],
     index: number,
-    solutions: PossibleSolution<T, U>[][]
+    solutions: PossibleSolution<T, U>[][],
   ): boolean {
     throw new Error(`JSONSetBlueprint: not implemented`);
   }
@@ -90,7 +90,7 @@ export class DecisionTreeNode<T, U> {
   get path(): string {
     return this._parent
       ? `${this._parent.path}.${this._name}`
-      : this._name ?? `node[${this._id}]`;
+      : (this._name ?? `node[${this._id}]`);
   }
 
   protected readonly _id: number;
@@ -106,7 +106,7 @@ export class DecisionTreeNode<T, U> {
     blueprint: JSONSetBlueprint<T, U>,
     parent?: DecisionTreeCombination<T, U>,
     name?: string,
-    description?: string
+    description?: string,
   ) {
     this._id = DecisionTreeNode.id++;
     this._description = description;
@@ -157,7 +157,7 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
   constructor(
     blueprint: JSONSetBlueprint<T, U>,
     parent: DecisionTreeCombination<T, U> | undefined,
-    statement: JSONSetStatement<U>
+    statement: JSONSetStatement<U>,
   ) {
     super(blueprint, parent, statement.name, statement.description);
     this.statement = statement;
@@ -174,23 +174,23 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
           !this.blueprint.validationMethods
             .map(
               (m) =>
-                m(item, condition, this._parent!.combination, this.path)?.valid
+                m(item, condition, this._parent!.combination, this.path)?.valid,
             )
-            .some((a) => !a)
-      )
+            .some((a) => !a),
+      ),
     );
 
     let result = checkedConditions.filter((a) => a.length > 0).flat();
     this._possibleSelections = [];
 
     const parsedSelectStatement = this.parseSelectStatement(
-      this.statement.select
+      this.statement.select,
     );
     if (result.length > 0) {
       this._possibleSelections = this.generatePossibleSolutions(
         parsedSelectStatement.type,
         parsedSelectStatement.selectNumber,
-        result
+        result,
       );
     } else if (parsedSelectStatement.type === 'max') {
       this._possibleSelections.push([]);
@@ -202,7 +202,7 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
   private generatePossibleSolutions(
     selectType: 'exact' | 'min' | 'max',
     selectNumber: number,
-    items: T[]
+    items: T[],
   ): PossibleSolution<T, U>[][] {
     if (selectNumber > items.length) {
       return []; // can't select more items than available
@@ -221,8 +221,8 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
                 path: this.path,
                 statement: this.statement,
                 selection: b,
-              })
-          )
+              }),
+          ),
         )
         .filter(this.blueprint.cleanUpSolutions);
     }
@@ -235,8 +235,8 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
                 path: this.path,
                 statement: this.statement,
                 selection: b,
-              })
-          )
+              }),
+          ),
         )
         .filter(this.blueprint.cleanUpSolutions);
     }
@@ -249,8 +249,8 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
                 path: this.path,
                 statement: this.statement,
                 selection: b,
-              })
-          )
+              }),
+          ),
         )
         .filter(this.blueprint.cleanUpSolutions);
     }
@@ -263,7 +263,7 @@ export class DecisionTreeExpression<T, U> extends DecisionTreeNode<T, U> {
     selectNumber: number;
   } {
     const matches = /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+)$/g.exec(
-      selectStatement
+      selectStatement,
     );
     if (!matches) {
       throw new Error(`JSONSetValidationError: Invalid select statement.`);
@@ -309,7 +309,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
     parent?: DecisionTreeCombination<T, U>,
     name?: string,
     description?: string,
-    children: DecisionTreeNode<T, U>[] = []
+    children: DecisionTreeNode<T, U>[] = [],
   ) {
     super(blueprint, parent, name, description);
     this.combination = combination;
@@ -325,7 +325,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       this.children.splice(index, 1);
     } else {
       throw new Error(
-        `Can't remove node from decision tree. Node with index ${index} not found.`
+        `Can't remove node from decision tree. Node with index ${index} not found.`,
       );
     }
   }
@@ -336,7 +336,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       this.children.splice(index, 1);
     } else {
       throw new Error(
-        `Can't remove node from decision tree. Node with id ${id} not found.`
+        `Can't remove node from decision tree. Node with id ${id} not found.`,
       );
     }
   }
@@ -352,7 +352,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       this.children.push(node);
     } else {
       throw new Error(
-        `Can't insert node to decision tree. Invalid index ${index}.`
+        `Can't insert node to decision tree. Invalid index ${index}.`,
       );
     }
   }
@@ -368,7 +368,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       for (let i = 1; i < this.children.length; i++) {
         const child = this.children[i];
         const filtered = child.possibleSelections.filter(
-          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b))
+          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b)),
         );
         if (filtered.length === 0) {
           product = [];
@@ -385,7 +385,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       }
 
       this._possibleSelections = product.filter(
-        this.blueprint.cleanUpSolutions
+        this.blueprint.cleanUpSolutions,
       );
     }
 
@@ -396,7 +396,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
       for (let i = 1; i < this.children.length; i++) {
         const child = this.children[i];
         const filtered = child.possibleSelections.filter(
-          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b))
+          (a) => !product.find((b) => this.blueprint.areEqualArray(a, b)),
         );
         if (filtered.length === 0) {
           product = [];
@@ -417,8 +417,8 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
           new JSONSetValidationError(
             this.description ??
               `Logical "${this.combination}" failed for condition "${this.path}."`,
-            this.path
-          )
+            this.path,
+          ),
         );
         product = [];
       }
@@ -432,8 +432,8 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
         new JSONSetValidationError(
           this.description ??
             `Logical "${this.combination}" failed for condition "${this.path}."`,
-          this.path
-        )
+          this.path,
+        ),
       );
       this._possibleSelections = [];
     }
@@ -453,21 +453,21 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
             }
             return a.clone();
           })
-        : []
+        : [],
     );
   }
 
   static json2treeCombination<T, U>(
     json: any,
     blueprint: JSONSetBlueprint<T, U>,
-    parent?: DecisionTreeCombination<T, U>
+    parent?: DecisionTreeCombination<T, U>,
   ) {
     const root = new DecisionTreeCombination(
       blueprint,
       json.combine.type,
       parent,
       json.name,
-      json.description
+      json.description,
     );
 
     for (const expression of json.combine.expressions) {
@@ -478,7 +478,7 @@ export class DecisionTreeCombination<T, U> extends DecisionTreeNode<T, U> {
         const expr = new DecisionTreeExpression<T, U>(
           blueprint,
           root,
-          expression
+          expression,
         );
         root.append(expr);
       }

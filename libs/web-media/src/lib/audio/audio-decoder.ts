@@ -61,7 +61,7 @@ export class AudioDecoder {
   constructor(
     format: AudioFormat,
     audioInfo: AudioInfo,
-    arrayBuffer: ArrayBuffer
+    arrayBuffer: ArrayBuffer,
   ) {
     if (!(format === undefined || format === null)) {
       this.format = format;
@@ -90,19 +90,19 @@ export class AudioDecoder {
               if (this.channelData === undefined || this.channelData === null) {
                 this.channelData = new Float32Array(
                   Math.round(
-                    this.audioInfo.duration.samples / this.channelDataFactor
-                  )
+                    this.audioInfo.duration.samples / this.channelDataFactor,
+                  ),
                 );
               }
 
               try {
                 const result = await this.minimizeChannelData(
                   job.result,
-                  this.channelDataFactor
+                  this.channelDataFactor,
                 );
                 this.insertChannelBuffer(
                   Math.floor(j.start / this.channelDataFactor),
-                  result
+                  result,
                 );
               } catch (e) {
                 console.error(e);
@@ -169,7 +169,7 @@ export class AudioDecoder {
             sampleStart.samples,
             sampleDur.samples,
             this.uint8Array!,
-            0
+            0,
           );
           const job = new TsWorkerJob<
             [data: IntArray, sampleDuration: number, bitsPerSample: number],
@@ -178,7 +178,7 @@ export class AudioDecoder {
             this.getChannelData,
             data,
             sampleDur.samples,
-            this.format.bitsPerSample
+            this.format.bitsPerSample,
           );
           this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
         } else {
@@ -187,7 +187,7 @@ export class AudioDecoder {
             sampleStart.samples,
             sampleDur.samples,
             this.uint8Array!,
-            0
+            0,
           );
           const job = new TsWorkerJob<
             [data: IntArray, sampleDuration: number, bitsPerSample: number],
@@ -196,7 +196,7 @@ export class AudioDecoder {
             this.getChannelData,
             result,
             sampleDur.samples,
-            this.format.bitsPerSample
+            this.format.bitsPerSample,
           );
           this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
 
@@ -211,7 +211,7 @@ export class AudioDecoder {
                     sampleDur.samples,
                     this.audioInfo.duration.samples -
                       sampleStart.samples -
-                      sampleDur.samples
+                      sampleDur.samples,
                   );
 
                   if (
@@ -227,15 +227,15 @@ export class AudioDecoder {
                   }
                   const durationUnit = new SampleUnit(
                     sampleDur2,
-                    this.audioInfo.sampleRate
+                    this.audioInfo.sampleRate,
                   );
                   this.getChunkedChannelData(
                     sampleStart.add(sampleDur),
-                    durationUnit
+                    durationUnit,
                   ).catch((error) => {
                     console.error(error);
                   });
-                })
+                }),
               );
             } else {
               this.onChannelDataCalculate.complete();
@@ -248,7 +248,7 @@ export class AudioDecoder {
       }
     } else {
       this.onChannelDataCalculate.error(
-        new Error('Unsopported audio file format')
+        new Error('Unsopported audio file format'),
       );
       throw new Error('Unsopported audio file format');
     }
@@ -264,7 +264,7 @@ export class AudioDecoder {
 
   public async minimizeChannelData(
     channelData: Float32Array,
-    factor: number
+    factor: number,
   ): Promise<Float32Array> {
     if (factor !== 1) {
       const result = new Float32Array(Math.round(channelData.length / factor));
@@ -302,7 +302,7 @@ export class AudioDecoder {
       console.error(
         `can't insert channel channelData: ${channelData.length}, buffer: ${
           offset + channelData.length - this.channelData!.length
-        }`
+        }`,
       );
     }
   }
@@ -310,7 +310,7 @@ export class AudioDecoder {
   private getChannelData = (
     data: IntArray,
     sampleDuration: number,
-    bitsPerSample: number
+    bitsPerSample: number,
   ) => {
     return new Promise<Float32Array>((resolve) => {
       const duration = sampleDuration;

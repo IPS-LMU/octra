@@ -27,9 +27,9 @@ export class AsrStoreService {
   itemChange$ = this.actions$.pipe(
     ofType(
       ASRActions.processQueueItem.success,
-      ASRActions.processQueueItem.fail
+      ASRActions.processQueueItem.fail,
     ),
-    map((action) => action.item)
+    map((action) => action.item),
   );
 
   startProcessing() {
@@ -40,14 +40,14 @@ export class AsrStoreService {
     this.store.dispatch(
       ASRActions.stopItemProcessing.do({
         time,
-      })
+      }),
     );
   }
 
   addToQueue(
     timeInterval: ASRTimeInterval,
     type: ASRQueueItemType,
-    transcript?: string
+    transcript?: string,
   ) {
     this.store.dispatch(
       ASRActions.addToQueue.do({
@@ -56,7 +56,7 @@ export class AsrStoreService {
           type,
           transcript,
         },
-      })
+      }),
     );
   }
 
@@ -68,13 +68,16 @@ export class AsrStoreService {
     this.store.dispatch(ASRActions.setASRSettings.do({ settings }));
   }
 
-  constructor(private store: Store<RootState>, private actions$: Actions) {
+  constructor(
+    private store: Store<RootState>,
+    private actions$: Actions,
+  ) {
     this.subscrManager.add(
       this.asrOptions$.subscribe({
         next: (asrOptions) => {
           this._asrOptions = asrOptions;
         },
-      })
+      }),
     );
   }
 }

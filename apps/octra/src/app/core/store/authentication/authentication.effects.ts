@@ -46,14 +46,14 @@ export class AuthenticationEffects {
     this.actions$.pipe(
       ofType(
         AuthenticationActions.loginOnline.do,
-        AuthenticationActions.reauthenticate.do
+        AuthenticationActions.reauthenticate.do,
       ),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         const waitForWindowResponse = (
           actionAfterSuccess: Action | undefined,
           url: string,
-          params: Record<string, string | number | undefined | null | boolean>
+          params: Record<string, string | number | undefined | null | boolean>,
         ) => {
           const baseURL = getBaseHrefURL();
 
@@ -63,7 +63,7 @@ export class AuthenticationEffects {
               this.store.dispatch(
                 AuthenticationActions.needReAuthentication.success({
                   actionAfterSuccess,
-                })
+                }),
               );
               bc.close();
             }
@@ -79,7 +79,7 @@ export class AuthenticationEffects {
             newURL,
             'Octra-Backend - Authenticate via Shibboleth',
             760,
-            760
+            760,
           );
 
           return AuthenticationActions.reauthenticate.wait();
@@ -102,14 +102,14 @@ export class AuthenticationEffects {
                 {
                   nc: true,
                   cid: Date.now(),
-                }
-              )
+                },
+              ),
             );
           } else {
             return of(
               AuthenticationActions.reauthenticate.fail({
                 error: 'Missing Shibboleth URL in application settings.',
-              })
+              }),
             );
           }
         }
@@ -120,12 +120,11 @@ export class AuthenticationEffects {
               // need to open windowURL
               const urlParams = {
                 cid: Date.now(),
-                r:
-                  joinURL(
-                    document.location.href.replace(/login\/?/g, ''),
-                    'intern',
-                    'projects'
-                  ),
+                r: joinURL(
+                  document.location.href.replace(/login\/?/g, ''),
+                  'intern',
+                  'projects',
+                ),
                 uuid: this.apiService.appProperties.server.uuid,
                 t: auth.agreementToken,
               };
@@ -150,7 +149,7 @@ export class AuthenticationEffects {
                 return waitForWindowResponse(
                   a.actionAfterSuccess,
                   url,
-                  urlParams
+                  urlParams,
                 );
               }
             } else if (auth.me) {
@@ -193,13 +192,13 @@ export class AuthenticationEffects {
               return of(
                 AuthenticationActions.reauthenticate.fail({
                   error: err?.error?.message ?? err?.message,
-                })
+                }),
               );
             }
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   onLoginDemo$ = createEffect(() =>
@@ -210,10 +209,10 @@ export class AuthenticationEffects {
         return of(
           AuthenticationActions.loginDemo.success({
             mode: LoginMode.DEMO,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   onLoginURL$ = createEffect(() =>
@@ -224,10 +223,10 @@ export class AuthenticationEffects {
         return of(
           AuthenticationActions.loginURL.success({
             mode: LoginMode.URL,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   onLoginLocal$ = createEffect(() =>
@@ -242,7 +241,7 @@ export class AuthenticationEffects {
               if (
                 AudioManager.isValidAudioFileName(
                   file.name,
-                  AppInfo.audioformats
+                  AppInfo.audioformats,
                 )
               ) {
                 audiofile = file;
@@ -255,7 +254,7 @@ export class AuthenticationEffects {
                 AuthenticationActions.loginLocal.prepare({
                   ...a,
                   sessionFile: this.getSessionFile(audiofile),
-                })
+                }),
               );
               return this.actions$.pipe(
                 ofType(IDBActions.saveModeOptions.success),
@@ -265,22 +264,22 @@ export class AuthenticationEffects {
                     AuthenticationActions.loginLocal.success({
                       ...a,
                       sessionFile: this.getSessionFile(audiofile!),
-                    })
+                    }),
                   );
-                })
+                }),
               );
             } else {
               return of(
                 AuthenticationActions.loginLocal.fail(
-                  new Error('file not supported')
-                )
+                  new Error('file not supported'),
+                ),
               );
             }
           } else {
             return of(
               AuthenticationActions.loginLocal.fail(
-                new Error('files are undefined')
-              )
+                new Error('files are undefined'),
+              ),
             );
           }
         };
@@ -293,8 +292,8 @@ export class AuthenticationEffects {
           return from(
             this.modalsService.openModal(
               TranscriptionDeleteModalComponent,
-              TranscriptionDeleteModalComponent.options
-            )
+              TranscriptionDeleteModalComponent.options,
+            ),
           ).pipe(
             exhaustMap((value) => {
               if (value === ModalDeleteAnswer.DELETE) {
@@ -302,11 +301,11 @@ export class AuthenticationEffects {
               } else {
                 return of();
               }
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   logout$ = createEffect(() =>
@@ -324,13 +323,13 @@ export class AuthenticationEffects {
               // ignore
               this.sessionStorageService.clear();
               return of(AuthenticationActions.logout.success(action));
-            })
+            }),
           );
         }
         this.sessionStorageService.clear();
         return of(AuthenticationActions.logout.success(action));
-      })
-    )
+      }),
+    ),
   );
 
   loginAuto$ = createEffect(() =>
@@ -341,10 +340,10 @@ export class AuthenticationEffects {
         return of(
           AuthenticationActions.loginAuto.success({
             method: a.method,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   loginSuccess$ = createEffect(
@@ -354,7 +353,7 @@ export class AuthenticationEffects {
           AuthenticationActions.loginOnline.success,
           AuthenticationActions.loginDemo.success,
           AuthenticationActions.loginURL.success,
-          AuthenticationActions.loginLocal.success
+          AuthenticationActions.loginLocal.success,
         ),
         withLatestFrom(this.store),
         tap(([a, state]) => {
@@ -375,22 +374,22 @@ export class AuthenticationEffects {
                         projectID: state.onlineMode.previousSession.project.id,
                         taskID: state.onlineMode.previousSession.task.id,
                         mode: a.mode,
-                      })
+                      }),
                     );
                   } else {
                     this.store.dispatch(
-                      AuthenticationActions.redirectToProjects.do()
+                      AuthenticationActions.redirectToProjects.do(),
                     );
                   }
                 }
               } else {
                 this.store.dispatch(
-                  AuthenticationActions.redirectToProjects.do()
+                  AuthenticationActions.redirectToProjects.do(),
                 );
               }
             } else {
               this.store.dispatch(
-                AuthenticationActions.redirectToProjects.do()
+                AuthenticationActions.redirectToProjects.do(),
               );
             }
           } else if (state.application.mode) {
@@ -400,7 +399,7 @@ export class AuthenticationEffects {
                 projectID: '7234892',
                 taskID: '73482',
                 mode: a.mode,
-              })
+              }),
             );
           } else {
             // mode is undefined
@@ -408,9 +407,9 @@ export class AuthenticationEffects {
               '/login',
             ]);
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   redirectToProjects$ = createEffect(
@@ -420,11 +419,11 @@ export class AuthenticationEffects {
         tap((a) => {
           this.routingService.navigate(
             'redirect to projects after authentication',
-            ['/intern/projects']
+            ['/intern/projects'],
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   loadCurrentAccountInformation$ = createEffect(() =>
@@ -438,8 +437,8 @@ export class AuthenticationEffects {
                 mode: a.mode,
                 actionAfterSuccess: a.actionAfterSuccess,
                 me,
-              })
-            )
+              }),
+            ),
           ),
           catchError((error: HttpErrorResponse) =>
             checkAndThrowError(
@@ -455,14 +454,14 @@ export class AuthenticationEffects {
               () => {
                 this.alertService.showAlert(
                   'danger',
-                  error.error?.message ?? error.message
+                  error.error?.message ?? error.message,
                 );
-              }
-            )
-          )
+              },
+            ),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 
   loadCurrentAccountInformationSuccess$ = createEffect(
@@ -473,9 +472,9 @@ export class AuthenticationEffects {
           if (a.actionAfterSuccess) {
             return this.store.dispatch(a.actionAfterSuccess);
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   continueSessionAfterAgreement$ = createEffect(() =>
@@ -500,12 +499,12 @@ export class AuthenticationEffects {
             return of(
               AuthenticationActions.continueSessionAfterAgreement.fail({
                 error,
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   continueSessionAfterAgreementSuccess$ = createEffect(
@@ -517,11 +516,11 @@ export class AuthenticationEffects {
             'continue after agreement',
             ['/load'],
             { queryParams: a.params },
-            null
+            null,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   reauthenticationNeedded$ = createEffect(
@@ -535,7 +534,7 @@ export class AuthenticationEffects {
               this.modalsService.openReAuthenticationModal(
                 a.forceAuthentication ?? state.authentication.type!,
                 a.forceLogout,
-                a.actionAfterSuccess
+                a.actionAfterSuccess,
               );
             const subscr = this.reauthenticationRef.closed.subscribe({
               next: () => {
@@ -544,9 +543,9 @@ export class AuthenticationEffects {
               },
             });
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   reauthenticationSuccess$ = createEffect(
@@ -559,9 +558,9 @@ export class AuthenticationEffects {
           if (a.actionAfterSuccess) {
             this.store.dispatch((a as any).actionAfterSuccess);
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   showErrorModal$ = createEffect(
@@ -574,11 +573,11 @@ export class AuthenticationEffects {
             ErrorModalComponent.options,
             {
               text: a.error.error?.message ?? a.error?.message ?? a.error,
-            }
+            },
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   redirectToURL$ = createEffect(
@@ -589,9 +588,9 @@ export class AuthenticationEffects {
           setTimeout(() => {
             document.location.href = a.url;
           }, 1000);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   private reauthenticationRef?: NgbModalRef;
@@ -602,7 +601,7 @@ export class AuthenticationEffects {
       file.name,
       file.size,
       new Date(file.lastModified),
-      normalizeMimeType(file.type)
+      normalizeMimeType(file.type),
     );
   };
 
@@ -615,6 +614,6 @@ export class AuthenticationEffects {
     private sessionStorageService: SessionStorageService,
     private transloco: TranslocoService,
     private routingService: RoutingService,
-    private modalsService: OctraModalService
+    private modalsService: OctraModalService,
   ) {}
 }

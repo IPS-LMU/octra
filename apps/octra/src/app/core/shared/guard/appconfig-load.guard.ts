@@ -11,19 +11,19 @@ import { RoutingService } from '../service/routing.service';
 
 export const CONFIG_LOADED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
+  state: RouterStateSnapshot,
 ) => {
   const applicationStoreService = inject(ApplicationStoreService);
   return applicationStoreService.appconfig$.pipe(
     map((a) => {
       return a !== undefined;
-    })
+    }),
   );
 };
 
 export const APP_INITIALIZED_GUARD: CanActivateFn = (
   route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
+  state: RouterStateSnapshot,
 ) => {
   const routingService: RoutingService = inject(RoutingService);
   return inject(ApplicationStoreService).appInitialized.pipe(
@@ -33,10 +33,10 @@ export const APP_INITIALIZED_GUARD: CanActivateFn = (
         routingService.navigate(
           'guard app init, to load',
           ['/load'],
-          AppInfo.queryParamsHandling
+          AppInfo.queryParamsHandling,
         );
       }
       return a;
-    })
+    }),
   );
 };

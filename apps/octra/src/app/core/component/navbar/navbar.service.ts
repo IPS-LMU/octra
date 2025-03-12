@@ -56,6 +56,6 @@ export class NavbarService {
 
   constructor(
     public uiService: UserInteractionsService,
-    private audio: AudioService
+    private audio: AudioService,
   ) {}
 }

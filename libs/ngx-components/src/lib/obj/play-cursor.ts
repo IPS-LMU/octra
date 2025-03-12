@@ -30,7 +30,7 @@ export class PlayCursor {
     absx: number,
     audioTCalculator: AudioTimeCalculator,
     audioPxWidth: number,
-    chunk: AudioChunk
+    chunk: AudioChunk,
   ) {
     this._absX = Math.max(0, Math.min(absx, audioPxWidth));
     this._timePos = audioTCalculator.absXChunktoSampleUnit(absx, chunk);
@@ -39,7 +39,7 @@ export class PlayCursor {
   public changeSamples(
     sample: SampleUnit,
     audioTCalculator: AudioTimeCalculator,
-    chunk?: AudioChunk
+    chunk?: AudioChunk,
   ) {
     this._timePos = sample.clone();
     const duration =

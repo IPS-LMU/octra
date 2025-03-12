@@ -38,8 +38,8 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       item: any,
       conditions: JSONSetFileConditions,
       combinationType: 'and' | 'or',
-      path: string
-    ) => JSONSetResult)[] = []
+      path: string,
+    ) => JSONSetResult)[] = [],
   ) {
     super(validationMethods);
     this._validationMethods = [
@@ -53,7 +53,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
 
   override areEqualArray(
     array: PossibleSolution<IFile, JSONSetFileConditions>[],
-    array2: PossibleSolution<IFile, JSONSetFileConditions>[]
+    array2: PossibleSolution<IFile, JSONSetFileConditions>[],
   ): boolean {
     if (array.length === array2.length) {
       for (const solution of array) {
@@ -64,7 +64,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
               a.selection.name === solution.selection.name &&
               a.selection.type === solution.selection.type &&
               a.selection.size === solution.selection.size &&
-              a.selection.content === solution.selection.content
+              a.selection.content === solution.selection.content,
           )
         ) {
         }
@@ -77,7 +77,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   private convertFileString = (fileString: string) => {
     const matches =
       /\s*([0-9]+(?:\.?[0-9]+)?)\s*((?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB))$/g.exec(
-        fileString
+        fileString,
       );
     if (!matches || matches.length < 3) {
       return undefined;
@@ -109,17 +109,17 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ) => {
     if (conditions.size && item.size) {
       const matches =
         /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+\.?[0-9]*\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
-          conditions.size
+          conditions.size,
         );
 
       if (!matches) {
         throw new Error(
-          `JSONFileSetValidationError: Invalid file size statement.`
+          `JSONFileSetValidationError: Invalid file size statement.`,
         );
       }
 
@@ -175,7 +175,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ): JSONSetResult {
     if (conditions.extension && conditions.extension.length > 0 && item.name) {
       for (const ext of conditions.extension) {
@@ -191,7 +191,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       return {
         valid: false,
         error: `File content type must be one of ${conditions.extension.join(
-          ','
+          ',',
         )}.`,
         path,
         combinationType,
@@ -208,7 +208,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ): JSONSetResult {
     if (
       conditions.content &&
@@ -218,7 +218,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       return {
         valid: false,
         error: `File content type must be one of ${conditions.content.join(
-          ','
+          ',',
         )}.`,
         path,
         combinationType,
@@ -236,7 +236,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ): JSONSetResult {
     if (
       conditions.namePattern &&
@@ -261,7 +261,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     item: IFile,
     conditions: JSONSetFileConditions,
     combinationType: 'and' | 'or',
-    path: string
+    path: string,
   ): JSONSetResult {
     if (
       conditions.mimeType &&
@@ -286,11 +286,11 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   override cleanUpSolutions(
     a: PossibleSolution<IFile, JSONSetFileConditions>[],
     index: number,
-    solutions: PossibleSolution<IFile, JSONSetFileConditions>[][]
+    solutions: PossibleSolution<IFile, JSONSetFileConditions>[][],
   ): boolean {
     const anyDuplicate = a.some(
       (b, i, so) =>
-        so.findIndex((c) => c.selection.name === b.selection.name) !== i
+        so.findIndex((c) => c.selection.name === b.selection.name) !== i,
     );
 
     return (
@@ -299,7 +299,8 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
         for (const iFile of a) {
           const i = b.findIndex(
             (c) =>
-              c.path === iFile.path && c.selection.name === iFile.selection.name
+              c.path === iFile.path &&
+              c.selection.name === iFile.selection.name,
           );
           if (i < 0) {
             return false;

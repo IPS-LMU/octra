@@ -154,7 +154,7 @@ export class AudioplayerComponent
         this.onAudioChunkStatusChanged,
         (error: any) => {
           console.error(error);
-        }
+        },
       );
     }
   }
@@ -229,7 +229,7 @@ export class AudioplayerComponent
             x: event.evt.x,
             y: event.evt.y,
           });
-        }
+        },
       );
 
       // add the shape to the layer
@@ -256,13 +256,13 @@ export class AudioplayerComponent
       let xCoord = Math.min(
         Math.max(this._settings.slider.margin.left, pos.x) -
           this._settings.playHead.width / 2,
-        maxWidth
+        maxWidth,
       );
 
       const samples = this.pxToSample(
         xCoord -
           this._settings.slider.margin.left +
-          this._settings.playHead.width / 2
+          this._settings.playHead.width / 2,
       );
 
       if (samples !== undefined && !isNaN(samples.samples)) {
@@ -305,13 +305,13 @@ export class AudioplayerComponent
       this.stage.height(this._settings.height + this._settings.border.width);
 
       this.canvasElements.panel.width(
-        this.width - this._settings.border.width * 2
+        this.width - this._settings.border.width * 2,
       );
 
       this.canvasElements.sliderBar.width(
         this.canvasElements.panel.width() -
           this._settings.slider.margin.left -
-          this._settings.slider.margin.right
+          this._settings.slider.margin.right,
       );
 
       this.canvasElements.playHead.x(this.getPlayHeadX);
@@ -335,7 +335,7 @@ export class AudioplayerComponent
       return new SampleUnit(
         (px * this.audioChunk.time.duration.samples) /
           this.canvasElements.sliderBar.width(),
-        this.audioChunk.audioManager.sampleRate
+        this.audioChunk.audioManager.sampleRate,
       );
     }
     return undefined;
@@ -352,7 +352,7 @@ export class AudioplayerComponent
       if (this.animation.playHead === undefined) {
         this.animation.playHead = new Konva.Animation(
           this.doPlayHeadAnimation,
-          layer
+          layer,
         );
       }
       this.animation.playHead.start();
@@ -447,7 +447,7 @@ export class AudioplayerComponent
       const xCoord =
         Math.min(
           Math.max(this._settings.slider.margin.left, event.evt.x),
-          maxWidth
+          maxWidth,
         ) -
         this._settings.playHead.width / 2;
       this.canvasElements.playHead.x(xCoord);
@@ -467,7 +467,7 @@ export class AudioplayerComponent
                       console.error(error);
                     });
                   }
-                })
+                }),
               );
             }
           })
@@ -495,7 +495,7 @@ export class AudioplayerComponent
       this.audioChunk.relativePlayposition = this.pxToSample(
         xCoord -
           this._settings.slider.margin.left +
-          this._settings.playHead.width / 2
+          this._settings.playHead.width / 2,
       );
       this.audioChunk.startpos = this.audioChunk.absolutePlayposition;
     }

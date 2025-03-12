@@ -14,16 +14,17 @@
       this browser and keep this page open until the test has finished.
     </div>
     @if (status === 'init') {
-    <button (click)="doStresstest()" class="btn btn-primary btn-raised">
-      START
-    </button>
+      <button (click)="doStresstest()" class="btn btn-primary btn-raised">
+        START
+      </button>
     }
     <br />
     <span id="measuredSize">{{ measuredString }}</span>
     @if (status === 'running') {
-    <span id="status">running...</span>
-    } @if (status === 'init') {
-    <span id="lastResult">last result: {{ lastResultString }}</span>
+      <span id="status">running...</span>
+    }
+    @if (status === 'init') {
+      <span id="lastResult">last result: {{ lastResultString }}</span>
     }
   </div>
   <div class="col-md-6">
@@ -39,27 +40,27 @@
           <td>{{ info.os }}</td>
         </tr>
         @if (info.browser.indexOf('Chrome') > -1) {
-        <tr>
-          <td>JS Heap Size Limit:</td>
-          <td>
-            {{ performance.heapSizeLimit.size }}
-            {{ performance.heapSizeLimit.label }}
-          </td>
-        </tr>
-        <tr>
-          <td>JS Heap Size Used:</td>
-          <td>
-            {{ performance.heapSizeUsed.size }}
-            {{ performance.heapSizeUsed.label }}
-          </td>
-        </tr>
-        <tr>
-          <td>JS Total Heap SIzeUsed:</td>
-          <td>
-            {{ performance.totalHeapSize.size }}
-            {{ performance.totalHeapSize.label }}
-          </td>
-        </tr>
+          <tr>
+            <td>JS Heap Size Limit:</td>
+            <td>
+              {{ performance.heapSizeLimit.size }}
+              {{ performance.heapSizeLimit.label }}
+            </td>
+          </tr>
+          <tr>
+            <td>JS Heap Size Used:</td>
+            <td>
+              {{ performance.heapSizeUsed.size }}
+              {{ performance.heapSizeUsed.label }}
+            </td>
+          </tr>
+          <tr>
+            <td>JS Total Heap SIzeUsed:</td>
+            <td>
+              {{ performance.totalHeapSize.size }}
+              {{ performance.totalHeapSize.label }}
+            </td>
+          </tr>
         }
       </tbody>
     </table>

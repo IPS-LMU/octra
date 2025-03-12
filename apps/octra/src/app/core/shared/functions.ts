@@ -19,7 +19,7 @@ import { UserActions } from '../store/user/user.actions';
 
 export function createSampleProjectDto(
   projectID: string,
-  dto?: Partial<ProjectDto>
+  dto?: Partial<ProjectDto>,
 ): ProjectDto {
   return {
     id: projectID,
@@ -69,7 +69,7 @@ export function createSampleTask(
   projectConfig: any,
   functions: string,
   guidelines: any[],
-  dto?: Partial<TaskDto>
+  dto?: Partial<TaskDto>,
 ): TaskDto {
   return {
     id: taskID,
@@ -144,7 +144,7 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
           type: io.fileType!,
           encoding: 'utf-8',
         },
-        audiofile
+        audiofile,
       );
 
       if (result?.annotjson) {
@@ -203,7 +203,7 @@ export function isIgnoredConsoleAction(type: string) {
 export function findCompatibleFileFromIO<T>(
   task: TaskDto,
   type: 'audio' | 'transcript',
-  validation: (io: TaskInputOutputDto) => T | undefined
+  validation: (io: TaskInputOutputDto) => T | undefined,
 ): T | undefined {
   let i = 0;
   let inputs = [...task.inputs];
@@ -221,14 +221,14 @@ export function findCompatibleFileFromIO<T>(
 
   while (inputs.length > 0 || outputs.length > 0) {
     const filteredInputs = inputs.filter(
-      (a) => a.chain_position === undefined || a.chain_position === i
+      (a) => a.chain_position === undefined || a.chain_position === i,
     );
     inputs = inputs.filter((a) => !filteredInputs.find((b) => b.id === a.id));
     const filteredOutputs = outputs.filter(
-      (a) => a.chain_position === undefined || a.chain_position === i
+      (a) => a.chain_position === undefined || a.chain_position === i,
     );
     outputs = outputs.filter(
-      (a) => !filteredOutputs.find((b) => b.id === a.id)
+      (a) => !filteredOutputs.find((b) => b.id === a.id),
     );
     let result: T | undefined;
 

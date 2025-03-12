@@ -40,7 +40,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
       name: string;
       type: string;
       size: number;
-    }[]
+    }[],
   ) {
     this.octraDropzoneService.oldFiles = value;
   }
@@ -72,7 +72,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   constructor(
     protected octraDropzoneService: OctraDropzoneService,
-    private modService: OctraModalService
+    private modService: OctraModalService,
   ) {
     super();
   }
@@ -95,7 +95,7 @@ export class OctraDropzoneComponent extends DefaultComponent {
     this.modService
       .openModal(
         SupportedFilesModalComponent,
-        SupportedFilesModalComponent.options
+        SupportedFilesModalComponent.options,
       )
       .catch((error) => {
         console.error(error);

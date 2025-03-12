@@ -40,7 +40,7 @@ export class AppComponent
     private route: ActivatedRoute,
     private multiThreading: MultiThreadingService,
     private appStoreService: ApplicationStoreService,
-    private annotationStoreService: AnnotationStoreService
+    private annotationStoreService: AnnotationStoreService,
   ) {
     super();
 
@@ -51,7 +51,7 @@ export class AppComponent
         next: (event: any) => {
           if (event.snapshot) {
             console.log(
-              `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`
+              `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`,
             );
           }
         },

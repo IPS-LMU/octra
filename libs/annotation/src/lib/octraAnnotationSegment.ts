@@ -40,7 +40,7 @@ export class OctraAnnotationEvent
   }
 
   static deserialize<T extends ASRContext>(
-    jsonObject: OctraAnnotationEvent
+    jsonObject: OctraAnnotationEvent,
   ): OctraAnnotationEvent {
     return jsonObject;
   }
@@ -121,7 +121,7 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
       this.id,
       sampleStart,
       this.time.samples - sampleStart,
-      this.labels
+      this.labels,
     );
   }
 
@@ -164,13 +164,13 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
   }
 
   static deserialize<T extends ASRContext>(
-    jsonObject: SegmentWithContext<T>
+    jsonObject: SegmentWithContext<T>,
   ): OctraAnnotationSegment<T> {
     const result = new OctraAnnotationSegment<T>(
       jsonObject.id,
       jsonObject.time,
       jsonObject.labels.map((a) => OLabel.deserialize(a)),
-      jsonObject.context
+      jsonObject.context,
     );
     return result;
   }
@@ -178,13 +178,13 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
   static deserializeFromOSegment<T extends ASRContext>(
     jsonObject: ISegment,
     sampleRate: number,
-    context?: T
+    context?: T,
   ): OctraAnnotationSegment<T> {
     return new OctraAnnotationSegment<T>(
       jsonObject.id,
       new SampleUnit(jsonObject.sampleStart + jsonObject.sampleDur, sampleRate),
       jsonObject.labels.map((a) => OLabel.deserialize(a)),
-      context
+      context,
     );
   }
 
@@ -195,7 +195,7 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
       [...this.labels],
       {
         ...this.context,
-      } as any
+      } as any,
     );
   }
 

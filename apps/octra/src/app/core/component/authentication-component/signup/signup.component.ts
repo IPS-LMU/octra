@@ -55,7 +55,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
 
   constructor(
     private api: OctraAPIService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {
     super();
   }
@@ -73,14 +73,14 @@ export class SignupComponent extends DefaultComponent implements OnInit {
         next: (policies) => {
           this.signUpLoading = false;
           this.signUpForm.policies = policies.map(
-            (a) => new PreparedPolicyListItemDto(a)
+            (a) => new PreparedPolicyListItemDto(a),
           );
         },
         error: (e) => {
           console.error(e);
         },
       },
-      'signup'
+      'signup',
     );
   }
 

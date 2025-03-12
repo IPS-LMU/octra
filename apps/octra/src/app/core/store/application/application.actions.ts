@@ -127,7 +127,7 @@ export class ApplicationActions {
     `UNDO FAILED`,
     props<{
       error: string;
-    }>()
+    }>(),
   );
 
   public static redoSuccess = createAction(`REDO SUCCESS`);
@@ -136,7 +136,7 @@ export class ApplicationActions {
     `REDO FAILED`,
     props<{
       error: string;
-    }>()
+    }>(),
   );
 
   public static finishLoading = createAction(`[${context}] Finish Loading`);
@@ -145,35 +145,35 @@ export class ApplicationActions {
     `[${context}] Add Error`,
     props<{
       error: string;
-    }>()
+    }>(),
   );
 
   public static setReloaded = createAction(
     `[${context}] Set reloaded`,
     props<{
       reloaded: boolean;
-    }>()
+    }>(),
   );
 
   public static setAppLanguage = createAction(
     `[${context}] Set app language`,
     props<{
       language: string;
-    }>()
+    }>(),
   );
 
   public static setDBVersion = createAction(
     `[${context}] Set IDB Version`,
     props<{
       version: number;
-    }>()
+    }>(),
   );
 
   public static setConsoleEntries = createAction(
     `[${context}] Set Console Entries`,
     props<{
       consoleEntries: (ConsoleEntry | ConsoleGroupEntry)[];
-    }>()
+    }>(),
   );
 
   public static setAudioSettings = createAction(
@@ -181,35 +181,35 @@ export class ApplicationActions {
     props<{
       volume: number;
       speed: number;
-    }>()
+    }>(),
   );
 
   public static setShowMagnifier = createAction(
     `[${context}] Set showMagnifier`,
     props<{
       showMagnifier: boolean;
-    }>()
+    }>(),
   );
 
   public static setEasyMode = createAction(
     `[${context}] Set easy mode`,
     props<{
       easyMode: boolean;
-    }>()
+    }>(),
   );
 
   public static setSecondsPerLine = createAction(
     `[${context}] Set seconds per line`,
     props<{
       secondsPerLine: number;
-    }>()
+    }>(),
   );
 
   public static setHighlightingEnabled = createAction(
     `[${context}] Set highlightingEnabled`,
     props<{
       highlightingEnabled: boolean;
-    }>()
+    }>(),
   );
 
   static changeApplicationOption = createActionGroup({

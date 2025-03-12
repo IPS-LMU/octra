@@ -183,7 +183,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     private cd: ChangeDetectorRef,
     protected appStorage: AppStorageService,
     protected settingsService: SettingsService,
-    private uiService: UserInteractionsService
+    private uiService: UserInteractionsService,
   ) {
     this.subscrmanager = new SubscriptionManager();
   }
@@ -214,14 +214,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
               undefined,
               undefined,
               undefined,
-              'overview'
+              'overview',
             );
           }
         },
         error: (error) => {
           console.error(error);
         },
-      })
+      }),
     );
 
     this.updateView();
@@ -235,7 +235,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     $event: MouseEvent,
     rowNumber: number,
     row: HTMLDivElement,
-    validationPopover: ValidationPopoverComponent
+    validationPopover: ValidationPopoverComponent,
   ) {
     if (validationPopover) {
       if (this.textEditor.state === 'inactive') {
@@ -291,7 +291,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             : this.audio.audioManager.resource.info.duration;
         const audiochunk = new AudioChunk(
           new AudioSelection(segment.time, nextSegmentTime),
-          this.audio.audiomanagers[0]
+          this.audio.audiomanagers[0],
         );
 
         this.audio.audiomanagers[0].addChunk(audiochunk);
@@ -348,7 +348,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           start: startSample,
           length: segment.time.samples - startSample,
         },
-        'overview'
+        'overview',
       );
     }
   }
@@ -397,9 +397,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             segment.time.samples,
             i,
             this.annotationStoreService.validationArray.filter(
-              (a) => a.level === level.id
+              (a) => a.level === level.id,
             ),
-            segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
+            segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
           );
 
           result.push(obj);
@@ -434,7 +434,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     endSamples: number,
     i: number,
     validation: any[],
-    rawText?: string
+    rawText?: string,
   ): Promise<{
     start: number;
     end: number;
@@ -462,12 +462,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       ) {
         obj.transcription.html = this.annotationStoreService.underlineTextRed(
           obj.transcription.text,
-          validation[i].validation
+          validation[i].validation,
         );
       }
 
       obj.transcription.html = await this.annotationStoreService.rawToHTML(
-        obj.transcription.html
+        obj.transcription.html,
       );
       obj.transcription.html = obj.transcription.html.replace(
         /((?:✉✉✉)|(?:📩📩📩))/,
@@ -476,11 +476,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             return '<';
           }
           return '>';
-        }
+        },
       );
     } else {
       obj.transcription.html = await this.annotationStoreService.rawToHTML(
-        obj.transcription.html
+        obj.transcription.html,
       );
       obj.transcription.html = obj.transcription.html.replace(
         /((?:✉✉✉)|(?:📩📩📩))/g,
@@ -489,13 +489,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             return '<';
           }
           return '>';
-        }
+        },
       );
     }
 
     obj.transcription.html = obj.transcription.html.replace(
       /(<p>)|(<\/p>)/g,
-      ''
+      '',
     );
     return obj;
   }
@@ -563,7 +563,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             undefined,
             undefined,
-            'overview'
+            'overview',
           );
           this.playAllState.state = 'started';
           this.playAll(0);
@@ -593,7 +593,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             undefined,
             undefined,
-            'overview'
+            'overview',
           );
         })
         .catch((error) => {
@@ -630,10 +630,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           .startPlayback(
             new AudioSelection(
               this.audio.audiomanagers[0].createSampleUnit(startSample),
-              segment.time.clone()
+              segment.time.clone(),
             ),
             1,
-            1
+            1,
           )
           .then(() => {
             this.playStateSegments[segmentNumber].state = 'stopped';
@@ -648,7 +648,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
                   resolve();
                 },
-              })
+              }),
             );
           })
           .catch((error) => {
@@ -711,7 +711,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
                   ] as OctraAnnotationSegment
                 ).time.samples - startSample,
             },
-            'overview'
+            'overview',
           );
 
           this.playSegment(segmentNumber)
@@ -752,7 +752,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
               ] as OctraAnnotationSegment
             ).time.samples - startSample,
         },
-        'overview'
+        'overview',
       );
 
       this.stopPlayback()
@@ -805,13 +805,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     for (const validationArrayElement of this.annotationStoreService
       .validationArray) {
       const index = result.findIndex(
-        (a) => a.id === validationArrayElement.level
+        (a) => a.id === validationArrayElement.level,
       );
       if (index < 0) {
         result.push({
           id: validationArrayElement.level,
           level: this.annotationStoreService.transcript.levels.find(
-            (a) => a.id === validationArrayElement.level
+            (a) => a.id === validationArrayElement.level,
           )!.name,
           errors: validationArrayElement.validation.length,
         });

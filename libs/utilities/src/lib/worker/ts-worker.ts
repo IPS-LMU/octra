@@ -17,7 +17,7 @@ export class TsWorker {
     this.blobURL = URL.createObjectURL(
       new Blob([TsWorker.getWorkerScript()], {
         type: 'application/javascript',
-      })
+      }),
     );
     this.worker = new Worker(this.blobURL);
   }
@@ -132,7 +132,7 @@ onmessage = (msg) => {
       this.checkBeforeStart();
     } else {
       console.error(
-        `job ${job.id} is already in job list of worker ${this._id}`
+        `job ${job.id} is already in job list of worker ${this._id}`,
       );
     }
   }

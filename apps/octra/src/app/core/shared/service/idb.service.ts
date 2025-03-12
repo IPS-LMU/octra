@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IAnnotJSON, OAnnotJSON } from '@octra/annotation';
-import { catchError, from, map, Observable, throwError } from 'rxjs';
+import { from, map, Observable, throwError } from 'rxjs';
 import { LoginMode } from '../../store';
 import {
   DefaultModeOptions,
@@ -33,7 +33,7 @@ export class IDBService {
     return from(this.database.init()).pipe(
       map((a) => {
         this._isOpened = true;
-      })
+      }),
     );
   }
 
@@ -101,7 +101,7 @@ export class IDBService {
    * load options
    */
   public loadOptions(
-    keys: IDBApplicationOptionName[]
+    keys: IDBApplicationOptionName[],
   ): Observable<IIDBApplicationOptions> {
     return from(this.database.app_options.bulkGet(keys)).pipe(
       map((values) => {
@@ -112,7 +112,7 @@ export class IDBService {
           result[entry!.name] = entry!.value;
         }
         return result;
-      })
+      }),
     );
   }
 
@@ -130,7 +130,7 @@ export class IDBService {
     return this.database.loadDataOfMode<IAnnotJSON>(
       mode,
       'annotation',
-      undefined as any
+      undefined as any,
     );
   }
 
@@ -142,7 +142,7 @@ export class IDBService {
   public saveOption<T>(key: string, value: T) {
     if (this.isReady) {
       return from(
-        this.database.app_options.put({ name: key, value }, key)
+        this.database.app_options.put({ name: key, value }, key),
       ).pipe(map((result: string) => result));
     } else {
       return throwError(() => {
@@ -159,7 +159,7 @@ export class IDBService {
     return this.database.loadDataOfMode<IIDBModeOptions>(
       mode,
       'options',
-      DefaultModeOptions
+      DefaultModeOptions,
     );
   }
 
@@ -167,7 +167,7 @@ export class IDBService {
     return this.database.loadDataOfMode<IIDBModeOptions>(
       mode,
       'importOptions',
-      undefined
+      undefined,
     );
   }
 

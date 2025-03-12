@@ -25,23 +25,23 @@ export class ApplicationStoreService {
           next: (mode) => {
             this._useMode = mode;
           },
-        })
+        }),
     );
   }
 
   loading$ = this.store.select((state: RootState) => state.application.loading);
   appconfig$ = this.store.select(
-    (state: RootState) => state.application.appConfiguration
+    (state: RootState) => state.application.appConfiguration,
   );
   idb$ = this.store.select((state: RootState) => state.application.idb);
   loggedIn$ = this.store.select(
-    (state: RootState) => state.application.loggedIn
+    (state: RootState) => state.application.loggedIn,
   );
   appInitialized = this.store.select(
-    (state: RootState) => state.application.initialized
+    (state: RootState) => state.application.initialized,
   );
   shortcutsEnabled$ = this.store.select(
-    (state: RootState) => state.application.shortcutsEnabled
+    (state: RootState) => state.application.shortcutsEnabled,
   );
 
   options$ = this.store.select((state: RootState) => state.application.options);
@@ -58,19 +58,19 @@ export class ApplicationStoreService {
     this.store.dispatch(
       ApplicationActions.setShortcutsEnabled.do({
         shortcutsEnabled,
-      })
+      }),
     );
   }
 
   changeApplicationOption(
     name: IDBApplicationOptionName,
-    value: boolean | number | string
+    value: boolean | number | string,
   ) {
     this.store.dispatch(
       ApplicationActions.changeApplicationOption.do({
         name,
         value,
-      })
+      }),
     );
   }
 }

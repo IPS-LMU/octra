@@ -32,17 +32,17 @@ export class AudioCutter {
     audioInfo: AudioInfo,
     fileName: string,
     buffer: Float32Array,
-    segment: NumeratedSegment
+    segment: NumeratedSegment,
   ) => {
     const data = buffer.slice(
       segment.sampleStart,
-      segment.sampleDur ? segment.sampleStart + segment.sampleDur : undefined
+      segment.sampleDur ? segment.sampleStart + segment.sampleDur : undefined,
     );
 
     const wavWriter = new WavWriter();
     const uint8Array = await wavWriter.writeAsync(
       [data],
-      audioInfo.audioBufferInfo?.sampleRate ?? audioInfo.sampleRate
+      audioInfo.audioBufferInfo?.sampleRate ?? audioInfo.sampleRate,
     );
     return {
       fileName,
@@ -108,7 +108,7 @@ export class AudioCutter {
   getNewFileName(
     namingConvention: string,
     fileName: string,
-    segment: NumeratedSegment
+    segment: NumeratedSegment,
   ) {
     const name = fileName.substring(0, fileName.lastIndexOf('.'));
     const extension = fileName.substring(fileName.lastIndexOf('.'));
@@ -138,7 +138,7 @@ export class AudioCutter {
         case 'secondsStart':
           return (
             Math.round(
-              (segment.sampleStart / this.audioInfo.sampleRate) * 1000
+              (segment.sampleStart / this.audioInfo.sampleRate) * 1000,
             ) / 1000
           );
         case 'secondsDur':
@@ -148,7 +148,7 @@ export class AudioCutter {
                 this.audioInfo.duration.samples) -
                 segment.sampleStart) /
                 this.audioInfo.sampleRate) *
-                1000
+                1000,
             ) / 1000
           );
       }
@@ -160,7 +160,7 @@ export class AudioCutter {
     namingConvention: string,
     buffer: Float32Array,
     segments: NumeratedSegment[],
-    pointer = 0
+    pointer = 0,
   ): void {
     if (pointer === 0) {
       this.status = 'running';
@@ -184,13 +184,13 @@ export class AudioCutter {
       const fileName = this.getNewFileName(
         namingConvention,
         this.audioInfo.fullname,
-        segment
+        segment,
       );
       this.cutAudioFileFromChannelData(
         this.audioInfo,
         fileName,
         buffer,
-        segment
+        segment,
       )
         .then(({ fileName, uint8Array }) => {
           this.onaudiocut.next({
@@ -210,9 +210,9 @@ export class AudioCutter {
                     namingConvention,
                     buffer,
                     segments,
-                    ++pointer
+                    ++pointer,
                   ),
-                200
+                200,
               );
             } else {
               this.status = 'stopped';
@@ -234,7 +234,7 @@ export class AudioCutter {
     filename: string,
     selectedChannels: number[],
     buffer: ArrayBuffer,
-    channelData?: Float32Array[]
+    channelData?: Float32Array[],
   ): Promise<File[]> {
     return new Promise<File[]>((resolve, reject) => {
       const result: File[] = [];
@@ -255,8 +255,8 @@ export class AudioCutter {
                 0,
                 this.audioInfo.duration.samples,
                 u8array,
-                selectedChannel
-              )
+                selectedChannel,
+              ),
             );
           }
           Promise.all(promises)
@@ -266,9 +266,9 @@ export class AudioCutter {
                   this.getFileFromBufferPart(
                     extracts[i],
                     1,
-                    `${name}_${a + 1}.wav`
-                  )
-                )
+                    `${name}_${a + 1}.wav`,
+                  ),
+                ),
               );
             })
             .catch((error) => {
@@ -284,11 +284,11 @@ export class AudioCutter {
               .decodeAudioData(buffer)
               .then((audioBuffer) => {
                 channelData = selectedChannels.map((i) =>
-                  audioBuffer.getChannelData(i)
+                  audioBuffer.getChannelData(i),
                 );
                 const wavWriter = new WavWriter();
                 return selectedChannels.map((i) =>
-                  wavWriter.writeAsync([channelData![i]], sampleRate)
+                  wavWriter.writeAsync([channelData![i]], sampleRate),
                 );
               })
               .then((promises) => {
@@ -299,8 +299,8 @@ export class AudioCutter {
                         (a, i) =>
                           new File([files[i]], `${name}_${a + 1}.wav`, {
                             type: 'audio/wav',
-                          })
-                      )
+                          }),
+                      ),
                     );
                   })
                   .catch((error) => {
@@ -311,8 +311,8 @@ export class AudioCutter {
             const wavWriter = new WavWriter();
             promises2.push(
               ...selectedChannels.map((i) =>
-                wavWriter.writeAsync([channelData![i]], sampleRate)
-              )
+                wavWriter.writeAsync([channelData![i]], sampleRate),
+              ),
             );
           }
         }
@@ -325,8 +325,8 @@ export class AudioCutter {
                   (a, i) =>
                     new File([files[i]], `${name}_${a + 1}.wav`, {
                       type: 'audio/wav',
-                    })
-                )
+                    }),
+                ),
               );
             })
             .catch((error) => {
@@ -352,7 +352,7 @@ export class AudioCutter {
     sampleStart: number,
     sampleDur: number,
     uint8Array: Uint8Array,
-    selectedChannel?: number
+    selectedChannel?: number,
   ): Promise<IntArray> {
     return new Promise<IntArray>((resolve, reject) => {
       let convertedData: IntArray;
@@ -375,7 +375,7 @@ export class AudioCutter {
         convertedData = new this.formatConstructor(
           uint8Array.buffer,
           uint8Array.byteOffset,
-          uint8Array.byteLength / divider
+          uint8Array.byteLength / divider,
         );
         start = Math.round(start / divider);
         startPos = 44 / divider + Math.round(start);
@@ -397,8 +397,8 @@ export class AudioCutter {
           for (let i = 0; i < this.audioInfo.channels; i++) {
             channelData.push(
               new this.formatConstructor(
-                Math.round(dataStart + dataChunkLength)
-              )
+                Math.round(dataStart + dataChunkLength),
+              ),
             );
           }
 
@@ -434,7 +434,7 @@ export class AudioCutter {
   private getFileFromBufferPart(
     data: IntArray,
     channels: number,
-    filename: string
+    filename: string,
   ): File {
     return new File([this.getFileDataView(data as any, channels)], filename, {
       type: 'audio/wav',

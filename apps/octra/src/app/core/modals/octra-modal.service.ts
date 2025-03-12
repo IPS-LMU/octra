@@ -30,7 +30,7 @@ export class OctraModalService implements OnDestroy {
     private modalService: NgbModal,
     private bugService: BugReportService,
     private appStorage: AppStorageService,
-    private store: Store<RootState>
+    private store: Store<RootState>,
   ) {}
 
   ngOnDestroy(): void {
@@ -50,7 +50,7 @@ export class OctraModalService implements OnDestroy {
   public openModalRef<T>(
     modal: any,
     config: NgbModalOptions,
-    data?: any
+    data?: any,
   ): NgbModalWrapper<T> {
     const ref = this.modalService.open(modal, {
       ...config,
@@ -83,11 +83,11 @@ export class OctraModalService implements OnDestroy {
   public openReAuthenticationModal(
     type: AccountLoginMethod,
     forceLogout = false,
-    actionAfterSuccess?: Action
+    actionAfterSuccess?: Action,
   ) {
     const ref = this.openModalRef<ReAuthenticationModalComponent>(
       ReAuthenticationModalComponent,
-      ReAuthenticationModalComponent.options
+      ReAuthenticationModalComponent.options,
     );
     ref.componentInstance.type = type;
     ref.componentInstance.forceLogout = forceLogout;
@@ -111,7 +111,7 @@ export class OctraModalService implements OnDestroy {
   openErrorModal(text: string) {
     const ref = this.openModalRef<ErrorModalComponent>(
       ErrorModalComponent,
-      ErrorModalComponent.options
+      ErrorModalComponent.options,
     );
     ref.componentInstance.text = text;
 
@@ -131,7 +131,7 @@ export class OctraModalService implements OnDestroy {
   openFeedbackNoticeModal() {
     const ref = this.openModalRef<FeedbackNoticeModalComponent>(
       FeedbackNoticeModalComponent,
-      FeedbackNoticeModalComponent.options
+      FeedbackNoticeModalComponent.options,
     );
 
     this.onModalAction.emit({
@@ -158,21 +158,22 @@ export class OctraModalService implements OnDestroy {
           this.appStorage.useMode !== LoginMode.ONLINE ||
           !this.appStorage.loggedIn,
         _profile: {
-          ...((this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn
+          ...((this.appStorage.useMode !== LoginMode.ONLINE ||
+          !this.appStorage.loggedIn
             ? this.appStorage.snapshot.user
             : {
                 email: this.appStorage.snapshot.authentication?.me?.email,
                 name: `${this.appStorage.snapshot.authentication?.me?.first_name} ${this.appStorage.snapshot.authentication?.me?.last_name}`,
               }) ?? {}),
         },
-      }
+      },
     );
     this.subscrManager.add(
       ref.componentInstance.profileChange.subscribe({
         next: ({ email, name }) => {
           this.store.dispatch(UserActions.setUserProfile({ email, name }));
         },
-      })
+      }),
     );
 
     this.subscrManager.add(
@@ -186,11 +187,11 @@ export class OctraModalService implements OnDestroy {
               email,
               message,
               sendProtocol,
-              screenshots
-            )
+              screenshots,
+            ),
           );
         },
-      })
+      }),
     );
 
     return ref.result;

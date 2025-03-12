@@ -113,7 +113,7 @@ export class ELANConverter extends Converter {
           const miliseconds = Math.round(
             ((segment.sampleStart + segment.sampleDur) /
               annotation.sampleRate) *
-              1000
+              1000,
           );
 
           // add time slot
@@ -153,7 +153,7 @@ export class ELANConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -179,7 +179,7 @@ export class ELANConverter extends Converter {
     result.annotjson = new OAnnotJSON(
       audiofile.name,
       FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
 
     const x2js = new X2JS();
@@ -194,18 +194,18 @@ export class ELANConverter extends Converter {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
           const level: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
-            tier._TIER_ID
+            tier._TIER_ID,
           );
           const readTier = (annotationElement: any) => {
             const t1 = this.getSamplesFromTimeSlot(
               jsonXML,
               annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1,
-              audiofile.sampleRate
+              audiofile.sampleRate,
             );
             const t2 = this.getSamplesFromTimeSlot(
               jsonXML,
               annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2,
-              audiofile.sampleRate
+              audiofile.sampleRate,
             );
 
             if (t1 < 0 || t2 < 0) {
@@ -216,7 +216,7 @@ export class ELANConverter extends Converter {
                 (level.items as OSegment[]).push(
                   new OSegment(counter++, lastSample, t1 - lastSample, [
                     new OLabel(tier._TIER_ID, ''),
-                  ])
+                  ]),
                 );
               }
 
@@ -225,9 +225,9 @@ export class ELANConverter extends Converter {
                 new OSegment(counter++, t1, t2 - t1, [
                   new OLabel(
                     tier._TIER_ID,
-                    annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE
+                    annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE,
                   ),
-                ])
+                ]),
               );
             }
             lastSample = t2;
@@ -253,8 +253,8 @@ export class ELANConverter extends Converter {
                   counter++,
                   lastSample,
                   audiofile.duration - lastSample,
-                  [new OLabel(tier._TIER_ID, '')]
-                )
+                  [new OLabel(tier._TIER_ID, '')],
+                ),
               );
             }
 
@@ -276,7 +276,7 @@ export class ELANConverter extends Converter {
   private getSamplesFromTimeSlot(
     obj: ELAN30Object,
     slotID: string,
-    sampleRate: number
+    sampleRate: number,
   ) {
     for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER
       .TIME_SLOT!) {

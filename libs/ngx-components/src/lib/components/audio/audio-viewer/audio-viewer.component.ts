@@ -57,7 +57,7 @@ export class AudioViewerComponent
    * @param value
    */
   @Input() set annotation(
-    value: OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined
+    value: OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined,
   ) {
     this.av.annotation = value ? value.clone() : undefined;
   }
@@ -103,7 +103,7 @@ export class AudioViewerComponent
   constructor(
     public av: AudioViewerService,
     private renderer: Renderer2,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) {
     this.subscrManager = new SubscriptionManager<Subscription>();
 
@@ -113,10 +113,10 @@ export class AudioViewerComponent
           this.renderer.setStyle(
             this.konvaContainer?.nativeElement,
             'cursor',
-            'auto'
+            'auto',
           );
         }
-      })
+      }),
     );
   }
 
@@ -276,7 +276,7 @@ export class AudioViewerComponent
       const t = Date.now();
       const parsedChanges = this.av.getChanges(
         annotation.previousValue,
-        annotation.currentValue
+        annotation.currentValue,
       );
       if (annotation.previousValue && annotation.currentValue) {
         if (
@@ -320,7 +320,7 @@ export class AudioViewerComponent
             console.error(error);
           },
         }),
-        'audioChunkStatusChange'
+        'audioChunkStatusChange',
       );
 
       try {
@@ -335,7 +335,7 @@ export class AudioViewerComponent
                   reject(error);
                 },
               }),
-              'audioChunkChannelFinished'
+              'audioChunkChannelFinished',
             );
           } else {
             resolve();
@@ -356,7 +356,7 @@ export class AudioViewerComponent
             this.width,
             this.height,
             this.konvaContainer?.nativeElement,
-            audioChunk
+            audioChunk,
           );
 
           await this.av.initializeSettings();
@@ -374,7 +374,7 @@ export class AudioViewerComponent
 
   private afterLevelUpdated(
     changes: AnnotationChange[],
-    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>
+    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
   ) {
     if (this.av.currentLevel && this.av.currentLevel.items.length > 0) {
       // subscribe to levelChanges for extern changes
@@ -384,7 +384,7 @@ export class AudioViewerComponent
   }
 
   public selectSegment(
-    segIndex: number
+    segIndex: number,
   ): Promise<{ posY1: number; posY2: number }> {
     return this.av.selectSegment(segIndex);
   }
@@ -426,7 +426,7 @@ export class AudioViewerComponent
           }
         },
       }),
-      'resize'
+      'resize',
     );
   }
 

@@ -10,12 +10,12 @@ import { ApplicationStoreService } from '../../store/application/application-sto
 export class ALoginGuard {
   constructor(
     private appStoreService: ApplicationStoreService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ): Observable<boolean> | boolean {
     return this.appStoreService.loggedIn$.pipe(
       map((a) => {
@@ -33,7 +33,7 @@ export class ALoginGuard {
         } else {
         }
         return true;
-      })
+      }),
     );
   }
 }

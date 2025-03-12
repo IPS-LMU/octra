@@ -8,7 +8,7 @@ export class MapPipe implements PipeTransform {
     value: any[],
     options: {
       func: (a: any) => any;
-    }
+    },
   ): any[] {
     return value.map(options.func) as any[];
   }

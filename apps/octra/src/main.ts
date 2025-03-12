@@ -7,7 +7,7 @@ import {
 import { importProvidersFrom } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import '@angular/localize/init';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
@@ -88,7 +88,7 @@ bootstrapApplication(AppComponent, {
             strictActionImmutability: true,
             strictStateImmutability: true,
           },
-        }
+        },
       ),
       !environment.production
         ? StoreDevtoolsModule.instrument({
@@ -117,7 +117,7 @@ bootstrapApplication(AppComponent, {
       NgxOctraApiModule,
       OctraComponentsModule,
       OctraUtilitiesModule,
-      NgbOffcanvasModule
+      NgbOffcanvasModule,
     ),
     ALoginGuard,
     AudioService,
@@ -139,7 +139,7 @@ bootstrapApplication(AppComponent, {
         prefix: 'custom',
       }),
       withLocalStorage(),
-      withSessionStorage()
+      withSessionStorage(),
     ),
     provideAnimations(),
     provideRouter(APP_ROUTES, withEnabledBlockingInitialNavigation()),

@@ -8,7 +8,7 @@ export class JoinPipe implements PipeTransform {
     value: string[],
     options: {
       separator: string;
-    }
+    },
   ): string {
     return value.join(options.separator);
   }

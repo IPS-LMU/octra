@@ -1,758 +1,830 @@
 @if (appStorage.snapshot.application.loading.status !== 'WAITING') {
-<nav
-  class="navbar fixed-top navbar-expand-md navbar-dark bg-primary py-0"
-  aria-label="Fourth navbar example"
-  #navbar
-  id="navbar"
->
-  <div class="container-fluid">
-    <a
-      [ngbPopover]="versionPopover"
-      popoverClass="version-popover"
-      class="navbar-brand"
-      >OCTRA 2 @if ( appStorage.useMode !== undefined && appStorage.useMode !==
-      undefined ) { ({{ appStorage.useMode }}) } @if (environment.beta_version
-      || environment.dev_version) {
-      <span
-        class="text-outline-white d-inline-block d-md-none text-danger fw-bold"
-        style="font-size: 0.85rem"
-      >
-        @if (environment.dev_version) { in development } @else { beta }
-      </span>
-      }
-    </a>
-    <ng-template #versionPopover>
-      <div id="build-information">
-        <div>
-          <div class="fw-bold">Version:</div>
-          <div>
-            {{ AppInfo.BUILD.version }}
-          </div>
-        </div>
-        <div>
-          <div class="fw-bold">Last updated:</div>
-          <div>
-            {{ AppInfo.BUILD.timestamp }}
-          </div>
-        </div>
-        <div>
-          <div class="fw-bold">Hash:</div>
-          <div style="font-size: 0.7rem">
-            {{ AppInfo.BUILD.hash }}
-          </div>
-        </div>
-      </div>
-    </ng-template>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarsExample04"
-      (click)="collapse.toggle()"
-      aria-controls="navbarsExample04"
-      [attr.aria-expanded]="!isCollapsed"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div
-      class="collapse navbar-collapse"
-      id="navbarsExample04"
-      #collapse="ngbCollapse"
-      [(ngbCollapse)]="isCollapsed"
-    >
-      @if (!appStorage.loggedIn) {
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li [routerLinkActive]="['active']" class="nav-item active">
-          <a
-            [queryParamsHandling]="'merge'"
-            [routerLink]="['/login']"
-            class="nav-link"
-            (click)="isCollapsed = true"
-            >{{ 'g.login' | transloco }}</a
-          >
-        </li>
-        <li [routerLinkActive]="['active']" class="nav-item">
-          <a
-            [queryParamsHandling]="'merge'"
-            [routerLink]="['/features']"
-            class="nav-link"
-            (click)="isCollapsed = true"
-            >{{ 'g.features' | transloco }}</a
-          >
-        </li>
-        <li [routerLinkActive]="['active']" class="nav-item">
-          <a
-            [queryParamsHandling]="'merge'"
-            [routerLink]="['/news']"
-            class="nav-link"
-            (click)="isCollapsed = true"
-            >{{ 'g.news' | transloco }}</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/"
-            target="_blank"
-            (click)="isCollapsed = true"
-          >
-            {{ 'g.manual' | transloco }}
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            href="https://github.com/IPS-LMU/octra"
-            target="_blank"
-            (click)="isCollapsed = true"
-          >
-            <i class="bi bi-github"></i>
-            Github
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" (click)="isCollapsed = true; openAboutModal()">
-            {{ 'g.about' | transloco }}
-          </a>
-        </li>
-      </ul>
-      } @else {
-      <ul class="navbar-nav me-auto">
-        @for (editor of editors; track editor) { @if ( appStorage.loggedIn &&
-        navbarServ.showInterfaces && interfaceActive(editor.name) ) {
-        <li class="nav-item" (click)="setInterface(editor.name)">
-          <a
-            class="nav-link"
-            [ngClass]="{
-              active: appStorage.interface === editor.name
-            }"
-            (click)="isCollapsed = true"
-          >
-            <span>
-              <i [classList]="['bi', editor.icon]"></i>
-              <span class="d-md-none d-xxl-inline">
-                {{ editor.translate | transloco }}
-              </span>
-            </span>
-          </a>
-        </li>
-        } } @if ( appStorage.loggedIn && navbarServ.showInterfaces &&
-        isAdministrator ) {
-        <li class="nav-item">
-          <a (mouseup)="isCollapsed = true; openStatisticsModal()" class="nav-link">
-            <i class="bi bi-pie-chart-fill"></i>
-            <span class="d-md-none d-xxl-inline"> Statistics</span></a
-          >
-        </li>
+  <nav
+    class="navbar fixed-top navbar-expand-md navbar-dark bg-primary py-0"
+    aria-label="Fourth navbar example"
+    #navbar
+    id="navbar"
+  >
+    <div class="container-fluid">
+      <a
+        [ngbPopover]="versionPopover"
+        popoverClass="version-popover"
+        class="navbar-brand"
+        >OCTRA 2
+        @if (
+          appStorage.useMode !== undefined && appStorage.useMode !== undefined
+        ) {
+          ({{ appStorage.useMode }})
         }
-      </ul>
-      }
-      <!--
+        @if (environment.beta_version || environment.dev_version) {
+          <span
+            class="text-outline-white d-inline-block d-md-none text-danger fw-bold"
+            style="font-size: 0.85rem"
+          >
+            @if (environment.dev_version) {
+              in development
+            } @else {
+              beta
+            }
+          </span>
+        }
+      </a>
+      <ng-template #versionPopover>
+        <div id="build-information">
+          <div>
+            <div class="fw-bold">Version:</div>
+            <div>
+              {{ AppInfo.BUILD.version }}
+            </div>
+          </div>
+          <div>
+            <div class="fw-bold">Last updated:</div>
+            <div>
+              {{ AppInfo.BUILD.timestamp }}
+            </div>
+          </div>
+          <div>
+            <div class="fw-bold">Hash:</div>
+            <div style="font-size: 0.7rem">
+              {{ AppInfo.BUILD.hash }}
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarsExample04"
+        (click)="collapse.toggle()"
+        aria-controls="navbarsExample04"
+        [attr.aria-expanded]="!isCollapsed"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="collapse navbar-collapse"
+        id="navbarsExample04"
+        #collapse="ngbCollapse"
+        [(ngbCollapse)]="isCollapsed"
+      >
+        @if (!appStorage.loggedIn) {
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li [routerLinkActive]="['active']" class="nav-item active">
+              <a
+                [queryParamsHandling]="'merge'"
+                [routerLink]="['/login']"
+                class="nav-link"
+                (click)="isCollapsed = true"
+                >{{ 'g.login' | transloco }}</a
+              >
+            </li>
+            <li [routerLinkActive]="['active']" class="nav-item">
+              <a
+                [queryParamsHandling]="'merge'"
+                [routerLink]="['/features']"
+                class="nav-link"
+                (click)="isCollapsed = true"
+                >{{ 'g.features' | transloco }}</a
+              >
+            </li>
+            <li [routerLinkActive]="['active']" class="nav-item">
+              <a
+                [queryParamsHandling]="'merge'"
+                [routerLink]="['/news']"
+                class="nav-link"
+                (click)="isCollapsed = true"
+                >{{ 'g.news' | transloco }}</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/"
+                target="_blank"
+                (click)="isCollapsed = true"
+              >
+                {{ 'g.manual' | transloco }}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="https://github.com/IPS-LMU/octra"
+                target="_blank"
+                (click)="isCollapsed = true"
+              >
+                <i class="bi bi-github"></i>
+                Github
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                (click)="isCollapsed = true; openAboutModal()"
+              >
+                {{ 'g.about' | transloco }}
+              </a>
+            </li>
+          </ul>
+        } @else {
+          <ul class="navbar-nav me-auto">
+            @for (editor of editors; track editor) {
+              @if (
+                appStorage.loggedIn &&
+                navbarServ.showInterfaces &&
+                interfaceActive(editor.name)
+              ) {
+                <li class="nav-item" (click)="setInterface(editor.name)">
+                  <a
+                    class="nav-link"
+                    [ngClass]="{
+                      active: appStorage.interface === editor.name,
+                    }"
+                    (click)="isCollapsed = true"
+                  >
+                    <span>
+                      <i [classList]="['bi', editor.icon]"></i>
+                      <span class="d-md-none d-xxl-inline">
+                        {{ editor.translate | transloco }}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              }
+            }
+            @if (
+              appStorage.loggedIn &&
+              navbarServ.showInterfaces &&
+              isAdministrator
+            ) {
+              <li class="nav-item">
+                <a
+                  (mouseup)="isCollapsed = true; openStatisticsModal()"
+                  class="nav-link"
+                >
+                  <i class="bi bi-pie-chart-fill"></i>
+                  <span class="d-md-none d-xxl-inline"> Statistics</span></a
+                >
+              </li>
+            }
+          </ul>
+        }
+        <!--
                 tiersDropdown
                 -->
-      <ul class="navbar-nav">
-        @if (annotationStoreService.currentLevel !== undefined) {
-        <li
-          class="nav-item dropdown"
-          [ngStyle]="{
-            display:
-              !appStorage.loggedIn ||
-              appStorage.onlineSession?.currentProject === undefined ||
-              !appStorage.audioLoaded
-                ? 'none'
-                : 'inherit'
-          }"
-          ngbDropdown
-          placement="bottom-left"
-        >
-          <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
-            <span class="d-inline d-md-none mt-2">
-              {{ 'p.selected level' | transloco }}:
-            </span>
-            {{
-              annotationStoreService.currentLevel !== undefined &&
-              annotationStoreService.currentLevel!.name !== undefined &&
-              annotationStoreService.currentLevel!.name!.length > 30
-                ? annotationStoreService.currentLevel!.name!.substring(0, 30) +
-                  '...'
-                : annotationStoreService.currentLevel!.name!
-            }}
-            <i class="bi bi-book-half navbar-icon"></i>
-          </a>
-          <div
-            ngbDropdownMenu
-            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right rounded rounded-3 rounded py-0"
-            role="menu"
-            style="min-width: 300px"
-            (click)="$event.stopPropagation()"
-          >
-            <table class="w-100">
-              <tbody>
-                @for ( level of annotationStoreService.transcript!.levels; track
-                level.name; let i = $index) {
-                <tr
-                  [ngClass]="{
-                    selected: annotationStoreService.currentLevelIndex === i,
-                    last:
-                      i === annotationStoreService.transcript!.levels.length - 1
-                  }"
-                  class="level-row"
-                >
-                  <td
-                    (click)="selectLevel(i)"
-                    [ngClass]="{
-                      disabled: level.type !== 'SEGMENT',
-                      'rounded-top-3 rounded-end-0': i === 0
-                    }"
-                    style="cursor: pointer"
-                  >
-                    {{ i + 1 }}:
-                  </td>
-                  <td
-                    [ngClass]="{
-                      disabled: level.type !== 'SEGMENT'
-                    }"
-                  >
-                    <input
-                      (blur)="onLevelNameLeave($event, i)"
-                      maxlength="100"
-                      type="text"
-                      value="{{ level.name }}"
-                      style="width: 100%"
-                    />
-                  </td>
-                  <td
-                    [ngClass]="{
-                      'rounded-top-3 rounded-start-0': i === 0
-                    }"
-                  >
-                    @if ( annotationStoreService.transcript!.levels.length > 1 )
-                    {
-                    <i
-                      class="bi bi-trash"
-                      (click)="onLevelRemoveClick(level)"
-                      style="cursor: pointer"
-                    ></i>
-                    } @if (level.type === annotJSONType.SEGMENT) {
-                    <i
-                      class="bi bi-back"
-                      (mousedown)="onLevelDuplicateClick(i)"
-                      style="margin-left: 3px; cursor: pointer"
-                    ></i>
+        <ul class="navbar-nav">
+          @if (annotationStoreService.currentLevel !== undefined) {
+            <li
+              class="nav-item dropdown"
+              [ngStyle]="{
+                display:
+                  !appStorage.loggedIn ||
+                  appStorage.onlineSession?.currentProject === undefined ||
+                  !appStorage.audioLoaded
+                    ? 'none'
+                    : 'inherit',
+              }"
+              ngbDropdown
+              placement="bottom-left"
+            >
+              <a
+                ngbDropdownToggle
+                type="button"
+                class="nav-link dropdown-toggle"
+              >
+                <span class="d-inline d-md-none mt-2">
+                  {{ 'p.selected level' | transloco }}:
+                </span>
+                {{
+                  annotationStoreService.currentLevel !== undefined &&
+                  annotationStoreService.currentLevel!.name !== undefined &&
+                  annotationStoreService.currentLevel!.name!.length > 30
+                    ? annotationStoreService.currentLevel!.name!.substring(
+                        0,
+                        30
+                      ) + '...'
+                    : annotationStoreService.currentLevel!.name!
+                }}
+                <i class="bi bi-book-half navbar-icon"></i>
+              </a>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right rounded rounded-3 rounded py-0"
+                role="menu"
+                style="min-width: 300px"
+                (click)="$event.stopPropagation()"
+              >
+                <table class="w-100">
+                  <tbody>
+                    @for (
+                      level of annotationStoreService.transcript!.levels;
+                      track level.name;
+                      let i = $index
+                    ) {
+                      <tr
+                        [ngClass]="{
+                          selected:
+                            annotationStoreService.currentLevelIndex === i,
+                          last:
+                            i ===
+                            annotationStoreService.transcript!.levels.length -
+                              1,
+                        }"
+                        class="level-row"
+                      >
+                        <td
+                          (click)="selectLevel(i)"
+                          [ngClass]="{
+                            disabled: level.type !== 'SEGMENT',
+                            'rounded-top-3 rounded-end-0': i === 0,
+                          }"
+                          style="cursor: pointer"
+                        >
+                          {{ i + 1 }}:
+                        </td>
+                        <td
+                          [ngClass]="{
+                            disabled: level.type !== 'SEGMENT',
+                          }"
+                        >
+                          <input
+                            (blur)="onLevelNameLeave($event, i)"
+                            maxlength="100"
+                            type="text"
+                            value="{{ level.name }}"
+                            style="width: 100%"
+                          />
+                        </td>
+                        <td
+                          [ngClass]="{
+                            'rounded-top-3 rounded-start-0': i === 0,
+                          }"
+                        >
+                          @if (
+                            annotationStoreService.transcript!.levels.length > 1
+                          ) {
+                            <i
+                              class="bi bi-trash"
+                              (click)="onLevelRemoveClick(level)"
+                              style="cursor: pointer"
+                            ></i>
+                          }
+                          @if (level.type === annotJSONType.SEGMENT) {
+                            <i
+                              class="bi bi-back"
+                              (mousedown)="onLevelDuplicateClick(i)"
+                              style="margin-left: 3px; cursor: pointer"
+                            ></i>
+                          }
+                        </td>
+                      </tr>
                     }
-                  </td>
-                </tr>
-                }
-                <tr>
-                  <td
-                    colspan="3"
-                    (click)="onLevelAddClick()"
-                    class="level-add-row rounded rounded-bottom-3"
-                  >
-                    <i class="bi bi-plus-lg"></i>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </li>
-        }
-        <!--
+                    <tr>
+                      <td
+                        colspan="3"
+                        (click)="onLevelAddClick()"
+                        class="level-add-row rounded rounded-bottom-3"
+                      >
+                        <i class="bi bi-plus-lg"></i>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </li>
+          }
+          <!--
                   infoDropdown
                   -->
-        @if (appStorage.loggedIn && appStorage.audioLoaded && audio.audioManager
-        !== undefined && audio.audioManager?.resource !== undefined) {
-        <li
-          class="nav-item dropdown"
-          ngbDropdown
-          [container]="'body'"
-          display="dynamic"
-          placement="bottom-end"
-        >
-          <a ngbDropdownToggle type="button" class="nav-link">
-            <i class="bi bi-info-circle-fill navbar-icon"></i>
-            <span class="d-inline d-md-none">
-              {{ 'g.information' | transloco }}
-            </span>
-          </a>
-          <div
-            ngbDropdownMenu
-            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-            role="menu"
-          >
-            <table class="table table-sm table-striped info-menu">
-              @if ( appStorage.useMode === 'online' || appStorage.useMode ===
-              'demo' ) {
-              <tr>
-                <td>
-                  <span>{{ 'g.project' | transloco }}:</span>
-                </td>
-                <td>
-                  <span>{{
-                    appStorage.onlineSession?.currentProject?.name
-                  }}</span>
-                </td>
-              </tr>
-              } @if ( appStorage.useMode === 'online' || appStorage.useMode ===
-              'demo' ) {
-              <tr>
-                <td>
-                  <span>{{ 'g.free jobs' | transloco }}:</span>
-                </td>
-                <td>
-                  <span>{{
-                    getFreeAnnotationTasks(
-                      appStorage.onlineSession?.currentProject
-                    )
-                  }}</span>
-                </td>
-              </tr>
-              }
-              <tr>
-                <td>
-                  <span>{{ 'g.name' | transloco }}:</span>
-                </td>
-                <td>
-                  <span>{{ audio.audioManager!.resource.info.fullname }}</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span>{{ 'g.duration' | transloco }}:</span>
-                </td>
-                <td>
-                  @if (audio.audioManager!.resource.info !== undefined) {
-                  <span
-                    >{{
-                      audio.audioManager!.resource.info!.duration.unix
-                        | timespan
-                          : {
-                              showHour: true
-                            }
-                    }}
-                    (H:m:s)</span
-                  >
+          @if (
+            appStorage.loggedIn &&
+            appStorage.audioLoaded &&
+            audio.audioManager !== undefined &&
+            audio.audioManager?.resource !== undefined
+          ) {
+            <li
+              class="nav-item dropdown"
+              ngbDropdown
+              [container]="'body'"
+              display="dynamic"
+              placement="bottom-end"
+            >
+              <a ngbDropdownToggle type="button" class="nav-link">
+                <i class="bi bi-info-circle-fill navbar-icon"></i>
+                <span class="d-inline d-md-none">
+                  {{ 'g.information' | transloco }}
+                </span>
+              </a>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
+                role="menu"
+              >
+                <table class="table table-sm table-striped info-menu">
+                  @if (
+                    appStorage.useMode === 'online' ||
+                    appStorage.useMode === 'demo'
+                  ) {
+                    <tr>
+                      <td>
+                        <span>{{ 'g.project' | transloco }}:</span>
+                      </td>
+                      <td>
+                        <span>{{
+                          appStorage.onlineSession?.currentProject?.name
+                        }}</span>
+                      </td>
+                    </tr>
                   }
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span>{{ 'g.sampleRate' | transloco }}:</span>
-                </td>
-                <td>
-                  <span>{{
-                    audio.audioManager!.resource!.info.sampleRate
-                  }}</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span>{{ 'g.bitspersecond' | transloco }}:</span>
-                </td>
-                <td>
-                  <span
-                    >{{
-                      audio.audioManager!.resource!.info.bitrate
-                    }}
-                    Bit/s</span
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span>{{ 'g.filesize' | transloco }}:</span>
-                </td>
-                <td>
-                  <span
-                    >{{ navbarServ.fileSize?.size }}
-                    {{ navbarServ.fileSize?.label }}</span
-                  >
-                </td>
-              </tr>
-              @if ( appStorage.useMode === 'online' || appStorage.useMode ===
-              'demo' ) {
-              <tr>
-                <td>
-                  <span>{{ 'g.id' | transloco }}:</span>
-                </td>
-                <td>
-                  <span>{{ appStorage.currentTask?.id }}</span>
-                </td>
-              </tr>
-              }
-            </table>
-          </div>
-        </li>
-        } @if ( appStorage.loggedIn && appStorage.audioLoaded &&
-        navbarServ.showExport && (settService.projectsettings?.octra?.tools ??
-        []).length > 0 ) {
-        <li class="nav-item">
-          <a (mouseup)="openToolsModal()" class="nav-link">
-            <i class="bi bi-tools navbar-icon"></i>
-            <span class="d-md-none d-xxl-inline">
-              {{ 'g.tools' | transloco }}</span
-            >
-          </a>
-        </li>
-        } @if ( appStorage.loggedIn && appStorage.audioLoaded &&
-        navbarServ.showExport ) {
-        <li class="nav-item">
-          <a (mouseup)="openExportModal()" class="nav-link">
-            <i class="bi bi-download navbar-icon"></i>
-            <span class="d-md-none d-xxl-inline">
-              {{ 'g.export' | transloco }}</span
-            >
-          </a>
-        </li>
-        }
-        <!-- options -->
-        <ng-template #canvasContent let-offcanvas>
-          <div class="offcanvas-header">
-            <h4 class="offcanvas-title">{{ 'g.settings' | transloco }}</h4>
-            <button
-              type="button"
-              class="btn-close"
-              aria-label="Close"
-              (click)="offcanvas.dismiss('Cross click')"
-            ></button>
-          </div>
-          <div class="offcanvas-body">
-            <table class="table w-100">
-              <tr>
-                <td>
-                  <label class="form-check-label" for="easymode"
-                    >{{ 'settings.easy mode' | transloco }}:</label
-                  >
-                </td>
-                <td class="align-middle">
-                  <div
-                    class="form-check form-switch form-check-reverse form-check-inline"
-                  >
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      (click)="toggleSettings('easyMode')"
-                      [checked]="appStorage.easyMode"
-                      id="easymode"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="playonhover"
-                    >{{ 'settings.play on hover' | transloco }}:</label
-                  >
-                </td>
-                <td>
-                  <div
-                    class="form-check form-switch form-check-reverse form-check-inline"
-                  >
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      (click)="toggleSettings('playOnHover')"
-                      [checked]="appStorage.playOnHover"
-                      id="playonhover"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="followplaycursor"
-                    >{{ 'settings.follow playcursor' | transloco }}:</label
-                  >
-                </td>
-                <td>
-                  <div
-                    class="form-check form-switch form-check-reverse form-check-inline"
-                  >
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      (click)="toggleSettings('followPlayCursor')"
-                      [checked]="appStorage.followPlayCursor"
-                      id="followplaycursor"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="logging"
-                    >{{ 'settings.logging' | transloco }}:</label
-                  >
-                </td>
-                <td>
-                  <div
-                    class="form-check form-switch form-check-reverse form-check-inline"
-                  >
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      (click)="toggleSettings('logging')"
-                      [checked]="appStorage.logging"
-                      [disabled]="appStorage.useMode === 'online'"
-                      id="logging"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="showMagnifier"
-                    >{{ 'settings.show magnifier' | transloco }}:</label
-                  >
-                </td>
-                <td>
-                  <div
-                    class="form-check form-switch form-check-reverse form-check-inline"
-                  >
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      (click)="toggleSettings('showMagnifier')"
-                      [checked]="appStorage.showMagnifier"
-                      id="showMagnifier"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </table>
-            @if (appStorage?.interface === '2D-Editor') {
-            <hr style="border: 1px solid lightgray" />
-            <br />
-            <label style="font-size: 1rem"
-              >{{ 'settings.seconds per line' | transloco }}:</label
-            >
-            <br />
-            <div
-              class="btn-group w-100"
-              role="group"
-              aria-label="Basic example"
-            >
+                  @if (
+                    appStorage.useMode === 'online' ||
+                    appStorage.useMode === 'demo'
+                  ) {
+                    <tr>
+                      <td>
+                        <span>{{ 'g.free jobs' | transloco }}:</span>
+                      </td>
+                      <td>
+                        <span>{{
+                          getFreeAnnotationTasks(
+                            appStorage.onlineSession?.currentProject
+                          )
+                        }}</span>
+                      </td>
+                    </tr>
+                  }
+                  <tr>
+                    <td>
+                      <span>{{ 'g.name' | transloco }}:</span>
+                    </td>
+                    <td>
+                      <span>{{
+                        audio.audioManager!.resource.info.fullname
+                      }}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>{{ 'g.duration' | transloco }}:</span>
+                    </td>
+                    <td>
+                      @if (audio.audioManager!.resource.info !== undefined) {
+                        <span
+                          >{{
+                            audio.audioManager!.resource.info!.duration.unix
+                              | timespan
+                                : {
+                                    showHour: true,
+                                  }
+                          }}
+                          (H:m:s)</span
+                        >
+                      }
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>{{ 'g.sampleRate' | transloco }}:</span>
+                    </td>
+                    <td>
+                      <span>{{
+                        audio.audioManager!.resource!.info.sampleRate
+                      }}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>{{ 'g.bitspersecond' | transloco }}:</span>
+                    </td>
+                    <td>
+                      <span
+                        >{{
+                          audio.audioManager!.resource!.info.bitrate
+                        }}
+                        Bit/s</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>{{ 'g.filesize' | transloco }}:</span>
+                    </td>
+                    <td>
+                      <span
+                        >{{ navbarServ.fileSize?.size }}
+                        {{ navbarServ.fileSize?.label }}</span
+                      >
+                    </td>
+                  </tr>
+                  @if (
+                    appStorage.useMode === 'online' ||
+                    appStorage.useMode === 'demo'
+                  ) {
+                    <tr>
+                      <td>
+                        <span>{{ 'g.id' | transloco }}:</span>
+                      </td>
+                      <td>
+                        <span>{{ appStorage.currentTask?.id }}</span>
+                      </td>
+                    </tr>
+                  }
+                </table>
+              </div>
+            </li>
+          }
+          @if (
+            appStorage.loggedIn &&
+            appStorage.audioLoaded &&
+            navbarServ.showExport &&
+            (settService.projectsettings?.octra?.tools ?? []).length > 0
+          ) {
+            <li class="nav-item">
+              <a (mouseup)="openToolsModal()" class="nav-link">
+                <i class="bi bi-tools navbar-icon"></i>
+                <span class="d-md-none d-xxl-inline">
+                  {{ 'g.tools' | transloco }}</span
+                >
+              </a>
+            </li>
+          }
+          @if (
+            appStorage.loggedIn &&
+            appStorage.audioLoaded &&
+            navbarServ.showExport
+          ) {
+            <li class="nav-item">
+              <a (mouseup)="openExportModal()" class="nav-link">
+                <i class="bi bi-download navbar-icon"></i>
+                <span class="d-md-none d-xxl-inline">
+                  {{ 'g.export' | transloco }}</span
+                >
+              </a>
+            </li>
+          }
+          <!-- options -->
+          <ng-template #canvasContent let-offcanvas>
+            <div class="offcanvas-header">
+              <h4 class="offcanvas-title">{{ 'g.settings' | transloco }}</h4>
               <button
-                [ngClass]="{
-                  'btn-primary': appStorage.secondsPerLine === 5,
-                  'btn-secondary': appStorage.secondsPerLine !== 5
-                }"
                 type="button"
-                class="btn btn-sm"
-                (click)="changeSecondsPerLine(5)"
-                name="secondsPerLine"
-              >
-                5
-              </button>
-              <button
-                [ngClass]="{
-                  'btn-primary': appStorage.secondsPerLine === 10,
-                  'btn-secondary': appStorage.secondsPerLine !== 10
-                }"
-                type="button"
-                class="btn btn-sm"
-                (click)="changeSecondsPerLine(10)"
-                name="secondsPerLine"
-              >
-                10
-              </button>
-              <button
-                [ngClass]="{
-                  'btn-primary': appStorage.secondsPerLine === 15,
-                  'btn-secondary': appStorage.secondsPerLine !== 15
-                }"
-                type="button"
-                class="btn btn-sm"
-                (click)="changeSecondsPerLine(15)"
-                name="secondsPerLine"
-              >
-                15
-              </button>
-              <button
-                [ngClass]="{
-                  'btn-primary': appStorage.secondsPerLine === 20,
-                  'btn-secondary': appStorage.secondsPerLine !== 20
-                }"
-                type="button"
-                class="btn btn-sm"
-                (click)="changeSecondsPerLine(20)"
-                name="secondsPerLine"
-              >
-                20
-              </button>
-              <button
-                [ngClass]="{
-                  'btn-primary': appStorage.secondsPerLine === 60,
-                  'btn-secondary': appStorage.secondsPerLine !== 60
-                }"
-                type="button"
-                class="btn btn-sm"
-                (click)="changeSecondsPerLine(60)"
-                name="secondsPerLine"
-              >
-                60
-              </button>
+                class="btn-close"
+                aria-label="Close"
+                (click)="offcanvas.dismiss('Cross click')"
+              ></button>
             </div>
-            @if (asrStoreService.asrEnabled$ | async) {
-            <br /><br />
-            <hr />
-            <label style="font-size: 1rem" class="mb-2">{{
-              'g.asr options' | transloco
-            }}</label>
-            <octra-asr-options
-              [options]="asrStoreService.asrOptions$ | async"
-              (optionsChange)="asrStoreService.setASRSettings($event)"
-              [languageSettings]="asrStoreService.languageSettings$ | async"
-              [manualURL]="api.appProperties?.support?.manual_url"
-              [mausLanguages]="asrStoreService.mausLanguages$ | async"
-              [asrLanguages]="asrStoreService.asrLanguages$ | async"
-              [showAccessCode]="true"
-              [i18n]="{
-                header: 'p.language and provider' | transloco,
-                asrLanguage: 'asr.asr language' | transloco,
-                mausLanguage: 'asr.maus language' | transloco,
-                nothingFound: 'p.nothing found' | transloco,
-                asrProvider: 'asr.asr provider' | transloco,
-                accessCode: 'g.access code' | transloco
-              }"
-            ></octra-asr-options>
-            <hr />
-            } }
-          </div>
-        </ng-template>
-        <li
-          class="nav-item dropdown"
-          [ngStyle]="{
-            display: !(appStorage.audioLoaded && appStorage.loggedIn)
-              ? 'none'
-              : 'inherit'
-          }"
-        >
-          <a type="button" class="nav-link" (click)="openEnd()">
-            <i class="bi bi-gear-wide-connected"></i>
-            <span class="d-inline d-md-none">
-              {{ 'g.settings' | transloco }}
-            </span>
-          </a>
-        </li>
-        <!-- profile -->
-        @if ( appStorage.loggedIn && (appStorage.useMode === 'online' ||
-        appStorage.useMode === 'demo') ) {
-        <li
-          class="nav-item dropdown"
-          ngbDropdown
-          [container]="'body'"
-          display="dynamic"
-          placement="bottom-end"
-        >
-          <a ngbDropdownToggle type="button" class="nav-link">
-            <i class="bi bi-person-circle"></i>
-            <span class="d-inline d-md-none">
-              {{ 'g.account' | transloco }}
-            </span>
-          </a>
-          <div
-            ngbDropdownMenu
-            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-            role="menu"
+            <div class="offcanvas-body">
+              <table class="table w-100">
+                <tr>
+                  <td>
+                    <label class="form-check-label" for="easymode"
+                      >{{ 'settings.easy mode' | transloco }}:</label
+                    >
+                  </td>
+                  <td class="align-middle">
+                    <div
+                      class="form-check form-switch form-check-reverse form-check-inline"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        (click)="toggleSettings('easyMode')"
+                        [checked]="appStorage.easyMode"
+                        id="easymode"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="playonhover"
+                      >{{ 'settings.play on hover' | transloco }}:</label
+                    >
+                  </td>
+                  <td>
+                    <div
+                      class="form-check form-switch form-check-reverse form-check-inline"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        (click)="toggleSettings('playOnHover')"
+                        [checked]="appStorage.playOnHover"
+                        id="playonhover"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="followplaycursor"
+                      >{{ 'settings.follow playcursor' | transloco }}:</label
+                    >
+                  </td>
+                  <td>
+                    <div
+                      class="form-check form-switch form-check-reverse form-check-inline"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        (click)="toggleSettings('followPlayCursor')"
+                        [checked]="appStorage.followPlayCursor"
+                        id="followplaycursor"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="logging"
+                      >{{ 'settings.logging' | transloco }}:</label
+                    >
+                  </td>
+                  <td>
+                    <div
+                      class="form-check form-switch form-check-reverse form-check-inline"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        (click)="toggleSettings('logging')"
+                        [checked]="appStorage.logging"
+                        [disabled]="appStorage.useMode === 'online'"
+                        id="logging"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="showMagnifier"
+                      >{{ 'settings.show magnifier' | transloco }}:</label
+                    >
+                  </td>
+                  <td>
+                    <div
+                      class="form-check form-switch form-check-reverse form-check-inline"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        (click)="toggleSettings('showMagnifier')"
+                        [checked]="appStorage.showMagnifier"
+                        id="showMagnifier"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              @if (appStorage?.interface === '2D-Editor') {
+                <hr style="border: 1px solid lightgray" />
+                <br />
+                <label style="font-size: 1rem"
+                  >{{ 'settings.seconds per line' | transloco }}:</label
+                >
+                <br />
+                <div
+                  class="btn-group w-100"
+                  role="group"
+                  aria-label="Basic example"
+                >
+                  <button
+                    [ngClass]="{
+                      'btn-primary': appStorage.secondsPerLine === 5,
+                      'btn-secondary': appStorage.secondsPerLine !== 5,
+                    }"
+                    type="button"
+                    class="btn btn-sm"
+                    (click)="changeSecondsPerLine(5)"
+                    name="secondsPerLine"
+                  >
+                    5
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': appStorage.secondsPerLine === 10,
+                      'btn-secondary': appStorage.secondsPerLine !== 10,
+                    }"
+                    type="button"
+                    class="btn btn-sm"
+                    (click)="changeSecondsPerLine(10)"
+                    name="secondsPerLine"
+                  >
+                    10
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': appStorage.secondsPerLine === 15,
+                      'btn-secondary': appStorage.secondsPerLine !== 15,
+                    }"
+                    type="button"
+                    class="btn btn-sm"
+                    (click)="changeSecondsPerLine(15)"
+                    name="secondsPerLine"
+                  >
+                    15
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': appStorage.secondsPerLine === 20,
+                      'btn-secondary': appStorage.secondsPerLine !== 20,
+                    }"
+                    type="button"
+                    class="btn btn-sm"
+                    (click)="changeSecondsPerLine(20)"
+                    name="secondsPerLine"
+                  >
+                    20
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': appStorage.secondsPerLine === 60,
+                      'btn-secondary': appStorage.secondsPerLine !== 60,
+                    }"
+                    type="button"
+                    class="btn btn-sm"
+                    (click)="changeSecondsPerLine(60)"
+                    name="secondsPerLine"
+                  >
+                    60
+                  </button>
+                </div>
+                @if (asrStoreService.asrEnabled$ | async) {
+                  <br /><br />
+                  <hr />
+                  <label style="font-size: 1rem" class="mb-2">{{
+                    'g.asr options' | transloco
+                  }}</label>
+                  <octra-asr-options
+                    [options]="asrStoreService.asrOptions$ | async"
+                    (optionsChange)="asrStoreService.setASRSettings($event)"
+                    [languageSettings]="
+                      asrStoreService.languageSettings$ | async
+                    "
+                    [manualURL]="api.appProperties?.support?.manual_url"
+                    [mausLanguages]="asrStoreService.mausLanguages$ | async"
+                    [asrLanguages]="asrStoreService.asrLanguages$ | async"
+                    [showAccessCode]="true"
+                    [i18n]="{
+                      header: 'p.language and provider' | transloco,
+                      asrLanguage: 'asr.asr language' | transloco,
+                      mausLanguage: 'asr.maus language' | transloco,
+                      nothingFound: 'p.nothing found' | transloco,
+                      asrProvider: 'asr.asr provider' | transloco,
+                      accessCode: 'g.access code' | transloco,
+                    }"
+                  ></octra-asr-options>
+                  <hr />
+                }
+              }
+            </div>
+          </ng-template>
+          <li
+            class="nav-item dropdown"
+            [ngStyle]="{
+              display: !(appStorage.audioLoaded && appStorage.loggedIn)
+                ? 'none'
+                : 'inherit',
+            }"
           >
-            <a class="dropdown-item">
-              <i class="bi bi-person-circle"></i>
-              {{ (authStoreService.me$ | async)?.username }}
+            <a type="button" class="nav-link" (click)="openEnd()">
+              <i class="bi bi-gear-wide-connected"></i>
+              <span class="d-inline d-md-none">
+                {{ 'g.settings' | transloco }}
+              </span>
             </a>
-            @if ( appStorage.useMode === 'online' &&
-            appStorage.snapshot.application.appConfiguration?.octraBackend
-            ?.enabled &&
-            appStorage.snapshot.application.appConfiguration?.octraBackend ?.url
-            ) {
-            <a
-              class="dropdown-item"
-              [href]="
-                appStorage.snapshot.application.appConfiguration?.octraBackend
-                  ?.url
-              "
-              target="_blank"
+          </li>
+          <!-- profile -->
+          @if (
+            appStorage.loggedIn &&
+            (appStorage.useMode === 'online' || appStorage.useMode === 'demo')
+          ) {
+            <li
+              class="nav-item dropdown"
+              ngbDropdown
+              [container]="'body'"
+              display="dynamic"
+              placement="bottom-end"
             >
-              <i class="bi bi-tools"></i>
-              {{ 'p.manage account' | transloco }}
-            </a>
-            }
-            <div class="dropdown-divider"></div>
-            @if (appStorage.useMode === 'online') {
-            <a class="dropdown-item" (click)="backToProjectsList()">
-              <i class="bi bi-arrow-left"></i>
-              {{ 'p.back to projects' | transloco }}
-            </a>
-            }
-            <a class="dropdown-item" (click)="logout()">
-              <i class="bi bi-door-open-fill"></i>
-              Logout
-            </a>
-          </div>
-        </li>
-        }
-        <!--
+              <a ngbDropdownToggle type="button" class="nav-link">
+                <i class="bi bi-person-circle"></i>
+                <span class="d-inline d-md-none">
+                  {{ 'g.account' | transloco }}
+                </span>
+              </a>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
+                role="menu"
+              >
+                <a class="dropdown-item">
+                  <i class="bi bi-person-circle"></i>
+                  {{ (authStoreService.me$ | async)?.username }}
+                </a>
+                @if (
+                  appStorage.useMode === 'online' &&
+                  appStorage.snapshot.application.appConfiguration?.octraBackend
+                    ?.enabled &&
+                  appStorage.snapshot.application.appConfiguration?.octraBackend
+                    ?.url
+                ) {
+                  <a
+                    class="dropdown-item"
+                    [href]="
+                      appStorage.snapshot.application.appConfiguration
+                        ?.octraBackend?.url
+                    "
+                    target="_blank"
+                  >
+                    <i class="bi bi-tools"></i>
+                    {{ 'p.manage account' | transloco }}
+                  </a>
+                }
+                <div class="dropdown-divider"></div>
+                @if (appStorage.useMode === 'online') {
+                  <a class="dropdown-item" (click)="backToProjectsList()">
+                    <i class="bi bi-arrow-left"></i>
+                    {{ 'p.back to projects' | transloco }}
+                  </a>
+                }
+                <a class="dropdown-item" (click)="logout()">
+                  <i class="bi bi-door-open-fill"></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+          }
+          <!--
                                     Feedback
                                     -->
-        @if (api.appProperties?.send_feedback) {
-        <li class="nav-item">
-          <a (mouseup)="isCollapsed = true; openBugReport()" class="nav-link">
-            <i
-              class="bi bi-question-circle-fill navbar-icon"
-              style="color: #fcffba"
-              [ngStyle]="{
-                color: errorsFound ? 'red' : '#fcffba'
-              }"
-            >
-            </i>
-            <span class="d-inline d-md-none">
-              {{ 'g.feedback' | transloco }}
-            </span>
-          </a>
-        </li>
-        }
-        <!-- languageDropdown -->
-        <li
-          class="nav-item dropdown"
-          ngbDropdown
-          [container]="'body'"
-          display="dynamic"
-          placement="bottom-end"
-        >
-          <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
-            {{ langService.getActiveLang() | uppercase }}
-            <span class="caret"></span>
-          </a>
-          <div
-            ngbDropdownMenu
-            class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-            role="menu"
-          >
-            @if (settService.appSettings !== undefined) { @for (item of
-            settService.appSettings.octra.languages; track item) {
-            <a (click)="changeLanguage(item)" class="dropdown-item">
-              {{ item | uppercase }}</a
-            >
-            } }
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" style="font-size: 0.8rem">
+          @if (api.appProperties?.send_feedback) {
+            <li class="nav-item">
               <a
-                href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php"
-                target="_blank"
-                ><i class="bi bi-translate"></i>
-                {{ 'p.contribute translations' | transloco }}</a
+                (mouseup)="isCollapsed = true; openBugReport()"
+                class="nav-link"
               >
+                <i
+                  class="bi bi-question-circle-fill navbar-icon"
+                  style="color: #fcffba"
+                  [ngStyle]="{
+                    color: errorsFound ? 'red' : '#fcffba',
+                  }"
+                >
+                </i>
+                <span class="d-inline d-md-none">
+                  {{ 'g.feedback' | transloco }}
+                </span>
+              </a>
+            </li>
+          }
+          <!-- languageDropdown -->
+          <li
+            class="nav-item dropdown"
+            ngbDropdown
+            [container]="'body'"
+            display="dynamic"
+            placement="bottom-end"
+          >
+            <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
+              {{ langService.getActiveLang() | uppercase }}
+              <span class="caret"></span>
+            </a>
+            <div
+              ngbDropdownMenu
+              class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
+              role="menu"
+            >
+              @if (settService.appSettings !== undefined) {
+                @for (
+                  item of settService.appSettings.octra.languages;
+                  track item
+                ) {
+                  <a (click)="changeLanguage(item)" class="dropdown-item">
+                    {{ item | uppercase }}</a
+                  >
+                }
+              }
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item" style="font-size: 0.8rem">
+                <a
+                  href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php"
+                  target="_blank"
+                  ><i class="bi bi-translate"></i>
+                  {{ 'p.contribute translations' | transloco }}</a
+                >
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 }

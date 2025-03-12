@@ -21,7 +21,7 @@ export class KeyStatisticElem extends StatisticElem {
       end?: number;
     },
     audioSelection?: SampleInterval,
-    transcriptionUnit?: SampleInterval
+    transcriptionUnit?: SampleInterval,
   ) {
     super(
       type,
@@ -30,7 +30,7 @@ export class KeyStatisticElem extends StatisticElem {
       timestamp,
       playpos,
       audioSelection,
-      transcriptionUnit
+      transcriptionUnit,
     );
     this.data = {
       timestamp,
@@ -88,7 +88,7 @@ export class KeyStatisticElem extends StatisticElem {
       result.playpos,
       result.textSelection,
       result.audioSelection,
-      result.transcriptionUnit
+      result.transcriptionUnit,
     );
   }
 }

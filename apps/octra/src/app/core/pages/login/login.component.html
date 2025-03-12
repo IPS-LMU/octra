@@ -1,164 +1,177 @@
 <div class="section order-2 order-md-1" id="login">
   <div class="row">
     <div class="col-12" style="text-align: center">
-      @if (settingsService.appSettings.octra.maintenanceNotification !==
-      undefined &&
-      settingsService.appSettings.octra.maintenanceNotification.active ===
-      'active') {
-      <octra-maint-banner
-        [serverURL]="
-          settingsService.appSettings.octra.maintenanceNotification.apiURL
-        "
-        [language]="appStorage.language"
-      ></octra-maint-banner>
+      @if (
+        settingsService.appSettings.octra.maintenanceNotification !==
+          undefined &&
+        settingsService.appSettings.octra.maintenanceNotification.active ===
+          'active'
+      ) {
+        <octra-maint-banner
+          [serverURL]="
+            settingsService.appSettings.octra.maintenanceNotification.apiURL
+          "
+          [language]="appStorage.language"
+        ></octra-maint-banner>
       }
     </div>
   </div>
   @if (settingsService.appSettings.octra.oldVersion?.url) {
-  <div class="row">
-    <div class="col">
-      <div class="alert mb-0 py-1" style="font-size: 0.8rem">
-        <i class="bi bi-info-circle"></i>
-        {{ 'login.old version.notice' | transloco }}
-        <a [href]="settingsService.appSettings.octra.oldVersion?.url">{{
-          'login.old version.click here' | transloco
-        }}</a>
-      </div>
-    </div>
-  </div>
-  } @if (compatibleBrowser !== false) {
-  <div class="row" id="loginrow">
-    <div class="col-md-6">
-      <div
-        class="card login-card d-flex flex-column flex-fill h-100"
-        #onlinemode
-      >
-        <div class="card-body">
-          <section class="d-flex flex-column flex-fill h-100">
-            <h4>{{ 'login.online mode' | transloco }}</h4>
-            <p style="text-align: center">
-              {{ 'login.online mode description' | transloco }}
-            </p>
-            @if (!apc.octra.login?.enabled || !apc.api?.url ||
-            !apc.api?.appToken ) {
-            <div
-              id="login-disabled"
-              style="display: table-cell; height: 100%; align-content: center"
-            >
-              <i class="bi bi-wifi-off fs-1"></i><br />
-              {{ 'login.online mode disabled' | transloco }}
-            </div>
-            } @else if ((authStoreService.serverOnline$ | async) === undefined ?
-            true : (authStoreService.serverOnline$ | async)) {
-            <div class="form-horizontal">
-              <octra-authentication-component
-                [showTitle]="false"
-                (submitClick)="onOnlineSubmit($event)"
-                [authentications]="api.appProperties?.authentications"
-                [passwordReset]="api.appProperties?.reset_password"
-                [registrations]="api.appProperties?.registrations"
-              ></octra-authentication-component>
-            </div>
-            } @else {
-            <div
-              class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75"
-            >
-              <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
-              <div
-                [innerHTML]="
-                  'login.api not available'
-                    | transloco
-                      : {
-                          email_link: email_link
-                        }
-                "
-              ></div>
-            </div>
-            }
-            <br />
-          </section>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card login-card position-relative" #localmode>
-        <p
-          style="
-            position: absolute;
-            top: 0;
-            right: 0;
-            text-align: right;
-            margin-top: 10px;
-            margin-right: 10px;
-          "
-        >
-          <a (click)="startDemo()" class="link pointer">{{
-            'login.demo' | transloco
+    <div class="row">
+      <div class="col">
+        <div class="alert mb-0 py-1" style="font-size: 0.8rem">
+          <i class="bi bi-info-circle"></i>
+          {{ 'login.old version.notice' | transloco }}
+          <a [href]="settingsService.appSettings.octra.oldVersion?.url">{{
+            'login.old version.click here' | transloco
           }}</a>
-        </p>
-        <div class="card-body">
-          <section>
-            <h4>{{ 'login.local mode' | transloco }}</h4>
-            <p style="text-align: center">
-              {{ 'login.local mode description' | transloco }}
-            </p>
-            <div>
-              @if (appStorage.sessionfile !== undefined) {
-              <div
-                [innerHTML]="
-                  'login.old file found'
-                    | transloco
-                      : { file_label: getDropzoneFileString(sessionfile) }
-                "
-                class="alert alert-warning"
-              ></div>
-              }
-              <div style="margin-top: 40px">
-                <octra-dropzone
-                  #dropzone
-                  [height]="'147px'"
-                  [oldFiles]="sessionfile ? [sessionfile] : []"
-                ></octra-dropzone>
-              </div>
-              @if (dropzone.statistics && dropzone.statistics.new === 0) {
-              <button
-                (click)="onOfflineSubmit(false)"
-                [disabled]="
-                  dropzone.files.length === 0 ||
-                  !dropzone.statistics ||
-                  dropzone.statistics.invalid > 0 ||
-                  dropzone.statistics.progress > 0 ||
-                  dropzone.statistics.waiting > 0
-                "
-                class="btn btn-raised btn-primary"
-                id="offline-submit"
-                type="submit"
-              >
-                {{ 'transcription.start' | transloco }}
-              </button>
-              } @else {
-              <button
-                (click)="onOfflineSubmit(true)"
-                [disabled]="
-                  dropzone.files.length === 0 ||
-                  !dropzone.statistics ||
-                  dropzone.statistics.invalid > 0 ||
-                  dropzone.statistics.progress > 0 ||
-                  dropzone.statistics.waiting > 0
-                "
-                class="btn btn-raised btn-danger offline-delete-btn"
-              >
-                {{ 'transcription.new' | transloco }}
-              </button>
-              }
-            </div>
-          </section>
         </div>
       </div>
     </div>
-  </div>
+  }
+  @if (compatibleBrowser !== false) {
+    <div class="row" id="loginrow">
+      <div class="col-md-6">
+        <div
+          class="card login-card d-flex flex-column flex-fill h-100"
+          #onlinemode
+        >
+          <div class="card-body">
+            <section class="d-flex flex-column flex-fill h-100">
+              <h4>{{ 'login.online mode' | transloco }}</h4>
+              <p style="text-align: center">
+                {{ 'login.online mode description' | transloco }}
+              </p>
+              @if (
+                !apc.octra.login?.enabled || !apc.api?.url || !apc.api?.appToken
+              ) {
+                <div
+                  id="login-disabled"
+                  style="
+                    display: table-cell;
+                    height: 100%;
+                    align-content: center;
+                  "
+                >
+                  <i class="bi bi-wifi-off fs-1"></i><br />
+                  {{ 'login.online mode disabled' | transloco }}
+                </div>
+              } @else if (
+                (authStoreService.serverOnline$ | async) === undefined
+                  ? true
+                  : (authStoreService.serverOnline$ | async)
+              ) {
+                <div class="form-horizontal">
+                  <octra-authentication-component
+                    [showTitle]="false"
+                    (submitClick)="onOnlineSubmit($event)"
+                    [authentications]="api.appProperties?.authentications"
+                    [passwordReset]="api.appProperties?.reset_password"
+                    [registrations]="api.appProperties?.registrations"
+                  ></octra-authentication-component>
+                </div>
+              } @else {
+                <div
+                  class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75"
+                >
+                  <i
+                    class="bi bi-exclamation-triangle-fill text-warning fs-1"
+                  ></i>
+                  <div
+                    [innerHTML]="
+                      'login.api not available'
+                        | transloco
+                          : {
+                              email_link: email_link,
+                            }
+                    "
+                  ></div>
+                </div>
+              }
+              <br />
+            </section>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card login-card position-relative" #localmode>
+          <p
+            style="
+              position: absolute;
+              top: 0;
+              right: 0;
+              text-align: right;
+              margin-top: 10px;
+              margin-right: 10px;
+            "
+          >
+            <a (click)="startDemo()" class="link pointer">{{
+              'login.demo' | transloco
+            }}</a>
+          </p>
+          <div class="card-body">
+            <section>
+              <h4>{{ 'login.local mode' | transloco }}</h4>
+              <p style="text-align: center">
+                {{ 'login.local mode description' | transloco }}
+              </p>
+              <div>
+                @if (appStorage.sessionfile !== undefined) {
+                  <div
+                    [innerHTML]="
+                      'login.old file found'
+                        | transloco
+                          : { file_label: getDropzoneFileString(sessionfile) }
+                    "
+                    class="alert alert-warning"
+                  ></div>
+                }
+                <div style="margin-top: 40px">
+                  <octra-dropzone
+                    #dropzone
+                    [height]="'147px'"
+                    [oldFiles]="sessionfile ? [sessionfile] : []"
+                  ></octra-dropzone>
+                </div>
+                @if (dropzone.statistics && dropzone.statistics.new === 0) {
+                  <button
+                    (click)="onOfflineSubmit(false)"
+                    [disabled]="
+                      dropzone.files.length === 0 ||
+                      !dropzone.statistics ||
+                      dropzone.statistics.invalid > 0 ||
+                      dropzone.statistics.progress > 0 ||
+                      dropzone.statistics.waiting > 0
+                    "
+                    class="btn btn-raised btn-primary"
+                    id="offline-submit"
+                    type="submit"
+                  >
+                    {{ 'transcription.start' | transloco }}
+                  </button>
+                } @else {
+                  <button
+                    (click)="onOfflineSubmit(true)"
+                    [disabled]="
+                      dropzone.files.length === 0 ||
+                      !dropzone.statistics ||
+                      dropzone.statistics.invalid > 0 ||
+                      dropzone.statistics.progress > 0 ||
+                      dropzone.statistics.waiting > 0
+                    "
+                    class="btn btn-raised btn-danger offline-delete-btn"
+                  >
+                    {{ 'transcription.new' | transloco }}
+                  </button>
+                }
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
   } @else {
-  <octra-browser-test></octra-browser-test>
+    <octra-browser-test></octra-browser-test>
   }
 </div>
 <div class="section order-3 order-md-2">
@@ -191,7 +204,7 @@
 </div>
 <section class="order-1 order-md-3">
   <div class="container-md p-2">
-    <hr class="d-none d-md-block"/>
+    <hr class="d-none d-md-block" />
     <div class="text-center mb-3 p-0 p-md-3" style="background-color: #279440">
       <img
         src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp"

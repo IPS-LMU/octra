@@ -41,7 +41,7 @@ export class AboutModalComponent extends OctraModal implements OnDestroy {
   constructor(
     private sanitizer: DomSanitizer,
     private api: OctraAPIService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('octraModal', activeModal);
 
@@ -83,11 +83,11 @@ pages={145--148}
 }`,
       ],
       'octra-2017.bib',
-      { type: 'text/plain' }
+      { type: 'text/plain' },
     );
 
     this.bibtexCiteURL = this.sanitizer.bypassSecurityTrustResourceUrl(
-      URL.createObjectURL(bibtex)
+      URL.createObjectURL(bibtex),
     );
   }
 
@@ -103,7 +103,7 @@ pages={145--148}
         },
         (err) => {
           reject(err);
-        }
+        },
       );
     });
   }

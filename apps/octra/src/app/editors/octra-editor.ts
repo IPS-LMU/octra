@@ -26,7 +26,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
     audioManager: AudioManager,
     isPlayingOnhover: boolean,
     audioChunk: AudioChunk,
-    mouseCursor: SampleUnit
+    mouseCursor: SampleUnit,
   ) {
     if (!audioManager.isPlaying && isPlayingOnhover) {
       // play audio on hover
@@ -37,7 +37,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
       audioChunkHover.playbackRate = 1;
       audioChunkHover.selection.start = mouseCursor.clone();
       audioChunkHover.selection.end = mouseCursor.add(
-        audioManager.createSampleUnit(audioManager.sampleRate / 10)
+        audioManager.createSampleUnit(audioManager.sampleRate / 10),
       );
       audioChunkHover.startPlayback(true).catch((error) => {
         // ignore
@@ -54,7 +54,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
     audioManager: AudioManager,
     audioChunkMagnifier: AudioChunk,
     cursorTime: SampleUnit,
-    factor: number
+    factor: number,
   ): Promise<AudioChunk | undefined> {
     return new Promise<AudioChunk | undefined>((resolve) => {
       const cursorLocation = signalDisplay.mouseCursor;
@@ -88,7 +88,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
 
   protected checkIfSmallAudioChunk(
     audioChunk: AudioChunk,
-    currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>
+    currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>,
   ) {
     const emptySegmentIndex = currentLevel.items.findIndex((a) => {
       return a instanceof OctraAnnotationSegment

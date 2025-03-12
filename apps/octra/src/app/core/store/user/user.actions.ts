@@ -7,6 +7,6 @@ export class UserActions {
     props<{
       name: string;
       email: string;
-    }>()
+    }>(),
   );
 }

@@ -51,8 +51,8 @@ console.log(validator);
 console.log(`SOLUTION__________`);
 console.log(
   validator.decisionTree.possibleSelections.map(
-    (a) => `(${a.map((b) => `{${b.path}: ${b.selection.name}}`).join(',')})`
-  )
+    (a) => `(${a.map((b) => `{${b.path}: ${b.selection.name}}`).join(',')})`,
+  ),
 );
 console.log('ERRORS');
 console.log(validator.decisionTree._errors);

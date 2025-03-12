@@ -59,7 +59,7 @@ export class SampleUnit {
 
   public static fromMiliSeconds(
     miliseconds: number,
-    sampleRate: number
+    sampleRate: number,
   ): SampleUnit {
     return new SampleUnit((miliseconds / 1000) * sampleRate, sampleRate);
   }

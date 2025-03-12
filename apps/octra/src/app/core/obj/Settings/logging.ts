@@ -43,7 +43,7 @@ export class OLogging implements ILogging {
     audiofile: string,
     sampleRate: number,
     duration: number,
-    logs: OLog[]
+    logs: OLog[],
   ) {
     this.version = version;
     this.encoding = encoding;
@@ -78,7 +78,7 @@ export class OLog implements ILog {
     playpos?: number,
     textSelection?: { start?: number; end?: number },
     audioSelection?: SampleInterval,
-    transcriptionUnit?: SampleInterval
+    transcriptionUnit?: SampleInterval,
   ) {
     this.timestamp = timestamp;
     this.type = type;

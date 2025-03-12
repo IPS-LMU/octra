@@ -45,7 +45,7 @@ export class WhisperJSONConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -69,7 +69,7 @@ export class WhisperJSONConverter extends Converter {
     result.annotjson = new OAnnotJSON(
       audiofile.name,
       FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
 
     const convertSecondsToSamples = (seconds: number) => {
@@ -112,7 +112,7 @@ export class WhisperJSONConverter extends Converter {
           id++,
           convertSecondsToSamples(segment.start),
           convertSecondsToSamples(segment.end - segment.start),
-          [new OLabel(speaker, segment.text)]
+          [new OLabel(speaker, segment.text)],
         );
 
         if (segment.speaker) {
@@ -123,7 +123,7 @@ export class WhisperJSONConverter extends Converter {
           result.annotjson.levels as OSegmentLevel<OSegment>[],
           speakers,
           segment.speaker,
-          oSegment
+          oSegment,
         );
 
         // add words
@@ -146,7 +146,7 @@ export class WhisperJSONConverter extends Converter {
               id++,
               convertSecondsToSamples(word.start),
               convertSecondsToSamples(word.end - word.start),
-              [new OLabel(speaker, word.word)]
+              [new OLabel(speaker, word.word)],
             );
 
             if (word.speaker) {
@@ -157,7 +157,7 @@ export class WhisperJSONConverter extends Converter {
               result.annotjson.levels as OSegmentLevel<OSegment>[],
               speakers,
               speaker,
-              oWordSegment
+              oWordSegment,
             );
           }
         }
@@ -180,7 +180,7 @@ export class WhisperJSONConverter extends Converter {
 
       // filter empty levels
       result.annotjson.levels = result.annotjson.levels.filter(
-        (a) => a.items.length > 0
+        (a) => a.items.length > 0,
       );
 
       // make sure that ids are sequences
@@ -207,7 +207,7 @@ export class WhisperJSONConverter extends Converter {
           segmentLevel.items.push(
             new OSegment(1, 0, audiofile.duration, [
               new OLabel(segmentLevel.name, ''),
-            ])
+            ]),
           );
         } else {
           if (
@@ -221,8 +221,8 @@ export class WhisperJSONConverter extends Converter {
                 lastSegment.sampleStart + lastSegment.sampleDur,
                 audiofile.duration -
                   (lastSegment.sampleStart + lastSegment.sampleDur),
-                [new OLabel(segmentLevel.name, '')]
-              )
+                [new OLabel(segmentLevel.name, '')],
+              ),
             );
           } else if (
             lastSegment.sampleStart + lastSegment.sampleDur >
@@ -243,7 +243,7 @@ export class WhisperJSONConverter extends Converter {
     levels: OLevel<OSegment>[],
     speakers: string[],
     speaker: string | undefined,
-    oSegment: OSegment
+    oSegment: OSegment,
   ) {
     // find correct speaker level
     let index = levels.findIndex((a) => a.name === speaker);
@@ -271,8 +271,8 @@ export class WhisperJSONConverter extends Converter {
             previousSegment.sampleStart + previousSegment.sampleDur,
             oSegment.sampleStart -
               (previousSegment.sampleStart + previousSegment.sampleDur),
-            [new OLabel(currentLevel.name, '')]
-          )
+            [new OLabel(currentLevel.name, '')],
+          ),
         );
       } else if (
         previousSegment.sampleStart + previousSegment.sampleDur >
@@ -285,7 +285,7 @@ export class WhisperJSONConverter extends Converter {
       currentLevel.items.push(
         new OSegment(1, 0, oSegment.sampleStart, [
           new OLabel(currentLevel.name, ''),
-        ])
+        ]),
       );
     }
 
@@ -295,13 +295,13 @@ export class WhisperJSONConverter extends Converter {
   private validateJSONFile(json: WhisperJSON) {
     if (!json.segments || !json.language) {
       throw new Error(
-        'Invalid format. Missing segments and language attribute.'
+        'Invalid format. Missing segments and language attribute.',
       );
     }
 
     if (!Array.isArray(json.segments)) {
       throw new Error(
-        'Invalid format. Attribute segments is not of type array.'
+        'Invalid format. Attribute segments is not of type array.',
       );
     }
   }

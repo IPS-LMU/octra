@@ -112,16 +112,16 @@
     </table>
 
     @if (legalsExist) {
-    <h5>{{ 'g.legals' | transloco }}</h5>
-    <ul>
-      @for (legal of legals; track legal) {
-      <li>
-        <a [href]="legal.url" target="_blank">{{
-          'g.' + legal.label | transloco
-        }}</a>
-      </li>
-      }
-    </ul>
+      <h5>{{ 'g.legals' | transloco }}</h5>
+      <ul>
+        @for (legal of legals; track legal) {
+          <li>
+            <a [href]="legal.url" target="_blank">{{
+              'g.' + legal.label | transloco
+            }}</a>
+          </li>
+        }
+      </ul>
     }
   </div>
   <div class="modal-footer">

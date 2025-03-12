@@ -4,18 +4,14 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/web-media-0.1.2...web-media-1.0.0) (2025-01-13)
 
-
 ### Bug Fixes
 
-* **octra:** transcr-overview shows wrong errors ([2b97a97](https://github.com/IPS-LMU/octra/commit/2b97a976e2156b265b1661369e6ccaf6f90d5e3d))
-* **web-media:** splitting audio files not working ([f6e58d1](https://github.com/IPS-LMU/octra/commit/f6e58d1d0ab6279f13b86ad9bd67db7a3281099c))
-
+- **octra:** transcr-overview shows wrong errors ([2b97a97](https://github.com/IPS-LMU/octra/commit/2b97a976e2156b265b1661369e6ccaf6f90d5e3d))
+- **web-media:** splitting audio files not working ([f6e58d1](https://github.com/IPS-LMU/octra/commit/f6e58d1d0ab6279f13b86ad9bd67db7a3281099c))
 
 ### Features
 
-* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
-
-
+- **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
 
 ## [0.1.2](https://github.com/IPS-LMU/octra/compare/web-media-0.1.1...web-media-0.1.2) (2024-11-18)
 

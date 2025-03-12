@@ -17,12 +17,12 @@ export class TranscActivateGuard {
   constructor(
     private appStoreService: ApplicationStoreService,
     private router: Router,
-    private store: Store<RootState>
+    private store: Store<RootState>,
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ): Observable<boolean> | boolean {
     return this.store.pipe(
       map((state) => {
@@ -38,7 +38,7 @@ export class TranscActivateGuard {
           return false;
         }
         return true;
-      })
+      }),
     );
   }
 }

@@ -17,7 +17,7 @@ export class FeedbackNoticeModalComponent implements OnInit {
 
   constructor(
     private modal: NgbActiveModal,
-    private appStorageService: AppStorageService
+    private appStorageService: AppStorageService,
   ) {}
 
   ngOnInit() {}

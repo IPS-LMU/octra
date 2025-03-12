@@ -22,11 +22,11 @@ export class SubscriberComponent implements OnDestroy {
   protected subscribe<R, E>(
     observable: Observable<R>,
     observerOrNext?: Partial<Observer<R>> | ((value: R) => void),
-    tag?: string
+    tag?: string,
   ): number {
     return this.subscriptionManager.add(
       observable.subscribe(observerOrNext),
-      tag
+      tag,
     );
   }
 }

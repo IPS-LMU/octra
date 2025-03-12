@@ -48,7 +48,7 @@ export class TranscriptionGuidelinesModalComponent
     public annotationStoreService: AnnotationStoreService,
     public settService: SettingsService,
     private sanitizer: DomSanitizer,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('transcriptionGuidelinesModal', activeModal);
   }
@@ -56,20 +56,20 @@ export class TranscriptionGuidelinesModalComponent
   async ngOnInit() {
     if (this.annotationStoreService.guidelines) {
       this.guidelines = await this.prepareGuidelines(
-        this.annotationStoreService.guidelines
+        this.annotationStoreService.guidelines,
       );
       this.shownGuidelines = { ...this.guidelines } as any;
       this.unCollapseAll();
       this.subscriptionManager.add(
         timer(1000).subscribe(() => {
           this.initVideoPlayers();
-        })
+        }),
       );
     }
   }
 
   private async prepareGuidelines(
-    guidelines: OctraGuidelines
+    guidelines: OctraGuidelines,
   ): Promise<OctraGuidelines | undefined> {
     if (!guidelines) {
       return undefined;
@@ -81,14 +81,14 @@ export class TranscriptionGuidelinesModalComponent
         result.instructions[i].entries[j] = {
           ...result.instructions[i].entries[j],
           description: (await this.getGuidelineHTML(
-            result.instructions[i].entries[j].description
+            result.instructions[i].entries[j].description,
           )) as string,
         };
 
         if (result.instructions[i].entries[j].examples) {
           for (const example of result.instructions[i].entries[j].examples) {
             example.annotation = (await this.getGuidelineHTML(
-              example.annotation
+              example.annotation,
             )) as string;
           }
         }

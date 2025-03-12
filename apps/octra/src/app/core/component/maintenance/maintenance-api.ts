@@ -1,10 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 
 export class MaintenanceAPI {
-  constructor(private serverURL: string, private httpClient: HttpClient) {}
+  constructor(
+    private serverURL: string,
+    private httpClient: HttpClient,
+  ) {}
 
   public readMaintenanceNotifications(
-    hoursBefore: number
+    hoursBefore: number,
   ): Promise<MaintenanceNotification> {
     return new Promise<MaintenanceNotification>((resolve, reject) => {
       const commandURL = hoursBefore

@@ -192,7 +192,7 @@ export class TranscrWindowComponent
   onAudioPlayPause = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -215,7 +215,7 @@ export class TranscrWindowComponent
   onStopAudio = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -232,7 +232,7 @@ export class TranscrWindowComponent
   onStepBackward = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -249,7 +249,7 @@ export class TranscrWindowComponent
   onStepBackwardTime = (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
@@ -266,7 +266,7 @@ export class TranscrWindowComponent
   onJumpRight = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     if (
       this.hasSegmentBoundaries ||
@@ -288,7 +288,7 @@ export class TranscrWindowComponent
   onJumpLeft = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     await this.doDirectionAction('left');
   };
@@ -296,7 +296,7 @@ export class TranscrWindowComponent
   onClose = async (
     $event: KeyboardEvent,
     shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent
+    hotkeyEvent: HotkeysEvent,
   ) => {
     await this.doDirectionAction('down');
   };
@@ -363,7 +363,7 @@ export class TranscrWindowComponent
     private langService: TranslocoService,
     private alertService: AlertService,
     private navbarService: NavbarService,
-    private activeModal: NgbActiveModal
+    private activeModal: NgbActiveModal,
   ) {
     super();
 
@@ -373,7 +373,7 @@ export class TranscrWindowComponent
           ? queue?.items.find(
               (a) =>
                 a.time.sampleStart === this.audiochunk.time.start.samples &&
-                a.time.sampleLength === this.audiochunk.time.duration.samples
+                a.time.sampleLength === this.audiochunk.time.duration.samples,
             )
           : undefined;
 
@@ -466,7 +466,7 @@ export class TranscrWindowComponent
       next: (guidelines) => {
         this.guidelines = guidelines!.selected!.json;
         this.breakMarkerCode = guidelines?.selected?.json.markers.find(
-          (a) => a.type === 'break'
+          (a) => a.type === 'break',
         )?.code;
       },
     });
@@ -548,37 +548,37 @@ export class TranscrWindowComponent
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'play_pause',
-      this.onAudioPlayPause
+      this.onAudioPlayPause,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'stop',
-      this.onStopAudio
+      this.onStopAudio,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'step_backward',
-      this.onStepBackward
+      this.onStepBackward,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'step_backwardtime',
-      this.onStepBackwardTime
+      this.onStepBackwardTime,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'jump_left',
-      this.onJumpLeft
+      this.onJumpLeft,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'jump_right',
-      this.onJumpRight
+      this.onJumpRight,
     );
     this.shortcutsService.overwriteCallback(
       'transcription window',
       'close_save',
-      this.onClose
+      this.onClose,
     );
     this.shortcutsService.enableGroup('transcription window');
 
@@ -586,7 +586,7 @@ export class TranscrWindowComponent
     this.audiochunk.startpos = this.audiochunk.time.start.clone();
     this.magnifier.av.drawnSelection = new AudioSelection(
       this.audioManager.createSampleUnit(0),
-      this.audioManager.createSampleUnit(0)
+      this.audioManager.createSampleUnit(0),
     );
 
     this.subscribe(timer(500), () => {
@@ -641,7 +641,7 @@ export class TranscrWindowComponent
             ] as OctraAnnotationSegment
           ).time.samples - startSample,
       },
-      'transcription window'
+      'transcription window',
     );
     this.audiochunk.stopPlayback();
 
@@ -673,7 +673,7 @@ export class TranscrWindowComponent
     ) {
       if (
         this.editor.html.indexOf(
-          '<img src="assets/img/components/transcr-editor/boundary.png"'
+          '<img src="assets/img/components/transcr-editor/boundary.png"',
         ) < 0
       ) {
         // no boundaries inserted
@@ -743,7 +743,7 @@ export class TranscrWindowComponent
         this.editor.textSelection,
         selection,
         segment,
-        'audio_buttons'
+        'audio_buttons',
       );
     }
   }
@@ -787,7 +787,7 @@ export class TranscrWindowComponent
               i
             ] as OctraAnnotationSegment;
             const breakMarker = this.guidelines.markers.find(
-              (a) => a.type === 'break'
+              (a) => a.type === 'break',
             );
             if (
               (!breakMarker ||
@@ -830,7 +830,7 @@ export class TranscrWindowComponent
                   ] as OctraAnnotationSegment
                 ).time.samples - start,
             },
-            'transcription window'
+            'transcription window',
           );
         }
 
@@ -852,7 +852,7 @@ export class TranscrWindowComponent
             ).getFirstLabelWithoutName('Speaker')?.value ?? '';
           // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(
-            new AudioSelection(begin, segment.time.clone())
+            new AudioSelection(begin, segment.time.clone()),
           )!;
 
           this.subscribe(timer(0), {
@@ -867,7 +867,7 @@ export class TranscrWindowComponent
                     resolve();
                   },
                 },
-                'oninitialized'
+                'oninitialized',
               );
             },
           });
@@ -908,7 +908,7 @@ export class TranscrWindowComponent
       segment = {
         start: Math.round(segment.start),
         length: Math.round(
-          annoSegment!.time.samples - Math.round(segment.start)
+          annoSegment!.time.samples - Math.round(segment.start),
         ),
       };
     }
@@ -940,7 +940,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'magnifier'
+      'magnifier',
     );
   }
 
@@ -989,7 +989,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'markers'
+      'markers',
     );
   }
 
@@ -1038,7 +1038,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'texteditor_toolbar'
+      'texteditor_toolbar',
     );
   }
 
@@ -1061,12 +1061,12 @@ export class TranscrWindowComponent
         },
         error: (error) => {
           console.error(
-            `couldn't update view for audio chunk in transcription window.`
+            `couldn't update view for audio chunk in transcription window.`,
           );
           console.error(error);
         },
       },
-      'audiochunkStatus'
+      'audiochunkStatus',
     );
   }
 
@@ -1115,7 +1115,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'audio_speed'
+      'audio_speed',
     );
   }
 
@@ -1173,14 +1173,14 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       selection,
       segment,
-      'audio_volume'
+      'audio_volume',
     );
   }
 
   onBoundaryClicked(sample: SampleUnit) {
     const i: number = getSegmentBySamplePosition(
       this.currentLevel!.items as OctraAnnotationSegment[],
-      sample
+      sample,
     );
 
     if (i > -1) {
@@ -1206,7 +1206,7 @@ export class TranscrWindowComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'texteditor'
+      'texteditor',
     );
   }
 
@@ -1218,7 +1218,7 @@ export class TranscrWindowComponent
     if (status === 'stopped') {
       if (
         this.editor.html.indexOf(
-          '<img src="assets/img/components/transcr-editor/boundary.png"'
+          '<img src="assets/img/components/transcr-editor/boundary.png"',
         ) > -1
       ) {
         this.showOverviewButton = false;
@@ -1232,8 +1232,8 @@ export class TranscrWindowComponent
     const segStart = getSegmentBySamplePosition(
       this.currentLevel?.items as OctraAnnotationSegment[],
       this.audiochunk.time.start.add(
-        new SampleUnit(20, this.audioManager.sampleRate)
-      )
+        new SampleUnit(20, this.audioManager.sampleRate),
+      ),
     );
 
     this.tempSegments = [
@@ -1274,7 +1274,7 @@ export class TranscrWindowComponent
         this.tempSegments,
         this.audioManager.createSampleUnit(samplesArray[i]),
         'OCTRA_1',
-        segTexts[i]
+        segTexts[i],
       );
       this.tempSegments = result.entries;
       this.idCounter = result.itemIDCounter;
@@ -1298,18 +1298,18 @@ export class TranscrWindowComponent
     html.replace(
       new RegExp(
         /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/,
-        'g'
+        'g',
       ),
       (match, g1, g2) => {
         samplesArray.push(Number(g1));
         return '';
-      }
+      },
     );
 
     let start = 0;
     for (let i = 0; i < samplesArray.length; i++) {
       const boundary = this.editor.wysiwyg?.querySelector(
-        'img[data-samples]:eq(' + i + ')'
+        'img[data-samples]:eq(' + i + ')',
       ) as HTMLDivElement;
       if (!(samplesArray[i] > start)) {
         // mark boundary red
@@ -1351,7 +1351,7 @@ export class TranscrWindowComponent
           start?: number;
           end?: number;
         }
-      | undefined
+      | undefined,
   ) {}
 
   onFontChange(fontName: string) {
@@ -1368,7 +1368,7 @@ export class TranscrWindowComponent
         this.alertService
           .showAlert(
             'danger',
-            this.langService.translate('asr.file too big').toString()
+            this.langService.translate('asr.file too big').toString(),
           )
           .catch((error) => {
             console.error(error);
@@ -1379,11 +1379,11 @@ export class TranscrWindowComponent
           OctraAnnotationSegmentLevel
         ) {
           const time = this.audiochunk!.time.start.add(
-            this.audiochunk!.time.duration
+            this.audiochunk!.time.duration,
           );
           const segNumber =
             this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
-              time
+              time,
             );
 
           if (segNumber > -1) {
@@ -1397,7 +1397,7 @@ export class TranscrWindowComponent
                   sampleStart: this.audiochunk!.time.start.samples,
                   sampleLength: this.audiochunk!.time.duration.samples,
                 },
-                ASRQueueItemType.ASR
+                ASRQueueItemType.ASR,
               );
               this.asrStoreService.startProcessing();
             } else {
@@ -1405,7 +1405,7 @@ export class TranscrWindowComponent
             }
           } else {
             console.error(
-              `could not start ASR because segment number was not found.`
+              `could not start ASR because segment number was not found.`,
             );
           }
         }
@@ -1416,7 +1416,7 @@ export class TranscrWindowComponent
   startASRForAllSegmentsNext() {
     const segNumber =
       this.annotationStoreService.transcript!.getCurrentSegmentIndexBySamplePosition(
-        this.audiochunk!.time.start.add(this.audiochunk!.time.duration)
+        this.audiochunk!.time.start.add(this.audiochunk!.time.duration),
       );
 
     if (
@@ -1450,7 +1450,7 @@ export class TranscrWindowComponent
             this.alertService
               .showAlert(
                 'danger',
-                this.langService.translate('asr.file too big')
+                this.langService.translate('asr.file too big'),
               )
               .catch((error) => {
                 console.error(error);
@@ -1476,20 +1476,20 @@ export class TranscrWindowComponent
                   sampleStart,
                   sampleLength,
                 },
-                ASRQueueItemType.ASR
+                ASRQueueItemType.ASR,
               );
             }
           }
         } else {
           console.error(
-            `could not find segment in startASRForAllSegmentsNext()`
+            `could not find segment in startASRForAllSegmentsNext()`,
           );
         }
       }
       this.asrStoreService.startProcessing();
     } else {
       console.error(
-        `could not start ASR for all next because segment number was not found.`
+        `could not start ASR for all next because segment number was not found.`,
       );
     }
   }

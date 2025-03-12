@@ -20,17 +20,17 @@
         [refreshOnInternChanges]="false"
         [name]="'magnifier'"
         [ngStyle]="{
-      width: minimagnifier.size.width + 'px',
-      height: minimagnifier.size.height + 'px',
-      position: 'fixed',
-      'margin-left': minimagnifier.location.x + 'px',
-      'margin-top': minimagnifier.location.y + 'px',
-      'z-index': '90',
-      display: 'flex',
-      visibility: magnifierHidden ? 'hidden' : 'inherit',
-      flex: 'auto',
-      'flex-direction': 'column'
-    }"
+          width: minimagnifier.size.width + 'px',
+          height: minimagnifier.size.height + 'px',
+          position: 'fixed',
+          'margin-left': minimagnifier.location.x + 'px',
+          'margin-top': minimagnifier.location.y + 'px',
+          'z-index': '90',
+          display: 'flex',
+          visibility: magnifierHidden ? 'hidden' : 'inherit',
+          flex: 'auto',
+          'flex-direction': 'column',
+        }"
         [settings]="miniMagnifierSettings"
         [annotation]="annotationStoreService.transcript!"
       ></octra-audio-viewer>

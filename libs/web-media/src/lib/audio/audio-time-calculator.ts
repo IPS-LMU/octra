@@ -6,7 +6,10 @@ export class AudioTimeCalculator {
     this._duration = value;
   }
 
-  constructor(public _duration: SampleUnit, public audioPxWidth: number) {
+  constructor(
+    public _duration: SampleUnit,
+    public audioPxWidth: number,
+  ) {
     if (this.audioPxWidth === undefined || this.audioPxWidth < 1) {
       console.error('audio px undefined');
     }
@@ -28,7 +31,7 @@ export class AudioTimeCalculator {
 
   public absXChunktoSampleUnit(
     absX: number,
-    chunk: AudioChunk
+    chunk: AudioChunk,
   ): SampleUnit | undefined {
     const start = chunk.time.start ? chunk.time.start.samples : 1;
     const duration = chunk.time.end!.samples - start;
@@ -36,9 +39,9 @@ export class AudioTimeCalculator {
       const ratio = absX / this.audioPxWidth;
       return new SampleUnit(
         AudioTimeCalculator.roundSamples(
-          duration * ratio + chunk.time.start!.samples
+          duration * ratio + chunk.time.start!.samples,
         ),
-        chunk.sampleRate
+        chunk.sampleRate,
       );
     }
 

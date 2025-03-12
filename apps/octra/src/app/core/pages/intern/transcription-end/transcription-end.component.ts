@@ -23,7 +23,7 @@ export class TranscriptionEndComponent
     private appStorage: AppStorageService,
     private annotationStoreService: AnnotationStoreService,
     private uiService: UserInteractionsService,
-    private navService: NavbarService
+    private navService: NavbarService,
   ) {
     super();
     this.navService.showInterfaces = false;

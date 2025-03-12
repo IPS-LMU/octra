@@ -85,7 +85,7 @@ export class UserInteractionsService {
           // tslint:disable-next-line:align
         }
       | undefined,
-    targetName?: string
+    targetName?: string,
   ) {
     if (!this._enabled) {
       return;
@@ -138,7 +138,7 @@ export class UserInteractionsService {
         playpos?.samples,
         textSelection,
         audioSelection,
-        transcriptionUnit
+        transcriptionUnit,
       );
     } else if (contains(type, 'mouse')) {
       elem = new MouseStatisticElem(
@@ -149,7 +149,7 @@ export class UserInteractionsService {
         originalPlayerPos,
         textSelection,
         audioSelection,
-        transcriptionUnit
+        transcriptionUnit,
       );
     } else if (contains(type, 'slider')) {
       elem = new MouseStatisticElem(
@@ -160,7 +160,7 @@ export class UserInteractionsService {
         originalPlayerPos,
         textSelection,
         audioSelection,
-        transcriptionUnit
+        transcriptionUnit,
       );
     } else {
       elem = new StatisticElem(
@@ -170,7 +170,7 @@ export class UserInteractionsService {
         timestamp,
         originalPlayerPos,
         audioSelection,
-        transcriptionUnit
+        transcriptionUnit,
       );
     }
 
@@ -183,7 +183,7 @@ export class UserInteractionsService {
         elem.context,
         '',
         elem.playpos,
-        elem.textSelection
+        elem.textSelection,
       );
 
       if (elem instanceof MouseStatisticElem) {
@@ -202,7 +202,7 @@ export class UserInteractionsService {
     playposition: SampleUnit,
     textSelection: { start?: number; end?: number } | undefined,
     audioSelection: { start: number; length: number } | undefined,
-    segment: { start: number; length: number } | undefined
+    segment: { start: number; length: number } | undefined,
   ) {
     if (
       state !== PlayBackStatus.PLAYING &&
@@ -217,7 +217,7 @@ export class UserInteractionsService {
         textSelection,
         audioSelection,
         segment,
-        context
+        context,
       );
     }
   }

@@ -19,7 +19,7 @@ export class AlertService {
     type: AlertType,
     data: string | any,
     unique: boolean = true,
-    duration?: number
+    duration?: number,
   ): Promise<{
     id: number;
     component: any;

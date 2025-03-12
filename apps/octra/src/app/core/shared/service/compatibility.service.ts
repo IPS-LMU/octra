@@ -155,7 +155,7 @@ export class CompatibilityService {
           this.settingsService.appSettings.octra.allowed_browsers.length > 0
         ) {
           const valid = this.isValidBrowser(
-            this.settingsService.appSettings.octra.allowed_browsers
+            this.settingsService.appSettings.octra.allowed_browsers,
           );
           resolve(valid);
         } else {

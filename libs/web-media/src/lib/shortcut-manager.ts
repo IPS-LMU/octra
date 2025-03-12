@@ -37,7 +37,7 @@ export interface Shortcut {
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
     hotkeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup
+    shortcutGroup: ShortcutGroup,
   ) => void;
   focusonly?: boolean;
 }
@@ -190,7 +190,7 @@ export class ShortcutManager {
   public checkKeyEvent(
     event: KeyboardEvent,
     timestamp: number,
-    checkPressKey = true
+    checkPressKey = true,
   ): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
       if (event.type === 'keydown') {
@@ -244,7 +244,7 @@ export class ShortcutManager {
 
   private getCommand(
     shortcut: string,
-    platform: 'mac' | 'pc'
+    platform: 'mac' | 'pc',
   ):
     | {
         shortcut: Shortcut;
@@ -253,7 +253,7 @@ export class ShortcutManager {
     | undefined {
     for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(
-        (a) => a.keys[platform] === shortcut
+        (a) => a.keys[platform] === shortcut,
       );
       if (elem !== undefined) {
         if (shortcutGroup.enabled) {
@@ -269,7 +269,7 @@ export class ShortcutManager {
 
     // look for general shortcut
     const generalShortcutElem = this.generalShortcuts.items.find(
-      (a) => a.keys[platform] === shortcut
+      (a) => a.keys[platform] === shortcut,
     );
 
     if (generalShortcutElem !== undefined) {

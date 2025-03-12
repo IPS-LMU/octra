@@ -130,11 +130,11 @@ export class AnnotationEffects {
                   () => {
                     this.alertService.showAlert(
                       'danger',
-                      error.error?.message ?? error.message
+                      error.error?.message ?? error.message,
                     );
-                  }
-                )
-              )
+                  },
+                ),
+              ),
             );
         }
 
@@ -142,10 +142,10 @@ export class AnnotationEffects {
           AnnotationActions.startAnnotation.fail({
             error: 'error.error?.message ?? error.message',
             showOKButton: true,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   onPrepareTaskForAnnotation$ = createEffect(() =>
@@ -185,8 +185,8 @@ export class AnnotationEffects {
               const found = guidelines.find(
                 (a) =>
                   new RegExp(
-                    `_${state.application.language.toLowerCase()}.json`
-                  ).exec(a.filename) !== null
+                    `_${state.application.language.toLowerCase()}.json`,
+                  ).exec(a.filename) !== null,
               );
               selectedGuidelines = found ?? guidelines[0];
             }
@@ -202,8 +202,8 @@ export class AnnotationEffects {
           guidelines,
           selectedGuidelines,
         });
-      })
-    )
+      }),
+    ),
   );
 
   prepareTaskSuccess$ = createEffect(() =>
@@ -220,7 +220,7 @@ export class AnnotationEffects {
                 return io;
               }
               return undefined;
-            }
+            },
           );
 
         if (audioFile) {
@@ -232,17 +232,17 @@ export class AnnotationEffects {
               guidelines: a.guidelines,
               selectedGuidelines: a.selectedGuidelines,
               mode: a.mode,
-            })
+            }),
           );
         } else {
           return of(
             AnnotationActions.loadAudio.fail({
               error: `No audio file found in given IO.`,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   onAnnotationStart$ = createEffect(
@@ -257,14 +257,14 @@ export class AnnotationEffects {
             this.uiService.init(
               true,
               modeState.logging.startTime,
-              modeState.logging.startReference
+              modeState.logging.startReference,
             );
             if (
               modeState.logging.logs &&
               Array.isArray(modeState.logging.logs)
             ) {
               this.uiService.elements = modeState.logging.logs.map((a) =>
-                StatisticElem.fromAny(a)
+                StatisticElem.fromAny(a),
               );
             }
             this.uiService.addElementFromEvent(
@@ -275,7 +275,7 @@ export class AnnotationEffects {
               undefined,
               undefined,
               undefined,
-              'version'
+              'version',
             );
             this.subscrManager.removeByTag('uiService');
             this.subscrManager.add(
@@ -285,11 +285,11 @@ export class AnnotationEffects {
                     AnnotationActions.addLog.do({
                       mode: state.application.mode!,
                       log: item.getDataClone(),
-                    })
+                    }),
                   );
                 },
               }),
-              'uiService'
+              'uiService',
             );
           }
 
@@ -298,16 +298,16 @@ export class AnnotationEffects {
               LoginModeActions.changeImportOptions.do({
                 mode: a.mode,
                 importOptions: a.projectSettings.octra?.importOptions,
-              })
+              }),
             );
           }
 
           this.store.dispatch(
-            AnnotationActions.initTranscriptionService.do({ mode: a.mode })
+            AnnotationActions.initTranscriptionService.do({ mode: a.mode }),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   setLogging$ = createEffect(
@@ -320,11 +320,11 @@ export class AnnotationEffects {
           this.uiService.init(
             action.logging,
             modeState.logging.startTime,
-            modeState.logging.startReference
+            modeState.logging.startReference,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onAudioLoad$ = createEffect(
@@ -337,7 +337,7 @@ export class AnnotationEffects {
             this.store.dispatch(
               AnnotationActions.loadAudio.fail({
                 error: `An error occured. Please click on "Back" and try it again.`,
-              })
+              }),
             );
             return;
           }
@@ -369,7 +369,7 @@ export class AnnotationEffects {
                       AnnotationActions.loadAudio.progress({
                         value: progress,
                         mode: state.application.mode!,
-                      })
+                      }),
                     );
                   } else {
                     this.store.dispatch(
@@ -380,7 +380,7 @@ export class AnnotationEffects {
                         selectedGuidelines: a.selectedGuidelines,
                         currentProject: a.currentProject,
                         audioFile: a.audioFile,
-                      })
+                      }),
                     );
                   }
                 },
@@ -388,7 +388,7 @@ export class AnnotationEffects {
                   this.store.dispatch(
                     AnnotationActions.loadAudio.fail({
                       error: 'Loading audio file failed',
-                    })
+                    }),
                   );
                   console.error(err);
                 },
@@ -397,7 +397,7 @@ export class AnnotationEffects {
               this.store.dispatch(
                 AnnotationActions.loadAudio.fail({
                   error: `No audio source found. Please click on "Back" and try it again.`,
-                })
+                }),
               );
               console.error('audio src is undefined');
             }
@@ -413,26 +413,26 @@ export class AnnotationEffects {
                     task: a.task,
                     currentProject: a.currentProject,
                     audioFile: a.audioFile,
-                  })
+                  }),
                 );
               } else {
                 this.store.dispatch(
                   AnnotationActions.loadAudio.fail({
                     error: 'audio from sessionfile not loaded. Reload needed.',
-                  })
+                  }),
                 );
               }
             } else {
               this.store.dispatch(
                 AnnotationActions.loadAudio.fail({
                   error: 'sessionfile is undefined',
-                })
+                }),
               );
             }
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onAnnotationLoadFailed$ = createEffect(
@@ -446,7 +446,7 @@ export class AnnotationEffects {
               .navigate(
                 'reload audio local',
                 ['/intern/transcr/reload-file'],
-                AppInfo.queryParamsHandling
+                AppInfo.queryParamsHandling,
               )
               .catch((error) => {
                 console.error(error);
@@ -455,9 +455,9 @@ export class AnnotationEffects {
             // it's an error
             this.modalsService.openErrorModal(a.error);
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onTranscriptionEnd$ = createEffect(
@@ -468,12 +468,12 @@ export class AnnotationEffects {
           this.routingService.navigate(
             'end transcription',
             ['/intern/transcr/end'],
-            AppInfo.queryParamsHandling
+            AppInfo.queryParamsHandling,
           );
           this.audio.destroy(true);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onQuit$ = createEffect(() =>
@@ -491,7 +491,7 @@ export class AnnotationEffects {
             return this.apiService
               .freeTask(
                 state.onlineMode.currentSession.currentProject.id,
-                state.onlineMode.currentSession.task.id
+                state.onlineMode.currentSession.task.id,
               )
               .pipe(
                 map((result) => {
@@ -519,11 +519,11 @@ export class AnnotationEffects {
                     () => {
                       this.alertService.showAlert(
                         'danger',
-                        error.error?.message ?? error.message
+                        error.error?.message ?? error.message,
                       );
-                    }
-                  )
-                )
+                    },
+                  ),
+                ),
               );
           } else {
             if (a.redirectToProjects) {
@@ -543,9 +543,9 @@ export class AnnotationEffects {
                     AuthenticationActions.logout.do({
                       clearSession: a.clearSession,
                       mode: state.application.mode,
-                    })
+                    }),
                   );
-                })
+                }),
               );
             }
           }
@@ -555,11 +555,11 @@ export class AnnotationEffects {
             AuthenticationActions.logout.do({
               clearSession: a.clearSession,
               mode: state.application.mode!,
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   showNoRemainingTasksModal$ = createEffect(
@@ -569,13 +569,13 @@ export class AnnotationEffects {
         tap((a) => {
           const ref = this.modalsService.openModalRef(
             ErrorModalComponent,
-            ErrorModalComponent.options
+            ErrorModalComponent.options,
           );
           (ref.componentInstance as ErrorModalComponent).text =
             this.transloco.translate('projects-list.no remaining tasks');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   afterLogoutSuccess$ = createEffect(
@@ -585,9 +585,9 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.audio.destroy(true);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   loadSegments$ = createEffect(() =>
@@ -597,8 +597,8 @@ export class AnnotationEffects {
       exhaustMap(([a, state]) => {
         this.initMaintenance(state);
         return this.loadSegments(getModeState(state)!, state);
-      })
-    )
+      }),
+    ),
   );
 
   loadSegmentsSuccess$ = createEffect(
@@ -610,11 +610,11 @@ export class AnnotationEffects {
           this.routingService.navigate(
             'transcription initialized',
             ['/intern/transcr'],
-            AppInfo.queryParamsHandling
+            AppInfo.queryParamsHandling,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   initTranscriptService$ = createEffect(
@@ -624,9 +624,9 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.modalsService.openErrorModal(action.error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   onAudioLoadSuccess$ = createEffect(() =>
@@ -642,10 +642,10 @@ export class AnnotationEffects {
             projectSettings: a.task.tool_configuration?.value,
             guidelines: a.guidelines,
             selectedGuidelines: a.selectedGuidelines,
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   onLoadOnlineInfo$ = createEffect(() =>
@@ -663,7 +663,7 @@ export class AnnotationEffects {
                     mode: LoginMode.ONLINE,
                     me: currentAccount,
                     startup: a.startup,
-                  })
+                  }),
                 );
               }
 
@@ -683,7 +683,7 @@ export class AnnotationEffects {
                       currentProject: currentProject ?? undefined,
                       task: task ?? undefined,
                       startup: a.startup,
-                    }
+                    },
                   );
                 }),
                 catchError((error: HttpErrorResponse) => {
@@ -700,11 +700,11 @@ export class AnnotationEffects {
                     () => {
                       this.alertService.showAlert(
                         'danger',
-                        error.error?.message ?? error.message
+                        error.error?.message ?? error.message,
                       );
-                    }
+                    },
                   );
-                })
+                }),
               );
             }),
             catchError((error) => {
@@ -722,19 +722,19 @@ export class AnnotationEffects {
                   () => {
                     this.alertService.showAlert(
                       'danger',
-                      error.error?.message ?? error.message
+                      error.error?.message ?? error.message,
                     );
-                  }
+                  },
                 );
               } else {
                 // ignore
                 return of(
                   LoginModeActions.loadProjectAndTaskInformation.success({
                     startup: true,
-                  })
+                  }),
                 );
               }
-            })
+            }),
           );
         } else if (
           [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
@@ -750,7 +750,7 @@ export class AnnotationEffects {
                   }
                 | undefined
               )[],
-              any
+              any,
             ]
           >([
             this.http.get('config/localmode/projectconfig.json', {
@@ -768,9 +768,9 @@ export class AnnotationEffects {
                         language: b,
                         json: c,
                       })),
-                      catchError(() => of(undefined))
-                    )
-              )
+                      catchError(() => of(undefined)),
+                    ),
+              ),
             ),
             this.http.get('config/localmode/functions.js', {
               responseType: 'text',
@@ -801,7 +801,7 @@ export class AnnotationEffects {
                         };
                       })
                       .slice(0, 1),
-                  })
+                  }),
                 );
               } else if (a.mode === LoginMode.LOCAL) {
                 observables.push(
@@ -818,7 +818,7 @@ export class AnnotationEffects {
                         content_type: '',
                       },
                     ],
-                  })
+                  }),
                 );
               } else if (a.mode === LoginMode.URL) {
                 // URL mode
@@ -844,13 +844,13 @@ export class AnnotationEffects {
                 urlInfo.audio.url = this.routingService.staticQueryParams
                   .audio_url
                   ? decodeURIComponent(
-                      this.routingService.staticQueryParams.audio_url
+                      this.routingService.staticQueryParams.audio_url,
                     )
                   : undefined;
                 urlInfo.transcript.url = this.routingService.staticQueryParams
                   .transcript
                   ? decodeURIComponent(
-                      this.routingService.staticQueryParams.transcript
+                      this.routingService.staticQueryParams.transcript,
                     )
                   : undefined;
 
@@ -897,7 +897,7 @@ export class AnnotationEffects {
                       key === 'audio' &&
                         this.routingService.staticQueryParams.audio_name
                         ? this.routingService.staticQueryParams.audio_name
-                        : `${nameFromURL.name}${extension}`
+                        : `${nameFromURL.name}${extension}`,
                     );
                   }
                 }
@@ -913,7 +913,7 @@ export class AnnotationEffects {
                             map((result) => ({
                               progress: 1,
                               result,
-                            }))
+                            })),
                           )
                       : of({ progress: 1, result: undefined }),
                   ]).pipe(
@@ -949,8 +949,8 @@ export class AnnotationEffects {
                       return of({
                         inputs,
                       });
-                    })
-                  )
+                    }),
+                  ),
                 );
               }
 
@@ -970,7 +970,7 @@ export class AnnotationEffects {
                             ? state.application.appConfiguration!.octra
                                 .audioExamples[0].description
                             : '',
-                      }
+                      },
                     );
 
                     return LoginModeActions.loadProjectAndTaskInformation.success(
@@ -980,21 +980,21 @@ export class AnnotationEffects {
                         currentProject,
                         task,
                         startup: a.startup,
-                      }
+                      },
                     );
                   },
                   catchError((e) => {
                     if (e instanceof HttpErrorResponse) {
                       alert(`Can't load transcript file: ${e.message}`);
                       return of(
-                        LoginModeActions.loadProjectAndTaskInformation.fail(e)
+                        LoginModeActions.loadProjectAndTaskInformation.fail(e),
                       );
                     }
                     return of();
-                  })
-                )
+                  }),
+                ),
               );
-            })
+            }),
           );
         }
 
@@ -1002,10 +1002,10 @@ export class AnnotationEffects {
         return of(
           LoginModeActions.loadProjectAndTaskInformation.success({
             startup: true,
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   combinePhrases$ = createEffect(() =>
@@ -1024,7 +1024,7 @@ export class AnnotationEffects {
             modeState.transcript.currentLevel.clone() as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
           const breakMarker =
             modeState.guidelines?.selected?.json?.markers?.find(
-              (a) => a.type === 'break'
+              (a) => a.type === 'break',
             );
 
           const maxWords = action.options.maxWordsPerSegment;
@@ -1061,7 +1061,7 @@ export class AnnotationEffects {
                 wordCounter = isSilence(segment)
                   ? 0
                   : countWords(
-                      segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
+                      segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
                     );
               } else {
                 if (i > 0) {
@@ -1084,16 +1084,16 @@ export class AnnotationEffects {
                     if (!isSilence(segment)) {
                       segment.changeFirstLabelWithoutName(
                         'Speaker',
-                        `${lastSegmentText} ${segmentText}`
+                        `${lastSegmentText} ${segmentText}`,
                       );
                       wordCounter = countWords(
-                        `${lastSegmentText} ${segmentText}`
+                        `${lastSegmentText} ${segmentText}`,
                       );
                     } else {
                       segmentText = '';
                       segment.changeFirstLabelWithoutName(
                         'Speaker',
-                        `${lastSegmentText}`
+                        `${lastSegmentText}`,
                       );
                     }
                     transcript = transcript!.removeItemByIndex(
@@ -1103,9 +1103,9 @@ export class AnnotationEffects {
                       (transcript: string) => {
                         return tidyUpAnnotation(
                           transcript,
-                          modeState.guidelines.selected.json
+                          modeState.guidelines.selected.json,
                         );
-                      }
+                      },
                     );
                     currentLevel = transcript.currentLevel as any;
                     i--;
@@ -1118,17 +1118,17 @@ export class AnnotationEffects {
             AnnotationActions.combinePhrases.success({
               mode: state.application.mode!,
               transcript,
-            })
+            }),
           );
         }
         return of(
           AnnotationActions.combinePhrases.fail({
             error:
               "Can't combine phrases: current level must be of type SEGMENT.",
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   onAnnotationSend$ = createEffect(() =>
@@ -1141,7 +1141,7 @@ export class AnnotationEffects {
             next: () => {
               this.transcrSendingModal.ref = this.modalsService.openModalRef(
                 TranscriptionSendingModalComponent,
-                TranscriptionSendingModalComponent.options
+                TranscriptionSendingModalComponent.options,
               );
               this.transcrSendingModal.ref.componentInstance.error =
                 this.transcrSendingModal.error ?? '';
@@ -1156,7 +1156,7 @@ export class AnnotationEffects {
               AnnotationActions.sendOnlineAnnotation.fail({
                 mode: state.application.mode!,
                 error: 'Current project or current task is undefined',
-              })
+              }),
             );
           }
 
@@ -1188,9 +1188,9 @@ export class AnnotationEffects {
                     this.transcrSendingModal.ref.componentInstance.error =
                       error.error?.message ?? error.message;
                   }
-                }
+                },
               );
-            })
+            }),
           );
         }
 
@@ -1198,10 +1198,10 @@ export class AnnotationEffects {
           AnnotationActions.sendOnlineAnnotation.fail({
             mode: state.application.mode!,
             error: 'Not implemented',
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   sendAnnotationFail$ = createEffect(
@@ -1214,9 +1214,9 @@ export class AnnotationEffects {
           this.transcrSendingModal.ref?.close();
 
           this.modalsService.openErrorModal(action.error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   afterAnnotationSent$ = createEffect(() =>
@@ -1231,7 +1231,7 @@ export class AnnotationEffects {
           'success',
           this.transloco.translate('g.submission success'),
           true,
-          2000
+          2000,
         );
 
         this.store.dispatch(ApplicationActions.waitForEffects.do());
@@ -1247,10 +1247,10 @@ export class AnnotationEffects {
                 mode: LoginMode.ONLINE,
               }),
             }),
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   afterClearOnlineSession$ = createEffect(() =>
@@ -1259,8 +1259,8 @@ export class AnnotationEffects {
       exhaustMap((a) => {
         this.audio.destroy(true);
         return of(a.actionAfterSuccess);
-      })
-    )
+      }),
+    ),
   );
 
   onClearWholeSession$ = createEffect(() =>
@@ -1269,8 +1269,8 @@ export class AnnotationEffects {
       exhaustMap((a) => {
         this.audio.destroy(true);
         return of(a.actionAfterSuccess);
-      })
-    )
+      }),
+    ),
   );
 
   redirectToProjects$ = createEffect(() =>
@@ -1280,11 +1280,11 @@ export class AnnotationEffects {
         this.routingService.navigate(
           'redirect to projects after quit',
           ['/intern/projects'],
-          AppInfo.queryParamsHandling
+          AppInfo.queryParamsHandling,
         );
         return of(AnnotationActions.redirectToProjects.success());
-      })
-    )
+      }),
+    ),
   );
 
   resumeTaskManually$ = createEffect(() =>
@@ -1303,13 +1303,13 @@ export class AnnotationEffects {
               mode: state.application.mode!,
               currentProject: modeState.currentSession.currentProject,
               task: modeState.currentSession.task,
-            })
+            }),
           );
         }
 
         return of();
-      })
-    )
+      }),
+    ),
   );
 
   redirectToTranscription$ = createEffect(
@@ -1320,11 +1320,11 @@ export class AnnotationEffects {
           this.routingService.navigate(
             'redirect to transcription loadOnlineInformationAfterIDBLoaded',
             ['/intern/transcr'],
-            AppInfo.queryParamsHandling
+            AppInfo.queryParamsHandling,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   combinePhrasesSuccess$ = createEffect(
@@ -1337,11 +1337,11 @@ export class AnnotationEffects {
             'success',
             this.transloco.translate('tools.alerts.done', {
               value: 'Combine Phrases',
-            })
+            }),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   combinePhrasesFailed$ = createEffect(
@@ -1354,11 +1354,11 @@ export class AnnotationEffects {
             this.transloco.translate('tools.alerts.fail', {
               value: 'Combine Phrases',
               error: action.error,
-            })
+            }),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   asrRunWordAlignmentSuccess$ = createEffect(() =>
@@ -1374,13 +1374,13 @@ export class AnnotationEffects {
           const segmentBoundary = new SampleUnit(
             action.timeInterval.sampleStart +
               action.timeInterval.sampleLength / 2,
-            getModeState(state)!.audio.sampleRate!
+            getModeState(state)!.audio.sampleRate!,
           );
           const segmentIndex =
             getModeState(
-              state
+              state,
             )!.transcript.getCurrentSegmentIndexBySamplePosition(
-              segmentBoundary
+              segmentBoundary,
             );
 
           const converter = new PraatTextgridConverter();
@@ -1396,14 +1396,14 @@ export class AnnotationEffects {
                 type: 'text',
                 encoding: 'utf-8',
               },
-              audiofile
+              audiofile,
             );
 
             if (convertedResult?.annotjson) {
               const wordsTier = convertedResult.annotjson.levels.find(
                 (a: any) => {
                   return a.name === 'ORT-MAU';
-                }
+                },
               );
 
               if (wordsTier !== undefined) {
@@ -1413,7 +1413,7 @@ export class AnnotationEffects {
                   return of(
                     AnnotationActions.addMultipleASRSegments.fail({
                       error: `could not find segment to be precessed by ASRMAUS!`,
-                    })
+                    }),
                   );
                 } else {
                   const segmentID =
@@ -1439,7 +1439,7 @@ export class AnnotationEffects {
                         itemCounter++,
                         new SampleUnit(
                           wordItemEnd,
-                          this.audio.audioManager.resource.info.sampleRate
+                          this.audio.audioManager.resource.info.sampleRate,
                         ),
                         wordItem.labels.map((a) =>
                           OLabel.deserialize({
@@ -1449,20 +1449,20 @@ export class AnnotationEffects {
                                 ? getModeState(state)!.transcript!.currentLevel!
                                     .name!
                                 : a.name,
-                          })
-                        )
+                          }),
+                        ),
                       );
 
                       const labelIndex = readSegment.labels.findIndex(
-                        (a) => a.value === '<p:>' || a.value === ''
+                        (a) => a.value === '<p:>' || a.value === '',
                       );
 
                       if (labelIndex > -1) {
                         readSegment.labels[labelIndex].value =
                           getModeState(
-                            state
+                            state,
                           )!.guidelines?.selected?.json.markers.find(
-                            (a) => a.type === 'break'
+                            (a) => a.type === 'break',
                           )?.code ?? '';
                       }
 
@@ -1471,12 +1471,12 @@ export class AnnotationEffects {
                     } else {
                       // tslint:disable-next-line:max-line-length
                       console.error(
-                        `Invalid word item boundary:! ${wordItemEnd} <= ${action.timeInterval.sampleStart}`
+                        `Invalid word item boundary:! ${wordItemEnd} <= ${action.timeInterval.sampleStart}`,
                       );
                       return of(
                         AnnotationActions.addMultipleASRSegments.fail({
                           error: `wordItem samples are out of the correct boundaries.`,
-                        })
+                        }),
                       );
                     }
                     counter++;
@@ -1486,34 +1486,34 @@ export class AnnotationEffects {
                       mode: state.application.mode!,
                       segmentID,
                       newSegments,
-                    })
+                    }),
                   );
                 }
               } else {
                 return of(
                   AnnotationActions.addMultipleASRSegments.fail({
                     error: 'word tier not found!',
-                  })
+                  }),
                 );
               }
             } else {
               return of(
                 AnnotationActions.addMultipleASRSegments.fail({
                   error: 'importresult ist undefined',
-                })
+                }),
               );
             }
           } else {
             return of(
               AnnotationActions.addMultipleASRSegments.fail({
                 error: 'Result is undefined',
-              })
+              }),
             );
           }
         }
         return of();
-      })
-    )
+      }),
+    ),
   );
 
   private addFunctions(assets: ToolConfigurationAssetDto[]) {
@@ -1536,7 +1536,7 @@ export class AnnotationEffects {
   }
 
   private readGuidelines(
-    assets: ToolConfigurationAssetDto[]
+    assets: ToolConfigurationAssetDto[],
   ): GuidelinesItem[] {
     return assets
       .filter((a) => a.name === 'guidelines')
@@ -1583,9 +1583,9 @@ export class AnnotationEffects {
               logs:
                 modeState.logging.logs && modeState.logging.logs.length > 0
                   ? modeState.logging.logs
-                  : task?.log ?? [],
+                  : (task?.log ?? []),
               mode: rootState.application.mode,
-            })
+            }),
           );
 
           const importResult = task
@@ -1598,7 +1598,7 @@ export class AnnotationEffects {
               >(task, 'transcript', (io: TaskInputOutputDto) => {
                 return isValidAnnotation(
                   io,
-                  this.audio.audioManager.resource.getOAudioFile()
+                  this.audio.audioManager.resource.getOAudioFile(),
                 );
               })
             : undefined;
@@ -1609,10 +1609,10 @@ export class AnnotationEffects {
               LoginModeActions.setImportConverter.do({
                 mode: rootState.application.mode,
                 importConverter: importResult?.converter,
-              })
+              }),
             );
             newAnnotation = OctraAnnotation.deserialize(
-              importResult?.annotjson
+              importResult?.annotjson,
             );
           }
 
@@ -1623,8 +1623,8 @@ export class AnnotationEffects {
                 this.audio.audioManager.resource.info.duration,
                 [
                   new OLabel('OCTRA_1', ''), // empty transcript
-                ]
-              )
+                ],
+              ),
             );
             newAnnotation.addLevel(level);
             newAnnotation.changeLevelIndex(0);
@@ -1635,7 +1635,7 @@ export class AnnotationEffects {
               modeState.previousCurrentLevel >= newAnnotation.levels.length
                 ? Math.max(
                     0,
-                    newAnnotation.levels.findIndex((a) => a.type === 'SEGMENT')
+                    newAnnotation.levels.findIndex((a) => a.type === 'SEGMENT'),
                   )
                 : modeState.previousCurrentLevel;
 
@@ -1650,8 +1650,8 @@ export class AnnotationEffects {
               this.audio.audioManager.resource.info.duration,
               [
                 new OLabel('OCTRA_1', ''), // empty transcript
-              ]
-            )
+              ],
+            ),
           );
           newAnnotation.addLevel(level);
           newAnnotation.changeLevelIndex(0);
@@ -1662,7 +1662,7 @@ export class AnnotationEffects {
           if (projectSettings?.feedback_form) {
             feedback = FeedBackForm.fromAny(
               projectSettings.feedback_form,
-              modeState.currentSession.comment ?? ''
+              modeState.currentSession.comment ?? '',
             );
           }
           if (feedback) {
@@ -1688,7 +1688,7 @@ export class AnnotationEffects {
             undefined,
             undefined,
             undefined,
-            'version'
+            'version',
           );
         }
 
@@ -1706,12 +1706,12 @@ export class AnnotationEffects {
             transcript: newAnnotation,
             feedback,
             saveToDB: true,
-          })
+          }),
         );
       }
 
       const transcript = modeState.transcript.changeSampleRate(
-        this.audio.audioManager.resource.info.sampleRate
+        this.audio.audioManager.resource.info.sampleRate,
       );
 
       const currentLevelIndex =
@@ -1720,7 +1720,7 @@ export class AnnotationEffects {
         modeState.previousCurrentLevel >= transcript.levels.length
           ? Math.max(
               0,
-              transcript.levels.findIndex((a) => a.type === 'SEGMENT')
+              transcript.levels.findIndex((a) => a.type === 'SEGMENT'),
             )
           : modeState.previousCurrentLevel;
       transcript.changeCurrentLevelIndex(currentLevelIndex);
@@ -1738,13 +1738,13 @@ export class AnnotationEffects {
           feedback,
           transcript,
           saveToDB: false,
-        })
+        }),
       );
     } catch (e: any) {
       return of(
         AnnotationActions.initTranscriptionService.fail({
           error: typeof e === 'string' ? e : e?.message,
-        })
+        }),
       );
     }
   }
@@ -1764,11 +1764,11 @@ export class AnnotationEffects {
             undefined,
             undefined,
             getModeState(state)?.transcript?.levels[action.currentLevelIndex]
-              ?.name
+              ?.name,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   public initMaintenance(state: RootState) {
@@ -1776,14 +1776,14 @@ export class AnnotationEffects {
       state.application.appConfiguration !== undefined &&
       hasProperty(
         state.application.appConfiguration.octra,
-        'maintenanceNotification'
+        'maintenanceNotification',
       ) &&
       state.application.appConfiguration.octra.maintenanceNotification
         .active === 'active'
     ) {
       const maintenanceAPI = new MaintenanceAPI(
         state.application.appConfiguration.octra.maintenanceNotification.apiURL,
-        this.http
+        this.http,
       );
 
       maintenanceAPI
@@ -1809,7 +1809,7 @@ export class AnnotationEffects {
                             .toLocaleString(DateTime.DATETIME_SHORT),
                         }),
                       true,
-                      60
+                      60,
                     );
                   }
                 })
@@ -1824,7 +1824,7 @@ export class AnnotationEffects {
 
             // run each 15 minutes
             this.maintenanceChecker = interval(15 * 60000).subscribe(
-              readNotification
+              readNotification,
             );
           }
         })
@@ -1836,7 +1836,7 @@ export class AnnotationEffects {
 
   private saveTaskToServer(
     state: RootState,
-    status: TaskStatus
+    status: TaskStatus,
   ): Observable<TaskDto | undefined> {
     if (!this.audio.audioManager?.resource) {
       return of(undefined);
@@ -1848,8 +1848,8 @@ export class AnnotationEffects {
         .serialize(
           this.audio.audioManager.resource.info.fullname,
           this.audio.audioManager.resource.info.sampleRate,
-          this.audio.audioManager.resource.info.duration.clone()
-        )
+          this.audio.audioManager.resource.info.duration.clone(),
+        ),
     )?.file?.content;
 
     const outputs = result
@@ -1858,11 +1858,11 @@ export class AnnotationEffects {
             [result],
             state.onlineMode.audio.fileName.substring(
               0,
-              state.onlineMode.audio.fileName.lastIndexOf('.')
+              state.onlineMode.audio.fileName.lastIndexOf('.'),
             ) + '_annot.json',
             {
               type: 'application/json',
-            }
+            },
           ),
         ]
       : [];
@@ -1881,10 +1881,10 @@ export class AnnotationEffects {
             'log.json',
             {
               type: 'application/json',
-            }
+            },
           )
         : undefined,
-      outputs
+      outputs,
     );
   }
 
@@ -1901,6 +1901,6 @@ export class AnnotationEffects {
     private audio: AudioService,
     private uiService: UserInteractionsService,
     private appStorage: AppStorageService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {}
 }

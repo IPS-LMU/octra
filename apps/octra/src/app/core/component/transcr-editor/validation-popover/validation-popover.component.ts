@@ -57,7 +57,7 @@ export class ValidationPopoverComponent {
   constructor(
     private el: ElementRef,
     private cd: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   public show() {

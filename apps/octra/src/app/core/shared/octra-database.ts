@@ -232,7 +232,7 @@ export class OctraDatabase extends Dexie {
       'version',
     ];
     const options = (await tr.table('options').bulkGet(optionKeys)).filter(
-      (a) => a !== undefined
+      (a) => a !== undefined,
     );
 
     console.log(`-> Migrate ${options.length} options from v3 to v4...`);
@@ -369,7 +369,7 @@ export class OctraDatabase extends Dexie {
                 audioFileName.replace(/\.wav$/g, ''),
                 -1,
                 oldAnnotationLevels?.map((a) => a.level),
-                oldAnnotationLinks?.map((a) => a.link)
+                oldAnnotationLinks?.map((a) => a.link),
               );
         await tr.table('local_data').put({
           name: 'annotation',
@@ -415,7 +415,7 @@ export class OctraDatabase extends Dexie {
       `${this.name}.json`,
       {
         type: 'application/json',
-      }
+      },
     );
     console.log(`BACKUP URL: ${URL.createObjectURL(backupFile)}`);
     this.close();
@@ -477,7 +477,7 @@ export class OctraDatabase extends Dexie {
   }
 
   private countEntries(
-    table: Dexie.Table<IIDBEntry, string>
+    table: Dexie.Table<IIDBEntry, string>,
   ): Observable<number> {
     return from(
       new Promise<number>((resolve, reject) => {
@@ -489,7 +489,7 @@ export class OctraDatabase extends Dexie {
           .catch(() => {
             reject();
           });
-      })
+      }),
     );
   }
 
@@ -506,7 +506,7 @@ export class OctraDatabase extends Dexie {
     mode: LoginMode,
     name: string,
     value: any,
-    overwrite = false
+    overwrite = false,
   ) {
     const table = this.getTableFromString(mode);
 
@@ -532,22 +532,22 @@ export class OctraDatabase extends Dexie {
               name,
               value: prepared,
             },
-            name
-          )
+            name,
+          ),
         ).pipe(
           map(() => {
             return;
-          })
+          }),
         );
       } else {
         return from(
           table.update(name, {
             value: prepared,
-          })
+          }),
         ).pipe(
           map(() => {
             return;
-          })
+          }),
         );
       }
     } else {
@@ -564,12 +564,12 @@ export class OctraDatabase extends Dexie {
             name: name,
             value: null,
           },
-          name
-        )
+          name,
+        ),
       ).pipe(
         map(() => {
           return;
-        })
+        }),
       );
     } else {
       return of();
@@ -590,7 +590,7 @@ export class OctraDatabase extends Dexie {
           } else {
             return emptyValue;
           }
-        })
+        }),
       );
     }
     return of(emptyValue);
@@ -650,7 +650,7 @@ export class OctraDatabase extends Dexie {
           name: 'console',
           value: [],
         },
-      ])
+      ]),
     );
   }
 

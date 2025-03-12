@@ -24,7 +24,10 @@ export class FeedBackForm {
     this._required = value;
   }
 
-  constructor(private _groups: Group[], private _comment: string) {}
+  constructor(
+    private _groups: Group[],
+    private _comment: string,
+  ) {}
 
   public static fromAny(feedbackData: any[], comment: string): FeedBackForm {
     const groups: Group[] = [];
@@ -115,7 +118,7 @@ export class FeedBackForm {
   public setValueForControl(
     name: string,
     value: string,
-    custom?: any
+    custom?: any,
   ): boolean {
     let found = false;
 

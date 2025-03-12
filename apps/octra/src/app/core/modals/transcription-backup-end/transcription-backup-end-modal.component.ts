@@ -41,7 +41,7 @@ export class TranscriptionBackupEndModalComponent
     private appStorageService: AppStorageService,
     private audioService: AudioService,
     public languageService: TranslocoService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('transcriptionDemoEnd', activeModal);
   }
@@ -56,7 +56,7 @@ export class TranscriptionBackupEndModalComponent
       const annotation = this.annotationStore.transcript.serialize(
         audioInfo.fullname,
         audioInfo.sampleRate,
-        audioInfo.duration
+        audioInfo.duration,
       );
       const time = DateTime.now().toFormat('yyyy-LL-dd_HH-mm-ss');
       const name = `octra_backup_t${this.annotationStore.task?.id}_${time}.json`;
@@ -76,14 +76,14 @@ export class TranscriptionBackupEndModalComponent
                       ?.assessment,
                 },
                 null,
-                2
+                2,
               ),
             ],
             name,
             {
               type: 'application/json',
-            }
-          )
+            },
+          ),
         ),
         name,
       };

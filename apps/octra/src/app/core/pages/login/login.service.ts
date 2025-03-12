@@ -10,7 +10,10 @@ export class LoginService {
 
   private subscrmanager: SubscriptionManager<Subscription>;
 
-  constructor(private http: HttpClient, private store: Store) {
+  constructor(
+    private http: HttpClient,
+    private store: Store,
+  ) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 

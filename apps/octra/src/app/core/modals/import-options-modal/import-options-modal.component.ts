@@ -28,7 +28,7 @@ export class ImportOptionsModalComponent extends OctraModal implements OnInit {
   constructor(
     public annotationStoreService: AnnotationStoreService,
     protected override activeModal: NgbActiveModal,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {
     super('importOptionsModal', activeModal);
   }

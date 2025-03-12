@@ -9,15 +9,15 @@
     <p [innerHTML]="text ? text : ''"></p>
   </div>
   @if (showOKButton) {
-  <div class="modal-footer">
-    <button
-      (click)="close()"
-      class="btn btn-default"
-      data-dismiss="modal"
-      type="button"
-    >
-      {{ 'g.OK' | transloco }}
-    </button>
-  </div>
+    <div class="modal-footer">
+      <button
+        (click)="close()"
+        class="btn btn-default"
+        data-dismiss="modal"
+        type="button"
+      >
+        {{ 'g.OK' | transloco }}
+      </button>
+    </div>
   }
 </div>

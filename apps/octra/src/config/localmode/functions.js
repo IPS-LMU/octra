@@ -22,7 +22,7 @@ function validateAnnotation(annotation, guidelines) {
 
     re = new RegExp(
       '(' + escapeRegex(marker) + ')( *(' + escapeRegex(marker) + '))+',
-      'g'
+      'g',
     );
     while ((match = re.exec(annotation)) != undefined) {
       result.push({

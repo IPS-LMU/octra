@@ -19,41 +19,41 @@
         {{ 'transcription.stop' | transloco }}</span
       >
     </button>
-    @if(dropzone.statistics.new > 0) {
-    <button
-      (click)="newTranscription()"
-      [disabled]="
-        dropzone.files.length === 0 ||
-        !dropzone.statistics ||
-        dropzone.statistics.invalid > 0 ||
-        dropzone.statistics.progress > 0 ||
-        dropzone.statistics.waiting > 0
-      "
-      class="btn btn-danger"
-    >
-      <i class="bi bi-file-fill"></i>
-      <span class="d-none d-lg-inline">
-        {{ 'transcription.new' | transloco }}</span
+    @if (dropzone.statistics.new > 0) {
+      <button
+        (click)="newTranscription()"
+        [disabled]="
+          dropzone.files.length === 0 ||
+          !dropzone.statistics ||
+          dropzone.statistics.invalid > 0 ||
+          dropzone.statistics.progress > 0 ||
+          dropzone.statistics.waiting > 0
+        "
+        class="btn btn-danger"
       >
-    </button>
+        <i class="bi bi-file-fill"></i>
+        <span class="d-none d-lg-inline">
+          {{ 'transcription.new' | transloco }}</span
+        >
+      </button>
     } @else {
-    <button
-      (click)="onOfflineSubmit()"
-      [disabled]="
-        dropzone.files.length === 0 ||
-        !dropzone.statistics ||
-        dropzone.statistics.invalid > 0 ||
-        dropzone.statistics.progress > 0 ||
-        dropzone.statistics.waiting > 0
-      "
-      class="btn btn-primary"
-      type="button"
-    >
-      <i class="bi bi-pencil-fill"></i>
-      <span class="d-none d-lg-inline">
-        {{ 'transcription.start' | transloco }}</span
+      <button
+        (click)="onOfflineSubmit()"
+        [disabled]="
+          dropzone.files.length === 0 ||
+          !dropzone.statistics ||
+          dropzone.statistics.invalid > 0 ||
+          dropzone.statistics.progress > 0 ||
+          dropzone.statistics.waiting > 0
+        "
+        class="btn btn-primary"
+        type="button"
       >
-    </button>
+        <i class="bi bi-pencil-fill"></i>
+        <span class="d-none d-lg-inline">
+          {{ 'transcription.start' | transloco }}</span
+        >
+      </button>
     }
   </div>
 </div>

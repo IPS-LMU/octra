@@ -9,7 +9,7 @@ import { RoutingService } from '../../../shared/service/routing.service';
 export class ReloadFileGuard {
   constructor(
     private appStorage: AppStorageService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {

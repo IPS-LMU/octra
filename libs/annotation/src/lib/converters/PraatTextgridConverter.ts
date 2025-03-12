@@ -132,7 +132,7 @@ export class PraatTextgridConverter extends Converter {
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -155,7 +155,7 @@ export class PraatTextgridConverter extends Converter {
     const result = new OAnnotJSON(
       audiofile.name,
       file.name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
 
     let content = file.content;
@@ -221,11 +221,7 @@ export class PraatTextgridConverter extends Converter {
                 // read items
                 let match = lines[i].match(/item \[([0-9]+)]:/);
 
-                while (
-                  lines[i] !== '' &&
-                  match === null &&
-                  i < lines.length
-                  ) {
+                while (lines[i] !== '' && match === null && i < lines.length) {
                   let isActive = true;
                   test = lines[i].match(/intervals \[[0-9]+]:/);
                   if (!test) {
@@ -274,7 +270,7 @@ export class PraatTextgridConverter extends Converter {
                       segNum,
                       Math.round(xmin * audiofile.sampleRate),
                       Math.round((xmax - xmin) * audiofile.sampleRate),
-                      olabels
+                      olabels,
                     ) as OSegment;
                     (olevel.items as OSegment[]).push(osegment);
                   } else {
@@ -302,7 +298,7 @@ export class PraatTextgridConverter extends Converter {
                     const oevent = new OEvent(
                       segNum,
                       Math.round(numberStr * audiofile.sampleRate),
-                      olabels
+                      olabels,
                     );
                     (olevel.items as OEvent[]).push(oevent);
                   }

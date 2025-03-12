@@ -10,7 +10,7 @@ export class ConfigurationService {
 
   public validateJSON(
     json: any,
-    schema: any
+    schema: any,
   ): ErrorObject<string, Record<string, any>, unknown>[] {
     if (!(json === undefined) && !(schema === undefined)) {
       const ajv = new Ajv({ allErrors: true, strict: 'log' }); // options can be passed, e.g. {allErrors: true}

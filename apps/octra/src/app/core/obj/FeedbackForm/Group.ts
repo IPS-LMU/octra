@@ -26,7 +26,7 @@ export class Group {
   constructor(
     private _title: string,
     private _name: string,
-    private _controls: Control[]
+    private _controls: Control[],
   ) {
     // check if group is required
     for (const control of _controls) {
@@ -53,7 +53,7 @@ export class Group {
       !(group.name === undefined || group.name === undefined)
         ? group.name
         : group.controls[0].name,
-      controls
+      controls,
     );
 
     result.required = required;

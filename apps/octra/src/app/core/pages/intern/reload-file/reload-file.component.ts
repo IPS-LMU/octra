@@ -34,7 +34,7 @@ export class ReloadFileComponent {
     public modService: OctraModalService,
     public langService: TranslocoService,
     private audioService: AudioService,
-    private authStoreService: AuthenticationStoreService
+    private authStoreService: AuthenticationStoreService,
   ) {}
 
   abortTranscription = () => {
@@ -47,7 +47,7 @@ export class ReloadFileComponent {
     this.authStoreService.loginLocal(
       this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
-      true
+      true,
     );
   };
 
@@ -56,7 +56,7 @@ export class ReloadFileComponent {
     this.authStoreService.loginLocal(
       this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
-      false
+      false,
     );
   };
 
@@ -82,7 +82,7 @@ export class ReloadFileComponent {
     navigateTo(this.router, ['/load'], AppInfo.queryParamsHandling).catch(
       (error) => {
         console.error(error);
-      }
+      },
     );
   };
 

@@ -17,7 +17,7 @@ export class ProtectedModalComponent extends OctraModal {
 
   constructor(
     protected override activeModal: NgbActiveModal,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     super('messageModal', activeModal);
   }

@@ -43,7 +43,7 @@ export class PartiturConverter extends Converter {
   public export(
     annotation: OAnnotJSON,
     audiofile: OAudiofile,
-    levelnum?: number
+    levelnum?: number,
   ): ExportResult {
     if (!annotation) {
       return {
@@ -117,7 +117,7 @@ LBD:\n`;
 
   override needsOptionsForImport(
     file: IFile,
-    audiofile: OAudiofile
+    audiofile: OAudiofile,
   ): any | undefined {
     return undefined;
   }
@@ -140,7 +140,7 @@ LBD:\n`;
     const result = new OAnnotJSON(
       audiofile.name,
       FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate
+      audiofile.sampleRate,
     );
     const tiers: any = {};
 
@@ -153,8 +153,8 @@ LBD:\n`;
         new RegExp(
           '^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
             '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))',
-          'g'
-        )
+          'g',
+        ),
       );
 
       if (search) {
@@ -164,7 +164,7 @@ LBD:\n`;
           if (audiofile.sampleRate !== Number(columns[1])) {
             console.error(
               `Sample Rate of audio file is not equal to the value from Partitur` +
-                ` file! ${audiofile.sampleRate} !== ${columns[1]}`
+                ` file! ${audiofile.sampleRate} !== ${columns[1]}`,
             );
           }
         }
@@ -190,13 +190,13 @@ LBD:\n`;
               };
             }
             (level.items as OItem[]).push(
-              new OItem(counter, [new OLabel(previousTier, columns[2])])
+              new OItem(counter, [new OLabel(previousTier, columns[2])]),
             );
             tiers[`${previousTier}`].push(columns[2]);
           } else {
             const transcript = lines[pointer];
             const transcriptArray = transcript.match(
-              /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/
+              /TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/,
             );
 
             if (level === undefined) {
@@ -213,8 +213,8 @@ LBD:\n`;
                   counter,
                   Number(transcriptArray[1]),
                   Number(transcriptArray[2]),
-                  [new OLabel(previousTier, transcriptArray[4])]
-                )
+                  [new OLabel(previousTier, transcriptArray[4])],
+                ),
               );
             }
           }

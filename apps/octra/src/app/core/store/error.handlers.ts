@@ -13,13 +13,13 @@ export const checkAndThrowError: (
   lastAction: Action,
   nextAction: Action,
   store: Store,
-  callback?: () => void
+  callback?: () => void,
 ) => Observable<Action> = (
   error: ActionError,
   lastAction: Action,
   nextAction: Action,
   store: Store,
-  callback?: () => void
+  callback?: () => void,
 ) => {
   console.error(error);
   if (Object.keys(error).includes('statusCode') && error.statusCode === 0) {
@@ -27,7 +27,7 @@ export const checkAndThrowError: (
       ApplicationActions.showErrorModal.do({
         error: 'server is offline',
         showOKButton: false,
-      })
+      }),
     );
   }
   if (error.statusCode === 401) {
@@ -37,7 +37,7 @@ export const checkAndThrowError: (
       AuthenticationActions.needReAuthentication.do({
         actionAfterSuccess: lastAction,
         forceLogout: true,
-      })
+      }),
     );
   } else if (callback) {
     callback();

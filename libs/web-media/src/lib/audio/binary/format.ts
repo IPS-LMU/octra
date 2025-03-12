@@ -22,7 +22,7 @@ export class PCMAudioFormat extends AudioFormat {
     channelCount: number,
     sampleSize: number,
     sampleSizeInBits: number,
-    encodingFloat = false
+    encodingFloat = false,
   ) {
     super(sampleRate, channelCount);
     this.sampleSize = sampleSize;

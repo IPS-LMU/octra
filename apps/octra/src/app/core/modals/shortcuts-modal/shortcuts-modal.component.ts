@@ -32,7 +32,7 @@ export class ShortcutsModalComponent extends OctraModal {
   constructor(
     public appStorage: AppStorageService,
     public shortcutService: ShortcutService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('ShortcutsModalComponent', activeModal);
   }

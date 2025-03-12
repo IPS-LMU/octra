@@ -1,6 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AccountLoginMethod } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
@@ -10,6 +11,7 @@ import { AuthenticationComponent } from '../../component/authentication-componen
 import { DefaultComponent } from '../../component/default.component';
 import { MaintenanceBannerComponent } from '../../component/maintenance/maintenance-banner/maint-banner.component';
 import { OctraDropzoneComponent } from '../../component/octra-dropzone/octra-dropzone.component';
+import { AppSettings } from '../../obj';
 import { SessionFile } from '../../obj/SessionFile';
 import { AudioService, SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -18,8 +20,6 @@ import { AuthenticationStoreService } from '../../store/authentication';
 import { BrowserTestComponent } from '../browser-test/browser-test.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
-import { AppSettings } from '../../obj';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'octra-login',
@@ -95,7 +95,7 @@ export class LoginComponent
     public settingsService: SettingsService,
     private audioService: AudioService,
     public authStoreService: AuthenticationStoreService,
-    protected compatibilityService: CompatibilityService
+    protected compatibilityService: CompatibilityService,
   ) {
     super();
     this.compatibilityService.testCompability().then((result) => {
@@ -127,7 +127,7 @@ I just want to let you know, that the OCTRA server is currently offline.
     this.authStoreService.loginLocal(
       this.dropzone.files.map((a) => a.file.file),
       this.dropzone.oannotation,
-      removeData
+      removeData,
     );
   };
 
@@ -141,7 +141,7 @@ I just want to let you know, that the OCTRA server is currently offline.
     this.authStoreService.loginOnline(
       $event.type,
       $event.credentials?.usernameEmail,
-      $event.credentials?.password
+      $event.credentials?.password,
     );
   }
 
@@ -149,7 +149,7 @@ I just want to let you know, that the OCTRA server is currently offline.
     this.authStoreService.loginOnline(
       AccountLoginMethod.local,
       this.state.online.user.nameOrEmail,
-      this.state.online.user.password
+      this.state.online.user.password,
     );
   }
 

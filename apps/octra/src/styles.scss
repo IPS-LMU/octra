@@ -481,7 +481,10 @@ a {
 }
 
 .text-outline-white {
-  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white,
+  text-shadow:
+    -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
     1px 1px 0 white !important;
 }
 
@@ -524,7 +527,7 @@ a {
   min-width: 300px;
 }
 
-ul.pagination.pagination-sm{
+ul.pagination.pagination-sm {
   margin-bottom: 0 !important;
 }
 

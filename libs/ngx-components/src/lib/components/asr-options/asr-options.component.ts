@@ -221,7 +221,7 @@ export class AsrOptionsComponent
 
   filterProviders(value: string, dropdown?: NgbDropdown, emit?: boolean) {
     const langItem = this.fields.asr.languages.find(
-      (a) => a.value === this.fields.asr.selected
+      (a) => a.value === this.fields.asr.selected,
     );
 
     if (this.fields.asr.selected && langItem) {
@@ -229,7 +229,7 @@ export class AsrOptionsComponent
         (a) =>
           !langItem.providersOnly ||
           langItem.providersOnly.length === 0 ||
-          langItem.providersOnly.includes(a.provider)
+          langItem.providersOnly.includes(a.provider),
       );
     } else {
       this.fields.provider.filtered = this.fields.provider.services;
@@ -237,7 +237,7 @@ export class AsrOptionsComponent
     this.fields.provider.filtered = this.fields.provider.filtered.filter(
       (a) =>
         a.basName?.toLowerCase().includes(value.toLowerCase()) ||
-        a.provider.toLowerCase().includes(value.toLowerCase())
+        a.provider.toLowerCase().includes(value.toLowerCase()),
     );
 
     if (
@@ -245,13 +245,13 @@ export class AsrOptionsComponent
       this.fields.provider.services.filter(
         (a) =>
           a.basName?.toLowerCase() === value.toLowerCase() ||
-          a.provider.toLowerCase() === value.toLowerCase()
+          a.provider.toLowerCase() === value.toLowerCase(),
       )
     ) {
       this.options = {
         ...this.options,
         selectedServiceProvider: this.fields.provider.services.find(
-          (a) => a.provider === value
+          (a) => a.provider === value,
         ),
       };
       if (emit) {
@@ -267,7 +267,7 @@ export class AsrOptionsComponent
     this.options = {
       ...this.options,
       selectedServiceProvider: this.languageSettings?.services.find(
-        (a) => a.provider === provider
+        (a) => a.provider === provider,
       ),
     };
 
@@ -284,18 +284,18 @@ export class AsrOptionsComponent
     value: string,
     type: 'asr' | 'maus',
     dropdown?: NgbDropdown,
-    emit?: boolean
+    emit?: boolean,
   ) {
     this.fields[type].filtered = this.fields[type].languages.filter(
       (a) =>
         a.description.toLowerCase().includes(value.toLowerCase()) ||
-        a.value.toLowerCase().includes(value.toLowerCase())
+        a.value.toLowerCase().includes(value.toLowerCase()),
     );
     dropdown?.open();
 
     if (
       this.fields[type].languages.find(
-        (a) => a.value.toLowerCase() === value.toLowerCase()
+        (a) => a.value.toLowerCase() === value.toLowerCase(),
       ) ||
       value === ''
     ) {
@@ -326,7 +326,7 @@ export class AsrOptionsComponent
   selectLanguage(language: string, type: 'asr' | 'maus', emit?: boolean) {
     this.popTemplate?.close();
     const langItem = this.fields[type].languages.find(
-      (a) => a.value === language
+      (a) => a.value === language,
     );
     if (!langItem) {
       language = '';
@@ -339,7 +339,7 @@ export class AsrOptionsComponent
           (a) =>
             !langItem.providersOnly ||
             langItem.providersOnly.length === 0 ||
-            langItem.providersOnly.includes(a.provider)
+            langItem.providersOnly.includes(a.provider),
         );
       } else {
         this.fields.provider.filtered = this.fields.provider.services;
@@ -347,7 +347,7 @@ export class AsrOptionsComponent
 
       if (
         !this.fields.provider.filtered.find(
-          (a) => a.provider === this.fields.provider.selected
+          (a) => a.provider === this.fields.provider.selected,
         )
       ) {
         this.fields.provider.selected = '';
@@ -379,7 +379,7 @@ export class AsrOptionsComponent
       !opened &&
       !this.fields[type].languages.find(
         (a) =>
-          a.value.toLowerCase() === this.fields[type].selected.toLowerCase()
+          a.value.toLowerCase() === this.fields[type].selected.toLowerCase(),
       )
     ) {
       this.fields[type].selected = '';

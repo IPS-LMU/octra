@@ -17,7 +17,7 @@ export class BrowserTestComponent {
 
   constructor(
     private router: Router,
-    public compatibilityService: CompatibilityService
+    public compatibilityService: CompatibilityService,
   ) {}
 
   getStateIcon(rule: any) {

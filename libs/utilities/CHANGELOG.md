@@ -4,30 +4,21 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [1.0.2](https://github.com/IPS-LMU/octra/compare/utilities-1.0.1...utilities-1.0.2) (2025-01-27)
 
-
 ### Features
 
-* **utilities:** wait() function for simplified waiting in async blocks ([73414ba](https://github.com/IPS-LMU/octra/commit/73414ba7127febc67c03be22349129872d48e56f))
-
-
+- **utilities:** wait() function for simplified waiting in async blocks ([73414ba](https://github.com/IPS-LMU/octra/commit/73414ba7127febc67c03be22349129872d48e56f))
 
 ## [1.0.1](https://github.com/IPS-LMU/octra/compare/utilities-1.0.0...utilities-1.0.1) (2025-01-14)
 
-
 ### Bug Fixes
 
-* **utilities:** extractFileNameFromURL can't parse on available query params ([4587ba3](https://github.com/IPS-LMU/octra/commit/4587ba36092b7d7f2aeddfac3cb438a1d335ed22))
-
-
+- **utilities:** extractFileNameFromURL can't parse on available query params ([4587ba3](https://github.com/IPS-LMU/octra/commit/4587ba36092b7d7f2aeddfac3cb438a1d335ed22))
 
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/utilities-0.1.0...utilities-1.0.0) (2025-01-13)
 
-
 ### Features
 
-* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
-
-
+- **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
 
 # [0.1.0](https://github.com/IPS-LMU/octra/compare/utilities-0.0.12...utilities-0.1.0) (2024-11-13)
 

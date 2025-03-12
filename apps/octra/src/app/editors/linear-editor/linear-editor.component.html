@@ -1,27 +1,27 @@
 @if (appStorage.showMagnifier) {
-<octra-audio-viewer
-  #minimagnifierComponent
-  [audioChunk]="audioChunkMagnifier"
-  [silencePlaceholder]="annotationStoreService.silencePlaceholder"
-  [isMultiLine]="false"
-  [refreshOnInternChanges]="false"
-  [name]="'magnifier'"
-  [ngStyle]="{
-    position: 'absolute',
-    'margin-left': minimagnifier.location.x + 'px',
-    'margin-top': minimagnifier.location.y + 'px',
-    width: '160px',
-    height: '160px',
-    display: 'flex',
-    'z-index': '900',
-    visibility: minimagnifier.isHidden ? 'hidden' : 'inherit',
-    flex: 'auto',
-    'flex-direction': 'column'
-  }"
-  [settings]="miniMagnifierSettings"
-  [annotation]="annotationStoreService.transcript!"
->
-</octra-audio-viewer>
+  <octra-audio-viewer
+    #minimagnifierComponent
+    [audioChunk]="audioChunkMagnifier"
+    [silencePlaceholder]="annotationStoreService.silencePlaceholder"
+    [isMultiLine]="false"
+    [refreshOnInternChanges]="false"
+    [name]="'magnifier'"
+    [ngStyle]="{
+      position: 'absolute',
+      'margin-left': minimagnifier.location.x + 'px',
+      'margin-top': minimagnifier.location.y + 'px',
+      width: '160px',
+      height: '160px',
+      display: 'flex',
+      'z-index': '900',
+      visibility: minimagnifier.isHidden ? 'hidden' : 'inherit',
+      flex: 'auto',
+      'flex-direction': 'column',
+    }"
+    [settings]="miniMagnifierSettings"
+    [annotation]="annotationStoreService.transcript!"
+  >
+  </octra-audio-viewer>
 }
 <octra-audio-navigation
   #nav
@@ -41,10 +41,12 @@
     (mousecursorchange)="onMouseOver($event)"
     (mousedown)="onViewerMouseDown()"
     (mouseenter)="
-      minimagnifier.isHidden = false; onAudioViewerMouseEnter('signaldisplay_top')
+      minimagnifier.isHidden = false;
+      onAudioViewerMouseEnter('signaldisplay_top')
     "
     (mouseleave)="
-      minimagnifier.isHidden = true; onAudioViewerMouseLeave('signaldisplay_top')
+      minimagnifier.isHidden = true;
+      onAudioViewerMouseLeave('signaldisplay_top')
     "
     (segmententer)="onSegmentEnter($event)"
     (selchange)="onSelectionChanged($event)"
@@ -60,45 +62,46 @@
 </div>
 
 @if (audioChunkDown !== undefined) {
-<octra-audio-viewer
-  #signalDisplayDown
-  [refreshOnInternChanges]="false"
-  (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
-  (alert)="onAlertTriggered($event)"
-  (click)="onMagnifierClick()"
-  (mousedown)="onViewerMouseDown()"
-  (segmententer)="onMagnifierSegmentEnter($event)"
-  (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
-  (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
-  [audioChunk]="audioChunkDown"
-  [silencePlaceholder]="annotationStoreService.silencePlaceholder"
-  [name]="'downMagnifier'"
-  [settings]="magnifierSettings"
-  [annotation]="annotationStoreService.transcript!"
-  (currentLevelChange)="onCurrentLevelChange($event)"
->
-</octra-audio-viewer>
+  <octra-audio-viewer
+    #signalDisplayDown
+    [refreshOnInternChanges]="false"
+    (shortcut)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+    (alert)="onAlertTriggered($event)"
+    (click)="onMagnifierClick()"
+    (mousedown)="onViewerMouseDown()"
+    (segmententer)="onMagnifierSegmentEnter($event)"
+    (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
+    (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
+    [audioChunk]="audioChunkDown"
+    [silencePlaceholder]="annotationStoreService.silencePlaceholder"
+    [name]="'downMagnifier'"
+    [settings]="magnifierSettings"
+    [annotation]="annotationStoreService.transcript!"
+    (currentLevelChange)="onCurrentLevelChange($event)"
+  >
+  </octra-audio-viewer>
 }
 <div [hidden]="segmentselected" id="editor-placeholder">
-  @if ( !segmentselected && audioChunkDown !== undefined ) {
-  <div
-    [innerHTML]="
-      'signal-gui.segment enter text'
-        | transloco : { value: segmententer_shortc }
-    "
-    class="inner"
-  ></div>
-  } @if (audioChunkDown === undefined) {
-  <div
-    [innerHTML]="'signal-gui.selection text' | transloco"
-    class="inner"
-  ></div>
+  @if (!segmentselected && audioChunkDown !== undefined) {
+    <div
+      [innerHTML]="
+        'signal-gui.segment enter text'
+          | transloco: { value: segmententer_shortc }
+      "
+      class="inner"
+    ></div>
+  }
+  @if (audioChunkDown === undefined) {
+    <div
+      [innerHTML]="'signal-gui.selection text' | transloco"
+      class="inner"
+    ></div>
   }
 </div>
 <octra-transcr-editor
   [ngClass]="{
     'd-none': !segmentselected,
-    'd-grid': segmentselected
+    'd-grid': segmentselected,
   }"
   #transcr
   (keyup)="onKeyUp()"

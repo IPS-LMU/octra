@@ -188,7 +188,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     public audio: AudioService,
     public transloco: TranslocoService,
     protected settings: SettingsService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('toolsModal', activeModal);
   }
@@ -276,7 +276,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
     // start cutting
     this.tools.audioCutting.cutter = new AudioCutter(
-      this.audio.audioManager.resource.info
+      this.audio.audioManager.resource.info,
     );
 
     let totalSize = 0;
@@ -291,7 +291,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           intArray: IntArray;
         }) => {
           this.tools.audioCutting.progress = Math.round(
-            (status.finishedSegments / overallTasks) * 100
+            (status.finishedSegments / overallTasks) * 100,
           );
           if (this.tools.audioCutting.archiveStructure === undefined) {
             this.tools.audioCutting.archiveStructure = {};
@@ -317,14 +317,14 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 this.audio.audioManager.resource.arraybuffer!.byteLength *
                   zippingSpeed +
                 10) *
-                1000
+                1000,
             );
 
             this.tools.audioCutting.subscriptionIDs[2] = this.subscribe(
               interval(1000),
               () => {
                 this.tools.audioCutting.timeLeft -= 1000;
-              }
+              },
             );
           }
 
@@ -340,7 +340,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 cutList,
                 this.audio.audioManager.resource.info,
                 this.audio.audioManager.resource.info.fullname,
-                this.namingConvention.namingConvention
+                this.namingConvention.namingConvention,
               );
 
               this.tools.audioCutting.archiveStructure[
@@ -356,7 +356,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                 cutList,
                 this.audio.audioManager.resource.info,
                 this.audio.audioManager.resource.info.fullname,
-                this.namingConvention.namingConvention
+                this.namingConvention.namingConvention,
               );
 
               this.tools.audioCutting.archiveStructure[
@@ -376,7 +376,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                     // first process
                     if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
                       this.subscriptionManager.removeById(
-                        this.tools.audioCutting.subscriptionIDs[2]
+                        this.tools.audioCutting.subscriptionIDs[2],
                       );
                       this.tools.audioCutting.subscriptionIDs[2] = -1;
                     }
@@ -392,7 +392,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                     (
                       ((finished + overAllProgress) / overallTasks) *
                       100
-                    ).toFixed(2)
+                    ).toFixed(2),
                   );
                   if (Date.now() - lastCheck >= 1000) {
                     if (sizeProcessed > 1024 * 1024 * 2) {
@@ -410,7 +410,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
                   if (this.tools.audioCutting.result.url !== undefined) {
                     window.URL.revokeObjectURL(
-                      this.tools.audioCutting.result.url.toString()
+                      this.tools.audioCutting.result.url.toString(),
                     );
                   }
 
@@ -420,9 +420,9 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                         URL.createObjectURL(
                           new File(
                             [data],
-                            this.audio.audioManager.resource.info.name + '.zip'
-                          )
-                        )
+                            this.audio.audioManager.resource.info.name + '.zip',
+                          ),
+                        ),
                       );
                     this.tools.audioCutting.result.filename =
                       this.audio.audioManager.resource.info.name + '.zip';
@@ -432,14 +432,14 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
                       ErrorModalComponent.options,
                       {
                         text: (e as any).message ?? e,
-                      }
+                      },
                     );
                   }
                 } else {
                   console.error(`cutting error`);
                   console.error(error);
                 }
-              }
+              },
             );
 
             /*
@@ -465,7 +465,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         error: (err: any) => {
           if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
             this.subscriptionManager.removeById(
-              this.tools.audioCutting.subscriptionIDs[2]
+              this.tools.audioCutting.subscriptionIDs[2],
             );
             this.tools.audioCutting.subscriptionIDs[2] = -1;
           }
@@ -475,7 +475,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
           console.error(`other error`);
           console.error(err);
         },
-      }
+      },
     );
 
     this.tools.audioCutting.status = 'running';
@@ -489,7 +489,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         this.tools.audioCutting.cutter.cutChannelDataSequentially(
           this.namingConvention.namingConvention,
           this.audio.audioManager.channel,
-          cutList
+          cutList,
         );
       })
       .catch((err) => {
@@ -546,7 +546,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         {
           'test.txt': new Uint8Array(new ArrayBuffer(1024 * 1024)),
         },
-        { level: 9 }
+        { level: 9 },
       );
       const dur = (Date.now() - started) / 1000;
       resolve(dur / (1024 * 1024));
@@ -555,7 +555,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
 
   private combinePhrases() {
     this.annotationStoreService.combinePhrases(
-      this.tools.combinePhrases.options
+      this.tools.combinePhrases.options,
     );
     this.close();
   }

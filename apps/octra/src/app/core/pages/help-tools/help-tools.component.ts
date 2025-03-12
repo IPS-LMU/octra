@@ -26,7 +26,7 @@ export class HelpToolsComponent extends DefaultComponent {
     private appStorage: AppStorageService,
     private idbService: IDBService,
     private sanitizer: DomSanitizer,
-    private modalService: OctraModalService
+    private modalService: OctraModalService,
   ) {
     super();
   }
@@ -48,7 +48,7 @@ export class HelpToolsComponent extends DefaultComponent {
     this.localBackup = {
       name: `octra_local_backup_${Date.now()}.json`,
       url: this.sanitizer.bypassSecurityTrustResourceUrl(
-        URL.createObjectURL(blob)
+        URL.createObjectURL(blob),
       ),
     };
   }

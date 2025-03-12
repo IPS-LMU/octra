@@ -15,52 +15,54 @@
       {{ i18n.introduction }}
     </p>
     @if (sendStatus === 'error') {
-    <div [innerHTML]="i18n.error" class="alert alert-danger bugsent"></div>
+      <div [innerHTML]="i18n.error" class="alert alert-danger bugsent"></div>
     } @else if (sendStatus === 'success') {
-    <div class="alert alert-success bugsent">
-      {{ i18n.bugReportSent }}
-    </div>
+      <div class="alert alert-success bugsent">
+        {{ i18n.bugReportSent }}
+      </div>
     } @else if (sendStatus === 'sending') {
-    <div class="alert alert-info bugsent">
-      {{ i18n.sending }}
-    </div>
+      <div class="alert alert-info bugsent">
+        {{ i18n.sending }}
+      </div>
     }
 
     <form #form="ngForm">
       @if (showSenderFields) {
-      <div class="row">
-        <div class="col-6">
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="inputName"
-              name="name"
-              aria-describedby="name"
-              [required]="true"
-              [placeholder]="i18n.name"
-              [(ngModel)]="name"
-            />
-            <label for="inputName" class="form-label">{{ i18n.name }}</label>
+        <div class="row">
+          <div class="col-6">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="name"
+                aria-describedby="name"
+                [required]="true"
+                [placeholder]="i18n.name"
+                [(ngModel)]="name"
+              />
+              <label for="inputName" class="form-label">{{ i18n.name }}</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-floating mb-3">
+              <input
+                type="email"
+                class="form-control"
+                id="inputEmail"
+                name="email"
+                aria-describedby="email"
+                [pattern]="'[^@]+\\@.+\\.[^.]+$'"
+                [(ngModel)]="email"
+                [required]="true"
+                placeholder="email@example.com"
+              />
+              <label for="inputEmail" class="form-label">{{
+                i18n.eMail
+              }}</label>
+            </div>
           </div>
         </div>
-        <div class="col-6">
-          <div class="form-floating mb-3">
-            <input
-              type="email"
-              class="form-control"
-              id="inputEmail"
-              name="email"
-              aria-describedby="email"
-              [pattern]="'[^@]+\\@.+\\.[^.]+$'"
-              [(ngModel)]="email"
-              [required]="true"
-              placeholder="email@example.com"
-            />
-            <label for="inputEmail" class="form-label">{{ i18n.eMail }}</label>
-          </div>
-        </div>
-      </div>
       }
       <div class="row">
         <div class="col-12">
@@ -92,41 +94,47 @@
           <div class="form-group" style="margin-bottom: 20px">
             <label>{{ i18n.screenshots }} (optional):</label><br />
             <div class="preview-images">
-              @for (screenshot of screenshots; track screenshot; let i = $index)
-              {
-              <div
-                (click)="selectFileForUpload(uploadInput2)"
-                class="upload-screenshot"
-              >
-                <span (click)="removeScreenshot(i)" class="cross rounded-circle"
-                  >X</span
+              @for (
+                screenshot of screenshots;
+                track screenshot;
+                let i = $index
+              ) {
+                <div
+                  (click)="selectFileForUpload(uploadInput2)"
+                  class="upload-screenshot"
                 >
-                <input
-                  #uploadInput2
-                  (change)="onFileChange($event)"
-                  accept=".jpg, .png, .jpeg|image/*"
-                  name="upload"
-                  style="display: none"
-                  type="file"
-                />
-                @if (screenshot.previewURL !== '') {
-                <img [src]="screenshot.previewURL" class="preview-image" />
-                }
-              </div>
-              } @if (screenshots.length < 4) {
-              <div
-                (click)="selectFileForUpload(uploadInput)"
-                class="upload-screenshot"
-              >
-                <input
-                  #uploadInput
-                  (change)="onFileChange($event)"
-                  name="upload"
-                  style="display: none"
-                  type="file"
-                />
-                <i class="bi bi-plus-lg"></i>
-              </div>
+                  <span
+                    (click)="removeScreenshot(i)"
+                    class="cross rounded-circle"
+                    >X</span
+                  >
+                  <input
+                    #uploadInput2
+                    (change)="onFileChange($event)"
+                    accept=".jpg, .png, .jpeg|image/*"
+                    name="upload"
+                    style="display: none"
+                    type="file"
+                  />
+                  @if (screenshot.previewURL !== '') {
+                    <img [src]="screenshot.previewURL" class="preview-image" />
+                  }
+                </div>
+              }
+              @if (screenshots.length < 4) {
+                <div
+                  (click)="selectFileForUpload(uploadInput)"
+                  class="upload-screenshot"
+                >
+                  <input
+                    #uploadInput
+                    (change)="onFileChange($event)"
+                    name="upload"
+                    style="display: none"
+                    type="file"
+                  />
+                  <i class="bi bi-plus-lg"></i>
+                </div>
               }
             </div>
             <div class="clearfix"></div>

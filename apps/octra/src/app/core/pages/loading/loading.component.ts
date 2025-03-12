@@ -38,7 +38,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
     public appStorage: AppStorageService,
     public appStoreService: ApplicationStoreService,
     public audio: AudioService,
-    private router: Router
+    private router: Router,
   ) {
     super();
   }
@@ -66,7 +66,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
     navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch(
       (error) => {
         console.error(error);
-      }
+      },
     );
   }
 }

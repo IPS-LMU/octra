@@ -177,7 +177,7 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     moveItemInArray(
       this.resultConvention,
       $event.previousIndex,
-      $event.currentIndex
+      $event.currentIndex,
     );
   }
 }

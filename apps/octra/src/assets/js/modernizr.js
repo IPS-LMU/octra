@@ -19,8 +19,8 @@
     return 'function' != typeof t.createElement
       ? t.createElement(arguments[0])
       : S
-      ? t.createElementNS.call(t, 'http://www.w3.org/2000/svg', arguments[0])
-      : t.createElement.apply(t, arguments);
+        ? t.createElementNS.call(t, 'http://www.w3.org/2000/svg', arguments[0])
+        : t.createElement.apply(t, arguments);
   }
   function a(e, n) {
     return !!~('' + e).indexOf(n);
@@ -80,7 +80,7 @@
         var s = i.error ? 'error' : 'log';
         i[s].call(
           i,
-          'getComputedStyle returning null, its possible modernizr test results are inaccurate'
+          'getComputedStyle returning null, its possible modernizr test results are inaccurate',
         );
       }
     } else o = !t && e.currentStyle && e.currentStyle[r];
@@ -100,7 +100,7 @@
           '@supports (' + i + ') { #modernizr { position: absolute; } }',
           function (e) {
             return 'absolute' === d(e, null, 'position');
-          }
+          },
         )
       );
     }
@@ -364,7 +364,7 @@
   (N = N && n[N]),
     Modernizr.addTest(
       'bloburls',
-      N && 'revokeObjectURL' in N && 'createObjectURL' in N
+      N && 'revokeObjectURL' in N && 'createObjectURL' in N,
     ),
     Modernizr.addTest('webworkers', 'Worker' in n),
     (function () {

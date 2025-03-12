@@ -81,7 +81,7 @@ export class OverviewModalComponent
     private shortcutsService: ShortcutService,
     public appStorage: AppStorageService,
     private uiService: UserInteractionsService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('overviewModal', activeModal);
   }
@@ -140,7 +140,7 @@ export class OverviewModalComponent
       undefined,
       undefined,
       undefined,
-      'overview'
+      'overview',
     );
   }
 
@@ -178,7 +178,7 @@ export class OverviewModalComponent
         undefined,
         undefined,
         undefined,
-        'overview'
+        'overview',
       );
     }
     return super.close();

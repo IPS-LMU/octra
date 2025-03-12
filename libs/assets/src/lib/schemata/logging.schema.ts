@@ -42,5 +42,5 @@ export const OctraLoggingJSONSchema: JSONSchema4 = {
       type: 'array',
     },
   },
-  additionalProperties: true
+  additionalProperties: true,
 };

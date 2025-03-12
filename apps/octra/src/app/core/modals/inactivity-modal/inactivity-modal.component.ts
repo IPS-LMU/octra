@@ -20,7 +20,7 @@ export class InactivityModalComponent extends OctraModal {
   constructor(
     public appStorage: AppStorageService,
     public settService: SettingsService,
-    protected override activeModal: NgbActiveModal
+    protected override activeModal: NgbActiveModal,
   ) {
     super('inactivityModal', activeModal);
   }

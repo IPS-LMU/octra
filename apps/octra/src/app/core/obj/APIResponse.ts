@@ -10,7 +10,7 @@ export class APIResponse {
     systemstate: string,
     type: string,
     data: APIData,
-    message: string
+    message: string,
   ) {
     this.systemstate = systemstate;
     this.type = type;

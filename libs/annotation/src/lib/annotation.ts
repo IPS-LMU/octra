@@ -29,7 +29,10 @@ export class OctraAnnotationLink {
     return this._link;
   }
 
-  constructor(private _id: number, private _link: OLink) {}
+  constructor(
+    private _id: number,
+    private _link: OLink,
+  ) {}
 
   clone() {
     return new OctraAnnotationLink(this._id, this._link.clone());
@@ -38,7 +41,7 @@ export class OctraAnnotationLink {
 
 export class OctraAnnotation<
   S extends ASRContext,
-  T extends OctraAnnotationSegment<S>
+  T extends OctraAnnotationSegment<S>,
 > {
   get selectedLevelIndex(): number | undefined {
     return this._selectedLevelIndex;
@@ -89,7 +92,7 @@ export class OctraAnnotation<
       level: number;
       link: number;
       item: number;
-    }
+    },
   ) {
     this._levels = levels ?? [];
     this._links = links ?? [];
@@ -112,7 +115,7 @@ export class OctraAnnotation<
           return Math.max(0, ...a.items.map((b) => b.id)) + 1;
         }
         return 1;
-      })
+      }),
     );
     this.idCounters.link = Math.max(0, ...this.links.map((a) => a.id)) + 1;
     this.idCounters.level = Math.max(0, ...this.levels.map((a) => a.id)) + 1;
@@ -125,12 +128,12 @@ export class OctraAnnotation<
 
   createSegmentLevel(
     name: string,
-    items?: T[]
+    items?: T[],
   ): OctraAnnotationSegmentLevel<T> {
     return new OctraAnnotationSegmentLevel<T>(
       this._idCounters.level++,
       name,
-      items
+      items,
     );
   }
 
@@ -153,7 +156,7 @@ export class OctraAnnotation<
 
   createEventLevel(
     name: string,
-    items: OctraAnnotationEvent[]
+    items: OctraAnnotationEvent[],
   ): OctraAnnotationEventLevel {
     return new OctraAnnotationEventLevel(this._idCounters.level++, name, items);
   }
@@ -167,7 +170,7 @@ export class OctraAnnotation<
       this._idCounters.item++,
       time,
       labels,
-      context
+      context,
     );
   }
 
@@ -181,7 +184,7 @@ export class OctraAnnotation<
       const level = this._levels[index];
       const duplicate = level.duplicate(
         this._idCounters.level++,
-        this._idCounters.item
+        this._idCounters.item,
       );
 
       this._levels = [
@@ -328,7 +331,7 @@ export class OctraAnnotation<
                 this.idCounters.item++,
                 time!,
                 labels && labels.length > 0 ? labels : oldLabels,
-                context ?? {}
+                context ?? {},
               ) as any,
             ];
             items.sort(this.sortSegmentsBySampleUnit);
@@ -339,8 +342,8 @@ export class OctraAnnotation<
               this.idCounters.item++,
               time!,
               labels,
-              context ?? {}
-            ) as any
+              context ?? {},
+            ) as any,
           );
         }
         this.currentLevel.overwriteItems(items as any);
@@ -366,7 +369,7 @@ export class OctraAnnotation<
     index: number,
     silenceValue?: string,
     mergeTranscripts?: boolean,
-    changeTranscript?: (transcript: string) => string
+    changeTranscript?: (transcript: string) => string,
   ) {
     if (!this.currentLevel) {
       throw new Error('Current level is undefined');
@@ -452,7 +455,7 @@ export class OctraAnnotation<
     id: number,
     silenceCode?: string,
     mergeTranscripts?: boolean,
-    changeTranscript?: (transcript: string) => string
+    changeTranscript?: (transcript: string) => string,
   ) {
     const index = this.currentLevel?.items.findIndex((a) => a.id === id);
     if (index !== undefined && index > -1) {
@@ -460,7 +463,7 @@ export class OctraAnnotation<
         index,
         silenceCode,
         mergeTranscripts,
-        changeTranscript
+        changeTranscript,
       );
     } else {
       throw new Error(`Can't find item with id ${id}`);
@@ -471,7 +474,7 @@ export class OctraAnnotation<
 
   addLink(fromID: number, toID: number) {
     this._links.push(
-      new OctraAnnotationLink(this.idCounters.link++, new OLink(fromID, toID))
+      new OctraAnnotationLink(this.idCounters.link++, new OLink(fromID, toID)),
     );
   }
 
@@ -488,7 +491,7 @@ export class OctraAnnotation<
     if (index > -1) {
       this._links[index] = new OctraAnnotationLink(
         this._links[index].id,
-        oLink
+        oLink,
       );
     } else {
       throw new Error(`Can't find link with index ${index}`);
@@ -531,9 +534,9 @@ export class OctraAnnotation<
                 a.id,
                 new SampleUnit(a.time.samples, sampleRate),
                 a.labels,
-                a.context
-              )
-          )
+                a.context,
+              ),
+          ),
         );
       } else if (level.type === 'EVENT') {
         return new OctraAnnotationEventLevel(
@@ -544,9 +547,9 @@ export class OctraAnnotation<
               new OctraAnnotationEvent(
                 a.id,
                 new SampleUnit(a.samplePoint.samples, a.samplePoint.sampleRate),
-                a.labels
-              )
-          )
+                a.labels,
+              ),
+          ),
         );
       }
       return level;
@@ -555,7 +558,7 @@ export class OctraAnnotation<
     const result = new OctraAnnotation(
       levels,
       this._links.map((a) => a.clone()),
-      this.idCounters
+      this.idCounters,
     );
     result.changeCurrentLevelIndex(this._selectedLevelIndex!);
     return result;
@@ -564,7 +567,7 @@ export class OctraAnnotation<
   serialize(
     mediaFileName: string,
     sampleRate: number,
-    lastSegmentTime: SampleUnit
+    lastSegmentTime: SampleUnit,
   ): OAnnotJSON {
     return new OAnnotJSON(
       mediaFileName,
@@ -580,19 +583,19 @@ export class OctraAnnotation<
             lastSegmentTime.samples
           ) {
             result.items.push(
-              this.createSegment(lastSegmentTime, [new OLabel(a.name, '')])
+              this.createSegment(lastSegmentTime, [new OLabel(a.name, '')]),
             );
           }
         }
 
         return result;
       }),
-      this.links.map((a) => a.link.serialize())
+      this.links.map((a) => a.link.serialize()),
     );
   }
 
   static deserialize<S extends ASRContext, T extends OctraAnnotationSegment<S>>(
-    jsonObject: OAnnotJSON
+    jsonObject: OAnnotJSON,
   ): OctraAnnotation<S, T> {
     const result = new OctraAnnotation<S, T>();
 
@@ -605,10 +608,10 @@ export class OctraAnnotation<
             level.items.map((a) =>
               OctraAnnotationSegment.deserializeFromOSegment(
                 a,
-                jsonObject.sampleRate
-              )
-            ) as T[]
-          )
+                jsonObject.sampleRate,
+              ),
+            ) as T[],
+          ),
         );
       } else if (jsonObjectElement.type === AnnotationLevelType.EVENT) {
         const level = jsonObjectElement as OEventLevel;
@@ -620,17 +623,17 @@ export class OctraAnnotation<
                 new OctraAnnotationEvent(
                   a.id,
                   new SampleUnit(a.samplePoint, jsonObject.sampleRate),
-                  a.labels
-                )
-            )
-          )
+                  a.labels,
+                ),
+            ),
+          ),
         );
       } else {
         result.levels.push(
           result.createItemLevel(
             jsonObjectElement.name,
-            jsonObjectElement.items
-          )
+            jsonObjectElement.items,
+          ),
         );
       }
     }
@@ -691,7 +694,10 @@ export class OctraAnnotationLevel<T extends OLevel<S>, S extends OItem> {
     this.level.items = [];
   }
 
-  constructor(protected _id: number, level: T) {
+  constructor(
+    protected _id: number,
+    level: T,
+  ) {
     this.level = level;
   }
 
@@ -706,7 +712,7 @@ export class OctraAnnotationLevel<T extends OLevel<S>, S extends OItem> {
         ...this.level.items.map((a) => {
           return a.clone(itemIDCounter++) as S;
         }),
-      ]) as T
+      ]) as T,
     );
     return result;
   }
@@ -744,7 +750,7 @@ export class OctraAnnotationLevel<T extends OLevel<S>, S extends OItem> {
 }
 
 export class OctraAnnotationSegmentLevel<
-  T extends OctraAnnotationSegment<ASRContext>
+  T extends OctraAnnotationSegment<ASRContext>,
 > extends OctraAnnotationLevel<OLevel<T>, T> {
   constructor(id: number, name: string, items?: T[]) {
     super(id, new OLevel<T>(name, AnnotationLevelType.SEGMENT, items));
@@ -769,13 +775,13 @@ export class OctraAnnotationSegmentLevel<
     return new OctraAnnotationSegmentLevel<T>(
       this._id,
       this.name,
-      this.level.items.map((a) => a.clone() as any)
+      this.level.items.map((a) => a.clone() as any),
     );
   }
 
   override duplicate(
     id: number,
-    itemIDCounter: number
+    itemIDCounter: number,
   ): OctraAnnotationSegmentLevel<T> {
     return new OctraAnnotationSegmentLevel<T>(
       id,
@@ -786,9 +792,9 @@ export class OctraAnnotationSegmentLevel<
             itemIDCounter++,
             a.time,
             [...a.labels],
-            { ...a.context }
-          ) as T
-      )
+            { ...a.context },
+          ) as T,
+      ),
     );
   }
 }
@@ -813,18 +819,18 @@ export class OctraAnnotationItemLevel extends OctraAnnotationLevel<
     return new OctraAnnotationItemLevel(
       this.id,
       this.name,
-      this.items.map((a) => a.clone())
+      this.items.map((a) => a.clone()),
     );
   }
 
   override duplicate(
     id: number,
-    itemIDCounter: number
+    itemIDCounter: number,
   ): OctraAnnotationItemLevel {
     return new OctraAnnotationItemLevel(
       id,
       `${this.name}_2`,
-      this.items.map((a) => new OItem(itemIDCounter++, [...a.labels]))
+      this.items.map((a) => new OItem(itemIDCounter++, [...a.labels])),
     );
   }
 }
@@ -848,7 +854,7 @@ export class OctraAnnotationEventLevel {
   serialize(): OEventLevel {
     return new OEventLevel(
       this.name,
-      this.items.map((a) => new OEvent(a.id, a.samplePoint.samples, a.labels))
+      this.items.map((a) => new OEvent(a.id, a.samplePoint.samples, a.labels)),
     );
   }
 
@@ -856,7 +862,7 @@ export class OctraAnnotationEventLevel {
     return new OctraAnnotationEventLevel(
       this.id,
       this.name,
-      this.items.map((a) => a.clone())
+      this.items.map((a) => a.clone()),
     );
   }
 
@@ -870,7 +876,7 @@ export class OctraAnnotationEventLevel {
       this.name + '_2',
       this.items.map((a) => {
         return a.clone(itemIDCounter++);
-      })
+      }),
     );
     return result;
   }
@@ -904,7 +910,7 @@ export class OctraAnnotationEventLevel {
 }
 
 export type OctraAnnotationAnyLevel<
-  T extends OctraAnnotationSegment<ASRContext>
+  T extends OctraAnnotationSegment<ASRContext>,
 > =
   | OctraAnnotationSegmentLevel<T>
   | OctraAnnotationItemLevel

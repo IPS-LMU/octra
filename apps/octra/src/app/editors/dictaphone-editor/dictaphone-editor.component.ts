@@ -81,7 +81,7 @@ export class DictaphoneEditorComponent
   onAudioPlayerPlay = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
@@ -102,7 +102,7 @@ export class DictaphoneEditorComponent
   onAudioStop = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
@@ -117,7 +117,7 @@ export class DictaphoneEditorComponent
   onStepBackward = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
@@ -132,7 +132,7 @@ export class DictaphoneEditorComponent
   onStepBackwardTime = (
     keyboardEvent: KeyboardEvent,
     shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent
+    hotKeyEvent: HotkeysEvent,
   ) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
@@ -209,7 +209,7 @@ export class DictaphoneEditorComponent
     public annotationStoreService: AnnotationStoreService,
     private uiService: UserInteractionsService,
     public settingsService: SettingsService,
-    public appStorage: AppStorageService
+    public appStorage: AppStorageService,
   ) {
     super();
   }
@@ -249,7 +249,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'audio_buttons'
+      'audio_buttons',
     );
   }
 
@@ -263,7 +263,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'audio_speed'
+      'audio_speed',
     );
   }
 
@@ -277,7 +277,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'audio_volume'
+      'audio_volume',
     );
   }
 
@@ -311,14 +311,14 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'texteditor'
+      'texteditor',
     );
   };
 
   onBoundaryClicked(samples: SampleUnit) {
     const i: number =
       this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-        samples
+        samples,
       ) ?? -1;
 
     if (i > -1) {
@@ -361,7 +361,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'texteditor'
+      'texteditor',
     );
   }
 
@@ -374,7 +374,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'texteditor'
+      'texteditor',
     );
   }
 
@@ -389,7 +389,7 @@ export class DictaphoneEditorComponent
       this.editor.textSelection,
       undefined,
       undefined,
-      'texteditor_toolbar'
+      'texteditor_toolbar',
     );
   }
 
@@ -442,7 +442,7 @@ export class DictaphoneEditorComponent
         items.push(
           transcript.createSegment(time, [
             new OLabel(transcript.currentLevel!.name, segTexts[i]),
-          ])
+          ]),
         );
       }
       transcript.currentLevel.overwriteItems(items as any);
@@ -478,7 +478,7 @@ export class DictaphoneEditorComponent
         this.subscriptionManager.removeByTag('annochange');
         this.loadEditor();
       }),
-      'annochange'
+      'annochange',
     );
 
     if (type === 'undo') {

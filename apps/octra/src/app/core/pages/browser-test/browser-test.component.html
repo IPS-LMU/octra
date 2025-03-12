@@ -16,7 +16,11 @@
             {{ rule.description }}
             @if (rule.state === 'failed' && rule.help !== '') {
               <p
-                [innerHTML]="$index === 0 ? rule.help + compatibilityService.supportedBrowsers : rule.help"
+                [innerHTML]="
+                  $index === 0
+                    ? rule.help + compatibilityService.supportedBrowsers
+                    : rule.help
+                "
                 style="color: red"
               ></p>
             }
@@ -27,7 +31,8 @@
                   <ul>
                     <li>Open a new tab.</li>
                     <li>
-                      Type in "chrome://settings/content/cookies" in the address bar.
+                      Type in "chrome://settings/content/cookies" in the address
+                      bar.
                     </li>
                     <li>Enable "Cookies".</li>
                     <li>Reload this page.</li>
@@ -37,11 +42,13 @@
                   To use OCTRA with this browser please follow the instructions:
                   <ul>
                     <li>Open a new tab.</li>
-                    <li>Type in "about:preferences#privacy" in the address bar.</li>
+                    <li>
+                      Type in "about:preferences#privacy" in the address bar.
+                    </li>
                     <li>Scroll to chronicle. Disable the "private mode"</li>
                     <li>
-                      Scroll to "Cookies and web data". Check the first radio box to
-                      enable Cookies.
+                      Scroll to "Cookies and web data". Check the first radio
+                      box to enable Cookies.
                     </li>
                     <li>Reload this page.</li>
                   </ul>
@@ -59,6 +66,6 @@
       class="btn btn-raised btn-primary"
       fragment="feedback"
       >I need help</a
-      >
-    </div>
+    >
   </div>
+</div>

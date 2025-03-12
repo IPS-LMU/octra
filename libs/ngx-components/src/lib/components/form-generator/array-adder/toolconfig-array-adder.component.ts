@@ -11,7 +11,10 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
 export class PreparedItem {
-  constructor(public value: any, public selected = false) {}
+  constructor(
+    public value: any,
+    public selected = false,
+  ) {}
 }
 
 @Component({
@@ -36,7 +39,7 @@ export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   add() {
     if (!this.inputValue) {
       this.itemsAdd.emit(
-        this._items.filter((a) => a.selected).map((a) => a.value)
+        this._items.filter((a) => a.selected).map((a) => a.value),
       );
     } else {
       this.itemsAdd.emit([this.inputValue]);

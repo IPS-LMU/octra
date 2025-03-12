@@ -29,7 +29,7 @@ export class MaintenanceBannerComponent implements OnChanges {
   constructor(
     private http: HttpClient,
     private renderer: Renderer2,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -44,7 +44,7 @@ export class MaintenanceBannerComponent implements OnChanges {
     if (isServerURL) {
       const api = new MaintenanceAPI(
         changes['serverURL'].currentValue,
-        this.http
+        this.http,
       );
       api
         .readMaintenanceNotifications(72)
@@ -81,7 +81,7 @@ export class MaintenanceBannerComponent implements OnChanges {
         this.renderer.setStyle(
           this.elementRef.nativeElement,
           'display',
-          'inherit'
+          'inherit',
         );
       }
     }

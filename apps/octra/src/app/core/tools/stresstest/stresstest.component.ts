@@ -29,13 +29,13 @@ export class StresstestComponent {
   public get performance() {
     return {
       heapSizeLimit: getFileSize(
-        (window.performance as any).memory.jsHeapSizeLimit
+        (window.performance as any).memory.jsHeapSizeLimit,
       ),
       totalHeapSize: getFileSize(
-        (window.performance as any).memory.totalJSHeapSize
+        (window.performance as any).memory.totalJSHeapSize,
       ),
       heapSizeUsed: getFileSize(
-        (window.performance as any).memory.usedJSHeapSize
+        (window.performance as any).memory.usedJSHeapSize,
       ),
     };
   }
@@ -51,7 +51,7 @@ export class StresstestComponent {
 
   constructor(
     private cd: ChangeDetectorRef,
-    private sessionStorage: SessionStorageService
+    private sessionStorage: SessionStorageService,
   ) {}
 
   public getSampleData(mb: number) {
@@ -90,7 +90,7 @@ export class StresstestComponent {
         reader.onloadend = () => {
           this.sampleData = new File(
             [this.arrayBuffer, reader.result!],
-            'test2'
+            'test2',
           );
           resolve();
         };

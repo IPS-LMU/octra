@@ -129,14 +129,14 @@ export class ShortcutService {
     callback?: (
       keyboardEvent: KeyboardEvent,
       shortcut: Shortcut,
-      hotkeyEvent: HotkeysEvent
-    ) => void
+      hotkeyEvent: HotkeysEvent,
+    ) => void,
   ) {
     const groupIndex = this._groups.findIndex((a) => a.name == groupName);
 
     if (groupIndex > -1) {
       const itemIndex = this._groups[groupIndex].items.findIndex(
-        (a) => a.name === itemName
+        (a) => a.name === itemName,
       );
       if (itemIndex > -1) {
         this._groups[groupIndex].items[itemIndex].callback = callback;

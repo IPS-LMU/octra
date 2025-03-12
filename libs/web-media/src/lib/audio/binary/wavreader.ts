@@ -31,7 +31,7 @@ export class WavReader {
           cl +
           ' (expected: ' +
           (this.br.length() - this.br.pos) +
-          ' )'
+          ' )',
       );
     }
     this.totalLength = cl;
@@ -145,7 +145,7 @@ export class WavReader {
         channels,
         frameSize / channels,
         sampleSizeInBits,
-        fmt === WavFileFormat.WAVE_FORMAT_IEEE_FLOAT
+        fmt === WavFileFormat.WAVE_FORMAT_IEEE_FLOAT,
       );
     }
     return pcmAf;

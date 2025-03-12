@@ -1,9 +1,9 @@
+import { NgClass } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../component/default.component';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
-import { NgClass } from '@angular/common';
 
 export enum TranscriptionStopModalAnswer {
   CONTINUE = 'CONTINUE',
@@ -28,7 +28,7 @@ export class TranscriptionStopModalComponent extends DefaultComponent {
 
   constructor(
     private activeModal: NgbActiveModal,
-    protected appStore: ApplicationStoreService
+    protected appStore: ApplicationStoreService,
   ) {
     super();
   }

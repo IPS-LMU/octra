@@ -50,7 +50,7 @@ export class ShortcutComponent implements OnInit {
     let result = keyString;
 
     const regex = new RegExp(
-      /((?:(ARROW)?(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g
+      /((?:(ARROW)?(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g,
     );
 
     result = result.replace(regex, (g0, g1) => {

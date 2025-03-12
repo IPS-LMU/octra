@@ -7,7 +7,6 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { AppStorageService } from '../../../../shared/service/appstorage.service';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ApplicationStoreService } from '../../../../store/application/application-store.service';
 
@@ -17,7 +16,7 @@ import { ApplicationStoreService } from '../../../../store/application/applicati
   styleUrls: ['./project-request-modal.component.scss'],
   imports: [TranslocoPipe],
 })
-export class ProjectRequestModalComponent extends SubscriberComponent{
+export class ProjectRequestModalComponent extends SubscriberComponent {
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: 'static',
@@ -34,29 +33,37 @@ export class ProjectRequestModalComponent extends SubscriberComponent{
     protected api: OctraAPIService,
     private sanitizer: DomSanitizer,
     protected appStorage: ApplicationStoreService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {
     super();
     if (this.api.appProperties.support?.admin_email) {
       this.supportEmailURL = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `mailto:${this.api.appProperties.support?.admin_email}`
+        `mailto:${this.api.appProperties.support?.admin_email}`,
       );
     }
 
     this.subscribe(this.appStorage.appconfig$, {
-      next: (appSettings) =>{
+      next: (appSettings) => {
         this.introductionHTML = this.sanitizer.bypassSecurityTrustHtml(
-          this.transloco.translate('modals.create project request.introduction', {
-            octraBackendURL:
-              "<a href='" +
-              appSettings?.octraBackend?.url +
-              "' target='_blank'>OCTRA-Backend</a>",
-          })
+          this.transloco.translate(
+            'modals.create project request.introduction',
+            {
+              octraBackendURL:
+                "<a href='" +
+                appSettings?.octraBackend?.url +
+                "' target='_blank'>OCTRA-Backend</a>",
+            },
+          ),
         );
-        this.description = this.sanitizer.bypassSecurityTrustHtml(this.transloco.translate('modals.create project request.description', {
-          adminEmail: `<a href="mailto:${this.api.appProperties?.support?.admin_email}">${this.api.appProperties?.support?.admin_email}</a>`
-        }))
-      }
-    })
+        this.description = this.sanitizer.bypassSecurityTrustHtml(
+          this.transloco.translate(
+            'modals.create project request.description',
+            {
+              adminEmail: `<a href="mailto:${this.api.appProperties?.support?.admin_email}">${this.api.appProperties?.support?.admin_email}</a>`,
+            },
+          ),
+        );
+      },
+    });
   }
 }

@@ -65,7 +65,7 @@ export class AuthenticationComponent extends DefaultComponent {
 
   constructor(
     private api: OctraAPIService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {
     super();
   }

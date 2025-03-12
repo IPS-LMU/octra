@@ -149,7 +149,7 @@ export class BugreportModalComponent
 
   constructor(
     private cd: ChangeDetectorRef,
-    protected activeModal: NgbActiveModal
+    protected activeModal: NgbActiveModal,
   ) {
     super();
   }
@@ -166,7 +166,7 @@ export class BugreportModalComponent
       alert(
         `Please write a message with less 10000 letters. Remove ${
           this.bgdescr.length - 10000
-        } letters.`
+        } letters.`,
       );
       return;
     }
@@ -228,7 +228,7 @@ export class BugreportModalComponent
           });
       } else {
         alert(
-          'Only files with the extensions ".jpg, jpeg,.png" are supported.'
+          'Only files with the extensions ".jpg, jpeg,.png" are supported.',
         );
       }
     }

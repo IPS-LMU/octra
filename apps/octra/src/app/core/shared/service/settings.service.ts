@@ -41,7 +41,10 @@ export class SettingsService {
     return this._filename;
   }
 
-  constructor(private http: HttpClient, private appStorage: AppStorageService) {
+  constructor(
+    private http: HttpClient,
+    private appStorage: AppStorageService,
+  ) {
     this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 

@@ -1,15 +1,15 @@
 export interface BugReportTranslations {
-  giveFeedback?: string;
-  error?: string;
-  introduction?: string;
-  bugReportSent?: string;
-  addProtocol?: string;
-  name?: string;
-  eMail?: string;
-  description?: string;
-  screenshots?: string;
-  protocol?: string;
-  sendFeedback?: string;
   abort?: string;
+  addProtocol?: string;
+  bugReportSent?: string;
+  description?: string;
+  eMail?: string;
+  error?: string;
+  giveFeedback?: string;
+  introduction?: string;
+  name?: string;
+  protocol?: string;
+  screenshots?: string;
+  sendFeedback?: string;
   sending?: string;
 }

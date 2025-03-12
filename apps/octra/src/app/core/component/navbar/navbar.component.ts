@@ -19,7 +19,7 @@ import {
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { OctraUtilitiesModule } from '@octra/ngx-utilities';
+import { TimespanPipe } from '@octra/ngx-utilities';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
@@ -66,7 +66,7 @@ import { NavbarService } from './navbar.service';
     AsyncPipe,
     UpperCasePipe,
     TranslocoPipe,
-    OctraUtilitiesModule,
+    TimespanPipe,
   ],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {

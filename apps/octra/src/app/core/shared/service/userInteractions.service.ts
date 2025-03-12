@@ -87,6 +87,10 @@ export class UserInteractionsService {
       | undefined,
     targetName?: string
   ) {
+    if (!this._enabled) {
+      return;
+    }
+
     if (!this.startTime) {
       throw new Error('Start time is undefined in logging!');
     }
@@ -106,90 +110,88 @@ export class UserInteractionsService {
         : textSelection
       : undefined;
 
-    if (this._enabled) {
-      let name = '';
-      let context: any = undefined;
+    let name = '';
+    let context: any = undefined;
 
-      if (!targetName) {
-        if (event && event.target) {
-          context = event.target;
-          name = context.getAttribute('name');
+    if (!targetName) {
+      if (event && event.target) {
+        context = event.target;
+        name = context.getAttribute('name');
 
-          if (!name && context !== undefined) {
-            name = context.parentNode.getAttribute('name');
-          }
-          if (!name) {
-            name = '';
-          }
+        if (!name && context !== undefined) {
+          name = context.parentNode.getAttribute('name');
         }
-      } else {
-        name = targetName;
-      }
-      let elem: StatisticElem | undefined = undefined;
-      if (contains(type, 'key') || contains(type, 'shortcut')) {
-        elem = new KeyStatisticElem(
-          type,
-          name,
-          event.value,
-          timestamp,
-          playpos?.samples,
-          textSelection,
-          audioSelection,
-          transcriptionUnit
-        );
-      } else if (contains(type, 'mouse')) {
-        elem = new MouseStatisticElem(
-          type,
-          name,
-          event.value,
-          timestamp,
-          originalPlayerPos,
-          textSelection,
-          audioSelection,
-          transcriptionUnit
-        );
-      } else if (contains(type, 'slider')) {
-        elem = new MouseStatisticElem(
-          type,
-          name,
-          event.new_value,
-          timestamp,
-          originalPlayerPos,
-          textSelection,
-          audioSelection,
-          transcriptionUnit
-        );
-      } else {
-        elem = new StatisticElem(
-          type,
-          name,
-          event.value,
-          timestamp,
-          originalPlayerPos,
-          audioSelection,
-          transcriptionUnit
-        );
-      }
-
-      if (elem) {
-        this._elements.push(elem);
-        this._afteradd.emit(elem);
-        const newElem = new OLog(
-          elem.timestamp,
-          elem.type,
-          elem.context,
-          '',
-          elem.playpos,
-          elem.textSelection
-        );
-
-        if (elem instanceof MouseStatisticElem) {
-          newElem.value = elem.value;
-        } else if (elem instanceof KeyStatisticElem) {
-          newElem.value = (elem as KeyStatisticElem).value;
-        } else {
-          newElem.value = (elem as StatisticElem).value;
+        if (!name) {
+          name = '';
         }
+      }
+    } else {
+      name = targetName;
+    }
+    let elem: StatisticElem | undefined = undefined;
+    if (contains(type, 'key') || contains(type, 'shortcut')) {
+      elem = new KeyStatisticElem(
+        type,
+        name,
+        event.value,
+        timestamp,
+        playpos?.samples,
+        textSelection,
+        audioSelection,
+        transcriptionUnit
+      );
+    } else if (contains(type, 'mouse')) {
+      elem = new MouseStatisticElem(
+        type,
+        name,
+        event.value,
+        timestamp,
+        originalPlayerPos,
+        textSelection,
+        audioSelection,
+        transcriptionUnit
+      );
+    } else if (contains(type, 'slider')) {
+      elem = new MouseStatisticElem(
+        type,
+        name,
+        event.new_value,
+        timestamp,
+        originalPlayerPos,
+        textSelection,
+        audioSelection,
+        transcriptionUnit
+      );
+    } else {
+      elem = new StatisticElem(
+        type,
+        name,
+        event.value,
+        timestamp,
+        originalPlayerPos,
+        audioSelection,
+        transcriptionUnit
+      );
+    }
+
+    if (elem) {
+      this._elements.push(elem);
+      this._afteradd.emit(elem);
+      const newElem = new OLog(
+        elem.timestamp,
+        elem.type,
+        elem.context,
+        '',
+        elem.playpos,
+        elem.textSelection
+      );
+
+      if (elem instanceof MouseStatisticElem) {
+        newElem.value = elem.value;
+      } else if (elem instanceof KeyStatisticElem) {
+        newElem.value = (elem as KeyStatisticElem).value;
+      } else {
+        newElem.value = (elem as StatisticElem).value;
       }
     }
   }

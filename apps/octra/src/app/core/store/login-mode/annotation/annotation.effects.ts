@@ -71,10 +71,10 @@ import { AnnotationState, GuidelinesItem } from './index';
 
 import { FileInfo } from '@octra/web-media';
 import { DateTime } from 'luxon';
+import mime from 'mime';
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
-import mime from 'mime';
 
 @Injectable()
 export class AnnotationEffects {
@@ -253,7 +253,7 @@ export class AnnotationEffects {
         tap(([a, state]) => {
           // INIT UI SERVICE
           const modeState = getModeState(state)!;
-          if (a.projectSettings.logging?.forced || modeState.logging.enabled) {
+          if (a.projectSettings.logging?.forced) {
             this.uiService.init(
               true,
               modeState.logging.startTime,

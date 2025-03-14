@@ -1,5 +1,5 @@
 {
-  "name": "@octra-new2/source",
+  "name": "@octra/source",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "targets": {
     "local-registry": {

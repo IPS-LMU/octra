@@ -139,7 +139,7 @@ export function unEscapeHtml(text: string): string {
 export function insertString(
   input: string,
   pos: number,
-  insertion: string,
+  insertion: string
 ): string {
   let result = input;
 
@@ -160,7 +160,7 @@ export function waitTillResultRetrieved<
   A2 extends {
     type: string;
   },
-  T,
+  T
 >(actions: A1, success: A2, failure: A2) {
   return new Promise<T>((resolve, reject) => {
     const subscr = actions.subscribe((action: A2) => {
@@ -481,4 +481,10 @@ export function appendURLQueryParams(
 
   const query = array.length > 0 ? `${startingLetter}${array.join('&')}` : '';
   return `${url}${query}`;
+}
+
+export function filterUnique<T>(array: T[], isEqual: (a: T, b: T) => boolean) {
+  return array.filter(
+    (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i
+  );
 }

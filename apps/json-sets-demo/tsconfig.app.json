@@ -2,9 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "declaration": true,
-    "sourceMap": true,
-    "types": ["node", "vite/client"]
+    "module": "commonjs",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }

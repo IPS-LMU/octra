@@ -1,25 +1,3 @@
-export interface AudioFileMetaData {
-  bitRate?: number;
-  numberOfChannels?: number;
-  duration?: { samples: number; seconds: number };
-  sampleRate?: number;
-  container?: string;
-  codec?: string;
-  lossless?: boolean;
-}
-
-export class JSONSetValidationError<U> {
-  path?: string;
-  message!: string;
-  statement?: JSONSetStatement<U>;
-  combinationType?: 'and' | 'or';
-
-  constructor(message: string, path?: string) {
-    this.message = message;
-    this.path = path;
-  }
-}
-
 export class JSONSetStatement<U> {
   select: string;
   with: U | U[];

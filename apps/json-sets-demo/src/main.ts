@@ -1,4 +1,4 @@
-const { FileSetValidator } = require('../../dist/libs/json-sets/');
+import { FileSetValidator } from '@octra/json-sets';
 
 const validator = new FileSetValidator({
   name: 'one audio file and one text file',
@@ -9,20 +9,18 @@ const validator = new FileSetValidator({
       {
         select: '1',
         name: 'audiofile',
-        description: '',
+        description: 'Two are audiofiles',
         with: {
-          fileSize: 2000, // - // <- oder Verbindungen          //  |- und Verbindungen
-          mimeType: ['audio/wav', 'audio/ogg'], // <- oder Verbindungen  // -
+          size: '<= 1KB',
+          mimeType: ['audio/wav', 'audio/ogg'],
         },
       },
       {
-        select: '1',
+        select: '>= 1',
         name: 'textfile',
-        description: '',
+        description: 'One is a text file',
         with: {
-          fileSize: 2000,
           mimeType: ['application/json'],
-          content: ['AnnotJSON'],
         },
       },
     ],
@@ -31,28 +29,27 @@ const validator = new FileSetValidator({
 
 validator.validate([
   {
-    name: 'test.wav',
+    name: 'a.wav',
     size: 1000,
     type: 'audio/wav',
   },
   {
-    name: 'test.ogg',
+    name: 'b.ogg',
     size: 1000,
     type: 'audio/ogg',
   },
   {
-    name: 'test.json',
+    name: 'c.json',
+    size: 1000,
+    type: 'application/json',
+  },
+  {
+    name: 'd.json',
     size: 1000,
     type: 'application/json',
   },
 ]);
 console.log(`TREE__________`);
-console.log(validator);
-console.log(`SOLUTION__________`);
-console.log(
-  validator.decisionTree.possibleSelections.map(
-    (a) => `(${a.map((b) => `{${b.path}: ${b.selection.name}}`).join(',')})`,
-  ),
-);
+console.log(validator.decisionTree.output());
 console.log('ERRORS');
 console.log(validator.decisionTree._errors);

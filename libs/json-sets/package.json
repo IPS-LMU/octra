@@ -1,7 +1,7 @@
 {
   "name": "@octra/json-sets",
   "description": "library that allows to define and parse a set of objects using JSON.",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "license": "MIT",
   "private": false,
   "author": {

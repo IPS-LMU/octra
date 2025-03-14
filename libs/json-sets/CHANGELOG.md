@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.0.0](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.2...json-sets-1.0.0) (2025-03-14)
+
+
+### Bug Fixes
+
+* **json-sets:** fix unexpected behaviour of json-sets validator ([32ccaf1](https://github.com/IPS-LMU/octra/commit/32ccaf1d06ca83e2ea3cde6a9565aed75938cfb4))
+
+
+### Features
+
+* **octra:** upgrade to Nx 20 incl. Angular 19 ([5850cbc](https://github.com/IPS-LMU/octra/commit/5850cbcb71a6664ca53e9a038443e913390910c3))
+
+
+
 ## [0.1.2](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.1...json-sets-0.1.2) (2024-02-19)
 
 ### Features

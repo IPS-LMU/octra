@@ -1,6 +1,79 @@
 # @octra/json-sets <a href="https://www.npmjs.com/package/@octra/json-sets"><img alt="npm" src="https://img.shields.io/npm/v/@octra/json-sets"></a>
 
-This library allows to define sets using JSON. JSONSetValidator parsed an array of objects and validates it using the JSON definition.
+This library allows to define sets using JSON. JSONSetValidator parses an array of objects and validates it using a JSON definition. You can extend from JSONSetValidator and create your own validator for specific object.
+
+## Features
+
+- Easy select statements syntax:
+  - `"select": "x"`: Select exact x items
+  - `"select": "> x"`: Select more than x items
+  - `"select": "< x"`: Select less than x items
+  - `"select": ">= x"`: Select min. x items
+  - `"select": "<= x"`: Select max. x items
+- Combine statements using common logic: `and`, `or` operators.
+- Calculate all possible solution with a given set of objects
+- Get List of failed statements on error
+
+## Example
+
+You can clone this repository and try the following example running `npm run start:json-sets-demo`.
+
+```typescript
+import { FileSetValidator } from '@octra/json-sets';
+
+const validator = new FileSetValidator({
+  name: 'one audio file and one text file',
+  description: 'root description',
+  combine: {
+    type: 'and',
+    expressions: [
+      {
+        select: '2',
+        name: 'audiofile',
+        description: 'Two are audiofiles',
+        with: {
+          mimeType: ['audio/wav', 'audio/ogg'],
+        },
+      },
+      {
+        select: '1',
+        name: 'textfile',
+        description: 'One is a text file',
+        with: {
+          mimeType: ['application/json'],
+        },
+      },
+    ],
+  },
+});
+
+validator.validate([
+  {
+    name: 'a.wav',
+    size: 1000,
+    type: 'audio/wav',
+  },
+  {
+    name: 'b.ogg',
+    size: 1000,
+    type: 'audio/ogg',
+  },
+  {
+    name: 'c.json',
+    size: 1000,
+    type: 'application/json',
+  },
+  {
+    name: 'd.json',
+    size: 1000,
+    type: 'application/json',
+  },
+]);
+console.log(`TREE__________`);
+console.log(validator.decisionTree.output());
+console.log('ERRORS');
+console.log(validator.decisionTree._errors);
+```
 
 ## Installation
 

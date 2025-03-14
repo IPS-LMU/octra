@@ -1,4 +1,4 @@
-import { JSONSetStatement } from '@octra/json-sets';
+import { JSONSetStatement } from './interfaces';
 
 export class JSONSetValidationError<U> {
   path?: string;

@@ -463,7 +463,10 @@ export async function wait(seconds: number): Promise<void> {
  * @param url
  * @param params
  */
-export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean>) {
+export function appendURLQueryParams(
+  url: string,
+  params: Record<string, string | number | boolean>
+) {
   let startingLetter = '?';
   if (/[^/]*\?([^/]*)$/g.exec(url)) {
     startingLetter = '&';
@@ -478,4 +481,10 @@ export function appendURLQueryParams(url: string, params: Record<string, string 
 
   const query = array.length > 0 ? `${startingLetter}${array.join('&')}` : '';
   return `${url}${query}`;
+}
+
+export function filterUnique<T>(array: T[], isEqual: (a: T, b: T) => boolean) {
+  return array.filter(
+    (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i
+  );
 }

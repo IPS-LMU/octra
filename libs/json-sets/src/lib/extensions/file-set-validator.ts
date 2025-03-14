@@ -1,10 +1,21 @@
 import {
+  DecisionTreeNode,
+  JSONSet,
   JSONSetBlueprint,
   JSONSetResult,
+  JsonSetValidator,
   PossibleSolution,
-} from './decision-tree';
-import { JSONSet } from './interfaces';
-import { JsonSetValidator } from './json-set-validator';
+} from '../core';
+
+export interface AudioFileMetaData {
+  bitRate?: number;
+  numberOfChannels?: number;
+  duration?: { samples: number; seconds: number };
+  sampleRate?: number;
+  container?: string;
+  codec?: string;
+  lossless?: boolean;
+}
 
 export class IFile {
   name!: string;
@@ -33,45 +44,45 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   IFile,
   JSONSetFileConditions
 > {
-  constructor(
-    validationMethods: ((
-      item: any,
-      conditions: JSONSetFileConditions,
-      combinationType: 'and' | 'or',
-      path: string
-    ) => JSONSetResult)[] = []
-  ) {
-    super(validationMethods);
-    this._validationMethods = [
-      this.validateMimeType,
-      this.validateContent,
-      this.validateFileSize,
-      this.validateExtension,
-      this.validateNamePattern,
+  override validateItem(
+    item: IFile,
+    conditions: JSONSetFileConditions,
+    combinationType: 'and' | 'or',
+    path: string
+  ): JSONSetResult[] {
+    const args: [IFile, JSONSetFileConditions, 'and' | 'or', string] = [
+      item,
+      conditions,
+      combinationType,
+      path,
+    ];
+
+    return [
+      this.validateFileSize(...args),
+      this.validateContent(...args),
+      this.validateNamePattern(...args),
+      this.validateMimeType(...args),
+      this.validateExtension(...args),
     ];
   }
 
-  override areEqualArray(
-    array: PossibleSolution<IFile, JSONSetFileConditions>[],
-    array2: PossibleSolution<IFile, JSONSetFileConditions>[]
+  override areSolutionsEqual(
+    solutionA: PossibleSolution<IFile, JSONSetFileConditions>,
+    solutionB: PossibleSolution<IFile, JSONSetFileConditions>
   ): boolean {
-    if (array.length === array2.length) {
-      for (const solution of array) {
-        if (
-          !array2.find(
-            (a) =>
-              a.path === solution.path &&
-              a.selection.name === solution.selection.name &&
-              a.selection.type === solution.selection.type &&
-              a.selection.size === solution.selection.size &&
-              a.selection.content === solution.selection.content
-          )
-        ) {
-        }
-      }
-    }
+    return (
+      solutionA.selection.content === solutionB.selection.content &&
+      solutionA.selection.type === solutionB.selection.type &&
+      solutionA.selection.name === solutionB.selection.name
+    );
+  }
 
-    return false;
+  override outputSolutions(
+    possibleSolutions: PossibleSolution<IFile, JSONSetFileConditions>[][]
+  ): string {
+    return `${possibleSolutions.length} solutions: [${possibleSolutions
+      .map((a) => `(${a.map((b) => b.selection.name).join(', ')})`)
+      .join(', ')}]`;
   }
 
   private convertFileString = (fileString: string) => {
@@ -82,6 +93,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     if (!matches || matches.length < 3) {
       return undefined;
     }
+
     try {
       const size = Number(matches[1]);
       const label = matches[2];
@@ -113,7 +125,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   ) => {
     if (conditions.size && item.size) {
       const matches =
-        /^((?:>=)|(?:<=)|(?:=))?\s*([0-9]+\.?[0-9]*\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
+        /^((?:>=?)|(?:<=?)|(?:=))?\s*([0-9]+\.?[0-9]*\s*(?:(?:B)|(?:KB)|(?:MB)|(?:GB)|(?:TB)))$/g.exec(
           conditions.size
         );
 
@@ -129,46 +141,70 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
         if (matches[1] === undefined || matches[1] === '=') {
           // exact
           if (item.size !== size) {
-            return {
+            return new JSONSetResult({
               valid: false,
               error: `File size condition not met by ${path}.`,
               path,
               combinationType,
-            };
+            });
           }
         }
 
         if (matches[1] === '>=') {
           // min
           if (item.size < size) {
-            return {
+            return new JSONSetResult({
               valid: false,
               error: `File size condition not met by ${path}.`,
               path,
               combinationType,
-            };
+            });
           }
         }
 
         if (matches[1] === '<=') {
           // max
           if (item.size > size) {
-            return {
+            return new JSONSetResult({
               valid: false,
               error: `File size condition not met by ${path}.`,
               path,
               combinationType,
-            };
+            });
+          }
+        }
+
+        if (matches[1] === '<') {
+          // max
+          if (item.size >= size) {
+            return new JSONSetResult({
+              valid: false,
+              error: `File size condition not met by ${path}.`,
+              path,
+              combinationType,
+            });
+          }
+        }
+
+        if (matches[1] === '>') {
+          // min
+          if (item.size <= size) {
+            return new JSONSetResult({
+              valid: false,
+              error: `File size condition not met by ${path}.`,
+              path,
+              combinationType,
+            });
           }
         }
       }
     }
 
-    return {
+    return new JSONSetResult({
       valid: true,
       path,
       combinationType,
-    };
+    });
   };
 
   private validateExtension(
@@ -180,28 +216,28 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
     if (conditions.extension && conditions.extension.length > 0 && item.name) {
       for (const ext of conditions.extension) {
         if (new RegExp(`${ext.replace(/\./g, '\\.')}$`).exec(item.name)) {
-          return {
+          return new JSONSetResult({
             valid: true,
             path,
             combinationType,
-          };
+          });
         }
       }
 
-      return {
+      return new JSONSetResult({
         valid: false,
         error: `File content type must be one of ${conditions.extension.join(
           ','
         )}.`,
         path,
         combinationType,
-      };
+      });
     }
-    return {
+    return new JSONSetResult({
       valid: true,
       path,
       combinationType,
-    };
+    });
   }
 
   private validateContent(
@@ -215,21 +251,21 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       conditions.content.length > 0 &&
       (!item.content || !conditions.content.includes(item.content))
     ) {
-      return {
+      return new JSONSetResult({
         valid: false,
         error: `File content type must be one of ${conditions.content.join(
           ','
         )}.`,
         path,
         combinationType,
-      };
+      });
     }
 
-    return {
+    return new JSONSetResult({
       valid: true,
       path,
       combinationType,
-    };
+    });
   }
 
   private validateNamePattern(
@@ -242,19 +278,19 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       conditions.namePattern &&
       new RegExp(conditions.namePattern).exec(item.name) === null
     ) {
-      return {
+      return new JSONSetResult({
         valid: false,
         error: `File name does not match pattern "${conditions.namePattern}".`,
         path,
         combinationType,
-      };
+      });
     }
 
-    return {
+    return new JSONSetResult({
       valid: true,
       path,
       combinationType,
-    };
+    });
   }
 
   private validateMimeType(
@@ -269,45 +305,18 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
       item.type !== undefined &&
       !conditions.mimeType.includes(item.type)
     ) {
-      return {
+      return new JSONSetResult({
         valid: false,
         error: `File type must be one of ${conditions.mimeType.join(',')}.`,
         path,
         combinationType,
-      };
+      });
     }
-    return {
+    return new JSONSetResult({
       valid: true,
       path,
       combinationType,
-    };
-  }
-
-  override cleanUpSolutions(
-    a: PossibleSolution<IFile, JSONSetFileConditions>[],
-    index: number,
-    solutions: PossibleSolution<IFile, JSONSetFileConditions>[][]
-  ): boolean {
-    const anyDuplicate = a.some(
-      (b, i, so) =>
-        so.findIndex((c) => c.selection.name === b.selection.name) !== i
-    );
-
-    return (
-      !anyDuplicate &&
-      solutions.findIndex((b) => {
-        for (const iFile of a) {
-          const i = b.findIndex(
-            (c) =>
-              c.path === iFile.path && c.selection.name === iFile.selection.name
-          );
-          if (i < 0) {
-            return false;
-          }
-        }
-        return true;
-      }) === index
-    );
+    });
   }
 }
 
@@ -315,10 +324,14 @@ export class FileSetValidator extends JsonSetValidator<
   IFile,
   JSONSetFileConditions
 > {
-  override blueprint: JSONSetFileBlueprint = new JSONSetFileBlueprint();
-
   constructor(jsonSet: JSONSet<JSONSetFileConditions>) {
-    super();
-    this.parse(jsonSet);
+    super(jsonSet, new JSONSetFileBlueprint());
+  }
+
+  protected override parse(jsonSet: JSONSet<JSONSetFileConditions>) {
+    this._decisionTree = DecisionTreeNode.json2tree<
+      IFile,
+      JSONSetFileConditions
+    >(this._blueprint, jsonSet);
   }
 }

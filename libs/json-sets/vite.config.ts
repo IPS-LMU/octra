@@ -26,7 +26,9 @@ export default defineConfig({
     outDir: '../../dist/libs/json-sets',
     emptyOutDir: true,
     reportCompressedSize: true,
+    sourcemap: true,
     commonjsOptions: {
+      sourceMap: true,
       transformMixedEsModules: true,
     },
     lib: {

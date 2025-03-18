@@ -372,11 +372,7 @@ export class AudioCutter {
       if ([32, 16, 8].includes(this.audioInfo.bitrate)) {
         dataChunkLength = Math.round(dataChunkLength / divider);
         result = new this.formatConstructor(dataChunkLength);
-        convertedData = new this.formatConstructor(
-          uint8Array.buffer,
-          uint8Array.byteOffset,
-          uint8Array.byteLength / divider,
-        );
+        convertedData = new this.formatConstructor(uint8Array.buffer);
         start = Math.round(start / divider);
         startPos = 44 / divider + Math.round(start);
       }

@@ -31,7 +31,6 @@ const defaultI18n: ASROptionsTranslations = {
 
 @Component({
   selector: 'octra-asr-options',
-  standalone: true,
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss'],
   imports: [

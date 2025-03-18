@@ -1,15 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { environment } from '../environments/environment';
-import { NavigationComponent } from './core/component';
-import { AlertComponent } from './core/component/alert/alert.component';
+import { AlertComponent, NavigationComponent } from './core/component';
 import { DefaultComponent } from './core/component/default.component';
-import { NavigationComponent as NavigationComponent_1 } from './core/component/navbar/navbar.component';
-import { OctraModalComponent } from './core/modals/octra-modal/octra-modal.component';
+import { OctraModalComponent } from './core/modals/octra-modal';
 import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
+import { OctraComponentsModule } from '@octra/ngx-components';
 
 @Component({
   selector: 'octra-app',
@@ -18,8 +17,9 @@ import { AnnotationStoreService } from './core/store/login-mode/annotation/annot
   imports: [
     AlertComponent,
     OctraModalComponent,
-    NavigationComponent_1,
     RouterOutlet,
+    OctraComponentsModule,
+    NavigationComponent,
   ],
 })
 export class AppComponent

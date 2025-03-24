@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.1](https://github.com/IPS-LMU/octra/compare/json-sets-1.0.0...json-sets-1.0.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* **json-sets:** and operator not working if only one condition exists ([d3f0ee1](https://github.com/IPS-LMU/octra/commit/d3f0ee1eaed659531c77ed541f51bcb6f3bf9ccb))
+
+
+
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/json-sets-0.1.2...json-sets-1.0.0) (2025-03-14)
 
 

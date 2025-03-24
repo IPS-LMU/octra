@@ -110,7 +110,7 @@
     "mime": "^4.0.6",
     "modernizr": "^3.13.0",
     "ngrx-wieder": "^13.0.0",
-    "ngx-jodit": "^3.2.1",
+    "ngx-jodit": "^3.2.2",
     "ngx-webstorage": "^19.0.0",
     "node-ssh": "^13.2.0",
     "platform": "^1.3.6",

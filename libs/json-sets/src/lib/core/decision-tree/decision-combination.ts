@@ -7,7 +7,7 @@ import { DecisionTreeNode } from './decision-node';
 
 export class DecisionTreeCombination<
   T extends object,
-  U extends object
+  U extends object,
 > extends DecisionTreeNode<T, U> {
   combination: 'and' | 'or';
   children: DecisionTreeNode<T, U>[] = [];
@@ -18,7 +18,7 @@ export class DecisionTreeCombination<
     parent?: DecisionTreeCombination<T, U>,
     name?: string,
     description?: string,
-    children: DecisionTreeNode<T, U>[] = []
+    children: DecisionTreeNode<T, U>[] = [],
   ) {
     super(blueprint, parent, name, description);
     this.combination = combination;
@@ -34,7 +34,7 @@ export class DecisionTreeCombination<
       this.children.splice(index, 1);
     } else {
       throw new Error(
-        `Can't remove node from decision tree. Node with index ${index} not found.`
+        `Can't remove node from decision tree. Node with index ${index} not found.`,
       );
     }
   }
@@ -45,7 +45,7 @@ export class DecisionTreeCombination<
       this.children.splice(index, 1);
     } else {
       throw new Error(
-        `Can't remove node from decision tree. Node with id ${id} not found.`
+        `Can't remove node from decision tree. Node with id ${id} not found.`,
       );
     }
   }
@@ -61,7 +61,7 @@ export class DecisionTreeCombination<
       this.children.push(node);
     } else {
       throw new Error(
-        `Can't insert node to decision tree. Invalid index ${index}.`
+        `Can't insert node to decision tree. Invalid index ${index}.`,
       );
     }
   }
@@ -80,8 +80,8 @@ export class DecisionTreeCombination<
           new JSONSetValidationError(
             this.description ??
               `Logical "${this.combination}" failed for condition "${this.path}."`,
-            this.path
-          )
+            this.path,
+          ),
         );
 
         return;
@@ -89,7 +89,8 @@ export class DecisionTreeCombination<
 
       const product: PossibleSolution<T, U>[][] =
         this.children[0].possibleSelections;
-      const newProduct: PossibleSolution<T, U>[][] = [];
+      const newProduct: PossibleSolution<T, U>[][] =
+        this.children.length === 1 ? this.children[0].possibleSelections : [];
       for (let i = 1; i < this.children.length; i++) {
         const productElement = this.children[i].possibleSelections;
         newProduct.push(...this.multiplySolutions(product, productElement));
@@ -114,14 +115,14 @@ export class DecisionTreeCombination<
           new JSONSetValidationError(
             this.description ??
               `Logical "${this.combination}" failed for condition "${this.path}."`,
-            this.path
-          )
+            this.path,
+          ),
         );
         product = [];
       }
       this._possibleSelections = product.filter((a) => a.length > 0);
       this._possibleSelections = this._blueprint.makeSolutionsUnique(
-        this._possibleSelections
+        this._possibleSelections,
       );
     }
 
@@ -130,8 +131,8 @@ export class DecisionTreeCombination<
         new JSONSetValidationError(
           this.description ??
             `Logical "${this.combination}" failed for condition "${this.path}."`,
-          this.path
-        )
+          this.path,
+        ),
       );
       this._possibleSelections = [];
     }
@@ -151,21 +152,21 @@ export class DecisionTreeCombination<
             }
             return a.clone();
           })
-        : []
+        : [],
     );
   }
 
   static json2treeCombination<T extends object, U extends object>(
     blueprint: JSONSetBlueprint<T, U>,
     json: any,
-    parent?: DecisionTreeCombination<T, U>
+    parent?: DecisionTreeCombination<T, U>,
   ) {
     const root = new DecisionTreeCombination<T, U>(
       blueprint,
       json.combine.type,
       parent,
       json.name,
-      json.description
+      json.description,
     );
 
     for (const expression of json.combine.expressions) {
@@ -176,7 +177,7 @@ export class DecisionTreeCombination<
         const expr = new DecisionTreeExpression<T, U>(
           blueprint,
           root,
-          expression
+          expression,
         );
         root.append(expr);
       }

@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-node@v4
 
       - name: Retrieve the cached "node-modules" directory (if present)
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: node_cache
         with:
           path: node_modules

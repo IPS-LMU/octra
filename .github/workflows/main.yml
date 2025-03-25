@@ -23,7 +23,7 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies (if the cached directory was not found)
-       # if: steps.node-cache.outputs.cache-hit != 'true'
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci --legacy-peer-deps
 
       - name: Create the docs directory locally in CI

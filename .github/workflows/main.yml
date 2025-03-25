@@ -13,14 +13,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
 
-      # - name: Retrieve the cached "node-modules" directory (if present)
-        # uses: actions/cache@v4
-        # id: node_cache
-        # with:
-         #  path: node_modules
-          # key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Retrieve the cached "node-modules" directory (if present)
+        uses: actions/cache@v4
+        id: node_cache
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies (if the cached directory was not found)
        # if: steps.node-cache.outputs.cache-hit != 'true'
@@ -30,7 +30,7 @@ jobs:
         run: npx typedoc --out typedocs && node runner.js prepare:docs
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: typedocs

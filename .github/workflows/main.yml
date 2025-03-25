@@ -15,15 +15,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
 
-      - name: Retrieve the cached "node-modules" directory (if present)
-        uses: actions/cache@v4
-        id: node_cache
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      # - name: Retrieve the cached "node-modules" directory (if present)
+        # uses: actions/cache@v4
+        # id: node_cache
+        # with:
+         #  path: node_modules
+          # key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies (if the cached directory was not found)
-        if: steps.node-cache.outputs.cache-hit != 'true'
+       # if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci --legacy-peer-deps
 
       - name: Create the docs directory locally in CI

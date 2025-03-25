@@ -30,7 +30,7 @@ jobs:
         run: npx typedoc --out typedocs && node runner.js prepare:docs
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.7.3
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           branch: gh-pages
           folder: typedocs

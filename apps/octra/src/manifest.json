@@ -1,0 +1,28 @@
+{
+  "theme_color": "#3f51b5",
+  "background_color": "#27943f",
+  "icons": [
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "assets/img/Octra2_icon_full_512p.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "assets/img/Octra2_icon_full_rounded_512p.png",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "any",
+  "display": "standalone",
+  "dir": "left",
+  "lang": "en-EN",
+  "name": "Octra",
+  "short_name": "octra",
+  "start_url": "/",
+  "scope": "/",
+  "description": "OCTRA is a web-application for the orthographic transcription of audio files. ",
+  "id": "/"
+}

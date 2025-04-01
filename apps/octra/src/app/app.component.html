@@ -1,4 +1,6 @@
-@if (versionChecker.isNewVersionAvailable) {
+@if (
+  versionChecker.isNewVersionAvailable && appStorage.useMode !== LoginMode.URL
+) {
   <octra-version-notification
     class="position-absolute top-0 start-50 translate-middle-x"
     [i18n]="{

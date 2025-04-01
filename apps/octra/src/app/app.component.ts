@@ -14,6 +14,7 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LoginMode } from './core/store';
 
 @Component({
   selector: 'octra-app',
@@ -90,4 +91,6 @@ export class AppComponent
     const params = this.route.snapshot.queryParams;
     return params['audio_url'] && params['embedded'];
   }
+
+  protected readonly LoginMode = LoginMode;
 }

@@ -8,10 +8,10 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NgbToast, NgbToastHeader } from '@ng-bootstrap/ng-bootstrap';
-import { VersionCheckerService } from '@octra/ngx-components';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { swingAnimation } from 'angular-animations';
 import { interval } from 'rxjs';
+import { VersionCheckerService } from '../version-checker.service';
 
 @Component({
   standalone: true,
@@ -38,13 +38,12 @@ export class VersionNotificationComponent
 
   @Input() icons = {
     'new update': '<i class="bi bi-bell-fill" style="color: #ffca00;"></i>',
-    reload:
-      '<i class="bi bi-arrow-clockwise" style="color: cornflowerblue;"></i>',
+    reload: '<i class="bi bi-arrow-clockwise" style="color: white;"></i>',
   };
 
   @ViewChild('toast', { static: true }) toast: NgbToast;
 
-  labels: {
+  preparedI18n: {
     'reload now': SafeHtml;
     later: SafeHtml;
     'new update': {
@@ -53,15 +52,22 @@ export class VersionNotificationComponent
     };
   };
 
+  preparedIcons: {
+    reload: SafeHtml;
+    'new update': SafeHtml;
+  };
+
   constructor(
     protected readonly versionCheckerService: VersionCheckerService,
     protected readonly sanitizer: DomSanitizer,
   ) {
     super();
+    this.prepareI18n(this.i18n);
+    this.prepareIcons(this.icons);
   }
 
   prepareI18n(i18n: any) {
-    this.labels = {
+    this.preparedI18n = {
       'reload now': i18n['reload now'],
       later: i18n['later'],
       'new update': {
@@ -70,6 +76,13 @@ export class VersionNotificationComponent
         ),
         body: this.sanitizer.bypassSecurityTrustHtml(i18n['new update'].body),
       },
+    };
+  }
+
+  prepareIcons(icons: any) {
+    this.preparedIcons = {
+      reload: this.sanitizer.bypassSecurityTrustHtml(icons['reload']),
+      'new update': this.sanitizer.bypassSecurityTrustHtml(icons['new update']),
     };
   }
 
@@ -85,6 +98,11 @@ export class VersionNotificationComponent
     const i18n = changes['i18n'];
     if (i18n?.currentValue) {
       this.prepareI18n(i18n.currentValue);
+    }
+
+    const icons = changes['icons'];
+    if (icons?.currentValue) {
+      this.prepareIcons(icons.currentValue);
     }
   }
   close() {

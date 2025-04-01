@@ -5,11 +5,11 @@
         <div
           class="d-inline-block"
           [@swing]="swingBell"
-          [innerHTML]="sanitizer.bypassSecurityTrustHtml(icons['new update'])"
+          [innerHTML]="preparedIcons['new update']"
         ></div>
       </div>
       <div class="col ps-2">
-        <h5 [innerHTML]="labels['new update'].header"></h5>
+        <h5 [innerHTML]="preparedI18n['new update'].header"></h5>
       </div>
       <div class="col-auto align-items-start" (click)="close()">
         <i class="bi bi-x-lg" style="font-size: 1.2rem"></i>
@@ -17,19 +17,19 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12" [innerHTML]="labels['new update'].body"></div>
+    <div class="col-12" [innerHTML]="preparedI18n['new update'].body"></div>
     <div class="col-12 text-end">
       <button
         class="btn btn-outline-secondary btn-sm mt-3 me-2"
         (click)="close()"
       >
-        {{ labels['later'] }}
+        {{ preparedI18n['later'] }}
       </button>
       <button
         class="btn btn-primary btn-sm mt-3"
         (click)="versionCheckerService.applyUpdate()"
       >
-        <span [innerHTML]="icons.reload"></span> {{ labels['reload now'] }}
+        <span [innerHTML]="preparedIcons.reload"></span> {{ preparedI18n['reload now'] }}
       </button>
     </div>
   </div>

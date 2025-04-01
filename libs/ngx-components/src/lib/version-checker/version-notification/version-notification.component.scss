@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  z-index: 10000;
+}
+
+ngb-toast {
+  background-color: white;
+}
+
+.icon {
+  font-size: 1.5rem;
+}
+
+h5 {
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  :host {
+    width: 100%;
+  }
+}

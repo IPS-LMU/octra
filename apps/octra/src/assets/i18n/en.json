@@ -178,6 +178,7 @@
     "insert comment": "Insert comment here... (optional)",
     "job number": "Job number",
     "last name": "Last name",
+    "later": "Later",
     "legals": "Legals",
     "level": "Level",
     "locale": "Language",
@@ -213,6 +214,7 @@
     "quit discard": "Quit & discard annotation",
     "recommended": "recommended",
     "reload": "reload",
+    "reload now": "Reload now",
     "replay": "Replay",
     "sampleRate": "Sample Rate",
     "save": "Save",
@@ -563,6 +565,12 @@
     "speaker-actions": {
       "merge segments by speaker": "Merge segments with same speaker label",
       "permutations replace": "Replace Permutations"
+    }
+  },
+  "toasts": {
+    "new update": {
+      "header": "New update available",
+      "body": "A new update for Octra is available. Make sure that no automatic processes are running (ASR, Word Alignment, Trimming etc.). Then reload Octra to install it."
     }
   }
 }

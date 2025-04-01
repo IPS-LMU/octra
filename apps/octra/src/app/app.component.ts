@@ -1,5 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import {
+  OctraComponentsModule,
+  VersionCheckerService,
+  VersionNotificationComponent,
+} from '@octra/ngx-components';
 import { environment } from '../environments/environment';
 import { AlertComponent, NavigationComponent } from './core/component';
 import { DefaultComponent } from './core/component/default.component';
@@ -8,7 +13,7 @@ import { MultiThreadingService } from './core/shared/multi-threading/multi-threa
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
-import { OctraComponentsModule } from '@octra/ngx-components';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'octra-app',
@@ -20,6 +25,8 @@ import { OctraComponentsModule } from '@octra/ngx-components';
     RouterOutlet,
     OctraComponentsModule,
     NavigationComponent,
+    VersionNotificationComponent,
+    TranslocoPipe,
   ],
 })
 export class AppComponent
@@ -41,10 +48,13 @@ export class AppComponent
     private multiThreading: MultiThreadingService,
     private appStoreService: ApplicationStoreService,
     private annotationStoreService: AnnotationStoreService,
+    protected versionChecker: VersionCheckerService,
   ) {
     super();
-
     this.appStoreService.initApplication();
+    this.versionChecker.init({
+      interval: 5 * 60 * 1000, // check every 5 minutes
+    });
 
     if (environment.debugging.enabled && environment.debugging.logging.routes) {
       this.subscribe(this.router.events, {

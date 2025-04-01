@@ -6,7 +6,7 @@ const buildDir = "dist/apps/octra/";
 const targetFolder = "assets";
 let baseHref = "";
 let dev = "";
-const excludedList = ["config", "LICENSE.txt", "media"];
+const excludedList = ["index.html", "ocb_info.json", "config", "manifest.json", "LICENSE.txt", "media", "worker-basic.min.js", "3rdpartylicenses.txt", "ngsw.json", "ngsw-worker.js", "safety-worker.js"];
 let isUpdate = false;
 const timeNow = getDateTimeString();
 let version = "";
@@ -82,7 +82,7 @@ async function main() {
           break;
         }
       }
-      if (item !== "index.html" && item !== "ocb_info.json" && item !== "manifest.json" && item !== targetFolder && !found) {
+      if (item !== targetFolder && !found) {
         execSync(`mv "./${buildDir}${item}" "./${buildDir}${targetFolder}/${item}"`);
       }
     }

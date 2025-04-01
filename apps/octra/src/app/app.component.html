@@ -1,3 +1,17 @@
+@if (versionChecker.isNewVersionAvailable) {
+  <octra-version-notification
+    class="position-absolute top-0 start-50 translate-middle-x"
+    [i18n]="{
+      'reload now': 'g.reload now' | transloco,
+      later: 'g.later' | transloco,
+      'new update': {
+        header: 'toasts.new update.header' | transloco,
+        body: 'toasts.new update.body' | transloco,
+      },
+    }"
+  ></octra-version-notification>
+}
+
 <div class="overflow-box position-relative">
   <octra-alert id="alerts"></octra-alert>
   <octra-modal></octra-modal>

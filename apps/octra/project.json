@@ -8,12 +8,16 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/octra",
         "index": "apps/octra/src/index.html",
         "main": "apps/octra/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/octra/tsconfig.app.json",
         "allowedCommonJsDependencies": [
           "jodit-angular",
@@ -40,7 +44,9 @@
           "apps/octra/src/assets/js/modernizr.js",
           "node_modules/hammerjs/hammer.min.js"
         ],
-        "extractLicenses": true
+        "extractLicenses": true,
+        "serviceWorker": true,
+        "ngswConfigPath": "apps/octra/ngsw-config.json"
       },
       "configurations": {
         "production": {
@@ -155,11 +161,15 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/octra/jest.config.ts"
       }
@@ -174,7 +184,9 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "angular",
-        "postTargets": ["octra:github"],
+        "postTargets": [
+          "octra:github"
+        ],
         "baseBranch": "main",
         "releaseAs": "patch",
         "commitMessageFormat": "build({projectName}): release version ${version}"

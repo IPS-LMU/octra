@@ -178,6 +178,7 @@
     "insert comment": "Kommentar hier eingeben... (optional)",
     "job number": "Aufgabennummer",
     "last name": "Nachname",
+    "later": "Später",
     "legals": "Rechtliches",
     "level": "Ebene",
     "locale": "Sprache",
@@ -213,6 +214,7 @@
     "quit discard": "Beenden & Fortschritt löschen",
     "recommended": "empfohlen",
     "reload": "NEU LADEN",
+    "reload now": "Jetzt neu laden",
     "replay": "Wiederholung",
     "sampleRate": "Abtastrate",
     "save": "Speichern",
@@ -563,6 +565,12 @@
     "speaker-actions": {
       "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen",
       "permutations replace": "Ersetze Permutationen"
+    }
+  },
+  "toasts": {
+    "new update": {
+      "header": "Neue Aktualisierung verfügbar",
+      "body": "Eine neue Aktualisierung für Octra ist verfügbar. Stelle sicher, dass keine automatischen Prozesse laufen (ASR, Word Alignment, Schneiden etc.). Lade dann Octra neu, um diese zu installieren."
     }
   }
 }

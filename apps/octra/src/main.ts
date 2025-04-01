@@ -4,7 +4,7 @@ import {
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, isDevMode } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import '@angular/localize/init';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
@@ -65,6 +65,7 @@ import {
 import { IDBEffects } from './app/core/store/idb/idb-effects.service';
 import * as fromUser from './app/core/store/user/user.reducer';
 import { environment } from './environments/environment';
+import { provideServiceWorker } from '@angular/service-worker';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -143,5 +144,9 @@ bootstrapApplication(AppComponent, {
     ),
     provideAnimations(),
     provideRouter(APP_ROUTES, withEnabledBlockingInitialNavigation()),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 }).catch((err) => console.error(err));

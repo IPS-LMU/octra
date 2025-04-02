@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.1.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.0.0...ngx-components-1.1.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* **ngx-components:** icons are not overwritten properly on version notification ([49b69c9](https://github.com/IPS-LMU/octra/commit/49b69c9fc6a3c4531950132d67228e0cf767e0bc))
+* **ngx-components:** magnifier not working properly ([3d92813](https://github.com/IPS-LMU/octra/commit/3d928137a9afcb285477dc13e6b0310d17d7b01f))
+* **octra:** buttons on 2D-editor are not accessible on small screens ([145eb90](https://github.com/IPS-LMU/octra/commit/145eb90afcfff94bafa9ff422028f4f87308162f))
+
+
+### Features
+
+* **ngx-components:** version notification component for service worker ([46a0b4a](https://github.com/IPS-LMU/octra/commit/46a0b4a44d27def4a66bc528d96d8727788b702f))
+
+
+
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/ngx-components-0.2.3...ngx-components-1.0.0) (2025-01-13)
 
 ### Bug Fixes

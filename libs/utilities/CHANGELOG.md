@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.1.0](https://github.com/IPS-LMU/octra/compare/utilities-1.0.2...utilities-1.1.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* **json-sets:** fix unexpected behaviour of json-sets validator ([32ccaf1](https://github.com/IPS-LMU/octra/commit/32ccaf1d06ca83e2ea3cde6a9565aed75938cfb4))
+
+
+### Features
+
+* **utilities:** appendURLQueryParams for better handling query params ([fda5bc5](https://github.com/IPS-LMU/octra/commit/fda5bc5db92117729cd81579a452c53f10b3389a))
+
+
+
 ## [1.0.2](https://github.com/IPS-LMU/octra/compare/utilities-1.0.1...utilities-1.0.2) (2025-01-27)
 
 ### Features

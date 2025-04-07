@@ -928,6 +928,7 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'ngsw-bypass': 'true',
           },
           responseType: 'text',
         },
@@ -986,6 +987,9 @@ export class AsrEffects {
     return this.http
       .post(`${selectedLanguage.host}uploadFileMulti`, formData, {
         responseType: 'text',
+        headers: {
+          'ngsw-bypass': 'true',
+        },
       })
       .pipe(
         take(1),
@@ -1034,6 +1038,7 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'ngsw-bypass': 'true',
           },
           responseType: 'text',
         },

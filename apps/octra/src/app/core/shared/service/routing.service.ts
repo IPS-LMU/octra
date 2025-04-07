@@ -3,16 +3,17 @@ import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
 import { removeEmptyProperties } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { environment } from '../../../../environments/environment';
+import { URLParameters } from '../../store/application';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoutingService {
-  get staticQueryParams(): any {
+  get staticQueryParams(): URLParameters {
     return this._staticQueryParams;
   }
 
-  private _staticQueryParams: any = {};
+  private _staticQueryParams: URLParameters = {};
 
   // Observable exposing the breadcrumb hierarchy
   constructor(
@@ -30,11 +31,13 @@ export class RoutingService {
     }
   }
 
-  public addStaticParams(params: Record<string, string | undefined | null>) {
+  public addStaticParams(
+    params: Record<string, string | boolean | number | undefined | null>,
+  ) {
     this._staticQueryParams = {
-      ...removeEmptyProperties<Record<string, string | undefined | null>>(
-        params,
-      ),
+      ...removeEmptyProperties<
+        Record<string, string | boolean | number | undefined | null>
+      >(params),
       ...params,
     };
   }

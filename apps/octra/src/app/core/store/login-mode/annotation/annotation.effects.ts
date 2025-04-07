@@ -866,7 +866,6 @@ export class AnnotationEffects {
                       const regex = /mediatype=([^&]+)/g;
                       const matches = regex.exec(decodedURL);
                       mediaType = matches ? matches[1] : mediaType;
-                      decodedURL = decodedURL.replace(/\?.*$/g, '');
                     }
 
                     const nameFromURL = extractFileNameFromURL(decodedURL);

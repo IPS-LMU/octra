@@ -34,10 +34,16 @@ export const selectAppSettings = pipe(
 );
 
 export interface URLParameters {
-  audio: string;
-  transcript: string;
-  embedded: boolean;
-  host: string;
+  audio_url?: string;
+  audio_name?: string;
+  audio_type?: string;
+  auto_playback?: boolean;
+  annotationExportType?: string;
+  host?: string;
+  transcript?: string;
+  readonly?: boolean;
+  embedded?: boolean;
+  bottomNav?: boolean;
 }
 
 export interface ApplicationState {

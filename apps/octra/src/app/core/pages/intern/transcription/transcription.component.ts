@@ -501,7 +501,9 @@ export class TranscriptionComponent
     if (this.interface) {
       this.changeEditor(this.interface)
         .then(() => {
-          (this._currentEditor.instance as any).afterFirstInitialization();
+          if (this.routingService.staticQueryParams.auto_playback !== false) {
+            (this._currentEditor.instance as any).afterFirstInitialization();
+          }
         })
         .catch((error) => {
           console.error(error);

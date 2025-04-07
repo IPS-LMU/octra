@@ -43,6 +43,7 @@ import { IDBActions } from '../idb/idb.actions';
 import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
+import { URLParameters } from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -58,19 +59,26 @@ export class ApplicationEffects {
         ).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
         this.appStorage.saveCurrentPageAsLastPage();
 
-        const queryParams = {
-          audio_url: this.getParameterByName('audio_url'),
-          annotationExportType: this.getParameterByName('aType'),
-          audio_name: this.getParameterByName('audio_name'),
-          audio_type: this.getParameterByName('audio_type'),
-          host: this.getParameterByName('host'),
-          transcript: this.getParameterByName('transcript'),
-          readonly: this.getParameterByName('readonly'),
-          embedded: this.getParameterByName('embedded'),
-          bottomNav: this.getParameterByName('bottomNav'),
+        const queryParams: URLParameters = {
+          audio_url: this.getParameterByName<string>('audio_url'),
+          audio_name: this.getParameterByName<string>('audio_name'),
+          audio_type: this.getParameterByName<string>('audio_type'),
+          auto_playback: this.getParameterByName<boolean>('auto_playback'),
+          annotationExportType: this.getParameterByName<string>('aType'),
+          host: this.getParameterByName<string>('host'),
+          transcript: this.getParameterByName<string>('transcript'),
+          readonly: this.getParameterByName<boolean>('readonly'),
+          embedded: this.getParameterByName<boolean>('embedded'),
+          bottomNav: this.getParameterByName<boolean>('bottomNav'),
         };
 
-        this.routerService.addStaticParams(queryParams);
+        if ((queryParams.embedded as any) === 1) {
+          queryParams.embedded = true;
+        } else if ((queryParams.embedded as any) === 0) {
+          queryParams.embedded = false;
+        }
+
+        this.routerService.addStaticParams(queryParams as any);
 
         this.initConsoleLogging();
         return of(ApplicationActions.loadLanguage.do());
@@ -1188,19 +1196,27 @@ export class ApplicationEffects {
     }
   }
 
-  private getParameterByName(name: string, url?: string) {
+  private getParameterByName<T>(name: string, url?: string): T | undefined {
     if (!url) {
       url = document.location.href;
     }
     name = name.replace(/[[]]/g, '\\$&');
     const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
     const results = regExp.exec(url);
-    if (!results) {
+    if (!results || !results[2]) {
       return undefined;
     }
-    if (!results[2]) {
-      return '';
+
+    const result = decodeURIComponent(results[2].replace(/\+/g, ' '));
+
+    if (result === 'undefined' || result === 'null') {
+      return undefined;
+    } else if (result === 'true' || result === 'false') {
+      return (result === 'true') as any;
+    } else if (/^[0-9]+$/g.exec(result)) {
+      return Number(result) as any;
     }
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+
+    return result as any;
   }
 }

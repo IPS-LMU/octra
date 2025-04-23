@@ -1,0 +1,29 @@
+body {
+    padding-top: 5rem;
+}
+
+.starter-template {
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.half {
+    width: 50%;
+}
+
+table tr .bg-danger {
+    color: white;
+}
+
+table .border-red{
+    border-right: 5px solid red;
+}
+
+table .border-green{
+    border-right: 5px solid forestgreen;
+}
+
+table thead td{
+    font-weight: bold;
+    text-align: center;
+}

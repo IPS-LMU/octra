@@ -59,3 +59,6 @@ deploy
 
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+/apps/translations/translations
+/apps/translations/config.php

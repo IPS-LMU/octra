@@ -1218,6 +1218,44 @@ export class AnnotationEffects {
     { dispatch: false },
   );
 
+  somethingChanged$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          AnnotationActions.changeCurrentLevelItems.do,
+          AnnotationActions.changeCurrentItemById.do,
+          AnnotationActions.changeAnnotationLevel.do,
+          AnnotationActions.overwriteTranscript.do,
+          AnnotationActions.combinePhrases.success,
+          AnnotationActions.removeAnnotationLevel.do,
+          AnnotationActions.removeCurrentLevelItems.do,
+          AnnotationActions.addCurrentLevelItems.do,
+          AnnotationActions.addAnnotationLevel.do,
+        ),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          const currentMode = getModeState(state);
+          const annotation = currentMode?.transcript.serialize(
+            currentMode.audio.fileName,
+            this.audio.audioManager.resource.info.sampleRate,
+            this.audio.audioManager.resource.info.duration,
+          );
+          const converter = new AnnotJSONConverter();
+          const result = converter.export(annotation);
+          window.parent.postMessage(
+            {
+              data: {
+                annotation: result.file,
+              },
+              status: 'changed',
+            },
+            '*',
+          );
+        }),
+      ),
+    { dispatch: false },
+  );
+
   afterAnnotationSent$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.sendOnlineAnnotation.success),

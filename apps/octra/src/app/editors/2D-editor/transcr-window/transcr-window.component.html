@@ -163,10 +163,17 @@
               </span>
             }
             @if (!easyMode) {
-              <span>
-                {{ 'g.save' | transloco }} &
-                {{ 'segments.previous' | transloco }}
-              </span>
+              @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
+                <span>
+                  {{ 'g.save' | transloco }} &
+                  {{ 'segments.previous' | transloco }}
+                </span>
+              } @else {
+                <span>
+                  {{ 'g.apply' | transloco }} &
+                  {{ 'segments.previous' | transloco }}
+                </span>
+              }
             }
           </button>
         </div>
@@ -181,10 +188,17 @@
               </span>
             }
             @if (!easyMode) {
-              <span>
-                {{ 'g.save' | transloco }} &
-                {{ 'g.close' | transloco }}
-              </span>
+              @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
+                <span>
+                  {{ 'g.save' | transloco }} &
+                  {{ 'g.close' | transloco }}
+                </span>
+              } @else {
+                <span>
+                  {{ 'g.apply' | transloco }} &
+                  {{ 'g.close' | transloco }}
+                </span>
+              }
             }
           </button>
         </div>
@@ -201,10 +215,17 @@
                 </span>
               }
               @if (!easyMode) {
-                <span>
-                  {{ 'g.save' | transloco }} &
-                  {{ 'segments.next' | transloco }}
-                </span>
+                @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
+                  <span>
+                    {{ 'g.save' | transloco }} &
+                    {{ 'segments.next' | transloco }}
+                  </span>
+                } @else {
+                  <span>
+                    {{ 'g.apply' | transloco }} &
+                    {{ 'segments.next' | transloco }}
+                  </span>
+                }
               }
             </button>
           </div>
@@ -223,10 +244,17 @@
                 </span>
               }
               @if (!easyMode) {
-                <span>
-                  {{ 'g.save' | transloco }} &
-                  {{ 'g.overview' | transloco }}
-                </span>
+                @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
+                  <span>
+                    {{ 'g.save' | transloco }} &
+                    {{ 'g.overview' | transloco }}
+                  </span>
+                } @else {
+                  <span>
+                    {{ 'g.apply' | transloco }} &
+                    {{ 'g.overview' | transloco }}
+                  </span>
+                }
               }
             </button>
           </div>

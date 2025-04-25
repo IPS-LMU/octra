@@ -66,6 +66,7 @@ import { ApplicationStoreService } from '../../../core/store/application/applica
 import { ASRProcessStatus } from '../../../core/store/asr';
 import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
 import { AnnotationStoreService } from '../../../core/store/login-mode/annotation/annotation.store.service';
+import { RoutingService } from '../../../core/shared/service/routing.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -364,6 +365,7 @@ export class TranscrWindowComponent
     private alertService: AlertService,
     private navbarService: NavbarService,
     private activeModal: NgbActiveModal,
+    protected routingService: RoutingService,
   ) {
     super();
 

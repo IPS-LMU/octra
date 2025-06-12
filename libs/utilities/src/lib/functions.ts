@@ -488,3 +488,24 @@ export function filterUnique<T>(array: T[], isEqual: (a: T, b: T) => boolean) {
     (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i
   );
 }
+
+/**
+ * removes given Properties from an object
+ * @param obj
+ * @param properties
+ */
+export function removeProperties<T>(obj: T, properties: (keyof T)[]) {
+  const copy = {
+    ...obj,
+  };
+
+  if (copy) {
+    const keys = Object.keys(copy);
+    for (const property of properties) {
+      if (keys.find((a) => a === property)) {
+        delete copy[property];
+      }
+    }
+  }
+  return copy;
+}

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { FeedbackRequestPropertiesDto } from '@octra/api-types';
-import { OctraAPIService, removeProperties } from '@octra/ngx-octra-api';
-import { getFileSize } from '@octra/utilities';
+import { OctraAPIService } from '@octra/ngx-octra-api';
+import { getFileSize, removeProperties } from '@octra/utilities';
 import { BrowserInfo } from '@octra/web-media';
 import { DateTime } from 'luxon';
 import { Observable } from 'rxjs';

@@ -8,23 +8,23 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/octra",
         "index": "apps/octra/src/index.html",
         "main": "apps/octra/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/octra/tsconfig.app.json",
         "allowedCommonJsDependencies": [
           "jodit-angular",
           "ajv",
           "x2js",
           "konva",
-          "platform"
+          "platform",
+          "@videojs",
+          "music-metadata",
+          "mux.js",
+          "videojs-vtt.js"
         ],
         "assets": [
           "apps/octra/src/assets",
@@ -151,7 +151,8 @@
           "buildTarget": "octra:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "continuous": true
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -161,15 +162,11 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/octra/jest.config.ts"
       }
@@ -184,9 +181,7 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "angular",
-        "postTargets": [
-          "octra:github"
-        ],
+        "postTargets": ["octra:github"],
         "baseBranch": "main",
         "releaseAs": "patch",
         "commitMessageFormat": "build({projectName}): release version ${version}"

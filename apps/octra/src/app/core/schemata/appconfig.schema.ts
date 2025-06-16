@@ -1,7 +1,7 @@
 import { JSONSchema4 } from 'json-schema';
 
 export const AppConfigSchema: JSONSchema4 = {
-  $id: '2.0.0',
+  $id: '2.1.0',
   required: ['version', 'octra'],
   type: 'object',
   properties: {
@@ -25,7 +25,7 @@ export const AppConfigSchema: JSONSchema4 = {
       type: 'object',
     },
     octra: {
-      required: ['database', 'supportEmail', 'allowed_browsers', 'languages'],
+      required: ['database', 'supportEmail', 'languages'],
       properties: {
         database: {
           required: ['name'],
@@ -51,22 +51,6 @@ export const AppConfigSchema: JSONSchema4 = {
             },
           },
           type: 'object',
-        },
-        allowed_browsers: {
-          items: {
-            properties: {
-              name: {
-                type: 'string',
-              },
-              version: {
-                type: 'string',
-              },
-            },
-            type: 'object',
-          },
-          type: 'array',
-          description:
-            "You can define the browsers which can be used. Because OCTRA was tested in Chrome it's recommended to use Chrome. If there is no entry all browsers are allowed.",
         },
         languages: {
           items: {

@@ -8,24 +8,6 @@
       "enabled": true
     },
     "supportEmail": "no-email-provided@email.com",
-    "allowed_browsers": [
-      {
-        "name": "Chrome",
-        "version": ""
-      },
-      {
-        "name": "Firefox",
-        "version": ""
-      },
-      {
-        "name": "Opera",
-        "version": ""
-      },
-      {
-        "name": "Microsoft Edge",
-        "version": ""
-      }
-    ],
     "languages": ["en", "de", "nl", "it", "ko", "zh"],
     "audioExamples": [
       {

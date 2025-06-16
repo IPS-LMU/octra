@@ -5,6 +5,7 @@ import { LoadingStatus, LoginMode } from '../index';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ApplicationActions } from './application.actions';
 import { ApplicationState } from './index';
+import { AppSettings } from '../../obj';
 
 export const initialState: ApplicationState = {
   initialized: false,
@@ -99,7 +100,7 @@ export const reducer = createReducer(
     (state: ApplicationState, { settings }) => ({
       ...state,
       appSettingsLoaded: true,
-      appConfiguration: settings,
+      appConfiguration: new AppSettings(settings),
       loading: {
         ...state.loading,
         status: LoadingStatus.LOADING,

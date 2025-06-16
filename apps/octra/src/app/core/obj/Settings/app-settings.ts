@@ -1,4 +1,4 @@
-export interface AppSettings {
+export class AppSettings {
   version: string;
   api?: {
     url: string;
@@ -47,6 +47,33 @@ export interface AppSettings {
     enabled: boolean;
     url: string;
   };
+
+  constructor(partial?: Partial<AppSettings>) {
+    Object.assign(this, {
+      ...partial,
+      octra: {
+        ...partial.octra,
+        allowed_browsers: [
+          {
+            name: 'Chrome',
+            version: '',
+          },
+          {
+            name: 'Firefox',
+            version: '',
+          },
+          {
+            name: 'Opera',
+            version: '',
+          },
+          {
+            name: 'Microsoft Edge',
+            version: '',
+          },
+        ],
+      },
+    });
+  }
 }
 
 export interface ServiceProvider {

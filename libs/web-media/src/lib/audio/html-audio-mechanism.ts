@@ -9,7 +9,8 @@ import {
   MusicMetadataFormat,
   WavFormat,
 } from '@octra/web-media';
-import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
+import { Howl } from 'howler';
+import { concat, map, Observable, Subject } from 'rxjs';
 import { SourceType } from '../types';
 import {
   AudioMechanism,
@@ -17,11 +18,8 @@ import {
 } from './audio-mechanism';
 
 export class HtmlAudioMechanism extends AudioMechanism {
-  private _audio?: HTMLAudioElement;
-  private onEnd = () => {};
-  private _playbackEndChecker?: Subscription;
-  private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
   private callBacksAfterEnded: (() => void)[] = [];
+  private _howler?: Howl;
 
   private audioFormats: AudioFormat[] = [
     new WavFormat(),
@@ -30,13 +28,13 @@ export class HtmlAudioMechanism extends AudioMechanism {
   private decoder?: AudioDecoder;
 
   get playPosition(): SampleUnit | undefined {
-    if (!this._audio || !this._resource?.info?.sampleRate) {
+    if (!this._howler || !this._resource?.info?.sampleRate) {
       return undefined;
     }
 
     return new SampleUnit(
       SampleUnit.calculateSamples(
-        this._audio.currentTime,
+        this._howler.seek(),
         this._resource.info.sampleRate,
       ),
       this._resource.info.sampleRate,
@@ -44,8 +42,8 @@ export class HtmlAudioMechanism extends AudioMechanism {
   }
 
   set playPosition(value: SampleUnit) {
-    if (this._audio) {
-      this._audio.currentTime = value.seconds;
+    if (this._howler) {
+      this._howler.seek(value.seconds);
     }
   }
 
@@ -93,12 +91,17 @@ export class HtmlAudioMechanism extends AudioMechanism {
       throw new Error(`HTMLAudioMechanism needs an url to the audio file`);
     }
 
-    this._audio = new Audio();
-    this._audio.autoplay = false;
-    this._audio.defaultPlaybackRate = 1;
-    this._audio.defaultMuted = false;
-    this._audio.loop = false;
-    this._audio.src = url;
+    this._howler = new Howl({
+      src: url,
+      sprite: {
+        test: [0, 5000],
+      },
+      html5: true,
+      autoplay: false,
+      rate: 1,
+      mute: false,
+      loop: false,
+    });
 
     this.initAudioContext();
   }
@@ -341,10 +344,6 @@ export class HtmlAudioMechanism extends AudioMechanism {
     onEnd: () => void,
     onError: () => void,
   ) {
-    this.onEnd = () => {
-      this.endPlayBack();
-      onEnd();
-    };
     await super.play(
       audioSelection,
       volume,
@@ -355,47 +354,36 @@ export class HtmlAudioMechanism extends AudioMechanism {
       onError,
     );
 
-    if (!this._audio) {
-      throw new Error(`AudioElement not initialized`);
+    if (!this._howler) {
+      throw new Error(`Howler not initialized`);
     }
 
     if (!this.audioContext) {
       throw new Error('AudioContext not initialized');
     }
 
-    this._audio.addEventListener('canplay', this.initPlayback);
-    this._audio!.addEventListener('pause', this.onPlayBackChanged);
-    this._audio!.addEventListener('ended', this.onPlayBackChanged);
-    this._audio!.addEventListener('error', this.onPlaybackFailed);
+    this._howler.on('play', this.initPlayback);
+    this._howler!.on('pause', this.onPause);
+    this._howler!.on('end', () => {
+      onEnd();
+      this.onEnd();
+    });
+    this._howler.on('playerror', () => {
+      onError();
+      this.runAllCallbacksOnEnd();
+    });
 
-    await this.audioContext.resume();
-    this.afterAudioContextResumed();
-    this._audio.onerror = onError;
+    // this.playPosition = audioSelection.start!.clone();
 
-    this.playPosition = audioSelection.start!.clone();
-    const playPromise = this._audio.play();
-
-    if (playPromise !== undefined) {
-      try {
-        await playPromise;
-      } catch (error: any) {
-        this._playbackEndChecker?.unsubscribe();
-        if (!this.playOnHover) {
-          if (error.name && error.name === 'NotAllowedError') {
-            // no permission
-            this.missingPermission.next();
-          }
-
-          this.statechange.error(new Error(error));
-          throw new Error(error);
-        }
-      }
-    }
+    console.log(
+      `play at ${this._howler.seek()} (audioSelection: ${audioSelection.start!.clone().seconds})`,
+    );
+    this._howler.play('test');
   }
 
   private initPlayback = () => {
-    if (!this._audio) {
-      throw new Error(`AudioElement not initialized`);
+    if (!this._howler) {
+      throw new Error(`Howler not initialized`);
     }
     if (!this.audioSelection) {
       throw new Error(`AudioSelection not initialized`);
@@ -405,61 +393,25 @@ export class HtmlAudioMechanism extends AudioMechanism {
     }
 
     this.changeStatus(PlayBackStatus.PLAYING);
-
-    this._playbackEndChecker = timer(
-      Math.round(this.audioSelection.duration.unix / this._playbackRate),
-    ).subscribe({
-      next: this.onEnd,
-    });
   };
 
   override initializeSource() {
     if (!this.audioContext) {
       throw new Error('AudioContext not initialized');
     }
-    if (!this._audio) {
-      throw new Error(`AudioElement not initialized`);
+    if (!this._howler) {
+      throw new Error(`Howler not initialized`);
     }
-
-    this._source = this.audioContext.createMediaElementSource(this._audio);
-  }
-
-  override afterAudioContextResumed() {
-    super.afterAudioContextResumed();
-
-    // Firefox issue causes playBackRate working only for volume up to 1
-    // create a gain node
-    this._gainNode!.gain.value = this.volume!;
-    this._source!.connect(this._gainNode!);
-    // connect the gain node to an output destination
-    this._gainNode!.connect(this.audioContext!.destination);
-    this._audio!.playbackRate = this._playbackRate!;
   }
 
   private removeEventListeners() {
-    this._audio?.removeEventListener('ended', this.onPlayBackChanged);
-    this._audio?.removeEventListener('pause', this.onPlayBackChanged);
-    this._audio?.removeEventListener('error', this.onPlaybackFailed);
-    this._audio?.removeEventListener('canplay', this.initPlayback);
-    this._gainNode?.disconnect();
-    this._source?.disconnect();
-    this._playbackEndChecker?.unsubscribe();
+    this._howler?.off('ended');
+    this._howler?.off('pause');
+    this._howler?.off('error');
+    this._howler?.off('playing');
   }
 
-  private onPlayBackChanged = () => {
-    this.removeEventListeners();
-    switch (this._statusRequest) {
-      case PlayBackStatus.PAUSED:
-        this.onPause();
-        break;
-      case PlayBackStatus.STOPPED:
-        this.onStop();
-        break;
-      default:
-        this.onEnded();
-        break;
-    }
-
+  private runAllCallbacksOnEnd = () => {
     for (const callBacksAfterEndedElement of this.callBacksAfterEnded) {
       callBacksAfterEndedElement();
     }
@@ -472,33 +424,34 @@ export class HtmlAudioMechanism extends AudioMechanism {
 
   private onPause = () => {
     this.changeStatus(PlayBackStatus.PAUSED);
+    this.runAllCallbacksOnEnd();
   };
 
   private onStop = () => {
     this.changeStatus(PlayBackStatus.STOPPED);
+    this.runAllCallbacksOnEnd();
   };
 
-  private onEnded = () => {
+  private onEnd = () => {
     if (this._state === PlayBackStatus.PLAYING) {
       // audio ended normally
       this.changeStatus(PlayBackStatus.ENDED);
     }
 
-    this._gainNode?.disconnect();
+    this.runAllCallbacksOnEnd();
   };
 
   override stop(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (!this._audio) {
-        reject(new Error('Missing Audio instance.'));
+      if (!this._howler) {
+        reject(new Error('Missing Howler instance.'));
         return;
       }
       if (this._state === 'PLAYING') {
-        this._statusRequest = PlayBackStatus.STOPPED;
         this.callBacksAfterEnded.push(() => {
           resolve();
         });
-        this._audio.pause();
+        this._howler.stop();
       } else {
         // ignore
         resolve();
@@ -509,20 +462,15 @@ export class HtmlAudioMechanism extends AudioMechanism {
   override pause(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this._state === 'PLAYING') {
-        this._statusRequest = PlayBackStatus.PAUSED;
+        this._howler?.pause();
         this.callBacksAfterEnded.push(() => {
           resolve();
         });
-        this._audio?.pause();
+        console.log(`Pause at ${this.playPosition?.seconds}`);
       } else {
         reject('cant pause because not playing');
       }
     });
-  }
-
-  private endPlayBack() {
-    this._statusRequest = PlayBackStatus.ENDED;
-    this._audio?.pause();
   }
 
   /**

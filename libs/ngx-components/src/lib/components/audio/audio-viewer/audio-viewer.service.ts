@@ -1221,7 +1221,9 @@ export class AudioViewerService {
   };
 
   private doPlayHeadAnimation = () => {
-    this.updatePlayCursor();
+    window.requestAnimationFrame(() => {
+      this.updatePlayCursor();
+    });
   };
 
   public updatePlayCursor = () => {
@@ -2401,12 +2403,6 @@ export class AudioViewerService {
                       const segment = this.currentLevel.items[
                         segmentI
                       ] as OctraAnnotationSegment<ASRContext>;
-                      console.log('set break');
-                      console.log(`
-                      ${segmentI > -1} &&
-                        ${segment.context?.asr?.isBlockedBy} === undefined &&
-                        ${this.silencePlaceholder !== undefined}
-`);
                       if (
                         segmentI > -1 &&
                         segment.context?.asr?.isBlockedBy === undefined &&

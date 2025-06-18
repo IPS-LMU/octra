@@ -9,7 +9,7 @@ import {
   MusicMetadataFormat,
   WavFormat,
 } from '@octra/web-media';
-import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
+import { concat, map, Observable, Subject, Subscription } from 'rxjs';
 import { SourceType } from '../types';
 import {
   AudioMechanism,
@@ -19,9 +19,18 @@ import {
 export class HtmlAudioMechanism extends AudioMechanism {
   private _audio?: HTMLAudioElement;
   private onEnd = () => {};
+  private onEndTriggered = false;
   private _playbackEndChecker?: Subscription;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
   private callBacksAfterEnded: (() => void)[] = [];
+
+  timings = {
+    playbackStarted: 0,
+    currentTimeDuration: 0,
+    currentTimeStart: 0,
+    lastCurrentTime: 0,
+    lastCurrentTimestamp: 0,
+  };
 
   private audioFormats: AudioFormat[] = [
     new WavFormat(),
@@ -33,14 +42,24 @@ export class HtmlAudioMechanism extends AudioMechanism {
     if (!this._audio || !this._resource?.info?.sampleRate) {
       return undefined;
     }
+    let currentTime = this._audio.currentTime;
 
-    return new SampleUnit(
-      SampleUnit.calculateSamples(
-        this._audio.currentTime,
-        this._resource.info.sampleRate,
-      ),
+    const result = new SampleUnit(
+      SampleUnit.calculateSamples(currentTime, this._resource.info.sampleRate),
       this._resource.info.sampleRate,
     );
+
+    if (
+      this.audioSelection &&
+      Number(this._audio.currentTime.toFixed(6)) >=
+        Number(this.audioSelection!.end.seconds.toFixed(6)) &&
+      !this.onEndTriggered
+    ) {
+      this.onEndTriggered = true;
+      this.onEnd();
+    }
+
+    return result;
   }
 
   set playPosition(value: SampleUnit) {
@@ -94,6 +113,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     }
 
     this._audio = new Audio();
+    this._audio.addEventListener('canplay', this.onCanPlay);
     this._audio.autoplay = false;
     this._audio.defaultPlaybackRate = 1;
     this._audio.defaultMuted = false;
@@ -341,6 +361,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
     onEnd: () => void,
     onError: () => void,
   ) {
+    this.onEndTriggered = false;
     this.onEnd = () => {
       this.endPlayBack();
       onEnd();
@@ -363,22 +384,26 @@ export class HtmlAudioMechanism extends AudioMechanism {
       throw new Error('AudioContext not initialized');
     }
 
-    this._audio.addEventListener('canplay', this.initPlayback);
-    this._audio!.addEventListener('pause', this.onPlayBackChanged);
-    this._audio!.addEventListener('ended', this.onPlayBackChanged);
-    this._audio!.addEventListener('error', this.onPlaybackFailed);
+    this._audio.addEventListener('play', this.onPlay);
+    this._audio.addEventListener('pause', this.onPlayBackChanged);
+    this._audio.addEventListener('ended', this.onPlayBackChanged);
+    this._audio.addEventListener('error', this.onPlaybackFailed);
 
+    this._audio.load();
     await this.audioContext.resume();
     this.afterAudioContextResumed();
     this._audio.onerror = onError;
-
     this.playPosition = audioSelection.start!.clone();
+    console.log(
+      `play from ${this.playPosition.seconds} with speed ${this.playBackRate}`,
+    );
     const playPromise = this._audio.play();
 
     if (playPromise !== undefined) {
       try {
         await playPromise;
       } catch (error: any) {
+        console.error(error);
         this._playbackEndChecker?.unsubscribe();
         if (!this.playOnHover) {
           if (error.name && error.name === 'NotAllowedError') {
@@ -393,24 +418,21 @@ export class HtmlAudioMechanism extends AudioMechanism {
     }
   }
 
-  private initPlayback = () => {
+  private onCanPlay = () => {
     if (!this._audio) {
       throw new Error(`AudioElement not initialized`);
     }
+
     if (!this.audioSelection) {
       throw new Error(`AudioSelection not initialized`);
     }
     if (!this._playbackRate) {
       throw new Error(`PlaybackRate not initialized`);
     }
+  };
 
+  private onPlay = () => {
     this.changeStatus(PlayBackStatus.PLAYING);
-
-    this._playbackEndChecker = timer(
-      Math.round(this.audioSelection.duration.unix / this._playbackRate),
-    ).subscribe({
-      next: this.onEnd,
-    });
   };
 
   override initializeSource() {
@@ -440,13 +462,20 @@ export class HtmlAudioMechanism extends AudioMechanism {
     this._audio?.removeEventListener('ended', this.onPlayBackChanged);
     this._audio?.removeEventListener('pause', this.onPlayBackChanged);
     this._audio?.removeEventListener('error', this.onPlaybackFailed);
-    this._audio?.removeEventListener('canplay', this.initPlayback);
+    this._audio?.removeEventListener('play', this.onPlay);
     this._gainNode?.disconnect();
     this._source?.disconnect();
     this._playbackEndChecker?.unsubscribe();
   }
 
   private onPlayBackChanged = () => {
+    const duration = Date.now() - this.timings.playbackStarted;
+    this.playPosition = this.audioSelection!.start.add(
+      SampleUnit.fromMiliSeconds(
+        duration * this.playBackRate,
+        this._resource!.info.sampleRate,
+      ),
+    );
     this.removeEventListeners();
     switch (this._statusRequest) {
       case PlayBackStatus.PAUSED:

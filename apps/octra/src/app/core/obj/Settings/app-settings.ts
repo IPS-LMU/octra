@@ -70,6 +70,10 @@ export class AppSettings {
             name: 'Microsoft Edge',
             version: '',
           },
+          {
+            name: 'Safari',
+            version: '',
+          },
         ],
       },
     });

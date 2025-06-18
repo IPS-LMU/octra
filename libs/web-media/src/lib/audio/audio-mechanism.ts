@@ -90,7 +90,7 @@ export abstract class AudioMechanism {
       window.webkitAudioContext || // Safari and old versions of Chrome
       window.mozAudioContext ||
       false;
-    if (audioContext) {
+    if (!this._audioContext && audioContext) {
       this._audioContext = new audioContext();
     }
   }
@@ -148,6 +148,7 @@ export abstract class AudioMechanism {
   }
 
   protected changeStatus(newStatus: PlayBackStatus) {
+    console.log('changeStatus', newStatus);
     this._state = newStatus;
     this.statechange.next(this._state);
   }

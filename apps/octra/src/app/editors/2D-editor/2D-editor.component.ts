@@ -88,7 +88,7 @@ export class TwoDEditorComponent
   };
 
   public audioManager!: AudioManager;
-  public audioChunkLines!: any;
+  public audioChunkLines!: AudioChunk;
   public audioChunkWindow!: AudioChunk;
   public audioChunkMagnifier!: AudioChunk;
   public miniMagnifierSettings!: AudioviewerConfig;
@@ -111,6 +111,10 @@ export class TwoDEditorComponent
       type: 'audio',
       timestamp: Date.now(),
     });
+    console.log(
+      'try to pause',
+      this.audioChunkLines.audioManager.audioMechanism.state,
+    );
     if (this.audioChunkLines.isPlaying) {
       this.audioChunkLines.pausePlayback().catch((error: any) => {
         console.error(error);

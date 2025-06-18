@@ -20,6 +20,9 @@ import {
 export class HtmlAudioMechanism extends AudioMechanism {
   private callBacksAfterEnded: (() => void)[] = [];
   private _howler?: Howl;
+  private onEndTriggered = false;
+  private ignorePause = false;
+  private url?: string;
 
   private audioFormats: AudioFormat[] = [
     new WavFormat(),
@@ -30,6 +33,18 @@ export class HtmlAudioMechanism extends AudioMechanism {
   get playPosition(): SampleUnit | undefined {
     if (!this._howler || !this._resource?.info?.sampleRate) {
       return undefined;
+    }
+
+    if (
+      this.audioSelection &&
+      Number(this._howler.seek().toFixed(6)) >=
+        Number(this.audioSelection!.end.seconds.toFixed(6)) &&
+      !this.onEndTriggered
+    ) {
+      this.onEndTriggered = true;
+      this.ignorePause = true;
+      this._howler.pause();
+      this.onEnd();
     }
 
     return new SampleUnit(
@@ -65,18 +80,15 @@ export class HtmlAudioMechanism extends AudioMechanism {
       this.prepareAudioChannel(options).pipe(
         map(({ decodeProgress }) => {
           if (decodeProgress === 1) {
-            this.prepareAudioPlayback({
-              ...options,
-              url: URL.createObjectURL(
-                new File(
-                  [this._resource!.arraybuffer!],
-                  this._resource!.info.fullname,
-                  {
-                    type: this._resource!.info.type,
-                  },
-                ),
+            this.url = URL.createObjectURL(
+              new File(
+                [this._resource!.arraybuffer!],
+                this._resource!.info.fullname,
+                {
+                  type: this._resource!.info.type,
+                },
               ),
-            });
+            );
           }
           return {
             progress: decodeProgress,
@@ -86,24 +98,26 @@ export class HtmlAudioMechanism extends AudioMechanism {
     );
   }
 
-  private prepareAudioPlayback({ url }: AudioMechanismPrepareOptions) {
-    if (!url) {
+  private prepareAudioPlayback() {
+    if (!this.url) {
       throw new Error(`HTMLAudioMechanism needs an url to the audio file`);
     }
 
+    if (this._howler) {
+      console.log('unload howler');
+      this._howler.unload();
+    }
+
     this._howler = new Howl({
-      src: url,
-      sprite: {
-        test: [0, 5000],
-      },
+      src: this.url,
+      format: this._resource?.extension.replace('.', ''),
       html5: true,
       autoplay: false,
       rate: 1,
       mute: false,
       loop: false,
     });
-
-    this.initAudioContext();
+    this._howler.load();
   }
 
   private prepareAudioChannel({
@@ -344,6 +358,11 @@ export class HtmlAudioMechanism extends AudioMechanism {
     onEnd: () => void,
     onError: () => void,
   ) {
+    console.log('a');
+    this.onEndTriggered = false;
+    this.ignorePause = false;
+    this.removeEventListeners();
+
     await super.play(
       audioSelection,
       volume,
@@ -353,6 +372,8 @@ export class HtmlAudioMechanism extends AudioMechanism {
       onEnd,
       onError,
     );
+    this.prepareAudioPlayback();
+    console.log('b');
 
     if (!this._howler) {
       throw new Error(`Howler not initialized`);
@@ -362,26 +383,34 @@ export class HtmlAudioMechanism extends AudioMechanism {
       throw new Error('AudioContext not initialized');
     }
 
-    this._howler.on('play', this.initPlayback);
+    this._howler!.on('play', this.onPlay);
     this._howler!.on('pause', this.onPause);
+    this._howler!.on('seek', this.onSeek);
+    this._howler!.on('stop', this.onStop);
     this._howler!.on('end', () => {
       onEnd();
       this.onEnd();
     });
     this._howler.on('playerror', () => {
       onError();
+      this.removeEventListeners();
       this.runAllCallbacksOnEnd();
     });
-
-    // this.playPosition = audioSelection.start!.clone();
+    console.log('c');
 
     console.log(
       `play at ${this._howler.seek()} (audioSelection: ${audioSelection.start!.clone().seconds})`,
     );
-    this._howler.play('test');
+    this._howler.once('play', () => {
+      this.playPosition = audioSelection.start!.clone();
+      console.log('e');
+    });
+    this._howler.play();
+    console.log('f');
   }
 
   private initPlayback = () => {
+    console.log('called play');
     if (!this._howler) {
       throw new Error(`Howler not initialized`);
     }
@@ -405,10 +434,13 @@ export class HtmlAudioMechanism extends AudioMechanism {
   }
 
   private removeEventListeners() {
-    this._howler?.off('ended');
-    this._howler?.off('pause');
-    this._howler?.off('error');
-    this._howler?.off('playing');
+    this._howler?.off('end', this.onEnd);
+    this._howler?.off('pause', this.onPause);
+    this._howler?.off('play', this.onPlay);
+    this._howler?.off('playerror');
+    this._howler?.off('stop', this.onStop);
+    this._howler?.off('seek', this.onSeek);
+    console.log('removed EventListeners');
   }
 
   private runAllCallbacksOnEnd = () => {
@@ -418,17 +450,28 @@ export class HtmlAudioMechanism extends AudioMechanism {
     this.callBacksAfterEnded = [];
   };
 
-  private onPlaybackFailed = (error: any) => {
-    console.error(error);
+  private onPlay = () => {
+    console.log('called play');
+    this.changeStatus(PlayBackStatus.PLAYING);
   };
 
   private onPause = () => {
-    this.changeStatus(PlayBackStatus.PAUSED);
-    this.runAllCallbacksOnEnd();
+    if (!this.ignorePause) {
+      console.log('called pause');
+      this.changeStatus(PlayBackStatus.PAUSED);
+      this.removeEventListeners();
+      this.runAllCallbacksOnEnd();
+    }
+  };
+
+  private onSeek = () => {
+    console.log('called seek');
   };
 
   private onStop = () => {
+    console.log('stopped??');
     this.changeStatus(PlayBackStatus.STOPPED);
+    this.removeEventListeners();
     this.runAllCallbacksOnEnd();
   };
 
@@ -438,11 +481,13 @@ export class HtmlAudioMechanism extends AudioMechanism {
       this.changeStatus(PlayBackStatus.ENDED);
     }
 
+    this.removeEventListeners();
     this.runAllCallbacksOnEnd();
   };
 
   override stop(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      console.log('appy stop??');
       if (!this._howler) {
         reject(new Error('Missing Howler instance.'));
         return;
@@ -461,6 +506,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
 
   override pause(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      console.log(`pause ${this._state}`);
       if (this._state === 'PLAYING') {
         this._howler?.pause();
         this.callBacksAfterEnded.push(() => {

@@ -61,12 +61,12 @@ import {
   UserInteractionsService,
 } from '../../../core/shared/service';
 import { AppStorageService } from '../../../core/shared/service/appstorage.service';
+import { RoutingService } from '../../../core/shared/service/routing.service';
 import { ShortcutService } from '../../../core/shared/service/shortcut.service';
 import { ApplicationStoreService } from '../../../core/store/application/application-store.service';
 import { ASRProcessStatus } from '../../../core/store/asr';
 import { AsrStoreService } from '../../../core/store/asr/asr-store-service.service';
 import { AnnotationStoreService } from '../../../core/store/login-mode/annotation/annotation.store.service';
-import { RoutingService } from '../../../core/shared/service/routing.service';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -125,6 +125,8 @@ export class TranscrWindowComponent
   private guidelines!: OctraGuidelines;
   private breakMarkerCode?: string;
   private idCounter = 1;
+
+  protected audioViewerHeight = 200;
 
   @Output()
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
@@ -483,7 +485,8 @@ export class TranscrWindowComponent
     this.magnifier.name = 'transcr-window viewer';
     this.magnifier.settings.margin.top = 5;
     this.magnifier.settings.margin.bottom = 0;
-    this.magnifier.settings.lineheight = window.innerHeight > 760 ? 200 : 100;
+    this.audioViewerHeight = window.innerHeight > 760 ? 200 : 100;
+    this.magnifier.settings.lineheight = this.audioViewerHeight;
     this.magnifier.settings.justifySignalHeight = true;
     this.magnifier.settings.boundaries.enabled = false;
     this.magnifier.settings.boundaries.readonly = true;
@@ -1522,10 +1525,11 @@ export class TranscrWindowComponent
   onResize($event: Event) {
     if (this.magnifier) {
       if (window.innerHeight <= 760) {
-        this.magnifier.settings.lineheight = 100;
+        this.audioViewerHeight = 100;
       } else {
-        this.magnifier.settings.lineheight = 200;
+        this.audioViewerHeight = 200;
       }
+      this.magnifier.settings.lineheight = this.audioViewerHeight;
 
       this.cd.markForCheck();
       this.cd.detectChanges();

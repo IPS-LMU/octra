@@ -7,14 +7,18 @@ import {
   AudioResource,
   getAudioInfo,
   MusicMetadataFormat,
-  WavFormat,
+  WavFormat
 } from '@octra/web-media';
 import { concat, map, Observable, Subject, Subscription } from 'rxjs';
 import { SourceType } from '../types';
-import {
-  AudioMechanism,
-  AudioMechanismPrepareOptions,
-} from './audio-mechanism';
+import { AudioMechanism, AudioMechanismPrepareOptions } from './audio-mechanism';
+
+/**
+ * KNOWN ISSUES:
+ * 1.) Safari: increased playBackRate doesn't work in combination with web audio api
+ * 2.) Safari: Animation while playing is buggy
+ * 3.) Safari: Playback doesn't stop properly at the end of a selection
+ */
 
 export class HtmlAudioMechanism extends AudioMechanism {
   private _audio?: HTMLAudioElement;

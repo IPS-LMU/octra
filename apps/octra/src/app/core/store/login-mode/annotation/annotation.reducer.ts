@@ -206,6 +206,29 @@ export class AnnotationStateReducers {
           if (mode === this.mode) {
             const transcript = state.transcript.clone();
             transcript.changeLevelNameByIndex(index, name);
+
+            // change speaker labels
+            const level = transcript.levels[index];
+
+            if (level.type === 'SEGMENT') {
+              const segementLevel =
+                level as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+
+              for (const item of segementLevel.items) {
+                const spkIndex = item.labels.findIndex(
+                  (a) => a.name === 'Speaker',
+                );
+
+                if (spkIndex > -1) {
+                  item.labels = [
+                    ...item.labels.slice(0, spkIndex),
+                    new OLabel('Speaker', name),
+                    ...item.labels.slice(spkIndex + 1),
+                  ];
+                }
+              }
+            }
+
             state.transcript = transcript;
           }
 

@@ -11,7 +11,7 @@ export class VersionCheckerOptions {
   }
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class VersionCheckerService extends SubscriberComponent {
   isNewVersionAvailable = false;
   private options = new VersionCheckerOptions();

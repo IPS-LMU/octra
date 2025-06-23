@@ -26,7 +26,10 @@ import {
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { OctraComponentsModule } from '@octra/ngx-components';
+import {
+  OctraComponentsModule,
+  VersionCheckerService,
+} from '@octra/ngx-components';
 import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import 'jodit/esm/plugins/justify/justify.js';
@@ -148,5 +151,6 @@ bootstrapApplication(AppComponent, {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
+    VersionCheckerService,
   ],
 }).catch((err) => console.error(err));

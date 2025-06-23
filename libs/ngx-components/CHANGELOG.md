@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.1.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.1.0...ngx-components-1.1.1) (2025-06-23)
+
+
+
 # [1.1.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.0.0...ngx-components-1.1.0) (2025-04-02)
 
 

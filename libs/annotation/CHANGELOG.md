@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/IPS-LMU/octra/compare/annotation-1.1.1...annotation-1.2.0) (2025-06-24)
+
+
+### Features
+
+* **annotation:** PartiturConverter now supports SPK labels ([21f9ae0](https://github.com/IPS-LMU/octra/commit/21f9ae0708d5786fd368c373e5e5e102443cfc41))
+
+
+
 ## [1.1.1](https://github.com/IPS-LMU/octra/compare/annotation-1.1.0...annotation-1.1.1) (2025-04-02)
 
 

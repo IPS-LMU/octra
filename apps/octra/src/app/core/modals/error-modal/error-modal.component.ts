@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -10,6 +10,8 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class ErrorModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
@@ -19,7 +21,11 @@ export class ErrorModalComponent extends OctraModal {
   text = '';
   showOKButton = true;
 
-  constructor(protected override activeModal: NgbActiveModal) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('errorModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

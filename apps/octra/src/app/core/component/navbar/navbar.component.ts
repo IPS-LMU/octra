@@ -1,5 +1,11 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -72,6 +78,21 @@ import { NavbarService } from './navbar.service';
   ],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit {
+  appStorage = inject(AppStorageService);
+  private appStoreService = inject(ApplicationStoreService);
+  navbarServ = inject(NavbarService);
+  sanitizer = inject(DomSanitizer);
+  langService = inject(TranslocoService);
+  modalService = inject(OctraModalService);
+  settService = inject(SettingsService);
+  bugService = inject(BugReportService);
+  annotationStoreService = inject(AnnotationStoreService);
+  authStoreService = inject(AuthenticationStoreService);
+  audio = inject(AudioService);
+  api = inject(OctraAPIService);
+  private offcanvasService = inject(NgbOffcanvas);
+  protected asrStoreService = inject(AsrStoreService);
+
   modalexport?: NgbModalRef;
   modalTools?: NgbModalRef;
   modalStatistics?: NgbModalRef;
@@ -143,25 +164,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
         }
       }).length > 0
     );
-  }
-
-  constructor(
-    public appStorage: AppStorageService,
-    private appStoreService: ApplicationStoreService,
-    public navbarServ: NavbarService,
-    public sanitizer: DomSanitizer,
-    public langService: TranslocoService,
-    public modalService: OctraModalService,
-    public settService: SettingsService,
-    public bugService: BugReportService,
-    public annotationStoreService: AnnotationStoreService,
-    public authStoreService: AuthenticationStoreService,
-    public audio: AudioService,
-    public api: OctraAPIService,
-    private offcanvasService: NgbOffcanvas,
-    protected asrStoreService: AsrStoreService,
-  ) {
-    super();
   }
 
   ngOnInit() {

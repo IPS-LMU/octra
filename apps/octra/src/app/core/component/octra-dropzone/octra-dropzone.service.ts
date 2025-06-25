@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   AnnotationLevelType,
@@ -31,6 +31,9 @@ export interface DropzoneStatistics {
 
 @Injectable()
 export class OctraDropzoneService {
+  private modService = inject(OctraModalService);
+  private store = inject<Store<RootState>>(Store);
+
   get oannotation(): OAnnotJSON {
     return this._oannotation;
   }
@@ -91,11 +94,6 @@ export class OctraDropzoneService {
   }>();
 
   private _audioManager?: AudioManager;
-
-  constructor(
-    private modService: OctraModalService,
-    private store: Store<RootState>,
-  ) {}
 
   add(file: File) {
     const progressFile: FileProgress = {

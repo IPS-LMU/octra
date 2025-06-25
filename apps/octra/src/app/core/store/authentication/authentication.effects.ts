@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
@@ -42,6 +42,15 @@ import { AuthenticationActions } from './authentication.actions';
 
 @Injectable()
 export class AuthenticationEffects {
+  private actions$ = inject(Actions);
+  private store = inject<Store<RootState>>(Store);
+  private apiService = inject(OctraAPIService);
+  private alertService = inject(AlertService);
+  private sessionStorageService = inject(SessionStorageService);
+  private transloco = inject(TranslocoService);
+  private routingService = inject(RoutingService);
+  private modalsService = inject(OctraModalService);
+
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
@@ -604,16 +613,4 @@ export class AuthenticationEffects {
       normalizeMimeType(file.type),
     );
   };
-
-  constructor(
-    private actions$: Actions,
-    private store: Store<RootState>,
-    private apiService: OctraAPIService,
-    // private settingsService: AppSettingsService,
-    private alertService: AlertService,
-    private sessionStorageService: SessionStorageService,
-    private transloco: TranslocoService,
-    private routingService: RoutingService,
-    private modalsService: OctraModalService,
-  ) {}
 }

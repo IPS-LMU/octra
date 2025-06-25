@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { SettingsService } from '../../shared/service';
@@ -12,16 +12,20 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class InactivityModalComponent extends OctraModal {
+  appStorage = inject(AppStorageService);
+  settService = inject(SettingsService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     backdrop: true,
     keyboard: false,
   };
 
-  constructor(
-    public appStorage: AppStorageService,
-    public settService: SettingsService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('inactivityModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

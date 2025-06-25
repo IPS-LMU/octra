@@ -1,19 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { SubscriptionManager } from '@octra/utilities';
 import { Subscription } from 'rxjs';
 
 @Injectable()
 export class LoginService {
+  private http = inject(HttpClient);
+  private store = inject(Store);
+
   private dbData: any[] = [];
 
   private subscrmanager: SubscriptionManager<Subscription>;
 
-  constructor(
-    private http: HttpClient,
-    private store: Store,
-  ) {
+  constructor() {
     this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 

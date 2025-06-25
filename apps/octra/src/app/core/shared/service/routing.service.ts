@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { NavigationExtras, QueryParamsHandling, Router } from '@angular/router';
 import { removeEmptyProperties } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
@@ -9,17 +9,14 @@ import { URLParameters } from '../../store/application';
   providedIn: 'root',
 })
 export class RoutingService {
+  private router = inject(Router);
+  private sessionStorage = inject(SessionStorageService);
+
   get staticQueryParams(): URLParameters {
     return this._staticQueryParams;
   }
 
   private _staticQueryParams: URLParameters = {};
-
-  // Observable exposing the breadcrumb hierarchy
-  constructor(
-    private router: Router,
-    private sessionStorage: SessionStorageService,
-  ) {}
 
   clear() {
     this._staticQueryParams = {};

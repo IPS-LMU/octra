@@ -1,4 +1,4 @@
-import { ApplicationRef, Injectable } from '@angular/core';
+import { ApplicationRef, inject, Injectable } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { interval } from 'rxjs';
@@ -13,15 +13,11 @@ export class VersionCheckerOptions {
 
 @Injectable()
 export class VersionCheckerService extends SubscriberComponent {
+  private swUpdate = inject(SwUpdate);
+  private appRef = inject(ApplicationRef);
+
   isNewVersionAvailable = false;
   private options = new VersionCheckerOptions();
-
-  constructor(
-    private swUpdate: SwUpdate,
-    private appRef: ApplicationRef,
-  ) {
-    super();
-  }
 
   init(options?: VersionCheckerOptions) {
     this.options = options ? new VersionCheckerOptions(options) : this.options;

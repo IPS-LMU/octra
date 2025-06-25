@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import {
   Component,
+  inject,
   OnInit,
   SecurityContext,
   ViewEncapsulation,
@@ -30,6 +31,12 @@ export class TranscriptionGuidelinesModalComponent
   extends OctraModal
   implements OnInit
 {
+  private lang = inject(TranslocoService);
+  annotationStoreService = inject(AnnotationStoreService);
+  settService = inject(SettingsService);
+  private sanitizer = inject(DomSanitizer);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     size: 'xl',
     backdrop: true,
@@ -43,14 +50,12 @@ export class TranscriptionGuidelinesModalComponent
   protected data = undefined;
   private videoPlayers: any[] = [];
 
-  constructor(
-    private lang: TranslocoService,
-    public annotationStoreService: AnnotationStoreService,
-    public settService: SettingsService,
-    private sanitizer: DomSanitizer,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('transcriptionGuidelinesModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   async ngOnInit() {

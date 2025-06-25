@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -40,6 +40,14 @@ export class LoginComponent
   extends DefaultComponent
   implements ComponentCanDeactivate
 {
+  private elementRef = inject(ElementRef);
+  appStorage = inject(AppStorageService);
+  api = inject(OctraAPIService);
+  settingsService = inject(SettingsService);
+  private audioService = inject(AudioService);
+  authStoreService = inject(AuthenticationStoreService);
+  protected compatibilityService = inject(CompatibilityService);
+
   @ViewChild('f', { static: false }) loginform?: NgForm;
   @ViewChild('dropzone', { static: false }) dropzone?: OctraDropzoneComponent;
   @ViewChild('agreement', { static: false }) agreement?: ElementRef;
@@ -88,16 +96,10 @@ export class LoginComponent
 
   compatibleBrowser?: boolean;
 
-  constructor(
-    private elementRef: ElementRef,
-    public appStorage: AppStorageService,
-    public api: OctraAPIService,
-    public settingsService: SettingsService,
-    private audioService: AudioService,
-    public authStoreService: AuthenticationStoreService,
-    protected compatibilityService: CompatibilityService,
-  ) {
+  constructor() {
     super();
+    const elementRef = this.elementRef;
+
     this.compatibilityService.testCompability().then((result) => {
       this.compatibleBrowser = result;
       setTimeout(() => {

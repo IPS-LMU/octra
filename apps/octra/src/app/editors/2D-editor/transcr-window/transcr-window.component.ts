@@ -7,6 +7,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  inject,
   OnChanges,
   OnInit,
   Output,
@@ -90,6 +91,21 @@ export class TranscrWindowComponent
   extends DefaultComponent
   implements OnInit, AfterContentInit, AfterViewInit, OnChanges
 {
+  private shortcutsService = inject(ShortcutService);
+  annotationStoreService = inject(AnnotationStoreService);
+  audio = inject(AudioService);
+  uiService = inject(UserInteractionsService);
+  asrStoreService = inject(AsrStoreService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+  appStoreService = inject(ApplicationStoreService);
+  cd = inject(ChangeDetectorRef);
+  private langService = inject(TranslocoService);
+  private alertService = inject(AlertService);
+  private navbarService = inject(NavbarService);
+  private activeModal = inject(NgbActiveModal);
+  protected routingService = inject(RoutingService);
+
   public static options: NgbModalOptions = {
     size: 'xl',
     fullscreen: 'xl',
@@ -353,22 +369,7 @@ export class TranscrWindowComponent
 
   public transcript = '';
 
-  constructor(
-    private shortcutsService: ShortcutService,
-    public annotationStoreService: AnnotationStoreService,
-    public audio: AudioService,
-    public uiService: UserInteractionsService,
-    public asrStoreService: AsrStoreService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-    public appStoreService: ApplicationStoreService,
-    public cd: ChangeDetectorRef,
-    private langService: TranslocoService,
-    private alertService: AlertService,
-    private navbarService: NavbarService,
-    private activeModal: NgbActiveModal,
-    protected routingService: RoutingService,
-  ) {
+  constructor() {
     super();
 
     this.subscribe(this.asrStoreService.queue$, {

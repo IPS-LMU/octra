@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { getBrowserLang, TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -49,6 +49,20 @@ import { URLParameters } from './index';
   providedIn: 'root',
 })
 export class ApplicationEffects {
+  private actions$ = inject(Actions);
+  private transloco = inject(TranslocoService);
+  private sessStr = inject(SessionStorageService);
+  private localStorage = inject(LocalStorageService);
+  private store = inject<Store<RootState>>(Store);
+  private http = inject(HttpClient);
+  private configurationService = inject(ConfigurationService);
+  private bugService = inject(BugReportService);
+  private appStorage = inject(AppStorageService);
+  private settingsService = inject(SettingsService);
+  private routerService = inject(RoutingService);
+  private modalService = inject(OctraModalService);
+  private sessionStorage = inject(SessionStorageService);
+
   initApp$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.do),
@@ -1031,22 +1045,6 @@ export class ApplicationEffects {
       ),
     { dispatch: false },
   );
-
-  constructor(
-    private actions$: Actions,
-    private transloco: TranslocoService,
-    private sessStr: SessionStorageService,
-    private localStorage: LocalStorageService,
-    private store: Store<RootState>,
-    private http: HttpClient,
-    private configurationService: ConfigurationService,
-    private bugService: BugReportService,
-    private appStorage: AppStorageService,
-    private settingsService: SettingsService,
-    private routerService: RoutingService,
-    private modalService: OctraModalService,
-    private sessionStorage: SessionStorageService,
-  ) {}
 
   private initConsoleLogging() {
     // overwrite console.log

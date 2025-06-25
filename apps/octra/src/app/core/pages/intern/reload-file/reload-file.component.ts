@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -20,22 +20,20 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   imports: [OctraDropzoneComponent, TranslocoPipe, OctraDropzoneComponent],
 })
 export class ReloadFileComponent {
+  router = inject(Router);
+  appStorage = inject(AppStorageService);
+  annotationStoreService = inject(AnnotationStoreService);
+  modService = inject(OctraModalService);
+  langService = inject(TranslocoService);
+  private audioService = inject(AudioService);
+  private authStoreService = inject(AuthenticationStoreService);
+
   @ViewChild('dropzone', { static: true }) dropzone!: OctraDropzoneComponent;
   private error = '';
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
   }
-
-  constructor(
-    public router: Router,
-    public appStorage: AppStorageService,
-    public annotationStoreService: AnnotationStoreService,
-    public modService: OctraModalService,
-    public langService: TranslocoService,
-    private audioService: AudioService,
-    private authStoreService: AuthenticationStoreService,
-  ) {}
 
   abortTranscription = () => {
     this.annotationStoreService.endTranscription();

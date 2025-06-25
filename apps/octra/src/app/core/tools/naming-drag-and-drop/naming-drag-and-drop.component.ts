@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   Input,
   Output,
   ViewChild,
@@ -28,6 +29,8 @@ import { DefaultComponent } from '../../component/default.component';
   ],
 })
 export class NamingDragAndDropComponent extends DefaultComponent {
+  private cd = inject(ChangeDetectorRef);
+
   public namingConventionArray = [
     'text',
     '<name>',
@@ -114,10 +117,6 @@ export class NamingDragAndDropComponent extends DefaultComponent {
     }
 
     return result;
-  }
-
-  constructor(private cd: ChangeDetectorRef) {
-    super();
   }
 
   remove(i: number) {

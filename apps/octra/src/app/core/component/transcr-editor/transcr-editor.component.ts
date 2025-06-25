@@ -7,6 +7,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -70,6 +71,13 @@ export class TranscrEditorComponent
   extends DefaultComponent
   implements OnChanges, AfterViewInit, OnInit, OnDestroy
 {
+  private cd = inject(ChangeDetectorRef);
+  private shortcutService = inject(ShortcutService);
+  private langService = inject(TranslocoService);
+  private annotationStoreService = inject(AnnotationStoreService);
+  private renderer = inject(Renderer2);
+  private asrStoreService = inject(AsrStoreService);
+
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
@@ -182,14 +190,7 @@ export class TranscrEditorComponent
   public htmlValue = '';
   private initialized: boolean = false;
 
-  constructor(
-    private cd: ChangeDetectorRef,
-    private shortcutService: ShortcutService,
-    private langService: TranslocoService,
-    private annotationStoreService: AnnotationStoreService,
-    private renderer: Renderer2,
-    private asrStoreService: AsrStoreService,
-  ) {
+  constructor() {
     super();
     this._settings = new TranscrEditorConfig();
   }

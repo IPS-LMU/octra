@@ -1,7 +1,7 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, NgModule } from '@angular/core';
+import { inject, Injectable, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   Translation,
@@ -57,7 +57,7 @@ import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getTranslation(lang: string) {
     return this.http.get<Translation>(`./assets/i18n/${lang}.json`);

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { OAnnotJSON } from '@octra/annotation';
 import { AccountLoginMethod } from '@octra/api-types';
@@ -9,7 +9,7 @@ import { AuthenticationActions } from './authentication.actions';
   providedIn: 'root',
 })
 export class AuthenticationStoreService {
-  constructor(private store: Store<RootState>) {}
+  private store = inject<Store<RootState>>(Store);
 
   me$ = this.store.select((store: RootState) => store.authentication.me);
   serverOnline$ = this.store.select(

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { OctraAPIService } from '@octra/ngx-octra-api';
@@ -9,6 +9,10 @@ import { APIActions } from './api.actions';
 
 @Injectable()
 export class APIEffects {
+  private actions$ = inject(Actions);
+  private store = inject<Store<RootState>>(Store);
+  private apiService = inject(OctraAPIService);
+
   init$ = createEffect(() =>
     this.actions$.pipe(
       ofType(APIActions.init.do),
@@ -41,10 +45,4 @@ export class APIEffects {
       }),
     ),
   );
-
-  constructor(
-    private actions$: Actions,
-    private store: Store<RootState>,
-    private apiService: OctraAPIService,
-  ) {}
 }

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
@@ -78,6 +78,18 @@ import { ASRQueueItemType } from '../../asr';
 
 @Injectable()
 export class AnnotationEffects {
+  private actions$ = inject(Actions);
+  private store = inject<Store<RootState>>(Store);
+  private apiService = inject(OctraAPIService);
+  private http = inject(HttpClient);
+  private alertService = inject(AlertService);
+  private routingService = inject(RoutingService);
+  private modalsService = inject(OctraModalService);
+  private audio = inject(AudioService);
+  private uiService = inject(UserInteractionsService);
+  private appStorage = inject(AppStorageService);
+  private transloco = inject(TranslocoService);
+
   transcrSendingModal: {
     ref?: NgbModalWrapper<TranscriptionSendingModalComponent>;
     timeout?: Subscription;
@@ -1926,18 +1938,4 @@ export class AnnotationEffects {
   }
 
   private maintenanceChecker?: Subscription;
-
-  constructor(
-    private actions$: Actions,
-    private store: Store<RootState>,
-    private apiService: OctraAPIService,
-    private http: HttpClient,
-    private alertService: AlertService,
-    private routingService: RoutingService,
-    private modalsService: OctraModalService,
-    private audio: AudioService,
-    private uiService: UserInteractionsService,
-    private appStorage: AppStorageService,
-    private transloco: TranslocoService,
-  ) {}
 }

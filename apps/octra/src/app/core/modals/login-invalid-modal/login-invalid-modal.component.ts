@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -10,7 +10,13 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class LoginInvalidModalComponent extends OctraModal {
-  constructor(protected override activeModal: NgbActiveModal) {
+  protected override activeModal: NgbActiveModal;
+
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('yesNoModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

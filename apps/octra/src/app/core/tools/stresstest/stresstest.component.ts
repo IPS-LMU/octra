@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  inject,
 } from '@angular/core';
 import { getFileSize } from '@octra/utilities';
 import { BrowserInfo } from '@octra/web-media';
@@ -15,6 +16,9 @@ import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
   providers: [SessionStorageService],
 })
 export class StresstestComponent {
+  private cd = inject(ChangeDetectorRef);
+  private sessionStorage = inject(SessionStorageService);
+
   @SessionStorage('stresstest_js_result') lastResult: any;
   public measured = 0;
   public status = 'init';
@@ -48,11 +52,6 @@ export class StresstestComponent {
   public get info(): any {
     return BrowserInfo;
   }
-
-  constructor(
-    private cd: ChangeDetectorRef,
-    private sessionStorage: SessionStorageService,
-  ) {}
 
   public getSampleData(mb: number) {
     const array: ArrayBuffer = new ArrayBuffer(1024 * 1024 * mb);

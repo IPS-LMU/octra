@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -10,6 +10,8 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class YesNoModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: 'static',
@@ -17,7 +19,11 @@ export class YesNoModalComponent extends OctraModal {
   };
   public message = '';
 
-  constructor(protected override activeModal: NgbActiveModal) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('yesNoModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

@@ -4,6 +4,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  inject,
   SecurityContext,
   ViewChild,
 } from '@angular/core';
@@ -16,6 +17,10 @@ import { DomSanitizer } from '@angular/platform-browser';
   imports: [NgClass],
 })
 export class ValidationPopoverComponent {
+  private el = inject(ElementRef);
+  private cd = inject(ChangeDetectorRef);
+  private sanitizer = inject(DomSanitizer);
+
   @ViewChild('validationContainer', { static: true })
   validationContainer?: ElementRef;
   public visible = false;
@@ -53,12 +58,6 @@ export class ValidationPopoverComponent {
   public get height() {
     return this.validationContainer?.nativeElement.offsetHeight;
   }
-
-  constructor(
-    private el: ElementRef,
-    private cd: ChangeDetectorRef,
-    private sanitizer: DomSanitizer,
-  ) {}
 
   public show() {
     if (!this.visible) {

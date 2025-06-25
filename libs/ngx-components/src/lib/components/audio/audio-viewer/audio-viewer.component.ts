@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -52,6 +53,10 @@ export interface CurrentLevelChangeEvent {
 export class AudioViewerComponent
   implements OnInit, OnChanges, OnDestroy, AfterViewInit
 {
+  av = inject(AudioViewerService);
+  private renderer = inject(Renderer2);
+  private elementRef = inject(ElementRef);
+
   /**
    * annotation of type OctraAnnotation
    * @param value
@@ -100,11 +105,7 @@ export class AudioViewerComponent
     this.av.currentLevelID = value;
   }
 
-  constructor(
-    public av: AudioViewerService,
-    private renderer: Renderer2,
-    private elementRef: ElementRef,
-  ) {
+  constructor() {
     this.subscrManager = new SubscriptionManager<Subscription>();
 
     this.subscrManager.add(

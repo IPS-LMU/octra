@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -18,13 +18,13 @@ export class TranscriptionEndComponent
   extends DefaultComponent
   implements OnInit
 {
-  constructor(
-    private router: Router,
-    private appStorage: AppStorageService,
-    private annotationStoreService: AnnotationStoreService,
-    private uiService: UserInteractionsService,
-    private navService: NavbarService,
-  ) {
+  private router = inject(Router);
+  private appStorage = inject(AppStorageService);
+  private annotationStoreService = inject(AnnotationStoreService);
+  private uiService = inject(UserInteractionsService);
+  private navService = inject(NavbarService);
+
+  constructor() {
     super();
     this.navService.showInterfaces = false;
     this.navService.showExport = false;

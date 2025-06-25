@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   DomSanitizer,
   SafeHtml,
@@ -17,6 +17,12 @@ import { ApplicationStoreService } from '../../../../store/application/applicati
   imports: [TranslocoPipe],
 })
 export class ProjectRequestModalComponent extends SubscriberComponent {
+  protected activeModal = inject(NgbActiveModal);
+  protected api = inject(OctraAPIService);
+  private sanitizer = inject(DomSanitizer);
+  protected appStorage = inject(ApplicationStoreService);
+  private transloco = inject(TranslocoService);
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: 'static',
@@ -28,13 +34,7 @@ export class ProjectRequestModalComponent extends SubscriberComponent {
   protected introductionHTML?: SafeHtml;
   protected description?: SafeHtml;
 
-  constructor(
-    protected activeModal: NgbActiveModal,
-    protected api: OctraAPIService,
-    private sanitizer: DomSanitizer,
-    protected appStorage: ApplicationStoreService,
-    private transloco: TranslocoService,
-  ) {
+  constructor() {
     super();
     if (this.api.appProperties.support?.admin_email) {
       this.supportEmailURL = this.sanitizer.bypassSecurityTrustResourceUrl(

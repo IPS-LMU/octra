@@ -2,6 +2,7 @@ import { DecimalPipe, NgClass, NgStyle } from '@angular/common';
 import {
   Component,
   ElementRef,
+  inject,
   Input,
   OnDestroy,
   ViewChild,
@@ -63,6 +64,14 @@ import { OctraModal } from '../types';
   ],
 })
 export class ToolsModalComponent extends OctraModal implements OnDestroy {
+  private sanitizer = inject(DomSanitizer);
+  private modalsService = inject(OctraModalService);
+  annotationStoreService = inject(AnnotationStoreService);
+  audio = inject(AudioService);
+  transloco = inject(TranslocoService);
+  protected settings = inject(SettingsService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
@@ -181,16 +190,12 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     );
   }
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private modalsService: OctraModalService,
-    public annotationStoreService: AnnotationStoreService,
-    public audio: AudioService,
-    public transloco: TranslocoService,
-    protected settings: SettingsService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('toolsModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   onHidden() {

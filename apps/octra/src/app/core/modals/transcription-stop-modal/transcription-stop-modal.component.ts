@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { DefaultComponent } from '../../component/default.component';
@@ -18,6 +18,9 @@ export enum TranscriptionStopModalAnswer {
   imports: [TranslocoPipe, NgClass],
 })
 export class TranscriptionStopModalComponent extends DefaultComponent {
+  private activeModal = inject(NgbActiveModal);
+  protected appStore = inject(ApplicationStoreService);
+
   @ViewChild('modal', { static: true }) modal: any;
 
   static options: NgbModalOptions = {
@@ -25,13 +28,6 @@ export class TranscriptionStopModalComponent extends DefaultComponent {
     keyboard: false,
     backdrop: 'static',
   };
-
-  constructor(
-    private activeModal: NgbActiveModal,
-    protected appStore: ApplicationStoreService,
-  ) {
-    super();
-  }
 
   public close(action: string) {
     this.activeModal.close(action);

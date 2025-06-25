@@ -5,6 +5,7 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -73,6 +74,17 @@ export class TrnEditorComponent
   extends OCTRAEditor
   implements OnInit, OctraEditorRequirements
 {
+  audio = inject(AudioService);
+  private uiService = inject(UserInteractionsService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+  private sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef);
+  private alertService = inject(AlertService);
+  private translocoService = inject(TranslocoService);
+  private modalService = inject(NgbModal);
+  annotationStoreService = inject(AnnotationStoreService);
+
   get textEditor(): Texteditor {
     return this._textEditor;
   }
@@ -83,21 +95,6 @@ export class TrnEditorComponent
   private guidelines!: OctraGuidelines;
   private breakMarkerCode?: string;
   private idCounter = 1;
-
-  constructor(
-    public audio: AudioService,
-    private uiService: UserInteractionsService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-    private sanitizer: DomSanitizer,
-    private cd: ChangeDetectorRef,
-    private alertService: AlertService,
-    private translocoService: TranslocoService,
-    private modalService: NgbModal,
-    public annotationStoreService: AnnotationStoreService,
-  ) {
-    super();
-  }
 
   public static editorname = 'TRN-Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();

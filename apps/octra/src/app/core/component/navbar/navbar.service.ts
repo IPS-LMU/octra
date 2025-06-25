@@ -1,9 +1,12 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 
 @Injectable()
 export class NavbarService {
+  uiService = inject(UserInteractionsService);
+  private audio = inject(AudioService);
+
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();
   public openSettings = new EventEmitter<void>();
@@ -53,9 +56,4 @@ export class NavbarService {
   public doclick(name: string) {
     this.onclick.emit(name);
   }
-
-  constructor(
-    public uiService: UserInteractionsService,
-    private audio: AudioService,
-  ) {}
 }

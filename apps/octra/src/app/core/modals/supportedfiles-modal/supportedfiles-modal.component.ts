@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbActiveModal,
@@ -19,6 +19,8 @@ import { OctraModal } from '../types';
   imports: [NgbPopover, NgbTooltip, TranslocoPipe, OctraUtilitiesModule],
 })
 export class SupportedFilesModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     backdrop: true,
     size: 'lg',
@@ -29,8 +31,12 @@ export class SupportedFilesModalComponent extends OctraModal {
   supportedFormats: AudioFormat[] = AppInfo.audioformats;
   converters: Converter[] = [];
 
-  constructor(protected override activeModal: NgbActiveModal) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('supportedFilesModal', activeModal);
+    this.activeModal = activeModal;
+
     this.converters = AppInfo.converters.map((a) => {
       (a as any)._applications = (a as any)._applications.filter(
         (a) => a.application.name !== 'Octra',

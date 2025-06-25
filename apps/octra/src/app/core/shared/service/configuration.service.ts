@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import Ajv, { ErrorObject } from 'ajv';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigurationService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   public validateJSON(
     json: any,

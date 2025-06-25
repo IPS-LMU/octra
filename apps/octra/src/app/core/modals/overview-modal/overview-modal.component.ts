@@ -3,6 +3,7 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
+  inject,
   OnDestroy,
   OnInit,
   Output,
@@ -39,6 +40,14 @@ export class OverviewModalComponent
   extends OctraModal
   implements OnInit, OnDestroy, AfterViewInit
 {
+  modalService = inject(NgbModal);
+  settingsService = inject(SettingsService);
+  annotationStoreService = inject(AnnotationStoreService);
+  private shortcutsService = inject(ShortcutService);
+  appStorage = inject(AppStorageService);
+  private uiService = inject(UserInteractionsService);
+  protected override activeModal: NgbActiveModal;
+
   public override name = 'OverviewModalComponent';
   public static options: NgbModalOptions = {
     keyboard: false,
@@ -74,16 +83,12 @@ export class OverviewModalComponent
 
   public trnEditorswitch = new EventEmitter<void>();
 
-  constructor(
-    public modalService: NgbModal,
-    public settingsService: SettingsService,
-    public annotationStoreService: AnnotationStoreService,
-    private shortcutsService: ShortcutService,
-    public appStorage: AppStorageService,
-    private uiService: UserInteractionsService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('overviewModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   ngOnInit() {

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { SubscriptionManager } from '@octra/utilities';
 
 import { Subscription } from 'rxjs';
@@ -11,6 +11,9 @@ import { AppStorageService } from './appstorage.service';
   providedIn: 'root',
 })
 export class SettingsService {
+  private http = inject(HttpClient);
+  private appStorage = inject(AppStorageService);
+
   private subscrmanager: SubscriptionManager<Subscription>;
 
   get projectsettings(): ProjectSettings | undefined {
@@ -41,10 +44,7 @@ export class SettingsService {
     return this._filename;
   }
 
-  constructor(
-    private http: HttpClient,
-    private appStorage: AppStorageService,
-  ) {
+  constructor() {
     this.subscrmanager = new SubscriptionManager<Subscription>();
   }
 

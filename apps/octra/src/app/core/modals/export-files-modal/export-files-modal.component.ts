@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -41,6 +41,11 @@ import { OctraModal } from '../types';
   ],
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {
+  private sanitizer = inject(DomSanitizer);
+  private audio = inject(AudioService);
+  annotationStoreService = inject(AnnotationStoreService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: true,
@@ -118,13 +123,12 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
   converters: Converter[] = [];
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private audio: AudioService,
-    public annotationStoreService: AnnotationStoreService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('ExportFilesModalComponent', activeModal);
+    this.activeModal = activeModal;
+
     this.converters = AppInfo.converters;
   }
 

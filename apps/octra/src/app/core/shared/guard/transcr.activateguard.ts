@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import {
   ActivatedRouteSnapshot,
@@ -14,11 +14,9 @@ import { ApplicationStoreService } from '../../store/application/application-sto
 
 @Injectable()
 export class TranscActivateGuard {
-  constructor(
-    private appStoreService: ApplicationStoreService,
-    private router: Router,
-    private store: Store<RootState>,
-  ) {}
+  private appStoreService = inject(ApplicationStoreService);
+  private router = inject(Router);
+  private store = inject<Store<RootState>>(Store);
 
   canActivate(
     route: ActivatedRouteSnapshot,

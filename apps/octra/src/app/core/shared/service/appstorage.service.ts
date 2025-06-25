@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import {
@@ -31,6 +31,10 @@ import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
   providedIn: 'root',
 })
 export class AppStorageService {
+  private store = inject<Store<RootState>>(Store);
+  private actions = inject(Actions);
+  private sessionStorage = inject(SessionStorageService);
+
   get undoRedoDisabled(): boolean {
     return this._undoRedoDisabled;
   }
@@ -211,11 +215,7 @@ export class AppStorageService {
 
   private _undoRedoDisabled = false;
 
-  constructor(
-    private store: Store<RootState>,
-    private actions: Actions,
-    private sessionStorage: SessionStorageService,
-  ) {
+  constructor() {
     this.subscrManager.add(
       this.store.subscribe((state: RootState) => {
         this._snapshot = state;

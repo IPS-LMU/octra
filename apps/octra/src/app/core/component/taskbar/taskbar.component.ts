@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -10,6 +10,10 @@ import { ApplicationStoreService } from '../../store/application/application-sto
   styleUrls: ['./taskbar.component.scss'],
 })
 export class FastbarComponent {
+  appStorage = inject(AppStorageService);
+  private appStoreService = inject(ApplicationStoreService);
+  private modalService = inject(OctraModalService);
+
   @Input() buttonLabels: any = {
     shortcuts: 'Shortcuts',
     guidelines: 'Guidelines',
@@ -20,12 +24,6 @@ export class FastbarComponent {
   @Output() shortcutbtnclicked: EventEmitter<void> = new EventEmitter<void>();
   @Output() guidelinesbtnclicked: EventEmitter<void> = new EventEmitter<void>();
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
-
-  constructor(
-    public appStorage: AppStorageService,
-    private appStoreService: ApplicationStoreService,
-    private modalService: OctraModalService,
-  ) {}
 
   openHelpModal() {
     this.appStoreService.setShortcutsEnabled(false);

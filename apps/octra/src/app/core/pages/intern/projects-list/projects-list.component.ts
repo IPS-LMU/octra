@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
@@ -32,6 +32,14 @@ import { ProjectRequestModalComponent } from './project-request-modal/project-re
   imports: [AsyncPipe, TranslocoPipe, LuxonShortDateTimePipe, NgbPagination],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
+  private api = inject(OctraAPIService);
+  appStorage = inject(AppStorageService);
+  private modalService = inject(OctraModalService);
+  authStoreService = inject(AuthenticationStoreService);
+  private annotationStoreService = inject(AnnotationStoreService);
+  private store = inject<Store<RootState>>(Store);
+  private actions$ = inject(Actions);
+
   projects?: ProjectListDto;
   shownProjects?: ProjectDto[];
 
@@ -45,16 +53,10 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   projectRoles: AccountProjectRoleDto[] = [];
   istProjectAdmin = false;
 
-  constructor(
-    private api: OctraAPIService,
-    public appStorage: AppStorageService,
-    private modalService: OctraModalService,
-    public authStoreService: AuthenticationStoreService,
-    private annotationStoreService: AnnotationStoreService,
-    private store: Store<RootState>,
-    private actions$: Actions,
-  ) {
+  constructor() {
     super();
+    const authStoreService = this.authStoreService;
+
     this.subscribe(
       this.actions$.pipe(
         ofType(

@@ -1,4 +1,4 @@
-import { Component, OnInit, SecurityContext } from '@angular/core';
+import { Component, inject, OnInit, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -24,6 +24,13 @@ export class TranscriptionBackupEndModalComponent
   extends OctraModal
   implements OnInit
 {
+  private sanitizer = inject(DomSanitizer);
+  private annotationStore = inject(AnnotationStoreService);
+  private appStorageService = inject(AppStorageService);
+  private audioService = inject(AudioService);
+  languageService = inject(TranslocoService);
+  protected override activeModal: NgbActiveModal;
+
   downloadClicked = false;
   downloadFile?: {
     name: string;
@@ -35,15 +42,12 @@ export class TranscriptionBackupEndModalComponent
     backdrop: 'static',
   };
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private annotationStore: AnnotationStoreService,
-    private appStorageService: AppStorageService,
-    private audioService: AudioService,
-    public languageService: TranslocoService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('transcriptionDemoEnd', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   sanitize(html: string) {

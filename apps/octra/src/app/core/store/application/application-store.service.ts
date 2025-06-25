@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { SubscriptionManager } from '@octra/utilities';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
@@ -9,6 +9,8 @@ import { ApplicationActions } from './application.actions';
   providedIn: 'root',
 })
 export class ApplicationStoreService {
+  private store = inject<Store<RootState>>(Store);
+
   private _useMode?: LoginMode;
 
   get useMode(): LoginMode | undefined {
@@ -17,7 +19,7 @@ export class ApplicationStoreService {
 
   private subscrManager = new SubscriptionManager();
 
-  constructor(private store: Store<RootState>) {
+  constructor() {
     this.subscrManager.add(
       this.store
         .select((state: RootState) => state.application.mode)

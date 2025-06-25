@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
@@ -18,6 +18,9 @@ import { SignupComponent } from './signup/signup.component';
   imports: [FormsModule, SignupComponent, TranslocoPipe],
 })
 export class AuthenticationComponent extends DefaultComponent {
+  private api = inject(OctraAPIService);
+  private transloco = inject(TranslocoService);
+
   @Output() submitClick = new EventEmitter<{
     type: AccountLoginMethod;
     credentials?: {
@@ -61,13 +64,6 @@ export class AuthenticationComponent extends DefaultComponent {
           this.passwordResetRequested = true;
         },
       });
-  }
-
-  constructor(
-    private api: OctraAPIService,
-    private transloco: TranslocoService,
-  ) {
-    super();
   }
 
   isAuthAllowed(type: AccountLoginMethod) {

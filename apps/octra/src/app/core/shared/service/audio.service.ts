@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { TaskInputOutputDto } from '@octra/api-types';
 import { downloadFile } from '@octra/ngx-utilities';
 import { SubscriptionManager } from '@octra/utilities';
@@ -8,6 +8,8 @@ import { Subject, Subscription } from 'rxjs';
 
 @Injectable()
 export class AudioService {
+  private http = inject(HttpClient);
+
   public missingPermission = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager<Subscription> =
     new SubscriptionManager<Subscription>();
@@ -28,11 +30,6 @@ export class AudioService {
   get audioManager(): AudioManager {
     return this._audiomanagers[0];
   }
-
-  /***
-   * Constructor
-   */
-  constructor(private http: HttpClient) {}
 
   /**
    * loadAudio(url) loads the audio data referred to via the URL in an AJAX call.

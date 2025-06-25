@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -14,6 +20,10 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class AboutModalComponent extends OctraModal implements OnDestroy {
+  private sanitizer = inject(DomSanitizer);
+  private api = inject(OctraAPIService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     size: 'xl',
     keyboard: false,
@@ -38,12 +48,11 @@ export class AboutModalComponent extends OctraModal implements OnDestroy {
     return AppInfo;
   }
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private api: OctraAPIService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('octraModal', activeModal);
+    this.activeModal = activeModal;
 
     this.legalsExist =
       this.api.appProperties?.legals.imprint_url !== undefined &&

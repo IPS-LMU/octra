@@ -1,5 +1,6 @@
 import {
   Component,
+  inject,
   Input,
   OnChanges,
   OnInit,
@@ -25,6 +26,9 @@ export class VersionNotificationComponent
   extends SubscriberComponent
   implements OnInit, OnChanges
 {
+  protected readonly versionCheckerService = inject(VersionCheckerService);
+  protected readonly sanitizer = inject(DomSanitizer);
+
   swingBell = false;
 
   @Input() i18n = {
@@ -57,10 +61,7 @@ export class VersionNotificationComponent
     'new update': SafeHtml;
   };
 
-  constructor(
-    protected readonly versionCheckerService: VersionCheckerService,
-    protected readonly sanitizer: DomSanitizer,
-  ) {
+  constructor() {
     super();
     this.prepareI18n(this.i18n);
     this.prepareIcons(this.icons);

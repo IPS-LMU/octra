@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   AnnotationAnySegment,
@@ -39,6 +39,12 @@ import { AnnotationActions } from './annotation.actions';
   providedIn: 'root',
 })
 export class AnnotationStoreService {
+  private store = inject<Store<RootState>>(Store);
+  private audio = inject(AudioService);
+  private appStoreService = inject(ApplicationStoreService);
+  private appStorage = inject(AppStorageService);
+  private multiThreading = inject(MultiThreadingService);
+
   public segmentrequested = new EventEmitter<number>();
 
   get feedback(): any {
@@ -247,13 +253,7 @@ export class AnnotationStoreService {
     return getModeState(this.appStorage.snapshot)?.currentSession.comment ?? '';
   }
 
-  constructor(
-    private store: Store<RootState>,
-    private audio: AudioService,
-    private appStoreService: ApplicationStoreService,
-    private appStorage: AppStorageService,
-    private multiThreading: MultiThreadingService,
-  ) {
+  constructor() {
     this.subscrManager.add(
       this.transcript$.subscribe({
         next: (transcript) => {

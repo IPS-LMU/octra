@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AppInfo } from '../../../../app.info';
@@ -7,10 +7,8 @@ import { RoutingService } from '../../../shared/service/routing.service';
 
 @Injectable()
 export class ReloadFileGuard {
-  constructor(
-    private appStorage: AppStorageService,
-    private routingService: RoutingService,
-  ) {}
+  private appStorage = inject(AppStorageService);
+  private routingService = inject(RoutingService);
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (!this.appStorage.loggedIn) {

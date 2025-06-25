@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { interval } from 'rxjs';
@@ -12,16 +12,16 @@ import { NavbarService } from '../../../component/navbar/navbar.service';
   imports: [TranslocoPipe],
 })
 export class AuthComponent extends DefaultComponent implements OnInit {
+  private router = inject(Router);
+  private navbarService = inject(NavbarService);
+
   private _secondsToClose = 10;
 
   get secondsToClose(): number {
     return this._secondsToClose;
   }
 
-  constructor(
-    private router: Router,
-    private navbarService: NavbarService,
-  ) {
+  constructor() {
     super();
     this.navbarService.showNavbar = false;
     this.subscribe(interval(1000), {

@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbToast } from '@ng-bootstrap/ng-bootstrap';
 import {
   fadeInOnEnterAnimation,
@@ -16,7 +16,5 @@ import { DefaultComponent } from '../default.component';
   imports: [NgbToast, NgClass],
 })
 export class AlertComponent extends DefaultComponent {
-  constructor(public alertService: AlertService) {
-    super();
-  }
+  alertService = inject(AlertService);
 }

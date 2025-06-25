@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, Input, Output, ViewChild } from '@angular/core';
+import { Component, inject, Input, Output, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { OAnnotJSON } from '@octra/annotation';
@@ -33,6 +33,9 @@ import {
   ],
 })
 export class OctraDropzoneComponent extends DefaultComponent {
+  protected octraDropzoneService = inject(OctraDropzoneService);
+  private modService = inject(OctraModalService);
+
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
   @Input() height = '250px';
   @Input() set oldFiles(
@@ -68,13 +71,6 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   get oannotation(): OAnnotJSON | undefined {
     return this.octraDropzoneService.oannotation;
-  }
-
-  constructor(
-    protected octraDropzoneService: OctraDropzoneService,
-    private modService: OctraModalService,
-  ) {
-    super();
   }
 
   public afterDrop = async () => {

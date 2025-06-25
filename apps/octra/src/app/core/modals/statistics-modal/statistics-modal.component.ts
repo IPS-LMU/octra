@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NavbarService } from '../../component/navbar/navbar.service';
@@ -16,6 +16,11 @@ import { OctraModal } from '../types';
   imports: [AsyncPipe, DatePipe, TranslocoPipe],
 })
 export class StatisticsModalComponent extends OctraModal {
+  annotationStore = inject(AnnotationStoreService);
+  private navbarService = inject(NavbarService);
+  private appStorage = inject(AppStorageService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
@@ -40,13 +45,12 @@ export class StatisticsModalComponent extends OctraModal {
     return this.uiService !== undefined ? this.uiService.elements : undefined;
   }
 
-  constructor(
-    public annotationStore: AnnotationStoreService,
-    private navbarService: NavbarService,
-    private appStorage: AppStorageService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('statisticsModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   clearElements() {

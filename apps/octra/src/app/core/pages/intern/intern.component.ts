@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { DefaultComponent } from '../../component/default.component';
 import { SettingsService, UserInteractionsService } from '../../shared/service';
@@ -11,10 +11,10 @@ import { SettingsService, UserInteractionsService } from '../../shared/service';
   imports: [RouterOutlet],
 })
 export class InternComponent extends DefaultComponent {
-  constructor(
-    private router: Router,
-    private settService: SettingsService,
-  ) {
+  private router = inject(Router);
+  private settService = inject(SettingsService);
+
+  constructor() {
     super();
     document.body.setAttribute('style', 'overflow:hidden');
   }

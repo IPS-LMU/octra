@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -10,15 +10,13 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
   imports: [TranslocoPipe],
 })
 export class FeedbackNoticeModalComponent implements OnInit {
+  private modal = inject(NgbActiveModal);
+  private appStorageService = inject(AppStorageService);
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
   };
-
-  constructor(
-    private modal: NgbActiveModal,
-    private appStorageService: AppStorageService,
-  ) {}
 
   ngOnInit() {}
 

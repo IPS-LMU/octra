@@ -1,6 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import {
   Component,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -21,6 +22,11 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
   imports: [FormsModule, AsyncPipe, TranslocoPipe],
 })
 export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
+  annotationStoreService = inject(AnnotationStoreService);
+  langService = inject(TranslocoService);
+  private appStorage = inject(AppStorageService);
+  private settingsService = inject(SettingsService);
+
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
   @ViewChild('fo', { static: true }) feedbackForm!: NgForm;
@@ -35,13 +41,6 @@ export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {
     name: string;
     value: any;
   }[] = [];
-
-  constructor(
-    public annotationStoreService: AnnotationStoreService,
-    public langService: TranslocoService,
-    private appStorage: AppStorageService,
-    private settingsService: SettingsService,
-  ) {}
 
   translate(languages: any, lang: string): string {
     if (languages[lang] === undefined || languages[lang] === undefined) {

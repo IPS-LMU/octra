@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
+  inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -53,6 +54,13 @@ export class DictaphoneEditorComponent
   extends OCTRAEditor
   implements OnInit, OnDestroy, AfterViewInit, OctraEditorRequirements
 {
+  audio = inject(AudioService);
+  shortcutService = inject(ShortcutService);
+  annotationStoreService = inject(AnnotationStoreService);
+  private uiService = inject(UserInteractionsService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+
   public static editorname = 'Dictaphone Editor';
 
   @ViewChild('nav', { static: true }) nav!: AudioNavigationComponent;
@@ -201,17 +209,6 @@ export class DictaphoneEditorComponent
 
   public get projectsettings(): any {
     return this.settingsService.projectsettings;
-  }
-
-  constructor(
-    public audio: AudioService,
-    public shortcutService: ShortcutService,
-    public annotationStoreService: AnnotationStoreService,
-    private uiService: UserInteractionsService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-  ) {
-    super();
   }
 
   ngOnInit() {

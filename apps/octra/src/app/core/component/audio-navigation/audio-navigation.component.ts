@@ -5,6 +5,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   Output,
@@ -56,6 +57,8 @@ export class AudioNavigationComponent
   extends DefaultComponent
   implements OnChanges
 {
+  private cd = inject(ChangeDetectorRef);
+
   @Output() buttonClick = new EventEmitter<{
     type: string;
     timestamp: number;
@@ -147,10 +150,6 @@ export class AudioNavigationComponent
     if (this.audioChunk !== undefined) {
       this.audioChunk.playbackRate = value ?? 1;
     }
-  }
-
-  constructor(private cd: ChangeDetectorRef) {
-    super();
   }
 
   /**

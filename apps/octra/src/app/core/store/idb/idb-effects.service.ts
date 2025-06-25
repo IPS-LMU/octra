@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import {
@@ -48,6 +48,13 @@ import { IDBActions } from './idb.actions';
   providedIn: 'root',
 })
 export class IDBEffects {
+  private actions$ = inject(Actions);
+  private idbService = inject(IDBService);
+  private sessStr = inject(SessionStorageService);
+  private routingService = inject(RoutingService);
+  private store = inject<Store<RootState>>(Store);
+  private audio = inject(AudioService);
+
   loadOptions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationActions.initApplication.setSessionStorageOptions),
@@ -963,14 +970,9 @@ export class IDBEffects {
     { dispatch: false },
   );
 
-  constructor(
-    private actions$: Actions,
-    private idbService: IDBService,
-    private sessStr: SessionStorageService,
-    private routingService: RoutingService,
-    private store: Store<RootState>,
-    private audio: AudioService,
-  ) {
+  constructor() {
+    const actions$ = this.actions$;
+
     actions$.subscribe((action) => {
       if (action.type.toLocaleLowerCase().indexOf('failed') > -1) {
         const errorMessage = (action as any).error;

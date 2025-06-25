@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, Renderer2 } from '@angular/core';
+import { EventEmitter, inject, Injectable, Renderer2 } from '@angular/core';
 import {
   AnnotationAnySegment,
   AnnotationLevelType,
@@ -43,6 +43,8 @@ import Context = Konva.Context;
 
 @Injectable()
 export class AudioViewerService {
+  private multiThreadingService = inject(MultiThreadingService);
+
   get focused(): boolean {
     return this._focused;
   }
@@ -369,7 +371,7 @@ export class AudioViewerService {
     return this.itemIDCounter - 1;
   }
 
-  constructor(private multiThreadingService: MultiThreadingService) {
+  constructor() {
     this.shortcutsManager = new ShortcutManager();
     this._boundaryDragging = new Subject<{
       status: 'started' | 'stopped' | 'dragging';

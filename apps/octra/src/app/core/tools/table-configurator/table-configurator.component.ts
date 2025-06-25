@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgStyle } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -52,6 +52,8 @@ export interface ColumnFormat {
   ],
 })
 export class TableConfiguratorComponent implements OnInit {
+  private sanitizer = inject(DomSanitizer);
+
   @Input() columns: {
     title: string;
     columnDefinition: {
@@ -426,8 +428,6 @@ export class TableConfiguratorComponent implements OnInit {
 
     return remaining;
   }
-
-  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.tableConfiguratorAddColumn();

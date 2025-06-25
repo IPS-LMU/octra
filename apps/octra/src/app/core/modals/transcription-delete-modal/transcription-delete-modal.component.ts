@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AppInfo } from '../../../app.info';
@@ -16,6 +16,8 @@ export enum ModalDeleteAnswer {
   imports: [TranslocoPipe],
 })
 export class TranscriptionDeleteModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: true,
@@ -23,7 +25,11 @@ export class TranscriptionDeleteModalComponent extends OctraModal {
 
   AppInfo = AppInfo;
 
-  constructor(protected override activeModal: NgbActiveModal) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('transcriptionDelete', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

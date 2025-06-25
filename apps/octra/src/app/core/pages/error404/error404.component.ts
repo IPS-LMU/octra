@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,5 +7,5 @@ import { Router } from '@angular/router';
   styleUrls: ['./error404.component.scss'],
 })
 export class Error404Component {
-  constructor(public router: Router) {}
+  router = inject(Router);
 }

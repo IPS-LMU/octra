@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit } from '@angular/core';
 import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
@@ -12,16 +12,12 @@ export class NewEditorComponent
   extends OCTRAEditor
   implements OnInit, OctraEditorRequirements
 {
+  audio = inject(AudioService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+
   public static editorname = 'New Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();
-
-  constructor(
-    public audio: AudioService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-  ) {
-    super();
-  }
 
   ngOnInit() {}
 

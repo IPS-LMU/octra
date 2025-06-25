@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { hasProperty } from '@octra/utilities';
 import { AppInfo } from '../../../app.info';
 import { DefaultComponent } from '../../component/default.component';
@@ -16,6 +16,8 @@ import { YesNoModalComponent } from '../yes-no-modal/yes-no-modal.component';
   styleUrls: ['./octra-modal.component.scss'],
 })
 export class OctraModalComponent extends DefaultComponent {
+  private modService = inject(OctraModalService);
+
   modals: any = {
     error: {
       visible: false,
@@ -47,10 +49,6 @@ export class OctraModalComponent extends DefaultComponent {
 
   public get AppInfo(): any {
     return AppInfo;
-  }
-
-  constructor(private modService: OctraModalService) {
-    super();
   }
 
   openModal(name: string, data?: any): Promise<any> {

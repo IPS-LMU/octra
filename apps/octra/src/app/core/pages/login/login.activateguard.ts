@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { map, Observable } from 'rxjs';
@@ -8,10 +8,8 @@ import { ApplicationStoreService } from '../../store/application/application-sto
 
 @Injectable()
 export class ALoginGuard {
-  constructor(
-    private appStoreService: ApplicationStoreService,
-    private routingService: RoutingService,
-  ) {}
+  private appStoreService = inject(ApplicationStoreService);
+  private routingService = inject(RoutingService);
 
   canActivate(
     route: ActivatedRouteSnapshot,

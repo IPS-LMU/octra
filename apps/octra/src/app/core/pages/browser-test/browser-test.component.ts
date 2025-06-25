@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BrowserInfo } from '@octra/web-media';
 import { CompatibilityService } from '../../shared/service/compatibility.service';
@@ -11,14 +11,12 @@ import { CompatibilityService } from '../../shared/service/compatibility.service
   imports: [NgStyle, RouterLink],
 })
 export class BrowserTestComponent {
+  private router = inject(Router);
+  compatibilityService = inject(CompatibilityService);
+
   public get browserName(): string {
     return BrowserInfo.browser!;
   }
-
-  constructor(
-    private router: Router,
-    public compatibilityService: CompatibilityService,
-  ) {}
 
   getStateIcon(rule: any) {
     switch (rule.state) {

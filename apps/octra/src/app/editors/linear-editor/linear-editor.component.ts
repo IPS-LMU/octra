@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -70,6 +71,15 @@ export class LinearEditorComponent
   extends OCTRAEditor
   implements OnInit, AfterViewInit, OctraEditorRequirements
 {
+  audio = inject(AudioService);
+  alertService = inject(AlertService);
+  annotationStoreService = inject(AnnotationStoreService);
+  shortcutService = inject(ShortcutService);
+  cd = inject(ChangeDetectorRef);
+  uiService = inject(UserInteractionsService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+
   public static editorname = 'Linear Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('signalDisplayTop', { static: true })
@@ -417,19 +427,6 @@ export class LinearEditorComponent
 
   get miniMagnifierSettings(): AudioviewerConfig {
     return this._miniMagnifierSettings;
-  }
-
-  constructor(
-    public audio: AudioService,
-    public alertService: AlertService,
-    public annotationStoreService: AnnotationStoreService,
-    public shortcutService: ShortcutService,
-    public cd: ChangeDetectorRef,
-    public uiService: UserInteractionsService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-  ) {
-    super();
   }
 
   /**

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -39,6 +39,14 @@ import {
   providedIn: 'root',
 })
 export class AsrEffects {
+  private store = inject<Store<RootState>>(Store);
+  private actions$ = inject(Actions);
+  private audio = inject(AudioService);
+  private http = inject(HttpClient);
+  private langService = inject(TranslocoService);
+  private alertService = inject(AlertService);
+  private uiService = inject(UserInteractionsService);
+
   private readonly MAX_PARALLEL_ITEMS = 3;
 
   addToQueue$ = createEffect(() =>
@@ -839,16 +847,6 @@ export class AsrEffects {
       }),
     ),
   );
-
-  constructor(
-    private store: Store<RootState>,
-    private actions$: Actions,
-    private audio: AudioService,
-    private http: HttpClient,
-    private langService: TranslocoService,
-    private alertService: AlertService,
-    private uiService: UserInteractionsService,
-  ) {}
 
   private getFirstFreeItem(
     queue: ASRStateQueue,

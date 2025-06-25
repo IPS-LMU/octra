@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
+import { EventEmitter, inject, Injectable, OnDestroy } from '@angular/core';
 import {
   NgbModal,
   NgbModalOptions,
@@ -19,19 +19,17 @@ import { ReAuthenticationModalComponent } from './re-authentication-modal/re-aut
 
 @Injectable()
 export class OctraModalService implements OnDestroy {
+  private modalService = inject(NgbModal);
+  private bugService = inject(BugReportService);
+  private appStorage = inject(AppStorageService);
+  private store = inject<Store<RootState>>(Store);
+
   onModalAction = new EventEmitter<{
     name: string;
     type: 'open' | 'close';
     result?: any;
   }>();
   private subscrManager = new SubscriptionManager();
-
-  constructor(
-    private modalService: NgbModal,
-    private bugService: BugReportService,
-    private appStorage: AppStorageService,
-    private store: Store<RootState>,
-  ) {}
 
   ngOnDestroy(): void {
     this.subscrManager.destroy();

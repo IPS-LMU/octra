@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -52,6 +53,14 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   ],
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
+  annotationStoreService = inject(AnnotationStoreService);
+  audio = inject(AudioService);
+  sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef);
+  protected appStorage = inject(AppStorageService);
+  protected settingsService = inject(SettingsService);
+  private uiService = inject(UserInteractionsService);
+
   get textEditor(): {
     selectedSegment: number;
     state: string;
@@ -176,15 +185,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  constructor(
-    public annotationStoreService: AnnotationStoreService,
-    public audio: AudioService,
-    public sanitizer: DomSanitizer,
-    private cd: ChangeDetectorRef,
-    protected appStorage: AppStorageService,
-    protected settingsService: SettingsService,
-    private uiService: UserInteractionsService,
-  ) {
+  constructor() {
     this.subscrmanager = new SubscriptionManager();
   }
 

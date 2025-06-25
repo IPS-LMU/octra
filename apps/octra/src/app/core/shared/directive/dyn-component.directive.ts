@@ -2,6 +2,7 @@ import {
   ComponentFactoryResolver,
   Directive,
   EventEmitter,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -14,6 +15,9 @@ import { Subscription } from 'rxjs';
 
 @Directive({ selector: '[octraDynComponent]' })
 export class DynComponentDirective implements OnInit, OnDestroy {
+  viewContainerRef = inject(ViewContainerRef);
+  private _componentFactoryResolver = inject(ComponentFactoryResolver);
+
   @Input() component!: {
     id: number;
     class: any;
@@ -24,11 +28,6 @@ export class DynComponentDirective implements OnInit, OnDestroy {
   @Output() destroyed = new EventEmitter<{ id: number }>();
 
   private subscrManager = new SubscriptionManager<Subscription>();
-
-  constructor(
-    public viewContainerRef: ViewContainerRef,
-    private _componentFactoryResolver: ComponentFactoryResolver,
-  ) {}
 
   ngOnInit(): void {
     const componentFactory =

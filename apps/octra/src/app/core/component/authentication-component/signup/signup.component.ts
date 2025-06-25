@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
@@ -28,6 +28,9 @@ export class PreparedPolicyListItemDto extends PolicyListItemDto {
   imports: [FormsModule, TranslocoPipe],
 })
 export class SignupComponent extends DefaultComponent implements OnInit {
+  private api = inject(OctraAPIService);
+  private transloco = inject(TranslocoService);
+
   protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;
   protected readonly LANGUAGES = LANGUAGES;
 
@@ -52,13 +55,6 @@ export class SignupComponent extends DefaultComponent implements OnInit {
   };
 
   signUpForm = this.initialState;
-
-  constructor(
-    private api: OctraAPIService,
-    private transloco: TranslocoService,
-  ) {
-    super();
-  }
 
   ngOnInit() {
     this.showSignUpForm();

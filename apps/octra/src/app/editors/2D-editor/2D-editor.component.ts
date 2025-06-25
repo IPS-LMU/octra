@@ -4,6 +4,7 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  inject,
   OnInit,
   Output,
   ViewChild,
@@ -65,6 +66,19 @@ export class TwoDEditorComponent
   extends OCTRAEditor
   implements OnInit, AfterViewInit, OctraEditorRequirements
 {
+  annotationStoreService = inject(AnnotationStoreService);
+  audio = inject(AudioService);
+  uiService = inject(UserInteractionsService);
+  alertService = inject(AlertService);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+  private cd = inject(ChangeDetectorRef);
+  private langService = inject(TranslocoService);
+  private asrStoreService = inject(AsrStoreService);
+  private modalService = inject(OctraModalService);
+  private shortcutService = inject(ShortcutService);
+  private navbarService = inject(NavbarService);
+
   public static editorname = '2D-Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();
 
@@ -334,20 +348,7 @@ export class TwoDEditorComponent
     return this.settingsService.projectsettings;
   }
 
-  constructor(
-    public annotationStoreService: AnnotationStoreService,
-    public audio: AudioService,
-    public uiService: UserInteractionsService,
-    public alertService: AlertService,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-    private cd: ChangeDetectorRef,
-    private langService: TranslocoService,
-    private asrStoreService: AsrStoreService,
-    private modalService: OctraModalService,
-    private shortcutService: ShortcutService,
-    private navbarService: NavbarService,
-  ) {
+  constructor() {
     super();
     this.initialized = new EventEmitter<void>();
     this.miniMagnifierSettings = new AudioviewerConfig();

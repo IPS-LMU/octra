@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Action } from '@ngrx/store';
@@ -22,6 +22,12 @@ export class ReAuthenticationModalComponent
   extends DefaultComponent
   implements OnInit
 {
+  activeModal = inject(NgbActiveModal);
+  settingsService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+  private authService = inject(AuthenticationStoreService);
+  apiService = inject(OctraAPIService);
+
   public static options: NgbModalOptions = {
     backdrop: 'static',
     centered: true,
@@ -36,16 +42,6 @@ export class ReAuthenticationModalComponent
   forceLogout = false;
 
   actionAfterSuccess?: Action;
-
-  constructor(
-    public activeModal: NgbActiveModal,
-    public settingsService: SettingsService,
-    public appStorage: AppStorageService,
-    private authService: AuthenticationStoreService,
-    public apiService: OctraAPIService,
-  ) {
-    super();
-  }
 
   init() {
     this.initialized = true;

@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  inject,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +42,9 @@ export class BugreportModalComponent
   extends SubscriberComponent
   implements AfterViewInit
 {
+  private cd = inject(ChangeDetectorRef);
+  protected activeModal = inject(NgbActiveModal);
+
   @ViewChild('editor') editor?: NgxJoditComponent;
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -145,13 +149,6 @@ export class BugreportModalComponent
     setTimeout(() => {
       this.editor?.jodit?.focus();
     }, 0);
-  }
-
-  constructor(
-    private cd: ChangeDetectorRef,
-    protected activeModal: NgbActiveModal,
-  ) {
-    super();
   }
 
   onHidden() {

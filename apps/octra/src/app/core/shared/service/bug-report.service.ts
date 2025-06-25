@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { FeedbackRequestPropertiesDto } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
@@ -33,6 +33,12 @@ export interface ConsoleGroupEntry {
 
 @Injectable()
 export class BugReportService {
+  private langService = inject(TranslocoService);
+  private appStorage = inject(AppStorageService);
+  private annotationStoreService = inject(AnnotationStoreService);
+  private audio = inject(AudioService);
+  private api = inject(OctraAPIService);
+
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
   private readonly MAX_LOG_ENTRIES = 100;
 
@@ -43,14 +49,6 @@ export class BugReportService {
   }
 
   private startedGroup?: ConsoleGroupEntry;
-
-  constructor(
-    private langService: TranslocoService,
-    private appStorage: AppStorageService,
-    private annotationStoreService: AnnotationStoreService,
-    private audio: AudioService,
-    private api: OctraAPIService,
-  ) {}
 
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {

@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, inject, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -17,6 +17,13 @@ import { ApplicationStoreService } from '../../store/application/application-sto
   imports: [NgStyle],
 })
 export class LoadingComponent extends DefaultComponent implements OnInit {
+  private langService = inject(TranslocoService);
+  settService = inject(SettingsService);
+  appStorage = inject(AppStorageService);
+  appStoreService = inject(ApplicationStoreService);
+  audio = inject(AudioService);
+  private router = inject(Router);
+
   @Output() loaded = false;
   public text = '';
   public state = '';
@@ -31,17 +38,6 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
     progress: 0,
     errors: [],
   };
-
-  constructor(
-    private langService: TranslocoService,
-    public settService: SettingsService,
-    public appStorage: AppStorageService,
-    public appStoreService: ApplicationStoreService,
-    public audio: AudioService,
-    private router: Router,
-  ) {
-    super();
-  }
 
   ngOnInit() {
     this.langService

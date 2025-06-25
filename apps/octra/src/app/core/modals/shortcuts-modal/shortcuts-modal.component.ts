@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserInfo } from '@octra/web-media';
@@ -14,6 +14,10 @@ import { OctraModal } from '../types';
   imports: [ShortcutComponent, TranslocoPipe],
 })
 export class ShortcutsModalComponent extends OctraModal {
+  appStorage = inject(AppStorageService);
+  shortcutService = inject(ShortcutService);
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     keyboard: true,
     backdrop: true,
@@ -29,12 +33,12 @@ export class ShortcutsModalComponent extends OctraModal {
     return BrowserInfo.platform;
   }
 
-  constructor(
-    public appStorage: AppStorageService,
-    public shortcutService: ShortcutService,
-    protected override activeModal: NgbActiveModal,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('ShortcutsModalComponent', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   getShortcut(entry: any, platform: string) {

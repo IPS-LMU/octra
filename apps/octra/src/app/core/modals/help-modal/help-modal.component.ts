@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -10,6 +10,8 @@ import { OctraModal } from '../types';
   imports: [TranslocoPipe],
 })
 export class HelpModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+
   public static options: NgbModalOptions = {
     size: 'xl',
     backdrop: true,
@@ -19,7 +21,11 @@ export class HelpModalComponent extends OctraModal {
   @ViewChild('modal', { static: true }) modal!: any;
   @ViewChild('content', { static: false }) contentElement!: ElementRef;
 
-  constructor(protected override activeModal: NgbActiveModal) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('HelpModalComponent', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

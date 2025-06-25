@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import {
   OctraComponentsModule,
@@ -34,6 +34,14 @@ export class AppComponent
   extends DefaultComponent
   implements OnInit, OnDestroy
 {
+  appStorage = inject(AppStorageService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private multiThreading = inject(MultiThreadingService);
+  private appStoreService = inject(ApplicationStoreService);
+  private annotationStoreService = inject(AnnotationStoreService);
+  protected versionChecker = inject(VersionCheckerService);
+
   @ViewChild('navigation', { static: true }) navigation:
     | NavigationComponent
     | undefined;
@@ -42,15 +50,7 @@ export class AppComponent
     return environment;
   }
 
-  constructor(
-    public appStorage: AppStorageService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private multiThreading: MultiThreadingService,
-    private appStoreService: ApplicationStoreService,
-    private annotationStoreService: AnnotationStoreService,
-    protected versionChecker: VersionCheckerService,
-  ) {
+  constructor() {
     super();
     this.appStoreService.initApplication();
     this.versionChecker.init({

@@ -1,4 +1,4 @@
-import { Component, SecurityContext } from '@angular/core';
+import { Component, inject, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -9,16 +9,20 @@ import { OctraModal } from '../types';
   styleUrls: ['./protected-modal.component.scss'],
 })
 export class ProtectedModalComponent extends OctraModal {
+  protected override activeModal: NgbActiveModal;
+  private sanitizer = inject(DomSanitizer);
+
   public htmlMessage = '';
 
   public get sanitizedHTMLMessage() {
     return this.sanitizer.sanitize(SecurityContext.HTML, this.htmlMessage);
   }
 
-  constructor(
-    protected override activeModal: NgbActiveModal,
-    private sanitizer: DomSanitizer,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('messageModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DefaultComponent } from '../../../component/default.component';
 import { ApplicationStoreService } from '../../../store/application/application-store.service';
@@ -13,9 +13,7 @@ export class AuthSuccessPageComponent
   extends DefaultComponent
   implements OnInit
 {
-  constructor(private appService: ApplicationStoreService) {
-    super();
-  }
+  private appService = inject(ApplicationStoreService);
 
   ngOnInit() {
     const bc = new BroadcastChannel('ocb_authentication');

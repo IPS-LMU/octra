@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   ComponentRef,
+  inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -81,6 +82,22 @@ export class TranscriptionComponent
   extends DefaultComponent
   implements OnInit, OnDestroy
 {
+  router = inject(Router);
+  audio = inject(AudioService);
+  uiService = inject(UserInteractionsService);
+  appStorage = inject(AppStorageService);
+  shortcutService = inject(ShortcutService);
+  navbarServ = inject(NavbarService);
+  settingsService = inject(SettingsService);
+  modService = inject(OctraModalService);
+  private appStoreService = inject(ApplicationStoreService);
+  langService = inject(TranslocoService);
+  routingService = inject(RoutingService);
+  private cd = inject(ChangeDetectorRef);
+  private alertService = inject(AlertService);
+  annotationStoreService = inject(AnnotationStoreService);
+  private authService = inject(AuthenticationStoreService);
+
   get selectedTheme(): string {
     return this._selectedTheme;
   }
@@ -336,24 +353,10 @@ export class TranscriptionComponent
     return this.annotationStoreService.comment;
   }
 
-  constructor(
-    public router: Router,
-    public audio: AudioService,
-    public uiService: UserInteractionsService,
-    public appStorage: AppStorageService,
-    public shortcutService: ShortcutService,
-    public navbarServ: NavbarService,
-    public settingsService: SettingsService,
-    public modService: OctraModalService,
-    private appStoreService: ApplicationStoreService,
-    public langService: TranslocoService,
-    public routingService: RoutingService,
-    private cd: ChangeDetectorRef,
-    private alertService: AlertService,
-    public annotationStoreService: AnnotationStoreService,
-    private authService: AuthenticationStoreService,
-  ) {
+  constructor() {
     super();
+    const appStorage = this.appStorage;
+
     this.audioManager = this.audio.audiomanagers[0];
     this.shortcutService.registerGeneralShortcutGroup(this.modalShortcuts);
 

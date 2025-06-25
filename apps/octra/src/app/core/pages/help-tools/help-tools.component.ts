@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { getBaseHrefURL, joinURL } from '@octra/utilities';
@@ -14,6 +14,11 @@ import { IDBService } from '../../shared/service/idb.service';
   imports: [RouterLink],
 })
 export class HelpToolsComponent extends DefaultComponent {
+  private appStorage = inject(AppStorageService);
+  private idbService = inject(IDBService);
+  private sanitizer = inject(DomSanitizer);
+  private modalService = inject(OctraModalService);
+
   @ViewChild('canvas', { static: false }) canvas!: ElementRef;
   localBackup?: {
     name: string;
@@ -21,15 +26,6 @@ export class HelpToolsComponent extends DefaultComponent {
   };
 
   backupFiles?: FileList;
-
-  constructor(
-    private appStorage: AppStorageService,
-    private idbService: IDBService,
-    private sanitizer: DomSanitizer,
-    private modalService: OctraModalService,
-  ) {
-    super();
-  }
 
   refreshApp() {
     document.location.reload();

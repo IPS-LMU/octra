@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  inject,
   Input,
   OnChanges,
   OnInit,
@@ -21,16 +22,14 @@ import { SettingsService } from '../../shared/service';
   imports: [NgStyle, TranslocoPipe],
 })
 export class NewsComponent implements OnInit, OnChanges {
+  private sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef);
+  settService = inject(SettingsService);
+  private navService = inject(NavbarService);
+
   @Input() url = '';
 
   public loaded = false;
-
-  constructor(
-    private sanitizer: DomSanitizer,
-    private cd: ChangeDetectorRef,
-    public settService: SettingsService,
-    private navService: NavbarService,
-  ) {}
 
   ngOnInit() {
     this.navService.showInterfaces = false;

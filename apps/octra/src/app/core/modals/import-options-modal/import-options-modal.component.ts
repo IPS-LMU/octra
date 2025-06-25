@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Converter } from '@octra/annotation';
@@ -13,6 +13,10 @@ import { OctraModal } from '../types';
   imports: [OctraFormGeneratorModule, TranslocoPipe],
 })
 export class ImportOptionsModalComponent extends OctraModal implements OnInit {
+  annotationStoreService = inject(AnnotationStoreService);
+  protected override activeModal: NgbActiveModal;
+  private transloco = inject(TranslocoService);
+
   public static options: NgbModalOptions = {
     keyboard: false,
     backdrop: 'static',
@@ -25,12 +29,12 @@ export class ImportOptionsModalComponent extends OctraModal implements OnInit {
   value: any = undefined;
   jsonText = '';
 
-  constructor(
-    public annotationStoreService: AnnotationStoreService,
-    protected override activeModal: NgbActiveModal,
-    private transloco: TranslocoService,
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal);
+
     super('importOptionsModal', activeModal);
+
+    this.activeModal = activeModal;
   }
 
   ngOnInit() {

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import {
   Component,
   ElementRef,
+  inject,
   Input,
   OnChanges,
   Renderer2,
@@ -20,17 +21,15 @@ import { MaintenanceAPI, MaintenanceNotification } from '../maintenance-api';
   imports: [TranslocoPipe],
 })
 export class MaintenanceBannerComponent implements OnChanges {
+  private http = inject(HttpClient);
+  private renderer = inject(Renderer2);
+  private elementRef = inject(ElementRef);
+
   @Input() serverURL!: string;
   @Input() language?: string;
 
   notification?: MaintenanceNotification;
   parsedNotification?: MaintenanceNotification;
-
-  constructor(
-    private http: HttpClient,
-    private renderer: Renderer2,
-    private elementRef: ElementRef,
-  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     const isServerURL =

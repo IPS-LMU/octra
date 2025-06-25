@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BrowserInfo } from '@octra/web-media';
 import { SettingsService } from './index';
 
@@ -8,6 +8,8 @@ declare let Modernizr: any;
   providedIn: 'root',
 })
 export class CompatibilityService {
+  private settingsService = inject(SettingsService);
+
   public rules: {
     name: string;
     description: string;
@@ -72,8 +74,6 @@ export class CompatibilityService {
   ];
 
   supportedBrowsers = '';
-
-  constructor(private settingsService: SettingsService) {}
 
   public isValidBrowser(allowedBrowsers: any[]): boolean {
     for (const browser of allowedBrowsers) {

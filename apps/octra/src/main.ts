@@ -30,7 +30,6 @@ import {
   OctraComponentsModule,
   VersionCheckerService,
 } from '@octra/ngx-components';
-import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import 'jodit/esm/plugins/justify/justify.js';
 import {
@@ -69,6 +68,7 @@ import { IDBEffects } from './app/core/store/idb/idb-effects.service';
 import * as fromUser from './app/core/store/user/user.reducer';
 import { environment } from './environments/environment';
 import { provideServiceWorker } from '@angular/service-worker';
+import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -77,6 +77,7 @@ bootstrapApplication(AppComponent, {
       AppSharedModule,
       FormsModule,
       ReactiveFormsModule,
+      NgxOctraApiModule,
       PagesModule,
       TranslocoModule,
       StoreModule.forRoot(
@@ -118,7 +119,6 @@ bootstrapApplication(AppComponent, {
       NgbCollapseModule,
       ModalsModule,
       TranslocoRootModule,
-      NgxOctraApiModule,
       OctraComponentsModule,
       OctraUtilitiesModule,
       NgbOffcanvasModule,

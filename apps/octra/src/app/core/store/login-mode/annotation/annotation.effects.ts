@@ -15,6 +15,7 @@ import {
   PraatTextgridConverter,
 } from '@octra/annotation';
 import {
+  ProjectDto,
   TaskDto,
   TaskInputOutputCreatorType,
   TaskInputOutputDto,
@@ -538,28 +539,30 @@ export class AnnotationEffects {
                 ),
               );
           } else {
-            if (a.redirectToProjects) {
-              this.store.dispatch(ApplicationActions.waitForEffects.do());
-              return of(AnnotationActions.redirectToProjects.do());
-            } else {
-              this.store.dispatch(ApplicationActions.waitForEffects.do());
-              return this.saveTaskToServer(state, TaskStatus.paused).pipe(
-                map(() => {
+            this.store.dispatch(ApplicationActions.waitForEffects.do());
+            return this.saveTaskToServer(state, TaskStatus.paused).pipe(
+              map(() => {
+                if (a.redirectToProjects) {
+                  this.store.dispatch(ApplicationActions.waitForEffects.do());
+                  return AnnotationActions.redirectToProjects.do();
+                } else {
                   return AuthenticationActions.logout.do({
                     clearSession: a.clearSession,
                     mode: state.application.mode,
+                    keepPreviousInformation: true,
                   });
-                }),
-                catchError(() => {
-                  return of(
-                    AuthenticationActions.logout.do({
-                      clearSession: a.clearSession,
-                      mode: state.application.mode,
-                    }),
-                  );
-                }),
-              );
-            }
+                }
+              }),
+              catchError(() => {
+                return of(
+                  AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode,
+                    keepPreviousInformation: true,
+                  }),
+                );
+              }),
+            );
           }
         } else {
           this.store.dispatch(ApplicationActions.waitForEffects.do());
@@ -1294,6 +1297,10 @@ export class AnnotationEffects {
               actionAfterFail: LoginModeActions.endTranscription.do({
                 clearSession: true,
                 mode: LoginMode.ONLINE,
+                project: state.onlineMode.currentSession.currentProject,
+                task: state.onlineMode.currentSession.task,
+                currentEditor: state.onlineMode.currentEditor,
+                keepPreviousInformation: false,
               }),
             }),
           }),
@@ -1336,23 +1343,107 @@ export class AnnotationEffects {
     ),
   );
 
-  resumeTaskManually$ = createEffect(() =>
+  prepareResumeTaskManually$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.resumeTaskManually.do),
       withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        const mode = getModeState(state);
+
+        if (action.task && action.project) {
+          // user selected one combination of project task
+          return of(
+            AnnotationActions.resumeTaskManually.success({
+              project: action.project,
+              task: action.task,
+              mode: action.mode,
+            }),
+          );
+        } else {
+          // user want to continue last task
+          const project: ProjectDto | undefined =
+            action.project ?? mode.currentSession?.currentProject;
+          const taskID: string | undefined =
+            mode.currentSession?.task?.id ?? mode.previousSession?.task?.id;
+
+          return forkJoin<{
+            project: Observable<ProjectDto>;
+            task: Observable<TaskDto>;
+          }>({
+            project: project
+              ? of(project)
+              : this.apiService.getProject(mode.previousSession.project.id),
+            task: this.apiService.getTask(
+              project?.id ?? mode.previousSession.project.id,
+              taskID,
+            ),
+          }).pipe(
+            map((result) => {
+              if (result.project && result.task) {
+                return AnnotationActions.resumeTaskManually.success({
+                  project: result.project,
+                  task: result.task,
+                  mode: action.mode,
+                });
+              } else {
+                AnnotationActions.resumeTaskManually.fail({
+                  mode: action.mode,
+                  error: 'Missing project and/or task id',
+                });
+              }
+            }),
+            catchError((error: HttpErrorResponse) =>
+              checkAndThrowError(
+                error,
+                action,
+                AnnotationActions.resumeTaskManually.fail({
+                  error: error?.error?.message ?? error?.message,
+                  mode: state.application.mode!,
+                }),
+                this.store,
+              ),
+            ),
+          );
+        }
+      }),
+    ),
+  );
+
+  resumeTaskManually$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.resumeTaskManually.success),
+      withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         const modeState = getModeState(state);
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
 
-        if (
-          modeState?.currentSession?.currentProject &&
-          modeState?.currentSession?.task
-        ) {
-          return of(
-            AnnotationActions.prepareTaskDataForAnnotation.do({
-              mode: state.application.mode!,
-              currentProject: modeState.currentSession.currentProject,
-              task: modeState.currentSession.task,
+        const projectID =
+          modeState?.currentSession?.currentProject?.id ??
+          modeState?.previousSession?.project?.id;
+        const taskID =
+          modeState?.currentSession?.task?.id ??
+          modeState?.previousSession?.task?.id;
+
+        if (projectID && taskID) {
+          return this.apiService.continueTask(projectID, taskID).pipe(
+            map(() => {
+              return AnnotationActions.prepareTaskDataForAnnotation.do({
+                mode: state.application.mode!,
+                currentProject: modeState.currentSession.currentProject,
+                task: modeState.currentSession.task,
+              });
             }),
+            catchError((error: HttpErrorResponse) =>
+              checkAndThrowError(
+                error,
+                a,
+                AnnotationActions.resumeTaskManually.fail({
+                  error: error?.error?.message ?? error?.message,
+                  mode: state.application.mode!,
+                }),
+                this.store,
+              ),
+            ),
           );
         }
 

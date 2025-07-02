@@ -5,6 +5,8 @@ import {
   AccountLoginMethod,
   AuthDto,
   CurrentAccountDto,
+  ProjectDto,
+  TaskDto,
 } from '@octra/api-types';
 import { SessionFile } from '../../obj/SessionFile';
 import { LoginMode } from '../index';
@@ -142,12 +144,17 @@ export class AuthenticationActions {
         messageType?: string;
         clearSession: boolean;
         mode?: LoginMode;
+        keepPreviousInformation?: boolean;
       }>(),
       success: props<{
         message?: string;
         messageType?: string;
         clearSession: boolean;
+        keepPreviousInformation?: boolean;
         mode?: LoginMode;
+        project: ProjectDto;
+        task: TaskDto;
+        currentEditor: string;
       }>(),
     },
   });

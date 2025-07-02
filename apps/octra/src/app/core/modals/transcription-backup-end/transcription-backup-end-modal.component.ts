@@ -8,12 +8,6 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraModal } from '../types';
 
-export enum ModalEndAnswer {
-  CANCEL = 'CANCEL',
-  QUIT = 'QUIT',
-  CONTINUE = 'CONTINUE',
-}
-
 @Component({
   selector: 'octra-transcription-backup-end-modal',
   templateUrl: './transcription-backup-end-modal.component.html',

@@ -353,7 +353,16 @@ export class AnnotationActions {
   static resumeTaskManually = createActionGroup({
     source: 'annotation/resume task manually',
     events: {
-      do: emptyProps(),
+      do: props<{ project?: ProjectDto; task?: TaskDto; mode: LoginMode }>(),
+      fail: props<{
+        mode: LoginMode;
+        error: string;
+      }>(),
+      success: props<{
+        project?: ProjectDto;
+        task?: TaskDto;
+        mode: LoginMode;
+      }>(),
     },
   });
 

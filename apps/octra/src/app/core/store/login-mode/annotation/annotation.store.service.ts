@@ -12,7 +12,7 @@ import {
   OItem,
   TextConverter,
 } from '@octra/annotation';
-import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
+import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { OctraGuidelines } from '@octra/assets';
 import { MultiThreadingService } from '@octra/ngx-components';
 import {
@@ -354,8 +354,14 @@ export class AnnotationStoreService {
     );
   }
 
-  resumeTaskManually() {
-    this.store.dispatch(AnnotationActions.resumeTaskManually.do());
+  resumeTaskManually(project?: ProjectDto, task?: TaskDto) {
+    this.store.dispatch(
+      AnnotationActions.resumeTaskManually.do({
+        project,
+        task,
+        mode: this.appStorage.snapshot.application.mode!,
+      }),
+    );
   }
 
   public addAnnotationLevel(levelType: AnnotationLevelType) {

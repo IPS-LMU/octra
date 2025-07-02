@@ -109,6 +109,8 @@
     "very good intelligible": "very good intelligibility"
   },
   "g": {
+    "instructions": "Instructions",
+    "comment": "Comment",
     "File extension": "File extension",
     "Format": "Format",
     "Language": "Language",
@@ -166,6 +168,7 @@
     "free jobs": "Free Jobs",
     "free quota": "Free Quota",
     "free tasks": "Free Tasks",
+    "paused tasks": "Paused tasks",
     "gender": "Gender",
     "good": "Good",
     "guidelines": "Guidelines",
@@ -248,7 +251,8 @@
     "validation": "Validation",
     "wanted": "Wanted",
     "website": "Website",
-    "yes": "Yes"
+    "yes": "Yes",
+    "text excerpt": "Text excerpt"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -445,7 +449,10 @@
     "selected level": "Selected level",
     "send email": "Send e-mail",
     "sign up": "Sign up",
-    "username or email": "Username or E-Mail"
+    "username or email": "Username or E-Mail",
+    "continue task": "Continue task",
+    "free task": "Free task",
+    "my paused tasks": "My previously paused tasks"
   },
   "projects-list": {
     "introduction": "Please select a project that you want to transcribe and click on \"START\".",

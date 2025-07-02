@@ -109,6 +109,8 @@
     "very good intelligible": "sehr gut verständlich"
   },
   "g": {
+    "instructions": "Anweisungen",
+    "comment": "Kommentar",
     "File extension": "Dateiendung",
     "Format": "Format",
     "Language": "Sprache",
@@ -166,6 +168,7 @@
     "free jobs": "Freie Aufgaben",
     "free quota": "Kostenloses Kontingent",
     "free tasks": "Freie Aufgaben",
+    "paused tasks": "Pausierte Aufgaben",
     "gender": "Geschlecht",
     "good": "Gut",
     "guidelines": "Regeln",
@@ -248,7 +251,8 @@
     "validation": "Validierung",
     "wanted": "Gesucht wird",
     "website": "Webseite",
-    "yes": "Ja"
+    "yes": "Ja",
+    "text excerpt": "Textausschnitt"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -445,7 +449,10 @@
     "selected level": "Ausgewähltes level",
     "send email": "E-Mail senden",
     "sign up": "Neu registrieren",
-    "username or email": "Nutzername oder E-Mail"
+    "username or email": "Nutzername oder E-Mail",
+    "continue task": "Aufgabe fortsetzen",
+    "free task": "Aufgabe freigeben",
+    "my paused tasks": "Meine zuletzt pausierten Aufgaben"
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",

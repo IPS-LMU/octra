@@ -1,14 +1,15 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import {
   AccountProjectRoleDto,
   ProjectDto,
   ProjectListDto,
+  TaskDto,
 } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../../component/default.component';
@@ -23,25 +24,61 @@ import {
 } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
+import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
+
+class PreparedProjectDto extends ProjectDto {
+  collapsed = true;
+  canExpand = false;
+
+  pausedTasks = 0;
+  freeTasks = 0;
+
+  constructor(partial?: Partial<ProjectDto>) {
+    super();
+    Object.assign(this, partial);
+
+    if (partial) {
+      this.pausedTasks = partial.statistics.tasks.find(
+        (a) => a.type === 'annotation',
+      )?.status.paused;
+      this.freeTasks = partial.statistics.tasks.find(
+        (a) => a.type === 'annotation',
+      )?.status.free;
+
+      if (this.pausedTasks > 0) {
+        this.canExpand = true;
+      }
+    }
+  }
+}
 
 @Component({
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
-  imports: [AsyncPipe, TranslocoPipe, LuxonShortDateTimePipe, NgbPagination],
+  imports: [
+    AsyncPipe,
+    TranslocoPipe,
+    LuxonShortDateTimePipe,
+    NgbPagination,
+    NgStyle,
+    NgbAccordionModule,
+    NgClass,
+    MyTasksComponent,
+  ],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   private api = inject(OctraAPIService);
   appStorage = inject(AppStorageService);
   private modalService = inject(OctraModalService);
   authStoreService = inject(AuthenticationStoreService);
-  private annotationStoreService = inject(AnnotationStoreService);
+  annotationStoreService = inject(AnnotationStoreService);
   private store = inject<Store<RootState>>(Store);
   private actions$ = inject(Actions);
 
   projects?: ProjectListDto;
-  shownProjects?: ProjectDto[];
+  shownProjects?: PreparedProjectDto[];
 
   projectStarting = false;
   itemsPerPage = 20;
@@ -52,6 +89,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
 
   projectRoles: AccountProjectRoleDto[] = [];
   istProjectAdmin = false;
+
+  sameUserWithOpenTask?: { projectID: string; taskID: string };
+  previousProject?: ProjectDto;
 
   constructor() {
     super();
@@ -76,6 +116,18 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         this.istProjectAdmin =
           this.projectRoles.find((a) => a.role === 'project_admin') !==
           undefined;
+      },
+    });
+    this.subscribe(authStoreService.sameUserWithOpenTask$, {
+      next: (result) => {
+        this.sameUserWithOpenTask = result;
+        if (result?.projectID) {
+          this.subscribe(this.api.getProject(result.projectID), {
+            next: (result) => {
+              this.previousProject = result;
+            },
+          });
+        }
       },
     });
   }
@@ -115,7 +167,10 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
               );
 
               if (annotationStatistics) {
-                if (annotationStatistics.status.free > 0) {
+                if (
+                  annotationStatistics.status.free > 0 ||
+                  annotationStatistics.status.paused > 0
+                ) {
                   return true;
                 }
               }
@@ -146,10 +201,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   showProjects(page: number) {
-    this.shownProjects = this.projects.list.slice(
-      (page - 1) * this.itemsPerPage,
-      page * this.itemsPerPage,
-    );
+    this.shownProjects = this.projects.list
+      .slice((page - 1) * this.itemsPerPage, page * this.itemsPerPage)
+      .map((a) => new PreparedProjectDto(a));
     this.currentPage = {
       page,
       collectionSize: this.projects.list.length,
@@ -161,14 +215,10 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.appStorage.startOnlineAnnotation(project);
   }
 
-  resumeTaskManually() {
-    this.annotationStoreService.resumeTaskManually();
-  }
-
-  getFreeAnnotationTasks(project: ProjectDto) {
+  getPausedTasks(project: ProjectDto) {
     return (
       project.statistics?.tasks.find((a) => a.type === 'annotation')?.status
-        .free ?? 0
+        .paused ?? 0
     );
   }
 
@@ -177,5 +227,9 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       ProjectRequestModalComponent,
       ProjectRequestModalComponent.options,
     );
+  }
+
+  pausedTaskContinueClick($event: { project: ProjectDto; task: TaskDto }) {
+    this.annotationStoreService.resumeTaskManually($event.project, $event.task);
   }
 }

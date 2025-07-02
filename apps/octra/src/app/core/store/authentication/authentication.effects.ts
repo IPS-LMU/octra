@@ -36,7 +36,7 @@ import { RoutingService } from '../../shared/service/routing.service';
 import { ApplicationActions } from '../application/application.actions';
 import { checkAndThrowError } from '../error.handlers';
 import { IDBActions } from '../idb/idb.actions';
-import { LoginMode, RootState } from '../index';
+import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { AuthenticationActions } from './authentication.actions';
 
@@ -322,21 +322,41 @@ export class AuthenticationEffects {
       ofType(AuthenticationActions.logout.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
+        const modeState = getModeState(state);
         if (state.application.mode === LoginMode.ONLINE) {
           return this.apiService.logout().pipe(
             map(() => {
               this.sessionStorageService.clear();
-              return AuthenticationActions.logout.success(action);
+              return AuthenticationActions.logout.success({
+                ...action,
+                project: modeState.currentSession?.currentProject,
+                task: modeState.currentSession?.task,
+                currentEditor: modeState.currentEditor,
+              });
             }),
             catchError((err: HttpErrorResponse) => {
               // ignore
               this.sessionStorageService.clear();
-              return of(AuthenticationActions.logout.success(action));
+              return of(
+                AuthenticationActions.logout.success({
+                  ...action,
+                  project: modeState.currentSession?.currentProject,
+                  task: modeState.currentSession?.task,
+                  currentEditor: modeState.currentEditor,
+                }),
+              );
             }),
           );
         }
         this.sessionStorageService.clear();
-        return of(AuthenticationActions.logout.success(action));
+        return of(
+          AuthenticationActions.logout.success({
+            ...action,
+            project: modeState.currentSession?.currentProject,
+            task: modeState.currentSession?.task,
+            currentEditor: modeState.currentEditor,
+          }),
+        );
       }),
     ),
   );

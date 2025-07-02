@@ -141,6 +141,31 @@ export class AnnotationStateReducers {
         return state;
       }),
       on(
+        AnnotationActions.resumeTaskManually.success,
+        (state: AnnotationState, { mode, task, project }) => {
+          if (this.mode === mode && project && task) {
+            return {
+              ...state,
+              currentSession: {
+                ...state.currentSession,
+                currentProject: {
+                  ...project,
+                },
+                comment: task.comment,
+                task: {
+                  ...task,
+                },
+              },
+              logging: {
+                ...state.logging,
+                logs: task.log,
+              },
+            };
+          }
+          return state;
+        },
+      ),
+      on(
         AnnotationActions.loadAudio.success,
         (state: AnnotationState, { mode, audioFile }) => {
           if (this.mode === mode) {
@@ -502,6 +527,7 @@ export class AnnotationStateReducers {
               ...state,
               currentSession: {
                 ...state.currentSession,
+                comment: task?.comment,
                 task,
                 currentProject,
               },

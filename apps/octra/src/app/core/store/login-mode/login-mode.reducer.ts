@@ -77,13 +77,20 @@ export class LoginModeReducers {
       on(
         AuthenticationActions.logout.success,
         LoginModeActions.endTranscription.do,
-        (state: AnnotationState, { clearSession, mode }) => {
+        (
+          state: AnnotationState,
+          { clearSession, mode, keepPreviousInformation },
+        ) => {
           return mode === this.mode && clearSession
             ? {
                 ...initialState,
-                currentSession: {
-                  ...initialState.currentSession,
-                },
+                currentEditor: state.currentEditor,
+                previousCurrentLevel: keepPreviousInformation
+                  ? state.previousCurrentLevel
+                  : initialState.previousCurrentLevel,
+                previousSession: keepPreviousInformation
+                  ? state.previousSession
+                  : initialState.previousSession,
               }
             : {
                 ...state,
@@ -286,7 +293,7 @@ export class LoginModeReducers {
                     : state.logging.enabled,
                 startTime: Date.now(),
                 startReference:
-                  state.logging.logs.length > 0
+                  state.logging.logs && state.logging.logs.length > 0
                     ? state.logging.logs[state.logging.logs.length - 1]
                     : undefined,
               },
@@ -413,6 +420,17 @@ export class LoginModeReducers {
           previousSession: {
             ...state.previousSession,
             task: {
+              id: value,
+            },
+          } as any,
+        };
+        break;
+      case 'projectID':
+        state = {
+          ...state,
+          previousSession: {
+            ...state.previousSession,
+            project: {
               id: value,
             },
           } as any,

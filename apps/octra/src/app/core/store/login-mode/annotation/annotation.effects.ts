@@ -757,7 +757,7 @@ export class AnnotationEffects {
           let projectConfigURL = 'config/localmode/projectconfig.json';
           let guidelinesURLs =
             state.application.appConfiguration!.octra.languages.map((lang) => ({
-              url: `config/localmode/guidelines/guidelines_${a}.json`,
+              url: `config/localmode/guidelines/guidelines_${lang}.json`,
               lang,
             }));
           let functionsURL = `config/localmode/functions.js`;

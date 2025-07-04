@@ -9,7 +9,7 @@
         <span class="d-none d-lg-inline"> [ALT + 8]</span>
       }
     </a>
-    @if (appStorage.useMode !== 'url') {
+    @if (appStorage.useMode !== 'url' || routingService.staticQueryParams.guidelines_url !== undefined) {
       <a (click)="guidelinesbtnclicked.emit()" class="w-100">
         <i class="bi bi-card-list"></i>
         @if (!appStorage.easyMode) {

@@ -41,6 +41,10 @@ export interface URLParameters {
   annotationExportType?: string;
   host?: string;
   transcript?: string;
+  project_config_url?: string;
+  guidelines_url?: string;
+  functions_url?: string;
+  locale?: string;
   readonly?: boolean;
   embedded?: boolean;
   bottomNav?: boolean;

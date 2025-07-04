@@ -75,6 +75,11 @@ export class ApplicationEffects {
 
         const queryParams: URLParameters = {
           audio_url: this.getParameterByName<string>('audio_url'),
+          project_config_url:
+            this.getParameterByName<string>('project_config_url'),
+          guidelines_url: this.getParameterByName<string>('guidelines_url'),
+          locale: this.getParameterByName<string>('locale'),
+          functions_url: this.getParameterByName<string>('functions_url'),
           audio_name: this.getParameterByName<string>('audio_name'),
           audio_type: this.getParameterByName<string>('audio_type'),
           auto_playback: this.getParameterByName<boolean>('auto_playback'),

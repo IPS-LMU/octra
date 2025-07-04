@@ -3,6 +3,7 @@ import { HelpModalComponent } from '../../modals/help-modal/help-modal.component
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
+import { RoutingService } from '../../shared/service/routing.service';
 
 @Component({
   selector: 'octra-fastbar',
@@ -13,6 +14,7 @@ export class FastbarComponent {
   appStorage = inject(AppStorageService);
   private appStoreService = inject(ApplicationStoreService);
   private modalService = inject(OctraModalService);
+  protected routingService = inject(RoutingService);
 
   @Input() buttonLabels: any = {
     shortcuts: 'Shortcuts',

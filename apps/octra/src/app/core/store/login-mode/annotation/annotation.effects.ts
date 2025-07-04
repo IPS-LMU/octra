@@ -754,6 +754,34 @@ export class AnnotationEffects {
         } else if (
           [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
         ) {
+          let projectConfigURL = 'config/localmode/projectconfig.json';
+          let guidelinesURLs =
+            state.application.appConfiguration!.octra.languages.map((lang) => ({
+              url: `config/localmode/guidelines/guidelines_${a}.json`,
+              lang,
+            }));
+          let functionsURL = `config/localmode/functions.js`;
+          if (
+            a.mode === LoginMode.URL &&
+            this.routingService.staticQueryParams.project_config_url &&
+            this.routingService.staticQueryParams.guidelines_url &&
+            this.routingService.staticQueryParams.functions_url
+          ) {
+            projectConfigURL =
+              this.routingService.staticQueryParams.project_config_url +
+              `&v=${Date.now()}`;
+            guidelinesURLs = [
+              {
+                url:
+                  this.routingService.staticQueryParams.guidelines_url +
+                  `&v=${Date.now()}`,
+                lang: this.routingService.staticQueryParams.locale ?? 'en',
+              },
+            ];
+            functionsURL =
+              this.routingService.staticQueryParams.functions_url +
+              `&v=${Date.now()}`;
+          }
           // mode is not online => load configuration for local environment
           return forkJoin<
             [
@@ -768,26 +796,26 @@ export class AnnotationEffects {
               any,
             ]
           >([
-            this.http.get('config/localmode/projectconfig.json', {
+            this.http.get(projectConfigURL, {
               responseType: 'json',
             }),
             forkJoin(
-              state.application.appConfiguration!.octra.languages.map(
-                (b: string) =>
+              guidelinesURLs.map(
+                ({ url, lang }: { url: string; lang: string }) =>
                   this.http
-                    .get(`config/localmode/guidelines/guidelines_${b}.json`, {
+                    .get(url, {
                       responseType: 'json',
                     })
                     .pipe(
                       map((c) => ({
-                        language: b,
+                        language: lang,
                         json: c,
                       })),
                       catchError(() => of(undefined)),
                     ),
               ),
             ),
-            this.http.get('config/localmode/functions.js', {
+            this.http.get(functionsURL, {
               responseType: 'text',
             }),
           ]).pipe(

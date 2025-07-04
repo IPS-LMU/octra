@@ -34,6 +34,7 @@ import { ApplicationActions } from '../../application/application.actions';
 import { getModeState, LoginMode, RootState } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
+import { RoutingService } from '../../../shared/service/routing.service';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +45,7 @@ export class AnnotationStoreService {
   private appStoreService = inject(ApplicationStoreService);
   private appStorage = inject(AppStorageService);
   private multiThreading = inject(MultiThreadingService);
+  private routingService = inject(RoutingService);
 
   public segmentrequested = new EventEmitter<number>();
 
@@ -795,7 +797,9 @@ export class AnnotationStoreService {
     )?.projectConfig;
 
     if (
-      this.appStorage.useMode !== LoginMode.URL &&
+      (this.appStorage.useMode !== LoginMode.URL ||
+        (this.routingService.staticQueryParams.guidelines_url &&
+          this.routingService.staticQueryParams.functions_url)) &&
       (this.appStorage.useMode === LoginMode.DEMO ||
         projectSettings?.octra?.validationEnabled === true)
     ) {

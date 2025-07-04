@@ -525,7 +525,9 @@ export class TranscrWindowComponent
 
   setValidationEnabledToDefault() {
     this._validationEnabled =
-      this.appStorage.useMode !== 'url' &&
+      (this.appStorage.useMode !== 'url' ||
+        (this.routingService.staticQueryParams.guidelines_url &&
+          this.routingService.staticQueryParams.functions_url)) &&
       (this.appStorage.useMode === 'demo' ||
         this.settingsService?.projectsettings?.octra?.validationEnabled ===
           true);

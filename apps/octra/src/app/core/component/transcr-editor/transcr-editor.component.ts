@@ -52,8 +52,6 @@ import { DefaultComponent } from '../default.component';
 import { TranscrEditorConfig } from './config';
 import { ValidationPopoverComponent } from './validation-popover/validation-popover.component';
 
-declare let document: any;
-
 @Component({
   selector: 'octra-transcr-editor',
   templateUrl: './transcr-editor.component.html',
@@ -303,7 +301,10 @@ export class TranscrEditorComponent
     let html = this.wysiwyg.innerHTML;
 
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
-    html = html.replace(/&nbsp;/g, ' ');
+
+    if (html.includes('⌈') || html.includes('⌉')) {
+      console.error('HTML contains protected utf-8 icons!');
+    }
 
     // check for markers that are utf8 symbols
     if (this.markers) {
@@ -323,10 +324,8 @@ export class TranscrEditorComponent
       }
     }
 
-    const dom: HTMLElement = document.createElement('p');
+    const dom: HTMLElement = this.renderer.createElement('p');
     dom.innerHTML = html;
-
-    let charCounter = 0;
 
     const textSelection = {
       start: -1,
@@ -353,23 +352,20 @@ export class TranscrEditorComponent
           for (const marker of this.markers) {
             if (markerCode === marker.code) {
               const parent = elem.parentNode;
-              parent.replaceChild(document.createTextNode(markerCode), elem);
-              charCounter += markerCode.length;
+              parent.replaceChild(this.renderer.createText(markerCode), elem);
               break;
             }
           }
         } else if (elem.nodeType === 3) {
           // is textNode
           const text = elem.nodeValue;
-          charCounter += text.length;
           elem.innerText = text;
         } else if (tagName.toLowerCase() === 'img') {
           if (getAttr(elem, 'data-samples') !== undefined) {
             const boundaryText = `{${getAttr(elem, 'data-samples')}}`;
-            const textnode = document.createTextNode(boundaryText);
+            const textnode = this.renderer.createText(boundaryText);
             elem.parentNode.insertBefore(textnode, elem);
             elem.remove();
-            charCounter += boundaryText.length;
           }
         } else if (
           getAttr(elem, 'class') === 'val-error' &&
@@ -379,40 +375,47 @@ export class TranscrEditorComponent
         } else if (tagName.toLowerCase() === 'span') {
           if (getAttr(elem, 'data-jodit-selection_marker') === 'start') {
             // save start selection
-            textSelection.start = charCounter;
+            const textnode = this.renderer.createText(`⌈start⌉`);
+            elem.parentNode.insertBefore(textnode, elem);
+            elem.remove();
           } else if (getAttr(elem, 'data-jodit-selection_marker') === 'end') {
             // save start selection
-            textSelection.end = charCounter;
+            const textnode = this.renderer.createText(`⌈end⌉`);
+            elem.parentNode.insertBefore(textnode, elem);
+            elem.remove();
           } else if (getAttr(elem, 'class') === 'highlighted') {
             elem.remove();
           } else {
             const elemText = elem.innerText;
-            const textnode = document.createTextNode(elemText);
+            const textnode = this.renderer.createText(elemText);
             elem.parentNode.insertBefore(textnode, elem);
             elem.remove();
-            charCounter += elemText.length;
           }
         }
       }
     };
+    dom.childNodes.forEach(replaceFunc);
+    let rawText = dom.innerText.replace(/\uFEFF/gm, '').replace(/&nbsp;/g, ' ');
 
-    if (textSelection.start === -1 || textSelection.end === -1) {
+    if (replaceEmptySpaces) {
+      rawText = rawText.replace(/[\s ]+/g, ' ');
+    }
+
+    textSelection.start = rawText.indexOf('⌈start⌉');
+    rawText = rawText.replace('⌈start⌉', '');
+    textSelection.end = rawText.indexOf('⌈end⌉');
+    rawText = rawText.replace('⌈end⌉', '');
+
+    if (textSelection.start === -1 && textSelection.end === -1) {
       textSelection.start = 0;
       textSelection.end = 0;
     }
 
     this._textSelection = textSelection;
 
-    dom.childNodes.forEach(replaceFunc);
-
-    let rawText = dom.innerText;
-
-    if (replaceEmptySpaces) {
-      rawText = rawText.replace(/[\s ]+/g, ' ');
-    }
-
-    return rawText.replace(/\uFEFF/gm, '');
+    return rawText;
   };
+
   /**
    * initializes the editor and the containing jodit editor
    */
@@ -468,7 +471,7 @@ export class TranscrEditorComponent
       this.cd.markForCheck();
       this.cd.detectChanges();
 
-      const validationError = document.createElement('div');
+      const validationError = this.renderer.createElement('div');
       validationError.setAttribute('class', 'card error-card');
       validationError.innerHTML = `
       <div class="card-header" style="padding:5px 10px; font-weight: bold;background-color:whitesmoke;">
@@ -592,15 +595,15 @@ export class TranscrEditorComponent
       ) {
         // it's an icon
 
-        const element = document.createElement('img');
+        const element = this.renderer.createElement('img');
         element.setAttribute('src', icon);
         element.setAttribute('class', 'btn-icon-text');
         element.setAttribute('data-marker-code', markerCode);
         element.setAttribute('alt', markerCode);
 
-        editor!.selection.insertNode(document.createTextNode(' '), true);
+        editor!.selection.insertNode(this.renderer.createText(' '), true);
         editor!.selection.insertHTML(element.outerHTML, true);
-        editor!.selection.insertNode(document.createTextNode(' '), true);
+        editor!.selection.insertNode(this.renderer.createText(' '), true);
       } else {
         editor!.selection.insertHTML(icon, true);
       }
@@ -779,7 +782,7 @@ export class TranscrEditorComponent
         if (!btn) {
           const content = getContent();
 
-          const button = document.createElement('span');
+          const button = this.renderer.createElement('span');
 
           if (tooltip) {
             button.setAttribute('title', tooltip);
@@ -995,7 +998,7 @@ export class TranscrEditorComponent
           : 'Arial';
 
       const createOption = (fontName: string) => {
-        const option = document.createElement('option');
+        const option = this.renderer.createElement('option');
         option.setAttribute('value', fontName);
         option.style.fontSize = '0.85rem';
         option.innerText = fontName;
@@ -1005,7 +1008,8 @@ export class TranscrEditorComponent
         return option;
       };
 
-      const selection: HTMLSelectElement = document.createElement('select');
+      const selection: HTMLSelectElement =
+        this.renderer.createElement('select');
       selection.value = currentFont;
       selection.appendChild(createOption('Helvetica'));
       selection.appendChild(createOption('Arial'));
@@ -1024,7 +1028,7 @@ export class TranscrEditorComponent
   }
 
   insertBoundary(imgURL: string) {
-    const element = document.createElement('img');
+    const element = this.renderer.createElement('img');
     element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute(
@@ -1135,8 +1139,8 @@ export class TranscrEditorComponent
           let code = this._rawText;
           // insert selection placeholders
           if (!focusAtEnd) {
-            const startMarker = '✉✉✉sel-start/📩📩📩';
-            const endMarker = '✉✉✉sel-end/📩📩📩';
+            const startMarker = '⌈sel-start/⌉';
+            const endMarker = '⌈sel-end/⌉';
             code =
               this.lastCursorPosition!.endMarker !== undefined &&
               this._textSelection.end >= this._textSelection.start
@@ -1145,7 +1149,7 @@ export class TranscrEditorComponent
                     this._textSelection.end,
                     endMarker,
                   )
-                : this._rawText;
+                : code;
             code = insertString(code, this._textSelection.start, startMarker);
             code = this.tidyUpRaw(code);
           }
@@ -1284,7 +1288,7 @@ export class TranscrEditorComponent
       }
 
       let currentSegIndex = 0;
-      let puffer = document.createElement('span');
+      let puffer = this.renderer.createElement('span');
       puffer.setAttribute('class', 'highlighted');
 
       const parentElement: HTMLElement = dom;
@@ -1321,13 +1325,13 @@ export class TranscrEditorComponent
                   pointer.parentNode!.insertBefore(puffer, pointer);
                 }
                 this.lastHighlightedSegment = currentSegIndex;
-                puffer = document.createElement('span');
+                puffer = this.renderer.createElement('span');
                 puffer.setAttribute('class', 'highlighted');
 
                 pointer = pointer.nextSibling;
                 currentSegIndex++;
               } else {
-                puffer = document.createElement('span');
+                puffer = this.renderer.createElement('span');
                 puffer.setAttribute('class', 'highlighted');
                 currentSegIndex++;
                 pointer = pointer.nextSibling;
@@ -1722,7 +1726,7 @@ export class TranscrEditorComponent
       (await this.annotationStoreService.rawToHTML(html)) +
       '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
-    const htmlObj = document.createElement('span');
+    const htmlObj = this.renderer.createElement('span');
     htmlObj.innerHTML = html;
 
     if (this.rawText !== undefined && this._rawText !== '') {
@@ -1742,7 +1746,7 @@ export class TranscrEditorComponent
       () => {
         if (this.workplace?.parentNode) {
           if (!this.popovers.segmentBoundary) {
-            const segmentBoundary = document.createElement('div');
+            const segmentBoundary = this.renderer.createElement('div');
             segmentBoundary.setAttribute('class', 'panel seg-popover');
             segmentBoundary.innerHTML = '00:00:000';
             this.popovers.segmentBoundary = segmentBoundary;

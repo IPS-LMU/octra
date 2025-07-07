@@ -471,9 +471,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         obj.transcription.html,
       );
       obj.transcription.html = obj.transcription.html.replace(
-        /((?:✉✉✉)|(?:📩📩📩))/,
+        /((?:⌈)|(?:⌉))/,
         (g0, g1) => {
-          if (g1 === '✉✉✉') {
+          if (g1 === '⌈') {
             return '<';
           }
           return '>';
@@ -484,9 +484,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         obj.transcription.html,
       );
       obj.transcription.html = obj.transcription.html.replace(
-        /((?:✉✉✉)|(?:📩📩📩))/g,
+        /((?:⌈)|(?:⌉))/g,
         (g0, g1) => {
-          if (g1 === '✉✉✉') {
+          if (g1 === '⌈') {
             return '<';
           }
           return '>';

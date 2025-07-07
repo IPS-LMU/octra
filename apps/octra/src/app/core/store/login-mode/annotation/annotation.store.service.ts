@@ -403,10 +403,10 @@ export class AnnotationStoreService {
     const results = validateAnnotation(rawText, this.guidelines);
 
     // check if selection is in the raw text
-    const sPos = rawText.indexOf('✉✉✉sel-start/📩📩📩');
-    const sLen = '✉✉✉sel-start/✉✉✉'.length;
-    const ePos = rawText.indexOf('✉✉✉sel-end/📩📩📩');
-    const eLen = '✉✉✉sel-end/📩📩📩'.length;
+    const sPos = rawText.indexOf('⌈sel-start/⌉');
+    const sLen = '⌈sel-start/⌈'.length;
+    const ePos = rawText.indexOf('⌈sel-end/⌉');
+    const eLen = '⌈sel-end/⌉'.length;
 
     // look for segment boundaries like {23423424}
     const segRegex = new RegExp(/{[0-9]+}/g);
@@ -448,7 +448,7 @@ export class AnnotationStoreService {
 
   public replaceSingleTags(html: string) {
     html = html.replace(/(<)([^<>]+)(>)/g, (g0, g1, g2) => {
-      return `✉✉✉${g2}📩📩📩`;
+      return `⌈${g2}⌉`;
     });
 
     html = html.replace(/([<>])/g, (g0, g1) => {
@@ -458,8 +458,8 @@ export class AnnotationStoreService {
       return '&gt;';
     });
 
-    html = html.replace(/((?:✉✉✉)|(?:📩📩📩))/g, (g0, g1) => {
-      if (g1 === '✉✉✉') {
+    html = html.replace(/((?:⌈)|(?:⌉))/g, (g0, g1) => {
+      if (g1 === '⌈') {
         return '<';
       }
 
@@ -549,13 +549,13 @@ export class AnnotationStoreService {
                     g2 === 'u' &&
                     g2 === 's'
                   ) {
-                    return `✉✉✉${g2}📩📩📩`;
+                    return `⌈${g2}⌉`;
                   }
 
                   // check if it's a marker
                   for (const marker of markers) {
                     if (`${g1}${g2}${g3}` === marker.code) {
-                      return `✉✉✉${g2}📩📩📩`;
+                      return `⌈${g2}⌉`;
                     }
                   }
 
@@ -572,7 +572,7 @@ export class AnnotationStoreService {
                 return '&gt;';
               });
 
-              result = result.replace(/(✉✉✉)|(📩📩📩)/g, (g0, g1, g2) => {
+              result = result.replace(/(⌈)|(⌉)/g, (g0, g1, g2) => {
                 if (g2 === undefined && g1 !== undefined) {
                   return '<';
                 } else {
@@ -662,9 +662,6 @@ export class AnnotationStoreService {
     let result = rawtext;
 
     try {
-      const sPos = rawtext.indexOf('✉✉✉sel-start/📩📩📩');
-      const sLen = '✉✉✉sel-start/📩📩📩'.length;
-
       interface Pos {
         start: number;
         puffer: string;
@@ -676,7 +673,9 @@ export class AnnotationStoreService {
 
       if (validation.length > 0) {
         // prepare insertions
-        for (const validationElement of validation) {
+        for (let i = validation.length - 1; i >= 0; i--) {
+          const validationElement = validation[i];
+
           const foundMarker = markerPositions.find((a) => {
             return (
               validationElement.start > a.start &&
@@ -691,21 +690,18 @@ export class AnnotationStoreService {
 
             if (insertStart === undefined) {
               insertStart = {
-                start:
-                  sPos < 0 || validationElement.start < sPos
-                    ? validationElement.start
-                    : sPos + sLen + validationElement.start,
+                start: validationElement.start,
                 puffer:
-                  "✉✉✉span class='val-error' data-errorcode='" +
+                  "⌈span class='val-error' data-errorcode='" +
                   validationElement.code +
-                  "'📩📩📩",
+                  "'⌉",
               };
               insertions.push(insertStart);
             } else {
               insertStart.puffer +=
-                "✉✉✉span class='val-error' data-errorcode='" +
+                "⌈span class='val-error' data-errorcode='" +
                 validationElement.code +
-                "'📩📩📩";
+                "'⌉";
             }
 
             let insertEnd = insertions.find((val) => {
@@ -719,10 +715,10 @@ export class AnnotationStoreService {
                 start: insertStart.start + validationElement.length,
                 puffer: '',
               };
-              insertEnd.puffer = '✉✉✉/span📩📩📩';
+              insertEnd.puffer = '⌈/span⌉';
               insertions.push(insertEnd);
             } else {
-              insertEnd.puffer = '✉✉✉/span📩📩📩' + insertEnd.puffer;
+              insertEnd.puffer = '⌈/span⌉' + insertEnd.puffer;
             }
           }
         }
@@ -731,18 +727,13 @@ export class AnnotationStoreService {
           if (a.start === b.start) {
             return 0;
           } else if (a.start < b.start) {
-            return -1;
+            return 1;
           }
-          return 1;
+          return -1;
         });
 
-        let puffer = '';
         for (const insertion of insertions) {
-          const offset = puffer.length;
-          const pos = insertion.start;
-
-          result = insertString(result, pos + offset, insertion.puffer);
-          puffer += insertion.puffer;
+          result = insertString(result, insertion.start, insertion.puffer);
         }
       }
     } catch (e) {

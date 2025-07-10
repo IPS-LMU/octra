@@ -452,15 +452,17 @@
     "username or email": "Nutzername oder E-Mail",
     "continue task": "Aufgabe fortsetzen",
     "free task": "Aufgabe freigeben",
-    "my paused tasks": "Meine zuletzt pausierten Aufgaben"
+    "my paused tasks": "Meine zuletzt pausierten Aufgaben",
+    "further information": "Weitere informationen"
   },
   "projects-list": {
-    "introduction": "Wähle ein Projekt, für das Du transkribieren möchtest und klicke auf \"START\".",
+    "introduction": "Wähle ein Projekt aus und beginne eine neue Transcriktion. Falls pausierte Aufgaben eines Projekts verfügbar sind, kannst Du diese einzeln fortsetzen.",
     "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben.",
     "other user logged in": "Es sind Daten von einer Sitzung eines anderen Nutzers vorhanden (<b>{{username}}</b>). Wenn Du eine neue Aufgabe beginnst, werden diese Daten entfernt.",
     "project creation wanted": "I möchte ein neues Projekt erstellen",
     "resume transcription": "Transkription fortsetzen",
-    "same user free task": "Es sind Daten einer nicht abgeschlossenen Sitzung vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die Transkription fortzusetzen oder beginne eine neue Aufgabe. <b>Beginnst Du eine neue Aufgabe, werden die Daten der vorherigen Sitzung entfernt.</b>"
+    "resuming feature": "Jetzt neu: Du kannst nun deine zuletzt pausierten Aufgaben eines Projektes einsehen und ausgeählte Aufgaben fortsetzen. Z.B. kannst Du die Arbeit an einer Aufgabe pausieren und eine andere Aufgabe beginnen oder fortsetzen - auch von einem anderen Projekt oder Gerät.",
+    "same user free task": "Es sind Daten einer zuvor pausierten Transkription vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die diese Transkription fortzusetzen. Alternativ kannst Du eine neue Transkription beginnen oder eine andere pausierte Aufgabe fortsetzen."
   },
   "reload-file": {
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'",

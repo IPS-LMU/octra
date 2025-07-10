@@ -27,9 +27,11 @@
             "
           ></span>
           <p>
-            <a class="link" (click)="annotationStoreService.resumeTaskManually()">{{
-              'projects-list.resume transcription' | transloco
-            }}</a>
+            <a
+              class="link"
+              (click)="annotationStoreService.resumeTaskManually()"
+              >{{ 'projects-list.resume transcription' | transloco }}</a
+            >
           </p>
         </div>
       }
@@ -42,6 +44,20 @@
     </div>
     <div class="flex" style="height: 100px">
       @if (shownProjects) {
+        <div class="row shadow p-3 m-3 rounded">
+          <div class="col-auto align-items-center">
+            <i class="bi bi-stars" style="font-size: 2rem; color: #ffb700"></i>
+          </div>
+          <div class="col align-items-center">
+            {{ 'projects-list.resuming feature' | transloco }}
+            <a
+              href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/the-modes.html#resuming-paused-tasks"
+              target="_blank"
+              >{{ 'p.further information' | transloco }}</a
+            >
+          </div>
+        </div>
+
         <div
           class="text-end link"
           style="font-size: 0.8rem"

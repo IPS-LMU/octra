@@ -1,18 +1,5 @@
 import { NavigationExtras } from '@angular/router';
-import {
-  AnnotJSONConverter,
-  BundleJSONConverter,
-  Converter,
-  CTMConverter,
-  ELANConverter,
-  PartiturConverter,
-  PraatTableConverter,
-  PraatTextgridConverter,
-  SRTConverter,
-  TextConverter,
-  WebVTTConverter,
-  WhisperJSONConverter,
-} from '@octra/annotation';
+import { AllOctraConverters, Converter } from '@octra/annotation';
 import { MusicMetadataFormat, WavFormat } from '@octra/web-media';
 
 export class AppInfo {
@@ -21,19 +8,7 @@ export class AppInfo {
     new MusicMetadataFormat(),
   ];
 
-  public static readonly converters: Converter[] = [
-    new AnnotJSONConverter(),
-    new WhisperJSONConverter(),
-    new PraatTableConverter(),
-    new PraatTextgridConverter(),
-    new CTMConverter(),
-    new PartiturConverter(),
-    new BundleJSONConverter(),
-    new ELANConverter(),
-    new SRTConverter(),
-    new WebVTTConverter(),
-    new TextConverter(),
-  ];
+  public static readonly converters: Converter[] = AllOctraConverters;
 
   public static readonly themes: string[] = ['default', 'shortAudioFiles'];
   static readonly manualURL =
@@ -47,7 +22,7 @@ export class AppInfo {
   };
 
   public static BUILD = {
-    version: '0.0.0',
+    version: '2.0.0',
     hash: '2893u092i349i23904',
     timestamp: new Date().toISOString(),
   };

@@ -139,7 +139,7 @@ export function unEscapeHtml(text: string): string {
 export function insertString(
   input: string,
   pos: number,
-  insertion: string
+  insertion: string,
 ): string {
   let result = input;
 
@@ -160,7 +160,7 @@ export function waitTillResultRetrieved<
   A2 extends {
     type: string;
   },
-  T
+  T,
 >(actions: A1, success: A2, failure: A2) {
   return new Promise<T>((resolve, reject) => {
     const subscr = actions.subscribe((action: A2) => {
@@ -440,8 +440,12 @@ export function stringifyQueryParams(params: Record<string, any>) {
   const strArray: string[] = [];
 
   for (const key of Object.keys(params)) {
-    if (params[key] !== undefined) {
-      strArray.push(`${key}=${params[key]}`);
+    let value = params[key];
+    if (value !== undefined) {
+      if (typeof value !== 'string' && Array.isArray(value)) {
+        value = value.join(',');
+      }
+      strArray.push(`${key}=${value}`);
     }
   }
 
@@ -485,7 +489,7 @@ export function appendURLQueryParams(
 
 export function filterUnique<T>(array: T[], isEqual: (a: T, b: T) => boolean) {
   return array.filter(
-    (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i
+    (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i,
   );
 }
 

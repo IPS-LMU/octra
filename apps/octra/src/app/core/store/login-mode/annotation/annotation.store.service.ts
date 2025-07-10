@@ -12,7 +12,7 @@ import {
   OItem,
   TextConverter,
 } from '@octra/annotation';
-import { TaskDto, TaskInputOutputDto } from '@octra/api-types';
+import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { OctraGuidelines } from '@octra/assets';
 import { MultiThreadingService } from '@octra/ngx-components';
 import {
@@ -34,6 +34,7 @@ import { ApplicationActions } from '../../application/application.actions';
 import { getModeState, LoginMode, RootState } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
+import { RoutingService } from '../../../shared/service/routing.service';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +45,7 @@ export class AnnotationStoreService {
   private appStoreService = inject(ApplicationStoreService);
   private appStorage = inject(AppStorageService);
   private multiThreading = inject(MultiThreadingService);
+  private routingService = inject(RoutingService);
 
   public segmentrequested = new EventEmitter<number>();
 
@@ -323,6 +325,7 @@ export class AnnotationStoreService {
         clearSession,
         freeTask,
         redirectToProjects,
+        mode: this.appStorage.useMode,
       }),
     );
   }
@@ -354,8 +357,14 @@ export class AnnotationStoreService {
     );
   }
 
-  resumeTaskManually() {
-    this.store.dispatch(AnnotationActions.resumeTaskManually.do());
+  resumeTaskManually(project?: ProjectDto, task?: TaskDto) {
+    this.store.dispatch(
+      AnnotationActions.resumeTaskManually.do({
+        project,
+        task,
+        mode: this.appStorage.snapshot.application.mode!,
+      }),
+    );
   }
 
   public addAnnotationLevel(levelType: AnnotationLevelType) {
@@ -780,7 +789,9 @@ export class AnnotationStoreService {
     )?.projectConfig;
 
     if (
-      this.appStorage.useMode !== LoginMode.URL &&
+      (this.appStorage.useMode !== LoginMode.URL ||
+        (this.routingService.staticQueryParams.guidelines_url &&
+          this.routingService.staticQueryParams.functions_url)) &&
       (this.appStorage.useMode === LoginMode.DEMO ||
         projectSettings?.octra?.validationEnabled === true)
     ) {

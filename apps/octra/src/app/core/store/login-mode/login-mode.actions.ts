@@ -107,7 +107,14 @@ export class LoginModeActions extends AnnotationActions {
   static endTranscription = createActionGroup({
     source: 'annotation/ redirect to transcription end',
     events: {
-      do: props<{ clearSession: boolean; mode: LoginMode }>(),
+      do: props<{
+        clearSession: boolean;
+        mode: LoginMode;
+        project: ProjectDto;
+        keepPreviousInformation: boolean;
+        task: TaskDto;
+        currentEditor: string;
+      }>(),
     },
   });
 

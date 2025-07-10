@@ -33,6 +33,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
+import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../transcr-editor/transcr-editor.component';
@@ -60,6 +61,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   protected appStorage = inject(AppStorageService);
   protected settingsService = inject(SettingsService);
   private uiService = inject(UserInteractionsService);
+  protected routingService = inject(RoutingService);
 
   get textEditor(): {
     selectedSegment: number;
@@ -373,6 +375,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this._internLevel &&
       (this.annotationStoreService.validationArray.length > 0 ||
         this.appStorage.useMode === 'url' ||
+        (this.routingService.staticQueryParams.guidelines_url &&
+          this.routingService.staticQueryParams.functions_url) ||
         !this.settingsService.projectsettings?.octra?.validationEnabled)
     ) {
       if (
@@ -455,7 +459,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       validation: '',
     };
 
-    if (this.appStorage.useMode !== 'url') {
+    if (
+      this.appStorage.useMode !== 'url' ||
+      (this.routingService.staticQueryParams.guidelines_url &&
+        this.routingService.staticQueryParams.functions_url)
+    ) {
       if (
         typeof validateAnnotation !== 'undefined' &&
         typeof validateAnnotation === 'function' &&

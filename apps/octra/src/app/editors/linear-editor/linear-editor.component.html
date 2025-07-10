@@ -113,7 +113,9 @@
   [easymode]="appStorage.easyMode"
   [markers]="annotationStoreService.guidelines?.markers!"
   [validationEnabled]="
-    appStorage.useMode !== 'url' &&
+    (appStorage.useMode !== 'url' ||
+      (routingService.staticQueryParams.functions_url &&
+        routingService.staticQueryParams.guidelines_url)) &&
     (appStorage.useMode === 'demo' ||
       settingsService.projectsettings?.octra?.validationEnabled === true)
   "

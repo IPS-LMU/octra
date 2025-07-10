@@ -51,3 +51,15 @@ table tbody tr {
   font-size: 0.7rem;
   padding: 3px 10px;
 }
+
+.accordion-item {
+  border: none;
+}
+
+.accordion-body {
+  padding: 0;
+}
+
+.paused-tasks-badge {
+  color: black !important;
+}

@@ -1,0 +1,162 @@
+@if (project) {
+  <h5>{{ 'p.my paused tasks' | transloco }}</h5>
+
+  @if (tasks) {
+    <div class="list-group">
+      <ng-container [ngTemplateOutlet]="paginationBar"></ng-container>
+      @for (task of tasks; track task.id) {
+        <div class="list-group-item">
+          <div class="row g-1">
+            <div class="col-md-9" style="margin-top: 2px">
+              <div class="row g-0 pb-1 align-items-center">
+                <div class="col-12 col-md-4" style="height: 30px">
+                  <div
+                    class="badge text-bg-warning d-block position-absolute top-0"
+                    style="border-radius: 0 0 5px 0; font-size: 0.8rem"
+                  >
+                    <i class="bi bi-database"></i> {{ task.id }}
+                  </div>
+                </div>
+                <div class="col-12 col-md-8 text-md-end">
+                  <div class="p-1">
+                    <span class="d-inline-block small ms-3 ms-md-0 text-muted">
+                      <b>Paused at:</b>
+                      {{
+                        task.enddate
+                          | luxonShortDateTime
+                            : {
+                                locale: (authSoreService.me$ | async)?.locale,
+                              }
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row py-0 g-0">
+                <div class="col py-0">
+                  <div class="px-3">
+                    <div class="bg-info-subtle">
+                      <span class="text-muted ms-2 small"
+                        ><b>{{ task.audio?.name }}</b
+                        >: {{ task.orgtext }}</span
+                      >
+                    </div>
+                    @if (task.audio?.url) {
+                      <audio
+                        controls
+                        crossorigin="anonymous"
+                        style="height: 30px"
+                        class="w-100"
+                      >
+                        <source
+                          [src]="task.audio.url"
+                          [type]="task.audio.type"
+                        />
+                      </audio>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="row g-0">
+                <div class="col-12 text-muted small">
+                  @if (task.transcript) {
+                    <div
+                      class="px-2 text-truncate position-relative"
+                      [ngbPopover]="task.transcript"
+                      triggers="mouseenter:mouseleave"
+                      placement="top"
+                      container="body"
+                    >
+                      <span class="ms-2 pointer">
+                        <b>{{ 'g.text excerpt' | transloco }}:</b>
+                        {{ task.transcript }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="row g-0">
+                <div class="col">
+                  <div class="px-2">
+                    @if (task.comment) {
+                      <span class="text-muted ms-2 small">
+                        <b>{{ 'g.comment' | transloco }}:</b> {{ task.comment }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="row g-0">
+                <div class="col">
+                  <div class="px-2">
+                    @if (task.assessment) {
+                      <span class="text-muted ms-2 small">
+                        <b>{{ 'g.feedback' | transloco }}:</b>
+                        {{ task.assessment }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3 align-content-center p-2" style="background-color: #e4e4e4;">
+              <div
+                class="btn-group-vertical w-100"
+                role="group"
+                aria-label="Vertical button group"
+              >
+                <button
+                  class="btn btn-primary btn-sm w-100" style="background-color: #2dae52 !important; border:none;"
+                  (click)="continueTaskClick(task)"
+                >
+                  {{ 'p.continue task' | transloco }}
+                  <i class="bi bi-fast-forward"></i>
+                </button>
+                @if (task.assigned_worker_id === undefined) {
+                  <button
+                    class="btn btn-danger btn-sm w-100"
+                    (click)="freeTask(task)"
+                  >
+                    {{ 'p.free task' | transloco }}
+                    <i class="bi bi-dash-circle"></i>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      <ng-template [ngTemplateOutlet]="paginationBar"></ng-template>
+    </div>
+  } @else {
+    <div class="text-center p-3 position-relative" style="height: 400px">
+      <div class="position-absolute top-50 start-50 translate-middle">
+        <div
+          class="spinner-border"
+          style="width: 3rem; height: 3rem"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<ng-template #paginationBar>
+  <div class="list-group-item p-2">
+    <div class="row">
+      <div class="col"></div>
+      <div class="col-auto">
+        <ngb-pagination
+          [collectionSize]="pagination.collectionSize"
+          [(page)]="pagination.currentPage"
+          [pageSize]="options.itemsPerPage"
+          (pageChange)="onPageChange($event)"
+          size="sm"
+          [boundaryLinks]="true"
+        />
+      </div>
+    </div>
+  </div>
+</ng-template>

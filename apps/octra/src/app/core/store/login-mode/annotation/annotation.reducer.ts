@@ -141,6 +141,40 @@ export class AnnotationStateReducers {
         return state;
       }),
       on(
+        AnnotationActions.resumeTaskManually.success,
+        (state: AnnotationState, { mode, task, project }) => {
+          if (this.mode === mode && project && task) {
+            return {
+              ...state,
+              transcript: initialState.transcript,
+              currentSession: {
+                ...state.currentSession,
+                currentProject: {
+                  ...project,
+                },
+                comment: task.comment,
+                task: {
+                  ...task,
+                },
+              },
+              logging: {
+                ...state.logging,
+                logs: task.log,
+              },
+              previousSession: {
+                project: {
+                  id: project.id,
+                },
+                task: {
+                  id: task.id,
+                },
+              },
+            };
+          }
+          return state;
+        },
+      ),
+      on(
         AnnotationActions.loadAudio.success,
         (state: AnnotationState, { mode, audioFile }) => {
           if (this.mode === mode) {
@@ -502,6 +536,7 @@ export class AnnotationStateReducers {
               ...state,
               currentSession: {
                 ...state.currentSession,
+                comment: task?.comment,
                 task,
                 currentProject,
               },
@@ -521,6 +556,7 @@ export class AnnotationStateReducers {
         if (mode === this.mode) {
           return {
             ...state,
+            currentSession: initialState.currentSession,
             transcript: new OctraAnnotation<
               ASRContext,
               OctraAnnotationSegment<ASRContext>

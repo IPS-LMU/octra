@@ -30,7 +30,6 @@ import {
   OctraComponentsModule,
   VersionCheckerService,
 } from '@octra/ngx-components';
-import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import 'jodit/esm/plugins/justify/justify.js';
 import {
@@ -43,7 +42,6 @@ import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
 import { AppSharedModule } from './app/app.shared.module';
 import { TranslocoRootModule } from './app/app.transloco';
-import { NavbarService } from './app/core/component/navbar/navbar.service';
 import { ModalsModule } from './app/core/modals/modals.module';
 import { OctraModalService } from './app/core/modals/octra-modal.service';
 import { ReloadFileGuard } from './app/core/pages/intern/reload-file/reload-file.activateguard';
@@ -51,7 +49,7 @@ import { PagesModule } from './app/core/pages/pages.module';
 import { ALoginGuard, DeALoginGuard } from './app/core/shared/guard';
 import { TranscActivateGuard } from './app/core/shared/guard/transcr.activateguard';
 import { MultiThreadingService } from './app/core/shared/multi-threading/multi-threading.service';
-import { AudioService, SettingsService } from './app/core/shared/service';
+import { SettingsService } from './app/core/shared/service';
 import { AppStorageService } from './app/core/shared/service/appstorage.service';
 import { BugReportService } from './app/core/shared/service/bug-report.service';
 import { CompatibilityService } from './app/core/shared/service/compatibility.service';
@@ -69,6 +67,7 @@ import { IDBEffects } from './app/core/store/idb/idb-effects.service';
 import * as fromUser from './app/core/store/user/user.reducer';
 import { environment } from './environments/environment';
 import { provideServiceWorker } from '@angular/service-worker';
+import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -77,6 +76,7 @@ bootstrapApplication(AppComponent, {
       AppSharedModule,
       FormsModule,
       ReactiveFormsModule,
+      NgxOctraApiModule,
       PagesModule,
       TranslocoModule,
       StoreModule.forRoot(
@@ -118,16 +118,13 @@ bootstrapApplication(AppComponent, {
       NgbCollapseModule,
       ModalsModule,
       TranslocoRootModule,
-      NgxOctraApiModule,
       OctraComponentsModule,
       OctraUtilitiesModule,
       NgbOffcanvasModule,
     ),
     ALoginGuard,
-    AudioService,
     DeALoginGuard,
     OctraModalService,
-    NavbarService,
     ReloadFileGuard,
     AppStorageService,
     IDBService,

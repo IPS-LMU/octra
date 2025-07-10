@@ -15,6 +15,7 @@ import {
   PraatTextgridConverter,
 } from '@octra/annotation';
 import {
+  ProjectDto,
   TaskDto,
   TaskInputOutputCreatorType,
   TaskInputOutputDto,
@@ -493,13 +494,15 @@ export class AnnotationEffects {
       ofType(AnnotationActions.quit.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
+        this.audio.destroy(true);
+
         if (state.application.mode === LoginMode.ONLINE) {
           if (
             a.freeTask &&
             state.onlineMode.currentSession.currentProject &&
             state.onlineMode.currentSession.task
           ) {
-            this.store.dispatch(ApplicationActions.waitForEffects.do());
             return this.apiService
               .freeTask(
                 state.onlineMode.currentSession.currentProject.id,
@@ -508,7 +511,9 @@ export class AnnotationEffects {
               .pipe(
                 map((result) => {
                   if (a.redirectToProjects) {
-                    return AnnotationActions.redirectToProjects.do();
+                    return AnnotationActions.redirectToProjects.do({
+                      mode: state.application.mode,
+                    });
                   } else {
                     return AuthenticationActions.logout.do({
                       clearSession: a.clearSession,
@@ -538,31 +543,33 @@ export class AnnotationEffects {
                 ),
               );
           } else {
-            if (a.redirectToProjects) {
-              this.store.dispatch(ApplicationActions.waitForEffects.do());
-              return of(AnnotationActions.redirectToProjects.do());
-            } else {
-              this.store.dispatch(ApplicationActions.waitForEffects.do());
-              return this.saveTaskToServer(state, TaskStatus.paused).pipe(
-                map(() => {
+            return this.saveTaskToServer(state, TaskStatus.paused).pipe(
+              map(() => {
+                if (a.redirectToProjects) {
+                  this.store.dispatch(ApplicationActions.waitForEffects.do());
+                  return AnnotationActions.redirectToProjects.do({
+                    mode: state.application.mode,
+                  });
+                } else {
                   return AuthenticationActions.logout.do({
                     clearSession: a.clearSession,
                     mode: state.application.mode,
+                    keepPreviousInformation: true,
                   });
-                }),
-                catchError(() => {
-                  return of(
-                    AuthenticationActions.logout.do({
-                      clearSession: a.clearSession,
-                      mode: state.application.mode,
-                    }),
-                  );
-                }),
-              );
-            }
+                }
+              }),
+              catchError(() => {
+                return of(
+                  AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode,
+                    keepPreviousInformation: true,
+                  }),
+                );
+              }),
+            );
           }
         } else {
-          this.store.dispatch(ApplicationActions.waitForEffects.do());
           return of(
             AuthenticationActions.logout.do({
               clearSession: a.clearSession,
@@ -751,6 +758,34 @@ export class AnnotationEffects {
         } else if (
           [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
         ) {
+          let projectConfigURL = 'config/localmode/projectconfig.json';
+          let guidelinesURLs =
+            state.application.appConfiguration!.octra.languages.map((lang) => ({
+              url: `config/localmode/guidelines/guidelines_${lang}.json`,
+              lang,
+            }));
+          let functionsURL = `config/localmode/functions.js`;
+          if (
+            a.mode === LoginMode.URL &&
+            this.routingService.staticQueryParams.project_config_url &&
+            this.routingService.staticQueryParams.guidelines_url &&
+            this.routingService.staticQueryParams.functions_url
+          ) {
+            projectConfigURL =
+              this.routingService.staticQueryParams.project_config_url +
+              `&v=${Date.now()}`;
+            guidelinesURLs = [
+              {
+                url:
+                  this.routingService.staticQueryParams.guidelines_url +
+                  `&v=${Date.now()}`,
+                lang: this.routingService.staticQueryParams.locale ?? 'en',
+              },
+            ];
+            functionsURL =
+              this.routingService.staticQueryParams.functions_url +
+              `&v=${Date.now()}`;
+          }
           // mode is not online => load configuration for local environment
           return forkJoin<
             [
@@ -765,26 +800,26 @@ export class AnnotationEffects {
               any,
             ]
           >([
-            this.http.get('config/localmode/projectconfig.json', {
+            this.http.get(projectConfigURL, {
               responseType: 'json',
             }),
             forkJoin(
-              state.application.appConfiguration!.octra.languages.map(
-                (b: string) =>
+              guidelinesURLs.map(
+                ({ url, lang }: { url: string; lang: string }) =>
                   this.http
-                    .get(`config/localmode/guidelines/guidelines_${b}.json`, {
+                    .get(url, {
                       responseType: 'json',
                     })
                     .pipe(
                       map((c) => ({
-                        language: b,
+                        language: lang,
                         json: c,
                       })),
                       catchError(() => of(undefined)),
                     ),
               ),
             ),
-            this.http.get('config/localmode/functions.js', {
+            this.http.get(functionsURL, {
               responseType: 'text',
             }),
           ]).pipe(
@@ -1294,6 +1329,10 @@ export class AnnotationEffects {
               actionAfterFail: LoginModeActions.endTranscription.do({
                 clearSession: true,
                 mode: LoginMode.ONLINE,
+                project: state.onlineMode.currentSession.currentProject,
+                task: state.onlineMode.currentSession.task,
+                currentEditor: state.onlineMode.currentEditor,
+                keepPreviousInformation: false,
               }),
             }),
           }),
@@ -1336,27 +1375,109 @@ export class AnnotationEffects {
     ),
   );
 
-  resumeTaskManually$ = createEffect(() =>
+  prepareResumeTaskManually$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.resumeTaskManually.do),
       withLatestFrom(this.store),
-      exhaustMap(([a, state]) => {
-        const modeState = getModeState(state);
+      exhaustMap(([action, state]) => {
+        const mode = getModeState(state);
 
-        if (
-          modeState?.currentSession?.currentProject &&
-          modeState?.currentSession?.task
-        ) {
+        if (action.task && action.project) {
+          // user selected one combination of project task
           return of(
-            AnnotationActions.prepareTaskDataForAnnotation.do({
-              mode: state.application.mode!,
-              currentProject: modeState.currentSession.currentProject,
-              task: modeState.currentSession.task,
+            AnnotationActions.resumeTaskManually.success({
+              project: action.project,
+              task: action.task,
+              mode: action.mode,
             }),
+          );
+        } else {
+          // user want to continue last task
+          const project: ProjectDto | undefined =
+            action.project ?? mode.currentSession?.currentProject;
+          const taskID: string | undefined =
+            mode.currentSession?.task?.id ?? mode.previousSession?.task?.id;
+
+          return forkJoin<{
+            project: Observable<ProjectDto>;
+            task: Observable<TaskDto>;
+          }>({
+            project: project
+              ? of(project)
+              : this.apiService.getProject(mode.previousSession.project.id),
+            task: this.apiService.getTask(
+              project?.id ?? mode.previousSession.project.id,
+              taskID,
+            ),
+          }).pipe(
+            map((result) => {
+              if (result.project && result.task) {
+                return AnnotationActions.resumeTaskManually.success({
+                  project: result.project,
+                  task: result.task,
+                  mode: action.mode,
+                });
+              } else {
+                AnnotationActions.resumeTaskManually.fail({
+                  mode: action.mode,
+                  error: 'Missing project and/or task id',
+                });
+              }
+            }),
+            catchError((error: HttpErrorResponse) =>
+              checkAndThrowError(
+                error,
+                action,
+                AnnotationActions.resumeTaskManually.fail({
+                  error: error?.error?.message ?? error?.message,
+                  mode: state.application.mode!,
+                }),
+                this.store,
+              ),
+            ),
+          );
+        }
+      }),
+    ),
+  );
+
+  resumeTaskManually$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.resumeTaskManually.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
+
+        if (a.project && a.task) {
+          return this.apiService.continueTask(a.project.id, a.task.id).pipe(
+            map(() => {
+              return AnnotationActions.prepareTaskDataForAnnotation.do({
+                mode: state.application.mode!,
+                currentProject: a.project,
+                task: a.task,
+              });
+            }),
+            catchError((error: HttpErrorResponse) =>
+              checkAndThrowError(
+                error,
+                a,
+                AnnotationActions.resumeTaskManually.fail({
+                  error: error?.error?.message ?? error?.message,
+                  mode: state.application.mode!,
+                }),
+                this.store,
+              ),
+            ),
           );
         }
 
-        return of();
+        return of(
+          AnnotationActions.resumeTaskManually.fail({
+            error:
+              "Can't resume task because of missing task id or project id.",
+            mode: state.application.mode!,
+          }),
+        );
       }),
     ),
   );

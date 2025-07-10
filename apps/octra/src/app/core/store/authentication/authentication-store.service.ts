@@ -38,12 +38,18 @@ export class AuthenticationStoreService {
 
   sameUserWithOpenTask$ = this.store.select((store: RootState) => {
     const differentUserData = this.getDifferentUserData(store);
-    if (
-      !differentUserData &&
-      store.onlineMode.currentSession.currentProject &&
-      store.onlineMode.currentSession.task
-    ) {
-      return store.onlineMode.currentSession;
+    const projectID =
+      store.onlineMode.currentSession.currentProject?.id ??
+      store.onlineMode.previousSession?.project?.id;
+    const taskID =
+      store.onlineMode.currentSession.task?.id ??
+      store.onlineMode.previousSession?.task?.id;
+
+    if (!differentUserData && (projectID || taskID)) {
+      return {
+        projectID,
+        taskID,
+      };
     }
 
     return undefined;

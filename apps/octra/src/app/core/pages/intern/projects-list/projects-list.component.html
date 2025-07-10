@@ -13,22 +13,21 @@
         "
       ></div>
     } @else {
-      @if (authStoreService.sameUserWithOpenTask$ | async) {
+      @if (previousProject) {
         <div class="alert alert-warning text-center">
           <span
             [innerHTML]="
               'projects-list.same user free task'
                 | transloco
                   : {
-                      project: (authStoreService.sameUserWithOpenTask$ | async)
-                        ?.currentProject?.name,
+                      project: previousProject?.name,
                       resumeTranscription:
                         'projects-list.resume transcription' | transloco,
                     }
             "
           ></span>
           <p>
-            <a class="link" (click)="resumeTaskManually()">{{
+            <a class="link" (click)="annotationStoreService.resumeTaskManually()">{{
               'projects-list.resume transcription' | transloco
             }}</a>
           </p>
@@ -66,77 +65,145 @@
             </div>
           </div>
           <div class="table-wrapper">
-            @for (project of shownProjects; track project) {
-              <div class="list-group-item list-group-item-action">
-                <div
-                  class="row g-1 align-items-center justify-items-center justify-content-center"
-                >
-                  @if (
-                    (authStoreService.me$ | async)?.systemRole?.label ===
-                      'administrator' || istProjectAdmin
-                  ) {
-                    <div class="col-auto project-name">
-                      @if (project.active) {
-                        <i class="bi bi-check-circle" style="color: green"></i>
-                      }
-                      @if (!project.active) {
-                        <i class="bi bi-dash-circle" style="color: red"></i>
-                      }
-                    </div>
-                  }
-                  <div
-                    class="col align-items-center justify-items-center justify-content-center"
-                  >
-                    <span class="project-name"
-                      >{{ project.name }} ({{ project.shortname }})</span
+            <div
+              ngbAccordion
+              #accordion="ngbAccordion"
+              [closeOthers]="true"
+              [destroyOnHide]="true"
+            >
+              @for (project of shownProjects; track project) {
+                <div [ngbAccordionItem]="project.id" #acc="ngbAccordionItem">
+                  <div ngbAccordionHeader class="list-group-item">
+                    <div
+                      class="row g-3 align-items-center justify-items-center justify-content-center"
                     >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col text-muted project-description">
-                    {{ project.public_description }}
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col mb-2">
-                    <span
-                      class="rounded-pill text-white property-pill me-1"
-                      style="background-color: purple"
-                    >
-                      <i class="bi bi-list-ol"></i>
-                      {{ 'g.free tasks' | transloco }}:
-                      {{ getFreeAnnotationTasks(project) }}
-                    </span>
+                      <div class="col-auto project-name">
+                        <i
+                          class="bi ms-2 pointer"
+                          [ngClass]="{
+                            'bi-chevron-down': acc.collapsed,
+                            'bi-chevron-up': !acc.collapsed,
+                          }"
+                          ngbAccordionToggle
+                          [ngStyle]="{
+                            visibility: project.canExpand
+                              ? 'visible'
+                              : 'hidden',
+                          }"
+                        ></i>
+                      </div>
+                      <div class="col">
+                        <div
+                          class="row align-items-center justify-items-center justify-content-center"
+                        >
+                          @if (
+                            (authStoreService.me$ | async)?.systemRole
+                              ?.label === 'administrator' || istProjectAdmin
+                          ) {
+                            <div class="col-auto project-name">
+                              @if (project.active) {
+                                <i
+                                  class="bi bi-check-circle"
+                                  style="color: green"
+                                ></i>
+                              }
+                              @if (!project.active) {
+                                <i
+                                  class="bi bi-dash-circle"
+                                  style="color: red"
+                                ></i>
+                              }
+                            </div>
+                          }
+                          <div
+                            class="col align-items-center justify-items-center justify-content-center"
+                          >
+                            <span class="project-name"
+                              >{{ project.name }} ({{
+                                project.shortname
+                              }})</span
+                            >
 
-                    @if (project.enddate) {
-                      <span
-                        class="rounded-pill text-white property-pill me-1 bg-info"
-                      >
-                        <i class="bi bi-calendar-day"></i>
-                        {{ 'p.available until' | transloco }}:
-                        {{
-                          project.enddate
-                            | luxonShortDateTime
-                              : {
-                                  locale: (authStoreService.me$ | async).locale,
+                            <div class="row">
+                              <div class="col text-muted project-description">
+                                {{ project.public_description }}
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col mb-2">
+                                <span
+                                  class="rounded-pill text-white property-pill me-1"
+                                  style="background-color: purple"
+                                >
+                                  <i class="bi bi-list-ol"></i>
+                                  {{ 'g.free tasks' | transloco }}:
+                                  {{ project.freeTasks }}
+                                </span>
+                                @if (project.pausedTasks > 0) {
+                                  <span
+                                    class="rounded-pill text-white property-pill me-1 text-bg-warning paused-tasks-badge pointer"
+                                    (click)="acc.collapsed = !acc.collapsed"
+                                  >
+                                    <i class="bi bi-pause"></i>
+                                    {{ 'g.paused tasks' | transloco }}:
+                                    {{ project.pausedTasks }}
+                                  </span>
                                 }
-                        }}
-                      </span>
-                    }
+
+                                @if (project.enddate) {
+                                  <span
+                                    class="rounded-pill text-white property-pill me-1 bg-info"
+                                  >
+                                    <i class="bi bi-calendar-day"></i>
+                                    {{ 'p.available until' | transloco }}:
+                                    {{
+                                      project.enddate
+                                        | luxonShortDateTime
+                                          : {
+                                              locale: (
+                                                authStoreService.me$ | async
+                                              ).locale,
+                                            }
+                                    }}
+                                  </span>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="col-md-3 align-items-center justify-items-center justify-content-center"
+                          >
+                            @if (project.freeTasks > 0) {
+                              <button
+                                class="btn btn-primary btn-sm w-100"
+                                size="sm"
+                                [disabled]="projectStarting"
+                                (click)="onStartNewTaskClick(project)"
+                              >
+                                {{ 'transcription.new' | transloco }}
+                                <i class="bi bi-play-fill"></i>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="col-md-2">
-                    <button
-                      class="btn btn-primary btn-sm w-100"
-                      size="sm"
-                      [disabled]="projectStarting"
-                      (click)="onProjectClick(project)"
-                    >
-                      {{ 'g.start' | transloco }}
-                    </button>
+                  <div ngbAccordionCollapse>
+                    <div ngbAccordionBody>
+                      <ng-template>
+                        <div class="border bg-light-subtle">
+                          <octra-my-tasks
+                            [project]="project"
+                            (continueTask)="pausedTaskContinueClick($event)"
+                          ></octra-my-tasks>
+                        </div>
+                      </ng-template>
+                    </div>
                   </div>
                 </div>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
       } @else {

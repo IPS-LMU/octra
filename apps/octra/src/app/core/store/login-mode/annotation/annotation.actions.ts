@@ -206,6 +206,7 @@ export class AnnotationActions {
         clearSession: boolean;
         freeTask: boolean;
         redirectToProjects?: boolean;
+        mode: LoginMode;
       }>(),
     },
   });
@@ -338,7 +339,9 @@ export class AnnotationActions {
   static redirectToProjects = createActionGroup({
     source: `annotation/redirect to projects`,
     events: {
-      do: emptyProps(),
+      do: props<{
+        mode: LoginMode;
+      }>(),
       success: emptyProps(),
     },
   });
@@ -353,7 +356,16 @@ export class AnnotationActions {
   static resumeTaskManually = createActionGroup({
     source: 'annotation/resume task manually',
     events: {
-      do: emptyProps(),
+      do: props<{ project?: ProjectDto; task?: TaskDto; mode: LoginMode }>(),
+      fail: props<{
+        mode: LoginMode;
+        error: string;
+      }>(),
+      success: props<{
+        project: ProjectDto;
+        task: TaskDto;
+        mode: LoginMode;
+      }>(),
     },
   });
 

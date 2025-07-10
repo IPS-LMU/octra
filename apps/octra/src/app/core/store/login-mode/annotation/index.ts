@@ -47,12 +47,30 @@ export class AnnotationStateSegment<
 }
 
 export interface AnnotationState extends UndoRedoState {
+  // defines if saving the annotation is going to be running
   savingNeeded: boolean;
+  // defines if the annotation is currently saving
   isSaving: boolean;
+  // the current Editor
   currentEditor?: string;
+  // options set by the user on import
   importOptions?: Record<string, any>;
+  // the converter used for importing the transcript
   importConverter?: string;
+  // selected level of a previous session
   previousCurrentLevel?: number;
+  // the data for the current session
+  currentSession: AnnotationSessionState;
+  previousSession?: {
+    task: {
+      id: string;
+    };
+    project: {
+      id: string;
+    };
+  };
+  sessionFile?: SessionFile;
+  // information about the audio file
   audio: {
     loaded: boolean;
     fileName: string;
@@ -74,18 +92,8 @@ export interface AnnotationState extends UndoRedoState {
     validate: (transcript: string, guidelines: any) => any;
     tidyUp: (transcript: string, guidelines: any) => any;
   };
-  transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
+  transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>; // TODO move transcript to current session
   histories: Histories;
-  currentSession: AnnotationSessionState;
-  previousSession?: {
-    task: {
-      id: string;
-    };
-    project: {
-      id: string;
-    };
-  };
-  sessionFile?: SessionFile;
 }
 
 export interface AnnotationSessionState {

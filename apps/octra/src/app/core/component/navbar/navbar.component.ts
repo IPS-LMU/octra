@@ -2,6 +2,7 @@ import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
 import {
   Component,
   inject,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -77,7 +78,10 @@ import { NavbarService } from './navbar.service';
     OctraComponentsModule,
   ],
 })
-export class NavigationComponent extends DefaultComponent implements OnInit {
+export class NavigationComponent
+  extends DefaultComponent
+  implements OnInit, OnDestroy
+{
   appStorage = inject(AppStorageService);
   private appStoreService = inject(ApplicationStoreService);
   navbarServ = inject(NavbarService);
@@ -96,8 +100,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
   modalexport?: NgbModalRef;
   modalTools?: NgbModalRef;
   modalStatistics?: NgbModalRef;
-
-  isCollapsed = true;
 
   public get environment(): any {
     return environment;
@@ -341,5 +343,10 @@ export class NavigationComponent extends DefaultComponent implements OnInit {
       },
       'canvasDismissed',
     );
+  }
+
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    this.navbarServ.isCollapsed = true;
   }
 }

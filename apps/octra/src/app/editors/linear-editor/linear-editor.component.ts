@@ -53,6 +53,7 @@ import { AppStorageService } from '../../core/shared/service/appstorage.service'
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+import { RoutingService } from '../../core/shared/service/routing.service';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -79,6 +80,7 @@ export class LinearEditorComponent
   uiService = inject(UserInteractionsService);
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
+  routingService = inject(RoutingService);
 
   public static editorname = 'Linear Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();

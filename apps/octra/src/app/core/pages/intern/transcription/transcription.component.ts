@@ -432,7 +432,7 @@ export class TranscriptionComponent
         )
         .then((answer: any) => {
           if (answer === TranscriptionStopModalAnswer.QUIT) {
-            this.annotationStoreService.quit(false, false, false);
+            this.annotationStoreService.quit(true, false, false);
           } else if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
             this.annotationStoreService.quit(true, true, false);
           }

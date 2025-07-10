@@ -10,7 +10,7 @@
         [ngbPopover]="versionPopover"
         popoverClass="version-popover"
         class="navbar-brand"
-        >OCTRA 2
+        >OCTRA 2 {{navbarServ.isCollapsed}}
         @if (
           appStorage.useMode !== undefined && appStorage.useMode !== undefined
         ) {
@@ -58,7 +58,7 @@
         data-bs-target="#navbarsExample04"
         (click)="collapse.toggle()"
         aria-controls="navbarsExample04"
-        [attr.aria-expanded]="!isCollapsed"
+        [attr.aria-expanded]="!navbarServ.isCollapsed"
         aria-label="Toggle navigation"
       >
         <span class="navbar-toggler-icon"></span>
@@ -67,7 +67,7 @@
         class="collapse navbar-collapse"
         id="navbarsExample04"
         #collapse="ngbCollapse"
-        [(ngbCollapse)]="isCollapsed"
+        [(ngbCollapse)]="navbarServ.isCollapsed"
       >
         @if (!appStorage.loggedIn) {
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
@@ -76,7 +76,7 @@
                 [queryParamsHandling]="'merge'"
                 [routerLink]="['/login']"
                 class="nav-link"
-                (click)="isCollapsed = true"
+                (click)="navbarServ.isCollapsed = true"
                 >{{ 'g.login' | transloco }}</a
               >
             </li>
@@ -85,7 +85,7 @@
                 [queryParamsHandling]="'merge'"
                 [routerLink]="['/features']"
                 class="nav-link"
-                (click)="isCollapsed = true"
+                (click)="navbarServ.isCollapsed = true"
                 >{{ 'g.features' | transloco }}</a
               >
             </li>
@@ -94,7 +94,7 @@
                 [queryParamsHandling]="'merge'"
                 [routerLink]="['/news']"
                 class="nav-link"
-                (click)="isCollapsed = true"
+                (click)="navbarServ.isCollapsed = true"
                 >{{ 'g.news' | transloco }}</a
               >
             </li>
@@ -103,7 +103,7 @@
                 class="nav-link"
                 href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/"
                 target="_blank"
-                (click)="isCollapsed = true"
+                (click)="navbarServ.isCollapsed = true"
               >
                 {{ 'g.manual' | transloco }}
               </a>
@@ -113,7 +113,7 @@
                 class="nav-link"
                 href="https://github.com/IPS-LMU/octra"
                 target="_blank"
-                (click)="isCollapsed = true"
+                (click)="navbarServ.isCollapsed = true"
               >
                 <i class="bi bi-github"></i>
                 Github
@@ -122,7 +122,7 @@
             <li class="nav-item">
               <a
                 class="nav-link"
-                (click)="isCollapsed = true; openAboutModal()"
+                (click)="navbarServ.isCollapsed = true; openAboutModal()"
               >
                 {{ 'g.about' | transloco }}
               </a>
@@ -142,7 +142,7 @@
                     [ngClass]="{
                       active: appStorage.interface === editor.name,
                     }"
-                    (click)="isCollapsed = true"
+                    (click)="navbarServ.isCollapsed = true"
                   >
                     <span>
                       <i [classList]="['bi', editor.icon]"></i>
@@ -161,7 +161,7 @@
             ) {
               <li class="nav-item">
                 <a
-                  (mouseup)="isCollapsed = true; openStatisticsModal()"
+                  (mouseup)="navbarServ.isCollapsed = true; openStatisticsModal()"
                   class="nav-link"
                 >
                   <i class="bi bi-pie-chart-fill"></i>
@@ -768,7 +768,7 @@
           @if (api.appProperties?.send_feedback) {
             <li class="nav-item">
               <a
-                (mouseup)="isCollapsed = true; openBugReport()"
+                (mouseup)="navbarServ.isCollapsed = true; openBugReport()"
                 class="nav-link"
               >
                 <i

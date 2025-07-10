@@ -52,16 +52,9 @@ export class IDBService {
   }
 
   /**
-   * clears all options
+   * clears all app options
    */
-  public clearModeOptions(mode: LoginMode) {
-    return this.database.clearDataOfMode(mode, 'app_options');
-  }
-
-  /**
-   * clears all options
-   */
-  public clearOptions(): Promise<any> {
+  public clearAppOptions(): Promise<any> {
     return this.database.app_options.clear();
   }
 

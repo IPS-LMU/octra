@@ -8,6 +8,7 @@ import {
   OctraAnnotation,
   OctraAnnotationSegment,
 } from '@octra/annotation';
+import { ProjectDto, TaskDto } from '@octra/api-types';
 import { hasProperty } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import {
@@ -376,7 +377,7 @@ export class IDBEffects {
         const subject = new Subject<Action>();
 
         this.idbService
-          .clearOptions()
+          .clearAppOptions()
           .then(() => {
             subject.next(IDBActions.clearAllOptions.success());
             subject.complete();
@@ -473,10 +474,14 @@ export class IDBEffects {
       ),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {
-        const modeState = this.getModeStateFromString(
-          appState,
-          (action as any).mode,
-        );
+        const mode = (action as any).mode as LoginMode;
+        const modeState = this.getModeStateFromString(appState, mode);
+
+        const clearSession =
+          (action as any).clearSession === true ? true : false;
+        const project = (action as any).project as ProjectDto;
+        const task = (action as any).task as TaskDto;
+        const currentEditor = (action as any).currentEditor as string;
 
         if (modeState) {
           return this.idbService
@@ -487,15 +492,23 @@ export class IDBEffects {
                   ? modeState.sessionFile.toAny()
                   : null,
               importConverter: modeState.importConverter,
-              currentEditor: modeState.currentEditor ?? null,
+              currentEditor:
+                mode === LoginMode.ONLINE && clearSession && currentEditor
+                  ? currentEditor
+                  : (modeState.currentEditor ?? null),
               currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
               logging: modeState.logging.enabled ?? null,
               project: modeState.currentSession?.loadFromServer
                 ? (modeState.currentSession?.currentProject ?? null)
-                : undefined,
-              transcriptID: modeState.currentSession?.loadFromServer
-                ? (modeState.currentSession?.task?.id ?? null)
-                : undefined,
+                : mode === LoginMode.ONLINE && clearSession && project
+                  ? project
+                  : undefined,
+              transcriptID:
+                mode === LoginMode.ONLINE && clearSession && task
+                  ? task.id
+                  : modeState.currentSession?.loadFromServer
+                    ? (modeState.currentSession?.task?.id ?? null)
+                    : undefined,
               feedback: modeState.currentSession?.assessment ?? null,
               comment: modeState.currentSession?.comment ?? null,
               user: appState.authentication.me

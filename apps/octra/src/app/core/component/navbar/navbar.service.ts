@@ -2,7 +2,7 @@ import { EventEmitter, inject, Injectable } from '@angular/core';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class NavbarService {
   uiService = inject(UserInteractionsService);
   private audio = inject(AudioService);
@@ -17,6 +17,7 @@ export class NavbarService {
   public toolApplied = new EventEmitter<string>();
 
   private _showExport = false;
+  isCollapsed = true;
 
   public get fileSize(): FileSize | undefined {
     if (this.audio.audioManager?.resource?.size !== undefined) {

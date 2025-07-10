@@ -210,7 +210,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     };
   }
 
-  onProjectClick(project: ProjectDto) {
+  onStartNewTaskClick(project: ProjectDto) {
     this.projectStarting = true;
     this.appStorage.startOnlineAnnotation(project);
   }

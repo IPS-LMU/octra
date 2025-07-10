@@ -494,13 +494,15 @@ export class AnnotationEffects {
       ofType(AnnotationActions.quit.do),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
+        this.store.dispatch(ApplicationActions.waitForEffects.do());
+        this.audio.destroy(true);
+
         if (state.application.mode === LoginMode.ONLINE) {
           if (
             a.freeTask &&
             state.onlineMode.currentSession.currentProject &&
             state.onlineMode.currentSession.task
           ) {
-            this.store.dispatch(ApplicationActions.waitForEffects.do());
             return this.apiService
               .freeTask(
                 state.onlineMode.currentSession.currentProject.id,
@@ -509,7 +511,9 @@ export class AnnotationEffects {
               .pipe(
                 map((result) => {
                   if (a.redirectToProjects) {
-                    return AnnotationActions.redirectToProjects.do();
+                    return AnnotationActions.redirectToProjects.do({
+                      mode: state.application.mode,
+                    });
                   } else {
                     return AuthenticationActions.logout.do({
                       clearSession: a.clearSession,
@@ -539,12 +543,13 @@ export class AnnotationEffects {
                 ),
               );
           } else {
-            this.store.dispatch(ApplicationActions.waitForEffects.do());
             return this.saveTaskToServer(state, TaskStatus.paused).pipe(
               map(() => {
                 if (a.redirectToProjects) {
                   this.store.dispatch(ApplicationActions.waitForEffects.do());
-                  return AnnotationActions.redirectToProjects.do();
+                  return AnnotationActions.redirectToProjects.do({
+                    mode: state.application.mode,
+                  });
                 } else {
                   return AuthenticationActions.logout.do({
                     clearSession: a.clearSession,
@@ -565,7 +570,6 @@ export class AnnotationEffects {
             );
           }
         } else {
-          this.store.dispatch(ApplicationActions.waitForEffects.do());
           return of(
             AuthenticationActions.logout.do({
               clearSession: a.clearSession,
@@ -1442,23 +1446,15 @@ export class AnnotationEffects {
       ofType(AnnotationActions.resumeTaskManually.success),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        const modeState = getModeState(state);
         this.store.dispatch(ApplicationActions.waitForEffects.do());
 
-        const projectID =
-          modeState?.currentSession?.currentProject?.id ??
-          modeState?.previousSession?.project?.id;
-        const taskID =
-          modeState?.currentSession?.task?.id ??
-          modeState?.previousSession?.task?.id;
-
-        if (projectID && taskID) {
-          return this.apiService.continueTask(projectID, taskID).pipe(
+        if (a.project && a.task) {
+          return this.apiService.continueTask(a.project.id, a.task.id).pipe(
             map(() => {
               return AnnotationActions.prepareTaskDataForAnnotation.do({
                 mode: state.application.mode!,
-                currentProject: modeState.currentSession.currentProject,
-                task: modeState.currentSession.task,
+                currentProject: a.project,
+                task: a.task,
               });
             }),
             catchError((error: HttpErrorResponse) =>
@@ -1475,7 +1471,13 @@ export class AnnotationEffects {
           );
         }
 
-        return of();
+        return of(
+          AnnotationActions.resumeTaskManually.fail({
+            error:
+              "Can't resume task because of missing task id or project id.",
+            mode: state.application.mode!,
+          }),
+        );
       }),
     ),
   );

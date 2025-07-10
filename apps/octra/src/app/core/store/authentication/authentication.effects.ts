@@ -323,7 +323,7 @@ export class AuthenticationEffects {
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
         const modeState = getModeState(state);
-        if (state.application.mode === LoginMode.ONLINE) {
+        if (modeState && state.application.mode === LoginMode.ONLINE) {
           return this.apiService.logout().pipe(
             map(() => {
               this.sessionStorageService.clear();
@@ -352,9 +352,9 @@ export class AuthenticationEffects {
         return of(
           AuthenticationActions.logout.success({
             ...action,
-            project: modeState.currentSession?.currentProject,
-            task: modeState.currentSession?.task,
-            currentEditor: modeState.currentEditor,
+            project: modeState?.currentSession?.currentProject,
+            task: modeState?.currentSession?.task,
+            currentEditor: modeState?.currentEditor,
           }),
         );
       }),

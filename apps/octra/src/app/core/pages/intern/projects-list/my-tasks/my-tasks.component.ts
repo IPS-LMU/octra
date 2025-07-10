@@ -53,16 +53,16 @@ class PreparedTask extends TaskDto {
       return undefined;
     });
 
-    this.audio = {
-      name: audioFile.filename,
-      url: this.api.prepareFileURL(audioFile?.url),
-      type: audioFile.fileType,
-    };
-
     if (
       audioFile?.metadata?.sampleRate &&
       audioFile?.metadata?.duration?.seconds
     ) {
+      this.audio = {
+        name: audioFile.filename,
+        url: this.api.prepareFileURL(audioFile?.url),
+        type: audioFile.fileType,
+      };
+
       const oAudioFile = new OAudiofile();
       oAudioFile.name = audioFile.filename;
       oAudioFile.type = audioFile.fileType;

@@ -42,7 +42,6 @@ import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
 import { AppSharedModule } from './app/app.shared.module';
 import { TranslocoRootModule } from './app/app.transloco';
-import { NavbarService } from './app/core/component/navbar/navbar.service';
 import { ModalsModule } from './app/core/modals/modals.module';
 import { OctraModalService } from './app/core/modals/octra-modal.service';
 import { ReloadFileGuard } from './app/core/pages/intern/reload-file/reload-file.activateguard';
@@ -50,7 +49,7 @@ import { PagesModule } from './app/core/pages/pages.module';
 import { ALoginGuard, DeALoginGuard } from './app/core/shared/guard';
 import { TranscActivateGuard } from './app/core/shared/guard/transcr.activateguard';
 import { MultiThreadingService } from './app/core/shared/multi-threading/multi-threading.service';
-import { AudioService, SettingsService } from './app/core/shared/service';
+import { SettingsService } from './app/core/shared/service';
 import { AppStorageService } from './app/core/shared/service/appstorage.service';
 import { BugReportService } from './app/core/shared/service/bug-report.service';
 import { CompatibilityService } from './app/core/shared/service/compatibility.service';
@@ -124,10 +123,8 @@ bootstrapApplication(AppComponent, {
       NgbOffcanvasModule,
     ),
     ALoginGuard,
-    AudioService,
     DeALoginGuard,
     OctraModalService,
-    NavbarService,
     ReloadFileGuard,
     AppStorageService,
     IDBService,

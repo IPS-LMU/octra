@@ -325,6 +325,7 @@ export class AnnotationStoreService {
         clearSession,
         freeTask,
         redirectToProjects,
+        mode: this.appStorage.useMode,
       }),
     );
   }

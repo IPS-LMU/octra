@@ -75,34 +75,82 @@ export class LoginModeReducers {
         },
       ),
       on(
-        AuthenticationActions.logout.success,
+        LoginModeActions.redirectToProjects.do,
+        (state: AnnotationState, { mode }) => {
+          if (this.mode === mode) {
+            return {
+              ...state,
+              savingNeeded: false,
+              isSaving: false,
+              audio: initialState.audio,
+              histories: {},
+            };
+          }
+          return state;
+        },
+      ),
+      on(
+        LoginModeActions.quit.do,
+        (state: AnnotationState, { clearSession, freeTask, mode }) => {
+          if (this.mode === mode) {
+            if (!clearSession || !freeTask) {
+              return {
+                ...state,
+                previousCurrentLevel: state.transcript.currentLevel
+                  ? state.transcript.levels.findIndex(
+                      (a) => a.id === state.transcript.currentLevel.id,
+                    )
+                  : initialState.previousCurrentLevel,
+                previousSession:
+                  state.currentSession.currentProject &&
+                  state.currentSession.task?.id
+                    ? {
+                        project: {
+                          id: state.currentSession.currentProject.id,
+                        },
+                        task: {
+                          id: state.currentSession.task.id,
+                        },
+                      }
+                    : initialState.previousSession,
+              };
+            }
+          }
+
+          return state;
+        },
+      ),
+      on(
+        AuthenticationActions.logout.do,
         LoginModeActions.endTranscription.do,
         (
           state: AnnotationState,
           { clearSession, mode, keepPreviousInformation },
         ) => {
-          return mode === this.mode && clearSession
-            ? {
-                ...initialState,
-                currentEditor: state.currentEditor,
-                previousCurrentLevel: keepPreviousInformation
-                  ? state.previousCurrentLevel
-                  : initialState.previousCurrentLevel,
-                previousSession: keepPreviousInformation
-                  ? state.previousSession
-                  : initialState.previousSession,
-              }
-            : {
-                ...state,
-                savingNeeded: false,
-                isSaving: false,
-                audio: {
-                  fileName: '',
-                  sampleRate: 0,
-                  loaded: false,
-                },
-                histories: {},
-              };
+          if (this.mode === mode) {
+            return clearSession
+              ? {
+                  ...initialState,
+                  currentEditor: state.currentEditor,
+                  currentSession: keepPreviousInformation
+                    ? state.currentSession
+                    : initialState.currentSession,
+                  previousCurrentLevel: keepPreviousInformation
+                    ? state.previousCurrentLevel
+                    : initialState.previousCurrentLevel,
+                  previousSession: keepPreviousInformation
+                    ? state.previousSession
+                    : initialState.previousSession,
+                }
+              : {
+                  ...state,
+                  savingNeeded: false,
+                  isSaving: false,
+                  audio: initialState.audio,
+                  histories: {},
+                };
+          }
+          return state;
         },
       ),
       on(
@@ -211,7 +259,7 @@ export class LoginModeReducers {
                 ASRContext,
                 OctraAnnotationSegment<ASRContext>
               >(),
-              currentSession: {},
+              currentSession: initialState.currentSession,
             };
           }
           return state;
@@ -239,7 +287,7 @@ export class LoginModeReducers {
                     ASRContext,
                     OctraAnnotationSegment<ASRContext>
                   >(),
-                  currentSession: {},
+                  currentSession: initialState.currentSession,
                   sessionFile,
                 };
               } else {
@@ -253,14 +301,14 @@ export class LoginModeReducers {
                     logs: [],
                   },
                   transcript: deserialized,
-                  currentSession: {},
+                  currentSession: initialState.currentSession,
                   sessionFile,
                 };
               }
             } else {
               return {
                 ...state,
-                currentSession: {},
+                currentSession: initialState.currentSession,
                 sessionFile,
               };
             }
@@ -322,6 +370,7 @@ export class LoginModeReducers {
                     : undefined,
                 },
                 task,
+                comment: task.comment,
               },
               guidelines: {
                 selected: selectedGuidelines,

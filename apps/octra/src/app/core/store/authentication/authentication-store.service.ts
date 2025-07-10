@@ -40,10 +40,10 @@ export class AuthenticationStoreService {
     const differentUserData = this.getDifferentUserData(store);
     const projectID =
       store.onlineMode.currentSession.currentProject?.id ??
-      store.onlineMode.previousSession.project?.id;
+      store.onlineMode.previousSession?.project?.id;
     const taskID =
       store.onlineMode.currentSession.task?.id ??
-      store.onlineMode.previousSession.task?.id;
+      store.onlineMode.previousSession?.task?.id;
 
     if (!differentUserData && (projectID || taskID)) {
       return {

@@ -4,12 +4,14 @@ import { removeEmptyProperties } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { environment } from '../../../../environments/environment';
 import { URLParameters } from '../../store/application';
+import { NavbarService } from '../../component/navbar/navbar.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoutingService {
   private router = inject(Router);
+  private navbarService = inject(NavbarService);
   private sessionStorage = inject(SessionStorageService);
 
   get staticQueryParams(): URLParameters {
@@ -46,6 +48,7 @@ export class RoutingService {
     queryParamsHandling: QueryParamsHandling | null | undefined = 'merge',
   ) {
     try {
+      this.navbarService.isCollapsed = true;
       if (
         environment.debugging.enabled &&
         environment.debugging.logging.routes

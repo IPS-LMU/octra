@@ -26,6 +26,7 @@ import {
 } from '../../store/login-mode/annotation';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -159,13 +160,15 @@ export class AppStorageService {
   }
 
   set consoleEntries(consoleEntries: (ConsoleEntry | ConsoleGroupEntry)[]) {
-    asapScheduler.schedule(() =>
-      this.store.dispatch(
-        ApplicationActions.setConsoleEntries({
-          consoleEntries,
-        }),
-      ),
-    );
+    if (environment.debugging.logging.console) {
+      asapScheduler.schedule(() =>
+        this.store.dispatch(
+          ApplicationActions.setConsoleEntries({
+            consoleEntries,
+          }),
+        ),
+      );
+    }
   }
 
   get easyMode(): boolean | undefined | null {

@@ -6,7 +6,7 @@ import { SubscriptionManager } from '@octra/utilities';
 import { AudioManager } from '@octra/web-media';
 import { Subject, Subscription } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AudioService {
   private http = inject(HttpClient);
 

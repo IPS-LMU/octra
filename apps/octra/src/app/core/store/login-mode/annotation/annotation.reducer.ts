@@ -146,6 +146,7 @@ export class AnnotationStateReducers {
           if (this.mode === mode && project && task) {
             return {
               ...state,
+              transcript: initialState.transcript,
               currentSession: {
                 ...state.currentSession,
                 currentProject: {
@@ -159,6 +160,14 @@ export class AnnotationStateReducers {
               logging: {
                 ...state.logging,
                 logs: task.log,
+              },
+              previousSession: {
+                project: {
+                  id: project.id,
+                },
+                task: {
+                  id: task.id,
+                },
               },
             };
           }
@@ -547,6 +556,7 @@ export class AnnotationStateReducers {
         if (mode === this.mode) {
           return {
             ...state,
+            currentSession: initialState.currentSession,
             transcript: new OctraAnnotation<
               ASRContext,
               OctraAnnotationSegment<ASRContext>

@@ -459,7 +459,7 @@
     "introduction": "Wähle ein Projekt aus und beginne eine neue Transcriktion. Falls pausierte Aufgaben eines Projekts verfügbar sind, kannst Du diese einzeln fortsetzen.",
     "no remaining tasks": "Dieses Projekt besitzt keine freien Aufgaben.",
     "other user logged in": "Es sind Daten von einer Sitzung eines anderen Nutzers vorhanden (<b>{{username}}</b>). Wenn Du eine neue Aufgabe beginnst, werden diese Daten entfernt.",
-    "project creation wanted": "I möchte ein neues Projekt erstellen",
+    "project creation wanted": "Ich möchte ein neues Projekt erstellen",
     "resume transcription": "Transkription fortsetzen",
     "resuming feature": "Jetzt neu: Du kannst nun deine zuletzt pausierten Aufgaben eines Projektes einsehen und ausgeählte Aufgaben fortsetzen. Z.B. kannst Du die Arbeit an einer Aufgabe pausieren und eine andere Aufgabe beginnen oder fortsetzen - auch von einem anderen Projekt oder Gerät.",
     "same user free task": "Es sind Daten einer zuvor pausierten Transkription vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die diese Transkription fortzusetzen. Alternativ kannst Du eine neue Transkription beginnen oder eine andere pausierte Aufgabe fortsetzen."

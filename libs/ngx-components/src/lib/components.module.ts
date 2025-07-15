@@ -6,13 +6,16 @@ import {
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
+import {
+  OctraASRLanguageSelectComponent,
+  OctraProviderSelectComponent,
+} from './components/asr-options';
 import { AudioViewerComponent } from './components/audio/audio-viewer';
 import { AudioplayerComponent } from './components/audio/audioplayer';
-import { AsrOptionsComponent } from './components/asr-options';
 
 @NgModule({
   declarations: [],
-  exports: [AudioplayerComponent, AudioViewerComponent, AsrOptionsComponent],
+  exports: [AudioplayerComponent, AudioViewerComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -20,7 +23,8 @@ import { AsrOptionsComponent } from './components/asr-options';
     OctraUtilitiesModule,
     AudioplayerComponent,
     AudioViewerComponent,
-    AsrOptionsComponent,
+    OctraASRLanguageSelectComponent,
+    OctraProviderSelectComponent,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })

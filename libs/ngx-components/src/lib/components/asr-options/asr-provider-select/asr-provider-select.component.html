@@ -1,0 +1,173 @@
+<div
+  class="d-block"
+  ngbDropdown
+  placement="bottom-right"
+  container="body"
+  #dropdown="ngbDropdown"
+  [autoClose]="false"
+>
+  <input
+    type="text"
+    class="form-control"
+    id="providerDropdown"
+    ngbDropdownToggle
+    [placeholder]="i18n.asrProvider"
+    autocomplete="one-time-code"
+    autocapitalize="off"
+    name="provider"
+    [ngModel]="internValue?.provider"
+    #providerInput
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    (focus)="ocbFocus.emit()"
+    [required]="required"
+    (keyup)="onInputKeyup($event, providerInput.value, dropdown)"
+  />
+  <div
+    ngbDropdownMenu
+    aria-labelledby="mausDropdown"
+    style="max-height: 150px; max-width: 300px"
+    class="overflow-y-auto"
+    id="providerDropdownMenu"
+  >
+    <span class="d-block mb-2 ms-2"
+      ><b>{{ i18n.asrProvider }}</b></span
+    >
+    <ul class="list-group">
+      @for (provider of filtered; track provider) {
+        <li class="list-group-item p-1 pointer">
+          <div class="px-1 py-2">
+            <div class="row g-1 px-0 justify-items-center align-items-center">
+              <div
+                class="col-8 text-start"
+                (click)="selectProvider(provider, dropdown)"
+              >
+                <img
+                  [src]="provider.logoURL"
+                  [alt]="provider.provider + ' logo'"
+                  style="max-height: 50px; max-width: 100%"
+                />
+              </div>
+              <div class="col" (click)="selectProvider(provider, dropdown)">
+                <div class="progress">
+                  <ng-template #popTemplate>
+                    <div
+                      id="quota-tooltip"
+                      [innerHtml]="
+                        '<div class=\'text-center\'>' +
+                        getQuotaLabel(provider) +
+                        '</div>'
+                      "
+                    ></div>
+                  </ng-template>
+                  <!-- [popover]="popTemplate" -->
+                  <div
+                    class="progress-bar bg-success"
+                    role="progressbar"
+                    [ngbPopover]="popTemplate"
+                    container="body"
+                    triggers="mouseenter:mouseleave"
+                    [ngStyle]="{
+                      width: 100 - getQuotaPercentage(provider) + '%',
+                    }"
+                    aria-valuenow="30"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  >
+                    {{ 100 - getQuotaPercentage(provider) + '%' }}
+                  </div>
+                  @if (getQuotaPercentage(provider) > 0) {
+                    <div
+                      class="progress-bar bg-danger"
+                      role="progressbar"
+                      [ngStyle]="{
+                        width: getQuotaPercentage(provider) + '%',
+                      }"
+                      aria-valuenow="20"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      @if (getQuotaPercentage(provider) > 90) {
+                        {{ 100 - getQuotaPercentage(provider) + '%' }}
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-auto">
+                <i
+                  class="bi bi-info-circle-fill pointer"
+                  style="color: cornflowerblue"
+                  [ngbPopover]="asrDescription"
+                  popoverTitle="Service information"
+                  [container]="'body'"
+                  [autoClose]="true"
+                ></i>
+                <ng-template #asrDescription>
+                  <table class="table table-sm table-borderless provider-info">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <i class="bi bi-database-fill"></i>
+                        </td>
+                        <td>
+                          {{ provider.dataStoragePolicy }}
+                        </td>
+                      </tr>
+                      @if (provider.maxSignalDuration !== undefined) {
+                        <tr>
+                          <td>
+                            <i class="bi bi-exclamation-triangle"></i>
+                          </td>
+                          <td>
+                            max audio duration:
+                            {{ provider.maxSignalDuration }}
+                            seconds
+                          </td>
+                        </tr>
+                      }
+                      @if (provider.maxSignalSize !== undefined) {
+                        <tr>
+                          <td>
+                            <i class="bi bi-exclamation-triangle"></i>
+                          </td>
+                          <td>
+                            max file size:
+                            {{ provider.maxSignalSize }} MB
+                          </td>
+                        </tr>
+                      }
+                      <tr>
+                        <td>
+                          <i class="bi bi-person-check"></i>
+                        </td>
+                        <td>
+                          <a [href]="provider?.termsURL" target="_blank"
+                            >Terms &amp; Conditions</a
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <i class="bi bi-globe-americas"></i>
+                        </td>
+                        <td>
+                          <a [href]="provider?.homepageURL" target="_blank"
+                            >Homepage</a
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </li>
+      }
+      @if (filtered.length === 0) {
+        <li class="text-center">{{ i18n.nothingFound }}</li>
+      }
+    </ul>
+  </div>
+</div>

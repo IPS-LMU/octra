@@ -21,7 +21,7 @@ export class ASRActions {
   });
 
   static setASRSettings = createActionGroup({
-    source: 'asr/set settings',
+    source: 'asr/set asr settings',
     events: {
       do: props<{
         settings: ASRStateSettings;

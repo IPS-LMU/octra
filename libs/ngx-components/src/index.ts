@@ -1,6 +1,5 @@
 export * from './lib/components.module';
-export * from './lib/components/asr-options/asr-options.component';
-export * from './lib/components/asr-options/types';
+export * from './lib/components/asr-options';
 export * from './lib/components/audio/audio-viewer';
 export * from './lib/components/audio/audioplayer';
 export * from './lib/components/bugreport-modal/bugreport-modal.component';

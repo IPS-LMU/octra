@@ -1,0 +1,28 @@
+input,
+input::placeholder {
+  font-size: 0.85rem;
+}
+
+.dropdown-menu * {
+  font-size: 0.85rem;
+}
+
+.progress {
+  height: 15px !important;
+}
+
+.progress-bar {
+  font-size: 11px !important;
+}
+
+.provider-info {
+  font-size: 12px !important;
+}
+
+.provider-info tbody tr td {
+  padding: 3px 5px;
+}
+
+.ng-touched.ng-invalid {
+  border-bottom: 2px solid red;
+}

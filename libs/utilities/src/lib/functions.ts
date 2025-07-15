@@ -445,7 +445,7 @@ export function stringifyQueryParams(params: Record<string, any>) {
       if (typeof value !== 'string' && Array.isArray(value)) {
         value = value.join(',');
       }
-      strArray.push(`${key}=${value}`);
+      strArray.push(`${key}=${encodeURIComponent(value)}`);
     }
   }
 

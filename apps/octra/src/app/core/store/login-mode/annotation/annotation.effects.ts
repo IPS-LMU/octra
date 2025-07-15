@@ -25,6 +25,7 @@ import {
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import {
+  appendURLQueryParams,
   extractFileNameFromURL,
   hasProperty,
   SubscriptionManager,
@@ -771,20 +772,29 @@ export class AnnotationEffects {
             this.routingService.staticQueryParams.guidelines_url &&
             this.routingService.staticQueryParams.functions_url
           ) {
-            projectConfigURL =
-              this.routingService.staticQueryParams.project_config_url +
-              `&v=${Date.now()}`;
+            projectConfigURL = appendURLQueryParams(
+              this.routingService.staticQueryParams.project_config_url,
+              {
+                v: Date.now().toString(),
+              },
+            );
             guidelinesURLs = [
               {
-                url:
-                  this.routingService.staticQueryParams.guidelines_url +
-                  `&v=${Date.now()}`,
+                url: appendURLQueryParams(
+                  this.routingService.staticQueryParams.guidelines_url,
+                  {
+                    v: Date.now().toString(),
+                  },
+                ),
                 lang: this.routingService.staticQueryParams.locale ?? 'en',
               },
             ];
-            functionsURL =
-              this.routingService.staticQueryParams.functions_url +
-              `&v=${Date.now()}`;
+            functionsURL = appendURLQueryParams(
+              this.routingService.staticQueryParams.functions_url,
+              {
+                v: Date.now().toString(),
+              },
+            );
           }
           // mode is not online => load configuration for local environment
           return forkJoin<

@@ -1,0 +1,50 @@
+<div
+  ngbDropdown
+  #dropdown="ngbDropdown"
+  placement="bottom-left"
+  container="body"
+  (openChange)="onLanguageDropdownOpenChange($event)"
+>
+  <input
+    type="text"
+    class="form-control"
+    id="languageDropdown"
+    ngbDropdownToggle
+    [placeholder]="placeholder"
+    autocomplete="one-time-code"
+    autocapitalize="off"
+    name="language"
+    #languageInput
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    [ngModel]="internValue"
+    (focus)="ocbFocus.emit()"
+    [required]="required"
+    (keyup)="onInputKeyup($event, languageInput.value, dropdown)"
+  />
+  <div
+    ngbDropdownMenu
+    aria-labelledby="languageDropdown"
+    style="max-height: 150px"
+    class="overflow-y-auto"
+    id="languageDropdownMenu"
+  >
+          <span class="d-block mb-2 ms-2"
+          ><b>{{ title }}</b></span
+          >
+    <ul class="list-group">
+      @for (language of filtered; track language) {
+        <li
+          class="list-group-item list-group-item-action p-1"
+          ngbDropdownItem
+          (click)="selectLanguage(language.value)"
+        >
+          <a class="dropdown-item">{{ language.description }}</a>
+        </li>
+      }
+      @if (filtered.length === 0) {
+        <li class="text-center">{{ i18n.nothingFound }}</li>
+      }
+    </ul>
+  </div>
+</div>

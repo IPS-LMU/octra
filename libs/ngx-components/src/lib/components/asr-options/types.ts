@@ -31,4 +31,5 @@ export interface ASROptionsTranslations {
   nothingFound?: string;
   asrProvider?: string;
   accessCode?: string;
+  nothingSelected?: string;
 }

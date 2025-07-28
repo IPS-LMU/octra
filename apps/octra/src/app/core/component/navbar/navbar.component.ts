@@ -51,11 +51,13 @@ import {
 } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../../store';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
+import { ASRStateSettings } from '../../store/asr';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
+import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -76,6 +78,7 @@ import { NavbarService } from './navbar.service';
     TranslocoPipe,
     TimespanPipe,
     OctraComponentsModule,
+    AsrOptionsComponent,
   ],
 })
 export class NavigationComponent
@@ -94,8 +97,10 @@ export class NavigationComponent
   authStoreService = inject(AuthenticationStoreService);
   audio = inject(AudioService);
   api = inject(OctraAPIService);
+
   private offcanvasService = inject(NgbOffcanvas);
   protected asrStoreService = inject(AsrStoreService);
+  protected asrSettings?: ASRStateSettings;
 
   modalexport?: NgbModalRef;
   modalTools?: NgbModalRef;
@@ -187,6 +192,12 @@ export class NavigationComponent
     this.subscribe(this.navbarServ.openSettings, {
       next: () => {
         this.openEnd();
+      },
+    });
+
+    this.subscribe(this.asrStoreService.asrOptions$, {
+      next: (asrOptions) => {
+        this.asrSettings = asrOptions;
       },
     });
   }

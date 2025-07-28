@@ -1,0 +1,84 @@
+<form autocomplete="one-time-code">
+  <div class="row g-0">
+    <label for="languageDropdown" class="form-label">{{ i18n.header }}:</label>
+  </div>
+  <div class="row g-0 asr-language-options mb-3">
+    <div class="col-4">
+      <octra-asr-language-select
+        #asrLanguageSelection
+        class="d-inline-block"
+        [value]="fields.asr.selected"
+        (valueChange)="setASRLanguage($event)"
+        [title]="'asr.asr language' | transloco"
+        [placeholder]="'asr.asr language' | transloco"
+        [languages]="asrLanguages"
+        [languageSettings]="languageSettings"
+        [i18n]="asrTranslations"
+        [required]="true"
+        (ocbFocus)="providerSelection.unfocus(); mausSelection.unfocus()"
+      ></octra-asr-language-select>
+    </div>
+    <div class="col-4">
+      <octra-asr-provider-select
+        #providerSelection
+        class="d-inline-block"
+        [value]="fields.provider.selected"
+        [asrProviders]="languageSettings.services"
+        (valueChange)="setProvider($event)"
+        [i18n]="asrTranslations"
+        [required]="true"
+        (ocbFocus)="asrLanguageSelection.unfocus(); mausSelection.unfocus()"
+      ></octra-asr-provider-select>
+    </div>
+    <div class="col-4">
+      <octra-asr-language-select
+        class="d-inline-block"
+        #mausSelection
+        [value]="fields.maus.selected"
+        (valueChange)="setMAUSLanguage($event)"
+        [title]="'asr.maus language' | transloco"
+        [placeholder]="'asr.maus language' | transloco"
+        [languages]="mausLanguages"
+        [languageSettings]="languageSettings"
+        [i18n]="asrTranslations"
+        [required]="true"
+        (ocbFocus)="asrLanguageSelection.unfocus(); providerSelection.unfocus()"
+      ></octra-asr-language-select>
+    </div>
+  </div>
+
+  @if (showAccessCode) {
+    <div class="row g-0">
+      <div class="col">
+        <div class="mb-3">
+          <label for="asrAccessCode" class="form-label"
+            >{{ i18n.accessCode }}:</label
+          >
+          <div class="input-group">
+            <input
+              [type]="accessCodeVisible ? 'text' : 'password'"
+              class="form-control"
+              id="asrAccessCode"
+              autocomplete="one-time-code"
+              name="asrAccessCode"
+              [(ngModel)]="fields.asr.accessCode"
+              (ngModelChange)="onAccessCodeChange($event, true)"
+            />
+            <div
+              class="input-group-text pointer"
+              (click)="accessCodeVisible = !accessCodeVisible"
+            >
+              <i
+                class="bi"
+                [ngClass]="{
+                  'bi-eye-slash': !accessCodeVisible,
+                  'bi-eye-fill': accessCodeVisible,
+                }"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</form>

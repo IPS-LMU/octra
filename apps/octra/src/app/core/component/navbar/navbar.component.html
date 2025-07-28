@@ -161,7 +161,9 @@
             ) {
               <li class="nav-item">
                 <a
-                  (mouseup)="navbarServ.isCollapsed = true; openStatisticsModal()"
+                  (mouseup)="
+                    navbarServ.isCollapsed = true; openStatisticsModal()
+                  "
                   class="nav-link"
                 >
                   <i class="bi bi-pie-chart-fill"></i>
@@ -657,33 +659,29 @@
                     60
                   </button>
                 </div>
-                @if (asrStoreService.asrEnabled$ | async) {
-                  <br /><br />
-                  <hr />
-                  <label style="font-size: 1rem" class="mb-2">{{
-                    'g.asr options' | transloco
-                  }}</label>
-                  <octra-asr-options
-                    [options]="asrStoreService.asrOptions$ | async"
-                    (optionsChange)="asrStoreService.setASRSettings($event)"
-                    [languageSettings]="
-                      asrStoreService.languageSettings$ | async
-                    "
-                    [manualURL]="api.appProperties?.support?.manual_url"
-                    [mausLanguages]="asrStoreService.mausLanguages$ | async"
-                    [asrLanguages]="asrStoreService.asrLanguages$ | async"
-                    [showAccessCode]="true"
-                    [i18n]="{
-                      header: 'p.language and provider' | transloco,
-                      asrLanguage: 'asr.asr language' | transloco,
-                      mausLanguage: 'asr.maus language' | transloco,
-                      nothingFound: 'p.nothing found' | transloco,
-                      asrProvider: 'asr.asr provider' | transloco,
-                      accessCode: 'g.access code' | transloco,
-                    }"
-                  ></octra-asr-options>
-                  <hr />
-                }
+                <br /><br />
+                <hr />
+                <label style="font-size: 1rem" class="mb-2">{{
+                  'g.asr options' | transloco
+                }}</label>
+                <octra-asr-options
+                  [options]="asrStoreService.asrOptions$ | async"
+                  (optionsChange)="asrStoreService.setASRSettings($event)"
+                  [languageSettings]="asrStoreService.languageSettings$ | async"
+                  [manualURL]="api.appProperties?.support?.manual_url"
+                  [mausLanguages]="asrStoreService.mausLanguages$ | async"
+                  [asrLanguages]="asrStoreService.asrLanguages$ | async"
+                  [showAccessCode]="true"
+                  [i18n]="{
+                    header: 'p.language and provider' | transloco,
+                    asrLanguage: 'asr.asr language' | transloco,
+                    mausLanguage: 'asr.maus language' | transloco,
+                    nothingFound: 'p.nothing found' | transloco,
+                    asrProvider: 'asr.asr provider' | transloco,
+                    accessCode: 'g.access code' | transloco,
+                  }"
+                ></octra-asr-options>
+                <hr />
               }
             </div>
           </ng-template>
@@ -757,7 +755,7 @@
                 }
                 <a class="dropdown-item" (click)="logout()">
                   <i class="bi bi-door-open-fill"></i>
-                  {{"g.logout" | transloco}}
+                  {{ 'g.logout' | transloco }}
                 </a>
               </div>
             </li>

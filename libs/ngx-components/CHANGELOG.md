@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.1.2...ngx-components-1.2.0) (2025-07-28)
+
+
+### Features
+
+* **octra:** split asr-options into provider and language components ([0670fcb](https://github.com/IPS-LMU/octra/commit/0670fcb002c33747f9b97391a0f8c09140bf570d))
+
+
+
 ## [1.1.2](https://github.com/IPS-LMU/octra/compare/ngx-components-1.1.1...ngx-components-1.1.2) (2025-06-23)
 
 

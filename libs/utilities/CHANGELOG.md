@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/IPS-LMU/octra/compare/utilities-1.1.0...utilities-1.2.0) (2025-07-28)
+
+
+### Bug Fixes
+
+* **octra:** PraatTableConverter loaded as plain text in URL mode ([d6d882a](https://github.com/IPS-LMU/octra/commit/d6d882a3fb49db6fca44c050c779d64a41a3978f))
+
+
+### Features
+
+* **octra:** continue paused tasks later ([276b9f4](https://github.com/IPS-LMU/octra/commit/276b9f46620983cf5e26e7431fb9a1d7cd560b1f))
+* **utilities:** add removeProperties function ([f0ef154](https://github.com/IPS-LMU/octra/commit/f0ef1545dd6e1450a4e1bb6d48f0827ea293d76e))
+
+
+
 # [1.1.0](https://github.com/IPS-LMU/octra/compare/utilities-1.0.2...utilities-1.1.0) (2025-04-02)
 
 

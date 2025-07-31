@@ -43,7 +43,7 @@ export class AnnotJSONConverter extends Converter {
       return {
         file: {
           name: annotation.name + this._extensions[0],
-          content: JSON.stringify(annotation, undefined, 2),
+          content: JSON.stringify(annotation.serialize(), undefined, 2),
           encoding: 'UTF-8',
           type: 'application/json',
         },

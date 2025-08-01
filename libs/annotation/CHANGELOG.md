@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.2.2](https://github.com/IPS-LMU/octra/compare/annotation-1.2.1...annotation-1.2.2) (2025-08-01)
+
+
+### Bug Fixes
+
+* **annotation:** AnnotJSONConverter exports AnnotJSON with additional fields ([65b0e11](https://github.com/IPS-LMU/octra/commit/65b0e117d7814110f81abd00b4f19455c2bd411c))
+
+
+
 ## [1.2.1](https://github.com/IPS-LMU/octra/compare/annotation-1.2.0...annotation-1.2.1) (2025-07-28)
 
 

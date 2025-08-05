@@ -1007,4 +1007,8 @@ export class AnnotationStoreService {
       LoginModeActions.setImportConverter.do({ mode, importConverter }),
     );
   }
+
+  sendAnnotationToParentWindow() {
+    this.store.dispatch(AnnotationActions.sendAnnotationToParentWindow.do());
+  }
 }

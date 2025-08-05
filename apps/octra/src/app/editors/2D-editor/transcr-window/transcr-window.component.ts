@@ -31,8 +31,10 @@ import {
   ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
+  OctraAnnotationEvent,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
+  OItem,
 } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { AudioSelection, SampleUnit } from '@octra/media';
@@ -106,6 +108,11 @@ export class TranscrWindowComponent
   private activeModal = inject(NgbActiveModal);
   protected routingService = inject(RoutingService);
 
+  protected neighbours?: {
+    left?: OItem | OctraAnnotationSegment<ASRContext>[] | OctraAnnotationEvent;
+    right?: OItem | OctraAnnotationSegment<ASRContext>[] | OctraAnnotationEvent;
+  };
+
   public static options: NgbModalOptions = {
     size: 'xl',
     fullscreen: 'xl',
@@ -131,8 +138,7 @@ export class TranscrWindowComponent
 
   private showWindow = false;
   private tempSegments!: OctraAnnotationSegment[];
-  private oldRaw = '';
-  protected showOverviewButton = false;
+  protected isShortAudiofile = false;
 
   private get currentLevel() {
     return this.annotationStoreService.currentLevel;
@@ -476,7 +482,6 @@ export class TranscrWindowComponent
       },
     });
 
-    this.updateOverviewButtonVisibility();
     this._loading = false;
     this.setValidationEnabledToDefault();
 
@@ -518,9 +523,27 @@ export class TranscrWindowComponent
       this.shortcutsService.getShortcutGroup('2D-Editor viewer');
     shortcutGroup!.enabled = false;
      */
+    this.updateNeighbours();
+    this.isShortAudiofile =
+      this.audio.audioManager.resource.info.duration.seconds <= 35;
 
     this.cd.markForCheck();
     this.cd.detectChanges();
+  }
+
+  protected updateNeighbours() {
+    this.neighbours = {
+      left:
+        this.segmentIndex > 0
+          ? this.currentLevel.items[this.segmentIndex - 1]
+          : undefined,
+      right:
+        this.segmentIndex > -1 &&
+        this.segmentIndex < this.currentLevel.items.length - 1 &&
+        !this.isNextSegmentLastAndBreak(this.segmentIndex)
+          ? this.currentLevel.items[this.segmentIndex + 1]
+          : undefined,
+    };
   }
 
   setValidationEnabledToDefault() {
@@ -807,7 +830,7 @@ export class TranscrWindowComponent
             ) {
               segment = tempSegment;
               this.segmentIndex = i;
-              this.updateOverviewButtonVisibility();
+              this.updateNeighbours();
               break;
             }
           }
@@ -1219,19 +1242,13 @@ export class TranscrWindowComponent
   }
 
   afterTyping(status: string) {
-    if (status === 'started') {
-      this.oldRaw = this.editor.rawText;
-    }
-
     if (status === 'stopped') {
       if (
         this.editor.html.indexOf(
           '<img src="assets/img/components/transcr-editor/boundary.png"',
-        ) > -1
+        ) < 0
       ) {
-        this.showOverviewButton = false;
-      } else {
-        this.updateOverviewButtonVisibility();
+        this.updateNeighbours();
       }
     }
   }
@@ -1517,13 +1534,6 @@ export class TranscrWindowComponent
     this.navbarService.openSettings.emit();
   }
 
-  private updateOverviewButtonVisibility() {
-    this.showOverviewButton =
-      this.segmentIndex ===
-        this.annotationStoreService.currentLevel!.items.length - 1 ||
-      this.isNextSegmentLastAndBreak(this.segmentIndex);
-  }
-
   @HostListener('window:resize', ['$event'])
   onResize($event: Event) {
     if (this.magnifier) {
@@ -1537,5 +1547,13 @@ export class TranscrWindowComponent
       this.cd.markForCheck();
       this.cd.detectChanges();
     }
+  }
+
+  saveToParentWindow() {
+    this.act.emit({
+      action: 'save to parent',
+      segmentIndex: this.segmentIndex,
+    });
+    this.close();
   }
 }

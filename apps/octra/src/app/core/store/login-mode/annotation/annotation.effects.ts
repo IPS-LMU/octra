@@ -5,6 +5,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import {
   AnnotJSONConverter,
+  Converter,
   ImportResult,
   ISegment,
   OAnnotJSON,
@@ -2067,6 +2068,76 @@ export class AnnotationEffects {
       outputs,
     );
   }
+
+  sendToParentWindwo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.sendAnnotationToParentWindow.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        const modeState = getModeState(state);
+        const aType =
+          this.routingService.staticQueryParams.annotationExportType;
+        let converter: Converter | undefined = undefined;
+
+        if (!aType || aType === 'AnnotJSON') {
+          converter = new AnnotJSONConverter();
+        } else {
+          converter = AppInfo.converters.find((a) => a.name === aType);
+
+          if (!converter) {
+            window.parent.postMessage(
+              {
+                error: `Export Type ${aType} is not supported.`,
+                status: 'error',
+              },
+              '*',
+            );
+            return;
+          }
+        }
+
+        const oannotjson = modeState.transcript!.serialize(
+          this.audio.audioManager.resource.info.fullname,
+          this.audio.audioManager.resource.info.sampleRate,
+          this.audio.audioManager.resource.info.duration,
+        );
+        const result = converter.export(
+          oannotjson,
+          this.audio.audioManager.resource.getOAudioFile(),
+          0,
+        );
+
+        if (!result.error && result.file) {
+          // send result to iframe owner
+          window.parent.postMessage(
+            {
+              data: {
+                annotation: result.file,
+              },
+              status: 'success',
+            },
+            '*',
+          );
+
+          return of(AnnotationActions.sendAnnotationToParentWindow.success());
+        } else {
+          console.error(`Annotation conversion failed: ${result.error}`);
+          window.parent.postMessage(
+            {
+              error: `Annotation conversion failed: ${result.error}`,
+              status: 'error',
+            },
+            '*',
+          );
+          return of(
+            AnnotationActions.sendAnnotationToParentWindow.fail({
+              error: `Annotation conversion failed: ${result.error}`,
+            }),
+          );
+        }
+      }),
+    ),
+  );
 
   private maintenanceChecker?: Subscription;
 }

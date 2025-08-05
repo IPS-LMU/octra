@@ -474,4 +474,15 @@ export class AnnotationActions {
       }>(),
     },
   });
+
+  static sendAnnotationToParentWindow = createActionGroup({
+    source: 'annotation/send to parent',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
 }

@@ -37,7 +37,6 @@ import { LoadeditorDirective } from '../../../shared/directive/loadeditor.direct
 import { AsyncPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AnnotJSONConverter, Converter } from '@octra/annotation';
 import {
   AudioManager,
   BrowserInfo,
@@ -45,7 +44,6 @@ import {
   ShortcutGroup,
 } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
-import { AppInfo } from '../../../../app.info';
 import { DefaultComponent } from '../../../component/default.component';
 import { NavbarService } from '../../../component/navbar/navbar.service';
 import { FastbarComponent } from '../../../component/taskbar/taskbar.component';
@@ -644,7 +642,7 @@ export class TranscriptionComponent
               this.subscribe(
                 (this.currentEditor.instance as any).openModal,
                 () => {
-                  (this.currentEditor.instance as any).disableAllShortcuts();
+                  this.appStoreService.setShortcutsEnabled(false);
 
                   this.subscriptionManager.removeByTag(
                     'overview modal transcr send',
@@ -653,6 +651,7 @@ export class TranscriptionComponent
                     OverviewModalComponent,
                     OverviewModalComponent.options,
                   );
+
                   this.subscribe(
                     this.modalOverview.componentInstance.transcriptionSend,
                     () => {
@@ -671,9 +670,11 @@ export class TranscriptionComponent
                   this.modalOverview.result
                     .then(() => {
                       this.appStoreService.setShortcutsEnabled(true);
+                      this.cd.markForCheck();
                     })
                     .catch(() => {
                       this.appStoreService.setShortcutsEnabled(true);
+                      this.cd.markForCheck();
                     });
                 },
               );
@@ -784,8 +785,14 @@ export class TranscriptionComponent
         },
         'overview modal transcr send',
       );
+      this.modalOverview.result.then(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+        this.modalVisiblities.overview = false;
+        this.cd.markForCheck();
+      });
     } else {
       this.onSendNowClick();
+      this.cd.markForCheck();
     }
   }
 
@@ -813,58 +820,7 @@ export class TranscriptionComponent
   }
 
   public onSaveTranscriptionButtonClicked() {
-    const aType = this.routingService.staticQueryParams.annotationExportType;
-    let converter: Converter | undefined = undefined;
-
-    if (!aType || aType === 'AnnotJSON') {
-      converter = new AnnotJSONConverter();
-    } else {
-      converter = AppInfo.converters.find((a) => a.name === aType);
-
-      if (!converter) {
-        window.parent.postMessage(
-          {
-            error: `Export Type ${aType} is not supported.`,
-            status: 'error',
-          },
-          '*',
-        );
-        return;
-      }
-    }
-
-    const oannotjson = this.annotationStoreService.transcript!.serialize(
-      this.audio.audioManager.resource.info.fullname,
-      this.audio.audioManager.resource.info.sampleRate,
-      this.audio.audioManager.resource.info.duration,
-    );
-    const result = converter.export(
-      oannotjson,
-      this.audio.audioManager.resource.getOAudioFile(),
-      0,
-    );
-
-    if (!result.error && result.file) {
-      // send result to iframe owner
-      window.parent.postMessage(
-        {
-          data: {
-            annotation: result.file,
-          },
-          status: 'success',
-        },
-        '*',
-      );
-    } else {
-      console.error(`Annotation conversion failed: ${result.error}`);
-      window.parent.postMessage(
-        {
-          error: `Annotation conversion failed: ${result.error}`,
-          status: 'error',
-        },
-        '*',
-      );
-    }
+    this.annotationStoreService.sendAnnotationToParentWindow();
   }
 
   public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
@@ -899,6 +855,7 @@ export class TranscriptionComponent
         this.appStoreService.setShortcutsEnabled(true);
       });
     this.modalVisiblities.guidelines = true;
+    this.cd.markForCheck();
   }
 
   openOverview() {
@@ -930,12 +887,15 @@ export class TranscriptionComponent
       .then(() => {
         this.appStoreService.setShortcutsEnabled(true);
         this.modalVisiblities.overview = false;
+        this.cd.markForCheck();
       })
       .catch((err) => {
         this.appStoreService.setShortcutsEnabled(true);
         this.modalVisiblities.overview = false;
+        this.cd.markForCheck();
       });
     this.modalVisiblities.overview = true;
+    this.cd.markForCheck();
   }
 
   openShortcutsModal() {
@@ -953,6 +913,7 @@ export class TranscriptionComponent
         this.appStoreService.setShortcutsEnabled(true);
       });
     this.modalVisiblities.shortcuts = true;
+    this.cd.markForCheck();
   }
 
   openPromptModal() {

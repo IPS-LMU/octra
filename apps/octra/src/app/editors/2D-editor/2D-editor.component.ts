@@ -677,6 +677,8 @@ export class TwoDEditorComponent
     } else if (action === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');
+    } else if (action === 'save to parent') {
+      this.annotationStoreService.sendAnnotationToParentWindow();
     }
   };
 

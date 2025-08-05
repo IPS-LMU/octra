@@ -151,33 +151,38 @@
   <div class="modal-footer">
     <div class="window-nav-bottom">
       <div class="row g-1">
-        <div class="col-md-4 d-flex">
-          <button
-            class="btn btn-info w-100 rounded-0"
-            (click)="save(); doDirectionAction('left')"
-          >
-            @if (easyMode) {
-              <span [ngClass]="{ 'd-lg-none': !easyMode }">
-                <i class="bi bi-save-fill"></i> &
-                <i class="bi bi-arrow-left"></i>
-              </span>
-            }
-            @if (!easyMode) {
-              @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
-                <span>
-                  {{ 'g.save' | transloco }} &
-                  {{ 'segments.previous' | transloco }}
-                </span>
-              } @else {
-                <span>
-                  {{ 'g.apply' | transloco }} &
-                  {{ 'segments.previous' | transloco }}
+        @if (neighbours?.left !== undefined) {
+          <div class="col-md d-flex">
+            <button
+              class="btn btn-info w-100 rounded-0"
+              (click)="save(); doDirectionAction('left')"
+            >
+              @if (easyMode) {
+                <span [ngClass]="{ 'd-lg-none': !easyMode }">
+                  <i class="bi bi-save-fill"></i> &
+                  <i class="bi bi-arrow-left"></i>
                 </span>
               }
-            }
-          </button>
-        </div>
-        <div class="col-md-4 d-flex">
+              @if (!easyMode) {
+                @if (
+                  appStoreService.useMode !== 'url' ||
+                  routingService.staticQueryParams.bottomNav === true
+                ) {
+                  <span>
+                    {{ 'g.save' | transloco }} &
+                    {{ 'segments.previous' | transloco }}
+                  </span>
+                } @else {
+                  <span>
+                    {{ 'g.apply' | transloco }} &
+                    {{ 'segments.previous' | transloco }}
+                  </span>
+                }
+              }
+            </button>
+          </div>
+        }
+        <div class="col-md d-flex">
           <button
             (click)="save(); close()"
             class="btn btn-info w-100 rounded-0"
@@ -188,7 +193,10 @@
               </span>
             }
             @if (!easyMode) {
-              @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
+              @if (
+                appStoreService.useMode !== 'url' ||
+                routingService.staticQueryParams.bottomNav === true
+              ) {
                 <span>
                   {{ 'g.save' | transloco }} &
                   {{ 'g.close' | transloco }}
@@ -202,60 +210,77 @@
             }
           </button>
         </div>
-        @if (!showOverviewButton) {
-          <div class="col-md-4 d-flex">
-            <button
-              class="btn btn-info w-100 rounded-0"
-              (click)="save(); doDirectionAction('right')"
-            >
-              @if (easyMode) {
-                <span [ngClass]="{ 'd-lg-none': !easyMode }">
-                  <i class="bi bi-save-fill"></i> &
-                  <i class="bi bi-arrow-right"></i>
-                </span>
-              }
-              @if (!easyMode) {
-                @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
-                  <span>
-                    {{ 'g.save' | transloco }} &
-                    {{ 'segments.next' | transloco }}
-                  </span>
-                } @else {
-                  <span>
-                    {{ 'g.apply' | transloco }} &
-                    {{ 'segments.next' | transloco }}
+          @if (neighbours.right) {
+            <div class="col-md d-flex">
+              <button
+                class="btn btn-info w-100 rounded-0"
+                (click)="save(); doDirectionAction('right')"
+              >
+                @if (easyMode) {
+                  <span [ngClass]="{ 'd-lg-none': !easyMode }">
+                    <i class="bi bi-save-fill"></i> &
+                    <i class="bi bi-arrow-right"></i>
                   </span>
                 }
-              }
-            </button>
-          </div>
-        }
-        @if (showOverviewButton) {
-          <div class="col-md-4 d-flex">
-            <!-- check if last segment ord if the next segment is a break -->
-            <button
-              (click)="save(); close(); openOverview()"
-              class="btn btn-info w-100 rounded-0"
-            >
-              @if (easyMode) {
-                <span [ngClass]="{ 'd-lg-none': !easyMode }">
-                  <i class="bi bi-save-fill"></i> &
-                  <i class="bi bi-eye-fill"></i>
-                </span>
-              }
-              @if (!easyMode) {
-                @if (appStoreService.useMode !== 'url' || routingService.staticQueryParams.bottomNav === true) {
-                  <span>
-                    {{ 'g.save' | transloco }} &
-                    {{ 'g.overview' | transloco }}
-                  </span>
-                } @else {
-                  <span>
-                    {{ 'g.apply' | transloco }} &
-                    {{ 'g.overview' | transloco }}
+                @if (!easyMode) {
+                  @if (
+                    appStoreService.useMode !== 'url' ||
+                    routingService.staticQueryParams.bottomNav === true
+                  ) {
+                    <span>
+                      {{ 'g.save' | transloco }} &
+                      {{ 'segments.next' | transloco }}
+                    </span>
+                  } @else {
+                    <span>
+                      {{ 'g.apply' | transloco }} &
+                      {{ 'segments.next' | transloco }}
+                    </span>
+                  }
+                }
+              </button>
+            </div>
+          } @else if(!isShortAudiofile) {
+            <div class="col-md d-flex">
+              <!-- check if last segment ord if the next segment is a break -->
+              <button
+                (click)="save(); close(); openOverview()"
+                class="btn btn-info w-100 rounded-0"
+              >
+                @if (easyMode) {
+                  <span [ngClass]="{ 'd-lg-none': !easyMode }">
+                    <i class="bi bi-save-fill"></i> &
+                    <i class="bi bi-eye-fill"></i>
                   </span>
                 }
-              }
+                @if (!easyMode) {
+                  @if (
+                    appStoreService.useMode !== 'url' ||
+                    routingService.staticQueryParams.bottomNav === true
+                  ) {
+                    <span>
+                      {{ 'g.save' | transloco }} &
+                      {{ 'g.overview' | transloco }}
+                    </span>
+                  } @else {
+                    <span>
+                      {{ 'g.apply' | transloco }} &
+                      {{ 'g.overview' | transloco }}
+                    </span>
+                  }
+                }
+              </button>
+            </div>
+          } @else if(appStoreService.useMode === "url") {
+          <div class="col-md d-flex">
+            <button
+              class="btn btn-primary w-100 rounded-0"
+              (click)="save(); saveToParentWindow()"
+            >
+              <i class="bi bi-save-fill"></i>
+              <span>
+                {{ 'g.save' | transloco }}
+              </span>
             </button>
           </div>
         }

@@ -8,7 +8,7 @@ import {
   OAnnotJSON,
   OLabel,
   OSegment,
-  OSegmentLevel,
+  OSegmentLevel
 } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
 import { escapeRegex, SubscriptionManager } from '@octra/utilities';
@@ -316,7 +316,7 @@ export class OctraDropzoneService {
     }
   }
 
-  private async checkForValidFiles() {
+  private async checkForValidFiles(showOptionsModal = true) {
     for (const fileProgress of this._files) {
       if (fileProgress.status !== 'progress') {
         const isAudioFile = AudioManager.isValidAudioFileName(
@@ -361,7 +361,7 @@ export class OctraDropzoneService {
                 fileProgress.needsOptions = optionsSchema;
                 fileProgress.converter = converter;
 
-                if (optionsSchema) {
+                if (optionsSchema && showOptionsModal) {
                   await this.openImportOptionsModal(fileProgress);
                 }
 
@@ -566,7 +566,6 @@ export class OctraDropzoneService {
 
     const importOptions = {};
     importOptions[fileProgress.converter.name] = fileProgress.options;
-
     this.store.dispatch(
       LoginModeActions.setImportConverter.do({
         mode: LoginMode.LOCAL,
@@ -579,6 +578,7 @@ export class OctraDropzoneService {
         importOptions,
       }),
     );
+    this.checkForValidFiles(false);
   }
 
   destroy() {

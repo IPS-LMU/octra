@@ -285,6 +285,7 @@
     "successful text": "Du hast Dich erfolgreich abgemeldet."
   },
   "maintenance": {
+    "warning": "Es wird gerade eine Wartung durchgeführt. Du kannst Dich in Kürze wieder anmelden.",
     "banner": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
     "in app": "Von <b>{{start}} Uhr</b> bis voraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
   },

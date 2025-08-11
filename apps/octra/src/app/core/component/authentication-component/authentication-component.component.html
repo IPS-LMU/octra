@@ -46,6 +46,12 @@
       {{ 'authentication.signin' | transloco }}
     </h1>
   }
+  @if (api.appProperties?.maintenance?.enabled) {
+    <div class="alert alert-warning">
+      {{ 'maintenance.warning' | transloco }}
+    </div>
+  }
+
   @if (
     isAuthAllowed(AccountLoginMethod.shibboleth) &&
     (type === undefined || type === 'shibboleth')

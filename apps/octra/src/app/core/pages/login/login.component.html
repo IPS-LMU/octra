@@ -67,8 +67,8 @@
                     [showTitle]="false"
                     (submitClick)="onOnlineSubmit($event)"
                     [authentications]="api.appProperties?.authentications"
-                    [passwordReset]="api.appProperties?.reset_password"
-                    [registrations]="api.appProperties?.registrations"
+                    [passwordReset]="api.appProperties?.reset_password && !api.appProperties?.maintenance?.enabled"
+                    [registrations]="api.appProperties?.registrations && !api.appProperties?.maintenance?.enabled"
                   ></octra-authentication-component>
                 </div>
               } @else {

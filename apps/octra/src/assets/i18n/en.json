@@ -285,6 +285,7 @@
     "successful text": "You are successfully logged out."
   },
   "maintenance": {
+    "warning": "Maintenance mode is active. You will be able to log in again shortly.",
     "banner": "From <b>{{start}}</b> until <b>{{end}}</b> (expected) a maintenance is going to run.<br/>In this time OCTRA is not available. Please make sure that you don't use OCTRA in this time.",
     "in app": "From <b>{{start}}</b> until <b>{{end}}</b> (expected) a maintenance is going to run. <b>Please quit OCTRA 15 minutes before the maintenance begins.</b>"
   },

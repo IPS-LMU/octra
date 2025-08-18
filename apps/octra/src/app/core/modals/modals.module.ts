@@ -3,24 +3,16 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  Translation,
-  TranslocoLoader,
-  TranslocoModule,
-} from '@jsverse/transloco';
+import { Translation, TranslocoLoader, TranslocoModule } from '@jsverse/transloco';
 import {
   NgbAccordionCollapse,
   NgbCollapseModule,
   NgbDropdownModule,
   NgbModalModule,
   NgbPopover,
-  NgbTooltipModule,
+  NgbTooltipModule
 } from '@ng-bootstrap/ng-bootstrap';
-import {
-  BugreportModalComponent,
-  OctraComponentsModule,
-  OctraFormGeneratorModule,
-} from '@octra/ngx-components';
+import { BugreportModalComponent, OctraComponentsModule, OctraFormGeneratorModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { NgxJoditComponent } from 'ngx-jodit';
 import { AppSharedModule } from '../../app.shared.module';
@@ -45,12 +37,17 @@ import { ReAuthenticationModalComponent } from './re-authentication-modal/re-aut
 import { ShortcutsModalComponent } from './shortcuts-modal/shortcuts-modal.component';
 import { StatisticsModalComponent } from './statistics-modal/statistics-modal.component';
 import { SupportedFilesModalComponent } from './supportedfiles-modal/supportedfiles-modal.component';
-import { ToolsModalComponent } from './tools-modal/tools-modal.component';
-import { TranscriptionBackupEndModalComponent } from './transcription-backup-end/transcription-backup-end-modal.component';
+import {
+  TranscriptionBackupEndModalComponent
+} from './transcription-backup-end/transcription-backup-end-modal.component';
 import { TranscriptionDeleteModalComponent } from './transcription-delete-modal/transcription-delete-modal.component';
 import { TranscriptionDemoEndModalComponent } from './transcription-demo-end/transcription-demo-end-modal.component';
-import { TranscriptionGuidelinesModalComponent } from './transcription-guidelines-modal/transcription-guidelines-modal.component';
-import { TranscriptionSendingModalComponent } from './transcription-sending-modal/transcription-sending-modal.component';
+import {
+  TranscriptionGuidelinesModalComponent
+} from './transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {
+  TranscriptionSendingModalComponent
+} from './transcription-sending-modal/transcription-sending-modal.component';
 import { TranscriptionStopModalComponent } from './transcription-stop-modal/transcription-stop-modal.component';
 import { WaitingModalComponent } from './waiting-modal/waiting-modal.component';
 import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
@@ -95,7 +92,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ShortcutsModalComponent,
     StatisticsModalComponent,
     SupportedFilesModalComponent,
-    ToolsModalComponent,
     TranscriptionDeleteModalComponent,
     TranscriptionDemoEndModalComponent,
     TranscriptionGuidelinesModalComponent,
@@ -126,7 +122,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ShortcutsModalComponent,
     StatisticsModalComponent,
     SupportedFilesModalComponent,
-    ToolsModalComponent,
     TranscriptionDeleteModalComponent,
     TranscriptionDemoEndModalComponent,
     TranscriptionGuidelinesModalComponent,

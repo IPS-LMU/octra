@@ -13,14 +13,9 @@ import {
   Renderer2,
   SimpleChanges,
   ViewChild,
-  ViewEncapsulation,
+  ViewEncapsulation
 } from '@angular/core';
-import {
-  AnnotationAnySegment,
-  ASRContext,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { AnnotationAnySegment, ASRContext, OctraAnnotation, OctraAnnotationSegment } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { SubscriptionManager, wait } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
@@ -274,7 +269,6 @@ export class AudioViewerComponent
 
     const annotation = changes['annotation'];
     if (annotation && annotation.currentValue !== undefined) {
-      const t = Date.now();
       const parsedChanges = this.av.getChanges(
         annotation.previousValue,
         annotation.currentValue,
@@ -380,7 +374,7 @@ export class AudioViewerComponent
     if (this.av.currentLevel && this.av.currentLevel.items.length > 0) {
       // subscribe to levelChanges for extern changes
       this.subscrManager.removeByTag('externLevelChanges');
-      this.av.applyChanges(changes, oldAnnotation);
+      this.av.applyChanges(changes.filter(a => a.level.new.id === this.av.currentLevelID), oldAnnotation);
     }
   }
 

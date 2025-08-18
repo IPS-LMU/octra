@@ -166,6 +166,16 @@ export class AnnotationActions {
     },
   });
 
+  static changeLevels = createActionGroup({
+    source: `annotation/ change levels`,
+    events: {
+      do: props<{
+        levels: OctraAnnotationAnyLevel<OctraAnnotationSegment>[];
+        mode: LoginMode;
+      }>(),
+    },
+  });
+
   static removeCurrentLevelItems = createActionGroup({
     source: `annotation/ remove items`,
     events: {

@@ -11,332 +11,347 @@
     ></button>
   </div>
   <div class="modal-body" #content id="tools-table">
-    <table class="table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>{{ 'g.name' | transloco }}</th>
-          <th>{{ 'g.description' | transloco }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- combine phrases tool -->
-        @if (isToolEnabled('combine-phrases')) {
-          <tr class="top-tr">
-            <td
-              (click)="
-                tools.combinePhrases.opened = !tools.combinePhrases.opened
-              "
-            >
-              <i
-                class="bi"
-                style="color: gray"
-                [ngClass]="{
-                  'bi-chevron-up': tools.combinePhrases.opened,
-                  'bi-chevron-down': !tools.combinePhrases.opened,
-                }"
-              ></i>
-            </td>
-            <td
-              (click)="
-                tools.combinePhrases.opened = !tools.combinePhrases.opened
-              "
-            >
-              <a #a>
-                <span>{{ 'tools.combine phrases.name' | transloco }} </span>
-              </a>
-            </td>
-            <td
-              (click)="
-                tools.combinePhrases.opened = !tools.combinePhrases.opened
-              "
-              colspan="2"
-            >
-              <span
-                >{{ 'tools.combine phrases.description' | transloco }}
-              </span>
-              <a
-                [href]="manualURL + 'using-tools.html#octra-combine-units'"
-                target="_blank"
-              >
-                <i class="bi bi-question-circle text-info"></i>
-              </a>
-            </td>
+    <form>
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{{ 'g.name' | transloco }}</th>
+            <th>{{ 'g.description' | transloco }}</th>
+            <th></th>
           </tr>
-          @if (tools.combinePhrases.opened) {
-            <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
-              <td></td>
-              <td colspan="4" style="padding-left: 20px">
-                <div class="card" style="padding: 10px">
-                  <div class="alert alert-warning">
-                    {{ 'tools.combine phrases.warning' | transloco }}
-                  </div>
-                  <div class="configurator">
-                    <form>
-                      <table class="table" style="max-width: 400px">
-                        <tbody>
-                          <tr>
-                            <td>
-                              <label for="minSilenceLength">{{
-                                'tools.combine phrases.minimal silence'
-                                  | transloco
-                              }}</label>
-                            </td>
-                            <td>
-                              <input
-                                [(ngModel)]="
-                                  tools.combinePhrases.options.minSilenceLength
-                                "
-                                id="minSilenceLength"
-                                name="minSilenceLength"
-                                type="number"
-                              />
-                            </td>
-                            <td>
-                              <i
-                                class="bi bi-question-circle"
-                                [ngbTooltip]="
-                                  transloco.translate(
-                                    'tools.combine phrases.minimal silence desc'
-                                  )
-                                "
-                                placement="right"
-                                style="color: darkblue"
-                              ></i>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <label for="maxWordsPerSegment">{{
-                                'tools.combine phrases.maximal words'
-                                  | transloco
-                              }}</label>
-                            </td>
-                            <td>
-                              <input
-                                [(ngModel)]="
-                                  tools.combinePhrases.options
-                                    .maxWordsPerSegment
-                                "
-                                id="maxWordsPerSegment"
-                                name="maxWordsPerSegment"
-                                type="number"
-                              />
-                            </td>
-                            <td>
-                              <i
-                                class="bi bi-question-circle"
-                                [ngbTooltip]="
-                                  transloco.translate(
-                                    'tools.combine phrases.maximal words desc'
-                                  )
-                                "
-                                placement="right"
-                                style="color: darkblue"
-                              ></i>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </form>
-                    <button
-                      (click)="onCombinePhrasesClick()"
-                      [disabled]="!isCombinePhrasesSettingsValid"
-                      class="btn btn-primary btn-raised"
-                    >
-                      {{ 'tools.combine phrases.name' | transloco }}
-                    </button>
-                  </div>
-                </div>
+        </thead>
+        <tbody>
+          <!-- combine phrases tool -->
+          @if (isToolEnabled('combine-phrases')) {
+            <tr class="top-tr">
+              <td
+                (click)="
+                  tools.combinePhrases.opened = !tools.combinePhrases.opened
+                "
+              >
+                <i
+                  class="bi"
+                  style="color: gray"
+                  [ngClass]="{
+                    'bi-chevron-up': tools.combinePhrases.opened,
+                    'bi-chevron-down': !tools.combinePhrases.opened,
+                  }"
+                ></i>
+              </td>
+              <td
+                (click)="
+                  tools.combinePhrases.opened = !tools.combinePhrases.opened
+                "
+              >
+                <a #a>
+                  <span>{{ 'tools.combine phrases.name' | transloco }} </span>
+                </a>
+              </td>
+              <td
+                (click)="
+                  tools.combinePhrases.opened = !tools.combinePhrases.opened
+                "
+                colspan="2"
+              >
+                <span
+                  >{{ 'tools.combine phrases.description' | transloco }}
+                </span>
+                <a
+                  [href]="manualURL + 'using-tools.html#octra-combine-units'"
+                  target="_blank"
+                >
+                  <i class="bi bi-question-circle text-info"></i>
+                </a>
               </td>
             </tr>
-          }
-        }
-
-        <!-- cut audio files -->
-        @if (isToolEnabled('cut-audio')) {
-          <tr>
-            <td
-              (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
-            >
-              <i
-                class="bi"
-                style="color: gray"
-                [ngClass]="{
-                  'bi-chevron-up': tools.audioCutting.opened,
-                  'bi-chevron-down': !tools.audioCutting.opened,
-                }"
-              ></i>
-            </td>
-            <td
-              (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
-            >
-              <a #a>
-                {{ 'tools.cut audio.name' | transloco }}
-              </a>
-            </td>
-            <td
-              (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
-              colspan="3"
-            >
-              <span>{{ 'tools.cut audio.description' | transloco }} </span>
-              <a
-                [href]="manualURL + 'using-tools.html#cutting-audio-files'"
-                target="_blank"
-              >
-                <i class="bi bi-question-circle text-info"></i>
-              </a>
-            </td>
-          </tr>
-
-          @if (tools.audioCutting.opened) {
-            <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
-              <td></td>
-              <td colspan="4" style="padding-left: 20px">
-                <div class="alert alert-warning my-3">
-                  {{
-                    'tools.cut audio.warning wav'
-                      | transloco
-                        : {
-                            sampleRate:
-                              audio.audioManager.resource.info.audioBufferInfo
-                                .sampleRate,
-                          }
-                  }}
-                </div>
-                <div class="card" style="padding: 10px">
-                  <a
-                    (click)="
-                      tools.audioCutting.showConfigurator =
-                        !tools.audioCutting.showConfigurator
-                    "
-                    class="show-configurator-link"
-                  >
-                    @if (tools.audioCutting.showConfigurator) {
-                      <i class="bi bi-chevron-up" style="color: gray"></i>
-                      {{ 'tools.cut audio.hide configurator' | transloco }}
-                    }
-                    @if (!tools.audioCutting.showConfigurator) {
-                      <i class="bi bi-chevron-down" style="color: gray"></i>
-                      {{ 'tools.cut audio.show configurator' | transloco }}
-                    }
-                  </a>
-                  <div
-                    [hidden]="!tools.audioCutting.showConfigurator"
-                    class="configurator"
-                  >
-                    <octra-naming-drag-and-drop
-                      #namingConvention
-                      [fileName]="audio.audioManager!.resource!.name"
-                      [firstSegment]="
-                        annotationStoreService.currentLevel!.items[0]
-                      "
-                    ></octra-naming-drag-and-drop>
-                    <div class="form-control">
-                      <span
-                        >{{ 'tools.cut audio.append meta files' | transloco }}:
-                      </span>
-                      @for (
-                        exportFormat of tools.audioCutting.exportFormats;
-                        track exportFormat;
-                        let i = $index
-                      ) {
-                        <div class="form-check form-check-inline">
-                          <input
-                            [(ngModel)]="
-                              tools.audioCutting.exportFormats[i].selected
-                            "
-                            [value]="exportFormat.value"
-                            class="form-check-input"
-                            id="inlineCheckbox{{ i }}"
-                            type="checkbox"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="inlineCheckbox{{ i }}"
-                            >{{ exportFormat.label }}</label
-                          >
-                        </div>
-                      }
+            @if (tools.combinePhrases.opened) {
+              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+                <td></td>
+                <td colspan="4" style="padding-left: 20px">
+                  <div class="card" style="padding: 10px">
+                    <div class="alert alert-warning">
+                      {{ 'tools.combine phrases.warning' | transloco }}
+                    </div>
+                    <div class="configurator">
+                      <form>
+                        <table class="table" style="max-width: 400px">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <label for="minSilenceLength">{{
+                                  'tools.combine phrases.minimal silence'
+                                    | transloco
+                                }}</label>
+                              </td>
+                              <td>
+                                <input
+                                  [(ngModel)]="
+                                    tools.combinePhrases.options
+                                      .minSilenceLength
+                                  "
+                                  id="minSilenceLength"
+                                  name="minSilenceLength"
+                                  type="number"
+                                />
+                              </td>
+                              <td>
+                                <i
+                                  class="bi bi-question-circle"
+                                  [ngbTooltip]="
+                                    transloco.translate(
+                                      'tools.combine phrases.minimal silence desc'
+                                    )
+                                  "
+                                  placement="right"
+                                  style="color: darkblue"
+                                ></i>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <label for="maxWordsPerSegment">{{
+                                  'tools.combine phrases.maximal words'
+                                    | transloco
+                                }}</label>
+                              </td>
+                              <td>
+                                <input
+                                  [(ngModel)]="
+                                    tools.combinePhrases.options
+                                      .maxWordsPerSegment
+                                  "
+                                  id="maxWordsPerSegment"
+                                  name="maxWordsPerSegment"
+                                  type="number"
+                                />
+                              </td>
+                              <td>
+                                <i
+                                  class="bi bi-question-circle"
+                                  [ngbTooltip]="
+                                    transloco.translate(
+                                      'tools.combine phrases.maximal words desc'
+                                    )
+                                  "
+                                  placement="right"
+                                  style="color: darkblue"
+                                ></i>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </form>
+                      <button
+                        (click)="onCombinePhrasesClick()"
+                        [disabled]="!isCombinePhrasesSettingsValid"
+                        class="btn btn-primary btn-raised"
+                      >
+                        {{ 'tools.combine phrases.name' | transloco }}
+                      </button>
                     </div>
                   </div>
-                  <div class="progress-area" style="text-align: center">
-                    @if (tools.audioCutting.status !== 'running') {
-                      <button
-                        (click)="splitAudio()"
-                        [disabled]="
-                          namingConvention.resultConvention.length === 1
-                        "
-                        class="btn btn-primary btn-raised"
-                        style="max-width: 200px; margin-top: 20px"
-                      >
-                        {{ 'tools.cut audio.name' | transloco }}
-                      </button>
-                    }
-                    @if (tools.audioCutting.status === 'running') {
-                      <button
-                        (click)="stopAudioSplitting()"
-                        class="btn btn-danger btn-raised"
-                        style="max-width: 200px; margin-top: 20px"
-                      >
-                        {{ 'g.stop' | transloco }}
-                      </button>
-                    }
-                    @if (tools.audioCutting.status !== 'idle') {
-                      <div class="my-2">
-                        <div class="progress" style="height: 20px">
-                          <div
-                            class="progress-bar progress-bar-animated"
-                            role="progressbar"
-                            [ngStyle]="{
-                              width: tools.audioCutting.progress + '%',
-                            }"
-                            aria-valuenow="25"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                          >
-                            <b>
-                              {{
-                                tools.audioCutting.progress | number: '1.2-2'
-                              }}%
-                            </b>
-                          </div>
-                        </div>
-                        @if (tools.audioCutting.status === 'failed') {
-                          <div class="text-danger" style="padding: 10px">
-                            {{ tools.audioCutting.message }}
-                          </div>
-                        }
-                      </div>
-                    }
-                    @if (
-                      tools.audioCutting.status !== 'idle' &&
-                      tools.audioCutting.status !== 'finished' &&
-                      tools.audioCutting.timeLeft > 0
-                    ) {
-                      Time left:
-                      {{ tools.audioCutting.timeLeft | timespan }}
-                    }
-                    @if (tools.audioCutting.result.url !== undefined) {
-                      <a
-                        [href]="tools.audioCutting.result.url"
-                        class="link"
-                        download="{{ tools.audioCutting.result.filename }}"
-                        style="margin-left: 10px"
-                      >
-                        <i class="bi bi-save-fill"></i>
-                        {{ 'g.download' | transloco }}
-                      </a>
-                    }
-                  </div>
-                </div>
+                </td>
+              </tr>
+            }
+          }
+
+          <!-- reg-replace tool -->
+          @if (isToolEnabled('reg-replace')) {
+            <tr class="top-tr">
+              <td (click)="tools.regReplace.opened = !tools.regReplace.opened">
+                <i
+                  class="bi"
+                  style="color: gray"
+                  [ngClass]="{
+                    'bi-chevron-up': tools.regReplace.opened,
+                    'bi-chevron-down': !tools.regReplace.opened,
+                  }"
+                ></i>
+              </td>
+              <td (click)="tools.regReplace.opened = !tools.regReplace.opened">
+                <a #a>
+                  <span>{{ 'tools.reg replace.name' | transloco }} </span>
+                </a>
+              </td>
+              <td
+                (click)="tools.regReplace.opened = !tools.regReplace.opened"
+                colspan="2"
+              >
+                <span>{{ 'tools.reg replace.description' | transloco }} </span>
               </td>
             </tr>
+            @if (tools.regReplace.opened) {
+              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+                <td></td>
+                <td colspan="4" style="padding-left: 20px">
+                  <div class="card" style="padding: 10px">
+                    <p
+                      [innerHTML]="
+                        'tools.reg replace.inner description' | transloco
+                      "
+                    ></p>
+                    <table class="table table-sm table-striped">
+                      <tbody>
+                        <tr class="align-middle">
+                          <td>
+                            {{ 'tools.reg replace.pattern' | transloco }}:
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="regReplacePattern"
+                              [(ngModel)]="tools.regReplace.pattern"
+                            />
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            {{ 'tools.reg replace.replace with' | transloco }}:
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="regReplaceValue"
+                              [(ngModel)]="tools.regReplace.replacement"
+                            />
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>Ebenen:</td>
+                          <td>
+                            @for (
+                              level of annotationStoreService.transcript.levels;
+                              track level.id
+                            ) {
+                              <div
+                                class="me-1 form-check border bg-white rounded d-inline-block py-1 px-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  class="form-check-input d-inline-block ms-0 me-1"
+                                  [id]="'reg_replace_level_check_' + level.id"
+                                  name="levels"
+                                  [(ngModel)]="
+                                    tools.regReplace.levels[level.name]
+                                  "
+                                />
+                                <label
+                                  class="form-check-label pointer"
+                                  [for]="'reg_replace_level_check_' + level.id"
+                                  >{{ level.name }}</label
+                                >
+                              </div>
+                            }
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div class="mt-2">
+                      <button
+                        class="btn btn-secondary-outline btn-sm me-1"
+                        (click)="preview()"
+                      >
+                        {{ 'g.preview' | transloco }}
+                      </button>
+                      <button class="btn btn-primary btn-sm">
+                        {{ 'g.execute' | transloco }}
+                      </button>
+                    </div>
+
+                    <div class="mt-3">
+                      <h5>{{ 'g.preview' | transloco }}</h5>
+                      <div class="row g-0">
+                        <div class="col-md-3">
+                          <div class="list-group">
+                            @for (
+                              item of tools.regReplace.results;
+                              track item.name
+                            ) {
+                              <div class="list-group-item">
+                                {{ item.name }}
+                              </div>
+                            }
+                          </div>
+                        </div>
+                        <div class="col-md-9">
+                          <table class="table table-striped table-sm">
+                            <tbody>
+                              @for (
+                                result of tools.regReplace.results;
+                                track result.name
+                              ) {
+                                @for (
+                                  item of result.matches;
+                                  track item.unitID
+                                ) {
+                                  <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td [innerHTML]="item.html"></td>
+                                  </tr>
+                                }
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
           }
-        }
-      </tbody>
-    </table>
+
+          <!-- cut audio files -->
+          @if (isToolEnabled('cut-audio')) {
+            <tr>
+              <td
+                (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
+              >
+                <i
+                  class="bi"
+                  style="color: gray"
+                  [ngClass]="{
+                    'bi-chevron-up': tools.audioCutting.opened,
+                    'bi-chevron-down': !tools.audioCutting.opened,
+                  }"
+                ></i>
+              </td>
+              <td
+                (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
+              >
+                <a #a>
+                  {{ 'tools.cut audio.name' | transloco }}
+                </a>
+              </td>
+              <td
+                (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
+                colspan="3"
+              >
+                <span>{{ 'tools.cut audio.description' | transloco }} </span>
+                <a
+                  [href]="manualURL + 'using-tools.html#cutting-audio-files'"
+                  target="_blank"
+                >
+                  <i class="bi bi-question-circle text-info"></i>
+                </a>
+              </td>
+            </tr>
+
+            @if (tools.audioCutting.opened) {
+              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+                <td></td>
+                <td colspan="4" style="padding-left: 20px">
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </form>
   </div>
   <div class="modal-footer">
     <button

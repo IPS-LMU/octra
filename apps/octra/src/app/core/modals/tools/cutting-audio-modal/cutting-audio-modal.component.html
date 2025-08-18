@@ -1,0 +1,164 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-title">
+      {{ 'tools.cut-audio.name' | transloco }}
+      <a
+        [href]="manualURL + 'using-tools.html#cutting-audio-files'"
+        target="_blank"
+      >
+        <i class="bi bi-question-circle text-info"></i>
+      </a>
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <p>{{ 'tools.cut-audio.description' | transloco }}</p>
+    <div class="configurator">
+      <form>
+        <div class="alert alert-warning my-3">
+          {{
+            'tools.cut-audio.warning wav'
+              | transloco
+                : {
+                    sampleRate:
+                      audio.audioManager.resource.info.audioBufferInfo
+                        .sampleRate,
+                  }
+          }}
+        </div>
+        <div class="card" style="padding: 10px">
+          <a
+            (click)="
+              state.showConfigurator =
+                !state.showConfigurator
+            "
+            class="show-configurator-link"
+          >
+            @if (state.showConfigurator) {
+              <i class="bi bi-chevron-up" style="color: gray"></i>
+              {{ 'tools.cut-audio.hide configurator' | transloco }}
+            }
+            @if (!state.showConfigurator) {
+              <i class="bi bi-chevron-down" style="color: gray"></i>
+              {{ 'tools.cut-audio.show configurator' | transloco }}
+            }
+          </a>
+          <div
+            [hidden]="!state.showConfigurator"
+            class="configurator"
+          >
+            <octra-naming-drag-and-drop
+              #namingConvention
+              [fileName]="audio.audioManager!.resource!.name"
+              [firstSegment]="annotationStoreService.currentLevel!.items[0]"
+            ></octra-naming-drag-and-drop>
+            <div class="form-control">
+              <span
+                >{{ 'tools.cut-audio.append meta files' | transloco }}:
+              </span>
+              @for (
+                exportFormat of state.exportFormats;
+                track exportFormat;
+                let i = $index
+              ) {
+                <div class="form-check form-check-inline">
+                  <input
+                    [(ngModel)]="state.exportFormats[i].selected"
+                    [value]="exportFormat.value"
+                    [name]="'inlineCheckbox' + i"
+                    class="form-check-input"
+                    id="inlineCheckbox{{ i }}"
+                    type="checkbox"
+                  />
+                  <label class="form-check-label" for="inlineCheckbox{{ i }}">{{
+                    exportFormat.label
+                  }}</label>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="progress-area" style="text-align: center">
+            @if (state.status !== 'running') {
+              <button
+                (click)="splitAudio()"
+                [disabled]="namingConvention.resultConvention.length === 1"
+                class="btn btn-primary btn-raised"
+                style="max-width: 200px; margin-top: 20px"
+              >
+                {{ 'tools.cut-audio.name' | transloco }}
+              </button>
+            }
+            @if (state.status === 'running') {
+              <button
+                (click)="stopAudioSplitting()"
+                class="btn btn-danger btn-raised"
+                style="max-width: 200px; margin-top: 20px"
+              >
+                {{ 'g.stop' | transloco }}
+              </button>
+            }
+            @if (state.status !== 'idle') {
+              <div class="my-2">
+                <div class="progress" style="height: 20px">
+                  <div
+                    class="progress-bar progress-bar-animated"
+                    role="progressbar"
+                    [ngStyle]="{
+                      width: state.progress + '%',
+                    }"
+                    aria-valuenow="25"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  >
+                    <b>
+                      {{ state.progress | number: '1.2-2' }}%
+                    </b>
+                  </div>
+                </div>
+                @if (state.status === 'failed') {
+                  <div class="text-danger" style="padding: 10px">
+                    {{ state.message }}
+                  </div>
+                }
+              </div>
+            }
+            @if (
+              state.status !== 'idle' &&
+              state.status !== 'finished' &&
+              state.timeLeft > 0
+            ) {
+              Time left:
+              {{ state.timeLeft | timespan }}
+            }
+            @if (state.result.url !== undefined) {
+              <a
+                [href]="state.result.url"
+                class="link"
+                download="{{ state.result.filename }}"
+                style="margin-left: 10px"
+              >
+                <i class="bi bi-save-fill"></i>
+                {{ 'g.download' | transloco }}
+              </a>
+            }
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      (click)="close()"
+      class="btn btn-primary"
+      data-dismiss="modal"
+      type="button"
+    >
+      {{ 'g.close' | transloco }}
+    </button>
+  </div>
+</div>

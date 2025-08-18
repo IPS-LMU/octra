@@ -443,13 +443,44 @@
             navbarServ.showExport &&
             (settService.projectsettings?.octra?.tools ?? []).length > 0
           ) {
-            <li class="nav-item">
-              <a (mouseup)="openToolsModal()" class="nav-link">
+            <li
+              class="nav-item dropdown"
+              ngbDropdown
+              [container]="'body'"
+              display="dynamic"
+              placement="bottom-end"
+            >
+              <a ngbDropdownToggle type="button" class="nav-link">
                 <i class="bi bi-tools navbar-icon"></i>
                 <span class="d-md-none d-xxl-inline">
                   {{ 'g.tools' | transloco }}</span
                 >
               </a>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right tools-dropdown"
+                role="menu"
+              >
+                @for (tool of tools; track tool.name) {
+                  @if (isToolEnabled(tool.name)) {
+                    <ng-template #popover>
+                      {{ 'tools.' + tool.name + '.description' | transloco }}
+                    </ng-template>
+                    <li
+                      ngbDropdownItem
+                      (click)="tool.click()"
+                      class="pointer"
+                      [ngbPopover]="popover"
+                      popoverClass="tools-dropdown-popover"
+                      triggers="mouseenter:mouseleave"
+                      container="body"
+                      placement="left-bottom"
+                    >
+                      {{ 'tools.' + tool.name + '.name' | transloco }}
+                    </li>
+                  }
+                }
+              </div>
             </li>
           }
           @if (

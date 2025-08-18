@@ -315,7 +315,7 @@
     "alerts": {
       "done": "工具 '{{value}}' 成功被应用"
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "使用此工具，将短语之间的静音去掉，以减少短标注单元。 如果相邻标注单元之间的静音时长短于给定值，则此静音段被合并。",
       "hide settings": "隐藏设置",
       "maximal words": "最大词数目",
@@ -324,7 +324,7 @@
       "minimal silence desc": "如果其包括的静音时长超过这个值，则此标注单元将被忽略。",
       "show settings": "显示设置"
     },
-    "cut audio": {
+    "cut-audio": {
       "add placeholder": "添加字段",
       "append meta files": "添加原始信息",
       "description": "这个工具将音频文件以标注单元为边界进行切分",

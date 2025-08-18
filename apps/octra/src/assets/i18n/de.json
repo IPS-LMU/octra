@@ -109,6 +109,7 @@
     "very good intelligible": "sehr gut verständlich"
   },
   "g": {
+    "skip": "Überspringen",
     "instructions": "Anweisungen",
     "comment": "Kommentar",
     "File extension": "Dateiendung",
@@ -172,6 +173,7 @@
     "gender": "Geschlecht",
     "good": "Gut",
     "guidelines": "Regeln",
+    "regular expression": "Regulärer Ausdruck",
     "help": "Hilfe",
     "id": "ID",
     "ignore": "Ignorieren",
@@ -184,6 +186,8 @@
     "later": "Später",
     "legals": "Rechtliches",
     "level": "Ebene",
+    "levels": "Ebenen",
+    "execute": "Ausführen",
     "locale": "Sprache",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -239,6 +243,7 @@
     "switch to": "Zu {{editor}} wechseln",
     "terms and conditions": "AGB",
     "text file": "Textdatei",
+    "text": "Text",
     "time": "Zeit",
     "timespan": "Zeitspanne (s)",
     "timezone": "Zeitzone",
@@ -513,18 +518,27 @@
       "done": "Das Werkzeug '{{value}}' wurde erfolgreich angewendet.",
       "fail": "Das Werkzeug '{{value}} wurde nicht erfolgreich ausgeführt:<br/>{{error}}'"
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Transkriptionseinheiten entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
       "hide settings": "Verstecke die Einstellungen",
       "maximal words": "Maximale Anzahl an Wörtern",
       "maximal words desc": "Die Transkriptionseinheiten werden so zusammengeführt, dass eine Einheit eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert.",
       "minimal silence": "Minimale Pausenlänge (ms)",
       "minimal silence desc": "Alle Pausen, deren Länge größer oder gleich dem angegebenen Wert sind, werden nicht zusammengeführt.",
-      "name": "Kombiniere Transkriptionseinheiten",
+      "name": "Transkriptionseinheiten kombinieren",
       "show settings": "Zeige die Einstellungen",
       "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat mit \"CMD + Z (MacOS) or CTRL + Z (PC)\" rückgängig gemacht werden."
     },
-    "cut audio": {
+    "reg-replace": {
+      "name": "Suchen & Ersetzen",
+      "description": "Ersetze Teile des Transkripts mit einem Text oder regulären Ausdruck.",
+      "inner description": "Fülle die folgenden Felder aus. Verwendest Du einen regulären Ausdruck mit Gruppen, kannst Du diese im Feld \"Ersetze mit\" mit $1 für die erste Gruppe u.s.w. ansprechen.",
+      "pattern": "Text / Regulärer Ausdruck",
+      "replace with": "Ersetze mit",
+      "affected units": "Betroffene Transkriptionseinheiten",
+      "matches": "Funde"
+    },
+    "cut-audio": {
       "add placeholder": "Platzhalter hinzufügen",
       "append meta files": "Meta Dateien hinzufügen",
       "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Grenzen geschnitten werden.",

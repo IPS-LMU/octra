@@ -8,7 +8,8 @@ function validateAnnotation(annotation, guidelines) {
 
   //R06 Satzzeichen
   var re = /[(.,!?;)]/g;
-  while ((match = re.exec(annotation)) != undefined) {
+  let match;
+  while ((match = re.exec(annotation)) !== undefined) {
     result.push({
       start: match.index,
       length: match[0].length,

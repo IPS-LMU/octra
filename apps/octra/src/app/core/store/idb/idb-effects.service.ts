@@ -824,6 +824,7 @@ export class IDBEffects {
         AnnotationActions.removeAnnotationLevel.do,
         AnnotationActions.updateASRSegmentInformation.do,
         AnnotationActions.overwriteTranscript.do,
+        AnnotationActions.changeLevels.do,
         AnnotationActions.addCurrentLevelItems.do,
         AnnotationActions.removeCurrentLevelItems.do,
         AnnotationActions.changeCurrentLevelItems.do,

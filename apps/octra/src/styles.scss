@@ -564,3 +564,9 @@ ul.pagination.pagination-sm {
     max-width: 100% !important;
   }
 }
+
+.table td.fit,
+.table th.fit {
+  white-space: nowrap;
+  width: 1%;
+}

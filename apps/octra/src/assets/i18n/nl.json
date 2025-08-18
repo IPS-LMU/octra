@@ -315,7 +315,7 @@
     "alerts": {
       "done": "Tool '{{value}}' is succesvol toegepast."
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "Met deze tool worden zinnen tussen stiltes gecombineerd om korte transcriptie-eenheden te verminderen. Transcriptie-eenheden die stilte bevatten die korter is dan een bepaalde duur, worden samengevoegd met hun buren.",
       "hide settings": "Verberg instellingen",
       "maximal words": "Maximaal aantal woorden",
@@ -324,7 +324,7 @@
       "minimal silence desc": "Alle transcriptie-eenheden die stilte bevatten, worden genegeerd als hun duur langer is dan deze waarde.",
       "show settings": "Toon instellingen"
     },
-    "cut audio": {
+    "cut-audio": {
       "add placeholder": "Tijdelijke aanduiding toevoegen",
       "append meta files": "Metabestanden toevoegen",
       "description": "Deze tool biedt aan om het audiobestand in sequenties van de transcriptie-eenheden te knippen.",

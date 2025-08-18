@@ -29,12 +29,12 @@ import { MouseStatisticElem } from '../../../obj/statistics/MouseStatisticElem';
 import { StatisticElem } from '../../../obj/statistics/StatisticElement';
 import { AudioService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
+import { RoutingService } from '../../../shared/service/routing.service';
 import { ApplicationStoreService } from '../../application/application-store.service';
 import { ApplicationActions } from '../../application/application.actions';
 import { getModeState, LoginMode, RootState } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
-import { RoutingService } from '../../../shared/service/routing.service';
 
 @Injectable({
   providedIn: 'root',
@@ -927,6 +927,15 @@ export class AnnotationStoreService {
     this.store.dispatch(
       AnnotationActions.changeCurrentLevelItems.do({
         items,
+        mode: this.appStoreService.useMode!,
+      }),
+    );
+  }
+
+  changeLevels(levels: OctraAnnotationAnyLevel<OctraAnnotationSegment>[]) {
+    this.store.dispatch(
+      AnnotationActions.changeLevels.do({
+        levels,
         mode: this.appStoreService.useMode!,
       }),
     );

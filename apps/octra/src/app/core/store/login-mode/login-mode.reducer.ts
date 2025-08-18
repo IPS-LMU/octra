@@ -34,6 +34,7 @@ const { createUndoRedoReducer } = undoRedo({
     AnnotationActions.addAnnotationLevel.do.type,
     AnnotationActions.addCurrentLevelItems.do.type,
     AnnotationActions.removeAnnotationLevel.do.type,
+    AnnotationActions.changeLevels.do.type,
     AnnotationActions.changeCurrentLevelItems.do.type,
     AnnotationActions.removeCurrentLevelItems.do.type,
     AnnotationActions.changeCurrentItemById.do.type,

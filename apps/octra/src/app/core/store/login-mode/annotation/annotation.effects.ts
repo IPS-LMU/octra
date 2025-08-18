@@ -1281,6 +1281,7 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(
           AnnotationActions.changeCurrentLevelItems.do,
+          AnnotationActions.changeLevels.do,
           AnnotationActions.changeCurrentItemById.do,
           AnnotationActions.changeAnnotationLevel.do,
           AnnotationActions.overwriteTranscript.do,

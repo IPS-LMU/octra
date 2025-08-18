@@ -109,6 +109,7 @@
     "very good intelligible": "very good intelligibility"
   },
   "g": {
+    "skip": "Skip",
     "instructions": "Instructions",
     "comment": "Comment",
     "File extension": "File extension",
@@ -139,9 +140,11 @@
     "backward": "Back",
     "backwardtime": "Back (in time)",
     "bad": "Bad",
+    "execute": "Execute",
     "bitspersecond": "Bits per Second",
     "bug report": "Bug Report",
     "close": "Close",
+    "regular expression": "Regular expression",
     "continue": "Continue",
     "continue transcription": "Continue transcription now",
     "country": "Country",
@@ -184,6 +187,7 @@
     "later": "Later",
     "legals": "Legals",
     "level": "Level",
+    "levels": "Levels",
     "locale": "Language",
     "login": "Login",
     "logout": "Logout",
@@ -239,6 +243,7 @@
     "switch to": "Switch to {{editor}}",
     "terms and conditions": "Terms and Conditions",
     "text file": "Text file",
+    "text": "Text",
     "time": "Time",
     "timespan": "Timespan (s)",
     "timezone": "Timezone",
@@ -513,7 +518,7 @@
       "done": "Tool '{{value}}' was applied sucessfully.",
       "fail": "Running tool '{{value}} failed:<br/>{{error}}'"
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "With this tool phrases between silence are combined in order to reduce short transcription units. Transcription units containing silence shorter than a gven duration are merged with their neighbours.",
       "hide settings": "Hide settings",
       "maximal words": "Maximal number of words",
@@ -524,7 +529,7 @@
       "show settings": "Show settings",
       "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After running this tool you can revert the changes with hotkeys \"CMD + Z (MacOS) or CTRL + Z (PC)\"."
     },
-    "cut audio": {
+    "cut-audio": {
       "add placeholder": "Add placeholder",
       "append meta files": "Append meta files",
       "description": "This tool offers to cut the audio file to sequences from the transcription units.",
@@ -532,6 +537,15 @@
       "name": "Cut audio file",
       "show configurator": "Show configurator",
       "warning wav": "The audio file is going to be converted to WAVE PCM 16Bit, mono, {{sampleRate}} Hz during cutting."
+    },
+    "reg-replace": {
+      "name": "Search & Replace",
+      "description": "Replace parts of the transcript with text or a regular expression.",
+      "inner description": "Fill in the following fields. If you use a regular expression with groups, you can refer to them in the ‘Replace with’ field using $1 for the first group, etc.",
+      "pattern": "Text / Regular expression",
+      "replace with": "Replace with",
+      "affected units": "Affected transcription units",
+      "matches": "Matches"
     }
   },
   "transcription": {

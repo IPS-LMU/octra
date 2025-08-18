@@ -1,7 +1,12 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { AccountLoginMethod, AppPropertiesDtoAuthenticationsEnum, LANGUAGES, TIMEZONE_NAMES } from '@octra/api-types';
+import {
+  AccountLoginMethod,
+  AppPropertiesDtoAuthenticationsEnum,
+  LANGUAGES,
+  TIMEZONE_NAMES,
+} from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../default.component';
 import { SignupComponent } from './signup/signup.component';

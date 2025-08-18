@@ -368,6 +368,23 @@ export class AnnotationStateReducers {
         },
       ),
       on(
+        AnnotationActions.changeLevels.do,
+        (state: AnnotationState, { levels, mode }) => {
+          if (this.mode === mode) {
+            for (const level of state.transcript.levels) {
+              const changedLevel = levels.find((a) => a.id === level.id);
+              if (changedLevel) {
+                state.transcript = state.transcript
+                  .clone()
+                  .changeLevelById(level.id, changedLevel);
+              }
+            }
+          }
+
+          return state;
+        },
+      ),
+      on(
         AnnotationActions.addCurrentLevelItems.do,
         (state: AnnotationState, { items, mode }) => {
           if (this.mode === mode) {

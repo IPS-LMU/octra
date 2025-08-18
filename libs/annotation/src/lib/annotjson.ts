@@ -311,6 +311,27 @@ export class OItem implements IItem, Serializable<IItem, OItem> {
     return this.labels?.find((a) => a.name !== notName);
   }
 
+  replaceFirstLabelWithoutName(
+    notName: string,
+    replace: (value: string) => string,
+  ) {
+    const index = this.labels?.findIndex((a) => a.name !== notName);
+
+    if (index > -1) {
+      const label = this.labels[index].clone();
+      label.value = replace(label.value);
+
+      this.labels = [
+        ...this.labels.slice(0, index),
+        label,
+        ...this.labels.slice(index + 1),
+      ];
+      return label;
+    }
+
+    return undefined;
+  }
+
   clone(id?: number) {
     return new OItem(id ?? this.id, [...this.labels]);
   }
@@ -378,9 +399,12 @@ export class OSegment
   }
 
   override clone(id?: number) {
-    return new OSegment(id ?? this.id, this.sampleStart, this.sampleDur, [
-      ...this.labels,
-    ]);
+    return new OSegment(
+      id ?? this.id,
+      this.sampleStart,
+      this.sampleDur,
+      this.labels.map((a) => a.clone()),
+    );
   }
 }
 
@@ -436,6 +460,10 @@ export class OLabel implements ILabel, Serializable<ILabel, OLabel> {
 
   static deserialize(jsonObject: ILabel): OLabel {
     return new OLabel(jsonObject.name, jsonObject.value);
+  }
+
+  clone() {
+    return new OLabel(this.name, this.value);
   }
 }
 

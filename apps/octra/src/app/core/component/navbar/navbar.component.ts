@@ -13,6 +13,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   NgbCollapse,
   NgbDropdown,
+  NgbDropdownItem,
   NgbDropdownMenu,
   NgbDropdownToggle,
   NgbModalRef,
@@ -25,7 +26,7 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
-import { OctraComponentsModule } from '@octra/ngx-components';
+import { NgbModalWrapper, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { environment } from '../../../../environments/environment';
@@ -35,7 +36,8 @@ import { AboutModalComponent } from '../../modals/about-modal/about-modal.compon
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
-import { ToolsModalComponent } from '../../modals/tools-modal/tools-modal.component';
+import { CombinePhrasesModalComponent } from '../../modals/tools/combine-phrases-modal/combine-phrases-modal.component';
+import { CuttingAudioModalComponent } from '../../modals/tools/cutting-audio-modal/cutting-audio-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
 import {
   AudioService,
@@ -55,9 +57,10 @@ import { ASRStateSettings } from '../../store/asr';
 import { AsrStoreService } from '../../store/asr/asr-store-service.service';
 import { AuthenticationStoreService } from '../../store/authentication';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
-import { AsrOptionsComponent } from '../asr-options/asr-options.component';
+import { RegReplaceModalComponent } from '../../modals/tools/reg-replace-modal/reg-replace-modal.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -79,6 +82,7 @@ import { AsrOptionsComponent } from '../asr-options/asr-options.component';
     TimespanPipe,
     OctraComponentsModule,
     AsrOptionsComponent,
+    NgbDropdownItem,
   ],
 })
 export class NavigationComponent
@@ -103,8 +107,40 @@ export class NavigationComponent
   protected asrSettings?: ASRStateSettings;
 
   modalexport?: NgbModalRef;
-  modalTools?: NgbModalRef;
   modalStatistics?: NgbModalRef;
+
+  protected tools: {
+    name: string;
+    click: () => NgbModalWrapper<unknown>;
+  }[] = [
+    {
+      name: 'reg-replace',
+      click: () => {
+        return this.modalService.openModalRef(
+          RegReplaceModalComponent,
+          RegReplaceModalComponent.options,
+        );
+      },
+    },
+    {
+      name: 'combine-phrases',
+      click: () => {
+        return this.modalService.openModalRef(
+          CombinePhrasesModalComponent,
+          CombinePhrasesModalComponent.options,
+        );
+      },
+    },
+    {
+      name: 'cut-audio',
+      click: () => {
+        return this.modalService.openModalRef(
+          CuttingAudioModalComponent,
+          CuttingAudioModalComponent.options,
+        );
+      },
+    },
+  ];
 
   public get environment(): any {
     return environment;
@@ -135,6 +171,14 @@ export class NavigationComponent
 
   get annotJSONType() {
     return AnnotationLevelType;
+  }
+
+  isToolEnabled(tool: string) {
+    return (
+      this.settService.projectsettings?.octra?.tools?.find(
+        (a) => a === tool,
+      ) !== undefined
+    );
   }
 
   @ViewChild('canvasContent') canvasContent?: TemplateRef<any>;
@@ -292,10 +336,10 @@ export class NavigationComponent
     );
   }
 
-  openToolsModal() {
-    this.modalTools = this.modalService.openModalRef(
-      ToolsModalComponent,
-      ToolsModalComponent.options,
+  openCombinePhrases() {
+    this.modalStatistics = this.modalService.openModalRef(
+      CombinePhrasesModalComponent,
+      CombinePhrasesModalComponent.options,
     );
   }
 

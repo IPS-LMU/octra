@@ -11,7 +11,7 @@
   "interfaces": ["2D-Editor", "Dictaphone Editor", "Linear Editor"],
   "octra": {
     "validationEnabled": true,
-    "tools": ["combine-phrases", "cut-audio"],
+    "tools": ["combine-phrases", "cut-audio", "reg-replace"],
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": false,
     "theme": "shortAudioFiles",

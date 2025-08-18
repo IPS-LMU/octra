@@ -1,0 +1,108 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-title">
+      {{ 'tools.combine-phrases.name' | transloco }}
+      <a
+        [href]="manualURL + 'using-tools.html#octra-combine-units'"
+        target="_blank"
+      >
+        <i class="bi bi-question-circle text-info"></i>
+      </a>
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-describedby="modal-title"
+      (click)="close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <p>{{ 'tools.combine-phrases.description' | transloco }}</p>
+    <form>
+      <div class="alert alert-warning">
+        {{ 'tools.combine-phrases.warning' | transloco }}
+      </div>
+      <div class="configurator">
+        <form>
+          <table class="table" style="max-width: 400px">
+            <tbody>
+              <tr>
+                <td>
+                  <label for="minSilenceLength">{{
+                    'tools.combine-phrases.minimal silence' | transloco
+                  }}</label>
+                </td>
+                <td>
+                  <input
+                    [(ngModel)]="state.options.minSilenceLength"
+                    id="minSilenceLength"
+                    name="minSilenceLength"
+                    type="number"
+                  />
+                </td>
+                <td>
+                  <i
+                    class="bi bi-question-circle"
+                    [ngbTooltip]="
+                      transloco.translate(
+                        'tools.combine-phrases.minimal silence desc'
+                      )
+                    "
+                    placement="right"
+                    style="color: darkblue"
+                  ></i>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="maxWordsPerSegment">{{
+                    'tools.combine-phrases.maximal words' | transloco
+                  }}</label>
+                </td>
+                <td>
+                  <input
+                    [(ngModel)]="
+                      state.options.maxWordsPerSegment
+                    "
+                    id="maxWordsPerSegment"
+                    name="maxWordsPerSegment"
+                    type="number"
+                  />
+                </td>
+                <td>
+                  <i
+                    class="bi bi-question-circle"
+                    [ngbTooltip]="
+                      transloco.translate(
+                        'tools.combine-phrases.maximal words desc'
+                      )
+                    "
+                    placement="right"
+                    style="color: darkblue"
+                  ></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+        <button
+          (click)="onCombinePhrasesClick()"
+          [disabled]="!isCombinePhrasesSettingsValid"
+          class="btn btn-primary btn-raised"
+        >
+          {{ 'tools.combine-phrases.name' | transloco }}
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      (click)="close()"
+      class="btn btn-primary"
+      data-dismiss="modal"
+      type="button"
+    >
+      {{ 'g.close' | transloco }}
+    </button>
+  </div>
+</div>

@@ -315,7 +315,7 @@
     "alerts": {
       "done": "'{value}}' 도구가 성공적으로 적용되었습니다."
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "이 도구를 사용하면 짧은 기록 유닛들을 줄이기 위해 무음 사이의 문구가 결합됩니다. 주어진 기간보다 짧은 침묵을 포함하는 기록 유닛은 인접한 유닛들과 병합됩니다.",
       "hide settings": "설정 숨기기",
       "maximal words": "최대 단어 수",
@@ -324,7 +324,7 @@
       "minimal silence desc": "무음이 포함된 모든 전사 단위는 지속 시간이 이 값보다 길 경우 무시됩니다.",
       "show settings": "설정 표시"
     },
-    "cut audio": {
+    "cut-audio": {
       "add placeholder": "자리 표시자 추가",
       "append meta files": "메타 파일 추가",
       "description": "이 도구는 오디오 파일을 기록 유닛에서 시퀀스로 잘라내는 기능을 제공합니다.",

@@ -1,43 +1,19 @@
-import { DecimalPipe, NgClass, NgStyle } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnDestroy,
-  ViewChild,
-} from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  DomSanitizer,
-  SafeResourceUrl,
-  SafeUrl,
-} from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import {
-  NgbActiveModal,
-  NgbModalOptions,
-  NgbTooltip,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
+import { insertString, last } from '@octra/utilities';
 import { AudioCutter, IntArray } from '@octra/web-media';
-import {
-  fadeInExpandOnEnterAnimation,
-  fadeOutCollapseOnLeaveAnimation,
-} from 'angular-animations';
+import { fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation } from 'angular-animations';
 import { strToU8, zip, zipSync } from 'fflate';
 import { interval } from 'rxjs';
 import { AppInfo } from '../../../app.info';
-import {
-  JSONConverter,
-  TextTableConverter,
-} from '../../obj/tools/audio-cutting/cutting-format';
-import {
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { JSONConverter, TextTableConverter } from '../../obj/tools/audio-cutting/cutting-format';
+import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
@@ -56,14 +32,15 @@ import { OctraModal } from '../types';
     NgClass,
     FormsModule,
     NgbTooltip,
-    NamingDragAndDropComponent,
-    NgStyle,
-    DecimalPipe,
     TranslocoPipe,
     OctraUtilitiesModule,
   ],
+  encapsulation: ViewEncapsulation.None,
 })
-export class ToolsModalComponent extends OctraModal implements OnDestroy {
+export class ToolsModalComponent
+  extends OctraModal
+  implements OnDestroy, OnInit
+{
   private sanitizer = inject(DomSanitizer);
   private modalsService = inject(OctraModalService);
   annotationStoreService = inject(AnnotationStoreService);
@@ -77,6 +54,7 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
     backdrop: true,
     scrollable: true,
     size: 'xl',
+    fullscreen: 'md',
   };
 
   public parentformat: {
@@ -125,6 +103,24 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         maxWordsPerSegment: number;
       };
     };
+    regReplace: {
+      opened: boolean;
+      status: string;
+      pattern: string;
+      replacement: string;
+      levels: Record<string, boolean>;
+      results: {
+        name: string;
+        matches: {
+          unitID: number;
+          replacements: {
+            start: number;
+            length: number;
+          }[];
+          html: string;
+        }[];
+      }[];
+    };
   } = {
     audioCutting: {
       opened: false,
@@ -167,6 +163,14 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
         minSilenceLength: 100,
         maxWordsPerSegment: 10,
       },
+    },
+    regReplace: {
+      opened: false,
+      status: 'idle',
+      pattern: '(a|e)',
+      replacement: '[$1]',
+      levels: {},
+      results: [],
     },
   };
 
@@ -570,5 +574,84 @@ export class ToolsModalComponent extends OctraModal implements OnDestroy {
       this.settings.projectsettings?.octra?.tools?.find((a) => a === tool) !==
       undefined
     );
+  }
+
+  ngOnInit() {
+    this.annotationStoreService.transcript.levels.forEach((a) => {
+      this.tools.regReplace.levels[a.name] = true;
+    });
+  }
+
+  preview() {
+    this.tools.regReplace.results = [];
+    const regex = new RegExp(this.tools.regReplace.pattern, 'g');
+    const selectedLevels = Object.keys(this.tools.regReplace.levels).filter(
+      (a) => this.tools.regReplace.levels[a] === true,
+    );
+
+    if (selectedLevels.length > 0 && this.tools.regReplace.pattern !== '') {
+      for (const level of this.annotationStoreService.transcript.levels) {
+        this.tools.regReplace.results.push({
+          name: level.name,
+          matches: [],
+        });
+        const result = last(this.tools.regReplace.results);
+
+        for (const item of level.items) {
+          const transcriptLabel = item.getFirstLabelWithoutName('Speaker');
+          const replacements = [];
+          let html: string | undefined;
+
+          if (transcriptLabel?.value) {
+            const transcript = transcriptLabel.value;
+            html = transcriptLabel.value;
+
+            let matches = regex.exec(transcript);
+            while (matches !== null) {
+              replacements.push({
+                start: matches.index,
+                length: matches[0].length,
+                text: matches[0].replace(
+                  new RegExp(regex, 'g'),
+                  this.tools.regReplace.replacement,
+                ),
+              });
+              matches = regex.exec(transcript);
+            }
+          }
+
+          if (replacements.length > 0) {
+            for (let i = replacements.length - 1; i > -1; i--) {
+              const replacement = replacements[i];
+              const start = `<div class="reg-replace-marker">`;
+              const end = `</div>`;
+              html = insertString(
+                html,
+                replacement.start + replacement.length,
+                end,
+              );
+              html =
+                html.slice(0, replacement.start) +
+                (replacement.text || '&nbsp;') +
+                html.slice(replacement.start + replacement.length);
+              html = insertString(html, replacement.start, start);
+            }
+
+            result.matches.push({
+              unitID: item.id,
+              replacements,
+              html,
+            });
+          }
+        }
+
+        if (result.matches.length === 0) {
+          this.tools.regReplace.results.splice(
+            this.tools.regReplace.results.length - 1,
+            1,
+          );
+        }
+      }
+    }
   }
 }

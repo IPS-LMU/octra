@@ -315,7 +315,7 @@
     "alerts": {
       "done": "Lo strumento '{{value}}' è stato applicato con successo."
     },
-    "combine phrases": {
+    "combine-phrases": {
       "description": "Con questo strumento le frasi comprese fra silenzi sono combinate così da unire unità di trascrizione breve. Le unità di trascrizione che contengono silenzio più brevi di una certa durata.",
       "hide settings": "Nascondi impostazioni",
       "maximal words": "Numero massimo di parole.",
@@ -324,7 +324,7 @@
       "minimal silence desc": "Tutte le unità di trascrizione contenenti silenzio sono ignorate se la loro durata è più lunga di questo valore.",
       "show settings": "Mostra impostazioni"
     },
-    "cut audio": {
+    "cut-audio": {
       "add placeholder": "Aggiungi segnaposto",
       "append meta files": "Aggiungi meta files",
       "description": "Questo strumento permette di tagliare il file audio in sequenze in base alle unità di trascrizione.",

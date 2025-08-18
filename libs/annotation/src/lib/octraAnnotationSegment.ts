@@ -55,6 +55,27 @@ export class OctraAnnotationEvent
     return this.labels?.find((a) => a.name !== notName);
   }
 
+  replaceFirstLabelWithoutName(
+    notName: string,
+    replace: (value: string) => string,
+  ) {
+    const index = this.labels?.findIndex((a) => a.name !== notName);
+
+    if (index > -1) {
+      const label = this.labels[index].clone();
+      label.value = replace(label.value);
+
+      this.labels = [
+        ...this.labels.slice(0, index),
+        label,
+        ...this.labels.slice(index + 1),
+      ];
+      return label;
+    }
+
+    return undefined;
+  }
+
   isEqualWith(other: OctraAnnotationEvent): boolean {
     if (!other) {
       return false;
@@ -137,17 +158,25 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
     return this.labels?.find((a) => a.name !== notName);
   }
 
-  changeLabel(name: string, value: string) {
-    const index = this.labels.findIndex((a) => a.name === name);
+  replaceFirstLabelWithoutName(
+    notName: string,
+    replace: (value: string) => string,
+  ) {
+    const index = this.labels?.findIndex((a) => a.name !== notName);
+
     if (index > -1) {
+      const label = this.labels[index].clone();
+      label.value = replace(label.value);
+
       this.labels = [
         ...this.labels.slice(0, index),
-        new OLabel(this.labels[index].name, value),
+        label,
         ...this.labels.slice(index + 1),
       ];
-      return true;
+      return label;
     }
-    return false;
+
+    return undefined;
   }
 
   changeFirstLabelWithoutName(notName: string, value: string) {
@@ -192,7 +221,7 @@ export class OctraAnnotationSegment<T extends ASRContext = ASRContext>
     return new OctraAnnotationSegment<T>(
       id ?? this._id,
       this.time,
-      [...this.labels],
+      [...this.labels.map((a) => a.clone())],
       {
         ...this.context,
       } as any,

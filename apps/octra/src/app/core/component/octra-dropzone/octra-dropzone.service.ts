@@ -8,7 +8,7 @@ import {
   OAnnotJSON,
   OLabel,
   OSegment,
-  OSegmentLevel
+  OSegmentLevel,
 } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
 import { escapeRegex, SubscriptionManager } from '@octra/utilities';

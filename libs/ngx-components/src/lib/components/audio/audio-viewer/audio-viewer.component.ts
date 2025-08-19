@@ -374,7 +374,7 @@ export class AudioViewerComponent
     if (this.av.currentLevel && this.av.currentLevel.items.length > 0) {
       // subscribe to levelChanges for extern changes
       this.subscrManager.removeByTag('externLevelChanges');
-      this.av.applyChanges(changes.filter(a => a.level.new.id === this.av.currentLevelID), oldAnnotation);
+      this.av.applyChanges(changes.filter(a => a.affectedLevelID === this.av.currentLevel.id), oldAnnotation);
     }
   }
 

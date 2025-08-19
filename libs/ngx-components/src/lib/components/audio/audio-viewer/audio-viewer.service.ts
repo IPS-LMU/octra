@@ -15,18 +15,12 @@ import {
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OItem,
-  OLabel,
+  OLabel
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioTimeCalculator,
-  ShortcutGroup,
-  ShortcutManager,
-} from '@octra/web-media';
+import { AudioChunk, AudioManager, AudioTimeCalculator, ShortcutGroup, ShortcutManager } from '@octra/web-media';
 import Konva from 'konva';
 import { Subject, timer } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -2403,12 +2397,7 @@ export class AudioViewerService {
                       const segment = this.currentLevel.items[
                         segmentI
                       ] as OctraAnnotationSegment<ASRContext>;
-                      console.log('set break');
-                      console.log(`
-                      ${segmentI > -1} &&
-                        ${segment.context?.asr?.isBlockedBy} === undefined &&
-                        ${this.silencePlaceholder !== undefined}
-`);
+
                       if (
                         segmentI > -1 &&
                         segment.context?.asr?.isBlockedBy === undefined &&
@@ -3951,6 +3940,7 @@ export class AudioViewerService {
         // level was removed
         result.push({
           type: 'remove',
+          affectedLevelID: oldAnnoLevel.id,
           level: {
             old: oldAnnoLevel,
             new: undefined,
@@ -3972,6 +3962,7 @@ export class AudioViewerService {
                   // changed
                   result.push({
                     type: 'change',
+                    affectedLevelID: newLevel.id,
                     level: {
                       old: newLevel,
                       new: newLevel,
@@ -3997,6 +3988,7 @@ export class AudioViewerService {
                   // changed
                   result.push({
                     type: 'change',
+                    affectedLevelID: newLevel.id,
                     level: {
                       old: newLevel,
                       new: newLevel,
@@ -4018,6 +4010,7 @@ export class AudioViewerService {
                   // changed
                   result.push({
                     type: 'change',
+                    affectedLevelID: newLevel.id,
                     level: {
                       old: newLevel,
                       new: newLevel,
@@ -4041,6 +4034,7 @@ export class AudioViewerService {
               // types changed
               result.push({
                 type: 'change',
+                affectedLevelID: newLevel.id,
                 level: {
                   old: newLevel,
                   new: newLevel,
@@ -4061,6 +4055,7 @@ export class AudioViewerService {
             // newAnnotation doesn't have this item => was removed
             result.push({
               type: 'remove',
+              affectedLevelID: newLevel.id,
               item: {
                 old: item,
                 new: undefined,
@@ -4085,6 +4080,7 @@ export class AudioViewerService {
           newAnnotation.levels.find((a) => a.id === id)!;
         result.push({
           type: 'add',
+          affectedLevelID: level.id,
           level: {
             old: undefined,
             new: level,
@@ -4113,6 +4109,7 @@ export class AudioViewerService {
 
         result.push({
           type: 'add',
+          affectedLevelID: level.id,
           item: {
             old: undefined,
             new: item,
@@ -4136,6 +4133,7 @@ export class AudioViewerService {
           // changed
           result.push({
             type: 'change',
+            affectedLevelID: -1,
             link: {
               old: link,
               new: found,
@@ -4157,6 +4155,7 @@ export class AudioViewerService {
         )!;
         result.push({
           type: 'add',
+          affectedLevelID: -1,
           link: {
             old: undefined,
             new: link,
@@ -5252,6 +5251,7 @@ export class AudioViewerService {
 
 export interface AnnotationChange {
   type: 'add' | 'remove' | 'change';
+  affectedLevelID: number;
   level?: {
     old?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
     new?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;

@@ -20,7 +20,7 @@
   <header>
     <octra-navigation #navigation></octra-navigation>
   </header>
-  <main style="margin-top: 40px">
+  <main style="padding-top: 40px" class="h-100 flex">
     @if (environment.dev_version) {
       <div class="d-none d-md-block beta_mark text-outline-white">
         in development
@@ -29,7 +29,7 @@
     @if (environment.beta_version) {
       <div class="d-none d-md-block beta_mark text-outline-white">beta</div>
     }
-    <div class="container-fluid flex">
+    <div class="container-fluid flex h-100">
       <router-outlet></router-outlet>
     </div>
     <!-- /.container -->

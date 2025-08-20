@@ -1,5 +1,5 @@
 <div class="card container my-0 my-lg-3">
-  <div class="card-body flex h-100">
+  <div class="card-body">
     @if (authStoreService.otherUserLoggedIn$ | async) {
       <div
         class="alert alert-warning text-center"
@@ -42,7 +42,7 @@
         {{ 'projects-list.introduction' | transloco }}
       </p>
     </div>
-    <div class="flex" style="height: 100px">
+    <div>
       @if (shownProjects) {
         <div class="row shadow p-3 m-3 rounded">
           <div class="col-auto align-items-center">
@@ -65,7 +65,7 @@
         >
           {{ 'projects-list.project creation wanted' | transloco }}
         </div>
-        <div class="list-group flex" style="height: 100px">
+        <div class="list-group">
           <div class="list-group-item">
             <div class="row g-0">
               <div class="col"></div>

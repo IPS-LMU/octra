@@ -13,7 +13,7 @@ import {
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OLabel,
-  PraatTextgridConverter,
+  PraatTextgridConverter
 } from '@octra/annotation';
 import {
   ProjectDto,
@@ -21,16 +21,11 @@ import {
   TaskInputOutputCreatorType,
   TaskInputOutputDto,
   TaskStatus,
-  ToolConfigurationAssetDto,
+  ToolConfigurationAssetDto
 } from '@octra/api-types';
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import {
-  appendURLQueryParams,
-  extractFileNameFromURL,
-  hasProperty,
-  SubscriptionManager,
-} from '@octra/utilities';
+import { appendURLQueryParams, extractFileNameFromURL, hasProperty, SubscriptionManager } from '@octra/utilities';
 import {
   catchError,
   exhaustMap,
@@ -42,26 +37,24 @@ import {
   Subscription,
   tap,
   timer,
-  withLatestFrom,
+  withLatestFrom
 } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
 import { OctraModalService } from '../../../modals/octra-modal.service';
-import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {
+  TranscriptionSendingModalComponent
+} from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   createSampleProjectDto,
   createSampleTask,
   createSampleUser,
   findCompatibleFileFromIO,
   isValidAnnotation,
-  StatisticElem,
+  StatisticElem
 } from '../../../shared';
-import {
-  AlertService,
-  AudioService,
-  UserInteractionsService,
-} from '../../../shared/service';
+import { AlertService, AudioService, UserInteractionsService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { RoutingService } from '../../../shared/service/routing.service';
 import { ApplicationActions } from '../../application/application.actions';
@@ -1129,34 +1122,10 @@ export class AnnotationEffects {
                   }
                   duration = lastSegment.time.unix - startPos;
                   if (!isSilence(lastSegment) || duration < minSilenceLength) {
-                    let lastSegmentText =
-                      lastSegment.getFirstLabelWithoutName('Speaker')?.value;
-                    let segmentText =
-                      segment.getFirstLabelWithoutName('Speaker')?.value;
-
-                    if (isSilence(lastSegment)) {
-                      lastSegmentText = '';
-                    }
-
-                    if (!isSilence(segment)) {
-                      segment.changeFirstLabelWithoutName(
-                        'Speaker',
-                        `${lastSegmentText} ${segmentText}`,
-                      );
-                      wordCounter = countWords(
-                        `${lastSegmentText} ${segmentText}`,
-                      );
-                    } else {
-                      segmentText = '';
-                      segment.changeFirstLabelWithoutName(
-                        'Speaker',
-                        `${lastSegmentText}`,
-                      );
-                    }
                     transcript = transcript!.removeItemByIndex(
                       i - 1,
                       '',
-                      false,
+                      true,
                       (transcript: string) => {
                         return tidyUpAnnotation(
                           transcript,

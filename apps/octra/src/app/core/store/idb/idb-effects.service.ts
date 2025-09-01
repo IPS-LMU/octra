@@ -1,7 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { ASRContext, IAnnotJSON, OAnnotJSON, OctraAnnotation, OctraAnnotationSegment } from '@octra/annotation';
+import {
+  ASRContext,
+  IAnnotJSON,
+  OAnnotJSON,
+  OctraAnnotation,
+  OctraAnnotationSegment,
+} from '@octra/annotation';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { hasProperty } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
@@ -19,9 +25,12 @@ import {
   Subject,
   tap,
   timer,
-  withLatestFrom
+  withLatestFrom,
 } from 'rxjs';
-import { IIDBApplicationOptions, IIDBModeOptions } from '../../shared/octra-database';
+import {
+  IIDBApplicationOptions,
+  IIDBModeOptions,
+} from '../../shared/octra-database';
 import { AudioService } from '../../shared/service';
 import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { IDBService } from '../../shared/service/idb.service';

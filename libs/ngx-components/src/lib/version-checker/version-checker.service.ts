@@ -30,16 +30,12 @@ export class VersionCheckerService extends SubscriberComponent {
       return;
     }
 
-    this.swUpdate.checkForUpdate().then(() => {
-      console.log('Checking for updates...');
-    });
+    this.swUpdate.checkForUpdate();
 
     // check for updates every 5 minutes
     this.subscribe(interval(this.options.interval), {
       next: () => {
-        this.swUpdate.checkForUpdate().then(() => {
-          console.log('Checking for updates...');
-        });
+        this.swUpdate.checkForUpdate();
       },
     });
 

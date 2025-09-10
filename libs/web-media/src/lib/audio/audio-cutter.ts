@@ -297,7 +297,7 @@ export class AudioCutter {
                     resolve(
                       selectedChannels.map(
                         (a, i) =>
-                          new File([files[i]], `${name}_${a + 1}.wav`, {
+                          new File([files[i]] as any, `${name}_${a + 1}.wav`, {
                             type: 'audio/wav',
                           }),
                       ),
@@ -323,7 +323,7 @@ export class AudioCutter {
               resolve(
                 selectedChannels.map(
                   (a, i) =>
-                    new File([files[i]], `${name}_${a + 1}.wav`, {
+                    new File([files[i]] as any, `${name}_${a + 1}.wav`, {
                       type: 'audio/wav',
                     }),
                 ),
@@ -372,7 +372,7 @@ export class AudioCutter {
       if ([32, 16, 8].includes(this.audioInfo.bitrate)) {
         dataChunkLength = Math.round(dataChunkLength / divider);
         result = new this.formatConstructor(dataChunkLength);
-        convertedData = new this.formatConstructor(uint8Array.buffer);
+        convertedData = new this.formatConstructor(uint8Array.buffer as any);
         start = Math.round(start / divider);
         startPos = 44 / divider + Math.round(start);
       }

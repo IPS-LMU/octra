@@ -288,9 +288,13 @@ export class AsrEffects {
 
             // 2. upload
             if (item.status !== ASRProcessStatus.STOPPED) {
-              const fileBlob = new File([file.uint8Array], file.fileName, {
-                type: 'audio/wav',
-              });
+              const fileBlob = new File(
+                [file.uint8Array] as any,
+                file.fileName,
+                {
+                  type: 'audio/wav',
+                },
+              );
               const serviceRequirementsError = this.fitsServiceRequirements(
                 fileBlob,
                 action.item,

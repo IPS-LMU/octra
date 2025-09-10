@@ -98,7 +98,7 @@ export class WavReader {
         sampleRate: sr,
       });
       for (let ch = 0; ch < nChs; ch++) {
-        ab.copyToChannel(chsArr[ch], ch);
+        ab.copyToChannel(chsArr[ch] as any, ch);
       }
     }
     return ab;

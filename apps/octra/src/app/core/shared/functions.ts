@@ -35,6 +35,9 @@ export function createSampleProjectDto(
         finished: 30,
         postponed: 23,
         failed: 15,
+        protected: 12,
+        accepted: 1,
+        finalized: 3,
       },
       tasks: [
         {
@@ -47,6 +50,9 @@ export function createSampleProjectDto(
             finished: 30,
             postponed: 23,
             failed: 15,
+            protected: 12,
+            accepted: 1,
+            finalized: 3,
           },
         },
       ],

@@ -377,7 +377,7 @@ export class CuttingAudioModalComponent
                     this.sanitizer.bypassSecurityTrustResourceUrl(
                       URL.createObjectURL(
                         new File(
-                          [data],
+                          [data] as any,
                           this.audio.audioManager.resource.info.name + '.zip',
                         ),
                       ),

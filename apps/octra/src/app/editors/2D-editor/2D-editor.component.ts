@@ -543,7 +543,11 @@ export class TwoDEditorComponent
 
     this.subscribe(this.annotationStoreService.importOptions$, {
       next: (importOptions) => {
-        if (importOptions && Object.keys(importOptions).includes('SRT')) {
+        if (
+          importOptions &&
+          Object.keys(importOptions).includes('SRT') &&
+          importOptions.SRT
+        ) {
           this.viewer.settings.speakerPattern =
             importOptions['SRT']['speakerIdentifierPattern'];
         }

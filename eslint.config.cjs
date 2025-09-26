@@ -7,8 +7,7 @@ module.exports = [
   {
     ignores: [
       '**/dist',
-      '**/vite.config.*.timestamp*',
-      '**/vitest.config.*.timestamp*',
+      '**/vite.config.*.timestamp*'
     ],
   },
   {

@@ -1,8 +1,19 @@
 import { OAudiofile } from '@octra/media';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
-import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
+import {
+  Converter,
+  ExportResult,
+  IFile,
+  ImportResult,
+  OctraAnnotationFormatType,
+} from './Converter';
+import {
+  AnyTextEditor,
+  AnyVideoPlayer,
+  OctraApplication,
+  WordApplication,
+} from './SupportedApplications';
 
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -217,7 +228,7 @@ export class SRTConverter extends Converter {
       );
       let regexStr = `([0-9]+)[\\n\\r]*([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}(?:,[0-9]{3})?)\\r?\\n\\r?`;
       if (options.speakerIdentifierPattern) {
-        regexStr += `(?:${options.speakerIdentifierPattern ?? ''})`;
+        regexStr += `(${options.speakerIdentifierPattern ?? ''})`;
       } else {
         regexStr += '()';
       }
@@ -229,28 +240,40 @@ export class SRTConverter extends Converter {
         let matches = regex.exec(content);
         while (matches !== null) {
           let olevel: OSegmentLevel<OSegment> = defaultLevel;
+          let index = matches[1];
+          let startTime = matches[2];
+          let endTime = matches[3];
+          let speakerLabel = options.speakerIdentifierPattern
+            ? matches[5]
+            : undefined;
+          let speakerLabelWrapped = options.speakerIdentifierPattern
+            ? matches[4]
+            : undefined;
+          let transcript = speakerLabel ? matches[6] : matches[5];
 
-          if (!options.sortSpeakerSegments && matches[4]) {
-            matches[5] = `[${matches[4]}]: ${matches[5] ?? ''}`;
+          if (!options.sortSpeakerSegments && speakerLabel) {
+            transcript = `${speakerLabelWrapped}${transcript ?? ''}`;
           }
 
           let timeStart = SRTConverter.getSamplesFromTimeString(
-            matches[2],
+            startTime,
             audiofile.sampleRate,
           );
           const timeEnd = SRTConverter.getSamplesFromTimeString(
-            matches[3],
+            endTime,
             audiofile.sampleRate,
           );
           let segmentContent: string = '';
-          segmentContent = matches[5].replace(/(\n|\s)+$/g, '');
+          segmentContent = transcript.replace(/(\n|\s)+$/g, '');
 
           if (timeStart > -1 && timeEnd > -1) {
             if (timeStart > lastEnd) {
               // add additional segment
               olevel.items.push(
                 new OSegment(counterID++, lastEnd, timeStart - lastEnd, [
-                  ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
+                  ...(speakerLabel
+                    ? [new OLabel('Speaker', speakerLabel)]
+                    : []),
                   new OLabel(olevel.name, ''),
                 ]),
               );
@@ -259,7 +282,9 @@ export class SRTConverter extends Converter {
             if (timeEnd >= timeStart) {
               olevel.items.push(
                 new OSegment(counterID++, timeStart, timeEnd - timeStart, [
-                  ...(matches[4] ? [new OLabel('Speaker', matches[4])] : []),
+                  ...(speakerLabel
+                    ? [new OLabel('Speaker', speakerLabel)]
+                    : []),
                   new OLabel(olevel.name, segmentContent),
                 ]),
               );

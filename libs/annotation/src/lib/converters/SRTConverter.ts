@@ -1,19 +1,8 @@
 import { OAudiofile } from '@octra/media';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
-import {
-  AnyTextEditor,
-  AnyVideoPlayer,
-  OctraApplication,
-  WordApplication,
-} from './SupportedApplications';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
+import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
 
 export class SRTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -419,7 +408,6 @@ export class SRTConverter extends Converter {
         });
 
         result.levels = levels;
-        console.log(result);
         return {
           annotjson: result,
           error: '',

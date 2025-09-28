@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.2.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.2.0...ngx-components-1.2.1) (2025-09-28)
+
+
+### Bug Fixes
+
+* **octra:** changing transcript units on audio viewer doesn't work properly ([b3da5ee](https://github.com/IPS-LMU/octra/commit/b3da5eed08cee20c48582e6de1ceb0fdc9128249))
+
+
+### Features
+
+* **octra:** new tool: search & replace ([739eac2](https://github.com/IPS-LMU/octra/commit/739eac2d2f5df23c1e2069a6d264e7ac0252a783))
+
+
+
 # [1.2.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.1.2...ngx-components-1.2.0) (2025-07-28)
 
 

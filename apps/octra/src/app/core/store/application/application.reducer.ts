@@ -60,6 +60,7 @@ export const reducer = createReducer(
   ),
   on(
     AuthenticationActions.needReAuthentication.success,
+    AuthenticationActions.needReAuthentication.abort,
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: true,

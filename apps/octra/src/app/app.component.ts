@@ -15,6 +15,7 @@ import { ApplicationStoreService } from './core/store/application/application-st
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LoginMode } from './core/store';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'octra-app',
@@ -78,6 +79,12 @@ export class AppComponent
           break;
       }
     });
+
+    this.subscribe(timer(5000), {
+      next: () => {
+        console.log("Test: Accesscode ACCESSCODE=udf98sudf98su849536");
+      }
+    })
   }
 
   override ngOnDestroy() {

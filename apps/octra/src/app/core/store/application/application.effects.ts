@@ -27,12 +27,10 @@ import { ErrorModalComponent } from '../../modals/error-modal/error-modal.compon
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { AppSettings, ASRSettings } from '../../obj';
 import { AppConfigSchema } from '../../schemata/appconfig.schema';
-import { isIgnoredAction, isIgnoredConsoleAction } from '../../shared';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import {
-  BugReportService,
-  ConsoleType,
+  BugReportService
 } from '../../shared/service/bug-report.service';
 import { ConfigurationService } from '../../shared/service/configuration.service';
 import { RoutingService } from '../../shared/service/routing.service';
@@ -44,6 +42,12 @@ import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { URLParameters } from './index';
+import {
+  ConsoleLoggingService,
+  ConsoleLoggingServiceOptions,
+} from '@octra/ngx-components';
+import { ASRActions } from '../asr/asr.actions';
+import { UserActions } from '../user/user.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +66,7 @@ export class ApplicationEffects {
   private routerService = inject(RoutingService);
   private modalService = inject(OctraModalService);
   private sessionStorage = inject(SessionStorageService);
+  private consoleLoggingService = inject(ConsoleLoggingService);
 
   initApp$ = createEffect(() =>
     this.actions$.pipe(
@@ -867,7 +872,7 @@ export class ApplicationEffects {
         ofType(IDBActions.loadConsoleEntries.success),
         withLatestFrom(this.store),
         tap(([a, state]: [Action, RootState]) => {
-          this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
+          this.consoleLoggingService.addEntriesFromDB(this.appStorage.consoleEntries);
 
           // define languages
           const languages = state.application.appConfiguration!.octra.languages;
@@ -1012,11 +1017,11 @@ export class ApplicationEffects {
       this.actions$.pipe(
         tap((action) => {
           if (
-            !isIgnoredConsoleAction(action.type) &&
+            !this.isIgnoredConsoleAction(action.type) &&
             environment.debugging.enabled &&
             environment.debugging.logging.actions &&
             action.type.indexOf('Set Console Entries') < 0 &&
-            (!environment.production || !isIgnoredAction(action.type))
+            (!environment.production || !this.isIgnoredAction(action.type))
           ) {
             console.groupCollapsed(`ACTION ${action.type} ---`);
             console.log(action);
@@ -1054,110 +1059,20 @@ export class ApplicationEffects {
   private initConsoleLogging() {
     // overwrite console.log
     if (environment.debugging.logging.console) {
-      const oldLog = console.log;
-      const serv = this.bugService;
-      (() => {
-        // tslint:disable-next-line:only-arrow-functions
-        console.log = function (...args) {
+      this.consoleLoggingService.init(new ConsoleLoggingServiceOptions({
+        confidentialList: [
+          '(ACCESSCODE=)[^\\s&]+',
+          '(accesscode=)[^\\s&]+'
+        ],
+        ignore: (...args)=> {
           if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
-            if (isIgnoredAction(args[0].type)) {
-              return;
+            if (this.isIgnoredAction(args[0].type)) {
+              return true;
             }
           }
-          serv.addEntry(ConsoleType.LOG, args[0]);
-          // eslint-disable-next-line prefer-rest-params
-          oldLog.apply(console, args);
-        };
-      })();
-
-      // overwrite console.err
-      const oldError = console.error;
-      (() => {
-        // tslint:disable-next-line:only-arrow-functions
-        console.error = function (...args) {
-          const error = args[0];
-          const context = args[1];
-
-          let debug = '';
-          let stack: string | undefined = '';
-
-          if (typeof error === 'string') {
-            debug = error;
-
-            if (
-              error === 'ERROR' &&
-              context !== undefined &&
-              context.stack &&
-              context.message
-            ) {
-              debug = context.message;
-              stack = context.stack;
-            }
-          } else {
-            if (error instanceof Error) {
-              debug = error.message;
-              stack = error.stack;
-            } else {
-              if (typeof error === 'object') {
-                // some other type of object
-                debug = 'OBJECT';
-                stack = JSON.stringify(error);
-              } else {
-                debug = error;
-              }
-            }
-          }
-
-          if (debug !== '') {
-            serv.addEntry(
-              ConsoleType.ERROR,
-              `${debug}${stack !== '' ? ' ' + stack : ''}`,
-            );
-          }
-
-          // eslint-disable-next-line prefer-rest-params
-          oldError.apply(console, args);
-        };
-      })();
-
-      // overwrite console.warn
-      const oldWarn = console.warn;
-      (() => {
-        // tslint:disable-next-line:only-arrow-functions
-        console.warn = function (...args) {
-          if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
-            if (isIgnoredAction(args[0].type)) {
-              return;
-            }
-          }
-
-          serv.addEntry(ConsoleType.WARN, args[0]);
-          // eslint-disable-next-line prefer-rest-params
-          oldWarn.apply(console, args);
-        };
-      })();
-
-      // overwrite console.collapsedGroup
-      const oldGroupCollapsed = console.groupCollapsed;
-      (() => {
-        // tslint:disable-next-line:only-arrow-functions
-        console.groupCollapsed = function (...args) {
-          serv.beginGroup(args[0]);
-          // eslint-disable-next-line prefer-rest-params
-          oldGroupCollapsed.apply(console, args);
-        };
-      })();
-
-      // overwrite console.groupEnd
-      const oldGroupEnd = console.groupEnd;
-      (() => {
-        // tslint:disable-next-line:only-arrow-functions
-        console.groupEnd = function (...args) {
-          serv.endGroup();
-          // eslint-disable-next-line prefer-rest-params
-          oldGroupEnd.apply(console, args);
-        };
-      })();
+          return false;
+        }
+      }))
     }
   }
 
@@ -1221,5 +1136,41 @@ export class ApplicationEffects {
     }
 
     return result as any;
+  }
+
+  private isIgnoredAction(type: string) {
+    // IMPORTANT: MAKE SURE TO ADD ".type"
+    return (
+      (
+        [
+          AnnotationActions.loadAudio.progress.type,
+          AnnotationActions.addLog.do.type,
+          IDBActions.loadConsoleEntries.success.type,
+          IDBActions.loadOptions.success.type,
+          ApplicationActions.loadSettings.success.type,
+          APIActions.init.do.type,
+          IDBActions.loadLogs.success.type,
+          LoginModeActions.changeComment.do.type,
+          AnnotationActions.setSavingNeeded.do.type,
+          AnnotationActions.overwriteTranscript.do.type,
+          ASRActions.processQueueItem.do.type,
+          ApplicationActions.loadASRSettings.do.type,
+          ApplicationActions.loadASRSettings.success.type,
+          IDBActions.saveUserProfile.success.type,
+          UserActions.setUserProfile.type,
+        ] as string[]
+      ).includes(type) || this.isIgnoredConsoleAction(type)
+    );
+  }
+
+  private isIgnoredConsoleAction(type: string) {
+    // IMPORTANT: MAKE SURE TO ADD ".type"
+    return (
+      [
+        ApplicationActions.setConsoleEntries.type,
+        IDBActions.saveConsoleEntries.success.type,
+        IDBActions.saveConsoleEntries.fail.type,
+      ] as string[]
+    ).includes(type);
   }
 }

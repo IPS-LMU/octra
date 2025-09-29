@@ -26,7 +26,11 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
-import { NgbModalWrapper, OctraComponentsModule } from '@octra/ngx-components';
+import {
+  ConsoleLoggingService,
+  NgbModalWrapper,
+  OctraComponentsModule,
+} from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { environment } from '../../../../environments/environment';
@@ -97,6 +101,7 @@ export class NavigationComponent
   modalService = inject(OctraModalService);
   settService = inject(SettingsService);
   bugService = inject(BugReportService);
+  consoleLoggingService = inject(ConsoleLoggingService);
   annotationStoreService = inject(AnnotationStoreService);
   authStoreService = inject(AuthenticationStoreService);
   audio = inject(AudioService);
@@ -186,7 +191,7 @@ export class NavigationComponent
   public get errorsFound(): boolean {
     let beginCheck = false;
     return (
-      this.bugService.console.filter((a) => {
+      this.consoleLoggingService.console.filter((a) => {
         const hasError = (b: ConsoleEntry) => {
           if (b.type === ConsoleType.ERROR && beginCheck) {
             return true;

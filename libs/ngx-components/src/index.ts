@@ -10,3 +10,4 @@ export * from './lib/components/form-generator/toolconfig-group/toolconfig-group
 export * from './lib/multi-threading.service';
 export * from './lib/obj';
 export * from "./lib/version-checker";
+export * from "./lib/console-logging.service";

@@ -170,42 +170,6 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
   return undefined;
 };
 
-export function isIgnoredAction(type: string) {
-  // IMPORTANT: MAKE SURE TO ADD ".type"
-  return (
-    (
-      [
-        AnnotationActions.loadAudio.progress.type,
-        AnnotationActions.addLog.do.type,
-        IDBActions.loadConsoleEntries.success.type,
-        IDBActions.loadOptions.success.type,
-        ApplicationActions.loadSettings.success.type,
-        APIActions.init.do.type,
-        IDBActions.loadLogs.success.type,
-        LoginModeActions.changeComment.do.type,
-        AnnotationActions.setSavingNeeded.do.type,
-        AnnotationActions.overwriteTranscript.do.type,
-        ASRActions.processQueueItem.do.type,
-        ApplicationActions.loadASRSettings.do.type,
-        ApplicationActions.loadASRSettings.success.type,
-        IDBActions.saveUserProfile.success.type,
-        UserActions.setUserProfile.type,
-      ] as string[]
-    ).includes(type) || isIgnoredConsoleAction(type)
-  );
-}
-
-export function isIgnoredConsoleAction(type: string) {
-  // IMPORTANT: MAKE SURE TO ADD ".type"
-  return (
-    [
-      ApplicationActions.setConsoleEntries.type,
-      IDBActions.saveConsoleEntries.success.type,
-      IDBActions.saveConsoleEntries.fail.type,
-    ] as string[]
-  ).includes(type);
-}
-
 export function findCompatibleFileFromIO<T>(
   task: TaskDto,
   type: 'audio' | 'transcript',

@@ -79,12 +79,6 @@ export class AppComponent
           break;
       }
     });
-
-    this.subscribe(timer(5000), {
-      next: () => {
-        console.log("Test: Accesscode ACCESSCODE=udf98sudf98su849536");
-      }
-    })
   }
 
   override ngOnDestroy() {

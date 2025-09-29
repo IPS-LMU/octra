@@ -32,7 +32,6 @@ import {
   IIDBModeOptions,
 } from '../../shared/octra-database';
 import { AudioService } from '../../shared/service';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { IDBService } from '../../shared/service/idb.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ApplicationActions } from '../application/application.actions';
@@ -44,6 +43,7 @@ import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { UserActions } from '../user/user.actions';
 import { IDBActions } from './idb.actions';
+import { ConsoleEntry } from '@octra/ngx-components';
 
 @Injectable({
   providedIn: 'root',

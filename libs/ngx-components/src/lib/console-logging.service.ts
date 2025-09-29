@@ -51,6 +51,7 @@ export class ConsoleLoggingService {
   private options: ConsoleLoggingServiceOptions;
   private startedGroup?: ConsoleGroupEntry;
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
+  private initialized = false;
 
   get console(): (ConsoleEntry | ConsoleGroupEntry)[] {
     return this._console;
@@ -164,6 +165,8 @@ export class ConsoleLoggingService {
         oldGroupEnd.apply(console, args);
       };
     })();
+
+    this.initialized = true;
   }
 
   public addEntry(type: ConsoleType, message: any) {
@@ -173,7 +176,7 @@ export class ConsoleLoggingService {
       message,
     };
 
-    if (this._console !== undefined) {
+    if (this.initialized && this._console !== undefined) {
       if (!this.startedGroup) {
         this._console = [...this._console, consoleItem];
         if (this._console.length > this.options.maxLogEntries) {
@@ -210,7 +213,7 @@ export class ConsoleLoggingService {
   }
 
   public endGroup() {
-    if (this._console && this.startedGroup) {
+    if (this.initialized && this._console && this.startedGroup) {
       this._console = [...this._console, this.startedGroup];
       this.startedGroup = undefined;
       if (this._console.length > this.options.maxLogEntries) {
@@ -248,7 +251,7 @@ export class ConsoleLoggingService {
       );
     }
 
-    if (this._console.length > this.options.maxLogEntries) {
+    if (this.initialized && this._console.length > this.options.maxLogEntries) {
       this._console.splice(
         0,
         this._console.length - this.options.maxLogEntries,

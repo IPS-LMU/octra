@@ -3,6 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { getBrowserLang, TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
+import {
+  ConsoleLoggingService,
+  ConsoleLoggingServiceOptions,
+} from '@octra/ngx-components';
 import { uniqueHTTPRequest } from '@octra/ngx-utilities';
 import { isNumber } from '@octra/utilities';
 import { findElements, getAttr } from '@octra/web-media';
@@ -29,25 +33,19 @@ import { AppSettings, ASRSettings } from '../../obj';
 import { AppConfigSchema } from '../../schemata/appconfig.schema';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import {
-  BugReportService
-} from '../../shared/service/bug-report.service';
+import { BugReportService } from '../../shared/service/bug-report.service';
 import { ConfigurationService } from '../../shared/service/configuration.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { APIActions } from '../api';
 import { ApplicationActions } from '../application/application.actions';
+import { ASRActions } from '../asr/asr.actions';
 import { AuthenticationActions } from '../authentication';
 import { IDBActions } from '../idb/idb.actions';
 import { getModeState, LoginMode, RootState } from '../index';
 import { LoginModeActions } from '../login-mode';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
-import { URLParameters } from './index';
-import {
-  ConsoleLoggingService,
-  ConsoleLoggingServiceOptions,
-} from '@octra/ngx-components';
-import { ASRActions } from '../asr/asr.actions';
 import { UserActions } from '../user/user.actions';
+import { URLParameters } from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -872,7 +870,9 @@ export class ApplicationEffects {
         ofType(IDBActions.loadConsoleEntries.success),
         withLatestFrom(this.store),
         tap(([a, state]: [Action, RootState]) => {
-          this.consoleLoggingService.addEntriesFromDB(this.appStorage.consoleEntries);
+          this.consoleLoggingService.addEntriesFromDB(
+            this.appStorage.consoleEntries,
+          );
 
           // define languages
           const languages = state.application.appConfiguration!.octra.languages;
@@ -1059,20 +1059,24 @@ export class ApplicationEffects {
   private initConsoleLogging() {
     // overwrite console.log
     if (environment.debugging.logging.console) {
-      this.consoleLoggingService.init(new ConsoleLoggingServiceOptions({
-        confidentialList: [
-          '(ACCESSCODE=)[^\\s&]+',
-          '(accesscode=)[^\\s&]+'
-        ],
-        ignore: (...args)=> {
-          if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
-            if (this.isIgnoredAction(args[0].type)) {
-              return true;
+      this.consoleLoggingService.init(
+        new ConsoleLoggingServiceOptions({
+          confidentialList: ['(ACCESSCODE=)[^\\s&]+', '(accesscode=)[^\\s&]+'],
+          ignore: (...args) => {
+            if (args[0] && typeof args[0] === 'object' && args[0]?.type) {
+              if (this.isIgnoredAction(args[0].type)) {
+                return true;
+              }
             }
-          }
-          return false;
-        }
-      }))
+            return false;
+          },
+        }),
+      );
+      this.consoleLoggingService.consoleChange.subscribe({
+        next: (event) => {
+          this.appStorage.consoleEntries = event.console;
+        },
+      });
     }
   }
 

@@ -4,7 +4,6 @@ import { FeedbackRequestPropertiesDto } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { getFileSize, removeProperties } from '@octra/utilities';
 import { BrowserInfo } from '@octra/web-media';
-import { DateTime } from 'luxon';
 import { Observable } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { LoginMode } from '../../store';

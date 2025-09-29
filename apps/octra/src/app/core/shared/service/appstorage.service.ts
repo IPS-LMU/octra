@@ -25,8 +25,8 @@ import {
   AnnotationState,
 } from '../../store/login-mode/annotation';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
-import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
 import { environment } from '../../../../environments/environment';
+import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 
 @Injectable({
   providedIn: 'root',

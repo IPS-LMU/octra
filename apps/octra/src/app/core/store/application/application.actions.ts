@@ -7,11 +7,8 @@ import {
 } from '@ngrx/store';
 import { AppSettings, ASRSettings } from '../../obj';
 import { IDBApplicationOptionName } from '../../shared/octra-database';
-import {
-  ConsoleEntry,
-  ConsoleGroupEntry,
-} from '../../shared/service/bug-report.service';
 import { LoginMode } from '../index';
+import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 
 const context = 'Application';
 

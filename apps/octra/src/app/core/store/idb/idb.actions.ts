@@ -8,8 +8,8 @@ import {
   IIDBApplicationOptions,
   IIDBModeOptions,
 } from '../../shared/octra-database';
-import { ConsoleEntry } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../index';
+import { ConsoleEntry } from '@octra/ngx-components';
 
 export class IDBActions {
   static loadOptions = createActionGroup({

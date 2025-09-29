@@ -9,7 +9,7 @@ import {
   IIDBModeOptions,
   OctraDatabase,
 } from '../octra-database';
-import { ConsoleEntry, ConsoleGroupEntry } from './bug-report.service';
+import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 
 @Injectable({
   providedIn: 'root',

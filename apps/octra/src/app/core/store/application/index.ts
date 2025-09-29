@@ -1,11 +1,8 @@
 import { pipe } from 'rxjs';
 import { AppSettings } from '../../obj';
 import { IIDBApplicationOptions } from '../../shared/octra-database';
-import {
-  ConsoleEntry,
-  ConsoleGroupEntry,
-} from '../../shared/service/bug-report.service';
 import { LoadingStatus, LoginMode, RootState } from '../index';
+import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 
 export const selectApplication = (state: RootState) => state.application;
 export const selectLoadingStatus = pipe(

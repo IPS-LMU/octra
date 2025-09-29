@@ -27,7 +27,10 @@ import {
 } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
 import {
+  ConsoleEntry,
+  ConsoleGroupEntry,
   ConsoleLoggingService,
+  ConsoleType,
   NgbModalWrapper,
   OctraComponentsModule,
 } from '@octra/ngx-components';
@@ -42,6 +45,7 @@ import { OctraModalService } from '../../modals/octra-modal.service';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { CombinePhrasesModalComponent } from '../../modals/tools/combine-phrases-modal/combine-phrases-modal.component';
 import { CuttingAudioModalComponent } from '../../modals/tools/cutting-audio-modal/cutting-audio-modal.component';
+import { RegReplaceModalComponent } from '../../modals/tools/reg-replace-modal/reg-replace-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
 import {
   AudioService,
@@ -49,12 +53,7 @@ import {
   UserInteractionsService,
 } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import {
-  BugReportService,
-  ConsoleEntry,
-  ConsoleGroupEntry,
-  ConsoleType,
-} from '../../shared/service/bug-report.service';
+import { BugReportService } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../../store';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { ASRStateSettings } from '../../store/asr';
@@ -64,7 +63,6 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
-import { RegReplaceModalComponent } from '../../modals/tools/reg-replace-modal/reg-replace-modal.component';
 
 @Component({
   selector: 'octra-navigation',

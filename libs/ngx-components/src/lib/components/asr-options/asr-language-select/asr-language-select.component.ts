@@ -22,7 +22,7 @@ import { ASROptionsTranslations, ServiceProvider } from '../types';
 const defaultI18n: ASROptionsTranslations = {
   header: 'Language and Provider',
   asrLanguage: 'ASR Language',
-  nothingFound: 'Nothing found',
+  nothingFound: 'Nothing found'
 };
 
 @Component({
@@ -34,7 +34,7 @@ const defaultI18n: ASROptionsTranslations = {
     FormsModule,
     NgbDropdownMenu,
     NgbDropdownItem,
-    NgbDropdownToggle,
+    NgbDropdownToggle
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -100,30 +100,27 @@ export class OctraASRLanguageSelectComponent
       this.filtered = asrLanguages ?? [];
     }
 
-    const value = changes['value']?.currentValue;
-    if (value) {
-      this.value = value ?? '';
+    this.value = changes['value']?.currentValue;
 
-      setTimeout(() => {
-        this.filterLanguages(this.value);
-      }, 0);
+    setTimeout(() => {
+      this.filterLanguages(this.value);
+    }, 0);
 
-      const i18n = changes['i18n']?.currentValue;
-      if (i18n) {
-        this.i18n = {
-          ...defaultI18n,
-          ...i18n,
-        };
-      }
+    const i18n = changes['i18n']?.currentValue;
+    if (i18n) {
+      this.i18n = {
+        ...defaultI18n,
+        ...i18n,
+      };
     }
   }
 
-  filterLanguages(value: string, dropdown?: NgbDropdown, emit?: boolean) {
-    if (value !== '') {
+  filterLanguages(value?: string, dropdown?: NgbDropdown, emit?: boolean) {
+    if (value) {
       this.filtered = this.languages.filter(
         (a) =>
-          a.description.toLowerCase().includes(value.toLowerCase()) ||
-          a.value.toLowerCase().includes(value.toLowerCase()),
+          a.description?.toLowerCase().includes(value.toLowerCase()) ||
+          a.value?.toLowerCase().includes(value.toLowerCase()),
       );
       dropdown?.open();
 
@@ -146,12 +143,14 @@ export class OctraASRLanguageSelectComponent
     }
   }
 
-  selectLanguage(language: string, dropdown?: NgbDropdown) {
+  selectLanguage(language?: string, dropdown?: NgbDropdown) {
     this.popTemplate?.close();
     dropdown?.close();
-    const langItem = this.languages.find((a) => a.value === language);
-    if (!langItem) {
-      language = '';
+    if (language) {
+      const langItem = this.languages.find((a) => a.value === language);
+      if (!langItem) {
+        language = '';
+      }
     }
     this.internValue = language ?? undefined;
     this.filterLanguages(this.internValue);

@@ -93,21 +93,18 @@ export class OctraProviderSelectComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const value = changes['value']?.currentValue;
-    if (value) {
-      this.value = value;
+    this.value = changes['value']?.currentValue;
 
-      setTimeout(() => {
-        this.filterProviders(this.value.basName);
-      }, 0);
+    setTimeout(() => {
+      this.filterProviders(this.value?.basName);
+    }, 0);
 
-      const i18n = changes['i18n']?.currentValue;
-      if (i18n) {
-        this.i18n = {
-          ...defaultI18n,
-          ...i18n,
-        };
-      }
+    const i18n = changes['i18n']?.currentValue;
+    if (i18n) {
+      this.i18n = {
+        ...defaultI18n,
+        ...i18n,
+      };
     }
 
     const asrProviders = changes['asrProviders']?.currentValue;
@@ -201,7 +198,7 @@ export class OctraProviderSelectComponent
     return '';
   }
 
-  onInputKeyup(event: KeyboardEvent, value: string, dropdown?: NgbDropdown) {
+  onInputKeyup(event: KeyboardEvent, value?: string, dropdown?: NgbDropdown) {
     this.filterProviders(value, dropdown);
 
     if (

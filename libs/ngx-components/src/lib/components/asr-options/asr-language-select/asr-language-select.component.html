@@ -29,9 +29,9 @@
     class="overflow-y-auto"
     id="languageDropdownMenu"
   >
-          <span class="d-block mb-2 ms-2"
-          ><b>{{ title }}</b></span
-          >
+    <span class="d-block mb-2 ms-2"
+      ><b>{{ title }}</b></span
+    >
     <ul class="list-group">
       @for (language of filtered; track language) {
         <li
@@ -43,7 +43,7 @@
         </li>
       }
       @if (filtered.length === 0) {
-        <li class="text-center">{{ i18n.nothingFound }}</li>
+        <li class="p-1 text-center">{{ i18n.nothingFound }}</li>
       }
     </ul>
   </div>

@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.0...ngx-components-1.3.1) (2025-10-02)
+
+
+### Bug Fixes
+
+* **ngx-components:** asr-language-select and asr-provider-select components can't handle undefined values ([a416aa7](https://github.com/IPS-LMU/octra/commit/a416aa7ecabb3bdd3b664d843dfb2cf76c40a941))
+* **ngx-components:** prevent console logging before initialization ([42a9fbb](https://github.com/IPS-LMU/octra/commit/42a9fbbee596732a61927fec63d4f47ec991089c))
+
+
+
 # [1.3.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.2.1...ngx-components-1.3.0) (2025-09-29)
 
 

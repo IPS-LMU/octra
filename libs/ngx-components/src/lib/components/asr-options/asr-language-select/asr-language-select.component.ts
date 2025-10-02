@@ -22,7 +22,7 @@ import { ASROptionsTranslations, ServiceProvider } from '../types';
 const defaultI18n: ASROptionsTranslations = {
   header: 'Language and Provider',
   asrLanguage: 'ASR Language',
-  nothingFound: 'Nothing found'
+  nothingFound: 'Nothing found',
 };
 
 @Component({
@@ -34,7 +34,7 @@ const defaultI18n: ASROptionsTranslations = {
     FormsModule,
     NgbDropdownMenu,
     NgbDropdownItem,
-    NgbDropdownToggle
+    NgbDropdownToggle,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -159,11 +159,12 @@ export class OctraASRLanguageSelectComponent
   onLanguageDropdownOpenChange(opened: boolean) {
     if (
       !opened &&
-      !this.languages.find(
-        (a) => a.value.toLowerCase() === this.value.toLowerCase(),
-      )
+      (!this.value ||
+        !this.languages.find(
+          (a) => a.value.toLowerCase() === this.value.toLowerCase(),
+        ))
     ) {
-      this.internValue = '';
+      this.internValue = undefined;
       this.filtered = this.languages;
     }
   }

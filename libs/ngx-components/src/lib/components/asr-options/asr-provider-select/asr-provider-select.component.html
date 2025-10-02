@@ -26,7 +26,7 @@
   <div
     ngbDropdownMenu
     aria-labelledby="mausDropdown"
-    style="max-height: 150px; max-width: 300px"
+    style="max-height: 150px; max-width: 400px"
     class="overflow-y-auto"
     id="providerDropdownMenu"
   >
@@ -38,8 +38,9 @@
         <li class="list-group-item p-1 pointer">
           <div class="px-1 py-2">
             <div class="row g-1 px-0 justify-items-center align-items-center">
+              <div class="col-3">{{provider.provider}}</div>
               <div
-                class="col-8 text-start"
+                class="col-5 text-start"
                 (click)="selectProvider(provider, dropdown)"
               >
                 <img

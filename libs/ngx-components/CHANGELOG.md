@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.2](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.1...ngx-components-1.3.2) (2025-10-02)
+
+
+### Features
+
+* **ngx-components:** show provider names on asr provider selection ([410a788](https://github.com/IPS-LMU/octra/commit/410a788b7d5c2088175767fd78aadcc2e9ad6ece))
+
+
+
 ## [1.3.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.0...ngx-components-1.3.1) (2025-10-02)
 
 

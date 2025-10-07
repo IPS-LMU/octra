@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -79,6 +79,7 @@ export class AsrOptionsComponent
   @Input() i18n: ASROptionsTranslations = defaultI18n;
 
   @Input() showAccessCode = false;
+  @ViewChild('form', { static: false }) form?: NgForm;
 
   @ViewChild('dropdown', { static: false }) dropdown?: NgbDropdown;
   @ViewChild('dropdown2', { static: false }) dropdown2?: NgbDropdown;
@@ -177,5 +178,11 @@ export class AsrOptionsComponent
       selectedServiceProvider: provider,
     };
     this.optionsChange.emit(this.options);
+  }
+
+  selectAll(){
+    for (const key of Object.keys(this.form.controls)) {
+      this.form.controls[key].markAsTouched();
+    }
   }
 }

@@ -4,31 +4,30 @@
   placement="bottom-right"
   container="body"
   #dropdown="ngbDropdown"
-  [autoClose]="false"
+  [autoClose]="autoClose"
+  (openChange)="onProviderDropdownOpenChange($event)"
 >
   <input
     type="text"
     class="form-control"
-    id="providerDropdown"
     ngbDropdownToggle
     [placeholder]="i18n.asrProvider"
     autocomplete="one-time-code"
     autocapitalize="off"
-    name="provider"
-    [ngModel]="internValue?.provider"
-    #providerInput
+    [name]="name"
+    [ngModel]="internValue?.provider ?? ''"
+    #providerInput="ngModel"
     data-bs-toggle="dropdown"
     aria-expanded="false"
     (focus)="ocbFocus.emit()"
-    [required]="required"
     (keyup)="onInputKeyup($event, providerInput.value, dropdown)"
   />
   <div
     ngbDropdownMenu
-    aria-labelledby="mausDropdown"
+    [attr.aria-labelledby]="id"
     style="max-height: 150px; max-width: 400px"
     class="overflow-y-auto"
-    id="providerDropdownMenu"
+    [id]="id + 'Menu'"
   >
     <span class="d-block mb-2 ms-2"
       ><b>{{ i18n.asrProvider }}</b></span
@@ -37,8 +36,12 @@
       @for (provider of filtered; track provider) {
         <li class="list-group-item p-1 pointer">
           <div class="px-1 py-2">
-            <div class="row g-1 px-0 justify-items-center align-items-center">
-              <div class="col-3">{{provider.provider}}</div>
+            <div
+              class="row g-1 px-0 justify-items-center align-items-center pointer"
+            >
+              <div class="col-3" (click)="selectProvider(provider, dropdown)">
+                {{ provider.provider }}
+              </div>
               <div
                 class="col-5 text-start"
                 (click)="selectProvider(provider, dropdown)"
@@ -103,6 +106,10 @@
                   popoverTitle="Service information"
                   [container]="'body'"
                   [autoClose]="true"
+                  triggers="manual"
+                  #asrInfoPopover="ngbPopover"
+                  (hidden)="autoClose = true"
+                  (click)="toggleAsrInfoPopover(asrInfoPopover)"
                 ></i>
                 <ng-template #asrDescription>
                   <table class="table table-sm table-borderless provider-info">

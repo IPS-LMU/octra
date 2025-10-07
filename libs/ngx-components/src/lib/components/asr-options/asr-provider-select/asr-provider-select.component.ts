@@ -11,7 +11,16 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  NgModel,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
 import {
   NgbDropdown,
   NgbDropdownMenu,
@@ -39,17 +48,28 @@ const defaultI18n: ASROptionsTranslations = {
     NgbPopover,
     NgStyle,
   ],
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: OctraProviderSelectComponent,
+    },
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: OctraProviderSelectComponent,
+    },
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OctraProviderSelectComponent
   extends SubscriberComponent
-  implements OnChanges
+  implements OnChanges, ControlValueAccessor, Validator
 {
   @Output() ocbFocus = new EventEmitter<void>();
-
+  @Input() name = '';
+  @Input() id = 'providerDropdown';
   @Input() i18n: ASROptionsTranslations = defaultI18n;
-  @Input() value?: ServiceProvider;
-  @Output() valueChange = new EventEmitter<ServiceProvider>();
   @Input() langItem?: {
     value: string;
     providersOnly?: string[];
@@ -70,6 +90,13 @@ export class OctraProviderSelectComponent
 
   @Input() asrProviders?: ServiceProvider[];
   @Input() required = false;
+  @Input() placeholder = "ASR Provider";
+  protected autoClose = true;
+
+  @ViewChild('providerInput', { static: true }) input?: NgModel;
+  @ViewChild('asrInfoPopover', { static: true }) asrInfoPopover?: NgbPopover;
+
+  private value?: ServiceProvider | null;
 
   get internValue(): ServiceProvider | undefined {
     return this.value;
@@ -77,8 +104,6 @@ export class OctraProviderSelectComponent
 
   set internValue(value: ServiceProvider | undefined) {
     this.value = value;
-    this.valueChange.emit(value);
-    this.cd.markForCheck();
   }
 
   @ViewChild('dropdown', { static: false }) dropdown?: NgbDropdown;
@@ -86,10 +111,32 @@ export class OctraProviderSelectComponent
 
   filtered: ServiceProvider[] = [];
 
+  protected touched = false;
+  protected disabled = false;
+
   protected cd = inject(ChangeDetectorRef);
 
   constructor() {
     super();
+  }
+
+  validate(
+    control: AbstractControl<OctraProviderSelectComponent>,
+  ): ValidationErrors | null {
+    if (this.required && !this.value) {
+      return {
+        mustBeSet: true,
+      };
+    }
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void) {
+    this.onValidate = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -164,7 +211,8 @@ export class OctraProviderSelectComponent
       this.internValue = provider ?? undefined;
     }
     this.internValue = provider;
-    this.dropdown.close();
+    this.onChange(provider);
+    dropdown?.close();
     this.cd.markForCheck();
   }
 
@@ -209,6 +257,8 @@ export class OctraProviderSelectComponent
     ) {
       const provider = this.asrProviders.find((a) => a.provider === value);
       this.selectProvider(provider, dropdown);
+    } else {
+      this.selectProvider(undefined);
     }
     this.cd.markForCheck();
   }
@@ -220,5 +270,57 @@ export class OctraProviderSelectComponent
 
   unfocus() {
     this.dropdown?.close();
+  }
+
+  onTouched = () => {};
+  onValidate = () => {};
+
+  markAsTouched() {
+    if (!this.touched) {
+      this.onTouched();
+      this.touched = true;
+      this.input?.control.markAsTouched();
+    }
+  }
+
+  writeValue(value?: ServiceProvider): void {
+    this.value = value;
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  onChange(value?: ServiceProvider) {
+    this.markAsTouched();
+  }
+
+  onProviderDropdownOpenChange(opened: boolean) {
+    if (
+      !opened &&
+      (!this.value ||
+        !this.asrProviders.find(
+          (a) => a.provider.toLowerCase() === this.value.provider.toLowerCase(),
+        ))
+    ) {
+      this.internValue = undefined;
+      this.filtered = this.asrProviders;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    }
+  }
+
+  toggleAsrInfoPopover(asrInfoPopover: NgbPopover) {
+    if (!asrInfoPopover.isOpen()) {
+      asrInfoPopover.open();
+      this.autoClose = false;
+    } else {
+      asrInfoPopover.close();
+      this.autoClose = true;
+    }
   }
 }

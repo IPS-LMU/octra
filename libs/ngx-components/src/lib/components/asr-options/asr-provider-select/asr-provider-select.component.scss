@@ -23,6 +23,14 @@ input::placeholder {
   padding: 3px 5px;
 }
 
-.ng-touched.ng-invalid {
+:host.ng-touched.ng-invalid {
   border-bottom: 2px solid red;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.pointer {
+  cursor: pointer;
 }

@@ -8,26 +8,25 @@
   <input
     type="text"
     class="form-control"
-    id="languageDropdown"
+    [id]="id"
     ngbDropdownToggle
     [placeholder]="placeholder"
     autocomplete="one-time-code"
     autocapitalize="off"
-    name="language"
-    #languageInput
+    [name]="name + 'Input'"
+    #languageInput="ngModel"
     data-bs-toggle="dropdown"
     aria-expanded="false"
     [ngModel]="internValue"
     (focus)="ocbFocus.emit()"
-    [required]="required"
     (keyup)="onInputKeyup($event, languageInput.value, dropdown)"
   />
   <div
     ngbDropdownMenu
-    aria-labelledby="languageDropdown"
+    [attr.aria-labelledby]="id"
     style="max-height: 150px"
     class="overflow-y-auto"
-    id="languageDropdownMenu"
+    [id]="id + 'Menu'"
   >
     <span class="d-block mb-2 ms-2"
       ><b>{{ title }}</b></span

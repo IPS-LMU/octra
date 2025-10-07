@@ -1,4 +1,4 @@
-<form autocomplete="one-time-code">
+<form autocomplete="one-time-code" #form="ngForm">
   <div class="row g-0">
     <label for="languageDropdown" class="form-label">{{ i18n.header }}:</label>
   </div>
@@ -7,14 +7,16 @@
       <octra-asr-language-select
         #asrLanguageSelection
         class="d-inline-block"
-        [value]="fields.asr.selected"
-        (valueChange)="setASRLanguage($event)"
+        [ngModel]="fields.asr.selected"
+        (ngModelChange)="setASRLanguage($event)"
         [title]="'asr.asr language' | transloco"
         [placeholder]="'asr.asr language' | transloco"
         [languages]="asrLanguages"
         [languageSettings]="languageSettings"
         [i18n]="asrTranslations"
         [required]="true"
+        name="asrLanguage"
+        id="asrLanguage"
         (ocbFocus)="providerSelection.unfocus(); mausSelection.unfocus()"
       ></octra-asr-language-select>
     </div>
@@ -22,11 +24,13 @@
       <octra-asr-provider-select
         #providerSelection
         class="d-inline-block"
-        [value]="fields.provider.selected"
+        [ngModel]="fields.provider.selected"
         [asrProviders]="languageSettings.services"
-        (valueChange)="setProvider($event)"
+        (ngModelChange)="setProvider($event)"
         [i18n]="asrTranslations"
         [required]="true"
+        name="asrProviderLanguage"
+        id="asrProviderLanguage"
         (ocbFocus)="asrLanguageSelection.unfocus(); mausSelection.unfocus()"
       ></octra-asr-provider-select>
     </div>
@@ -34,8 +38,10 @@
       <octra-asr-language-select
         class="d-inline-block"
         #mausSelection
-        [value]="fields.maus.selected"
-        (valueChange)="setMAUSLanguage($event)"
+        [ngModel]="fields.maus.selected"
+        (ngModelChange)="setMAUSLanguage($event)"
+        name="mausLanguage"
+        id="mausLanguage"
         [title]="'asr.maus language' | transloco"
         [placeholder]="'asr.maus language' | transloco"
         [languages]="mausLanguages"
@@ -44,6 +50,8 @@
         [required]="true"
         (ocbFocus)="asrLanguageSelection.unfocus(); providerSelection.unfocus()"
       ></octra-asr-language-select>
+      <br/>
+      <button (click)="selectAll()">select</button>
     </div>
   </div>
 

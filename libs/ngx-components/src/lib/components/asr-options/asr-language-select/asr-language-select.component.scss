@@ -7,6 +7,10 @@ input::placeholder {
   font-size: 0.85rem;
 }
 
-.ng-touched.ng-invalid {
+:host.ng-touched.ng-invalid {
   border-bottom: 2px solid red;
+}
+
+.dropdown-item {
+  cursor: pointer;
 }

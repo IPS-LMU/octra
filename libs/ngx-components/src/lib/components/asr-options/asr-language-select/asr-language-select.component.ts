@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -8,13 +7,21 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  NgModel,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
 import {
   NgbDropdown,
   NgbDropdownItem,
   NgbDropdownMenu,
   NgbDropdownToggle,
-  NgbPopover,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ASROptionsTranslations, ServiceProvider } from '../types';
@@ -36,15 +43,27 @@ const defaultI18n: ASROptionsTranslations = {
     NgbDropdownItem,
     NgbDropdownToggle,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: OctraASRLanguageSelectComponent,
+    },
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: OctraASRLanguageSelectComponent,
+    },
+  ],
 })
 export class OctraASRLanguageSelectComponent
   extends SubscriberComponent
-  implements OnChanges
+  implements OnChanges, ControlValueAccessor, Validator
 {
   @Input() languageSettings?: {
     services: ServiceProvider[];
   };
+  @Input() id = 'languageDropdownMenu';
   @Input() languages?: {
     value: string;
     providersOnly?: string[];
@@ -68,9 +87,11 @@ export class OctraASRLanguageSelectComponent
   @Input() title?: string = 'Language';
   @Input() placeholder?: string = 'Language';
   @Input() required = false;
+  @Input() name = '';
 
-  @Input() value?: string;
-  @Output() valueChange = new EventEmitter<string>();
+  @ViewChild('languageInput', { static: true }) input?: NgModel;
+
+  private value?: string | null;
 
   get internValue(): string | undefined {
     return this.value;
@@ -78,11 +99,9 @@ export class OctraASRLanguageSelectComponent
 
   set internValue(value: string | undefined) {
     this.value = value;
-    this.valueChange.emit(value);
   }
 
   @ViewChild('dropdown', { static: false }) dropdown?: NgbDropdown;
-  @ViewChild('popTemplate', { static: true }) popTemplate!: NgbPopover;
 
   filtered: {
     value: string;
@@ -90,8 +109,30 @@ export class OctraASRLanguageSelectComponent
     description: string;
   }[] = [];
 
+  protected touched = false;
+  protected disabled = false;
+
   constructor() {
     super();
+  }
+
+  validate(
+    control: AbstractControl<OctraASRLanguageSelectComponent>,
+  ): ValidationErrors | null {
+    if (this.required && !this.value) {
+      return {
+        mustBeSet: true,
+      };
+    }
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void) {
+    this.onValidate = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -144,7 +185,6 @@ export class OctraASRLanguageSelectComponent
   }
 
   selectLanguage(language?: string, dropdown?: NgbDropdown) {
-    this.popTemplate?.close();
     dropdown?.close();
     if (language) {
       const langItem = this.languages.find((a) => a.value === language);
@@ -154,6 +194,7 @@ export class OctraASRLanguageSelectComponent
     }
     this.internValue = language ?? undefined;
     this.filterLanguages(this.internValue);
+    this.onChange(language);
   }
 
   onLanguageDropdownOpenChange(opened: boolean) {
@@ -179,6 +220,8 @@ export class OctraASRLanguageSelectComponent
       event.code === 'Enter'
     ) {
       this.selectLanguage(value, dropdown);
+    } else if (value === '') {
+      this.selectLanguage(undefined);
     }
   }
 
@@ -189,5 +232,34 @@ export class OctraASRLanguageSelectComponent
 
   unfocus() {
     this.dropdown?.close();
+  }
+
+  onTouched = () => {};
+  onValidate = () => {};
+
+  markAsTouched() {
+    if (!this.touched) {
+      this.input?.control.markAsTouched();
+      this.touched = true;
+    }
+  }
+
+  writeValue(value?: string): void {
+    this.value = value;
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = () => {
+      console.log('TOUCHED!');
+      fn();
+    };
+  }
+
+  onChange(value?: string) {
+    this.markAsTouched();
   }
 }

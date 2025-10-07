@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.4.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.2...ngx-components-1.4.0) (2025-10-07)
+
+
+### Features
+
+* **ngx-components:** asr options support for reactive forms ([5cd6e88](https://github.com/IPS-LMU/octra/commit/5cd6e88ec73776162eec92e87bba2a927b2b538e))
+
+
+
 ## [1.3.2](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.1...ngx-components-1.3.2) (2025-10-02)
 
 

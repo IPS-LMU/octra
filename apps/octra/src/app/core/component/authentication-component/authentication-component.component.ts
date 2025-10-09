@@ -1,5 +1,13 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  SecurityContext,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   AccountLoginMethod,
@@ -20,6 +28,7 @@ import { SignupComponent } from './signup/signup.component';
 export class AuthenticationComponent extends DefaultComponent {
   protected api = inject(OctraAPIService);
   private transloco = inject(TranslocoService);
+  private sanitizer = inject(DomSanitizer);
 
   @Output() submitClick = new EventEmitter<{
     type: AccountLoginMethod;
@@ -37,6 +46,12 @@ export class AuthenticationComponent extends DefaultComponent {
   @Input() showTitle = true;
   @Input() registrations?: boolean = false;
   @Input() passwordReset?: boolean = false;
+  @Input() set octraBackendURL(value: string | undefined) {
+    this._octraBackendURL = value
+      ? this.sanitizer.sanitize(SecurityContext.URL, value)
+      : undefined;
+  }
+  protected _octraBackendURL?: SafeUrl | null;
 
   showForgetPassword = false;
   showSignup = false;

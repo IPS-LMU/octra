@@ -132,17 +132,27 @@
           </a>
         }
         @if (passwordReset && registrations) {
-          <a> | </a>
+          <a style="text-decoration: none"> | </a>
         }
         @if (registrations) {
           <a
-            class="pointer"
+            class="d-inline-block mt-2 text-center pointer"
             style="font-size: 0.8rem; text-decoration: none"
-            (click)="showSignUpForm()"
+            (click)="this.showSignUpForm()"
           >
             {{ 'p.sign up' | transloco }}
           </a>
         }
+        @if (passwordReset || registrations) {
+          <a style="text-decoration: none"> | </a>
+        }
+        <a
+          class="d-inline-block mt-2 text-center pointer"
+          style="font-size: 0.8rem; text-decoration: none"
+          [href]="_octraBackendURL" target="_blank"
+        >
+          powered by OCTRA-Backend
+        </a>
       </div>
     </form>
   }

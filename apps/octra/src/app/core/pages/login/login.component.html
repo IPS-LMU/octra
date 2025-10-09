@@ -69,6 +69,7 @@
                     [authentications]="api.appProperties?.authentications"
                     [passwordReset]="api.appProperties?.reset_password && !api.appProperties?.maintenance?.enabled"
                     [registrations]="api.appProperties?.registrations && !api.appProperties?.maintenance?.enabled"
+                    [octraBackendURL]="settingsService.appSettings.octraBackend?.url"
                   ></octra-authentication-component>
                 </div>
               } @else {

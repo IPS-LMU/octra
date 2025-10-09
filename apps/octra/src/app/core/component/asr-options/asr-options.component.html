@@ -4,23 +4,6 @@
   </div>
   <div class="row g-0 asr-language-options mb-3">
     <div class="col-4">
-      <octra-asr-language-select
-        #asrLanguageSelection
-        class="d-inline-block"
-        [ngModel]="fields.asr.selected"
-        (ngModelChange)="setASRLanguage($event)"
-        [title]="'asr.asr language' | transloco"
-        [placeholder]="'asr.asr language' | transloco"
-        [languages]="asrLanguages"
-        [languageSettings]="languageSettings"
-        [i18n]="asrTranslations"
-        [required]="true"
-        name="asrLanguage"
-        id="asrLanguage"
-        (ocbFocus)="providerSelection.unfocus(); mausSelection.unfocus()"
-      ></octra-asr-language-select>
-    </div>
-    <div class="col-4">
       <octra-asr-provider-select
         #providerSelection
         class="d-inline-block"
@@ -36,9 +19,27 @@
     </div>
     <div class="col-4">
       <octra-asr-language-select
+        #asrLanguageSelection
+        class="d-inline-block"
+        [ngModel]="fields.asr.selected"
+        (ngModelChange)="setASRLanguage($event)"
+        [title]="'asr.asr language' | transloco"
+        [placeholder]="'asr.asr language' | transloco"
+        [languages]="asrLanguages"
+        [languageSettings]="languageSettings"
+        [i18n]="asrTranslations"
+        [required]="true"
+        [options]="options"
+        name="asrLanguage"
+        id="asrLanguage"
+        (ocbFocus)="providerSelection.unfocus(); mausSelection.unfocus()"
+      ></octra-asr-language-select>
+    </div>
+    <div class="col-4">
+      <octra-asr-language-select
         class="d-inline-block"
         #mausSelection
-        [ngModel]="fields.maus.selected"
+        [(ngModel)]="fields.maus.selected"
         (ngModelChange)="setMAUSLanguage($event)"
         name="mausLanguage"
         id="mausLanguage"
@@ -50,8 +51,6 @@
         [required]="true"
         (ocbFocus)="asrLanguageSelection.unfocus(); providerSelection.unfocus()"
       ></octra-asr-language-select>
-      <br/>
-      <button (click)="selectAll()">select</button>
     </div>
   </div>
 

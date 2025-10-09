@@ -180,7 +180,7 @@ export class AsrOptionsComponent
     this.optionsChange.emit(this.options);
   }
 
-  selectAll(){
+  selectAll() {
     for (const key of Object.keys(this.form.controls)) {
       this.form.controls[key].markAsTouched();
     }

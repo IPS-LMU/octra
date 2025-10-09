@@ -141,9 +141,13 @@ export class OctraASRLanguageSelectComponent
       this.filtered = asrLanguages ?? [];
     }
 
-    this.value = changes['value']?.currentValue;
-
     setTimeout(() => {
+      if (this.value) {
+        const language = this.languages.find((a) => a.value === this.value);
+        if (!language || !this.isLanguageSupportedByProvider(language)) {
+          this.value = undefined;
+        }
+      }
       this.filterLanguages(this.value);
     }, 0);
 
@@ -156,12 +160,27 @@ export class OctraASRLanguageSelectComponent
     }
   }
 
+  private isLanguageSupportedByProvider(language: {
+    value: string;
+    providersOnly?: string[];
+    description: string;
+  }) {
+    return (
+      !this.options?.selectedServiceProvider ||
+      !language.providersOnly ||
+      language.providersOnly.find(
+        (b) => b === this.options.selectedServiceProvider.provider,
+      ) !== undefined
+    );
+  }
+
   filterLanguages(value?: string, dropdown?: NgbDropdown, emit?: boolean) {
     if (value) {
       this.filtered = this.languages.filter(
         (a) =>
-          a.description?.toLowerCase().includes(value.toLowerCase()) ||
-          a.value?.toLowerCase().includes(value.toLowerCase()),
+          (a.description?.toLowerCase().includes(value.toLowerCase()) ||
+            a.value?.toLowerCase().includes(value.toLowerCase())) &&
+          this.isLanguageSupportedByProvider(a),
       );
       dropdown?.open();
 
@@ -180,7 +199,9 @@ export class OctraASRLanguageSelectComponent
         }
       }
     } else {
-      this.filtered = this.languages;
+      this.filtered = this.languages.filter((a) =>
+        this.isLanguageSupportedByProvider(a),
+      );
     }
   }
 
@@ -206,7 +227,9 @@ export class OctraASRLanguageSelectComponent
         ))
     ) {
       this.internValue = undefined;
-      this.filtered = this.languages;
+      this.filtered = this.languages.filter((a) =>
+        this.isLanguageSupportedByProvider(a),
+      );
     }
   }
 

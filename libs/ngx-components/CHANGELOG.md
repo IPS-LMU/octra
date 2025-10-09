@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.5.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.4.0...ngx-components-1.5.0) (2025-10-09)
+
+
+### Features
+
+* **ngx-components:** filter languages in relation to selected provider ([cfe72e5](https://github.com/IPS-LMU/octra/commit/cfe72e594637aa65f000c1d33e993453745faeda))
+
+
+
 # [1.4.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.3.2...ngx-components-1.4.0) (2025-10-07)
 
 

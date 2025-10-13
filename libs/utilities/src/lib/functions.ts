@@ -513,3 +513,11 @@ export function removeProperties<T>(obj: T, properties: (keyof T)[]) {
   }
   return copy;
 }
+
+/**
+ * tries to convert a given string to number, returns undefined on fail
+ * @param value
+ */
+export function ensureNumber(value: string): number | undefined {
+  return !Number.isNaN(Number(value)) ? Number(value) : undefined;
+}

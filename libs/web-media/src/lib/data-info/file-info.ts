@@ -6,9 +6,7 @@ export class FileInfo extends DataInfo {
    * returns if the file is ready for processing
    */
   get available(): boolean {
-    return (
-      this.online || !(this._file === undefined || this._file === undefined)
-    );
+    return this.online || (this._file !== null && this._file !== undefined);
   }
 
   protected _extension: string;
@@ -169,8 +167,8 @@ export class FileInfo extends DataInfo {
     return new Promise<File>((resolve, reject) => {
       const reader = new FileReader();
 
-      reader.onload = (result: any) => {
-        resolve(new File([result.target.result], newName, attributes));
+      reader.onload = () => {
+        resolve(new File([reader.result as ArrayBuffer], newName, attributes));
       };
       reader.onerror = (error) => {
         reject(error);
@@ -227,7 +225,7 @@ export class FileInfo extends DataInfo {
     }
   }
 
-  public static fromAny(object: any): FileInfo {
+  public static fromAny(object: FileInfoSerialized): FileInfo {
     let file;
     if (object.content !== undefined && object.content !== '') {
       file = this.getFileFromContent(object.content, object.fullname);
@@ -274,9 +272,9 @@ export class FileInfo extends DataInfo {
     return new File([content], filename, properties);
   }
 
-  public toAny(): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      const result = {
+  public toAny(): Promise<FileInfoSerialized> {
+    return new Promise<FileInfoSerialized>((resolve, reject) => {
+      const result: FileInfoSerialized = {
         fullname: this.fullname,
         size: this.size,
         type: this.type,
@@ -323,7 +321,7 @@ export class FileInfo extends DataInfo {
     });
   }
 
-  getBase64(file: File): any {
+  getBase64(file: File): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -331,4 +329,14 @@ export class FileInfo extends DataInfo {
       reader.onerror = (error) => reject(error);
     });
   }
+}
+
+export interface FileInfoSerialized {
+  fullname: string;
+  size: number;
+  type: string;
+  url?: string;
+  attributes?: any;
+  content?: string;
+  hash?: string;
 }

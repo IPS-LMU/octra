@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.3.0](https://github.com/IPS-LMU/octra/compare/annotation-1.2.2...annotation-1.3.0) (2025-10-17)
+
+
+### Bug Fixes
+
+* **annotation:** srt converter adds brackets to all speaker labels ([14306b0](https://github.com/IPS-LMU/octra/commit/14306b0097c24cadf94e70528419ad70038ce44c))
+
+
+### Features
+
+* **annotation:** PartiturConverter now supports WOR in combination with SPK tiers ([1b8edc8](https://github.com/IPS-LMU/octra/commit/1b8edc854d4afbe82963db66104ea2a444fc17e1))
+* **octra:** new tool: search & replace ([739eac2](https://github.com/IPS-LMU/octra/commit/739eac2d2f5df23c1e2069a6d264e7ac0252a783))
+
+
+
 ## [1.2.2](https://github.com/IPS-LMU/octra/compare/annotation-1.2.1...annotation-1.2.2) (2025-08-01)
 
 

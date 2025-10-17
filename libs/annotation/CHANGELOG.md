@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.1](https://github.com/IPS-LMU/octra/compare/annotation-1.3.0...annotation-1.3.1) (2025-10-17)
+
+
+### Bug Fixes
+
+* **annotation:** PartiturConverter does not handle combination of TRN and SPK ([5c9a006](https://github.com/IPS-LMU/octra/commit/5c9a0068f5cb2b5b00bece87a6d2ebac93ee07b5))
+
+
+
 # [1.3.0](https://github.com/IPS-LMU/octra/compare/annotation-1.2.2...annotation-1.3.0) (2025-10-17)
 
 

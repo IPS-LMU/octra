@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.3.0](https://github.com/IPS-LMU/octra/compare/utilities-1.2.0...utilities-1.3.0) (2025-10-17)
+
+
+### Features
+
+* **utilities:** new function ensureNumber ([0fa709f](https://github.com/IPS-LMU/octra/commit/0fa709f0ba370da5bed0a652d131b3d58bf64bd9))
+
+
+
 # [1.2.0](https://github.com/IPS-LMU/octra/compare/utilities-1.1.0...utilities-1.2.0) (2025-07-28)
 
 

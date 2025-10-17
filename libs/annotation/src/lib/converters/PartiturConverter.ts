@@ -41,6 +41,7 @@ class ParsedBASPartitur {
     start: number;
     duration: number;
     value: string;
+    ortIndex: number;
   }[] = [];
 
   parse(lines: string[]) {
@@ -91,14 +92,16 @@ class ParsedBASPartitur {
             value: columns[4],
           });
         } else if (columns[0] === 'TRN:') {
-          const parsed = /(TRN): ([0-9]+) ([0-9]+) (?:[0-9]+,?)+ (.*)/g.exec(
-            line,
-          );
+          const parsed =
+            /(TRN): ([0-9]+) ([0-9]+) ([0-9]+)(?:,[0-9]+)* (.*)/g.exec(
+              line,
+            );
           if (parsed) {
             this.TRN.push({
               start: ensureNumber(parsed[2])!,
               duration: ensureNumber(parsed[3])!,
-              value: parsed[4],
+              ortIndex: ensureNumber(parsed[4])!,
+              value: parsed[5],
             });
           }
         }
@@ -271,17 +274,27 @@ LBD:\n`;
     if (parsedPartitur.SPK.length === 0 || parsedPartitur.WOR.length === 0) {
       // fallback to TRN
       if (parsedPartitur.TRN.length > 0) {
-        const level = new OSegmentLevel<OSegment>('TRN');
+        let level: OSegmentLevel<OSegment> | undefined = undefined;
 
         for (const item of parsedPartitur.TRN) {
+          const speaker =
+            parsedPartitur.SPK.find((a) => a.ortIndex === item.ortIndex)
+              ?.value ?? 'TRN';
+          level = result.levels.find(
+            (a) => a.name === speaker,
+          ) as OSegmentLevel<OSegment>;
+          if (!level) {
+            level = new OSegmentLevel<OSegment>(speaker);
+            result.levels.push(level);
+          }
+
           level.items.push(
             new OSegment(counter++, item.start, item.duration, [
-              new OLabel('TRN', item.value),
+              new OLabel(speaker, item.value),
+              ...(speaker !== 'TRN' ? [new OLabel('Speaker', speaker)] : []),
             ]),
           );
         }
-
-        result.levels.push(level);
       }
     } else {
       // found speakers. We need to read all WOR items and assign them to levels

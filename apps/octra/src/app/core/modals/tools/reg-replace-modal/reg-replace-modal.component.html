@@ -137,12 +137,12 @@
               </div>
               <div class="col-md-9 p-2">
                 @if (state.preview.active && state.results.length > 0) {
-                  <table class="table table-striped table-sm">
+                  <table class="table table-striped table-sm preview-table">
                     <thead>
                       <tr>
-                        <th class="fit">#</th>
+                        <th class="fit num-column">#</th>
                         <th>{{ 'g.transcript' | transloco }}</th>
-                        <th class="text-center fit">
+                        <th class="text-center checkbox-column">
                           {{ 'g.skip' | transloco }}?
                         </th>
                       </tr>
@@ -160,9 +160,9 @@
                             let i = $index
                           ) {
                             <tr>
-                              <td class="fit">{{ $index + 1 }}</td>
+                              <td class="fit num-column"><span class="font-bold">{{ $index + 1 }}</span></td>
                               <td [innerHTML]="item.html"></td>
-                              <td class="text-center align-middle fit">
+                              <td class="text-center align-middle checkbox-column">
                                 <input
                                   class="form-check-input pointer"
                                   type="checkbox"

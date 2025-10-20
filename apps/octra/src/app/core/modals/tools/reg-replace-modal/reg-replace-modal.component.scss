@@ -31,3 +31,15 @@ body .reg-replace-marker {
   display: inline;
   background-color: #ffd500;
 }
+
+.preview-table {
+  table-layout: fixed;
+}
+
+.preview-table .checkbox-column{
+  width: 120px;
+}
+
+.preview-table .num-column{
+  width: 50px !important;
+}

@@ -371,34 +371,33 @@ export class OctraDropzoneService {
                   fileProgress.options,
                 );
 
-                if (
-                  importResult !== undefined &&
-                  importResult.audiofile !== undefined
-                ) {
-                  // is bundle file
-                  this.dropFiles('audio');
-                  const audioProcess: FileProgress = {
-                    id: OctraDropzoneService.id++,
-                    status: 'progress',
-                    file: fileProgress.file,
-                    content: importResult?.audiofile?.arraybuffer,
-                    checked_converters: 0,
-                    progress: 0,
-                    error: '',
-                  };
-                  this._files.push(audioProcess);
-                  this.filesChange.emit({
-                    statistics: this._statistics,
-                    addedFiles: this._files,
-                  });
-                } else {
-                  await this.setAnnotation(
-                    fileProgress,
-                    converter,
-                    importResult,
-                  );
-                  if (this._oannotation) {
-                    break;
+                if (importResult && !importResult.error) {
+                  if (importResult.audiofile !== undefined) {
+                    // is bundle file
+                    this.dropFiles('audio');
+                    const audioProcess: FileProgress = {
+                      id: OctraDropzoneService.id++,
+                      status: 'progress',
+                      file: fileProgress.file,
+                      content: importResult?.audiofile?.arraybuffer,
+                      checked_converters: 0,
+                      progress: 0,
+                      error: '',
+                    };
+                    this._files.push(audioProcess);
+                    this.filesChange.emit({
+                      statistics: this._statistics,
+                      addedFiles: this._files,
+                    });
+                  } else {
+                    await this.setAnnotation(
+                      fileProgress,
+                      converter,
+                      importResult,
+                    );
+                    if (this._oannotation) {
+                      break;
+                    }
                   }
                 }
               }

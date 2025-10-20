@@ -93,9 +93,7 @@ class ParsedBASPartitur {
           });
         } else if (columns[0] === 'TRN:') {
           const parsed =
-            /(TRN): ([0-9]+) ([0-9]+) ([0-9]+)(?:,[0-9]+)* (.*)/g.exec(
-              line,
-            );
+            /(TRN): ([0-9]+) ([0-9]+) ([0-9]+)(?:,[0-9]+)* (.*)/g.exec(line);
           if (parsed) {
             this.TRN.push({
               start: ensureNumber(parsed[2])!,
@@ -271,7 +269,10 @@ LBD:\n`;
     // skip not needed information and read needed information
     let counter = 1;
 
-    if (parsedPartitur.SPK.length === 0 || parsedPartitur.WOR.length === 0) {
+    if (
+      (parsedPartitur.SPK.length === 0 && parsedPartitur.TRN.length > 0) ||
+      parsedPartitur.WOR.length === 0
+    ) {
       // fallback to TRN
       if (parsedPartitur.TRN.length > 0) {
         let level: OSegmentLevel<OSegment> | undefined = undefined;
@@ -297,17 +298,23 @@ LBD:\n`;
         }
       }
     } else {
-      // found speakers. We need to read all WOR items and assign them to levels
+      // found speakers OR empty TRNs. We need to read all WOR items and assign them to levels
       if (parsedPartitur.WOR.length === 0) {
         return {
           error: "Can't read Partitur file with SPK but missing WOR items.",
         };
       } else {
         for (const worElement of parsedPartitur.WOR) {
-          if (worElement.ortIndex > -1) {
+          if (
+            (worElement.ortIndex > -1 || parsedPartitur.SPK.length === 0) &&
+            worElement.value !== '<p:>'
+          ) {
             const speaker =
-              parsedPartitur.SPK.find((a) => a.ortIndex === worElement.ortIndex)
-                ?.value ?? 'NA';
+              parsedPartitur.SPK.length === 0
+                ? 'OCTRA_1'
+                : (parsedPartitur.SPK.find(
+                    (a) => a.ortIndex === worElement.ortIndex,
+                  )?.value ?? 'NA');
             let level: OSegmentLevel<OSegment> | undefined = result.levels.find(
               (a) => a.name === speaker,
             ) as any;

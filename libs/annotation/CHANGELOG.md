@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.3](https://github.com/IPS-LMU/octra/compare/annotation-1.3.2...annotation-1.3.3) (2025-10-21)
+
+
+### Bug Fixes
+
+* **annotation:** SRTConverter import fails on invalid timestamps ([88f8305](https://github.com/IPS-LMU/octra/commit/88f8305c34870f9cb14f8b11aac27f2ea34d3de1))
+
+
+
 ## [1.3.2](https://github.com/IPS-LMU/octra/compare/annotation-1.3.1...annotation-1.3.2) (2025-10-20)
 
 

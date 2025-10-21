@@ -289,9 +289,7 @@ export class SRTConverter extends Converter {
                 ]),
               );
             } else {
-              return {
-                error: `Invalid timestamps in line: ${matches[0]}`,
-              };
+              console.warn(`Invalid timestamps in line: ${matches[0]}`);
             }
           }
           matches = regex.exec(content);

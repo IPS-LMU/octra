@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.2.1](https://github.com/IPS-LMU/octra/compare/web-media-1.2.0...web-media-1.2.1) (2025-10-25)
+
+
+### Bug Fixes
+
+* **web-media:** FileInfo.fromAny() sets online attribute to false ([9a4643f](https://github.com/IPS-LMU/octra/commit/9a4643f00d13e2981ba8efbd879d32941476b71b))
+
+
+
 # [1.2.0](https://github.com/IPS-LMU/octra/compare/web-media-1.1.0...web-media-1.2.0) (2025-10-25)
 
 

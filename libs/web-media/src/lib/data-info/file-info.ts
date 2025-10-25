@@ -237,7 +237,7 @@ export class FileInfo extends DataInfo {
       object.size,
       file,
     );
-    result.online = object.online ?? false;
+    result.online = object.online ?? true;
     result.attributes = object.attributes;
     result.url = object.url;
     result.hash = object.hash;

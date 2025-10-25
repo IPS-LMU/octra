@@ -237,6 +237,7 @@ export class FileInfo extends DataInfo {
       object.size,
       file,
     );
+    result.online = object.online ?? false;
     result.attributes = object.attributes;
     result.url = object.url;
     result.hash = object.hash;
@@ -280,6 +281,7 @@ export class FileInfo extends DataInfo {
         type: this.type,
         url: this.url,
         attributes: this.attributes,
+        online: this.online,
         content: '',
         hash: this.hash,
       };
@@ -336,6 +338,7 @@ export interface FileInfoSerialized {
   size: number;
   type: string;
   url?: string;
+  online?: boolean;
   attributes?: any;
   content?: string;
   hash?: string;

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/IPS-LMU/octra/compare/web-media-1.1.0...web-media-1.2.0) (2025-10-25)
+
+
+### Features
+
+* **web-media:** add online property to serialized FileInfo ([6cbec27](https://github.com/IPS-LMU/octra/commit/6cbec27cd7ac5adcf977e72aa7c1d3ef15453c30))
+
+
+
 # [1.1.0](https://github.com/IPS-LMU/octra/compare/web-media-1.0.1...web-media-1.1.0) (2025-10-13)
 
 

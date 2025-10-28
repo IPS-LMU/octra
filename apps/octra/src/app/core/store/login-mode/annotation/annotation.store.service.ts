@@ -829,6 +829,10 @@ export class AnnotationStoreService {
     rawText: string,
     guidelines: any,
   ): { start: number; end: number }[] {
+    if (guidelines.markers.length === 0) {
+      return [];
+    }
+
     const result = [];
     let regexStr = '';
     for (let i = 0; i < guidelines.markers.length; i++) {
@@ -842,7 +846,7 @@ export class AnnotationStoreService {
     const regex = new RegExp(regexStr, 'g');
 
     let match = regex.exec(rawText);
-    while (match != undefined) {
+    while (match != null) {
       result.push({
         start: match.index,
         end: match.index + match[0].length,

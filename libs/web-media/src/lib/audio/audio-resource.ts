@@ -4,20 +4,20 @@ import { SourceType } from '../types';
 import { AudioInfo } from './audio-info';
 
 export class AudioResource extends MediaResource {
-  private _info: AudioInfo;
+  private _info: AudioInfo<any>;
 
-  get info(): AudioInfo {
+  get info(): AudioInfo<any> {
     return this._info;
   }
 
-  set info(value: AudioInfo) {
+  set info(value: AudioInfo<any>) {
     this._info = value;
   }
 
   constructor(
     fullname: string,
     source: SourceType,
-    info: AudioInfo,
+    info: AudioInfo<any>,
     buffer?: ArrayBuffer,
     size?: number,
     url?: string,

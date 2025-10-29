@@ -1,7 +1,7 @@
 import { extractFileNameFromURL } from '@octra/utilities';
 import { DataInfo } from './data-info';
 
-export class FileInfo extends DataInfo {
+export class FileInfo<F extends object = any> extends DataInfo<F> {
   /**
    * returns if the file is ready for processing
    */
@@ -78,8 +78,8 @@ export class FileInfo extends DataInfo {
     this._file = file;
   }
 
-  public static fromFileObject(file: File) {
-    return new FileInfo(file.name, file.type, file.size, file);
+  public static fromFileObject<F extends object = any>(file: File) {
+    return new FileInfo<F>(file.name, file.type, file.size, file);
   }
 
   /**
@@ -90,7 +90,7 @@ export class FileInfo extends DataInfo {
    * @param createdAt
    * @param size
    */
-  public static fromURL(
+  public static fromURL<F extends object = any>(
     url: string,
     type?: string,
     name?: string,
@@ -98,7 +98,7 @@ export class FileInfo extends DataInfo {
     size?: number,
   ) {
     const extraction = extractFileNameFromURL(url);
-    const result = new FileInfo(
+    const result = new FileInfo<F>(
       name ?? `${extraction.name}${extraction.extension}`,
       type ?? this.getMimeTypeByExtension(extraction.extension),
       size ?? 0,
@@ -225,13 +225,13 @@ export class FileInfo extends DataInfo {
     }
   }
 
-  public static fromAny(object: FileInfoSerialized): FileInfo {
+  public static fromAny<F extends object>(object: FileInfoSerialized): FileInfo<F> {
     let file;
     if (object.content !== undefined && object.content !== '') {
       file = this.getFileFromContent(object.content, object.fullname);
     }
 
-    const result = new FileInfo(
+    const result = new FileInfo<F>(
       object.fullname,
       object.type,
       object.size,
@@ -330,6 +330,22 @@ export class FileInfo extends DataInfo {
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = (error) => reject(error);
     });
+  }
+
+  override clone(): FileInfo<F> {
+    const result = new FileInfo<F>(
+      this.fullname,
+      this._type,
+      this._size,
+      this._file,
+      this._createdAt,
+    );
+
+    result._attributes = {...this._attributes} as F;
+    result._hash = this._hash;
+    result._online = this._online;
+    result._url = this._url;
+    return result;
   }
 }
 

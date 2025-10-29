@@ -1,4 +1,4 @@
-export class DataInfo {
+export class DataInfo<T extends object = any> {
   protected _type: string;
 
   get type(): string {
@@ -21,13 +21,13 @@ export class DataInfo {
     this._size = value;
   }
 
-  private _attributes = {};
+  protected _attributes?: T;
 
-  get attributes(): any {
+  get attributes(): T | undefined {
     return this._attributes;
   }
 
-  set attributes(value: any) {
+  set attributes(value: T | undefined) {
     this._attributes = value;
   }
 
@@ -45,5 +45,9 @@ export class DataInfo {
     this._name = name;
     this._type = type;
     this._size = size !== undefined ? size : 0;
+  }
+
+  clone(): DataInfo<T> {
+    return new DataInfo<T>(this.name, this.type, this.size);
   }
 }

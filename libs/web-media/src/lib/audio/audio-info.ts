@@ -1,7 +1,7 @@
 import { SampleUnit } from '@octra/media';
 import { FileInfo } from '../data-info';
 
-export class AudioInfo extends FileInfo {
+export class AudioInfo<F extends object = any> extends FileInfo<F> {
   private readonly _bitrate: number = -1;
 
   get bitrate(): number {

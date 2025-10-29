@@ -128,7 +128,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
           .then(() => {
             // audio format contains required information
 
-            let audioInfo = getAudioInfo(audioformat, filename, type, buffer);
+            let audioInfo = getAudioInfo(AudioInfo, audioformat, filename, type, buffer);
             const bufferLength = buffer.byteLength;
 
             audioInfo = new AudioInfo(

@@ -212,14 +212,15 @@ export function setStyle(elem: HTMLElement, styleObj: any) {
   }
 }
 
-export function getAudioInfo<F extends object = any>(
+export function getAudioInfo<A extends AudioInfo<F>, F extends object = any>(
+  constructor: new (...args: any[]) => A,
   format: AudioFormat,
   filename: string,
   type: string,
   buffer: ArrayBuffer,
-): AudioInfo<F> {
+): A {
   if (format.isValid(buffer)) {
-    return new AudioInfo(
+    return new constructor(
       filename,
       type,
       buffer.byteLength,

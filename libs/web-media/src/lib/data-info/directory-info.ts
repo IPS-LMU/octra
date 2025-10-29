@@ -2,9 +2,10 @@ import { DataInfo } from './data-info';
 import { FileInfo } from './file-info';
 
 export class DirectoryInfo<
-  D extends object = any,
-  F extends object = any,
-> extends DataInfo<D> {
+  F extends FileInfo<FA>,
+  A extends object = any,
+  FA extends object = any,
+> extends DataInfo<A> {
   private readonly _path: string;
 
   public constructor(path: string, size?: number) {
@@ -16,23 +17,25 @@ export class DirectoryInfo<
     return this._path;
   }
 
-  private _entries: (FileInfo<F> | DirectoryInfo<D, F>)[] = [];
+  private _entries: (DirectoryInfo<F, A, FA> | F)[] = [];
 
-  get entries(): (FileInfo<F> | DirectoryInfo<D, F>)[] {
+  get entries(): (F | DirectoryInfo<F, A, FA>)[] {
     return this._entries;
   }
 
-  set entries(value: (FileInfo<F> | DirectoryInfo<D, F>)[]) {
+  set entries(value: (F | DirectoryInfo<F, A, FA>)[]) {
     this._entries = value;
   }
 
-  public static async fromFolderObject<D extends object, F extends object>(
-    folder: FileSystemEntry | null,
-  ): Promise<DirectoryInfo<D, F>> {
+  public static async fromFolderObject<
+    F extends FileInfo<FA>,
+    A extends object = any,
+    FA extends object = any,
+  >(folder: FileSystemEntry | null): Promise<DirectoryInfo<F, A, FA>> {
     if (folder) {
-      const result = await this.traverseFileTree<D, F>(folder, '');
+      const result = await this.traverseFileTree<A, FA>(folder, '');
       if (result && result[0] instanceof DirectoryInfo) {
-        return result[0] as DirectoryInfo<D, F>;
+        return result[0] as DirectoryInfo<F, A, FA>;
       } else {
         throw new Error('could not parse directory');
       }
@@ -61,15 +64,18 @@ export class DirectoryInfo<
     return undefined;
   }
 
-  private static async traverseFileTree<D extends object, F extends object>(
+  private static async traverseFileTree<
+    A extends object = any,
+    FA extends object = any,
+  >(
     item: FileSystemEntry,
     path?: string,
-  ): Promise<(FileInfo<F> | DirectoryInfo<D, F>)[]> {
+  ): Promise<(FileInfo<FA> | DirectoryInfo<FileInfo<FA>, A>)[]> {
     const getFile = async (webKitEntry: FileSystemFileEntry) => {
-      return new Promise<FileInfo<F>[]>((resolve) => {
+      return new Promise<FileInfo[]>((resolve) => {
         webKitEntry.file((file: File) => {
           if (file.name.indexOf('.') > -1) {
-            const fileInfo = new FileInfo<F>(
+            const fileInfo = new FileInfo<FA>(
               file.name,
               file.type,
               file.size,
@@ -114,7 +120,7 @@ export class DirectoryInfo<
           readItems = await readEntries(dirReader);
         }
 
-        const values: (FileInfo<F> | DirectoryInfo<D, F>)[][] = [];
+        const values: (FileInfo<FA> | DirectoryInfo<FileInfo<FA>, A>)[][] = [];
 
         for (const entry of entries) {
           values.push(
@@ -122,8 +128,10 @@ export class DirectoryInfo<
           );
         }
 
-        const dir = new DirectoryInfo<D, F>(path + dirEntry.name + '/');
-        let result: (FileInfo<F> | DirectoryInfo<D, F>)[] = [];
+        const dir = new DirectoryInfo<FileInfo<FA>, A, FA>(
+          path + dirEntry.name + '/',
+        );
+        let result: (FileInfo<FA> | DirectoryInfo<FileInfo<FA>, A, FA>)[] = [];
 
         for (const value of values) {
           for (const val of value) {
@@ -133,13 +141,13 @@ export class DirectoryInfo<
 
         result = result.sort((a, b) => {
           if (a instanceof FileInfo && b instanceof FileInfo) {
-            const a2 = a as FileInfo<F>;
-            const b2 = b as FileInfo<F>;
+            const a2 = a as FileInfo<FileInfo<FA>>;
+            const b2 = b as FileInfo<FileInfo<FA>>;
 
             return a2.name.localeCompare(b2.name);
           } else if (a instanceof DirectoryInfo && b instanceof DirectoryInfo) {
-            const a2 = a as DirectoryInfo<D, F>;
-            const b2 = b as DirectoryInfo<D, F>;
+            const a2 = a as DirectoryInfo<FileInfo<FA>, A, FA>;
+            const b2 = b as DirectoryInfo<FileInfo<FA>, A, FA>;
 
             return a2.path.localeCompare(b2.path);
           } else {
@@ -155,17 +163,19 @@ export class DirectoryInfo<
     }
   }
 
-  public addEntries(entries: (FileInfo<F> | DirectoryInfo<D, F>)[]) {
+  public addEntries(entries: (F | DirectoryInfo<F, A, FA>)[]) {
     for (const entry of entries) {
       this._entries.push(entry);
     }
   }
 
-  public override clone(): DirectoryInfo<D, F> {
-    const result = new DirectoryInfo<D, F>(this._path, this._size);
-    result._entries = this.entries.map((a) => a.clone());
+  public override clone(): DirectoryInfo<F, A, FA> {
+    const result = new DirectoryInfo<F, A, FA>(this._path, this._size);
+    result._entries = this._entries.map(
+      (a) => a.clone() as F | DirectoryInfo<F, A, FA>,
+    );
     result._hash = this._hash;
-    result._attributes = { ...this._attributes } as D;
+    result._attributes = { ...this._attributes } as A;
     result._type = this._type;
 
     return result;

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.3.0](https://github.com/IPS-LMU/octra/compare/web-media-1.2.1...web-media-1.3.0) (2025-10-29)
+
+
+### Features
+
+* **web-media:** FileInfo and DirectoryInfo now generic classes, added clone methods ([991aed9](https://github.com/IPS-LMU/octra/commit/991aed9d9b33644a1f149e02067aadb7d7470af2))
+
+
+
 ## [1.2.1](https://github.com/IPS-LMU/octra/compare/web-media-1.2.0...web-media-1.2.1) (2025-10-25)
 
 

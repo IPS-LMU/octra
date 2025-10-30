@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.2](https://github.com/IPS-LMU/octra/compare/web-media-1.3.1...web-media-1.3.2) (2025-10-30)
+
+
+### Bug Fixes
+
+* **web-media:** missing clone() function for AudioInfo ([fcd71a9](https://github.com/IPS-LMU/octra/commit/fcd71a96000bea556b98b390d56670a83a3579d0))
+
+
+
 ## [1.3.1](https://github.com/IPS-LMU/octra/compare/web-media-1.3.0...web-media-1.3.1) (2025-10-29)
 
 

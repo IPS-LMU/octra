@@ -1,7 +1,7 @@
 {
   "name": "@octra/web-media",
   "description": "This library offers classes and functions for handling audio files in web browsers (e.g. chunked decoding etc.) used by [Octra](https://github.com/IPS-LMU/octra).",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "license": "MIT",
   "private": false,
   "author": {

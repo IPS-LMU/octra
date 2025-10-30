@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.3](https://github.com/IPS-LMU/octra/compare/web-media-1.3.2...web-media-1.3.3) (2025-10-30)
+
+
+### Bug Fixes
+
+* **web-media:** missing toAny() and fromAny() methods for AudioInfo ([d021182](https://github.com/IPS-LMU/octra/commit/d021182b23ad00b8fc835b1a20adc195ad534e33))
+
+
+
 ## [1.3.2](https://github.com/IPS-LMU/octra/compare/web-media-1.3.1...web-media-1.3.2) (2025-10-30)
 
 

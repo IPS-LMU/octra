@@ -65,6 +65,26 @@ export class AudioInfo<F extends object = any> extends FileInfo<F> {
     this._bitrate = bitrate;
     this._audioBufferInfo = audioBufferInfo;
   }
+
+  override clone(): AudioInfo<F> {
+    const result = new AudioInfo<F>(
+      this.fullname,
+      this._type,
+      this._size,
+      this._sampleRate,
+      this._duration.samples,
+      this._channels,
+      this._bitrate,
+      this._audioBufferInfo,
+    );
+    result._file = this._file;
+    result._attributes = this._attributes ? { ...this._attributes } as F : undefined;
+    result._hash = this._hash;
+    result._url = this._url;
+    result._online = this._online;
+
+    return result;
+  }
 }
 
 /**

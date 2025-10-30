@@ -6,7 +6,7 @@ export class DirectoryInfo<
   A extends object = any,
   FA extends object = any,
 > extends DataInfo<A> {
-  private readonly _path: string;
+  protected readonly _path: string;
 
   public constructor(path: string, size?: number) {
     super(DirectoryInfo.extractFolderName(path)!, 'folder', size);
@@ -17,7 +17,7 @@ export class DirectoryInfo<
     return this._path;
   }
 
-  private _entries: (DirectoryInfo<F, A, FA> | F)[] = [];
+  protected _entries: (DirectoryInfo<F, A, FA> | F)[] = [];
 
   get entries(): (F | DirectoryInfo<F, A, FA>)[] {
     return this._entries;

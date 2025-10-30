@@ -144,10 +144,12 @@
       "configurations": {
         "production": {
           "port": 5321,
+          "host": "127.0.0.1",
           "buildTarget": "octra:build:production"
         },
         "development": {
           "port": 5321,
+          "host": "127.0.0.1",
           "buildTarget": "octra:build:development"
         }
       },

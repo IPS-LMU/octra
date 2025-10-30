@@ -38,7 +38,7 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
     this._url = value;
   }
 
-  private _online = true;
+  protected _online = true;
 
   get online(): boolean {
     return this._online;
@@ -62,7 +62,7 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
     return this._createdAt;
   }
 
-  private readonly _createdAt: number = 0;
+  protected readonly _createdAt: number = 0;
 
   public constructor(
     fullname: string,
@@ -225,7 +225,9 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
     }
   }
 
-  public static fromAny<F extends object>(object: FileInfoSerialized): FileInfo<F> {
+  public static fromAny<F extends object>(
+    object: FileInfoSerialized,
+  ): FileInfo<F> {
     let file;
     if (object.content !== undefined && object.content !== '') {
       file = this.getFileFromContent(object.content, object.fullname);
@@ -341,7 +343,7 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
       this._createdAt,
     );
 
-    result._attributes = {...this._attributes} as F;
+    result._attributes = this._attributes ? { ...this._attributes } as F : undefined;
     result._hash = this._hash;
     result._online = this._online;
     result._url = this._url;

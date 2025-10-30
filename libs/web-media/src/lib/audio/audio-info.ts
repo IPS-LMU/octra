@@ -1,5 +1,5 @@
 import { SampleUnit } from '@octra/media';
-import { FileInfo } from '../data-info';
+import { FileInfo, FileInfoSerialized } from '../data-info';
 
 export class AudioInfo<F extends object = any> extends FileInfo<F> {
   private readonly _bitrate: number = -1;
@@ -78,11 +78,66 @@ export class AudioInfo<F extends object = any> extends FileInfo<F> {
       this._audioBufferInfo,
     );
     result._file = this._file;
-    result._attributes = this._attributes ? { ...this._attributes } as F : undefined;
+    result._attributes = this._attributes
+      ? ({ ...this._attributes } as F)
+      : undefined;
     result._hash = this._hash;
     result._url = this._url;
     result._online = this._online;
 
+    return result;
+  }
+
+  public override toAny(): Promise<AudioFileInfoSerialized> {
+    return new Promise<AudioFileInfoSerialized>((resolve, reject) => {
+      const result: AudioFileInfoSerialized = {
+        fullname: this.fullname,
+        size: this._size,
+        type: this._type,
+        url: this._url,
+        attributes: this._attributes,
+        online: this._online,
+        content: '',
+        hash: this._hash,
+        sampleRate: this._sampleRate,
+        duration: this.duration.samples,
+        bitsPerSecond: this._bitrate,
+        channels: this._channels,
+        audioBufferInfo: this._audioBufferInfo,
+      };
+
+      if (!this.isMediaFile() && this._file) {
+        FileInfo.getFileContent(this._file)
+          .then((content) => {
+            result.content = content;
+            resolve(result);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      } else {
+        resolve(result);
+      }
+    });
+  }
+
+  static override fromAny<F extends object>(
+    object: AudioFileInfoSerialized,
+  ): AudioInfo<F> {
+    const result = new AudioInfo<F>(
+      object.fullname,
+      object.type,
+      object.size,
+      object.sampleRate,
+      object.duration,
+      object.channels,
+      object.bitsPerSecond,
+      object.audioBufferInfo,
+    );
+    result.online = object.online ?? true;
+    result.attributes = object.attributes as F;
+    result.url = object.url;
+    result.hash = object.hash;
     return result;
   }
 }
@@ -112,4 +167,12 @@ export function normalizeMimeType(type: string) {
   }
 
   return type;
+}
+
+export interface AudioFileInfoSerialized extends FileInfoSerialized {
+  sampleRate: number;
+  bitsPerSecond: number;
+  channels: number;
+  duration: number;
+  audioBufferInfo?: { samples: number; sampleRate: number };
 }

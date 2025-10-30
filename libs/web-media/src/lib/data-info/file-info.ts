@@ -288,8 +288,7 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
         hash: this.hash,
       };
 
-      // TODO better check mime type
-      if (this._extension.indexOf('wav') < 0 && this._file !== undefined) {
+      if (!this.isMediaFile() && this._file) {
         FileInfo.getFileContent(this._file)
           .then((content) => {
             result.content = content;
@@ -343,7 +342,9 @@ export class FileInfo<F extends object = any> extends DataInfo<F> {
       this._createdAt,
     );
 
-    result._attributes = this._attributes ? { ...this._attributes } as F : undefined;
+    result._attributes = this._attributes
+      ? ({ ...this._attributes } as F)
+      : undefined;
     result._hash = this._hash;
     result._online = this._online;
     result._url = this._url;

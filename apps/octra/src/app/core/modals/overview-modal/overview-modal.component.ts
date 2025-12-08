@@ -6,7 +6,6 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  Output,
   ViewChild,
 } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -59,7 +58,6 @@ export class OverviewModalComponent
 
   @ViewChild('feedback', { static: false })
   feedback?: TranscriptionFeedbackComponent;
-  @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = undefined;
   private shortcutID = -1;
@@ -206,7 +204,7 @@ export class OverviewModalComponent
     if (this.feedback) {
       this.annotationStoreService.comment = this.feedback.comment;
     }
-    this.transcriptionSend.emit();
+    this.activeModal.close('send');
   }
 
   public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {

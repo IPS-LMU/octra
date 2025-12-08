@@ -134,20 +134,28 @@
               @if (
                 appStorage.loggedIn &&
                 navbarServ.showInterfaces &&
-                interfaceActive(editor.name)
+                interfaceActive(editor.meta.name)
               ) {
-                <li class="nav-item" (click)="setInterface(editor.name)">
+                <li class="nav-item" (click)="setInterface(editor)">
                   <a
                     class="nav-link"
                     [ngClass]="{
-                      active: appStorage.interface === editor.name,
+                      active: appStorage.interface === editor.meta.name,
                     }"
                     (click)="navbarServ.isCollapsed = true"
                   >
                     <span>
-                      <i [classList]="['bi', editor.icon]"></i>
+                      @if (editor.meta.icon) {
+                        <i [classList]="['bi', editor.meta.icon]"></i>
+                      } @else if (editor.meta.iconURL) {
+                        <img [src]="editor.meta.iconURL" style="height: 16px" />
+                      }
                       <span class="d-md-none d-xxl-inline">
-                        {{ editor.translate | transloco }}
+                        @if (editor.meta.translate) {
+                          {{ editor.meta.translate | transloco }}
+                        } @else {
+                          {{ editor.meta.label }}
+                        }
                       </span>
                     </span>
                   </a>
@@ -239,16 +247,17 @@
                         <td
                           (click)="selectLevel(i)"
                           [ngClass]="{
-                            disabled: level.type !== 'SEGMENT',
+                            disabled: !isLevelTypeSupported(level.type),
                             'rounded-top-3 rounded-end-0': i === 0,
                           }"
+                          class="p-2"
                           style="cursor: pointer"
                         >
                           {{ i + 1 }}:
                         </td>
                         <td
                           [ngClass]="{
-                            disabled: level.type !== 'SEGMENT',
+                            disabled: !isLevelTypeSupported(level.type),
                           }"
                         >
                           <input
@@ -261,8 +270,16 @@
                         </td>
                         <td
                           [ngClass]="{
+                            disabled: !isLevelTypeSupported(level.type)
+                          }">
+                          <span class="badge bg-info">{{ level.type }}</span>
+                        </td>
+                        <td
+                          [ngClass]="{
+                            disabled: !isLevelTypeSupported(level.type),
                             'rounded-top-3 rounded-start-0': i === 0,
                           }"
+                          class="p-2"
                         >
                           @if (
                             annotationStoreService.transcript!.levels.length > 1
@@ -285,7 +302,7 @@
                     }
                     <tr>
                       <td
-                        colspan="3"
+                        colspan="4"
                         (click)="onLevelAddClick()"
                         class="level-add-row rounded rounded-bottom-3"
                       >

@@ -5,7 +5,12 @@ import { SubscriptionManager } from '@octra/utilities';
 import { map } from 'rxjs';
 import { RootState } from '../index';
 import { ASRActions } from './asr.actions';
-import { ASRQueueItemType, ASRStateSettings, ASRTimeInterval } from './index';
+import {
+  ASRQueueItemType,
+  ASRStateQueue,
+  ASRStateSettings,
+  ASRTimeInterval,
+} from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -71,6 +76,8 @@ export class AsrStoreService {
     this.store.dispatch(ASRActions.setASRSettings.do({ settings }));
   }
 
+  queue?: ASRStateQueue;
+
   constructor() {
     this.subscrManager.add(
       this.asrOptions$.subscribe({
@@ -79,5 +86,13 @@ export class AsrStoreService {
         },
       }),
     );
+
+    this.subscrManager.add(this.queue$.subscribe({
+      next: (queue) => {
+        this.queue = queue;
+        console.log("statistics");
+        console.log(queue.statistics);
+      }
+    }));
   }
 }

@@ -17,6 +17,7 @@ import { LoginMode } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
 import { AnnotationState } from './index';
+import { editorComponents } from '../../../../editors/components';
 
 export const initialState: AnnotationState = {
   transcript: new OctraAnnotation<
@@ -36,6 +37,16 @@ export const initialState: AnnotationState = {
   },
   currentSession: {},
   histories: {},
+  modalVisibilities: {
+    overview: false,
+    inactivity: false,
+    shortcuts: false,
+    permissions: false,
+    sending: false,
+    demoEnd: false,
+    guidelines: false,
+    help: false
+  },
 };
 
 export class AnnotationStateReducers {
@@ -307,9 +318,10 @@ export class AnnotationStateReducers {
         (state: AnnotationState, { id, mode }) => {
           if (this.mode === mode) {
             if (id > -1) {
+              const editor = editorComponents.find(a => a.meta.name === state.currentEditor!)!;
               return {
                 ...state,
-                transcript: state.transcript.clone().removeLevel(id),
+                transcript: state.transcript.clone().removeLevel(id, editor.meta.supportedLevelTypes),
               };
             } else {
               console.error(`can't remove level because id not valid.`);

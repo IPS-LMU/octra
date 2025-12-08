@@ -98,13 +98,22 @@ export const reducer = createReducer(
         }
       : undefined,
   })),
-  on(ASRActions.stopProcessing.do, (state: ASRState) => ({
-    ...state,
-    queue: {
-      ...(state.queue! ?? initialState.queue),
-      status: ASRProcessStatus.STOPPED,
-    },
-  })),
+  on(ASRActions.stopItemProcessing.success, (state: ASRState) => {
+    const runningItems = state.queue.items.filter(
+      (item) => item.status === ASRProcessStatus.STARTED,
+    );
+
+    return {
+      ...state,
+      queue: {
+        ...state.queue,
+        status:
+          runningItems.length === 0
+            ? ASRProcessStatus.STOPPED
+            : state.queue.status,
+      },
+    };
+  }),
   on(ASRActions.setQueueStatus.do, (state: ASRState, { status }) => ({
     ...state,
     queue: state.queue
@@ -137,6 +146,10 @@ export const reducer = createReducer(
                   },
                   ...state.queue.items.slice(index + 1),
                 ],
+                statistics: {
+                  ...state.queue.statistics,
+                  running: state.queue.statistics.running - 1,
+                }
               }
             : undefined,
         };

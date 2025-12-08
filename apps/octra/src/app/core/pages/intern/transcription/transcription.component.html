@@ -43,9 +43,9 @@
     }
   </span>
   <octra-fastbar
-    (guidelinesbtnclicked)="openGuidelines()"
-    (overviewbtnclicked)="openOverview()"
-    (shortcutbtnclicked)="openShortcutsModal()"
+    (guidelinesbtnclicked)="annotationStoreService.openGuidelinesModal()"
+    (overviewbtnclicked)="annotationStoreService.openOverviewModal()"
+    (shortcutbtnclicked)="annotationStoreService.openShortcutsModal()"
     [buttonLabels]="{
       shortcuts: 'g.shortcuts' | transloco,
       guidelines: 'g.guidelines' | transloco,
@@ -54,27 +54,25 @@
     }"
   ></octra-fastbar>
 
-  <div class="flex">
-    @if (
-      !editorloaded ||
-      (annotationStoreService.status$ | async) === 'sending' ||
-      projectsettings === undefined
-    ) {
+  @if (
+    !editorloaded ||
+    (annotationStoreService.status$ | async) === 'sending' ||
+    projectsettings === undefined
+  ) {
+    <div
+      id="editor-loading"
+      class="w-100 h-100 flex position-absolute justify-content-center align-items-center"
+    >
       <div
-        id="editor-loading"
-        class="w-100 h-100 flex justify-content-center align-items-center"
+        class="spinner-border"
+        role="status"
+        style="color: lightgray; height: 150px; width: 150px"
       >
-        @if (true) {
-          <div
-            class="spinner-border"
-            role="status"
-            style="color: lightgray; height: 150px; width: 150px"
-          >
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        }
+        <span class="visually-hidden">Loading...</span>
       </div>
-    }
+    </div>
+  }
+  <div class="flex position-relative">
     <ng-container octraLoadeditor #showEditor></ng-container>
   </div>
 

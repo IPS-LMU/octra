@@ -434,6 +434,18 @@
         "list5": "Laufzeit: Start und Endzeitpunkt der Sichtbarkeit"
       },
       "title": "Anfrage auf Projekterstellung"
+    },
+    "switch editor": {
+      "title": "Laufende automatische Prozesse",
+      "body": "Es laufen gerade {{runningProcesses}} Prozess(e). {{editorName}} unterstützt die automatische Verarbeitung (ASR, Wort-Alignierung) nicht. Du kannst auf die Fertigstellung warten und dann wechseln oder Du kannst die automatische Verarbeitung abbrechen und wechseln.<br/><br/>Was möchtest Du tun?",
+      "choices": {
+        "stay": {
+          "label": "Auf Beendigung der automatischen Verarbeitung warten"
+        },
+        "abort": {
+          "label": "Automatische Verarbeitung abbrechen & Editor wechseln"
+        }
+      }
     }
   },
   "p": {
@@ -590,6 +602,9 @@
       "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen",
       "permutations replace": "Ersetze Permutationen"
     }
+  },
+  "unsupported level placeholder": {
+    "placeholder": "Der {{editorName}} unterstützt Ebenen vom Typ {{levelType}} nicht. Wähle eine andere Ebene aus oder wechsle den Editor."
   },
   "toasts": {
     "new update": {

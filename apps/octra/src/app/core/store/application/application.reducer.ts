@@ -1,11 +1,11 @@
 import { createReducer, on } from '@ngrx/store';
+import { AppSettings } from '../../obj';
 import { AuthenticationActions } from '../authentication';
 import { IDBActions } from '../idb/idb.actions';
 import { LoadingStatus, LoginMode } from '../index';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ApplicationActions } from './application.actions';
 import { ApplicationState } from './index';
-import { AppSettings } from '../../obj';
 
 export const initialState: ApplicationState = {
   initialized: false,
@@ -318,6 +318,27 @@ export const reducer = createReducer(
         status: LoadingStatus.FAILED,
         errors: [error],
       },
+    }),
+  ),
+  on(
+    AnnotationActions.overviewModal.open,
+    AnnotationActions.shortcutsModal.open,
+    AnnotationActions.guidelinesModal.open,
+    AnnotationActions.helpModal.open,
+    (state: ApplicationState) => ({
+      ...state,
+      shortcutsEnabled: false,
+    }),
+  ),
+  on(
+    AnnotationActions.overviewModal.close,
+    AnnotationActions.overviewModal.send,
+    AnnotationActions.shortcutsModal.close,
+    AnnotationActions.guidelinesModal.close,
+    AnnotationActions.helpModal.close,
+    (state: ApplicationState) => ({
+      ...state,
+      shortcutsEnabled: true,
     }),
   ),
 );

@@ -28,7 +28,7 @@ export class OctraAnnotationEvent
   constructor(id: number, samplePoint: SampleUnit, labels?: OLabel[]) {
     this.id = id;
     this.samplePoint = samplePoint;
-    this.labels = labels ?? [];
+    this.labels = labels?.map((a) => new OLabel(a.name, a.value)) ?? [];
   }
 
   serialize(): OctraAnnotationEvent {

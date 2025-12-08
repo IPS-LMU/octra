@@ -199,7 +199,14 @@ export class OctraAnnotation<
     }
   }
 
-  removeLevel(id: number) {
+  removeLevel(
+    id: number,
+    supportedLevelTypes: AnnotationLevelType[] = [
+      AnnotationLevelType.EVENT,
+      AnnotationLevelType.ITEM,
+      AnnotationLevelType.SEGMENT,
+    ],
+  ) {
     const index = this.levels.findIndex((a) => a.id === id);
 
     if (this.selectedLevelIndex === index) {
@@ -207,7 +214,13 @@ export class OctraAnnotation<
         this._selectedLevelIndex !== undefined &&
         this._selectedLevelIndex > 0
       ) {
-        this.changeCurrentLevelIndex(index - 1);
+        for (let i = index - 1; i > -1; i--) {
+          const level = this._levels[i];
+          if (supportedLevelTypes.includes(level.type)) {
+            this.changeCurrentLevelIndex(i);
+            break;
+          }
+        }
       } else {
         if (this._selectedLevelIndex === 0 && this._levels.length === 1) {
           this._selectedLevelIndex = undefined;
@@ -239,7 +252,22 @@ export class OctraAnnotation<
 
   changeLevelNameByIndex(index: number, name: string) {
     if (index > -1 && index < this._levels.length) {
-      this._levels[index].name = name;
+      const level = this._levels[index].clone();
+      for (let i = 0; i < level.items.length; i++) {
+        const item = level.items[i];
+        if (item.type === 'segment') {
+          const nameIndex = item.labels.findIndex((a) => a.name === level.name);
+          if (nameIndex > -1) {
+            level.items[i].labels[nameIndex].name = name;
+          }
+        }
+      }
+      level.name = name;
+      this._levels = [
+        ...this._levels.slice(0, index),
+        level,
+        ...this._levels.slice(index + 1),
+      ];
     } else {
       throw new Error(`Can't find level with index ${index}`);
     }
@@ -632,7 +660,7 @@ export class OctraAnnotation<
         result.levels.push(
           result.createItemLevel(
             jsonObjectElement.name,
-            jsonObjectElement.items,
+            jsonObjectElement.items.map((a) => new OItem(a.id, a.labels)),
           ),
         );
       }

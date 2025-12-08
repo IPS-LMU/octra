@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Shortcut, ShortcutGroup } from '@octra/web-media';
 import hotkeys, { HotkeysEvent } from 'hotkeys-js';
 
@@ -18,17 +18,21 @@ export class ShortcutService {
   private _generalShortcuts: ShortcutGroup[] = [];
   private previouslyEnabled: string[] = [];
 
+  readonly triggerGeneralShortcuts = new EventEmitter<{
+    shortcut: string;
+  }>();
+
   constructor() {}
 
   registerGeneralShortcutGroup(shortcutGroup: ShortcutGroup) {
     if (!this._generalShortcuts.find((a) => a.name === shortcutGroup.name)) {
-      this._generalShortcuts.push(shortcutGroup);
+      this._generalShortcuts = [...this._generalShortcuts, shortcutGroup];
     }
   }
 
   registerShortcutGroup(shortcutGroup: ShortcutGroup) {
     if (!this._groups.find((a) => a.name === shortcutGroup.name)) {
-      this._groups.push(shortcutGroup);
+      this._groups = [...this._groups, shortcutGroup];
     }
     this.initShortcuts();
   }
@@ -41,7 +45,6 @@ export class ShortcutService {
   initShortcuts() {
     hotkeys.unbind();
     hotkeys.filter = () => true;
-
     const registerItems = (group: ShortcutGroup, isGeneral: boolean) => {
       for (const item of group.items) {
         const hotkeyString = Array.from(new Set([item.keys.mac, item.keys.pc]))
@@ -49,6 +52,7 @@ export class ShortcutService {
           .join(',');
         hotkeys(hotkeyString, (kEvent, hEvent) => {
           const groups = isGeneral ? this._generalShortcuts : this._groups;
+
           const Group = groups.find((a) => a.name === group.name);
           if (Group && item.callback) {
             if (Group.enabled) {

@@ -22,6 +22,17 @@ export interface GuidelinesItem {
   type?: string;
 }
 
+export interface ModalVisibilities {
+  overview: boolean;
+  inactivity: boolean;
+  shortcuts: boolean;
+  permissions: boolean;
+  sending: boolean;
+  demoEnd: boolean;
+  guidelines: boolean;
+  help: boolean;
+}
+
 export class AnnotationStateSegment<
   T extends ASRContext,
 > extends OctraAnnotationSegment<T> {
@@ -94,6 +105,7 @@ export interface AnnotationState extends UndoRedoState {
   };
   transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>; // TODO move transcript to current session
   histories: Histories;
+  modalVisibilities: ModalVisibilities;
 }
 
 export interface AnnotationSessionState {

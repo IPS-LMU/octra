@@ -1,0 +1,14 @@
+@if (error) {
+  <div
+    class="alert alert-danger d-flex flex-column flex-auto h-100 m-0 justify-content-center text-center"
+  >
+    {{ error }}
+  </div>
+} @else if (iframeURL) {
+  <iframe
+    class="d-flex flex-column flex-auto h-100"
+    [src]="iframeURL"
+    #iframe
+    (load)="afterIframeLoaded()"
+  ></iframe>
+}

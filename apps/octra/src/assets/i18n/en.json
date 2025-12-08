@@ -434,6 +434,18 @@
         "list5": "Runtime: Start and end time of visibility"
       },
       "title": "Request for project creation"
+    },
+    "switch editor": {
+      "title": "Running automatic processes",
+      "body": "There are currently {{runningProcesses}} running process(es). {{editorName}} does not support automatic processing (ASR, word alignment). You can wait for completion and then switch, or you can cancel automatic processing and switch. <br/><br/>What would you like to do?",
+      "choices": {
+        "stay": {
+          "label": "Wait for automatic processing to finish"
+        },
+        "abort": {
+          "label": "Cancel automatic processing & switch editor"
+        }
+      }
     }
   },
   "p": {
@@ -590,6 +602,9 @@
       "merge segments by speaker": "Merge segments with same speaker label",
       "permutations replace": "Replace Permutations"
     }
+  },
+  "unsupported level placeholder": {
+    "placeholder": "The {{editorName}} does not support levels of type {{levelType}}. Please select another level or switch to another editor."
   },
   "toasts": {
     "new update": {

@@ -16,6 +16,7 @@ import {
 import { NgClass, NgStyle } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
+  AnnotationLevelType,
   ASRContext,
   OctraAnnotation,
   OctraAnnotationSegment,
@@ -50,10 +51,14 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { RoutingService } from '../../core/shared/service/routing.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { RoutingService } from '../../core/shared/service/routing.service';
+import {
+  OCTRAEditor,
+  OctraEditorRequirements,
+  SupportedOctraEditorMetaData,
+} from '../octra-editor';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -81,6 +86,14 @@ export class LinearEditorComponent
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
   routingService = inject(RoutingService);
+
+  static meta: SupportedOctraEditorMetaData = {
+    name: 'Linear Editor',
+    supportedLevelTypes: [AnnotationLevelType.SEGMENT],
+    editor: LinearEditorComponent,
+    translate: 'interfaces.linear editor',
+    icon: 'bi bi-window-desktop',
+  };
 
   public static editorname = 'Linear Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();

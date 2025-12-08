@@ -6,6 +6,7 @@ import {
   OctraAnnotationSegment,
 } from '@octra/annotation';
 import { ProjectDto, TaskDto } from '@octra/api-types';
+import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 import {
   getBaseHrefURL,
   SubscriptionManager,
@@ -13,6 +14,7 @@ import {
 } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { asapScheduler, Observable, Subject, Subscription } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { SessionFile } from '../../obj/SessionFile';
 import { getModeState, LoginMode, RootState } from '../../store';
 import { ApplicationActions } from '../../store/application/application.actions';
@@ -25,8 +27,6 @@ import {
   AnnotationState,
 } from '../../store/login-mode/annotation';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
-import { environment } from '../../../../environments/environment';
-import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
 
 @Injectable({
   providedIn: 'root',
@@ -448,7 +448,7 @@ export class AppStorageService {
     });
   }
 
-  public removeAnnotationLevel(id: number): Promise<void> {
+  public removeAnnotationLevel(id: number) {
     if (id > -1) {
       this.store.dispatch(
         AnnotationActions.removeAnnotationLevel.do({
@@ -456,13 +456,8 @@ export class AppStorageService {
           mode: this.useMode,
         }),
       );
-      return new Promise<void>((resolve) => {
-        resolve();
-      });
     } else {
-      return new Promise<void>((resolve, reject2) => {
-        reject2(new Error('level is undefined or undefined'));
-      });
+      console.error(new Error('level is undefined or undefined'));
     }
   }
 

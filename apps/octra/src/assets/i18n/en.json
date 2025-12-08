@@ -468,7 +468,8 @@
     "project creation wanted": "I want to create a new project",
     "resume transcription": "Continue transcription",
     "resuming feature": "New: You can now view your recently paused tasks in a project and resume selected tasks. For example, you can pause work on a task and start or resume another task - even from another project or device.",
-    "same user free task": "Data from a previously paused transcription is available (project: {{project}}). Click on “{{resumeTranscription}}” to resume this transcription. Alternatively, you can start a new transcription or continue another paused task."
+    "same user free task": "Data from a previously paused transcription is available (project: {{project}}). Click on “{{resumeTranscription}}” to resume this transcription. Alternatively, you can start a new transcription or continue another paused task.",
+    "no free tasks": "There are no available tasks for projects in which you may participate. If you want to just try out the online mode, send an E-Mail to {{email}}. Alternatively you can use the demo mode."
   },
   "reload-file": {
     "another file selected": "Another file selected. Please select the same file as before or start a new transcription.\n\nWanted: '{{file}}'",

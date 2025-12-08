@@ -26,6 +26,7 @@ import { AnnotationActions } from '../../../store/login-mode/annotation/annotati
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
+import { SettingsService } from '../../../shared/service';
 
 class PreparedProjectDto extends ProjectDto {
   collapsed = true;
@@ -76,9 +77,14 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   annotationStoreService = inject(AnnotationStoreService);
   private store = inject<Store<RootState>>(Store);
   private actions$ = inject(Actions);
+  private settings = inject(SettingsService);
 
   projects?: ProjectListDto;
   shownProjects?: PreparedProjectDto[];
+
+  get email(){
+    return this.settings.appSettings.octra.supportEmail;
+  }
 
   projectStarting = false;
   itemsPerPage = 20;

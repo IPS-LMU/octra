@@ -468,7 +468,8 @@
     "project creation wanted": "Ich möchte ein neues Projekt erstellen",
     "resume transcription": "Transkription fortsetzen",
     "resuming feature": "Jetzt neu: Du kannst nun deine zuletzt pausierten Aufgaben eines Projektes einsehen und ausgewählte Aufgaben fortsetzen. Z.B. kannst Du die Arbeit an einer Aufgabe pausieren und eine andere Aufgabe beginnen oder fortsetzen - auch von einem anderen Projekt oder Gerät.",
-    "same user free task": "Es sind Daten einer zuvor pausierten Transkription vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die diese Transkription fortzusetzen. Alternativ kannst Du eine neue Transkription beginnen oder eine andere pausierte Aufgabe fortsetzen."
+    "same user free task": "Es sind Daten einer zuvor pausierten Transkription vorhanden (Projekt: {{project}}). Klicke auf \"{{resumeTranscription}}\", um die diese Transkription fortzusetzen. Alternativ kannst Du eine neue Transkription beginnen oder eine andere pausierte Aufgabe fortsetzen.",
+    "no free tasks": "Es sind keine freien Aufgaben vorhanden für Projekte, an denen Du teilnehmen darfst. Wenn Du den Online Modus ausprobieren möchtest, sende eine E-Mail an {{email}}. Alternativ kannst Du den Demo Modus verwenden."
   },
   "reload-file": {
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'",

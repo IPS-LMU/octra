@@ -919,7 +919,7 @@ export class AsrEffects {
       .replace('{{language}}', language)
       .replace('{{outFormat}}', outFormat);
 
-    if (accessCode && accessCode !== '') {
+    if (accessCode && accessCode !== '' && service.provider === "Google") {
       asrUrl += `&ACCESSCODE=${accessCode}`;
     }
 

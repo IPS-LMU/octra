@@ -35,6 +35,7 @@ import { ApplicationActions } from '../../application/application.actions';
 import { getModeState, LoginMode, RootState } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
+import { ModalVisibilities } from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -192,6 +193,11 @@ export class AnnotationStoreService {
     return this._currentLevelIndex;
   }
 
+  modalVisibilities$ = this.store.select((state: RootState) => {
+    return getModeState(state)?.modalVisibilities;
+  });
+  modalVisibilities?: ModalVisibilities;
+
   transcript$ = this.store.select(
     (state: RootState) => getModeState(state)?.transcript,
   );
@@ -317,6 +323,14 @@ export class AnnotationStoreService {
         return getModeState(state)?.importConverter;
       })
       .subscribe(this.importConverter$);
+
+    this.subscrManager.add(
+      this.modalVisibilities$.subscribe({
+        next: (modalVisibilities) => {
+          this.modalVisibilities = modalVisibilities;
+        },
+      }),
+    );
   }
 
   quit(clearSession: boolean, freeTask: boolean, redirectToProjects = false) {
@@ -1023,5 +1037,21 @@ export class AnnotationStoreService {
 
   sendAnnotationToParentWindow() {
     this.store.dispatch(AnnotationActions.sendAnnotationToParentWindow.do());
+  }
+
+  openOverviewModal() {
+    this.store.dispatch(AnnotationActions.overviewModal.open());
+  }
+
+  openShortcutsModal() {
+    this.store.dispatch(AnnotationActions.shortcutsModal.open());
+  }
+
+  openGuidelinesModal() {
+    this.store.dispatch(AnnotationActions.guidelinesModal.open());
+  }
+
+  openHelpModal() {
+    this.store.dispatch(AnnotationActions.helpModal.open());
   }
 }

@@ -142,7 +142,11 @@ export abstract class AudioMechanism {
 
   public async destroy(disconnect = false) {
     if (disconnect && this._audioContext?.state !== 'closed') {
-      await this._audioContext?.close();
+      try {
+        await this._audioContext?.close();
+      } catch (e) {
+        // ignore
+      }
     }
     this.subscrManager.destroy();
   }

@@ -1,13 +1,14 @@
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { FileSize, getFileSize } from '@octra/utilities';
 import { AudioService, UserInteractionsService } from '../../shared/service';
+import { OCTRAEditor } from '../../../editors/octra-editor';
 
 @Injectable({ providedIn: 'root' })
 export class NavbarService {
   uiService = inject(UserInteractionsService);
   private audio = inject(AudioService);
 
-  public interfacechange = new EventEmitter<string>();
+  public interfacechange = new EventEmitter<typeof OCTRAEditor>();
   public onclick = new EventEmitter<string>();
   public openSettings = new EventEmitter<void>();
 
@@ -18,6 +19,8 @@ export class NavbarService {
 
   private _showExport = false;
   isCollapsed = true;
+
+  currentEditor?: typeof OCTRAEditor;
 
   public get fileSize(): FileSize | undefined {
     if (this.audio.audioManager?.resource?.size !== undefined) {

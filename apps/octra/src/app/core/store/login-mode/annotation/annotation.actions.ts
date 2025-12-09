@@ -495,4 +495,37 @@ export class AnnotationActions {
       }>(),
     },
   });
+
+  static overviewModal = createActionGroup({
+    source: 'annotation/overview modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+      send: emptyProps(),
+    },
+  });
+
+  static shortcutsModal = createActionGroup({
+    source: 'annotation/shortcuts modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
+
+  static guidelinesModal = createActionGroup({
+    source: 'annotation/guidelines modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
+
+  static helpModal = createActionGroup({
+    source: 'annotation/help modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
 }

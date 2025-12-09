@@ -14,6 +14,10 @@ export class AppSettings {
     };
     plugins?: {
       asr?: ASRSettings;
+      emuWebApp?: {
+        enabled: boolean;
+        url: string;
+      }
     };
     allowed_browsers: {
       name: string;

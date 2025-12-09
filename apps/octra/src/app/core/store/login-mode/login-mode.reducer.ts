@@ -438,6 +438,62 @@ export class LoginModeReducers {
           return state;
         },
       ),
+      on(AnnotationActions.overviewModal.open, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          overview: true,
+        },
+      })),
+      on(AnnotationActions.overviewModal.close, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          overview: false,
+        },
+      })),
+      on(AnnotationActions.shortcutsModal.open, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          shortcuts: true,
+        },
+      })),
+      on(AnnotationActions.shortcutsModal.close, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          shortcuts: false,
+        },
+      })),
+      on(AnnotationActions.guidelinesModal.open, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          guidelines: true,
+        },
+      })),
+      on(AnnotationActions.guidelinesModal.close, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          guidelines: false,
+        },
+      })),
+      on(AnnotationActions.helpModal.open, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          help: true,
+        },
+      })),
+      on(AnnotationActions.helpModal.close, (state: AnnotationState) => ({
+        ...state,
+        modalVisibilities: {
+          ...state.modalVisibilities,
+          help: false,
+        },
+      })),
     );
   }
 

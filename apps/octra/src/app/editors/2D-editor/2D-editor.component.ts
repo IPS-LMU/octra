@@ -15,6 +15,7 @@ import { TranscrEditorComponent } from '../../core/component';
 
 import { NgStyle } from '@angular/common';
 import {
+  AnnotationLevelType,
   ASRContext,
   ASRQueueItemType,
   getSegmentBySamplePosition,
@@ -53,7 +54,11 @@ import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+import {
+  OCTRAEditor,
+  OctraEditorRequirements,
+  SupportedOctraEditorMetaData,
+} from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
 
 @Component({
@@ -78,6 +83,14 @@ export class TwoDEditorComponent
   private modalService = inject(OctraModalService);
   private shortcutService = inject(ShortcutService);
   private navbarService = inject(NavbarService);
+
+  static meta: SupportedOctraEditorMetaData = {
+    name: '2D-Editor',
+    supportedLevelTypes: [AnnotationLevelType.SEGMENT],
+    translate: 'interfaces.2D editor',
+    icon: 'bi bi-justify',
+    supportsASR: true,
+  };
 
   public static editorname = '2D-Editor';
   public initialized: EventEmitter<void> = new EventEmitter<void>();

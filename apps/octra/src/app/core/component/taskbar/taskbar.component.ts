@@ -4,6 +4,7 @@ import { OctraModalService } from '../../modals/octra-modal.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 
 @Component({
   selector: 'octra-fastbar',
@@ -15,6 +16,7 @@ export class FastbarComponent {
   private appStoreService = inject(ApplicationStoreService);
   private modalService = inject(OctraModalService);
   protected routingService = inject(RoutingService);
+  protected annotationStoreService = inject(AnnotationStoreService);
 
   @Input() buttonLabels: any = {
     shortcuts: 'Shortcuts',
@@ -28,14 +30,6 @@ export class FastbarComponent {
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
   openHelpModal() {
-    this.appStoreService.setShortcutsEnabled(false);
-    this.modalService
-      .openModal(HelpModalComponent, HelpModalComponent.options)
-      .then(() => {
-        this.appStoreService.setShortcutsEnabled(true);
-      })
-      .catch(() => {
-        this.appStoreService.setShortcutsEnabled(true);
-      });
+    this.annotationStoreService.openHelpModal();
   }
 }

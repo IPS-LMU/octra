@@ -1,5 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import {
+  AnnotationLevelType,
   ASRContext,
   OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
@@ -19,8 +20,21 @@ export interface OctraEditorRequirements {
   initialized: EventEmitter<void>;
 }
 
+export interface SupportedOctraEditorMetaData {
+  name: string;
+  editor?: any;
+  supportedLevelTypes: AnnotationLevelType[];
+  supportsASR?: boolean;
+  url?: string;
+  translate?: string;
+  label?: string;
+  icon?: string;
+  iconURL?: string;
+}
+
 export abstract class OCTRAEditor extends DefaultComponent {
   protected shortcutsEnabled = true;
+  static meta: SupportedOctraEditorMetaData;
 
   protected doPlayOnHover(
     audioManager: AudioManager,

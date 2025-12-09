@@ -76,6 +76,10 @@ import { FileInfo } from '@octra/web-media';
 import { DateTime } from 'luxon';
 import mime from 'mime';
 import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
+import { HelpModalComponent } from '../../../modals/help-modal/help-modal.component';
+import { OverviewModalComponent } from '../../../modals/overview-modal/overview-modal.component';
+import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
+import { TranscriptionGuidelinesModalComponent } from '../../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import { MimeTypeMapper } from '../../../obj';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
@@ -98,6 +102,13 @@ export class AnnotationEffects {
     ref?: NgbModalWrapper<TranscriptionSendingModalComponent>;
     timeout?: Subscription;
     error?: string;
+  } = {};
+
+  modals: {
+    shortcuts?: NgbModalWrapper<any>;
+    guidelines?: NgbModalWrapper<any>;
+    overview?: NgbModalWrapper<any>;
+    help?: NgbModalWrapper<any>;
   } = {};
 
   subscrManager = new SubscriptionManager();
@@ -595,6 +606,123 @@ export class AnnotationEffects {
           );
           (ref.componentInstance as ErrorModalComponent).text =
             this.transloco.translate('projects-list.no remaining tasks');
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openOverviewModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.overviewModal.open),
+        tap(() => {
+          if (!this.modals.overview) {
+            this.modals.overview =
+              this.modalsService.openModalRef<OverviewModalComponent>(
+                OverviewModalComponent,
+                OverviewModalComponent.options,
+              );
+            this.modals.overview.result
+              .then((action) => {
+                this.modals.overview = undefined;
+
+                if (action === 'send') {
+                  this.store.dispatch(AnnotationActions.overviewModal.send());
+                } else {
+                  this.store.dispatch(AnnotationActions.overviewModal.close());
+                }
+              })
+              .catch((error) => {
+                this.modals.overview = undefined;
+                this.store.dispatch(AnnotationActions.overviewModal.close());
+              });
+          } else {
+            this.modals.overview.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openShortcutsModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.shortcutsModal.open),
+        tap(() => {
+          if (!this.modals.shortcuts) {
+            this.modals.shortcuts =
+              this.modalsService.openModalRef<ShortcutsModalComponent>(
+                ShortcutsModalComponent,
+                ShortcutsModalComponent.options,
+              );
+            this.modals.shortcuts.result
+              .then(() => {
+                this.modals.shortcuts = undefined;
+                this.store.dispatch(AnnotationActions.shortcutsModal.close());
+              })
+              .catch((error) => {
+                this.modals.shortcuts = undefined;
+                this.store.dispatch(AnnotationActions.shortcutsModal.close());
+              });
+          } else {
+            this.modals.shortcuts.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openGuidelinesModal = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.guidelinesModal.open),
+        tap(() => {
+          if (!this.modals.guidelines) {
+            this.modals.guidelines =
+              this.modalsService.openModalRef<TranscriptionGuidelinesModalComponent>(
+                TranscriptionGuidelinesModalComponent,
+                TranscriptionGuidelinesModalComponent.options,
+              );
+            this.modals.guidelines.result
+              .then(() => {
+                this.modals.guidelines = undefined;
+                this.store.dispatch(AnnotationActions.guidelinesModal.close());
+              })
+              .catch((error) => {
+                this.modals.guidelines = undefined;
+                this.store.dispatch(AnnotationActions.guidelinesModal.close());
+              });
+          } else {
+            this.modals.guidelines.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openHelpModal = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.helpModal.open),
+        tap(() => {
+          if (!this.modals.help) {
+            this.modals.help =
+              this.modalsService.openModalRef<HelpModalComponent>(
+                HelpModalComponent,
+                HelpModalComponent.options,
+              );
+            this.modals.help.result
+              .then(() => {
+                this.modals.help = undefined;
+                this.store.dispatch(AnnotationActions.helpModal.close());
+              })
+              .catch((error) => {
+                this.modals.help = undefined;
+                this.store.dispatch(AnnotationActions.helpModal.close());
+              });
+          } else {
+            this.modals.help.close();
+          }
         }),
       ),
     { dispatch: false },

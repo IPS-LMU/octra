@@ -10,6 +10,7 @@ import {
 import { TranscrEditorComponent } from '../../core/component';
 
 import {
+  AnnotationLevelType,
   ASRContext,
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
@@ -36,10 +37,14 @@ import {
   UserInteractionsService,
 } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { RoutingService } from '../../core/shared/service/routing.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
-import { RoutingService } from '../../core/shared/service/routing.service';
+import {
+  OCTRAEditor,
+  OctraEditorRequirements,
+  SupportedOctraEditorMetaData,
+} from '../octra-editor';
 
 @Component({
   selector: 'octra-audioplayer-gui',
@@ -63,7 +68,12 @@ export class DictaphoneEditorComponent
   appStorage = inject(AppStorageService);
   routingService = inject(RoutingService);
 
-  public static editorname = 'Dictaphone Editor';
+  static meta: SupportedOctraEditorMetaData = {
+    name: 'Dictaphone Editor',
+    supportedLevelTypes: [AnnotationLevelType.SEGMENT],
+    translate: 'interfaces.simple editor',
+    icon: 'bi bi-dash-lg',
+  };
 
   @ViewChild('nav', { static: true }) nav!: AudioNavigationComponent;
   @ViewChild('audioplayer', { static: true })

@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">{{ title }}</h4>
+  <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="bsModalRef.close()">
+    <span aria-hidden="true" class="visually-hidden">&times;</span>
+  </button>
+</div>
+<div class="modal-body" [innerHTML]="message"></div>
+<div class="modal-footer">
+  <div class="row w-100 g-1">
+    @for (choice of choices; track choice) {
+      <div [class]="choice.colClass">
+        <button type="button" [attr.class]="choice.btnClass" (click)="bsModalRef.close(choice.value);">
+          {{ choice.label }}
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -39,6 +39,7 @@ import { TimespanPipe } from '@octra/ngx-utilities';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
+import { OCTRAEditor } from '../../../editors/octra-editor';
 import { AboutModalComponent } from '../../modals/about-modal/about-modal.component';
 import { ExportFilesModalComponent } from '../../modals/export-files-modal/export-files-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
@@ -249,8 +250,8 @@ export class NavigationComponent
     });
   }
 
-  setInterface(newInterface: string) {
-    this.navbarServ.interfacechange.emit(newInterface);
+  setInterface(editor: typeof OCTRAEditor) {
+    this.navbarServ.interfacechange.emit(editor);
   }
 
   changeLanguage(lang: string) {
@@ -306,9 +307,7 @@ export class NavigationComponent
       })
       .then((answer) => {
         if (answer === 'yes') {
-          this.appStorage.removeAnnotationLevel(level.id).catch((err) => {
-            console.error(err);
-          });
+          this.appStorage.removeAnnotationLevel(level.id);
         }
       })
       .catch((error) => {
@@ -320,8 +319,17 @@ export class NavigationComponent
     this.annotationStoreService.duplicateLevel(tiernum);
   }
 
+  isLevelTypeSupported(type: AnnotationLevelType) {
+    return this.navbarServ.currentEditor?.meta.supportedLevelTypes.includes(
+      type,
+    ) ?? false;
+  }
+
   public selectLevel(tiernum: number) {
-    this.annotationStoreService.setLevelIndex(tiernum);
+    const level = this.annotationStoreService.transcript.levels[tiernum];
+    if (this.isLevelTypeSupported(level.type)) {
+      this.annotationStoreService.setLevelIndex(tiernum);
+    }
   }
 
   public changeSecondsPerLine(seconds: number) {

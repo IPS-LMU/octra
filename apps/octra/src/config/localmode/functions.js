@@ -9,7 +9,7 @@ function validateAnnotation(annotation, guidelines) {
   //R06 Satzzeichen
   var re = /[(.,!?;)]/g;
   let match;
-  while ((match = re.exec(annotation)) !== undefined) {
+  while ((match = re.exec(annotation)) !== null) {
     result.push({
       start: match.index,
       length: match[0].length,
@@ -25,7 +25,7 @@ function validateAnnotation(annotation, guidelines) {
       '(' + escapeRegex(marker) + ')( *(' + escapeRegex(marker) + '))+',
       'g',
     );
-    while ((match = re.exec(annotation)) != undefined) {
+    while ((match = re.exec(annotation)) !== null) {
       result.push({
         start: match.index,
         length: match[0].length,

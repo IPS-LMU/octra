@@ -34,10 +34,10 @@ export interface Shortcut {
   title: string;
   label?: string;
   callback?: (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup,
+    keyboardEvent?: KeyboardEvent,
+    shortcut?: Shortcut,
+    hotkeyEvent?: HotkeysEvent,
+    shortcutGroup?: ShortcutGroup,
   ) => void;
   focusonly?: boolean;
 }

@@ -51,6 +51,7 @@ import {
 import { TranscriptionStopModalComponent } from './transcription-stop-modal/transcription-stop-modal.component';
 import { WaitingModalComponent } from './waiting-modal/waiting-modal.component';
 import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
+import { ChoiceModalComponent } from './choice-modal/choice-modal.component';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -108,6 +109,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     TranscriptionBackupEndModalComponent,
     ImportOptionsModalComponent,
     WaitingModalComponent,
+    ChoiceModalComponent,
   ],
   exports: [
     ErrorModalComponent,
@@ -133,6 +135,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     AboutModalComponent,
     ImportOptionsModalComponent,
     TranscriptionBackupEndModalComponent,
+    ChoiceModalComponent,
   ],
 })
 export class ModalsModule {}

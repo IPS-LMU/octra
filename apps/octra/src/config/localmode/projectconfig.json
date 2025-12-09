@@ -8,7 +8,7 @@
     "interfaces": true
   },
   "languages": ["de", "en", "it", "nl", "ko", "zh"],
-  "interfaces": ["2D-Editor", "Dictaphone Editor", "Linear Editor"],
+  "interfaces": ["2D-Editor", "Dictaphone Editor", "Linear Editor", "EMU"],
   "octra": {
     "validationEnabled": true,
     "tools": ["combine-phrases", "cut-audio", "reg-replace"],

@@ -74,9 +74,9 @@ export class EmuWebAppEditorComponent
 
   ngAfterViewInit() {
     if (this.audio.audioManager.resource.info.size <= 1024 * 1024 * 50) {
-      if (this.settingsService.appSettings.octra.plugins.emuWebApp.url) {
+      if (this.settingsService.appSettings.octra.plugins?.emuWebApp?.url) {
         this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `${this.settingsService.appSettings.octra.plugins.emuWebApp.url}${stringifyQueryParams(
+          `${this.settingsService.appSettings.octra.plugins?.emuWebApp?.url}${stringifyQueryParams(
             {
               listenForMessages: true,
             },
@@ -244,7 +244,6 @@ export class EmuWebAppEditorComponent
           this.iframe.nativeElement.contentWindow.postMessage(command, '*');
 
           this.initialized.emit();
-          console.log('updated EMU options');
         },
       },
       'init emu',
@@ -268,7 +267,7 @@ export class EmuWebAppEditorComponent
   @HostListener('window:message', ['$event'])
   windowMessageReceived(event: MessageEvent) {
     const url =
-      this.settingsService.appSettings.octra.plugins.emuWebApp.url.replace(
+      this.settingsService.appSettings.octra.plugins?.emuWebApp?.url.replace(
         /(^https?:\/\/[^/]+)(.*)/g,
         '$1',
       );
@@ -276,13 +275,10 @@ export class EmuWebAppEditorComponent
     if (url === event.origin) {
       const data = event.data as EmuWebAppOutMessageEventData;
       if (data.data?.annotation && data.trigger === 'autoSave') {
-        console.log(event);
-        console.log('got data from emu');
         const anno = OctraAnnotation.deserialize(data.data.annotation);
         anno.changeCurrentLevelIndex(
           this.annotationStoreService.transcript.selectedLevelIndex,
         );
-        console.log(anno);
         this.annotationStoreService.overwriteTranscript(anno);
       }
     }

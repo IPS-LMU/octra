@@ -332,10 +332,12 @@ export class TranscriptionComponent
     super();
     const appStorage = this.appStorage;
 
-    EmuWebAppEditorComponent.meta.iconURL = joinURL(
-      this.settingsService.appSettings.octra.plugins.emuWebApp.url,
-      '/assets/favicon-32x32.png',
-    );
+    if (this.settingsService.appSettings.octra.plugins?.emuWebApp?.url) {
+      EmuWebAppEditorComponent.meta.iconURL = joinURL(
+        this.settingsService.appSettings.octra.plugins.emuWebApp.url,
+        '/assets/favicon-32x32.png',
+      );
+    }
 
     this.audioManager = this.audio.audiomanagers[0];
     this.shortcutService.registerGeneralShortcutGroup(this.modalShortcuts);

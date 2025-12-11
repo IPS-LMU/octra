@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.4](https://github.com/IPS-LMU/octra/compare/web-media-1.3.3...web-media-1.3.4) (2025-12-11)
+
+
+### Features
+
+* **octra): feat(octra:** phonetic annotation with the Emu-webApp as 4th editor ([c93f1be](https://github.com/IPS-LMU/octra/commit/c93f1be66e08f55948ff7ccd26e49dbf3c0db825))
+* **web-media:** add options to apply headers for downloadFile ([43d9762](https://github.com/IPS-LMU/octra/commit/43d976264952e272e28f2fe64c83aa3be182c0d6))
+
+
+
 ## [1.3.3](https://github.com/IPS-LMU/octra/compare/web-media-1.3.2...web-media-1.3.3) (2025-10-30)
 
 

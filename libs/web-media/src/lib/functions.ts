@@ -125,15 +125,27 @@ export function fileListToArray(fileList: FileList): File[] {
 
 /**
  * downloads a file from a given URL and a given type for the result.
- * @param url
- * @param type
+ * @param url target URL
+ * @param type type of the result
+ * @param headers optional headers
  */
 export async function downloadFile<
   T extends string | ArrayBuffer | Blob | Document | object,
->(url: string, type: XMLHttpRequestResponseType = 'text'): Promise<T> {
+>(
+  url: string,
+  type: XMLHttpRequestResponseType = 'text',
+  headers?: Record<string, any>,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = type;
+
+    if (headers) {
+      for (const key of Object.keys(headers)) {
+        xhr.setRequestHeader(key, headers[key] + '');
+      }
+    }
+
     xhr.open('get', url, true);
     xhr.addEventListener('load', () => {
       resolve(xhr.response as T);

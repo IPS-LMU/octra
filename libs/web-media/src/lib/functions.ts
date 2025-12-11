@@ -123,16 +123,20 @@ export function fileListToArray(fileList: FileList): File[] {
   return result;
 }
 
-export async function downloadFile(
-  url: string,
-  type: XMLHttpRequestResponseType = 'text',
-): Promise<File> {
-  return new Promise<File>((resolve, reject) => {
+/**
+ * downloads a file from a given URL and a given type for the result.
+ * @param url
+ * @param type
+ */
+export async function downloadFile<
+  T extends string | ArrayBuffer | Blob | Document | object,
+>(url: string, type: XMLHttpRequestResponseType = 'text'): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = type;
     xhr.open('get', url, true);
-    xhr.addEventListener('load', (result) => {
-      resolve(xhr.response);
+    xhr.addEventListener('load', () => {
+      resolve(xhr.response as T);
     });
     xhr.addEventListener('error', (error) => {
       reject(error);

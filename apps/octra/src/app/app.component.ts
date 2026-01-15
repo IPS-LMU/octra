@@ -15,6 +15,7 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { LoginMode } from './core/store';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
+import { FileInfo } from '@octra/web-media';
 
 @Component({
   selector: 'octra-app',
@@ -78,6 +79,9 @@ export class AppComponent
           break;
       }
     });
+
+    const test = new FileInfo("Bahnauskunft_.wav", "audio/wav", 2378);
+    const t = "";
   }
 
   override ngOnDestroy() {

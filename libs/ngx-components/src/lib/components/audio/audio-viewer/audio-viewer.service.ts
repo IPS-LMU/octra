@@ -15,12 +15,18 @@ import {
   OctraAnnotationSegment,
   OctraAnnotationSegmentLevel,
   OItem,
-  OLabel
+  OLabel,
 } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { SubscriptionManager, TsWorkerJob } from '@octra/utilities';
-import { AudioChunk, AudioManager, AudioTimeCalculator, ShortcutGroup, ShortcutManager } from '@octra/web-media';
+import {
+  AudioChunk,
+  AudioManager,
+  AudioTimeCalculator,
+  ShortcutGroup,
+  ShortcutManager,
+} from '@octra/web-media';
 import Konva from 'konva';
 import { Subject, timer } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -1341,76 +1347,82 @@ export class AudioViewerService {
           const newShapes: (Group | Shape)[] = [];
 
           for (let i = startIndex; i <= endIndex; i++) {
-            const segment = segments[i];
-            const beginTime =
-              i > 0
-                ? segments[i - 1].time.clone()
-                : this.audioManager.createSampleUnit(0);
-            const start = beginTime.sub(this.audioChunk.time.start.clone());
-            const absXStart = this.audioTCalculator.samplestoAbsX(
-              start,
-              this.audioChunk.time.duration,
-            );
-            const absXEnd = this.audioTCalculator.samplestoAbsX(
-              segment.time,
-              this.audioChunk.time.duration,
-            );
-
-            const yStart =
-              (this.innerWidth < this.AudioPxWidth
-                ? Math.floor(absXStart / this.innerWidth)
-                : 0) *
-              (this.settings.lineheight + this.settings.margin.top);
-
-            const yEnd =
-              (this.innerWidth < this.AudioPxWidth
-                ? Math.ceil(absXEnd / this.innerWidth)
-                : 0) *
-              (this.settings.lineheight + this.settings.margin.top);
-
-            if (
-              this.isVisibleInView(
-                0,
-                yStart,
-                this._innerWidth!,
-                yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart,
-              )
-            ) {
-              const createdShapes = this.createSegmentOnCanvas(
-                numOfLines,
-                {
-                  index: i,
-                  segment: segments[i],
-                },
-                { start: startIndex, end: endIndex },
+            try {
+              const segment = segments[i];
+              const beginTime =
+                i > 0
+                  ? segments[i - 1].time.clone()
+                  : this.audioManager.createSampleUnit(0);
+              const start = beginTime.sub(this.audioChunk.time.start.clone());
+              const absXStart = this.audioTCalculator.samplestoAbsX(
+                start,
+                this.audioChunk.time.duration,
+              );
+              const absXEnd = this.audioTCalculator.samplestoAbsX(
+                segment.time,
+                this.audioChunk.time.duration,
               );
 
-              if (createdShapes) {
-                newShapes.push(createdShapes.overlayGroup);
-              }
+              const yStart =
+                (this.innerWidth < this.AudioPxWidth
+                  ? Math.floor(absXStart / this.innerWidth)
+                  : 0) *
+                (this.settings.lineheight + this.settings.margin.top);
 
-              // draw boundary
+              const yEnd =
+                (this.innerWidth < this.AudioPxWidth
+                  ? Math.ceil(absXEnd / this.innerWidth)
+                  : 0) *
+                (this.settings.lineheight + this.settings.margin.top);
+
               if (
-                segment.time.samples !==
-                  this.audioManager.resource.info.duration.samples &&
-                segment.time.samples <=
-                  this.audioManager.resource.info.duration.samples
+                this.isVisibleInView(
+                  0,
+                  yStart,
+                  this._innerWidth!,
+                  yEnd - yStart === 0
+                    ? this.settings.lineheight
+                    : yEnd - yStart,
+                )
               ) {
-                let relX = 0;
-                if (this.settings.multiLine) {
-                  relX =
-                    (absXStart % this.innerWidth) + this.settings.margin.left;
-                } else {
-                  relX = absXStart + this.settings.margin.left;
+                const createdShapes = this.createSegmentOnCanvas(
+                  numOfLines,
+                  {
+                    index: i,
+                    segment: segments[i],
+                  },
+                  { start: startIndex, end: endIndex },
+                );
+
+                if (createdShapes) {
+                  newShapes.push(createdShapes.overlayGroup);
                 }
 
-                boundariesToDraw.push({
-                  x: relX,
-                  y: yStart,
-                  num: i,
-                  id: segment.id,
-                });
+                // draw boundary
+                if (
+                  segment.time.samples !==
+                    this.audioManager.resource.info.duration.samples &&
+                  segment.time.samples <=
+                    this.audioManager.resource.info.duration.samples
+                ) {
+                  let relX = 0;
+                  if (this.settings.multiLine) {
+                    relX =
+                      (absXStart % this.innerWidth) + this.settings.margin.left;
+                  } else {
+                    relX = absXStart + this.settings.margin.left;
+                  }
+
+                  boundariesToDraw.push({
+                    x: relX,
+                    y: yStart,
+                    num: i,
+                    id: segment.id,
+                  });
+                }
               }
+            } catch (e) {
+              console.error(e);
             }
           }
 
@@ -1480,39 +1492,43 @@ export class AudioViewerService {
 
       if (this.audioTCalculator !== undefined) {
         for (let i = startIndex; i <= endIndex; i++) {
-          const segment = segments[i];
-          const start = segment.time.sub(this.audioChunk.time.start.clone());
-          const absX = this.audioTCalculator.samplestoAbsX(
-            start,
-            this.audioChunk.time.duration,
-          );
+          try {
+            const segment = segments[i];
+            const start = segment.time.sub(this.audioChunk.time.start.clone());
+            const absX = this.audioTCalculator.samplestoAbsX(
+              start,
+              this.audioChunk.time.duration,
+            );
 
-          y =
-            (this.innerWidth < this.AudioPxWidth
-              ? Math.floor(absX / this.innerWidth)
-              : 0) *
-            (this.settings.lineheight + this.settings.margin.top);
+            y =
+              (this.innerWidth < this.AudioPxWidth
+                ? Math.floor(absX / this.innerWidth)
+                : 0) *
+              (this.settings.lineheight + this.settings.margin.top);
 
-          // draw boundary
-          if (
-            segment.time.samples !==
-              this.audioManager.resource.info.duration.samples &&
-            segment.time.samples <=
-              this.audioManager.resource.info.duration.samples
-          ) {
-            let relX = 0;
-            if (this.settings.multiLine) {
-              relX = (absX % this.innerWidth) + this.settings.margin.left;
-            } else {
-              relX = absX + this.settings.margin.left;
+            // draw boundary
+            if (
+              segment.time.samples !==
+                this.audioManager.resource.info.duration.samples &&
+              segment.time.samples <=
+                this.audioManager.resource.info.duration.samples
+            ) {
+              let relX = 0;
+              if (this.settings.multiLine) {
+                relX = (absX % this.innerWidth) + this.settings.margin.left;
+              } else {
+                relX = absX + this.settings.margin.left;
+              }
+
+              boundariesToDraw.push({
+                x: relX,
+                y,
+                num: i,
+                id: segment.id,
+              });
             }
-
-            boundariesToDraw.push({
-              x: relX,
-              y,
-              num: i,
-              id: segment.id,
-            });
+          } catch (e) {
+            console.error(e);
           }
         }
 

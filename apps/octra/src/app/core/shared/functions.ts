@@ -8,19 +8,10 @@ import {
   TaskInputOutputDto,
   TaskStatus,
 } from '@octra/api-types';
+import { FileInfo } from '@octra/web-media';
 import { AppInfo } from '../../app.info';
-import { APIActions } from '../store/api';
-import { ApplicationActions } from '../store/application/application.actions';
-import { ASRActions } from '../store/asr/asr.actions';
-import { IDBActions } from '../store/idb/idb.actions';
-import { LoginModeActions } from '../store/login-mode';
-import { AnnotationActions } from '../store/login-mode/annotation/annotation.actions';
-import { UserActions } from '../store/user/user.actions';
 
-export function createSampleProjectDto(
-  projectID: string,
-  dto?: Partial<ProjectDto>,
-): ProjectDto {
+export function createSampleProjectDto(projectID: string, dto?: Partial<ProjectDto>): ProjectDto {
   return {
     id: projectID,
     name: 'demo project',
@@ -135,14 +126,9 @@ export function createSampleUser(): CurrentAccountDto {
   };
 }
 
-export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
+export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any, options?: any) => {
   for (const converter of AppInfo.converters) {
-    if (
-      !io.fileType ||
-      (!io.fileType.includes('audio') &&
-        !io.fileType.includes('video') &&
-        !io.fileType.includes('image'))
-    ) {
+    if (!io.fileType || (!io.fileType.includes('audio') && !io.fileType.includes('video') && !io.fileType.includes('image'))) {
       const result = converter.import(
         {
           name: io.filename,
@@ -151,18 +137,21 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any) => {
           encoding: 'utf-8',
         },
         audiofile,
+        options,
       );
 
-      if (result?.annotjson) {
+      const { extension } = FileInfo.extractFileName(io.filename);
+
+      if (result?.annotjson && converter.extensions.includes(extension)) {
         return {
           annotjson: result.annotjson,
           converter: converter.name,
+          io,
         };
-      } else if (
-        converter.name === 'AnnotJSON' &&
-        /_annot\.json$/g.exec(io.filename) !== null
-      ) {
+      } else if (converter.name === 'AnnotJSON' && /_annot\.json$/g.exec(io.filename) !== null) {
         throw new Error(`Can't read AnnotJSON file: ${result.error}`);
+      } else if (converter.extensions.includes(extension)) {
+        throw new Error(`Can't parse transcript ${io.filename}: ${converter.name}: ${result.error}`);
       }
     }
   }
@@ -190,16 +179,10 @@ export function findCompatibleFileFromIO<T>(
   };
 
   while (inputs.length > 0 || outputs.length > 0) {
-    const filteredInputs = inputs.filter(
-      (a) => a.chain_position === undefined || a.chain_position === i,
-    );
+    const filteredInputs = inputs.filter((a) => a.chain_position === undefined || a.chain_position === i);
     inputs = inputs.filter((a) => !filteredInputs.find((b) => b.id === a.id));
-    const filteredOutputs = outputs.filter(
-      (a) => a.chain_position === undefined || a.chain_position === i,
-    );
-    outputs = outputs.filter(
-      (a) => !filteredOutputs.find((b) => b.id === a.id),
-    );
+    const filteredOutputs = outputs.filter((a) => a.chain_position === undefined || a.chain_position === i);
+    outputs = outputs.filter((a) => !filteredOutputs.find((b) => b.id === a.id));
     let result: T | undefined;
 
     if (i === 0) {

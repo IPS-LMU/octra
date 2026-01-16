@@ -222,6 +222,10 @@ class SRTImporter {
       parsedLevel = combinationResult.level;
       counterID = combinationResult.counterID;
 
+      if (this.options.speakerIdentifierPattern) {
+        parsedLevel = this.reduceBoundaries(parsedLevel, this.options.combineSegmentsWithSameSpeakerThreshold !== undefined ? 500 : 25);
+      }
+
       if (this.debugging) {
         console.log('AFTER COMBINATION');
         this.outputReadableLevel(parsedLevel);
@@ -404,6 +408,10 @@ class SRTImporter {
         lastEnd = timeEnd;
       }
 
+      if (counterID === 1) {
+        throw new Error("Regex without matches. Please check if the file is empty or speaker regex is invalid.")
+      }
+
       if (this.debugging) {
         console.log('Parsed Transcript:');
         this.outputReadableLevel(parsedLevel);
@@ -516,32 +524,6 @@ class SRTImporter {
           }
         }
       }
-
-      // reduce boundaries
-      for (let i = 0; i < parsedLevel.items.length; i++) {
-        const item = parsedLevel.items[i];
-        const nextItem = i < parsedLevel.items.length - 1 ? parsedLevel.items[i + 1] : undefined;
-        const nextItemDuration = nextItem ? (nextItem.sampleDur * 1000) / this.audiofile.sampleRate : 0;
-
-        if (nextItem) {
-          const diffToNextItem = nextItem.sampleStart - (item.sampleStart + item.sampleDur);
-          const diffToNextItemInMilliSeconds = (diffToNextItem * 1000) / this.audiofile.sampleRate;
-
-          if (nextItem.getFirstLabelWithoutName('Speaker')?.value === '' && nextItemDuration <= 500) {
-            // remove next item if it's empty and has duration less 500ms
-            parsedLevel.items[i].sampleDur += nextItem.sampleDur;
-            parsedLevel.items.splice(i + 1, 1);
-          } else if (diffToNextItemInMilliSeconds <= 500) {
-            // there is empty space without a segment => fill with current item
-            parsedLevel.items[i].sampleDur = nextItem.sampleStart - item.sampleStart;
-          }
-        }
-      }
-    }
-
-    if (this.debugging) {
-      console.log('---------- COMBINATION RESULT -------------');
-      this.outputReadableLevel(parsedLevel);
     }
 
     return {
@@ -596,5 +578,29 @@ class SRTImporter {
         : '\\[SPEAKER_[0-9]+] *: *';
     item.replaceFirstLabelWithoutName('Speaker', (value) => value.replace(new RegExp(`(?!^) *${speakerRegex}`), ' '));
     return item;
+  }
+
+  private reduceBoundaries(parsedLevel: OSegmentLevel<OSegment>, threshold: number) {
+    // reduce boundaries
+    for (let i = 0; i < parsedLevel.items.length; i++) {
+      const item = parsedLevel.items[i];
+      const nextItem = i < parsedLevel.items.length - 1 ? parsedLevel.items[i + 1] : undefined;
+      const nextItemDuration = nextItem ? (nextItem.sampleDur * 1000) / this.audiofile.sampleRate : 0;
+
+      if (nextItem) {
+        const diffToNextItem = nextItem.sampleStart - (item.sampleStart + item.sampleDur);
+        const diffToNextItemInMilliSeconds = (diffToNextItem * 1000) / this.audiofile.sampleRate;
+
+        if (nextItem.getFirstLabelWithoutName('Speaker')?.value === '' && nextItemDuration <= threshold) {
+          // remove next item if it's empty and has duration less 500ms
+          parsedLevel.items[i].sampleDur += nextItem.sampleDur;
+          parsedLevel.items.splice(i + 1, 1);
+        } else if (diffToNextItemInMilliSeconds <= threshold) {
+          // there is empty space without a segment => fill with current item
+          parsedLevel.items[i].sampleDur = nextItem.sampleStart - item.sampleStart;
+        }
+      }
+    }
+    return parsedLevel;
   }
 }

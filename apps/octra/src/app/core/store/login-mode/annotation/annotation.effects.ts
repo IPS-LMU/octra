@@ -1875,12 +1875,15 @@ export class AnnotationEffects {
                 | {
                     annotjson: OAnnotJSON;
                     converter?: string;
+                    error?: string;
+                    io: TaskInputOutputDto;
                   }
                 | undefined
               >(task, 'transcript', (io: TaskInputOutputDto) => {
                 return isValidAnnotation(
                   io,
                   this.audio.audioManager.resource.getOAudioFile(),
+                  modeState.importOptions?.SRT, // TODO improve import selection
                 );
               })
             : undefined;

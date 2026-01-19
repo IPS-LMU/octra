@@ -72,6 +72,26 @@ export class SubscriptionManager<T> {
         (element.subscription as any).unsubscribe();
         this.subscriptions.splice(i, 1);
         removed = true;
+        i--;
+      }
+    }
+    return removed;
+  }
+
+  /***
+   * unsubscribes all subscriptions with a string included in the tag
+   * @param tag name that is tagged to the subscription
+   */
+  public removeByIncludedTag(tag: string): boolean {
+    let removed = false;
+    for (let i = 0; i < this.subscriptions.length; i++) {
+      const element = this.subscriptions[i];
+
+      if (element.tag?.includes(tag)) {
+        (element.subscription as any).unsubscribe();
+        this.subscriptions.splice(i, 1);
+        removed = true;
+        i--;
       }
     }
     return removed;

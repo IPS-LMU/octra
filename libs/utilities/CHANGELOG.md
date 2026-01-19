@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.4.0](https://github.com/IPS-LMU/octra/compare/utilities-1.3.0...utilities-1.4.0) (2026-01-19)
+
+
+### Features
+
+* **utilities:** SubcriptionManager can remove subscription by included tag ([dd9be8f](https://github.com/IPS-LMU/octra/commit/dd9be8f11f3da5cf992d0e6eb2a7af9f2486e901))
+
+
+
 # [1.3.0](https://github.com/IPS-LMU/octra/compare/utilities-1.2.0...utilities-1.3.0) (2025-10-17)
 
 

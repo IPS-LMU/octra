@@ -26,10 +26,7 @@ import {
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import {
-  OctraComponentsModule,
-  VersionCheckerService,
-} from '@octra/ngx-components';
+import { MultiThreadingService, OctraComponentsModule, VersionCheckerService } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import 'jodit/esm/plugins/justify/justify.js';
 import {
@@ -48,7 +45,6 @@ import { ReloadFileGuard } from './app/core/pages/intern/reload-file/reload-file
 import { PagesModule } from './app/core/pages/pages.module';
 import { ALoginGuard, DeALoginGuard } from './app/core/shared/guard';
 import { TranscActivateGuard } from './app/core/shared/guard/transcr.activateguard';
-import { MultiThreadingService } from './app/core/shared/multi-threading/multi-threading.service';
 import { SettingsService } from './app/core/shared/service';
 import { AppStorageService } from './app/core/shared/service/appstorage.service';
 import { BugReportService } from './app/core/shared/service/bug-report.service';

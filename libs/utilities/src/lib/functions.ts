@@ -30,9 +30,7 @@ export function contains(haystack: string, needle: string): boolean {
  */
 export function hasPropertyTree(obj: any, treeString: string): boolean {
   if (obj !== undefined) {
-    const properties = treeString
-      .split('.')
-      .filter((a) => a !== undefined && a.trim() !== '');
+    const properties = treeString.split('.').filter((a) => a !== undefined && a.trim() !== '');
     let pointer = obj;
 
     for (let i = 0; i < properties.length; i++) {
@@ -119,12 +117,7 @@ export function getFileSize(bytes: number): FileSize {
 }
 
 export function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 export function unEscapeHtml(text: string): string {
@@ -136,11 +129,7 @@ export function unEscapeHtml(text: string): string {
     .replace(/&#039;/g, "'");
 }
 
-export function insertString(
-  input: string,
-  pos: number,
-  insertion: string,
-): string {
+export function insertString(input: string, pos: number, insertion: string): string {
   let result = input;
 
   if (pos <= input.length) {
@@ -199,12 +188,7 @@ export function flatten(values: never[]) {
 }
 
 export function isEmpty(obj: unknown) {
-  return (
-    obj === undefined ||
-    obj === null ||
-    (typeof obj === 'string' && obj.trim() === '') ||
-    (Array.isArray(obj) && obj.length === 0)
-  );
+  return obj === undefined || obj === null || (typeof obj === 'string' && obj.trim() === '') || (Array.isArray(obj) && obj.length === 0);
 }
 
 /**
@@ -234,8 +218,7 @@ export function joinURL(...args: string[]) {
       const httpsArr = /(https?:\/\/)/g.exec(a);
       const https = httpsArr ? httpsArr[1] : '';
 
-      const result =
-        https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
+      const result = https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
       return result;
     })
     .filter((a) => a !== null && a !== undefined && a !== '')
@@ -247,8 +230,7 @@ export function joinURL(...args: string[]) {
  * @param start
  * @param end
  */
-export const range = (start: number, end: number) =>
-  Array.from({ length: end - start }, (v, k) => k + start);
+export const range = (start: number, end: number) => Array.from({ length: end - start }, (v, k) => k + start);
 
 /**
  * removes all empty values from an given object.
@@ -272,9 +254,7 @@ export function removeEmptyProperties<T>(
       (a) =>
         (!options.removeUndefined || a !== undefined) &&
         (!options.removeNull || a !== null) &&
-        (!options.removeEmptyStrings ||
-          typeof a !== 'string' ||
-          a.trim() !== ''),
+        (!options.removeEmptyStrings || typeof a !== 'string' || a.trim() !== ''),
     );
     return filtered.map((a) => removeEmptyProperties<T>(a, options)) as T;
   } else {
@@ -286,12 +266,8 @@ export function removeEmptyProperties<T>(
         if (
           (options.removeNull && anyObj[key] === null) ||
           (options.removeUndefined && anyObj[key] === undefined) ||
-          (anyObj[key] !== undefined &&
-            anyObj[key] !== null &&
-            anyObj[key].toString() === 'NaN') ||
-          (options.removeEmptyStrings &&
-            typeof anyObj[key] === 'string' &&
-            anyObj[key].toString().trim() === '')
+          (anyObj[key] !== undefined && anyObj[key] !== null && anyObj[key].toString() === 'NaN') ||
+          (options.removeEmptyStrings && typeof anyObj[key] === 'string' && anyObj[key].toString().trim() === '')
         ) {
           delete anyObj[key];
         } else if (typeof anyObj[key] === 'object') {
@@ -309,10 +285,7 @@ export function removeEmptyProperties<T>(
  * @param obj
  * @param fn
  */
-export function mapFnOnObject(
-  obj: Record<string, any>,
-  fn: (key: string, value: any) => any,
-) {
+export function mapFnOnObject(obj: Record<string, any>, fn: (key: string, value: any) => any) {
   Object.keys(obj).forEach((key: string) => {
     obj[key] = fn(key, obj[key]);
   });
@@ -320,25 +293,14 @@ export function mapFnOnObject(
 }
 
 export function getTranscriptFromIO(io: any[]): any | undefined {
-  return io.find(
-    (a) =>
-      !a.fileType!.includes('audio') &&
-      !a.fileType!.includes('video') &&
-      !a.fileType!.includes('image'),
-  );
+  return io.find((a) => !a.fileType!.includes('audio') && !a.fileType!.includes('video') && !a.fileType!.includes('image'));
 }
 
 export function popupCenter(url: string, title: string, w: number, h: number) {
-  const dualScreenLeft =
-    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop =
-    window.screenTop !== undefined ? window.screenTop : window.screenY;
+  const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+  const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
 
-  const width = window.innerWidth
-    ? window.innerWidth
-    : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width;
+  const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
   const height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
@@ -371,9 +333,7 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
  * returns the base URL path to the application
  */
 export function getBaseHrefURL() {
-  return (
-    location.origin + document.querySelector('head base')?.getAttribute('href')
-  );
+  return location.origin + document.querySelector('head base')?.getAttribute('href');
 }
 
 /**
@@ -467,10 +427,7 @@ export async function wait(seconds: number): Promise<void> {
  * @param url
  * @param params
  */
-export function appendURLQueryParams(
-  url: string,
-  params: Record<string, string | number | boolean>,
-) {
+export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean>) {
   let startingLetter = '?';
   if (/[^/]*\?([^/]*)$/g.exec(url)) {
     startingLetter = '&';
@@ -488,9 +445,7 @@ export function appendURLQueryParams(
 }
 
 export function filterUnique<T>(array: T[], isEqual: (a: T, b: T) => boolean) {
-  return array.filter(
-    (a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i,
-  );
+  return array.filter((a: T, i: number) => array.findIndex((b: T) => isEqual(a, b)) === i);
 }
 
 /**

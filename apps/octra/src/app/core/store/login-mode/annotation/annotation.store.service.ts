@@ -15,13 +15,8 @@ import {
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { OctraGuidelines } from '@octra/assets';
 import { MultiThreadingService } from '@octra/ngx-components';
-import {
-  escapeRegex,
-  getTranscriptFromIO,
-  insertString,
-  SubscriptionManager,
-  TsWorkerJob,
-} from '@octra/utilities';
+import { escapeRegex, getTranscriptFromIO, insertString, SubscriptionManager } from '@octra/utilities';
+import { TsWorkerJob } from '@octra/web-media';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { OLog, OLogging } from '../../../obj/Settings/logging';
 import { KeyStatisticElem } from '../../../obj/statistics/KeyStatisticElem';
@@ -61,9 +56,7 @@ export class AnnotationStoreService {
     return undefined;
   }
 
-  get transcript():
-    | OctraAnnotation<ASRContext, OctraAnnotationSegment>
-    | undefined {
+  get transcript(): OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined {
     return this._transcript;
   }
 
@@ -87,16 +80,10 @@ export class AnnotationStoreService {
         if (level instanceof OctraAnnotationSegmentLevel) {
           for (let i = 0; i < level.items.length; i++) {
             const item = level.items[i];
-            const labelIndex = item.labels.findIndex(
-              (a) => a.name !== 'Speaker',
-            );
+            const labelIndex = item.labels.findIndex((a) => a.name !== 'Speaker');
 
             if (labelIndex > -1 && item.labels[labelIndex].value !== '') {
-              if (
-                this.breakMarker !== undefined &&
-                item.labels[labelIndex].value.indexOf(this.breakMarker.code) >
-                  -1
-              ) {
+              if (this.breakMarker !== undefined && item.labels[labelIndex].value.indexOf(this.breakMarker.code) > -1) {
                 result.pause++;
               } else {
                 result.transcribed++;
@@ -145,23 +132,15 @@ export class AnnotationStoreService {
     return this._transcriptValid;
   }
 
-  task$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession?.task,
-  );
+  task$ = this.store.select((state: RootState) => getModeState(state)?.currentSession?.task);
 
   textInput$ = this.store.select((state: RootState) => {
-    if (
-      state.application.mode === undefined ||
-      state.application.mode === LoginMode.LOCAL ||
-      state.application.mode === LoginMode.URL
-    ) {
+    if (state.application.mode === undefined || state.application.mode === LoginMode.LOCAL || state.application.mode === LoginMode.URL) {
       return undefined;
     }
 
     const mode = getModeState(state);
-    const result = getTranscriptFromIO(
-      mode?.currentSession?.task?.inputs ?? [],
-    ) as TaskInputOutputDto;
+    const result = getTranscriptFromIO(mode?.currentSession?.task?.inputs ?? []) as TaskInputOutputDto;
     return result;
   });
 
@@ -174,9 +153,7 @@ export class AnnotationStoreService {
   });
   private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
 
-  get currentLevel():
-    | OctraAnnotationAnyLevel<OctraAnnotationSegment>
-    | undefined {
+  get currentLevel(): OctraAnnotationAnyLevel<OctraAnnotationSegment> | undefined {
     return this._currentLevel;
   }
 
@@ -198,12 +175,8 @@ export class AnnotationStoreService {
   });
   modalVisibilities?: ModalVisibilities;
 
-  transcript$ = this.store.select(
-    (state: RootState) => getModeState(state)?.transcript,
-  );
-  status$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession?.status,
-  );
+  transcript$ = this.store.select((state: RootState) => getModeState(state)?.transcript);
+  status$ = this.store.select((state: RootState) => getModeState(state)?.currentSession?.status);
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   private _task?: TaskDto;
 
@@ -228,29 +201,19 @@ export class AnnotationStoreService {
     }),
   );
 
-  guidelines$ = this.store.select(
-    (state: RootState) => getModeState(state)?.guidelines,
-  );
+  guidelines$ = this.store.select((state: RootState) => getModeState(state)?.guidelines);
   private _guidelines?: OctraGuidelines;
 
   get guidelines(): OctraGuidelines | undefined {
     return this._guidelines;
   }
 
-  feedback$ = this.store.select(
-    (state: RootState) => getModeState(state)?.currentSession.assessment,
-  );
+  feedback$ = this.store.select((state: RootState) => getModeState(state)?.currentSession.assessment);
   private _feedback: any; // TODO check feedback
 
-  breakMarker$ = this.store.select((state: RootState) =>
-    getModeState(state)?.guidelines?.selected?.json?.markers?.find(
-      (a) => a.type === 'break',
-    ),
-  );
+  breakMarker$ = this.store.select((state: RootState) => getModeState(state)?.guidelines?.selected?.json?.markers?.find((a) => a.type === 'break'));
 
-  importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(
-    undefined,
-  );
+  importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(undefined);
   importConverter$ = new BehaviorSubject<string>(undefined);
 
   public set comment(value: string | undefined) {
@@ -440,10 +403,8 @@ export class AnnotationStoreService {
       if (sPos > -1 && ePos > -1) {
         // check if error is between the selection marks
         if (
-          (validation.start >= sPos &&
-            validation.start + validation.length <= sPos + sLen) ||
-          (validation.start >= ePos &&
-            validation.start + validation.length <= ePos + eLen)
+          (validation.start >= sPos && validation.start + validation.length <= sPos + sLen) ||
+          (validation.start >= ePos && validation.start + validation.length <= ePos + eLen)
         ) {
           // remove
           results.splice(i, 1);
@@ -453,10 +414,7 @@ export class AnnotationStoreService {
 
       let match = segRegex.exec(rawText);
       while (match != undefined) {
-        if (
-          validation.start >= match.index &&
-          validation.start + validation.length <= match.index + match[0].length
-        ) {
+        if (validation.start >= match.index && validation.start + validation.length <= match.index + match[0].length) {
           // remove
           results.splice(i, 1);
           i--;
@@ -497,9 +455,7 @@ export class AnnotationStoreService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      this.appStorage.onlineSession?.currentProject?.name === undefined
-        ? 'local'
-        : this.appStorage.onlineSession?.currentProject?.name,
+      this.appStorage.onlineSession?.currentProject?.name === undefined ? 'local' : this.appStorage.onlineSession?.currentProject?.name,
       now.toUTCString(),
       this.audio.audioManager.resource.name,
       this.audio.audioManager.resource.info.sampleRate,
@@ -555,36 +511,25 @@ export class AnnotationStoreService {
               };
               const markers = guidelines.markers;
               // replace all tags that are not markers
-              result = result.replace(
-                new RegExp(/(<\/?)?([^<>]+)(>)/, 'g'),
-                (g0, g1, g2, g3) => {
-                  g1 = g1 === undefined ? '' : g1;
-                  g2 = g2 === undefined ? '' : g2;
-                  g3 = g3 === undefined ? '' : g3;
+              result = result.replace(new RegExp(/(<\/?)?([^<>]+)(>)/, 'g'), (g0, g1, g2, g3) => {
+                g1 = g1 === undefined ? '' : g1;
+                g2 = g2 === undefined ? '' : g2;
+                g3 = g3 === undefined ? '' : g3;
 
-                  // check if its an html tag
-                  if (
-                    g2 === 'img' &&
-                    g2 === 'span' &&
-                    g2 === 'div' &&
-                    g2 === 'i' &&
-                    g2 === 'b' &&
-                    g2 === 'u' &&
-                    g2 === 's'
-                  ) {
+                // check if its an html tag
+                if (g2 === 'img' && g2 === 'span' && g2 === 'div' && g2 === 'i' && g2 === 'b' && g2 === 'u' && g2 === 's') {
+                  return `⌈${g2}⌉`;
+                }
+
+                // check if it's a marker
+                for (const marker of markers) {
+                  if (`${g1}${g2}${g3}` === marker.code) {
                     return `⌈${g2}⌉`;
                   }
+                }
 
-                  // check if it's a marker
-                  for (const marker of markers) {
-                    if (`${g1}${g2}${g3}` === marker.code) {
-                      return `⌈${g2}⌉`;
-                    }
-                  }
-
-                  return `${g1}${g2}${g3}`;
-                },
-              );
+                return `${g1}${g2}${g3}`;
+              });
 
               // replace
               result = result.replace(/([<>])/g, (g0, g1) => {
@@ -618,10 +563,7 @@ export class AnnotationStoreService {
                 });
 
                 // replace markers
-                const regex = new RegExp(
-                  '( )*(' + escapeRegex(marker.code) + ')( )*',
-                  'g',
-                );
+                const regex = new RegExp('( )*(' + escapeRegex(marker.code) + ')( )*', 'g');
                 result = result.replace(regex, (x, g1, g2, g3) => {
                   const s1 = g1 ? g1 : '';
                   const s3 = g3 ? g3 : '';
@@ -629,13 +571,9 @@ export class AnnotationStoreService {
                   let img = '';
                   if (
                     !(marker.icon === undefined || marker.icon === '') &&
-                    (marker.icon.indexOf('.png') > -1 ||
-                      marker.icon.indexOf('.jpg') > -1 ||
-                      marker.icon.indexOf('.gif') > -1)
+                    (marker.icon.indexOf('.png') > -1 || marker.icon.indexOf('.jpg') > -1 || marker.icon.indexOf('.gif') > -1)
                   ) {
-                    const markerCode = marker.code
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;');
+                    const markerCode = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                     img =
                       "<img src='" +
@@ -651,9 +589,7 @@ export class AnnotationStoreService {
                     if (marker.icon !== undefined && marker.icon !== '') {
                       img = marker.icon;
                     } else {
-                      img = marker.code
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
+                      img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                     }
                   }
 
@@ -665,8 +601,7 @@ export class AnnotationStoreService {
             }
 
             // wrap result with <p>. Missing this would cause the editor fail on marker insertion
-            result =
-              result !== '' && result !== ' ' ? '<p>' + result + '</p>' : '';
+            result = result !== '' && result !== ' ' ? '<p>' + result + '</p>' : '';
 
             resolve(result.replace(/\uFEFF/gm, ''));
           } catch (e) {
@@ -674,8 +609,7 @@ export class AnnotationStoreService {
           }
         });
       },
-      rawtext,
-      this.guidelines,
+      [rawtext, this.guidelines],
     );
 
     return this.multiThreading.run(job);
@@ -700,10 +634,7 @@ export class AnnotationStoreService {
           const validationElement = validation[i];
 
           const foundMarker = markerPositions.find((a) => {
-            return (
-              validationElement.start > a.start &&
-              validationElement.start + validationElement.length < a.end
-            );
+            return validationElement.start > a.start && validationElement.start + validationElement.length < a.end;
           });
 
           if (foundMarker === undefined) {
@@ -714,23 +645,15 @@ export class AnnotationStoreService {
             if (insertStart === undefined) {
               insertStart = {
                 start: validationElement.start,
-                puffer:
-                  "⌈span class='val-error' data-errorcode='" +
-                  validationElement.code +
-                  "'⌉",
+                puffer: "⌈span class='val-error' data-errorcode='" + validationElement.code + "'⌉",
               };
               insertions.push(insertStart);
             } else {
-              insertStart.puffer +=
-                "⌈span class='val-error' data-errorcode='" +
-                validationElement.code +
-                "'⌉";
+              insertStart.puffer += "⌈span class='val-error' data-errorcode='" + validationElement.code + "'⌉";
             }
 
             let insertEnd = insertions.find((val) => {
-              return (
-                val.start === validationElement.start + validationElement.length
-              );
+              return val.start === validationElement.start + validationElement.length;
             });
 
             if (insertEnd === undefined) {
@@ -770,19 +693,13 @@ export class AnnotationStoreService {
       const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {
-        if (
-          instruction.entries !== undefined &&
-          Array.isArray(instruction.entries)
-        ) {
+        if (instruction.entries !== undefined && Array.isArray(instruction.entries)) {
           for (const entry of instruction.entries) {
             const newEntry = { ...entry };
             if (newEntry.code === code) {
-              newEntry.description = newEntry.description.replace(
-                /{{([^{}]+)}}/g,
-                (g0: string, g1: string) => {
-                  return ''; // (await this.rawToHTML(g1)).replace(/(<p>)|(<\/p>)/g, '');
-                },
-              );
+              newEntry.description = newEntry.description.replace(/{{([^{}]+)}}/g, (g0: string, g1: string) => {
+                return ''; // (await this.rawToHTML(g1)).replace(/(<p>)|(<\/p>)/g, '');
+              });
               return newEntry;
             }
           }
@@ -798,16 +715,12 @@ export class AnnotationStoreService {
 
   public validateAll() {
     this._validationArray = [];
-    const projectSettings = getModeState(
-      this.appStorage.snapshot,
-    )?.projectConfig;
+    const projectSettings = getModeState(this.appStorage.snapshot)?.projectConfig;
 
     if (
       (this.appStorage.useMode !== LoginMode.URL ||
-        (this.routingService.staticQueryParams.guidelines_url &&
-          this.routingService.staticQueryParams.functions_url)) &&
-      (this.appStorage.useMode === LoginMode.DEMO ||
-        projectSettings?.octra?.validationEnabled === true)
+        (this.routingService.staticQueryParams.guidelines_url && this.routingService.staticQueryParams.functions_url)) &&
+      (this.appStorage.useMode === LoginMode.DEMO || projectSettings?.octra?.validationEnabled === true)
     ) {
       let invalid = false;
       for (const level of this.transcript!.levels) {
@@ -815,9 +728,7 @@ export class AnnotationStoreService {
           const segment = level!.items[i];
 
           let segmentValidation = [];
-          const labelIndex = segment.labels.findIndex(
-            (a) => a.name !== 'Speaker',
-          );
+          const labelIndex = segment.labels.findIndex((a) => a.name !== 'Speaker');
           if (labelIndex > -1 && segment.labels[labelIndex].value.length > 0) {
             segmentValidation = this.validate(segment.labels[labelIndex].value);
           }
@@ -839,10 +750,7 @@ export class AnnotationStoreService {
     }
   }
 
-  public getMarkerPositions(
-    rawText: string,
-    guidelines: any,
-  ): { start: number; end: number }[] {
+  public getMarkerPositions(rawText: string, guidelines: any): { start: number; end: number }[] {
     if (guidelines.markers.length === 0) {
       return [];
     }
@@ -901,10 +809,7 @@ export class AnnotationStoreService {
         const valueLabel = segment.getFirstLabelWithoutName('Speaker');
 
         if (segment.getFirstLabelWithoutName('Speaker')?.value !== '') {
-          if (
-            this.breakMarker !== undefined &&
-            valueLabel!.value.indexOf(this.breakMarker.code) > -1
-          ) {
+          if (this.breakMarker !== undefined && valueLabel!.value.indexOf(this.breakMarker.code) > -1) {
             this._statistics.pause++;
           } else {
             this._statistics.transcribed++;
@@ -916,9 +821,7 @@ export class AnnotationStoreService {
     }
   }
 
-  overwriteTranscript(
-    transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-  ) {
+  overwriteTranscript(transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment>) {
     this.store.dispatch(
       AnnotationActions.overwriteTranscript.do({
         transcript,
@@ -928,10 +831,7 @@ export class AnnotationStoreService {
     );
   }
 
-  changeCurrentItemById(
-    id: number,
-    item: OItem | OEvent | OctraAnnotationSegment,
-  ) {
+  changeCurrentItemById(id: number, item: OItem | OEvent | OctraAnnotationSegment) {
     this.store.dispatch(
       AnnotationActions.changeCurrentItemById.do({
         id,
@@ -959,11 +859,7 @@ export class AnnotationStoreService {
     );
   }
 
-  removeCurrentLevelItems(
-    items: { index?: number; id?: number }[],
-    silenceCode?: string,
-    mergeTranscripts?: boolean,
-  ) {
+  removeCurrentLevelItems(items: { index?: number; id?: number }[], silenceCode?: string, mergeTranscripts?: boolean) {
     this.store.dispatch(
       AnnotationActions.removeCurrentLevelItems.do({
         items,
@@ -1001,13 +897,8 @@ export class AnnotationStoreService {
       transcript = tidyUp(transcript, guidelines);
 
       // make sure there is only one speaker label for each unit if exists
-      if (
-        this.importOptions$.value &&
-        this.importConverter$.value === 'SRT' &&
-        this.importOptions$.value['SRT']?.speakerIdentifierPattern
-      ) {
-        const pattern =
-          this.importOptions$.value['SRT'].speakerIdentifierPattern;
+      if (this.importOptions$.value && this.importConverter$.value === 'SRT' && this.importOptions$.value['SRT']?.speakerIdentifierPattern) {
+        const pattern = this.importOptions$.value['SRT'].speakerIdentifierPattern;
         const regex = new RegExp(pattern, 'g');
         const matches: RegExpExecArray[] = [];
         let match = regex.exec(transcript);
@@ -1019,9 +910,7 @@ export class AnnotationStoreService {
 
         for (let i = matches.length - 1; i > 0; i--) {
           match = matches[i];
-          transcript =
-            transcript.substring(0, match.index) +
-            transcript.substring(match.index + match[0].length);
+          transcript = transcript.substring(0, match.index) + transcript.substring(match.index + match[0].length);
           match = regex.exec(transcript);
         }
       }
@@ -1030,9 +919,7 @@ export class AnnotationStoreService {
   }
 
   setImportConverter(mode: LoginMode, importConverter: string) {
-    this.store.dispatch(
-      LoginModeActions.setImportConverter.do({ mode, importConverter }),
-    );
+    this.store.dispatch(LoginModeActions.setImportConverter.do({ mode, importConverter }));
   }
 
   sendAnnotationToParentWindow() {

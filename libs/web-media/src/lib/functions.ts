@@ -3,11 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { AudioFormat } from './audio/AudioFormats';
 import { AudioInfo } from './audio/audio-info';
 
-export async function readFileContents<T>(
-  file: File,
-  method: 'text' | 'binary' | 'arraybuffer',
-  encoding?: string,
-): Promise<T> {
+export async function readFileContents<T>(file: File, method: 'text' | 'binary' | 'arraybuffer', encoding?: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('loadend', () => {
@@ -37,11 +33,7 @@ export interface ReadFileEvent<T> {
   result?: T;
 }
 
-export function readFile<T>(
-  file: File,
-  method: 'text' | 'binary' | 'arraybuffer',
-  encoding?: string,
-): Observable<ReadFileEvent<T>> {
+export function readFile<T>(file: File, method: 'text' | 'binary' | 'arraybuffer', encoding?: string): Observable<ReadFileEvent<T>> {
   const subj = new BehaviorSubject<ReadFileEvent<T>>({
     status: 'initialized',
     progress: 0,
@@ -85,11 +77,7 @@ export function readFile<T>(
   return subj;
 }
 
-export function renameFile(
-  file: File,
-  newName: string,
-  attributes: any,
-): Promise<File> {
+export function renameFile(file: File, newName: string, attributes: any): Promise<File> {
   return new Promise<File>((resolve, reject) => {
     const reader = new FileReader();
 
@@ -129,9 +117,7 @@ export function fileListToArray(fileList: FileList): File[] {
  * @param type type of the result
  * @param headers optional headers
  */
-export async function downloadFile<
-  T extends string | ArrayBuffer | Blob | Document | object,
->(
+export async function downloadFile<T extends string | ArrayBuffer | Blob | Document | object>(
   url: string,
   type: XMLHttpRequestResponseType = 'text',
   headers?: Record<string, any>,
@@ -158,16 +144,10 @@ export async function downloadFile<
 }
 
 export function popupCenter(url: string, title: string, w: number, h: number) {
-  const dualScreenLeft =
-    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop =
-    window.screenTop !== undefined ? window.screenTop : window.screenY;
+  const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+  const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
 
-  const width = window.innerWidth
-    ? window.innerWidth
-    : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width;
+  const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
   const height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
@@ -200,9 +180,7 @@ export function popupCenter(url: string, title: string, w: number, h: number) {
  * returns the base URL path to the application
  */
 export function getBaseHrefURL() {
-  return (
-    location.origin + document.querySelector('head base')?.getAttribute('href')
-  );
+  return location.origin + document.querySelector('head base')?.getAttribute('href');
 }
 
 export function findElements(parent: HTMLElement, selector: string) {
@@ -236,15 +214,7 @@ export function getAudioInfo<A extends AudioInfo<F>, F extends object = any>(
   buffer: ArrayBuffer,
 ): A {
   if (format.isValid(buffer)) {
-    return new constructor(
-      filename,
-      type,
-      buffer.byteLength,
-      format.sampleRate,
-      format.duration.samples,
-      format.channels,
-      format.bitsPerSample,
-    );
+    return new constructor(filename, type, buffer.byteLength, format.sampleRate, format.duration.samples, format.channels, format.bitsPerSample);
   } else {
     throw new Error(`Audio file is not a valid file.`);
   }

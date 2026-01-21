@@ -1,5 +1,13 @@
-import { Subject } from 'rxjs';
+import { SubscriptionManager } from '@octra/utilities';
+import { Observable, Subject } from 'rxjs';
 import { TsWorkerJob, TsWorkerStatus } from './ts-worker-job';
+
+export interface TsWorkerEvent {
+  status: TsWorkerStatus;
+  progress?: number;
+  result?: any;
+  error?: string;
+}
 
 /**
  * Inline web worker that runs jobs asynchronously.
@@ -10,6 +18,7 @@ export class TsWorker {
   private worker: Worker;
   private status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
   private readonly _id: number;
+  private readonly subscrManager = new SubscriptionManager();
 
   constructor() {
     this._id = TsWorker.workerID++;
@@ -45,10 +54,7 @@ export class TsWorker {
    * converts a job to an JSON object
    */
   private static convertJobToObj(job: TsWorkerJob<any, any>) {
-    let scriptString =
-      typeof job.doFunction === 'string'
-        ? job.doFunction
-        : job.doFunction.toString();
+    let scriptString = typeof job.doFunction === 'string' ? job.doFunction : job.doFunction.toString();
     scriptString = scriptString
       // remove comments
       .replace(/(\/\*+[^**/]+\*+\/)|(\/\/.*)\n*/g, '')
@@ -82,7 +88,10 @@ onmessage = (msg) => {
       base.job = args[0];
 
       for (let i = 0; i < base.job.args.length; i++) {
-        if (typeof base.job.args[i] === "object" && base.job.args[i].isFunction) {
+        if (
+          typeof base.job.args[i] === "object" &&
+          base.job.args[i].isFunction
+        ) {
           var evaluated = undefined;
 
           evaluated = eval("(" + base.job.args[i].funcString + ")");
@@ -96,27 +105,58 @@ onmessage = (msg) => {
       }
 
       var func = eval(base.job.doFunction);
-      func(...base.job.args).then((result) => {
-        base.postMessage({
-          status: "finished",
-          result: result
+      func(...base.job.args)
+        .then((result) => {
+          base.postMessage({
+            status: "finished",
+            result: result,
+          });
+        })
+        .catch((error) => {
+          base.postMessage({
+            status: "failed",
+            message: error,
+          });
         });
-      }).catch((error) => {
+    } else if (command === "run_observable") {
+      base.job = args[0];
+
+      for (let i = 0; i < base.job.args.length; i++) {
+        if (
+          typeof base.job.args[i] === "object" &&
+          base.job.args[i].isFunction
+        ) {
+          var evaluated = undefined;
+
+          evaluated = eval("(" + base.job.args[i].funcString + ")");
+
+          base.job.args[i] = evaluated;
+
+          if (!evaluated) {
+            throw new Error("Can't evaluate function in args with index " + i);
+          }
+        }
+      }
+
+      var func = eval(base.job.doFunction);
+      try {
+        func(...base.job.args, base);
+      } catch (e) {
         base.postMessage({
           status: "failed",
-          message: error
+          message: e?.message,
         });
-      });
+      }
     } else {
       base.postMessage({
         status: "failed",
-        message: "invalid command"
+        message: "invalid command",
       });
     }
   } catch (error) {
     base.postMessage({
       status: "failed",
-      message: error.message
+      message: error.message,
     });
   }
 };`;
@@ -126,14 +166,12 @@ onmessage = (msg) => {
    * adds a job to the worker's queue and starts it automatically
    * @param job the job to run
    */
-  public async addJob(job: TsWorkerJob<any, any>) {
+  public addJob(job: TsWorkerJob<any, any>) {
     if (!this.hasJob(job)) {
       this._queue.push(job);
       this.checkBeforeStart();
     } else {
-      console.error(
-        `job ${job.id} is already in job list of worker ${this._id}`,
-      );
+      console.error(`job ${job.id} is already in job list of worker ${this._id}`);
     }
   }
 
@@ -164,23 +202,55 @@ onmessage = (msg) => {
       const job = this.getFirstFreeJob();
       if (job !== undefined) {
         job.changeStatus(TsWorkerStatus.RUNNING);
-        this.run(this._queue[0])
-          .then((result: any) => {
-            // remove job from job list
-            this.removeJobByID(job.id);
+        if (job.resultType === 'PROMISE') {
+          this.run(this._queue[0])
+            .then((result: any) => {
+              // remove job from job list
+              this.removeJobByID(job.id);
 
-            job.result = result;
-            job.changeStatus(TsWorkerStatus.FINISHED);
-            this._jobstatuschange.next(job);
+              job.result = result;
+              job.changeStatus(TsWorkerStatus.FINISHED);
+              this._jobstatuschange.next(job);
 
-            this.checkBeforeStart();
-          })
-          .catch((error) => {
-            job.changeStatus(TsWorkerStatus.FAILED);
-            this._jobstatuschange.error(error);
-            this._jobstatuschange = new Subject();
-            this.checkBeforeStart();
-          });
+              this.checkBeforeStart();
+            })
+            .catch((error) => {
+              job.changeStatus(TsWorkerStatus.FAILED);
+              this._jobstatuschange.error(error);
+              this._jobstatuschange = new Subject();
+              this.checkBeforeStart();
+            });
+        } else {
+          this.subscrManager.add(
+            this.runAsObservable(job).subscribe({
+              next: (event) => {
+                job.changeStatus(event.status);
+                if ([TsWorkerStatus.FINISHED, TsWorkerStatus.FAILED].includes(event.status)) {
+                  this.removeJobByID(job.id);
+
+                  if (event.status === TsWorkerStatus.FINISHED) {
+                    job.result = event.result;
+                    job.progress = 1;
+                    this._jobstatuschange.next(job);
+                  } else if (event.status === TsWorkerStatus.FAILED) {
+                    this._jobstatuschange.error(new Error(event.error));
+                    this._jobstatuschange = new Subject();
+                  }
+
+                  this.checkBeforeStart();
+                } else if (event.status === TsWorkerStatus.RUNNING) {
+                  job.progress = event.progress;
+                  this._jobstatuschange.next(job);
+                }
+              },
+              error: (error) => {
+                job.changeStatus(TsWorkerStatus.FAILED);
+                this._jobstatuschange.error(error);
+                this._jobstatuschange = new Subject();
+              },
+            }),
+          );
+        }
       }
     }
   }
@@ -225,6 +295,7 @@ onmessage = (msg) => {
    */
   public destroy() {
     URL.revokeObjectURL(this.blobURL);
+    this.subscrManager.destroy();
   }
 
   /**
@@ -258,5 +329,52 @@ onmessage = (msg) => {
         args: [TsWorker.convertJobToObj(job)],
       });
     });
+  };
+
+  /**
+   * runs a job. This function is called automatically
+   * @param job the job to run
+   */
+  private runAsObservable = (job: TsWorkerJob<any, any>): Observable<TsWorkerEvent> => {
+    const subj = new Subject<any>();
+
+    this.worker.onmessage = (ev: MessageEvent) => {
+      this.status = ev.data.status;
+
+      if (ev.data.status === TsWorkerStatus.RUNNING) {
+        subj.next({
+          status: TsWorkerStatus.RUNNING,
+          progress: ev.data.progress,
+        });
+      } else if (ev.data.status === 'finished') {
+        job.statistics.ended = Date.now();
+        this.removeJobByID(job.id);
+        subj.next({
+          status: TsWorkerStatus.FINISHED,
+          progress: 1,
+          result: ev.data.result,
+        });
+        subj.complete();
+      } else if (ev.data.status === 'failed') {
+        job.statistics.ended = Date.now();
+        this.removeJobByID(job.id);
+        subj.error(new Error(ev.data.message));
+      }
+    };
+
+    this.worker.onerror = (err) => {
+      this.status = TsWorkerStatus.FAILED;
+      job.statistics.ended = Date.now();
+      this.removeJobByID(job.id);
+      subj.error(err);
+    };
+
+    job.statistics.started = Date.now();
+    this.worker.postMessage({
+      command: 'run_observable',
+      args: [TsWorker.convertJobToObj(job)],
+    });
+
+    return subj;
   };
 }

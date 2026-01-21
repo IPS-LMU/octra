@@ -5,7 +5,7 @@
  * Extracted: 2024-11-04
  */
 
-import { TsWorker, TsWorkerJob } from '@octra/utilities';
+import { TsWorker, TsWorkerJob } from '../../worker';
 import { BinaryByteWriter } from './BinaryWriter';
 import { WavFileFormat } from './wavformat';
 
@@ -16,8 +16,7 @@ export enum SampleSize {
 
 export class WavWriter {
   static readonly DEFAULT_SAMPLE_SIZE: SampleSize = SampleSize.INT16;
-  private readonly sampleSizeInBytes: number =
-    WavWriter.DEFAULT_SAMPLE_SIZE.valueOf() / 8;
+  private readonly sampleSizeInBytes: number = WavWriter.DEFAULT_SAMPLE_SIZE.valueOf() / 8;
   private encodingFloat: boolean = false;
   private sampleSize = WavWriter.DEFAULT_SAMPLE_SIZE;
   private sampleSizeInBits = this.sampleSize.valueOf();
@@ -173,16 +172,7 @@ export class WavWriter {
           buffPos: number,
         ],
         ArrayBuffer
-      >(
-        this.workerFunction,
-        this.encodingFloat,
-        this.sampleSizeInBits,
-        chs,
-        frameLength,
-        ad,
-        this.bw.buf,
-        this.bw.pos,
-      );
+      >(this.workerFunction, [this.encodingFloat, this.sampleSizeInBits, chs, frameLength, ad, this.bw.buf, this.bw.pos]);
       WavWriter.worker.addJob(job);
       WavWriter.worker.jobstatuschange.subscribe({
         next: (job) => {

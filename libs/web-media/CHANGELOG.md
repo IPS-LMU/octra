@@ -2,6 +2,25 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/IPS-LMU/octra/compare/web-media-1.3.4...web-media-2.0.0) (2026-01-28)
+
+
+### Bug Fixes
+
+* **web-media:** readFile() calculates progress incorrectly ([69f4ceb](https://github.com/IPS-LMU/octra/commit/69f4ceb84e70d88081b26a1dee7f81999f2d80fd))
+
+
+### Features
+
+* **web-media:** TsWorker now supports Observable ([be5198c](https://github.com/IPS-LMU/octra/commit/be5198c4ee435b1f34da418018493ead7a3a9848))
+
+
+### BREAKING CHANGES
+
+* **web-media:** TsWorker was moved from @octra/utilities to @octra/web-media
+
+
+
 ## [1.3.4](https://github.com/IPS-LMU/octra/compare/web-media-1.3.3...web-media-1.3.4) (2025-12-11)
 
 

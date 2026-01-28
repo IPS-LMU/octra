@@ -111,7 +111,7 @@
     "luxon": "^3.7.2",
     "mime": "^4.0.7",
     "modernizr": "^3.13.1",
-    "ngrx-wieder": "file:../ngrx-wieder/dist/ngrx-wieder/ngrx-wieder-16.0.0.tgz",
+    "ngrx-wieder": "15.0.0",
     "ngx-jodit": "^3.2.2",
     "ngx-webstorage": "^21.0.1",
     "platform": "^1.3.6",

@@ -901,7 +901,7 @@ export class TrnEditorComponent
     this.viewer.init();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     const oldValue = this.showSignalDisplay;
     this.showSignalDisplay = true;

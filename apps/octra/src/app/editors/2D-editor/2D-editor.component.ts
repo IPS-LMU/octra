@@ -1116,7 +1116,7 @@ export class TwoDEditorComponent
     }
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     // this.viewer.height = this.linesViewHeight;
   }

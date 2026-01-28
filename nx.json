@@ -23,12 +23,7 @@
     },
     "@nx/eslint:lint": {
       "cache": true,
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.cjs"
-      ]
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/.eslintignore", "{workspaceRoot}/eslint.config.cjs"]
     },
     "@nx/jest:jest": {
       "cache": true,
@@ -136,7 +131,6 @@
       "plugin": "@nx/vite/plugin",
       "options": {
         "buildTargetName": "build",
-        "testTargetName": "test",
         "serveTargetName": "serve",
         "previewTargetName": "preview",
         "serveStaticTargetName": "serve-static",
@@ -147,6 +141,12 @@
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "eslint:lint"
+      }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test"
       }
     }
   ]

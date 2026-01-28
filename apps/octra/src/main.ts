@@ -4,7 +4,7 @@ import {
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
-import { importProvidersFrom, isDevMode } from '@angular/core';
+import { importProvidersFrom, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import '@angular/localize/init';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
@@ -67,7 +67,7 @@ import { NgxOctraApiModule } from '@octra/ngx-octra-api';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
+    provideZoneChangeDetection(),importProvidersFrom(
       BrowserModule,
       AppSharedModule,
       FormsModule,

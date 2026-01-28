@@ -1207,7 +1207,7 @@ export class TranscrEditorComponent
     this.popoversNew.validation.location.y = y;
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     if (this.transcrEditor) {
       this.size.height = this.transcrEditor.nativeElement.offsetHeight;

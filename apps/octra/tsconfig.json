@@ -10,7 +10,10 @@
     "noFallthroughCasesInSwitch": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./src/types"]
+    "typeRoots": ["./src/types"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["dom", "es2022"]
   },
   "files": [],
   "include": [],

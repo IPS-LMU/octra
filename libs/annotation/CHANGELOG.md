@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.4](https://github.com/IPS-LMU/octra/compare/annotation-1.3.3...annotation-1.3.4) (2026-01-28)
+
+
+### Bug Fixes
+
+* **annotation:** SRTConverter doesn't cleanup annotation on import properly ([76efb24](https://github.com/IPS-LMU/octra/commit/76efb242aae07a60468ea51bddead8f9813ca70c))
+* **octra:** importing SRT format from Online or URL mode does not include importOptions ([657af6d](https://github.com/IPS-LMU/octra/commit/657af6d430f48a00d10ae5e27a0dc8b5710827d9))
+
+
+### Features
+
+* **octra): feat(octra:** phonetic annotation with the Emu-webApp as 4th editor ([c93f1be](https://github.com/IPS-LMU/octra/commit/c93f1be66e08f55948ff7ccd26e49dbf3c0db825))
+
+
+
 ## [1.3.3](https://github.com/IPS-LMU/octra/compare/annotation-1.3.2...annotation-1.3.3) (2025-10-21)
 
 

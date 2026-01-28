@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.2](https://github.com/IPS-LMU/octra/compare/ngx-utilities-1.0.1...ngx-utilities-1.0.2) (2026-01-28)
+
+
+### Bug Fixes
+
+* **overview:** unit numbers with invalid number of leading 0 ([dbd6b13](https://github.com/IPS-LMU/octra/commit/dbd6b13b451e3193531ee181ee7935b9cde0eba7))
+
+
+
 ## [1.0.1](https://github.com/IPS-LMU/octra/compare/ngx-utilities-1.0.0...ngx-utilities-1.0.1) (2025-04-02)
 
 

@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.5](https://github.com/IPS-LMU/octra/compare/annotation-1.3.4...annotation-1.3.5) (2026-01-28)
+
+
+### Bug Fixes
+
+* **annotation:** invalid peer dependency for octra/utilities ([0850b66](https://github.com/IPS-LMU/octra/commit/0850b66c2cd95bc15ecb08875f058e2847e1e62c))
+
+
+
 ## [1.3.4](https://github.com/IPS-LMU/octra/compare/annotation-1.3.3...annotation-1.3.4) (2026-01-28)
 
 

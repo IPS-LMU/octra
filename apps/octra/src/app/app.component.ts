@@ -1,16 +1,11 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import {
-  OctraComponentsModule,
-  VersionCheckerService,
-  VersionNotificationComponent,
-} from '@octra/ngx-components';
+import { MultiThreadingService, OctraComponentsModule, VersionCheckerService, VersionNotificationComponent } from '@octra/ngx-components';
 import { environment } from '../environments/environment';
 import { AlertComponent, NavigationComponent } from './core/component';
 import { DefaultComponent } from './core/component/default.component';
 import { OctraModalComponent } from './core/modals/octra-modal';
-import { MultiThreadingService } from './core/shared/multi-threading/multi-threading.service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { LoginMode } from './core/store';
 import { ApplicationStoreService } from './core/store/application/application-store.service';

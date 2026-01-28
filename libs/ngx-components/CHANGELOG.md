@@ -2,6 +2,25 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.6.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.5.0...ngx-components-1.6.0) (2026-01-28)
+
+
+### Bug Fixes
+
+* **annotation:** SRTConverter doesn't cleanup annotation on import properly ([76efb24](https://github.com/IPS-LMU/octra/commit/76efb242aae07a60468ea51bddead8f9813ca70c))
+
+
+### Features
+
+* **web-media:** TsWorker now supports Observable ([be5198c](https://github.com/IPS-LMU/octra/commit/be5198c4ee435b1f34da418018493ead7a3a9848))
+
+
+### BREAKING CHANGES
+
+* **web-media:** TsWorker was moved from @octra/utilities to @octra/web-media
+
+
+
 # [1.5.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.4.0...ngx-components-1.5.0) (2025-10-09)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "@octra/ngx-components",
   "description": "library with a list of components created for OCTRA",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "license": "MIT",
   "private": false,
   "author": {

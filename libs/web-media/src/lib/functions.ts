@@ -53,7 +53,7 @@ export function readFile<T>(file: File, method: 'text' | 'binary' | 'arraybuffer
   reader.onprogress = (e) => {
     subj.next({
       status: 'reading',
-      progress: e.loaded / e.total / 2,
+      progress: e.loaded / e.total,
       result: reader.result as T,
     });
   };

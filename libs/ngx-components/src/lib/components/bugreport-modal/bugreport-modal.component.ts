@@ -1,24 +1,16 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  inject,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalOptions, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { downloadFile } from '@octra/web-media';
 import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
 import { Observable, Subject, timer } from 'rxjs';
 import { BugReportTranslations } from './types';
 
 const defaultTranslations: BugReportTranslations = {
   giveFeedback: 'Give Feedback',
-  error:
-    'Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.',
-  introduction:
-    'Please tell us what you think about this web application. What can we do better? Did you find any bugs?',
+  error: 'Unfortunately your feedback could not be sent to us. Please send us an e-mail to {{email}}.',
+  introduction: 'Please tell us what you think about this web application. What can we do better? Did you find any bugs?',
   bugReportSent: 'Your feedback was successfully reported \uD83D\uDE42',
   addProtocol: 'Add Protocol (recommended)',
   eMail: 'E-Mail',
@@ -36,12 +28,9 @@ const defaultTranslations: BugReportTranslations = {
   standalone: true,
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.scss'],
-  imports: [FormsModule, NgxJoditComponent],
+  imports: [FormsModule, NgxJoditComponent, NgbPopover],
 })
-export class BugreportModalComponent
-  extends SubscriberComponent
-  implements AfterViewInit
-{
+export class BugreportModalComponent extends SubscriberComponent implements AfterViewInit {
   private cd = inject(ChangeDetectorRef);
   protected activeModal = inject(NgbActiveModal);
 
@@ -54,16 +43,7 @@ export class BugreportModalComponent
 
   joditOptions: JoditConfig = {
     maxHeight: 300,
-    buttons: [
-      'bold',
-      'italic',
-      'underline',
-      'strikethrough',
-      'align',
-      'ul',
-      'ol',
-      'brush',
-    ],
+    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'align', 'ul', 'ol', 'brush'],
     statusbar: false,
     placeholder: 'Please write a message in German or English...',
   };
@@ -160,11 +140,7 @@ export class BugreportModalComponent
 
   sendBugReport() {
     if (this.bgdescr.length > 10000) {
-      alert(
-        `Please write a message with less 10000 letters. Remove ${
-          this.bgdescr.length - 10000
-        } letters.`,
-      );
+      alert(`Please write a message with less 10000 letters. Remove ${this.bgdescr.length - 10000} letters.`);
       return;
     }
 
@@ -224,9 +200,7 @@ export class BugreportModalComponent
             console.error(error);
           });
       } else {
-        alert(
-          'Only files with the extensions ".jpg, jpeg,.png" are supported.',
-        );
+        alert('Only files with the extensions ".jpg, jpeg,.png" are supported.');
       }
     }
   }
@@ -254,5 +228,40 @@ export class BugreportModalComponent
   update() {
     this.cd.markForCheck();
     this.cd.detectChanges();
+  }
+
+  async readFromClipboard() {
+    const results: string[] = [];
+    const clipboardContents = await navigator.clipboard.read();
+    const supportedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+
+    for (const item of clipboardContents) {
+      if (!item.types.find((a) => supportedTypes.includes(a))) {
+        throw new Error(`Clipboard does not contain image of type ${supportedTypes.join(', ')}.`);
+      }
+      const blob = await item.getType(item.types[0]);
+      results.push(URL.createObjectURL(blob));
+    }
+
+    return results;
+  }
+
+  async addFromClipboard() {
+    try {
+      const urls = await this.readFromClipboard();
+      if (urls.length > 0) {
+        for (const url of urls) {
+          if (this.screenshots.length > 3) {
+            break;
+          }
+          const blob = await downloadFile<Blob>(url, 'blob');
+          this.screenshots.push({ blob, previewURL: url });
+        }
+      } else {
+        alert('No compatible image found in clipboard.');
+      }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 }

@@ -122,9 +122,9 @@
                 </div>
               }
               @if (screenshots.length < 4) {
-                <div
+                <div [ngbPopover]="'Add screenshot from your PC'" triggers="mouseenter:mouseleave" placement="bottom"
                   (click)="selectFileForUpload(uploadInput)"
-                  class="upload-screenshot"
+                  class="upload-screenshot align-items-center justify-content-center"
                 >
                   <input
                     #uploadInput
@@ -133,7 +133,13 @@
                     style="display: none"
                     type="file"
                   />
-                  <i class="bi bi-plus-lg"></i>
+                  <i class="bi bi-plus-lg"></i> <i class="bi bi-laptop"></i>
+                </div>
+                <div [ngbPopover]="'Add screenshot from clipboard'" triggers="mouseenter:mouseleave" placement="bottom"
+                  (click)="addFromClipboard()"
+                  class="upload-screenshot align-items-center justify-content-center"
+                >
+                  <i class="bi bi-plus-lg"></i> <i class="bi bi-clipboard"></i>
                 </div>
               }
             </div>

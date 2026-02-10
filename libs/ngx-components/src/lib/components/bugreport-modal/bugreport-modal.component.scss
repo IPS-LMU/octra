@@ -12,7 +12,7 @@
   padding: 5px;
   text-align: center;
   vertical-align: middle;
-  display: table-cell;
+  display: flex;
   cursor: pointer;
   float: left;
   margin-right: 5px;
@@ -21,10 +21,10 @@
   position: relative;
 }
 
-.upload-screenshot .bi-plus-lg {
+.upload-screenshot .bi {
   color: cornflowerblue;
-  margin-top: 30px;
-  display: block;
+  display: inline-block;
+  font-size: 2rem;
 }
 
 .upload-screenshot .preview-image {

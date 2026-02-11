@@ -31,6 +31,9 @@ export interface ModalVisibilities {
   demoEnd: boolean;
   guidelines: boolean;
   help: boolean;
+  regReplace: boolean;
+  cutting: boolean;
+  combineTranscripts: boolean;
 }
 
 export class AnnotationStateSegment<

@@ -941,4 +941,16 @@ export class AnnotationStoreService {
   openHelpModal() {
     this.store.dispatch(AnnotationActions.helpModal.open());
   }
+
+  openRegReplaceModal() {
+    this.store.dispatch(AnnotationActions.regReplaceModal.open());
+  }
+
+  openCombinedPhrasesModal() {
+    this.store.dispatch(AnnotationActions.combineTranscriptsModal.open());
+  }
+
+  openCuttingModal() {
+    this.store.dispatch(AnnotationActions.cuttingModal.open());
+  }
 }

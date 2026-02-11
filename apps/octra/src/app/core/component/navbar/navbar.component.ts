@@ -1,12 +1,5 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import {
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -20,20 +13,9 @@ import {
   NgbOffcanvas,
   NgbPopover,
 } from '@ng-bootstrap/ng-bootstrap';
-import {
-  AnnotationLevelType,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { AnnotationLevelType, OctraAnnotationAnyLevel, OctraAnnotationSegment } from '@octra/annotation';
 import { AccountRole, ProjectDto } from '@octra/api-types';
-import {
-  ConsoleEntry,
-  ConsoleGroupEntry,
-  ConsoleLoggingService,
-  ConsoleType,
-  NgbModalWrapper,
-  OctraComponentsModule,
-} from '@octra/ngx-components';
+import { ConsoleEntry, ConsoleGroupEntry, ConsoleLoggingService, ConsoleType, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { TimespanPipe } from '@octra/ngx-utilities';
 import { environment } from '../../../../environments/environment';
@@ -45,14 +27,8 @@ import { ExportFilesModalComponent } from '../../modals/export-files-modal/expor
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { CombinePhrasesModalComponent } from '../../modals/tools/combine-phrases-modal/combine-phrases-modal.component';
-import { CuttingAudioModalComponent } from '../../modals/tools/cutting-audio-modal/cutting-audio-modal.component';
-import { RegReplaceModalComponent } from '../../modals/tools/reg-replace-modal/reg-replace-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
-import {
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { BugReportService } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../../store';
@@ -88,10 +64,7 @@ import { NavbarService } from './navbar.service';
     NgbDropdownItem,
   ],
 })
-export class NavigationComponent
-  extends DefaultComponent
-  implements OnInit, OnDestroy
-{
+export class NavigationComponent extends DefaultComponent implements OnInit, OnDestroy {
   appStorage = inject(AppStorageService);
   private appStoreService = inject(ApplicationStoreService);
   navbarServ = inject(NavbarService);
@@ -115,33 +88,24 @@ export class NavigationComponent
 
   protected tools: {
     name: string;
-    click: () => NgbModalWrapper<unknown>;
+    click: () => void;
   }[] = [
     {
       name: 'reg-replace',
       click: () => {
-        return this.modalService.openModalRef(
-          RegReplaceModalComponent,
-          RegReplaceModalComponent.options,
-        );
+        this.annotationStoreService.openRegReplaceModal();
       },
     },
     {
       name: 'combine-phrases',
       click: () => {
-        return this.modalService.openModalRef(
-          CombinePhrasesModalComponent,
-          CombinePhrasesModalComponent.options,
-        );
+        this.annotationStoreService.openCombinedPhrasesModal();
       },
     },
     {
       name: 'cut-audio',
       click: () => {
-        return this.modalService.openModalRef(
-          CuttingAudioModalComponent,
-          CuttingAudioModalComponent.options,
-        );
+        this.annotationStoreService.openCuttingModal();
       },
     },
   ];
@@ -155,10 +119,7 @@ export class NavigationComponent
   }
 
   public get isAdministrator() {
-    return (
-      this.appStorage.snapshot.authentication.me?.systemRole.label ===
-      AccountRole.administrator
-    );
+    return this.appStorage.snapshot.authentication.me?.systemRole.label === AccountRole.administrator;
   }
 
   public get AppInfo(): any {
@@ -178,11 +139,7 @@ export class NavigationComponent
   }
 
   isToolEnabled(tool: string) {
-    return (
-      this.settService.projectsettings?.octra?.tools?.find(
-        (a) => a === tool,
-      ) !== undefined
-    );
+    return this.settService.projectsettings?.octra?.tools?.find((a) => a === tool) !== undefined;
   }
 
   @ViewChild('canvasContent') canvasContent?: TemplateRef<any>;
@@ -195,19 +152,13 @@ export class NavigationComponent
           if (b.type === ConsoleType.ERROR && beginCheck) {
             return true;
           }
-          if (
-            typeof b.message === 'string' &&
-            b.message.indexOf('AFTER RELOAD') > -1
-          ) {
+          if (typeof b.message === 'string' && b.message.indexOf('AFTER RELOAD') > -1) {
             beginCheck = true;
           }
           return false;
         };
 
-        if (
-          Object.keys(a).includes('label') ||
-          Object.keys(a).includes('entries')
-        ) {
+        if (Object.keys(a).includes('label') || Object.keys(a).includes('entries')) {
           for (const entry of (a as ConsoleGroupEntry).entries) {
             if (hasError(entry)) {
               return true;
@@ -225,14 +176,10 @@ export class NavigationComponent
     this.subscribe(this.navbarServ.onclick, (name) => {
       switch (name) {
         case 'export':
-          this.modalexport = this.modalService.openModalRef(
-            ExportFilesModalComponent,
-            ExportFilesModalComponent.options,
-            {
-              navbarService: this,
-              uiService: this.uiService,
-            },
-          );
+          this.modalexport = this.modalService.openModalRef(ExportFilesModalComponent, ExportFilesModalComponent.options, {
+            navbarService: this,
+            uiService: this.uiService,
+          });
           break;
       }
     });
@@ -320,9 +267,7 @@ export class NavigationComponent
   }
 
   isLevelTypeSupported(type: AnnotationLevelType) {
-    return this.navbarServ.currentEditor?.meta.supportedLevelTypes.includes(
-      type,
-    ) ?? false;
+    return this.navbarServ.currentEditor?.meta.supportedLevelTypes.includes(type) ?? false;
   }
 
   public selectLevel(tiernum: number) {
@@ -337,28 +282,18 @@ export class NavigationComponent
   }
 
   openExportModal() {
-    this.modalexport = this.modalService.openModalRef(
-      ExportFilesModalComponent,
-      ExportFilesModalComponent.options,
-      {
-        navbarService: this,
-        uiService: this.uiService,
-      },
-    );
+    this.modalexport = this.modalService.openModalRef(ExportFilesModalComponent, ExportFilesModalComponent.options, {
+      navbarService: this,
+      uiService: this.uiService,
+    });
   }
 
   openCombinePhrases() {
-    this.modalStatistics = this.modalService.openModalRef(
-      CombinePhrasesModalComponent,
-      CombinePhrasesModalComponent.options,
-    );
+    this.modalStatistics = this.modalService.openModalRef(CombinePhrasesModalComponent, CombinePhrasesModalComponent.options);
   }
 
   openStatisticsModal() {
-    this.modalStatistics = this.modalService.openModalRef(
-      StatisticsModalComponent,
-      StatisticsModalComponent.options,
-    );
+    this.modalStatistics = this.modalService.openModalRef(StatisticsModalComponent, StatisticsModalComponent.options);
   }
 
   backToProjectsList() {
@@ -366,32 +301,19 @@ export class NavigationComponent
   }
 
   logout(redirectToProjects = false) {
-    if (
-      this.appStorage.snapshot.application.mode === LoginMode.ONLINE &&
-      this.appStorage.snapshot.onlineMode.currentSession.currentProject
-    ) {
-      this.annotationStoreService.quit(
-        true,
-        !redirectToProjects,
-        redirectToProjects,
-      );
+    if (this.appStorage.snapshot.application.mode === LoginMode.ONLINE && this.appStorage.snapshot.onlineMode.currentSession.currentProject) {
+      this.annotationStoreService.quit(true, !redirectToProjects, redirectToProjects);
     } else {
       this.appStorage.logout(true);
     }
   }
 
   getFreeAnnotationTasks(project: ProjectDto | undefined) {
-    return (
-      project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status
-        .free ?? 0
-    );
+    return project?.statistics?.tasks.find((a) => a.type === 'annotation')?.status.free ?? 0;
   }
 
   openAboutModal() {
-    this.modalService.openModalRef(
-      AboutModalComponent,
-      AboutModalComponent.options,
-    );
+    this.modalService.openModalRef(AboutModalComponent, AboutModalComponent.options);
   }
 
   openEnd() {

@@ -278,10 +278,7 @@ export class AnnotationActions {
       }>(),
       success: props<{
         mode: LoginMode;
-        transcript: OctraAnnotation<
-          ASRContext,
-          OctraAnnotationSegment<ASRContext>
-        >;
+        transcript: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
         feedback?: FeedBackForm;
         saveToDB: boolean;
       }>(),
@@ -526,6 +523,38 @@ export class AnnotationActions {
     events: {
       open: emptyProps(),
       close: emptyProps(),
+    },
+  });
+
+  static regReplaceModal = createActionGroup({
+    source: 'annotation/reg replace modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
+
+  static cuttingModal = createActionGroup({
+    source: 'annotation/cutting modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
+
+  static combineTranscriptsModal = createActionGroup({
+    source: 'annotation/combine transcripts modal',
+    events: {
+      open: emptyProps(),
+      close: emptyProps(),
+    },
+  });
+
+  static closeAllModals = createActionGroup({
+    source: 'annotation/close all modals',
+    events: {
+      do: emptyProps(),
+      success: emptyProps(),
     },
   });
 }

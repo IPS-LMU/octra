@@ -39,55 +39,35 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
-  on(
-    ApplicationActions.initApplication.setSessionStorageOptions,
-    (state: ApplicationState, { reloaded, loggedIn }) => ({
-      ...state,
-      reloaded,
-      loggedIn,
-    }),
-  ),
+  on(ApplicationActions.initApplication.setSessionStorageOptions, (state: ApplicationState, { reloaded, loggedIn }) => ({
+    ...state,
+    reloaded,
+    loggedIn,
+  })),
   on(ApplicationActions.initApplication.finish, (state: ApplicationState) => ({
     ...state,
     initialized: true,
   })),
-  on(
-    AuthenticationActions.needReAuthentication.do,
-    (state: ApplicationState) => ({
-      ...state,
-      shortcutsEnabled: false,
-    }),
-  ),
-  on(
-    AuthenticationActions.needReAuthentication.success,
-    AuthenticationActions.needReAuthentication.abort,
-    (state: ApplicationState) => ({
-      ...state,
-      shortcutsEnabled: true,
-    }),
-  ),
-  on(
-    ApplicationActions.setShortcutsEnabled.do,
-    (state: ApplicationState, { shortcutsEnabled }) => ({
-      ...state,
-      shortcutsEnabled,
-    }),
-  ),
-  on(
-    AuthenticationActions.reauthenticate.success,
-    AnnotationActions.prepareTaskDataForAnnotation.do,
-    (state: ApplicationState) => ({
-      ...state,
-      shortcutsEnabled: true,
-    }),
-  ),
-  on(
-    AuthenticationActions.loginOnline.redirectToURL,
-    (state: ApplicationState) => ({
-      ...state,
-      mode: LoginMode.ONLINE,
-    }),
-  ),
+  on(AuthenticationActions.needReAuthentication.do, (state: ApplicationState) => ({
+    ...state,
+    shortcutsEnabled: false,
+  })),
+  on(AuthenticationActions.needReAuthentication.success, AuthenticationActions.needReAuthentication.abort, (state: ApplicationState) => ({
+    ...state,
+    shortcutsEnabled: true,
+  })),
+  on(ApplicationActions.setShortcutsEnabled.do, (state: ApplicationState, { shortcutsEnabled }) => ({
+    ...state,
+    shortcutsEnabled,
+  })),
+  on(AuthenticationActions.reauthenticate.success, AnnotationActions.prepareTaskDataForAnnotation.do, (state: ApplicationState) => ({
+    ...state,
+    shortcutsEnabled: true,
+  })),
+  on(AuthenticationActions.loginOnline.redirectToURL, (state: ApplicationState) => ({
+    ...state,
+    mode: LoginMode.ONLINE,
+  })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {
@@ -96,26 +76,20 @@ export const reducer = createReducer(
       errors: [...state.loading.errors, error],
     },
   })),
-  on(
-    ApplicationActions.loadSettings.success,
-    (state: ApplicationState, { settings }) => ({
-      ...state,
-      appSettingsLoaded: true,
-      appConfiguration: new AppSettings(settings),
-      loading: {
-        ...state.loading,
-        status: LoadingStatus.LOADING,
-        progress: 50,
-      },
-    }),
-  ),
-  on(
-    ApplicationActions.setReloaded,
-    (state: ApplicationState, { reloaded }) => ({
-      ...state,
-      reloaded,
-    }),
-  ),
+  on(ApplicationActions.loadSettings.success, (state: ApplicationState, { settings }) => ({
+    ...state,
+    appSettingsLoaded: true,
+    appConfiguration: new AppSettings(settings),
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.LOADING,
+      progress: 50,
+    },
+  })),
+  on(ApplicationActions.setReloaded, (state: ApplicationState, { reloaded }) => ({
+    ...state,
+    reloaded,
+  })),
   on(ApplicationActions.finishLoading, (state: ApplicationState) => ({
     ...state,
     loading: {
@@ -123,57 +97,42 @@ export const reducer = createReducer(
       status: LoadingStatus.FINISHED,
     },
   })),
-  on(
-    ApplicationActions.setAppLanguage,
-    (state: ApplicationState, { language }) => ({
-      ...state,
-      language,
-    }),
-  ),
-  on(
-    ApplicationActions.setDBVersion,
-    (state: ApplicationState, { version }) => ({
-      ...state,
-      version,
-    }),
-  ),
-  on(
-    ApplicationActions.setConsoleEntries,
-    (state: ApplicationState, { consoleEntries }) => ({
-      ...state,
-      consoleEntries,
-    }),
-  ),
-  on(
-    IDBActions.loadConsoleEntries.success,
-    (state: ApplicationState, { consoleEntries }) => ({
-      ...state,
-      consoleEntries,
-    }),
-  ),
-  on(
-    IDBActions.loadOptions.success,
-    (state: ApplicationState, { applicationOptions }) => ({
-      ...state,
-      mode: applicationOptions.useMode ?? state.mode,
-      language: applicationOptions.language ?? 'en',
-      options: {
-        ...state.options,
-        showMagnifier: applicationOptions.showMagnifier ?? false,
-        playOnHover: applicationOptions.playOnHover ?? false,
-        followPlayCursor: applicationOptions.followPlayCursor ?? false,
-        secondsPerLine: applicationOptions.secondsPerLine ?? 5,
-        editorFont: applicationOptions.editorFont,
-        easyMode: applicationOptions.easyMode ?? false,
-        highlightingEnabled: applicationOptions.highlightingEnabled ?? false,
-        showFeedbackNotice: applicationOptions.showFeedbackNotice ?? true,
-        audioSettings: applicationOptions.audioSettings ?? {
-          volume: 1,
-          speed: 1,
-        },
+  on(ApplicationActions.setAppLanguage, (state: ApplicationState, { language }) => ({
+    ...state,
+    language,
+  })),
+  on(ApplicationActions.setDBVersion, (state: ApplicationState, { version }) => ({
+    ...state,
+    version,
+  })),
+  on(ApplicationActions.setConsoleEntries, (state: ApplicationState, { consoleEntries }) => ({
+    ...state,
+    consoleEntries,
+  })),
+  on(IDBActions.loadConsoleEntries.success, (state: ApplicationState, { consoleEntries }) => ({
+    ...state,
+    consoleEntries,
+  })),
+  on(IDBActions.loadOptions.success, (state: ApplicationState, { applicationOptions }) => ({
+    ...state,
+    mode: applicationOptions.useMode ?? state.mode,
+    language: applicationOptions.language ?? 'en',
+    options: {
+      ...state.options,
+      showMagnifier: applicationOptions.showMagnifier ?? false,
+      playOnHover: applicationOptions.playOnHover ?? false,
+      followPlayCursor: applicationOptions.followPlayCursor ?? false,
+      secondsPerLine: applicationOptions.secondsPerLine ?? 5,
+      editorFont: applicationOptions.editorFont,
+      easyMode: applicationOptions.easyMode ?? false,
+      highlightingEnabled: applicationOptions.highlightingEnabled ?? false,
+      showFeedbackNotice: applicationOptions.showFeedbackNotice ?? true,
+      audioSettings: applicationOptions.audioSettings ?? {
+        volume: 1,
+        speed: 1,
       },
-    }),
-  ),
+    },
+  })),
   on(IDBActions.loadAnnotation.success, (state: ApplicationState) => ({
     ...state,
     idb: {
@@ -200,23 +159,20 @@ export const reducer = createReducer(
       loggedIn: false,
     };
   }),
-  on(
-    ApplicationActions.changeApplicationOption.do,
-    (state: ApplicationState, { name, value }) => {
-      const options = {
-        ...state.options,
-      };
+  on(ApplicationActions.changeApplicationOption.do, (state: ApplicationState, { name, value }) => {
+    const options = {
+      ...state.options,
+    };
 
-      if (Object.keys(options).includes(name)) {
-        (options as any)[name] = value;
-      }
+    if (Object.keys(options).includes(name)) {
+      (options as any)[name] = value;
+    }
 
-      return {
-        ...state,
-        options,
-      };
-    },
-  ),
+    return {
+      ...state,
+      options,
+    };
+  }),
   on(ApplicationActions.setAudioSettings, (state: ApplicationState, data) => ({
     ...state,
     options: {
@@ -224,46 +180,34 @@ export const reducer = createReducer(
       audioSettings: data,
     },
   })),
-  on(
-    ApplicationActions.setShowMagnifier,
-    (state: ApplicationState, { showMagnifier }) => ({
-      ...state,
-      options: {
-        ...state.options,
-        showMagnifier,
-      },
-    }),
-  ),
-  on(
-    ApplicationActions.setEasyMode,
-    (state: ApplicationState, { easyMode }) => ({
-      ...state,
-      options: {
-        ...state.options,
-        easyMode,
-      },
-    }),
-  ),
-  on(
-    ApplicationActions.setSecondsPerLine,
-    (state: ApplicationState, { secondsPerLine }) => ({
-      ...state,
-      options: {
-        ...state.options,
-        secondsPerLine,
-      },
-    }),
-  ),
-  on(
-    ApplicationActions.setHighlightingEnabled,
-    (state: ApplicationState, { highlightingEnabled }) => ({
-      ...state,
-      options: {
-        ...state.options,
-        highlightingEnabled,
-      },
-    }),
-  ),
+  on(ApplicationActions.setShowMagnifier, (state: ApplicationState, { showMagnifier }) => ({
+    ...state,
+    options: {
+      ...state.options,
+      showMagnifier,
+    },
+  })),
+  on(ApplicationActions.setEasyMode, (state: ApplicationState, { easyMode }) => ({
+    ...state,
+    options: {
+      ...state.options,
+      easyMode,
+    },
+  })),
+  on(ApplicationActions.setSecondsPerLine, (state: ApplicationState, { secondsPerLine }) => ({
+    ...state,
+    options: {
+      ...state.options,
+      secondsPerLine,
+    },
+  })),
+  on(ApplicationActions.setHighlightingEnabled, (state: ApplicationState, { highlightingEnabled }) => ({
+    ...state,
+    options: {
+      ...state.options,
+      highlightingEnabled,
+    },
+  })),
   on(ApplicationActions.waitForEffects.do, (state: ApplicationState) => ({
     ...state,
     loading: {
@@ -282,49 +226,42 @@ export const reducer = createReducer(
       errors: [],
     },
   })),
-  on(
-    AnnotationActions.loadAudio.progress,
-    (state: ApplicationState, { mode, value }) => {
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          status: LoadingStatus.LOADING,
-          progress: 50 + Math.round(value * 50),
-          errors: [],
-        },
-      };
-    },
-  ),
-  on(
-    AnnotationActions.loadAudio.success,
-    AuthenticationActions.logout.success,
-    (state: ApplicationState, { mode }) => ({
+  on(AnnotationActions.loadAudio.progress, (state: ApplicationState, { mode, value }) => {
+    return {
       ...state,
       loading: {
         ...state.loading,
-        status: LoadingStatus.FINISHED,
-        progress: 100,
+        status: LoadingStatus.LOADING,
+        progress: 50 + Math.round(value * 50),
         errors: [],
       },
-    }),
-  ),
-  on(
-    AnnotationActions.loadAudio.fail,
-    (state: ApplicationState, { error }) => ({
-      ...state,
-      loading: {
-        ...state.loading,
-        status: LoadingStatus.FAILED,
-        errors: [error],
-      },
-    }),
-  ),
+    };
+  }),
+  on(AnnotationActions.loadAudio.success, AuthenticationActions.logout.success, (state: ApplicationState, { mode }) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.FINISHED,
+      progress: 100,
+      errors: [],
+    },
+  })),
+  on(AnnotationActions.loadAudio.fail, (state: ApplicationState, { error }) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.FAILED,
+      errors: [error],
+    },
+  })),
   on(
     AnnotationActions.overviewModal.open,
     AnnotationActions.shortcutsModal.open,
     AnnotationActions.guidelinesModal.open,
     AnnotationActions.helpModal.open,
+    AnnotationActions.regReplaceModal.open,
+    AnnotationActions.cuttingModal.open,
+    AnnotationActions.combineTranscriptsModal.open,
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: false,
@@ -336,6 +273,10 @@ export const reducer = createReducer(
     AnnotationActions.shortcutsModal.close,
     AnnotationActions.guidelinesModal.close,
     AnnotationActions.helpModal.close,
+    AnnotationActions.cuttingModal.close,
+    AnnotationActions.regReplaceModal.close,
+    AnnotationActions.combineTranscriptsModal.close,
+    AnnotationActions.closeAllModals.success,
     (state: ApplicationState) => ({
       ...state,
       shortcutsEnabled: true,

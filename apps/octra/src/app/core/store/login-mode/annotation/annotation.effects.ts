@@ -15,35 +15,11 @@ import {
   OLabel,
   PraatTextgridConverter,
 } from '@octra/annotation';
-import {
-  ProjectDto,
-  TaskDto,
-  TaskInputOutputCreatorType,
-  TaskInputOutputDto,
-  TaskStatus,
-  ToolConfigurationAssetDto,
-} from '@octra/api-types';
+import { ProjectDto, TaskDto, TaskInputOutputCreatorType, TaskInputOutputDto, TaskStatus, ToolConfigurationAssetDto } from '@octra/api-types';
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import {
-  appendURLQueryParams,
-  extractFileNameFromURL,
-  hasProperty,
-  SubscriptionManager,
-} from '@octra/utilities';
-import {
-  catchError,
-  exhaustMap,
-  forkJoin,
-  interval,
-  map,
-  Observable,
-  of,
-  Subscription,
-  tap,
-  timer,
-  withLatestFrom,
-} from 'rxjs';
+import { appendURLQueryParams, extractFileNameFromURL, hasProperty, SubscriptionManager } from '@octra/utilities';
+import { catchError, exhaustMap, forkJoin, interval, map, Observable, of, Subscription, tap, timer, withLatestFrom } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
@@ -57,11 +33,7 @@ import {
   isValidAnnotation,
   StatisticElem,
 } from '../../../shared';
-import {
-  AlertService,
-  AudioService,
-  UserInteractionsService,
-} from '../../../shared/service';
+import { AlertService, AudioService, UserInteractionsService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { RoutingService } from '../../../shared/service/routing.service';
 import { ApplicationActions } from '../../application/application.actions';
@@ -79,6 +51,9 @@ import { MaintenanceAPI } from '../../../component/maintenance/maintenance-api';
 import { HelpModalComponent } from '../../../modals/help-modal/help-modal.component';
 import { OverviewModalComponent } from '../../../modals/overview-modal/overview-modal.component';
 import { ShortcutsModalComponent } from '../../../modals/shortcuts-modal/shortcuts-modal.component';
+import { CombinePhrasesModalComponent } from '../../../modals/tools/combine-phrases-modal/combine-phrases-modal.component';
+import { CuttingAudioModalComponent } from '../../../modals/tools/cutting-audio-modal/cutting-audio-modal.component';
+import { RegReplaceModalComponent } from '../../../modals/tools/reg-replace-modal/reg-replace-modal.component';
 import { TranscriptionGuidelinesModalComponent } from '../../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import { MimeTypeMapper } from '../../../obj';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
@@ -109,6 +84,9 @@ export class AnnotationEffects {
     guidelines?: NgbModalWrapper<any>;
     overview?: NgbModalWrapper<any>;
     help?: NgbModalWrapper<any>;
+    regReplaceModal?: NgbModalWrapper<any>;
+    cuttingModal?: NgbModalWrapper<any>;
+    combineTranscriptions?: NgbModalWrapper<any>;
   } = {};
 
   subscrManager = new SubscriptionManager();
@@ -155,10 +133,7 @@ export class AnnotationEffects {
                   }),
                   this.store,
                   () => {
-                    this.alertService.showAlert(
-                      'danger',
-                      error.error?.message ?? error.message,
-                    );
+                    this.alertService.showAlert('danger', error.error?.message ?? error.message);
                   },
                 ),
               ),
@@ -187,10 +162,7 @@ export class AnnotationEffects {
           });
         }
 
-        if (
-          !task.tool_configuration.assets ||
-          task.tool_configuration.assets.length === 0
-        ) {
+        if (!task.tool_configuration.assets || task.tool_configuration.assets.length === 0) {
           return AnnotationActions.startAnnotation.fail({
             error: 'Missing tool configuration assets',
             showOKButton: true,
@@ -209,12 +181,7 @@ export class AnnotationEffects {
             if (guidelines.length === 1) {
               selectedGuidelines = guidelines[0];
             } else {
-              const found = guidelines.find(
-                (a) =>
-                  new RegExp(
-                    `_${state.application.language.toLowerCase()}.json`,
-                  ).exec(a.filename) !== null,
-              );
+              const found = guidelines.find((a) => new RegExp(`_${state.application.language.toLowerCase()}.json`).exec(a.filename) !== null);
               selectedGuidelines = found ?? guidelines[0];
             }
           } else {
@@ -238,17 +205,12 @@ export class AnnotationEffects {
       ofType(AnnotationActions.prepareTaskDataForAnnotation.success),
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
-        const audioFile: TaskInputOutputDto | undefined =
-          findCompatibleFileFromIO<TaskInputOutputDto>(
-            a.task,
-            'audio',
-            (io: TaskInputOutputDto) => {
-              if (io.fileType && io.fileType.includes('audio')) {
-                return io;
-              }
-              return undefined;
-            },
-          );
+        const audioFile: TaskInputOutputDto | undefined = findCompatibleFileFromIO<TaskInputOutputDto>(a.task, 'audio', (io: TaskInputOutputDto) => {
+          if (io.fileType && io.fileType.includes('audio')) {
+            return io;
+          }
+          return undefined;
+        });
 
         if (audioFile) {
           return of(
@@ -281,18 +243,9 @@ export class AnnotationEffects {
           // INIT UI SERVICE
           const modeState = getModeState(state)!;
           if (a.projectSettings.logging?.forced) {
-            this.uiService.init(
-              true,
-              modeState.logging.startTime,
-              modeState.logging.startReference,
-            );
-            if (
-              modeState.logging.logs &&
-              Array.isArray(modeState.logging.logs)
-            ) {
-              this.uiService.elements = modeState.logging.logs.map((a) =>
-                StatisticElem.fromAny(a),
-              );
+            this.uiService.init(true, modeState.logging.startTime, modeState.logging.startReference);
+            if (modeState.logging.logs && Array.isArray(modeState.logging.logs)) {
+              this.uiService.elements = modeState.logging.logs.map((a) => StatisticElem.fromAny(a));
             }
             this.uiService.addElementFromEvent(
               'octra',
@@ -329,9 +282,7 @@ export class AnnotationEffects {
             );
           }
 
-          this.store.dispatch(
-            AnnotationActions.initTranscriptionService.do({ mode: a.mode }),
-          );
+          this.store.dispatch(AnnotationActions.initTranscriptionService.do({ mode: a.mode }));
         }),
       ),
     { dispatch: false },
@@ -344,11 +295,7 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           const modeState = getModeState(state)!;
-          this.uiService.init(
-            action.logging,
-            modeState.logging.startTime,
-            modeState.logging.startReference,
-          );
+          this.uiService.init(action.logging, modeState.logging.startTime, modeState.logging.startReference);
         }),
       ),
     { dispatch: false },
@@ -370,17 +317,10 @@ export class AnnotationEffects {
           }
 
           let filename = a.audioFile!.filename;
-          if (
-            state.application.mode === LoginMode.ONLINE ||
-            state.application.mode === LoginMode.URL ||
-            state.application.mode === LoginMode.DEMO
-          ) {
+          if (state.application.mode === LoginMode.ONLINE || state.application.mode === LoginMode.URL || state.application.mode === LoginMode.DEMO) {
             // online, url or demo
             if (a.audioFile) {
-              const src =
-                state.application.mode === LoginMode.ONLINE
-                  ? this.apiService.prepareFileURL(a.audioFile!.url!)
-                  : a.audioFile!.url!;
+              const src = state.application.mode === LoginMode.ONLINE ? this.apiService.prepareFileURL(a.audioFile!.url!) : a.audioFile!.url!;
               // extract filename
 
               filename = filename.substring(0, filename.lastIndexOf('.'));
@@ -469,15 +409,9 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([a, state]) => {
           if (state.application.mode === LoginMode.LOCAL) {
-            this.routingService
-              .navigate(
-                'reload audio local',
-                ['/intern/transcr/reload-file'],
-                AppInfo.queryParamsHandling,
-              )
-              .catch((error) => {
-                console.error(error);
-              });
+            this.routingService.navigate('reload audio local', ['/intern/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
+              console.error(error);
+            });
           } else {
             // it's an error
             this.modalsService.openErrorModal(a.error);
@@ -492,11 +426,7 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(LoginModeActions.endTranscription.do),
         tap((a) => {
-          this.routingService.navigate(
-            'end transcription',
-            ['/intern/transcr/end'],
-            AppInfo.queryParamsHandling,
-          );
+          this.routingService.navigate('end transcription', ['/intern/transcr/end'], AppInfo.queryParamsHandling);
           this.audio.destroy(true);
         }),
       ),
@@ -512,50 +442,38 @@ export class AnnotationEffects {
         this.audio.destroy(true);
 
         if (state.application.mode === LoginMode.ONLINE) {
-          if (
-            a.freeTask &&
-            state.onlineMode.currentSession.currentProject &&
-            state.onlineMode.currentSession.task
-          ) {
-            return this.apiService
-              .freeTask(
-                state.onlineMode.currentSession.currentProject.id,
-                state.onlineMode.currentSession.task.id,
-              )
-              .pipe(
-                map((result) => {
-                  if (a.redirectToProjects) {
-                    return AnnotationActions.redirectToProjects.do({
-                      mode: state.application.mode,
-                    });
-                  } else {
-                    return AuthenticationActions.logout.do({
-                      clearSession: a.clearSession,
-                      mode: state.application.mode!,
-                    });
-                  }
-                }),
-                catchError((error) =>
-                  checkAndThrowError(
-                    {
-                      statusCode: error.status,
-                      message: error.error?.message ?? error.message,
-                    },
-                    a,
-                    AuthenticationActions.logout.do({
-                      clearSession: a.clearSession,
-                      mode: state.application.mode!,
-                    }),
-                    this.store,
-                    () => {
-                      this.alertService.showAlert(
-                        'danger',
-                        error.error?.message ?? error.message,
-                      );
-                    },
-                  ),
+          if (a.freeTask && state.onlineMode.currentSession.currentProject && state.onlineMode.currentSession.task) {
+            return this.apiService.freeTask(state.onlineMode.currentSession.currentProject.id, state.onlineMode.currentSession.task.id).pipe(
+              map((result) => {
+                if (a.redirectToProjects) {
+                  return AnnotationActions.redirectToProjects.do({
+                    mode: state.application.mode,
+                  });
+                } else {
+                  return AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode!,
+                  });
+                }
+              }),
+              catchError((error) =>
+                checkAndThrowError(
+                  {
+                    statusCode: error.status,
+                    message: error.error?.message ?? error.message,
+                  },
+                  a,
+                  AuthenticationActions.logout.do({
+                    clearSession: a.clearSession,
+                    mode: state.application.mode!,
+                  }),
+                  this.store,
+                  () => {
+                    this.alertService.showAlert('danger', error.error?.message ?? error.message);
+                  },
                 ),
-              );
+              ),
+            );
           } else {
             return this.saveTaskToServer(state, TaskStatus.paused).pipe(
               map(() => {
@@ -600,12 +518,8 @@ export class AnnotationEffects {
       this.actions$.pipe(
         ofType(AnnotationActions.showNoRemainingTasksModal.do),
         tap((a) => {
-          const ref = this.modalsService.openModalRef(
-            ErrorModalComponent,
-            ErrorModalComponent.options,
-          );
-          (ref.componentInstance as ErrorModalComponent).text =
-            this.transloco.translate('projects-list.no remaining tasks');
+          const ref = this.modalsService.openModalRef(ErrorModalComponent, ErrorModalComponent.options);
+          (ref.componentInstance as ErrorModalComponent).text = this.transloco.translate('projects-list.no remaining tasks');
         }),
       ),
     { dispatch: false },
@@ -617,11 +531,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.overviewModal.open),
         tap(() => {
           if (!this.modals.overview) {
-            this.modals.overview =
-              this.modalsService.openModalRef<OverviewModalComponent>(
-                OverviewModalComponent,
-                OverviewModalComponent.options,
-              );
+            this.modals.overview = this.modalsService.openModalRef<OverviewModalComponent>(OverviewModalComponent, OverviewModalComponent.options);
             this.modals.overview.result
               .then((action) => {
                 this.modals.overview = undefined;
@@ -650,11 +560,10 @@ export class AnnotationEffects {
         ofType(AnnotationActions.shortcutsModal.open),
         tap(() => {
           if (!this.modals.shortcuts) {
-            this.modals.shortcuts =
-              this.modalsService.openModalRef<ShortcutsModalComponent>(
-                ShortcutsModalComponent,
-                ShortcutsModalComponent.options,
-              );
+            this.modals.shortcuts = this.modalsService.openModalRef<ShortcutsModalComponent>(
+              ShortcutsModalComponent,
+              ShortcutsModalComponent.options,
+            );
             this.modals.shortcuts.result
               .then(() => {
                 this.modals.shortcuts = undefined;
@@ -678,11 +587,10 @@ export class AnnotationEffects {
         ofType(AnnotationActions.guidelinesModal.open),
         tap(() => {
           if (!this.modals.guidelines) {
-            this.modals.guidelines =
-              this.modalsService.openModalRef<TranscriptionGuidelinesModalComponent>(
-                TranscriptionGuidelinesModalComponent,
-                TranscriptionGuidelinesModalComponent.options,
-              );
+            this.modals.guidelines = this.modalsService.openModalRef<TranscriptionGuidelinesModalComponent>(
+              TranscriptionGuidelinesModalComponent,
+              TranscriptionGuidelinesModalComponent.options,
+            );
             this.modals.guidelines.result
               .then(() => {
                 this.modals.guidelines = undefined;
@@ -706,11 +614,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.helpModal.open),
         tap(() => {
           if (!this.modals.help) {
-            this.modals.help =
-              this.modalsService.openModalRef<HelpModalComponent>(
-                HelpModalComponent,
-                HelpModalComponent.options,
-              );
+            this.modals.help = this.modalsService.openModalRef<HelpModalComponent>(HelpModalComponent, HelpModalComponent.options);
             this.modals.help.result
               .then(() => {
                 this.modals.help = undefined;
@@ -720,8 +624,133 @@ export class AnnotationEffects {
                 this.modals.help = undefined;
                 this.store.dispatch(AnnotationActions.helpModal.close());
               });
-          } else {
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  closeHelpModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.helpModal.close),
+        tap(() => {
+          if (this.modals.help) {
             this.modals.help.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openRegReplaceModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.regReplaceModal.open),
+        tap(() => {
+          if (!this.modals.regReplaceModal) {
+            this.modals.regReplaceModal = this.modalsService.openModalRef<HelpModalComponent>(
+              RegReplaceModalComponent,
+              RegReplaceModalComponent.options,
+            );
+            this.modals.regReplaceModal.result
+              .then(() => {
+                this.modals.regReplaceModal = undefined;
+                this.store.dispatch(AnnotationActions.regReplaceModal.close());
+              })
+              .catch(() => {
+                this.modals.regReplaceModal = undefined;
+                this.store.dispatch(AnnotationActions.regReplaceModal.close());
+              });
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  closeRegReplaceModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.regReplaceModal.close),
+        tap(() => {
+          if (this.modals.regReplaceModal) {
+            this.modals.regReplaceModal.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openCuttingModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.cuttingModal.open),
+        tap(() => {
+          if (!this.modals.cuttingModal) {
+            this.modals.cuttingModal = this.modalsService.openModalRef<CuttingAudioModalComponent>(
+              CuttingAudioModalComponent,
+              CuttingAudioModalComponent.options,
+            );
+            this.modals.cuttingModal.result
+              .then(() => {
+                this.modals.cuttingModal = undefined;
+                this.store.dispatch(AnnotationActions.cuttingModal.close());
+              })
+              .catch(() => {
+                this.modals.cuttingModal = undefined;
+                this.store.dispatch(AnnotationActions.cuttingModal.close());
+              });
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  closeCuttingModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.cuttingModal.close),
+        tap(() => {
+          if (this.modals.cuttingModal) {
+            this.modals.cuttingModal.close();
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  openCombinePhrasesModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.combineTranscriptsModal.open),
+        tap(() => {
+          if (!this.modals.combineTranscriptions) {
+            this.modals.combineTranscriptions = this.modalsService.openModalRef<CombinePhrasesModalComponent>(
+              CombinePhrasesModalComponent,
+              CombinePhrasesModalComponent.options,
+            );
+            this.modals.combineTranscriptions.result
+              .then(() => {
+                this.modals.combineTranscriptions = undefined;
+                this.store.dispatch(AnnotationActions.combineTranscriptsModal.close());
+              })
+              .catch(() => {
+                this.modals.combineTranscriptions = undefined;
+                this.store.dispatch(AnnotationActions.combineTranscriptsModal.close());
+              });
+          }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  closeCombinePhrasesModal$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.combineTranscriptsModal.close),
+        tap(() => {
+          if (this.modals.combineTranscriptions) {
+            this.modals.combineTranscriptions.close();
           }
         }),
       ),
@@ -757,11 +786,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.initTranscriptionService.success),
         withLatestFrom(this.store),
         tap(([action, state]) => {
-          this.routingService.navigate(
-            'transcription initialized',
-            ['/intern/transcr'],
-            AppInfo.queryParamsHandling,
-          );
+          this.routingService.navigate('transcription initialized', ['/intern/transcr'], AppInfo.queryParamsHandling);
         }),
       ),
     { dispatch: false },
@@ -818,23 +843,17 @@ export class AnnotationEffects {
               }
 
               return forkJoin({
-                currentProject: this.apiService
-                  .getProject(a.projectID)
-                  .pipe(catchError((b) => of(undefined))),
-                task: this.apiService
-                  .continueTask(a.projectID, a.taskID)
-                  .pipe(catchError((b) => of(undefined))),
+                currentProject: this.apiService.getProject(a.projectID).pipe(catchError((b) => of(undefined))),
+                task: this.apiService.continueTask(a.projectID, a.taskID).pipe(catchError((b) => of(undefined))),
               }).pipe(
                 map(({ currentProject, task }) => {
-                  return LoginModeActions.loadProjectAndTaskInformation.success(
-                    {
-                      mode: LoginMode.ONLINE,
-                      me: currentAccount,
-                      currentProject: currentProject ?? undefined,
-                      task: task ?? undefined,
-                      startup: a.startup,
-                    },
-                  );
+                  return LoginModeActions.loadProjectAndTaskInformation.success({
+                    mode: LoginMode.ONLINE,
+                    me: currentAccount,
+                    currentProject: currentProject ?? undefined,
+                    task: task ?? undefined,
+                    startup: a.startup,
+                  });
                 }),
                 catchError((error: HttpErrorResponse) => {
                   return checkAndThrowError(
@@ -848,10 +867,7 @@ export class AnnotationEffects {
                     }),
                     this.store,
                     () => {
-                      this.alertService.showAlert(
-                        'danger',
-                        error.error?.message ?? error.message,
-                      );
+                      this.alertService.showAlert('danger', error.error?.message ?? error.message);
                     },
                   );
                 }),
@@ -870,10 +886,7 @@ export class AnnotationEffects {
                   }),
                   this.store,
                   () => {
-                    this.alertService.showAlert(
-                      'danger',
-                      error.error?.message ?? error.message,
-                    );
+                    this.alertService.showAlert('danger', error.error?.message ?? error.message);
                   },
                 );
               } else {
@@ -886,15 +899,12 @@ export class AnnotationEffects {
               }
             }),
           );
-        } else if (
-          [LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)
-        ) {
+        } else if ([LoginMode.DEMO, LoginMode.LOCAL, LoginMode.URL].includes(a.mode)) {
           let projectConfigURL = 'config/localmode/projectconfig.json';
-          let guidelinesURLs =
-            state.application.appConfiguration!.octra.languages.map((lang) => ({
-              url: `config/localmode/guidelines/guidelines_${lang}.json`,
-              lang,
-            }));
+          let guidelinesURLs = state.application.appConfiguration!.octra.languages.map((lang) => ({
+            url: `config/localmode/guidelines/guidelines_${lang}.json`,
+            lang,
+          }));
           let functionsURL = `config/localmode/functions.js`;
           if (
             a.mode === LoginMode.URL &&
@@ -902,29 +912,20 @@ export class AnnotationEffects {
             this.routingService.staticQueryParams.guidelines_url &&
             this.routingService.staticQueryParams.functions_url
           ) {
-            projectConfigURL = appendURLQueryParams(
-              this.routingService.staticQueryParams.project_config_url,
-              {
-                v: Date.now().toString(),
-              },
-            );
+            projectConfigURL = appendURLQueryParams(this.routingService.staticQueryParams.project_config_url, {
+              v: Date.now().toString(),
+            });
             guidelinesURLs = [
               {
-                url: appendURLQueryParams(
-                  this.routingService.staticQueryParams.guidelines_url,
-                  {
-                    v: Date.now().toString(),
-                  },
-                ),
+                url: appendURLQueryParams(this.routingService.staticQueryParams.guidelines_url, {
+                  v: Date.now().toString(),
+                }),
                 lang: this.routingService.staticQueryParams.locale ?? 'en',
               },
             ];
-            functionsURL = appendURLQueryParams(
-              this.routingService.staticQueryParams.functions_url,
-              {
-                v: Date.now().toString(),
-              },
-            );
+            functionsURL = appendURLQueryParams(this.routingService.staticQueryParams.functions_url, {
+              v: Date.now().toString(),
+            });
           }
           // mode is not online => load configuration for local environment
           return forkJoin<
@@ -944,19 +945,18 @@ export class AnnotationEffects {
               responseType: 'json',
             }),
             forkJoin(
-              guidelinesURLs.map(
-                ({ url, lang }: { url: string; lang: string }) =>
-                  this.http
-                    .get(url, {
-                      responseType: 'json',
-                    })
-                    .pipe(
-                      map((c) => ({
-                        language: lang,
-                        json: c,
-                      })),
-                      catchError(() => of(undefined)),
-                    ),
+              guidelinesURLs.map(({ url, lang }: { url: string; lang: string }) =>
+                this.http
+                  .get(url, {
+                    responseType: 'json',
+                  })
+                  .pipe(
+                    map((c) => ({
+                      language: lang,
+                      json: c,
+                    })),
+                    catchError(() => of(undefined)),
+                  ),
               ),
             ),
             this.http.get(functionsURL, {
@@ -1028,25 +1028,16 @@ export class AnnotationEffects {
                     fileInfo: undefined,
                   },
                 };
-                urlInfo.audio.url = this.routingService.staticQueryParams
-                  .audio_url
-                  ? decodeURIComponent(
-                      this.routingService.staticQueryParams.audio_url,
-                    )
+                urlInfo.audio.url = this.routingService.staticQueryParams.audio_url
+                  ? decodeURIComponent(this.routingService.staticQueryParams.audio_url)
                   : undefined;
-                urlInfo.transcript.url = this.routingService.staticQueryParams
-                  .transcript
-                  ? decodeURIComponent(
-                      this.routingService.staticQueryParams.transcript,
-                    )
+                urlInfo.transcript.url = this.routingService.staticQueryParams.transcript
+                  ? decodeURIComponent(this.routingService.staticQueryParams.transcript)
                   : undefined;
 
                 for (const key of Object.keys(urlInfo)) {
                   if (urlInfo[key].url) {
-                    let mediaType: string | undefined =
-                      key === 'audio'
-                        ? this.routingService.staticQueryParams.audio_type
-                        : undefined;
+                    let mediaType: string | undefined = key === 'audio' ? this.routingService.staticQueryParams.audio_type : undefined;
                     let decodedURL = decodeURIComponent(urlInfo[key].url);
 
                     if (decodedURL.includes('?')) {
@@ -1062,8 +1053,7 @@ export class AnnotationEffects {
                       extension = nameFromURL.extension;
                     } else {
                       if (mediaType) {
-                        extension =
-                          MimeTypeMapper.mapTypeToExtension(mediaType);
+                        extension = MimeTypeMapper.mapTypeToExtension(mediaType);
                       }
                     }
 
@@ -1075,8 +1065,7 @@ export class AnnotationEffects {
                     urlInfo[key].fileInfo = FileInfo.fromURL(
                       decodedURL,
                       mediaType,
-                      key === 'audio' &&
-                        this.routingService.staticQueryParams.audio_name
+                      key === 'audio' && this.routingService.staticQueryParams.audio_name
                         ? this.routingService.staticQueryParams.audio_name
                         : `${nameFromURL.name}${extension}`,
                     );
@@ -1138,38 +1127,23 @@ export class AnnotationEffects {
               return forkJoin(observables).pipe(
                 map(
                   ([event]) => {
-                    const task = createSampleTask(
-                      a.taskID ?? '-1',
-                      event.inputs,
-                      [],
-                      projectConfig,
-                      functions,
-                      guidelines,
-                      {
-                        orgtext:
-                          LoginMode.DEMO === state.application.mode!
-                            ? state.application.appConfiguration!.octra
-                                .audioExamples[0].description
-                            : '',
-                      },
-                    );
+                    const task = createSampleTask(a.taskID ?? '-1', event.inputs, [], projectConfig, functions, guidelines, {
+                      orgtext:
+                        LoginMode.DEMO === state.application.mode! ? state.application.appConfiguration!.octra.audioExamples[0].description : '',
+                    });
 
-                    return LoginModeActions.loadProjectAndTaskInformation.success(
-                      {
-                        mode: a.mode,
-                        me: createSampleUser(),
-                        currentProject,
-                        task,
-                        startup: a.startup,
-                      },
-                    );
+                    return LoginModeActions.loadProjectAndTaskInformation.success({
+                      mode: a.mode,
+                      me: createSampleUser(),
+                      currentProject,
+                      task,
+                      startup: a.startup,
+                    });
                   },
                   catchError((e) => {
                     if (e instanceof HttpErrorResponse) {
                       alert(`Can't load transcript file: ${e.message}`);
-                      return of(
-                        LoginModeActions.loadProjectAndTaskInformation.fail(e),
-                      );
+                      return of(LoginModeActions.loadProjectAndTaskInformation.fail(e));
                     }
                     return of();
                   }),
@@ -1196,30 +1170,20 @@ export class AnnotationEffects {
       exhaustMap(([action, state]) => {
         const modeState = getModeState(state)!;
 
-        if (
-          modeState.transcript.currentLevel &&
-          modeState.transcript.currentLevel.type === 'SEGMENT'
-        ) {
+        if (modeState.transcript.currentLevel && modeState.transcript.currentLevel.type === 'SEGMENT') {
           let transcript = modeState.transcript.clone();
           let currentLevel: OctraAnnotationSegmentLevel<OctraAnnotationSegment> =
             modeState.transcript.currentLevel.clone() as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
-          const breakMarker =
-            modeState.guidelines?.selected?.json?.markers?.find(
-              (a) => a.type === 'break',
-            );
+          const breakMarker = modeState.guidelines?.selected?.json?.markers?.find((a) => a.type === 'break');
 
           const maxWords = action.options.maxWordsPerSegment;
           const minSilenceLength = action.options.minSilenceLength;
           const isSilence = (segment: OctraAnnotationSegment) => {
             return (
-              segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-                '' ||
-              segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-                breakMarker?.code ||
-              segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-                '<p:>' ||
-              segment.getFirstLabelWithoutName('Speaker')?.value.trim() ===
-                breakMarker?.code
+              segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '' ||
+              segment.getFirstLabelWithoutName('Speaker')?.value.trim() === breakMarker?.code ||
+              segment.getFirstLabelWithoutName('Speaker')?.value.trim() === '<p:>' ||
+              segment.getFirstLabelWithoutName('Speaker')?.value.trim() === breakMarker?.code
             );
           };
 
@@ -1239,11 +1203,7 @@ export class AnnotationEffects {
             let duration = segment.time.unix - startPos;
             if (!isSilence(segment) || duration < minSilenceLength) {
               if (maxWords > 0 && wordCounter >= maxWords) {
-                wordCounter = isSilence(segment)
-                  ? 0
-                  : countWords(
-                      segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
-                    );
+                wordCounter = isSilence(segment) ? 0 : countWords(segment.getFirstLabelWithoutName('Speaker')?.value ?? '');
               } else {
                 if (i > 0) {
                   const lastSegment = currentLevel.items[i - 1];
@@ -1253,17 +1213,9 @@ export class AnnotationEffects {
                   }
                   duration = lastSegment.time.unix - startPos;
                   if (!isSilence(lastSegment) || duration < minSilenceLength) {
-                    transcript = transcript!.removeItemByIndex(
-                      i - 1,
-                      '',
-                      true,
-                      (transcript: string) => {
-                        return tidyUpAnnotation(
-                          transcript,
-                          modeState.guidelines.selected.json,
-                        );
-                      },
-                    );
+                    transcript = transcript!.removeItemByIndex(i - 1, '', true, (transcript: string) => {
+                      return tidyUpAnnotation(transcript, modeState.guidelines.selected.json);
+                    });
                     currentLevel = transcript.currentLevel as any;
                     i--;
                   }
@@ -1280,11 +1232,17 @@ export class AnnotationEffects {
         }
         return of(
           AnnotationActions.combinePhrases.fail({
-            error:
-              "Can't combine phrases: current level must be of type SEGMENT.",
+            error: "Can't combine phrases: current level must be of type SEGMENT.",
           }),
         );
       }),
+    ),
+  );
+
+  closeAllModalsOnQuit$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.sendOnlineAnnotation.do, AnnotationActions.quit.do),
+      exhaustMap(() => of(AnnotationActions.closeAllModals.do())),
     ),
   );
 
@@ -1300,15 +1258,11 @@ export class AnnotationEffects {
                 TranscriptionSendingModalComponent,
                 TranscriptionSendingModalComponent.options,
               );
-              this.transcrSendingModal.ref.componentInstance.error =
-                this.transcrSendingModal.error ?? '';
+              this.transcrSendingModal.ref.componentInstance.error = this.transcrSendingModal.error ?? '';
             },
           });
 
-          if (
-            !state.onlineMode.currentSession.currentProject ||
-            !state.onlineMode.currentSession.task?.id
-          ) {
+          if (!state.onlineMode.currentSession.currentProject || !state.onlineMode.currentSession.task?.id) {
             return of(
               AnnotationActions.sendOnlineAnnotation.fail({
                 mode: state.application.mode!,
@@ -1342,8 +1296,7 @@ export class AnnotationEffects {
                 this.store,
                 () => {
                   if (this.transcrSendingModal.ref) {
-                    this.transcrSendingModal.ref.componentInstance.error =
-                      error.error?.message ?? error.message;
+                    this.transcrSendingModal.ref.componentInstance.error = error.error?.message ?? error.message;
                   }
                 },
               );
@@ -1423,12 +1376,7 @@ export class AnnotationEffects {
         this.transcrSendingModal.timeout?.unsubscribe();
         this.transcrSendingModal.ref?.close();
 
-        this.alertService.showAlert(
-          'success',
-          this.transloco.translate('g.submission success'),
-          true,
-          2000,
-        );
+        this.alertService.showAlert('success', this.transloco.translate('g.submission success'), true, 2000);
 
         this.store.dispatch(ApplicationActions.waitForEffects.do());
 
@@ -1477,11 +1425,7 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.redirectToProjects.do),
       exhaustMap((a) => {
-        this.routingService.navigate(
-          'redirect to projects after quit',
-          ['/intern/projects'],
-          AppInfo.queryParamsHandling,
-        );
+        this.routingService.navigate('redirect to projects after quit', ['/intern/projects'], AppInfo.queryParamsHandling);
         return of(AnnotationActions.redirectToProjects.success());
       }),
     ),
@@ -1505,22 +1449,15 @@ export class AnnotationEffects {
           );
         } else {
           // user want to continue last task
-          const project: ProjectDto | undefined =
-            action.project ?? mode.currentSession?.currentProject;
-          const taskID: string | undefined =
-            mode.currentSession?.task?.id ?? mode.previousSession?.task?.id;
+          const project: ProjectDto | undefined = action.project ?? mode.currentSession?.currentProject;
+          const taskID: string | undefined = mode.currentSession?.task?.id ?? mode.previousSession?.task?.id;
 
           return forkJoin<{
             project: Observable<ProjectDto>;
             task: Observable<TaskDto>;
           }>({
-            project: project
-              ? of(project)
-              : this.apiService.getProject(mode.previousSession.project.id),
-            task: this.apiService.getTask(
-              project?.id ?? mode.previousSession.project.id,
-              taskID,
-            ),
+            project: project ? of(project) : this.apiService.getProject(mode.previousSession.project.id),
+            task: this.apiService.getTask(project?.id ?? mode.previousSession.project.id, taskID),
           }).pipe(
             map((result) => {
               if (result.project && result.task) {
@@ -1585,8 +1522,7 @@ export class AnnotationEffects {
 
         return of(
           AnnotationActions.resumeTaskManually.fail({
-            error:
-              "Can't resume task because of missing task id or project id.",
+            error: "Can't resume task because of missing task id or project id.",
             mode: state.application.mode!,
           }),
         );
@@ -1648,22 +1584,12 @@ export class AnnotationEffects {
       ofType(AnnotationActions.updateASRSegmentInformation.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
-        if (
-          (action.itemType === ASRQueueItemType.ASRMAUS ||
-            action.itemType === ASRQueueItemType.MAUS) &&
-          action.result
-        ) {
+        if ((action.itemType === ASRQueueItemType.ASRMAUS || action.itemType === ASRQueueItemType.MAUS) && action.result) {
           const segmentBoundary = new SampleUnit(
-            action.timeInterval.sampleStart +
-              action.timeInterval.sampleLength / 2,
+            action.timeInterval.sampleStart + action.timeInterval.sampleLength / 2,
             getModeState(state)!.audio.sampleRate!,
           );
-          const segmentIndex =
-            getModeState(
-              state,
-            )!.transcript.getCurrentSegmentIndexBySamplePosition(
-              segmentBoundary,
-            );
+          const segmentIndex = getModeState(state)!.transcript.getCurrentSegmentIndexBySamplePosition(segmentBoundary);
 
           const converter = new PraatTextgridConverter();
           const audioManager = this.audio.audioManager;
@@ -1682,11 +1608,9 @@ export class AnnotationEffects {
             );
 
             if (convertedResult?.annotjson) {
-              const wordsTier = convertedResult.annotjson.levels.find(
-                (a: any) => {
-                  return a.name === 'ORT-MAU';
-                },
-              );
+              const wordsTier = convertedResult.annotjson.levels.find((a: any) => {
+                return a.name === 'ORT-MAU';
+              });
 
               if (wordsTier !== undefined) {
                 let counter = 0;
@@ -1698,63 +1622,40 @@ export class AnnotationEffects {
                     }),
                   );
                 } else {
-                  const segmentID =
-                    getModeState(state)!.transcript.currentLevel!.items[
-                      segmentIndex
-                    ].id;
+                  const segmentID = getModeState(state)!.transcript.currentLevel!.items[segmentIndex].id;
                   const newSegments: OctraAnnotationSegment[] = [];
 
-                  let itemCounter =
-                    getModeState(state)?.transcript.idCounters.item ?? 1;
+                  let itemCounter = getModeState(state)?.transcript.idCounters.item ?? 1;
 
                   for (const wordItem of wordsTier.items as ISegment[]) {
-                    const itemEnd =
-                      action.timeInterval.sampleStart +
-                      action.timeInterval.sampleLength;
-                    let wordItemEnd =
-                      action.timeInterval.sampleStart +
-                      Math.ceil(wordItem.sampleStart + wordItem.sampleDur);
+                    const itemEnd = action.timeInterval.sampleStart + action.timeInterval.sampleLength;
+                    let wordItemEnd = action.timeInterval.sampleStart + Math.ceil(wordItem.sampleStart + wordItem.sampleDur);
                     wordItemEnd = Math.min(itemEnd, wordItemEnd);
 
                     if (wordItemEnd >= action.timeInterval.sampleStart) {
                       const readSegment = new OctraAnnotationSegment(
                         itemCounter++,
-                        new SampleUnit(
-                          wordItemEnd,
-                          this.audio.audioManager.resource.info.sampleRate,
-                        ),
+                        new SampleUnit(wordItemEnd, this.audio.audioManager.resource.info.sampleRate),
                         wordItem.labels.map((a) =>
                           OLabel.deserialize({
                             ...a,
-                            name:
-                              a.name === 'ORT-MAU'
-                                ? getModeState(state)!.transcript!.currentLevel!
-                                    .name!
-                                : a.name,
+                            name: a.name === 'ORT-MAU' ? getModeState(state)!.transcript!.currentLevel!.name! : a.name,
                           }),
                         ),
                       );
 
-                      const labelIndex = readSegment.labels.findIndex(
-                        (a) => a.value === '<p:>' || a.value === '',
-                      );
+                      const labelIndex = readSegment.labels.findIndex((a) => a.value === '<p:>' || a.value === '');
 
                       if (labelIndex > -1) {
                         readSegment.labels[labelIndex].value =
-                          getModeState(
-                            state,
-                          )!.guidelines?.selected?.json.markers.find(
-                            (a) => a.type === 'break',
-                          )?.code ?? '';
+                          getModeState(state)!.guidelines?.selected?.json.markers.find((a) => a.type === 'break')?.code ?? '';
                       }
 
                       newSegments.push(readSegment);
                       // the last segment is the original segment
                     } else {
                       // tslint:disable-next-line:max-line-length
-                      console.error(
-                        `Invalid word item boundary:! ${wordItemEnd} <= ${action.timeInterval.sampleStart}`,
-                      );
+                      console.error(`Invalid word item boundary:! ${wordItemEnd} <= ${action.timeInterval.sampleStart}`);
                       return of(
                         AnnotationActions.addMultipleASRSegments.fail({
                           error: `wordItem samples are out of the correct boundaries.`,
@@ -1817,9 +1718,7 @@ export class AnnotationEffects {
     document.head.appendChild(script);
   }
 
-  private readGuidelines(
-    assets: ToolConfigurationAssetDto[],
-  ): GuidelinesItem[] {
+  private readGuidelines(assets: ToolConfigurationAssetDto[]): GuidelinesItem[] {
     return assets
       .filter((a) => a.name === 'guidelines')
       .map((a) => {
@@ -1827,8 +1726,7 @@ export class AnnotationEffects {
           return {
             filename: a.filename!,
             name: a.name,
-            json:
-              typeof a.content === 'string' ? JSON.parse(a.content) : a.content,
+            json: typeof a.content === 'string' ? JSON.parse(a.content) : a.content,
             type: a.mime_type,
           };
         } catch (e) {
@@ -1845,27 +1743,18 @@ export class AnnotationEffects {
   private loadSegments(modeState: AnnotationState, rootState: RootState) {
     try {
       let feedback: FeedBackForm | undefined = undefined;
-      if (
-        modeState.transcript.levels === undefined ||
-        modeState.transcript.levels.length === 0
-      ) {
+      if (modeState.transcript.levels === undefined || modeState.transcript.levels.length === 0) {
         // create new annotation
         let newAnnotation = new OctraAnnotation();
 
-        if (
-          rootState.application.mode === LoginMode.ONLINE ||
-          rootState.application.mode === LoginMode.URL
-        ) {
+        if (rootState.application.mode === LoginMode.ONLINE || rootState.application.mode === LoginMode.URL) {
           let annotResult: ImportResult | undefined;
           const task: TaskDto | undefined = modeState.currentSession?.task;
 
           // import logs
           this.store.dispatch(
             AnnotationActions.saveLogs.do({
-              logs:
-                modeState.logging.logs && modeState.logging.logs.length > 0
-                  ? modeState.logging.logs
-                  : (task?.log ?? []),
+              logs: modeState.logging.logs && modeState.logging.logs.length > 0 ? modeState.logging.logs : (task?.log ?? []),
               mode: rootState.application.mode,
             }),
           );
@@ -1896,20 +1785,15 @@ export class AnnotationEffects {
                 importConverter: importResult?.converter,
               }),
             );
-            newAnnotation = OctraAnnotation.deserialize(
-              importResult?.annotjson,
-            );
+            newAnnotation = OctraAnnotation.deserialize(importResult?.annotjson);
           }
 
           if (newAnnotation.levels.length === 0) {
             const level = newAnnotation.createSegmentLevel('OCTRA_1');
             level.items.push(
-              newAnnotation.createSegment(
-                this.audio.audioManager.resource.info.duration,
-                [
-                  new OLabel('OCTRA_1', ''), // empty transcript
-                ],
-              ),
+              newAnnotation.createSegment(this.audio.audioManager.resource.info.duration, [
+                new OLabel('OCTRA_1', ''), // empty transcript
+              ]),
             );
             newAnnotation.addLevel(level);
             newAnnotation.changeLevelIndex(0);
@@ -1931,24 +1815,16 @@ export class AnnotationEffects {
 
           const level = newAnnotation.createSegmentLevel('OCTRA_1');
           level.items.push(
-            newAnnotation.createSegment(
-              this.audio.audioManager.resource.info.duration,
-              [
-                new OLabel('OCTRA_1', ''), // empty transcript
-              ],
-            ),
+            newAnnotation.createSegment(this.audio.audioManager.resource.info.duration, [
+              new OLabel('OCTRA_1', ''), // empty transcript
+            ]),
           );
           newAnnotation.addLevel(level);
           newAnnotation.changeLevelIndex(0);
 
-          const projectSettings =
-            getModeState(rootState)!.currentSession.task!.tool_configuration!
-              .value;
+          const projectSettings = getModeState(rootState)!.currentSession.task!.tool_configuration!.value;
           if (projectSettings?.feedback_form) {
-            feedback = FeedBackForm.fromAny(
-              projectSettings.feedback_form,
-              modeState.currentSession.comment ?? '',
-            );
+            feedback = FeedBackForm.fromAny(projectSettings.feedback_form, modeState.currentSession.comment ?? '');
           }
           if (feedback) {
             feedback?.importData(feedback);
@@ -1977,10 +1853,7 @@ export class AnnotationEffects {
           );
         }
 
-        if (
-          rootState.application.options.showFeedbackNotice &&
-          this.apiService.appProperties?.send_feedback
-        ) {
+        if (rootState.application.options.showFeedbackNotice && this.apiService.appProperties?.send_feedback) {
           this.modalsService.openFeedbackNoticeModal();
         }
 
@@ -1995,9 +1868,7 @@ export class AnnotationEffects {
         );
       }
 
-      const transcript = modeState.transcript.changeSampleRate(
-        this.audio.audioManager.resource.info.sampleRate,
-      );
+      const transcript = modeState.transcript.changeSampleRate(this.audio.audioManager.resource.info.sampleRate);
 
       const currentLevelIndex =
         modeState.previousCurrentLevel === undefined ||
@@ -2010,10 +1881,7 @@ export class AnnotationEffects {
           : modeState.previousCurrentLevel;
       transcript.changeCurrentLevelIndex(currentLevelIndex);
 
-      if (
-        rootState.application.options.showFeedbackNotice &&
-        this.apiService.appProperties?.send_feedback
-      ) {
+      if (rootState.application.options.showFeedbackNotice && this.apiService.appProperties?.send_feedback) {
         this.modalsService.openFeedbackNoticeModal();
       }
 
@@ -2048,8 +1916,7 @@ export class AnnotationEffects {
             undefined,
             undefined,
             undefined,
-            getModeState(state)?.transcript?.levels[action.currentLevelIndex]
-              ?.name,
+            getModeState(state)?.transcript?.levels[action.currentLevelIndex]?.name,
           );
         }),
       ),
@@ -2059,17 +1926,10 @@ export class AnnotationEffects {
   public initMaintenance(state: RootState) {
     if (
       state.application.appConfiguration !== undefined &&
-      hasProperty(
-        state.application.appConfiguration.octra,
-        'maintenanceNotification',
-      ) &&
-      state.application.appConfiguration.octra.maintenanceNotification
-        .active === 'active'
+      hasProperty(state.application.appConfiguration.octra, 'maintenanceNotification') &&
+      state.application.appConfiguration.octra.maintenanceNotification.active === 'active'
     ) {
-      const maintenanceAPI = new MaintenanceAPI(
-        state.application.appConfiguration.octra.maintenanceNotification.apiURL,
-        this.http,
-      );
+      const maintenanceAPI = new MaintenanceAPI(state.application.appConfiguration.octra.maintenanceNotification.apiURL, this.http);
 
       maintenanceAPI
         .readMaintenanceNotifications(24)
@@ -2086,12 +1946,8 @@ export class AnnotationEffects {
                       'warning',
                       '⚠️ ' +
                         this.transloco.translate('maintenance.in app', {
-                          start: DateTime.fromISO(notification.begin)
-                            .setLocale(this.appStorage.language)
-                            .toLocaleString(DateTime.DATETIME_SHORT),
-                          end: DateTime.fromISO(notification.end)
-                            .setLocale(this.appStorage.language)
-                            .toLocaleString(DateTime.DATETIME_SHORT),
+                          start: DateTime.fromISO(notification.begin).setLocale(this.appStorage.language).toLocaleString(DateTime.DATETIME_SHORT),
+                          end: DateTime.fromISO(notification.end).setLocale(this.appStorage.language).toLocaleString(DateTime.DATETIME_SHORT),
                         }),
                       true,
                       60,
@@ -2108,9 +1964,7 @@ export class AnnotationEffects {
             }
 
             // run each 15 minutes
-            this.maintenanceChecker = interval(15 * 60000).subscribe(
-              readNotification,
-            );
+            this.maintenanceChecker = interval(15 * 60000).subscribe(readNotification);
           }
         })
         .catch(() => {
@@ -2119,10 +1973,7 @@ export class AnnotationEffects {
     }
   }
 
-  private saveTaskToServer(
-    state: RootState,
-    status: TaskStatus,
-  ): Observable<TaskDto | undefined> {
+  private saveTaskToServer(state: RootState, status: TaskStatus): Observable<TaskDto | undefined> {
     if (!this.audio.audioManager?.resource) {
       return of(undefined);
     }
@@ -2139,16 +1990,9 @@ export class AnnotationEffects {
 
     const outputs = result
       ? [
-          new File(
-            [result],
-            state.onlineMode.audio.fileName.substring(
-              0,
-              state.onlineMode.audio.fileName.lastIndexOf('.'),
-            ) + '_annot.json',
-            {
-              type: 'application/json',
-            },
-          ),
+          new File([result], state.onlineMode.audio.fileName.substring(0, state.onlineMode.audio.fileName.lastIndexOf('.')) + '_annot.json', {
+            type: 'application/json',
+          }),
         ]
       : [];
 
@@ -2161,13 +2005,9 @@ export class AnnotationEffects {
         status,
       },
       state.onlineMode.logging.logs
-        ? new File(
-            [JSON.stringify(state.onlineMode.logging.logs)],
-            'log.json',
-            {
-              type: 'application/json',
-            },
-          )
+        ? new File([JSON.stringify(state.onlineMode.logging.logs)], 'log.json', {
+            type: 'application/json',
+          })
         : undefined,
       outputs,
     );
@@ -2179,8 +2019,7 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
         const modeState = getModeState(state);
-        const aType =
-          this.routingService.staticQueryParams.annotationExportType;
+        const aType = this.routingService.staticQueryParams.annotationExportType;
         let converter: Converter | undefined = undefined;
 
         if (!aType || aType === 'AnnotJSON') {
@@ -2205,11 +2044,7 @@ export class AnnotationEffects {
           this.audio.audioManager.resource.info.sampleRate,
           this.audio.audioManager.resource.info.duration,
         );
-        const result = converter.export(
-          oannotjson,
-          this.audio.audioManager.resource.getOAudioFile(),
-          0,
-        );
+        const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), 0);
 
         if (!result.error && result.file) {
           // send result to iframe owner
@@ -2239,6 +2074,21 @@ export class AnnotationEffects {
             }),
           );
         }
+      }),
+    ),
+  );
+
+  closeAllModals$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.closeAllModals.do),
+      exhaustMap(() => {
+        for (const key of Object.keys(this.modals)) {
+          if (this.modals[key]) {
+            this.modals[key].close();
+            this.modals[key] = undefined;
+          }
+        }
+        return of(AnnotationActions.closeAllModals.success());
       }),
     ),
   );

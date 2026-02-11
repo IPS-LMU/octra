@@ -1,30 +1,14 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ComponentRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ComponentRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { hasProperty, joinURL } from '@octra/utilities';
 import { interval, timer } from 'rxjs';
 import { editorComponents } from '../../../../editors/components';
-import {
-  OCTRAEditor,
-  OctraEditorRequirements,
-} from '../../../../editors/octra-editor';
+import { OCTRAEditor } from '../../../../editors/octra-editor';
 import { InactivityModalComponent } from '../../../modals/inactivity-modal/inactivity-modal.component';
 import { MissingPermissionsModalComponent } from '../../../modals/missing-permissions/missing-permissions.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
-import { OverviewModalComponent } from '../../../modals/overview-modal/overview-modal.component';
-import {
-  ModalEndAnswer,
-  TranscriptionDemoEndModalComponent,
-} from '../../../modals/transcription-demo-end/transcription-demo-end-modal.component';
-import { TranscriptionGuidelinesModalComponent } from '../../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import { ModalEndAnswer, TranscriptionDemoEndModalComponent } from '../../../modals/transcription-demo-end/transcription-demo-end-modal.component';
 import { TranscriptionSendingModalComponent } from '../../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {
   TranscriptionStopModalAnswer,
@@ -38,12 +22,7 @@ import { AsyncPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
-import {
-  AudioManager,
-  BrowserInfo,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
+import { AudioManager, BrowserInfo, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { EmuWebAppEditorComponent } from '../../../../editors';
 import { UnsupportedLevelPlaceholderComponent } from '../../../component';
@@ -52,12 +31,7 @@ import { NavbarService } from '../../../component/navbar/navbar.service';
 import { FastbarComponent } from '../../../component/taskbar/taskbar.component';
 import { ChoiceModalComponent } from '../../../modals/choice-modal/choice-modal.component';
 import { PromptModalComponent } from '../../../modals/prompt-modal/prompt-modal.component';
-import {
-  AlertService,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../../shared/service';
+import { AlertService, AudioService, SettingsService, UserInteractionsService } from '../../../shared/service';
 import { AppStorageService } from '../../../shared/service/appstorage.service';
 import { RoutingService } from '../../../shared/service/routing.service';
 import { ShortcutService } from '../../../shared/service/shortcut.service';
@@ -72,19 +46,9 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.scss'],
-  imports: [
-    NgClass,
-    FastbarComponent,
-    LoadeditorDirective,
-    FormsModule,
-    AsyncPipe,
-    TranslocoPipe,
-  ],
+  imports: [NgClass, FastbarComponent, LoadeditorDirective, FormsModule, AsyncPipe, TranslocoPipe],
 })
-export class TranscriptionComponent
-  extends DefaultComponent
-  implements OnInit, OnDestroy
-{
+export class TranscriptionComponent extends DefaultComponent implements OnInit, OnDestroy {
   router = inject(Router);
   audio = inject(AudioService);
   uiService = inject(UserInteractionsService);
@@ -93,6 +57,7 @@ export class TranscriptionComponent
   navbarServ = inject(NavbarService);
   settingsService = inject(SettingsService);
   modService = inject(OctraModalService);
+  private ngModalService = inject(OctraModalService);
   private appStoreService = inject(ApplicationStoreService);
   langService = inject(TranslocoService);
   routingService = inject(RoutingService);
@@ -132,25 +97,12 @@ export class TranscriptionComponent
   private audioManager: AudioManager;
 
   private isLevelSupportedByEditor(editor: typeof OCTRAEditor) {
-    return editor.meta?.supportedLevelTypes.includes(
-      this.annotationStoreService.transcript.currentLevel.type,
-    );
+    return editor.meta?.supportedLevelTypes.includes(this.annotationStoreService.transcript.currentLevel.type);
   }
 
-  private onAltSend = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-  ) => {
-    if (
-      this._useMode === LoginMode.ONLINE ||
-      this._useMode === LoginMode.DEMO
-    ) {
-      if (
-        ['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(
-          shortcut.keys.mac!,
-        )
-      ) {
+  private onAltSend = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+    if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
+      if (['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(shortcut.keys.mac!)) {
         this.appStorage
           .afterSaving()
           .then(() => {
@@ -205,6 +157,14 @@ export class TranscriptionComponent
     }
   };
 
+  private onSearchShortcut = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+    keyboardEvent.preventDefault();
+    keyboardEvent.stopPropagation();
+    keyboardEvent.stopImmediatePropagation();
+
+    this.openRegReplaceModal();
+  };
+
   private onShortcutsModal = () => {
     this.annotationStoreService.openShortcutsModal();
   };
@@ -215,6 +175,10 @@ export class TranscriptionComponent
 
   private onOverviewModal = () => {
     this.annotationStoreService.openOverviewModal();
+  };
+
+  private openRegReplaceModal = () => {
+    this.annotationStoreService.openRegReplaceModal();
   };
 
   private modalShortcuts: ShortcutGroup = {
@@ -294,6 +258,16 @@ export class TranscriptionComponent
         },
         callback: this.onAltSend,
       },
+      {
+        name: 'feedback3',
+        title: 'feedback and send 3',
+        focusonly: false,
+        keys: {
+          mac: 'CMD + F',
+          pc: 'CTRL + F',
+        },
+        callback: this.onSearchShortcut,
+      },
     ],
   };
 
@@ -301,9 +275,7 @@ export class TranscriptionComponent
   isInactivityModalVisible = false;
 
   get loaded(): boolean {
-    return (
-      this.audio.loaded && this.annotationStoreService.guidelines !== undefined
-    );
+    return this.audio.loaded && this.annotationStoreService.guidelines !== undefined;
   }
 
   get appc(): any {
@@ -333,10 +305,7 @@ export class TranscriptionComponent
     const appStorage = this.appStorage;
 
     if (this.settingsService.appSettings.octra.plugins?.emuWebApp?.url) {
-      EmuWebAppEditorComponent.meta.iconURL = joinURL(
-        this.settingsService.appSettings.octra.plugins.emuWebApp.url,
-        '/assets/favicon-32x32.png',
-      );
+      EmuWebAppEditorComponent.meta.iconURL = joinURL(this.settingsService.appSettings.octra.plugins.emuWebApp.url, '/assets/favicon-32x32.png');
     }
 
     this.audioManager = this.audio.audiomanagers[0];
@@ -347,25 +316,14 @@ export class TranscriptionComponent
         if (!appStorage.playOnHover && !this.annotationStoreService.modalVisibilities.overview) {
           let caretpos = undefined;
 
-          if (
-            this.currentEditor !== undefined &&
-            (this.currentEditor.instance as any).editor !== undefined
-          ) {
-            caretpos = (this.currentEditor.instance as any).editor
-              .textSelection;
+          if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
+            caretpos = (this.currentEditor.instance as any).editor.textSelection;
           }
 
           if (this.appStorage.interface) {
             // make sure that events from playonhover are not logged
             const currentEditorName = this.appStorage.interface;
-            this.uiService.logAudioEvent(
-              currentEditorName,
-              state,
-              this.audioManager.playPosition,
-              caretpos,
-              undefined,
-              undefined,
-            );
+            this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playPosition, caretpos, undefined, undefined);
           }
         }
       },
@@ -387,10 +345,7 @@ export class TranscriptionComponent
             .catch((error) => {
               console.error(error);
             });
-          if (
-            this.currentEditor !== undefined &&
-            (this.currentEditor.instance as any).editor !== undefined
-          ) {
+          if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
             (this._currentEditor.instance as any).update();
           }
           break;
@@ -398,20 +353,14 @@ export class TranscriptionComponent
     });
 
     this.subscribe(this.audio.missingPermission, () => {
-      this.modService.openModal(
-        MissingPermissionsModalComponent,
-        MissingPermissionsModalComponent.options,
-      );
+      this.modService.openModal(MissingPermissionsModalComponent, MissingPermissionsModalComponent.options);
     });
   }
 
   abortTranscription = () => {
     if ([LoginMode.ONLINE, LoginMode.URL].includes(this.appStorage.useMode)) {
       this.modService
-        .openModal(
-          TranscriptionStopModalComponent,
-          TranscriptionStopModalComponent.options,
-        )
+        .openModal(TranscriptionStopModalComponent, TranscriptionStopModalComponent.options)
         .then((answer: any) => {
           if (answer === TranscriptionStopModalAnswer.QUIT) {
             this.annotationStoreService.quit(true, false, false);
@@ -430,12 +379,8 @@ export class TranscriptionComponent
 
   ngOnInit() {
     this._useMode = this.appStorage.useMode;
-    this._selectedTheme = !this.projectsettings?.octra?.theme
-      ? 'default'
-      : this.projectsettings?.octra.theme;
-    this.showCommentSection =
-      this.settingsService.isTheme('shortAudioFiles') &&
-      (this._useMode === 'online' || this._useMode === 'demo');
+    this._selectedTheme = !this.projectsettings?.octra?.theme ? 'default' : this.projectsettings?.octra.theme;
+    this.showCommentSection = this.settingsService.isTheme('shortAudioFiles') && (this._useMode === 'online' || this._useMode === 'demo');
 
     this.subscribe(this.appStoreService.shortcutsEnabled$, {
       next: (shortcutsEnabled) => {
@@ -453,17 +398,12 @@ export class TranscriptionComponent
 
     this.subscribe(this.shortcutService.triggerGeneralShortcuts, {
       next: ({ shortcut }) => {
-        const searchGroups = [
-          ...this.shortcutService.groups,
-          ...this.shortcutService.generalShortcuts,
-        ];
+        const searchGroups = [...this.shortcutService.groups, ...this.shortcutService.generalShortcuts];
 
         for (const searchGroup of searchGroups) {
           if (searchGroup.enabled === true) {
             for (const item of searchGroup.items) {
-              const keys: string[] = Object.keys(item.keys).map(
-                (a) => item.keys[a],
-              );
+              const keys: string[] = Object.keys(item.keys).map((a) => item.keys[a]);
               if (keys.includes(shortcut)) {
                 item.callback(undefined, item, undefined, searchGroup);
                 return;
@@ -474,31 +414,23 @@ export class TranscriptionComponent
       },
     });
 
-    this.subscribe(
-      this.actions.pipe(ofType(AnnotationActions.overviewModal.send)),
-      {
-        next: () => {
-          this.onSendNowClick();
-          this.cd.markForCheck();
-        },
+    this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.send)), {
+      next: () => {
+        this.onSendNowClick();
+        this.cd.markForCheck();
       },
-    );
+    });
 
-    this.subscribe(
-      this.actions.pipe(ofType(AnnotationActions.overviewModal.close)),
-      {
-        next: () => {
-          this.cd.markForCheck();
-        },
+    this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.close)), {
+      next: () => {
+        this.cd.markForCheck();
       },
-    );
+    });
 
     this.annotationStoreService.overwriteTidyUpAnnotation();
 
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-    this.shortcutService.registerGeneralShortcutGroup(
-      this.transcriptionShortcuts,
-    );
+    this.shortcutService.registerGeneralShortcutGroup(this.transcriptionShortcuts);
 
     /**
      for (const marker of this.transcrService.guidelines.markers) {
@@ -514,48 +446,34 @@ export class TranscriptionComponent
     this.interface = this.appStorage.interface;
 
     this.subscribe(this.navbarServ.interfacechange, async (editor) => {
-      const runningProcesses =
-        this.asrStoreService.queue?.statistics.running ?? 0;
+      const runningProcesses = this.asrStoreService.queue?.statistics.running ?? 0;
 
       if (runningProcesses === 0 || editor.meta.supportsASR) {
         this.changeEditor(editor.meta.name).catch((error) => {
           console.error(error);
         });
       } else {
-        const ref = this.modService.openModalRef(
-          ChoiceModalComponent,
-          ChoiceModalComponent.options,
-          {
-            title: this.translocoService.translate(
-              'modals.switch editor.title',
-            ),
-            message: this.translocoService.translate(
-              'modals.switch editor.body',
-              {
-                runningProcesses,
-                editorName: editor.meta.label,
-              },
-            ),
-            choices: [
-              {
-                label: this.translocoService.translate(
-                  'modals.switch editor.choices.abort.label',
-                ),
-                value: 'abort',
-                btnClass: 'btn btn-danger w-100 h-100',
-                colClass: 'col-md-5',
-              },
-              {
-                label: this.translocoService.translate(
-                  'modals.switch editor.choices.stay.label',
-                ),
-                value: 'stay',
-                btnClass: 'btn btn-primary w-100 h-100',
-                colClass: 'col-md-7',
-              },
-            ],
-          },
-        );
+        const ref = this.modService.openModalRef(ChoiceModalComponent, ChoiceModalComponent.options, {
+          title: this.translocoService.translate('modals.switch editor.title'),
+          message: this.translocoService.translate('modals.switch editor.body', {
+            runningProcesses,
+            editorName: editor.meta.label,
+          }),
+          choices: [
+            {
+              label: this.translocoService.translate('modals.switch editor.choices.abort.label'),
+              value: 'abort',
+              btnClass: 'btn btn-danger w-100 h-100',
+              colClass: 'col-md-5',
+            },
+            {
+              label: this.translocoService.translate('modals.switch editor.choices.stay.label'),
+              value: 'stay',
+              btnClass: 'btn btn-primary w-100 h-100',
+              colClass: 'col-md-7',
+            },
+          ],
+        });
         const answer = await ref.result;
         if (answer === 'abort') {
           this.asrStoreService.stopProcessing();
@@ -599,38 +517,23 @@ export class TranscriptionComponent
       }
     });
 
-    this.navbarServ.showExport =
-      this.settingsService.projectsettings?.navigation?.export === true;
+    this.navbarServ.showExport = this.settingsService.projectsettings?.navigation?.export === true;
 
-    if (
-      this._useMode === LoginMode.ONLINE ||
-      this._useMode === LoginMode.DEMO
-    ) {
+    if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
       if (
         this.settingsService.appSettings.octra.inactivityNotice !== undefined &&
-        this.settingsService.appSettings.octra.inactivityNotice.showAfter !==
-          undefined &&
+        this.settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined &&
         this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0
       ) {
         // if waitTime is 0 the inactivity modal isn't shown
-        let waitTime =
-          this.settingsService.appSettings.octra.inactivityNotice.showAfter;
+        let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
         this.subscribe(interval(5000), () => {
-          if (
-            Date.now() - this.uiService.lastAction > waitTime &&
-            !this.annotationStoreService.modalVisibilities.inactivity
-          ) {
-            if (
-              this.inactivityModal === undefined &&
-              !this.isInactivityModalVisible
-            ) {
+          if (Date.now() - this.uiService.lastAction > waitTime && !this.annotationStoreService.modalVisibilities.inactivity) {
+            if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
               this.isInactivityModalVisible = true;
               this.modService
-                .openModal(
-                  InactivityModalComponent,
-                  InactivityModalComponent.options,
-                )
+                .openModal(InactivityModalComponent, InactivityModalComponent.options)
                 .then((answer) => {
                   this.isInactivityModalVisible = false;
                   switch (answer) {
@@ -702,28 +605,19 @@ export class TranscriptionComponent
             viewContainerRef.clear();
 
             if (this.isLevelSupportedByEditor(comp)) {
-              this._currentEditor =
-                viewContainerRef.createComponent<OCTRAEditor>(comp);
+              this._currentEditor = viewContainerRef.createComponent<OCTRAEditor>(comp);
 
-              const id = this.subscribe(
-                this._currentEditor.instance.initialized,
-                () => {
-                  this.editorloaded = true;
-                  this.subscriptionManager.removeById(id);
-                  this.cd.detectChanges();
+              const id = this.subscribe(this._currentEditor.instance.initialized, () => {
+                this.editorloaded = true;
+                this.subscriptionManager.removeById(id);
+                this.cd.detectChanges();
 
-                  resolve();
-                },
-              );
-              if (
-                hasProperty(this.currentEditor.instance as any, 'openModal')
-              ) {
-                this.subscribe(
-                  (this.currentEditor.instance as any).openModal,
-                  () => {
-                    this.annotationStoreService.openOverviewModal();
-                  },
-                );
+                resolve();
+              });
+              if (hasProperty(this.currentEditor.instance as any, 'openModal')) {
+                this.subscribe((this.currentEditor.instance as any).openModal, () => {
+                  this.annotationStoreService.openOverviewModal();
+                });
               }
 
               if (emitUIActions) {
@@ -739,16 +633,11 @@ export class TranscriptionComponent
                 );
               }
             } else {
-              this._currentEditor =
-                viewContainerRef.createComponent<UnsupportedLevelPlaceholderComponent>(
-                  UnsupportedLevelPlaceholderComponent,
-                );
+              this._currentEditor = viewContainerRef.createComponent<UnsupportedLevelPlaceholderComponent>(UnsupportedLevelPlaceholderComponent);
               this._currentEditor.instance.editorName = this.interface;
-              this._currentEditor.instance.levelType =
-                this.annotationStoreService.transcript.currentLevel.type;
+              this._currentEditor.instance.levelType = this.annotationStoreService.transcript.currentLevel.type;
               this.editorloaded = true;
-              const currentLevelindex =
-                this.annotationStoreService.transcript.selectedLevelIndex;
+              const currentLevelindex = this.annotationStoreService.transcript.selectedLevelIndex;
               this.subscribe(
                 this.annotationStoreService.transcript$,
                 {
@@ -785,10 +674,7 @@ export class TranscriptionComponent
     } else if (this._useMode === LoginMode.DEMO) {
       // only if opened
       this.modService
-        .openModal(
-          TranscriptionDemoEndModalComponent,
-          TranscriptionDemoEndModalComponent.options,
-        )
+        .openModal(TranscriptionDemoEndModalComponent, TranscriptionDemoEndModalComponent.options)
         .then((action: any) => {
           this.appStorage.savingNeeded = false;
 
@@ -799,10 +685,7 @@ export class TranscriptionComponent
               this.abortTranscription();
               break;
             case ModalEndAnswer.CONTINUE:
-              this.transcrSendingModal = this.modService.openModalRef(
-                TranscriptionSendingModalComponent,
-                TranscriptionSendingModalComponent.options,
-              );
+              this.transcrSendingModal = this.modService.openModalRef(TranscriptionSendingModalComponent, TranscriptionSendingModalComponent.options);
               this.subscribe(timer(1000), () => {
                 // simulate nextTranscription
                 this.transcrSendingModal!.close();
@@ -819,21 +702,14 @@ export class TranscriptionComponent
 
   onSendButtonClick() {
     const showOverview =
-      this.projectsettings.octra?.showOverviewIfTranscriptNotValid === undefined
-        ? true
-        : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
+      this.projectsettings.octra?.showOverviewIfTranscriptNotValid === undefined ? true : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
     const validTranscriptOnly =
-      this.projectsettings.octra?.sendValidatedTranscriptionOnly === undefined
-        ? false
-        : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
+      this.projectsettings.octra?.sendValidatedTranscriptionOnly === undefined ? false : this.projectsettings.octra?.sendValidatedTranscriptionOnly;
 
     this.annotationStoreService.validateAll();
     const validTranscript = this.annotationStoreService.transcriptValid;
 
-    if (
-      (!validTranscript && showOverview) ||
-      (validTranscriptOnly && !validTranscript)
-    ) {
+    if ((!validTranscript && showOverview) || (validTranscriptOnly && !validTranscript)) {
       this.annotationStoreService.openOverviewModal();
     } else {
       this.onSendNowClick();
@@ -886,9 +762,6 @@ export class TranscriptionComponent
   }
 
   openPromptModal() {
-    this.modService.openModalRef(
-      PromptModalComponent,
-      PromptModalComponent.options,
-    );
+    this.modService.openModalRef(PromptModalComponent, PromptModalComponent.options);
   }
 }

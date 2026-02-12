@@ -1,19 +1,7 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalOptions,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { TranscrOverviewComponent } from '../../component/transcr-overview/transcr-overview.component';
 import { TranscriptionFeedbackComponent } from '../../component/transcription-feedback/transcription-feedback.component';
 import { SettingsService, UserInteractionsService } from '../../shared/service';
@@ -27,18 +15,9 @@ import { OctraModal } from '../types';
   selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
-  imports: [
-    NgClass,
-    TranscrOverviewComponent,
-    TranscriptionFeedbackComponent,
-    AsyncPipe,
-    TranslocoPipe,
-  ],
+  imports: [NgClass, TranscrOverviewComponent, TranscriptionFeedbackComponent, AsyncPipe, TranslocoPipe],
 })
-export class OverviewModalComponent
-  extends OctraModal
-  implements OnInit, OnDestroy, AfterViewInit
-{
+export class OverviewModalComponent extends OctraModal implements OnInit, OnDestroy, AfterViewInit {
   modalService = inject(NgbModal);
   settingsService = inject(SettingsService);
   annotationStoreService = inject(AnnotationStoreService);
@@ -68,8 +47,7 @@ export class OverviewModalComponent
   }
 
   public get sendValidTranscriptOnly(): boolean {
-    return this.settingsService.projectsettings.octra
-      ?.sendValidatedTranscriptionOnly;
+    return this.settingsService.projectsettings.octra?.sendValidatedTranscriptionOnly;
   }
 
   public shownSegments: {
@@ -90,10 +68,7 @@ export class OverviewModalComponent
   }
 
   ngOnInit() {
-    if (
-      this.settingsService.isTheme('shortAudioFiles') ||
-      this.settingsService.isTheme('secondSegmentFast')
-    ) {
+    if (this.settingsService.isTheme('shortAudioFiles') || this.settingsService.isTheme('secondSegmentFast')) {
       this.shortcutsService.registerShortcutGroup({
         name: 'overview modal',
         items: [
@@ -135,16 +110,7 @@ export class OverviewModalComponent
       });
     }
 
-    this.uiService.addElementFromEvent(
-      'overview',
-      { value: 'opened' },
-      Date.now(),
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      'overview',
-    );
+    this.uiService.addElementFromEvent('overview', { value: 'opened' }, Date.now(), undefined, undefined, undefined, undefined, 'overview');
   }
 
   ngAfterViewInit() {
@@ -164,39 +130,26 @@ export class OverviewModalComponent
       this.shortcutID = -1;
     }
 
-    if (
-      (this.appStorage.useMode === LoginMode.ONLINE ||
-        this.appStorage.useMode === LoginMode.DEMO) &&
-      this.feedback
-    ) {
+    if ((this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) && this.feedback) {
       this.feedback.saveFeedbackform();
     }
 
     if (fromModal) {
-      this.uiService.addElementFromEvent(
-        'overview',
-        { value: 'closed' },
-        Date.now(),
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        'overview',
-      );
+      this.uiService.addElementFromEvent('overview', { value: 'closed' }, Date.now(), undefined, undefined, undefined, undefined, 'overview');
     }
     return super.close();
   }
 
-  onSegmentInOverviewClicked(segnumber: number) {
-    this.annotationStoreService.requestSegment(segnumber);
+  onSegmentInOverviewClicked(segment: {
+    levelID: number,
+    itemID: number,
+  }) {
+    this.annotationStoreService.openSegment(segment.levelID, segment.itemID);
     this.close();
   }
 
   sendTranscription() {
-    if (
-      this.appStorage.useMode === LoginMode.ONLINE ||
-      this.appStorage.useMode === LoginMode.DEMO
-    ) {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       // TODO implement feedback form
       // this.feedback.saveFeedbackform();
     }
@@ -221,11 +174,7 @@ export class OverviewModalComponent
       default:
     }
 
-    if (
-      (this.sendValidTranscriptOnly &&
-        this.annotationStoreService.transcriptValid) ||
-      !this.sendValidTranscriptOnly
-    ) {
+    if ((this.sendValidTranscriptOnly && this.annotationStoreService.transcriptValid) || !this.sendValidTranscriptOnly) {
       this.sendTranscription();
     }
   }

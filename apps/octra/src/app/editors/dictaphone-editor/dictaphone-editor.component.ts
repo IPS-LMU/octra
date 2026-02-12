@@ -1,65 +1,28 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TranscrEditorComponent } from '../../core/component';
 
-import {
-  AnnotationLevelType,
-  ASRContext,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-  OLabel,
-} from '@octra/annotation';
+import { AnnotationLevelType, ASRContext, OctraAnnotationSegment, OctraAnnotationSegmentLevel, OLabel } from '@octra/annotation';
 import { SampleUnit } from '@octra/media';
-import {
-  AudioplayerComponent,
-  OctraComponentsModule,
-} from '@octra/ngx-components';
-import {
-  AudioChunk,
-  AudioManager,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
+import { AudioplayerComponent, OctraComponentsModule } from '@octra/ngx-components';
+import { AudioChunk, AudioManager, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
 import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
-import {
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
+import { AudioService, SettingsService, UserInteractionsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { RoutingService } from '../../core/shared/service/routing.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import {
-  OCTRAEditor,
-  OctraEditorRequirements,
-  SupportedOctraEditorMetaData,
-} from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 
 @Component({
   selector: 'octra-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.scss'],
-  imports: [
-    AudioNavigationComponent_1,
-    OctraComponentsModule,
-    TranscrEditorComponent_1,
-  ],
+  imports: [AudioNavigationComponent_1, OctraComponentsModule, TranscrEditorComponent_1],
 })
-export class DictaphoneEditorComponent
-  extends OCTRAEditor
-  implements OnInit, OnDestroy, AfterViewInit, OctraEditorRequirements
-{
+export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit, OctraEditorRequirements {
   audio = inject(AudioService);
   shortcutService = inject(ShortcutService);
   annotationStoreService = inject(AnnotationStoreService);
@@ -98,11 +61,7 @@ export class DictaphoneEditorComponent
   private oldRaw = '';
   boundaryselected = false;
 
-  onAudioPlayerPlay = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-  ) => {
+  onAudioPlayerPlay = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
       value: hotKeyEvent.shortcut,
@@ -119,11 +78,7 @@ export class DictaphoneEditorComponent
     }
   };
 
-  onAudioStop = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-  ) => {
+  onAudioStop = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
       value: hotKeyEvent.shortcut,
@@ -134,11 +89,7 @@ export class DictaphoneEditorComponent
     });
   };
 
-  onStepBackward = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-  ) => {
+  onStepBackward = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
       value: hotKeyEvent.shortcut,
@@ -149,11 +100,7 @@ export class DictaphoneEditorComponent
     });
   };
 
-  onStepBackwardTime = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-  ) => {
+  onStepBackwardTime = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
       shortcut: shortcut.name,
       value: hotKeyEvent.shortcut,
@@ -226,8 +173,7 @@ export class DictaphoneEditorComponent
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
     this.audiochunk = this.audioManager.mainchunk.clone();
-    this.editor.settings.markers =
-      this.annotationStoreService.guidelines?.markers ?? [];
+    this.editor.settings.markers = this.annotationStoreService.guidelines?.markers ?? [];
     this.editor.settings.specialMarkers.boundary = true;
     this.editor.settings.highlightingEnabled = true;
 
@@ -325,18 +271,11 @@ export class DictaphoneEditorComponent
   };
 
   onBoundaryClicked(samples: SampleUnit) {
-    const i: number =
-      this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-        samples,
-      ) ?? -1;
+    const i: number = this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(samples) ?? -1;
 
     if (i > -1) {
       this.boundaryselected = true;
-      const start =
-        i > 0
-          ? (this.annotationStoreService.currentLevel?.items[i - 1]! as any)
-              .time.samples
-          : 0;
+      const start = i > 0 ? (this.annotationStoreService.currentLevel?.items[i - 1]! as any).time.samples : 0;
 
       new Promise<void>((resolve) => {
         if (this.audiochunk.isPlaying) {
@@ -346,8 +285,7 @@ export class DictaphoneEditorComponent
         }
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
-        this.audiochunk.selection.end = (this.annotationStoreService
-          .currentLevel!.items[i] as any)!.time.clone();
+        this.audiochunk.selection.end = (this.annotationStoreService.currentLevel!.items[i] as any)!.time.clone();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos to selected boundary
@@ -444,15 +382,9 @@ export class DictaphoneEditorComponent
 
       for (let i = 0; i < segTexts.length; i++) {
         const time =
-          i < samplesArray.length
-            ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
-            : this.audioManager.resource.info.duration;
+          i < samplesArray.length ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate) : this.audioManager.resource.info.duration;
 
-        items.push(
-          transcript.createSegment(time, [
-            new OLabel(transcript.currentLevel!.name, segTexts[i]),
-          ]),
-        );
+        items.push(transcript.createSegment(time, [new OLabel(transcript.currentLevel!.name, segTexts[i])]));
       }
       transcript.currentLevel.overwriteItems(items as any);
       this.annotationStoreService.overwriteTranscript(transcript);
@@ -497,15 +429,14 @@ export class DictaphoneEditorComponent
     }
   }
 
-  openSegment(index: number) {
+  openSegment(item: { levelID: number; itemID: number }) {
     // ignore
   }
 
   private loadEditor() {
     if (
       this.annotationStoreService.currentLevel &&
-      this.annotationStoreService.currentLevel instanceof
-        OctraAnnotationSegmentLevel &&
+      this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel &&
       this.annotationStoreService.currentLevel.items.length > 0
     ) {
       this.segments = this.annotationStoreService.currentLevel.items;

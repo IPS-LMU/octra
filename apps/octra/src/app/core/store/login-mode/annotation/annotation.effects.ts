@@ -19,7 +19,7 @@ import { ProjectDto, TaskDto, TaskInputOutputCreatorType, TaskInputOutputDto, Ta
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { appendURLQueryParams, extractFileNameFromURL, hasProperty, SubscriptionManager } from '@octra/utilities';
-import { catchError, exhaustMap, forkJoin, interval, map, Observable, of, Subscription, tap, timer, withLatestFrom } from 'rxjs';
+import { catchError, delay, exhaustMap, forkJoin, interval, map, Observable, of, Subscription, tap, timer, withLatestFrom } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
@@ -58,6 +58,7 @@ import { TranscriptionGuidelinesModalComponent } from '../../../modals/transcrip
 import { MimeTypeMapper } from '../../../obj';
 import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { ASRQueueItemType } from '../../asr';
+import { AnnotationStoreService } from './annotation.store.service';
 
 @Injectable()
 export class AnnotationEffects {
@@ -72,6 +73,7 @@ export class AnnotationEffects {
   private uiService = inject(UserInteractionsService);
   private appStorage = inject(AppStorageService);
   private transloco = inject(TranslocoService);
+  private annotationStoreService = inject(AnnotationStoreService);
 
   transcrSendingModal: {
     ref?: NgbModalWrapper<TranscriptionSendingModalComponent>;
@@ -80,13 +82,13 @@ export class AnnotationEffects {
   } = {};
 
   modals: {
-    shortcuts?: NgbModalWrapper<any>;
-    guidelines?: NgbModalWrapper<any>;
-    overview?: NgbModalWrapper<any>;
-    help?: NgbModalWrapper<any>;
-    regReplaceModal?: NgbModalWrapper<any>;
-    cuttingModal?: NgbModalWrapper<any>;
-    combineTranscriptions?: NgbModalWrapper<any>;
+    shortcuts?: NgbModalWrapper<ShortcutsModalComponent>;
+    guidelines?: NgbModalWrapper<TranscriptionGuidelinesModalComponent>;
+    overview?: NgbModalWrapper<OverviewModalComponent>;
+    help?: NgbModalWrapper<HelpModalComponent>;
+    regReplaceModal?: NgbModalWrapper<RegReplaceModalComponent>;
+    cuttingModal?: NgbModalWrapper<CuttingAudioModalComponent>;
+    combineTranscriptions?: NgbModalWrapper<CombinePhrasesModalComponent>;
   } = {};
 
   subscrManager = new SubscriptionManager();
@@ -643,16 +645,76 @@ export class AnnotationEffects {
     { dispatch: false },
   );
 
+  openSegment$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.openSegment.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        const level = getModeState(state).transcript.levels.find((a) => a.id === action.levelID);
+        const item = level?.items.find((a) => a.id === action.itemID);
+
+        if (level && item) {
+          if(level.id !== getModeState(state).transcript.currentLevel.id) {
+            this.uiService.addElementFromEvent(
+              'level',
+              { value: 'changed' },
+              Date.now(),
+              this.audio.audioManager.createSampleUnit(0),
+              undefined,
+              undefined,
+              undefined,
+              getModeState(state)?.transcript?.levels[level.id]?.name,
+            );
+          }
+
+          return of(AnnotationActions.openSegment.success({ mode: state.application.mode, itemID: action.itemID, levelID: action.levelID }));
+        }
+
+        return of(
+          AnnotationActions.openSegment.fail({
+            error: "Can't find level or item",
+          }),
+        );
+      }),
+    ),
+  );
+
+  afterSegmentOpened$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.openSegment.success),
+        delay(100),
+        tap((action) => {
+          this.annotationStoreService.segmentRequested.emit({
+            levelID: action.levelID,
+            itemID: action.itemID,
+          });
+        }),
+      ),
+    { dispatch: false },
+  );
+
   openRegReplaceModal$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AnnotationActions.regReplaceModal.open),
         tap(() => {
           if (!this.modals.regReplaceModal) {
-            this.modals.regReplaceModal = this.modalsService.openModalRef<HelpModalComponent>(
+            this.modals.regReplaceModal = this.modalsService.openModalRef<RegReplaceModalComponent>(
               RegReplaceModalComponent,
               RegReplaceModalComponent.options,
             );
+
+            this.subscrManager.removeByTag('reg replace segment open');
+            this.subscrManager.add(
+              this.modals.regReplaceModal.componentInstance.segmentOpened.subscribe({
+                next: (segment: { levelID: number; itemID: number }) => {
+                  this.store.dispatch(AnnotationActions.openSegment.do(segment));
+                },
+              }),
+              'reg replace segment open',
+            );
+
             this.modals.regReplaceModal.result
               .then(() => {
                 this.modals.regReplaceModal = undefined;
@@ -1038,7 +1100,7 @@ export class AnnotationEffects {
                 for (const key of Object.keys(urlInfo)) {
                   if (urlInfo[key].url) {
                     let mediaType: string | undefined = key === 'audio' ? this.routingService.staticQueryParams.audio_type : undefined;
-                    let decodedURL = decodeURIComponent(urlInfo[key].url);
+                    const decodedURL = decodeURIComponent(urlInfo[key].url);
 
                     if (decodedURL.includes('?')) {
                       const regex = /mediatype=([^&]+)/g;

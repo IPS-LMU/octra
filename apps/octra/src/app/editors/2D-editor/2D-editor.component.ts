@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostListener,
-  inject,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
@@ -31,34 +21,19 @@ import {
   NgbModalWrapper,
   OctraComponentsModule,
 } from '@octra/ngx-components';
-import {
-  AudioChunk,
-  AudioManager,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
+import { AudioChunk, AudioManager, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { interval, Subscription, timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { NavbarService } from '../../core/component/navbar/navbar.service';
 import { OctraModalService } from '../../core/modals/octra-modal.service';
-import {
-  AlertService,
-  AlertType,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
+import { AlertService, AlertType, AudioService, SettingsService, UserInteractionsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { ASRProcessStatus, ASRTimeInterval } from '../../core/store/asr';
 import { AsrStoreService } from '../../core/store/asr/asr-store-service.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import {
-  OCTRAEditor,
-  OctraEditorRequirements,
-  SupportedOctraEditorMetaData,
-} from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 import { TranscrWindowComponent } from './transcr-window';
 
 @Component({
@@ -67,10 +42,7 @@ import { TranscrWindowComponent } from './transcr-window';
   styleUrls: ['./2D-editor.component.scss'],
   imports: [OctraComponentsModule, NgStyle, AudioNavigationComponent],
 })
-export class TwoDEditorComponent
-  extends OCTRAEditor
-  implements OnInit, AfterViewInit, OctraEditorRequirements
-{
+export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OctraEditorRequirements {
   annotationStoreService = inject(AnnotationStoreService);
   audio = inject(AudioService);
   uiService = inject(UserInteractionsService);
@@ -126,11 +98,7 @@ export class TwoDEditorComponent
   private shortcuts!: ShortcutGroup;
   private authWindow?: Window;
 
-  onAudioPlayPause = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onAudioPlayPause = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
       shortcutName: shortcut.name,
@@ -149,11 +117,7 @@ export class TwoDEditorComponent
     }
   };
 
-  onAudioStop = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onAudioStop = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
       shortcutName: shortcut.name,
@@ -166,11 +130,7 @@ export class TwoDEditorComponent
     });
   };
 
-  onStepBackward = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onStepBackward = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
       shortcutName: shortcut.name,
@@ -183,11 +143,7 @@ export class TwoDEditorComponent
     });
   };
 
-  onStepBackwardTime = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onStepBackwardTime = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     this.triggerUIAction({
       shortcut: hotkeyEvent.shortcut,
       shortcutName: shortcut.name,
@@ -200,11 +156,7 @@ export class TwoDEditorComponent
     });
   };
 
-  onZoomInOut = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onZoomInOut = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     if (this.shortcutsEnabled) {
       if (this.appStorage.showMagnifier) {
         if (hotkeyEvent.key === '.' || hotkeyEvent.key === ',') {
@@ -216,19 +168,14 @@ export class TwoDEditorComponent
             }
           }
 
-          this.changeArea(
-            this.magnifier,
-            this.viewer,
-            this.audioManager,
-            this.audioChunkMagnifier,
-            this.viewer.av.mouseCursor!,
-            this.factor,
-          ).then((newMagnifierChunk) => {
-            if (newMagnifierChunk !== undefined) {
-              this.audioChunkMagnifier = newMagnifierChunk;
-              this.cd.detectChanges();
-            }
-          });
+          this.changeArea(this.magnifier, this.viewer, this.audioManager, this.audioChunkMagnifier, this.viewer.av.mouseCursor!, this.factor).then(
+            (newMagnifierChunk) => {
+              if (newMagnifierChunk !== undefined) {
+                this.audioChunkMagnifier = newMagnifierChunk;
+                this.cd.detectChanges();
+              }
+            },
+          );
         }
       }
     }
@@ -395,9 +342,7 @@ export class TwoDEditorComponent
     this.viewer.settings.justifySignalHeight = true;
     this.viewer.settings.scrollbar.enabled = true;
     this.viewer.settings.roundValues = false;
-    this.viewer.settings.stepWidthRatio =
-      this.viewer.settings.pixelPerSec /
-      this.audioManager.resource.info.sampleRate;
+    this.viewer.settings.stepWidthRatio = this.viewer.settings.pixelPerSec / this.audioManager.resource.info.sampleRate;
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
     this.viewer.settings.showProgressBars = true;
@@ -419,59 +364,40 @@ export class TwoDEditorComponent
       next: (enabled) => {
         this.viewer.settings.asr.enabled = enabled === true;
         if (!this.viewer.settings.asr.enabled) {
-          this.shortcutService.unregisterItemFromGroup(
-            '2D-Editor viewer',
-            'do_maus',
-          );
-          this.shortcutService.unregisterItemFromGroup(
-            '2D-Editor viewer',
-            'do_asr',
-          );
-          this.shortcutService.unregisterItemFromGroup(
-            '2D-Editor viewer',
-            'do_asr_maus',
-          );
+          this.shortcutService.unregisterItemFromGroup('2D-Editor viewer', 'do_maus');
+          this.shortcutService.unregisterItemFromGroup('2D-Editor viewer', 'do_asr');
+          this.shortcutService.unregisterItemFromGroup('2D-Editor viewer', 'do_asr_maus');
         }
       },
     });
     this.subscribe(this.viewer.alert, (result: any) => {
-      this.alertService
-        .showAlert(result.type as AlertType, result.message)
-        .catch((error) => {
-          console.error(error);
-        });
+      this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
+        console.error(error);
+      });
     });
 
-    this.subscribe(
-      this.audioChunkLines.statuschange,
-      (state: PlayBackStatus) => {
-        if (state === PlayBackStatus.PLAYING) {
-          if (this.appStorage.followPlayCursor) {
-            if (this.scrolltimer !== undefined) {
-              this.scrolltimer.unsubscribe();
-            }
-
-            this.scrolltimer = interval(1000).subscribe(() => {
-              const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(
-                this.audioChunkLines.relativePlayposition!,
-              );
-
-              const lines = Math.floor(absx / this.viewer.av.innerWidth!);
-              const y =
-                lines *
-                (this.viewer.settings.lineheight +
-                  this.viewer.settings.margin.bottom);
-
-              this.viewer.scrollToAbsY(y);
-            });
-          }
-        } else {
+    this.subscribe(this.audioChunkLines.statuschange, (state: PlayBackStatus) => {
+      if (state === PlayBackStatus.PLAYING) {
+        if (this.appStorage.followPlayCursor) {
           if (this.scrolltimer !== undefined) {
             this.scrolltimer.unsubscribe();
           }
+
+          this.scrolltimer = interval(1000).subscribe(() => {
+            const absx = this.viewer.av.audioTCalculator!.samplestoAbsX(this.audioChunkLines.relativePlayposition!);
+
+            const lines = Math.floor(absx / this.viewer.av.innerWidth!);
+            const y = lines * (this.viewer.settings.lineheight + this.viewer.settings.margin.bottom);
+
+            this.viewer.scrollToAbsY(y);
+          });
         }
-      },
-    );
+      } else {
+        if (this.scrolltimer !== undefined) {
+          this.scrolltimer.unsubscribe();
+        }
+      }
+    });
 
     this.subscribe(this.appStorage.settingschange, (event) => {
       switch (event.key) {
@@ -503,9 +429,7 @@ export class TwoDEditorComponent
       if (item.status !== ASRProcessStatus.IDLE) {
         const segmentIndex =
           this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-            this.audio.audioManager.createSampleUnit(
-              item.time.sampleStart + item.time.sampleLength,
-            ),
+            this.audio.audioManager.createSampleUnit(item.time.sampleStart + item.time.sampleLength),
           ) ?? -1;
 
         if (segmentIndex > -1) {
@@ -547,22 +471,14 @@ export class TwoDEditorComponent
       }
     });
 
-    this.subscribe(
-      this.annotationStoreService.segmentrequested,
-      (segnumber: number) => {
-        this.openSegment(segnumber);
-      },
-    );
+    this.subscribe(this.annotationStoreService.segmentRequested, (segment) => {
+      this.openSegment(segment);
+    });
 
     this.subscribe(this.annotationStoreService.importOptions$, {
       next: (importOptions) => {
-        if (
-          importOptions &&
-          Object.keys(importOptions).includes('SRT') &&
-          importOptions.SRT
-        ) {
-          this.viewer.settings.speakerPattern =
-            importOptions['SRT']['speakerIdentifierPattern'];
+        if (importOptions && Object.keys(importOptions).includes('SRT') && importOptions.SRT) {
+          this.viewer.settings.speakerPattern = importOptions['SRT']['speakerIdentifierPattern'];
         }
       },
     });
@@ -592,48 +508,32 @@ export class TwoDEditorComponent
     });
   }
 
-  async onSegmentEntered(selected: any) {
-    const currentLevel = this.annotationStoreService.currentLevel;
+  async onSegmentEntered(selected: { levelID: number; itemID: number }) {
+    const selectedLevel = this.annotationStoreService.transcript.levels.find((a) => a.id === selected.levelID);
+    const itemIndex = selectedLevel.items.findIndex((a) => a.id === selected.itemID);
 
-    if (
-      currentLevel &&
-      currentLevel.items &&
-      selected.index > -1 &&
-      selected.index < currentLevel.items.length
-    ) {
-      const segment = currentLevel.items[selected.index];
+    if (selectedLevel && selectedLevel.items && itemIndex > -1) {
+      const segment = selectedLevel.items[itemIndex];
 
       if (segment !== undefined && segment instanceof OctraAnnotationSegment) {
-        if (
-          segment.context?.asr?.isBlockedBy !== ASRQueueItemType.ASRMAUS &&
-          segment.context?.asr?.isBlockedBy !== ASRQueueItemType.MAUS
-        ) {
+        if (segment.context?.asr?.isBlockedBy !== ASRQueueItemType.ASRMAUS && segment.context?.asr?.isBlockedBy !== ASRQueueItemType.MAUS) {
           const start: SampleUnit =
-            selected.index > 0
-              ? (
-                  currentLevel.items[
-                    selected.index - 1
-                  ] as OctraAnnotationSegment
-                ).time.clone()
-              : this.audioManager.createSampleUnit(0);
-          this.selectedIndex = selected.index;
-          this.audioChunkWindow = new AudioChunk(
-            new AudioSelection(start, segment.time.clone()),
-            this.audioManager,
-          );
+            itemIndex > 0 ? (selectedLevel.items[itemIndex - 1] as OctraAnnotationSegment).time.clone() : this.audioManager.createSampleUnit(0);
+          this.selectedIndex = itemIndex;
+          this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
           this.shortcutsEnabled = false;
 
           this.viewer.disableShortcuts();
 
-          this.window = this.modalService.openModalRef(
-            TranscrWindowComponent,
-            TranscrWindowComponent.options,
-            {
-              audiochunk: this.audioChunkWindow,
-              easyMode: this.appStorage.easyMode,
-              segmentIndex: this.selectedIndex,
-            },
-          );
+          this.window?.close();
+          this.window = this.modalService.openModalRef(TranscrWindowComponent, TranscrWindowComponent.options, {
+            audiochunk: this.audioChunkWindow,
+            easyMode: this.appStorage.easyMode,
+            segmentIndex: this.selectedIndex,
+          });
+          this.window.result.then(() => {
+            this.window = undefined;
+          });
           this.subscriptionManager.removeByTag('windowActions');
           this.subscribe(
             this.window.componentInstance.act,
@@ -654,9 +554,7 @@ export class TwoDEditorComponent
             undefined,
             {
               start: start.samples,
-              length:
-                (currentLevel.items[selected.index] as OctraAnnotationSegment)
-                  .time.samples - start.samples,
+              length: (selectedLevel.items[itemIndex] as OctraAnnotationSegment).time.samples - start.samples,
             },
             TwoDEditorComponent.editorname,
           );
@@ -665,27 +563,18 @@ export class TwoDEditorComponent
         } else {
           // tslint:disable-next-line:max-line-length
           this.alertService
-            .showAlert(
-              'danger',
-              "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first.",
-            )
+            .showAlert('danger', "You can't open this segment while processing segmentation. If you need to open it, cancel segmentation first.")
             .catch((error) => {
               console.error(error);
             });
         }
       } else {
-        console.error(`couldn't find segment with index ${selected.index}`);
+        console.error(`couldn't find segment with index ${itemIndex}`);
       }
     }
   }
 
-  onWindowAction = ({
-    action,
-    segmentIndex,
-  }: {
-    action: string;
-    segmentIndex: number;
-  }) => {
+  onWindowAction = ({ action, segmentIndex }: { action: string; segmentIndex: number }) => {
     if (action === 'close') {
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
@@ -699,25 +588,14 @@ export class TwoDEditorComponent
     }
   };
 
-  onMouseOver($event: {
-    event: MouseEvent | undefined;
-    time: SampleUnit | undefined;
-  }) {
+  onMouseOver($event: { event: MouseEvent | undefined; time: SampleUnit | undefined }) {
     this.subscriptionManager.removeByTag('mouseTimer');
     this.mousestate = 'moving';
 
-    this.doPlayOnHover(
-      this.audioManager,
-      this.appStorage.playOnHover ?? false,
-      this.audioChunkLines,
-      this.viewer.av.mouseCursor!,
-    );
+    this.doPlayOnHover(this.audioManager, this.appStorage.playOnHover ?? false, this.audioChunkLines, this.viewer.av.mouseCursor!);
 
     if (this.appStorage.showMagnifier) {
-      if (
-        this.viewer.audioChunk!.time.duration.seconds !==
-        this.viewer.av.mouseCursor!.seconds
-      ) {
+      if (this.viewer.audioChunk!.time.duration.seconds !== this.viewer.av.mouseCursor!.seconds) {
         this.magnifierHidden = false;
         this.subscribe(
           timer(0),
@@ -735,16 +613,9 @@ export class TwoDEditorComponent
     }
   }
 
-  public changeMagnifierPosition(
-    mouseEvent: MouseEvent,
-    cursorTime: SampleUnit,
-  ) {
-    const offsetX =
-      mouseEvent.clientX -
-      (mouseEvent.target as HTMLElement).getBoundingClientRect().left;
-    const offsetY =
-      mouseEvent.clientY -
-      (mouseEvent.target as HTMLElement).getBoundingClientRect().top;
+  public changeMagnifierPosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+    const offsetX = mouseEvent.clientX - (mouseEvent.target as HTMLElement).getBoundingClientRect().left;
+    const offsetY = mouseEvent.clientY - (mouseEvent.target as HTMLElement).getBoundingClientRect().top;
 
     const fullY = offsetY + 30 + this.minimagnifier.size.height;
     const x = offsetX - (this.minimagnifier.size.width - 10) / 2 - 2;
@@ -761,14 +632,7 @@ export class TwoDEditorComponent
     newPosition.x = x;
 
     this.magnifierHidden = false;
-    this.changeArea(
-      this.magnifier,
-      this.viewer,
-      this.audioManager,
-      this.audioChunkMagnifier,
-      cursorTime,
-      this.factor,
-    ).then((newMagnifierChunk) => {
+    this.changeArea(this.magnifier, this.viewer, this.audioManager, this.audioChunkMagnifier, cursorTime, this.factor).then((newMagnifierChunk) => {
       if (newMagnifierChunk !== undefined) {
         this.audioChunkMagnifier = newMagnifierChunk;
         this.minimagnifier.location = newPosition;
@@ -782,10 +646,7 @@ export class TwoDEditorComponent
     this.triggerUIAction($event);
     if ($event.shortcutName === 'undo' || $event.shortcutName === 'redo') {
       if (this.appStorage.undoRedoDisabled) {
-        this.alertService.showAlert(
-          'danger',
-          this.langService.translate('alerts.undo deactivated'),
-        );
+        this.alertService.showAlert('danger', this.langService.translate('alerts.undo deactivated'));
       }
       if ($event.shortcutName === 'undo') {
         this.appStorage.undo();
@@ -805,36 +666,18 @@ export class TwoDEditorComponent
         $event.value === 'cancel_maus') &&
       $event.type === 'segment'
     ) {
-      const timePosition: SampleUnit =
-        $event.timePosition !== undefined
-          ? $event.timePosition!
-          : this.viewer.av.mouseCursor!;
+      const timePosition: SampleUnit = $event.timePosition !== undefined ? $event.timePosition! : this.viewer.av.mouseCursor!;
 
       const currentLevel = this.annotationStoreService.currentLevel;
 
-      const segmentNumber = getSegmentBySamplePosition(
-        currentLevel!.items as OctraAnnotationSegment[],
-        timePosition,
-      );
+      const segmentNumber = getSegmentBySamplePosition(currentLevel!.items as OctraAnnotationSegment[], timePosition);
 
       if (segmentNumber > -1) {
-        if (
-          this.appStorage.snapshot.asr.settings?.selectedASRLanguage &&
-          this.appStorage.snapshot.asr.settings?.selectedServiceProvider
-        ) {
-          const segment = currentLevel!.items[
-            segmentNumber
-          ].clone() as OctraAnnotationSegment;
+        if (this.appStorage.snapshot.asr.settings?.selectedASRLanguage && this.appStorage.snapshot.asr.settings?.selectedServiceProvider) {
+          const segment = currentLevel!.items[segmentNumber].clone() as OctraAnnotationSegment;
 
           if (segment !== undefined) {
-            const sampleStart =
-              segmentNumber > 0
-                ? (
-                    currentLevel!.items[
-                      segmentNumber - 1
-                    ] as OctraAnnotationSegment
-                  ).time.samples
-                : 0;
+            const sampleStart = segmentNumber > 0 ? (currentLevel!.items[segmentNumber - 1] as OctraAnnotationSegment).time.samples : 0;
 
             this.uiService.addElementFromEvent(
               'shortcut',
@@ -856,48 +699,23 @@ export class TwoDEditorComponent
             };
 
             if (segment.context?.asr?.isBlockedBy === undefined) {
-              if (
-                $event.value === 'do_asr' ||
-                $event.value === 'do_asr_maus' ||
-                $event.value === 'do_maus'
-              ) {
+              if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
                 this.viewer.selectSegment(segmentNumber);
 
                 if ($event.value === 'do_asr') {
-                  this.asrStoreService.addToQueue(
-                    selection,
-                    ASRQueueItemType.ASR,
-                  );
+                  this.asrStoreService.addToQueue(selection, ASRQueueItemType.ASR);
                 } else if ($event.value === 'do_asr_maus') {
-                  this.asrStoreService.addToQueue(
-                    selection,
-                    ASRQueueItemType.ASRMAUS,
-                  );
+                  this.asrStoreService.addToQueue(selection, ASRQueueItemType.ASRMAUS);
                 } else if ($event.value === 'do_maus') {
                   if (
-                    (segment.getFirstLabelWithoutName('Speaker') &&
-                      segment
-                        .getFirstLabelWithoutName('Speaker')!
-                        .value.trim() === '') ||
-                    segment
-                      .getFirstLabelWithoutName('Speaker')!
-                      .value.split(' ').length < 2
+                    (segment.getFirstLabelWithoutName('Speaker') && segment.getFirstLabelWithoutName('Speaker')!.value.trim() === '') ||
+                    segment.getFirstLabelWithoutName('Speaker')!.value.split(' ').length < 2
                   ) {
-                    this.alertService
-                      .showAlert(
-                        'danger',
-                        this.langService.translate('asr.maus empty text'),
-                        false,
-                      )
-                      .catch((error) => {
-                        console.error(error);
-                      });
+                    this.alertService.showAlert('danger', this.langService.translate('asr.maus empty text'), false).catch((error) => {
+                      console.error(error);
+                    });
                   } else {
-                    this.asrStoreService.addToQueue(
-                      selection,
-                      ASRQueueItemType.MAUS,
-                      segment.getFirstLabelWithoutName('Speaker')?.value,
-                    );
+                    this.asrStoreService.addToQueue(selection, ASRQueueItemType.MAUS, segment.getFirstLabelWithoutName('Speaker')?.value);
                   }
                 }
               }
@@ -912,14 +730,9 @@ export class TwoDEditorComponent
         } else {
           // open transcr window
           this.navbarService.openSettings.emit();
-          this.alertService
-            .showAlert(
-              'warning',
-              this.langService.translate('asr.no asr selected').toString(),
-            )
-            .catch((error) => {
-              console.error(error);
-            });
+          this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString()).catch((error) => {
+            console.error(error);
+          });
         }
       }
     }
@@ -973,10 +786,7 @@ export class TwoDEditorComponent
         undefined,
         'multi-lines-viewer',
       );
-    } else if (
-      $event.value !== undefined &&
-      contains($event.value, 'playonhover')
-    ) {
+    } else if ($event.value !== undefined && contains($event.value, 'playonhover')) {
       this.appStorage.playOnHover = !this.appStorage.playOnHover;
     }
   }
@@ -1040,8 +850,8 @@ export class TwoDEditorComponent
     }
   }
 
-  public openSegment(segnumber: number) {
-    this.onSegmentEntered({ index: segnumber });
+  public openSegment(item: { levelID: number; itemID: number }) {
+    this.onSegmentEntered(item);
   }
 
   public update() {
@@ -1061,44 +871,9 @@ export class TwoDEditorComponent
   }
 
   afterFirstInitialization() {
-    this.checkIfSmallAudioChunk(
-      this.audioChunkLines,
-      this.annotationStoreService.currentLevel!,
-    );
+    this.checkIfSmallAudioChunk(this.audioChunkLines, this.annotationStoreService.currentLevel!);
     this.cd.detectChanges();
   }
-
-  openAuthWindow = () => {
-    const url = document.location.href
-      .replace('transcr/', '')
-      .replace('transcr', '');
-    const left = (window.innerHeight - 200) / 2;
-    // tslint:disable-next-line:max-line-length
-    const tempWindow = window.open(
-      url + 'auth',
-      '_blank',
-      'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' +
-        left +
-        ',width=760,height=550',
-    );
-
-    if (tempWindow !== undefined) {
-      this.authWindow = tempWindow as any;
-    }
-  };
-
-  resetQueueItemsWithNoAuth = () => {
-    /*
-    for (const asrQueueItem of this.asrService.queue.queue) {
-      if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
-        // reset
-        asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
-      }
-    }
-    this.asrService.queue.start();
-
-     */
-  };
 
   public enableAllShortcuts() {
     this.shortcutsEnabled = true;
@@ -1116,42 +891,22 @@ export class TwoDEditorComponent
     }
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    // this.viewer.height = this.linesViewHeight;
-  }
-
-  onEntriesChange(
-    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-  ) {
-    // this.annotationStoreService.saveSegments();
-    this.annotationStoreService.overwriteTranscript(annotation);
-  }
-
   onCurrentLevelChange($event: CurrentLevelChangeEvent) {
     if ($event.type === 'change') {
-      this.annotationStoreService.changeCurrentLevelItems(
-        $event.items.map((a) => a.instance!),
-      );
+      this.annotationStoreService.changeCurrentLevelItems($event.items.map((a) => a.instance!));
     }
 
     if ($event.type === 'remove') {
-      this.annotationStoreService.removeCurrentLevelItems(
-        $event.items,
-        $event.removeOptions?.silenceCode,
-        $event.removeOptions?.mergeTranscripts,
-      );
+      this.annotationStoreService.removeCurrentLevelItems($event.items, $event.removeOptions?.silenceCode, $event.removeOptions?.mergeTranscripts);
     }
 
     if ($event.type === 'add') {
-      this.annotationStoreService.addCurrentLevelItems(
-        $event.items.map((a) => a.instance!),
-      );
+      this.annotationStoreService.addCurrentLevelItems($event.items.map((a) => a.instance!));
     }
   }
 
   private onModalAction = (event: any) => {
-    if (event.type === 'open' && event.name === 'OverviewModalComponent') {
+    if (event.type === 'open' && (event.name === 'OverviewModalComponent' || event.name === 'RegReplaceModalComponent')) {
       this.window?.close();
     }
   };

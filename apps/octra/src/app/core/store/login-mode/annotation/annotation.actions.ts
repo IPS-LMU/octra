@@ -451,6 +451,24 @@ export class AnnotationActions {
     },
   });
 
+  static openSegment = createActionGroup({
+    source: 'annotation/open segment',
+    events: {
+      do: props<{
+        levelID: number;
+        itemID: number;
+      }>(),
+      success: props<{
+        mode: LoginMode;
+        levelID: number;
+        itemID: number;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
   static changeCurrentItemById = createActionGroup({
     source: 'annotation/change current level item by id',
     events: {

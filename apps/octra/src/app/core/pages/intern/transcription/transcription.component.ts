@@ -384,7 +384,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
     this.subscribe(this.appStoreService.shortcutsEnabled$, {
       next: (shortcutsEnabled) => {
-        if (this._currentEditor?.instance) {
+        if (this._currentEditor?.instance?.enableAllShortcuts && this._currentEditor?.instance?.disableAllShortcuts) {
           if (shortcutsEnabled) {
             (this._currentEditor.instance as OCTRAEditor).enableAllShortcuts();
             this.shortcutService.enableAll();

@@ -2,48 +2,47 @@
   <div class="modal-header">
     <h5 class="modal-title" id="modal-title">
       {{ 'tools.reg-replace.name' | transloco }}
-      <a
-        [href]="manualURL + 'using-tools.html#search-replace'"
-        target="_blank"
-      >
+      <a [href]="manualURL + 'using-tools.html#search-replace'" target="_blank">
         <i class="bi bi-question-circle text-info"></i>
       </a>
     </h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-describedby="modal-title"
-      (click)="close()"
-    ></button>
+    <button type="button" class="btn-close" aria-describedby="modal-title" (click)="close()"></button>
   </div>
   <div class="modal-body">
     <p>{{ 'tools.reg-replace.description' | transloco }}</p>
     <form>
       <div class="card" style="padding: 10px">
-        <p [innerHTML]="'tools.reg-replace.inner description' | transloco"></p>
         <table class="table table-sm table-striped">
           <tbody>
             <tr class="align-middle">
-              <td class="align-bottom pb-2 fit">
-                {{ 'tools.reg-replace.pattern' | transloco }}:
-              </td>
+              <td class="align-bottom pb-2 fit">{{ 'g.mode' | transloco }}:</td>
               <td>
-                <ul
-                  ngbNav
-                  #nav="ngbNav"
-                  [(activeId)]="state.patternType"
-                  class="nav-tabs"
-                >
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="radioModeSearch" name="mode" value="search" [(ngModel)]="state.mode" />
+                  <label class="form-check-label" for="radioModeSearch">{{ 'g.search' | transloco }}</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="radioModeReplace" name="mode" value="replace" [(ngModel)]="state.mode" />
+                  <label class="form-check-label" for="radioModeReplace">{{ 'g.replace' | transloco }}</label>
+                </div>
+              </td>
+            </tr>
+            <tr class="align-middle">
+              <td class="align-bottom pb-2 fit">{{ 'tools.reg-replace.pattern' | transloco }}:</td>
+              <td>
+                <ul ngbNav #nav="ngbNav" [(activeId)]="state.patternType" class="nav-tabs">
                   <li [ngbNavItem]="'text'" class="ms-auto">
                     <button ngbNavLink class="px-2 py-1">
                       {{ 'g.text' | transloco }}
                     </button>
                     <ng-template ngbNavContent>
                       <input
+                        #textPattern
                         type="text"
                         class="form-control form-control-sm"
                         name="regReplacePattern"
                         (ngModelChange)="somethingChanged()"
+                        (keydown)="captureEnterKey($event)"
                         [(ngModel)]="state.patternText"
                       />
                     </ng-template>
@@ -59,6 +58,7 @@
                         name="regReplacePattern"
                         [placeholder]="('g.example' | transloco) + ': [,.:]$'"
                         (ngModelChange)="somethingChanged()"
+                        (keydown)="captureEnterKey($event)"
                         [(ngModel)]="state.patternText"
                       />
                     </ng-template>
@@ -67,30 +67,28 @@
                 <div [ngbNavOutlet]="nav"></div>
               </td>
             </tr>
-            <tr class="align-middle">
-              <td class="fit">
-                {{ 'tools.reg-replace.replace with' | transloco }}:
-              </td>
-              <td>
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  name="regReplaceValue"
-                  (ngModelChange)="somethingChanged()"
-                  [(ngModel)]="state.replacement"
-                />
-              </td>
-            </tr>
+            @if (state.mode === 'replace') {
+              <tr class="align-middle">
+                <td class="fit">{{ 'tools.reg-replace.replace with' | transloco }}:</td>
+                <td>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    name="regReplaceValue"
+                    (ngModelChange)="somethingChanged()"
+                    [(ngModel)]="state.replacement"
+                  />
+                  <span class="text-muted small">
+                    {{ 'tools.reg-replace.replace with help text' | transloco }}
+                  </span>
+                </td>
+              </tr>
+            }
             <tr class="align-middle">
               <td class="fit">{{ 'g.levels' | transloco }}:</td>
               <td>
-                @for (
-                  level of annotationStoreService.transcript.levels;
-                  track level.id
-                ) {
-                  <div
-                    class="me-1 form-check border bg-white rounded d-inline-block py-1 px-2"
-                  >
+                @for (level of annotationStoreService.transcript.levels; track level.id) {
+                  <div class="me-1 form-check border bg-white rounded d-inline-block py-1 px-2">
                     <input
                       type="checkbox"
                       class="form-check-input d-inline-block ms-0 me-1"
@@ -99,11 +97,7 @@
                       (ngModelChange)="somethingChanged()"
                       [(ngModel)]="state.levels[level.name]"
                     />
-                    <label
-                      class="form-check-label pointer"
-                      [for]="'reg_replace_level_check_' + level.id"
-                      >{{ level.name }}</label
-                    >
+                    <label class="form-check-label pointer" [for]="'reg_replace_level_check_' + level.id">{{ level.name }}</label>
                   </div>
                 }
               </td>
@@ -140,37 +134,37 @@
                   <table class="table table-striped table-sm preview-table">
                     <thead>
                       <tr>
-                        <th class="fit num-column">#</th>
+                        <th class="fit num-column text-center"><i class="bi bi-clock"></i></th>
                         <th>{{ 'g.transcript' | transloco }}</th>
                         <th class="text-center checkbox-column">
-                          {{ 'g.skip' | transloco }}?
+                          @if (state.mode === 'replace') {
+                            {{ 'g.skip' | transloco }}?
+                          }
                         </th>
                       </tr>
                     </thead>
                     <tbody>
-                      @for (
-                        result of state.results;
-                        track result.levelName;
-                        let r = $index
-                      ) {
+                      @for (result of state.results; track result.levelName; let r = $index) {
                         @if (result.levelName === state.preview.selectedLevel) {
-                          @for (
-                            item of result.matches;
-                            track item.unitID;
-                            let i = $index
-                          ) {
+                          @for (item of result.matches; track item.unitID; let i = $index) {
                             <tr>
-                              <td class="fit num-column"><span class="font-bold">{{ $index + 1 }}</span></td>
-                              <td [innerHTML]="item.html"></td>
+                              <td class="fit num-column text-center align-middle">
+                                @if (item.startUnix !== undefined) {
+                                  <a class="font-bold link" (click)="openSegment(item.unitID, result.levelID)">{{ item.startUnix | timespan }}</a>
+                                } @else {
+                                  <a class="font-bold link" (click)="openSegment(item.unitID, result.levelID)">{{ $index + 1 }}</a>
+                                }
+                              </td>
+                              <td [innerHTML]="item.html" class="align-middle"></td>
                               <td class="text-center align-middle checkbox-column">
-                                <input
-                                  class="form-check-input pointer"
-                                  type="checkbox"
-                                  [(ngModel)]="item.skip"
-                                  [name]="
-                                    'reg_replace_check_skip_' + r + '_i' + i
-                                  "
-                                />
+                                @if (state.mode === 'replace') {
+                                  <input
+                                    class="form-check-input pointer"
+                                    type="checkbox"
+                                    [(ngModel)]="item.skip"
+                                    [name]="'reg_replace_check_skip_' + r + '_i' + i"
+                                  />
+                                }
                               </td>
                             </tr>
                           }
@@ -179,7 +173,7 @@
                     </tbody>
                   </table>
                 } @else {
-                  <p class="text-center mt-3">No results.</p>
+                  <p class="text-center mt-3">{{ 'p.no results found' | transloco }}</p>
                 }
               </div>
             </div>
@@ -189,28 +183,35 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button
-      (click)="close()"
-      class="btn btn-secondary me-2"
-      data-dismiss="modal"
-      type="button"
-    >
+    <button (click)="close()" class="btn btn-secondary me-2" data-dismiss="modal" type="button">
       {{ 'g.close' | transloco }}
     </button>
 
-    <button class="btn btn-info me-2" (click)="execute(true)">
-      {{ 'g.preview' | transloco }}
+    <button
+      class="btn btn-info me-2"
+      (click)="execute(true)"
+      [ngClass]="{
+        'btn-primary': state.mode === 'search',
+      }"
+    >
+      @if (state.mode === 'search') {
+        {{ 'g.search' | transloco }}
+      } @else {
+        {{ 'g.preview' | transloco }}
+      }
     </button>
 
-    <button
-      class="btn btn-primary"
-      (click)="execute(false)"
-      [ngClass]="{
-        'btn-secondary': !state.preview.active || state.results.length === 0,
-      }"
-      [disabled]="!state.preview.active || state.results.length === 0"
-    >
-      {{ 'g.execute' | transloco }}
-    </button>
+    @if (state.mode === 'replace') {
+      <button
+        class="btn btn-primary"
+        (click)="execute(false)"
+        [ngClass]="{
+          'btn-secondary': !state.preview.active || state.results.length === 0,
+        }"
+        [disabled]="!state.preview.active || state.results.length === 0"
+      >
+        {{ 'g.execute' | transloco }}
+      </button>
+    }
   </div>
 </div>

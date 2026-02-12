@@ -43,7 +43,10 @@ export class AnnotationStoreService {
   private multiThreading = inject(MultiThreadingService);
   private routingService = inject(RoutingService);
 
-  public segmentrequested = new EventEmitter<number>();
+  public segmentRequested = new EventEmitter<{
+    levelID: number;
+    itemID: number;
+  }>();
 
   get feedback(): any {
     return this._feedback;
@@ -709,10 +712,6 @@ export class AnnotationStoreService {
     return undefined;
   }
 
-  public requestSegment(segnumber: number) {
-    this.segmentrequested.emit(segnumber);
-  }
-
   public validateAll() {
     this._validationArray = [];
     const projectSettings = getModeState(this.appStorage.snapshot)?.projectConfig;
@@ -952,5 +951,14 @@ export class AnnotationStoreService {
 
   openCuttingModal() {
     this.store.dispatch(AnnotationActions.cuttingModal.open());
+  }
+
+  openSegment(levelID: number, itemID: number) {
+    this.store.dispatch(
+      AnnotationActions.openSegment.do({
+        levelID,
+        itemID,
+      }),
+    );
   }
 }

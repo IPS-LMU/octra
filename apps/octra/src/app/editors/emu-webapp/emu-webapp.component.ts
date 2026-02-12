@@ -1,47 +1,24 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Actions, ofType } from '@ngrx/effects';
-import {
-  AnnotationLevelType,
-  AnnotJSONConverter,
-  OctraAnnotation,
-} from '@octra/annotation';
+import { AnnotationLevelType, AnnotJSONConverter, OctraAnnotation } from '@octra/annotation';
 import { stringifyQueryParams } from '@octra/utilities';
 import { AudioCutter } from '@octra/web-media';
 import { timer } from 'rxjs';
-import {
-  EmuWebAppInMessageEventData,
-  EmuWebAppOutMessageEventData,
-} from '../../core/obj/emu-webapp.types';
+import { EmuWebAppInMessageEventData, EmuWebAppOutMessageEventData } from '../../core/obj/emu-webapp.types';
 import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationActions } from '../../core/store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import {
-  OCTRAEditor,
-  OctraEditorRequirements,
-  SupportedOctraEditorMetaData,
-} from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 
 @Component({
   selector: 'octra-emu-webapp',
   templateUrl: './emu-webapp.component.html',
   styleUrls: ['./emu-webapp.component.scss'],
 })
-export class EmuWebAppEditorComponent
-  extends OCTRAEditor
-  implements OctraEditorRequirements, AfterViewInit, OnInit
-{
+export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditorRequirements, AfterViewInit, OnInit {
   audio = inject(AudioService);
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
@@ -52,11 +29,7 @@ export class EmuWebAppEditorComponent
 
   static meta: SupportedOctraEditorMetaData = {
     name: 'EMU',
-    supportedLevelTypes: [
-      AnnotationLevelType.SEGMENT,
-      AnnotationLevelType.ITEM,
-      AnnotationLevelType.EVENT,
-    ],
+    supportedLevelTypes: [AnnotationLevelType.SEGMENT, AnnotationLevelType.ITEM, AnnotationLevelType.EVENT],
     editor: EmuWebAppEditorComponent,
     label: 'EMU-webApp',
     iconURL: '',
@@ -76,19 +49,16 @@ export class EmuWebAppEditorComponent
     if (this.audio.audioManager.resource.info.size <= 1024 * 1024 * 50) {
       if (this.settingsService.appSettings.octra.plugins?.emuWebApp?.url) {
         this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `${this.settingsService.appSettings.octra.plugins?.emuWebApp?.url}${stringifyQueryParams(
-            {
-              listenForMessages: true,
-            },
-          )}`,
+          `${this.settingsService.appSettings.octra.plugins?.emuWebApp?.url}${stringifyQueryParams({
+            listenForMessages: true,
+          })}`,
         );
       } else {
         this.error = 'Missing EMU webApp URL';
         this.initialized.emit();
       }
     } else {
-      this.error =
-        'The EMU-webApp editor only supports audio files with a size smaller or equal 50 MB.';
+      this.error = 'The EMU-webApp editor only supports audio files with a size smaller or equal 50 MB.';
       this.initialized.emit();
     }
   }
@@ -110,38 +80,26 @@ export class EmuWebAppEditorComponent
       },
     );
 
-
     this.subscriptionManager.removeByTag('watch annotation changes');
-    this.subscribe(
-      this.actions$.pipe(ofType(AnnotationActions.overviewModal.open)),
-      {
-        next: () => {
-          this.subscribe(
-            this.annotationStoreService.transcript$,
-            {
-              next: () => {
-                this.updateEmuWebAppOptions();
-              },
+    this.subscribe(this.actions$.pipe(ofType(AnnotationActions.overviewModal.open)), {
+      next: () => {
+        this.subscribe(
+          this.annotationStoreService.transcript$,
+          {
+            next: () => {
+              this.updateEmuWebAppOptions();
             },
-            'watch annotation changes',
-          );
-        },
+          },
+          'watch annotation changes',
+        );
       },
-    );
+    });
 
-    this.subscribe(
-      this.actions$.pipe(
-        ofType(
-          AnnotationActions.overviewModal.close,
-          AnnotationActions.overviewModal.send,
-        ),
-      ),
-      {
-        next: () => {
-          this.subscriptionManager.removeByTag('watch annotation changes');
-        },
+    this.subscribe(this.actions$.pipe(ofType(AnnotationActions.overviewModal.close, AnnotationActions.overviewModal.send)), {
+      next: () => {
+        this.subscriptionManager.removeByTag('watch annotation changes');
       },
-    );
+    });
     this.updateEmuWebAppOptions();
 
     try {
@@ -186,9 +144,7 @@ export class EmuWebAppEditorComponent
         }
       });
     } catch (e) {
-      console.warn(
-        "Shortcuts for OCTRA can't be triggered while using Emu-webApp because origins are not the same.",
-      );
+      console.warn("Shortcuts for OCTRA can't be triggered while using Emu-webApp because origins are not the same.");
     }
   }
 
@@ -212,16 +168,11 @@ export class EmuWebAppEditorComponent
           } else {
             const audioCutter = new AudioCutter(resource.info);
             const buffer = (
-              await audioCutter.cutAudioFileFromChannelData(
-                resource.info,
-                resource.info.name,
-                this.audio.audioManager.channel,
-                {
-                  number: 1,
-                  sampleStart: 0,
-                  sampleDur: resource.info.duration.samples,
-                },
-              )
+              await audioCutter.cutAudioFileFromChannelData(resource.info, resource.info.name, this.audio.audioManager.channel, {
+                number: 1,
+                sampleStart: 0,
+                sampleDur: resource.info.duration.samples,
+              })
             ).uint8Array;
             audioArrayBuffer = buffer.buffer as ArrayBuffer;
           }
@@ -233,11 +184,7 @@ export class EmuWebAppEditorComponent
             audioArrayBuffer,
             annotation: JSON.parse(
               new AnnotJSONConverter().export(
-                this.annotationStoreService.transcript.serialize(
-                  resource.info.fullname,
-                  resource.info.sampleRate,
-                  resource.info.duration,
-                ),
+                this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
               ).file!.content,
             ),
           };
@@ -260,25 +207,19 @@ export class EmuWebAppEditorComponent
   disableAllShortcuts() {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  openSegment(index: number) {
+  openSegment(item: { levelID: number; itemID: number }) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }
 
   @HostListener('window:message', ['$event'])
   windowMessageReceived(event: MessageEvent) {
-    const url =
-      this.settingsService.appSettings.octra.plugins?.emuWebApp?.url.replace(
-        /(^https?:\/\/[^/]+)(.*)/g,
-        '$1',
-      );
+    const url = this.settingsService.appSettings.octra.plugins?.emuWebApp?.url.replace(/(^https?:\/\/[^/]+)(.*)/g, '$1');
 
     if (url === event.origin) {
       const data = event.data as EmuWebAppOutMessageEventData;
       if (data.data?.annotation && data.trigger === 'autoSave') {
         const anno = OctraAnnotation.deserialize(data.data.annotation);
-        anno.changeCurrentLevelIndex(
-          this.annotationStoreService.transcript.selectedLevelIndex,
-        );
+        anno.changeCurrentLevelIndex(this.annotationStoreService.transcript.selectedLevelIndex);
         this.annotationStoreService.overwriteTranscript(anno);
       }
     }

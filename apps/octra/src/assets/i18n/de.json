@@ -257,7 +257,9 @@
     "wanted": "Gesucht wird",
     "website": "Webseite",
     "yes": "Ja",
-    "text excerpt": "Textausschnitt"
+    "text excerpt": "Textausschnitt",
+    "mode": "Modus",
+    "replace": "Ersetzen"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -471,7 +473,8 @@
     "continue task": "Aufgabe fortsetzen",
     "free task": "Aufgabe freigeben",
     "my paused tasks": "Meine zuletzt pausierten Aufgaben",
-    "further information": "Weitere informationen"
+    "further information": "Weitere informationen",
+    "no results found": "Keine Ergebnisse gefunden."
   },
   "projects-list": {
     "introduction": "Wähle ein Projekt aus und beginne eine neue Transkription. Falls pausierte Aufgaben eines Projekts verfügbar sind, kannst Du diese einzeln fortsetzen.",
@@ -545,7 +548,7 @@
     "reg-replace": {
       "name": "Suchen & Ersetzen",
       "description": "Ersetze Teile des Transkripts mit einem Text oder regulären Ausdruck.",
-      "inner description": "Fülle die folgenden Felder aus. Verwendest Du einen regulären Ausdruck mit Gruppen, kannst Du diese im Feld \"Ersetze mit\" mit $1 für die erste Gruppe u.s.w. ansprechen.",
+      "replace with help text": "Verwendest Du einen regulären Ausdruck mit Gruppen im Suchfeld, kannst Du diese in diesem Feld mit $1 für die erste Gruppe u.s.w. ansprechen.",
       "pattern": "Text / Regulärer Ausdruck",
       "replace with": "Ersetze mit",
       "affected units": "Betroffene Transkriptionseinheiten",

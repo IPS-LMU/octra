@@ -257,7 +257,9 @@
     "wanted": "Wanted",
     "website": "Website",
     "yes": "Yes",
-    "text excerpt": "Text excerpt"
+    "text excerpt": "Text excerpt",
+    "mode": "Mode",
+    "replace": "Replace"
   },
   "interfaces": {
     "2D editor": "2D-Editor",
@@ -471,7 +473,8 @@
     "continue task": "Continue task",
     "free task": "Free task",
     "my paused tasks": "My previously paused tasks",
-    "further information": "Further information"
+    "further information": "Further information",
+    "no results found": "No results found."
   },
   "projects-list": {
     "introduction": "Select a project of your choice and start a new transcription. If paused tasks of a project are available, you can continue them individually.",
@@ -553,10 +556,10 @@
     },
     "reg-replace": {
       "name": "Search & Replace",
-      "description": "Replace parts of the transcript with text or a regular expression.",
-      "inner description": "Fill in the following fields. If you use a regular expression with groups, you can refer to them in the ‘Replace with’ field using $1 for the first group, etc.",
+      "description": "Search or replace parts of the transcript with text or a regular expression.",
       "pattern": "Text / Regular expression",
       "replace with": "Replace with",
+      "replace with help text": "If you use a regular expression with groups as search pattern, you can refer to these groups in this field using $1 for the first group, etc.",
       "affected units": "Affected transcription units",
       "matches": "Matches"
     }

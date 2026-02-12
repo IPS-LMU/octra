@@ -14,7 +14,7 @@ import { editorComponents } from '../../../../editors/components';
 import { IIDBModeOptions } from '../../../shared/octra-database';
 import { AuthenticationActions } from '../../authentication';
 import { IDBActions } from '../../idb/idb.actions';
-import { LoginMode } from '../../index';
+import { getModeState, LoginMode } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
 import { AnnotationState } from './index';
@@ -183,6 +183,22 @@ export class AnnotationStateReducers {
             return {
               ...state,
               transcript: state.transcript.changeLevelByIndex(index, level),
+            };
+          } else {
+            console.error(`can't change level because index not valid.`);
+          }
+        }
+
+        return state;
+      }),
+      on(AnnotationActions.openSegment.success, (state: AnnotationState, { levelID, mode }) => {
+        if (this.mode === mode) {
+          const index = state.transcript.levels.findIndex((a) => a.id === levelID);
+
+          if (index > -1 && index < state.transcript.levels.length) {
+            return {
+              ...state,
+              transcript: state.transcript.clone().changeLevelIndex(index),
             };
           } else {
             console.error(`can't change level because index not valid.`);

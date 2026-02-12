@@ -31,7 +31,10 @@ export class NewEditorComponent
   disableAllShortcuts() {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  openSegment(index: number) {
+  openSegment(segment: {
+    itemID: number;
+    levelID: number;
+  }) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }
 }

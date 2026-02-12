@@ -15,23 +15,14 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
-import {
-  ASRContext,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-} from '@octra/annotation';
+import { ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { isFunction, SubscriptionManager } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import { Subscription, timer } from 'rxjs';
-import {
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
@@ -44,14 +35,7 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    NgClass,
-    NgStyle,
-    TranscrEditorComponent_1,
-    ValidationPopoverComponent,
-    OctraUtilitiesModule,
-    TranslocoPipe,
-  ],
+  imports: [NgClass, NgStyle, TranscrEditorComponent_1, ValidationPopoverComponent, OctraUtilitiesModule, TranslocoPipe],
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   annotationStoreService = inject(AnnotationStoreService);
@@ -80,22 +64,27 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   public selectedError: any = '';
   public shownSegments: {
+    start: SampleUnit;
+    end: SampleUnit;
+    id: number;
     transcription: {
-      html: string;
       text: string;
+      html: string;
     };
+    validation: string;
   }[] = [];
   public transcript = '';
 
-  @Input() currentLevel?: OctraAnnotationAnyLevel<
-    OctraAnnotationSegment<ASRContext>
-  >;
+  @Input() currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
   _internLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
 
   @Input() public showTranscriptionTable = true;
   public showLoading = true;
 
-  @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
+  @Output() segmentclicked = new EventEmitter<{
+    itemID: number;
+    levelID: number;
+  }>();
 
   private subscrmanager: SubscriptionManager<Subscription>;
 
@@ -151,21 +140,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public get transcrSegments(): number {
-    return this.currentLevel?.items
-      ? this.annotationStoreService.statistics.transcribed
-      : 0;
+    return this.currentLevel?.items ? this.annotationStoreService.statistics.transcribed : 0;
   }
 
   public get pauseSegments(): number {
-    return this.currentLevel?.items
-      ? this.annotationStoreService.statistics.pause
-      : 0;
+    return this.currentLevel?.items ? this.annotationStoreService.statistics.pause : 0;
   }
 
   public get emptySegments(): number {
-    return this.currentLevel?.items
-      ? this.annotationStoreService.statistics.empty
-      : 0;
+    return this.currentLevel?.items ? this.annotationStoreService.statistics.empty : 0;
   }
 
   public get foundErrors(): number {
@@ -204,11 +187,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.audio.audiomanagers[0].statechange.subscribe({
         next: (state) => {
           // make sure that events from playonhover are not logged
-          if (
-            state !== PlayBackStatus.PLAYING &&
-            state !== PlayBackStatus.INITIALIZED &&
-            state !== PlayBackStatus.PREPARE
-          ) {
+          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
             this.uiService.addElementFromEvent(
               'audio',
               { value: state.toLowerCase() },
@@ -234,27 +213,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  async onMouseOver(
-    $event: MouseEvent,
-    rowNumber: number,
-    row: HTMLDivElement,
-    validationPopover: ValidationPopoverComponent,
-  ) {
+  async onMouseOver($event: MouseEvent, rowNumber: number, row: HTMLDivElement, validationPopover: ValidationPopoverComponent) {
     if (validationPopover) {
       if (this.textEditor.state === 'inactive') {
         let target = $event.target as HTMLElement;
-        if (
-          target.getAttribute('class') === 'val-error' ||
-          target.parentElement!.getAttribute('class') === 'val-error'
-        ) {
+        if (target.getAttribute('class') === 'val-error' || target.parentElement!.getAttribute('class') === 'val-error') {
           if (!this.popovers.validation.mouse.enter) {
             if (target.getAttribute('class') !== 'val-error') {
               target = target.parentElement!;
             }
 
             const errorcode = target.getAttribute('data-errorcode')!;
-            this.selectedError =
-              await this.annotationStoreService.getErrorDetails(errorcode);
+            this.selectedError = await this.annotationStoreService.getErrorDetails(errorcode);
 
             if (this.selectedError !== null) {
               validationPopover.show();
@@ -292,31 +262,21 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           i < this.currentLevel?.items.length - 1
             ? (this.currentLevel?.items[i + 1] as OctraAnnotationSegment).time
             : this.audio.audioManager.resource.info.duration;
-        const audiochunk = new AudioChunk(
-          new AudioSelection(segment.time, nextSegmentTime),
-          this.audio.audiomanagers[0],
-        );
+        const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
 
         this.audio.audiomanagers[0].addChunk(audiochunk);
         this.textEditor.audioChunk = audiochunk;
 
-        this.transcript =
-          segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+        this.transcript = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
         // this.transcrEditor.focus();
       }
     }
   }
 
   async onTextEditorLeave(i: number) {
-    if (
-      this.transcrEditor &&
-      this._internLevel?.items &&
-      this._internLevel.type === 'SEGMENT'
-    ) {
+    if (this.transcrEditor && this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
       this.transcrEditor.updateRawText();
-      (
-        this._internLevel?.items[i] as OctraAnnotationSegment
-      ).changeFirstLabelWithoutName('Speaker', this.transcrEditor.rawText);
+      (this._internLevel?.items[i] as OctraAnnotationSegment).changeFirstLabelWithoutName('Speaker', this.transcrEditor.rawText);
       const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
       this.annotationStoreService.validateAll();
 
@@ -330,14 +290,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.audio.audiomanagers[0].removeChunk(this.textEditor.audioChunk!);
       this.cd.markForCheck();
 
-      const startSample =
-        i > 0
-          ? (
-              this.annotationStoreService.currentLevel!.items[
-                i - 1
-              ] as OctraAnnotationSegment
-            ).time.samples
-          : 0;
+      const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
       this.uiService.addElementFromEvent(
         'segment',
         {
@@ -364,8 +317,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     this.cd.detectChanges();
   }
 
-  public onSegmentClicked(segnumber: number) {
-    this.segmentclicked.emit(segnumber);
+  public onSegmentClicked(itemID: number) {
+    this.segmentclicked.emit({
+      levelID: this.currentLevel.id,
+      itemID,
+    });
   }
 
   private async updateSegments() {
@@ -375,35 +331,47 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this._internLevel &&
       (this.annotationStoreService.validationArray.length > 0 ||
         this.appStorage.useMode === 'url' ||
-        (this.routingService.staticQueryParams.guidelines_url &&
-          this.routingService.staticQueryParams.functions_url) ||
+        (this.routingService.staticQueryParams.guidelines_url && this.routingService.staticQueryParams.functions_url) ||
         !this.settingsService.projectsettings?.octra?.validationEnabled)
     ) {
-      if (
-        !this.currentLevel?.items ||
-        !this.annotationStoreService.guidelines
-      ) {
+      if (!this.currentLevel?.items || !this.annotationStoreService.guidelines) {
         this.shownSegments = [];
         this._internLevel?.clear();
       }
 
       this.showLoading = true;
       let startTime = 0;
-      const result = [];
+      const result: {
+        start: SampleUnit;
+        end: SampleUnit;
+        id: number;
+        transcription: {
+          text: string;
+          html: string;
+        };
+        validation: string;
+      }[] = [];
 
       if (this._internLevel.type === 'SEGMENT') {
-        const level = this
-          ._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+        const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
         for (let i = 0; i < level.items.length; i++) {
           const segment = level.items[i];
 
-          const obj = await this.getShownSegment(
-            startTime,
-            segment.time.samples,
+          const obj: {
+            start: SampleUnit;
+            end: SampleUnit;
+            id: number;
+            transcription: {
+              text: string;
+              html: string;
+            };
+            validation: string;
+          } = await this.getShownSegment(
+            new SampleUnit(startTime, segment.time.sampleRate),
+            segment.time,
             i,
-            this.annotationStoreService.validationArray.filter(
-              (a) => a.level === level.id,
-            ),
+            segment.id,
+            this.annotationStoreService.validationArray.filter((a) => a.level === level.id),
             segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
           );
 
@@ -427,22 +395,21 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['currentLevel'].currentValue) {
-      this._internLevel = (
-        changes['currentLevel']
-          .currentValue as OctraAnnotationAnyLevel<OctraAnnotationSegment>
-      ).clone();
+      this._internLevel = (changes['currentLevel'].currentValue as OctraAnnotationAnyLevel<OctraAnnotationSegment>).clone();
     }
   }
 
   async getShownSegment(
-    startSamples: number,
-    endSamples: number,
+    start: SampleUnit,
+    end: SampleUnit,
     i: number,
+    id: number,
     validation: any[],
     rawText?: string,
   ): Promise<{
-    start: number;
-    end: number;
+    start: SampleUnit;
+    end: SampleUnit;
+    id: number;
     transcription: {
       text: string;
       html: string;
@@ -450,8 +417,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     validation: string;
   }> {
     const obj = {
-      start: startSamples,
-      end: endSamples,
+      start,
+      end,
+      id,
       transcription: {
         text: rawText ?? '',
         html: rawText ?? '',
@@ -461,51 +429,30 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
     if (
       this.appStorage.useMode !== 'url' ||
-      (this.routingService.staticQueryParams.guidelines_url &&
-        this.routingService.staticQueryParams.functions_url)
+      (this.routingService.staticQueryParams.guidelines_url && this.routingService.staticQueryParams.functions_url)
     ) {
-      if (
-        typeof validateAnnotation !== 'undefined' &&
-        typeof validateAnnotation === 'function' &&
-        validation[i].validation.length > 0
-      ) {
-        obj.transcription.html = this.annotationStoreService.underlineTextRed(
-          obj.transcription.text,
-          validation[i].validation,
-        );
+      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function' && validation[i].validation.length > 0) {
+        obj.transcription.html = this.annotationStoreService.underlineTextRed(obj.transcription.text, validation[i].validation);
       }
 
-      obj.transcription.html = await this.annotationStoreService.rawToHTML(
-        obj.transcription.html,
-      );
-      obj.transcription.html = obj.transcription.html.replace(
-        /((?:⌈)|(?:⌉))/,
-        (g0, g1) => {
-          if (g1 === '⌈') {
-            return '<';
-          }
-          return '>';
-        },
-      );
+      obj.transcription.html = await this.annotationStoreService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:⌈)|(?:⌉))/, (g0, g1) => {
+        if (g1 === '⌈') {
+          return '<';
+        }
+        return '>';
+      });
     } else {
-      obj.transcription.html = await this.annotationStoreService.rawToHTML(
-        obj.transcription.html,
-      );
-      obj.transcription.html = obj.transcription.html.replace(
-        /((?:⌈)|(?:⌉))/g,
-        (g0, g1) => {
-          if (g1 === '⌈') {
-            return '<';
-          }
-          return '>';
-        },
-      );
+      obj.transcription.html = await this.annotationStoreService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:⌈)|(?:⌉))/g, (g0, g1) => {
+        if (g1 === '⌈') {
+          return '<';
+        }
+        return '>';
+      });
     }
 
-    obj.transcription.html = obj.transcription.html.replace(
-      /(<p>)|(<\/p>)/g,
-      '',
-    );
+    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
     return obj;
   }
 
@@ -516,19 +463,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
     const segment = this._internLevel.items[nextSegment];
 
-    if (
-      nextSegment < this._internLevel.items.length &&
-      this.playAllState.state !== 'stopped'
-    ) {
+    if (nextSegment < this._internLevel.items.length && this.playAllState.state !== 'stopped') {
       if (
         !this.playAllState.skipSilence ||
         (this.playAllState.skipSilence &&
           segment.getFirstLabelWithoutName('Speaker')?.value !== '' &&
           this.annotationStoreService.breakMarker?.code &&
-          segment
-            .getFirstLabelWithoutName('Speaker')
-            ?.value?.indexOf(this.annotationStoreService.breakMarker.code) !==
-            undefined)
+          segment.getFirstLabelWithoutName('Speaker')?.value?.indexOf(this.annotationStoreService.breakMarker.code) !== undefined)
       ) {
         this.playAllState.currentSegment = nextSegment;
         this.playSegment(nextSegment).then(() => {
@@ -550,10 +491,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   togglePlayAll() {
-    this.playAllState.icon =
-      this.playAllState.icon === 'bi bi-play-fill'
-        ? 'bi bi-stop-fill'
-        : 'bi bi-play-fill';
+    this.playAllState.icon = this.playAllState.icon === 'bi bi-play-fill' ? 'bi bi-stop-fill' : 'bi bi-play-fill';
     this.cd.markForCheck();
 
     const playpos = this.audio.audioManager.createSampleUnit(0);
@@ -585,10 +523,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.stopPlayback()
         .then(() => {
           this.playAllState.state = 'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].state =
-            'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].icon =
-            'bi bi-play-fill';
+          this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
+          this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
 
           this.cd.markForCheck();
 
@@ -617,8 +553,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         resolve();
         return;
       }
-      const level = this
-        ._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+      const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
 
       if (this.playStateSegments[segmentNumber].state === 'stopped') {
         const segment: OctraAnnotationSegment = level.items[segmentNumber];
@@ -627,23 +562,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.playStateSegments[segmentNumber].icon = 'bi bi-stop-fill';
         this.cd.markForCheck();
 
-        const startSample =
-          segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
+        const startSample = segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
 
         this.playAllState.currentSegment = segmentNumber;
 
         this.cd.markForCheck();
-        this.audio.audiomanagers[0].playPosition =
-          this.audio.audiomanagers[0].createSampleUnit(startSample);
+        this.audio.audiomanagers[0].playPosition = this.audio.audiomanagers[0].createSampleUnit(startSample);
         this.audio.audiomanagers[0]
-          .startPlayback(
-            new AudioSelection(
-              this.audio.audiomanagers[0].createSampleUnit(startSample),
-              segment.time.clone(),
-            ),
-            1,
-            1,
-          )
+          .startPlayback(new AudioSelection(this.audio.audiomanagers[0].createSampleUnit(startSample), segment.time.clone()), 1, 1)
           .then(() => {
             this.playStateSegments[segmentNumber].state = 'stopped';
             this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
@@ -686,8 +612,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   playSelectedSegment(segmentNumber: number) {
     // make sure that audio is not playing
     if (
-      (this.playAllState.state === 'started' &&
-        this.playAllState.currentSegment !== segmentNumber) ||
+      (this.playAllState.state === 'started' && this.playAllState.currentSegment !== segmentNumber) ||
       this.playAllState.currentSegment !== segmentNumber
     ) {
       this.stopPlayback()
@@ -695,13 +620,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           this.cd.markForCheck();
 
           const startSample =
-            segmentNumber > 0
-              ? (
-                  this.annotationStoreService.currentLevel?.items[
-                    segmentNumber - 1
-                  ] as OctraAnnotationSegment
-                ).time.samples
-              : 0;
+            segmentNumber > 0 ? (this.annotationStoreService.currentLevel?.items[segmentNumber - 1] as OctraAnnotationSegment).time.samples : 0;
           this.uiService.addElementFromEvent(
             'mouseclick',
             {
@@ -713,12 +632,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             {
               start: startSample,
-              length:
-                (
-                  this.annotationStoreService.currentLevel?.items[
-                    segmentNumber
-                  ] as OctraAnnotationSegment
-                ).time.samples - startSample,
+              length: (this.annotationStoreService.currentLevel?.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
             },
             'overview',
           );
@@ -736,13 +650,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         });
     } else {
       const startSample =
-        segmentNumber > 0
-          ? (
-              this.annotationStoreService.currentLevel!.items[
-                segmentNumber - 1
-              ] as OctraAnnotationSegment
-            ).time.samples
-          : 0;
+        segmentNumber > 0 ? (this.annotationStoreService.currentLevel!.items[segmentNumber - 1] as OctraAnnotationSegment).time.samples : 0;
       this.uiService.addElementFromEvent(
         'mouseclick',
         {
@@ -754,12 +662,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         undefined,
         {
           start: startSample,
-          length:
-            (
-              this.annotationStoreService.currentLevel!.items[
-                segmentNumber
-              ] as OctraAnnotationSegment
-            ).time.samples - startSample,
+          length: (this.annotationStoreService.currentLevel!.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
         },
         'overview',
       );
@@ -794,10 +697,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
-        this.playStateSegments[this.playAllState.currentSegment].state =
-          'stopped';
-        this.playStateSegments[this.playAllState.currentSegment].icon =
-          'bi bi-play-fill';
+        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
+        this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
         this.cd.markForCheck();
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
@@ -811,17 +712,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       errors: number;
     }[] = [];
 
-    for (const validationArrayElement of this.annotationStoreService
-      .validationArray) {
-      const index = result.findIndex(
-        (a) => a.id === validationArrayElement.level,
-      );
+    for (const validationArrayElement of this.annotationStoreService.validationArray) {
+      const index = result.findIndex((a) => a.id === validationArrayElement.level);
       if (index < 0) {
         result.push({
           id: validationArrayElement.level,
-          level: this.annotationStoreService.transcript.levels.find(
-            (a) => a.id === validationArrayElement.level,
-          )!.name,
+          level: this.annotationStoreService.transcript.levels.find((a) => a.id === validationArrayElement.level)!.name,
           errors: validationArrayElement.validation.length,
         });
       } else {

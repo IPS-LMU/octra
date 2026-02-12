@@ -314,6 +314,8 @@ export class AudioViewerService {
   public alert = new EventEmitter<{ type: string; message: string }>();
   public segmententer = new EventEmitter<{
     index: number;
+    itemID: number;
+    levelID: number;
     pos: { Y1: number; Y2: number };
   }>();
 
@@ -2093,6 +2095,8 @@ export class AudioViewerService {
 
                             if (!this.settings.multiLine) {
                               this.segmententer.emit({
+                                itemID: segment.id,
+                                levelID: this.currentLevel.id,
                                 index: segmentI,
                                 pos: { Y1: posY1, Y2: posY2 },
                               });
@@ -2198,12 +2202,16 @@ export class AudioViewerService {
                   });
 
                   const segInde = getSegmentBySamplePosition(this.currentLevel.items as OctraAnnotationSegment<ASRContext>[], this.mouseCursor);
+                  const segment = this.currentLevel.items[segInde];
                   this.selectSegment(segInde)
                     .then(({ posY1, posY2 }) => {
                       this._focused = false;
                       this.drawWholeSelection();
                       this.stage?.draw();
+
                       this.segmententer.emit({
+                        itemID: segment.id,
+                        levelID: this.currentLevel.id,
                         index: segInde,
                         pos: { Y1: posY1, Y2: posY2 },
                       });

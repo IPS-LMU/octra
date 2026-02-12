@@ -1,27 +1,10 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
 import { contains } from '@octra/utilities';
-import {
-  TranscrEditorComponent,
-  TranscrEditorConfig,
-} from '../../core/component';
+import { TranscrEditorComponent, TranscrEditorConfig } from '../../core/component';
 
 import { NgClass, NgStyle } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
-import {
-  AnnotationLevelType,
-  ASRContext,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-  OctraAnnotationSegmentLevel,
-} from '@octra/annotation';
+import { AnnotationLevelType, ASRContext, OctraAnnotation, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { AudioSelection, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
@@ -30,53 +13,27 @@ import {
   CurrentLevelChangeEvent,
   OctraComponentsModule,
 } from '@octra/ngx-components';
-import {
-  AudioChunk,
-  AudioManager,
-  BrowserInfo,
-  Shortcut,
-  ShortcutGroup,
-} from '@octra/web-media';
+import { AudioChunk, AudioManager, BrowserInfo, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
 import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
 import { SampleInterval } from '../../core/obj/Settings/logging';
-import {
-  AlertService,
-  AlertType,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
+import { AlertService, AlertType, AudioService, SettingsService, UserInteractionsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { RoutingService } from '../../core/shared/service/routing.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import {
-  OCTRAEditor,
-  OctraEditorRequirements,
-  SupportedOctraEditorMetaData,
-} from '../octra-editor';
+import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 
 @Component({
   selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.scss'],
-  imports: [
-    OctraComponentsModule,
-    NgStyle,
-    AudioNavigationComponent_1,
-    TranscrEditorComponent_1,
-    NgClass,
-    TranslocoPipe,
-  ],
+  imports: [OctraComponentsModule, NgStyle, AudioNavigationComponent_1, TranscrEditorComponent_1, NgClass, TranslocoPipe],
 })
-export class LinearEditorComponent
-  extends OCTRAEditor
-  implements OnInit, AfterViewInit, OctraEditorRequirements
-{
+export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OctraEditorRequirements {
   audio = inject(AudioService);
   alertService = inject(AlertService);
   annotationStoreService = inject(AnnotationStoreService);
@@ -136,16 +93,8 @@ export class LinearEditorComponent
 
   private mousestate = 'initiliazied';
 
-  private onAudioPlayPause = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup,
-  ) => {
-    const currentAudioChunk =
-      shortcutGroup.name === 'signaldisplay_top_audio'
-        ? this.audioChunkTop
-        : this.audioChunkDown;
+  private onAudioPlayPause = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
+    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
     const controlName = shortcutGroup.name.replace('_audio', '');
 
     if (currentAudioChunk) {
@@ -170,16 +119,8 @@ export class LinearEditorComponent
     }
   };
 
-  private onAudioStop = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup,
-  ) => {
-    const currentAudioChunk =
-      shortcutGroup.name === 'signaldisplay_top_audio'
-        ? this.audioChunkTop
-        : this.audioChunkDown;
+  private onAudioStop = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
+    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
     const controlName = shortcutGroup.name.replace('_audio', '');
 
     if (currentAudioChunk) {
@@ -198,16 +139,8 @@ export class LinearEditorComponent
     }
   };
 
-  private onStepBackward = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup,
-  ) => {
-    const currentAudioChunk =
-      shortcutGroup.name === 'signaldisplay_top_audio'
-        ? this.audioChunkTop
-        : this.audioChunkDown;
+  private onStepBackward = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
+    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
     const controlName = shortcutGroup.name.replace('_audio', '');
 
     if (currentAudioChunk) {
@@ -226,16 +159,8 @@ export class LinearEditorComponent
     }
   };
 
-  private onStepBackwardTime = (
-    keyboardEvent: KeyboardEvent,
-    shortcut: Shortcut,
-    hotKeyEvent: HotkeysEvent,
-    shortcutGroup: ShortcutGroup,
-  ) => {
-    const currentAudioChunk =
-      shortcutGroup.name === 'signaldisplay_top_audio'
-        ? this.audioChunkTop
-        : this.audioChunkDown;
+  private onStepBackwardTime = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
+    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
     const controlName = shortcutGroup.name.replace('_audio', '');
 
     if (currentAudioChunk) {
@@ -254,11 +179,7 @@ export class LinearEditorComponent
     }
   };
 
-  onZoomInOut = (
-    $event: KeyboardEvent,
-    shortcut: Shortcut,
-    hotkeyEvent: HotkeysEvent,
-  ) => {
+  onZoomInOut = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
     if (this.shortcutsEnabled) {
       if (this.appStorage.showMagnifier) {
         if (this.minimagnifier !== undefined && this.signalDisplayTop.focused) {
@@ -425,14 +346,8 @@ export class LinearEditorComponent
   }
 
   get segmententer_shortc(): string {
-    const segmentEnterShortcut =
-      this.signalDisplayTop.settings.shortcuts.items.find(
-        (a) => a.name === 'segment_enter',
-      );
-    if (
-      segmentEnterShortcut !== undefined &&
-      this.signalDisplayTop.settings !== undefined
-    ) {
+    const segmentEnterShortcut = this.signalDisplayTop.settings.shortcuts.items.find((a) => a.name === 'segment_enter');
+    if (segmentEnterShortcut !== undefined && this.signalDisplayTop.settings !== undefined) {
       return segmentEnterShortcut.keys[this.platform]!;
     }
     return '';
@@ -528,8 +443,7 @@ export class LinearEditorComponent
     this._miniMagnifierSettings.cursor.fixed = true;
     this._miniMagnifierSettings.lineheight = 160;
 
-    this.editorSettings.markers =
-      this.annotationStoreService.guidelines?.markers ?? [];
+    this.editorSettings.markers = this.annotationStoreService.guidelines?.markers ?? [];
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
     this.subscribe(this.annotationStoreService.currentLevel$, ($event) => {
@@ -542,11 +456,9 @@ export class LinearEditorComponent
     });
 
     this.subscribe(this.signalDisplayTop.alert, (result) => {
-      this.alertService
-        .showAlert(result.type as AlertType, result.message)
-        .catch((error) => {
-          console.error(error);
-        });
+      this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
+        console.error(error);
+      });
     });
 
     this.cd.markForCheck();
@@ -585,12 +497,9 @@ export class LinearEditorComponent
       this.minimagnifierComponent.av.zoomY = this.factor;
     }
 
-    this.subscribe(
-      this.annotationStoreService.segmentrequested,
-      (segnumber: number) => {
-        this.openSegment(segnumber);
-      },
-    );
+    this.subscribe(this.annotationStoreService.segmentRequested, (item: { levelID: number; itemID: number }) => {
+      this.openSegment(item);
+    });
 
     this.subscribe(
       this.signalDisplayTop.onInitialized,
@@ -610,10 +519,7 @@ export class LinearEditorComponent
         if (this.audioChunkDown !== undefined) {
           this.audioChunkDown.destroy();
         }
-        this.audioChunkDown = new AudioChunk(
-          this.audioChunkTop.selection.clone(),
-          this.audioManager,
-        );
+        this.audioChunkDown = new AudioChunk(this.audioChunkTop.selection.clone(), this.audioManager);
       } else {
         this.audioChunkDown = undefined;
         this.selectedAudioChunk = this.audioChunkTop;
@@ -631,20 +537,12 @@ export class LinearEditorComponent
     this.saving = false;
   }
 
-  onMouseOver($event: {
-    event: MouseEvent | undefined;
-    time: SampleUnit | undefined;
-  }) {
+  onMouseOver($event: { event: MouseEvent | undefined; time: SampleUnit | undefined }) {
     this.subscriptionManager.removeByTag('mouseTimer');
 
     this.minimagnifier.component = this.signalDisplayTop as any;
 
-    this.doPlayOnHover(
-      this.audioManager,
-      this.appStorage.playOnHover ?? false,
-      this.audioChunkTop,
-      this.signalDisplayTop.av.mouseCursor!,
-    );
+    this.doPlayOnHover(this.audioManager, this.appStorage.playOnHover ?? false, this.audioChunkTop, this.signalDisplayTop.av.mouseCursor!);
 
     if (this.appStorage.showMagnifier) {
       this.minimagnifier.isHidden = false;
@@ -667,16 +565,8 @@ export class LinearEditorComponent
       });
     });
 
-    if (
-      this.appStorage.logging &&
-      this.annotationStoreService.currentLevel instanceof
-        OctraAnnotationSegmentLevel
-    ) {
-      const start =
-        $event.index > 0
-          ? this.annotationStoreService.currentLevel!.items[$event.index - 1]!
-              .time.samples
-          : 0;
+    if (this.appStorage.logging && this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel) {
+      const start = $event.index > 0 ? this.annotationStoreService.currentLevel!.items[$event.index - 1]!.time.samples : 0;
       this.uiService.addElementFromEvent(
         'segment',
         {
@@ -688,9 +578,7 @@ export class LinearEditorComponent
         undefined,
         {
           start,
-          length:
-            this.annotationStoreService.currentLevel!.items[$event.index]!.time
-              .samples - start,
+          length: this.annotationStoreService.currentLevel!.items[$event.index]!.time.samples - start,
         },
         LinearEditorComponent.editorname,
       );
@@ -721,15 +609,8 @@ export class LinearEditorComponent
     }
   }
 
-  private triggerUIActionAfterShortcut(
-    $event: any,
-    control: string,
-    timestamp: number,
-  ) {
-    const component: AudioViewerComponent =
-      control === 'signaldisplay_top'
-        ? this.signalDisplayTop
-        : this.signalDisplayDown;
+  private triggerUIActionAfterShortcut($event: any, control: string, timestamp: number) {
+    const component: AudioViewerComponent = control === 'signaldisplay_top' ? this.signalDisplayTop : this.signalDisplayDown;
     if (this.appStorage.logging) {
       if (
         $event.value === undefined ||
@@ -748,24 +629,14 @@ export class LinearEditorComponent
 
         let segment = undefined;
 
-        if (
-          this.segmentselected &&
-          this.selectedIndex > -1 &&
-          this.annotationStoreService.currentLevel instanceof
-            OctraAnnotationSegmentLevel
-        ) {
-          const annoSegment =
-            this.annotationStoreService.currentLevel!.items[this.selectedIndex];
+        if (this.segmentselected && this.selectedIndex > -1 && this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel) {
+          const annoSegment = this.annotationStoreService.currentLevel!.items[this.selectedIndex];
           segment = {
             start: annoSegment!.time.samples,
             length:
-              this.selectedIndex <
-              this.annotationStoreService.currentLevel!.items.length - 1
-                ? this.annotationStoreService.currentLevel!.items[
-                    this.selectedIndex + 1
-                  ]!.time.samples - annoSegment!.time.samples
-                : this.audioManager.resource.info.duration.samples -
-                  annoSegment!.time.samples,
+              this.selectedIndex < this.annotationStoreService.currentLevel!.items.length - 1
+                ? this.annotationStoreService.currentLevel!.items[this.selectedIndex + 1]!.time.samples - annoSegment!.time.samples
+                : this.audioManager.resource.info.duration.samples - annoSegment!.time.samples,
           };
         }
 
@@ -784,20 +655,8 @@ export class LinearEditorComponent
           }
         }
 
-        this.uiService.addElementFromEvent(
-          'shortcut',
-          $event,
-          timestamp,
-          playPosition,
-          textSelection,
-          audioSelection,
-          segment,
-          control,
-        );
-      } else if (
-        $event.value !== undefined &&
-        contains($event.value, 'playonhover')
-      ) {
+        this.uiService.addElementFromEvent('shortcut', $event, timestamp, playPosition, textSelection, audioSelection, segment, control);
+      } else if ($event.value !== undefined && contains($event.value, 'playonhover')) {
         this.appStorage.playOnHover = !this.appStorage.playOnHover;
       }
     }
@@ -807,23 +666,14 @@ export class LinearEditorComponent
     if (
       this.selectedIndex > -1 &&
       this.annotationStoreService.currentLevel?.items &&
-      this.annotationStoreService.currentLevel instanceof
-        OctraAnnotationSegmentLevel
+      this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel
     ) {
-      const endSamples =
-        this.annotationStoreService.currentLevel.items[this.selectedIndex]!.time
-          .samples;
+      const endSamples = this.annotationStoreService.currentLevel.items[this.selectedIndex]!.time.samples;
       let startSamples = 0;
       if (this.selectedIndex > 0) {
-        startSamples =
-          this.annotationStoreService.currentLevel.items[
-            this.selectedIndex - 1
-          ]!.time.samples;
+        startSamples = this.annotationStoreService.currentLevel.items[this.selectedIndex - 1]!.time.samples;
       }
-      if (
-        this.signalDisplayDown.av.MouseClickPos!.samples < startSamples ||
-        this.signalDisplayDown.av.MouseClickPos!.samples > endSamples
-      ) {
+      if (this.signalDisplayDown.av.MouseClickPos!.samples < startSamples || this.signalDisplayDown.av.MouseClickPos!.samples > endSamples) {
         this.segmentselected = false;
       }
     }
@@ -840,20 +690,14 @@ export class LinearEditorComponent
         this.segmentselected &&
         this.selectedIndex > -1 &&
         this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel
+        this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel
       ) {
-        const annoSegment =
-          this.annotationStoreService.currentLevel?.items[this.selectedIndex];
+        const annoSegment = this.annotationStoreService.currentLevel?.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
-          this.selectedIndex <
-          this.annotationStoreService.currentLevel.items.length - 1
-            ? this.annotationStoreService.currentLevel.items[
-                this.selectedIndex + 1
-              ]!.time.samples - annoSegment!.time.samples
-            : this.audioManager.resource.info.duration.samples -
-              annoSegment!.time.samples;
+          this.selectedIndex < this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[this.selectedIndex + 1]!.time.samples - annoSegment!.time.samples
+            : this.audioManager.resource.info.duration.samples - annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -880,20 +724,14 @@ export class LinearEditorComponent
         this.segmentselected &&
         this.selectedIndex > -1 &&
         this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel
+        this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel
       ) {
-        const annoSegment =
-          this.annotationStoreService.currentLevel.items[this.selectedIndex];
+        const annoSegment = this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
-          this.selectedIndex <
-          this.annotationStoreService.currentLevel.items.length - 1
-            ? this.annotationStoreService.currentLevel.items[
-                this.selectedIndex + 1
-              ]!.time.samples - annoSegment!.time.samples
-            : this.audioManager.resource.info.duration.samples -
-              annoSegment!.time.samples;
+          this.selectedIndex < this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[this.selectedIndex + 1]!.time.samples - annoSegment!.time.samples
+            : this.audioManager.resource.info.duration.samples - annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -909,28 +747,20 @@ export class LinearEditorComponent
     }
   }
 
-  public changeMagnifierPosition(
-    mouseEvent: MouseEvent,
-    cursorTime: SampleUnit,
-  ) {
+  public changeMagnifierPosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
     const x = mouseEvent.offsetX - (this.minimagnifier.size.width - 10) / 2 - 2;
 
     // magnifier is fully visible
     this.minimagnifier.location.y = mouseEvent.offsetY + 60;
     this.minimagnifier.location.x = x;
 
-    this.changeArea(
-      this.minimagnifierComponent,
-      this.signalDisplayTop,
-      this.audioManager,
-      this.audioChunkMagnifier,
-      cursorTime,
-      this.factor,
-    ).then((newMagnifierChunk) => {
-      if (newMagnifierChunk !== undefined) {
-        this.audioChunkMagnifier = newMagnifierChunk;
-      }
-    });
+    this.changeArea(this.minimagnifierComponent, this.signalDisplayTop, this.audioManager, this.audioChunkMagnifier, cursorTime, this.factor).then(
+      (newMagnifierChunk) => {
+        if (newMagnifierChunk !== undefined) {
+          this.audioChunkMagnifier = newMagnifierChunk;
+        }
+      },
+    );
     this.cd.detectChanges();
   }
 
@@ -949,20 +779,14 @@ export class LinearEditorComponent
         this.segmentselected &&
         this.selectedIndex > -1 &&
         this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel
+        this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel
       ) {
-        const annoSegment =
-          this.annotationStoreService.currentLevel.items[this.selectedIndex];
+        const annoSegment = this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment.start = annoSegment!.time.samples;
         segment.length =
-          this.selectedIndex <
-          this.annotationStoreService.currentLevel.items.length - 1
-            ? this.annotationStoreService.currentLevel.items[
-                this.selectedIndex + 1
-              ]!.time.samples - annoSegment!.time.samples
-            : this.audioManager.resource.info.duration.samples -
-              annoSegment!.time.samples;
+          this.selectedIndex < this.annotationStoreService.currentLevel.items.length - 1
+            ? this.annotationStoreService.currentLevel.items[this.selectedIndex + 1]!.time.samples - annoSegment!.time.samples
+            : this.audioManager.resource.info.duration.samples - annoSegment!.time.samples;
       }
 
       this.uiService.addElementFromEvent(
@@ -986,21 +810,15 @@ export class LinearEditorComponent
         this.segmentselected &&
         this.selectedIndex > -1 &&
         this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel
+        this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel
       ) {
-        const annoSegment =
-          this.annotationStoreService.currentLevel.items[this.selectedIndex];
+        const annoSegment = this.annotationStoreService.currentLevel.items[this.selectedIndex];
         segment = {
           start: annoSegment!.time.samples,
           length:
-            this.selectedIndex <
-            this.annotationStoreService.currentLevel.items.length - 1
-              ? this.annotationStoreService.currentLevel.items[
-                  this.selectedIndex + 1
-                ]!.time.samples - annoSegment!.time.samples
-              : this.audioManager.resource.info.duration.samples -
-                annoSegment!.time.samples,
+            this.selectedIndex < this.annotationStoreService.currentLevel.items.length - 1
+              ? this.annotationStoreService.currentLevel.items[this.selectedIndex + 1]!.time.samples - annoSegment!.time.samples
+              : this.audioManager.resource.info.duration.samples - annoSegment!.time.samples,
         };
       }
 
@@ -1017,8 +835,8 @@ export class LinearEditorComponent
     }
   }
 
-  public openSegment(segnumber: number) {
-    this.onSegmentEnter({ index: segnumber });
+  public openSegment(item: { itemID: number; levelID: number }) {
+    this.onSegmentEnter(item);
   }
 
   public update() {
@@ -1028,10 +846,7 @@ export class LinearEditorComponent
   }
 
   afterFirstInitialization() {
-    this.checkIfSmallAudioChunk(
-      this.audioChunkTop,
-      this.annotationStoreService.currentLevel!,
-    );
+    this.checkIfSmallAudioChunk(this.audioChunkTop, this.annotationStoreService.currentLevel!);
   }
 
   onKeyUp() {
@@ -1054,20 +869,14 @@ export class LinearEditorComponent
 
   private selectSegment(index: number): Promise<AudioSelection> {
     return new Promise<AudioSelection>((resolve) => {
-      if (
-        this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel
-      ) {
+      if (this.annotationStoreService.currentLevel?.items && this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel) {
         const segment = this.annotationStoreService.currentLevel.items[index];
-        this.transcript =
-          segment!.getFirstLabelWithoutName('Speaker')?.value ?? '';
+        this.transcript = segment!.getFirstLabelWithoutName('Speaker')?.value ?? '';
         this.selectedIndex = index;
         this.segmentselected = true;
         let start = this.audioManager.createSampleUnit(0);
         if (index > 0) {
-          start =
-            this.annotationStoreService.currentLevel.items[index - 1]!.time;
+          start = this.annotationStoreService.currentLevel.items[index - 1]!.time;
         }
         resolve(new AudioSelection(start, segment!.time));
       }
@@ -1079,63 +888,42 @@ export class LinearEditorComponent
       if (
         this.selectedIndex > -1 &&
         this.annotationStoreService.currentLevel?.items &&
-        this.annotationStoreService.currentLevel instanceof
-          OctraAnnotationSegmentLevel &&
-        this.selectedIndex <
-          this.annotationStoreService.currentLevel.items.length
+        this.annotationStoreService.currentLevel instanceof OctraAnnotationSegmentLevel &&
+        this.selectedIndex < this.annotationStoreService.currentLevel.items.length
       ) {
-        const segment = this.annotationStoreService.currentLevel.items[
-          this.selectedIndex
-        ].clone(
+        const segment = this.annotationStoreService.currentLevel.items[this.selectedIndex].clone(
           this.annotationStoreService.currentLevel.items[this.selectedIndex].id,
         );
         segment.changeFirstLabelWithoutName('Speaker', this.editor.rawText);
 
-        this.annotationStoreService.changeCurrentItemById(
-          this.annotationStoreService.currentLevel.items[this.selectedIndex].id,
-          segment,
-        );
+        this.annotationStoreService.changeCurrentItemById(this.annotationStoreService.currentLevel.items[this.selectedIndex].id, segment);
       }
     }
   }
 
-  public onAudioViewerMouseLeave(
-    keyGroup: 'signaldisplay_top' | 'signaldisplay_down',
-  ) {
+  public onAudioViewerMouseLeave(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
     // this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
   }
 
-  public onAudioViewerMouseEnter(
-    keyGroup: 'signaldisplay_top' | 'signaldisplay_down',
-  ) {
+  public onAudioViewerMouseEnter(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
     // this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 
-  onEntriesChange(
-    annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-  ) {
+  onEntriesChange(annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>) {
     this.annotationStoreService.overwriteTranscript(annotation);
   }
 
   onCurrentLevelChange($event: CurrentLevelChangeEvent) {
     if ($event.type === 'change') {
-      this.annotationStoreService.changeCurrentLevelItems(
-        $event.items.map((a) => a.instance!),
-      );
+      this.annotationStoreService.changeCurrentLevelItems($event.items.map((a) => a.instance!));
     }
 
     if ($event.type === 'remove') {
-      this.annotationStoreService.removeCurrentLevelItems(
-        $event.items,
-        $event.removeOptions?.silenceCode,
-        $event.removeOptions?.mergeTranscripts,
-      );
+      this.annotationStoreService.removeCurrentLevelItems($event.items, $event.removeOptions?.silenceCode, $event.removeOptions?.mergeTranscripts);
     }
 
     if ($event.type === 'add') {
-      this.annotationStoreService.addCurrentLevelItems(
-        $event.items.map((a) => a.instance!),
-      );
+      this.annotationStoreService.addCurrentLevelItems($event.items.map((a) => a.instance!));
     }
   }
 }

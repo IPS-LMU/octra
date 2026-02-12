@@ -1,10 +1,5 @@
 import { EventEmitter } from '@angular/core';
-import {
-  AnnotationLevelType,
-  ASRContext,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { AnnotationLevelType, ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment } from '@octra/annotation';
 import { AudioSelection, SampleUnit } from '@octra/media';
 import { AudioViewerComponent } from '@octra/ngx-components';
 import { AudioChunk, AudioManager } from '@octra/web-media';
@@ -36,12 +31,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
   protected shortcutsEnabled = true;
   static meta: SupportedOctraEditorMetaData;
 
-  protected doPlayOnHover(
-    audioManager: AudioManager,
-    isPlayingOnhover: boolean,
-    audioChunk: AudioChunk,
-    mouseCursor: SampleUnit,
-  ) {
+  protected doPlayOnHover(audioManager: AudioManager, isPlayingOnhover: boolean, audioChunk: AudioChunk, mouseCursor: SampleUnit) {
     if (!audioManager.isPlaying && isPlayingOnhover) {
       // play audio on hover
 
@@ -50,9 +40,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
       audioChunkHover.volume = 1;
       audioChunkHover.playbackRate = 1;
       audioChunkHover.selection.start = mouseCursor.clone();
-      audioChunkHover.selection.end = mouseCursor.add(
-        audioManager.createSampleUnit(audioManager.sampleRate / 10),
-      );
+      audioChunkHover.selection.end = mouseCursor.add(audioManager.createSampleUnit(audioManager.sampleRate / 10));
       audioChunkHover.startPlayback(true).catch((error) => {
         // ignore
       });
@@ -74,14 +62,10 @@ export abstract class OCTRAEditor extends DefaultComponent {
       const cursorLocation = signalDisplay.mouseCursor;
       if (cursorLocation && cursorTime) {
         const halfRate = Math.round(audioManager.sampleRate / factor);
-        const start =
-          cursorTime.samples > halfRate
-            ? audioManager.createSampleUnit(cursorTime.samples - halfRate)
-            : audioManager.createSampleUnit(0);
+        const start = cursorTime.samples > halfRate ? audioManager.createSampleUnit(cursorTime.samples - halfRate) : audioManager.createSampleUnit(0);
 
         const end =
-          cursorTime.samples <
-          audioManager.resource.info.duration.samples - halfRate
+          cursorTime.samples < audioManager.resource.info.duration.samples - halfRate
             ? audioManager.createSampleUnit(cursorTime.samples + halfRate)
             : audioManager.resource.info.duration.clone();
 
@@ -98,24 +82,26 @@ export abstract class OCTRAEditor extends DefaultComponent {
     });
   }
 
-  abstract openSegment(index: number): void;
+  public abstract openSegment(item: { levelID: number; itemID: number });
 
-  protected checkIfSmallAudioChunk(
-    audioChunk: AudioChunk,
-    currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>,
-  ) {
-    const emptySegmentIndex = currentLevel.items.findIndex((a) => {
+  protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
+    const emptySegment = currentLevel.items.find((a) => {
       return a instanceof OctraAnnotationSegment
-        ? a.getFirstLabelWithoutName('Speaker')?.value === undefined ||
-            a.getFirstLabelWithoutName('Speaker')?.value === ''
+        ? a.getFirstLabelWithoutName('Speaker')?.value === undefined || a.getFirstLabelWithoutName('Speaker')?.value === ''
         : false;
     });
 
     if (audioChunk.time.duration.seconds <= 35) {
-      if (emptySegmentIndex > -1) {
-        this.openSegment(emptySegmentIndex);
+      if (emptySegment) {
+        this.openSegment({
+          itemID: emptySegment.id,
+          levelID: currentLevel.id,
+        });
       } else if (currentLevel.items.length === 1) {
-        this.openSegment(0);
+        this.openSegment({
+          itemID: currentLevel.items[0].id,
+          levelID: currentLevel.id,
+        });
       }
     }
   }

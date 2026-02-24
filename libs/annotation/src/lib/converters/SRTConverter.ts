@@ -409,7 +409,7 @@ class SRTImporter {
       }
 
       if (counterID === 1) {
-        throw new Error("Regex without matches. Please check if the file is empty or speaker regex is invalid.")
+        throw new Error('Regex without matches. Please check if the file is empty or speaker regex is invalid.');
       }
 
       if (this.debugging) {
@@ -484,6 +484,8 @@ class SRTImporter {
                   item.sampleStart = previousItem!.sampleStart;
                   item.sampleDur += previousItem!.sampleDur;
                   parsedLevel.items.splice(i - 1, 1);
+                  i--;
+
                   item.replaceFirstLabelWithoutName(
                     'Speaker',
                     (value) => `${previousItemDetails.text !== '' ? previousItemDetails.text + ' ' : ''}${value}`,
@@ -509,7 +511,7 @@ class SRTImporter {
                 );
                 parsedLevel.items[i - 1] = this.cleanUpMultipleSpeakersInTranscript(parsedLevel.items[i - 1]);
                 parsedLevel.items.splice(i, 2);
-                i--;
+                i-=2;
               } else if (itemDetails.text !== '') {
                 if (nextItemDetails.speaker === itemDetails.speaker) {
                   // combine right with current item
@@ -517,7 +519,7 @@ class SRTImporter {
                   item.sampleDur = nextItem!.sampleStart + nextItem!.sampleDur - item.sampleStart;
                   parsedLevel.items.splice(i + 1, 1);
                   parsedLevel.items[i] = this.cleanUpMultipleSpeakersInTranscript(item);
-                  i--;
+                  i-=2;
                 }
               }
             }

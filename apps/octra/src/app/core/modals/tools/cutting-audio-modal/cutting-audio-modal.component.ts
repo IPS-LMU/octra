@@ -18,10 +18,6 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioCutter, IntArray } from '@octra/web-media';
-import {
-  fadeInExpandOnEnterAnimation,
-  fadeOutCollapseOnLeaveAnimation,
-} from 'angular-animations';
 import { strToU8, zip, zipSync } from 'fflate';
 import { interval } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
@@ -44,10 +40,6 @@ import { OctraModal } from '../../types';
   selector: 'octra-cutting-audio-modal',
   templateUrl: './cutting-audio-modal.component.html',
   styleUrls: ['./cutting-audio-modal.component.scss'],
-  animations: [
-    fadeOutCollapseOnLeaveAnimation(),
-    fadeInExpandOnEnterAnimation(),
-  ],
   imports: [
     FormsModule,
     TranslocoPipe,

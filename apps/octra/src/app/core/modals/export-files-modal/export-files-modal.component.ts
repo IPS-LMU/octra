@@ -10,10 +10,6 @@ import {
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Converter, ExportResult } from '@octra/annotation';
-import {
-  fadeInExpandOnEnterAnimation,
-  fadeOutCollapseOnLeaveAnimation,
-} from 'angular-animations';
 import { timer } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
@@ -27,10 +23,6 @@ import { OctraModal } from '../types';
   selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.scss'],
-  animations: [
-    fadeInExpandOnEnterAnimation(),
-    fadeOutCollapseOnLeaveAnimation(),
-  ],
   imports: [
     NgClass,
     NgbPopover,

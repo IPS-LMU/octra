@@ -8,10 +8,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import {
-  fadeInExpandOnEnterAnimation,
-  fadeOutCollapseOnLeaveAnimation,
-} from 'angular-animations';
 import { AppInfo } from '../../../../app.info';
 import {
   AlertService,
@@ -25,10 +21,6 @@ import { OctraModal } from '../../types';
   selector: 'octra-combine-phrases-modal',
   templateUrl: './combine-phrases-modal.component.html',
   styleUrls: ['./combine-phrases-modal.component.scss'],
-  animations: [
-    fadeOutCollapseOnLeaveAnimation(),
-    fadeInExpandOnEnterAnimation(),
-  ],
   imports: [FormsModule, NgbTooltip, TranslocoPipe, OctraUtilitiesModule],
   encapsulation: ViewEncapsulation.None,
 })

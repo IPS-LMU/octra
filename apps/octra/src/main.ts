@@ -8,7 +8,6 @@ import { importProvidersFrom, isDevMode, provideZoneChangeDetection } from '@ang
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import '@angular/localize/init';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -138,7 +137,6 @@ bootstrapApplication(AppComponent, {
       withLocalStorage(),
       withSessionStorage(),
     ),
-    provideAnimations(),
     provideRouter(APP_ROUTES, withEnabledBlockingInitialNavigation()),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),

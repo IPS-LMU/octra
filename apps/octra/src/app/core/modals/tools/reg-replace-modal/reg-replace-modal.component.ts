@@ -17,7 +17,6 @@ import { NgbActiveModal, NgbModalOptions, NgbNav, NgbNavContent, NgbNavItem, Ngb
 import { OctraAnnotationSegment } from '@octra/annotation';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { escapeHtml, escapeRegex, insertString, last } from '@octra/utilities';
-import { fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation } from 'angular-animations';
 import { timer } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { AlertService, AudioService, SettingsService } from '../../../shared/service';
@@ -28,7 +27,6 @@ import { OctraModal } from '../../types';
   selector: 'octra-reg-replace-modal',
   templateUrl: './reg-replace-modal.component.html',
   styleUrls: ['./reg-replace-modal.component.scss'],
-  animations: [fadeOutCollapseOnLeaveAnimation(), fadeInExpandOnEnterAnimation()],
   imports: [FormsModule, TranslocoPipe, OctraUtilitiesModule, NgbNavOutlet, NgbNavItem, NgbNavContent, NgbNavLinkButton, NgbNav, NgClass],
   encapsulation: ViewEncapsulation.None,
 })

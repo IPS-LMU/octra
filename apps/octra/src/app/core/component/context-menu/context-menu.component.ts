@@ -1,22 +1,10 @@
 import { NgStyle } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import {
-  fadeInOnEnterAnimation,
-  fadeOutOnLeaveAnimation,
-} from 'angular-animations';
 
 @Component({
   selector: 'octra-context-menu',
   templateUrl: './context-menu.component.html',
   styleUrls: ['./context-menu.component.scss'],
-  animations: [
-    fadeInOnEnterAnimation({
-      duration: 100,
-    }),
-    fadeOutOnLeaveAnimation({
-      duration: 100,
-    }),
-  ],
   imports: [NgStyle],
 })
 export class ContextMenuComponent {

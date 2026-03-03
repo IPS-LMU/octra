@@ -96,7 +96,6 @@ class PreparedTask extends TaskDto {
   selector: 'octra-my-tasks',
   templateUrl: './my-tasks.component.html',
   styleUrls: ['./my-tasks.component.scss'],
-  animations: [],
   imports: [
     TranslocoPipe,
     LuxonShortDateTimePipe,

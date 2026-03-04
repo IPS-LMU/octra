@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.6.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.6.0...ngx-components-1.6.1) (2026-03-04)
+
+
+### Features
+
+* **octra:** separate search and replace mode for RegReplace Modal ([05bd7e6](https://github.com/IPS-LMU/octra/commit/05bd7e6cefc2f07c04ae7022e3c6af41fef95619))
+* **octra:** users can add screenshots from the clipboard on feedback modal ([bc7ef17](https://github.com/IPS-LMU/octra/commit/bc7ef173370dc157d518c8cfbe446806c2151b22))
+
+
+
 # [1.6.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.5.0...ngx-components-1.6.0) (2026-01-28)
 
 

@@ -1,14 +1,9 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
-import {
-  NgbActiveModal,
-  NgbModalOptions,
-  NgbPopover,
-  NgbTooltip,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbCollapse, NgbModalOptions, NgbPopover, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Converter, ExportResult } from '@octra/annotation';
 import { timer } from 'rxjs';
 import { AppInfo } from '../../../app.info';
@@ -23,20 +18,15 @@ import { OctraModal } from '../types';
   selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.scss'],
-  imports: [
-    NgClass,
-    NgbPopover,
-    NgbTooltip,
-    FormsModule,
-    TableConfiguratorComponent,
-    TranslocoPipe,
-  ],
+  imports: [NgClass, NgbPopover, NgbTooltip, FormsModule, TableConfiguratorComponent, TranslocoPipe, NgbCollapse],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {
   private sanitizer = inject(DomSanitizer);
   private audio = inject(AudioService);
   annotationStoreService = inject(AnnotationStoreService);
   protected override activeModal: NgbActiveModal;
+  protected cd = inject(ChangeDetectorRef);
 
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -145,6 +135,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     if (this.tableConfigurator) {
       this.tableConfigurator.updateAllTableCells();
     }
+    this.cd.markForCheck();
   }
 
   public override close() {
@@ -165,11 +156,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onLineClick(converter: Converter, index: number) {
-    if (
-      converter.multitiers ||
-      (!converter.multitiers &&
-        this.annotationStoreService.transcript!.levels.length === 1)
-    ) {
+    if (converter.multitiers || (!converter.multitiers && this.annotationStoreService.transcript!.levels.length === 1)) {
       this.updateParentFormat(converter);
     }
     this.toggleLine(index);
@@ -193,6 +180,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         this.exportStates[index] = 'active';
       }
     }
+    this.cd.markForCheck();
   }
 
   private setParentFormatURI(url: string) {
@@ -200,6 +188,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       window.URL.revokeObjectURL(this.parentformat!.uri.toString());
     }
     this.parentformat.uri = this.sanitize(url);
+    this.cd.markForCheck();
   }
 
   onSelectionChange(converter: Converter, value: any) {
@@ -237,11 +226,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         }
 
         const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
-        const result: ExportResult = converter.export(
-          oannotjson,
-          oAudioFile,
-          levelnum,
-        );
+        const result: ExportResult = converter.export(oannotjson, oAudioFile, levelnum);
 
         if (!result.error && result.file) {
           this.parentformat.download = result.file.name;
@@ -260,6 +245,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         }
       });
     }
+    this.cd.markForCheck();
   }
 
   getProtocol() {
@@ -267,22 +253,12 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       name: 'Protocol',
       preparing: true,
     };
-    this.parentformat.download =
-      this.audio.audioManager.resource.info.name + '.json';
+    this.parentformat.download = this.audio.audioManager.resource.info.name + '.json';
 
     if (this.parentformat.uri !== undefined) {
       window.URL.revokeObjectURL(this.parentformat.uri.toString());
     }
-    const json = new File(
-      [
-        JSON.stringify(
-          this.annotationStoreService.extractUI(this.uiService.elements),
-          undefined,
-          2,
-        ),
-      ],
-      this.parentformat.download,
-    );
+    const json = new File([JSON.stringify(this.annotationStoreService.extractUI(this.uiService.elements), undefined, 2)], this.parentformat.download);
     this.setParentFormatURI(window.URL.createObjectURL(json));
     this.preparing = {
       name: 'Protocol',
@@ -319,9 +295,11 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
+    this.cd.markForCheck();
   }
 
   onPlaintextTimestampOptionChanged(converter: Converter) {
     this.updateParentFormat(converter, this.selectedLevel);
+    this.cd.markForCheck();
   }
 }

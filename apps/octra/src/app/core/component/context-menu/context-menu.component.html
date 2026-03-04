@@ -1,8 +1,8 @@
 @if (isVisible) {
   <div
     id="context-menu"
-    [@fadeInOnEnter]
-    [@fadeOutOnLeave]
+    [animate.enter]="['animate__animated', 'animate__fadeIn']"
+    [animate.leave]="['animate__animated', 'animate__fadeOut']"
     [ngStyle]="{
       'margin-left': x + 'px',
       'margin-top': y + 'px',

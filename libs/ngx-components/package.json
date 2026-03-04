@@ -25,6 +25,7 @@
     "@octra/web-media": "^2.0.0",
     "@octra/ngx-utilities": "^1.0.2",
     "@ng-bootstrap/ng-bootstrap": ">18.0.0",
+    "animate.css": "^4.1.1",
     "konva": ">=9.x <= 10.x",
     "rxjs": ">=7.5.0"
   },

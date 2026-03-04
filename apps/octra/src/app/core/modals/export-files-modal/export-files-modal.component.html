@@ -100,7 +100,10 @@
           }
           @if (converter.conversion.export) {
             @if (exportStates[i] === 'active') {
-              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+              <tr
+                [animate.enter]="['animate__animated', 'animate__fadeIn', 'animate__faster']"
+                [animate.leave]="['animate__animated', 'animate__fadeOut', 'animate__faster']"
+                [ngbCollapse]="exportStates[i] !== 'active'">
                 <td></td>
                 <td colspan="4" style="padding-left: 20px">
                   @if (
@@ -297,7 +300,10 @@
           </td>
         </tr>
         @if (tools.tableConfigurator.opened) {
-          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+          <tr
+            [animate.enter]="['animate__animated', 'animate__fadeIn', 'animate__faster']"
+            [animate.leave]="['animate__animated', 'animate__fadeOut', 'animate__faster']"
+            [ngbCollapse]="!tools.tableConfigurator.opened">
             <td></td>
             <td colspan="4" style="padding-left: 20px">
               <div class="card" style="padding: 10px">
@@ -346,7 +352,10 @@
           <td colspan="3">{{ 'export.meta data.description' | transloco }}</td>
         </tr>
         @if (preparing.name === 'Protocol') {
-          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+          <tr
+            [animate.enter]="['animate__animated', 'animate__fadeIn', 'animate__faster']"
+            [animate.leave]="['animate__animated', 'animate__fadeOut', 'animate__faster']"
+            [ngbCollapse]="preparing.name !== 'Protocol'">
             <td></td>
             <td colspan="4">
               @if (preparing.name === 'Protocol' && preparing.preparing) {

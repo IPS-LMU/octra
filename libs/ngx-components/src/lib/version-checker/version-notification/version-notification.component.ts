@@ -27,8 +27,6 @@ export class VersionNotificationComponent
   protected readonly versionCheckerService = inject(VersionCheckerService);
   protected readonly sanitizer = inject(DomSanitizer);
 
-  swingBell = false;
-
   @Input() i18n = {
     'reload now': 'Reload now',
     later: 'Later',
@@ -86,11 +84,6 @@ export class VersionNotificationComponent
   }
 
   ngOnInit() {
-    this.subscribe(interval(2000), {
-      next: () => {
-        this.swingBell = !this.swingBell;
-      },
-    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
